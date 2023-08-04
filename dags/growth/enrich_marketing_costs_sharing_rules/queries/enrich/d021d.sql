@@ -7,7 +7,7 @@ SELECT DISTINCT
          (DENSE_RANK() OVER(PARTITION BY dd.sk_date ORDER BY fhs.sk_sale_listing) +
          DENSE_RANK() OVER(PARTITION BY dd.sk_date ORDER BY fhs.sk_sale_listing DESC) - 1) AS share,
     'demand' AS funnel_side,
-    NULL AS business_context
+    CAST(NULL AS STRING) AS business_context
 FROM
     dw_public.dim_date AS dd
     JOIN dw_sale.fact_listing_status AS fhs

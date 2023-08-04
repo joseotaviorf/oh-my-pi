@@ -138,7 +138,7 @@ SELECT
         / NULLIF(SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date), 0)
   END AS share,
   'demand' AS funnel_side,
-  NULL AS business_context
+  CAST(NULL AS STRING) AS business_context
 FROM
 grouped_tenant_prospects AS tp
 FULL OUTER JOIN date_region AS dr

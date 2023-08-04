@@ -66,7 +66,7 @@ SELECT DISTINCT
 	drj.city_group,
 	COALESCE(pws.share, 0) AS share,
 	'partners' AS funnel_side,
-	NULL AS business_context
+	CAST(NULL AS STRING) AS business_context
 FROM
 	date_region_cross_join AS drj
 INNER JOIN

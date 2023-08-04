@@ -112,7 +112,7 @@ SELECT
 	tp.city_group,
 	FLOAT(COUNT(DISTINCT tp.sk_client)/NULLIF(SUM(COUNT(DISTINCT tp.sk_client)) OVER(PARTITION BY adt.id_date), 0)) AS share,
 	'demand' AS funnel_side,
-	NULL AS business_context
+	CAST(NULL AS STRING) AS business_context
 FROM
 	tenant_prospects AS tp
 INNER JOIN

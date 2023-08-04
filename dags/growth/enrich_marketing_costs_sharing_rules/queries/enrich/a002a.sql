@@ -26,7 +26,7 @@ SELECT
     drc.city_group,
     COALESCE(mbs.share,0) AS share,
     'affiliates' AS funnel_side,
-    NULL AS business_context
+    CAST(NULL AS STRING) AS business_context
 FROM
     date_region_cross_join AS drc
 INNER JOIN

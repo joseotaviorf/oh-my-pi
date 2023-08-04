@@ -13,7 +13,7 @@ SELECT DISTINCT
 		ELSE 0
 	END AS share,
 	'social' AS funnel_side,
-	NULL AS business_context
+	CAST(NULL AS STRING) AS business_context
 FROM
 	datalake_quintoandar.aux_date AS ad
 INNER JOIN

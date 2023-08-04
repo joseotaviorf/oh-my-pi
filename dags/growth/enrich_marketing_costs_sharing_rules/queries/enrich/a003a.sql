@@ -70,7 +70,7 @@ SELECT
     d.city_group,
     coalesce(s.share,0) AS share,
     'affiliates' AS funnel_side,
-    NULL AS business_context
+    CAST(NULL AS STRING) AS business_context
 FROM
     dim_distinct d
     JOIN share s
