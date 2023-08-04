@@ -20,9 +20,6 @@ column_level_validations:
   highest_funnel_step_achieved_last_90_days:
     is_complete:
       severity_level: Error
-  days_as_published:
-    is_complete:
-      severity_level: Error
   tier:
     is_complete:
       severity_level: Error
