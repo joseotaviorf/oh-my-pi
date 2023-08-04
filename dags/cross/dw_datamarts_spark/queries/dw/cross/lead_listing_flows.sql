@@ -43,7 +43,6 @@ WITH fact_house_listing_flows_adjust AS (
         END AS mkt_origin,
         dhl.ts_house_first_publication,
         FROM_UTC_TIMESTAMP(dhl.ts_house_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
-		hl.country_code,
         CASE
             WHEN om.sales_company IS NOT NULL
                 THEN om.sales_company
@@ -153,8 +152,7 @@ source_ops_rent AS (
         hlf.funnel_drop_reason,
         pj.sk_first_photo_job_date,
         pj.ts_first_job_scheduled,
-        FROM_UTC_TIMESTAMP(pj.ts_first_job_scheduled,'Brazil/East') AS ts_first_job_scheduled_br_tz,
-        hlf.country_code
+        FROM_UTC_TIMESTAMP(pj.ts_first_job_scheduled,'Brazil/East') AS ts_first_job_scheduled_br_tz
     FROM
         fact_house_listing_flows_adjust AS hlf
         LEFT JOIN
@@ -377,8 +375,7 @@ fact_sale AS (
         ssf.has_fup_photo_task,
         ssf.sk_user_lead_affiliate,
         'Sale' AS origin_table,
-        sor.rental_administrator,
-        NULL AS country_code
+        sor.rental_administrator
     FROM
         sale_fact_listing_flows_adjust AS ssf
     JOIN
@@ -436,8 +433,7 @@ fact_rent AS (
         hlf.has_fup_photo_task,
         hlf.sk_user_lead_affiliate,
         'Rent' AS origin_table,
-        hlf.rental_administrator,
-        hlf.country_code
+        hlf.rental_administrator
     FROM
         fact_house_listing_flows_adjust AS hlf
     JOIN
@@ -456,62 +452,64 @@ union_all AS (
         fact_sale
 )
 SELECT
-    sk_house_listing_flow,
-    sk_lead,
-    CAST(LEFT(sk_house_listing,9) AS BIGINT) AS sk_house,
-    sk_house_listing,
-    sk_region,
-    sk_lead_date,
-    sk_first_contact_date,
-    sk_prospect_date,
-    sk_qualified_date,
-    sk_available_qualified_date,
-    sk_opportunity_date,
-    sk_first_listing_date,
-    sk_conversion_date,
-    sk_discard_date,
-    sk_first_photojob_date_fact_photo_job,
-    sk_user_lead_affiliate,
-    country_code,
-    context_lead,
-    context_prospect,
-    context_qualified,
-    context_available_qualified,
-    context_opportunity,
-    context_first_listing,
-    mkt_origin,
-    mkt_completion,
-    mkt_channel,
-    mkt_source,
-    mkt_medium,
-    affiliate_mkt_origin,
-    affiliate_mkt_channel,
-    affiliate_mkt_medium,
-    affiliate_mkt_source,
-    sales_company,
-    sourcing_ops,
-    lead_origin,
-    funnel_drop_reason,
-    lead_context_origin,
-    origin_table,
-    rental_administrator,
-    ROW_NUMBER() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_rn_prospect, -- column to help differentiate the prospect with equal dates
-    DENSE_RANK() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_order_prospect,
-    ROW_NUMBER() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_rn_qualified, -- column to help differentiate the qualified with equal dates
-    DENSE_RANK() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_order_qualified,
-    ROW_NUMBER() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_available_qualified_date,-1)) AS aux_rn_available_qualified, -- column to help differentiate the available qualified with equal dates
-    DENSE_RANK() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_available_qualified_date,-1)) AS aux_order_available_qualified,
-    MIN(NULLIF(sk_prospect_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_prospect_date,
-    MAX(NULLIF(sk_prospect_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_prospect_date,
-    MIN(NULLIF(sk_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_qualified_date,
-    MAX(NULLIF(sk_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_qualified_date,
-    MIN(NULLIF(sk_available_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_available_qualified_date,
-    MAX(NULLIF(sk_available_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_available_qualified_date,
-    has_isales_intervention,
-    has_fup_photo_task,
-    ts_first_job_scheduled,
-    ts_first_job_scheduled_br_tz,
-    ts_first_publication,
-    ts_house_first_publication_br_tz
+    ua.sk_house_listing_flow,
+    ua.sk_lead,
+    CAST(LEFT(ua.sk_house_listing,9) AS BIGINT) AS sk_house,
+    ua.sk_house_listing,
+    ua.sk_region,
+    ua.sk_lead_date,
+    ua.sk_first_contact_date,
+    ua.sk_prospect_date,
+    ua.sk_qualified_date,
+    ua.sk_available_qualified_date,
+    ua.sk_opportunity_date,
+    ua.sk_first_listing_date,
+    ua.sk_conversion_date,
+    ua.sk_discard_date,
+    ua.sk_first_photojob_date_fact_photo_job,
+    ua.sk_user_lead_affiliate,
+    dr.country_code,
+    ua.context_lead,
+    ua.context_prospect,
+    ua.context_qualified,
+    ua.context_available_qualified,
+    ua.context_opportunity,
+    ua.context_first_listing,
+    ua.mkt_origin,
+    ua.mkt_completion,
+    ua.mkt_channel,
+    ua.mkt_source,
+    ua.mkt_medium,
+    ua.affiliate_mkt_origin,
+    ua.affiliate_mkt_channel,
+    ua.affiliate_mkt_medium,
+    ua.affiliate_mkt_source,
+    ua.sales_company,
+    ua.sourcing_ops,
+    ua.lead_origin,
+    ua.funnel_drop_reason,
+    ua.lead_context_origin,
+    ua.origin_table,
+    ua.rental_administrator,
+    ROW_NUMBER() OVER(PARTITION BY ua.sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_rn_prospect, -- column to help differentiate the prospect with equal dates
+    DENSE_RANK() OVER(PARTITION BY ua.sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_order_prospect,
+    ROW_NUMBER() OVER(PARTITION BY ua.sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_rn_qualified, -- column to help differentiate the qualified with equal dates
+    DENSE_RANK() OVER(PARTITION BY ua.sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_order_qualified,
+    ROW_NUMBER() OVER(PARTITION BY ua.sk_house_listing_flow ORDER BY NULLIF(sk_available_qualified_date,-1)) AS aux_rn_available_qualified, -- column to help differentiate the available qualified with equal dates
+    DENSE_RANK() OVER(PARTITION BY ua.sk_house_listing_flow ORDER BY NULLIF(sk_available_qualified_date,-1)) AS aux_order_available_qualified,
+    MIN(NULLIF(ua.sk_prospect_date,-1)) OVER(PARTITION BY ua.sk_house_listing_flow) AS first_prospect_date,
+    MAX(NULLIF(ua.sk_prospect_date,-1)) OVER(PARTITION BY ua.sk_house_listing_flow) AS last_prospect_date,
+    MIN(NULLIF(ua.sk_qualified_date,-1)) OVER(PARTITION BY ua.sk_house_listing_flow) AS first_qualified_date,
+    MAX(NULLIF(ua.sk_qualified_date,-1)) OVER(PARTITION BY ua.sk_house_listing_flow) AS last_qualified_date,
+    MIN(NULLIF(ua.sk_available_qualified_date,-1)) OVER(PARTITION BY ua.sk_house_listing_flow) AS first_available_qualified_date,
+    MAX(NULLIF(ua.sk_available_qualified_date,-1)) OVER(PARTITION BY ua.sk_house_listing_flow) AS last_available_qualified_date,
+    ua.has_isales_intervention,
+    ua.has_fup_photo_task,
+    ua.ts_first_job_scheduled,
+    ua.ts_first_job_scheduled_br_tz,
+    ua.ts_first_publication,
+    ua.ts_house_first_publication_br_tz
 FROM
-    union_all
+    union_all ua
+    LEFT JOIN dw_public.dim_region dr
+        ON ua.sk_region = dr.sk_region
