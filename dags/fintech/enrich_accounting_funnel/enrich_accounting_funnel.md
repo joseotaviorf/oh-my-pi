@@ -18,5 +18,6 @@ Produces the following output tables, via full load:
 - `accounts_payable`
 - `invoice_all`
 - `accounting_entries_retsuko`
+- `erp_gateway_stages_status`
 
 ​</details>

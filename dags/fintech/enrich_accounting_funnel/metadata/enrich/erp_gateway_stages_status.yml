@@ -1,0 +1,55 @@
+---
+database_name: datalake_accounting_funnel
+table_name: erp_gateway_stages_status
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table brings all ERP Gateway stages and their respetive statuses"
+columns:
+  id_feature:
+    lineage:
+      - datalake_sap_gateway.feature.id_feature
+    description: "This ID is the key to join with accounting_entries_retsuko."
+  hash:
+    lineage:
+      - datalake_sap_gateway.sync_sap_job.hash
+    description: "This hash is the key to join with SAP. ERP Gateway create this hash when a job is created."
+  id_source:
+    lineage:
+      - datalake_sap_gateway.feature.id_source
+    description: "This field is one of the inputs that products send to ERP Gateway to identification"
+  id_finance_entity:
+    lineage:
+      - datalake_sap_gateway.feature.id_finance_entity
+    description: "This field is the other input that products send to ERP Gateway to identification"
+  id_sync_sap_job:
+    lineage:
+      - datalake_sap_gateway.sync_sap_job.id_sync_sap_job
+    description: "ID that "
+  feature_source:
+    lineage:
+      - datalake_sap_gateway.feature.source
+    description: "Indicates the product and trigger that called ERP Gateway"
+  sync_sap_job_type:
+    lineage:
+      - datalake_sap_gateway.sync_sap_job.type
+    description: "Indicates the sync type: LCM or NF"
+  sync_sap_status:
+    lineage:
+      - datalake_sap_gateway.feature.sync_sap_status
+    description: "This fields indicates the first stage status: sync sap job creation"
+  sync_sap_job_status:
+    lineage:
+      - datalake_sap_gateway.sync_sap_job.status
+    description: "This fields indicates the second - and last - stage. The sync status between ERP Gatway and SAP"
+  dt_feature_created:
+    lineage:
+      - datalake_sap_gateway.feature.ts_created
+    description: "Feature creation date. It's when the product called - with success - ERP Gateway"
+  dt_sync_sap_job_created:
+    lineage:
+      - datalake_sap_gateway.sync_sap_job.ts_created
+    description: "This date indicates when ERP Gateway, after receive the feature, succeeds in create a job to sync"
+  dt_sync_sap_job_synced:
+    lineage:
+      - datalake_sap_gateway.sync_sap_job.ts_synced
+    description: "When the sync between ERP Gateway and SAP succeeds"
