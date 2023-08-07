@@ -105,11 +105,6 @@ columns:
         'If the booking is for a inspection'
       VistoriaQuarteirizada: >
         'If the booking is for a quartered inspection'
-  confirmed:
-    lineage:
-    - datalake_booking.booking.is_visit_completed
-    description: >
-      Boolean column indicating if he visit was completed by the visitor. The confirmation event is not registered yet.
   performed:
     lineage:
     - datalake_booking.booking.is_visit_performed
@@ -120,27 +115,6 @@ columns:
     - datalake_booking.booking.is_closed
     description: >
       "[Deprecated] This column is not used anymore."
-  is_rescheduled:
-    lineage:
-    - datalake_booking.booking.has_reschedule
-    description: >
-      Boolean column indicating if the visit has been rescheduled. True if it was cancelled to be reschedule.
-  flg_via_reschedule:
-    lineage:
-    - datalake_booking.booking.is_via_reschedule
-    description: >
-      Boolean column indicating if the visit has been rescheduled. True when this booking came from another booking as a reschedule.
-  is_first_booking_auto:
-    lineage:
-    - datalake_booking.booking.is_first_booking_auto
-    description: >
-      Boolean column indicating if the booking was originally created through planner (program that allocates 5A personnel to inspections and jobs). True if the visit originated via planner flow.
-  flg_branded:
-    lineage:
-    - datalake_amplitude_visit.amplitude_visit.is_branded
-    - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
-    description: > 
-      Boolean column indicating if the booking came from a branded campaign, defined by the lead taxonomy. True if we identify if it did.
   visitor_arrived:
     lineage:
     - datalake_booking.booking.has_tenant_attended
@@ -161,16 +135,6 @@ columns:
     - datalake_booking.booking.is_entrance_successful
     description: >
       Boolean column indicating if the owner appeared at the visit. True if is possible.
-  is_visit_created_from_app:
-    lineage:
-    - datalake_booking.booking.is_visit_created_from_app
-    description: >
-      Boolean column that indicates if the visit was created in the application. True if it was.
-  is_visit_last_updated_from_app:
-    lineage:
-    - datalake_booking.booking.is_visit_last_updated_from_app
-    description: >
-      Boolean column indicating whether the last update of visit information was done via the app. True if it was.
   visit_follow_up:
     lineage:
     - datalake_booking.booking.visit_fup
@@ -752,6 +716,42 @@ columns:
       Other: ''
       Web Desktop: ''
       Web Mobile: ''
+  flg_via_reschedule:
+    lineage:
+    - datalake_booking.booking.is_via_reschedule
+    description: >
+      Boolean column indicating if the visit has been rescheduled. True when this booking came from another booking as a reschedule.
+  flg_branded:
+    lineage:
+    - datalake_amplitude_visit.amplitude_visit.is_branded
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
+    description: > 
+      Boolean column indicating if the booking came from a branded campaign, defined by the lead taxonomy. True if we identify if it did.
+  is_visit_completed:
+    lineage:
+    - datalake_booking.booking.is_visit_completed
+    description: >
+      Boolean column indicating if he visit was completed by the visitor. The confirmation event is not registered yet.
+  is_rescheduled:
+    lineage:
+    - datalake_booking.booking.has_reschedule
+    description: >
+      Boolean column indicating if the visit has been rescheduled. True if it was cancelled to be reschedule.
+  is_first_booking_auto:
+    lineage:
+    - datalake_booking.booking.is_first_booking_auto
+    description: >
+      Boolean column indicating if the booking was originally created through planner (program that allocates 5A personnel to inspections and jobs). True if the visit originated via planner flow.
+  is_visit_created_from_app:
+    lineage:
+    - datalake_booking.booking.is_visit_created_from_app
+    description: >
+      Boolean column that indicates if the visit was created in the application. True if it was.
+  is_visit_last_updated_from_app:
+    lineage:
+    - datalake_booking.booking.is_visit_last_updated_from_app
+    description: >
+      Boolean column indicating whether the last update of visit information was done via the app. True if it was.
   is_3p_supply:
     lineage:
     - datalake_booking.booking.is_3p_supply
