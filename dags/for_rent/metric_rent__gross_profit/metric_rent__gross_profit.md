@@ -1,8 +1,9 @@
-## Metric Rent Tickets
+## Metric Rent Gross Profit
 
 ### Purpose
 
-The listings domain follows the volume of tickets received.
+Rental gross profit metrics.
+It contains the metrics of rental revenues and its taxes to calculate the net revenue.
 
 ### Execution Interval
 
@@ -12,4 +13,4 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output tables in the metric layer:
 
-- `total_tickets`
+- `gross_sales_tax`

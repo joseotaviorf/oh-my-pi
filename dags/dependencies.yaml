@@ -2307,6 +2307,8 @@ bietlejuice.metric_rent__contracts:
 bietlejuice.metric_rent__demand_events:
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-cohort-conversions-snapshot
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
+bietlejuice.metric_rent__gross_profit:
+  - bietlejuice.enrich_sap:load-enrich-ledger
 bietlejuice.metric_rent__listings:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status

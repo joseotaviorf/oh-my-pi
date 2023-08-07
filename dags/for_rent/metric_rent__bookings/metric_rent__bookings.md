@@ -10,7 +10,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Currently, there is the following output table for both our raw and clean layers:
+Currently, there is the following output tables in the metric layer
 
 - `bookeds_daily`
 - `bookeds_daily_by_sk_region`

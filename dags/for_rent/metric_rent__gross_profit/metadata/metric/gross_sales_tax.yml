@@ -1,0 +1,29 @@
+---
+database_name: metric_rent
+table_name: gross_sales_tax
+description: Monthly table that contains the aggregated value of Rental Gross Sales Tax segmented by cost center.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  cost_center_code:
+    lineage:
+      - datalake_pas.ledger.cost_center_code
+    description: Date when users scheduled a booking.
+    dimension: True
+  accrual_year_month:
+    lineage:
+      - datalake_pas.ledger.dt_reference
+    description: SAP transaction's date of competence (YYYYMM).
+    dimension: True
+  gross_sales_tax:
+    description: Revenue of Rental Gross Sales Tax from SAP source.
+    metric:
+      name: Gross Sales Taxes
+      description: Revenue of Rental Gross Sales Tax from SAP source.
+        It's the sum of debit_credit column filtered by specifics account_number and cost_center_code that starts with R (rental)
+      acronym: GST
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analisys
+      approved_by: guilherme.rodrigues@quintoandar.com.br
+      link_to_metric: ''
