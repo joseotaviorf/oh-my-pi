@@ -4,7 +4,8 @@ select
         when repo = "wonka" then "feature_sets"
         when substr(database, -4) = "_raw" then "raw"
         when substr(database, -6) = "_clean" then "clean"
-        when substr(database, 1, 10) = "dw_staging" then "dw_staging"
+        when substr(database, 1, 3) = "dw_" and substr(database, -8) = "_staging" then "dw_staging"
+        when substr(database, 1, 7) = "metric_" then "metric"
         else "enrich"
     end as layer,
     database,
