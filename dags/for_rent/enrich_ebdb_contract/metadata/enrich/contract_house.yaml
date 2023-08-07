@@ -1,30 +1,43 @@
 database_name: datalake_ebdb_contract
 table_name: contract_house
+description: Information related to ForRent contracts. Each line is an unique contract
+  with the information about the client, owner and listing related to such contract.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id_client:
     lineage:
       - datalake_ebdb_clean.contract.id_user
+    description: Id of the client.
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract.id
+    description: Id of the contract.
   id_owner:
     lineage:
       - datalake_ebdb_listing.house.id_user
+    description: Id of the house's owner.
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
+    description: Id of the house listing.
   id_house:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house
+    description: Id of the house.
   country_code:
     lineage:
       - datalake_ebdb_listing.house_listing.country_code
+    description: Country code of the house.
   version:
     lineage:
       - datalake_ebdb_listing.house_listing.version
+    description: Listing version related to the contract.
   dt_listing_version_start:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_listing_version_start
+    description: Timestamp when the listing version started.
   dt_listing_version_end:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_listing_version_end
+    description: Timestamp when the listing version ended.
