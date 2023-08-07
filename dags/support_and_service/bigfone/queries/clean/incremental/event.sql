@@ -12,5 +12,6 @@ SELECT
 FROM
     datalake_bigfone_raw.event
 WHERE
-    event_timestamp >= DATE('{year}-{month}-{day}')
-    AND event_timestamp < DATE_ADD(DATE('{year}-{month}-{day}'),1)
+    year = {year}
+    AND month = {month}
+    AND day = {day}
