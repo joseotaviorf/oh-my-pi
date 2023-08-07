@@ -1,27 +1,40 @@
 database_name: datalake_ebdb_smart_price
 table_name: smart_price_versioning
+description: Information about smart price status for each listing.
+  Each row represents a listing and a dynamic price id with its corresponding status and
+  timestamps of start and finish.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id_smart_price:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
+    description: ID of the smart price. Concatenation of listing ID and the smart price version.
   id_house_listing:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
+    description: ID of the listing.
   id_house:
     lineage:
       - datalake_ebdb_clean.dynamic_pricing_house_aud.id_house
+    description: ID of the house.
   id_dynamic_pricing:
     lineage:
       - datalake_ebdb_clean.dynamic_pricing_house_aud.id
+    description: ID of the dynamic pricing.
   rev_dynamic_pricing_house_aud:
     lineage:
       - datalake_ebdb_clean.dynamic_pricing_house_aud.rev
+    description: ID of the dynamic pricing revision (as found in dynamic_pricing_house_aud).
   id_dynamic_pricing_parameter:
     lineage:
       - datalake_ebdb_clean.dynamic_pricing_house_aud.id_dynamic_pricing_parameter
+    description: ID of the dynamic pricing parameter (as found in dynamic_pricing_parameters).
   status:
     lineage:
       - datalake_ebdb_clean.dynamic_pricing_house_aud.status
+    description: Status of the dynamic pricing.
   ts_start_status:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the dynamic pricing started.
