@@ -317,7 +317,7 @@ creating_disclaimer AS (
     days_as_published AS days_as_published_at_start,
     max_days_as_published AS days_as_published_at_end,
     tier,
-    CASE tier 
+    CASE 
       WHEN days_as_published > 90 AND vbs_last_15_days >= 3 THEN 'The listing has had at least 3 visits booked in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND vcs_last_15_days >= 2 THEN 'The listing has had at least 2 visits completed in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND oss_last_15_days >= 1 THEN 'The listing has had at least 1 offer submitted in the past 15 days and has been listed for ' || max_days_as_published || ' days.' 
