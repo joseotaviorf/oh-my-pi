@@ -2,6 +2,7 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
+from pyspark.sql.utils import AnalysisException
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -19,7 +20,7 @@ JOB_NAME = "load_batch_inference_into_datalake"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-if __name__ == "__main__":
+def main():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
@@ -69,10 +70,21 @@ if __name__ == "__main__":
 
     dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d")
 
-    df = s3_consumer.get_data_from_file(
-        f"{source_root_path}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
-        format
-    )
+    try:
+        df = s3_consumer.get_data_from_file(
+            f"{source_root_path}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
+            format
+        )
+    except AnalysisException as e:
+        logger.info(
+            f"""
+            m=__main__, msg=No data found for date_to_ingest={date_to_ingest}, source={source},
+            source_root_path={source_root_path}, table_name={table_name}.
+
+            Exception: {e}
+            """
+        )
+        return
 
     df = (
         SparkDataFrameService()
@@ -101,3 +113,6 @@ if __name__ == "__main__":
         table_name=table_name,
         partition_cols=raw_partition_cols,
     )
+
+if __name__ == "__main__":
+    main()
