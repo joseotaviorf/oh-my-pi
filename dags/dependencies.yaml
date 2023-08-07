@@ -1378,6 +1378,9 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity
+bietlejuice.enrich_hub_services:
+  - bietlejuice.hub_services:load-clean-business-unit
+  - bietlejuice.hub_services:load-clean-business-unit-region-aud
 bietlejuice.enrich_hubspot:
   - bietlejuice.company:load-clean-company
   - bietlejuice.ebdb:load-clean-house-listing-relation

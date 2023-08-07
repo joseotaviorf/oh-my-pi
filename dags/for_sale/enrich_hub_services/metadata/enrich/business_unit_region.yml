@@ -1,0 +1,39 @@
+---
+database_name: datalake_hub_services
+table_name: business_unit_region
+description: Table with the BU information and its coverage periods on each region.
+domain: For Sale
+owner: herivelto.junior@quintoandar.com.br
+columns:
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region_aud.id_business_unit
+    description: Business Unit ID.
+  id_region:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region_aud.id_region
+    description: 5A Region ID that this BU is attending.
+  hub_name:
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
+    description: Last BU name. So if this BU had a different name in the past it won't be considered.
+  business_model:
+    lineage:
+      - datalake_hub_services_clean.business_unit.sdr_type
+    description: BU business model.
+  lead_types:
+    lineage:
+      - datalake_hub_services_clean.business_unit.lead_types
+    description: Lead types that this BU works with.
+  negotiation_type:
+    lineage:
+      - datalake_hub_services_clean.business_unit.negotiation_type
+    description: BU negotiation type.
+  ts_start_coverage:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region_aud.ts_created
+    description: Timestamp indicating when this BU started attending this region.
+  ts_end_coverage:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region_aud.ts_created
+    description: Timestamp indicating when this BU stopped attending this region.
