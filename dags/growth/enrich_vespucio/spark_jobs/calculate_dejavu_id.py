@@ -109,8 +109,8 @@ def _make_api_request(api_keys, input):
                     input["id_address"],
                     input["input_address"],
                     best_geocode_match["formatted_address"],
-                    best_geocode_match["geometry"]["location"]["lat"],
-                    best_geocode_match["geometry"]["location"]["lng"],
+                    float(best_geocode_match["geometry"]["location"]["lat"]),
+                    float(best_geocode_match["geometry"]["location"]["lng"]),
                     datetime.now()
                 )
             ) 
