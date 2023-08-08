@@ -1,63 +1,5 @@
- WITH historical_zendesk_chat AS (
-    SELECT DISTINCT
-        c.*
-    FROM
-        historical_datalake_zendesk_clean.chats AS c
-    LEFT JOIN
-        datalake_zendesk_tickets_clean.tickets AS t
-            ON t.id_ticket = c.id_ticket
-    WHERE
-        t.id_ticket IS NULL
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY c.id_ticket ORDER BY c.ts_updated DESC) = 1
-),
-sale_offers_keys AS (
-    WITH custom_fields_exploded AS (
-        SELECT
-            id_ticket,
-            EXPLODE(custom_fields)
-        FROM
-            datalake_zendesk_custom_fields.custom_fields
-    )
+WITH zendesk_tickets AS (
     SELECT
-        cfe.id_ticket,
-        so.id_offer
-    FROM
-        custom_fields_exploded AS cfe
-    JOIN
-        datalake_sale_offer_flows.sale_offer_flows AS so
-            ON cfe.value = so.id_offer
-),
-union_historical_chat_with_zendesk AS (
-    SELECT DISTINCT
-        c.id_ticket,
-        NULL AS id_assignee,
-        CONCAT("Chat with ", GET_JSON_OBJECT(c.visitor, "$.name")) AS subject,
-        c.session AS description,
-        "zendesk_chat" AS ticket_via,
-        "chat" AS channel,
-        c.department_name,
-        NULL AS priority,
-        NULL AS recipient,
-        c.tags,
-        "closed" AS status,
-        NULL AS ticket_type,
-        c.id_department AS id_group,
-        NULL AS has_public_comments,
-        c.rating AS score,
-        NULL AS reason,
-        c.comment,
-        c.ts_created,
-        FROM_UTC_TIMESTAMP(c.ts_created, 'Brazil/East') AS ts_created_local,
-        c.ts_updated,
-        FROM_UTC_TIMESTAMP(c.ts_updated, 'Brazil/East') AS ts_updated_local,
-        YEAR(c.ts_updated) AS year,
-        MONTH(c.ts_updated) AS month,
-        DAY(c.ts_updated) AS day
-    FROM
-        historical_zendesk_chat AS c
-    UNION ALL
-    SELECT DISTINCT
         t.id_ticket,
         t.id_assignee,
         t.subject,
@@ -73,7 +15,6 @@ union_historical_chat_with_zendesk AS (
             WHEN t.ticket_via IN ('web', 'email', 'chat', 'whatsapp') THEN t.ticket_via
             ELSE 'other'
         END AS channel,
-        NULL AS department_name,
         t.priority,
         t.recipient,
         t.tags,
@@ -99,28 +40,54 @@ union_historical_chat_with_zendesk AS (
             t.ticket_via = 'api'
             AND t.tags NOT LIKE '%hsm%'
         )
+        AND DATE(t.ts_created) >= "2020-01-01"
 ),
 agents_control AS (
-  SELECT
-    LOWER(email) AS email,
-    agent_name,
-    manager,
-    agent_company,
-    CASE
-        WHEN LOWER(agent_company) = "atento" OR LOWER(email) LIKE "%atento%" THEN "ATENTO"
-        ELSE NULL
-    END AS agent_organization,
-    dt_start
-  FROM
-    datalake_gsheets_clean.agents_control
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY email ORDER BY dt_start DESC) = 1
+    SELECT
+        t.id_ticket,
+        -- 5124274148 is bot id
+        CASE
+            WHEN t.id_assignee = "5124274148" THEN COALESCE(a.id_agent, 5124274148)
+            ELSE t.id_assignee
+        END AS id_agent,
+        a.email,
+        a.name,
+        a.phone,
+        a.organization,
+        a.ts_created,
+        a.ts_updated
+    FROM
+        datalake_zendesk_tickets_clean.tickets AS t
+    LEFT JOIN
+        datalake_zendesk_custom_fields.custom_fields AS cf
+            ON t.id_ticket = cf.id_ticket
+    LEFT JOIN
+        datalake_zendesk_users.agents AS a
+            ON cf.custom_fields['[AUTO] Email do Agente'] = a.email
+),
+custom_fields_exploded AS (
+    SELECT
+        id_ticket,
+        EXPLODE(custom_fields)
+    FROM
+        datalake_zendesk_custom_fields.custom_fields
+),
+sale_offers_keys AS (
+    SELECT
+        cfe.id_ticket,
+        so.id_offer
+    FROM
+        custom_fields_exploded AS cfe
+    JOIN
+        datalake_sale_offer_flows.sale_offer_flows AS so
+            ON cfe.value = so.id_offer
 )
-SELECT DISTINCT
+SELECT
     t.id_ticket,
     sok.id_offer AS id_sale_offer,
     cf.custom_fields['[AQ] ID do Job '] AS id_job,
     cf.custom_fields['Ticket Problema ID'] AS id_problem_ticket,
+    ac.id_agent,
     t.subject,
     t.description,
     t.ticket_via,
@@ -137,10 +104,10 @@ SELECT DISTINCT
     t.comment,
     TO_JSON(cf.custom_fields) AS custom_fields,
     cf.custom_fields['Tipo de Solicitação'] AS request_type,
-    CASE
-        WHEN LOWER(ac.agent_company) = "atento" OR LOWER(ac.email) LIKE "%@atento%" THEN "ATENTO"
-        ELSE NULL
-    END AS agent_organization,
+    ac.name AS agent_name,
+    ac.email AS agent_email,
+    ac.phone AS agent_phone,
+    ac.organization AS agent_organization,
     COALESCE(
         cf.custom_fields['Tipo de Cliente'],
         REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço'),
@@ -166,6 +133,7 @@ SELECT DISTINCT
         cf.custom_fields['[PAY] Tipo de Solicitação'],
         cf.custom_fields['Tema do DM']
     ) AS contact_theme_tag,
+    ac.ts_created AS ts_agent_started,
     t.ts_created,
     t.ts_created_local,
     t.ts_updated,
@@ -174,7 +142,7 @@ SELECT DISTINCT
     t.month,
     t.day
 FROM
-    union_historical_chat_with_zendesk AS t
+    zendesk_tickets AS t
 LEFT JOIN
     datalake_zendesk_tickets_clean.groups AS g
         ON t.id_group = g.id_group
@@ -186,4 +154,6 @@ LEFT JOIN
         ON t.id_ticket = sok.id_ticket
 LEFT JOIN
     agents_control AS ac
-        ON ac.email = cf.custom_fields['[AUTO] Email do Agente']
+        ON t.id_ticket = ac.id_ticket
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1
