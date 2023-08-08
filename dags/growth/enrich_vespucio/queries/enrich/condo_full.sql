@@ -10,17 +10,28 @@ importance_order AS (
   UNION ALL
   SELECT 'Zelador' AS type, 5 AS order
 ),
-phones_mode AS (
+phones_frequency AS (
   SELECT
-    cc.id_condo,
-    cc.type,
-    o.order,
-    MODE(cc.phone_number) AS phone_number
+    id_condo,
+    type,
+    phone_number,
+    COUNT(0) AS cnt
   FROM
-    datalake_ebdb_clean.condo_contact cc
-    JOIN importance_order o
-      ON cc.type = o.type
+    datalake_ebdb_clean.condo_contact
   GROUP BY 1,2,3
+),
+phones_dedup AS (
+  SELECT
+    pf.id_condo,
+    pf.type,
+    io.order,
+    phone_number
+  FROM
+    phones_frequency pf
+    JOIN importance_order io
+      ON pf.type = io.type
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY pf.id_condo,pf.type ORDER BY cnt DESC) = 1
   ORDER BY order
 ),
 phones_set AS (
@@ -28,7 +39,7 @@ phones_set AS (
     id_condo,
     ARRAY_AGG(phone_number) phone_array
   FROM 
-    phones_mode
+    phones_dedup
   GROUP BY 1
 ),
 condo_ebdb AS (
