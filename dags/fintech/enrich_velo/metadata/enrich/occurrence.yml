@@ -52,7 +52,11 @@ columns:
   is_legacy:
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   dt_due:
-    description: Date that occurrence is/was due.
+    description: Date that occurrence is/was due, according to 3.0 rules.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_due
+  dt_due_legacy:
+    description: Date that occurrence is/was due, according to 2.0 rules.
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.dt_due
   ts_paid:

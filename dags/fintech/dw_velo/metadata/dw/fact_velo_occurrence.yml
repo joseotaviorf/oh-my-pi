@@ -58,9 +58,13 @@ columns:
     lineage:
       - datalake_velo.occurrence.is_legacy
   dt_due:
-    description: Date that occurrence is/was due.
+    description: Date that occurrence is/was due, according to 3.0 rules.
     lineage:
       - datalake_velo.occurrence.dt_due
+  dt_due_legacy:
+    description: Date that occurrence is/was due, according to 2.0 rules.
+    lineage:
+      - datalake_velo.occurrence.dt_due_legacy
   ts_paid:
     description: Timestamp that occurrence invoice was paid, if existent.
     lineage:

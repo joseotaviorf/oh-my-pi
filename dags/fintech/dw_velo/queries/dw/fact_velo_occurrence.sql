@@ -12,6 +12,7 @@ SELECT
     paid_amount,
     is_valid,
     dt_due,
+    dt_due_legacy,
     ts_paid,
     ts_created,
     is_legacy,
