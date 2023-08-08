@@ -1,6 +1,6 @@
 custom_cluster:
-  driver_node_type_id: r5d.2xlarge
-  node_type_id: r5d.2xlarge
+  driver_node_type_id: c5d.4xlarge
+  node_type_id: c6id.4xlarge
   num_workers: 3
   aws_attributes:
     ebs_volume_size: 300
