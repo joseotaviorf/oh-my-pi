@@ -24,12 +24,6 @@ external_s3_bucket: 5a-vespucio-prod
 tables_to_reverse: ["condo"]
 addresses_s2_geometry_mapping_table: dejavu
 table_task_group_parameters:
-  condo_incremental:
-    partition_cols:
-      - year
-      - month
-      - day
-    is_incremental: True
   condo_full:
     partition_cols:
       - year

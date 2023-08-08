@@ -230,7 +230,7 @@ bypass_task = DummyOperator(
 condo_enrich_task_group = enrich_task_groups.pop('condo')
 
 INNER_DEPENDENCIES = {
-    "condo_full": ["condo_incremental"]
+
 }
 
 (

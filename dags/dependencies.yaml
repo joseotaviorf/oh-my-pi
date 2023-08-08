@@ -2252,7 +2252,6 @@ bietlejuice.enrich_velo_omie:
   - bietlejuice.velo_omie:load-clean-cash-flows
 bietlejuice.enrich_vespucio:
   - bietlejuice.ebdb:load-clean-condo
-  - bietlejuice.ebdb:load-clean-condo-amenities
   - bietlejuice.ebdb:load-clean-condo-contact
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-info-condo-amenities
