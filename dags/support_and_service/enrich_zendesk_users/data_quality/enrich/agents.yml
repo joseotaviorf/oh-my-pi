@@ -7,7 +7,7 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_agent:
-    is_unique:
+    is_complete:
       severity_level: Error
   email:
     is_unique:

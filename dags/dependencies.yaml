@@ -816,20 +816,20 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.ebdb:load-clean-contract
+  - bietlejuice.enrich_retsuko:load-enrich-entry
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.enrich_sap_gateway:load-enrich-feature
+  - bietlejuice.enrich_sap_gateway:load-enrich-sync-sap-job
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
   - bietlejuice.payable_accounts_transactions:load-clean-accounts-payable
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.retsuko:load-clean-sap-entity
   - bietlejuice.vans:load-clean-bank
   - bietlejuice.vans:load-clean-bank-payment
   - bietlejuice.vans:load-clean-payment
   - bietlejuice.vans:load-clean-payment-boleto
-  - bietlejuice.enrich_sap_gateway:load-enrich-feature
-  - bietlejuice.enrich_sap_gateway:load-enrich-sync-sap-job
-  - bietlejuice.enrich_retsuko:load-enrich-invoice
-  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
-  - bietlejuice.enrich_retsuko:load-enrich-entry
-  - bietlejuice.retsuko:load-clean-contract
-  - bietlejuice.retsuko:load-clean-sap-entity
-  - bietlejuice.ebdb:load-clean-contract
 bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost
   - bietlejuice.enrich_region:load-enrich-region
@@ -2284,6 +2284,7 @@ bietlejuice.enrich_zendesk_users:
   - bietlejuice.bigfone:load-clean-event
   - bietlejuice.quinto_messenger:load-clean-task
   - bietlejuice.zendesk_tickets:load-clean-organizations
+  - bietlejuice.zendesk_tickets:load-clean-tickets
   - bietlejuice.zendesk_tickets:load-clean-users
 bietlejuice.enrich_zipcodes:
   - bietlejuice.ebdb:load-clean-polygon-region

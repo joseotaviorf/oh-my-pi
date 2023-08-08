@@ -8,7 +8,9 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
     id_agent:
       lineage:
-        - datalake_zendesk_tickets_clean.users.id_agent
+        - datalake_zendesk_tickets_clean.tickets.id_assignee
+        - datalake_bigfone_clean.event.metadata
+        - datalake_quinto_messenger_clean.task.assigned_to
       description: Analyst's unique identifier.
     id_user_external:
       lineage:
@@ -21,8 +23,8 @@ columns:
     email:
       lineage:
         - datalake_zendesk_tickets_clean.users.email
-        - datalake_bigfone_clean.event.email
-        - datalake_quinto_messenger_clean.task.email
+        - datalake_bigfone_clean.event.metadata
+        - datalake_quinto_messenger_clean.task.assigned_to
       description: Email with which the analyst is registered.
     phone:
       lineage:
@@ -31,13 +33,14 @@ columns:
     name:
       lineage:
         - datalake_zendesk_tickets_clean.users.name
-        - datalake_bigfone_clean.event.name
+        - datalake_bigfone_clean.event.metadata
       description: Analyst name.
     organization:
       lineage:
-        - datalake_zendesk_tickets_clean.users.organization
-        - datalake_bigfone_clean.event.organization
-        - datalake_quinto_messenger_clean.task.organization
+        - datalake_zendesk_tickets_clean.organizations.name
+        - datalake_zendesk_tickets_clean.users.email
+        - datalake_bigfone_clean.event.metadata
+        - datalake_quinto_messenger_clean.task.assigned_to
       description: Name of the company where the analyst works.
     is_active:
       lineage:
