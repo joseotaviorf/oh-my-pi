@@ -4,6 +4,12 @@ columns:
   id_partner:
     lineage:
       - datalake_gsheets_raw.carteira_ciq.id_partner
+    description: Id of the partner.
   carteira_vinculada:
     lineage:
       - datalake_gsheets_raw.carteira_ciq.carteira_vinculada
+    description: Wallet linked to the partner.
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.carteira_ciq.cluster
+    description: Partner segmentation based on quality and house attraction profile.
