@@ -27,3 +27,15 @@ SELECT
     CAST(is_ops_direct_register AS BOOLEAN) AS is_ops_direct_register
 FROM
     datalake_gsheets_raw.taxonomy_growth
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY 
+        lead_type,
+        lead_origin,
+        lead_tracking_medium,
+        lead_tracking_source,
+        affiliate_type,
+        is_agent_referral,
+        lead_referring_category,
+        is_branded,
+        is_ops_direct_register
+    ORDER BY id) = 1
