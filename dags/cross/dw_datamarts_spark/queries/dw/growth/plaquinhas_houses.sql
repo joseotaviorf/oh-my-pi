@@ -196,15 +196,15 @@ metrics_base AS (
         CAST(pr.date AS DATE) AS dt,
         CAST(pr.dt_plaquinha AS DATE) AS dt_plaquinha_installed,
         CAST(pr.dt_plaquinha_house AS DATE) AS dt_plaquinha_installed_house,
-        CAST(NULL AS DOUBLE) AS new_installed_plaquinhas_target,
-        CAST(NULL AS DOUBLE) AS active_plaquinhas_target,
-        CAST(NULL AS DOUBLE) AS cover_percent_target
+        CAST(NULL AS DOUBLE) AS new_installed_plaquinhas_target
+        -- CAST(NULL AS DOUBLE) AS active_plaquinhas_target,
+        -- CAST(NULL AS DOUBLE) AS cover_percent_target
     FROM
         plaquinhas_rent pr
     LEFT JOIN dw_public.dim_region dr
         ON pr.sk_region = dr.sk_region
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
     UNION
     SELECT
         CAST(substring(ps.sk_house_listing,0,9) AS BIGINT) AS id_house,
@@ -230,15 +230,15 @@ metrics_base AS (
         CAST(ps.date AS DATE) AS dt,
         CAST(ps.dt_plaquinha AS DATE) AS dt_plaquinha_installed,
         CAST(ps.dt_plaquinha_house AS DATE) AS dt_plaquinha_installed_house,
-        CAST(NULL AS DOUBLE) AS new_installed_plaquinhas_target,
-        CAST(NULL AS DOUBLE) AS active_plaquinhas_target,
-        CAST(NULL AS DOUBLE) AS cover_percent_target
+        CAST(NULL AS DOUBLE) AS new_installed_plaquinhas_target
+        -- CAST(NULL AS DOUBLE) AS active_plaquinhas_target,
+        -- CAST(NULL AS DOUBLE) AS cover_percent_target
     FROM
         plaquinhas_sale ps
     LEFT JOIN dw_public.dim_region dr
         ON ps.sk_region = dr.sk_region
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 ),
 targets AS (
     -------------------------------------
@@ -260,9 +260,9 @@ targets AS (
         CAST(NULL AS DATE) AS dt,
         CAST(NULL AS DATE) AS dt_plaquinha_installed,
         CAST(tgt.dt_target AS DATE) AS dt_plaquinha_installed_house,
-        CAST(tgt.new_installed_plaquinhas_target AS DOUBLE) AS new_installed_plaquinhas_target,
-        CAST(NULL AS DOUBLE) AS active_plaquinhas_target,
-        CAST(NULL AS DOUBLE) AS cover_percent_target
+        CAST(tgt.new_installed_plaquinhas_target AS DOUBLE) AS new_installed_plaquinhas_target
+        -- CAST(NULL AS DOUBLE) AS active_plaquinhas_target,
+        -- CAST(NULL AS DOUBLE) AS cover_percent_target
     FROM
         datalake_gsheets_clean.plaquinhas_installation_targets tgt
     UNION ALL
@@ -285,9 +285,9 @@ targets AS (
         CAST(tgt.dt_target AS DATE) AS dt,
         CAST(NULL AS DATE) AS dt_plaquinha_installed,
         CAST(NULL AS DATE) AS dt_plaquinha_installed_house,
-        CAST(NULL AS DOUBLE) AS new_installed_plaquinhas_target,
-        CAST(tgt.active_plaquinhas_target AS DOUBLE) AS active_plaquinhas_target,
-        CAST(tgt.cover_percent_target AS DOUBLE) AS cover_percent_target
+        CAST(NULL AS DOUBLE) AS new_installed_plaquinhas_target
+        -- CAST(tgt.active_plaquinhas_target AS DOUBLE) AS active_plaquinhas_target,
+        -- CAST(tgt.cover_percent_target AS DOUBLE) AS cover_percent_target
     FROM
         datalake_gsheets_clean.plaquinhas_installation_targets tgt
 )

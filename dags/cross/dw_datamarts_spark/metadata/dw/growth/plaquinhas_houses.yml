@@ -79,11 +79,11 @@ columns:
     description: The goal of installed plaquinhas.
     lineage:
       - datalake_gsheets_clean.plaquinhas_installation_targets.new_installed_plaquinhas_target
-  active_plaquinhas_target:
-    description: The goal of installed plaquinhas.
-    lineage:
-      - datalake_gsheets_clean.plaquinhas_installation_targets.active_plaquinhas_target
-  cover_percent_target:
-    description: This column specifies the target of coverage or placement achieved by plaquinhas.
-    lineage:
-      - datalake_gsheets_clean.plaquinhas_installation_targets.cover_percent_target
+#  active_plaquinhas_target:
+#    description: The goal of installed plaquinhas.
+#    lineage:
+#      - datalake_gsheets_clean.plaquinhas_installation_targets.active_plaquinhas_target
+#  cover_percent_target:
+#    description: This column specifies the target of coverage or placement achieved by plaquinhas.
+#    lineage:
+#      - datalake_gsheets_clean.plaquinhas_installation_targets.cover_percent_target
