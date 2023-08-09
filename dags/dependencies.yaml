@@ -1633,6 +1633,7 @@ bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listings-reprocessed-leads
   - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
 bietlejuice.enrich_mission_control:
+  - bietlejuice.mission_control:load-clean-contract
   - bietlejuice.mission_control:load-clean-onboarding
   - bietlejuice.mission_control:load-clean-onboarding-action
   - bietlejuice.mission_control:load-clean-onboarding-bill
@@ -2245,6 +2246,7 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
   - bietlejuice.rental_guarantee_platform:load-clean-item-type
+  - bietlejuice.rental_guarantee_platform:load-clean-omie-occurrence-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-payment
   - bietlejuice.rental_guarantee_platform:load-clean-plan
   - bietlejuice.rental_guarantee_platform:load-clean-profile-account
@@ -2265,7 +2267,6 @@ bietlejuice.enrich_velo:
   - bietlejuice.velo_omie:load-clean-clients
   - bietlejuice.velo_omie:load-clean-country
   - bietlejuice.velo_omie:load-clean-projects
-  - bietlejuice.rental_guarantee_platform:load-clean-omie-occurrence-legacy
 bietlejuice.enrich_velo_omie:
   - bietlejuice.velo_omie:load-clean-cash-flows
 bietlejuice.enrich_vespucio:
