@@ -3,6 +3,8 @@ SELECT DISTINCT
   proponent.id_proponent,
   proponent.cpf AS cpf,
   boavista.boavista_score,
+  boavista_p4.boavista_score_p4,
+  boavista_p4.boavista_negative_score,
   serasa.serasa_score_hspn,
   serasa.serasa_score_csba,
   neoway.neoway_estimated_income_low,
@@ -402,12 +404,17 @@ LEFT JOIN
   datalake_bureaus.boavista_bureau_analysis AS boavista
     ON proponent.id_proposal = boavista.id_proposal
     AND proponent.id_proponent = boavista.id_proponent
-    AND proponent.cpf = boavista.cpf 
+    AND proponent.cpf = boavista.cpf
+LEFT JOIN
+  datalake_bureaus.boavista_p4_bureau_analysis AS boavista_p4
+    ON proponent.id_proposal = boavista_p4.id_proposal
+    AND proponent.id_proponent = boavista_p4.id_proponent
+    AND proponent.cpf = boavista_p4.cpf
 LEFT JOIN
   datalake_bureaus.serasa_bureau_analysis AS serasa
     ON proponent.id_proposal = serasa.id_proposal
     AND proponent.id_proponent = serasa.id_proponent
-    AND proponent.cpf = serasa.cpf 
+    AND proponent.cpf = serasa.cpf
 LEFT JOIN
   datalake_bureaus.neoway_bureau_analysis AS neoway
     ON proponent.id_proposal = neoway.id_proposal

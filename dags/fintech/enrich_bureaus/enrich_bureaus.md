@@ -16,6 +16,7 @@ Produces the following output tables, via full load:
 - `transunion_income_features`
 - `bigdatacorp_bureau_analysis`
 - `boavista_bureau_analysis`
+- `boavista_p4_bureau_analysis`
 - `neoway_bureau_analysis`
 - `serasa_bureau_analysis`
 - `all_bureau_analysis`

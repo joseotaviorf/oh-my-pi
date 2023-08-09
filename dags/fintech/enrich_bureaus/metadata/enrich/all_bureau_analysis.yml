@@ -22,6 +22,14 @@ columns:
     lineage:
       - datalake_bureaus.boavista_bureau_analysis.boavista_score
     description: Score Boa Vista
+  boavista_score_p4:
+    lineage:
+      - datalake_bureaus.boavista_p4_bureau_analysis.boavista_score_p4
+    description: Score Boavista p4
+  boavista_negative_score:
+    lineage:
+      - datalake_bureaus.boavista_p4_bureau_analysis.boavista_negative_score
+    description: Score negativo boavista
   serasa_score_hspn:
     lineage:
       - datalake_bureaus.serasa_bureau_analysis.serasa_score_hspn
