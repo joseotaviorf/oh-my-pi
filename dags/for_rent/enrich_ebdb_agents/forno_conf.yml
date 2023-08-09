@@ -20,6 +20,8 @@ tables:
     is_incremental: false
   - table_name: agents_weekly_schedule_history
     is_incremental: false
+  - table_name: autonomous_agent_info
+    is_incremental: false
   - table_name: slots_base_time
     is_incremental: false
   - table_name: agents_slots

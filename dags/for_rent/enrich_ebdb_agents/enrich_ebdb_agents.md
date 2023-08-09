@@ -20,6 +20,7 @@ Produces the following output tables, via full load:
 - `agents_review`
 - `agents_specific_weekly_schedule`
 - `agents_weekly_schedule_history`
+- `autonomous_agent_info`
 - `rating_label`
 - `slots_base_time`
 
