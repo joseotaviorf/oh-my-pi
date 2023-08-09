@@ -28,7 +28,6 @@ class UDFEnum(Enum):
         """
         from bietlejuice.formatters.string_formatter import StringFormatter
         from bietlejuice.base.udfs.fintech import FintechUDFs
-
         from bietlejuice.base.udfs.governance import ProfilingFromYaml
         from bietlejuice.base.udfs.growth import VespucioScoreCalculator
 

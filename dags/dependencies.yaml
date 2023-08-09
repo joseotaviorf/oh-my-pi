@@ -1371,6 +1371,7 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:load-clean-proposal-aud
   - bietlejuice.ebdb:load-clean-sales-rep
   - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb:load-clean-user-merge
   - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_country:load-enrich-user
 bietlejuice.enrich_ebdb_work_contract:
