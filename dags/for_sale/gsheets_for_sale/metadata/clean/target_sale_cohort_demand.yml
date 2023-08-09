@@ -22,9 +22,18 @@ columns:
   origem:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_demand.origem
+  modelo:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.modelo
   operacao:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_demand.operacao
+  fluxo:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.fluxo
+  fb:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.FB
   visit_booked:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_demand.visit_booked

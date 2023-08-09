@@ -22,6 +22,9 @@ columns:
   new_buyer_prospect:
     lineage:
       - datalake_gsheets_raw.sale_demand_targets.new_buyer_prospect
+  recovered_buyer_prospect:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.recovered_buyer_prospect
   origin:
     lineage:
       - datalake_gsheets_raw.sale_demand_targets.origin

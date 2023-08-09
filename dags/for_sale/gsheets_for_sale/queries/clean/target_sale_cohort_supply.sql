@@ -5,6 +5,7 @@ SELECT
     mkt_origin,
     operacao AS operation,
     canal_planning,
+    FB AS fb,
     opportunity,
     qualified,
     available_qualified,

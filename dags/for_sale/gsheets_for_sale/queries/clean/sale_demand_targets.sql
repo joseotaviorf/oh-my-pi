@@ -6,6 +6,7 @@ SELECT
     operacao,
     fb,
     new_buyer_prospect,
+    recovered_buyer_prospect,
     origin,
     offer_accepted,
     offer_sent,
