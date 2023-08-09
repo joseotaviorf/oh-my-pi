@@ -26,6 +26,7 @@ CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols")
 TABLES_LIST = config_service.get_config("tables_list")
+LIST_OUT_OF_PATTERN = config_service.get_config("list_out_of_pattern")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -55,9 +56,10 @@ def get_date_param(dag_run, ds, date_param_name):
         return date_param
     return ds
 
-def change_case(table_name):
-    if table_name == "QUINTO_ANDAR_20200505_Mailing":
-        return "mailing"
+def change_case(table_name, list_out_of_pattern=LIST_OUT_OF_PATTERN):
+    for table_dict in list_out_of_pattern:
+      if table_name in table_dict:
+        return table_dict[table_name]
     table_name = table_name.replace('_', '')
     return reduce(lambda x, y: x + ('_' if y.isupper() else '') + y, table_name).lower()
 

@@ -23,6 +23,12 @@ tables_list:
   - Users
   - PbxBillingData
   - QUINTO_ANDAR_20200505_Mailing
+  - OPS_Mailing_LayoutId_4
+  - OPS_Mailing_LayoutId_7
+list_out_of_pattern:
+  - QUINTO_ANDAR_20200505_Mailing: mailing
+  - OPS_Mailing_LayoutId_4: reprocessing_mailing
+  - OPS_Mailing_LayoutId_7: pp_multi_mailing
 partition_cols:
   - year
   - month

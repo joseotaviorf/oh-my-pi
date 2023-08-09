@@ -6,7 +6,7 @@ Our outbound contacts with customers are carried out by an internal team and als
 QuintoAndar hired the [Olos company dialer](https://www.olos.com.br/discador-de-chamadas/) for that, so we need to ingest the data from these dialings to integrate with our internal data because only with the data coming from Olos we can determine which company acted in a certain dialing and other details.
 
 The Olos Company is responsible for sending us the data in JSON format on a daily basis, saving this data at the s3 bucket 5a-discador-olos.
-This is the [documentation](https://drive.google.com/file/d/14swW_Pi0oPARLVRIPQ9af3xNIIqKs_Ck/view?usp=sharing) about the files we extract, sent by Olos.
+This is the [documentation](https://drive.google.com/drive/folders/1vdSfSNhu3cyvH2HtAmZAsQ6_y1dyHX9V) about the files we extract, sent by Olos.
 
 ​<details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -40,7 +40,10 @@ This pipeline produces the following incremental output tables in each layer:
   * `datalake_olos_dialer_raw.Info_StatusId`
   * `datalake_olos_dialer_raw.LoginRawData`
   * `datalake_olos_dialer_raw.MailingInformation`
+  * `datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4`
+  * `datalake_olos_dialer_raw.OPS_Mailing_LayoutId_7`
   * `datalake_olos_dialer_raw.PbxBillingData`
+  * `datalake_olos_dialer_raw.QUINTO_ANDAR_20200505_Mailing`
   * `datalake_olos_dialer_raw.Reason`
   * `datalake_olos_dialer_raw.Users`
 * clean:
@@ -61,10 +64,13 @@ This pipeline produces the following incremental output tables in each layer:
   * `datalake_olos_dialer_clean.info_pbx_disposition`
   * `datalake_olos_dialer_clean.info_reason_type`
   * `datalake_olos_dialer_clean.info_status_id`
+  * `datalake_olos_dialer_clean.pp_multi_mailing`
   * `datalake_olos_dialer_clean.login_raw_data`
   * `datalake_olos_dialer_clean.mailing_information`
+  * `datalake_olos_dialer_clean.mailing`
   * `datalake_olos_dialer_clean.pbx_billing_data`
   * `datalake_olos_dialer_clean.reason`
+  * `datalake_olos_dialer_clean.reprocessing_mailing`
   * `datalake_olos_dialer_clean.users`
 
 </details>

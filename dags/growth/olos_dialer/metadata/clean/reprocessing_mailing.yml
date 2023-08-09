@@ -1,0 +1,259 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: reprocessing_mailing
+owner: arthur.gonzaga@quintoandar.com.br
+domain: growth
+description: Contains information about the contacts that will be dialed and attempt to convert after drop. This table contains the list of leads and which sales_company will contact them.
+columns:
+  id_lead:
+    description: Identifier of the customer that the dialer will contact. Equivalent to our internal sk_lead.
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.id_lead
+  id_campaign:
+    description: Id of the campaign. The campaign is where we allocate the analyst to perform the marketing action within the dialer.
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.mcxcampaignid
+  link:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.link
+  origin:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.origem
+  neighbourhood:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.bairro
+  zipcode:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.cep
+  city:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.cidade
+  address:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.endereco
+  advertiser_name:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.nomeanunciante
+  phone1:
+    description: Customer's phone 1.
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.telefone1
+  phone2:
+    description: Customer's phone 2.
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.telefone2
+  phone3:
+    description: Customer's phone 2.
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.telefone3
+  advertiser_phone:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.telefoneanunciante
+  phone_formatted:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.telefoneformated
+  channel:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.canal
+  table_name:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.tablename
+  category:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.categoria
+  joker_1:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_1
+  joker_2:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_2
+  joker_3:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_3
+  joker_4:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_4
+  joker_5:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_5
+  joker_6:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_6
+  joker_7:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_7
+  joker_8:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_8
+  joker_9:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_9
+  joker_10:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_10
+  joker_11:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_11
+  joker_12:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_12
+  joker_13:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_13
+  joker_14:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_14
+  joker_15:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_15
+  joker_16:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_16
+  joker_17:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_17
+  joker_18:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_18
+  joker_19:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_19
+  joker_20:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_20
+  joker_21:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_21
+  joker_22:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_22
+  joker_23:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_23
+  joker_24:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_24
+  joker_25:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_25
+  joker_26:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_26
+  joker_27:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_27
+  joker_28:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_28
+  joker_29:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_29
+  joker_30:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_30
+  joker_31:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_31
+  joker_32:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_32
+  joker_33:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_33
+  joker_34:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_34
+  joker_35:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_35
+  joker_36:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_36
+  joker_37:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_37
+  joker_38:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_38
+  joker_38r:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_38r
+  joker_39:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_39
+  joker_40:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.coringa_40
+  ts_created:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.datacriacao
+  ts_imported:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.dateimport
+  year:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.year
+  month:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.month
+  day:
+    description:
+    lineage:
+      - datalake_olos_dialer_raw.OPS_Mailing_LayoutId_4.day
