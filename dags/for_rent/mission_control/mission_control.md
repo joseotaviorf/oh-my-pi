@@ -17,6 +17,7 @@ Currently, there is the following output table for both our raw and clean layers
 Both layer the ingestion is via incremental load.
 
 Raw:
+- `contract`
 - `onboarding`
 - `onboardingaction`
 - `onboardingbill`
@@ -24,6 +25,7 @@ Raw:
 - `onboardingtasktypes`
 
 Clean:
+- `contract`
 - `onboarding`
 - `onboarding_action`
 - `onboarding_bill`
