@@ -5,7 +5,7 @@ custom_cluster:
   aws_attributes:
     ebs_volume_size: 300
   spark_conf:
-    spark.sql.shuffle.partitions: "128"
+    spark.sql.shuffle.partitions: "256"
 
 dag_documentation:
   dag_purpose:
