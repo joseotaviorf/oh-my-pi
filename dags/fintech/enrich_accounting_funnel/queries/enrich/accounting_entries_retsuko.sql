@@ -132,6 +132,7 @@ SELECT
   i.id_external AS id_invoice,
   ct.id_external AS id_contract,    
   sap.id_sap_gateway_feature,
+  sap.version as accounting_version,
   ii.invoice_user,
   ii.invoice_frequency,
   ii.payment_status,

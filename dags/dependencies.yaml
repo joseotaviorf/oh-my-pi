@@ -830,6 +830,17 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.vans:load-clean-bank-payment
   - bietlejuice.vans:load-clean-payment
   - bietlejuice.vans:load-clean-payment-boleto
+  - bietlejuice.vans:load-clean-file
+  - bietlejuice.vans:load-clean-boleto
+  - bietlejuice.vans:load-clean-boleto-file
+  - bietlejuice.trato_feito:load-clean-negotiation
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-payment
+  - bietlejuice.wall_street:load-clean-charge
+  - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
+  - bietlejuice.robin_hood:load-clean-accounting-entry-balance
+  - bietlejuice.robin_hood:load-clean-payment-request
 bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost
   - bietlejuice.enrich_region:load-enrich-region

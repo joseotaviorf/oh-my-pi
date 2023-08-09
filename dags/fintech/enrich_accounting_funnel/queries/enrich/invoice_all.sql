@@ -30,7 +30,9 @@ SELECT
     WHEN CHARINDEX('.', c.version)> 0 THEN  SUBSTRING(c.version, 1, CHARINDEX('.', c.version)-1)
     ELSE COALESCE(c.version, 'no info')
   END AS version,
+  sap.version as accounting_version,
   c.is_contract_b2b,
+  c.dt_start > c.dt_annulment AND c.dt_annulment IS NOT NULL AS ended_before_started,
   r.city_name AS locale,
   cl.id_locale AS localidade,
   c.guarantee,
@@ -103,7 +105,6 @@ SELECT
   DATE_FORMAT(nbd.date_next_bd, 'yyyy-MM-dd') AS invoice_paid_date_next_business_day,
   c.dt_start AS contract_start,
   c.dt_annulment AS contract_annulment,
-  c.dt_start > c.dt_annulment AND c.dt_annulment IS NOT NULL AS ended_before_started,
   NOW()       AS ts_load
 FROM
   dw_payment.fact_invoice_entries AS fie
@@ -131,6 +132,9 @@ LEFT JOIN
 LEFT JOIN
   next_business_day AS nbd
     ON nbd.date = i.dt_paid
+LEFT JOIN 
+    datalake_retsuko_clean.sap_entity sap 
+        on fie.sk_invoice = sap.id_finance_entity
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')

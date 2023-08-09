@@ -1,0 +1,56 @@
+---
+database_name: datalake_accounting_funnel
+table_name: payment_platforms
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Table containing all Payment Platforms in 5A For Rent business model."
+columns:
+  id_payment_platform:
+    lineage:
+      - datalake_trato_feito_clean.installment.id
+      - datalake_wall_street_clean.charge.id
+      - datalake_robin_hood.accounting_entry.id
+      - datalake_vans_clean.payment.id
+      - datalake_vans_clean.boleto.id
+    description: "Unique ID to identify payment in respective payment platform"
+  id_business_entity:
+    lineage:
+      - datalake_trato_feito_clean.negotiation.id_debtor_external
+      - datalake_wall_street_clean.charge.id_business_entity
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.boleto.company_use
+    description: "It's used to identify the payment in a bigger grain in other products"
+  id_finance_entity:
+    lineage:
+      - datalake_trato_feito_clean.accounting_installment.id_external
+      - datalake_wall_street_clean.charge.id_finance_entity
+      - datalake_robin_hood.accounting_entry.id_external
+      - datalake_vans_clean.payment.id_related_document
+      - datalake_vans_clean.boleto.id_related_document
+    description: "It's used to identify the payment in a smaller grain in other products"
+  payment_platform:
+    description: "Identifies the payment platform that the payment was made on"
+  payment_status:
+    lineage:
+      - datalake_trato_feito_clean.payment.status
+      - datalake_wall_street_clean.charge.charge_status
+      - datalake_robin_hood_clean.payment_request.status
+      - datalake_vans_clean.payment.status
+      - datalake_vans_clean.boleto.status
+    description: "Last status of the payment in the payment platform"
+  paid_amount:
+    lineage:
+      - datalake_trato_feito_clean.payment.metadata
+      - datalake_wall_street_clean.charge.amount
+      - datalake_robin_hood.accounting_entry.due_amount
+      - datalake_vans_clean.payment.paid_amount
+      - datalake_vans_clean.boleto.paid_amount
+    description: "Amount actually paid"
+  dt_paid:
+    lineage:
+      - datalake_trato_feito_clean.payment.metadata
+      - datalake_wall_street_clean.charge.ts_paid
+      - datalake_robin_hood_clean.payment_request.dt_paid
+      - datalake_vans_clean.payment.dt_paid
+      - datalake_vans_clean.boleto.dt_paid
+    description: "Last record payment date in the payment platform"

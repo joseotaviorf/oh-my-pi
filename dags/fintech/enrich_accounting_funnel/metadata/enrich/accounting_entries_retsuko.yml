@@ -21,6 +21,10 @@ columns:
     lineage:
       - datalake_retsuko_clean.sap_entity.id_sap_gateway_feature
     description: "ID feature that joins with erp gateway"
+  accounting_version:
+    lineage:
+      - datalake_retsuko_clean.sap_entity.version
+    description: "Information about sync with ERP Gateway"
   invoice_user:
     lineage:
       - datalake_retsuko.invoice_info.invoice_user
