@@ -352,12 +352,6 @@ sheets_info:
     sheet_name: offline_manual_share_cost_center
     clean_table_name: offline_manual_share_cost_center
     sheet_context: growth
-  
-  plaquinhas_cover_targets:
-    sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
-    sheet_name: cobertura
-    clean_table_name: plaquinhas_cover_targets
-    sheet_context: growth
 
   plaquinhas_demand_targets:
     sheet_id: 1PTguTGckx6mboWC2-AaFSH6yFAYCKBrdEDP1gpF5EUQ
@@ -373,7 +367,7 @@ sheets_info:
 
   plaquinhas_installation_targets:
     sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
-    sheet_name: instalacoes
+    sheet_name: targets
     clean_table_name: plaquinhas_installation_targets
     sheet_context: growth
 
