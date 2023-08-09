@@ -1,0 +1,93 @@
+database_name: datalake_gsheets_clean
+table_name: vespucio_condo_golden_set
+columns:
+  email:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.email_address
+  condo_affiliation_type:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.qual_a_sua_relacao_com_este_condominio
+  score:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.score
+  condo_name:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.qual_o_nome_do_condominio
+  condo_cnpj:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.cnpj_base
+  address_type:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.tipo_de_logradouro
+  address:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.nome_do_logradouro
+  number:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.numero
+  zipcode:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.cep
+  complement:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.alguma_outra_informacao_importante_para_identificar_o_endereco_do_seu_condominio_descreva_abaixo
+  neighborhood:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.bairro
+  city:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.cidade
+  state:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.estado
+  user_condo_comments:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.alguma_outra_informacao_relevante_sobre_este_condominio
+  has_garage:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_garagem
+  has_swim_pool:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_piscina
+  has_gym:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_academia
+  has_party_hall:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_salao_de_festas
+  has_grill_area:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_churrasqueira
+  has_sports_court:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_quadra_poliesportiva
+  has_playground:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_playground
+  has_toy_library:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_brinquedoteca
+  has_elevator:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_elevador
+  has_entrance_hall:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_portaria_24h
+  has_sauna:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_sauna
+  has_laundry:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_lavanderia_no_predio
+  has_piped_gas:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_gas_encanado
+  has_gourmet_area:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_area_gourmet
+  has_metro_or_train_close:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_e_proximo_ao_metro_ou_trem
+  dt_created:
+    lineage:
+      - datalake_gsheets_raw.vespucio_condo_golden_set.timestamp
