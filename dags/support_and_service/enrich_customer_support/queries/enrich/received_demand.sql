@@ -154,6 +154,7 @@ chat AS (
     SELECT
       t.id_external,
       t.id_channel_external,
+      t.task_status,
       GET_JSON_OBJECT(t.task_attributes,'$.chat_id') AS id_chat,
       GET_JSON_OBJECT(t.assigned_to,'$.worker_name') AS agent_email,
       GET_JSON_OBJECT(t.task_attributes,'$.target') AS ticket_group_name,
@@ -172,7 +173,11 @@ chat AS (
       t.agent_email,
       t.customer_phone,
       t.task_completion_reason,
-      ISNOTNULL(rce.id_task_external) AS is_answered,
+      CASE
+        WHEN t.task_status = 'canceled' THEN FALSE
+        WHEN t.task_completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
+        ELSE TRUE
+      END AS is_answered,
       t.ts_created AS ts_task_created,
       rce.ts_reservation_created,
       COALESCE(rce.ts_reservation_created, t.ts_created) AS ts_created
