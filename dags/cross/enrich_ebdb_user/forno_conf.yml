@@ -12,3 +12,4 @@ inner_dependencies:
     - user_revision_entity
 partition_cols:
   - country_code
+user_merge_table_name: user_merge

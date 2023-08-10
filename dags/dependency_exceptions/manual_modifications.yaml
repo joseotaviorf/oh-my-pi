@@ -367,6 +367,9 @@ bietlejuice.enrich_ebdb_listing_jobs:
   remove:
     - bietlejuice.ebdb:load-clean-inspection-aud
     - bietlejuice.enrich_ebdb_country:load-enrich-house
+bietlejuice.enrich_ebdb_user:
+  add:
+    - bietlejuice.ebdb:load-clean-user-merge
 bietlejuice.enrich_health_metrics:
   override: []
 bietlejuice.enrich_hubspot:
