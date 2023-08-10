@@ -36,7 +36,7 @@ LEFT JOIN
 LEFT JOIN
 	dw_datamarts.affiliates_clusters ac
         ON ac.sk_user = lf.sk_user_lead_affiliate
-		AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+		AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(lf.sk_lead_date AS STRING),'yyyyMMdd')))
 LEFT JOIN
     datalake_3p.houses_3p AS hp
         ON hp.id_house = lf.sk_house_listing / 1000

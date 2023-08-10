@@ -240,7 +240,8 @@ costs_targets_results_combined AS (
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
     LEFT JOIN dw_datamarts.affiliates_clusters ac
-        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+        ON ac.sk_user = f.sk_user_lead_affiliate
+        AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(f.sk_lead_date AS STRING),'yyyyMMdd')))
     WHERE
         f.sk_lead_date > 0
     GROUP BY
@@ -313,7 +314,8 @@ costs_targets_results_combined AS (
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
     LEFT JOIN dw_datamarts.affiliates_clusters ac
-        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+        ON ac.sk_user = f.sk_user_lead_affiliate
+        AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(f.sk_lead_date AS STRING),'yyyyMMdd')))
     WHERE
         f.sk_prospect_date > 0
     GROUP BY
@@ -385,7 +387,8 @@ costs_targets_results_combined AS (
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
     LEFT JOIN dw_datamarts.affiliates_clusters ac
-        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+        ON ac.sk_user = f.sk_user_lead_affiliate
+        AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(f.sk_lead_date AS STRING),'yyyyMMdd')))
     WHERE
         f.sk_qualified_date > 0
     GROUP BY
@@ -458,7 +461,8 @@ costs_targets_results_combined AS (
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
     LEFT JOIN dw_datamarts.affiliates_clusters ac
-        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+        ON ac.sk_user = f.sk_user_lead_affiliate
+        AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(f.sk_lead_date AS STRING),'yyyyMMdd')))
     WHERE
         f.sk_available_qualified_date > 0
     GROUP BY
@@ -531,7 +535,8 @@ costs_targets_results_combined AS (
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
     LEFT JOIN dw_datamarts.affiliates_clusters ac
-        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+        ON ac.sk_user = f.sk_user_lead_affiliate
+        AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(f.sk_lead_date AS STRING),'yyyyMMdd')))
     WHERE
         f.sk_opportunity_date > 0
     GROUP BY
@@ -606,7 +611,8 @@ costs_targets_results_combined AS (
     LEFT JOIN datalake_wololo_clean.prospect p
         ON p.id_reference = f.sk_lead
     LEFT JOIN dw_datamarts.affiliates_clusters ac
-        ON ac.sk_user = f.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('month', CURRENT_DATE)
+        ON ac.sk_user = f.sk_user_lead_affiliate
+        AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(f.sk_lead_date AS STRING),'yyyyMMdd')))
     WHERE
         f.sk_first_listing_date > 0
     GROUP BY

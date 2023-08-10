@@ -1,22 +1,31 @@
 ---
 database_name: dw_datamarts
 table_name: affiliates_clusters
+domain: Cross
+owner: '@data-growth'
+description: This dataset contains information about the affiliates clusters.
 columns:
   month_start:
+    description: Month of affiliate cluster
     lineage:
       - dw_public.dim_date.month_start
   year_month:
+    description: Year month of affiliate cluster
     lineage:
       - dw_public.dim_date.year_month
   sk_user:
+    description: Identifier for user affiliate
     lineage:
       - dw_public.dim_user_affiliate.sk_user
   type:
+    description: Type of affiliate
     lineage:
       - dw_public.dim_user_affiliate.type
   joined_program_date:
+    description: First month of affiliate subscription
     lineage:
       - dw_public.dim_user_affiliate.ts_joined_program
   first_inactivation:
+    description: First month of affiliate status inactive
     lineage:
       - dw_public.dim_date.month_start

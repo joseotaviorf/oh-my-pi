@@ -258,6 +258,7 @@ bietlejuice.dw_datamarts_spark.for_sale:
 bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-affiliates-clusters
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
@@ -340,6 +341,7 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.dw_call:load-dw-call-fact-calls
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-affiliates-clusters
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
@@ -820,27 +822,27 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
   - bietlejuice.enrich_sap_gateway:load-enrich-feature
   - bietlejuice.enrich_sap_gateway:load-enrich-sync-sap-job
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
   - bietlejuice.payable_accounts_transactions:load-clean-accounts-payable
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-sap-entity
-  - bietlejuice.vans:load-clean-bank
-  - bietlejuice.vans:load-clean-bank-payment
-  - bietlejuice.vans:load-clean-payment
-  - bietlejuice.vans:load-clean-payment-boleto
-  - bietlejuice.vans:load-clean-file
-  - bietlejuice.vans:load-clean-boleto
-  - bietlejuice.vans:load-clean-boleto-file
-  - bietlejuice.trato_feito:load-clean-negotiation
-  - bietlejuice.trato_feito:load-clean-installment
-  - bietlejuice.trato_feito:load-clean-accounting-installment
-  - bietlejuice.trato_feito:load-clean-payment
-  - bietlejuice.wall_street:load-clean-charge
-  - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance
   - bietlejuice.robin_hood:load-clean-payment-request
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-negotiation
+  - bietlejuice.trato_feito:load-clean-payment
+  - bietlejuice.vans:load-clean-bank
+  - bietlejuice.vans:load-clean-bank-payment
+  - bietlejuice.vans:load-clean-boleto
+  - bietlejuice.vans:load-clean-boleto-file
+  - bietlejuice.vans:load-clean-file
+  - bietlejuice.vans:load-clean-payment
+  - bietlejuice.vans:load-clean-payment-boleto
+  - bietlejuice.wall_street:load-clean-charge
 bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost
   - bietlejuice.enrich_region:load-enrich-region

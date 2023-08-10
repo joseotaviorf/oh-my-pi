@@ -14,6 +14,9 @@ columns:
   quarter:
     lineage:
       - dw_public.dim_date.quarter
+  affiliate_volumetry:
+    lineage:
+      - dw_datamarts.affiliates_clusters.affiliate_volumetry
   city_group:
     lineage:
       - dw_public.dim_region.city_group
@@ -42,6 +45,9 @@ columns:
   mkt_channel:
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_channel
+  mkt_medium:
+    lineage:
+      - dw_datamarts.lead_listing_flows.mkt_medium
   sales_company:
     lineage:
       - dw_datamarts.lead_listing_flows.sales_company

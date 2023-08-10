@@ -11,6 +11,7 @@ WITH sale_listing_flows_adjust AS (
         lf.sk_house_listing,
         lf.mkt_origin,
         lf.mkt_channel,
+        lf.mkt_medium,
         lf.sales_company,
         CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
         rbh.partner AS supply_3pbh_partner,
@@ -42,9 +43,13 @@ WITH sale_listing_flows_adjust AS (
         CASE
             WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN 'Out of coverage area'
             WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN dr.city_group
-        END AS city_group
+        END AS city_group,
+        ac.affiliate_volumetry
     FROM
         dw_datamarts.lead_listing_flows AS lf
+    LEFT JOIN
+        dw_datamarts.affiliates_clusters ac
+            ON ac.sk_user = lf.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(lf.sk_lead_date AS STRING),'yyyyMMdd')))
     LEFT JOIN
         dw_public.dim_region AS dr
             ON dr.sk_region = lf.sk_region
@@ -410,6 +415,7 @@ p2fc AS (
         slf.mkt_campaign_context,
         slf.mkt_origin,
         slf.mkt_channel,
+        slf.mkt_medium,
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
@@ -418,6 +424,7 @@ p2fc AS (
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
+        slf.affiliate_volumetry,
         CAST(NULL AS STRING) AS demand_3p_partner,
         NULL AS first_origin_demand,
         NULL AS origin_before_offer,
@@ -471,7 +478,7 @@ p2fc AS (
     WHERE
         slf.sk_prospect_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 fc2q AS (
     SELECT
@@ -481,6 +488,7 @@ fc2q AS (
         slf.mkt_campaign_context,
         slf.mkt_origin,
         slf.mkt_channel,
+        slf.mkt_medium,
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
@@ -489,6 +497,7 @@ fc2q AS (
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
+        slf.affiliate_volumetry,
         CAST(NULL AS STRING) AS demand_3p_partner,
         NULL AS first_origin_demand,
         NULL AS origin_before_offer,
@@ -542,7 +551,7 @@ fc2q AS (
     WHERE
         slf.sk_first_contact_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 p2q AS (
     SELECT
@@ -552,6 +561,7 @@ p2q AS (
         slf.mkt_campaign_context,
         slf.mkt_origin,
         slf.mkt_channel,
+        slf.mkt_medium,
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
@@ -560,6 +570,7 @@ p2q AS (
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
+        slf.affiliate_volumetry,
         CAST(NULL AS STRING) AS demand_3p_partner,
         NULL AS first_origin_demand,
         NULL AS origin_before_offer,
@@ -613,7 +624,7 @@ p2q AS (
     WHERE
         slf.sk_prospect_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 q2aq AS (
     SELECT
@@ -623,6 +634,7 @@ q2aq AS (
         slf.mkt_campaign_context,
         slf.mkt_origin,
         slf.mkt_channel,
+        slf.mkt_medium,
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
@@ -631,6 +643,7 @@ q2aq AS (
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
+        slf.affiliate_volumetry,
         CAST(NULL AS STRING) AS demand_3p_partner,
         NULL AS first_origin_demand,
         NULL AS origin_before_offer,
@@ -684,7 +697,7 @@ q2aq AS (
     WHERE
         slf.sk_qualified_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 aq2o AS (
     SELECT
@@ -694,6 +707,7 @@ aq2o AS (
         slf.mkt_campaign_context,
         slf.mkt_origin,
         slf.mkt_channel,
+        slf.mkt_medium,
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
@@ -702,6 +716,7 @@ aq2o AS (
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
+        slf.affiliate_volumetry,
         CAST(NULL AS STRING) AS demand_3p_partner,
         NULL AS first_origin_demand,
         NULL AS origin_before_offer,
@@ -755,7 +770,7 @@ aq2o AS (
     WHERE
         slf.sk_available_qualified_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 q2o AS (
     SELECT
@@ -765,6 +780,7 @@ q2o AS (
         slf.mkt_campaign_context,
         slf.mkt_origin,
         slf.mkt_channel,
+        slf.mkt_medium,
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
@@ -773,6 +789,7 @@ q2o AS (
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
+        slf.affiliate_volumetry,
         CAST(NULL AS STRING) AS demand_3p_partner,
         NULL AS first_origin_demand,
         NULL AS origin_before_offer,
@@ -826,7 +843,7 @@ q2o AS (
     WHERE
         slf.sk_qualified_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 o2fl AS (
     SELECT
@@ -836,6 +853,7 @@ o2fl AS (
         slf.mkt_campaign_context,
         slf.mkt_origin,
         slf.mkt_channel,
+        slf.mkt_medium,
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
@@ -844,6 +862,7 @@ o2fl AS (
         slf.is_3p_supply,
         slf.supply_3p_partner,
         0 AS is_3p_demand,
+        slf.affiliate_volumetry,
         CAST(NULL AS STRING) AS demand_3p_partner,
         NULL AS first_origin_demand,
         NULL AS origin_before_offer,
@@ -897,7 +916,7 @@ o2fl AS (
     WHERE
         slf.sk_opportunity_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 fl2ccv AS (
     SELECT
@@ -907,6 +926,7 @@ fl2ccv AS (
         slf.mkt_campaign_context,
         slf.mkt_origin,
         slf.mkt_channel,
+        slf.mkt_medium,
         slf.mkt_type,
         slf.sales_company,
         slf.lead_processing_operation,
@@ -915,6 +935,7 @@ fl2ccv AS (
         slf.is_3p_supply,
         slf.supply_3p_partner,
         sde.is_3p_demand,
+        slf.affiliate_volumetry,
         sde.demand_3p_partner,
         NULL AS first_origin_demand,
         NULL AS origin_before_offer,
@@ -971,7 +992,7 @@ fl2ccv AS (
     WHERE
         slf.sk_first_listing_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 vb2vc AS (
     SELECT
@@ -981,6 +1002,7 @@ vb2vc AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -989,6 +1011,7 @@ vb2vc AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1042,7 +1065,7 @@ vb2vc AS (
     WHERE
         dt_created IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 vb2os AS (
     SELECT
@@ -1052,6 +1075,7 @@ vb2os AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1060,6 +1084,7 @@ vb2os AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1113,7 +1138,7 @@ vb2os AS (
     WHERE
         dt_created IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 vb2oa AS (
     SELECT
@@ -1123,6 +1148,7 @@ vb2oa AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1131,6 +1157,7 @@ vb2oa AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1184,7 +1211,7 @@ vb2oa AS (
     WHERE
         dt_created IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 vb2ccv AS (
     SELECT
@@ -1194,6 +1221,7 @@ vb2ccv AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1202,6 +1230,7 @@ vb2ccv AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1254,7 +1283,7 @@ vb2ccv AS (
         sale_demand_classification
     WHERE
         dt_created IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 vc2ccv AS (
     SELECT
@@ -1264,6 +1293,7 @@ vc2ccv AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1272,6 +1302,7 @@ vc2ccv AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1325,7 +1356,7 @@ vc2ccv AS (
     WHERE
         dt_completed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 vc2os AS (
     SELECT
@@ -1335,6 +1366,7 @@ vc2os AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1343,6 +1375,7 @@ vc2os AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1396,7 +1429,7 @@ vc2os AS (
     WHERE
         dt_completed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 vc2oa AS (
     SELECT
@@ -1406,6 +1439,7 @@ vc2oa AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1414,6 +1448,7 @@ vc2oa AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1467,7 +1502,7 @@ vc2oa AS (
     WHERE
         dt_completed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 os2oa AS (
     SELECT
@@ -1477,6 +1512,7 @@ os2oa AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1485,6 +1521,7 @@ os2oa AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1538,7 +1575,7 @@ os2oa AS (
     WHERE
         dt_offer_sent IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 os2dq AS (
     SELECT
@@ -1548,6 +1585,7 @@ os2dq AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1556,6 +1594,7 @@ os2dq AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1609,7 +1648,7 @@ os2dq AS (
     WHERE
         dt_offer_sent IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 dq2oa AS (
     SELECT
@@ -1619,6 +1658,7 @@ dq2oa AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1627,6 +1667,7 @@ dq2oa AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1680,7 +1721,7 @@ dq2oa AS (
     WHERE
         dt_deal_qualified IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 os2ccv AS (
     SELECT
@@ -1690,6 +1731,7 @@ os2ccv AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1698,6 +1740,7 @@ os2ccv AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1751,7 +1794,7 @@ os2ccv AS (
     WHERE
         dt_offer_sent IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 oa2ccv AS (
     SELECT
@@ -1761,6 +1804,7 @@ oa2ccv AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1769,6 +1813,7 @@ oa2ccv AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1822,7 +1867,7 @@ oa2ccv AS (
     WHERE
         dt_offer_accepted IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 ccv2lts AS (
     SELECT
@@ -1832,6 +1877,7 @@ ccv2lts AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1840,6 +1886,7 @@ ccv2lts AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1893,7 +1940,7 @@ ccv2lts AS (
     WHERE
         dt_ccv_signed IS NOT NULL
     GROUP BY 
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 lts2lte AS (
     SELECT
@@ -1903,6 +1950,7 @@ lts2lte AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1911,6 +1959,7 @@ lts2lte AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -1964,7 +2013,7 @@ lts2lte AS (
     WHERE
         dt_diligence_started_legaut IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 lte2lrs AS (
     SELECT
@@ -1974,6 +2023,7 @@ lte2lrs AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -1982,6 +2032,7 @@ lte2lrs AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2035,7 +2086,7 @@ lte2lrs AS (
     WHERE
         dt_diligence_ended_legaut IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 lrs2lre AS (
     SELECT
@@ -2045,6 +2096,7 @@ lrs2lre AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2053,6 +2105,7 @@ lrs2lre AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2106,7 +2159,7 @@ lrs2lre AS (
     WHERE
         dt_diligence_started_legal IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 lre2de AS (
     SELECT
@@ -2116,6 +2169,7 @@ lre2de AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2124,6 +2178,7 @@ lre2de AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2177,7 +2232,7 @@ lre2de AS (
     WHERE
         dt_diligence_ended_legal IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 ccv2credstart AS (
     SELECT
@@ -2187,6 +2242,7 @@ ccv2credstart AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2195,6 +2251,7 @@ ccv2credstart AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2248,7 +2305,7 @@ ccv2credstart AS (
     WHERE
         dt_ccv_signed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 credstart2credsent AS (
     SELECT
@@ -2258,6 +2315,7 @@ credstart2credsent AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2266,6 +2324,7 @@ credstart2credsent AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2318,7 +2377,7 @@ credstart2credsent AS (
         sale_demand_classification
     WHERE
         dt_credit_started IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 ccv2crnended AS (
     SELECT
@@ -2328,6 +2387,7 @@ ccv2crnended AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2336,6 +2396,7 @@ ccv2crnended AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2388,7 +2449,7 @@ ccv2crnended AS (
         sale_demand_classification
     WHERE
         dt_ccv_signed IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 credsent2finstart AS (
     SELECT
@@ -2398,6 +2459,7 @@ credsent2finstart AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2406,6 +2468,7 @@ credsent2finstart AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2458,7 +2521,7 @@ credsent2finstart AS (
         sale_demand_classification
     WHERE
         dt_credit_approved IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 ccv2finstart AS (
     SELECT
@@ -2468,6 +2531,7 @@ ccv2finstart AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2476,6 +2540,7 @@ ccv2finstart AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2528,7 +2593,7 @@ ccv2finstart AS (
         sale_demand_classification
     WHERE
         dt_ccv_signed IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 finstart2finended AS (
     SELECT
@@ -2538,6 +2603,7 @@ finstart2finended AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2546,6 +2612,7 @@ finstart2finended AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2598,7 +2665,7 @@ finstart2finended AS (
         sale_demand_classification
     WHERE
         dt_finan_started IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 ccv2mi AS (
     SELECT
@@ -2608,6 +2675,7 @@ ccv2mi AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2616,6 +2684,7 @@ ccv2mi AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2668,7 +2737,7 @@ ccv2mi AS (
         sale_demand_classification
     WHERE
         dt_ccv_signed IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 mi2ma AS (
     SELECT
@@ -2678,6 +2747,7 @@ mi2ma AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2686,6 +2756,7 @@ mi2ma AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2739,7 +2810,7 @@ mi2ma AS (
     WHERE
         dt_matricula_inicio IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 ccv2ma AS (
     SELECT
@@ -2749,6 +2820,7 @@ ccv2ma AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2757,6 +2829,7 @@ ccv2ma AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2810,7 +2883,7 @@ ccv2ma AS (
     WHERE
         dt_ccv_signed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 ccv2pc AS (
     SELECT
@@ -2820,6 +2893,7 @@ ccv2pc AS (
         NULL AS mkt_campaign_context,
         NULL AS mkt_origin,
         NULL AS mkt_channel,
+        NULL AS mkt_medium,
         NULL AS mkt_type,
         NULL AS sales_company,
         NULL AS lead_processing_operation,
@@ -2828,6 +2902,7 @@ ccv2pc AS (
         is_3p_supply,
         supply_3p_partner,
         is_3p_demand,
+        NULL AS affiliate_volumetry,
         demand_3p_partner,
         first_touchpoint AS first_origin_demand,
         higher_intent_before_offer AS origin_before_offer,
@@ -2880,7 +2955,7 @@ ccv2pc AS (
     WHERE
         dt_ccv_signed IS NOT NULL
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 union_all AS (
     SELECT *
@@ -3035,11 +3110,13 @@ union_all_date AS (
         ua.is_3p_supply,
         ua.supply_3p_partner,
         ua.is_3p_demand,
+        ua.affiliate_volumetry,
         ua.demand_3p_partner,
         ua.lead_context,
         ua.mkt_campaign_context,
         ua.mkt_origin,
         ua.mkt_channel,
+        ua.mkt_medium,
         ua.mkt_type,
         ua.sales_company,
         ua.lead_processing_operation,
@@ -3104,9 +3181,11 @@ SELECT
     mkt_campaign_context,
     mkt_origin,
     mkt_channel,
+    mkt_medium,
     mkt_type,
     sales_company,
     lead_processing_operation,
+    affiliate_volumetry,
     first_origin_demand,
     origin_before_offer,
     origin_after_offer,
@@ -3168,9 +3247,11 @@ GROUP BY
     mkt_campaign_context,
     mkt_origin,
     mkt_channel,
+    mkt_medium,
     mkt_type,
     sales_company,
     lead_processing_operation,
+    affiliate_volumetry,
     first_origin_demand,
     origin_before_offer,
     origin_after_offer,

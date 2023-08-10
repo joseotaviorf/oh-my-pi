@@ -40,9 +40,13 @@ SELECT
     CASE
         WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN 'Out of coverage area'
         WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN dr.city_group
-    END AS city_group
+    END AS city_group,
+	ac.affiliate_volumetry
 FROM
     dw_datamarts.lead_listing_flows AS lf
+LEFT JOIN
+    dw_datamarts.affiliates_clusters ac
+        ON ac.sk_user = lf.sk_user_lead_affiliate AND ac.month_start = DATE_TRUNC('MONTH',(TO_DATE(CAST(lf.sk_lead_date AS STRING),'yyyyMMdd')))
 LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
@@ -451,6 +455,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0 AS is_3p_demand,
+    slf.affiliate_volumetry,
     NULL AS demand_3p_partner,
 	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
@@ -492,7 +497,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_lead_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 prospect AS (
 SELECT
@@ -511,6 +516,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0 AS is_3p_demand,
+	slf.affiliate_volumetry,
     NULL AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
@@ -552,7 +558,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 first_contacts AS (
 SELECT
@@ -571,6 +577,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0 AS is_3p_demand,
+	slf.affiliate_volumetry,
     NULL AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
@@ -612,7 +619,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_contact_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 qualified AS (
 SELECT
@@ -631,6 +638,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0 AS is_3p_demand,
+	slf.affiliate_volumetry,
     NULL AS demand_3p_partner,
     NULL AS first_origin_demand,
     NULL AS origin_before_offer,
@@ -672,7 +680,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 available_qualified AS (
 SELECT
@@ -691,6 +699,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0 AS is_3p_demand,
+	slf.affiliate_volumetry,
     NULL AS demand_3p_partner,
     NULL AS first_origin_demand,
     NULL AS origin_before_offer,
@@ -732,7 +741,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_available_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 opportunity AS (
 SELECT
@@ -751,6 +760,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0 AS is_3p_demand,
+	slf.affiliate_volumetry,
     NULL AS demand_3p_partner,
     NULL AS first_origin_demand,
     NULL AS origin_before_offer,
@@ -792,7 +802,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_opportunity_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 first_listing AS (
 SELECT
@@ -811,6 +821,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0 AS is_3p_demand,
+	slf.affiliate_volumetry,
     NULL AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
@@ -852,7 +863,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_listing_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 tta_sent AS (
 SELECT
@@ -871,6 +882,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -913,7 +925,7 @@ FROM
 WHERE
     sdc.tta_started IS NOT NULL
 --  DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 tta_completed AS (
 SELECT
@@ -932,6 +944,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -974,7 +987,7 @@ FROM
 WHERE
     sdc.tta_started IS NOT NULL
 --  DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 visits_booked AS (
 SELECT
@@ -993,6 +1006,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1034,7 +1048,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_created IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 order by 1 desc
 ),
 visits_completed AS (
@@ -1054,6 +1068,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1095,7 +1110,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_completed IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 offers_sent AS (
 SELECT
@@ -1114,6 +1129,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1155,7 +1171,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_offer_sent IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 offers_deal_qualified AS (
 SELECT
@@ -1174,6 +1190,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1215,7 +1232,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_deal_qualified IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 offers_accepted AS (
 SELECT
@@ -1234,6 +1251,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1275,7 +1293,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_offer_accepted IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 ccv_signed AS (
 SELECT
@@ -1294,6 +1312,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1335,7 +1354,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_ccv_signed IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 diligence_started_legaut AS (
 SELECT
@@ -1354,6 +1373,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1395,7 +1415,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_started_legaut IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 diligence_ended_legaut AS (
 SELECT
@@ -1414,6 +1434,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1455,7 +1476,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended_legaut IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 diligence_ended AS (
 SELECT
@@ -1474,6 +1495,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1515,7 +1537,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 diligence_started_legal AS (
 SELECT
@@ -1534,6 +1556,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1575,7 +1598,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_started_legal IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 diligence_ended_legal AS (
 SELECT
@@ -1594,6 +1617,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1635,7 +1659,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_diligence_ended_legal IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 credit_sent AS (
 SELECT
@@ -1654,6 +1678,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1695,7 +1720,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_credit_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 credit_approved AS (
 SELECT
@@ -1714,6 +1739,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1755,7 +1781,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_credit_approved IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 finan_started AS (
 SELECT
@@ -1774,6 +1800,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1815,7 +1842,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_finan_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 finan_ended AS (
 SELECT
@@ -1834,6 +1861,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1875,7 +1903,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_finan_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 payment_concluded AS (
 SELECT
@@ -1894,6 +1922,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1935,7 +1964,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_payment_concluded IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 notes_registry_started AS (
 SELECT
@@ -1954,6 +1983,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -1995,7 +2025,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_notes_registry_started IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 notes_registry_ended AS (
 SELECT
@@ -2014,6 +2044,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -2055,7 +2086,7 @@ FROM
 	sale_demand_classification
 WHERE
 	dt_notes_registry_ended IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 matricula_inicio AS (
 SELECT
@@ -2074,6 +2105,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -2115,7 +2147,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_matricula_inicio IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 matricula_atualizada AS (
 SELECT
@@ -2134,6 +2166,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -2175,7 +2208,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_matricula_atualizada IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 entrega_chave AS (
 SELECT
@@ -2194,6 +2227,7 @@ SELECT
     is_3p_supply,
     supply_3p_partner,
     is_3p_demand,
+	NULL AS affiliate_volumetry,
     demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -2235,7 +2269,7 @@ FROM
     sale_demand_classification
 WHERE
     dt_entrega_chaves IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
 ),
 union_all AS (
 SELECT * FROM lead_
@@ -2319,6 +2353,7 @@ SELECT
 	ua.mkt_type,
 	ua.sales_company,
     ua.lead_processing_operation,
+	ua.affiliate_volumetry,
 	ua.first_origin_demand,
 	ua.origin_before_offer,
 	ua.origin_after_offer,
@@ -2378,6 +2413,7 @@ SELECT
 	mkt_type,
 	sales_company,
 	lead_processing_operation,
+	affiliate_volumetry,
 	first_origin_demand,
 	origin_before_offer,
 	origin_after_offer,
@@ -2437,6 +2473,7 @@ GROUP BY
 	mkt_type,
 	sales_company,
 	lead_processing_operation,
+	affiliate_volumetry,
 	first_origin_demand,
 	origin_before_offer,
 	origin_after_offer,
