@@ -4,15 +4,39 @@ columns:
   base:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing.base
+  base_type:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.tipo_de_base
   dt_mailing:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing.data_mailing
+  dt_prospect:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_prospect
+  dt_qualified:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_qualified
+  dt_availalable_qualified:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_availalable_qualified
+  dt_opportunity:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_opp
+  dt_first_listing:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.dt_first_listing
   id_house:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing.id_house
   main_phone:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing.telefone_principal
+  reprocessing_channel:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.canal_reprocessamento
+  reprocessing_version:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing.versao_do_reprocessamento
   sales_company:
     lineage:
       - datalake_gsheets_raw.supply_listing_historical_reprocessing.sales_company

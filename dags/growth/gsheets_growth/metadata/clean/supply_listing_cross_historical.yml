@@ -10,6 +10,9 @@ columns:
   main_phone:
     lineage:
       - datalake_gsheets_raw.supply_listing_cross_historical.telefone_principal
+  reprocessing_context:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_cross_historical.contexto_reprocessamento
   sales_company:
     lineage:
       - datalake_gsheets_raw.supply_listing_cross_historical.sales_company
