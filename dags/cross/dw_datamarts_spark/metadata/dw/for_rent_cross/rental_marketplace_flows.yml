@@ -1,8 +1,8 @@
 ---
 database_name: dw_datamarts
 table_name: rental_marketplace_flows
-owner: '@data-for-rent'
-domain: Data For Rent
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Rent
 description: A datamart tracking rental flows in 5A context.
 columns:
   week_start:
@@ -27,3 +27,30 @@ columns:
       - dw_datamarts.rent_flow_interactions.sk_client
       - dw_datamarts.tenant_prospect_status.sk_client
       - dw_public.fact_listing_rent_flows.sk_client
+  listing_cummulative_rent_flows:
+    description: Number of cummulative distinct rent flows that the listing received until the indicated week.
+      Calculated by the sum of the listing_weekly_rent_flows of the week indicated plus previous weeks.
+  listing_weekly_rent_flows:
+    description: Number of distinct rent flows that the listing received on the indicated week.
+  status_last_week_short:
+    description: Listing status on the previous week. This is a short and treated version of the original status
+      based on the status itself and the change reason.
+  status_short:
+    description: Listing status on the indicated week. This is a short and treated version of the original status
+      based on the status itself and the change reason.
+  is_tp_active:
+    description: Flag to indicate if the tenant prospect is active or not.
+  had_demand:
+    description: Flag to indicate if the listing had demand funnel events.
+  rent_flows:
+    description: Number of ongoing rent flows that the pair listing - sk_client had on the indicated week.
+  visits_booked:
+    description: Number of visits booked that the pair listing - sk_client had on the indicated week.
+  offers_submitted:
+    description: Number of offers submiited that the pair listing - sk_client had on the indicated week.
+  offers_accepted:
+    description: Number of offers accepted that the pair listing - sk_client had on the indicated week.
+  credits_approved:
+    description: Number of credit analysis approved that the pair listing - sk_client had on the indicated week.
+  contracts_signed:
+    description: Number of contracts signed that the pair listing - sk_client had on the indicated week. 
