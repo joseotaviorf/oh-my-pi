@@ -20,15 +20,6 @@ WITH autonomous_agent_info AS (
         AND h.dt_creation >= partner_agent.ts_created --This rule might change WHEN we start to consider migration
         AND h.id_external IS NOT NULL --This rule might change WHEN we start to consider migration
 ),
-agents_with_keys AS (
-    SELECT
-        id_house_listing,
-        MIN(first_key_location) AS first_key_location,
-        MIN(is_keys_with_agent_eligible) AS is_keys_with_agent_eligible
-    FROM
-        datalake_ebdb_listing.agents_with_keys
-    GROUP BY 1
-),
 house_listings AS (
     WITH
     lbc AS (
@@ -166,7 +157,7 @@ house_listings AS (
     LEFT JOIN rl
         ON rl.id_house = lbc.id_house
     LEFT JOIN
-        agents_with_keys AS awk
+        datalake_ebdb_listing.agents_with_keys AS awk
             ON hl.id_house_listing = awk.id_house_listing
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
