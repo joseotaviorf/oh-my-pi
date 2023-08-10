@@ -308,18 +308,14 @@ base AS (
     UNION ALL
 
     SELECT
-      MD5(CONCAT(ROW_NUMBER() OVER (PARTITION BY 1 ORDER BY dt_created), 'golden_set')) AS id,
+      ROW_NUMBER() OVER (PARTITION BY 1 ORDER BY dt_created) AS id,
       'golden_set' AS source,
       INITCAP(condo_name) AS condo,
       condo_cnpj AS cnpj,
-      INITCAP(address_type || ' ' || address_type) AS address,
+      INITCAP(address_type || ' ' || address) AS address,
       number,
       neighborhood,
-      CASE LENGTH(zipcode)
-          WHEN 7 THEN CAST((LEFT(LPAD(TRIM(REPLACE(zipcode, '.', '')), 8, '0'), 5) || '-' || RIGHT(LPAD(TRIM(REPLACE(zipcode, '.', '')), 8, '0'), 3)) AS STRING)
-          WHEN 9 THEN CAST((LEFT(LPAD(TRIM(SPLIT(zipcode, '\\.')[0]), 8, '0'), 5) || '-' || RIGHT(LPAD(TRIM(SPLIT(zipcode, '\\.')[0]), 8, '0'), 3)) AS STRING)
-          ELSE TRANSLATE(zipcode, '\\.-', '')
-      END AS zip_code,
+      zipcode AS zip_code,
       city,
       state,
       CAST(NULL AS DECIMAL(10,6)) AS lat,
@@ -417,7 +413,6 @@ base AS (
       DAY(dt_created) AS day
     FROM
       datalake_gsheets_clean.vespucio_condo_golden_set
-
 )
 SELECT
     MD5(CONCAT(id, source)) AS uuid,
@@ -474,5 +469,3 @@ SELECT
     day
 FROM
     base
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id, source ORDER BY ts_updated) = 1
