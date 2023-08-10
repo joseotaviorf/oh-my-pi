@@ -2277,6 +2277,7 @@ bietlejuice.enrich_vespucio:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-info-condo-amenities
   - bietlejuice.ebdb:load-clean-map-region
+  - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
   - bietlejuice.sindico_net:load-clean-condominium
 bietlejuice.enrich_wololo_lead:
   - bietlejuice.wololo:load-clean-prospect-aud

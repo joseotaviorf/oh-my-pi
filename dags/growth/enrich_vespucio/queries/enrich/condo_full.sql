@@ -133,177 +133,291 @@ amenities_cnt AS (
 ),
 base AS (
     SELECT
-    condo_ebdb.id,
-    'ebdb' AS source,
-    condo_ebdb.condo,
-    NULL AS cnpj,
-    condo_ebdb.address,
-    condo_ebdb.number,
-    condo_ebdb.neighborhood,
-    condo_ebdb.zip_code,
-    condo_ebdb.city,
-    NULL AS state,
-    condo_ebdb.lat,
-    condo_ebdb.lng,
-    condo_ebdb.code,
-    condo_ebdb.phone_number,
-    0.5 AS dsr,
-    NULL AS type_syndic,
-    NULL AS account_type,
-    NULL AS type_of_administration,
-    NULL AS origin,
-    NULL AS total_blocks,
-    NULL AS total_ordinances,
-    NULL AS total_units,
-    NULL AS total_elevators,
-    NULL AS number_of_employees,
-    NULL AS outsourced_employees,
-    NULL AS monthly_tax_revenues,
-    NULL AS number_of_garage_parking_slots,
-    NULL AS number_of_garage_floors,
-    NULL AS number_of_garage_gates,
-    NULL AS number_of_water_tanks,
-    CASE 
-        WHEN amenities_cnt.has_condo_page_true = 0 AND amenities_cnt.has_condo_page_false = 0 THEN NULL
-        WHEN amenities_cnt.has_condo_page_true >= amenities_cnt.has_condo_page_false THEN TRUE
-        WHEN amenities_cnt.has_condo_page_true < amenities_cnt.has_condo_page_false THEN FALSE 
-    END AS has_condo_page,
-    CASE 
-        WHEN amenities_cnt.has_elevator_true = 0 AND amenities_cnt.has_elevator_false = 0 THEN NULL
-        WHEN amenities_cnt.has_elevator_true >= amenities_cnt.has_elevator_false THEN TRUE
-        WHEN amenities_cnt.has_elevator_true < amenities_cnt.has_elevator_false THEN FALSE
-    END AS has_elevator,
-    CASE 
-        WHEN amenities_cnt.has_entrance_hall_true = 0 AND amenities_cnt.has_entrance_hall_false = 0 THEN NULL
-        WHEN amenities_cnt.has_entrance_hall_true >= amenities_cnt.has_entrance_hall_false THEN TRUE
-        WHEN amenities_cnt.has_entrance_hall_true < amenities_cnt.has_entrance_hall_false THEN FALSE
-    END AS has_entrance_hall,
-    CASE 
-        WHEN amenities_cnt.has_grill_area_true = 0 AND amenities_cnt.has_grill_area_false = 0 THEN NULL
-        WHEN amenities_cnt.has_grill_area_true >= amenities_cnt.has_grill_area_false THEN TRUE
-        WHEN amenities_cnt.has_grill_area_true < amenities_cnt.has_grill_area_false THEN FALSE
-    END AS has_grill_area,
-    CASE 
-        WHEN amenities_cnt.has_swim_pool_true = 0 AND amenities_cnt.has_swim_pool_false = 0 THEN NULL
-        WHEN amenities_cnt.has_swim_pool_true >= amenities_cnt.has_swim_pool_false THEN TRUE
-        WHEN amenities_cnt.has_swim_pool_true < amenities_cnt.has_swim_pool_false THEN FALSE
-    END AS has_swim_pool,
-    CASE 
-        WHEN amenities_cnt.has_sports_court_true = 0 AND amenities_cnt.has_sports_court_false = 0 THEN NULL
-        WHEN amenities_cnt.has_sports_court_true >= amenities_cnt.has_sports_court_false THEN TRUE
-        WHEN amenities_cnt.has_sports_court_true < amenities_cnt.has_sports_court_false THEN FALSE
-    END AS has_sports_court,
-    CASE 
-        WHEN amenities_cnt.has_gym_true = 0 AND amenities_cnt.has_gym_false = 0 THEN NULL
-        WHEN amenities_cnt.has_gym_true >= amenities_cnt.has_gym_false THEN TRUE
-        WHEN amenities_cnt.has_gym_true < amenities_cnt.has_gym_false THEN FALSE
-    END AS has_gym,
-    CASE 
-        WHEN amenities_cnt.has_party_hall_true = 0 AND amenities_cnt.has_party_hall_false = 0 THEN NULL
-        WHEN amenities_cnt.has_party_hall_true >= amenities_cnt.has_party_hall_false THEN TRUE
-        WHEN amenities_cnt.has_party_hall_true < amenities_cnt.has_party_hall_false THEN FALSE
-    END AS has_party_hall,
-    CASE 
-        WHEN amenities_cnt.has_sauna_true = 0 AND amenities_cnt.has_sauna_false = 0 THEN NULL
-        WHEN amenities_cnt.has_sauna_true >= amenities_cnt.has_sauna_false THEN TRUE
-        WHEN amenities_cnt.has_sauna_true < amenities_cnt.has_sauna_false THEN FALSE
-    END AS has_sauna,
-    CASE 
-        WHEN amenities_cnt.has_laundry_true = 0 AND amenities_cnt.has_laundry_false = 0 THEN NULL
-        WHEN amenities_cnt.has_laundry_true >= amenities_cnt.has_laundry_false THEN TRUE
-        WHEN amenities_cnt.has_laundry_true < amenities_cnt.has_laundry_false THEN FALSE
-    END AS has_laundry,
-    CASE 
-        WHEN amenities_cnt.has_piped_gas_true = 0 AND amenities_cnt.has_piped_gas_false = 0 THEN NULL
-        WHEN amenities_cnt.has_piped_gas_true >= amenities_cnt.has_piped_gas_false THEN TRUE
-        WHEN amenities_cnt.has_piped_gas_true < amenities_cnt.has_piped_gas_false THEN FALSE
-    END AS has_piped_gas,
-    CASE 
-        WHEN amenities_cnt.has_gourmet_area_true = 0 AND amenities_cnt.has_gourmet_area_false = 0 THEN NULL
-        WHEN amenities_cnt.has_gourmet_area_true >= amenities_cnt.has_gourmet_area_false THEN TRUE
-        WHEN amenities_cnt.has_gourmet_area_true < amenities_cnt.has_gourmet_area_false THEN FALSE
-    END AS has_gourmet_area,
-    CASE 
-        WHEN amenities_cnt.has_metro_or_train_close_true = 0 AND amenities_cnt.has_metro_or_train_close_false = 0 THEN NULL
-        WHEN amenities_cnt.has_metro_or_train_close_true >= amenities_cnt.has_metro_or_train_close_false THEN TRUE
-        WHEN amenities_cnt.has_metro_or_train_close_true < amenities_cnt.has_metro_or_train_close_false THEN FALSE
-    END AS has_metro_or_train_close,
-    CASE 
-        WHEN amenities_cnt.has_toy_library_true = 0 AND amenities_cnt.has_toy_library_false = 0 THEN NULL
-        WHEN amenities_cnt.has_toy_library_true >= amenities_cnt.has_toy_library_false THEN TRUE
-        WHEN amenities_cnt.has_toy_library_true < amenities_cnt.has_toy_library_false THEN FALSE
-    END AS has_toy_library,
-    NULL AS has_water_reuse,
-    condo_ebdb.construction_year,
-    YEAR(condo_ebdb.ts_updated) AS updated_year,
-    condo_ebdb.ts_updated,
-    YEAR(condo_ebdb.ts_updated) AS year,
-    MONTH(condo_ebdb.ts_updated) AS month,
-    DAY(condo_ebdb.ts_updated) AS day
+      condo_ebdb.id,
+      'ebdb' AS source,
+      condo_ebdb.condo,
+      NULL AS cnpj,
+      condo_ebdb.address,
+      condo_ebdb.number,
+      condo_ebdb.neighborhood,
+      condo_ebdb.zip_code,
+      condo_ebdb.city,
+      NULL AS state,
+      condo_ebdb.lat,
+      condo_ebdb.lng,
+      condo_ebdb.code,
+      condo_ebdb.phone_number,
+      0.5 AS dsr,
+      NULL AS type_syndic,
+      NULL AS account_type,
+      NULL AS type_of_administration,
+      NULL AS origin,
+      NULL AS total_blocks,
+      NULL AS total_ordinances,
+      NULL AS total_units,
+      NULL AS total_elevators,
+      NULL AS number_of_employees,
+      NULL AS outsourced_employees,
+      NULL AS monthly_tax_revenues,
+      NULL AS number_of_garage_parking_slots,
+      NULL AS number_of_garage_floors,
+      NULL AS number_of_garage_gates,
+      NULL AS number_of_water_tanks,
+      CASE 
+          WHEN amenities_cnt.has_condo_page_true = 0 AND amenities_cnt.has_condo_page_false = 0 THEN NULL
+          WHEN amenities_cnt.has_condo_page_true >= amenities_cnt.has_condo_page_false THEN TRUE
+          WHEN amenities_cnt.has_condo_page_true < amenities_cnt.has_condo_page_false THEN FALSE 
+      END AS has_condo_page,
+      CASE 
+          WHEN amenities_cnt.has_elevator_true = 0 AND amenities_cnt.has_elevator_false = 0 THEN NULL
+          WHEN amenities_cnt.has_elevator_true >= amenities_cnt.has_elevator_false THEN TRUE
+          WHEN amenities_cnt.has_elevator_true < amenities_cnt.has_elevator_false THEN FALSE
+      END AS has_elevator,
+      CASE 
+          WHEN amenities_cnt.has_entrance_hall_true = 0 AND amenities_cnt.has_entrance_hall_false = 0 THEN NULL
+          WHEN amenities_cnt.has_entrance_hall_true >= amenities_cnt.has_entrance_hall_false THEN TRUE
+          WHEN amenities_cnt.has_entrance_hall_true < amenities_cnt.has_entrance_hall_false THEN FALSE
+      END AS has_entrance_hall,
+      CASE 
+          WHEN amenities_cnt.has_grill_area_true = 0 AND amenities_cnt.has_grill_area_false = 0 THEN NULL
+          WHEN amenities_cnt.has_grill_area_true >= amenities_cnt.has_grill_area_false THEN TRUE
+          WHEN amenities_cnt.has_grill_area_true < amenities_cnt.has_grill_area_false THEN FALSE
+      END AS has_grill_area,
+      CASE 
+          WHEN amenities_cnt.has_swim_pool_true = 0 AND amenities_cnt.has_swim_pool_false = 0 THEN NULL
+          WHEN amenities_cnt.has_swim_pool_true >= amenities_cnt.has_swim_pool_false THEN TRUE
+          WHEN amenities_cnt.has_swim_pool_true < amenities_cnt.has_swim_pool_false THEN FALSE
+      END AS has_swim_pool,
+      CASE 
+          WHEN amenities_cnt.has_sports_court_true = 0 AND amenities_cnt.has_sports_court_false = 0 THEN NULL
+          WHEN amenities_cnt.has_sports_court_true >= amenities_cnt.has_sports_court_false THEN TRUE
+          WHEN amenities_cnt.has_sports_court_true < amenities_cnt.has_sports_court_false THEN FALSE
+      END AS has_sports_court,
+      CASE 
+          WHEN amenities_cnt.has_gym_true = 0 AND amenities_cnt.has_gym_false = 0 THEN NULL
+          WHEN amenities_cnt.has_gym_true >= amenities_cnt.has_gym_false THEN TRUE
+          WHEN amenities_cnt.has_gym_true < amenities_cnt.has_gym_false THEN FALSE
+      END AS has_gym,
+      CASE 
+          WHEN amenities_cnt.has_party_hall_true = 0 AND amenities_cnt.has_party_hall_false = 0 THEN NULL
+          WHEN amenities_cnt.has_party_hall_true >= amenities_cnt.has_party_hall_false THEN TRUE
+          WHEN amenities_cnt.has_party_hall_true < amenities_cnt.has_party_hall_false THEN FALSE
+      END AS has_party_hall,
+      CASE 
+          WHEN amenities_cnt.has_sauna_true = 0 AND amenities_cnt.has_sauna_false = 0 THEN NULL
+          WHEN amenities_cnt.has_sauna_true >= amenities_cnt.has_sauna_false THEN TRUE
+          WHEN amenities_cnt.has_sauna_true < amenities_cnt.has_sauna_false THEN FALSE
+      END AS has_sauna,
+      CASE 
+          WHEN amenities_cnt.has_laundry_true = 0 AND amenities_cnt.has_laundry_false = 0 THEN NULL
+          WHEN amenities_cnt.has_laundry_true >= amenities_cnt.has_laundry_false THEN TRUE
+          WHEN amenities_cnt.has_laundry_true < amenities_cnt.has_laundry_false THEN FALSE
+      END AS has_laundry,
+      CASE 
+          WHEN amenities_cnt.has_piped_gas_true = 0 AND amenities_cnt.has_piped_gas_false = 0 THEN NULL
+          WHEN amenities_cnt.has_piped_gas_true >= amenities_cnt.has_piped_gas_false THEN TRUE
+          WHEN amenities_cnt.has_piped_gas_true < amenities_cnt.has_piped_gas_false THEN FALSE
+      END AS has_piped_gas,
+      CASE 
+          WHEN amenities_cnt.has_gourmet_area_true = 0 AND amenities_cnt.has_gourmet_area_false = 0 THEN NULL
+          WHEN amenities_cnt.has_gourmet_area_true >= amenities_cnt.has_gourmet_area_false THEN TRUE
+          WHEN amenities_cnt.has_gourmet_area_true < amenities_cnt.has_gourmet_area_false THEN FALSE
+      END AS has_gourmet_area,
+      CASE 
+          WHEN amenities_cnt.has_metro_or_train_close_true = 0 AND amenities_cnt.has_metro_or_train_close_false = 0 THEN NULL
+          WHEN amenities_cnt.has_metro_or_train_close_true >= amenities_cnt.has_metro_or_train_close_false THEN TRUE
+          WHEN amenities_cnt.has_metro_or_train_close_true < amenities_cnt.has_metro_or_train_close_false THEN FALSE
+      END AS has_metro_or_train_close,
+      CASE 
+          WHEN amenities_cnt.has_toy_library_true = 0 AND amenities_cnt.has_toy_library_false = 0 THEN NULL
+          WHEN amenities_cnt.has_toy_library_true >= amenities_cnt.has_toy_library_false THEN TRUE
+          WHEN amenities_cnt.has_toy_library_true < amenities_cnt.has_toy_library_false THEN FALSE
+      END AS has_toy_library,
+      NULL AS has_water_reuse,
+      condo_ebdb.construction_year,
+      YEAR(condo_ebdb.ts_updated) AS updated_year,
+      condo_ebdb.ts_updated,
+      YEAR(condo_ebdb.ts_updated) AS year,
+      MONTH(condo_ebdb.ts_updated) AS month,
+      DAY(condo_ebdb.ts_updated) AS day
     FROM
-    condo_ebdb
+      condo_ebdb
     JOIN amenities_cnt
         ON condo_ebdb.id = amenities_cnt.id
 
     UNION ALL
 
     SELECT
-    id,
-    'sindiconet' AS source,
-    condo,
-    cnpj,
-    street AS address,
-    number,
-    neighborhood,
-    zip_code,
-    city,
-    state,
-    CAST(lat AS DECIMAL(10,6)) AS lat,
-    CAST(lng AS DECIMAL(10,6)) AS lng,
-    NULL AS code,
-    NULL AS phone_number,
-    0.4 AS dsr,
-    type_syndic,
-    account_type,
-    type_of_administration,
-    origin,
-    total_blocks,
-    total_ordinances,
-    total_units,
-    total_elevators,
-    number_of_employees,
-    outsourced_employees,
-    monthly_tax_revenues,
-    number_of_garage_parking_slots,
-    number_of_garage_floors,
-    number_of_garage_gates,
-    number_of_water_tanks,
-    NULL AS has_condo_page,
-    has_elevator,
-    has_entrance_hall,
-    has_grill_area,
-    has_swim_pool,
-    has_sports_court,
-    NULL AS has_gym,
-    has_party_hall,
-    has_sauna,
-    has_laundry,
-    has_piped_gas,
-    NULL AS has_gourmet_area,
-    NULL AS has_metro_or_train_close,
-    NULL AS has_toy_library,
-    has_water_reuse,
-    construction_year,
-    YEAR(ts_updated) AS updated_year,
-    ts_updated,
-    YEAR(ts_updated) AS year,
-    MONTH(ts_updated) AS month,
-    DAY(ts_updated) AS day
+      id,
+      'sindiconet' AS source,
+      condo,
+      cnpj,
+      street AS address,
+      number,
+      neighborhood,
+      zip_code,
+      city,
+      state,
+      CAST(lat AS DECIMAL(10,6)) AS lat,
+      CAST(lng AS DECIMAL(10,6)) AS lng,
+      NULL AS code,
+      NULL AS phone_number,
+      0.4 AS dsr,
+      type_syndic,
+      account_type,
+      type_of_administration,
+      origin,
+      total_blocks,
+      total_ordinances,
+      total_units,
+      total_elevators,
+      number_of_employees,
+      outsourced_employees,
+      monthly_tax_revenues,
+      number_of_garage_parking_slots,
+      number_of_garage_floors,
+      number_of_garage_gates,
+      number_of_water_tanks,
+      NULL AS has_condo_page,
+      has_elevator,
+      has_entrance_hall,
+      has_grill_area,
+      has_swim_pool,
+      has_sports_court,
+      NULL AS has_gym,
+      has_party_hall,
+      has_sauna,
+      has_laundry,
+      has_piped_gas,
+      NULL AS has_gourmet_area,
+      NULL AS has_metro_or_train_close,
+      NULL AS has_toy_library,
+      has_water_reuse,
+      construction_year,
+      YEAR(ts_updated) AS updated_year,
+      ts_updated,
+      YEAR(ts_updated) AS year,
+      MONTH(ts_updated) AS month,
+      DAY(ts_updated) AS day
     FROM
-    datalake_sindico_net_clean.condominium
+      datalake_sindico_net_clean.condominium
     WHERE
         lat != 'None'
         AND lng != 'None'
+
+    UNION ALL
+
+    SELECT
+      MD5(CONCAT(ROW_NUMBER() OVER (PARTITION BY 1 ORDER BY dt_created), 'golden_set')) AS id,
+      'golden_set' AS source,
+      INITCAP(condo_name) AS condo,
+      condo_cnpj AS cnpj,
+      INITCAP(address_type || ' ' || address_type) AS address,
+      number,
+      neighborhood,
+      CASE LENGTH(zipcode)
+          WHEN 7 THEN CAST((LEFT(LPAD(TRIM(REPLACE(zipcode, '.', '')), 8, '0'), 5) || '-' || RIGHT(LPAD(TRIM(REPLACE(zipcode, '.', '')), 8, '0'), 3)) AS STRING)
+          WHEN 9 THEN CAST((LEFT(LPAD(TRIM(SPLIT(zipcode, '\\.')[0]), 8, '0'), 5) || '-' || RIGHT(LPAD(TRIM(SPLIT(zipcode, '\\.')[0]), 8, '0'), 3)) AS STRING)
+          ELSE TRANSLATE(zipcode, '\\.-', '')
+      END AS zip_code,
+      city,
+      state,
+      CAST(NULL AS DECIMAL(10,6)) AS lat,
+      CAST(NULL AS DECIMAL(10,6)) AS lng,
+      NULL AS code,
+      NULL AS phone_number,
+      0.0 AS dsr,
+      NULL AS type_syndic,
+      NULL AS account_type,
+      NULL AS type_of_administration,
+      NULL AS origin,
+      NULL AS total_blocks,
+      NULL AS total_ordinances,
+      NULL AS total_units,
+      NULL AS total_elevators,
+      NULL AS number_of_employees,
+      NULL AS outsourced_employees,
+      NULL AS monthly_tax_revenues,
+      NULL AS number_of_garage_parking_slots,
+      NULL AS number_of_garage_floors,
+      NULL AS number_of_garage_gates,
+      NULL AS number_of_water_tanks,
+      NULL AS has_condo_page,
+      CASE has_elevator
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_elevator,
+      CASE has_entrance_hall
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_entrance_hall,
+      CASE has_grill_area
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_grill_area,
+      CASE has_swim_pool
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_swim_pool,
+      CASE has_sports_court
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_sports_court,
+      CASE has_gym
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_gym,
+      CASE has_party_hall
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_party_hall,
+      CASE has_sauna
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_sauna,
+      CASE has_laundry
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_laundry,
+      CASE has_piped_gas
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_piped_gas,
+      CASE has_gourmet_area
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_gourmet_area,
+      CASE has_metro_or_train_close
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_metro_or_train_close,
+      CASE has_toy_library
+        WHEN 'Sim' THEN TRUE
+        WHEN 'Não' THEN FALSE
+        ELSE NULL
+      END AS has_toy_library,
+      NULL AS has_water_reuse,
+      NULL AS construction_year,
+      YEAR(dt_created) AS updated_year,
+      dt_created AS ts_updated,
+      YEAR(dt_created) AS year,
+      MONTH(dt_created) AS month,
+      DAY(dt_created) AS day
+    FROM
+      datalake_gsheets_clean.vespucio_condo_golden_set
+
 )
 SELECT
     MD5(CONCAT(id, source)) AS uuid,
