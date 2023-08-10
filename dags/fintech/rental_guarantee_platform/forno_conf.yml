@@ -232,4 +232,13 @@ tables:
   - table_name: delinquency_entry
     date_filter_column: updated_at
     extraction_type: incremental
+  - table_name: fiancavelo_payment_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
+  - table_name: fiancavelo_propose_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
+  - table_name: fiancavelo_proposehistory_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
 partition_cols: ["year", "month", "day"]

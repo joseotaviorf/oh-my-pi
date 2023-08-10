@@ -1,0 +1,88 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: payment
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.id
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.propose
+  id_subscription:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.subscription
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.userupdate
+  customer:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.customer
+  payment_link:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.payment_link
+  invoice_url:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.invoice_url
+  unicid:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.unicid
+  description:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.description
+  gateway:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.gateway
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.status
+  quintocred_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.quintocred_status
+  billing_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.billingtype
+  quintocred_billing_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.quintocred_billing_type
+  value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.value
+  netvalue:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.netvalue
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.active
+  ts_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.due_date
+  ts_due_original:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.originalduedate
+  ts_client_payment:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.clientpaymentdate
+  ts_confirmed:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.confirmeddate
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.datecreated
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.dateupdate
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_payment_legacy.day

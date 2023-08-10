@@ -1,0 +1,73 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: fiancavelo_propose_legacy
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.id
+  id_user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.userinsert
+  id_user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.userupdate
+  id_business_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.type
+  id_propose_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.status
+  id_quintocred_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.quintocred_status
+  id_velo_realestate:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.velo_realestate
+  id_velo_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.velo_company
+  id_quintocred_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.quintocred_company
+  id_plan:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.plan
+  activator_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.activator
+  billing:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.billing
+  realtor:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.realtor
+  hash:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.hash
+  step:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.step
+  status_name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.statusname
+  external_ref:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.externalref
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.active
+  ts_inserted:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.dateupdate
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.fiancavelo_propose_legacy.day
