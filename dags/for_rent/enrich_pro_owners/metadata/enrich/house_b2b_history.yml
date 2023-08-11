@@ -1,30 +1,43 @@
 ---
 database_name: datalake_pro_owners
 table_name: house_b2b_history
+description: Table with historical information about all the houses, with it's status, the historical of owner, B2B info like converted lead, partner.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id_house:
+    description: ID of the house.
     lineage:
       - datalake_ebdb_clean.conversion_lead_aud.id_house
       - datalake_ebdb_clean.house_aud.id_house
       - datalake_ebdb_listing.house_listing.id_house
   id_user:
+    description: ID of the user (owner).
     lineage:
       - datalake_ebdb_clean.house_aud.id_user
   id_converted_lead:
+    description: ID of the converted lead.
     lineage:
       - datalake_ebdb_clean.conversion_lead_aud.id_converted_lead
   id_house_listing:
+    description: ID of the listing version.
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
   id_partner:
+    description: ID of the partner.
     lineage:
       - datalake_ebdb_clean.partner_agent_aud.id_partner
   affiliate_type:
+    description: Type of affiliate.
     lineage:
       - datalake_ebdb_clean.lead_aud.affiliate_type
+  is_last_status_of_day:
+    description: Flag to indicate of the status is the last one of the day.
   ts_started:
+    description: Timestamp of when the status started.
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_ended:
+    description: Timestamp of when the status ended.
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
