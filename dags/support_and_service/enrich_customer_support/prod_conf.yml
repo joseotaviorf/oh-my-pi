@@ -5,16 +5,11 @@ inner_dependencies:
     - email
 
 custom_cluster:
-  driver_node_type_id: r5d.12xlarge
-  node_type_id: r5d.12xlarge
+  driver_node_type_id: m5d.16xlarge
+  node_type_id: m5d.16xlarge
   runtime_engine: PHOTON
-  autoscale:
-    min_workers: 2
-    max_workers: 6
+  num_workers: 5
   aws_attributes:
     ebs_volume_size: 300
   spark_conf:
-    spark.databricks.io.cache.maxDiskUsage: 110
-    spark.databricks.io.cache.maxMetaDataCache: 30
-    spark.databricks.io.cache.compression.enabled: false
-    spark.databricks.io.cache.enabled: true
+    spark.sql.shuffle.partitions: 1280
