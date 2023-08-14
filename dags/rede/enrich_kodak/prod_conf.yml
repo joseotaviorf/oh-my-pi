@@ -1,0 +1,3 @@
+---
+dag_documentation:
+  dag_purpose: Creates enriched tables focused on Kodak, which is QuintoAndar's image and video analysis service.

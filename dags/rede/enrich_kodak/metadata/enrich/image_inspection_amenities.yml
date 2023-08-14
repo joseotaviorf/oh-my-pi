@@ -1,0 +1,26 @@
+---
+database_name: datalake_kodak
+table_name: image_inspection_amenities
+description: Infers which amenities each analyzed house has, based on the image inspection.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_house:
+    description: Id of the house.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.id_external_domain
+      - datalake_ebdb_clean.house.id
+  id_lead_3p:
+    description: Id of the lead 3P.
+    lineage:
+      - datalake_brokers_supply_processor.lead_3p.id
+  has_pool:
+    description: True if there is any image with room_type = pool.
+  has_gym:
+    description: True if there is any image with room_type = gym or exercise_room.
+  has_sauna:
+    description: True if there is any image with room_type = sauna.
+  has_sports_court:
+    description: True if there is any image with room_type = tennis_court or basketball_court.
+  has_toy_library:
+    description: True if there is any image with room_type = game_room or playground.

@@ -1473,6 +1473,11 @@ bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-house
   - bietlejuice.kill_queue:load-clean-reservation
   - bietlejuice.kill_queue:load-clean-user
+bietlejuice.enrich_kodak:
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+  - bietlejuice.kodak:load-clean-image-inspection
+  - bietlejuice.kodak:load-clean-image-inspection-group
 bietlejuice.enrich_kong_ss:
   - bietlejuice.kong:load-clean-kong-logs
 bietlejuice.enrich_label_studio:
