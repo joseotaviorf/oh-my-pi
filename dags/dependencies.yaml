@@ -1866,6 +1866,14 @@ bietlejuice.enrich_rent_demand_events:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_proposal:load-enrich-proposal
+bietlejuice.enrich_rent_flows:
+  - bietlejuice.ebdb:load-clean-rent-flow
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_kill_queue:load-enrich-reservation
+  - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_proposal:load-enrich-proposal
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
 bietlejuice.enrich_rent_potential_listing:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent

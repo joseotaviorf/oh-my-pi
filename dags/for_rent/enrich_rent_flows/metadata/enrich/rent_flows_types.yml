@@ -1,0 +1,50 @@
+---
+database_name: datalake_rent_flows
+table_name: rent_flows_types
+description: This table has information related to rent flow's type information. It's used as a base for the junk dimension
+  dw_rent.dim_rent_flow_type.
+  Each line is an unique combination of all the possible characteristics of a rent flow. The id_rent_flow_type it's a mutable id
+  and should not be used for analysis purposes.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_rent_flow_type:
+    description: Unique and mutable id related to the combination of characteristics of a rent flow.
+      This id is updated daily and should not be used for analysis, only as a join condition for the
+      rent flow models (dw_rent.fact_rent_flows and the junk dimension dw_rent.dim_rent_flow_type.)
+  country_code:
+    lineage:
+      - datalake_rent_flows.rent_flows.country_code
+    description: The country code of the rent flow, related to the property.
+  first_touchpoint:
+    lineage:
+      - datalake_rent_flows.rent_flows.first_touchpoint
+    description: "The first touchpoint of the rent flow, related to the first event that happened to it."
+    categories:
+      'V': "Touchpoint is a visit."
+      'DO': "Touchpoint is a direct offer."
+      'TTA': "Touchpoint is a Talk to Agent event (historical data, a program that happened during Covid-19 pandemic.)"
+  status:
+    lineage:
+      - datalake_rent_flows.rent_flows.status
+    description: Present status of the rent flow.
+  is_step_rejected:
+    lineage:
+      - datalake_rent_flows.rent_flows.is_step_rejected
+    description: Boolean flag indicating if the present step in which the rent flow is, was rejected.
+  has_visit_flow:
+    lineage:
+      - datalake_rent_flows.rent_flows.has_visit_flow
+    description: Boolean flag indicating if the rent flow had any visit event.
+  has_offer_flow:
+    lineage:
+      - datalake_rent_flows.rent_flows.has_offer_flow
+    description: Boolean flag indicating if the rent flow had offer event.
+  has_tta_flow:
+    lineage:
+      - datalake_rent_flows.rent_flows.country_code
+    description: Boolean flag indicating if the rent flow had any Talk to Agent event.
+  had_contract_signed:
+    lineage:
+      - datalake_rent_flows.rent_flows.country_code
+    description: Boolean flag indicating if the rent flow had any contract signed.
