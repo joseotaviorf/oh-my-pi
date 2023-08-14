@@ -1,8 +1,7 @@
-from datetime import datetime
-
 import json
 import os
-import pendulum
+from datetime import datetime
+from pendulum import timezone
 
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
@@ -10,41 +9,40 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from airflow.utils.helpers import chain, cross_downstream
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
+# Pipeline inputs
 SOURCE = "heimdall"
 CONTEXT = SOURCE
-TABLE_NAME = "activity"
 DAG_ID = f"bietlejuice.{SOURCE}"
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 ENV = os.environ.get("ENVIRONMENT")
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
+CLUSTER_DESCRIPTION = "custom_cluster"
 
-config_service = ConfigurationService(CONTEXT)
+config_service = ConfigurationService(dag_name=SOURCE)
+
+# S3 Paths Setup
+datalake_bucket = config_service.get_config("datalake_bucket")
+
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
+
+base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
+raw_spark_jobs_path = f"{s3_prefix}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+
+cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
+default_libraries = config_service.get_config("default_libraries")
 
 tables = config_service.get_config("tables")
 partition_cols = config_service.get_config("partition_cols")
-
-datalake_bucket = config_service.get_config("datalake_bucket")
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
-doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-
-databricks_bietlejuice_repo_path = config_service.get_config(
-    "databricks_bietlejuice_repo_path"
-)
-base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-raw_spark_jobs_path = (
-    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
-)
-
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
-default_libraries = config_service.get_config("default_libraries")
+dag_documentation = config_service.get_config("dag_documentation")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -56,14 +54,18 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 
@@ -85,7 +87,6 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 for raw_table_name, table_details in tables.items():
