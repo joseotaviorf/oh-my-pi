@@ -5,7 +5,7 @@ SELECT DISTINCT
   dmt.origin AS channel,
   dmt.status,
   da.email AS agent_email,
-  da.agent_company,
+  da.agent_organization AS agent_company,
   dd.department,
   dd.journey_step,
   dd.front_or_back,

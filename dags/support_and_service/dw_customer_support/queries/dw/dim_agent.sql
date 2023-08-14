@@ -1,46 +1,10 @@
-WITH agents AS (
-  SELECT
-    id_agent AS sk_agent,
-    agent_email AS email,
-    agent_manager,
-    agent_name AS full_name,
-    LOWER(agent_company) AS agent_company,
-    agent_organization,
-    dt_agent_start
-  FROM
-    datalake_customer_support.call
-  UNION ALL
-  SELECT
-    id_agent AS sk_agent,
-    agent_email AS email,
-    agent_manager,
-    agent_name AS full_name,
-    LOWER(agent_company) AS agent_company,
-    agent_organization,
-    dt_agent_start
-  FROM
-    datalake_customer_support.chat
-  UNION ALL
-  SELECT
-    id_agent AS sk_agent,
-    agent_email AS email,
-    agent_manager,
-    agent_name AS full_name,
-    LOWER(agent_company) AS agent_company,
-    agent_organization,
-    dt_agent_start
-  FROM
-    datalake_customer_support.email
-)
 SELECT
-  sk_agent,
-  FIRST(email, TRUE) AS email,
-  FIRST(agent_manager, TRUE) AS agent_manager,
-  FIRST(full_name, TRUE) AS full_name,
-  FIRST(agent_company, TRUE) AS agent_company,
-  FIRST(agent_organization, TRUE) AS agent_organization,
-  FIRST(dt_agent_start, TRUE) AS dt_agent_start,
-  NOW() AS ts_load
+    id_agent AS sk_agent,
+    name AS full_name,
+    email,
+    phone,
+    organization AS agent_organization,
+    DATE(ts_created) AS dt_agent_start,
+    NOW() AS ts_load
 FROM
-  agents
-GROUP BY 1
+    datalake_zendesk_users.agents

@@ -14,7 +14,7 @@ SELECT DISTINCT
   CONCAT('https://quintoandar.zendesk.com/agent/tickets/', ft.sk_ticket) AS external_url,
   da.full_name AS agent_full_name,
   da.email AS agent_email,
-  da.agent_company,
+  da.agent_organization AS agent_company,
   dd.is_active,
   ft.is_ticket_session,
   ft.is_fcr_customer,

@@ -3,7 +3,7 @@ SELECT DISTINCT
   bmt.sk_agent,
   bmt.origin AS channel,
   bmt.status,
-  da.agent_company,
+  da.agent_organization AS agent_company,
   da.email AS agent_email,
   dd.department,
   dd.front_or_back,

@@ -27,7 +27,7 @@ SELECT DISTINCT
   ROUND(CAST(ft.full_resolution_time/60.0 AS DOUBLE), 2) AS hours_to_solve_ticket,
   da.full_name AS agent_full_name,
   da.email AS agent_email,
-  da.agent_company,
+  da.agent_organization AS agent_company,
   ft.reopens,
   ft.replies,
   dd.is_active,
