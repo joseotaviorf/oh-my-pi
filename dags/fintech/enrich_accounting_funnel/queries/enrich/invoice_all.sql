@@ -7,6 +7,13 @@ WITH locale_ids AS
     datalake_gsheets_clean.cod_locale
   GROUP BY 1
 ),
+deduplicate_sap_entity AS (
+  SELECT
+    DISTINCT id_finance_entity,
+    IF(version IS NULL, 'v1', version) AS version
+  FROM
+    datalake_retsuko_clean.sap_entity
+),
 next_business_day AS (
     SELECT
       dd.date,
@@ -21,7 +28,7 @@ next_business_day AS (
     GROUP BY
       1
 )
-SELECT
+SELECT DISTINCT
   fie.sk_invoice_entry AS id_entry,
   ie.sk_invoice_reversed_entry,
   fie.sk_invoice AS id_invoice,
@@ -30,7 +37,7 @@ SELECT
     WHEN CHARINDEX('.', c.version)> 0 THEN  SUBSTRING(c.version, 1, CHARINDEX('.', c.version)-1)
     ELSE COALESCE(c.version, 'no info')
   END AS version,
-  sap.version as accounting_version,
+  IF(sap.version IS NULL, 'v1', sap.version) as accounting_version,
   c.is_contract_b2b,
   c.dt_start > c.dt_annulment AND c.dt_annulment IS NOT NULL AS ended_before_started,
   r.city_name AS locale,
@@ -133,8 +140,8 @@ LEFT JOIN
   next_business_day AS nbd
     ON nbd.date = i.dt_paid
 LEFT JOIN 
-    datalake_retsuko_clean.sap_entity sap 
-        on fie.sk_invoice = sap.id_finance_entity
+    deduplicate_sap_entity sap 
+        on fie.sk_invoice_entry = sap.id_finance_entity
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')

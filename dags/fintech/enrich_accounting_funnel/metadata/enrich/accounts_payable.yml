@@ -13,6 +13,8 @@ columns:
     lineage:
       - dw_public.dim_contract.version
     description: "Contract version"
+  accounting_version:
+    description: "Not visible on CAP, it's used to match the number of columns in Invoice_all table"
   is_contract_b2b:
     lineage:
       - dw_public.dim_contract.version

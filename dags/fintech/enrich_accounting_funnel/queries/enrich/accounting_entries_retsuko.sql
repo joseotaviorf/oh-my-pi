@@ -1,4 +1,15 @@
-WITH retsuko_nf AS (
+WITH deduplicate_sap_entity AS (
+  SELECT
+    DISTINCT id_finance_entity,
+    id_sap_gateway_feature,
+    IF(version IS NULL, 'v1', version) AS version
+  FROM
+    datalake_retsuko_clean.sap_entity
+  QUALIFY 
+    RANK() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_created DESC) = 1
+), 
+
+retsuko_nf AS (
   SELECT DISTINCT
       i.id_external AS id_invoice,
       SPLIT(e.bill_item, 'entry.bill-item/')[1] AS bill_item,
@@ -127,12 +138,12 @@ invoice_selected AS (
         retsuko_nf
 )
 
-SELECT
+SELECT DISTINCT
   e.id_external AS id_invoice_entry,
   i.id_external AS id_invoice,
   ct.id_external AS id_contract,    
   sap.id_sap_gateway_feature,
-  sap.version as accounting_version,
+  IF(sap.version IS NULL, 'v1', sap.version) as accounting_version,
   ii.invoice_user,
   ii.invoice_frequency,
   ii.payment_status,
@@ -174,5 +185,5 @@ LEFT JOIN
     retsuko_nf inf
         on inf.id_invoice = i.id_external
 LEFT JOIN 
-    datalake_retsuko_clean.sap_entity sap 
-        on sap.id_finance_entity = i.id_external
+    deduplicate_sap_entity sap 
+        on sap.id_finance_entity = e.id_external

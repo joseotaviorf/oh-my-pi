@@ -157,13 +157,13 @@ GROUP BY
 ),
 
 cap_final AS (
-SELECT
-  DISTINCT
+SELECT DISTINCT
   CAST(NULL AS BIGINT) AS id_entry,
   CAST(NULL AS BIGINT) AS id_invoice,
   CAST(NULL AS BIGINT) AS sk_invoice_reversed_entry,
   COALESCE(TRY_CAST(cap.supplier_description AS INT),-1) AS sk_contract,
     COALESCE(SPLIT(REPLACE(version,'.','P'),'P')[0], 'no info') AS version,
+  'cap' as accounting_version,
   c.is_contract_b2b AS is_contract_b2b,
   r.city_name AS locale,
   cl.id_locale AS localidade,
@@ -226,6 +226,7 @@ vans_final AS (
     CAST(NULL AS BIGINT) AS sk_invoice_reversed_entry,
     COALESCE(TRY_CAST(vans.supplier_description AS INT),-1) AS sk_contract,
     COALESCE(SPLIT(REPLACE(version,'.','P'),'P')[0], 'no info') AS version,
+    'cap' as accounting_version,
     c.is_contract_b2b AS is_contract_b2b,
     r.city_name AS locale,
     cl.id_locale AS localidade,
