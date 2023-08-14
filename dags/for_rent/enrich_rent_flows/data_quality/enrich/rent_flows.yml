@@ -10,7 +10,4 @@ column_level_validations:
       severity_level: Error
   id_house:
     is_complete:
-      severity_level: Error
-  status:
-    is_complete:
-      severity_level: Error
+      severity_level: Error 
