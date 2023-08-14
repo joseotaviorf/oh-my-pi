@@ -142,7 +142,7 @@ installs AS (
 -- CTEs that identify condos that we had houses with placas installed at --
 --------------------------------------------------------------------------_
 condo_with_plaquinhas_rent AS ( 
-  SELECT
+  SELECT DISTINCT
       i.dt_install,
       i.sk_region, 
       i.listing_type,
@@ -162,10 +162,9 @@ condo_with_plaquinhas_rent AS (
       ON f.sk_house_listing = dhl.sk_house_listing
   WHERE TRUE
     AND f.sk_condo > 0
-  GROUP BY ALL 
 ),
 condo_with_plaquinhas_sale AS ( 
-  SELECT
+  SELECT DISTINCT
     i.dt_install,
     i.sk_region, 
     i.listing_type,
@@ -182,7 +181,6 @@ condo_with_plaquinhas_sale AS (
       ON substring(f.sk_house_listing,0,9) = i.id_house
   WHERE TRUE
     AND f.sk_condo > 0
-  GROUP BY ALL 
 ),
 rent_ongoing_listings AS (
 ----------------------------
