@@ -294,11 +294,15 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-budget
   - bietlejuice.casa_mineira_portal:load-clean-uf
   - bietlejuice.dw_lead:load-dw-public-dim-lead
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
+  - bietlejuice.dw_listing_jobs:load-dw-public-fact-photo-job
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
   - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
+  - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-contract-docusign-signed-events
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-home-page-viewed
@@ -317,6 +321,8 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.gsheets_growth:done-clean-city-share
   - bietlejuice.gsheets_growth:done-clean-local-holidays
+  - bietlejuice.gsheets_growth:done-clean-plaquinhas-cover-targets
+  - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-pp-organic
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-cost
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-nbp
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-ncp
