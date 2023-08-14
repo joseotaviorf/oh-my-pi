@@ -11,10 +11,10 @@ base_tickets AS (
     dd.team,
     COUNT(DISTINCT
         CASE
-            WHEN dd.front_or_back = 'back' THEN ft.sk_ticket
-            WHEN dd.front_or_back = 'front' AND ft.channel = 'email' THEN ft.sk_ticket
-            WHEN dd.front_or_back = 'front' AND ft.channel = 'chat' AND dc.direction = 'inbound' THEN ft.sk_ticket
-            WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'inbound' THEN ft.sk_ticket
+          WHEN ft.channel = 'email' THEN ft.sk_ticket
+          WHEN dd.front_or_back = 'front' AND ft.channel = 'chat' AND dc.direction = 'inbound' THEN ft.sk_ticket
+          WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'inbound' THEN ft.sk_ticket
+          WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'outbound-api' THEN ft.sk_ticket
     END) AS tickets
   FROM
     dw_customer_support.fact_ticket AS ft
@@ -32,7 +32,7 @@ base_tickets AS (
     ft.main_department NOT IN ('Offboarding Reparos [OFF] [POS] [BACK]', 'Offboarding pré saída [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão 1 [OFF] [POS] [BACK]')
     AND ft.ts_solved >= CAST('2022-01-01' AS DATE)
     AND dd.front_or_back IN ('back', 'front')
-    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross', 'Rental Manager')
+    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
     AND dd.team <> 'Ong Back'
     AND dd.area = 'CX'
   GROUP BY
@@ -44,10 +44,10 @@ missing_tickets AS (
     dd.front_or_back AS ticket_type,
     COUNT(DISTINCT
         CASE
-            WHEN dd.front_or_back = 'back' THEN ft.sk_ticket
-            WHEN dd.front_or_back = 'front' AND ft.channel = 'email' THEN ft.sk_ticket
-            WHEN dd.front_or_back = 'front' AND ft.channel = 'chat' AND dc.direction = 'inbound' THEN ft.sk_ticket
-            WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'inbound' THEN ft.sk_ticket
+          WHEN ft.channel = 'email' THEN ft.sk_ticket
+          WHEN dd.front_or_back = 'front' AND ft.channel = 'chat' AND dc.direction = 'inbound' THEN ft.sk_ticket
+          WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'inbound' THEN ft.sk_ticket
+          WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'outbound-api' THEN ft.sk_ticket
     END) AS missing_theme_tickets
   FROM
     dw_customer_support.fact_ticket AS ft
@@ -62,7 +62,7 @@ missing_tickets AS (
       ON ft.sk_channel = dc.sk_channel
   WHERE
     ft.main_department NOT IN ('Offboarding Reparos [OFF] [POS] [BACK]', 'Offboarding pré saída [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão 1 [OFF] [POS] [BACK]')
-    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross', 'Rental Manager')
+    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
     AND ft.ts_solved >= CAST('2022-01-01' AS DATE)
     AND dd.front_or_back IN ('back', 'front')
     AND dt.theme_detail IS NULL
@@ -86,10 +86,10 @@ abandoned_calls AS (
       ON dt.sk_taxonomy = frc.sk_taxonomy
   WHERE
     dd.front_or_back = 'front'
-    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross', 'Rental Manager')
+    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
     AND dd.area = 'CX'
     AND frc.is_answered = false
-    AND frc.channel = 'call'
+    AND frc.channel = 'call' 
   GROUP BY
     1,2
 ),
