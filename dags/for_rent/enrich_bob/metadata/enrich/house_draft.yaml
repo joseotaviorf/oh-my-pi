@@ -1,138 +1,226 @@
 database_name: datalake_bob
 table_name: house_draft
+description: This table contains house draft information saved during the process of registering a house by a PP or IS teams.
+domain: For Rent
+owner: arthur.gonzaga@quintoandar.com.br
 columns:
   id:
+    description: Identifier for house draft
     lineage:
       - datalake_bob_clean.house_draft.id
   id_client_side:
+    description: Identifier for client side
     lineage:
       - datalake_bob_clean.house_draft.id_client_side
   id_original_lead:
+    description: Identifier for original lead
     lineage:
       - datalake_bob_clean.house_draft.id_original_lead
   id_main_administrator:
+    description: Identifier for main administrator
     lineage:
       - datalake_bob_clean.house_draft.administrators
+  id_main_owner:
+    description: Identifier for main owner
+    lineage:
+      - datalake_bob_clean.house_draft.owners
   registrar:
+    description: Registrar information
     lineage:
       - datalake_bob_clean.house_draft.registrar
   owners_informations:
+    description: Information about owners
     lineage:
       - datalake_bob_clean.house_draft.owners
   house_access_informations:
+    description: Information about house access
     lineage:
       - datalake_bob_clean.house_draft.access
   administrators_informations:
+    description: Information about administrators
     lineage:
       - datalake_bob_clean.house_draft.administrators
   main_administrator_name:
+    description: Main administrator's name
     lineage:
       - datalake_bob_clean.house_draft.administrators
   main_administrator_email:
+    description: Main administrator's email
     lineage:
       - datalake_bob_clean.house_draft.administrators
   main_administrator_phone_number:
+    description: Main administrator's phone number
     lineage:
       - datalake_bob_clean.house_draft.administrators
+  main_owner_name:
+    description: Main owner's name
+    lineage:
+      - datalake_bob_clean.house_draft.owners
+  main_owner_email:
+    description: Main owner's email
+    lineage:
+      - datalake_bob_clean.house_draft.owners
+  main_owner_phone_number:
+    description: Main owner's phone number
+    lineage:
+      - datalake_bob_clean.house_draft.owners
   house_appliances:
+    description: Information about house appliances
     lineage:
       - datalake_bob_clean.house_draft.details
   house_description:
+    description: Description of the house
     lineage:
       - datalake_bob_clean.house_draft.details
   front_door_type:
+    description: Type of front door
     lineage:
       - datalake_bob_clean.house_draft.details
   installations:
+    description: Information about house installations
     lineage:
       - datalake_bob_clean.house_draft.details
   acessibility_items:
+    description: Accessibility items in the house
     lineage:
       - datalake_bob_clean.house_draft.details
   days_to_vacate:
+    description: Number of days to vacate the house
     lineage:
       - datalake_bob_clean.house_draft.details
   availability_type:
+    description: Type of availability
     lineage:
       - datalake_bob_clean.house_draft.details
   awaiting_availability_reason:
+    description: Reason for awaiting availability
     lineage:
       - datalake_bob_clean.house_draft.details
   awaiting_availability_custom_reason:
+    description: Custom reason for awaiting availability
     lineage:
       - datalake_bob_clean.house_draft.details
   rent_price:
+    description: Rent price for the house
     lineage:
       - datalake_bob_clean.house_draft.pricing
   sale_price:
+    description: Sale price for the house
     lineage:
       - datalake_bob_clean.house_draft.pricing
   condo_price:
+    description: Condo price for the house
     lineage:
       - datalake_bob_clean.house_draft.pricing
   iptu_installment_informations:
+    description: Information about IPTU installments
     lineage:
       - datalake_bob_clean.house_draft.pricing
   custom_administration_fee:
+    description: Custom administration fee for the house
     lineage:
       - datalake_bob_clean.house_draft.pricing
   special_conditions:
+    description: Special conditions related to pricing
     lineage:
       - datalake_bob_clean.house_draft.pricing
   suites:
+    description: Number of suites in the house
     lineage:
       - datalake_bob_clean.house_draft.blueprint
   garages:
+    description: Number of garages in the house
     lineage:
       - datalake_bob_clean.house_draft.blueprint
   garages_description:
+    description: Description of garages
     lineage:
       - datalake_bob_clean.house_draft.blueprint
   bedrooms:
+    description: Number of bedrooms in the house
     lineage:
       - datalake_bob_clean.house_draft.blueprint
   bathrooms:
+    description: Number of bathrooms in the house
     lineage:
       - datalake_bob_clean.house_draft.blueprint
   house_type:
+    description: Type of the house
     lineage:
       - datalake_bob_clean.house_draft.blueprint
   total_area:
+    description: Total area of the house
     lineage:
       - datalake_bob_clean.house_draft.blueprint
   business_context_type:
+    description: Type of business context
+    lineage:
+      - datalake_bob_clean.house_draft.business_context
+  is_for_sale:
+    description: Whether the house is for sale
+    lineage:
+      - datalake_bob_clean.house_draft.business_context
+  is_for_rent:
+    description: Whether the house is for rent
     lineage:
       - datalake_bob_clean.house_draft.business_context
   status:
+    description: Current status of the house
     lineage:
       - datalake_bob_clean.house_draft.status
   type:
+    description: Type of the house
     lineage:
       - datalake_bob_clean.house_draft.type
   is_furnished:
+    description: Whether the house is furnished
     lineage:
       - datalake_bob_clean.house_draft.details
   is_penthouse:
+    description: Whether the house is a penthouse
     lineage:
       - datalake_bob_clean.house_draft.details
   is_pet_friendly:
+    description: Whether the house is pet friendly
     lineage:
       - datalake_bob_clean.house_draft.details
   has_condo:
+    description: Indicates whether the house has a condominium fee
     lineage:
       - datalake_bob_clean.house_draft.pricing
   has_iptu_not_paid:
+    description: Indicates whether the house has unpaid IPTU
     lineage:
       - datalake_bob_clean.house_draft.pricing
   is_accepting_instant_offer:
+    description: Indicates whether the house is accepting instant offers
     lineage:
       - datalake_bob_clean.house_draft.pricing
+  ops_team:
+    description: Operations team responsible for the house
+    lineage:
+      - datalake_bob_clean.house_draft.attendance_info
+  ops_company:
+    description: Operations company responsible for the house
+    lineage:
+      - datalake_bob_clean.house_draft.attendance_info
+  ops_contact_type:
+    description: Type of contact for operations
+    lineage:
+      - datalake_bob_clean.house_draft.attendance_info
+  ops_contact_channel:
+    description: Contact channel for operations
+    lineage:
+      - datalake_bob_clean.house_draft.attendance_info
   ts_moved_out:
+    description: Timestamp indicating when the house was moved out
     lineage:
       - datalake_bob_clean.house_draft.details
   ts_created:
+    description: Timestamp indicating when the house was created
     lineage:
       - datalake_bob_clean.house_draft.ts_created
   ts_updated:
+    description: Timestamp indicating when the house was last updated
     lineage:
       - datalake_bob_clean.house_draft.ts_updated
