@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: plaquinhas_cover_targets
+columns:
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_cover_targets.business_context
+  timeframe:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_cover_targets.timeframe
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_cover_targets.city_group
+  cover_target:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_cover_targets.cover_target
+  active_plaquinhas_target:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_cover_targets.active_plaquinhas_target
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_cover_targets.date

@@ -13,12 +13,6 @@ columns:
   new_installed_plaquinhas_target:
     lineage:
       - datalake_gsheets_raw.plaquinhas_installation_targets.new_installed_plaquinhas_target
-  active_plaquinhas_target:
-    lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_targets.active_plaquinhas_target
-  cover_percent_target:
-    lineage:
-      - datalake_gsheets_raw.plaquinhas_installation_targets.cover_percent_target
   dt_target:
     lineage:
       - datalake_gsheets_raw.plaquinhas_installation_targets.date
