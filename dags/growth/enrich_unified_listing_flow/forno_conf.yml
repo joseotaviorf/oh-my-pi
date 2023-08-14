@@ -1,7 +1,0 @@
----
-spark_conf:
-  spark.executor.cores: 5
-  spark.driver.memory: 54g
-  spark.driver.memoryOverhead: 7g
-  spark.executor.memory: 54g
-  spark.executor.memoryOverhead: 7g
