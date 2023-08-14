@@ -25,6 +25,10 @@ columns:
     lineage:
       - datalake_zendesk_users.agents.organization
     description: Name of the company where the analyst works.
+  agent_company:
+    lineage:
+      - datalake_zendesk_users.agents.organization
+    description: Temporary field.
   dt_agent_start:
     lineage:
       - datalake_zendesk_users.agents.ts_created
