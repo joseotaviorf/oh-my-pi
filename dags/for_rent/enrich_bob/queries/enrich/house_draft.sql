@@ -3,10 +3,16 @@ WITH first_administrator_informations AS (
     id AS id_house_draft, 
     FROM_JSON(GET_JSON_OBJECT(administrators, '$.list'), 'array<string>')[0] AS first_administrator_informations,
     FROM_JSON(GET_JSON_OBJECT(owners, '$.list'), 'array<string>')[0] AS first_owner_informations,
-    GET_JSON_OBJECT(business_context, '$.businessContextType') AS business_context_type,
+    GET_JSON_OBJECT(business_context, '$.businessContextType') AS business_context_type
+  FROM 
+     datalake_bob_clean.house_draft
+),
+business_context AS (
+  SELECT *,
     CASE WHEN business_context_type IS NOT NULL AND array_contains(SPLIT(REGEXP_REPLACE(business_context_type, '\\["|\\"]|\\"', ''), ','), 'RENT') THEN TRUE ELSE FALSE END AS is_for_rent,
     CASE WHEN business_context_type IS NOT NULL AND array_contains(SPLIT(REGEXP_REPLACE(business_context_type, '\\["|\\"]|\\"', ''), ','), 'SALE') THEN TRUE ELSE FALSE END AS is_for_sale
-  FROM datalake_bob_clean.house_draft
+  FROM
+      first_administrator_informations
 )
 
 SELECT
@@ -66,5 +72,5 @@ SELECT
     ts_created,
     ts_updated
 FROM datalake_bob_clean.house_draft hd 
-LEFT JOIN first_administrator_informations fai
-    ON fai.id_house_draft = hd.id
+LEFT JOIN business_context bc
+    ON bc.id_house_draft = hd.id

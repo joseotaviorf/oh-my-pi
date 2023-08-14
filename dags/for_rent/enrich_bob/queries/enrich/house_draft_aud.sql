@@ -2,12 +2,8 @@ WITH first_administrator_informations AS (
   SELECT
     id_house_draft, 
     FROM_JSON(GET_JSON_OBJECT(administrators, '$.list'), 'array<string>')[0] AS first_administrator_informations,
-    id AS id_house_draft, 
-    FROM_JSON(GET_JSON_OBJECT(administrators, '$.list'), 'array<string>')[0] AS first_administrator_informations,
     FROM_JSON(GET_JSON_OBJECT(owners, '$.list'), 'array<string>')[0] AS first_owner_informations,
     GET_JSON_OBJECT(business_context, '$.businessContextType') AS business_context_type,
-    CASE WHEN business_context_type IS NOT NULL AND array_contains(SPLIT(REGEXP_REPLACE(business_context_type, '\\["|\\"]|\\"', ''), ','), 'RENT') THEN TRUE ELSE FALSE END AS is_for_rent,
-    CASE WHEN business_context_type IS NOT NULL AND array_contains(SPLIT(REGEXP_REPLACE(business_context_type, '\\["|\\"]|\\"', ''), ','), 'SALE') THEN TRUE ELSE FALSE END AS is_for_sale,
     year,
     month,
     day
@@ -18,6 +14,13 @@ WITH first_administrator_informations AS (
     AND month = {month}
     AND day = {day}
     AND GET_JSON_OBJECT(administrators, '$.list') IS NOT NULL 
+),
+business_context AS (
+  SELECT *,
+    CASE WHEN business_context_type IS NOT NULL AND array_contains(SPLIT(REGEXP_REPLACE(business_context_type, '\\["|\\"]|\\"', ''), ','), 'RENT') THEN TRUE ELSE FALSE END AS is_for_rent,
+    CASE WHEN business_context_type IS NOT NULL AND array_contains(SPLIT(REGEXP_REPLACE(business_context_type, '\\["|\\"]|\\"', ''), ','), 'SALE') THEN TRUE ELSE FALSE END AS is_for_sale
+  FROM
+     first_administrator_informations
 )
 SELECT
     hda.id_house_draft,
@@ -92,8 +95,8 @@ SELECT
 FROM
   datalake_bob_clean.house_draft_aud AS hda 
 LEFT JOIN
-  first_administrator_informations AS fai
-    ON fai.id_house_draft = hda.id_house_draft
+  business_context AS bc
+    ON bc.id_house_draft = hda.id_house_draft
 WHERE
   hda.year = {year}
   AND hda.month = {month}
