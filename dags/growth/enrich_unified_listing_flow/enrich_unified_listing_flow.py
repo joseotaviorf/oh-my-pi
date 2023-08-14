@@ -23,7 +23,7 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_photon_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_general_photon_cluster"
 INNER_DEPENDENCIES = {
     "listing_flows_with_reprocessed_leads": [
         "listing_flow",
