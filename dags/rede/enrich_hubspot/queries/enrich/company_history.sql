@@ -16,6 +16,7 @@ SELECT
         NULLIF(GET_JSON_OBJECT(properties, '$.state'), '')
     ) AS state,
     NULLIF(GET_JSON_OBJECT(properties, '$.country'), '') AS country,
+    NULLIF(GET_JSON_OBJECT(properties, '$.country_code'), '') AS country_code,
     NULLIF(GET_JSON_OBJECT(properties, '$.domain'), '') AS domain,
     NULLIF(GET_JSON_OBJECT(properties, '$.e_mail'), '') AS e_mail,
     NULLIF(GET_JSON_OBJECT(properties, '$.hs_analytics_source'), '') AS hs_analytics_source,

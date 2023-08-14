@@ -15,6 +15,7 @@ tables:
         - address
         - city
         - country
+        - country_code
         - createdate
         - data_em_que_se_tornou_contatado
         - data_em_que_se_tornou_lead
@@ -357,7 +358,7 @@ tables:
     schema: object
     date_filter_column: updated_at
     params:
-      properties: 
+      properties:
         - hs_timestamp
         - hs_call_body
         - hs_call_callee_object_id
@@ -385,7 +386,7 @@ tables:
     schema: object
     date_filter_column: updated_at
     params:
-      properties: 
+      properties:
         - hs_communication_channel_type
         - hs_communication_logged_from
         - hs_communication_body
@@ -402,7 +403,7 @@ tables:
     schema: object
     date_filter_column: updated_at
     params:
-      properties: 
+      properties:
         - hs_timestamp
         - hs_meeting_title
         - hubspot_owner_id
@@ -427,7 +428,7 @@ tables:
     schema: object
     date_filter_column: updated_at
     params:
-      properties: 
+      properties:
         - hs_timestamp
         - hs_note_body
         - hubspot_owner_id
@@ -444,7 +445,7 @@ tables:
     schema: object
     date_filter_column: updated_at
     params:
-      properties: 
+      properties:
         - hs_timestamp
         - hs_task_body
         - hubspot_owner_id

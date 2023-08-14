@@ -58,6 +58,13 @@ columns:
     lineage:
       - datalake_hubspot.company_history.country
     description: Country where the company is located.
+  country_code:
+    lineage:
+      - datalake_hubspot.company_history.country_code
+    description: Code of the country where the company is located.
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   domain:
     lineage:
       - datalake_hubspot.company_history.domain

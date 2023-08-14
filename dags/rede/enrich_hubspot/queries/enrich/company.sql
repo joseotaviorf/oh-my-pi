@@ -156,6 +156,7 @@ SELECT
     ch.city,
     ch.state,
     ch.country,
+    ch.country_code,
     ch.domain,
     ch.e_mail,
     ch.hs_analytics_source,
