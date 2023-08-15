@@ -448,9 +448,14 @@ class DatalakeTaskGroup(BaseTaskGroup):
         layer_enum = layer
         layer = layer_enum.value
         partitions = partitions or []
+        table_customization = table_customization or {}
         spark_session_configs = spark_session_configs or {}
         extra_query_template_params = extra_query_template_params or {}
         table_extraction_type = "incremental" if is_incremental else "full"
+
+        extraction_spark_job_file = table_customization.get(
+            "extraction_spark_job_file"
+        ) or path.join(self.spark_jobs_path, f"load_table_{table_extraction_type}.py")
 
         load_table_task = self._build_load_task(
             task_id=self.generate_default_task_id(
@@ -459,9 +464,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 schema=source_database_base_name,
                 table_name=table_name,
             ),
-            extraction_spark_job_file=path.join(
-                self.spark_jobs_path, f"load_table_{table_extraction_type}.py"
-            ),
+            extraction_spark_job_file=extraction_spark_job_file,
             do_output_xcom_push=do_output_xcom_push,
             spark_job_extra_args=[
                 layer,
