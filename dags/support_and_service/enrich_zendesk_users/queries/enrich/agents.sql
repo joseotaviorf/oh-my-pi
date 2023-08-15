@@ -68,54 +68,28 @@ quinto_messenger_analysts AS (
     FROM
         datalake_quinto_messenger_clean.task 
 ),
-union_base_analysts AS (
+consolidade_base_analysts AS (
     SELECT
-        id_agent,
-        id_user_external,
-        id_organization,
-        name,
-        email,
-        phone,
-        organization,
+        COALESCE(za.id_agent, ba.id_agent, qma.id_agent) AS id_agent,
+        za.id_user_external,
+        za.id_organization,
+        COALESCE(za.name, ba.name) AS name,
+        COALESCE(za.email, ba.email, qma.email) AS email,
+        za.phone,
+        COALESCE(za.organization, ba.organization, qma.organization) AS organization,
         role,
         is_active,
         ts_created,
         ts_created_local,
         ts_updated
     FROM
-        zendesk_analysts
-    UNION ALL
-    SELECT
-        id_agent,
-        NULL AS id_user_external,
-        NULL AS id_organization,
-        name,
-        email,
-        NULL AS phone,
-        organization,
-        NULL AS role,
-        NULL AS is_active,
-        NULL AS ts_created,
-        NULL AS ts_created_local,
-        NULL AS ts_updated
-    FROM 
-        bigfone_analysts
-    UNION ALL
-    SELECT
-        id_agent,
-        NULL AS id_user_external,
-        NULL AS id_organization,
-        NULL AS name,
-        email,
-        NULL AS phone,
-        organization,
-        NULL AS role,
-        NULL AS is_active,
-        NULL AS ts_created,
-        NULL AS ts_created_local,
-        NULL AS ts_updated
-    FROM
-        quinto_messenger_analysts
+        zendesk_analysts AS za
+    FULL OUTER JOIN
+        bigfone_analysts AS ba
+            ON za.email = ba.email
+    FULL OUTER JOIN
+        quinto_messenger_analysts AS qma
+            ON za.email = qma.email
 )
 SELECT
     email,
@@ -131,6 +105,6 @@ SELECT
     MAX(ts_created_local) AS ts_created_local,
     MAX(ts_updated) AS ts_updated
 FROM
-    union_base_analysts
+    consolidade_base_analysts AS u
 GROUP BY
     1
