@@ -372,17 +372,11 @@ bietlejuice.enrich_ebdb_user:
     - bietlejuice.ebdb:load-clean-user-merge
 bietlejuice.enrich_health_metrics:
   override: []
-bietlejuice.enrich_hubspot:
-  remove:
-    - bietlejuice.company:load-clean-company-document
-    - bietlejuice.company:load-clean-company-product
-    - bietlejuice.company:load-clean-document
-    - bietlejuice.hubspot:load-clean-call
-    - bietlejuice.hubspot:load-clean-communication
-    - bietlejuice.hubspot:load-clean-email
-    - bietlejuice.hubspot:load-clean-meeting
-    - bietlejuice.hubspot:load-clean-note
-    - bietlejuice.hubspot:load-clean-task
+bietlejuice.enrich_house_feature_inference:
+  add:
+    - bietlejuice.ebdb:load-clean-house
+    - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+    - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_lead:
   remove:
     - bietlejuice.ebdb:load-clean-ownerlead

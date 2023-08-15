@@ -1,0 +1,92 @@
+---
+custom_libraries:
+     - pypi:
+          package: ftfy 
+fields:
+  - has_swim_pool
+  - has_gym
+  - has_elevator
+  - has_sports_court
+  - has_grill_area
+  - has_party_hall
+  - has_sauna
+  - has_laundry
+  - has_metro_or_train_close
+  - has_toy_library
+  - has_piped_gas
+  - has_gourmet_area
+  - has_entrance_hall
+patterns_by_country_code:
+  BR:
+    - pattern: piscina
+      field: has_swim_pool
+      output: true
+    - pattern: academia
+      field: has_gym
+      output: true
+    - pattern: fitness
+      field: has_gym
+      output: true
+    - pattern: sem elevador
+      field: has_elevator
+      output: false
+    - pattern: (?<!sem )elevador
+      field: has_elevator
+      output: true
+    - pattern: quadra
+      field: has_sports_court
+      output: true
+    - pattern: poliesportiva
+      field: has_sports_court
+      output: true
+    - pattern: churrasquei
+      field: has_grill_area
+      output: true
+    - pattern: churrasc
+      field: has_grill_area
+      output: true
+    - pattern: salao de festa
+      field: has_party_hall
+      output: true
+    - pattern: sauna
+      field: has_sauna
+      output: true
+    - pattern: lavanderia no ed
+      field: has_laundry
+      output: true
+    - pattern: lavanderia no pr
+      field: has_laundry
+      output: true
+    - pattern: proximo ao metro
+      field: has_metro_or_train_close
+      output: true
+    - pattern: perto do metro
+      field: has_metro_or_train_close
+      output: true
+    - pattern: perto ao metro
+      field: has_metro_or_train_close
+      output: true
+    - pattern: proximo do metro
+      field: has_metro_or_train_close
+      output: true
+    - pattern: proximo da esta
+      field: has_metro_or_train_close
+      output: true
+    - pattern: perto da esta
+      field: has_metro_or_train_close
+      output: true
+    - pattern: playground
+      field: has_toy_library
+      output: true
+    - pattern: brinquedoteca
+      field: has_toy_library
+      output: true
+    - pattern: gas encanado
+      field: has_piped_gas
+      output: true
+    - pattern: area gourmet
+      field: has_gourmet_area
+      output: true
+    - pattern: portaria 24h
+      field: has_entrance_hall
+      output: true

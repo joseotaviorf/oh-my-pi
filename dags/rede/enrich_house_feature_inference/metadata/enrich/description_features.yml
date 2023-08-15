@@ -1,0 +1,46 @@
+---
+database_name: datalake_house_feature_inference
+table_name: description_features
+owner: 'gustavo.miller@quintoandar.com.br'
+domain: Rede
+description: Infers features about the houses from the description.
+columns:
+  id_house:
+    description: "Id of the house in EBDB"
+    lineage:
+      - datalake_ebdb_clean.house.id
+  house_description:
+    description: "Description of the house (or 3P lead, if it is a third party house)"
+    lineage:
+      - datalake_brokers_supply_processor.lead_3p.house_description
+      - datalake_ebdb_clean.house.house_description
+  country_code:
+    description: "Country code of the house"
+    lineage:
+      - datalake_ebdb_country.house.country_code
+  has_swim_pool:
+    description: "Whether the house has a swim pool, according to the description"
+  has_gym:
+    description: "Whether the condo has a gym, according to the description"
+  has_elevator:
+    description: "Whether the house has an elevator, according to the description"
+  has_sports_court:
+    description: "Whether the condo has a sports court, according to the description"
+  has_grill_area:
+    description: "Whether the condo has a grill area, according to the description"
+  has_party_hall:
+    description: "Whether the condo has a party hall, according to the description"
+  has_sauna:
+    description: "Whether the condo has a sauna, according to the description"
+  has_laundry:
+    description: "Whether the condo has a laundry, according to the description"
+  has_metro_or_train_close:
+    description: "Whether the house is close to a metro or train station, according to the description"
+  has_toy_library:
+    description: "Whether the condo has a toy library, according to the description"
+  has_piped_gas:
+    description: "Whether the house has piped gas, according to the description"
+  has_gourmet_area:
+    description: "Whether the condo has a gourmet area, according to the description"
+  has_entrance_hall:
+    description: "Whether the condo has an entrance hall, according to the description"

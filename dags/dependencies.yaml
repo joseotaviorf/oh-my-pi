@@ -1406,18 +1406,30 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity
+bietlejuice.enrich_house_feature_inference:
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+  - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_hub_services:
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.hub_services:load-clean-business-unit-region-aud
 bietlejuice.enrich_hubspot:
   - bietlejuice.company:load-clean-company
+  - bietlejuice.company:load-clean-company-document
+  - bietlejuice.company:load-clean-document
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb:load-clean-listing-business-context
+  - bietlejuice.hubspot:load-clean-call
+  - bietlejuice.hubspot:load-clean-communication
   - bietlejuice.hubspot:load-clean-company
   - bietlejuice.hubspot:load-clean-contact
   - bietlejuice.hubspot:load-clean-deal
   - bietlejuice.hubspot:load-clean-deal-pipeline
+  - bietlejuice.hubspot:load-clean-email
+  - bietlejuice.hubspot:load-clean-meeting
+  - bietlejuice.hubspot:load-clean-note
   - bietlejuice.hubspot:load-clean-owner
+  - bietlejuice.hubspot:load-clean-task
   - bietlejuice.hubspot:load-clean-team
   - bietlejuice.hubspot:load-clean-ticket
   - bietlejuice.hubspot:load-clean-ticket-pipeline
