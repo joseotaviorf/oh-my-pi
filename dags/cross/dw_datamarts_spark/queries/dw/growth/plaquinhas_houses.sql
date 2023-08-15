@@ -65,9 +65,9 @@ installs AS (
     datalake_listing_jobs.listing_quality_tasks AS gsps
       ON gsps.id_house = dhl.id_house 
       AND gsps.signboard_location <> ''
-  WHERE TRUE 
-    AND (is_for_rent IS NOT NULL
-        AND is_for_sale IS NOT NULL)
+  WHERE 
+    (is_for_rent IS NOT NULL
+    AND is_for_sale IS NOT NULL)
     AND fpj.sk_region > 0 
   UNION ALL
 -----------------------------------------
@@ -103,8 +103,8 @@ installs AS (
   LEFT JOIN 
     datalake_ebdb_clean.house AS h
       ON h.id = CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Código do Imóvel"]') AS BIGINT)
-  WHERE TRUE
-    AND dt.group_name = 'Plaquinhas - Pedidos da FAQ [SO]'
+  WHERE 
+    dt.group_name = 'Plaquinhas - Pedidos da FAQ [SO]'
     AND dt.subject LIKE '%Instalação%' 
     AND FROM_UTC_TIMESTAMP(CAST(dt.ts_created  AS TIMESTAMP), 'America/Sao_Paulo') >= DATE (DATE '2023-01-17')
     AND h.id_region > 0
@@ -135,8 +135,8 @@ installs AS (
   LEFT JOIN 
     datalake_ebdb_clean.house AS h
       ON h.id = p.id_house
-  WHERE TRUE 
-    AND client_type = "Proprietário"
+  WHERE 
+    client_type = "Proprietário"
 ),
 ---------------------------------------------------------------------------
 -- CTEs that identify condos that we had houses with placas installed at --
@@ -160,8 +160,8 @@ condo_with_plaquinhas_rent AS (
   INNER JOIN 
     dw_public.fact_house_listing_flows AS f
       ON f.sk_house_listing = dhl.sk_house_listing
-  WHERE TRUE
-    AND f.sk_condo > 0
+  WHERE
+    f.sk_condo > 0
 ),
 condo_with_plaquinhas_sale AS ( 
   SELECT DISTINCT
@@ -179,8 +179,8 @@ condo_with_plaquinhas_sale AS (
   INNER JOIN 
     dw_sale.fact_listing_flows AS f
       ON substring(f.sk_house_listing,0,9) = i.id_house
-  WHERE TRUE
-    AND f.sk_condo > 0
+  WHERE
+    f.sk_condo > 0
 ),
 rent_ongoing_listings AS (
 ----------------------------
@@ -200,8 +200,8 @@ rent_ongoing_listings AS (
   JOIN 
     dw_public.dim_date AS d
       ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) AND COALESCE(DATE_FORMAT(TO_DATE(NULLIF(sk_status_end_date, -1)::STRING, 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd')::BIGINT, DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd'))::BIGINT
-  WHERE TRUE 
-    AND f.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
+  WHERE
+    f.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
     AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
     AND date >= DATE('2021-02-01') -- Month when the campaign started
 ),
@@ -223,8 +223,8 @@ sale_ongoing_listings AS (
   JOIN 
     dw_public.dim_date AS d
       ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) AND COALESCE(DATE_FORMAT(TO_DATE(NULLIF(sk_status_end_date, -1)::STRING, 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd')::BIGINT, DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd')::BIGINT)
-  WHERE TRUE
-    AND f.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
+  WHERE
+    f.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
     AND date >= DATE('2021-09-01') -- Month when the campaign started
 ),
 cover_rent AS (
@@ -235,8 +235,9 @@ cover_rent AS (
     CAST(ol.sk_house_listing/1000 AS BIGINT) AS id_house,
     NULL AS id_install, 
     NULL AS photographer_id,
-    ol.date AS dt_ongoing_listing,
+    TIMESTAMP(ol.date) AS dt_ongoing_listing,
     NULL AS dt_install,
+    NULL AS timeframe,
     ol.weekday_name,
     ol.month_end,
     'Rent' AS business_context,
@@ -272,9 +273,11 @@ cover_rent AS (
   LEFT JOIN 
     dw_public.dim_region AS dr
      ON ol.sk_region = dr.sk_region
-  WHERE TRUE
-    AND ol.order_status = 1
+  WHERE
+    ol.order_status = 1
     AND ol.sk_region > 0
+    AND dr.country_code = 'BR'
+    AND dr.city_group NOT IN ('Belo Horizonte', 'Uberlândia')
 ),
 cover_sale AS (
   ----------------------------------------
@@ -284,8 +287,9 @@ cover_sale AS (
     CAST(ol.sk_house_listing/1000 AS BIGINT) AS id_house,
     NULL AS id_install, 
     NULL AS photographer_id,
-    ol.date AS dt_ongoing_listing,
+    TIMESTAMP(ol.date) AS dt_ongoing_listing,
     NULL AS dt_install,
+    NULL AS timeframe,
     ol.weekday_name,
     ol.month_end,
     'Sale' AS business_context,
@@ -321,9 +325,11 @@ cover_sale AS (
   LEFT JOIN 
     dw_public.dim_region AS dr
       ON ol.sk_region = dr.sk_region
-  WHERE TRUE
-    AND ol.order_status = 1
+  WHERE
+    ol.order_status = 1
     AND ol.sk_region > 0
+    AND dr.country_code = 'BR'
+    AND dr.city_group NOT IN ('Belo Horizonte', 'Uberlândia')
 ), 
 new_installs AS (
   -------------------------------
@@ -334,7 +340,8 @@ new_installs AS (
     id_install, 
     photographer_id,
     NULL AS dt_ongoing_listing,
-    i.dt_install,
+    TIMESTAMP(i.dt_install) AS dt_install,
+    NULL AS timeframe,
     NULL AS weekday_name,
     NULL AS month_end,
     business_context,
@@ -354,6 +361,9 @@ new_installs AS (
   LEFT JOIN 
     dw_public.dim_region AS dr 
       ON dr.sk_region = i.sk_region
+  WHERE 
+    (dr.country_code = 'BR' OR dr.country_code IS NULL)
+    AND (dr.city_group NOT IN ('Belo Horizonte', 'Uberlândia') OR dr.city_group IS NULL)
 ),
 targets AS (
   -------------------------------------
@@ -364,7 +374,8 @@ targets AS (
     NULL AS id_install,
     NULL AS photographer_id,
     NULL AS dt_ongoing_listing,
-    dt_target as dt_install,
+    TIMESTAMP(dt_target) as dt_install,
+    NULL AS timeframe,
     NULL AS weekday_name,
     NULL AS month_end,
     business_context,
@@ -389,7 +400,8 @@ targets AS (
     NULL AS id_house,
     NULL AS id_install,
     NULL AS photographer_id, 
-    dt_target AS dt_ongoing_listing,
+    TIMESTAMP(dt_target) AS dt_ongoing_listing,
+    timeframe,
     NULL as dt_install,
     NULL AS weekday_name,
     NULL AS month_end,
