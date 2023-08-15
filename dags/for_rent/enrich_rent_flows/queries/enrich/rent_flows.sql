@@ -65,10 +65,10 @@ flow_type AS (
     rf.id_owner,
     SUM(msg_sent) AS tta_messages,
     CASE
-      WHEN (MIN(rf.ts_booking_created) < MIN(rf.ts_offer_submitted)) AND (MIN(rf.ts_booking_created) < MIN(tta.first_message_ts)) THEN 'V'
-      WHEN (MIN(rf.ts_offer_submitted) < MIN(rf.ts_booking_created)) AND (MIN(rf.ts_offer_submitted) < MIN(tta.first_message_ts)) THEN 'DO'
-      WHEN (MIN(tta.first_message_ts) < MIN(rf.ts_booking_created)) AND (MIN(tta.first_message_ts) < MIN(rf.ts_offer_submitted)) THEN 'TTA'
-      ELSE NULL
+      WHEN MIN(rf.ts_booking_created) < LEAST(MIN(rf.ts_offer_submitted), MIN(CAST(tta.first_message_ts AS TIMESTAMP)), NOW()) THEN 'VISIT'
+      WHEN MIN(rf.ts_offer_submitted) < LEAST(MIN(rf.ts_booking_created), MIN(CAST(tta.first_message_ts AS TIMESTAMP)), NOW()) THEN 'DIRECT'
+      WHEN MIN(CAST(tta.first_message_ts AS TIMESTAMP)) < LEAST(MIN(rf.ts_booking_created), MIN(rf.ts_offer_submitted), NOW()) THEN 'TTA'
+      ELSE 'UNKNOWN'
     END AS first_touchpoint,
     IF(COUNT(rf.ts_booking_created) > 0, TRUE, FALSE) AS has_visit_flow,
     IF(COUNT(rf.ts_offer_submitted) > 0, TRUE, FALSE) AS has_offer_flow,

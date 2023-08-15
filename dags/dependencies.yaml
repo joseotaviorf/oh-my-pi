@@ -589,6 +589,8 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_rent_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region

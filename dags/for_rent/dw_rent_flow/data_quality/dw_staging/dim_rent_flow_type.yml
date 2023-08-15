@@ -1,0 +1,9 @@
+---
+table_name: dw_rent_staging.dim_rent_flow
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_rent_flow_type:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error

@@ -9,8 +9,14 @@ workflow:
   spark_session_configs:
     udfs: [FINTECHOPS_WORK_MIN_SLA]
   tables_customization:
+    dim_rent_flow_type:
+      partitions: [country_code, first_touchpoint]
+      custom_schema: rent
     fact_listing_rent_flows:
       partitions: [country_code]
+    fact_rent_flows:
+      partitions: [country_code]
+      custom_schema: rent
 cluster:
   type: databricks_10_4_med_general_photon_cluster
   access_control_list:

@@ -1,0 +1,253 @@
+database_name: dw_rent
+table_name: fact_rent_flows
+description: Fact table that contains information related to a rent flow (which is the tuple [property, tenant prospect]),
+  mostly related about its metrics. If desired to understand characteristics of the rent flow, it's necessary to join with
+  the dw_rent.dim_rent_flow_type using the key sk_rent_flow_type.
+  Each line is an unique rent flow (sk_rent_flow).
+  This table is partitioned by the country_code column, so make sure to use it as one of the first filters of the query
+  in order to improve its performance.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  sk_rent_flow:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_rent_flow
+    description: Id of the rent flow, also the PK of the table. Each line should be an unique rent flow.
+      Joins with dw_public.fact_listing_rent_flows.
+  sk_rent_flow_type:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.id_rent_flow_type
+    description: Unique but mutable id that makes possible to identify the type of the rent flow and its combinations.
+      To reach this information, it's necessary to use this key to join with the dw_rent.dim_rent_flow_type.
+      This id should be used only to connect with mentioned dim table in order to identify the rent flow type and its
+      characteristics, but never used for analysis (as for example, filtering data by it).
+  sk_house:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_house
+    description: Id of the property. Joins with dw_public.dim_house_listing
+  sk_tenant_prospect:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_tenant_prospect
+    description: Id of the tenant prospect. Joins with dw_public.dim_user.
+  sk_owner:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_owner
+    description: Id of the property owner. Joins with dw_public.dim_user.
+  sk_first_booking:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_booking
+    description: Id of the first booking. Joins with dw_public.dim_booking.
+  sk_last_booking:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_booking
+    description: Id of the most recent booking. Joins with dw_public.dim_booking.
+  sk_first_reservation:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_reservation
+    description: Id of the first reservation. Joins with dw_public.dim_reservation.
+  sk_last_reservation:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_reservation
+    description: Id of the most recent reservation. Joins with dw_public.dim_reservation.
+  sk_first_offer:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_offer
+    description: Id of the first offer. Joins with dw_public.dim_offer.
+  sk_last_offer:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_offer
+    description: Id of the most recent offer. Joins with dw_public.dim_offer.
+  sk_first_proposal:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_proposal
+    description: Id of the first proposal. Joins with dw_public.dim_proposal.
+  sk_last_proposal:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_proposal
+    description: Id of the most recent proposal. Joins with dw_public.dim_proposal.
+  sk_first_contract:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_contract
+    description: Id of the first contract. Joins with dw_public.dim_contract.
+  sk_last_contract:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_contract
+    description: Id of the most recent contract. Joins with dw_public.dim_contract.
+  sk_region:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_region
+    description: Id of the property region. Joins with dw_public.dim_region.
+  sk_first_event_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_rent_flow_event
+    description: Date of when happened the first event of the rent flow (touchpoint), transformed into an id.
+  sk_first_booking_created_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_booking_created
+    description: Date of when happened the first booking creation of the rent flow, transformed into an id.
+  sk_first_visit_completed_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_completed
+    description: Date of when happened the first visit completed of the rent flow, transformed into an id.
+  sk_first_visit_performed_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_performed
+    description: Date of when happened the first visit performed of the rent flow, transformed into an id.
+  sk_first_offer_submitted_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+    description: Date of when happened the first offer submission of the rent flow, transformed into an id.
+  sk_first_offer_approved_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_approved
+    description: Date of when happened the first offer approval of the rent flow, transformed into an id.
+  sk_first_contract_created_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_created
+    description: Date of when happened the first contract creation of the rent flow, transformed into an id.
+  sk_first_contract_signed_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_signed
+    description: Date of when the first contract of the rent flow was signed, transformed into an id.
+  sk_last_event_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_rent_flow_event
+    description: Date of when happened the last event of the rent flow, transformed into an id.
+  sk_last_booking_created_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_booking_created
+    description: Date of when happened the last booking creation of the rent flow, transformed into an id.
+  sk_last_visit_completed_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_completed
+    description: Date of when happened the last visit completed of the rent flow, transformed into an id.
+  sk_last_visit_performed_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_performed
+    description: Date of when happened the last visit performed of the rent flow, transformed into an id.
+  sk_last_offer_submitted_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+    description: Date of when happened the last offer submission of the rent flow, transformed into an id.
+  sk_last_offer_approved_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_approved
+    description: Date of when happened the last offer approval of the rent flow, transformed into an id.
+  sk_last_contract_created_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_created
+    description: Date of when happened the last contract creation of the rent flow, transformed into an id.
+  sk_last_contract_signed_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_signed
+    description: Date of when the last contract of the rent flow was signed, transformed into an id.
+  country_code:
+    lineage:
+      - datalake_rent_flows.rent_flows.country_code
+    description: Country code of the rent flow, related to the property. Also, a partition of this table --
+      if you're using this column as a filter, make sure to be one of the first filters, it will improve the
+      query's performance.
+  days_first_touchpoint_to_last:
+    description: Amount of days between the first touchpoint date to the last event of the rent flow.
+  days_since_last_event:
+    description: Amount of days since the last event of the rent flow happened.
+  nbr_bookings_created:
+    description: Number of bookings created in the rent flow.
+  nbr_visits_completed:
+    description: Number of visits completed in the rent flow.
+  nbr_visits_performed:
+    description: Number of visits performed in the rent flow.
+  nbr_visits_canceled:
+    description: Number of visits canceled in the rent flow.
+  nbr_reservations_created:
+    description: Number of reservations created in the rent flow.
+  nbr_offers_submitted:
+    description: Number of offers submitted in the rent flow.
+  nbr_offers_approved:
+    description: Number of offers approved in the rent flow.
+  nbr_proposals_created:
+    description: Number of proposals created in the rent flow.
+  nbr_guarantees_paid:
+    description: Number of guarantees paid in the rent flow.
+  nbr_contracts_created:
+    description: Number of contracts created in the rent flow.
+  nbr_contracts_signed:
+    description: Number of contracts signed in the rent flow.
+  nbr_contracts_terminated:
+    description: Number of contracts terminated in the rent flow.
+  nbr_tta_messages:
+    description: Number of messages sent during the Talk to Agent program, from the Covid-19 pandemic.
+  ts_created:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_created
+    description: Timestamp of when the rent flow was created.
+  ts_updated:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_updated
+    description: Timestamp of when the rent flow was updated.
+  ts_first_event:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_rent_flow_event
+    description: Timestamp of when happened the first event of the rent flow.
+  ts_first_booking_created:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_booking_created
+    description: Timestamp of when happened the first booking creation of the rent flow.
+  ts_first_visit_completed:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_completed
+    description: Timestamp of when happened the first visit completed of the rent flow.
+  ts_first_visit_performed:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_performed
+    description: Timestamp of when happened the first visit performed of the rent flow.
+  ts_first_offer_submitted:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+    description: Timestamp of when happened the first offer submission of the rent flow.
+  ts_first_offer_approved:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_approved
+    description: Timestamp of when happened the first offer approval of the rent flow.
+  ts_first_contract_created:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_created
+    description: Timestamp of when happened the first contract creation of the rent flow.
+  ts_first_contract_signed:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_signed
+    description: Timestamp of when happened the first contract of the rent flow was signed.
+  ts_last_event:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_rent_flow_event
+    description: Timestamp of when happened the last event of the rent flow.
+  ts_last_booking_created:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_booking_created
+    description: Timestamp of when happened the last booking creation of the rent flow.
+  ts_last_visit_completed:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_completed
+    description: Timestamp of when happened the last visit completed of the rent flow.
+  ts_last_visit_performed:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_performed
+    description: Timestamp of when happened the last visit performed of the rent flow.
+  ts_last_offer_submitted:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+    description: Timestamp of when happened the last offer submission of the rent flow.
+  ts_last_offer_approved:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_approved
+    description: Timestamp of when happened the last offer approval of the rent flow.
+  ts_last_contract_created:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_created
+    description: Timestamp of when happened the last contract creation of the rent flow.
+  ts_last_contract_signed:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_signed
+    description: Timestamp of when happened the last contract of the rent flow was signed.
+  ts_load:
+    description: Timestamp of the data load.

@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG loads to DW our models of rent flows. 
+This DAG loads to DW our models of rent flows.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -12,8 +12,9 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 ### Outputs
 
-This pipeline produces the following output table in DW: 
+This pipeline produces the following output table in DW:
 
-- `dim_rent_flow_taxonomy`
-- `fact_listing_rent_flows`
-
+- `dw_rent.dim_rent_flow_type`
+- `dw_public.dim_rent_flow_taxonomy`
+- `dw_public.fact_listing_rent_flows`
+- `dw_rent.fact_rent_flows`

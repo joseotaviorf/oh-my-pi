@@ -1,0 +1,63 @@
+database_name: dw_rent
+table_name: dim_rent_flow_type
+description: Junk dimension table that contains information related to the rent flow's type.
+    Each line is an unique rent flow type, identified by its sk_rent_flow_type (which is mutable, so should not be used
+    for analysis purposes, only to join with the dw_rent.fact_rent_flows).
+    This table is partitioned by the country_code and first_touchpoint columns (in this exactly order), so make sure to
+    use them as one of the first filters of the query (in the same order) in order to improve its performance.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  sk_rent_flow_type:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.id_rent_flow_type
+    description: Unique but mutable id that identifies the type of the rent flow and its combinations.
+      Joins with dw_rent.fact_rent_flows and should be used with it to identify the rent flow.
+  country_code:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.country_code
+    description: Country code of the rent flow. Also, a partition of this table -- if you're using this
+      column as a filter, make sure to be one of the first filters, it will improve the query's performance.
+  first_touchpoint:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.first_touchpoint
+    description: The first touchpoint of the rent flow, related to the first event that happened to it.
+      Also, a partition of this table -- if you're using this column as a filter, make sure to be one of the first filters,
+      it will improve the query's performance.
+    categories:
+      'VISIT': "Touchpoint is a visit."
+      'DIRECT': "Touchpoint is a direct offer (DO)."
+      'TTA': "Touchpoint is a Talk to Agent event (historical data, a program that happened during Covid-19 pandemic.)"
+      'UNKNOWN': "Touchpoint is unknown."
+  status:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.status
+    description: Present status of the rent flow.
+    categories:
+      'Contrato': The rent flow is in closing process, which means that a contract is being created (it could be in draft yet, waiting for signatures, etc.);
+      'Documentacao': Tenant prospect is on the documentation step, which means that the TP has already made an offer that was approved.
+      'Fechado': The rent flow's contract is now active, which means that the flow is "closed" for now.
+      'Negociacao': Tenant prospect has made an offer for the property.
+      'Prospeccao': Tenant prospect has made a visit, but hadn't any other following event (such as an offer, for example).
+  is_step_rejected:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.is_step_rejected
+    description: Boolean indicating if the present step in which the rent flow is, was rejected.
+  has_visit_flow:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.has_visit_flow
+    description: Boolean indicating if the rent flow had at least one visit event.
+  has_offer_flow:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.has_offer_flow
+    description: Boolean indicating if the rent flow had at least one offer event.
+  has_tta_flow:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.country_code
+    description: Boolean indicating if the rent flow had at least one Talk to Agent event, a program that happened during Covid-19 pandemic.
+  had_contract_signed:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.had_contract_signed
+    description: Boolean indicating if the rent flow had at least one contract signed.
+  ts_load:
+    description: Timestamp of the data load.
