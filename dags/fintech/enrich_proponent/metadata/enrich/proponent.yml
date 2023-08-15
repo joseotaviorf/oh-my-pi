@@ -10,6 +10,22 @@ columns:
       - datalake_docx_clean.credit_evaluation_proponent.cpf
       - datalake_docx_clean.credit_evaluation.id_proposal
     description: "id proponent formed based on the encryption of proponent cpf and proosal's id."
+  id_proponent_docx:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.id
+    description: "Proponent ID docx"
+  id_proponent_sorting_hat:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.id
+    description: "Sorting Hat Proponent ID"
+  id_proponent_ebdb:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id
+    description: "EBDB Proponent ID"
+  cpf:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.cpf
+    description: "EBDB Proponent ID"
   name:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.name

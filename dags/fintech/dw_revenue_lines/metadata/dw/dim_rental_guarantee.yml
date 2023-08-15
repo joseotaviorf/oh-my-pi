@@ -44,3 +44,6 @@ columns:
     description: "Timestamp of the guarantee created date"
     lineage:
     - datalake_revenue_lines.rental_guarantee.ts_guarantee_created
+  ts_load:
+    description: "Timestamp of when this table was loaded"
+   

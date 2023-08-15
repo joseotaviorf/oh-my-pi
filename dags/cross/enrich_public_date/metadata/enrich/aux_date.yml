@@ -6,70 +6,75 @@ domain: Cross
 owner: fintech-ae@quintoandar.com.br
 columns:
   id_date:
-    description: ""
+    description: Date ID (%Y%m%d format)
   day:
-    description: ""
+    description: Day of month
   day_of_year:
-    description: ""
+    description: Number that represents the day of the year
   week_day:
-    description: ""
+    description: The number of the day of the week. The day is given as an integer, ranging from 0 (Sunday) to 6 (Saturday)
   weekday_name:
-    description: ""
+    description: "The name of the day of the week. Values: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday"
   calendar_week:
-    description: ""
+    description: Week number of a year
   weekend:
-    description: ""
+    description: Indicates wheter is weekend or weekday
   month:
-    description: ""
+    description: Number of the month
   month_name:
-    description: ""
+    description: Name of the month
   quarter:
-    description: ""
+    description: The quarter of the year.
+    categories:
+      "1": January to March
+      "2": April to June 
+      "3": July to September
+      "4": October to December
   brz_season:
-    description: ""
+    description: "The season in Brazil: Summer, Autumn, Winter, Sprint"
   year:
-    description: ""
+    description: Year
   year_calendar_week:
-    description: ""
+    description: Week number/year
   year_month:
-    description: ""
+    description: Year/month
   year_quarter:
-    description: ""
+    description: Year/quarter
   working_days_in_month:
-    description: ""
+    description: "Cumulative sum of business days in the month counting from the first day to the day in question (field: date)"
   total_working_days_in_month:
-    description: ""
+    description: The total of working days in a month
   is_brz_holiday:
-    description: ""
+    description: Indicates wheter is a brazilian holiday or not
   is_mx_holiday:
-    description: ""
+    description: Indicates wheter is a mexican holiday or not
   date:
-    description: ""
+    description: Date in %Y-%m-%d format
   brz_date:
-    description: ""
+    description: Date in %d/%m/%Y format
   usa_date:
-    description: ""
+    description: Date in %m/%d/%Y format
   universal_date:
-    description: ""
+    description: Date in %Y/%m/%d format
   week_start:
-    description: ""
+    description: The day when the week starts
   week_end:
-    description: ""
+    description: The day when the week ends
   month_start:
-    description: ""
+    description: The first day of the month
   month_end:
-    description: ""
+    description: The last day of the month
   last_day:
-    description: ""
+    description: Previous day (date - 1 day)
   last_week:
-    description: ""
+    description: Previous week (date - 7 days)
   last_2_weeks:
-    description: ""
+    description: Previous 2 weeks (date - 14 days)
   last_4_weeks:
-    description: ""
+    description: Previous 4 weeks (date - 28 days)
   last_month:
-    description: ""
+    description: Previous month (date - 1 month)
   last_quarter:
-    description: ""
+    description: Previous quarter (date - 3 month)
   last_year:
-    description: ""
+    description: Previous year (date - 1 year)

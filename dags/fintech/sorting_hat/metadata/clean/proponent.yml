@@ -1,120 +1,160 @@
 database_name: datalake_sorting_hat_clean
 table_name: proponent
+description: Table with information about the proponent.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.proponent.id
+    description: Proponent ID
   name:
     lineage:
       - datalake_sorting_hat_raw.proponent.name
+    description: Proponent's full name
   cpf:
     lineage:
       - datalake_sorting_hat_raw.proponent.cpf
+    description: Proponent's CPF
   income_nature:
     lineage:
       - datalake_sorting_hat_raw.proponent.income_nature
+    description: Proponent's income nature type
   occupation_area:
     lineage:
       - datalake_sorting_hat_raw.proponent.occupation_area
+    description: Proponent's occupation area - ADMINISTRATION_AND_IT, JURIDICAL, BROKERAGE, HEALTH, EDUCATION...
   marital_status:
     lineage:
       - datalake_sorting_hat_raw.proponent.marital_status
+    description: Proponent's marital status
   gender:
     lineage:
       - datalake_sorting_hat_raw.proponent.gender
+    description: Proponent's gender
   dt_admitted:
     lineage:
       - datalake_sorting_hat_raw.proponent.admission_date
+    description: 
   cell_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent.cell_phone
+    description: Proponent's cellphone
   phone:
     lineage:
       - datalake_sorting_hat_raw.proponent.phone
+    description: Proponent's phone
   email:
     lineage:
       - datalake_sorting_hat_raw.proponent.email
+    description: Proponent's email
   monthly_income:
     lineage:
       - datalake_sorting_hat_raw.proponent.monthly_income
+    description: Proponent monthly income
   is_going_to_reside:
     lineage:
       - datalake_sorting_hat_raw.proponent.will_reside
+    description: Indicate if the proponent will reside
   location_motive:
     lineage:
       - datalake_sorting_hat_raw.proponent.location_motive
+    description: Proponent location motive
   second_doc_type:
     lineage:
       - datalake_sorting_hat_raw.proponent.second_doc_type
+    description: Proponent's second document type
   second_doc_number:
     lineage:
       - datalake_sorting_hat_raw.proponent.second_doc_number
+    description: Proponent's second document number
   second_doc_issuer:
     lineage:
       - datalake_sorting_hat_raw.proponent.second_doc_issuer
+    description: Proponent's second document issuer
   dt_second_doc_issued:
     lineage:
       - datalake_sorting_hat_raw.proponent.second_doc_issue_date
+    description: Proponent's second document issued date
   nationality:
     lineage:
       - datalake_sorting_hat_raw.proponent.nationality
+    description: Proponent's nationality
   dt_birthday:
     lineage:
       - datalake_sorting_hat_raw.proponent.birthday
+    description: Proponent's date of birth
   mother_name:
     lineage:
       - datalake_sorting_hat_raw.proponent.mother_name
+    description: Proponent's mother's name
   zipcode:
     lineage:
       - datalake_sorting_hat_raw.proponent.zipcode
+    description: Proponent's zip code
   address:
     lineage:
       - datalake_sorting_hat_raw.proponent.address
+    description: Proponent's address
   address_number:
     lineage:
       - datalake_sorting_hat_raw.proponent.address_number
+    description: Proponent's address number
   complement:
     lineage:
       - datalake_sorting_hat_raw.proponent.complement
+    description: Proponent's address complement
   neighborhood:
     lineage:
       - datalake_sorting_hat_raw.proponent.bairro
+    description: Proponent's address neighborhood
   city:
     lineage:
       - datalake_sorting_hat_raw.proponent.city
+    description: Proponent's address city
   state:
     lineage:
       - datalake_sorting_hat_raw.proponent.state
+    description: Proponent's address state
   residence_condition:
     lineage:
       - datalake_sorting_hat_raw.proponent.residence_condition
+    description:  Proponent's residence condition (Proprio, Alugado, Familiares..)
   residence_time:
     lineage:
       - datalake_sorting_hat_raw.proponent.residence_time
+    description: Residence time
   profession:
     lineage:
       - datalake_sorting_hat_raw.proponent.profession
+    description: Proponent's profession
   employer_name:
     lineage:
       - datalake_sorting_hat_raw.proponent.employer_name
+    description: Employer name
   employer_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent.employer_phone
+    description: Employer phone number
   extra_income_origin:
     lineage:
       - datalake_sorting_hat_raw.proponent.extra_income_origin
+    description: Origin of extra income
   extra_income_value:
     lineage:
       - datalake_sorting_hat_raw.proponent.extra_income_value
+    description: Extra income value
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.proponent.proposal_id
+    description: Proposal ID
   boavista_score:
     lineage:
       - datalake_sorting_hat_raw.proponent.boavista_score
+    description: Boavista Score
   serasa_score:
     lineage:
       - datalake_sorting_hat_raw.proponent.serasa_score
+    description: Serasa Score
   id_screening_result:
     lineage:
       - datalake_sorting_hat_raw.proponent.screening_result_id
+    description: Screening result ID

@@ -31,6 +31,9 @@ columns:
     description: "Information about sync with ERP Gateway"
   ended_before_started:
     description: "If the contract annulment happened before the start"
+    lineage:
+      - dw_public.dim_contract.dt_start
+      - dw_public.dim_contract.dt_annulment
   is_contract_b2b:
     lineage:
       - dw_public.dim_contract.version
@@ -68,6 +71,14 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.description
     description: "Invoice entry title as shown in invoice"
+  has_negotiation:
+    lineage:
+      - dw_payment.dim_invoice_entry.has_negotiation
+    description: "Indicates whether the invoice has an agreement (value 1) or not (value 0)"
+  has_installments:
+    lineage:
+      - dw_payment.dim_invoice_entry.has_installments
+    description: "Indicates whether the invoice has more then 1 installment (value 1) or not (value 0)"
   purpose:
     lineage:
       - dw_payment.dim_invoice.frequency
@@ -88,11 +99,18 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.producer
     description: "Rotine that produces the entry"
+  account_type:
+    lineage:
+      - dw_payment.dim_invoice_entry.account_type
+    description: "The account type: landlord, tenant or other."
+  account_classification:
+    lineage:
+      - dw_payment.dim_invoice_entry.account_classification
+    description: "Indicates the account classification based on bill item:  receivable or payable."
   status:
     lineage:
       - dw_payment.dim_invoice.payment_status
     description: "Description of payment status"
-
   closing_mode:
     lineage:
       - dw_payment.dim_invoice.closing_mode
@@ -121,6 +139,10 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.accrual_year_month
     description: "Entry expense reference month"
+  entry_creation_accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice_entry.accrual_year_month
+    description: "Entry creation expense reference month"
   entry_created_date:
     lineage:
       - dw_public.dim_date.date

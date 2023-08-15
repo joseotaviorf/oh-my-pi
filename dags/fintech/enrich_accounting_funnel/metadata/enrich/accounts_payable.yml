@@ -5,6 +5,12 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Table containing accounts payable data"
 columns:
+  id_entry:
+    description: "Invoice entry (credit or debit) registered in an invoice. Default value: NULL"
+  id_invoice:
+    description: "Invoice registered in SeuBarriga. Default value: NULL"
+  sk_invoice_reversed_entry:
+    description: "When an entry is created to cancel another entry, this field is filled with the Id of the canceled one. Default value: NULL"
   sk_contract:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.supplier_description
@@ -39,6 +45,40 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.is_rental_paid_in_advance
     description: "Some versions of contracts have variation in the payment method (aka mora/paga, paga/mora)"
+  bill_item:
+    description: "Bill item. Default value: cap"
+  description:
+    lineage:
+      - datalake_vans_clean.payment.company_use
+    description: "Description based on payment reason classification of bill item CAP"
+  has_negotiation:
+    description: "Indicates whether the invoice has an agreement or not (value 0). Default value: 0"
+  has_installments:
+    description: "Indicates whether the invoice has more then 1 installment or not (value 0). Default value: 0"
+  purpose:
+    description: "Invoice frequency type to be sent. Default value: monthly"
+  invoice_account_type:
+    description: "Description of invoice account type. Default value: NULL"
+  from_account_type:
+    description: "From account type in the invoice entry. Default value: quinto-andar"
+  to_account_type:
+    description: "To account type in the invoice entry . Default value: supplier"
+  account_type:
+    description: "The account type. Default value: supplier"
+  account_classification:
+    description: "Indicates the account classification based on bill item. Default value: payable"
+  status:
+    description: "Description of payment status. Default value: paid"
+  closing_mode:
+    description: "Description that shows if closing is automatic or manual. Default value: cap"
+  due_amount:
+    lineage:
+      - datalake_payable_accounts_transactions_clean.accounts_payable.paid_amount
+    description: "Invoice entry due value, considering debit or credit related to the contract cash flow"
+  invoice_due_amount:
+    lineage:
+      - datalake_payable_accounts_transactions_clean.accounts_payable.paid_amount
+    description: "Invoice due value, considering debit or credit related to the contract cash flow"
   accrual_year_month:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.accrual_year_month
@@ -55,6 +95,16 @@ columns:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.dt_paid
     description: "Entry creation date"
+  invoice_created_date:
+    description: "Invoice creation date"
+  invoice_due_date:
+    description: "Invoice due date"
+  invoice_paid_date:
+    description: "Date when the invoice was paid"
+  invoice_paid_date_next_business_day:
+    description: "First business day after the invoice payment"
+  invoice_canceled_date:
+    description: "Date when the invoice was canceled"
   contract_start:
     lineage:
       - dw_public.dim_contract.dt_start
@@ -63,5 +113,18 @@ columns:
     lineage:
       - dw_public.dim_contract.dt_annulment
     description: "Annulment of contract date"
+  ended_before_started:
+    description: "If the contract annulment happened before the start"
+    lineage:
+      - dw_public.dim_contract.dt_start
+      - dw_public.dim_contract.dt_annulment
+  pp_pays:
+    description: "Flag indicating PP pays. Default value: FALSE"
+  entry_sort_ascend:
+    description: "Sorting column for entries ordering by ascending. Default value: NULL"
+  entry_by_accrual_sort_ascend:
+    description: "Sorting column for entries by accrual ordering by ascending. Default value: NULL"
+  is_cap:
+    description: "Flag indicating if the register is cap. Default value: TRUE"
   ts_load:
     description: "Timestamp when the data was loaded"
