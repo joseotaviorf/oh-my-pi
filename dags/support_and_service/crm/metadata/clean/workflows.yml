@@ -1,5 +1,8 @@
+---
 database_name: datalake_crm_clean
 table_name: workflows
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -40,9 +43,12 @@ columns:
   year:
     lineage:
       - datalake_crm_raw.workflows.year
+    description: Year of update date.
   month:
     lineage:
       - datalake_crm_raw.workflows.month
+    description: Month of update date.
   day:
     lineage:
       - datalake_crm_raw.workflows.day
+    description: Day of update date.

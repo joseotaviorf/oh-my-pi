@@ -1,5 +1,8 @@
+---
 database_name: datalake_crm_clean
 table_name: task_status_histories
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -13,9 +16,12 @@ columns:
   year:
     lineage:
       - datalake_crm_raw.taskstatushistories.year
+    description: Year of update date.
   month:
     lineage:
       - datalake_crm_raw.taskstatushistories.month
+    description: Month of update date.
   day:
     lineage:
       - datalake_crm_raw.taskstatushistories.day
+    description: Day of update date.
