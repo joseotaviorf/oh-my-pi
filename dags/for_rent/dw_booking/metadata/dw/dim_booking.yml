@@ -488,6 +488,10 @@ columns:
     - datalake_booking.booking.checkin_status
     description: >
       Show status of whatsapp confirmation of visit. Only visits booked 2 days or more in advance need a whatsapp confirmation.
+  checkin_code:
+    lineage:
+    - datalake_booking.booking.checkin_code
+    description: Checkin code sent to buyer
   visit_checkin_status:
     lineage:
     - datalake_booking.booking.visit_checkin_status
