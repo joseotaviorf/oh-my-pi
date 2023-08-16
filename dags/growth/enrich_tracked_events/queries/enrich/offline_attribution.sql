@@ -85,7 +85,8 @@ cx_taxonomy_phone_events AS (
 	contact_theme_detail_tag IN ( 	
 	  'rental_listing_register_search_properties_sale_or_lease_signs' ,	
 	  'rental_listing_register_sign_real_estate_info',	
-    'house_plate_info') 	
+    'house_plate_info', 
+    'real_estate_information_plates') 	
 	AND id_user IS NOT NULL	
     AND DATE(ts_ticket_started) >= DATE('2022-10-17')	
 ), 	
@@ -100,7 +101,8 @@ cx_taxonomy_chat_events AS (
 	contact_theme_detail_tag IN ( 	
 	  'rental_listing_register_search_properties_sale_or_lease_signs' ,	
 	  'rental_listing_register_sign_real_estate_info',	
-    'house_plate_info') 	
+    'house_plate_info', 
+    'real_estate_information_plates') 	
 	AND id_user IS NOT NULL	
     AND DATE(ts_ticket_started) >= DATE('2022-10-17')	
 ), 
