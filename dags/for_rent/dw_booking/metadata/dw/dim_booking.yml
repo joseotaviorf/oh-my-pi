@@ -82,11 +82,11 @@ columns:
     - datalake_booking.booking.buyer_intention
     description: >
       Lists the buyers intention for the property (if the person was buying to live in the property or as an investment).
-    categories: 
-      INVESTMENT_FOR_RENT: > 
+    categories:
+      INVESTMENT_FOR_RENT: >
         If the intention of buying the property is to rent it out later.
-      INVESTMENT_OTHER: > 
-        If the purchase of the property is for investment. 
+      INVESTMENT_OTHER: >
+        If the purchase of the property is for investment.
       LIVING:
         If the purchase is for living in the property after the purchase.
   type:
@@ -293,7 +293,7 @@ columns:
         The agent cancelled the booking.
       Consequence Management: >
         The booking was cancelled because the owner was suspended because of "consequence management" reasons.
-      House Reserved: > 
+      House Reserved: >
         The house was reserved by a tenant, thus cancelling all bookings automatically.
       House Suspended: >
         The house was suspended.
@@ -338,7 +338,7 @@ columns:
     lineage:
     - datalake_booking.booking.last_update_source
     description: >
-      Shows the source of the last booking information change. 
+      Shows the source of the last booking information change.
     categories:
       SelfServiceWeb: >
         The booking was updated by the tenant through the website.
@@ -488,6 +488,18 @@ columns:
     - datalake_booking.booking.checkin_status
     description: >
       Show status of whatsapp confirmation of visit. Only visits booked 2 days or more in advance need a whatsapp confirmation.
+  visit_checkin_status:
+    lineage:
+    - datalake_booking.booking.visit_checkin_status
+    description: Buyer checkin status
+  checkin_fail_reason:
+    lineage:
+    - datalake_booking.booking.checkin_fail_reason
+    description: Checkin fail reason
+  checkin_fail_commentary:
+    lineage:
+    - datalake_booking.booking.checkin_fail_commentary
+    description: Checkin fail commentary made by the agent in the app.
     categories:
       CANCELED: >
         ''
@@ -522,7 +534,7 @@ columns:
   partner_3p_supply:
     lineage:
     - datalake_booking.booking.partner_3p_supply
-    description: > 
+    description: >
       Column with the name of QuintoAndar real estate partner, if the listing has the is_3p_supply flag.
   partner_3p_demand:
     lineage:
@@ -627,7 +639,7 @@ columns:
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.id
       - datalake_gsheets_clean.taxonomy_demand.flow
-    description: > 
+    description: >
       Type of flow in the marketing funnel by the lead.
     categories:
       Non-Self Service: >
@@ -657,7 +669,7 @@ columns:
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.id
       - datalake_gsheets_clean.taxonomy_demand.origin
-    description: > 
+    description: >
       Origin of the lead in the marketing funnel.
     categories:
       Not Mapped: >
@@ -725,7 +737,7 @@ columns:
     lineage:
     - datalake_amplitude_visit.amplitude_visit.is_branded
     - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
-    description: > 
+    description: >
       Boolean column indicating if the booking came from a branded campaign, defined by the lead taxonomy. True if we identify if it did.
   is_visit_completed:
     lineage:

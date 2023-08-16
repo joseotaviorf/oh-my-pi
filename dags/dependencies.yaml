@@ -957,6 +957,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb:load-clean-user-visit-preferences
   - bietlejuice.ebdb:load-clean-visit
+  - bietlejuice.ebdb:load-clean-visit-checkin
   - bietlejuice.ebdb:load-clean-visit-origin
   - bietlejuice.ebdb:load-clean-visitor
   - bietlejuice.ebdb:load-clean-work-contract

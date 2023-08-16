@@ -147,6 +147,26 @@ columns:
       Talvez: ''
       VaiNegociar: ''
       VisitouSozinho: ''
+  checkin_code:
+    lineage:
+      - datalake_ebdb_clean.booking.visit_checkin
+    description: Buyer checkin code.
+    categories:
+      FAILED: ''
+      PENDING: ''
+      COMPLETED: ''
+  checkin_fail_reason:
+    lineage:
+      - datalake_ebdb_clean.booking.checkin_fail_reason
+    description: Checkin fail reason
+  checkin_fail_commentary:
+    lineage:
+      - datalake_ebdb_clean.booking.checkin_fail_commentary
+    description: Checkin fail commentary made by the agent in the app.
+  visit_checkin_status:
+    lineage:
+      - datalake_ebdb_clean.booking.checkin_status
+    description: Checkin status
   slot_day:
     lineage:
     - datalake_ebdb_clean.booking.slot_day
@@ -422,13 +442,13 @@ columns:
   is_3p_supply_5a:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: > 
+    description: >
       Boolean column that identifies if the listing is from a real estate partner (Rede Supply) of QuintoAndar.
   is_3p_supply_bh:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: > 
-      Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte. 
+    description: >
+      Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte.
   is_virtual_visit:
     lineage:
     - datalake_ebdb_clean.follow_up_details.visit_type
@@ -552,3 +572,8 @@ columns:
     description: ''
   is_house_rented:
     description: ''
+  ts_checkin:
+    lineage:
+    - datalake_ebdb_clean.visit_checkin.ts_checkin
+    description: Checkin timestamp
+

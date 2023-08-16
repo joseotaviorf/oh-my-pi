@@ -121,6 +121,10 @@ columns:
     - datalake_insider_clean.review.dt_creation
     description: Date key to be joined with dim_date. Key to identify date of buyer
       booking review.
+  sk_visit_checkin_date:
+    lineage:
+    - datalake_booking.booking.ts_checkin
+    description: Date key to be joined with dim_date. Key to identify the checkin date.
   hub_agent_region:
     lineage:
     - datalake_booking.booking.hub_agent_region
@@ -182,6 +186,10 @@ columns:
     lineage:
     - datalake_booking.booking.ts_visit_fup
     description: Timestamp of the visit follow up.
+  ts_visit_checkin:
+    lineage:
+    - datalake_booking.booking.ts_checkin
+    description: Visit checkin timestamp
   ts_agent_review_rating:
     lineage:
     - datalake_ebdb_clean.real_estate_agent_rating.ts_created
