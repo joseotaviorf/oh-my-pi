@@ -604,6 +604,8 @@ bietlejuice.dw_rent_listing_flow:
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-lead-tasks
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listings-reprocessed-leads
   - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
+  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
+  - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.dw_rental_contribution_margin:
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -680,6 +682,8 @@ bietlejuice.dw_sale_listing_flow:
   - bietlejuice.enrich_sale_potential_listing:load-enrich-potential-listing-lead-tasks
   - bietlejuice.enrich_sale_potential_listing:load-enrich-potential-listing-reprocessed-leads
   - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
+  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
+  - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.dw_sale_listing_price_changes:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.dw_sale_listings:

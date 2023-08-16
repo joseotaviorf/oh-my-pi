@@ -1,4 +1,16 @@
 WITH
+rene_ops AS (
+  SELECT 
+    hl.id_lead_ebdb AS id_lead,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.type') AS STRING) AS lead_type,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) AS lead_origin,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.team') AS STRING) AS ops_agent
+  FROM datalake_rene_descartes_clean.house_lead AS hl
+  INNER JOIN datalake_rene_descartes_clean.acquisition_misc_data AS amd
+    ON hl.id_acquisition = amd.id
+  WHERE CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) = 'OwnerConversionPWA'
+  GROUP BY 1, 2, 3, 4
+),
 potential_listings AS (
     SELECT
         COALESCE(lfrl.id, -1) AS sk_house_listing_flow,
@@ -48,7 +60,12 @@ potential_listings AS (
         plrl.is_reprocessed,
         lfrl.acquisition_channel_rep = 'Inside Sales' AS is_isales_direct_register,
         lfrl.acquisition_channel_rep = 'Admin' AS is_cx_direct_register,
-        (lfrl.acquisition_channel_rep = 'Inside Sales') OR (lfrl.acquisition_channel_rep = 'Admin') AS is_ops_direct_register,
+        CASE 
+            WHEN (lfrl.acquisition_channel_rep = 'Inside Sales') THEN TRUE
+            WHEN (lfrl.acquisition_channel_rep = 'Admin') THEN TRUE
+            WHEN (plrl.lead_origin = 'OwnerConversionPWA') AND (ro.ops_agent != 'IS_INBOUND') THEN TRUE
+            ELSE FALSE
+        END AS is_ops_direct_register,
         lfrl.is_agent_referral,
         lfrl.is_doorman,
         pllt.has_isales_intervention,
@@ -69,8 +86,18 @@ potential_listings AS (
         END AS funnel_step,
         lfrl.funnel_step AS funnel_drop_reason,
         pllt.first_isales_intervention,
-        plrl.lead_type,
-        plrl.lead_origin,
+        plrl.lead_type AS old_lead_type,
+        CASE
+          WHEN (plrl.lead_type = 'OngoingLead') AND (ro.ops_agent = 'IS_INBOUND') THEN 'Inbound'
+          WHEN (plrl.lead_type = 'OngoingLead') THEN NULL
+          ELSE plrl.lead_type
+        END AS lead_type,
+        plrl.lead_origin AS old_lead_origin,
+        CASE
+          WHEN (plrl.lead_origin = 'OwnerConversionPWA') AND (ro.ops_agent = 'IS_INBOUND') THEN 'Inbound'
+          WHEN (plrl.lead_origin = 'OwnerConversionPWA') THEN NULL
+          ELSE plrl.lead_origin
+        END AS lead_origin,
         CASE
             WHEN lfet.id_lead IS NOT NULL
                 THEN lfet.tracking_source
@@ -119,6 +146,8 @@ potential_listings AS (
         ON dr.sk_region = lfrl.id_region
     LEFT JOIN datalake_rent_potential_listing.potential_listing_b2b plb2b
         ON plb2b.id = lfrl.id
+    LEFT JOIN rene_ops AS ro
+      ON lfrl.id_lead = ro.id_lead 
 ),
 potential_listings_enrich AS (
     SELECT
