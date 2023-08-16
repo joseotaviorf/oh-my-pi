@@ -1,36 +1,49 @@
 ---
 database_name: datalake_ebdb_agents
 table_name: agent_region_group
+description: Table with information about the agents areas of operation.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   dt:
+    description: Date of the agent's allocated slots.
     lineage:
       - datalake_ebdb_agents.agents_slots.ts_slot
   dadosagente_id:
+    description: ID of the agent (as found on dw_public.dim_user.dados_agente_id).
     lineage:
       - dw_public.dim_user.dados_agente_id
       - datalake_ebdb_clean_prod.agent_region_data_aud.id_agent_data
   regions:
+    description: List of the agent's regions IDs.
     lineage:
       - datalake_ebdb_agents.agents_region.id_region
       - datalake_ebdb_clean_prod.agent_region_data_aud.id_region
   area:
+    description: Name of the agent's area (region code).
     lineage:
       - datalake_gsheets_clean.auxiliary_region.region_code
   secondary_area:
+    description: Name of the agent's secondary area (region_code).
     lineage:
       - datalake_gsheets_clean.auxiliary_region.region_code
   area_deprecated:
+    description: Deprecated name of the agent's area (region_code_deprecated).
     lineage:
       - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
   secondary_area_deprecated:
+    description: Deprecated name of the agent's secondary area (region_code_deprecated).
     lineage:
       - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
   year:
+    description: Year, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_ebdb_agents.agents_slots.ts_slot
   month:
+    description: Month, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_ebdb_agents.agents_slots.ts_slot
   day:
+    description: Day, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_ebdb_agents.agents_slots.ts_slot

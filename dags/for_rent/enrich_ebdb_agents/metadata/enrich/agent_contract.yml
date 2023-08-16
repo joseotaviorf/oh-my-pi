@@ -1,34 +1,48 @@
 ---
 database_name: datalake_ebdb_agents
 table_name: agent_contract
+description: Table with historical information about the agents work contracts.
+  Each line represents a change in the agent's work contract.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id_agent:
+    description: ID of the agent (as found on dw_public.dim_user.dados_agente_id).
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_agent
   id_user_agent:
+    description: ID user of the agent (as found on dw_public.dim_user.sk_user)
     lineage:
       - datalake_ebdb_clean.user.id
   id_previous_work_contract:
+    description: ID of the agent's previous work contract.
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
   id_work_contract:
+    description: ID of the agent's work contract.
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
   id_current_work_contract:
+    description: ID of the agent's current work contract.
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
   previous_work_contract_name:
+    description: Name of the agent's previous work contract
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
   work_contract_name:
+    description: Name of the agent's work contract.
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
   current_work_contract_name:
+    description: Name of the agent's current work contract.
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
   ts_work_contract_started:
+    description: Timestamp of when the work contract started.
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
   ts_work_contract_ended:
+    description: Timestamp of when the work contract ended (null if it is currently active).
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
