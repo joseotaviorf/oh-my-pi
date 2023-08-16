@@ -1,7 +1,7 @@
 ---
 dag_documentation:
   dag_purpose:
-    This dag aims to ingest information related to messages within our chat in app. 
+    This dag aims to ingest information related to messages within our chat in app.
     This ingestion is done through files made available within s3.
 
 tables:
@@ -18,7 +18,6 @@ custom_cluster:
   num_workers: 2
   spark_version: 10.4.x-scala2.12
   aws_attributes:
-      ebs_volume_size: 200
-      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+    ebs_volume_size: 200
   spark_conf:
-      spark.sql.legacy.json.allowEmptyString.enabled: "true"
+    spark.sql.legacy.json.allowEmptyString.enabled: "true"

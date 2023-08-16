@@ -1,3 +1,7 @@
+inner_dependencies:
+  message:
+    - task
+
 custom_cluster:
   driver_node_type_id: r5d.4xlarge
   node_type_id: r5d.8xlarge

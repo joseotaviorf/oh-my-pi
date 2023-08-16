@@ -1809,6 +1809,7 @@ bietlejuice.enrich_public_date:
   - bietlejuice.google_calendar:load-clean-mexican-holidays
 bietlejuice.enrich_quinto_messenger:
   - bietlejuice.gsheets_support_and_service:done-clean-agents-control
+  - bietlejuice.internal_chat:load-clean-internal-chat-messages
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
   - bietlejuice.quinto_messenger:load-clean-chat
