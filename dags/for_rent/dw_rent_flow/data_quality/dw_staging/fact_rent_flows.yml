@@ -23,52 +23,32 @@ column_level_validations:
     is_complete:
       severity_level: Error
   sk_first_booking:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_last_booking:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_first_offer:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_last_offer:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_first_reservation:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_last_reservation:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_first_proposal:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_last_proposal:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_first_contract:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_last_contract:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
