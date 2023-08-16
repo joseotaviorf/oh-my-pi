@@ -76,25 +76,76 @@ condo_amenities AS (
       WHEN h.doorman_type IS NULL THEN NULL
       ELSE FALSE
     END AS has_entrance_hall,
-    CASE WHEN ica.id_condo_amenities = 1 THEN has_characteristic END AS has_playground,
-    CASE WHEN ica.id_condo_amenities = 2 THEN has_characteristic END AS has_swim_pool,
-    CASE WHEN ica.id_condo_amenities = 3 THEN has_characteristic END AS has_grill_area,
-    CASE WHEN ica.id_condo_amenities = 4 THEN has_characteristic END AS has_sports_court,
-    CASE WHEN ica.id_condo_amenities = 5 THEN has_characteristic END AS has_gym,
-    CASE WHEN ica.id_condo_amenities = 6 THEN has_characteristic END AS has_party_hall,
-    CASE WHEN ica.id_condo_amenities = 7 THEN has_characteristic END AS has_sauna,
-    CASE WHEN ica.id_condo_amenities = 8 THEN has_characteristic END AS has_laundry,
-    CASE WHEN ica.id_condo_amenities = 9 THEN has_characteristic END AS has_piped_gas,
-    CASE WHEN ica.id_condo_amenities = 11 THEN has_characteristic END AS has_gourmet_area,
-    CASE WHEN ica.id_condo_amenities = 12 THEN has_characteristic END AS has_metro_or_train_close,
-    CASE WHEN ica.id_condo_amenities = 13 THEN has_characteristic END AS has_toy_library,
+    CASE
+      WHEN ica.id_condo_amenities = 2
+        OR COALESCE(df.has_swim_pool, iia.has_pool) IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_swim_pool, iia.has_pool)
+    END AS has_swim_pool,
+    CASE
+      WHEN ica.id_condo_amenities = 3
+        OR df.has_grill_area IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_grill_area)
+    END AS has_grill_area,
+    CASE
+      WHEN ica.id_condo_amenities = 4
+        OR COALESCE(df.has_sports_court, iia.has_sports_court) IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_sports_court, iia.has_sports_court)
+    END AS has_sports_court,
+    CASE
+      WHEN ica.id_condo_amenities = 5
+        OR COALESCE(df.has_gym, iia.has_gym) IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_gym, iia.has_gym)
+    END AS has_gym,
+    CASE
+      WHEN ica.id_condo_amenities = 6
+        OR df.has_party_hall IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_party_hall)
+    END AS has_party_hall,
+    CASE
+      WHEN ica.id_condo_amenities = 7
+        OR COALESCE(df.has_sauna, iia.has_sauna) IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_sauna, iia.has_sauna)
+    END AS has_sauna,
+    CASE
+      WHEN ica.id_condo_amenities = 8
+        OR df.has_laundry IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_laundry)
+    END AS has_laundry,
+    CASE
+      WHEN ica.id_condo_amenities = 9
+        OR df.has_piped_gas IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_piped_gas)
+    END AS has_piped_gas,
+    CASE
+      WHEN ica.id_condo_amenities = 11
+        OR df.has_gourmet_area IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_gourmet_area)
+    END AS has_gourmet_area,
+    CASE
+      WHEN ica.id_condo_amenities = 12
+        OR df.has_metro_or_train_close IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_metro_or_train_close)
+    END AS has_metro_or_train_close,
+    CASE
+      WHEN ica.id_condo_amenities = 13
+        OR COALESCE(df.has_toy_library, iia.has_toy_library) IS NOT NULL
+          THEN COALESCE(has_characteristic, df.has_toy_library, iia.has_toy_library)
+    END AS has_toy_library,
     condo_ebdb.has_condo_page
   FROM
     condo_ebdb
-    LEFT JOIN datalake_ebdb_clean.house AS h
+  LEFT JOIN
+    datalake_ebdb_clean.house AS h
       ON h.id_condo_parent = condo_ebdb.id
-    LEFT JOIN datalake_ebdb_clean.info_condo_amenities ica
+  LEFT JOIN
+    datalake_ebdb_clean.info_condo_amenities AS ica
       ON ica.id_house = h.id
+  LEFT JOIN
+    datalake_house_feature_inference.description_features AS df
+      ON df.id_house = h.id
+  LEFT JOIN
+    datalake_kodak.image_inspection_amenities AS iia
+      ON iia.id_house = h.id
 ),
 amenities_cnt AS (
   SELECT
