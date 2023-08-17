@@ -856,8 +856,6 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.vans:load-clean-payment
   - bietlejuice.vans:load-clean-payment-boleto
   - bietlejuice.wall_street:load-clean-charge
-  - bietlejuice.enrich_sap:load-enrich-incoming-payments
-  - bietlejuice.enrich_sap:load-enrich-incoming-payments-lines
   - bietlejuice.enrich_sap:load-enrich-invoice-lines
   - bietlejuice.enrich_sap:load-enrich-invoices
   - bietlejuice.enrich_sap:load-enrich-journal-entries

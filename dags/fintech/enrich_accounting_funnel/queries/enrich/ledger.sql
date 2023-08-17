@@ -56,35 +56,6 @@ WITH _dh AS (
         FROM
             datalake_pas.invoices iin
     )
-    UNION ALL
-    (
-        SELECT
-            ip.document_entry,
-            ip.dt_accrual,
-            ip.dt_created,
-            ip.dt_document,
-            ip.dt_due,
-            ip.dt_reference,
-            ip.dt_tax,
-            ip.dt_updated,
-            ip.id_business_entity,
-            NULL AS id_document,
-            ip.id_external_payment,
-            ip.id_financial_entity,
-            ip.id_transaction,
-            ip.id_user_sign,
-            ip.legacy_uuid,
-            ip.loc_total,
-            ip.memo,
-            ip.series,
-            ip.source_client,
-            ip.source_document_number,
-            ip.transaction_type,
-            ip.updated_by,
-            ip.uuid
-        FROM
-            datalake_pas.incoming_payments ip
-    )
 ),
 dh AS (
     SELECT
@@ -198,34 +169,6 @@ db AS (
             iin.id_document
         FROM
             datalake_pas.invoice_lines iin
-    )
-    UNION ALL
-    (
-        SELECT
-            ip.id_transaction,
-            ip.id_line,
-            ip.id_business_entity,
-            ip.id_finance_entity_entry,
-            ip.id_finance_entity,
-            ip.cost_center_code,
-            ip.contra_act,
-            ip.location_profit_code,
-            ip.managerial_code,
-            ip.memo_line,
-            ip.source_document_number,
-            ip.series,
-            ip.account,
-            ip.account_shortname,
-            ip.transaction_type,
-            ip.credit,
-            ip.debit,
-            ip.dt_accrual,
-            ip.dt_due,
-            ip.dt_reference,
-            ip.dt_tax,
-            ip.id_document
-        FROM
-            datalake_pas.incoming_payments_lines ip
     )
 )
 SELECT
@@ -1219,4 +1162,4 @@ FROM
 INNER JOIN db
     ON db.id_transaction = dh.id_transaction
 WHERE 
-    dh.dt_due >= ADD_MONTHS(CURRENT_DATE, -18)
+    dh.dt_due >= '2023-01-01'

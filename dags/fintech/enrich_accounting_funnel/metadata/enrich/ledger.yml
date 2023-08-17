@@ -10,36 +10,30 @@ columns:
     lineage:
       - datalake_pas.journal_entries.id_transaction
       - datalake_pas.invoices.id_transaction
-      - datalake_pas.incoming_payments.id_transaction
   id_business_entity:
     description: "Identification number of the business entity"
     lineage:
       - datalake_pas.journal_entries.id_business_entity
       - datalake_pas.invoices.id_business_entity
-      - datalake_pas.incoming_payments.id_business_entity
   id_finance_entity:
     description: "Identification number of the finance entity"
     lineage:
       - datalake_pas.journal_entry_lines.id_finance_entity
       - datalake_pas.invoice_lines.id_finance_entity
-      - datalake_pas.incoming_payments_lines.id_finance_entity
   id_finance_entity_entry:
     description: "Identification number of the finance entitiy of entry"
     lineage:
       - datalake_pas.journal_entry_lines.id_finance_entity_entry
       - datalake_pas.invoice_lines.id_finance_entity_entry
-      - datalake_pas.incoming_payments_lines.id_finance_entity_entry
   id_external_payment:
     description: "External ID of the payment"
     lineage:
       - datalake_pas.journal_entries.id_external_payment
       - datalake_pas.invoices.id_external_payment
-      - datalake_pas.incoming_payments.id_external_payment
   id_document:
     description: "Identification number of the document"
     lineage:
       - datalake_pas.invoice_lines.id_document
-      - datalake_pas.incoming_payments_lines.id_document
   account_type:
     description: "Account type description"
   account_number:
@@ -47,100 +41,81 @@ columns:
     lineage:
       - datalake_pas.journal_entry_lines.account
       - datalake_pas.invoice_lines.account
-      - datalake_pas.incoming_payments_lines.account
   account_name:
     description: "Description of the account"
     lineage:
       - datalake_pas.journal_entry_lines.account
       - datalake_pas.invoice_lines.account
-      - datalake_pas.incoming_payments_lines.account
   series:
     description: "Series description"
     lineage:
       - datalake_pas.journal_entries.series
       - datalake_pas.invoices.series
-      - datalake_pas.incoming_payments.series
   document_number:
     description: "Transaction type and document number"
     lineage:
       - datalake_pas.journal_entries.transaction_type
       - datalake_pas.invoices.transaction_type
-      - datalake_pas.incoming_payments.transaction_type
       - datalake_pas.journal_entries.source_document_number
       - datalake_pas.invoices.source_document_number
-      - datalake_pas.incoming_payments.source_document_number
   comments:
     description: "Comments and observations"
     lineage:
       - datalake_pas.journal_entry_lines.memo_line
       - datalake_pas.invoice_lines.memo_line
-      - datalake_pas.incoming_payments_lines.memo_line
   debit_credit:
     description: "Debit - Credit value"
     lineage:
       - datalake_pas.journal_entry_lines.debit
       - datalake_pas.invoice_lines.debit
-      - datalake_pas.incoming_payments_lines.debit
       - datalake_pas.journal_entry_lines.credit
       - datalake_pas.invoice_lines.credit
-      - datalake_pas.incoming_payments_lines.credit
   debit:
     description: "Debit value"
     lineage:
       - datalake_pas.journal_entry_lines.debit
       - datalake_pas.invoice_lines.debit
-      - datalake_pas.incoming_payments_lines.debit
       - datalake_pas.journal_entry_lines.credit
       - datalake_pas.invoice_lines.credit
-      - datalake_pas.incoming_payments_lines.credit
   credit:
     description: "Credit value"
     lineage:
       - datalake_pas.journal_entry_lines.debit
       - datalake_pas.invoice_lines.debit
-      - datalake_pas.incoming_payments_lines.debit
       - datalake_pas.journal_entry_lines.credit
       - datalake_pas.invoice_lines.credit
-      - datalake_pas.incoming_payments_lines.credit
   created_by:
     description: "Name of the user who created the register"
     lineage:
       - datalake_pas.journal_entries.id_user_sign
       - datalake_pas.invoices.id_user_sign
-      - datalake_pas.incoming_payments.id_user_sign
   location_profit_code:
     description: "Location profit code"
     lineage:
       - datalake_pas.journal_entry_lines.location_profit_code
       - datalake_pas.invoice_lines.location_profit_code
-      - datalake_pas.incoming_payments_lines.location_profit_code
   cost_center_code:
     description: "Identification number of the cost center"
     lineage:
       - datalake_pas.journal_entry_lines.cost_center_code
       - datalake_pas.invoice_lines.cost_center_code
-      - datalake_pas.incoming_payments_lines.cost_center_code
   hash:
     description: "Unic ID"
     lineage:
       - datalake_pas.journal_entries.uuid
       - datalake_pas.invoices.uuid
-      - datalake_pas.incoming_payments.uuid
   dt_reference:
     description: "Reference date"
     lineage:
       - datalake_pas.journal_entries.dt_reference
       - datalake_pas.invoices.dt_reference
-      - datalake_pas.incoming_payments.dt_reference
   dt_due:
     description: "Due date"
     lineage:
       - datalake_pas.journal_entries.dt_due
       - datalake_pas.invoices.dt_due
-      - datalake_pas.incoming_payments.dt_due
   dt_accrual:
     description: "Accrual date"
     lineage:
       - datalake_pas.journal_entries.dt_accrual
       - datalake_pas.invoices.dt_accrual
-      - datalake_pas.incoming_payments.dt_accrual
