@@ -1,33 +1,46 @@
 database_name: datalake_big_agent
 table_name: agency
+description: Table with the association between houses and consultants (enrollments).
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id:
+    description: ID of the association bewteen house and consultant (enrollment).
     lineage:
       - datalake_big_agent_clean.agency.id
   id_house:
+    description: ID of the house (not the same as id_house from dw_public.dim_house_listing).
     lineage:
       - datalake_big_agent_clean.agency.id_house
   id_enrollment:
+    description: ID of the enrollment.
     lineage:
       - datalake_big_agent_clean.agency.id_enrollment
   dt_since:
+    description: Timestamp of the house creation on big agent.
     lineage:
       - datalake_big_agent_clean.agency.dt_since
   ts_created:
+    description: Timestamp of when the consultant association with the house was created (enrollment timestamp).
     lineage:
       - datalake_big_agent_clean.agency.ts_created
   ts_deleted:
+    description: Timestamp of when the consultant association with the house was deleted.
     lineage:
       - datalake_big_agent_clean.agency.deleted_at
   ts_updated:
+    description: Timestamp of the last update.
     lineage:
       - datalake_big_agent_clean.agency.ts_updated
   year:
+    description: Year, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_big_agent_clean.agency.year
   month:
+    description: Month, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_big_agent_clean.agency.month
   day:
+    description: Day, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_big_agent_clean.agency.day

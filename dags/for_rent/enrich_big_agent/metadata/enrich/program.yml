@@ -1,30 +1,42 @@
 database_name: datalake_big_agent
 table_name: program
+description: Table with big agent programs info.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id:
+    description: ID of the program.
     lineage:
       - datalake_big_agent_clean.program.id
   name:
+    description: Name of the program.
     lineage:
       - datalake_big_agent_clean.program.name
   code:
+    description: Code of the program.
     lineage:
       - datalake_big_agent_clean.program.code
   details:
+    description: Details of the program.
     lineage:
       - datalake_big_agent_clean.program.details
   ts_created:
+    description: Timestamp of when the program was created.
     lineage:
       - datalake_big_agent_clean.program.ts_created
   ts_updated:
+    description: Timestamp of when the program was last updated.
     lineage:
       - datalake_big_agent_clean.program.ts_updated
   year:
+    description: Year, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_big_agent_clean.program.year
   month:
+    description: Month, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_big_agent_clean.program.month
   day:
+    description: Day, partition of the table. It can be used to enhance the query's performance.
     lineage:
       - datalake_big_agent_clean.program.day
