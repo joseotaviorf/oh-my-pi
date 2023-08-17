@@ -9,6 +9,10 @@ columns:
     lineage:
       - datalake_zendesk_users.agents.id_agent
     description: Unique agent identifier.
+  sk_agent_twilio:
+    lineage:
+      - datalake_zendesk_users.agents.id_agent_twilio
+    description: Temporary field for analyst identification in twilio.
   full_name:
     lineage:
       - datalake_zendesk_users.agents.name

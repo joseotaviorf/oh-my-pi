@@ -9,6 +9,8 @@ column_level_validations:
   id_agent:
     is_complete:
       severity_level: Error
+    is_unique:
+      severity_level: Error
   email:
     is_unique:
       severity_level: Error

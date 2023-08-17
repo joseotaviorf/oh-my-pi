@@ -12,6 +12,11 @@ columns:
         - datalake_bigfone_clean.event.metadata
         - datalake_quinto_messenger_clean.task.assigned_to
       description: Analyst's unique identifier.
+    id_agent_twilio:
+      lineage:
+        - datalake_bigfone_clean.event.metadata
+        - datalake_quinto_messenger_clean.task.assigned_to
+      description: Temporary field for analyst identification in twilio.
     id_user_external:
       lineage:
         - datalake_zendesk_tickets_clean.users.id_user_external

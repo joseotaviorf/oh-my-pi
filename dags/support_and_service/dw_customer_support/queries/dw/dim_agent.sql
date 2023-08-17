@@ -1,5 +1,6 @@
 SELECT
     id_agent AS sk_agent,
+    id_agent_twilio AS sk_agent_twilio,
     name AS full_name,
     email,
     phone,

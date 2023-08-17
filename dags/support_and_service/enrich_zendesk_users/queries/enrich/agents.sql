@@ -71,6 +71,7 @@ quinto_messenger_analysts AS (
 consolidade_base_analysts AS (
     SELECT
         COALESCE(za.id_agent, ba.id_agent, qma.id_agent) AS id_agent,
+        COALESCE(ba.id_agent, qma.id_agent) AS id_agent_twilio,
         za.id_user_external,
         za.id_organization,
         COALESCE(za.name, ba.name) AS name,
@@ -94,6 +95,7 @@ consolidade_base_analysts AS (
 SELECT
     email,
     MAX(id_agent) AS id_agent,
+    MAX(id_agent_twilio) AS id_agent_twilio,
     MAX(id_user_external) AS id_user_external,
     MAX(id_organization) AS id_organization,
     MAX(name) AS name,
