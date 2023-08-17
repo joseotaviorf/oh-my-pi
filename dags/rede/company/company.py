@@ -117,7 +117,7 @@ for table in tables:
         target_database_base_name=CONTEXT,
         table_name=clean_table_name,
         is_incremental=clean_extraction_type == "incremental",
-        partitions=partition_cols,
+        partitions=partition_cols if clean_extraction_type == "incremental" else None,
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
