@@ -67,6 +67,7 @@ SELECT
         WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact, department ORDER BY ts_created) = 1 THEN TRUE
         ELSE FALSE
     END AS is_first_department_interaction,
+    ts_reservation_created,
     ts_created
 FROM
     received_contact

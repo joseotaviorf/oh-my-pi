@@ -96,7 +96,7 @@ call AS (
     WHERE
       task_queue_name <> previous_task_queue_name
   )
-  SELECT
+  SELECT DISTINCT
     crd.id_call,
     NULL AS id_session,
     call.id_ticket AS id_ticket,
@@ -121,6 +121,7 @@ call AS (
       ELSE 'TRANSFERRED'
     END AS status,
     call.id_external_service IS NOT NULL AS is_answered,
+    NULL AS ts_reservation_created,
     crd.ts_created
   FROM
     call_received_demand AS crd
@@ -132,7 +133,6 @@ call AS (
     customer_phone AS cp
       ON cp.phone_number = crd.customer_phone
 ),
-
 chat AS (
   WITH task_queue AS (
     SELECT DISTINCT
@@ -221,6 +221,7 @@ chat AS (
       ELSE 'TRANSFERRED'
     END AS status,
     crd.is_answered,
+    crd.ts_reservation_created,
     crd.ts_created
   FROM
     chat_received_demand AS crd
@@ -256,6 +257,7 @@ email AS (
       ELSE 'IN PROGRESS'
     END AS status,
     true AS is_answered,
+    NULL AS ts_reservation_created,
     ts_ticket_started AS ts_created
   FROM
     datalake_customer_support.email AS e

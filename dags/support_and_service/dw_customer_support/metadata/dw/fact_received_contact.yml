@@ -132,6 +132,12 @@ columns:
       - datalake_customer_support.received_demand.id_ticket
       - datalake_customer_support.received_demand.id_session
     description: Boolean if the interaction is the last of it's contact
+  ts_reservation_created:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
+    description:
+      For Twilio Events, the creation timestamp of every 'reservation.created' event.
+      Only present in the 'chat' channel
   ts_created:
     lineage:
       - datalake_customer_support.received_demand.ts_created

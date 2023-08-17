@@ -94,6 +94,12 @@ columns:
       It is used to track how quickly workers are able to start working on tasks once
       they are assigned to them, which can help optimize workflows and improve customer
       satisfaction. For Zendesk E-mail Tickets, the demand is always considered answered.
+  ts_reservation_created:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
+    description:
+      For Twilio Events, the creation timestamp of every 'reservation.created' event.
+      Only present in the 'chat' channel
   ts_created:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.ts_created_local
