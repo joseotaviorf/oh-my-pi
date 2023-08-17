@@ -52,7 +52,7 @@ products AS (
     SELECT
         id_company,
         MAX(id_product = 1) AS has_rental_guarantee_product,
-        MAX(id_product = 27) AS has_rede_product
+        MAX(id_product IN (27, 30, 31)) AS has_rede_product
     FROM
         datalake_company_clean.company_product
     GROUP BY
