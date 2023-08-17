@@ -1,0 +1,40 @@
+---
+database_name: datalake_recupera_clean
+table_name: email_records
+description: |
+  "Tables with customer emails. It is charged by customer charge and can also be updated via telecharging. 
+  Email types can be registered, however those inserted by the load are automatically registered by the system."
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_creditor:
+    description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_raw.email_records.id_creditor
+  id_customer:
+    description: "Customer Identifier Code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_raw.email_records.id_customer
+  customer_email:
+    description: "Email. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.email_records.customer_email
+  type:
+    description: "Email type"
+    lineage:
+      - datalake_recupera_raw.email_records.type
+  is_preferred_email:
+    description: "Email type"
+    lineage:
+      - datalake_recupera_raw.email_records.is_preferred_email
+  is_email_inactive:
+    description: "Mark email as inactive"
+    categories:
+      S: "Inactive"
+      Nulo: "Active"
+    lineage:
+      - datalake_recupera_raw.email_records.is_email_inactive
+  customer_name:
+    description: "Customer name in preferred email"
+    lineage:
+      - datalake_recupera_raw.email_records.customer_name

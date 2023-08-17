@@ -1,0 +1,27 @@
+---
+database_name: datalake_recupera_clean
+table_name: indicator_records
+description: "This table contains all customer indicators."
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_creditor:
+    description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_raw.indicator_records.id_creditor
+  id_customer:
+    description: "Customer Identifier Code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_raw.indicator_records.id_customer
+  id_indicator:
+    description: "Indicator code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_raw.indicator_records.id_indicator
+  indicator_content:
+    description: "Indicator content. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.indicator_records.indicator_content
+  content_description:
+    description: "Description of data indicator contents"
+    lineage:
+      - datalake_recupera_raw.indicator_records.content_description

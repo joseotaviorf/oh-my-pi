@@ -1,0 +1,39 @@
+---
+database_name: datalake_recupera_clean
+table_name: installments_indicators
+description: "stores data from performance level indicators (invoices)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_creditor:
+    description: "Creditor code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installments_indicators.id_creditor
+  id_customer:
+    description: "Customer ID. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installments_indicators.id_customer
+  id_product:
+    description: "Product code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installments_indicators.id_product
+  id_contract:
+    description: "Contract ID. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installments_indicators.id_contract
+  id_installment:
+    description: "Installment ID. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installments_indicators.id_installment
+  id_indicator:
+    description: "Installment indicator code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installments_indicators.id_indicator
+  indicator_content:
+    description: "Given indicator content. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installments_indicators.indicator_content
+  content_description:
+    description: "Description of data indicator content"
+    lineage:
+      - datalake_recupera_raw.installments_indicators.content_description

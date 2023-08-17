@@ -1,0 +1,39 @@
+---
+database_name: datalake_recupera_clean
+table_name: agreements_installment
+description: "Stores the deal with a unique key of the deal part"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_installment:
+    description: "Installment code"
+    lineage:
+      - datalake_recupera_raw.agreements_installment.id_installment
+  id_creditor:
+    description: "Creditor code"
+    lineage:
+      - datalake_recupera_raw.agreements_installment.id_creditor
+  id_customer:
+    description: "Customer ID"
+    lineage:
+      - datalake_recupera_raw.agreements_installment.id_customer
+  id_product:
+    description: "Product Code"
+    lineage:
+      - datalake_recupera_raw.agreements_installment.id_product
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_recupera_raw.agreements_installment.id_contract
+  dt_due:
+    description: "Expiration date of the installment of the agreement"
+    lineage:
+      - datalake_recupera_raw.agreements_installment.dt_due
+  installment_number:
+    description: "Installment number of the agreement"
+    lineage:
+      - datalake_recupera_raw.agreements_installment.installment_number
+  id_installment_agreement:
+    description: "Unique id of the installment of the agreement"
+    lineage:
+      - datalake_recupera_raw.agreements_installment.id_installment_agreement

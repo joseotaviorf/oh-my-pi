@@ -1,0 +1,123 @@
+---
+database_name: datalake_recupera_clean
+table_name: operational_records
+description: |
+  "This table is the customer's operational data. 
+  These are the data referring to their characteristics within the system
+  and the billing process."
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_creditor:
+    description: "Creditor code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.operational_records.id_creditor
+  id_customer:
+    description: "Customer Identifier Code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.operational_records.id_customer
+  balance_update_routine_indicator:
+    description: "Balance update routine handling indicator. 
+      The value 'Registro de trânsito' is a transit record, only for internal use by Recupera, and it can be disregard. The value will be changed to 'Aguardando processamento' or 'Já processado' in the next execution."
+    lineage:
+      - datalake_recupera_raw.operational_records.balance_update_routine_indicator
+  id_site:
+    description: "Customer location code"
+    lineage:
+      - datalake_recupera_raw.operational_records.id_site
+  collesction_customer_situation:
+    description: "Situação do cliente na cobrança. Cadastrável – situation_code da tbl_status"
+    lineage:
+      - datalake_recupera_raw.operational_records.collesction_customer_situation
+  origin:
+    description: "Origin - Dated filled with the content sent in the load file"
+    lineage:
+      - datalake_recupera_raw.operational_records.origin
+  dt_reference:
+    description: "Reference Date - Data filled with the content sent in the load file"
+    lineage:
+      - datalake_recupera_raw.operational_records.dt_reference
+  customer_oldest_debt_maturity:
+    description: "Customer's oldest debt maturity - updated when the registration is with Ind_alter = '1' "
+    lineage:
+      - datalake_recupera_raw.operational_records.customer_oldest_debt_maturity
+  dt_debt_freezing:
+    description: "Debt Freezing Date - Submitted in the load"
+    lineage:
+      - datalake_recupera_raw.operational_records.dt_debt_freezing
+  deadline:
+    description: "Deadline expiration date - Date at which records will be exchanged"
+    lineage:
+      - datalake_recupera_raw.operational_records.deadline
+  installment_amount:
+    description: "Value of the installment"
+    lineage:
+      - datalake_recupera_raw.operational_records.installment_amount
+  overdue_customer_debt_balance:
+    description: "Customer Debt Overdess Balance - Updated when the registration is with Ind_alter = '1'"
+    lineage:
+      - datalake_recupera_raw.operational_records.overdue_customer_debt_balance
+  latest_installment_number:
+    description: "Latest installment number - updated when the record has ind_alter = '1'"
+    lineage:
+      - datalake_recupera_raw.operational_records.latest_installment_number
+  dt_enrollment_receipt:
+    description: "Enrollment Receipt Date - completed with what was sent in the cargo"
+    lineage:
+      - datalake_recupera_raw.operational_records.dt_enrollment_receipt
+  dt_customer_insertion:
+    description: "Customer entry date in the system"
+    lineage:
+      - datalake_recupera_raw.operational_records.dt_customer_insertion
+  ts_operator_code_update:
+    description: "Date when cod_opera was updated"
+    lineage:
+      - datalake_recupera_raw.operational_records.ts_operator_code_update
+  ts_last_update:
+    description: "Last update date"
+    lineage:
+      - datalake_recupera_raw.operational_records.ts_last_update
+  ts_customer_status_last_update:
+    description: "Date of the last change in the customer's situation - tip_statu"
+    lineage:
+      - datalake_recupera_raw.operational_records.ts_customer_status_last_update
+  id_operator:
+    description: "Operator code where the customer is located"
+    lineage:
+      - datalake_recupera_raw.operational_records.id_operator
+  calls_same_occurence:
+    description: "Number of calls made to the customer with the same occurrence - to measure the attempts exhausted"
+    lineage:
+      - datalake_recupera_raw.operational_records.calls_same_occurence
+  is_next_customer:
+    description: "Control that the customer is the next to be picked up as new or not (it is not the next)."
+    lineage:
+      - datalake_recupera_raw.operational_records.is_next_customer
+  last_customer_history_code:
+    description: "Last customer history code"
+    lineage:
+      - datalake_recupera_raw.operational_records.last_customer_history_code
+  advisory_code:
+    description: "Advisory Code where the customer is located"
+    lineage:
+      - datalake_recupera_raw.operational_records.advisory_code
+  product_code:
+    description: "Product Code with greater delay"
+    lineage:
+      - datalake_recupera_raw.operational_records.product_code
+  distributor_code:
+    description: "Distributor code where the customer was sought"
+    lineage:
+      - datalake_recupera_raw.operational_records.distributor_code
+  operator_code_last_contact:
+    description: "Operator code that made the last contact"
+    lineage:
+      - datalake_recupera_raw.operational_records.operator_code_last_contact
+  distribution_phase:
+    description: "Number of the distribution phase in which the customer is"
+    lineage:
+      - datalake_recupera_raw.operational_records.distribution_phase
+  id_distribution:
+    description: "Distribution Identifier Code"
+    lineage:
+      - datalake_recupera_raw.operational_records.id_distribution

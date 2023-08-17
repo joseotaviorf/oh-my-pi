@@ -1,0 +1,39 @@
+---
+database_name: datalake_recupera_clean
+table_name: trato_feito_payment
+description: "Stores the payments to be integrated with the deal_feito"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_receipt:
+    description: "Receipt code – unique receipt id"
+    lineage:
+      - datalake_recupera_raw.status.id_receipt
+  installment_code:
+    description: "Installment code"
+    lineage:
+      - datalake_recupera_raw.status.installment_code
+  ts_current_registration:
+    description: "Current registration date"
+    lineage:
+      - datalake_recupera_raw.status.ts_current_registration
+  payment_traffic_flag:
+    description: "Payment Record Traffic Flag"
+    lineage:
+      - datalake_recupera_raw.status.payment_traffic_flag
+  internal_code:
+    description: "Internal code of the payment integration system"
+    lineage:
+      - datalake_recupera_raw.status.internal_code
+  trato_feito_payment_send:
+    description: "Number of times it was tried to send the payment to Trato-Feito"
+    lineage:
+      - datalake_recupera_raw.status.trato_feito_payment_send
+  ts_trato_feito_payment:
+    description: "Date of payment integration with Trato-Feito"
+    lineage:
+      - datalake_recupera_raw.status.ts_trato_feito_payment
+  error_description_trato_feito:
+    description: "Description of the error that returned in integration with Trato-Feito"
+    lineage:
+      - datalake_recupera_raw.status.error_description_trato_feito

@@ -1,0 +1,141 @@
+---
+database_name: datalake_recupera_clean
+table_name: installment
+description: |
+  "Contains the installments of the agreements. 
+  In this table we will have a line for each installment of the agreement made. 
+  In the case of reversing the installment receipt, there will be more than one line 
+  per installment The records are never deleted, the flag being changed in the case of cancellation."
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_installment:
+    description: "Installment code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installment.id_installment
+  dt_due:
+    description: "Due date. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installment.dt_due
+  id_sequence_number:
+    description: "Sequence number (in the event of reversal, new line is inserted to the portion with this different field). It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_raw.installment.id_sequence_number
+  id_creditor:
+    description: "Creditor code"
+    lineage:
+      - datalake_recupera_raw.installment.id_creditor
+  id_customer:
+    description: "Customer Identifier Code"
+    lineage:
+      - datalake_recupera_raw.installment.id_customer
+  dt_installment:
+    description: "Date the installment was made"
+    lineage:
+      - datalake_recupera_raw.installment.dt_installment
+  installment_number:
+    description: "Installment number - the first is always 000"
+    lineage:
+      - datalake_recupera_raw.installment.installment_number
+  installments_amount:
+    description: "Total amount of installments"
+    lineage:
+      - datalake_recupera_raw.installment.installments_amount
+  main_amount:
+    description: "Main installment value contained in the installment"
+    lineage:
+      - datalake_recupera_raw.installment.main_amount
+  amount_to_pay:
+    description: "Total amount to be paid in the installment"
+    lineage:
+      - datalake_recupera_raw.installment.amount_to_pay
+  amount_fine:
+    description: "Fine Amount"
+    lineage:
+      - datalake_recupera_raw.installment.amount_fine
+  interest_fee_amount:
+    description: "Interest Value"
+    lineage:
+      - datalake_recupera_raw.installment.interest_fee_amount
+  adm_fee_amount:
+    description: "Administrative Fee Amount"
+    lineage:
+      - datalake_recupera_raw.installment.adm_fee_amount
+  transfer_amount:
+    description: "Transfer value"
+    lineage:
+      - datalake_recupera_raw.installment.transfer_amount
+  revenue_amount:
+    description: "Revenue valuea"
+    lineage:
+      - datalake_recupera_raw.installment.revenue_amount
+  discount_amount:
+    description: "Discount amount"
+    lineage:
+      - datalake_recupera_raw.installment.discount_amount
+  expense_amount:
+    description: "Expense value"
+    lineage:
+      - datalake_recupera_raw.installment.expense_amount
+  default_interest_amount:
+    description: "Default interest value (juros de mora)"
+    lineage:
+      - datalake_recupera_raw.installment.default_interest_amount
+  installment_fee_amount:
+    description: "Value of installment interest"
+    lineage:
+      - datalake_recupera_raw.installment.installment_fee_amount
+  dt_paid:
+    description: "Date of payment"
+    lineage:
+      - datalake_recupera_raw.installment.dt_paid
+  id_site:
+    description: "Site code where the installment was made"
+    lineage:
+      - datalake_recupera_raw.installment.id_site
+  receipt_code:
+    description: "Receipt code"
+    lineage:
+      - datalake_recupera_raw.installment.receipt_code
+  is_installment_active:
+    description: "Indicates whether the installment is active (valid), or not (was reversed)"
+    lineage:
+      - datalake_recupera_raw.installment.is_installment_active
+  installment_situation:
+    description: "Installment situation. When the agreement is canceled all lines have this flag"
+    lineage:
+      - datalake_recupera_raw.installment.installment_situation
+  boleto_emission_indicator:
+    description: |
+      "Boleto emission indicator. Indicates the type of receipt selected when the installment was made"
+    lineage:
+      - datalake_recupera_raw.installment.boleto_emission_indicator
+  is_special_installment:
+    description: "Indicates whether it is a special installment or not (common installment)"
+    lineage:
+      - datalake_recupera_raw.installment.is_special_installment
+  id_operator:
+    description: "Operator code that made the agreement"
+    lineage:
+      - datalake_recupera_raw.installment.id_operator
+  advisory_code:
+    description: "Advisory Code. You will be filled if it is an agreement made for a client in advisory."
+    lineage:
+      - datalake_recupera_raw.installment.advisory_code
+  agreement_type:
+    description: "Indicates the type of agreement made for the customer"
+    lineage:
+      - datalake_recupera_raw.installment.agreement_type
+  installment_rate:
+    description: "Installment fee"
+    lineage:
+      - datalake_recupera_raw.installment.installment_rate
+  discount_percentage:
+    description: "Discount percentage"
+    lineage:
+      - datalake_recupera_raw.installment.discount_percentage
+  installlment_renegotiated:
+    description: |
+      "Indicates that the installment was renegotiated (identified at the time the agreement is made)"
+    lineage:
+      - datalake_recupera_raw.installment.installlment_renegotiated
