@@ -32,6 +32,7 @@ WITH received_contact AS (
         customer_email,
         agent_email,
         is_answered,
+        ts_reservation_created,
         ts_created
     FROM
         datalake_customer_support.received_demand
