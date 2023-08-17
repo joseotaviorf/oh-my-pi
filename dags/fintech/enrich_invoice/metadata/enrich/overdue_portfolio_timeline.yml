@@ -99,6 +99,12 @@ columns:
     lineage:
       - datalake_retsuko.invoice.paid_amount
     description: Invoice paid amount
+  recovered_amount:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_quintoandar.aux_date.date
+    description: Amount recovered between reference month start and reference date
   contract_overdue_invoices:
     description: Contract overdue invoices
   contract_debt:

@@ -201,6 +201,11 @@ SELECT
     dti,
     due_amount,
     paid_amount,
+    CASE
+        WHEN dt_paid BETWEEN month_start AND reference_date
+            AND dt_paid > dt_due_ajust
+        THEN due_amount
+    END AS recovered_amount,
     contract_overdue_invoices,
     contract_debt,
     delay_invoice_at_reference,
