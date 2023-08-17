@@ -106,7 +106,7 @@ INNER JOIN
         ON dt.sk_ticket = gdc.sk_ticket
 INNER JOIN
     agents_info AS ai
-        ON ai.email = cf.custom_fields['[AUTO] Email do Agente']
+        ON LOWER(ai.email) = LOWER(cf.custom_fields['[AUTO] Email do Agente'])
 WHERE
     DATE(dd.date) = CURRENT_DATE() - 1
     AND customer_type_tag IS NOT NULL

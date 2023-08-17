@@ -19,4 +19,4 @@ LEFT JOIN
         AND dc.channel = 'Twillio'
 WHERE
     ca.dt_task_created_local = current_date - 1
-        AND ca.agent_email LIKE '%%atento%%'
+        AND LOWER(ca.agent_email) LIKE '%%atento%%'
