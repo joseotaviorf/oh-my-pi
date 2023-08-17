@@ -856,6 +856,12 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.vans:load-clean-payment
   - bietlejuice.vans:load-clean-payment-boleto
   - bietlejuice.wall_street:load-clean-charge
+  - bietlejuice.enrich_sap:load-enrich-incoming-payments
+  - bietlejuice.enrich_sap:load-enrich-incoming-payments-lines
+  - bietlejuice.enrich_sap:load-enrich-invoice-lines
+  - bietlejuice.enrich_sap:load-enrich-invoices
+  - bietlejuice.enrich_sap:load-enrich-journal-entries
+  - bietlejuice.enrich_sap:load-enrich-journal-entry-lines
 bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost
   - bietlejuice.enrich_region:load-enrich-region
@@ -2382,6 +2388,7 @@ bietlejuice.metric_rent__demand_events:
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
 bietlejuice.metric_rent__gross_profit:
   - bietlejuice.enrich_sap:load-enrich-ledger
+  - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
 bietlejuice.metric_rent__listings:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
