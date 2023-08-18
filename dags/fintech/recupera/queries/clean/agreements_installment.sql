@@ -6,7 +6,7 @@ SELECT
     id_contract,
     id_installment_agreement,
     installment_number,
-    DATE(dt_due_date_installment_agreement) AS dt_due_date_installment_agreement,
+    DATE(dt_due) AS dt_due,
     ts_load,
     year,
     month,
