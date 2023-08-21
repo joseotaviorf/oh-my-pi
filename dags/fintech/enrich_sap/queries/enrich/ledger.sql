@@ -2,7 +2,7 @@ WITH _dh AS (
     (
         SELECT
             NULL AS document_entry,
-            je.dt_accrual,
+            je.accrual_year_month,
             je.dt_created,
             NULL AS dt_document,
             je.dt_due,
@@ -31,7 +31,7 @@ WITH _dh AS (
     (
         SELECT
             iin.document_entry AS document_entry,
-            iin.dt_accrual,
+            iin.accrual_year_month,
             iin.dt_created,
             iin.dt_document,
             iin.dt_due,
@@ -60,7 +60,7 @@ WITH _dh AS (
     (
         SELECT
             ip.document_entry,
-            ip.dt_accrual,
+            ip.accrual_year_month,
             ip.dt_created,
             ip.dt_document,
             ip.dt_due,
@@ -129,7 +129,7 @@ dh AS (
         _dh.dt_reference,
         _dh.dt_tax,
         _dh.dt_due,
-        _dh.dt_accrual,
+        _dh.accrual_year_month,
         _dh.dt_created,
         _dh.dt_updated,
         _dh.legacy_uuid,
@@ -161,7 +161,7 @@ db AS (
             je.transaction_type,
             je.credit,
             je.debit,
-            je.dt_accrual,
+            je.accrual_year_month,
             je.dt_due,
             je.dt_reference,
             je.dt_tax,
@@ -191,7 +191,7 @@ db AS (
             iin.transaction_type,
             iin.credit,
             iin.debit,
-            iin.dt_accrual,
+            iin.accrual_year_month,
             iin.dt_due,
             iin.dt_reference,
             iin.dt_tax,
@@ -219,7 +219,7 @@ db AS (
             ip.transaction_type,
             ip.credit,
             ip.debit,
-            ip.dt_accrual,
+            ip.accrual_year_month,
             ip.dt_due,
             ip.dt_reference,
             ip.dt_tax,
@@ -1211,7 +1211,7 @@ SELECT
     dh.uuid,
     dh.dt_reference,
     dh.dt_due,
-    db.dt_accrual
+    db.accrual_year_month
 FROM
     dh
 INNER JOIN db

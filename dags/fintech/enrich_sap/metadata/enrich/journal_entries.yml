@@ -57,6 +57,10 @@ columns:
     description: "Identification number of the user who updated the register"
     lineage:
       - datalake_pas_clean.journal_entries.updated_by
+  accrual_year_month:
+    description: "Accrual date"
+    lineage:
+      - datalake_pas_clean.journal_entries.accrual_year_month
   total_loc:
     description: "Total loc number"
     lineage:
@@ -69,10 +73,6 @@ columns:
     description: "Tax date"
     lineage:
       - datalake_pas_clean.journal_entries.dt_tax
-  dt_accrual:
-    description: "Accrual date"
-    lineage:
-      - datalake_pas_clean.journal_entries.dt_accrual
   dt_due:
     description: "Due date"
     lineage:

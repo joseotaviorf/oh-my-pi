@@ -65,6 +65,10 @@ columns:
     description: "Identification number of the transaction type"
     lineage:
       - datalake_pas_clean.journal_entry_lines.transaction_type
+  accrual_year_month:
+    description: "Accrual date"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.accrual_year_month
   credit:
     description: "Credit value"
     lineage:
@@ -73,10 +77,6 @@ columns:
     description: "Debit value"
     lineage:
       - datalake_pas_clean.journal_entry_lines.debit
-  dt_accrual:
-    description: "Accrual date"
-    lineage:
-      - datalake_pas_clean.journal_entry_lines.dt_accrual
   dt_due:
     description: "Due date"
     lineage:

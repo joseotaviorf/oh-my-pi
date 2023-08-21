@@ -50,15 +50,15 @@ columns:
   transaction_type:
     lineage:
       - datalake_pas_raw.incoming_payments_lines.transaction_type_transtype
+  accrual_year_month:
+    lineage:
+      - datalake_pas_raw.incoming_payments_lines.accrualdate_u_accrualdate
   credit:
     lineage:
       - datalake_pas_raw.incoming_payments_lines.credit
   debit:
     lineage:
       - datalake_pas_raw.incoming_payments_lines.debit
-  dt_accrual:
-    lineage:
-      - datalake_pas_raw.incoming_payments_lines.accrualdate_u_accrualdate
   dt_due:
     lineage:
       - datalake_pas_raw.incoming_payments_lines.duedate

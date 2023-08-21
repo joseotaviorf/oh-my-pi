@@ -61,6 +61,10 @@ columns:
     description: "Identification number of the user who updated the register"
     lineage:
       - datalake_pas_clean.incoming_payments.updated_by
+  accrual_year_month:
+    description: "Accrual date"
+    lineage:
+      - datalake_pas_clean.incoming_payments.accrual_year_month
   loc_total:
     description: "Total loc number"
     lineage:
@@ -69,10 +73,6 @@ columns:
     description: "Document date"
     lineage:
       - datalake_pas_clean.incoming_payments.dt_document
-  dt_accrual:
-    description: "Accrual date"
-    lineage:
-      - datalake_pas_clean.incoming_payments.dt_accrual
   dt_tax:
     description: "Tax date"
     lineage:

@@ -47,15 +47,15 @@ columns:
   transaction_type:
     lineage:
       - datalake_pas_raw.journal_entry_lines.transaction_type_transtype
+  accrual_year_month:
+    lineage:
+      - datalake_pas_raw.journal_entry_lines.accrualdate_ref3line
   credit:
     lineage:
       - datalake_pas_raw.journal_entry_lines.credit
   debit:
     lineage:
       - datalake_pas_raw.journal_entry_lines.debit
-  dt_accrual:
-    lineage:
-      - datalake_pas_raw.journal_entry_lines.accrualdate_ref3line
   dt_due:
     lineage:
       - datalake_pas_raw.journal_entry_lines.duedate

@@ -114,8 +114,8 @@ columns:
     lineage:
       - datalake_pas.journal_entries.dt_due
       - datalake_pas.invoices.dt_due
-  dt_accrual:
+  accrual_year_month:
     description: "Accrual date"
     lineage:
-      - datalake_pas.journal_entries.dt_accrual
-      - datalake_pas.invoices.dt_accrual
+      - datalake_pas.journal_entries.accrual_year_month
+      - datalake_pas.invoices.accrual_year_month

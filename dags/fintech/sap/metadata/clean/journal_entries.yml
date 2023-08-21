@@ -41,6 +41,9 @@ columns:
   updated_by:
     lineage:
       - datalake_pas_raw.journal_entries.updatedby_usersign2
+  accrual_year_month:
+    lineage:
+      - datalake_pas_raw.journal_entries.accrualdate_ref3
   loc_total:
     lineage:
       - datalake_pas_raw.journal_entries.loctotal
@@ -50,9 +53,6 @@ columns:
   dt_tax:
     lineage:
       - datalake_pas_raw.journal_entries.taxdate
-  dt_accrual:
-    lineage:
-      - datalake_pas_raw.journal_entries.accrualdate_ref3
   dt_due:
     lineage:
       - datalake_pas_raw.journal_entries.duedate

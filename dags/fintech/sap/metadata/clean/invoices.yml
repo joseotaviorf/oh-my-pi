@@ -47,15 +47,15 @@ columns:
   updated_by:
     lineage:
       - datalake_pas_raw.invoices.updatedby_usersign2
+  accrual_year_month:
+    lineage:
+      - datalake_pas_raw.invoices.accrualdate_u_accrualdate
   loc_total:
     lineage:
       - datalake_pas_raw.invoices.loctotal
   dt_document:
     lineage:
       - datalake_pas_raw.invoices.docdate
-  dt_accrual:
-    lineage:
-      - datalake_pas_raw.invoices.accrualdate_u_accrualdate
   dt_tax:
     lineage:
       - datalake_pas_raw.invoices.taxdate
