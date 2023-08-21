@@ -2,7 +2,7 @@ SELECT
     MAX(a.id_agent) AS sk_agent,
     MAX(a.name) AS full_name,
     a.email,
-    MAX(a.phone),
+    MAX(a.phone) AS phone,
     MAX(a.organization) AS agent_organization,
     MAX(a.organization) AS agent_company,
     MAX(ac.manager) AS agent_manager,
