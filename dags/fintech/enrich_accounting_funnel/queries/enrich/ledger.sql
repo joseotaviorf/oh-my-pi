@@ -173,7 +173,7 @@ db AS (
 )
 SELECT
     dh.id_transaction,
-    dh.id_business_entity,
+    db.id_business_entity,
     db.id_finance_entity,
     db.id_finance_entity_entry,
     dh.id_external_payment,
@@ -1156,7 +1156,7 @@ SELECT
     dh.uuid AS hash,
     dh.dt_reference,
     dh.dt_due,
-    db.dt_accrual
+    dh.dt_accrual
 FROM
     dh
 INNER JOIN db
