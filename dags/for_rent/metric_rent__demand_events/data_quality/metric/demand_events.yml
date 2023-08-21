@@ -2,5 +2,10 @@
 table_name: metric_rent.demand_events
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  dt_event:
+  business_type:
     is_complete:
+  rent_flow_origin:
+    is_complete:
+  country_code:
+    is_complete:
+      severity_level: Error
