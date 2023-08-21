@@ -190,6 +190,7 @@ Produces the following output tables:
     `special_condition_aud`
     `state`
     `state_aud`
+    `suspicious_listings`
     `user`
     `user_aud`
     `user_document`
