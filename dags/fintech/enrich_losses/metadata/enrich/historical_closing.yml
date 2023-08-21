@@ -1,13 +1,13 @@
 ---
 database_name: datalake_losses
-table_name: closing
+table_name: historical_closing
 description: "Enrich table with the losses model informations for the fact tables"
 owner: felipe.chies@quintoandar.com.br
 domain: fintech
 columns:
   id_invoice:
     lineage:
-    - dw_payment_snapshot.dim_invoice_snapshot.sk_invoice
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.sk_invoice
     description: Id of the invoice. 
   id_contract:
     lineage:   
@@ -15,15 +15,15 @@ columns:
     description: Id of the contract. 
   accrual_year_month:
     lineage:   
-    - dw_payment_snapshot.dim_invoice_snapshot.accrual_year_month
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.accrual_year_month
     description: String with Year number and Month number 'yyyymm' related to the sent date.
   due_amount:
     lineage:   
-    - dw_payment_snapshot.dim_invoice_snapshot.due_amount
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.due_amount
     description: Total value of the invoice. 
   frequency: 
     lineage:   
-    - dw_payment_snapshot.dim_invoice_snapshot.frequency
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.frequency
     description: Frequency of the payment. 
   is_guarantee_paid:
     description: Flag to show if the guarantee is paid. 
@@ -41,11 +41,11 @@ columns:
     description: Flag to show if the invoice is writtendown in the deadtime.
   payment_status:
     lineage:   
-    - dw_payment_snapshot.dim_invoice_snapshot.payment_status
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.payment_status
     description: Status of the invoice payment. 
   user:
     lineage:   
-    - dw_payment_snapshot.dim_invoice_snapshot.user
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.user
     description: User information related to the invoice. 
   origin_factor:
     description: Origin of the data, currently can come from the historical table or the snapshot.
@@ -55,13 +55,13 @@ columns:
     description: Last day of the month.
   dt_due: 
     lineage:   
-    - dw_payment_snapshot.dim_invoice_snapshot.dt_due
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.dt_due
     description: Due date of the invoice. 
   dt_paid: 
     lineage:   
-    - dw_payment_snapshot.dim_invoice_snapshot.dt_paid
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.dt_paid
     description: Payment completed date of the invoice. 
   dt_snapshot:
     lineage:
-    - dw_payment_snapshot.dim_invoice_snapshot.ts_snapshot
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.ts_snapshot
     description: Date of the snapshot.

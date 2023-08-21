@@ -135,6 +135,18 @@ BASE_ACORDOS_GLOBAL AS(
   FROM 
     BASE_ACORDOS_METODOLOGIA_NOVA as bamn
 ),
+closing_union AS(
+  SELECT 
+    * 
+  FROM 
+    datalake_losses.closing 
+  UNION 
+  SELECT 
+    * 
+  FROM 
+    datalake_losses.historical_closing 
+
+),
 base_step0_delay AS(
   SELECT 
     fc.*,
@@ -145,7 +157,7 @@ base_step0_delay AS(
     d.dt_min_due_date_at_deal AS deal_anchor_due_date,
     v.dt_due as dt_due_general_accrual
   FROM 
-    datalake_losses.closing fc
+    closing_union fc
   LEFT JOIN 
     BASE_ACORDOS_GLOBAL d 
       ON d.sk_deal_invoice = fc.id_invoice

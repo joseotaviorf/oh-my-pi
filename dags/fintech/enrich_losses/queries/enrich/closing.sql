@@ -101,6 +101,7 @@ SELECT
       flag_writtendown_in_dead_time AS is_writtendown_in_dead_time,
       payment_status, 
       COALESCE(user,'tenant') AS user,
+      'SNAPSHOT' as origin_factor,
       closing_day AS dt_closing,
       dt_due, 
       dt_paid, 
