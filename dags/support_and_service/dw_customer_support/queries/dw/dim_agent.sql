@@ -1,12 +1,17 @@
 SELECT
-    id_agent AS sk_agent,
-    id_agent_twilio AS sk_agent_twilio,
-    name AS full_name,
-    email,
-    phone,
-    organization AS agent_organization,
-    organization AS agent_company,
-    DATE(ts_created) AS dt_agent_start,
+    MAX(a.id_agent) AS sk_agent,
+    MAX(a.name) AS full_name,
+    a.email,
+    MAX(a.phone),
+    MAX(a.organization) AS agent_organization,
+    MAX(a.organization) AS agent_company,
+    MAX(ac.manager) AS agent_manager,
+    MAX(DATE(a.ts_created)) AS dt_agent_start,
     NOW() AS ts_load
 FROM
-    datalake_zendesk_users.agents
+    datalake_zendesk_users.agents AS a
+LEFT JOIN
+    datalake_gsheets_clean.agents_control AS ac
+        ON a.email = LOWER(ac.email)
+GROUP BY
+    a.email

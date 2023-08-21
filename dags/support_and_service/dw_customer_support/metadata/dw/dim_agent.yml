@@ -33,6 +33,10 @@ columns:
     lineage:
       - datalake_zendesk_users.agents.organization
     description: Temporary field.
+  agent_manager:
+    lineage:
+      - datalake_gsheets_clean.agents_control.manager
+    description: Analyst Manager.
   dt_agent_start:
     lineage:
       - datalake_zendesk_users.agents.ts_created
