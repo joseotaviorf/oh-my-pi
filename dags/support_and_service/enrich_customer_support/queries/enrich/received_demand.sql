@@ -134,48 +134,52 @@ call AS (
       ON cp.phone_number = crd.customer_phone
 ),
 chat AS (
-  WITH task_queue AS (
-    SELECT DISTINCT
-      GET_JSON_OBJECT(te.event_payload,'$.TaskQueueSid') AS id_task_queue,
-      GET_JSON_OBJECT(te.event_payload,'$.TaskQueueName') AS task_queue_name
+  WITH current_queue AS (
+    SELECT
+      GET_JSON_OBJECT(event_payload,'$.TaskQueueSid') AS id_task_queue,
+      GET_JSON_OBJECT(event_payload,'$.TaskQueueName') AS task_queue_name
     FROM
-      datalake_quinto_messenger_clean.task_event AS te
+      datalake_quinto_messenger_clean.task_event
+    QUALIFY
+      ROW_NUMBER() OVER(PARTITION BY GET_JSON_OBJECT(event_payload,'$.TaskQueueSid') ORDER BY ts_created DESC) = 1
   ),
   reservation_created_events AS (
     SELECT
-      te.id_task_external,
-      FROM_UTC_TIMESTAMP(te.ts_created, 'America/Sao_Paulo') AS ts_reservation_created
+      id_task_external,
+      FROM_UTC_TIMESTAMP(ts_created, 'America/Sao_Paulo') AS ts_reservation_created
     FROM
-      datalake_quinto_messenger_clean.task_event AS te
+      datalake_quinto_messenger_clean.task_event
     WHERE
-      te.event_type = 'reservation.created'
+      event_type = 'reservation.accepted'
+    QUALIFY
+      ROW_NUMBER() OVER(PARTITION BY id_task_external ORDER BY ts_created) = 1
   ),
   task AS (
     SELECT
-      t.id_external,
-      t.id_channel_external,
-      t.task_status,
-      GET_JSON_OBJECT(t.task_attributes,'$.chat_id') AS id_chat,
-      GET_JSON_OBJECT(t.assigned_to,'$.worker_name') AS agent_email,
-      GET_JSON_OBJECT(t.task_attributes,'$.target') AS ticket_group_name,
-      REGEXP_REPLACE(REGEXP_EXTRACT(GET_JSON_OBJECT(t.task_attributes,'$.from'), '(\\w+:)(.+)', 2), '^\\+(?=.*)', '') AS customer_phone,
-      GET_JSON_OBJECT(t.task_resource, '$.reason') AS task_completion_reason,
-      FROM_UTC_TIMESTAMP(t.ts_created, 'America/Sao_Paulo') AS ts_created
+      id_task,
+      id_channel,
+      task_status,
+      id_chat,
+      agent_email,
+      ticket_group_name,
+      REGEXP_REPLACE(from_phone_number, '^\\+(?=.*)', '') AS customer_phone,
+      completion_reason,
+      ts_created_local AS ts_created
     FROM
-      datalake_quinto_messenger_clean.task AS t
+      datalake_quinto_messenger.task AS t
   ),
-  chat_received_demand AS (
+  task_reservations AS (
     SELECT
-      t.id_external AS id_task_external,
+      t.id_task,
       chn.id_source AS id_session_whats,
       c.id_session AS id_session_inapp,
-      COALESCE(tq.task_queue_name, t.ticket_group_name) AS task_queue_name,
+      COALESCE(cq.task_queue_name, t.ticket_group_name) AS task_queue_name,
       t.agent_email,
       t.customer_phone,
-      t.task_completion_reason,
+      t.completion_reason,
       CASE
         WHEN t.task_status = 'canceled' THEN FALSE
-        WHEN t.task_completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
+        WHEN t.completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
         ELSE TRUE
       END AS is_answered,
       t.ts_created AS ts_task_created,
@@ -185,52 +189,75 @@ chat AS (
       task AS t
     LEFT JOIN
       reservation_created_events AS rce
-        ON rce.id_task_external = t.id_external
+        ON rce.id_task_external = t.id_task
     LEFT JOIN
-      task_queue AS tq
-        ON tq.id_task_queue = t.ticket_group_name
+      current_queue AS cq
+        ON cq.id_task_queue = t.ticket_group_name
     LEFT JOIN
       datalake_quinto_messenger.channel AS chn
-        ON chn.id_channel = t.id_channel_external
+        ON chn.id_channel = t.id_channel
     LEFT JOIN
       datalake_quinto_messenger.chat AS c
         ON c.id_chat = t.id_chat
+  ),
+  ticket_assignment AS (
+    SELECT DISTINCT
+      COALESCE(tr.id_session_whats, tr.id_session_inapp) AS id_session,
+      c.id_ticket AS id_ticket,
+      tr.id_task,
+      cp.id_user,
+      tr.agent_email,
+      tr.customer_phone,
+      tr.task_queue_name AS department,
+      tr.completion_reason,
+      c.client_type,
+      c.customer_type_tag,
+      c.contact_motivation_tag,
+      c.contact_theme_tag,
+      c.contact_theme_detail_tag,
+      c.step_tag,
+      c.request_type,
+      tr.is_answered,
+      tr.ts_reservation_created,
+      tr.ts_created
+    FROM
+      task_reservations AS tr
+    LEFT JOIN
+      datalake_customer_support.chat AS c
+        ON c.id_segment = tr.id_task
+    LEFT JOIN
+      customer_phone AS cp
+        ON cp.phone_number = tr.customer_phone
   )
   SELECT DISTINCT
     NULL AS id_call,
-    COALESCE(crd.id_session_whats, crd.id_session_inapp) AS id_session,
-    chat.id_ticket AS id_ticket,
-    crd.id_task_external AS id_task,
-    cp.id_user,
+    id_session,
+    id_ticket,
+    id_task,
+    id_user,
     NULL AS id_reservation,
-    crd.agent_email,
+    agent_email,
     'chat' AS channel,
-    crd.customer_phone,
+    customer_phone,
     NULL AS customer_email,
-    crd.task_queue_name AS department,
-    chat.client_type,
-    chat.customer_type_tag,
-    chat.contact_motivation_tag,
-    chat.contact_theme_tag,
-    chat.contact_theme_detail_tag,
-    chat.step_tag,
-    chat.request_type,
+    department,
+    client_type,
+    customer_type_tag,
+    contact_motivation_tag,
+    contact_theme_tag,
+    contact_theme_detail_tag,
+    step_tag,
+    request_type,
     CASE
-      WHEN task_completion_reason = 'task idled' THEN 'IDLED'
-      WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY crd.ts_created DESC) = 1 THEN 'COMPLETED'
+      WHEN completion_reason = 'task idled' THEN 'IDLED'
+      WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
-    crd.is_answered,
-    crd.ts_reservation_created,
-    crd.ts_created
+    is_answered,
+    ts_reservation_created,
+    ts_created
   FROM
-    chat_received_demand AS crd
-  LEFT JOIN
-    customer_phone AS cp
-      ON cp.phone_number = crd.customer_phone
-  LEFT JOIN
-    datalake_customer_support.chat
-      ON chat.id_segment = crd.id_task_external
+    ticket_assignment
 ),
 email AS (
   SELECT DISTINCT
