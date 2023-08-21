@@ -1,105 +1,147 @@
 database_name: datalake_firestore
 table_name: rent_offer
+description: Enriched table that consolidates rent offer data from the Firestore source.
+  Since Firestore is a messaging solution, this table basically extracts the data fields from the most recent message
+  related to an offer.
+  Each line is an unique offer, its most recently update.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_firestore:
+    description: Unique offer id that comes from the Firestore.
     lineage:
       - datalake_firestore_clean.rent_offer.id
   id_house:
+    description: Id of the property related to the offer.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   id_owner:
+    description: Id of the property owner.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   id_partner:
+    description: Id of the partner associated to the offer.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   id_tenant:
+    description: Id of the tenant prospect related to the offer.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   id_owner_string:
+    description: Id of the property owner, as a string.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   id_tenant_string:
+    description: Id of the tenant prospect related to the offer, as a string.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   code:
+    description: Code of the offer. Deprecated field.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   comment:
+    description: Comment related to the offer. Added by an internal user (Ops team).
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   house:
+    description: Information about the property related to the offer.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   iteration:
+    description: Number of interations that happened during the offer.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   last_proposed_rent:
+    description: The last rent value that was proposed.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   last_proposed_rent_draft:
+    description: The last rent value that was proposed, in draft.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   origin_offer:
+    description: Firestore id of the original offer, if it has one.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   original_rent:
+    description: The original value of the rent.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   original_total:
+    description: The original total value of the rent.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   rejection_reason:
+    description: Reason of the offer's rejection.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   rejection_reason_description:
+    description: Description of the rejection reason.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   resident:
+    description: Description of the resident(s).
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   status:
+    description: Present status of the offer.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   turn:
+    description: Whose turn is it.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   type:
+    description: The offer type.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   tenant_intent:
+    description: The intent, reason of why the tenant prospect is looking for a property.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   tenant_service_fee:
+    description: The tenant's service fee.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   has_draft_topics:
+    description: Boolean flag indicating if the offer has any draft topics.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   is_instant_offer:
+    description: Boolean flag indicating if the offer is an instant offer (offer that is automatically accepted
+      without intervention of the property owner).
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   is_visualized:
+    description: Boolean flag indicating if the offer was visualized.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_first_sent:
+    description: Timestamp of when the offer was first sent.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_last_sent:
+    description: Timestamp of when the offer was last sent.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_deadline:
+    description: Timestamp of the offer's deadline.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_visualized:
+    description: Timestamp of when the offer was visualized.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_created:
+    description: Timestamp of when the offer was created.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_updated:
+    description: Timestamp of when the offer was updated.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_updated_message:
+    description: Timestamp of when the message was updated.
+      Firestore is a messaging solution, so every chunk of data comes in a message format.
     lineage:
       - datalake_firestore_clean.rent_offer.ts_updated
