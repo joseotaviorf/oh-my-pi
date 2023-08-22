@@ -24,7 +24,6 @@ table_block_list:
   - UserPreferences_AUD
   - NotificacaoAgendamento
   - Condominio_AUD
-  - ContaConsumo
   - DaemonsJobExecution
   - UserDocument_AUD
   - ContaConsumo_AUD
