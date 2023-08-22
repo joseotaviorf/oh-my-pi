@@ -35,7 +35,7 @@ SELECT
     st.target AS sla_execution_target,
     CASE
         WHEN i.assessment_source = 'INSPECTORS_FLUTTER'
-        THEN timestampdiff(HOUR, i.ts_execution_started, i.ts_execution_finished)
+            THEN timestampdiff(HOUR, i.ts_execution_started_local_tz, i.ts_execution_finished_local_tz)
         ELSE NULL
     END AS ldt_hours_execution,
     CASE
@@ -51,8 +51,8 @@ SELECT
         ELSE FALSE
     END AS is_sla_execution,
     i.dt_execution_limit,
-    i.ts_execution_started,
-    i.ts_execution_finished,
+    i.ts_execution_started_local_tz,
+    i.ts_execution_finished_local_tz,
     i.ts_inspected,
     i.ts_created,
     i.ts_updated

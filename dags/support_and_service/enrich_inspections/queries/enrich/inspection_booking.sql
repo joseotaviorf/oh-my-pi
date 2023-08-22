@@ -97,6 +97,8 @@ inspection_contract AS (
     SELECT
         c.id AS id_contract,
         i.inspection_type,
+        r.id_country,
+        r.country_code,
         MAX(COALESCE(r.id_city, i.id_city)) AS id_city,
         MAX(COALESCE(r.city_name, i.city_name)) AS city_name,
         COUNT(i.id_contract) AS total_rescheduling,
@@ -121,7 +123,7 @@ inspection_contract AS (
     LEFT JOIN
         datalake_region.region AS r
             ON r.id = h.id_region
-    GROUP BY 1, 2, 7
+    GROUP BY 1, 2, 3, 4, 9
 )
 SELECT
     i.id_inspection,
@@ -132,10 +134,11 @@ SELECT
     i.id_contract,
     i.id_house,
     i.id_inspector,
-    b.id_country,
+    COALESCE(b.id_country, ic.id_country) AS id_country,
     ic.id_city,
     ic.city_name,
-    COALESCE(i.country_code, b.country_code) AS country_code,
+    COALESCE(i.country_code, b.country_code, ic.country_code) AS country_code,
+    c.default_timezone AS country_default_timezone,
     i.inspection_type,
     b.type AS booking_type,
     i.source,
@@ -184,12 +187,15 @@ SELECT
     b.ts_first_canceled_unevaluated AS ts_booking_cancelled_utc,
     b.ts_first_canceled_unevaluated_local_tz AS ts_booking_cancelled_local_tz,
     ic.ts_termination_canceled,
-    a.ts_started AS ts_execution_started,
-    a.ts_finished AS ts_execution_finished,
-    COALESCE(a.ts_created, i.ts_inspected) AS ts_inspected,
+    a.ts_started AS ts_execution_started_local_tz,
+    a.ts_finished AS ts_execution_finished_local_tz,
+    COALESCE(
+        TO_UTC_TIMESTAMP(a.ts_finished, c.default_timezone),
+        i.ts_inspected
+    ) AS ts_inspected,
     CASE
         WHEN i.source = "PWA" THEN mias.ts_first_synced
-        ELSE a.ts_finished
+        ELSE a.ts_created
     END AS ts_synced,
     i.ts_created,
     i.ts_updated
@@ -208,3 +214,6 @@ LEFT JOIN
     inspection_contract AS ic
         ON ic.id_contract = i.id_contract
         AND ic.inspection_type = i.inspection_type
+LEFT JOIN
+    datalake_ebdb_clean.country c
+        ON c.id = COALESCE(b.id_country, ic.id_country)

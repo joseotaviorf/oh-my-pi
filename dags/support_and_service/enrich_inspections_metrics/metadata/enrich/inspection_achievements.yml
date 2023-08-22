@@ -60,14 +60,14 @@ columns:
     description: Deadline for carrying out the inspection within the expected SLA.
     lineage:
       - datalake_inspections.inspection_booking.dt_execution_limit
-  ts_execution_started:
+  ts_execution_started_local_tz:
     description: This column should display the time when the inspector started to perform the inspection. (column with unreliable data)
     lineage:
-      - datalake_inspections.inspection_booking.ts_started
-  ts_execution_finished:
+      - datalake_inspections.inspection_booking.ts_execution_started_local_tz
+  ts_execution_finished_local_tz:
     description: This column should display the time when the inspector finished carrying out the inspection. (column with unreliable data)
     lineage:
-      - datalake_inspections.inspection_booking.ts_finished
+      - datalake_inspections.inspection_booking.ts_execution_finished_local_tz
   ts_created:
     description: Timestamp of when the inspection request was synchronized in the database product.
     lineage:
