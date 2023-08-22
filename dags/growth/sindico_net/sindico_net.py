@@ -19,7 +19,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 SOURCE = "sindico_net"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 21 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
