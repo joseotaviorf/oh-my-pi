@@ -44,7 +44,7 @@ company_document AS (
         datalake_company_clean.company AS c
             ON c.id = cd.id_company
     WHERE
-        document_type = 'CNPJ'
+        document_type IN ('CNPJ', 'RFC')
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY c.uuid_company ORDER BY document_status_preference, d.ts_updated DESC) = 1
 ),
@@ -108,4 +108,4 @@ LEFT JOIN
     products AS p
         ON p.id_company = c.id
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY c.uuid_company ORDER BY c.ts_updated DESC) = 1 
+    ROW_NUMBER() OVER(PARTITION BY c.uuid_company ORDER BY c.ts_updated DESC) = 1
