@@ -48,6 +48,10 @@ WITH fact_house_listing_flows_adjust AS (
                 THEN om.sales_company
             WHEN olc.sales_company IS NOT NULL
                 THEN olc.sales_company
+            WHEN dl.sales_company = 'OLOS' AND hl.ops_agent = 'IS_INBOUND'
+              THEN 'QUINTO_ANDAR_INBOUND'
+            WHEN dl.sales_company = 'OLOS' AND hl.ops_agent = 'IS_OUTBOUND'
+              THEN 'QUINTO_ANDAR_OUTBOUND'
             WHEN dl.sales_company = 'OLOS'
                 THEN 'QUINTO_ANDAR_OUTBOUND'
             WHEN IFNULL(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'
@@ -207,6 +211,10 @@ sale_fact_listing_flows_adjust AS (
                 THEN om.sales_company
             WHEN olc.sales_company IS NOT NULL
                 THEN olc.sales_company
+            WHEN dl.sales_company = 'OLOS' AND hl.ops_agent = 'IS_INBOUND'
+              THEN 'QUINTO_ANDAR_INBOUND'
+            WHEN dl.sales_company = 'OLOS' AND hl.ops_agent = 'IS_OUTBOUND'
+              THEN 'QUINTO_ANDAR_OUTBOUND'
             WHEN dl.sales_company = 'OLOS'
                 THEN 'QUINTO_ANDAR_OUTBOUND'
             WHEN IFNULL(dl.sales_company, '') <> 'OLOS' AND du.sales_company = 'QUINTO_ANDAR'

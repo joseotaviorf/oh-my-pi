@@ -66,6 +66,7 @@ potential_listings AS (
             WHEN (plrl.lead_origin = 'OwnerConversionPWA') AND (ro.ops_agent != 'IS_INBOUND') THEN TRUE
             ELSE FALSE
         END AS is_ops_direct_register,
+        ro.ops_agent,
         lfrl.is_agent_referral,
         lfrl.is_doorman,
         pllt.has_isales_intervention,
@@ -338,6 +339,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     atax.is_isales_direct_register,
     atax.is_cx_direct_register,
     atax.is_ops_direct_register,
+    atax.ops_agent,
     atax.has_isales_intervention,
     atax.has_fup_photo_task,
     atax.is_call_center,
