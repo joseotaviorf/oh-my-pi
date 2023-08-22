@@ -1,63 +1,62 @@
 ---
 database_name: dw_datamarts
 table_name: rental_cohort_conversions
-owner: '@data-for-rent'
-domain: Data For Rent
 description: A datamart to consolidate cohorts for supply and demand context.
+domain: For Rent
+owner: gustavo.geiger@quintoandar.com.br
 columns:
   date:
-    description: "The date of the rental cohort conversion."
     lineage:
       - dw_public.dim_date.date
+    description: The date of the rental cohort conversion.
   city_group:
-    description: "The group or category of cities."
     lineage:
       - dw_public.dim_region.city_group
+    description: The group or category of cities.
   country_code:
-    description: "The country code."
     lineage:
       - dw_datamarts.lead_listing_flows.country_code
       - dw_public.dim_region.country_code
       - dw_public.dim_house_listing.country_code
+    description: The country code.
   supply_mkt_origin:
-    description: "The market origin in supply context."
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
+    description: The market origin in supply context.
   supply_mkt_origin_detailed:
-    description: "The detailed market origin in supply context."
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
       - dw_datamarts.lead_listing_flows.mkt_channel
+    description: The detailed market origin in supply context.
   lead_context:
-    description: "The lead context of the rental cohort."
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
+    description: The lead context of the rental cohort.
   lead_processing_operation:
-    description: "The lead processing operation of cohort."
     lineage:
       - dw_datamarts.lead_listing_flows.sourcing_ops
+    description: The lead processing operation of cohort.
   demand_mkt_channel:
-    description: "The market channel in demand context."
     lineage:
       - dw_public.dim_booking.mkt_channel
       - dw_public.dim_offer.mkt_channel
+    description: The market channel in demand context.
   demand_mkt_channel_detailed:
-    description: "The detailed market channel in demand context."
     lineage:
       - dw_public.dim_offer.mkt_medium
       - dw_public.dim_booking.mkt_medium
       - dw_public.dim_booking.mkt_channel
       - dw_public.dim_offer.mkt_channel
+    description: The detailed market channel in demand context.
   first_touchpoint:
-    description: "The first touchpoint of the rental cohort in the marketing funnel."
     lineage:
       - dw_datamarts.funnel_demand_flows.funnel_first_touchpoint
+    description: The first touchpoint of the rental cohort in the marketing funnel.
   is_b2b_demand:
-    description: "Indicates whether the demand is from a B2B source."
     lineage:
       - dw_datamarts.quintoandar_consultant_listings.type_big_agent
+    description: Indicates whether the demand is from a B2B source.
   weeks_conversion:
-    description: "The number of weeks it took for the rental cohort to convert."
     lineage:
       - dw_datamarts.lead_listing_flows.sk_lead_date
       - dw_datamarts.lead_listing_flows.sk_prospect_date
@@ -78,7 +77,62 @@ columns:
       - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
       - dw_public.fact_listing_rent_flows.sk_contract_signed_date
       - dw_public.fact_listing_rent_flows.sk_contract_annulment_date
+    description: The number of weeks it took for the rental cohort to convert.
   rental_administrator:
-    description: "The rental administrator of the house listing in the rental cohort."
     lineage:
       - dw_public.dim_house_listing.rental_administrator
+    description: The rental administrator of the house listing in the rental cohort.
+  l2p:
+    description: Sum of lead that became a prospect.
+  p2q:
+    description: Sum of prospect that became a qualified.
+  q2aq:
+    description: Sum of qualified that became an available qualified.
+  aq2o:
+    description: Sum of available qualified that became an opportunity.
+  aq2o:
+    description: Sum of available qualified that became an opportunity.
+  q2opp:
+    description: Sum of qualified that became an opportunity.
+  opp2fl:
+    description: Sum of opportunity that became a first listing.
+  opp2fl:
+    description: Sum of opportunity that became a first listing.
+  vb2vc:
+    description: Sum of visit booking that became a visit completed.
+  vb2os:
+    description: Sum of visit booking that became an offer submitted.
+  vc:
+    description: Sum of visit completed.
+  vc2os:
+    description: Sum of visit completed that became an offer submitted.
+  os2oa:
+    description: Sum of offer submitted that became an offer approved.
+  oa2cei:
+    description: Sum of offer approved that became a credit evaluation.
+  oa2da:
+    description: Sum of offer approved that became a credit analysis approved.
+  oa2ds:
+    description: Sum of offer approved that became a first document sent.
+  cei2cep:
+    description: Sum of credit evaluation that became a credit evaluation positive.
+  cei2gs:
+    description: Sum of credit evaluation that became a guarantee.
+  cep2ds:
+    description: Sum of credit evaluation positive that became a first document sent.
+  gs2ds:
+    description: Sum of guarantee that became a first document sent.
+  ds2da:
+    description: Sum of document sent that became a credit analysis approved.
+  da2gp:
+    description: Sum of credit analysis approved that became a guarantee paid.
+  gp2cc:
+    description: Sum of guarantee paid that became a contract created.
+  da2cs:
+    description: Sum of credit analysis approved that became a contract signed.
+  da_gp2cs:
+    description: Sum of credit analysis approved or guarantee paid that became a contract signed.
+  cc2cs:
+    description: Sum of contract created that became a contract signed.
+  cc2cs:
+    description: Sum of contract signed that became a contract canceled.
