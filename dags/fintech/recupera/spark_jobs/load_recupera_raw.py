@@ -233,9 +233,5 @@ if __name__ == "__main__":
         raise error
     finally:
         folder_to_remove = os.path.join("dbfs:",tmp_folder)
-        
-        files_tmp = dbutils.fs.ls(os.path.join("dbfs:",tmp_folder))
-        logger.info(f"m=__main__, msg=Files found: {files_tmp}")
-    
         folder_deleted = dbutils.fs.rm(folder_to_remove, True)
         logger.info(f"m=__main__, msg=Folder {folder_to_remove} deleted: {folder_deleted}")
