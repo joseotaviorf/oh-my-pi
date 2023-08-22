@@ -649,8 +649,7 @@ bietlejuice.enrich_unified_listing_flow:
 bietlejuice.enrich_velo:
   remove:
     - bietlejuice.velo:load-clean-fiancavelo-fianca
-    - bietlejuice.velo:load-clean-fiancavelo-propose
-    - bietlejuice.velo:load-clean-fiancavelo-proposehistory
+    - bietlejuice.velo:load-clean-fiancavelo-proposecompany
 bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region

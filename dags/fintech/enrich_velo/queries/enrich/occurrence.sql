@@ -44,6 +44,8 @@ LEFT JOIN
                                 ELSE NULL
                             END
         AND jk2.desc_master_type = 'Occurrence Status'
+WHERE
+   is_active = True
 
 UNION ALL
 -- The following query is a complement for delinquancy table, it adds all cpfs from 2.0 that are not linked to any contract (this cases are going to be resolved manually, so when one case is fixed, it will be added to 3.0 and remove from this table).

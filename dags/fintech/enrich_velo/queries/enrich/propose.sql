@@ -4,10 +4,10 @@ WITH old_system_dates AS (
             id_propose,
             MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_ended
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 10 --10 indicates that the propose has ended
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 10 --10 indicates that the propose has ended
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -16,10 +16,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_propose_started
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 2 --2 indicates that the propose has started
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 2 --2 indicates that the propose has started
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -28,10 +28,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 3 -- indicates that the propose is waiting for more docs
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 3 -- indicates that the propose is waiting for more docs
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -40,11 +40,11 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_evaluation_started
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key > 2
-            AND id_text_key < 10
-            AND id_type_history = 1 -- alteration by the system
+            text_key > 2
+            AND text_key < 10
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -53,10 +53,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 5 -- indicates that the propose was rejected
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 5 -- indicates that the propose was rejected
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -65,10 +65,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 6 -- indicates that the sign has started
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 6 -- indicates that the sign has started
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -77,10 +77,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_signed
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 7 -- indicates that the propose has been paid
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 7 -- indicates that the propose has been paid
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -89,10 +89,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 8 -- indicates that the propose has been paid
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 8 -- indicates that the propose has been paid
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -101,10 +101,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 8 -- indicates that the propose is active
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 8 -- indicates that the propose is active
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -113,10 +113,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 9 -- indicates that the propose is secured
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 9 -- indicates that the propose is secured
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -125,10 +125,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 11 -- indicates that the propose is active but in analysis
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 11 -- indicates that the propose is active but in analysis
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -137,10 +137,10 @@ WITH old_system_dates AS (
             id_propose,
             MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
         FROM
-            datalake_velo_clean.fiancavelo_proposehistory
+            datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy
         WHERE
-            id_text_key = 12 -- indicates that the propose is waiting to be secured
-            AND id_type_history = 1 -- alteration by the system
+            text_key = 12 -- indicates that the propose is waiting to be secured
+            AND id_history_type = 1 -- alteration by the system
         GROUP BY
             1 -- some proposes can have multiple same status
     ),
@@ -153,6 +153,7 @@ WITH old_system_dates AS (
     )
     SELECT
         p.id AS id_propose,
+        f.id AS id_contract,
         DATE(f.dt_begin) AS dt_contract_started,
         COALESCE(DATE(pcd.ts_ended), f.dt_ended) AS dt_ended,
         COALESCE(sd.ts_propose_started, p.ts_inserted) AS ts_propose_started,
@@ -167,7 +168,7 @@ WITH old_system_dates AS (
         aad.ts_activation_analysis,
         spd.ts_secure_pending
     FROM
-        datalake_velo_clean.fiancavelo_propose AS p
+        datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS p
     LEFT JOIN
         fiancavelo_fianca_last_updated AS f
             ON f.id_propose = p.id
@@ -208,6 +209,14 @@ WITH old_system_dates AS (
         propose_secure_pending_date AS spd
             ON spd.id_propose = p.id
 ),
+propose_company AS (
+    SELECT
+        id_propose,
+        id_company,
+        ROW_NUMBER() OVER(PARTITION BY id_propose ORDER BY ts_updated DESC) AS rn
+    FROM
+        datalake_velo_clean.fiancavelo_proposecompany
+    ),
 propose_canceled_date AS (
     SELECT
         id_propose,
@@ -261,8 +270,8 @@ propose_evaluation_started_date AS (
             GROUP BY 1
     )
     SELECT
-        COALESCE(a.id_propose, ph.id_propose) AS id_propose,
-        COALESCE(a.ts_evaluation_started, ph.ts_evaluation_started) AS ts_evaluation_started
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_evaluation_started, a.ts_evaluation_started) AS ts_evaluation_started
     FROM
         cte_propose_aud AS a
     FULL OUTER JOIN
@@ -411,6 +420,25 @@ prop_values AS (
         prop_values_structure AS pv
             ON p.id = pv.id_propose
 ),
+-- cte to get propose_values from propose_legacy proposes
+old_prop_values AS (
+    SELECT
+        p.id AS id_propose,
+        CONCAT(p.id, cp.id, pl.id) AS id_propose_values,
+        COALESCE((pv.rent_amount + pv.condo_amount + pv.light_amount + pv.iptu_amount + pv.other_amount)*pl.pricing,0) AS monthly_guarantee
+    FROM
+        datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS p
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.plan AS pl
+            ON p.id_plan = pl.id_legacy
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.company_plan AS cp
+            ON p.id_quintocred_company = cp.id_company
+            AND pl.id = cp.id_plan
+    LEFT JOIN
+        prop_values_structure AS pv
+            ON p.id = pv.id_propose
+),
 main_person AS (
     SELECT
         id_person,
@@ -445,8 +473,8 @@ payments_metrics AS (
         SUM(IF(dt_paid IS NULL, due_amount, 0)) AS total_due_amount,
         -- CAST(NULL AS DOUBLE) AS lmi,
         COUNT(id_payment) AS total_payments,
-        COUNT(IF(dt_paid IS NOT NULL, 1, 0)) AS total_payments_paid,
-        COUNT(IF(dt_paid IS NULL AND dt_due < current_date(), 1, 0)) AS total_payments_expired,
+        SUM(IF(dt_paid IS NOT NULL, 1, 0)) AS total_payments_paid,
+        SUM(IF(dt_paid IS NULL AND dt_due < current_date, 1, 0)) AS total_payments_expired,
         MAX(dt_paid) AS dt_last_payment
     FROM
         datalake_velo.payment
@@ -486,6 +514,94 @@ property_propose AS (
     WHERE
         pl.plan_name LIKE '%3P%'
 )
+
+--query containing proposes from legacy table
+SELECT DISTINCT
+    p.id AS id_propose,
+    pv.id_propose_values AS id_propose_values,
+    p.id_quintocred_company AS id_broker,
+    CAST(NULL AS BIGINT) AS id_house,
+    CAST(NULL AS BIGINT) AS id_agent,
+    pc.id_company AS id_propose_company,
+    CAST(NULL AS BIGINT) AS id_primary_person,
+    jk1.id_junk AS id_origin,
+    jk2.id_junk AS id_propose_status,
+    CAST(NULL AS INT) AS id_guarantee_status,
+    jk4.id_junk AS id_propose_type,
+    CAST(NULL AS BIGINT) AS count_persons_included,
+    CAST(NULL AS DECIMAL(38,6)) AS percentage_income_from_primary_person,
+    CAST(NULL AS DECIMAL(14,4)) AS avg_serasa_score,
+    CAST(NULL AS DOUBLE) AS avg_risk_score,
+    CAST(NULL AS DECIMAL(38,22)) AS avg_declared_income,
+    CAST(NULL AS DECIMAL(38,18)) total_declared_income,
+    CAST(NULL AS DECIMAL(32,2)) AS dti,
+    CAST(NULL AS DECIMAL(38,18)) AS total_paid_amount,
+    CAST(NULL AS DECIMAL(38,18)) AS total_expected_amount,
+    CAST(NULL AS DECIMAL(38,18)) AS total_due_amount,
+    CAST(NULL AS DECIMAL(20,2)) AS total_occurrences_due_amount,
+    CAST(NULL AS DECIMAL(22,2)) AS total_occurrences_paid_amount,
+    CAST(NULL AS BIGINT) AS total_payments,
+    CAST(NULL AS BIGINT) AS total_payments_paid,
+    CAST(NULL AS BIGINT) AS total_payments_expired,
+    CAST(NULL AS BIGINT) AS total_occurrences,
+    CAST(NULL AS BIGINT) AS occurrences_solved,
+    old.id_contract IS NOT NULL AS is_contract,
+    IFNULL(DATEDIFF(old.dt_ended, DATE(old.dt_contract_started)) <= 10, False) AS is_grace_period_cancelled,
+    TRUE AS is_legacy,
+    FALSE AS is_3p,
+    CAST(NULL AS TIMESTAMP) AS dt_last_payment,
+    old.dt_contract_started AS dt_contract_started,
+    old.dt_ended AS dt_ended,
+    COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
+    old.ts_waiting_new_docs AS ts_waiting_new_docs,
+    old.ts_evaluation_started AS ts_evaluation_started,
+    old.ts_rejected AS ts_rejected,
+    old.ts_sign_started AS ts_sign_started,
+    old.ts_signed AS ts_signed,
+    old.ts_paid AS ts_paid,
+    old.ts_activation AS ts_activation,
+    old.ts_secured AS ts_secured,
+    old.ts_activation_analysis AS ts_activation_analysis,
+    old.ts_secure_pending AS ts_secure_pending
+FROM
+    datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS p
+LEFT JOIN
+    datalake_rental_guarantee_platform_clean.propose_status AS ps
+        ON p.id_quintocred_status = ps.id
+LEFT JOIN
+    propose_company AS pc
+        ON pc.id_propose = p.id
+        AND pc.rn = 1
+LEFT JOIN
+    datalake_velo.junk AS jk1
+        ON jk1.id_lvl_1 = IF(pc.id_propose IS NOT NULL, 1, 2)
+        AND jk1.desc_master_type = 'Origin'
+LEFT JOIN
+    datalake_velo.junk AS jk2
+        ON jk2.desc_lvl_1 = ps.name
+        AND jk2.desc_master_type = 'Propose Status'
+LEFT JOIN
+    datalake_rental_guarantee_platform_clean.bussines_type AS pbt
+    ON pbt.id = p.id_business_type
+LEFT JOIN
+    datalake_velo.junk AS jk4
+        ON jk4.desc_lvl_1 = pbt.name
+        AND jk4.desc_master_type = 'Propose Type'
+lEFT JOIN
+    3p_proposes AS 3p
+        ON 3p.id_propose = p.id
+LEFT JOIN
+    old_prop_values AS pv
+        ON pv.id_propose = p.id
+LEFT JOIN
+    old_system_dates AS old
+        ON old.id_propose = p.id
+WHERE
+    p.id NOT IN (SELECT id FROM datalake_rental_guarantee_platform_clean.propose)
+
+UNION ALL
+
+--query containing proposes from 3.0 and migrated proposes from 2.0
 SELECT DISTINCT
     p.id AS id_propose,
     pv.id_propose_values AS id_propose_values,
@@ -521,7 +637,7 @@ SELECT DISTINCT
     IF(3p.id_propose IS NULL, FALSE, TRUE) AS is_3p,
     pym.dt_last_payment,
     COALESCE(DATE(c.ts_began), old.dt_contract_started) AS dt_contract_started,
-    COALESCE(COALESCE(DATE(pcd.ts_ended), c.ts_done), old.dt_ended) AS dt_ended,
+    COALESCE(COALESCE(c.ts_done, DATE(pcd.ts_ended)), old.dt_ended) AS dt_ended,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
     IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
     IF(p.id < 5000000, old.ts_evaluation_started, esd.ts_evaluation_started) AS ts_evaluation_started,

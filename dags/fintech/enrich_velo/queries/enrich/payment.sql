@@ -1,4 +1,3 @@
-
 WITH cte_prop_values AS (
     SELECT
         p.id AS id_propose,
@@ -28,7 +27,7 @@ SELECT DISTINCT
     p.description,
     p.value AS due_amount,
     CAST(NULL AS DOUBLE) AS net_amount,
-    p.ts_client_payment > p.ts_due AS is_paid_late,
+    DATE(p.ts_client_payment) > DATE(p.ts_due) AS is_paid_late,
     p.ts_due_original IS NOT NULL AND p.ts_due_original <> p.ts_due AS is_due_modified,
     FALSE AS is_occurrence,
     p.id <= 5000000 AS is_legacy,
@@ -84,7 +83,7 @@ SELECT DISTINCT
     NULL AS description,
     ap.value AS due_amount,
     CAST(NULL AS DOUBLE) AS net_amount,
-    ap.dt_paid > ap.dt_due AS is_paid_late,
+    DATE(ap.dt_paid) > DATE(ap.dt_due) AS is_paid_late,
     NULL AS is_due_modified,
     TRUE AS is_occurrence,
     FALSE AS is_legacy,
