@@ -22,24 +22,32 @@ columns:
     lineage:
     - datalake_ebdb_listing.rent_listing.rental_administrator
     description: The rental administrator of the house.
-  total_houses:
-    description: Quantity of distincts houses that the owner has on a respective day independent of the status.
+  houses_published:
+    description: Quantity of distincts houses that the owner has on a respective day with status 'publicado' or 'PUBLISHED'.
+  houses_suspended:
+    description: Quantity of distincts houses that the owner has on a respective day with status 'suspenso' or 'SUSPENDED' but it's not rented.
+  houses_rented:
+    description: Quantity of distincts houses that the owner has on a respective day with status 'alugado' or 'SUSPENDED' but rented.
+  houses_unpublished:
+    description: Quantity of distincts houses that the owner has on a respective day with status 'despublicado' or 'UNPUBLISHED'.
+  houses_in_edition:
+    description: Quantity of distincts houses that the owner has on a respective day with status 'edicao' or 'EDITING'.
+  houses_opted_out:
+    description: Quantity of distincts houses that the owner has on a respective day with status 'excluido' or 'OPTED_OUT'.
   ongoing_houses:
     description: Quantity of distincts houses that the owner has on a respective day with status 'publicado', 'alugado' and 'suspenso'.
-  brokerage_only_previous_houses:
-    description: Quantity of distincts houses that the owner had before the change
-      and the house is managed by the owner (rental_administration = owner, which
-      means it's a Brokerage Only house).
+  total_houses:
+    description: Quantity of distincts houses that the owner has on a respective day independent of the status.
   brokerage_only_houses:
-    description: Quantity of distincts houses that the owner had before the change
-      and the house is managed by the owner (rental_administration = owner, which
+    description: Quantity of distincts houses that the owner had and that is
+      managed by the owner (rental_administration = OWNER, which
       means it's a Brokerage Only house).
-  quintoandar_previous_houses:
-    description: Quantity of distincts houses that the owner has and the house is
-      managed by QuintoAndar (rental_administration = quintoandar).
   quintoandar_houses:
-    description: Quantity of distincts houses that the owner had before the change
-      and the house is managed by QuintoAndar (rental_administration = quintoandar).
+    description: Quantity of distincts houses that the owner had and that is
+      managed by QuintoAndar (rental_administration = QUINTOANDAR).
+  third_party_houses:
+    description: Quantity of distincts houses that the owner had and the house is
+      from a third party supply. (rental_administration = THIRD_PARTY).
   is_merged_user:
     description: Boolean flag to check if the user is merged from another user.
   is_pp_multi_active:

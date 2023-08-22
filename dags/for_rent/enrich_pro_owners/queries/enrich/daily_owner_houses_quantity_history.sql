@@ -39,6 +39,7 @@ owner_houses_history AS (
     por.id_house IS NOT NULL AS is_portability,
     rl.rental_administrator,
     hls.status_history,
+    hls.status_change_reason,
     dd.date
   FROM
     datalake_ebdb_clean.house AS h
@@ -87,9 +88,18 @@ owner_qtd_houses_rental_administrator AS (
     id_owner,
     country_code,
     COUNT(DISTINCT IF(status_history IN ('alugado', 'publicado', 'suspenso', 'SUSPENDED', 'PUBLISHED'), id_house, NULL)) AS ongoing_houses,
+    COUNT(DISTINCT IF(status_history IN ('edicao', 'EDITING'), id_house, NULL)) AS houses_in_edition,
+    COUNT(DISTINCT IF(status_history IN ('excluido', 'OPTED_OUT'), id_house, NULL)) AS houses_opted_out,
+    COUNT(DISTINCT IF(status_history IN ('publicado', 'PUBLISHED'), id_house, NULL)) AS houses_published,
+    COUNT(DISTINCT IF(status_history = 'suspenso'
+      OR (status_history = 'SUSPENDED' AND status_change_reason != 'RENTED'), id_house, NULL)) AS houses_suspended,
+    COUNT(DISTINCT IF(status_history = 'alugado'
+      OR (status_history = 'SUSPENDED' AND status_change_reason = 'RENTED'), id_house, NULL)) AS houses_rented,
+    COUNT(DISTINCT IF(status_history IN ('despublicado', 'UNPUBLISHED'), id_house, NULL)) AS houses_unpublished,
     COUNT(DISTINCT id_house) AS total_houses,
     IF(rental_administrator = 'OWNER', COUNT(DISTINCT id_house), 0) AS brokerage_only_houses,
     IF(rental_administrator = 'QUINTOANDAR', COUNT(DISTINCT id_house), 0) AS quintoandar_houses,
+    IF(rental_administrator = 'THIRD_PARTY', COUNT(DISTINCT id_house), 0) AS third_party_houses,
     is_merged_user,
     date AS dt_houses_owned
   FROM 
@@ -97,22 +107,29 @@ owner_qtd_houses_rental_administrator AS (
   WHERE 
     is_for_rent = True
     AND is_b2b = False
-  GROUP BY 1,2,7,8,rental_administrator
+  GROUP BY 1,2,14,15,rental_administrator
 ),
 
 owner_qtd_houses AS (
   SELECT
     id_owner,
     country_code,
+    SUM(houses_published) AS houses_published,
+    SUM(houses_suspended) AS houses_suspended,
+    SUM(houses_rented) AS houses_rented,
+    SUM(houses_unpublished) AS houses_unpublished,
+    SUM(houses_in_edition) AS houses_in_edition,
+    SUM(houses_opted_out) AS houses_opted_out,
     SUM(ongoing_houses) AS ongoing_houses,
     SUM(total_houses) AS total_houses,
     SUM(brokerage_only_houses) AS brokerage_only_houses,
     SUM(quintoandar_houses) AS quintoandar_houses,
+    SUM(third_party_houses) AS third_party_houses,
     is_merged_user,
     dt_houses_owned
   FROM 
     owner_qtd_houses_rental_administrator
-  GROUP BY 1,2,7,8
+  GROUP BY 1,2,14,15
 ),
 
 pp_multi_history AS (
@@ -133,12 +150,17 @@ SELECT /*+ RANGE_JOIN(oqh, 800) */
   oqh.id_owner,
   ppm.id_account_manager,
   oqh.country_code,
-  oqh.total_houses,
+  oqh.houses_published,
+  oqh.houses_suspended,
+  oqh.houses_rented,
+  oqh.houses_unpublished,
+  oqh.houses_in_edition,
+  oqh.houses_opted_out,
   oqh.ongoing_houses,
-  LAG(oqh.brokerage_only_houses) OVER (PARTITION BY oqh.id_owner ORDER BY oqh.dt_houses_owned) AS brokerage_only_previous_houses,
+  oqh.total_houses,
   oqh.brokerage_only_houses,
-  LAG(oqh.quintoandar_houses) OVER (PARTITION BY oqh.id_owner ORDER BY oqh.dt_houses_owned) AS quintoandar_previous_houses,
   oqh.quintoandar_houses,
+  oqh.third_party_houses,
   oqh.is_merged_user,
   IF(ppm.id_owner IS NOT NULL AND ppm.is_active, TRUE, FALSE) AS is_pp_multi_active,
   oqh.dt_houses_owned
