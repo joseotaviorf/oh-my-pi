@@ -1,5 +1,6 @@
 SELECT
     MAX(a.id_agent) AS sk_agent,
+    MAX(a.id_agent_twilio) AS sk_agent_twilio,
     MAX(a.name) AS full_name,
     a.email,
     MAX(a.phone) AS phone,
