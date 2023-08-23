@@ -65,7 +65,7 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
         :param: _sheet_info: sheet dict with its info.
         """
         sheet_url = f"{self.GSHEETS_BASE_URL}{_sheet_info['sheet_id']}"
-        context = _sheet_info.get("dag_name")
+        context = _sheet_info.get("sheet_context")
         context_owner = self._get_slack_group_from_context(context)
         try:
             self._run_sheet_validation(
