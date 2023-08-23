@@ -61,6 +61,7 @@ calculate_dejavu_id_job_path = (
 external_s3_bucket = config_service.get_config("external_s3_bucket")
 tables_to_reverse = str(config_service.get_config("tables_to_reverse"))
 addresses_s2_geometry_mapping_table = config_service.get_config("addresses_s2_geometry_mapping_table")
+requests_limit = config_service.get_config("requests_limit")
 table_task_group_parameters = config_service.get_config("table_task_group_parameters")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -168,6 +169,7 @@ calculate_dejavu_id_task = QuintoAndarDatabricksSubmitRunOperator(
                 DAG_NAME,
                 CONTEXT,
                 addresses_s2_geometry_mapping_table,
+                requests_limit,
             ],
         }
     },

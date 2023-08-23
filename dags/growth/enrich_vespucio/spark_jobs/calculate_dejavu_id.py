@@ -23,7 +23,8 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 from pyspark.sql.types import StructType, StructField, DoubleType, StringType, TimestampType
-from pyspark.sql.functions import udf, col, expr
+from pyspark.sql.window import Window
+from pyspark.sql.functions import udf, col, expr, row_number
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "calculate_dejavu_id"
@@ -155,6 +156,7 @@ if __name__ == "__main__":
     parser.add_argument("dag_name", help="dag_name")
     parser.add_argument("context", help="context")
     parser.add_argument("addresses_s2_geometry_mapping_table", help="addresses_s2_geometry_mapping_table")
+    parser.add_argument("requests_limit", help="requests_limit")
     
     args = parser.parse_args()
 
@@ -163,6 +165,7 @@ if __name__ == "__main__":
     dag_name = args.dag_name
     context = args.context
     addresses_s2_geometry_mapping_table = args.addresses_s2_geometry_mapping_table
+    requests_limit = args.requests_limit
 
     logger.info(
         f"""m=__main__, environment={environment},
@@ -196,8 +199,8 @@ if __name__ == "__main__":
     """
     query = """
         WITH condo AS (
-                SELECT
-                    uuid AS id_address,
+                SELECT DISTINCT
+                    id_address,
                     'vespucio' AS source,
                     address,
                     number,
@@ -260,10 +263,11 @@ if __name__ == "__main__":
             ORDER BY 
                 u.source DESC
             LIMIT 
-                20000
+                {requests_limit}
     """.format(
         database_name=database_name,
-        addresses_s2_geometry_mapping_table=addresses_s2_geometry_mapping_table
+        addresses_s2_geometry_mapping_table=addresses_s2_geometry_mapping_table,
+        requests_limit=requests_limit
     )
 
     df = spark_client.conn.sql(query)
@@ -331,7 +335,8 @@ if __name__ == "__main__":
         polygons_query = """
             SELECT
                 CAST(r.id AS INTEGER) AS id_region,
-                ST_PolygonFromText(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(pr.polygon, 'POLYGON', ''), '[\\(\\)]', ''), ' ', ','), ',') AS polygon
+                ST_PolygonFromText(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(pr.polygon, 'POLYGON', ''), '[\\(\\)]', ''), ' ', ','), ',') AS polygon,
+                r.ts_created AS ts_region_created
             FROM
                 datalake_ebdb_clean.polygon_region AS pr
             JOIN
@@ -346,8 +351,13 @@ if __name__ == "__main__":
         We will now join the new data with the polygons to get the id_region.
         """
         new_data_with_region = new_data.join(polygons, expr("ST_Within(points, polygon)"), how = 'left')
+
+        new_data_with_region_dedup = (new_data_with_region
+                                      .withColumn("polygon_order", row_number().over(Window.partitionBy("id_address").orderBy("ts_region_created")))
+                                      .filter("polygon_order = 1"))
+        
         column_order = ["id_dejavu", "id_address", "id_region", "input_address", "output_address", "latitude", "longitude", "ts_updated"]
-        new_data_reordered = new_data_with_region.select(column_order)
+        new_data_reordered = new_data_with_region_dedup.select(column_order)
 
         df1 = spark_client.conn.table(f"{database_name}.{addresses_s2_geometry_mapping_table}")
         df2 = new_data_reordered.select("id_address")

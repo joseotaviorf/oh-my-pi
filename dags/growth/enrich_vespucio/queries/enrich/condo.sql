@@ -62,7 +62,7 @@ tmp AS (
         datalake_vespucio.condo_full AS cf
     LEFT JOIN
         datalake_vespucio.dejavu AS d
-            ON cf.uuid = d.id_address
+            ON cf.id_address = d.id_address
     GROUP BY 1
 )
 SELECT

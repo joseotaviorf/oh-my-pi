@@ -23,6 +23,7 @@ spark_conf:
 external_s3_bucket: 5a-vespucio-prod
 tables_to_reverse: ["condo"]
 addresses_s2_geometry_mapping_table: dejavu
+requests_limit: 20000
 table_task_group_parameters:
   condo_full:
     partition_cols: []

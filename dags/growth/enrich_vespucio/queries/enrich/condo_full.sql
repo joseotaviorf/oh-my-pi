@@ -468,6 +468,13 @@ base AS (
 SELECT
     MD5(CONCAT(id, source)) AS uuid,
     id AS id_source,
+    MD5(CONCAT(
+      COALESCE(address, 'N/A'), 
+      COALESCE(number, 'N/A'),
+      COALESCE(neighborhood, 'N/A'),
+      COALESCE(zip_code, 'N/A'),
+      COALESCE(city, 'N/A')
+    )) AS id_address,
     source,
     condo,
     cnpj,

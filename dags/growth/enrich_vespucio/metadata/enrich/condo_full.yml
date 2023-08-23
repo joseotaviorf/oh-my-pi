@@ -5,10 +5,12 @@ owner: '@data-growth'
 domain: growth
 description: Contains ebdb and sindiconet enrich data about condominiums.
 columns:
-  id:
+  id_source:
     description: "The unique identifier of the condo from the source origin."
     lineage:
       - datalake_ebdb_clean.condo.id
+  id_address:
+    description: "A hashed ID that is created by concatenating the address, number, neighborhood, zip code and city. It is used for geocoding (deduplicating condo)."
   condo:
     description: "The name of the condo."
     lineage:
