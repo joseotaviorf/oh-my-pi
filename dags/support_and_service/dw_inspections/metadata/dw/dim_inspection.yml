@@ -36,14 +36,19 @@ columns:
   status:
     description: Identifies the stage of the inspection from scheduling to review.
     categories:
-      scheduled: Inspection scheduled and awaiting execution
-      received: Inspection sent by the inspector, waiting for synchronization with the Main
-      sent_to_analysis: Inspection available for operations team interventions
-      sent_to_owner_review: Review available for owner review
-      review_started_by_owner: Survey whose owner has already done some intervention
-      sent_to_tenant_review: Survey available for tenant review
-      review_started_by_tenant: Survey whose tenant has already done some intervention
-      reviewed: Survey sent to the Operations team to validate interventions proposed by owner/tenant
+      scheduled: Inspection scheduled and awaiting execution [onboarding/offboarding]
+      received: Inspection sent by the inspector, waiting for synchronization with the Main [offboarding]
+      processing: Survey has been received and will be performed by the surveyor [onboarding]
+      sent_to_review: Indicates that the owner and tenant are able to do their reviews [onboarding]
+      review_started: When the owner or/and the tenant makes a comment [onboarding]
+      sent_to_analysis: Inspection available for operations team interventions [offboarding]
+      sent_to_owner_review: Review available for owner review [offboarding]
+      review_started_by_owner: Survey whose owner has already done some intervention [offboarding]
+      sent_to_tenant_review: Survey available for tenant review [offboarding]
+      review_started_by_tenant: Survey whose tenant has already done some intervention [offboarding]
+      reviewed: |
+        offboarding: Survey sent to the Operations team to validate interventions proposed by owner/tenant
+        onboarding: When the review deadline is reached
       EmAcordo: "Discontinued status, coming from the PWA data, so it's not part of the Inspection Service data flow, it's just historical data"
       ContratoCancelado: "Discontinued status, coming from the PWA data, so it's not part of the Inspection Service data flow, it's just historical data"
       Nova: "Discontinued status, coming from the PWA data, so it's not part of the Inspection Service data flow, it's just historical data"
