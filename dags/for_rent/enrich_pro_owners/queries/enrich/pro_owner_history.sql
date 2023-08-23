@@ -1,9 +1,9 @@
 WITH aud_ts AS (
   SELECT /*+ RANGE_JOIN(aud, 50000) */
-    COALESCE(um2.id_winner_account, um.id_winner_account, aud.id_user) AS id_owner,
-    LAG(aud.id_account_manager) OVER (PARTITION BY COALESCE(um2.id_winner_account, um.id_winner_account, aud.id_user) ORDER BY aud.rev) AS id_previous_account_manager,
+    COALESCE(um.id_user, aud.id_user) AS id_owner,
+    LAG(aud.id_account_manager) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev) AS id_previous_account_manager,
     aud.id_account_manager,
-    LAG(aud.is_active) OVER (PARTITION BY COALESCE(um2.id_winner_account, um.id_winner_account, aud.id_user) ORDER BY aud.rev) AS previous_status,
+    LAG(aud.is_active) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev) AS previous_status,
     aud.is_active,
     TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000)) AS ts_event
   FROM 
@@ -12,13 +12,8 @@ WITH aud_ts AS (
     datalake_ebdb_clean.user_revision_entity AS ure 
       ON aud.rev = ure.id
   LEFT JOIN
-    datalake_ebdb_clean.user_merge AS um
-      ON aud.id_user = um.id_loser_account
-      AND um.status = 'MERGED'
-  LEFT JOIN
-    datalake_ebdb_clean.user_merge AS um2
-      ON um.id_winner_account = um2.id_loser_account
-      AND um2.status = 'MERGED'
+    datalake_ebdb_user.user_merge AS um
+      ON ARRAY_CONTAINS(um.predecessor_user_list, aud.id_user)
 ),
 
 pro_owner_dates AS (

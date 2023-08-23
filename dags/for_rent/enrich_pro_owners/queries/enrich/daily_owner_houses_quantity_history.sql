@@ -35,7 +35,7 @@ owner_houses_history AS (
     ur.country_code,
     IF(lbc.is_rent_context OR lbc.id_house IS NULL, TRUE, FALSE) AS is_for_rent,
     IF((((hbh.affiliate_type = 'B2BPartner') OR (pa.id_partner IS NOT NULL AND p.type = 'PRIME') OR (hbh.id_house_listing IS NOT NULL)) AND pa.status = 'ACTIVE'), TRUE, FALSE) OR por.id_house IS NOT NULL AS is_b2b,
-    IF(um.id_winner_account IS NOT NULL, TRUE, FALSE) AS is_merged_user,
+    IF(um.id_user IS NOT NULL, TRUE, FALSE) AS is_merged_user,
     por.id_house IS NOT NULL AS is_portability,
     rl.rental_administrator,
     hls.status_history,
@@ -62,8 +62,8 @@ owner_houses_history AS (
     datalake_ebdb_listing.listing_business_context AS lbc
       ON h.id = lbc.id_house
   LEFT JOIN
-    datalake_ebdb_clean.user_merge AS um
-      ON hbh.id_user = um.id_loser_account
+    datalake_ebdb_user.user_merge AS um
+      ON ARRAY_CONTAINS(um.predecessor_user_list, hbh.id_user)
   LEFT JOIN
     datalake_ebdb_clean.partner_agent AS pa
       ON COALESCE(um.id_winner_account, hbh.id_user) = pa.id_user

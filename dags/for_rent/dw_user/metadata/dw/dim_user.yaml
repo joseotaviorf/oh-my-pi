@@ -48,6 +48,10 @@ columns:
     lineage:
     - datalake_big_agent.agent_current_program.id_partner
     description: Id of the partner.
+  predecessor_user_list:
+    lineage:
+    - datalake_ebdb_user.user_merge.predecessor_user_list
+    description: List with the ID user that the current user (sk_user) has already been.
   country_code:
     lineage:
     - datalake_ebdb_user.user.country_code
@@ -118,6 +122,8 @@ columns:
     lineage:
     - datalake_ebdb_user.agent_data.is_rent_agent
     description: Boolean flag that indicates if the user is an Agent in QuintoAndar working with Rentals.
+  is_user_merged:
+    description: Boolean flag that indicates if the user was merged into a new one.
   dadosbancarios_outro_titular:
     lineage:
     - datalake_ebdb_user.user.bank_another_holder
@@ -326,11 +332,11 @@ columns:
     description: Total amount of houses owned by user.
   brokerage_only_houses_owned:
     lineage:
-    - datalake_pro_owners.owner_houses_quantity_history.houses
+    - datalake_pro_owners.daily_owner_houses_quantity_history.brokerage_only_houses
     description: Amount of houses owned by user and it's managed by the owner (Brokerage Only program).
   quintoandar_houses_owned:
     lineage:
-    - datalake_pro_owners.owner_houses_quantity_history.houses
+    - datalake_pro_owners.daily_owner_houses_quantity_history.quintoandar_houses
     description: Amount of houses owned by user and it's managed by QuintoAndar.
   data_nascimento:
     lineage:

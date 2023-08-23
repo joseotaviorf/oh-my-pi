@@ -11,20 +11,28 @@ WITH user_dates (
         MIN(p.ts_created) AS ts_first_proposal_accepted,
         MIN(c.ts_created) AS ts_first_contract,
         MIN(c.ts_signed) AS ts_first_signed_contract
-    FROM datalake_ebdb_user.user u
-    LEFT JOIN datalake_booking.booking b
-        on b.id_visitor = u.id
-    LEFT JOIN datalake_ebdb_clean.visit v
-        on v.id = b.id_visit
-    LEFT JOIN datalake_ebdb_clean.rent_flow rf
-        on rf.id = b.id_rent_flow
-    LEFT JOIN datalake_ebdb_clean.pre_proposal pp
-        on rf.id_client = pp.id_user
-    LEFT JOIN datalake_ebdb_clean.proposal p
-        on p.id_pre_proposal = pp.id
-    LEFT JOIN datalake_ebdb_clean.contract c
-        on c.id_proposal = p.id
-    GROUP BY u.id
+    FROM 
+        datalake_ebdb_user.user AS u
+    LEFT JOIN
+        datalake_booking.booking AS b
+            ON b.id_visitor = u.id
+    LEFT JOIN
+        datalake_ebdb_clean.visit AS v
+            ON v.id = b.id_visit
+    LEFT JOIN
+        datalake_ebdb_clean.rent_flow AS rf
+            ON rf.id = b.id_rent_flow
+    LEFT JOIN
+        datalake_ebdb_clean.pre_proposal AS pp
+            ON rf.id_client = pp.id_user
+    LEFT JOIN
+        datalake_ebdb_clean.proposal AS p
+            ON p.id_pre_proposal = pp.id
+    LEFT JOIN
+        datalake_ebdb_clean.contract AS c
+            ON c.id_proposal = p.id
+    GROUP BY
+        u.id
 ),
 booking_counts AS (
     SELECT
@@ -32,18 +40,21 @@ booking_counts AS (
         CAST(COUNT(1) AS INTEGER) AS visits_booked,
         CAST(SUM(if(is_visit_completed, 1, 0)) AS INTEGER) AS visits_realized,
         CAST(SUM(if(visit_fup IS NOT NULL, 1, 0)) AS INTEGER) AS visits_expected_to_happen
-    FROM datalake_booking.booking
-    GROUP BY id_visitor
+    FROM 
+        datalake_booking.booking
+    GROUP BY
+        id_visitor
  ),
  house_counts AS (
     SELECT
         id_owner,
-        SUM(houses) as houses,
-        SUM(IF(rental_administrator = 'OWNER', houses, 0)) AS brokerage_only_houses_owned,
-        SUM(IF(rental_administrator = 'QUINTOANDAR', houses, 0)) AS quintoandar_houses_owned
-    FROM datalake_pro_owners.owner_houses_quantity_history
+        SUM(ongoing_houses) AS houses,
+        SUM(brokerage_only_houses) AS brokerage_only_houses_owned,
+        SUM(quintoandar_houses) AS quintoandar_houses_owned
+    FROM
+        datalake_pro_owners.daily_owner_houses_quantity_history
     WHERE
-        ts_house_number_ended IS NULL
+        dt_houses_owned = DATE_ADD(DATE(CURRENT_DATE()), -1)
     GROUP BY 1
  )
 SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refactoring to remove castings and renamings
@@ -58,6 +69,7 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     CAST(u.id_linkedin AS VARCHAR(255)) AS linkedin_id,
     NULLIF(CAST(u.id_google AS VARCHAR(255)), '') AS google_id,
     CAST(acpr.id_partner AS BIGINT) AS id_partner,
+    um.predecessor_user_list AS predecessor_user_list,
     u.country_code,
     CAST(u.is_active AS INTEGER) AS active,
     CAST(u.is_blocked AS INTEGER) AS bloqueado,
@@ -69,6 +81,7 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     CAST(CAST(u.is_tenant AS INTEGER) AS VARCHAR(10)) AS inquilino,
     ag.is_sale_agent,
     ag.is_rent_agent,
+    IF(um.id_user IS NULL, FALSE, TRUE) AS is_user_merged,
     CAST(u.bank_another_holder AS INTEGER) AS dadosbancarios_outro_titular,
     CAST(CAST(u.has_house AS INTEGER) AS VARCHAR(10)) AS tem_imovel,
     CAST(CAST(u.has_tenant_app AS INTEGER) AS VARCHAR(10)) AS tem_app_inquilino,
@@ -130,25 +143,38 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     u.ts_updated AS atualizado_em,
     CAST(NULL AS VARCHAR(255)) AS network, -- [ODS] just to match ODS original table / Remove after ODS migration
     NOW() AS load_timestamp
-FROM datalake_ebdb_user.user u
-INNER JOIN user_dates user_dates
-    on user_dates.id = u.id
-LEFT JOIN booking_counts b_counts
-    on b_counts.id_visitor = u.id
-LEFT JOIN datalake_ebdb_clean.state s
-    on s.id = u.id_state
-LEFT JOIN datalake_ebdb_user.agent_data ag
-    on ag.id = u.id_agent
-LEFT JOIN datalake_ebdb_clean.bank b
-    on b.id = u.id_bank
-LEFT JOIN datalake_ebdb_clean.photographer_data p
-    on p.id = u.id_photographer_data
-LEFT JOIN datalake_ebdb_clean.sales_rep sr
-    on sr.id = u.id_sales_rep
-LEFT JOIN datalake_ebdb_user.affiliate_data ad
-    on ad.id = u.id_affiliates
-LEFT JOIN house_counts hc
-    on hc.id_owner = u.id
+FROM
+    datalake_ebdb_user.user AS u
+INNER JOIN
+    user_dates AS user_dates
+        ON user_dates.id = u.id
+LEFT JOIN
+    booking_counts AS b_counts
+        ON b_counts.id_visitor = u.id
+LEFT JOIN
+    datalake_ebdb_clean.state AS s
+        ON s.id = u.id_state
+LEFT JOIN
+    datalake_ebdb_user.agent_data AS ag
+        ON ag.id = u.id_agent
+LEFT JOIN
+    datalake_ebdb_clean.bank AS b
+        ON b.id = u.id_bank
+LEFT JOIN
+    datalake_ebdb_clean.photographer_data AS p
+        ON p.id = u.id_photographer_data
+LEFT JOIN
+    datalake_ebdb_clean.sales_rep AS sr
+        ON sr.id = u.id_sales_rep
+LEFT JOIN
+    datalake_ebdb_user.affiliate_data AS ad
+        ON ad.id = u.id_affiliates
+LEFT JOIN
+    house_counts AS hc
+        ON hc.id_owner = u.id
 LEFT JOIN
     datalake_big_agent.agent_current_program AS acpr
         ON u.id = acpr.id_user
+LEFT JOIN
+    datalake_ebdb_user.user_merge AS um
+        ON u.id = um.id_user

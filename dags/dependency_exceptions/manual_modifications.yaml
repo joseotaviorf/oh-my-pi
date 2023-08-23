@@ -227,7 +227,7 @@ bietlejuice.dw_tenant_documentation:
 bietlejuice.dw_tickets:
   remove:
     - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements
-    - bietlejuice.zendesk_tickets:load-clean-organizations
+    - bietlejuice.zendesk_tickets:load-clean-organizations    
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent

@@ -9,7 +9,7 @@ columns:
   id_owner:
     lineage:
       - datalake_ebdb_clean.user_pro_owner_aud.id_user
-      - datalake_ebdb_clean.user_merge.id_winner_account
+      - datalake_ebdb_user.user_merge.id_user
     description: Id user of the owner.
   id_account_manager:
     lineage:
@@ -19,6 +19,8 @@ columns:
     lineage:
       - datalake_ebdb_clean.user_pro_owner_aud.is_active
     description: Boolean flag indicating if the PP Multi is active on the program.
+  is_expert:
+    description: Boolean flag indicating if the PP Multi is expert (is_active and has an account manager).
   ts_event:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
