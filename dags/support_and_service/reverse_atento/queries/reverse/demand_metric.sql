@@ -46,6 +46,7 @@ LEFT JOIN
 LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON dmt.sk_agent = da.sk_agent
+    OR dmt.sk_agent = da.sk_agent_twilio
 WHERE
   DATE(dmt.ts_started) >= '2022-07-19'
 AND

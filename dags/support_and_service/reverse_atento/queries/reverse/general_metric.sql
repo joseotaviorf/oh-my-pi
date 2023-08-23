@@ -59,6 +59,7 @@ LEFT JOIN
 LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON ft.sk_last_agent = da.sk_agent
+    OR ft.sk_last_agent = da.sk_agent_twilio
 WHERE
   DATE(ft.ts_started) >= DATE('2022-01-01')
 AND
