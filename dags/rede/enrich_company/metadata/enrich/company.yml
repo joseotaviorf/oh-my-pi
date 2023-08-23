@@ -16,7 +16,7 @@ columns:
   uuid_company:
     lineage:
       - datalake_company_clean.company.uuid_company
-    description: UUID of the company in the Company domain. 
+    description: UUID of the company in the Company domain.
   company_name:
     lineage:
       - datalake_company_clean.company.company_name
@@ -29,10 +29,18 @@ columns:
     lineage:
       - datalake_company_clean.company.company_type
     description: If the company is a headquarter or a subsidiary.
+  document:
+    lineage:
+      - datalake_company_clean.document.identification_number
+    description: Document of the company, cleaned to have only numbers and letters.
   cnpj:
     lineage:
       - datalake_company_clean.document.identification_number
-    description: CNPJ of the company, cleaned to have only numbers.
+    description: CNPJ of the Brasil company, cleaned to have only numbers.
+  rfc:
+    lineage:
+      - datalake_company_clean.document.identification_number
+    description: RFC of the Mexico company, cleaned to have only numbers and letters.
   status:
     lineage:
       - datalake_company_clean.company.status

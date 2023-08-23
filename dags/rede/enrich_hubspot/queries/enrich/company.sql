@@ -15,7 +15,9 @@ merged_companies AS (
 hubspot_companies AS (
     SELECT
         id_company,
+        document,
         cnpj,
+        rfc,
         ts_updated,
         LAST(sale_lead_status)
         OVER (
@@ -72,7 +74,14 @@ listing_ownership AS (
 company_document AS (
     SELECT
         COALESCE(c.uuid_company, d.uuid_company) AS uuid_company,
-        NULLIF(REGEXP_REPLACE(identification_number, '[^0-9]', ''), '') AS cnpj,
+        CASE
+            WHEN a.country IN ('Brasil', 'Brazil', 'BR')
+            OR a.country IS NULL THEN NULLIF(REGEXP_REPLACE(identification_number, '[^0-9]', ''), '')
+        END AS cnpj,
+        CASE
+            WHEN a.country IN ('México', 'Mexico', 'MX') THEN NULLIF(REGEXP_REPLACE(identification_number, '[^0-9A-Za-z]', ''), '')
+        END AS rfc,
+        NULLIF(REGEXP_REPLACE(identification_number, '[^0-9A-Za-z]', ''), '') AS document,
         c.status AS company_status,
         CASE d.status
             WHEN 'ACTIVE' THEN 0
@@ -86,6 +95,9 @@ company_document AS (
     LEFT JOIN
         datalake_company_clean.company AS c
             ON c.id = cd.id_company
+    LEFT JOIN
+        datalake_company_clean.address AS a
+            ON c.uuid_company = a.uuid_company
     WHERE
         document_type IN ('CNPJ', 'RFC')
     QUALIFY
@@ -111,7 +123,9 @@ company_matches_aux AS (
             ON lo.uuid_company = cd.uuid_company
     JOIN
         hubspot_companies AS ch
-            ON cd.cnpj = ch.cnpj
+            ON cd.document = ch.document
+            OR cd.cnpj = ch.cnpj
+            OR cd.rfc = ch.rfc
     LEFT JOIN
         merged_companies AS mc
             ON ch.id_company = mc.id_merged_company
@@ -198,7 +212,9 @@ SELECT
     ch.rental_guarantee_solutions,
     ch.real_estate_agency_focus,
     ch.financing_banks,
+    ch.document,
     ch.cnpj,
+    ch.rfc,
     ch.creci,
     ch.products_of_interest,
     CASE

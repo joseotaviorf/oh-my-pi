@@ -88,7 +88,15 @@ SELECT
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.qual_a_solucao_empresa_de_garantia_locaticia_oferece_para_os_clientes_de_locacao_'), ''), ';') AS rental_guarantee_solutions,
     NULLIF(GET_JSON_OBJECT(properties, '$.qual_o_foco_da_imobiliaria_'), '') AS real_estate_agency_focus,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_com_financiamento__se_sim__quais_bancos_'), ''), ';') AS financing_banks,
-    NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '') AS cnpj,
+    CASE
+        WHEN NULLIF(GET_JSON_OBJECT(properties, '$.country_code'), '') = 'BR'
+        OR NULLIF(GET_JSON_OBJECT(properties, '$.country'), '') IN ('Brasil', 'Brazil')
+        OR NULLIF(GET_JSON_OBJECT(properties, '$.country'), '') IS NULL THEN NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '')
+    END AS cnpj,
+    CASE
+        WHEN NULLIF(GET_JSON_OBJECT(properties, '$.country_code'), '') = 'MX' THEN NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9A-Za-z]', ''), '')
+    END AS rfc,
+    NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9A-Za-z]', ''), '') as document,
     NULLIF(GET_JSON_OBJECT(properties, '$.creci'), '') AS creci,
     SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.produto_de_interesse'), ''), ';') AS products_of_interest,
     NULLIF(GET_JSON_OBJECT(properties, '$.hs_lead_status'), '') AS lead_status,

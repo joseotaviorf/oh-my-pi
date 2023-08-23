@@ -30,7 +30,14 @@ lead_3p_ownership AS (
 company_document AS (
     SELECT
         COALESCE(c.uuid_company, d.uuid_company) AS uuid_company,
-        NULLIF(REGEXP_REPLACE(identification_number, '[^0-9]', ''), '') AS cnpj,
+        CASE
+            WHEN a.country IN ('Brasil', 'Brazil', 'BR')
+            OR a.country IS NULL THEN NULLIF(REGEXP_REPLACE(identification_number, '[^0-9]', ''), '')
+        END AS cnpj,
+        CASE
+            WHEN a.country IN ('México', 'Mexico', 'MX') THEN NULLIF(REGEXP_REPLACE(identification_number, '[^0-9A-Za-z]', ''), '')
+        END AS rfc,
+        NULLIF(REGEXP_REPLACE(identification_number, '[^0-9A-Za-z]', ''), '') AS document,
         CASE d.status
             WHEN 'ACTIVE' THEN 0
             ELSE 1
@@ -43,6 +50,9 @@ company_document AS (
     LEFT JOIN
         datalake_company_clean.company AS c
             ON c.id = cd.id_company
+    LEFT JOIN
+        datalake_company_clean.address AS a
+            ON c.uuid_company = a.uuid_company
     WHERE
         document_type IN ('CNPJ', 'RFC')
     QUALIFY
@@ -66,6 +76,8 @@ SELECT
     c.trade_name,
     c.company_type,
     cd.cnpj,
+    cd.rfc,
+    cd.document,
     c.status,
     a.country,
     COALESCE(s.name, a.state) AS state,

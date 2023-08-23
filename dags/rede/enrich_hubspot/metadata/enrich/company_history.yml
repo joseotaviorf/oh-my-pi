@@ -222,10 +222,18 @@ columns:
     lineage:
       - datalake_hubspot_clean.company.properties
     description: Financing banks associated with the company.
+  document:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Document of the company, cleaned to have only numbers and letters.
   cnpj:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: CNPJ of the company.
+    description: CNPJ of the Brasil company, cleaned to have only numbers.
+  rfc:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: RFC of the Mexico company, cleaned to have only numbers and letters.
   creci:
     lineage:
       - datalake_hubspot_clean.company.properties

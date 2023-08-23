@@ -1430,6 +1430,7 @@ bietlejuice.enrich_hubspot:
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-company-document
   - bietlejuice.company:load-clean-document
+  - bietlejuice.company:load-clean-address
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.hubspot:load-clean-call
