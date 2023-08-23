@@ -56,3 +56,9 @@ columns:
     lineage:
     - datalake_quintoandar.aux_date.date
     description: The date of the PP's house quantity.
+  year:
+    description: Year value of the date reference. Also, it's a partition.
+  month:
+    description: Month value of the date reference. Also, it's a partition.
+  day:
+    description: Day value of the date reference. Also, it's a partition.

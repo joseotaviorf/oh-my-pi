@@ -15,6 +15,7 @@ inner_dependencies:
     - owner_houses_quantity_history
 incremental_tables:
   - tracking_weekly_changes
+  - daily_owner_houses_quantity_history
 partition_cols:
   tracking_weekly_changes: ["year", "month", "day"]
-  daily_owner_houses_quantity_history: ["country_code"]
+  daily_owner_houses_quantity_history: ["year", "month", "day", "country_code"]

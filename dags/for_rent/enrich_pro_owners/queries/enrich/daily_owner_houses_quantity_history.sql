@@ -79,7 +79,7 @@ owner_houses_history AS (
     datalake_ebdb_country.user AS ur
       ON hbh.id_user = ur.id_user
   WHERE 
-    dd.date < CURRENT_DATE()
+    dd.date = MAKE_DATE({year}, {month}, {day})
     AND ur.country_code = 'BR'
 ),
 
@@ -163,7 +163,10 @@ SELECT /*+ RANGE_JOIN(oqh, 800) */
   oqh.third_party_houses,
   oqh.is_merged_user,
   IF(ppm.id_owner IS NOT NULL AND ppm.is_active, TRUE, FALSE) AS is_pp_multi_active,
-  oqh.dt_houses_owned
+  oqh.dt_houses_owned,
+  {year} AS year,
+  {month} AS month,
+  {day} AS day
 FROM 
   owner_qtd_houses AS oqh
 LEFT JOIN
