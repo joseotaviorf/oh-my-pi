@@ -47,6 +47,15 @@ columns:
   account_shortname:
     lineage:
       - datalake_pas_raw.invoice_lines.account_shortname
+  accounting_rule:
+    lineage:
+      - datalake_pas_raw.invoice_lines.accounting_rule
+  accounting_type:
+    lineage:
+      - datalake_pas_raw.invoice_lines.accounting_type
+  user_type:
+    lineage:
+      - datalake_pas_raw.invoice_lines.user_type
   transaction_type:
     lineage:
       - datalake_pas_raw.invoice_lines.transaction_type_transtype

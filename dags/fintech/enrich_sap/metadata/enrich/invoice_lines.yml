@@ -65,6 +65,18 @@ columns:
     description: "Description of the account shortname"
     lineage:
       - datalake_pas_clean.invoice_lines.account_shortname
+  accounting_rule:
+    description: "Accounting rule applied"
+    lineage:
+      - datalake_pas_clean.invoice_lines.accounting_rule
+  accounting_type:
+    description: "Accounting type"
+    lineage:
+      - datalake_pas_clean.invoice_lines.accounting_type
+  user_type:
+    description: "User type"
+    lineage:
+      - datalake_pas_clean.invoice_lines.user_type
   transaction_type:
     description: "Identification number of the transaction type"
     lineage:

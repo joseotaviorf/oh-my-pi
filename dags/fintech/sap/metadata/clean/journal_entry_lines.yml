@@ -44,6 +44,15 @@ columns:
   account_shortname:
     lineage:
       - datalake_pas_raw.journal_entry_lines.account_shortname
+  accounting_rule:
+    lineage:
+      - datalake_pas_raw.journal_entry_lines.accounting_rule
+  accounting_type:
+    lineage:
+      - datalake_pas_raw.journal_entry_lines.accounting_type
+  user_type:
+    lineage:
+      - datalake_pas_raw.journal_entry_lines.user_type
   transaction_type:
     lineage:
       - datalake_pas_raw.journal_entry_lines.transaction_type_transtype

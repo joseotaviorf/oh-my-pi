@@ -69,6 +69,18 @@ columns:
     description: "Transaction type ID"
     lineage:
       - datalake_pas_clean.incoming_payments_lines.transaction_type
+  accounting_rule:
+    description: "Accounting rule applied"
+    lineage:
+      - datalake_pas_clean.incoming_payments_lines.accounting_rule
+  accounting_type:
+    description: "Accounting type"
+    lineage:
+      - datalake_pas_clean.incoming_payments_lines.accounting_type
+  user_type:
+    description: "User type"
+    lineage:
+      - datalake_pas_clean.incoming_payments_lines.user_type
   accrual_year_month:
     description: "Accrual date"
     lineage:
