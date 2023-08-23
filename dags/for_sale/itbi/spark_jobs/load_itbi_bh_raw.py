@@ -1,7 +1,11 @@
 import re
+import ast
 import logging
 import requests
+import unidecode
+
 import pandas as pd
+from io import StringIO
 from datetime import date, datetime
 from functools import reduce
 from argparse import ArgumentParser
@@ -43,6 +47,7 @@ def main():
 
     table_name = ITBI_REGION
     source_download_page_url = itbi_configs["source"]["site_download_page_url"]
+    source_headers = ast.literal_eval(itbi_configs["source"]["headers"])
     source_format = itbi_configs["source"]["format"]
     source_blacklist_urls = itbi_configs["source"]["blacklist_urls"]
     is_incremental = itbi_configs["is_incremental"]
@@ -57,6 +62,7 @@ def main():
 
     dataframe = get_data(
         source_download_page_url,
+        source_headers,
         source_format,
         source_blacklist_urls,
         columns_rename_mapped,
@@ -77,11 +83,12 @@ def main():
 
 def get_data(
     source_download_page_url,
+    source_headers,
     source_format,
     source_blacklist_urls,
     columns_rename_mapped,
 ):
-    urls = scrap_files_url(source_download_page_url, source_format)
+    urls = scrap_files_url(source_download_page_url, source_headers, source_format)
     urls = [url for url in urls if url not in source_blacklist_urls]
 
     dataframes = []
@@ -94,7 +101,10 @@ def get_data(
         """
         )
 
-        df = pd.read_csv(url, encoding='utf-8', sep = ';', thousands = '.', decimal=',', skip_blank_lines=True)
+        response = requests.get(url, headers=source_headers)
+        csv_content = StringIO(unidecode.unidecode(response.text.encode('latin1').decode('utf-8')))
+
+        df = pd.read_csv(csv_content, encoding='utf-8', sep = ';', thousands = '.', decimal=',', skip_blank_lines=True)
         df.columns = df.columns.str.strip()
         df = spark_client.conn.createDataFrame(df.astype(str))
 
@@ -132,8 +142,8 @@ def get_data(
     return dataframe
 
 
-def scrap_files_url(source_download_page_url, source_format):
-    u = requests.get(source_download_page_url)
+def scrap_files_url(source_download_page_url, source_headers, source_format):
+    u = requests.get(source_download_page_url, headers=source_headers)
     urls = re.findall(
         r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?\{source_format})"'.format(
             source_format=source_format

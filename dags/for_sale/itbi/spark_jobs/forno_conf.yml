@@ -40,6 +40,7 @@ tables:
     is_incremental: false
     source:
       site_download_page_url: "https://dados.pbh.gov.br/dataset/relatorio-itbi"
+      headers: "{'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}"
       format: ".csv" 
       blacklist_urls: [
                 'https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/c98e75c0-fe00-4b0c-98c9-a30e45ee76dd/download/relatorioitbi2009_julho2021.csv',
@@ -73,9 +74,11 @@ tables:
       Fracao Ideal Adquirida: fracao_ideal_adquirida
       Tipo Construtivo Preponderante: tipo_construtivo_preponderante
       Descrição Tipo Ocupacao (Unidade): descricao_tipo_ocupacao_unidade
+      Descricao Tipo Ocupacao (Unidade): descricao_tipo_ocupacao_unidade
       Valor Base Calculo: valor_base_calculo
       " Valor Base Calculo ": valor_base_calculo
       Zona Uso ITBI: zona_uso_itbi
       Data Inclusao Transacao: data_inclusao_transacao
       Data Quitação Transacao: data_inclusao_transacao
+      Data Quitacao Transacao: data_inclusao_transacao
       Valor Imposto Cobrado (sumarizado): valor_imposto_cobrado_sumarizado
