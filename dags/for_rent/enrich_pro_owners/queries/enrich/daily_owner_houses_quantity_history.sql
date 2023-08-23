@@ -66,7 +66,7 @@ owner_houses_history AS (
       ON ARRAY_CONTAINS(um.predecessor_user_list, hbh.id_user)
   LEFT JOIN
     datalake_ebdb_clean.partner_agent AS pa
-      ON COALESCE(um.id_winner_account, hbh.id_user) = pa.id_user
+      ON COALESCE(um.id_user, hbh.id_user) = pa.id_user
   LEFT JOIN
     datalake_ebdb_clean.partner AS p
       ON pa.id_partner = p.id
