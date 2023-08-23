@@ -1,0 +1,12 @@
+---
+dag_documentation:
+  dag_purpose: Compares what was sent to the reports service (via the reverse_listings_report_access DAG)
+    to what was actually received. This is a quality assurance for the Reverse ETL process.
+tables:
+  extra_event:
+    is_incremental: true
+    partition_cols: [year, month, day]
+  unprocessed_event:
+    is_incremental: true
+    partition_cols: [year, month, day]
+inner_dependencies: {}

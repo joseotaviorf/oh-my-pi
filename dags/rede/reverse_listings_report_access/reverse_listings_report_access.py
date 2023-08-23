@@ -14,6 +14,7 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.formatters import StringFormatter
 
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -76,7 +77,7 @@ load_to_sns_tasks = []
 for table_name, table_config in tables.items():
     load_to_sns_tasks.append(
         QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"load_{table_name}_into_sns",
+            task_id=StringFormatter.slugify(f"load-{table_name}-into_sns"),
             dag=dag,
             json={
                 "spark_python_task": {

@@ -1954,6 +1954,16 @@ bietlejuice.enrich_repairs:
   - bietlejuice.zendesk_tickets:load-clean-groups
   - bietlejuice.zendesk_tickets:load-clean-tickets-history
   - bietlejuice.zendesk_tickets:load-clean-users
+bietlejuice.enrich_reports_validation:
+  - bietlejuice.reports:load-clean-processed-event
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-published
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-signed-contract
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-traffic
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-confirmed
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-scheduled
+  - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
@@ -2426,6 +2436,15 @@ bietlejuice.metric_rent_benvi__supply:
 bietlejuice.regions_polygon:
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.enrich_region:load-enrich-region
+bietlejuice.reports:
+  - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-accepted-into-sns
+  - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-sent-into-sns
+  - bietlejuice.reverse_listings_report_access:load-sale-listing-published-into-sns
+  - bietlejuice.reverse_listings_report_access:load-sale-listing-signed-contract-into-sns
+  - bietlejuice.reverse_listings_report_access:load-sale-listing-traffic-into-sns
+  - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-confirmed-into-sns
+  - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-scheduled-into-sns
+  - bietlejuice.reverse_listings_report_access:load-sale-ongoing-listings-into-sns
 bietlejuice.reverse_app_installed:
   - bietlejuice.enrich_app_installed:load-enrich-events
 bietlejuice.reverse_atento:
