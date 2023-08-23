@@ -34,7 +34,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("custom_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
