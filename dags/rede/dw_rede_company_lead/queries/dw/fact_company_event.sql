@@ -13,7 +13,8 @@ SELECT
     id_journey AS journey_number,
     ce.ts_event,
     NOW() AS ts_load,
-    ce.business_context
+    ce.business_context,
+    dc.country_code
 FROM
     datalake_rede_company_event.company_event AS ce
 JOIN

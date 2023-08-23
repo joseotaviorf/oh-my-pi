@@ -16,7 +16,7 @@ SELECT
             OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
         )
             THEN '3P BH'
-        ELSE '3P 5A' 
+        ELSE '3P 5A'
     END AS product,
     COALESCE(c.sale_member_category, 'Unknown') AS sale_member_category,
     COALESCE(c.rent_member_category, 'Unknown') AS rent_member_category,
@@ -27,6 +27,7 @@ SELECT
     COALESCE(c.state, ce.state_abbreviation, 'Unknown') AS state_abbreviation,
     COALESCE(s.name, c.state, ce.state, 'Unknown') AS state,
     COALESCE(c.country, IF(ce.country = 'Brasil', 'Brazil', ce.country), 'Unknown') AS country,
+    COALESCE(c.country_code, 'Undefined') AS country_code,
     COALESCE(c.domain, 'Unknown') AS domain,
     COALESCE(c.e_mail, 'Unknown') AS e_mail,
     COALESCE(c.phone, 'Unknown') AS phone,
@@ -44,7 +45,9 @@ SELECT
     COALESCE(c.first_conversion_event_name, 'Unknown') AS first_conversion_event_name,
     COALESCE(c.crm, 'Unknown') AS crm,
     COALESCE(c.real_estate_agency_focus, 'Unknown') AS real_estate_agency_focus,
+    COALESCE(c.document, ce.document, 'Unknown') AS document,
     COALESCE(c.cnpj, ce.cnpj, 'Unknown') AS cnpj,
+    COALESCE(c.rfc, ce.rfc, 'Unknown') AS rfc,
     COALESCE(c.creci, 'Unknown') AS creci,
     CASE
         WHEN c.is_juridical_person THEN 'PJ'

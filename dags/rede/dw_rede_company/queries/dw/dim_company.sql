@@ -21,7 +21,7 @@ SELECT
             OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
         )
             THEN '3P BH'
-        ELSE '3P 5A' 
+        ELSE '3P 5A'
     END AS product,
     COALESCE(c.member_category, 'Unknown') AS member_category,
     -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
@@ -35,12 +35,15 @@ SELECT
     COALESCE(ce.state_abbreviation, c.state, 'Unknown') AS state_abbreviation,
     COALESCE(ce.state, s.name, c.state, 'Unknown') AS state,
     COALESCE(IF(ce.country = 'Brasil', 'Brazil', ce.country), c.country, 'Unknown') AS country,
+    COALESCE(c.country_code, 'Undefined') AS country_code,
     COALESCE(c.domain, 'Unknown') AS domain,
     COALESCE(c.e_mail, 'Unknown') AS e_mail,
     COALESCE(c.phone, 'Unknown') AS phone,
     COALESCE(c.partnership_type, 'Unknown') AS partnership_type,
     COALESCE(c.crm, 'Unknown') AS crm,
+    COALESCE(ce.document, c.document, 'Unknown') AS document,
     COALESCE(ce.cnpj, c.cnpj, 'Unknown') AS cnpj,
+    COALESCE(ce.rfc, c.rfc, 'Unknown') AS rfc,
     COALESCE(c.creci, 'Unknown') AS creci,
     CASE
         WHEN c.is_juridical_person THEN 'PJ'
@@ -49,7 +52,7 @@ SELECT
     END AS person_type,
     (
         COALESCE(c.sale_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE)
-        OR COALESCE(c.rent_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE) 
+        OR COALESCE(c.rent_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE)
     ) AS is_partner,
     COALESCE(c.sale_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE) AS is_sale_partner,
     COALESCE(c.rent_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE) AS is_rent_partner,

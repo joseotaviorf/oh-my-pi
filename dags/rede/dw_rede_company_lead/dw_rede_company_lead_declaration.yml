@@ -16,9 +16,9 @@ workflow:
       - dim_company_lead
   tables_customization:
     fact_company_event:
-      partitions: [business_context]
+      partitions: [country_code, business_context]
     fact_company_journey:
-      partitions: [business_context]
+      partitions: [country_code, business_context]
 cluster:
   type: databricks_10_4_med_memory_cluster
   access_control_list:

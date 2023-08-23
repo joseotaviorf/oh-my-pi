@@ -44,3 +44,7 @@ columns:
     - datalake_rede_company_event.company_event.business_context
     description: Business context of the event. Partition key, so it can be used to
       filter the table efficiently.
+  country_code:
+    lineage:
+    - dw_rede.dim_company_lead.country_code
+    description: Code of the country where the company is located.

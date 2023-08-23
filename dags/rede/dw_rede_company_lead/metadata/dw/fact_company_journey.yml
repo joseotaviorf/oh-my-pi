@@ -16,6 +16,10 @@ columns:
     - dw_rede.dim_company_lead.sk_company
     description: Key of the company associated with the event, if the lead became a member at some point. Can be joined with
       dw_rede.dim_company.
+  country_code:
+    lineage:
+    - dw_rede.dim_company_lead.country_code
+    description: Code of the country where the company is located.
   sk_lead_date:
     lineage:
     - datalake_rede_company_event.company_event.ts_event

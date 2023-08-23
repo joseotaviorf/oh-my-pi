@@ -125,6 +125,10 @@ columns:
     - datalake_hubspot.company.country
     - datalake_company.company.country
     description: Country where the company is located.
+  country_code:
+    lineage:
+      - datalake_hubspot.company.country_code
+    description: Code of the country where the company is located.
   domain:
     lineage:
     - datalake_hubspot.company.domain
@@ -150,11 +154,21 @@ columns:
     lineage:
     - datalake_hubspot.company.crm
     description: Which CRM the Company uses.
+  document:
+    lineage:
+      - datalake_company.company.document
+      - datalake_hubspot.company.document
+    description: Document of the company.
   cnpj:
     lineage:
     - datalake_company.company.cnpj
     - datalake_hubspot.company.cnpj
-    description: CNPJ of the company.
+    description: CNPJ of the Brasil company.
+  rfc:
+    lineage:
+      - datalake_company.company.rfc
+      - datalake_hubspot.company.rfc
+    description: RFC of the Mexico company.
   creci:
     lineage:
     - datalake_hubspot.company.creci

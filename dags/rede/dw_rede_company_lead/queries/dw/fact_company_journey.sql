@@ -6,6 +6,7 @@ WITH base_dates AS (
         ce.id_company,
         id_journey AS journey_number,
         ce.business_context,
+        dc.country_code,
         MIN(ts_event) AS ts_lead,
         MIN(
             CASE
@@ -139,7 +140,7 @@ WITH base_dates AS (
     JOIN
         dw_rede.dim_company_lead AS dc
             ON ce.id_company = dc.id_hubspot
-    GROUP BY 1,2,3,4,5,6
+    GROUP BY 1,2,3,4,5,6,7
 ),
 leads_3p AS (
     SELECT
@@ -197,6 +198,7 @@ SELECT
     bd.sk_company_journey,
     bd.sk_company_lead,
     bd.sk_company,
+    bd.country_code,
     COALESCE(BIGINT(DATE_FORMAT(bd.ts_lead, 'yyyyMMdd')), -1) AS sk_lead_date,
     COALESCE(BIGINT(DATE_FORMAT(bd.ts_prospect, 'yyyyMMdd')), -1) AS sk_prospect_date,
     COALESCE(BIGINT(DATE_FORMAT(bd.ts_pre_qualified, 'yyyyMMdd')), -1) AS sk_pre_qualified_date,
