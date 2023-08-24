@@ -424,7 +424,7 @@ prop_values AS (
 old_prop_values AS (
     SELECT
         p.id AS id_propose,
-        CONCAT(p.id, cp.id, pl.id) AS id_propose_values,
+        CONCAT(p.id, COALESCE(cp.id, ''), pl.id) AS id_propose_values,
         COALESCE((pv.rent_amount + pv.condo_amount + pv.light_amount + pv.iptu_amount + pv.other_amount)*pl.pricing,0) AS monthly_guarantee
     FROM
         datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS p

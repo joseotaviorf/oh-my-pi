@@ -89,7 +89,7 @@ UNION ALL
 -- the following query includes propose_values for 2.0 proposes
 
 SELECT DISTINCT
-    CONCAT(p.id, cp.id, pl.id) AS id_propose_values,
+    CONCAT(p.id, COALESCE(cp.id, ''), pl.id) AS id_propose_values,
     CAST(NULL AS STRING) AS subscription_type,
     bt.name AS plan_type,
     CAST(NULL AS STRING) AS activator_type,
