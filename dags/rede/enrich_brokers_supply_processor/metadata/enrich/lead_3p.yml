@@ -69,10 +69,22 @@ columns:
     lineage:
       - datalake_hubspot.company.id_company
     description: 'Identifier of the lead company in HubSpot, in the context of ForRent.'
+  id_lead_first_version_global:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column identifies the ID of the first lead that contains this lead hash.'
+  id_lead_first_version_by_company:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column identifies the ID of the first lead that contains this lead hash sent by this particular company. It might have been sent by other companies before,
+      which would make the id_lead_first_version_global different from this one.'
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.lead_hash
-    description: 'Hash of the lead.'
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column identifies the lead hash of this lead.'
   block:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
@@ -339,6 +351,13 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.pricing
     description: 'House condo price.'
+  version_global:
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is a counter that indicates how many times the same lead hash has been sent until the current lead, which serves as its version.'
+  version_by_company:
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is a counter that indicates how many times the same lead hash has been sent by this particular company until the current lead, which serves as its version.
+      It is not equal to version_global, as the same lead hash might be sent by different companies.'
   is_for_sale:
     description: 'True if the lead has been sent in the context of ForSale. It is not exclusive with is_for_rent, as both can be true.'
   is_for_rent:
@@ -401,6 +420,24 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.is_sent_to_main
     description: If the lead was sent to main.
+  is_first_version_global:
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the first time this lead hash has been sent.'
+  is_first_version_by_company:
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the first time this lead hash has been sent by this particular company.'
+  is_last_version_global:
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the last time this lead hash has been sent.'
+  is_last_version_by_company:
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the last time this lead hash has been sent by this particular company.'
+  ts_first_version_created_global:
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is the timestamp of when the first version of this lead hash was created.'
+  ts_first_version_created_by_company:
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is the timestamp of when the first version of this lead hash was created by this particular company.'
   ts_house_created:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
