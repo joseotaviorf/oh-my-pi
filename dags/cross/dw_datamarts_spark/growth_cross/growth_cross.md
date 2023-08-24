@@ -26,7 +26,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `performance_marketing_cluster_promotional_bonus_costs`
 - `performance_marketing_cluster_promotional_bonus`
 - `performance_marketing_metrics_demand`
-- `plaquinhas_users_metrics_demand`
 - `pricing_rent_categorization`
 - `rent_flow_interactions`
 - `rental_cohort_conversions`
