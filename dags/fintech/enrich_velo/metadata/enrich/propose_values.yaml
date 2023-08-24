@@ -8,6 +8,7 @@ columns:
     description: ProposeValues's identification number (ID)
     lineage:
       - datalake_rental_guarantee_platform_clean.propose.id
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.id
       - datalake_rental_guarantee_platform_clean.company_plan.id
       - datalake_rental_guarantee_platform_clean.plan.id
     description: ID of the propose values.
@@ -31,6 +32,7 @@ columns:
     description: Propose's value paid to activate the contract. This marks the start of the propose as a contract.
     lineage:
       - datalake_rental_guarantee_platform_clean.propose.activator_value
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.activator_value
     description: Amount paid to activate the guarantee
   subscription_installments:
     description: Number of installments on the subscription.

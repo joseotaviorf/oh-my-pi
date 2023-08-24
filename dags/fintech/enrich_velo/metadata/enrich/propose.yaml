@@ -8,6 +8,7 @@ columns:
     description: Propose's identification number (ID)
     lineage:
       - datalake_rental_guarantee_platform_clean.propose.id
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.id
   id_propose_values:
     description: Propose values' identification number (ID). This key connects to the table datalake_velo.propose_values
     lineage:
@@ -18,6 +19,7 @@ columns:
     description: Broker's identification number (ID). This key connects to the table datalake_velo.broker
     lineage:
       - datalake_rental_guarantee_platform_clean.propose.id_real_estate
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.id_quintocred_company
   id_house:
     description: House's identification number (ID). This key connects to the table datalake_velo.house
     lineage:
@@ -53,7 +55,8 @@ columns:
   count_persons_included:
     description: How many persons were included on the propose
   percentage_income_from_primary_person:
-    description: The percentage of the primary person is realted to the total declared
+    description:
+      The percentage of the primary person is related to the total declared
       income of all persons related to the propose
   avg_serasa_score:
     description: Average serasa score of the persons included on the propose
@@ -95,7 +98,7 @@ columns:
     description: If the propose's comes from 3P flow
   dt_last_payment:
     lineage:
-    - datalake_velo.payment.dt_paid
+      - datalake_velo.payment.dt_paid
     description: Propose's last payment date
   dt_contract_started:
     description: Date of when status of the contract started
@@ -104,6 +107,13 @@ columns:
       - datalake_rental_guarantee_platform_clean.contract.ts_began
   dt_ended:
     description: Date of when status of the propose or the contract ended
+    lineage:
+      - datalake_velo_clean.fiancavelo_fianca.dt_ended
+      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+      - datalake_rental_guarantee_platform_clean.contract.ts_ended
+      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+  dt_analyst_annulment_input:
+    description: Date of when the information of propose/contract ended was entered into the system
     lineage:
       - datalake_velo_clean.fiancavelo_fianca.dt_ended
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
