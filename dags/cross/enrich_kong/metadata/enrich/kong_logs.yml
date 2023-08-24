@@ -1,0 +1,82 @@
+database_name: datalake_kong
+table_name: kong_logs
+description: Table with 5A applications logs.
+domain: Cross
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  app:
+    lineage:
+      - datalake_kong_clean.kong_logs.app
+    description: The application log, in this case, kong ingress.
+  cluster_name:
+    lineage:
+      - datalake_kong_clean.kong_logs.cluster_name
+    description: The cluster name that registered the logs.
+  container_name:
+    lineage:
+      - datalake_kong_clean.kong_logs.container_name
+    description: The container name responsible for the logs.
+  env:
+    lineage:
+      - datalake_kong_clean.kong_logs.env
+    description: The log environment.
+  message:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: Details about the log, such as, request method, app url, among others.
+  client_ip:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: Client IP address.
+  request_user:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: Authenticated user on the request.
+  request_host:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: Host name of the request.
+  request_method:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: HTTP method of the request.
+  request_uri:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The path and query parameters of the request.
+  response_code:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The HTTP response code of the request.
+  namespace:
+    lineage:
+      - datalake_kong_clean.kong_logs.namespace
+    description: The log space name.
+  pod_name:
+    lineage:
+      - datalake_kong_clean.kong_logs.pod_name
+    description: The pod name.
+  stream:
+    lineage:
+      - datalake_kong_clean.kong_logs.stream
+    description: The log stream type.
+  ts_event:
+    lineage:
+      - datalake_kong_clean.kong_logs.time
+    description: The event time.
+  year:
+    lineage:
+      - datalake_kong_clean.kong_logs.year
+    description: Partition column.
+  month:
+    lineage:
+      - datalake_kong_clean.kong_logs.month
+    description: Partition column.
+  day:
+    lineage:
+      - datalake_kong_clean.kong_logs.day
+    description: Partition column.
+  hour:
+    lineage:
+      - datalake_kong_clean.kong_logs.hour
+    description: Partition column.

@@ -1513,6 +1513,8 @@ bietlejuice.enrich_kodak:
   - bietlejuice.kodak:load-clean-image-inspection-group
 bietlejuice.enrich_kong_ss:
   - bietlejuice.kong:load-clean-kong-logs
+bietlejuice.enrich_kong:
+  - bietlejuice.kong:load-clean-kong-logs
 bietlejuice.enrich_label_studio:
   - bietlejuice.label_studio:load-clean-annotations
 bietlejuice.enrich_lead:
