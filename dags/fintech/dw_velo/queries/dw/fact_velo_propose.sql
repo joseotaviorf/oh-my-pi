@@ -35,6 +35,7 @@ SELECT
     dt_last_payment,
     dt_contract_started,
     dt_ended,
+    dt_analyst_annulment_input,
     ts_propose_started,
     ts_waiting_new_docs,
     ts_evaluation_started,
