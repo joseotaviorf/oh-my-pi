@@ -62,6 +62,7 @@ tables:
     is_incremental: True
     date_column: updated_at
   # termination_history: {}
+  termination_step: {}
   termination_task: {}
   # termination_task_aud:
   #   is_incremental: True
