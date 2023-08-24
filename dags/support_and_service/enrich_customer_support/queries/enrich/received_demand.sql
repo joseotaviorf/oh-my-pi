@@ -115,6 +115,7 @@ call AS (
     call.contact_theme_detail_tag,
     call.step_tag,
     call.request_type,
+    NULL AS completion_reason,
     CASE
       WHEN call.id_external_service IS NULL THEN 'ABANDONED'
       WHEN ROW_NUMBER() OVER(PARTITION BY crd.id_call ORDER BY crd.ts_created DESC) = 1 THEN 'COMPLETED'
@@ -248,6 +249,7 @@ chat AS (
     contact_theme_detail_tag,
     step_tag,
     request_type,
+    completion_reason,
     CASE
       WHEN completion_reason = 'task idled' THEN 'IDLED'
       WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'COMPLETED'
@@ -279,11 +281,12 @@ email AS (
     contact_theme_detail_tag,
     step_tag,
     request_type,
+    NULL AS completion_reason,
     CASE
       WHEN ts_ticket_ended IS NOT NULL THEN 'COMPLETED'
       ELSE 'IN PROGRESS'
     END AS status,
-    true AS is_answered,
+    TRUE AS is_answered,
     NULL AS ts_reservation_created,
     ts_ticket_started AS ts_created
   FROM
@@ -296,18 +299,63 @@ email AS (
       ON ce.email = usr.email
   WHERE
     front_or_back = 'front'
+),
+received_demand AS (
+  SELECT
+    *
+  FROM
+    call
+  UNION ALL
+  SELECT
+    *
+  FROM
+    chat
+  UNION ALL
+  SELECT
+    *
+  FROM
+    email
+),
+average_reply_time AS (
+  SELECT
+    id_task,
+    msg_sender AS agent_email,
+    AVG(reply_time) AS average_reply_time
+  FROM
+    datalake_quinto_messenger.message
+  WHERE
+    msg_sender LIKE "%@%.com%"
+  GROUP BY 1, 2
 )
 SELECT
-  *
+  rd.id_call,
+  rd.id_session,
+  rd.id_ticket,
+  rd.id_task,
+  rd.id_user,
+  rd.id_reservation,
+  rd.agent_email,
+  rd.channel,
+  rd.customer_phone,
+  rd.customer_email,
+  rd.department,
+  rd.client_type,
+  rd.customer_type_tag,
+  rd.contact_motivation_tag,
+  rd.contact_theme_tag,
+  rd.contact_theme_detail_tag,
+  rd.step_tag,
+  rd.request_type,
+  rd.completion_reason,
+  rd.status,
+  art.average_reply_time,
+  rd.is_answered,
+  rd.ts_reservation_created,
+  rd.ts_created
 FROM
-  call
-UNION ALL
-SELECT
-  *
-FROM
-  chat
-UNION ALL
-SELECT
-  *
-FROM
-  email
+  received_demand AS rd
+LEFT JOIN
+  average_reply_time AS art
+    ON art.id_task = rd.id_task
+    AND art.agent_email = rd.agent_email
+    AND channel = 'chat'

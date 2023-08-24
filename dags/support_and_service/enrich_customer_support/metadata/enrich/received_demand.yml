@@ -70,6 +70,10 @@ columns:
       - datalake_bigfone_twilio.call_flex_events.customer_phone
       - datalake_quinto_messenger_clean.task_event.event_payload
     description: The user customer phone. It is NULL for Zendesk E-mail Tickets.
+  completion_reason:
+    lineage:
+      - datalake_quinto_messenger.task.completion_reason
+    description: Reason for a given Twilio task to have been completed.
   status:
     lineage:
       - datalake_quinto_messenger_clean.task_event.event_payload
@@ -94,6 +98,10 @@ columns:
       It is used to track how quickly workers are able to start working on tasks once
       they are assigned to them, which can help optimize workflows and improve customer
       satisfaction. For Zendesk E-mail Tickets, the demand is always considered answered.
+  average_reply_time:
+    lineage:
+      - datalake_quinto_messenger.message.reply_time
+    description: Average reply time for every agent on a task - considering all messages the agent exchanged with the customer.
   ts_reservation_created:
     lineage:
       - datalake_quinto_messenger_clean.task_event.ts_created

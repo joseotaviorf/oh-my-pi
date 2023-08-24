@@ -98,6 +98,14 @@ columns:
     lineage:
       - datalake_customer_support.received_demand.status
     description: How a task ended, the final state of every interaction in a call, chat or email
+  completion_reason:
+    lineage:
+      - datalake_customer_support.received_demand.completion_reason
+    description: Reason for a given Twilio task to have been completed.
+  average_reply_time:
+    lineage:
+      - datalake_customer_support.received_demand.average_reply_time
+    description: Average reply time for every agent on a task - considering all messages the agent exchanged with the customer.
   is_answered:
     lineage:
       - datalake_customer_support.received_demand.is_answered

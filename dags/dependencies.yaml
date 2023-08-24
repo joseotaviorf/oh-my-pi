@@ -1173,6 +1173,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel-event
   - bietlejuice.enrich_quinto_messenger:load-enrich-chat
+  - bietlejuice.enrich_quinto_messenger:load-enrich-message
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
