@@ -1,5 +1,6 @@
 SELECT
     id,
+    documentuuid AS uuid_document,
     person_id AS id_person,
     identification_number,
     document_validation_status,
@@ -13,6 +14,7 @@ SELECT
     rev,
     revend AS rev_end,
     revtype AS rev_type,
+    documentuuid_mod AS mod_uuid_document,
     person_id_mod AS mod_id_person,
     identification_number_mod AS mod_identification_number,
     document_type_mod AS mod_document_type,

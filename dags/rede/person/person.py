@@ -14,6 +14,7 @@ from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissio
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -26,11 +27,11 @@ MAIN_START_DATE = datetime(2021, 8, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 config_service = ConfigurationService(SOURCE)
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
+partition_cols = config_service.get_config("partition_cols")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 
@@ -46,6 +47,8 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+DAG_DOCUMENTATION = config_service.get_config("dag_documentation")
+DAG_OWNER = DAGOwnerEnum.DATA_REDE
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -56,8 +59,12 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=DAG_DOCUMENTATION,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 
@@ -79,15 +86,16 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 tables = config_service.get_config("tables")
-partition_cols = config_service.get_config("partition_cols")
+inner_dependencies = config_service.get_config("inner_dependencies")
+clean_task_groups = {}
 
 for table in tables:
     table_name = table["table_name"]
     clean_table_name = table.get("clean_table_name", table_name)
+    clean_extraction_type = table.get("clean_extraction_type", "incremental")
     parameters = [SOURCE, table_name]
 
     extended_parameters = [
@@ -98,6 +106,7 @@ for table in tables:
 
     extended_parameters = list(filter(None, extended_parameters))
     parameters.extend(extended_parameters)
+
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
@@ -111,9 +120,10 @@ for table in tables:
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=clean_table_name,
-        is_incremental=True,
-        partitions=partition_cols,
+        is_incremental=clean_extraction_type == "incremental",
+        partitions=partition_cols if clean_extraction_type == "incremental" else None,
     )
+    clean_task_groups[table_name] = clean_task_group
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
@@ -123,3 +133,12 @@ for table in tables:
     )
 
     terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=clean_task_groups,
+    dag_inner_dependencies=inner_dependencies,
+)

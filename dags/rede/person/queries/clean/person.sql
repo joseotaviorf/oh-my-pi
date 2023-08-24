@@ -1,9 +1,20 @@
+WITH deleted_rows AS (
+    SELECT
+        id AS id_deleted_row
+    FROM
+        datalake_person_clean.person_aud
+    WHERE
+        rev_type = 2
+)
 SELECT
     id,
     personuuid AS uuid_person,
     name AS person_name,
     gender,
+    country_code,
+    photo,
     version,
+    blocked AS is_blocked,
     birth_date AS dt_birth,
     created_at AS ts_created,
     updated_at AS ts_updated,
@@ -11,8 +22,11 @@ SELECT
     month,
     day
 FROM
-    datalake_person_raw.person
+    datalake_person_raw.person AS p
+LEFT JOIN
+    deleted_rows AS dr
+        ON dr.id_deleted_row = p.id
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    dr.id_deleted_row IS NULL
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1

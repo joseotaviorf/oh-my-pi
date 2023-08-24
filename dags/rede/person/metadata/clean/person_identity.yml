@@ -1,0 +1,46 @@
+---
+database_name: datalake_person_clean
+table_name: person_identity
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: Identifiers of each person, such as email, CPF and phone number.
+columns:
+  id:
+    lineage:
+    - datalake_person_raw.person_identity.id
+  id_person:
+    lineage:
+    - datalake_person_raw.person_identity.person_id
+  value:
+    lineage:
+    - datalake_person_raw.person_identity.value
+  scope:
+    lineage:
+    - datalake_person_raw.person_identity.scope
+  type:
+    lineage:
+    - datalake_person_raw.person_identity.type
+  validation_type:
+    lineage:
+    - datalake_person_raw.person_identity.validation_type
+  version:
+    lineage:
+    - datalake_person_raw.person_identity.version
+  ts_last_validated:
+    lineage:
+    - datalake_person_raw.person_identity.last_validated_at
+  ts_created:
+    lineage:
+    - datalake_person_raw.person_identity.created_at
+  ts_updated:
+    lineage:
+    - datalake_person_raw.person_identity.updated_at
+  year:
+    lineage:
+    - datalake_person_raw.person_identity.year
+  month:
+    lineage:
+    - datalake_person_raw.person_identity.month
+  day:
+    lineage:
+    - datalake_person_raw.person_identity.day

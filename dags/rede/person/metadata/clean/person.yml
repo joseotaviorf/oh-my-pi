@@ -1,37 +1,49 @@
 ---
 database_name: datalake_person_clean
 table_name: person
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: Entity of a natural person.
 columns:
   id:
     lineage:
-      - datalake_person_raw.person.id
+    - datalake_person_raw.person.id
   uuid_person:
     lineage:
-      - datalake_person_raw.person.personuuid
+    - datalake_person_raw.person.personuuid
   person_name:
     lineage:
-      - datalake_person_raw.person.name
+    - datalake_person_raw.person.name
   gender:
     lineage:
-      - datalake_person_raw.person.gender
+    - datalake_person_raw.person.gender
+  country_code:
+    lineage:
+    - datalake_person_raw.person.country_code
+  photo:
+    lineage:
+    - datalake_person_raw.person.photo
   version:
     lineage:
-      - datalake_person_raw.person.version
+    - datalake_person_raw.person.version
+  is_blocked:
+    lineage:
+    - datalake_person_raw.person.blocked
   dt_birth:
     lineage:
-      - datalake_person_raw.person.birth_date
+    - datalake_person_raw.person.birth_date
   ts_created:
     lineage:
-      - datalake_person_raw.person.created_at
+    - datalake_person_raw.person.created_at
   ts_updated:
     lineage:
-      - datalake_person_raw.person.updated_at
+    - datalake_person_raw.person.updated_at
   year:
     lineage:
-      - datalake_person_raw.person.year
+    - datalake_person_raw.person.year
   month:
     lineage:
-      - datalake_person_raw.person.month
+    - datalake_person_raw.person.month
   day:
     lineage:
-      - datalake_person_raw.person.day
+    - datalake_person_raw.person.day
