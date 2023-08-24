@@ -1,6 +1,9 @@
 dag:
   name: dw_tracksale
   owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG loads the DW tables with [Tracksale](https://www.tracksale.co/) data. This data is related to NPS.
 workflow:
   type: query
   layer: dw

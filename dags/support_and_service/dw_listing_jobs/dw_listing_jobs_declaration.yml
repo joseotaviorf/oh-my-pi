@@ -2,6 +2,8 @@ dag:
   name: dw_listing_jobs
   schedule_start_date: 2020,08,29
   owner: Data SS
+  documentation:
+    dag_purpose: This DAG loads to DW our models related to the listings jobs.
 workflow:
   type: query
   layer: dw

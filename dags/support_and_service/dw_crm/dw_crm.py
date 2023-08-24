@@ -26,8 +26,8 @@ ENV = os.environ.get("ENVIRONMENT")
 CONTEXT = "crm"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-
 MAIN_START_DATE = datetime(2020, 11, 1, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = None
 
 config_service = ConfigurationService(DAG_NAME)
 dw_bucket = config_service.get_config("dw_bucket")
@@ -42,6 +42,7 @@ inner_dependencies = config_service.get_config("inner_dependencies")
 cluster_description = config_service.get_config(
     "databricks_10_4_med_memory_photon_cluster"
 )
+dag_documentation = config_service.get_config("dag_documentation")
 
 databricks_cluster_access_control_list = [
     {
@@ -49,18 +50,23 @@ databricks_cluster_access_control_list = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

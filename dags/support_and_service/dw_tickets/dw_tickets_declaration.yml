@@ -2,6 +2,11 @@ dag:
   name: dw_tickets
   schedule_start_date: 2020,12,02
   owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG loads the DW tables of our Tickets data. This data is related to
+      the external system named Zendesk, which is responsible for the tickets of
+      the customer services.
 workflow:
   type: query
   layer: dw

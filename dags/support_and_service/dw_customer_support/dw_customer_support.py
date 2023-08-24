@@ -17,6 +17,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 ENV = os.environ.get("ENVIRONMENT")
 MAIN_START_DATE = datetime(2021, 2, 7, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = None
 
 DW_SCHEMA = "customer_support"
 CONTEXT = "customer_support"
@@ -42,24 +43,31 @@ cluster_configuration = config_service.get_config("custom_cluster")
 cluster_configuration["spark_conf"].update(config_service.get_config("spark_conf"))
 
 default_libraries = config_service.get_config("default_libraries")
+dag_documentation = config_service.get_config("dag_documentation")
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

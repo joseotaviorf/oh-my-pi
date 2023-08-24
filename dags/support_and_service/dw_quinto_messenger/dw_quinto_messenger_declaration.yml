@@ -2,6 +2,11 @@ dag:
   name: dw_quinto_messenger
   schedule_start_date: 2020,12,02
   owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG loads the DW tables with chat data from our Quinto Messenger database.
+      [Quinto Messenger](https://github.com/quintoandar/quinto-messenger) is the service built
+      to be the connection between Twilio and QuintoAndar's system.
 workflow:
   type: query
   layer: dw

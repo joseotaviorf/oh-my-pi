@@ -1,6 +1,11 @@
 dag:
   name: dw_call
   owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG loads the DW tables of our Call data. This data is related to the system named [Bigfone]
+      (https://github.com/quintoandar/big-fone), which is responsible for interacting with Twilio (an
+      external service) to manage calls, peers and store data.
 workflow:
   type: query
   layer: dw

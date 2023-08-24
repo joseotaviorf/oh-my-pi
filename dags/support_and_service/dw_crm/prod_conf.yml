@@ -1,4 +1,7 @@
 ---
+dag_documentation:
+    dag_purpose: Creates DW fact and dimension tables for CRM context.
+
 inner_dependencies:
     fact_lead_tasks:
         - fact_lead_task_actions

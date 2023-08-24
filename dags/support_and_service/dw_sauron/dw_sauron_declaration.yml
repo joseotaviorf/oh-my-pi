@@ -2,6 +2,11 @@ dag:
   name: dw_sauron
   schedule_start_date: 2022,12,02
   owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG loads the DW tables with the sessions data from our Sauron database.
+      [Sauron](https://github.com/quintoandar/sauron) is the messaging orchestration service,
+      and it controls the user session when someone contact our customer service lines.
 workflow:
   type: query
   layer: dw

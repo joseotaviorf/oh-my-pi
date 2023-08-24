@@ -1,4 +1,6 @@
 ---
+dag_documentation:
+  dag_purpose: This DAG load the DW tables for Customer Support.
 incremental_tables:
   - fact_agent_ranking
   - fact_agent_daily_productivity
