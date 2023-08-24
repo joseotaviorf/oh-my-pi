@@ -1,5 +1,7 @@
 SELECT
-    personuuid AS uuid_person,
+    user_id AS id_user,
+    user_type,
+    reason,
     rev,
     TO_TIMESTAMP(revtstmp/1000) AS ts_created,
     year,

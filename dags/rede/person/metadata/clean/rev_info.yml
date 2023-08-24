@@ -1,10 +1,19 @@
 ---
 database_name: datalake_person_clean
 table_name: rev_info
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: Info about revisions in the audit tables, such as when they happened, reason, and who did it.
 columns:
-  uuid_person:
+  id_user:
     lineage:
-      - datalake_person_raw.revinfo.personuuid
+      - datalake_person_raw.revinfo.user_id
+  user_type:
+    lineage:
+      - datalake_person_raw.revinfo.user_type
+  reason:
+    lineage:
+      - datalake_person_raw.revinfo.reason
   rev:
     lineage:
       - datalake_person_raw.revinfo.rev
