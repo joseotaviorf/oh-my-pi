@@ -6,6 +6,27 @@ tables:
   extra_event:
     is_incremental: true
     partition_cols: [year, month, day]
+  sale_listing_offer_accepted_divergence:
+    is_incremental: true
+    partition_cols: [year, month, day]
+  sale_listing_offer_sent_divergence:
+    is_incremental: true
+    partition_cols: [year, month, day]
+  sale_listing_signed_contract_divergence:
+    is_incremental: true
+    partition_cols: [year, month, day]
+  sale_listing_traffic_divergence:
+    is_incremental: true
+    partition_cols: [year, month, day]
+  sale_listing_visit_confirmed_divergence:
+    is_incremental: true
+    partition_cols: [year, month, day]
+  sale_listing_visit_scheduled_divergence:
+    is_incremental: true
+    partition_cols: [year, month, day]
+  sale_ongoing_listing_divergence:
+    is_incremental: true
+    partition_cols: [year, month, day]
   unprocessed_event:
     is_incremental: true
     partition_cols: [year, month, day]

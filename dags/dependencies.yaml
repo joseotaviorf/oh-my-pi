@@ -1957,6 +1957,7 @@ bietlejuice.enrich_repairs:
   - bietlejuice.zendesk_tickets:load-clean-tickets-history
   - bietlejuice.zendesk_tickets:load-clean-users
 bietlejuice.enrich_reports_validation:
+  - bietlejuice.reports:load-clean-daily-listings-summary
   - bietlejuice.reports:load-clean-processed-event
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
@@ -2306,6 +2307,8 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-contract-status
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
+  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-propose-legacy
+  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposehistory-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-item-type
   - bietlejuice.rental_guarantee_platform:load-clean-omie-occurrence-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-payment
@@ -2322,8 +2325,6 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info
   - bietlejuice.rental_guarantee_platform:load-clean-tenant-company
   - bietlejuice.rental_guarantee_platform:load-clean-user-account
-  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-propose-legacy
-  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposehistory-legacy
   - bietlejuice.velo_neurotech:load-clean-logs-credit-granting
   - bietlejuice.velo_omie:load-clean-bank-account
   - bietlejuice.velo_omie:load-clean-categories
