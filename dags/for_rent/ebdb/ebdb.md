@@ -190,7 +190,8 @@ Produces the following output tables:
     `special_condition_aud`
     `state`
     `state_aud`
-    `suspicious_listings`
+    `suspected_unavailability_listings`
+    `suspected_unavailability_listings_aud`
     `user`
     `user_aud`
     `user_document`
