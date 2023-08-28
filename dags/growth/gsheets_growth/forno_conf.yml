@@ -551,6 +551,18 @@ sheets_info:
     clean_table_name: target_supply_and_demand_autonomous_agent
     sheet_context: growth
 
+  target_supply_historical_rent:
+    sheet_id: 1Tik3MWlzXufDLEb5CoeXCX_r_5H5a5J-XgnOEcI8w3U
+    sheet_name: Rent
+    clean_table_name: target_supply_historical_rent
+    sheet_context: growth
+
+  target_supply_historical_sale:
+    sheet_id: 1Tik3MWlzXufDLEb5CoeXCX_r_5H5a5J-XgnOEcI8w3U
+    sheet_name: Sale
+    clean_table_name: target_supply_historical_sale
+    sheet_context: growth   
+
   taxonomy_affiliates:
     sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
     sheet_name: taxonomy_affiliates
