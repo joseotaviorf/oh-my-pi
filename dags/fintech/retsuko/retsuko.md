@@ -18,24 +18,24 @@ We load the following tables into the datalake:
 1. In datalake raw:
 
     * account
-    * boleto
+    * boleto (incremental)
     * contract
     * credit_card_payment
-    * entry
+    * entry (incremental)
     * file
-    * invoice
+    * invoice (incremental)
     * recurrent_credit_card
     * sap_entity
 
 2. In datalake clean
 
     * account
-    * boleto
+    * boleto (incremental)
     * contract
     * credit_card_payment
-    * entry
-    * file
-    * invoice
+    * entry (incremental)
+    * file 
+    * invoice (incremental)
     * recurrent_credit_card
     * sap_entity
 

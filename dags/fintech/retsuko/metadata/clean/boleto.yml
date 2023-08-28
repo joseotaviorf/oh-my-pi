@@ -65,3 +65,15 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.boleto.retsuko_updated_at
+  year:
+    description: Year information
+    lineage:
+      - datalake_retsuko_raw.boleto.year
+  month:
+    description: Month information
+    lineage:
+      - datalake_retsuko_raw.boleto.month
+  day:
+    description: Day information
+    lineage:
+      - datalake_retsuko_raw.boleto.day

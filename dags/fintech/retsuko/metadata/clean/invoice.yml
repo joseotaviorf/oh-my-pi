@@ -93,3 +93,15 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.retsuko_updated_at
+  year:
+    description: Year information
+    lineage:
+      - datalake_retsuko_raw.invoice.year
+  month:
+    description: Month information
+    lineage:
+      - datalake_retsuko_raw.invoice.month
+  day:
+    description: Day information
+    lineage:
+      - datalake_retsuko_raw.invoice.day
