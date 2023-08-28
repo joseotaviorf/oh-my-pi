@@ -39,6 +39,10 @@ columns:
     lineage:
       - datalake_inspections_clean.inspection.id_contract
       - datalake_ebdb_clean.inspection.id_contract
+  id_client_side:
+    lineage:
+      - datalake_inspections_clean.inspection.id_client_side
+    description: Inspection unique identifier (uuid)
   id_house:
     description: Unique identifier of the related house to be inspected.
     lineage:

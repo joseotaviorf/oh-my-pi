@@ -8,8 +8,8 @@ WITH contracts AS (
         turf.id_origin AS sk_origin,
         turf.id_assignee AS sk_assignee,
         turf.id_user_action AS sk_user_action,
-        COALESCE(ec.id, ib.id_contract, -1) AS sk_contract,
-        COALESCE(ib.id_external, -1) AS sk_inspection,
+        COALESCE(ec.id, ib1.id_contract, ib2.id_contract, -1) AS sk_contract,
+        COALESCE(ib1.id_external, ib2.id_external, -1) AS sk_inspection,
         turf.id_action_date AS sk_action_date,
         turf.id_task_user_start_date AS sk_task_action_start_date,
         turf.id_task_user_end_date AS sk_task_action_end_date,
@@ -26,14 +26,20 @@ WITH contracts AS (
         turf.day
     FROM
         datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
-        LEFT JOIN
-            datalake_ebdb_clean.contract AS ec
-                ON turf.origin = 'Contrato'
-                    AND turf.id_origin = ec.id
-        LEFT JOIN
-            datalake_inspections.inspection_booking AS ib
-                ON turf.origin = 'Vistoria'
-                    AND turf.id_origin = ib.id_external
+    LEFT JOIN
+        datalake_ebdb_clean.contract AS ec
+            ON turf.origin = 'Contrato'
+            AND turf.id_origin = ec.id
+    LEFT JOIN
+        datalake_inspections.inspection_booking AS ib1
+            ON turf.origin = 'Vistoria'
+            AND INT(turf.id_origin) IS NOT NULL
+            AND turf.id_origin = ib1.id_external
+    LEFT JOIN
+        datalake_inspections.inspection_booking AS ib2
+            ON turf.origin = 'Vistoria'
+            AND INT(turf.id_origin) IS NULL
+            AND turf.id_origin = ib2.id_client_side
     WHERE
         (
         turf.type IN (
@@ -112,7 +118,7 @@ SELECT DISTINCT
     c.day
 FROM
     contracts AS c
-    LEFT JOIN
-        contract_house_listing AS chl
-            ON c.sk_contract = chl.sk_contract
-                AND c.sk_contract != -1
+LEFT JOIN
+    contract_house_listing AS chl
+        ON c.sk_contract = chl.sk_contract
+        AND c.sk_contract != -1
