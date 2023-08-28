@@ -200,7 +200,6 @@ bietlejuice.dw_revenue_lines:
   remove:
     - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
     - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-fee
-    - bietlejuice.enrich_revenue_lines:load-enrich-contract-revenues
     - bietlejuice.enrich_revenue_lines:load-enrich-management-fee
     - bietlejuice.enrich_revenue_lines:load-enrich-service-fee
 bietlejuice.dw_sale_events:
@@ -518,6 +517,9 @@ bietlejuice.enrich_retsuko:
   remove:
     - bietlejuice.retsuko:load-clean-boleto
 bietlejuice.enrich_revenue_lines:
+  add:
+    - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
+    - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   remove:
     - bietlejuice.dw_contract:load-dw-public-dim-contract
     - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice

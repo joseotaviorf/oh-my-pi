@@ -83,8 +83,8 @@ columns:
     description: Quarter of the revenue's competence month.
   accrual_year_month:
     lineage:
-    - datalake_revenue_lines.contract_revenues.month_start
-    description: Competence month of the revenue
+    - datalake_retsuko.invoice.accrual_year_month
+    description: Competence month of the revenue.
   dt_month_start:
     lineage:
     - dw_public.dim_date.month_start
