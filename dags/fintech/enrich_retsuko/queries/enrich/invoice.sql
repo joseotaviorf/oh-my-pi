@@ -1,25 +1,40 @@
+WITH latest_audit AS (
+  SELECT
+    id_invoice,
+    id_audit,
+    MAX(ts_retsuko_updated)
+  FROM
+    datalake_retsuko_clean.entry
+  GROUP BY
+    id_invoice,
+    id_audit    
+)
 SELECT
-    id,
-    id_external,
-    id_account,
-    id_contract,
-    status,
-    substatus,
-    negotiation_status,
-    paid_via,
-    purpose,
-    closing_mode,
-    reason,
-    due_amount,
-    paid_amount,
-    accrual_year_month,
-    ts_paid,
-    ts_canceled,
-    ts_sent,
-    ts_due,
-    ts_created,
-    ts_retsuko_updated
+    in.id,
+    in.id_external,
+    in.id_account,
+    in.id_contract,
+    la.id_audit,
+    in.status,
+    in.substatus,
+    in.negotiation_status,
+    in.paid_via,
+    in.purpose,
+    in.closing_mode,
+    in.reason,
+    in.due_amount,
+    in.paid_amount,
+    in.accrual_year_month,
+    in.ts_paid,
+    in.ts_canceled,
+    in.ts_sent,
+    in.ts_due,
+    in.ts_created,
+    in.ts_retsuko_updated
 FROM
-    datalake_retsuko_clean.invoice
+    datalake_retsuko_clean.invoice AS in
+LEFT JOIN
+  latest_audit AS la
+ON in.id = la.id_invoice
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_retsuko_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY in.id ORDER BY in.ts_retsuko_updated DESC) = 1

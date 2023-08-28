@@ -33,6 +33,10 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.entry.reversed_entry_external_id
+  id_audit:
+    description: "TODO FINISH DESCRIPTIONS"
+    lineage:
+      - datalake_retsuko_raw.entry.audit_id
   amount:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
