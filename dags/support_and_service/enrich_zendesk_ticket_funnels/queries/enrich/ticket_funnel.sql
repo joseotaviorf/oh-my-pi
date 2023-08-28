@@ -50,12 +50,12 @@ agents_control AS (
             WHEN t.id_assignee = "5124274148" THEN COALESCE(a.id_agent, 5124274148)
             ELSE t.id_assignee
         END AS id_agent,
-        a.email,
-        a.name,
-        a.phone,
-        a.organization,
-        a.ts_created,
-        a.ts_updated
+        COALESCE(a.email, a2.email) AS email,
+        COALESCE(a.name, a2.name) AS name,
+        COALESCE(a.phone, a2.phone) AS phone,
+        COALESCE(a.organization, a2.organization) AS organization,
+        COALESCE(a.ts_created, a2.ts_created) AS ts_created,
+        COALESCE(a.ts_updated, a2.ts_updated) AS ts_updated
     FROM
         datalake_zendesk_tickets_clean.tickets AS t
     LEFT JOIN
@@ -64,6 +64,9 @@ agents_control AS (
     LEFT JOIN
         datalake_zendesk_users.agents AS a
             ON cf.custom_fields['[AUTO] Email do Agente'] = a.email
+    LEFT JOIN
+        datalake_zendesk_users.agents AS a2
+            ON t.id_assignee = a2.id_agent
 ),
 custom_fields_exploded AS (
     SELECT
