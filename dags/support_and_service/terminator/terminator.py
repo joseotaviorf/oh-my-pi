@@ -21,7 +21,7 @@ SOURCE = "terminator"
 CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{CONTEXT}"
 MAIN_START_DATE = datetime(2020, 1, 1, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
+MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
 CLUSTER_DESCRIPTION = "custom_cluster"
 
 config_service = ConfigurationService(SOURCE)
