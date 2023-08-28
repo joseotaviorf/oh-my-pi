@@ -52,7 +52,8 @@ bigfone_analysts AS (
             AND GET_JSON_OBJECT(metadata, '$.event_data.WorkerName') NOT LIKE "%ext%" 
                 THEN LOWER(SPLIT(REPLACE(SPLIT(GET_JSON_OBJECT(metadata, '$.event_data.WorkerName'), "@")[1], ".", " "), " ")[0])
             ELSE LOWER(GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location'))
-        END AS organization
+        END AS organization,
+        event_timestamp AS ts_created
     FROM
         datalake_bigfone_clean.event
 ),
@@ -64,49 +65,66 @@ quinto_messenger_analysts AS (
             WHEN GET_JSON_OBJECT(assigned_to,'$.worker_name') LIKE "%ext%" 
                 THEN LOWER(SPLIT(REPLACE(SPLIT(GET_JSON_OBJECT(assigned_to,'$.worker_name'), "@")[0], ".", " "), " ")[2])
             ELSE LOWER(SPLIT(REPLACE(SPLIT(GET_JSON_OBJECT(assigned_to,'$.worker_name'), "@")[1], ".", " "), " ")[0])
-        END AS organization
+        END AS organization,
+        ts_created
     FROM
         datalake_quinto_messenger_clean.task 
 ),
+union_twilio_data AS (
+    SELECT
+        id_agent,
+        email,
+        name,
+        organization,
+        ts_created
+    FROM
+        bigfone_analysts
+    UNION ALL
+    SELECT
+        id_agent,
+        email,
+        NULL AS name,
+        organization,
+        ts_created
+    FROM
+        quinto_messenger_analysts
+),
 consolidade_base_analysts AS (
     SELECT
-        COALESCE(za.id_agent, ba.id_agent, qma.id_agent) AS id_agent,
-        COALESCE(ba.id_agent, qma.id_agent) AS id_agent_twilio,
+        COALESCE(za.id_agent, td.id_agent) AS id_agent,
+        td.id_agent AS id_agent_twilio,
         za.id_user_external,
         za.id_organization,
-        COALESCE(za.name, ba.name) AS name,
-        COALESCE(za.email, ba.email, qma.email) AS email,
+        COALESCE(za.name, td.name) AS name,
+        COALESCE(za.email, td.email) AS email,
         za.phone,
-        COALESCE(za.organization, ba.organization, qma.organization) AS organization,
+        COALESCE(za.organization, td.organization) AS organization,
         role,
         is_active,
-        ts_created,
+        COALESCE(za.ts_created,td.ts_created) AS ts_created,
         ts_created_local,
         ts_updated
     FROM
         zendesk_analysts AS za
     FULL OUTER JOIN
-        bigfone_analysts AS ba
-            ON za.email = ba.email
-    FULL OUTER JOIN
-        quinto_messenger_analysts AS qma
-            ON za.email = qma.email
+        union_twilio_data AS td
+            ON za.email = td.email
 )
 SELECT
+    id_agent,
+    id_agent_twilio,
+    id_user_external,
+    id_organization,
     email,
-    MAX(id_agent) AS id_agent,
-    MAX(id_agent_twilio) AS id_agent_twilio,
-    MAX(id_user_external) AS id_user_external,
-    MAX(id_organization) AS id_organization,
-    MAX(name) AS name,
-    MAX(phone) AS phone,
-    MAX(organization) AS organization,
-    MAX(role) AS role,
-    MAX(is_active) AS is_active,
-    MAX(ts_created) AS ts_created,
-    MAX(ts_created_local) AS ts_created_local,
-    MAX(ts_updated) AS ts_updated
+    name,
+    phone,
+    organization,
+    role,
+    is_active,
+    ts_created,
+    ts_created_local,
+    ts_updated
 FROM
     consolidade_base_analysts AS u
-GROUP BY
-    1
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY email ORDER BY ts_created DESC) = 1
