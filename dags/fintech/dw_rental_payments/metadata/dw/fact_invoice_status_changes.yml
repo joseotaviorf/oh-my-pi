@@ -1,0 +1,43 @@
+database_name: dw_rental_payments
+table_name: fact_invoice_status_changes
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "This table materializes the temporal monthly evolution of a given status of an invoice and the financial value of that status"
+columns:
+  sk_invoice:
+    description: Identification of invoices and key to join with invoice granularity tables
+    lineage:
+      - datalake_retsuko.invoice.id_external
+  sk_contract:
+    description: Identification of contracts and key to join with contracts granularity tables
+    lineage:
+      - datalake_retsuko.invoice.id_contract
+  mob:
+    description: MOB (Months on books), which is the number of months that have completed since the reference date (creation date or due date) of an invoice
+  cohort_type:
+    description: Indicates the date used to calculate dt_cohort. It can be CREATION DATE or DUE DATE
+  status:
+    description: Invoice status at a given MOB
+    categories:
+      CANCELADA: The invoice has been canceled
+      BAIXADA: The invoice has been written-down, meaning it has been involved in a negotiation and this debt will be replace by future installments of a deal.
+      PAGA: The invoice has been paid
+      A VENCER: The invoice is not paid but hasn't yet expired, meaning the end of that MOB is earlier than the due date of the invoice. All invoices starts with this status.
+      VENCIDA: The invoice is overdue
+    lineage:
+      - datalake_retsuko.invoice.status
+      - datalake_retsuko.invoice.ts_created
+      - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice.ts_canceled
+  invoice_due_amount:
+    description: Invoice due amount
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+  dt_cohort:
+    description: Reference month based on creation date or due date of an invoice
+    lineage:
+      - datalake_retsuko.invoice.ts_created
+      - datalake_retsuko.invoice.ts_due
+  ts_load:
+    description: Timestamp of data insertion in the table
