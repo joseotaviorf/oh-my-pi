@@ -31,9 +31,6 @@ columns:
       may have multiple segments.
   sk_agent:
     lineage:
-      - datalake_customer_support.call.id_agent
-      - datalake_customer_support.chat.id_agent
-      - datalake_customer_support.email.id_agent
       - datalake_customer_support.historical_call.id_agent
       - datalake_customer_support.historical_chat.id_agent
     description: Id of the agent that answered this segment.

@@ -1,16 +1,5 @@
-/*
-In order to run these queries directly from databricks notebook you must replace double
-brackets (`{{` `}}`) for single ones.
-*/
+-- TO RUN ON DATABRICKS: replace double brackets ('{{', '}}') for single ones
 WITH zendesk_email AS (
-  WITH last_update_ticket AS (
-    SELECT
-      id_ticket,
-      MAX(ts_updated) AS ts_last_updated
-    FROM
-      datalake_zendesk_tickets_clean.tickets
-    GROUP BY 1
-  )
   SELECT DISTINCT
     t.id_ticket,
     t.id_requester,
@@ -21,15 +10,7 @@ WITH zendesk_email AS (
     t.description,
     t.status,
     g.name AS department,
-    ac.agent_name,
-    ac.agent_company,
-    CASE 
-        WHEN LOWER(ac.agent_company)="atento" OR LOWER(ac.email) LIKE "%atento%" THEN "ATENTO"
-        ELSE NULL 
-    END AS agent_organization,
-    ac.manager AS agent_manager,
-    ac.email AS agent_email,
-    ac.dt_start,
+    tf.agent_email,
     tf.request_type,
     tf.client_type,
     tf.step_tag,
@@ -57,19 +38,12 @@ WITH zendesk_email AS (
     tfm.ts_closed_local AS ts_ticket_ended
   FROM
     datalake_zendesk_tickets_clean.tickets t
-  JOIN
-    last_update_ticket lut
-      ON t.id_ticket = lut.id_ticket
-      AND t.ts_updated = lut.ts_last_updated
-  JOIN
+  INNER JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
       ON t.id_ticket = tfm.id_ticket
-  JOIN
+  INNER JOIN
     datalake_zendesk_ticket_funnels.ticket_funnel tf
       ON t.id_ticket = tf.id_ticket
-  LEFT JOIN
-    datalake_gsheets_clean.agents_control ac
-      ON t.id_assignee = ac.id_assignee
   LEFT JOIN
     datalake_zendesk_tickets_clean.groups g
       ON g.id_group = t.id_group
@@ -78,53 +52,41 @@ WITH zendesk_email AS (
     AND tfm.id_call IS NULL
 ),
 csat AS (
-    WITH last_update_ticket AS (
-      SELECT
-        id_ticket,
-        MAX(ts_updated) AS ts_last_updated
-      FROM
-        datalake_zendesk_tickets_clean.tickets
-      GROUP BY 1
-    )
-    SELECT
-      t.id_ticket,
-      GET_JSON_OBJECT(satisfaction_rating,'$.comment') AS csat_comment,
-      GET_JSON_OBJECT(satisfaction_rating,'$.reason') AS score_reason,
-      CASE
-        WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'bad' THEN  1
-        WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'good' THEN  5
-        ELSE NULL
-      END AS csat_score,
-      GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad') AS is_answered,
-      CASE
-          WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good') THEN TRUE
-          WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
-      END AS is_solved,
-      NULL AS ts_first_seen,
-      NULL AS ts_first_response
-    FROM
-      datalake_zendesk_tickets_clean.tickets t
-    JOIN
-      last_update_ticket lut
-        ON t.id_ticket = lut.id_ticket
-        AND t.ts_updated = lut.ts_last_updated
-    WHERE
-      GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad')
-    UNION ALL
-    SELECT
-      id_ticket,
-      user_comment AS csat_comment,
-      NULL AS score_reason,
-      csat_score,
-      COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL AS is_answered,
-      is_solved,
-      ts_first_seen,
-      ts_first_response
-    FROM
-      datalake_survicate.zendesk_email_surveys
-    WHERE
-      id_ticket IS NOT NULL
-      AND COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL
+  SELECT
+    id_ticket,
+    GET_JSON_OBJECT(satisfaction_rating,'$.comment') AS csat_comment,
+    GET_JSON_OBJECT(satisfaction_rating,'$.reason') AS score_reason,
+    CASE
+      WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'bad' THEN  1
+      WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'good' THEN  5
+      ELSE NULL
+    END AS csat_score,
+    GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad') AS is_answered,
+    CASE
+        WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good') THEN TRUE
+        WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
+    END AS is_solved,
+    NULL AS ts_first_seen,
+    NULL AS ts_first_response
+  FROM
+    datalake_zendesk_tickets_clean.tickets
+  WHERE
+    GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad')
+  UNION ALL
+  SELECT
+    id_ticket,
+    user_comment AS csat_comment,
+    NULL AS score_reason,
+    csat_score,
+    COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL AS is_answered,
+    is_solved,
+    ts_first_seen,
+    ts_first_response
+  FROM
+    datalake_survicate.zendesk_email_surveys
+  WHERE
+    id_ticket IS NOT NULL
+    AND COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL
 ),
 last_csat_answer AS (
   SELECT
@@ -158,7 +120,10 @@ back_tickets AS (
   WHERE
     (tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
-    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
+    AND COALESCE(
+      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),
+      REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)
+    ) != ''
 ),
 last_and_first_back_tickets_timestamps AS (
   SELECT
@@ -180,7 +145,7 @@ last_back_ticket AS (
     CAST((TO_UNIX_TIMESTAMP(lt.ts_last_solved) - TO_UNIX_TIMESTAMP(lt.ts_first_created))/60.0 AS DOUBLE) AS total_backoffice_minutes_time
   FROM
     back_tickets bt
-  JOIN
+  INNER JOIN
     last_and_first_back_tickets_timestamps lt
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_ticket_solved
@@ -191,10 +156,6 @@ SELECT DISTINCT
   ze.id_agent,
   ze.id_user,
   ze.id_contract,
-  ze.agent_name,
-  ze.agent_company,
-  ze.agent_organization,
-  ze.agent_manager,
   ze.agent_email,
   CASE
     WHEN ze.tags LIKE '%"ticket_ativo"%' THEN 'outbound'
@@ -240,7 +201,6 @@ SELECT DISTINCT
   CAST((TO_UNIX_TIMESTAMP(bt.ts_first_created) - TO_UNIX_TIMESTAMP(ze.ts_ticket_solved))/60.0 AS DOUBLE) AS total_minutes_front_to_open_back_ticket_time,
   cs.ts_first_seen AS ts_csat_first_seen,
   cs.ts_first_response AS ts_csat_first_response,
-  ze.dt_start AS dt_agent_start,
   ze.ts_initially_assigned_local,
   ze.ts_last_assigned_local,
   ze.ts_ticket_started,

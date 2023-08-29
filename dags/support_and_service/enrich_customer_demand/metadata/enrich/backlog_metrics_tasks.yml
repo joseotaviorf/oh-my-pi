@@ -70,6 +70,10 @@ columns:
       crm: For CRM tasks.
       email: For Zendesk E-mail Tickets.
       whatsapp: For backoffice whatsapp tickets.
+  agent_email:
+    lineage:
+      - datalake_customer_demand.base_tasks.agent_email
+    description: Email of the agent assigned to the stask
   status:
     lineage:
       - datalake_customer_demand.base_tasks.status

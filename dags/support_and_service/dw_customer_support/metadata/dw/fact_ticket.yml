@@ -64,18 +64,12 @@ columns:
     description: Key generated to identify the channel of this ticket.
   sk_first_agent:
     lineage:
-      - datalake_customer_support.call.id_first_agent
-      - datalake_customer_support.chat.id_first_agent
-      - datalake_customer_support.email.id_agent
       - datalake_customer_support.historical_chat.id_first_agent
     description:
       Id of the first agent that answered this ticket. For email tickets
       first agent will always be equal to the last agent.
   sk_last_agent:
     lineage:
-      - datalake_customer_support.call.id_last_agent
-      - datalake_customer_support.chat.id_last_agent
-      - datalake_customer_support.email.id_agent
       - datalake_customer_support.historical_chat.id_last_agent
     description:
       Id of the last agent that answered this ticket. For email tickets

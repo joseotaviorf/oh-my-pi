@@ -1,6 +1,6 @@
 SELECT
   id_task AS sk_task,
-  id_agent AS sk_agent,
+  MD5(agent_email) AS sk_agent,
   id_taxonomy AS sk_taxonomy,
   id_tags AS sk_tags,
   id_main_department AS sk_main_department,

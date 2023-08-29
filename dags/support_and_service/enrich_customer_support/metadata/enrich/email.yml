@@ -36,24 +36,10 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
     description: The respective contract associated with the Zendesk Ticket.
-  agent_name:
-    lineage:
-      - datalake_gsheets_clean.agents_control.agent_name
-    description: The full name of the agent assigned to the ticket.
-  agent_company:
-    lineage:
-      - datalake_gsheets_clean.agents_control.agent_company
-    description: The company of the agent assigned to the ticket, such as QuintoAndar.
-  agent_manager:
-    lineage:
-      - datalake_gsheets_clean.agents_control.manager
-    description: The manager of the agent assigned to the ticket.
   agent_email:
     lineage:
       - datalake_gsheets_clean.agents_control.email
     description: The email of the agent assigned to the ticket.
-  agent_organization:
-    description: Agent organization, temporary field to filters.
   direction:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.tags
@@ -253,10 +239,6 @@ columns:
     description:
       Time in minutes to open the related back-office ticket after resolving the
       front-end ticket.
-  dt_agent_start:
-    lineage:
-      - datalake_gsheets_clean.agents_control.dt_start
-    description: Date agent start working for QuintoAndar.
   ts_csat_first_seen:
     lineage:
       - datalake_survicate.zendesk_email_surveys.ts_first_seen

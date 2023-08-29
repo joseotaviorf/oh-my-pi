@@ -63,6 +63,10 @@ columns:
       For Zendesk Tickets, it first considers the "tag sla target". If there is no
       return, it then considers the "unique_theme_detail_sla_target", followed by the
       "unique_theme_sla_target", and finally the "unique_journey_sla_target".
+  agent_email:
+    lineage:
+      - datalake_customer_demand.base_tasks.agent_email
+    description: Email of the agent assigned to the stask
   origin:
     lineage:
       - datalake_customer_demand.base_tasks.origin

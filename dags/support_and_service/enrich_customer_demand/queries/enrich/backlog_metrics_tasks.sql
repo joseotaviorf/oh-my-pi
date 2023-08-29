@@ -23,6 +23,7 @@ exploded_backlog AS (
         id_main_department,
         type,
         sla_target,
+        agent_email,
         origin,
         status,
         EXPLODE(
@@ -60,6 +61,7 @@ SELECT
   eb.id_main_department,
   eb.type,
   eb.sla_target,
+  eb.agent_email,
   eb.origin,
   eb.status,
   DATEDIFF(DATE(eb.dt_interval), DATE(ts_started)) - COALESCE(do.days_off, 0) AS days_worked,

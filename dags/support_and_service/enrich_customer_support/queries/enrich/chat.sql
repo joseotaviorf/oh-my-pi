@@ -79,7 +79,7 @@ task AS (
     t.id_channel,
     t.id_agent,
     t.id_chat,
-    t.agent_email,
+    LOWER(t.agent_email) AS agent_email,
     tt.department,
     t.completion_reason,
     LAG(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) AS transferred_from_dept,
@@ -182,22 +182,6 @@ chatbot_time_metrics_chat_inapp AS (
       ON te.id_task = t.id_task
   GROUP BY 1
 ),
-agents_control AS (
-  SELECT
-    email,
-    agent_name,
-    manager,
-    agent_company,
-    CASE
-        WHEN LOWER(agent_company)="atento" OR LOWER(email) LIKE "%atento%" THEN "ATENTO"
-        ELSE NULL
-    END AS agent_organization,
-    dt_start
-  FROM
-    datalake_gsheets_clean.agents_control
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY email ORDER BY dt_start DESC) = 1
-),
 quinto_messenger_tasks AS (
   SELECT
     t.id_task,
@@ -206,11 +190,6 @@ quinto_messenger_tasks AS (
     t.id_agent,
     'whatsapp' AS origin,
     t.agent_email,
-    ac.manager AS agent_manager,
-    ac.agent_name,
-    ac.agent_company,
-    ac.agent_organization,
-    ac.dt_start,
     t.seconds_to_first_response AS seconds_first_reply,
     t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
     t.department,
@@ -261,9 +240,6 @@ quinto_messenger_tasks AS (
     task_transfer_reason AS ttr
       ON ttr.id_task = t.id_task
   LEFT JOIN
-    agents_control AS ac
-      ON t.agent_email = ac.email
-  LEFT JOIN
     twilio_time_metrics AS ttm
       ON ttm.id_channel = c.id_channel
   WHERE
@@ -277,11 +253,6 @@ quinto_messenger_tasks AS (
     t.id_agent,
     'chat5a' AS origin,
     t.agent_email,
-    ac.manager AS agent_manager,
-    ac.agent_name,
-    ac.agent_company,
-    ac.agent_organization,
-    ac.dt_start,
     t.seconds_to_first_response AS seconds_first_reply,
     t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
     t.department,
@@ -328,9 +299,6 @@ quinto_messenger_tasks AS (
   LEFT JOIN
     task_transfer_reason AS ttr
       ON ttr.id_task = t.id_task
-  LEFT JOIN
-    agents_control AS ac
-      ON t.agent_email = ac.email
   LEFT JOIN
     twilio_time_metrics AS ttm
       ON ttm.id_channel = c5a.id_channel
@@ -537,16 +505,12 @@ SELECT DISTINCT
   qmt.id_conversation,
   qmt.id_session,
   qmt.id_agent,
-  FIRST(qmt.id_agent) OVER (PARTITION BY zti.id_ticket ORDER BY qmt.ts_task_created ASC) AS id_first_agent,
-  FIRST(qmt.id_agent) OVER (PARTITION BY zti.id_ticket ORDER BY qmt.ts_task_created DESC) AS id_last_agent,
   zti.id_user,
   zti.id_contract,
+  FIRST(qmt.agent_email) OVER (PARTITION BY zti.id_ticket ORDER BY qmt.ts_task_created) AS first_agent_email,
+  FIRST(qmt.agent_email) OVER (PARTITION BY zti.id_ticket ORDER BY qmt.ts_task_created DESC) AS last_agent_email,
   qmt.origin AS ticket_origin,
   qmt.agent_email,
-  qmt.agent_manager,
-  qmt.agent_name,
-  qmt.agent_company,
-  qmt.agent_organization,
   cc.comment AS csat_comment,
   qmt.department,
   zti.zendesk_ticket_department AS zendesk_department,
@@ -609,7 +573,6 @@ SELECT DISTINCT
   cc.group_name,
   cc.ts_survey,
   cc.ts_csat_response,
-  qmt.dt_start AS dt_agent_start,
   qmt.ts_created,
   qmt.ts_updated,
   qmt.ts_first_event AS ts_ticket_started,

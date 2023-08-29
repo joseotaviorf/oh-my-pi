@@ -47,13 +47,13 @@ columns:
     description:
       This is the unique identifier for the Twilio agent who is responsible for
       the task.
-  id_first_agent:
+  first_agent_email:
     lineage:
       - datalake_quinto_messenger.task.id_agent
     description:
       When considering the first task of a conversation, the responsible agent for
       that task is taken into account.
-  id_last_agent:
+  last_agent_email:
     lineage:
       - datalake_quinto_messenger.task.id_agent
     description:
@@ -78,20 +78,6 @@ columns:
     lineage:
       - datalake_quinto_messenger.task.agent_email
     description: The email of the Twilio agent responsible for the task.
-  agent_manager:
-    lineage:
-      - datalake_gsheets_clean.agents_control.manager
-    description: The manager of the agent.
-  agent_name:
-    lineage:
-      - datalake_gsheets_clean.agents_control.agent_name
-    description: The full name of the agent.
-  agent_company:
-    lineage:
-      - datalake_gsheets_clean.agents_control.agent_company
-    description: The company of the agent, for example, QuintoAndar.
-  agent_organization:
-    description: Agent organization, temporary field to filters.
   csat_comment:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.comment
@@ -369,10 +355,6 @@ columns:
     lineage:
       - datalake_chat_fup_clean.chats_chat.group_name
     description: The respective department for the ticket survey.
-  dt_agent_start:
-    lineage:
-      - datalake_gsheets_clean.agents_control.dt_start
-    description: The date when the agent started working for QuintoAndar.
   ts_survey:
     lineage:
       - datalake_chat_fup_clean.chats_chat.ts_attended

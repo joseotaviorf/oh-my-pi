@@ -12,11 +12,7 @@ columns:
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.id_task
   sk_agent:
-    description:
-      The id agent responsible for the task comes from the agents_control gsheets for
-      CRM tasks, and from the tickets id_assignee for Zendesk e-mail tickets.
-    lineage:
-      - datalake_customer_demand.backlog_metrics_tasks.id_agent
+    description: SK generated to uniquely identify an agent based on teh agent's email
   sk_taxonomy:
     description:
       The id taxonomy is used to represent the task taxonomy. For CRM tasks, the

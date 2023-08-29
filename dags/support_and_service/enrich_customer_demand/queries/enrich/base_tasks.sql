@@ -2,6 +2,7 @@ WITH base_crm_analyst_info AS (
   SELECT DISTINCT
     turf.id_task,
     ac.id_assignee AS id_agent,
+    LOWER(ac.email) AS agent_email,
     action_type
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
@@ -10,7 +11,7 @@ WITH base_crm_analyst_info AS (
       ON du.id = turf.id_assignee
   INNER JOIN
     datalake_gsheets_clean.agents_control AS ac
-      ON LOWER(ac.email) = du.email
+      ON LOWER(ac.email) = LOWER(du.email)
 ),
 crm_tasks AS (
   WITH last_updated_task AS (
@@ -24,6 +25,7 @@ crm_tasks AS (
   SELECT DISTINCT
     tarf.id_task,
     COALESCE(bca.id_agent, '-1') AS id_agent,
+    bca.agent_email,
     tarf.type,
     5 AS sla_target,
     tarf.ts_started,
@@ -65,6 +67,7 @@ ticket_tasks AS (
       MAX(e.id_user) AS id_user,
       MD5(MAX(e.tags)) AS id_tags,
       MAX(e.tags) AS tags,
+      e.agent_email,
       e.channel,
       e.department,
       e.csat_score,
@@ -90,7 +93,7 @@ ticket_tasks AS (
     LEFT JOIN
       datalake_zendesk_ticket_funnels.ticket_funnel AS tf
         ON e.id_ticket = tf.id_ticket
-    GROUP BY 1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20
+    GROUP BY 1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21
   ),
   unique_theme_detail_sla_target AS (
     SELECT DISTINCT
@@ -159,6 +162,7 @@ ticket_tasks AS (
       WHEN t.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]') THEN 21
       ELSE COALESCE(tst.sla, tds.sla_in_days, ts.sla_in_days, ujst.sla_in_days)
     END AS sla_target,
+    t.agent_email,
     t.ts_zendesk_started,
     t.ts_budget,
     t.ts_started,
@@ -201,7 +205,7 @@ ticket_tasks AS (
       OR t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
     )
 )
-SELECT
+SELECT DISTINCT
   id_task,
   id_agent,
   NULL AS id_user,
@@ -210,6 +214,7 @@ SELECT
   MD5(type) AS id_main_department,
   type,
   sla_target,
+  agent_email,
   'crm' AS origin,
   NULL AS status,
   NULL AS csat_score,
@@ -223,7 +228,7 @@ SELECT
 FROM
   crm_tasks
 UNION ALL
-SELECT
+SELECT DISTINCT
   id_task,
   id_agent,
   id_user,
@@ -232,6 +237,7 @@ SELECT
   id_main_department,
   type,
   sla_target,
+  agent_email,
   CASE
     WHEN channel IN ('email', 'form_faq', 'web', 'other') THEN 'email'
     ELSE channel

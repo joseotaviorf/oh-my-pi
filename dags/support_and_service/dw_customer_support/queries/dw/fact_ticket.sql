@@ -14,8 +14,8 @@ WITH call_tickets AS (
     ) AS sk_taxonomy,
     MD5(tags) AS sk_tags,
     MD5(CONCAT('call', 'twilio', COALESCE(direction, ''))) AS sk_channel,
-    id_first_agent AS sk_first_agent,
-    id_last_agent AS sk_last_agent,
+    MD5(first_agent_email) AS sk_first_agent,
+    MD5(last_agent_email) AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_main_department,
     MAX(id_user) AS sk_user,
@@ -104,8 +104,8 @@ chat_tickets AS (
     ) AS sk_taxonomy,
     MD5(tags) AS sk_tags,
     MD5(CONCAT('chat', 'twilio')) AS sk_channel,
-    id_first_agent AS sk_first_agent,
-    id_last_agent AS sk_last_agent,
+    MD5(first_agent_email) AS sk_first_agent,
+    MD5(last_agent_email) AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_main_department,
     MAX(id_user) AS sk_user,
@@ -194,8 +194,8 @@ email_tickets AS (
     ) AS sk_taxonomy,
     MD5(tags) AS sk_tags,
     MD5(CONCAT('email', 'zendesk', COALESCE(direction, ''))) AS sk_channel,
-    id_agent AS sk_first_agent,
-    id_agent AS sk_last_agent,
+    MD5(agent_email) AS sk_first_agent,
+    MD5(agent_email) AS sk_last_agent,
     MD5(department) AS sk_first_department,
     MD5(department) AS sk_main_department,
     MAX(id_user) AS sk_user,
@@ -462,7 +462,7 @@ fcr_customer AS (
   FROM
     base_fcr
 )
-SELECT
+SELECT DISTINCT
     bt.sk_ticket,
     bt.sk_taxonomy,
     bt.sk_tags,

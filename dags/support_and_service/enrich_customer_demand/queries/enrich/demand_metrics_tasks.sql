@@ -48,6 +48,7 @@ task_info AS (
     bt.origin,
     bt.status,
     bt.sla_target,
+    bt.agent_email,
     do.days_off,
     DATEDIFF(DATE(ts_completed), DATE(ts_started)) - COALESCE(do.days_off, 0) AS days_worked,
     bt.ts_completed,
@@ -70,6 +71,7 @@ SELECT
   ti.id_main_department,
   ti.type,
   ti.sla_target,
+  ti.agent_email,
   ti.origin,
   ti.status,
   CASE
