@@ -65,3 +65,4 @@ WHERE
 AND
   dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
+  AND (da.agent_organization = "atento" OR da.agent_organization = "atn")

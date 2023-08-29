@@ -40,12 +40,7 @@ LEFT JOIN
     OR ft.sk_last_agent = da.sk_agent_twilio
 WHERE
   DATE(ft.ts_started) >= '2022-07-19'
-AND
-  da.agent_company = 'atento'
-AND
-  (ft.front_or_back IS NULL
-     OR ft.front_or_back <> 'back')
-AND
-  dd.area = 'CX'
-AND
-  dc.direction = 'inbound'
+  AND (da.agent_organization = "atento" OR da.agent_organization = "atn")
+  AND (ft.front_or_back IS NULL OR ft.front_or_back <> 'back')
+  AND dd.area = 'CX'
+  AND dc.direction = 'inbound'

@@ -29,8 +29,8 @@ LEFT JOIN
 LEFT JOIN
     dw_customer_support.dim_agent AS da
         ON ft.sk_last_agent = da.sk_agent
-        OR ft.sk_last_agent = da.sk_agent_twilio
 WHERE
     ft.ts_csat_response >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '3' months)
     AND dd.is_partner IS TRUE
     AND dd.front_or_back = 'front'
+    AND (da.agent_organization = "atento" OR da.agent_organization = "atn")

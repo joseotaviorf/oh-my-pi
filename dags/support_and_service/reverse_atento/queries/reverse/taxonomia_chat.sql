@@ -1,18 +1,4 @@
-WITH agents_info AS (
-    SELECT DISTINCT
-        ac.id_assignee AS assignee_id,
-        ac.email,
-        ac.agent_name AS nome,
-        ac.department AS departamento,
-        CASE
-            WHEN ac.agent_company ILIKE '%concentrix%' THEN 'concentrix'
-            WHEN ac.agent_company ILIKE '%atento%' THEN 'atento'
-            ELSE 'quintoandar'
-        END AS centro_de_custo
-    FROM
-        datalake_gsheets_clean.agents_control AS ac
-),
-last_task AS (
+WITH last_task AS (
     SELECT
         t.id_channel,
         MAX(t.ts_created) AS last_timestamp
@@ -104,12 +90,9 @@ INNER JOIN
 INNER JOIN
     tickets_areas AS gdc
         ON dt.sk_ticket = gdc.sk_ticket
-INNER JOIN
-    agents_info AS ai
-        ON LOWER(ai.email) = LOWER(cf.custom_fields['[AUTO] Email do Agente'])
 WHERE
     DATE(dd.date) = CURRENT_DATE() - 1
     AND customer_type_tag IS NOT NULL
     AND contact_motivation_tag IS NOT NULL
     AND contact_theme_tag IS NOT NULL
-    AND ai.centro_de_custo = 'atento'
+    AND (dt.agent_organization = "atento" OR dt.agent_organization = "atn")

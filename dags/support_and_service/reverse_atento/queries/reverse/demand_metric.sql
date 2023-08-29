@@ -46,9 +46,9 @@ LEFT JOIN
 LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON dmt.sk_agent = da.sk_agent
-    OR dmt.sk_agent = da.sk_agent_twilio
 WHERE
   DATE(dmt.ts_started) >= '2022-07-19'
 AND
   dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
+  AND (da.agent_organization = "atento" OR da.agent_organization = "atn")
