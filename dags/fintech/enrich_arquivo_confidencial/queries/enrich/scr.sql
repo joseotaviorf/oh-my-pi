@@ -54,6 +54,8 @@ operation_items_exploded AS (
     `version`,
     mob,
     scr_data.reference_date,
+    scr_data.financial_institution_count,
+    scr_data.start_relationship_date,
     EXPLODE(scr_data.operation_items) AS dat,
     ts_created,
     ts_updated,
@@ -75,6 +77,8 @@ SELECT
     dat.modality_description,
     dat.submodality_description,
     dat.linked_to_foreign_currency,
+    financial_institution_count,
+    start_relationship_date,
     ts_created,
     ts_updated,
     ts_next_updated
