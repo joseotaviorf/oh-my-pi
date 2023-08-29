@@ -497,6 +497,11 @@ bietlejuice.enrich_rede_company_event:
 bietlejuice.enrich_rede_supply:
   remove:
     - bietlejuice.ebdb:load-clean-user
+bietlejuice.enrich_rental_crawlers_listings:
+  remove:
+    - bietlejuice.listings.olx:load-clean-olx
+    - bietlejuice.listings.viva_real:load-clean-viva-real
+    - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
 bietlejuice.enrich_repairs:
   remove:
     - bietlejuice.repairs:load-clean-repair-expense
@@ -545,6 +550,13 @@ bietlejuice.enrich_sale_closing_flows:
     - bietlejuice.monopoly:load-clean-sale
   remove:
     - bietlejuice.firestore:load-clean-sale-offer
+bietlejuice.enrich_sale_crawlers_listings:
+  remove:
+    - bietlejuice.ebdb:load-clean-map-region
+    - bietlejuice.ebdb:load-clean-polygon-region
+    - bietlejuice.enrich_region:load-enrich-region
+    - bietlejuice.listings.em_casa:load-clean-em-casa
+    - bietlejuice.listings.loft:load-clean-loft
 bietlejuice.enrich_sale_flows:
   add:
     - bietlejuice.enrich_offer:load-enrich-sale-offer

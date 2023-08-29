@@ -2,7 +2,7 @@ database_name: datalake_crawlers_listings
 table_name: loft_status_listing_flows
 description: Creates a history of publication and depublication of loft listings.
   Every row represents a change in status, with its validity period.
-domain: For Rent
+domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:

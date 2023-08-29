@@ -1,0 +1,115 @@
+---
+database_name: datalake_crawlers_listings
+table_name: em_casa
+description: Creates a table with all the listings that have already been published
+  in Em Casa. Where we use the version of the last extraction in which the listing appears
+  in our crawlers. Every row represents a Em Casa listing, either published or unpublished.
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
+columns:
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.id
+    description: ID house from platform.
+  id_neighborhood:
+    lineage:
+      - datalake_crawlers_listings.em_casa_region_mapping.id_neighborhood
+    description: ID of the house listing's region.
+  city:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.address
+    description: The name for the city where listing is in.
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+    description: 'A grouping of city or clusters of cities and neighborhoods (RMSP:
+      Região Metropolitana de São Paulo).'
+  neighborhood:
+    lineage:
+      - datalake_crawlers_listings.em_casa_region_mapping.neighborhood
+    description: House listing neighborhood name.
+  state:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.address
+    description: House listing Brazilian state acronym (SP, MG, RJ, etc.)
+  lat:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.geolocation
+    description: House listing latitude.
+  lng:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.geolocation
+    description: House listing longitude.
+  address:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.address
+    description: Name of the street where the listing is located.
+  zip_code:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.address
+    description: House listing zip code.
+  floors:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: Floor where the listing is located.
+  num_floors:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: Number of floors in the building.
+  unit_per_floor:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: Number of apartments on each floor.
+  total_area:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: House listing total area.
+  bedrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: Number of bathrooms in the listing.
+  suites:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: Number of suites in the listing.
+  parking_spaces:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: Number of parking spaces released for the listing.
+  bathrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: Number of bathrooms in the listing.
+  price:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.price
+    description: Published sales price on competitor site.
+  condo_fee:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.price
+    description: Monthly condominium fee.
+  iptu:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.price
+    description: Monthly amount for IPTU (property tax).
+  is_for_sale:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.type
+    description: Boolean value to check if the house is for sale.
+  is_for_rent:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.type
+    description: Boolean flag to check if the house is for rent.
+  nearby_other_platform_houses:
+    description: All the records has NULL values.
+  avg_nearby_price_m2:
+    description: All the records has NULL values.
+  avg_distance:
+    description: All the records has NULL values.
+  is_platform_property:
+    description: Boolean value to check if the platform is owner of the property (all the records has False values).
+  is_exclusive:
+    description: All the records has NULL values.
+  ts_updated:
+    description: Timestamp when the data was updated.
+

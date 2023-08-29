@@ -2,8 +2,8 @@
 database_name: datalake_crawlers_listings
 table_name: em_casa_status_listing_flows
 description: Table with listings from Em Casa platform and their status changes.
-domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
     id_house:
         description: ID of the house. Concatenation of the id_house_platform and the label 'Emcasa'.

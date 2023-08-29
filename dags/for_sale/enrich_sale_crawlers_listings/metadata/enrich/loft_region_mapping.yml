@@ -1,7 +1,7 @@
 database_name: datalake_crawlers_listings
 table_name: loft_region_mapping
 description: Finds the id_neighborhood given the listing's latitude and longitude.
-domain: For Rent
+domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:

@@ -3,7 +3,7 @@ table_name: loft
 description: Creates a table with all the listings that have already been published
   in Loft. Where we use the version of the last extraction in which the listing appears
   in our crawlers. Every row represents a Loft listing, either published or unpublished.
-domain: For Rent
+domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:

@@ -22,9 +22,9 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 7, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 6 * * 2,3,5"
 CONTEXT = "crawlers_listings"
-DAG_NAME = f"enrich_{CONTEXT}"
+DAG_NAME = f"enrich_rental_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -37,14 +37,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 crawlers = config_service.get_config("tables")
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
-
-# start sedona
-dag_custom_init_script = config_service.get_config("init_script")
-dag_spark_conf = config_service.get_config("spark_conf")
-
-cluster_description["init_scripts"].append(dag_custom_init_script[0])
-cluster_description["spark_conf"].update(dag_spark_conf)
+cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -53,7 +46,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 default_libraries = config_service.get_config("default_libraries")
-custom_libraries = config_service.get_config("custom_libraries")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -74,7 +66,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=default_libraries + custom_libraries,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -91,7 +83,6 @@ datalake_task_group = DatalakeTaskGroup(
 )
 
 enrich_task_groups = {}
-inner_dependencies = {}
 
 # The execution date will always be the previous day, because this DAG runs daily.
 # However, it should be the previous week, because the source runs weekly. That is why we are subtracting 6 days.
@@ -100,7 +91,7 @@ actual_execution_date = "{{macros.ds_add(ds, -6)}}"
 for crawler in crawlers:
     crawler_name = crawler["table_name"]
     is_incremental = crawler["is_incremental"]
-    partition_cols = crawler.get("partition_cols")
+    partition_cols = crawler["partition_cols"]
 
     enrich_task_groups[crawler_name] = datalake_task_group.build_enrich_task_group(
         source_database_base_name=CONTEXT,
@@ -110,31 +101,20 @@ for crawler in crawlers:
         partitions=partition_cols,
         execution_date=actual_execution_date,
     )
-    if "depends_on" not in crawler:
-        crawler_weekday = crawler["weekday_run"]
-        skip_run_task = ShortCircuitOperator(
-            task_id=f"check-day-to-skip-execution-{crawler_name}",
-            python_callable=DAGRunDateValidators.check_is_specific_weekday,
-            op_args=[actual_execution_date, crawler_weekday],
-        )
-        chain(
-            create_cluster_task,
-            skip_run_task,
-            DatalakeTaskGroup.first_tasks(enrich_task_groups[crawler_name]),
-        )
-    else:
-        inner_dependencies[crawler_name] = crawler["depends_on"]
-(
-    task_groups_boundaries_without_inner_dependencies,
-    inner_dependencies_task_groups_boundaries,
-) = datalake_task_group.set_inner_dag_dependencies(
-    task_flow_helper=TaskFlowHelper(),
-    task_groups_boundaries=enrich_task_groups,
-    dag_inner_dependencies=inner_dependencies,
-)
+
+    crawler_weekday = crawler["weekday_run"]
+    skip_run_task = ShortCircuitOperator(
+        task_id=f"check-day-to-skip-execution-{crawler_name}",
+        python_callable=DAGRunDateValidators.check_is_specific_weekday,
+        op_args=[actual_execution_date, crawler_weekday],
+    )
+    chain(
+        create_cluster_task,
+        skip_run_task,
+        DatalakeTaskGroup.first_tasks(enrich_task_groups[crawler_name]),
+    )
 
 chain(
-    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
-    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    DatalakeTaskGroup.all_last_tasks(enrich_task_groups),
     terminate_cluster_task,
 )

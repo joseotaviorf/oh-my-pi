@@ -1,21 +1,29 @@
 ---
 database_name: datalake_crawlers_listings
 table_name: em_casa_region_mapping
+description: Finds the id_neighborhood given the listing's latitude and longitude.
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
     id_house:
         lineage:
             - datalake_crawlers_listings_clean.em_casa.id
+        description: ID with the competitor name together. In this case, <id>Loft.
     id_house_platform:
         lineage:
             - datalake_crawlers_listings_clean.em_casa.id
+        description: ID from platform.
     id_neighborhood:
         lineage:
             - datalake_ebdb_clean.map_region.id_neighborhood
+        description: ID of the house listing's region.
     neighborhood:
         lineage:
             - datalake_crawlers_listings_clean.em_casa.neighborhood
             - datalake_ebdb_clean.polygon_region.neighborhood
+        description: House listing neighborhood name.
     neighborhood_em_casa:
         lineage:
             - datalake_crawlers_listings_clean.em_casa.neighborhood
             - datalake_ebdb_clean.polygon_region.neighborhood
+        description: House listing neighborhood name.

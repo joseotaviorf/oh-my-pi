@@ -5,30 +5,6 @@ tables:
     depends_on:
       - em_casa_region_mapping
     is_incremental: false
-  - table_name: olx
-    weekday_run: 4
-    is_incremental: true
-    partition_cols:
-      - address_city
-      - year
-      - month
-      - day
-  - table_name: viva_real
-    weekday_run: 2
-    is_incremental: true
-    partition_cols:
-      - address_city
-      - year
-      - month
-      - day
-  - table_name: zap_imoveis
-    weekday_run: 1
-    is_incremental: true
-    partition_cols:
-      - address_city
-      - year
-      - month
-      - day
   - table_name: loft
     depends_on:
       - loft_region_mapping
@@ -70,3 +46,9 @@ spark_conf:
   spark.serializer: "org.apache.spark.serializer.KryoSerializer"
   spark.sql.extensions: "org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions"
   spark.kryo.registrator: "org.apache.sedona.core.serde.SedonaKryoRegistrator"
+custom_cluster:
+  driver_node_type_id: m5a.xlarge
+  node_type_id: c5a.2xlarge
+  autoscale:
+      max_workers: 3
+      min_workers: 1
