@@ -1,0 +1,19 @@
+database_name: datalake_gsheets_raw
+table_name: fdic_liquidation_2022
+columns:
+  cedentecnpjcpf:
+    tags:
+    - PII
+    - Confidential
+  sacadocnpjcpf:
+    tags:
+    - PII
+    - Confidential
+  cedentenome:
+    tags:
+    - PII
+    - Confidential
+  sacadonome:
+    tags:
+    - PII
+    - Confidential

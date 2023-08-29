@@ -1,0 +1,78 @@
+database_name: datalake_gsheets_clean
+table_name: fdic_liquidation_2023
+columns:
+  id_vx_security:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.idtitulovx
+  id_vortex_security_wave_effect:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.idtitulovortxorigemefeitovagao
+  id_occurrence:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.codigoocorrencia
+  id_invoice_bank:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.numeroboletobanco
+  security_number:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.cedentecnpjcpf
+  assignor_name:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.cedentenome
+  withdraw_cnpj_cpf:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.sacadocnpjcpf
+  withdraw_name:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.sacadonome
+  occurrence:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.ocorrencia
+  situation:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.situacao
+  asset_type:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.tipoativo
+  key_field:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.campochave
+  wave_effect_generator:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.geradorefeitovagao
+  nominal_value:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.valornominal
+  payment_value:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.valorpagamento
+  residual_value:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.valorresidual
+  reductions:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.abatimentos
+  fee:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.juros
+  partial_payment:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.pagamentoparcial
+  description_status:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.statusdescricao
+  value_present_opening:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.valorpresenteabertura
+  payment_impact:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.impactopagamento
+  dt_due:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.datavencimento
+  dt_payment:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.datapagamento
+  dt_liquidation:
+    lineage:
+      - datalake_gsheets_raw.fdic_liquidation_2023.dataliquidacao
