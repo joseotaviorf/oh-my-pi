@@ -1,45 +1,66 @@
 database_name: datalake_kill_queue
 table_name: reservation
+description: The table contains reservation data of Kill Queue micro-service, which is
+  responsible for the reservation. It receives the last update of a record.
+  We're deduplicating the repeated IDs in this table, because
+  our raw/clean DAG makes the ingestion via incremental load.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
 columns:
   id_reservation:
     lineage:
       - datalake_kill_queue_clean.reservation.id
+    description: ID of the reservation.
   id_rent_flow:
     lineage:
       - datalake_kill_queue_clean.reservation.id_rent_flow
+    description: ID of the rent flow. It's no longer being created 
+      and the id_rent_flow of this table is not the same of EBDB source. 
   id_tenant:
     lineage:
       - datalake_kill_queue_clean.reservation.id_tenant
+    description: ID user of the tenant. It can be joined with user table from EBDB.
   id_house:
     lineage:
       - datalake_kill_queue_clean.house.id_main
+    description: ID house of the reservation. It can be joined with house table from EBDB.
   version:
     lineage:
       - datalake_kill_queue_clean.reservation.version
+    description: Version of the reservation
   attempt:
     lineage:
       - datalake_kill_queue_clean.reservation.attempt
+    description: Number of attempts for the reservation.
   status:
     lineage:
       - datalake_kill_queue_clean.reservation.status
+    description: Status of the reservation.
   value:
     lineage:
       - datalake_kill_queue_clean.reservation.value
+    description: Reservation value in BRL.
   mundipagg_token:
     lineage:
       - datalake_kill_queue_clean.reservation.mundipagg_token
+    description: Token from MundiPagg service. MundiPagg is an outside payment platform.
   cancellation_reason:
     lineage:
       - datalake_kill_queue_clean.reservation.cancellation_reason
+    description: Reason of the cancellation.
   installments:
     lineage:
       - datalake_kill_queue_clean.reservation.installments
+    description: Number of installments.
   is_ongoing:
     lineage:
       - datalake_kill_queue_clean.reservation.is_ongoing
+    description: Boolean flag to check if the reservation is ongoing.
   ts_created:
     lineage:
       - datalake_kill_queue_clean.reservation.ts_created
+    description: Timestamp of when the reservation was created.
   ts_updated:
     lineage:
       - datalake_kill_queue_clean.reservation.ts_updated
+    description: Timestamp of the reservation was updated for the last time.

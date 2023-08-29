@@ -1,39 +1,57 @@
 database_name: datalake_kill_queue
 table_name: documentation
+description: The table contains documentation of Kill Queue micro-service, which is
+  responsible for the reservation. It receives the last update of a record.
+  We're deduplicating the repeated IDs in this table, because
+  our raw/clean DAG makes the ingestion via incremental load.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_clean.documentation.id
+    description: ID of the documentation. It's the primary key of this table.
   id_house:
     lineage:
       - datalake_kill_queue_clean.documentation.id_house
+    description: ID of the house, it can be joined with ID house from EBDB.
   id_tenant:
     lineage:
       - datalake_kill_queue_clean.documentation.id_tenant
+    description: ID user of the tenant. It can be joined with user table from EBDB.
   version:
     lineage:
       - datalake_kill_queue_clean.documentation.version
+    description: Version number of the documentation.
   is_active:
     lineage:
       - datalake_kill_queue_clean.documentation.is_active
+    description: Boolean value to check if the documentation is active.
   ts_expired:
     lineage:
       - datalake_kill_queue_clean.documentation.ts_expired
+    description: Timestamp when the documentation expired.
   ts_event:
     lineage:
       - datalake_kill_queue_clean.documentation.ts_event
+    description: Timestamp of the event.
   ts_created:
     lineage:
       - datalake_kill_queue_clean.documentation.ts_created
+    description: Timestamp when the record was created.
   ts_updated:
     lineage:
       - datalake_kill_queue_clean.documentation.ts_updated
+    description: Timestamp when the record was updated for the last time.
   year:
     lineage:
       - datalake_kill_queue_clean.documentation.year
+    description: Year value of the timestamp update. It's not a partition!
   month:
     lineage:
       - datalake_kill_queue_clean.documentation.month
+    description: Month value of the timestmap update. It's not a partition!
   day:
     lineage:
       - datalake_kill_queue_clean.documentation.day
+    description: Day value of the timestamp updated. It's not a partition!
