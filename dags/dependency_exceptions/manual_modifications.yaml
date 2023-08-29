@@ -226,7 +226,7 @@ bietlejuice.dw_tenant_documentation:
 bietlejuice.dw_tickets:
   remove:
     - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements
-    - bietlejuice.zendesk_tickets:load-clean-organizations    
+    - bietlejuice.zendesk_tickets:load-clean-organizations
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent
@@ -482,8 +482,8 @@ bietlejuice.enrich_proponent:
   override: []
 bietlejuice.enrich_recommendations:
   add:
-    - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:create-house-amenities
-    - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:create-house-condo-amenities
+    - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
+    - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_condo_amenities
     - wonka.house_main:load-house_main
     - wonka.user_agg_search_filters:load-user_agg_search_filters
     - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
@@ -739,13 +739,13 @@ wonka.user_most_viewed_region:
   add:
     - wonka.user_region_listing_page_viewed:execute-job-cluster
     - wonka.user_region_listing_page_viewed:load-user_region_listing_page_viewed
-    - wonka.user_region_listing_page_viewed:check-completion-notify
+    - wonka.user_region_listing_page_viewed:check-completion-notify-user_region_listing_page_viewed
 
 wonka.user_most_viewed_city:
   add:
     - wonka.user_region_listing_page_viewed:execute-job-cluster
     - wonka.user_region_listing_page_viewed:load-user_region_listing_page_viewed
-    - wonka.user_region_listing_page_viewed:check-completion-notify
+    - wonka.user_region_listing_page_viewed:check-completion-notify-user_region_listing_page_viewed
     - bietlejuice.ebdb:load-clean-region
 
 wonka.user_region_listing_page_viewed:
