@@ -16,10 +16,10 @@ columns:
       - datalake_customer_support.email.agent_email
   agent_name:
     lineage:
-      - datalake_customer_support.email.agent_name
+      - datalake_zendesk_users.agents.name
   agent_company:
     lineage:
-      - datalake_customer_support.email.agent_company
+      - datalake_zendesk_users.agents.organization
   department:
     lineage:
       - datalake_customer_support.email.department

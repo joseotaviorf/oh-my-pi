@@ -5,8 +5,8 @@ WITH tickets AS (
         GET_JSON_OBJECT(e.custom_fields, '$.Código do Imóvel') as id_house,
         'email' AS channel,
         e.agent_email,
-        e.agent_name,
-        e.agent_company,
+        a.name AS agent_name,
+        a.organization AS agent_company,
         e.department,
         GET_JSON_OBJECT(e.custom_fields, '$.Tipo de Demanda') AS demand_type,
         GET_JSON_OBJECT(e.custom_fields, '$.Tipo de processo') AS process_type,
@@ -38,6 +38,9 @@ WITH tickets AS (
         DATE(e.ts_ticket_ended) AS dt_closed
     FROM 
         datalake_customer_support.email e
+    LEFT JOIN
+        datalake_zendesk_users.agents AS a
+            ON LOWER(e.agent_email) = a.email
     WHERE 
         e.department IN ('Offboarding Reparos [OFF] [POS] [BACK]','Offboarding [OFF] [POS] [BACK]','B2B [POS] [OFF] [BACK]','Rescisão Prime [Casa Mineira]','B2B Prime [OFF] [POS] [BACK]')
 ),
