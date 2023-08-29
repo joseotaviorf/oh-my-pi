@@ -14,14 +14,7 @@ SELECT
     accrual_year_month,
     due_year_month,
     timestamp(created_at) AS ts_created,
-    timestamp(retsuko_created_at) AS ts_retsuko_created,
-    timestamp(retsuko_updated_at) AS ts_retsuko_updated,
-    year,
-    month,
-    day
+    retsuko_created_at AS ts_retsuko_created,
+    retsuko_updated_at AS ts_retsuko_updated
 FROM
     datalake_retsuko_raw.entry
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
