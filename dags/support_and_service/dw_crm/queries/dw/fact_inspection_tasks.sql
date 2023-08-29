@@ -92,7 +92,7 @@ contract_house_listing AS (
 SELECT DISTINCT
     c.sk_task,
     c.sk_receiver,
-    COALESCE(CAST(c.sk_origin AS BIGINT), -1) AS sk_origin,
+    COALESCE(c.sk_origin, -1) AS sk_origin,
     c.sk_assignee,
     c.sk_user_action,
     c.sk_inspection,
