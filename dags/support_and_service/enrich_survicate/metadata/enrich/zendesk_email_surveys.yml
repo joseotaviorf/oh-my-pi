@@ -12,6 +12,7 @@ columns:
   id_ticket:
     lineage:
       - datalake_survicate_clean.surveys.custom_attributes
+      - datalake_survicate_clean.surveys.page_url
     description: Zendesk ticket unique identifier
   id_visitor:
     lineage:
