@@ -1417,6 +1417,7 @@ bietlejuice.enrich_greenseer:
   - bietlejuice.journey_flow:load-clean-journey-flow
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_gsheets:
+  - bietlejuice.gsheets_fintech:done-clean-fdic-liquidation-2023
   - bietlejuice.gsheets_for_rent:done-clean-demand-targets-2022
   - bietlejuice.gsheets_for_rent:done-clean-supply-targets-2022
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
