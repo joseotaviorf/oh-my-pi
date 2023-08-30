@@ -45,7 +45,7 @@ def _create_dataframe_with_standard_columns(response_data: dict, display_date: s
         .option("delimiter",";")\
         .csv(rdd_data)\
         .withColumn("domain", lit(domain))\
-        .withColumn("date", lit(execution_date))
+        .withColumn("date", lit(display_date))
 
     dt_execution = datetime.strptime(display_date, "%Y%m%d")
 
@@ -87,7 +87,8 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
-    display_date = execution_date.replace(day=15)
+    # adding 1 month to run the actual month, otherwise the execution date will be the previus month
+    display_date = execution_date.replace(day=15) + relativedelta(months=1)
     display_date = display_date.strftime('%Y%m%d')
 
     config_service = ConfigurationService(source)
