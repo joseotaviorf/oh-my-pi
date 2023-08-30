@@ -1,6 +1,5 @@
 -- AHT stands for Average Handling Time
-WITH
-tasks_last_update AS (
+WITH tasks_last_update AS (
     SELECT
         id,
         MAX(to_date(CONCAT(year,'-',month,'-',day))) AS dt_last_update
@@ -151,24 +150,11 @@ engagement_metrics AS (
    FROM
         chat_tasks_structure
    GROUP BY 1,2,3,4
-),
-agents_control AS (
-    SELECT
-        email,
-        agent_company
-    FROM
-        datalake_gsheets_clean.agents_control
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY email ORDER BY dt_start DESC) = 1
 )
-
 SELECT
     cd.dt_task_created_local,
-    cd.agent_email,
-    CASE 
-        WHEN LOWER(ac.agent_company)="atento" OR LOWER(cd.agent_email) LIKE "%atento%" THEN "ATENTO"
-        ELSE NULL 
-    END AS agent_organization,
+    a.email AS agent_email,
+    a.agent_organization,
     cd.department_name,
     cd.ts_start_first_task,
     cd.ts_end_last_task,
@@ -192,6 +178,6 @@ JOIN
         AND cd.id_agent = em.id_agent
         AND cd.department_name = em.department_name
 LEFT JOIN
-    agents_control AS ac
-        ON cd.agent_email = ac.email
+    datalake_zendesk_users.agents AS a
+        ON cd.id_agent = a.id_agent
 ORDER BY 1,2

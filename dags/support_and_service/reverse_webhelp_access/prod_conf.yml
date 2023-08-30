@@ -1,0 +1,20 @@
+database_name: lake-quinto-andar-prod
+azure_container_name: lake-quinto-andar
+
+tables:
+  - backlog_metric
+  - csat_front
+  - demand_metric
+  - fcr_metric
+  - general_metric
+  - taxonomia_call
+  - taxonomia_chat
+  - taxonomia_email
+  - twilio_chat_aht
+
+custom_cluster:
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.2xlarge
+  autoscale:
+    max_workers: 3
+    min_workers: 1

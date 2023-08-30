@@ -1823,7 +1823,7 @@ bietlejuice.enrich_public_date:
   - bietlejuice.google_calendar:load-clean-brazillian-holidays
   - bietlejuice.google_calendar:load-clean-mexican-holidays
 bietlejuice.enrich_quinto_messenger:
-  - bietlejuice.gsheets_support_and_service:done-clean-agents-control
+  - bietlejuice.enrich_zendesk_users:load-enrich-agents
   - bietlejuice.internal_chat:load-clean-internal-chat-messages
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
@@ -2547,6 +2547,34 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.terminator:load-clean-termination
+bietlejuice.reverse_webhelp:
+  - bietlejuice.dw_call:load-dw-call-dim-call
+  - bietlejuice.dw_call:load-dw-call-fact-calls
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-tags
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
+  - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
+  - bietlejuice.enrich_quinto_messenger:load-enrich-task
+  - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
+  - bietlejuice.gsheets_support_and_service:done-clean-department-control
+bietlejuice.reverse_webhelp_access:
+  - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
+  - bietlejuice.reverse_webhelp:load-reverse-csat-front
+  - bietlejuice.reverse_webhelp:load-reverse-demand-metric
+  - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
+  - bietlejuice.reverse_webhelp:load-reverse-general-metric
+  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-call
+  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
+  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
+  - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
 wonka.user_most_viewed_city:
   - bietlejuice.ebdb:load-clean-region
   - wonka.user_region_listing_page_viewed:check-completion-notify-user_region_listing_page_viewed

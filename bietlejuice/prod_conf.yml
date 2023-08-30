@@ -81,6 +81,8 @@ dags_out_of_pattern:
         "reverse_navent_bigquery",
         "reverse_nazare",
         "reverse_tracksale",
+        "reverse_webhelp",
+        "reverse_webhelp_access",
         "wonka.house_main",
         "wonka.house_amenities",
         "wonka.house_condo_amenities",

@@ -10,10 +10,12 @@ columns:
     description: Date the task was created in the fifth messenger, in the BR timezone format.
   agent_email:
     lineage:
-      - datalake_quinto_messenger_clean.task.assigned_to
+      - datalake_zendesk_users.agents.email
     description: Email of the analyst who signed the task.
   agent_organization:
-    description: Agent organization, temporary field to filters
+    lineage:
+      - datalake_zendesk_users.agents.organization
+    description: Name of the company where the analyst works.
   department_name:
     lineage:
       - datalake_quinto_messenger_clean.task.task_resource
