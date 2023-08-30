@@ -36,7 +36,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
