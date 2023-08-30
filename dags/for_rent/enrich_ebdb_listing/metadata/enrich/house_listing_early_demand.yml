@@ -24,3 +24,9 @@ columns:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_started
     description: Timestamp when this listing started on Early Demand Program.
+  listing_version:
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.listing_version
+    description: Number of the listing version.
+  is_early_relisting:
+    description: Boolean indicating if this listing had a PUBLISHED status and RELISTING status_reason

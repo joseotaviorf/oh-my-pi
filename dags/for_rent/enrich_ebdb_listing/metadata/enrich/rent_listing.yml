@@ -44,6 +44,8 @@ columns:
     lineage:
     - datalake_ebdb_clean.listing_business_context.ts_last_publication
     description: Timestamp of the last publication of listing
+  ts_administrator_changed:
+    description: Timestamp of when the rental administrator has changed
   ts_created:
     lineage:
     - datalake_ebdb_clean.listing_business_context.ts_created

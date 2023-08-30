@@ -59,6 +59,8 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
     description: Boolean indicating if the listing is a sale listing
+  is_3p_supply:
+    description: Boolean indicating if the listing is from Rede QuintoAndar
   user_listing_registrant_rent:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user

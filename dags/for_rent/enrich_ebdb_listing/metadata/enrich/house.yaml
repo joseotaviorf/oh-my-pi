@@ -468,6 +468,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.is_follow_up_owner_upload_photos
     description: 'If the owner needs to upload photos (deprecated)'
+  has_rent_sign_permission: 
+    lineage:
+      - datalake_ebdb_clean.house.has_rent_sign_permission
+    description: 'If the house is allowed to have a rent sign (placa aluga-se)'
   has_service_bathroom:
     lineage:
       - datalake_ebdb_clean.house.has_service_bathroom
@@ -526,11 +530,17 @@ columns:
     description: 'True if the house is from Rede QuintoAndar, in the context of ForSale.'
   is_rent_3p_supply:
     description: 'True if the house is from Rede QuintoAndar, in the context of ForRent.'
+  is_3p_supply_5a:
+    description: 'True if the house is from Rede QuintoAndar, supplied by QuintoAndar.'
+  is_3p_supply_bh:
+    description: 'True if the house is from Rede QuintoAndar, supplied by Casa Mineira.'
   is_imovel_v3:
     lineage:
       - datalake_ebdb_clean.house.announced_by
       - datalake_ebdb_clean.house.id_announced_by
     description: 'True if the house is from Imovel V3.'
+  is_casa_mineira_migration:
+    description: 'True if the house was inported in a Casa Mineira migration.'
   has_sale_great_price_tag:
     lineage:
       - datalake_ebdb_clean.listing_sale_model.has_great_sale_price_tag

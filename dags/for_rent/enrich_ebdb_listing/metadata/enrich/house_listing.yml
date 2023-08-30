@@ -71,6 +71,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_in
     description: Flag indicating if this is a Exclusive listing.
+  is_extended_rental:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.is_extended_rental
+    description: Boolean indicating if the contract termination was canceled after relisting as early demand.
   is_originals_active:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_in
