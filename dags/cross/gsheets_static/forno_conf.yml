@@ -113,6 +113,18 @@ sheets_info:
     clean_table_name: projreparos_espelhamento_dl
     sheet_context: static
 
+  fdic_acquisition_2021:
+    sheet_id: 1ekBa2wZjTbW_nF0z4K4XFQnkINy6OGDOE3Qggm7Qdzk
+    sheet_name: acquisition
+    clean_table_name: fdic_acquisition_2021
+    sheet_context: static
+  
+  fdic_acquisition_2022:
+    sheet_id: 1FGeBxPXwU0sBzz9UAsRiFsD7Ev_qtVQEeN4WFFkIXDU
+    sheet_name: acquisition
+    clean_table_name: fdic_acquisition_2022
+    sheet_context: static
+
   fdic_liquidation_2021:
     sheet_id: 1ekBa2wZjTbW_nF0z4K4XFQnkINy6OGDOE3Qggm7Qdzk
     sheet_name: liquidation

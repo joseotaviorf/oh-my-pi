@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: fdic_acquisition_2021
+columns:
+  id_vx_security:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.idtitulovx
+  assignor_cnpj:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.cedentecnpjcpf
+  assignor_name:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.cedentenome
+  withdraw_cnpj_cpf:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.sacadocnpjcpf
+  withdraw_name:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.sacadonome
+  type:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.tipo
+  asset_type:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.tipoativo
+  key_field:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.campochave
+  cmc7:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.cmc7
+  security_number:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.numerotitulo
+  acquisition_value:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.valoraquisicao
+  nominal_value:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.valornominal
+  invoice_number:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.numeroboleto
+  dt_emission:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.dataemissao
+  dt_acquisition:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.dataaquisicao
+  dt_due:
+    lineage:
+      - datalake_gsheets_raw.fdic_acquisition_2021.datavencimento

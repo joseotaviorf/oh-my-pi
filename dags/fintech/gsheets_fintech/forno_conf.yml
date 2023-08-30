@@ -91,6 +91,12 @@ sheets_info:
     clean_table_name: early_termination_fee_fines
     sheet_context: fintech
 
+  fdic_acquisition_2023:
+    sheet_id: 1Vu0vpRWjgzcr_e-R0WLmhyExZ4I05dk_jstdyagOaS4
+    sheet_name: acquisition
+    clean_table_name: fdic_acquisition_2023
+    sheet_context: fintech
+
   fdic_liquidation_2023:
     sheet_id: 1Vu0vpRWjgzcr_e-R0WLmhyExZ4I05dk_jstdyagOaS4
     sheet_name: liquidation
