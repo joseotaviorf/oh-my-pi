@@ -1,7 +1,58 @@
 ---
 database_name: metric_rent
 table_name: listing_to_rental_8w
+description: Weekly metric of listings with signed contract within 8 weeks after publication. 
+domain: For Rent
+owner: marcus.pinto@quintoandar.com.br
 columns:
   dt_week_started:
     lineage:
       - dw_public.dim_date.week_start
+    description: Reference week first day
+    dimension: True
+  listings:
+    lineage:
+      - dw_public.dim_house_listing.sk_house_listing
+      - dw_public.dim_house_listing.ts_publication
+    description: Volume of listings.
+    metric:
+      name: Listings
+      description: Number of the listings published in the week
+      acronym: L
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: marcus.pinto@quintoandar.com.br
+      link_to_metric: ''
+  listings_rented_8w:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+      - dw_public.fact_listing_rent_flows.days_house_listing_to_contract_signed
+    description: Volume of listings with signed contract within 8 weeks
+    metric: 
+      name: Listings rented 8W
+      description: Number of the listings published in the week, which 
+        were converted to a contract signed within 8 weeks after publication
+      acronym: L
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: marcus.pinto@quintoandar.com.br
+      link_to_metric: ''
+  l2r_8w:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+      - dw_public.fact_listing_rent_flows.days_house_listing_to_contract_signed
+      - dw_public.dim_house_listing.sk_house_listing
+      - dw_public.dim_house_listing.ts_publication
+    description: Rate of listings with signed contract within 8 weeks.
+    metric: 
+      name: Listings rented 8W
+      description: Rate of listings published in the week which 
+        were converted to a contract signed within 8 weeks after publication
+      acronym: L2R 8W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: marcus.pinto@quintoandar.com.br
+      link_to_metric: ''

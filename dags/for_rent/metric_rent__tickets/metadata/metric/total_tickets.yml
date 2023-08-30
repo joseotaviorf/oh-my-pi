@@ -6,7 +6,7 @@ description: Daily total tickets.
 domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
 columns:
-  started_month:
+  dt_started:
     lineage:
       - dw_customer_support.fact_received_contact.ts_created
       - dw_customer_support.fact_ticket.ts_solved
