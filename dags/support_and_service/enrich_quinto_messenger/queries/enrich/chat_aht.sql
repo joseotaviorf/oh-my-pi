@@ -154,7 +154,7 @@ engagement_metrics AS (
 SELECT
     cd.dt_task_created_local,
     a.email AS agent_email,
-    a.agent_organization,
+    a.organization AS agent_organization,
     cd.department_name,
     cd.ts_start_first_task,
     cd.ts_end_last_task,
@@ -179,5 +179,5 @@ JOIN
         AND cd.department_name = em.department_name
 LEFT JOIN
     datalake_zendesk_users.agents AS a
-        ON cd.id_agent = a.id_agent
+        ON cd.agent_email = a.email
 ORDER BY 1,2
