@@ -1,3 +1,28 @@
 ---
 database_name: datalake_pro_owners
 table_name: tracking_weekly_changes 
+description: Enrich table that cointains the weekly amount of houses, 
+  but only for owners with 5 or more houses (just considering rent and not b2b houses).
+  Each row is the amount of houses for each owner at the end 
+  of each week at the time of the snapshot (stored in the [year, month, day] keys).
+domain: For Rent
+owner: matheus.baroni@quintoandar.com.br
+columns:
+  id_owner:
+    lineage:
+      - datalake_pro_owners.owner_houses_quantity_history.id_owner
+    description: User ID (Owner)
+  houses:
+    lineage:
+      - datalake_pro_owners.owner_houses_quantity_history.houses
+    description: Amount of houses
+  dt_week_end:
+    lineage:
+      - dw_public.dim_date.week_end
+    description: Date of the end of the week
+  year:
+    description: Snapshot year, partition column
+  month:
+    description: Snapshot month, partition column
+  day:
+    description: Snapshot day, partition column
