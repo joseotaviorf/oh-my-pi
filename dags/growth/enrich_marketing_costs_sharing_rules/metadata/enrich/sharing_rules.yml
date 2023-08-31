@@ -1,8 +1,8 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
 table_name: sharing_rules
-owner: '@data-growth'
 domain: Growth
+owner: henrique.miamoto@quintoandar.com.br
 description: This table concat all share rules by date
 columns:
   id_date:
@@ -205,3 +205,43 @@ columns:
       - datalake_marketing_costs_sharing_rules.d042d.funnel_side
       - datalake_marketing_costs_sharing_rules.d043d.funnel_side
       - datalake_marketing_costs_sharing_rules.d044d.funnel_side
+  business_context:
+    description: Business context of the rule.
+    lineage:
+      - datalake_marketing_costs_sharing_rules.a002a.business_context
+      - datalake_marketing_costs_sharing_rules.a003a.business_context
+      - datalake_marketing_costs_sharing_rules.a004a.business_context
+      - datalake_marketing_costs_sharing_rules.a009a.business_context
+      - datalake_marketing_costs_sharing_rules.b016b.business_context
+      - datalake_marketing_costs_sharing_rules.b017b.business_context
+      - datalake_marketing_costs_sharing_rules.b018b.business_context
+      - datalake_marketing_costs_sharing_rules.b035b.business_context
+      - datalake_marketing_costs_sharing_rules.d000d.business_context
+      - datalake_marketing_costs_sharing_rules.d001d.business_context
+      - datalake_marketing_costs_sharing_rules.d005d.business_context
+      - datalake_marketing_costs_sharing_rules.d006d.business_context
+      - datalake_marketing_costs_sharing_rules.d007d.business_context
+      - datalake_marketing_costs_sharing_rules.d008d.business_context
+      - datalake_marketing_costs_sharing_rules.d010d.business_context
+      - datalake_marketing_costs_sharing_rules.d011d.business_context
+      - datalake_marketing_costs_sharing_rules.d020d.business_context
+      - datalake_marketing_costs_sharing_rules.d021d.business_context
+      - datalake_marketing_costs_sharing_rules.d023d.business_context
+      - datalake_marketing_costs_sharing_rules.p014p.business_context
+      - datalake_marketing_costs_sharing_rules.s012s.business_context
+      - datalake_marketing_costs_sharing_rules.s019s.business_context
+      - datalake_marketing_costs_sharing_rules.s024s.business_context
+      - datalake_marketing_costs_sharing_rules.s025s.business_context
+      - datalake_marketing_costs_sharing_rules.s026s.business_context
+      - datalake_marketing_costs_sharing_rules.s027s.business_context
+      - datalake_marketing_costs_sharing_rules.s029s.business_context
+      - datalake_marketing_costs_sharing_rules.s030s.business_context
+      - datalake_marketing_costs_sharing_rules.s031s.business_context
+      - datalake_marketing_costs_sharing_rules.s032s.business_context
+      - datalake_marketing_costs_sharing_rules.d038d.business_context
+      - datalake_marketing_costs_sharing_rules.d039d.business_context
+      - datalake_marketing_costs_sharing_rules.d040d.business_context
+      - datalake_marketing_costs_sharing_rules.d041d.business_context
+      - datalake_marketing_costs_sharing_rules.d042d.business_context
+      - datalake_marketing_costs_sharing_rules.d043d.business_context
+      - datalake_marketing_costs_sharing_rules.d044d.business_context

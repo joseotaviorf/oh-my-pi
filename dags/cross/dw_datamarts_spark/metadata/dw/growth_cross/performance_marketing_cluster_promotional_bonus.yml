@@ -1,39 +1,52 @@
 ---
 database_name: dw_datamarts
 table_name: performance_marketing_cluster_promotional_bonus
+description: this table contains information about the affiliates promotional bonus.
+domain: Growth
+owner: henrique.miamoto@quintoandar.com.br
 columns:
   sk_user:
+    description: key of the affiliate user
     lineage:
       - dw_public.dim_lead.usuario_que_indicou_id
   year_month:
+    description: bonus year/month.
     lineage:
       - dw_public.dim_date.date
   affiliate_type:
+    description: type of the affiliate
     lineage:
       - dw_public.dim_user_affiliate.type
   is_active:
+    description: flag that identifies if the affiliate is active
     lineage:
       - dw_public.dim_user_affiliate.is_active
   cluster:
+    description: affiliate cluster.
     lineage:
       - dw_datamarts.affiliates_clusters.cluster
   target_base:
+    description: the target base for the affiliate gain the bonus base
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
   bonus_base:
+    description: the value of the bonus base
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_base
   target_boost:
+    description: the target boost for the affiliate gain the bonus boost
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_boost
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_boost
   bonus_boost:
+    description: the value of the bonus boost
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_boost
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_boost
   promotional_bonus:
+    description: the value of the promotional bonus.
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_boost
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_base
