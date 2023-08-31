@@ -3,4 +3,125 @@ table_name: affiliates_events
 owner: data-growth@quintoandar.com
 domain: growth
 description: This table contains details about event related/realized by affiliates, e.g. dispatches or clicks.
-columns: {}
+columns:
+  id_user_dispatch:
+    lineage:
+      - datalake_braze.events_affiliates.id_user_dispatch
+    description: The combination of id_dispatch and id_user.
+  id_user_braze:
+    lineage:
+      - datalake_braze.events_affiliates.id_user_braze
+    description: Unique code to identify an user created by Braze.
+  id_user:
+    description: Unique code to identify an user created here at QuintoAndar.
+  id_campaign:
+    lineage:
+      - datalake_braze.events_affiliates.id_campaign
+    description: Unique code to identify a campaign.
+  id_variant_campaign:
+    lineage:
+      - datalake_braze.events_affiliates.id_variant_campaign
+    description: Unique code to identify a campaign variant.
+  id_canvas:
+    lineage:
+      - datalake_braze.events_affiliates.id_canvas
+    description: Unique code to identify a canvas.
+  id_variant_canvas:
+    lineage:
+      - datalake_braze.events_affiliates.id_variant_canvas
+    description: Unique code to identify a canvas variant.
+  id_step_canvas:
+    lineage:
+      - datalake_braze.events_affiliates.id_step_canvas
+    description: Unique code to identify to which step the event related to.
+  user_type:
+    description: Which type of user received/interacted with the message. In this case, will be only owner.
+  event_channel:
+    lineage:
+      - datalake_braze.events_affiliates.event_channel
+    description: Through where the event occurred.
+    categories:
+      email: It's a message sent via email.
+      inappmessage: It's a message that's not delivered outside of the user's app i.e. it's delivered when the user is active within the app.
+      pushnotification: It's a message sent via push.
+      webhook: It's a message sent via webhook.
+  ts_email_sent:
+    lineage:
+      - datalake_braze_dispatches.email_affiliates.ts_email_sent
+    description: Timestamp of when the email was sent.
+  ts_email_delivered:
+    lineage:
+      - datalake_braze_dispatches.email_affiliates.ts_email_delivered
+    description: Timestamp of when the email was delivered.
+  ts_email_opened:
+    lineage:
+      - datalake_braze_dispatches.email_affiliates.ts_email_opened
+    description: Timestamp of when the email was opened by the owner.
+  ts_email_clicked:
+    lineage:
+      - datalake_braze_dispatches.email_affiliates.ts_email_clicked
+    description: Timestamp of when the email was clicked by the owner.
+  ts_email_bounced:
+    lineage:
+      - datalake_braze_dispatches.email_affiliates.ts_email_bounced
+    description: Timestamp of when the email was bounced.
+  ts_email_spammed:
+    lineage:
+      - datalake_braze_dispatches.email_affiliates.ts_email_spammed
+    description: Timestamp of when the email was marked as a spam.
+  ts_email_unsubscribed:
+    lineage:
+      - datalake_braze_dispatches.email_affiliates.ts_email_unsubscribed
+    description: Timestamp of when the user clicked on the unsubscribed with the email link.
+  ts_push_sent:
+    lineage:
+      - datalake_braze_dispatches.push_affiliates.ts_push_sent
+    description: Timestamp of when the push was sent.
+  ts_push_opened:
+    lineage:
+      - datalake_braze_dispatches.push_affiliates.ts_push_opened
+    description: Timestamp of when the push was oppened.
+  ts_push_bounced:
+    lineage:
+      - datalake_braze_dispatches.push_affiliates.ts_push_bounced
+    description: Timestamp of when the push bounced.
+  ts_webhook_sent:
+    lineage:
+      - datalake_braze_dispatches.webhook_affiliates.ts_webhook_sent
+    description: Timestamp of when the webhook was sent.
+  ts_inapp_impressioned:
+    lineage:
+      - datalake_braze_dispatches.inapp_affiliates.ts_inapp_impressioned
+    description: Timestamp of when the in-app communication was visualized.
+  ts_sms_sent:
+    lineage:
+      - datalake_braze_dispatches.sms_affiliates.ts_sms_sent
+    description: Timestamp of when the sms was sent.
+  ts_sms_send_to_carried:
+    lineage:
+      - datalake_braze_dispatches.sms_affiliates.ts_sms_send_to_carried
+    description: Timestamp of when the sms was sent to the carrier.
+  ts_sms_delivered:
+    lineage:
+      - datalake_braze_dispatches.sms_affiliates.ts_sms_delivered
+    description: Timestamp of when the sms was delivered to the user.
+  ts_sms_rejected:
+    lineage:
+      - datalake_braze_dispatches.sms_affiliates.ts_sms_rejected
+    description: Timestamp of when the sms was rejected by the user.
+  ts_sms_delivery_failed:
+    lineage:
+      - datalake_braze_dispatches.sms_affiliates.ts_sms_delivery_failed
+    description: Timestamp of when the sms was not delivered due to fail.
+  year:
+    lineage:
+      - datalake_braze.events_affiliates.year
+    description: Year of when the information was updated.
+  month:
+    lineage:
+      - datalake_braze.events_affiliates.month
+    description: Month of when the information was updated.
+  day:
+    lineage:
+      - datalake_braze.events_affiliates.day
+    description: Day of when the information was updated.
