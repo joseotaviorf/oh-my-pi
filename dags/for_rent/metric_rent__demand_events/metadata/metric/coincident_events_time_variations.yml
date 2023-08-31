@@ -1,0 +1,180 @@
+database_name: metric_rent
+table_name: coincident_events_time_variations
+description: This table contains the aggregated sum of coincident events of For Rent, based on a time variation which allows
+  to understand data updates through time (historical data being retroactively updated).
+  The D-1 target type refers to the current day load looking to the events that happened on the day before. The columns that shows the volume
+  differences for this time visualization are always null;
+  The W1-W5 target type refers to the current day load looking to the events that happened one to five weeks ago. The column that shows the
+  volume differences for this time visualization is comparing to the end of week's load of the related week. For example, if we're currently on
+  the week of 28/08/23. The W1-W5 weeks goes from 24/07/23 to 21/08/23. In order to check the load differences, we're calculating the current day load
+  volume for the mentioned related weeks minus the load volume that happened on the last day of each week (which in this case would be the load of
+  the days 30/07 for the W1 week, 06/08 for the W2, 13/08 for the W3, 20/08 for the W4 and 27/08 for the W5);
+  The LM (Last Month) target type refers to the current day load looking to the events that happened on the past month. The columns that shows the
+  volume differences for this time visualization are comparing to the load that happened on the last day of the previous month;
+  The LQ (Last Quarter) target type refers to the current day load looking to the events that happened on the past quarter. The columns that shows the
+  volume differences for this time visualization are comparing to the load that happened on the last day of the previous quarter;
+  The LY (Last Year) target type refers to the current day load looking to the events that happened on the past year. The columns that shows the
+  volume differences for this time visualization are comparing to the load that happened on the last day of the previous year (e.g. the load of
+  December 31 of the past year).
+  This table is partitioned by country_code, year, month and day columns -- which should be used in analysis, following that order, to improve the
+  query's performance.
+  Each line has the total volume of the coincident events on different days within several dimensions.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  target_type:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.target_type
+    description: Target type of the current time visualization.
+    categories:
+      D-1: Current day load looking to the events that happened on the day before (D-1).
+      W1-W5: Current day load looking to the events that happened on one to five weeks ago.
+      LM: Current day load looking to the events that happened on the last month.
+      LQ: Current day load looking to the events that happened on the last quarter.
+      LY: Current day load looking to the events that happened on the last year.
+    dimension: True
+  business_type:
+    description: Business type related to the event.
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.business_type
+    dimension: True
+  rent_flow_origin:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.rent_flow_origin
+    description: Funnel first touchpoint information related to the event.
+    dimension: True
+  visits_booked:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.visits_booked
+    description: Total volume of visits booked within the aggregation.
+    metric:
+      name: Visits Booked
+      description: Total volume of visits booked within the aggregation.
+      acronym: VB
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: sarah.rsilva@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/explore/sale_event/sale_demand_event?qid=VriFdAhegLapblm5xS3W0i&origin_space=2129&toggle=vis'
+  visits_completed:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.visits_completed
+    description: Total volume of visits completed within the aggregation.
+    metric:
+      name: Visits Completed
+      description: Total volume of visits completed within the aggregation.
+      acronym: VC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: bruno.choumar@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  offers_submitted:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.offers_submitted
+    description: Total volume of offers submitted within the aggregation.
+    metric:
+      name: Offers Submitted
+      description: Total volume of offers submitted within the aggregation.
+      acronym: OS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: bruno.choumar@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  offers_accepted:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.offers_accepted
+    description: Total volume of offers accepted within the aggregation.
+    metric:
+      name: Offers Accepted
+      description: Total volume of offers accepted within the aggregation.
+      acronym: OA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: bruno.choumar@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  evaluation_started:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.evaluation_started
+    description: Total volume of evaluations started within the aggregation.
+    metric:
+      name: Evaluation Started
+      description: Total volume of evaluations started within the aggregation.
+      acronym: ES
+      is_additive: True
+      business_stage: Demand
+      hierarchy: operations mgmt
+      approved_by: 'gustavo.geiger@quintoandar.com.br'
+      link_to_metric: 'https://metabase.quintoandar.com.br/question#eyJkYXRhc2V0X3F1ZXJ5Ijp7InR5cGUiOiJuYXRpdmUiLCJuYXRpdmUiOnsicXVlcnkiOiJTRUxFQ1RcbiAgICBkZC5kYXRlLFxuICAgIENPVU5UKERJU1RJTkNUIHJmLnNrX29mZmVyKSBBUyBjcmVkaXRfZXZhbHVhdGlvbl9pbml0XG4gIEZST01cbiAgICBkd19wdWJsaWMuZmFjdF9saXN0aW5nX3JlbnRfZmxvd3MgQVMgcmZcbiAgSk9JTlxuICAgZHdfcHVibGljLmRpbV9kYXRlIEFTIGRkXG4gICAgICBPTiBkZC5za19kYXRlID0gcmYuc2tfZmlyc3RfY3JlZGl0X2V2YWx1YXRpb25faW5pdFxuICAgICAgQU5EIHJmLnNrX2ZpcnN0X2NyZWRpdF9ldmFsdWF0aW9uX2luaXQgPiAwXG4gIFdIRVJFIChkZC5kYXRlIEJFVFdFRU4gKERBVEVfVFJVTkMoJ3llYXInLENVUlJFTlRfREFURSkgLSBJTlRFUlZBTCAnNCcgeWVhcikgQU5EIENVUlJFTlRfREFURSkgLS0gZmlsdGVyIGRhdGEgRlJPTSA0IHllYXJzIGFnb1xuICBHUk9VUCBCWSAxIiwidGVtcGxhdGUtdGFncyI6e319LCJkYXRhYmFzZSI6NzV9LCJkaXNwbGF5IjoidGFibGUiLCJwYXJhbWV0ZXJzIjpbXSwidmlzdWFsaXphdGlvbl9zZXR0aW5ncyI6e319'
+  evaluation_positive:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.evaluation_positive
+    description: Total volume of evaluations positive within the aggregation.
+    metric:
+      name: Evaluation Positive
+      description: Total volume of evaluations positive within the aggregation.
+      acronym: EP
+      is_additive: True
+      business_stage: Demand
+      hierarchy: operations mgmt
+      approved_by: 'gustavo.geiger@quintoandar.com.br'
+      link_to_metric: 'https://metabase.quintoandar.com.br/question#eyJkYXRhc2V0X3F1ZXJ5Ijp7InR5cGUiOiJuYXRpdmUiLCJuYXRpdmUiOnsicXVlcnkiOiJTRUxFQ1RcbiAgICBkZC5kYXRlLFxuICAgIENPVU5UKERJU1RJTkNUIHJmLnNrX29mZmVyKSBBUyBjcmVkaXRfZXZhbHVhdGlvbl9wb3NpdGl2ZVxuICBGUk9NXG4gICAgZHdfcHVibGljLmZhY3RfbGlzdGluZ19yZW50X2Zsb3dzIEFTIHJmXG4gIEpPSU5cbiAgIGR3X3B1YmxpYy5kaW1fZGF0ZSBBUyBkZFxuICAgICAgT04gZGQuc2tfZGF0ZSA9IHJmLnNrX2ZpcnN0X2NyZWRpdF9ldmFsdWF0aW9uX3Bvc2l0aXZlXG4gICAgICBBTkQgcmYuc2tfZmlyc3RfY3JlZGl0X2V2YWx1YXRpb25fcG9zaXRpdmUgPiAwXG4gIFdIRVJFIChkZC5kYXRlIEJFVFdFRU4gKERBVEVfVFJVTkMoJ3llYXInLENVUlJFTlRfREFURSkgLSBJTlRFUlZBTCAnNCcgeWVhcikgQU5EIENVUlJFTlRfREFURSkgLS0gZmlsdGVyIGRhdGEgRlJPTSA0IHllYXJzIGFnb1xuICBHUk9VUCBCWSAxIiwidGVtcGxhdGUtdGFncyI6e319LCJkYXRhYmFzZSI6NzV9LCJkaXNwbGF5IjoidGFibGUiLCJwYXJhbWV0ZXJzIjpbXSwidmlzdWFsaXphdGlvbl9zZXR0aW5ncyI6e319'
+  documentation_sent:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.documentation_sent
+    description: Total volume of documentations sent within the aggregation.
+    metric:
+      name: Documentation Sent
+      description: Total volume of documentations sent within the aggregation.
+      acronym: DS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: bruno.choumar@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  credit_approved:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.credit_approved
+    description: Total volume of credits approved within the aggregation.
+    metric:
+      name: Credit Approved
+      description: Total volume of credits approved within the aggregation.
+      acronym: CA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: bruno.choumar@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  contracts_signed:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.contracts_signed
+    description: Total volume of contracts signed within the aggregation.
+    metric:
+      name: Contract Signed
+      description: Total volume of contracts signed within the aggregation.
+      acronym: CS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: bruno.choumar@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  dt_target:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.dt_target
+    description: Date of when the present event happened (could be a VC, OS, CS, etc.)
+    dimension: True
+  dt_snapshot:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.dt_week_started
+    description: Date of when the snapshot of the data happened. It should be the current day.
+    dimension: True
+  country_code:
+    lineage:
+    - dw_rent_snapshot.coincident_events_time_variations_snapshot.country_code
+    description: Country code information.
+    dimension: True
+  ts_load:
+    description: Load date.
+    dimension: True

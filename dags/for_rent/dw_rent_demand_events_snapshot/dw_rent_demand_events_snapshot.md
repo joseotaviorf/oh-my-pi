@@ -13,8 +13,7 @@ Daily.
 ### Outputs
 
 Produces the following output table on the `dw_rent_snapshot` schema (which is not available for the public):
- 
+
+- `dw_rent_snapshot.coincident_events_time_variations_snapshot`
 - `dw_rent_snapshot.rent_cohort_conversions_snapshot`
 - `dw_rent_snapshot.rent_demand_events_snapshot`
-
-

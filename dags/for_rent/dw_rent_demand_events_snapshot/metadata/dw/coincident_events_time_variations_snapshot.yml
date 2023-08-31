@@ -1,6 +1,6 @@
 ---
 database_name: dw_rent_snapshot
-table_name: coincident_events_time_variations
+table_name: coincident_events_time_variations_snapshot
 description: This table has the dailies snapshots data based on the rent demand events metrics, creating a full historical
   of the data volume changes, allowing to understand updates through time. The table has aggregated sums of coincident conversions
   of the rental funnel by several metrics and time visualizations, described below.

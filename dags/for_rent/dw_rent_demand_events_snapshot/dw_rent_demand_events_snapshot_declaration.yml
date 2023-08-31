@@ -10,7 +10,7 @@ workflow:
   default_extraction_type: incremental
   has_load_to_redshift_task: false
   inner_dependencies:
-    coincident_events_time_variations:
+    coincident_events_time_variations_snapshot:
       - rent_demand_events_snapshot
 cluster:
   type: databricks_10_4_med_general_cluster
