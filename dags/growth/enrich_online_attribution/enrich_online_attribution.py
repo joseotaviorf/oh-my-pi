@@ -25,7 +25,6 @@ MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
 INNER_DEPENDENCIES = {
     "online_attribution": ["events_exploded"],
-    "online_attribution_with_attributed_at": ["online_attribution"],
 }
 CLUSTER_DESCRIPTION = "databricks_10_4_med_io-memory_photon_cluster"
 
