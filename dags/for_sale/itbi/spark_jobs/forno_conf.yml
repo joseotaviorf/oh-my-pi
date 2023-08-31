@@ -81,4 +81,5 @@ tables:
       Data Inclusao Transacao: data_inclusao_transacao
       Data Quitação Transacao: data_inclusao_transacao
       Data Quitacao Transacao: data_inclusao_transacao
+      Data_quitacao: data_inclusao_transacao
       Valor Imposto Cobrado (sumarizado): valor_imposto_cobrado_sumarizado
