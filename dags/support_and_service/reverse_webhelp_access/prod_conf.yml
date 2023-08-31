@@ -1,5 +1,5 @@
-database_name: lake-quinto-andar-prod
-azure_container_name: lake-quinto-andar
+database_name: reverse_webhelp
+azure_container_name: lake-quinto-andar-prod
 
 tables:
   - backlog_metric
