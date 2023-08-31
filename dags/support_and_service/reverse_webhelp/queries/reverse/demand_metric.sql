@@ -29,9 +29,9 @@ SELECT DISTINCT
     dmt.ts_started,
     dmt.ts_solved,
     dmt.ts_closed,
-    YEAR(CURRENT_DATE) AS year,
-    MONTH(CURRENT_DATE) AS month,
-    DAY(CURRENT_DATE) AS day
+    YEAR(dmt.ts_started) AS year,
+    MONTH(dmt.ts_started) AS month,
+    DAY(dmt.ts_started) AS day
 FROM
     dw_customer_support.fact_demand_metrics_tasks AS dmt
 LEFT JOIN
