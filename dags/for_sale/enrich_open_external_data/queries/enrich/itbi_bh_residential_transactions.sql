@@ -74,13 +74,13 @@ dejavu AS (
 )
 SELECT 
     t.id_itbi_transaction,
-    COALESCE(d.id_region, z.id_region) AS id_region,
-    COALESCE(d.address, INITCAP(t.address), z.address) AS address,
+    d.id_region AS id_region,
+    COALESCE(d.address, INITCAP(t.address)) AS address,
     COALESCE(d.number, t.number) AS number,
     INITCAP(t.complement) AS complement,
-    COALESCE(d.zipcode, t.zipcode, z.zipcode) AS zipcode,
-    COALESCE(r.name, d.neighborhood, z.neighborhood, t.neighborhood) AS neighborhood,
-    COALESCE(t.city, z.city_name) AS city,
+    COALESCE(d.zipcode, t.zipcode) AS zipcode,
+    COALESCE(r.name, d.neighborhood, t.neighborhood) AS neighborhood,
+    t.city,
     d.latitude,
     d.longitude,
     t.state,
@@ -109,10 +109,6 @@ LEFT JOIN
 LEFT JOIN 
     datalake_region.region AS r 
         ON d.id_region = r.id
-LEFT JOIN
-    datalake_zipcodes.zipcodes AS z 
-        ON t.zipcode = z.zipcode
 WHERE 
     t.occupation_description = 'Residencial'
     AND t.year >= 2019
-    AND z.city_name = 'Belo Horizonte'

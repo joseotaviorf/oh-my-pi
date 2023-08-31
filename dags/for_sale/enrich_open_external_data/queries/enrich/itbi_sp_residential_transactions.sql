@@ -76,13 +76,13 @@ SELECT
     i.id_itbi_transaction,
     i.iptu_sql_registration_number,
     i.house_registry_number,
-    COALESCE(d.id_region, c.id_region) AS id_region,
-    COALESCE(r.name, d.neighborhood, c.neighborhood, i.address_neighborhood) AS address_neighborhood,
-    COALESCE(d.address, c.address, i.address_street_name) AS address_street_name,
+    d.id_region AS id_region,
+    COALESCE(r.name, d.neighborhood, i.address_neighborhood) AS address_neighborhood,
+    COALESCE(d.address, i.address_street_name) AS address_street_name,
     COALESCE(d.number, i.address_number) AS address_number,
     i.address_complement,
     i.address_reference,
-    COALESCE(d.zipcode, c.zipcode, i.address_zipcode) AS address_zipcode,
+    COALESCE(d.zipcode, i.address_zipcode) AS address_zipcode,
     d.latitude,
     d.longitude,
     i.financing_type,
@@ -123,7 +123,3 @@ LEFT JOIN
 LEFT JOIN 
     datalake_region.region AS r 
         ON d.id_region = r.id
-LEFT JOIN 
-    datalake_zipcodes.zipcodes AS c 
-        ON c.zipcode = CAST((LEFT(i.address_zipcode, 5) || '-' || RIGHT(i.address_zipcode, 3)) AS STRING) 
-        AND c.city_name = 'São Paulo'

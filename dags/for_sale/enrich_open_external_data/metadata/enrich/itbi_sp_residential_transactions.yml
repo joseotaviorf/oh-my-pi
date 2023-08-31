@@ -19,7 +19,6 @@ columns:
     description: 'The property registration number is the registration number of that property in a specific house notary.'
   id_region:
     lineage:
-      - datalake_zipcodes.zipcodes.id_region
       - datalake_vespucio.dejavu.id_region
     description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region.
       For ITBI, we retrieve it in 2 different ways: 

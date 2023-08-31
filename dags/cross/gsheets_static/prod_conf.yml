@@ -286,9 +286,3 @@ sheets_info:
     sheet_name: users_cx_plaquinhas
     clean_table_name: users_cx_plaquinhas
     sheet_context: static
-
-  zipcodes_sp:
-    sheet_id: 1ej4KiYUK-7gbxykN1AANpcWllW2wXffChTiF8h0nUPc
-    sheet_name: zipcodes_sp
-    clean_table_name: zipcodes_sp
-    sheet_context: static

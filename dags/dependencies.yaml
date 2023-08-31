@@ -1785,7 +1785,6 @@ bietlejuice.enrich_online_attribution:
 bietlejuice.enrich_open_external_data:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_vespucio:load-enrich-dejavu
-  - bietlejuice.enrich_zipcodes:load-enrich-zipcodes
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
@@ -2377,11 +2376,6 @@ bietlejuice.enrich_zendesk_users:
   - bietlejuice.zendesk_tickets:load-clean-organizations
   - bietlejuice.zendesk_tickets:load-clean-tickets
   - bietlejuice.zendesk_tickets:load-clean-users
-bietlejuice.enrich_zipcodes:
-  - bietlejuice.ebdb:load-clean-polygon-region
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-  - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.metric_fintech__atta:
   - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow

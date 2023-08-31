@@ -9,7 +9,6 @@ columns:
     description: Unique table key, created from the transaction extract file and the IPTU number.
   id_region:
     lineage:
-      - datalake_zipcodes.zipcodes 
       - datalake_vespucio.dejavu
     description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region.
       For ITBI, we retrieve it in 2 different ways: 
