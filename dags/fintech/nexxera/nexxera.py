@@ -45,7 +45,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 
-SOURCE_ROOT_PATH = config_service.get_config("source_root_path")
 CONSUMER_EXTRA_ARGS = config_service.get_config("consumer_extra_args")
 
 
@@ -90,6 +89,8 @@ tables = config_service.get_config("tables")
 
 for table in tables:
     table_name = table["table_name"]
+    SOURCE_ROOT_PATH = table["source_root_path"]
+    format = table["format"]
     col_names = table["col_names"]
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
@@ -103,6 +104,7 @@ for table in tables:
             "{{ ds }}",
             table_name,
             json.dumps(CONSUMER_EXTRA_ARGS),
+            format,
             json.dumps(col_names)
         ],
     )

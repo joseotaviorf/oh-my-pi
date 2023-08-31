@@ -57,8 +57,8 @@ if __name__ == "__main__":
         "consumer_extra_args",
         help="extra arguments to pass to get_data_from_file of S3Consumer",
     )
-    parser.add_argument("col_names", help="new names of the columns")
-
+    parser.add_argument("format", help="file format")
+    parser.add_argument("col_names", help="new names of the columns", default=None)
     args = parser.parse_args()
 
     environment = args.environment
@@ -70,15 +70,16 @@ if __name__ == "__main__":
     consumer_extra_args = json.loads(args.consumer_extra_args)
     partition_cols = ["year", "month", "day"]
     datetime_to_ingest = datetime.strptime(date_to_ingest, "%Y-%m-%d")
-    col_names = json.loads(args.col_names)
+    format = args.format
+    col_names = json.loads(args.col_names) if args.col_names != "None" else None
 
-    s3_files_path = f"{source_root_path}{table_name}"
+
 
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
                 source_root_path={source_root_path}, date_to_ingest={date_to_ingest}, table_name={table_name},
-                col_names={col_names}, consumer_extra_args={consumer_extra_args}, msg=Starting spark job...
+                format={format},col_names={col_names}, consumer_extra_args={consumer_extra_args}, msg=Starting spark job...
         """
     )
 
@@ -91,30 +92,58 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
-    pattern = re.compile(f".*{datetime_to_ingest.strftime('%Y%m%d')}.*")
-    filtered_files = list(filter(pattern.match, files))
+    if format == 'csv':
+        s3_files_path = f"{source_root_path}{table_name}"
+        files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
+        pattern = re.compile(f".*{datetime_to_ingest.strftime('%Y%m%d')}.*")
+        filtered_files = list(filter(pattern.match, files))
 
-    schema = generate_schema(col_names)
+        schema = generate_schema(col_names)
 
-    dfs = []
-    for file_path in filtered_files:
+        dfs = []
+        for file_path in filtered_files:
+            df = (
+                spark.read.format("csv")
+                .schema(schema)
+                .option("encoding", "ISO-8859-1")
+                .load(file_path)
+            )
+            dfs.append(df)
+
+        df = reduce(DataFrame.unionAll, dfs)
+
         df = (
-            spark.read.format("csv")
-            .schema(schema)
-            .option("encoding", "ISO-8859-1")
-            .load(file_path)
+            SparkDataFrameService()
+            .input(df)
+            .create_year_month_day_columns_from_date(datetime_to_ingest)
+            .output()
         )
-        dfs.append(df)
+    elif format == 'txt':
+        s3_files_path = f"{source_root_path}{table_name}"
+        files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
+        pattern = re.compile(f".*{datetime_to_ingest.strftime('%y%m%d')}.*")
+        filtered_files = list(filter(pattern.match, files))
 
-    df = reduce(DataFrame.unionAll, dfs)
+        dfs = []
 
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_date(datetime_to_ingest)
-        .output()
-    )
+        for path in filtered_files:
+            df = spark.read.text(filtered_files)
+            df = df.select(
+                df.value.substr(1,3).alias('id_bank'),
+                df.value.substr(4,4).alias('id_service_batch'),
+                df.value.substr(8,1).alias('record_type'),
+                df.value.substr(9,240).alias('metadata'),
+
+                )
+            dfs.append(df)
+            df = reduce(DataFrame.unionAll, dfs)
+            df = (
+                    SparkDataFrameService()
+                    .input(df)
+                    .create_year_month_day_columns_from_date(datetime_to_ingest)
+                    .output()
+                )
+
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(spark_client)

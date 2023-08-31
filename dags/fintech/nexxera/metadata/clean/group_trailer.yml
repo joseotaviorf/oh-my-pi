@@ -1,0 +1,103 @@
+---
+database_name: datalake_nexxera_clean
+table_name: group_trailer
+description: "Table containing all establishment group data from nexxera files (id_registration = 99). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+columns:
+  id_registration:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_1
+      - datalake_nexxera_raw.financial.col_1
+      - datalake_nexxera_raw.inadvance.col_1
+      - datalake_nexxera_raw.sales.col_1
+      - datalake_nexxera_raw.transaction.col_1
+  group_name:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_2
+      - datalake_nexxera_raw.financial.col_2
+      - datalake_nexxera_raw.inadvance.col_2
+      - datalake_nexxera_raw.sales.col_2
+      - datalake_nexxera_raw.transaction.col_2
+  group_cnpj:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_3
+      - datalake_nexxera_raw.financial.col_3
+      - datalake_nexxera_raw.inadvance.col_3
+      - datalake_nexxera_raw.sales.col_3
+      - datalake_nexxera_raw.transaction.col_3
+  total_credited_acquirers:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_4
+      - datalake_nexxera_raw.financial.col_4
+      - datalake_nexxera_raw.inadvance.col_4
+      - datalake_nexxera_raw.sales.col_4
+      - datalake_nexxera_raw.transaction.col_4
+  total_file_records:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_5
+      - datalake_nexxera_raw.financial.col_5
+      - datalake_nexxera_raw.inadvance.col_5
+      - datalake_nexxera_raw.sales.col_5
+      - datalake_nexxera_raw.transaction.col_5
+  sale_installments_value:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_6
+      - datalake_nexxera_raw.financial.col_6
+      - datalake_nexxera_raw.inadvance.col_6
+      - datalake_nexxera_raw.sales.col_6
+      - datalake_nexxera_raw.transaction.col_6
+  summary_anticipated_value:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_7
+      - datalake_nexxera_raw.financial.col_7
+      - datalake_nexxera_raw.inadvance.col_7
+      - datalake_nexxera_raw.sales.col_7
+      - datalake_nexxera_raw.transaction.col_7
+  credit_adjustments_value:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_8
+      - datalake_nexxera_raw.financial.col_8
+      - datalake_nexxera_raw.inadvance.col_8
+      - datalake_nexxera_raw.sales.col_8
+      - datalake_nexxera_raw.transaction.col_8
+  debit_adjustments_value:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_9
+      - datalake_nexxera_raw.financial.col_9
+      - datalake_nexxera_raw.inadvance.col_9
+      - datalake_nexxera_raw.sales.col_9
+      - datalake_nexxera_raw.transaction.col_9
+  compensated_adjustments_value:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_10
+      - datalake_nexxera_raw.financial.col_10
+      - datalake_nexxera_raw.inadvance.col_10
+      - datalake_nexxera_raw.sales.col_10
+      - datalake_nexxera_raw.transaction.col_10
+  legacy_summary_installments_value:
+    lineage:
+      - datalake_nexxera_raw.adjustments.col_11
+      - datalake_nexxera_raw.financial.col_11
+      - datalake_nexxera_raw.inadvance.col_11
+      - datalake_nexxera_raw.sales.col_11
+      - datalake_nexxera_raw.transaction.col_11
+  year:
+    lineage:
+      - datalake_nexxera_raw.adjustments.year
+      - datalake_nexxera_raw.financial.year
+      - datalake_nexxera_raw.inadvance.year
+      - datalake_nexxera_raw.sales.year
+      - datalake_nexxera_raw.transaction.year
+  month:
+    lineage:
+      - datalake_nexxera_raw.adjustments.month
+      - datalake_nexxera_raw.financial.month
+      - datalake_nexxera_raw.inadvance.month
+      - datalake_nexxera_raw.sales.month
+      - datalake_nexxera_raw.transaction.month
+  day:
+    lineage:
+      - datalake_nexxera_raw.adjustments.day
+      - datalake_nexxera_raw.financial.day
+      - datalake_nexxera_raw.inadvance.day
+      - datalake_nexxera_raw.sales.day
+      - datalake_nexxera_raw.transaction.day

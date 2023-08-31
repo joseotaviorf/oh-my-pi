@@ -1,0 +1,77 @@
+---
+database_name: datalake_nexxera_clean
+table_name: financial_legacy
+description: "Table containing legacy financial data from nexxera files (id_registration = 13). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+columns:
+  id_registration:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_1
+  acquirer_name:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_2
+  establishment_cnpj:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_3
+  acquirer_pos:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_4
+  rv_summary_number:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_5
+  rv_summary_date:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_6
+  installment_number:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_7
+  dt_installment_credit:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_8
+  id_bank_deposit:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_9
+  agency_deposit:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_10
+  account_deposit:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_11
+  summary_installment_gross_amount:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_12
+  summary_installment_discount:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_13
+  summary_installment_net_amount:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_14
+  summary_installment_antecipation_discount:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_15
+  summary_installment_paid_amount:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_16
+  acquirer_code:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_17
+  id_bank_grouper:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_18
+  voucher_flag:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_19
+  id_sale_type:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_20
+  id_flag:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.col_21
+  year:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.year
+  month:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.month
+  day:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.day

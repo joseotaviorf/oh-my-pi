@@ -1,139 +1,149 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: adjustments
+description: "Table containing adjustments data from nexxera files (id_registration = 12). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
-  registration_type:
+  id_registration:
     lineage:
-      - datalake_nexxera_raw.adjustments.registration_type
+      - datalake_nexxera_raw.adjustments.col_1
   acquirer_name:
     lineage:
-      - datalake_nexxera_raw.adjustments.acquirer_name
+      - datalake_nexxera_raw.adjustments.col_2
   establishment_cnpj:
     lineage:
-      - datalake_nexxera_raw.adjustments.establishment_cnpj
+      - datalake_nexxera_raw.adjustments.col_3
   adjusted_pos:
     lineage:
-      - datalake_nexxera_raw.adjustments.adjusted_pos
+      - datalake_nexxera_raw.adjustments.col_4
   original_pos:
     lineage:
-      - datalake_nexxera_raw.adjustments.original_pos
+      - datalake_nexxera_raw.adjustments.col_5
   current_summary_number:
     lineage:
-      - datalake_nexxera_raw.adjustments.current_summary_number
+      - datalake_nexxera_raw.adjustments.col_6
   original_summary_number:
     lineage:
-      - datalake_nexxera_raw.adjustments.original_summary_number
+      - datalake_nexxera_raw.adjustments.col_7
   nsu_cv:
     lineage:
-      - datalake_nexxera_raw.adjustments.nsu_cv
+      - datalake_nexxera_raw.adjustments.col_8
   id_authorization:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_authorization
+      - datalake_nexxera_raw.adjustments.col_9
   dt_sale_adjustment:
     lineage:
-      - datalake_nexxera_raw.adjustments.dt_sale_adjustment
+      - datalake_nexxera_raw.adjustments.col_10
   installment_number:
     lineage:
-      - datalake_nexxera_raw.adjustments.installment_number
+      - datalake_nexxera_raw.adjustments.col_11
   adjustment_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.adjustment_value
+      - datalake_nexxera_raw.adjustments.col_12
   dt_adjustment_launch:
     lineage:
-      - datalake_nexxera_raw.adjustments.dt_adjustment_launch
+      - datalake_nexxera_raw.adjustments.col_13
   launch_type:
     lineage:
-      - datalake_nexxera_raw.adjustments.launch_type
+      - datalake_nexxera_raw.adjustments.col_14
   installment_gross_amount:
     lineage:
-      - datalake_nexxera_raw.adjustments.installment_gross_amount
+      - datalake_nexxera_raw.adjustments.col_15
   adjustment_original_reason:
     lineage:
-      - datalake_nexxera_raw.adjustments.adjustment_original_reason
+      - datalake_nexxera_raw.adjustments.col_16
   id_nexxera_adjustment:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_nexxera_adjustment
+      - datalake_nexxera_raw.adjustments.col_17
   receipt_number:
     lineage:
-      - datalake_nexxera_raw.adjustments.receipt_number
-  tid:
+      - datalake_nexxera_raw.adjustments.col_18
+  id_transaction:
     lineage:
-      - datalake_nexxera_raw.adjustments.tid
+      - datalake_nexxera_raw.adjustments.col_19
   nexxera_detail_adjustment_code:
     lineage:
-      - datalake_nexxera_raw.adjustments.nexxera_detail_adjustment_code
+      - datalake_nexxera_raw.adjustments.col_20
   id_occurrence:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_occurrence
+      - datalake_nexxera_raw.adjustments.col_21
   launch_status:
     lineage:
-      - datalake_nexxera_raw.adjustments.launch_status
+      - datalake_nexxera_raw.adjustments.col_22
   dt_sent_to_bank:
     lineage:
-      - datalake_nexxera_raw.adjustments.dt_sent_to_bank
+      - datalake_nexxera_raw.adjustments.col_23
   summary_net_amount:
     lineage:
-      - datalake_nexxera_raw.adjustments.summary_net_amount
+      - datalake_nexxera_raw.adjustments.col_24
   summary_discount_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.summary_discount_value
+      - datalake_nexxera_raw.adjustments.col_25
   id_bank_compensation:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_bank_compensation
+      - datalake_nexxera_raw.adjustments.col_26
   deposit_agency:
     lineage:
-      - datalake_nexxera_raw.adjustments.deposit_agency
+      - datalake_nexxera_raw.adjustments.col_27
   deposit_account:
     lineage:
-      - datalake_nexxera_raw.adjustments.deposit_account
+      - datalake_nexxera_raw.adjustments.col_28
   id_bank_grouper:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_bank_grouper
+      - datalake_nexxera_raw.adjustments.col_29
   dt_summary_adjustment:
     lineage:
-      - datalake_nexxera_raw.adjustments.dt_summary_adjustment
+      - datalake_nexxera_raw.adjustments.col_30
   card_number:
     lineage:
-      - datalake_nexxera_raw.adjustments.card_number
+      - datalake_nexxera_raw.adjustments.col_31
   service_charge_value:
     lineage:
-      - datalake_nexxera_raw.adjustments.service_charge_value
+      - datalake_nexxera_raw.adjustments.col_32
   process_number:
     lineage:
-      - datalake_nexxera_raw.adjustments.process_number
+      - datalake_nexxera_raw.adjustments.col_33
   reference_number:
     lineage:
-      - datalake_nexxera_raw.adjustments.reference_number
+      - datalake_nexxera_raw.adjustments.col_34
   dt_reference_negotiation:
     lineage:
-      - datalake_nexxera_raw.adjustments.dt_reference_negotiation
+      - datalake_nexxera_raw.adjustments.col_35
   capture_type:
     lineage:
-      - datalake_nexxera_raw.adjustments.capture_type
+      - datalake_nexxera_raw.adjustments.col_36
   id_acquirer:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_acquirer
+      - datalake_nexxera_raw.adjustments.col_37
   total_installments:
     lineage:
-      - datalake_nexxera_raw.adjustments.total_installments
+      - datalake_nexxera_raw.adjustments.col_38
   id_flag:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_flag
+      - datalake_nexxera_raw.adjustments.col_39
   tef_pos:
     lineage:
-      - datalake_nexxera_raw.adjustments.tef_pos
+      - datalake_nexxera_raw.adjustments.col_40
   id_bpag:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_bpag
+      - datalake_nexxera_raw.adjustments.col_41
   id_erp:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_erp
+      - datalake_nexxera_raw.adjustments.col_42
   id_product:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_product
+      - datalake_nexxera_raw.adjustments.col_43
   product_name:
     lineage:
-      - datalake_nexxera_raw.adjustments.product_name
+      - datalake_nexxera_raw.adjustments.col_44
   id_hash:
     lineage:
-      - datalake_nexxera_raw.adjustments.id_hash
+      - datalake_nexxera_raw.adjustments.col_45
+  year:
+    lineage:
+      - datalake_nexxera_raw.adjustments.year
+  month:
+    lineage:
+      - datalake_nexxera_raw.adjustments.month
+  day:
+    lineage:
+      - datalake_nexxera_raw.adjustments.day

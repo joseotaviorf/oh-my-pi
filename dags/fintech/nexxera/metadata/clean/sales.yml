@@ -1,166 +1,176 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: sales
+description: "Table containing sales data from nexxera files (id_registration = 11). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
-  registration_type:
+  id_registration:
     lineage:
-      - datalake_nexxera_raw.sales.registration_type
+      - datalake_nexxera_raw.sales.col_1
   acquirer_name:
     lineage:
-      - datalake_nexxera_raw.sales.acquirer_name
+      - datalake_nexxera_raw.sales.col_2
   establishment_cnpj:
     lineage:
-      - datalake_nexxera_raw.sales.establishment_cnpj
+      - datalake_nexxera_raw.sales.col_3
   acquirer_pos:
     lineage:
-      - datalake_nexxera_raw.sales.acquirer_pos
+      - datalake_nexxera_raw.sales.col_4
   rv_summary_number:
     lineage:
-      - datalake_nexxera_raw.sales.rv_summary_number
+      - datalake_nexxera_raw.sales.col_5
   nsu_cv:
     lineage:
-      - datalake_nexxera_raw.sales.nsu_cv
+      - datalake_nexxera_raw.sales.col_6
   id_authorization:
     lineage:
-      - datalake_nexxera_raw.sales.id_authorization
+      - datalake_nexxera_raw.sales.col_7
   id_bank_deposit:
     lineage:
-      - datalake_nexxera_raw.sales.id_bank_deposit
+      - datalake_nexxera_raw.sales.col_8
   agency_deposit:
     lineage:
-      - datalake_nexxera_raw.sales.agency_deposit
+      - datalake_nexxera_raw.sales.col_9
   account_deposit:
     lineage:
-      - datalake_nexxera_raw.sales.account_deposit
+      - datalake_nexxera_raw.sales.col_10
   dt_sale:
     lineage:
-      - datalake_nexxera_raw.sales.dt_sale
+      - datalake_nexxera_raw.sales.col_11
   installment_number:
     lineage:
-      - datalake_nexxera_raw.sales.installment_number
+      - datalake_nexxera_raw.sales.col_12
   total_installments:
     lineage:
-      - datalake_nexxera_raw.sales.total_installments
+      - datalake_nexxera_raw.sales.col_13
   installment_net_amount:
     lineage:
-      - datalake_nexxera_raw.sales.installment_net_amount
+      - datalake_nexxera_raw.sales.col_14
   dt_installment_credit:
     lineage:
-      - datalake_nexxera_raw.sales.dt_installment_credit
+      - datalake_nexxera_raw.sales.col_15
   sale_type:
     lineage:
-      - datalake_nexxera_raw.sales.sale_type
+      - datalake_nexxera_raw.sales.col_16
   installment_gross_amount:
     lineage:
-      - datalake_nexxera_raw.sales.installment_gross_amount
+      - datalake_nexxera_raw.sales.col_17
   id_reconciliation:
     lineage:
-      - datalake_nexxera_raw.sales.id_reconciliation
+      - datalake_nexxera_raw.sales.col_18
   receipt_number:
     lineage:
-      - datalake_nexxera_raw.sales.receipt_number
-  tid:
+      - datalake_nexxera_raw.sales.col_19
+  id_transaction:
     lineage:
-      - datalake_nexxera_raw.sales.tid
+      - datalake_nexxera_raw.sales.col_20
   id_bpag:
     lineage:
-      - datalake_nexxera_raw.sales.id_bpag
+      - datalake_nexxera_raw.sales.col_21
   nsu_tef:
     lineage:
-      - datalake_nexxera_raw.sales.nsu_tef
+      - datalake_nexxera_raw.sales.col_22
   payment_status:
     lineage:
-      - datalake_nexxera_raw.sales.payment_status
+      - datalake_nexxera_raw.sales.col_23
   dt_sent_to_bank:
     lineage:
-      - datalake_nexxera_raw.sales.dt_sent_to_bank
+      - datalake_nexxera_raw.sales.col_24
   flag:
     lineage:
-      - datalake_nexxera_raw.sales.flag
+      - datalake_nexxera_raw.sales.col_25
   id_bank_grouper:
     lineage:
-      - datalake_nexxera_raw.sales.id_bank_grouper
+      - datalake_nexxera_raw.sales.col_26
   id_erp:
     lineage:
-      - datalake_nexxera_raw.sales.id_erp
+      - datalake_nexxera_raw.sales.col_27
   card_number:
     lineage:
-      - datalake_nexxera_raw.sales.card_number
+      - datalake_nexxera_raw.sales.col_28
   installment_discount_value:
     lineage:
-      - datalake_nexxera_raw.sales.installment_discount_value
+      - datalake_nexxera_raw.sales.col_29
   terminal_number:
     lineage:
-      - datalake_nexxera_raw.sales.terminal_number
+      - datalake_nexxera_raw.sales.col_30
   capture_type:
     lineage:
-      - datalake_nexxera_raw.sales.capture_type
+      - datalake_nexxera_raw.sales.col_31
   total_sale_gross_amount:
     lineage:
-      - datalake_nexxera_raw.sales.total_sale_gross_amount
+      - datalake_nexxera_raw.sales.col_32
   total_sale_discount_amount:
     lineage:
-      - datalake_nexxera_raw.sales.total_sale_discount_amount
+      - datalake_nexxera_raw.sales.col_33
   total_sale_net_amount:
     lineage:
-      - datalake_nexxera_raw.sales.total_sale_net_amount
+      - datalake_nexxera_raw.sales.col_34
   dt_summary_sale:
     lineage:
-      - datalake_nexxera_raw.sales.dt_summary_sale
+      - datalake_nexxera_raw.sales.col_35
   hr_summary_sale:
     lineage:
-      - datalake_nexxera_raw.sales.hr_summary_sale
+      - datalake_nexxera_raw.sales.col_36
   discount_charge:
     lineage:
-      - datalake_nexxera_raw.sales.discount_charge
+      - datalake_nexxera_raw.sales.col_37
   id_bank_liquidated:
     lineage:
-      - datalake_nexxera_raw.sales.id_bank_liquidated
+      - datalake_nexxera_raw.sales.col_38
   agency_liquidated:
     lineage:
-      - datalake_nexxera_raw.sales.agency_liquidated
+      - datalake_nexxera_raw.sales.col_39
   account_liquidated:
     lineage:
-      - datalake_nexxera_raw.sales.account_liquidated
+      - datalake_nexxera_raw.sales.col_40
   credit_installment_gross_amount:
     lineage:
-      - datalake_nexxera_raw.sales.credit_installment_gross_amount
+      - datalake_nexxera_raw.sales.col_41
   credit_installment_discount_amount:
     lineage:
-      - datalake_nexxera_raw.sales.credit_installment_discount_amount
+      - datalake_nexxera_raw.sales.col_42
   credit_installment_net_amount:
     lineage:
-      - datalake_nexxera_raw.sales.credit_installment_net_amount
+      - datalake_nexxera_raw.sales.col_43
   reconciliation_status:
     lineage:
-      - datalake_nexxera_raw.sales.reconciliation_status
+      - datalake_nexxera_raw.sales.col_44
   information_origin:
     lineage:
-      - datalake_nexxera_raw.sales.information_origin
+      - datalake_nexxera_raw.sales.col_45
   id_acquirer:
     lineage:
-      - datalake_nexxera_raw.sales.id_acquirer
+      - datalake_nexxera_raw.sales.col_46
   id_flag:
     lineage:
-      - datalake_nexxera_raw.sales.id_flag
+      - datalake_nexxera_raw.sales.col_47
   tef_pos:
     lineage:
-      - datalake_nexxera_raw.sales.tef_pos
+      - datalake_nexxera_raw.sales.col_48
   launch_type:
     lineage:
-      - datalake_nexxera_raw.sales.launch_type
+      - datalake_nexxera_raw.sales.col_49
   installment_antecipation_discount_amount:
     lineage:
-      - datalake_nexxera_raw.sales.installment_antecipation_discount_amount
+      - datalake_nexxera_raw.sales.col_50
   installment_antecipation_net_amount:
     lineage:
-      - datalake_nexxera_raw.sales.installment_antecipation_net_amount
+      - datalake_nexxera_raw.sales.col_51
   id_hash:
     lineage:
-      - datalake_nexxera_raw.sales.id_hash
+      - datalake_nexxera_raw.sales.col_52
   dt_deposit:
     lineage:
-      - datalake_nexxera_raw.sales.dt_deposit
+      - datalake_nexxera_raw.sales.col_53
   manual_bank_reconciliation:
     lineage:
-      - datalake_nexxera_raw.sales.manual_bank_reconciliation
+      - datalake_nexxera_raw.sales.col_54
+  year:
+    lineage:
+      - datalake_nexxera_raw.sales.year
+  month:
+    lineage:
+      - datalake_nexxera_raw.sales.month
+  day:
+    lineage:
+      - datalake_nexxera_raw.sales.day

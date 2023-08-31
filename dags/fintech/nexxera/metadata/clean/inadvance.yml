@@ -1,37 +1,83 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: inadvance
+description: "Table containing inadvance data from nexxera files (id_registration = 10). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
-  registration_type:
+  id_registration:
     lineage:
-      - datalake_nexxera_raw.inadvance.registration_type
-  group_name:
+      - datalake_nexxera_raw.inadvance.col_1
+  acquirer_name:
     lineage:
-      - datalake_nexxera_raw.inadvance.group_name
-  group_cnpj:
+      - datalake_nexxera_raw.inadvance.col_2
+  establishment_cnpj:
     lineage:
-      - datalake_nexxera_raw.inadvance.group_cnpj
-  constant_acquirers_number:
+      - datalake_nexxera_raw.inadvance.col_3
+  acquirer_pos:
     lineage:
-      - datalake_nexxera_raw.inadvance.constant_acquirers_number
-  total_records_number:
+      - datalake_nexxera_raw.inadvance.col_4
+  rv_summary_number:
     lineage:
-      - datalake_nexxera_raw.inadvance.total_records_number
-  total_sale_installments_value:
+      - datalake_nexxera_raw.inadvance.col_5
+  dt_due:
     lineage:
-      - datalake_nexxera_raw.inadvance.total_sale_installments_value
-  total_advance_summaries_value:
+      - datalake_nexxera_raw.inadvance.col_6
+  summary_installment_number:
     lineage:
-      - datalake_nexxera_raw.inadvance.total_advance_summaries_value
-  total_credit_adjustments_value:
+      - datalake_nexxera_raw.inadvance.col_7
+  dt_credit_installment:
     lineage:
-      - datalake_nexxera_raw.inadvance.total_credit_adjustments_value
-  total_debit_adjustments_value:
+      - datalake_nexxera_raw.inadvance.col_8
+  id_bank_deposit:
     lineage:
-      - datalake_nexxera_raw.inadvance.total_debit_adjustments_value
-  total_offset_adjustments_value:
+      - datalake_nexxera_raw.inadvance.col_9
+  agency_deposit:
     lineage:
-      - datalake_nexxera_raw.inadvance.total_offset_adjustments_value
-  total_legacy_summary_installments_value:
+      - datalake_nexxera_raw.inadvance.col_10
+  account_deposit:
     lineage:
-      - datalake_nexxera_raw.inadvance.total_legacy_summary_installments_value
+      - datalake_nexxera_raw.inadvance.col_11
+  inicial_antecipation_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_12
+  discount_antecipation_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_13
+  credit_net_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_14
+  original_installment_net_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_15
+  dt_summary_sale:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_16
+  original_installment_gross_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_17
+  discount_installment_gross_value:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_18
+  acquirer_code:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_19
+  conciliation_status:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_20
+  id_flag:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_21
+  total_installments:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_22
+  sale_type:
+    lineage:
+      - datalake_nexxera_raw.inadvance.col_23
+  year:
+    lineage:
+      - datalake_nexxera_raw.inadvance.year
+  month:
+    lineage:
+      - datalake_nexxera_raw.inadvance.month
+  day:
+    lineage:
+      - datalake_nexxera_raw.inadvance.day
