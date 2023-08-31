@@ -114,7 +114,9 @@ deal_stage_renamed AS (
     WHERE
         p.id_pipeline IN (5160960, 28040470) -- (SALE, RENT)
     QUALIFY 
-        LAST(event, TRUE) OVER (PARTITION BY id_company ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) IS DISTINCT FROM event
+        LAST(event, TRUE) OVER (
+            PARTITION BY id_company, business_context ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) IS DISTINCT FROM event
         AND event IS NOT NULL
 ),
 removed_deal_stage_oscillations AS (
@@ -264,7 +266,7 @@ status_changes AS (
     FROM
         removed_deal_stage_oscillations
     QUALIFY
-        LAG(event) OVER (PARTITION BY id_company ORDER BY ts_event) IS DISTINCT FROM event
+        LAG(event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) IS DISTINCT FROM event
     UNION ALL
     SELECT
         id_company,
@@ -284,7 +286,7 @@ status_changes AS (
     FROM
         removed_ticket_stage_oscillations
     QUALIFY
-        LAG(event) OVER (PARTITION BY id_company ORDER BY ts_event) IS DISTINCT FROM event
+        LAG(event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) IS DISTINCT FROM event
     UNION ALL
     SELECT
         id_company_demand AS id_company,
@@ -464,7 +466,7 @@ treated_with_loss AS (
                 WHEN is_loss AND last_status IN ('Membership Started', 'Contract Transition Started') AND event_type = 'Deal' THEN FALSE
                 ELSE is_loss
             END, TRUE
-        ) OVER (PARTITION BY id_company ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS is_previous_loss
+        ) OVER (PARTITION BY id_company, business_context ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS is_previous_loss
     FROM
         treated
 ),
