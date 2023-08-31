@@ -1,0 +1,111 @@
+---
+database_name: dw_rent_snapshot
+table_name: coincident_events_time_variations
+description: This table has the dailies snapshots data based on the rent demand events metrics, creating a full historical
+  of the data volume changes, allowing to understand updates through time. The table has aggregated sums of coincident conversions
+  of the rental funnel by several metrics and time visualizations, described below.
+  The D-1 target type refers to the current day load looking to the events that happened on the day before. The columns that shows the volume
+  differences for this time visualization are always null;
+  The W1-W5 target type refers to the current day load looking to the events that happened one to five weeks ago. The column that shows the
+  volume differences for this time visualization is comparing to the end of week's load of the related week. For example, if we're currently on
+  the week of 28/08/23. The W1-W5 weeks goes from 24/07/23 to 21/08/23. In order to check the load differences, we're calculating the current day load
+  volume for the mentioned related weeks minus the load volume that happened on the last day of each week (which in this case would be the load of
+  the days 30/07 for the W1 week, 06/08 for the W2, 13/08 for the W3, 20/08 for the W4 and 27/08 for the W5);
+  The LM (Last Month) target type refers to the current day load looking to the events that happened on the past month. The columns that shows the
+  volume differences for this time visualization are comparing to the load that happened on the last day of the previous month;
+  The LQ (Last Quarter) target type refers to the current day load looking to the events that happened on the past quarter. The columns that shows the
+  volume differences for this time visualization are comparing to the load that happened on the last day of the previous quarter;
+  The LY (Last Year) target type refers to the current day load looking to the events that happened on the past year. The columns that shows the
+  volume differences for this time visualization are comparing to the load that happened on the last day of the previous year (e.g. the load of
+  December 31 of the past year).
+  This table is partitioned by country_code, year, month and day columns -- which should be used in analysis, following that order, to improve the
+  query's performance.
+  Each line has the total volume of the coincident conversions and its differences groupped by some dimensions (country_code, business_type,
+  rent_flow_origin) on a daily snapshot.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  target_type:
+    description: Target type of the current time visualization.
+    categories:
+      D-1: Current day load looking to the events that happened on the day before (D-1).
+      W1-W5: Current day load looking to the events that happened on one to five weeks ago.
+      LM: Current day load looking to the events that happened on the last month.
+      LQ: Current day load looking to the events that happened on the last quarter.
+      LY: Current day load looking to the events that happened on the last year.
+  business_type:
+    description: Business type of the related aggregation.
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.business_type
+  rent_flow_origin:
+    description: The rent flow origin (touchpoint) of the related aggregation.
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.rent_flow_origin
+  visits_booked:
+    description: The volume of the visits booked within the aggregation.
+  diff_vb:
+    description: The volume difference of the visits booked within the aggregation, compared to the present day load of the target type.
+      Every target type has a different time window to visualize the differences (e.g. for D-1 it has no difference check (it's always null),
+      but for W1-W5 it checks the data volume load of the end of the week of each week in focus, comparing to the present day load related to
+      these weeks. For LM, it checks the data volume load of the last day of the previous month, comparing to the present day load related to
+      the past month. For LQ, it checks the data volume load of the last day of the previous quarter, comparing to the present day load related to
+      the past quarter. For LY, it checks the data volume load of the last day of the previous year, comparing to the present day load related to
+      the past year. Follows the same rule for all difference check columns).
+  visits_completed:
+    description: The volume of the visits completed within the aggregation.
+  diff_vc:
+    description: The volume difference of the visits completed within the aggregation, compared to the present day load of the target type.
+  offers_submitted:
+    description: The volume of the offers submitted within the aggregation.
+  diff_os:
+    description: The volume difference of the offers submitted within the aggregation, compared to the present day load of the target type.
+  offers_approved:
+    description: The volume of the offers approved within the aggregation.
+  diff_oa:
+    description: The volume difference of the offers approved within the aggregation, compared to the present day load of the target type.
+  evaluation_started:
+    description: The volume of the evaluation started within the aggregation.
+  diff_es:
+    description: The volume difference of the evaluation started within the aggregation, compared to the present day load of the target type.
+  evaluation_positive:
+    description: The volume of the evaluation positive within the aggregation.
+  diff_ep:
+    description: The volume difference of the evaluation positive within the aggregation, compared to the present day load of the target type.
+  documentation_sent:
+    description: The volume of the documentation sent within the aggregation.
+  diff_ds:
+    description: The volume difference of the documentation sent within the aggregation, compared to the present day load of the target type.
+  credit_approved:
+    description: The volume of the credit approved within the aggregation.
+  diff_ca:
+    description: The volume difference of the credit approved within the aggregation, compared to the present day load of the target type.
+  contracts_signed:
+    description: The volume of the contracts signed within the aggregation.
+  diff_cs:
+    description: The volume difference of the contracts signed within the aggregation, compared to the present day load of the target type.
+  dt_target:
+    description: Date of when the present event happened (could be a VC, OS, CS, etc.)
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.dt_event
+  dt_snapshot:
+    description: Date of when the snapshot of the data happened. It should be the current day.
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.ts_snapshot
+  country_code:
+    description: Country code of the related aggregation. Also, a partition of the table and should be used to improve analysis' performance.
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.country_code
+  year:
+    description: Year of the present data load. Also, a partition of the table and should be used to improve analysis' performance.
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.year
+  month:
+    description: Month of the present data load. Also, a partition of the table and should be used to improve analysis' performance.
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.month
+  day:
+    description: Day of the present data load. Also, a partition of the table and should be used to improve analysis' performance.
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.day
+  ts_load:
+    description: Timestamp of when the present data was loaded into our systems.
