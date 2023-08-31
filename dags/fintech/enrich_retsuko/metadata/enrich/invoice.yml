@@ -18,9 +18,13 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.id_account
   id_contract:
-    description: "Contract ID associated with the invoice"
+    description: "The Seu Barriga's internal contract ID reference of an invoice"
     lineage:
       - datalake_retsuko_clean.invoice.id_contract
+  id_contract_external:
+    description: "Most used ID to identify contracts. It is the MAIN (system that generates 5A contracts) Contract ID"
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
   id_audit:
     description: "Latest audit ID associated with an invoice entry"
     lineage:

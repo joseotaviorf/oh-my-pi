@@ -7,13 +7,14 @@ WITH latest_audit AS (
     datalake_retsuko_clean.entry
   GROUP BY
     id_invoice,
-    id_audit    
+    id_audit
 )
 SELECT
     in.id,
     in.id_external,
     in.id_account,
     in.id_contract,
+    c.id_external AS id_contract_external,
     la.id_audit,
     in.status,
     in.substatus,
@@ -36,5 +37,8 @@ FROM
 LEFT JOIN
   latest_audit AS la
 ON in.id = la.id_invoice
+LEFT JOIN
+  datalake_retsuko_clean.contract AS c
+      ON c.id = in.id_contract
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY in.id ORDER BY in.ts_retsuko_updated DESC) = 1

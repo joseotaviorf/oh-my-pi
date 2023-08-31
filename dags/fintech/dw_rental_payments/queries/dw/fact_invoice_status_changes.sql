@@ -1,7 +1,7 @@
 WITH invoice_data AS (
   SELECT
     id_external AS sk_invoice,
-    id_contract AS sk_contract,
+    id_contract_external AS sk_contract,
     ABS(due_amount) AS invoice_due_amount,
     IF(status = 'written-down', TRUE, FALSE) AS is_written_down,
     DATE(ts_created) AS dt_created,
@@ -78,7 +78,7 @@ SELECT
     ELSE 'VENCIDA'
   END AS status,
   invoice.invoice_due_amount,
-  invoice.dt_cohort,
+  DATE(invoice.dt_cohort) AS dt_cohort,
   NOW() AS ts_load
 FROM
   invoice_status_mob AS invoice
