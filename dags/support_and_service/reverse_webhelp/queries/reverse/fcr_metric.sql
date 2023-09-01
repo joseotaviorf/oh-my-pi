@@ -23,9 +23,9 @@ SELECT DISTINCT
     ft.ts_survey,
     ft.ts_solved,
     ft.ts_closed,
-    YEAR(ft.ts_started) AS year,
-    MONTH(ft.ts_started) AS month,
-    DAY(ft.ts_started) AS day
+    YEAR(CURRENT_DATE - 1) AS year,
+    MONTH(CURRENT_DATE - 1) AS month,
+    DAY(CURRENT_DATE - 1) AS day
 FROM
     dw_customer_support.fact_ticket AS ft
 LEFT JOIN

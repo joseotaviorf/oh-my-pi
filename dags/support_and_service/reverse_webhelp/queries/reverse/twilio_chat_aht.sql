@@ -8,9 +8,9 @@ SELECT
     ca.average_concurrency,
     ca.average_handling_time_seconds,
     dc.team AS area_aux,
-    YEAR(ca.dt_task_created_local) AS year,
-    MONTH(ca.dt_task_created_local) AS month,
-    DAY(ca.dt_task_created_local) AS day
+    YEAR(CURRENT_DATE - 1) AS year,
+    MONTH(CURRENT_DATE - 1) AS month,
+    DAY(CURRENT_DATE - 1) AS day
 FROM
     datalake_quinto_messenger.chat_aht AS ca
 LEFT JOIN

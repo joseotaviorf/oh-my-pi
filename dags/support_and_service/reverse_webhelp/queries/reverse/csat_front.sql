@@ -15,9 +15,9 @@ SELECT DISTINCT
     DATE(ts_started) AS ts_started,
     DATE(ts_closed) AS ts_closed,
     DATE(ts_csat_response) AS ts_response,
-    YEAR(ts_csat_response) AS year,
-    MONTH(ts_csat_response) AS month,
-    DAY(ts_csat_response) AS day
+    YEAR(CURRENT_DATE - 1) AS year,
+    MONTH(CURRENT_DATE - 1) AS month,
+    DAY(CURRENT_DATE - 1) AS day
 FROM
     dw_customer_support.fact_ticket AS ft
 LEFT JOIN

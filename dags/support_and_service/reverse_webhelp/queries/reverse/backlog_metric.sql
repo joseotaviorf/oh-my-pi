@@ -25,9 +25,9 @@ SELECT DISTINCT
     bmt.dt_metric_reference,
     bmt.ts_started,
     bmt.ts_solved,
-    YEAR(bmt.ts_started) AS year,
-    MONTH(bmt.ts_started) AS month,
-    DAY(bmt.ts_started) AS day
+    YEAR(CURRENT_DATE - 1) AS year,
+    MONTH(CURRENT_DATE - 1) AS month,
+    DAY(CURRENT_DATE - 1) AS day
 FROM
     dw_customer_support.fact_backlog_metrics_tasks AS bmt
 LEFT JOIN

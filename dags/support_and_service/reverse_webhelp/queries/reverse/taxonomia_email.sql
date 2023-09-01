@@ -48,9 +48,9 @@ SELECT DISTINCT
     contact_theme_detail_tag AS ThemeDetail,
     gdc.ticket_area AS Area,
     'new' AS taxonomy_version,
-    YEAR(dt.ts_created) AS year,
-    MONTH(dt.ts_created) AS month,
-    DAY(dt.ts_created) AS day
+    YEAR(CURRENT_DATE - 1) AS year,
+    MONTH(CURRENT_DATE - 1) AS month,
+    DAY(CURRENT_DATE - 1) AS day
 FROM
     dw_tickets.fact_tickets AS ft
 JOIN
