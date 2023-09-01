@@ -40,7 +40,7 @@ WITH status_changes AS (
             ON bcda.id = bcd.id
     LEFT JOIN
         datalake_brokers_supply_processor_clean.lead_3p_aud AS la
-            ON la.id = bcda.id_lead
+            ON la.id = bcd.id_lead
             AND la.ts_updated <= bcda.ts_updated
     WHERE
         bcda.mod_status

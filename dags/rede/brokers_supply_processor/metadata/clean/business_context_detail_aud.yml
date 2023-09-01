@@ -21,10 +21,6 @@ columns:
     description: 'Unique identifier of the partner that sent the lead.'
     lineage:
       - datalake_brokers_supply_processor_raw.business_context_detail_aud.partner_id
-  id_lead:
-    description: 'Unique identifier of the lead.'
-    lineage:
-      - datalake_brokers_supply_processor_raw.business_context_detail_aud.lead_id
   business_context:
     description: 'Either SALE or RENT.'
     lineage:
@@ -72,10 +68,6 @@ columns:
     description: Flag indicating if the column mod_id_partner has changed.
     lineage:
       - datalake_brokers_supply_processor_raw.business_context_detail_aud.partner_id_mod
-  mod_id_lead:
-    description: Flag indicating if the column mod_id_lead has changed.
-    lineage:
-      - datalake_brokers_supply_processor_raw.business_context_detail_aud.lead_id_mod
   mod_business_context:
     description: Flag indicating if the column mod_business_context has changed.
     lineage:
