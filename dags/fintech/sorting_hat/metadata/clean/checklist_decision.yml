@@ -1,0 +1,36 @@
+database_name: datalake_sorting_hat_clean
+table_name: checklist_decision
+description: This table stores the decision of the checklist after the analysis request flow.
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.checklistdecision.id
+    description: Checklist decision primary identification.
+  id_checklist:
+    lineage:
+      - datalake_sorting_hat_raw.checklistdecision.checklist_id
+    description: Checklist ID.
+  id_input_source:
+    lineage:
+      - datalake_sorting_hat_raw.checklistdecision.input_source_id
+    description: Input source ID. If the input source is ANALYST_MAIN_USER the id_input_source corresponds to the analyst ID.
+  type:
+    lineage:
+      - datalake_sorting_hat_raw.checklistdecision.type
+    description: Checklist decision type. It can be manual or automatic.
+  input_source_type:
+    lineage:
+      - datalake_sorting_hat_raw.checklistdecision.input_source_type
+    description: Type of the input source responsible to the checklist decision.
+  decision:
+    lineage:
+      - datalake_sorting_hat_raw.checklistdecision.decision
+    description: Final checklist decision. It can be APPROVED or REJECTED.
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.checklistdecision.created_at
+    description: Timestamp of the creation date.
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.checklistdecision.updated_at
+    description: Timestamp of the checklist decision update date.

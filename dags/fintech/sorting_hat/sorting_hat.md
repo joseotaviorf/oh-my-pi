@@ -23,6 +23,7 @@ Currently, there is the following output table for both our raw and clean layers
 - `analysis_state`
 - `checklist_group`
 - `checklist_item`
+- `checklist_decision`
 - `checklist`
 - `credit_analysis`
 - `credit_analysis_version`
