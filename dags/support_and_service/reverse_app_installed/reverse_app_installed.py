@@ -19,7 +19,9 @@ ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "app_installed"
 DAG_NAME = f"reverse_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 MAIN_START_DATE = datetime(2022, 7, 12, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = None
 
 config_service = ConfigurationService(DAG_NAME)
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -36,6 +38,7 @@ default_libraries = config_service.get_config("default_libraries")
 
 minority_report_endpoint = config_service.get_config("minority_report_endpoint")
 tables_to_send = config_service.get_config("tables_to_send")
+dag_documentation = config_service.get_config("dag_documentation")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -47,14 +50,18 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID, ENV=ENV
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

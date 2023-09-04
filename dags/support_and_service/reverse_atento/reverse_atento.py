@@ -26,6 +26,8 @@ DAG_NAME = f"reverse_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 MAIN_START_DATE = datetime(2022, 7, 12, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = None
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 config_service = ConfigurationService(DAG_NAME)
 
@@ -53,18 +55,23 @@ default_libraries = config_service.get_config("default_libraries")
 external_s3_bucket = config_service.get_config("external_s3_bucket")
 
 partition_cols = config_service.get_config("partition_cols")
+dag_documentation = config_service.get_config("dag_documentation")
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID, ENV=ENV
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 
