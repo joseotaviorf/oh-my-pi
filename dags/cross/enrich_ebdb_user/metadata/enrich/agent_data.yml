@@ -1,24 +1,40 @@
 database_name: datalake_ebdb_user
 table_name: agent_data
+description: Table with more information about the agents. Each row represents an agent.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id:
+    description: ID of the agent.
     lineage:
       - datalake_ebdb_clean.agent_data.id
   id_city:
+    description: ID of the agent's city.
     lineage:
       - datalake_ebdb_clean.agent_data.id_city
   country_code:
+    description: Country code of the agent.
     lineage:
       - datalake_ebdb_user.user.country_code
   creci_number:
+    description: Agent's CRECI number (CRECI is the regional council of realtors)
     lineage:
       - datalake_ebdb_clean.agent_data.creci_number
   profile:
+    description: Agent profile regarding transportation method.
     lineage:
       - datalake_ebdb_clean.agent_data.profile
   is_active:
+    description: Flag to indicate if the agent is active.
     lineage:
       - datalake_ebdb_clean.agent_data.is_active
+  is_realstate_agent:
+    description: Flag to indicate if the agent is a realstate agent (has a CRECI number).
   is_photographer:
+    description: Flag to indicate if the agent is a photographer.
     lineage:
       - datalake_ebdb_user.user.is_photographer
+  is_sale_agent:
+    description: Flag to indicate if the agent operates in For Sale business context.
+  is_rent_agent:
+    description: Flag to indicate if the agent operates in For Rent business context.
