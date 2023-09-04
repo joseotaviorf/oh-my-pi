@@ -1,45 +1,61 @@
 database_name: datalake_docx
 table_name: credit_evaluation
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+description: "Table with the credit evaluation of the tenant"
 columns:
   id:
     lineage:
       - datalake_docx_clean.credit_evaluation.id
+    description: "Id of the income documentation"  
   id_proposal:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_proposal
+    description: "Id of the proposal" 
   id_house:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_house
+    description: "Id of the house" 
   id_user:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_user
+    description: "Id of the user" 
   reason:
     lineage:
       - datalake_docx_clean.credit_evaluation.reason
+    description: "Reason of the evaluation" 
   result:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
+    description: "Result of the evaluation" 
   status:
     lineage:
       - datalake_docx_clean.credit_evaluation.status
+    description: "Status of the evaluation" 
   proposal_last_result:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
+    description: "Last result of the proposal" 
   proposal_number_evaluations:
     lineage:
       - datalake_docx_clean.credit_evaluation.id
+    description: "Last result of the proposal" 
   ts_created:
     lineage:
       - datalake_docx_clean.credit_evaluation.ts_created
+    description: "Creation timestamp"
   ts_updated:
     lineage:
       - datalake_docx_clean.credit_evaluation.ts_updated
+    description: "Updated timestamp"
   ts_proposal_first_credit_evaluation_positive:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
       - datalake_docx_clean.credit_evaluation.ts_updated
+    description: "Timestamp of the positive first credit evaluation"
   ts_proposal_last_credit_evaluation_positive:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
       - datalake_docx_clean.credit_evaluation.ts_updated
+    description: "Timestamp of the positive last credit evaluation"
  

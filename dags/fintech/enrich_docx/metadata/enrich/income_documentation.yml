@@ -1,63 +1,86 @@
 database_name: datalake_docx
 table_name: income_documentation
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+description: "Table with the income documentation of the tenant"
 columns:
   id:
     lineage:
       - datalake_docx_clean.document.id
+    description: "Id of the income documentation"  
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
+    description: "Id of the folder"  
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
+    description: "Id of the document type"  
   id_document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
+    description: "Id of the document context"  
   id_context_external:
     lineage:
       - datalake_docx_clean.document.id_context_external
+    description: "Id external of the document context"  
   monthly_salary:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant monthly salary"  
   company_name:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant company name"  
   company_phone_number:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant company phone number"  
   emp_link:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant type of job" 
   profession:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant profession" 
   additional_income:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant additional income" 
   source_of_income:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant source of income" 
   documentation_extra_comment:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Documentation extra comment" 
   payslips:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant payslip" 
   ctps_pages:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant ctps pages" 
   bank_statements:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant bank statements" 
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Documentation attributes"
   attachments:
     lineage:
       - datalake_docx_clean.document.attachments
+    description: "Documentation attachments"
   ts_created:
     lineage:
       - datalake_docx_clean.document.ts_created
+    description: "Creation timestamp"
   ts_updated:
     lineage:
       - datalake_docx_clean.document.ts_updated
+    description: "Updated timestamp"

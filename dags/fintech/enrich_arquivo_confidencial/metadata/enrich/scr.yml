@@ -1,6 +1,6 @@
 database_name: datalake_arquivo_confidencial
 table_name: scr
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: felipe.chies@quintoandar.com.br
 domain: fintech
 description: "Table with SCR data broken by Months on Booking (mob) and version."
 columns:
@@ -54,6 +54,14 @@ columns:
         - datalake_arquivo_confidencial_clean.integration_report.raw_data
   linked_to_foreign_currency:
     description: "If data is informed on foreign currency."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+  financial_institution_count:
+    description: "Count of financial institution."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+  start_relationship_date:
+    description: "Start date of the relationship"
     lineage:
         - datalake_arquivo_confidencial_clean.integration_report.raw_data
   ts_created:

@@ -1,51 +1,70 @@
 database_name: datalake_docx
 table_name: personal_documentation
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+description: "Table with the personal documentation of the tenant"
 columns:
   id:
     lineage:
       - datalake_docx_clean.document.id
+    description: "Id of the personal documentation"  
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
+    description: "Id of the folder"  
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
+    description: "Id of the document type"  
   id_document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
+    description: "Id of the document context"  
   id_context_external:
     lineage:
       - datalake_docx_clean.document.id_context_external
+    description: "Id external of the document context" 
   full_name:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant full name" 
   email:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant email" 
   telephone_number:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant telephone number" 
   cell_phone_number:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant cell phone number" 
   marital_status:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant marital status" 
   rent_reason:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Tenant rent reason" 
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Documentation attributes"
   attachments:
     lineage:
       - datalake_docx_clean.document.attachments
+    description: "Documentation attachments"
   will_reside:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Will reside information"
   ts_created:
     lineage:
       - datalake_docx_clean.document.ts_created
+    description: "Creation timestamp"
   ts_updated:
     lineage:
       - datalake_docx_clean.document.ts_updated
+    description: "Updated timestamp"

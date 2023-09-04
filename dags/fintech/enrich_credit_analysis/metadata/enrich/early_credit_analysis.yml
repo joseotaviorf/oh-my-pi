@@ -1,37 +1,59 @@
 ---
 database_name: datalake_credit_analysis
 table_name: early_credit_analysis
+description: "Enrich table with the early credit analysis information"
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
 columns:
   id_house:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_house 
+    description: "House id coming from early credit analysis table(sorting hat)"
   id_visit:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_visit
+    description: "Visit id coming from rent flow ebdb table"
   id_offer:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_offer
+    description: "Offer id coming from rent flow ebdb table"
   id_user:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_user
+    description: "User id coming from early credit analysis table(sorting hat)"
   id_rent_flow:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
+    description: "Rent flow id coming from rent flow ebdb table"
   id_credit_evaluation:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_credit_evaluation
+    description: "Credit evaluation id coming from early credit analysis table(sorting hat)"
   result:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Result of the analysis"
+  days_offer_after_early_credit_evaluation:
+    description: "Number of days of the offer after early credit evaluation"
+  days_booking_after_early_credit_evaluation:
+    description: "Number of days of the booking after early credit evaluation"
+  days_visit_after_early_credit_evaluation: 
+    description: "Number of days of the visit after early credit evaluation"
+  is_most_recent_evaluation:
+    description: "True if the evaluation is the most recent"
   dt_visit:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_visit
+    description: "Date of the visit"
   ts_booking_created:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
+    description: "Booking creation timestamp"
   ts_offer_created:
     lineage:
       - datalake_ebdb_clean.offer.ts_created
+    description: "Offer creation timestamp"
   ts_early_credit_analysis_created:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_created
+    description: "Early credit analysis creation timestamp"

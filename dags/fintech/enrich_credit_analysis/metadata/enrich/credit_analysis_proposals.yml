@@ -1,6 +1,6 @@
 database_name: datalake_credit_analysis
 table_name: credit_analysis_proposals
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: felipe.chies@quintoandar.com.br
 domain: Fintech
 description: "Table that aggregates data from credit analysis to a proposal levels"
 columns:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_variant
     description: "First credit model+policy variant identifier that evaluated the proposal."
-  id_last_variant:
+  id_last_variant_not_null:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_variant
     description: "Last credit model+policy variant identifier that evaluated the proposal."
@@ -32,7 +32,7 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.category
     description: "First guarantee offer identifier given to a proposal. Join with dw_credit.dim_variant for more details."
-  rental_guarantee_category:
+  guarantee_category:
     lineage:
       - datalake_rental_guarantee.guarantee.score
     description: "Guarantee offer identifier on rental guarantee microservice given to a proposal. Here should only have paid options. Join with dw_credit.dim_variant for more details."
@@ -54,6 +54,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract.guarantee_type
     description: "Guarantee name as given on the contract."
+  liquidity:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.liquidity
+    description: "Liquidity information of the proposal."
   last_result:
     lineage:
       - datalake_docx.credit_evaluation.proposal_last_result
@@ -115,6 +119,11 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.proposal.ts_analyzed
     description: "Last timestamp on which the proposal was manually analyzed."
+  ts_first_analyzed:
+    lineage:
+      - datalake_sorting_hat_clean.proposal.ts_analyzed
+      - datalake_sorting_hat_clean.proposal_version.ts_analyzed 
+    description: "First timestamp on which the proposal was manually analyzed."
   ts_first_credit_evaluation_positive:
     lineage:
       - datalake_docx.credit_evaluation.ts_proposal_first_credit_evaluation_positive

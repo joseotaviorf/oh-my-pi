@@ -1,60 +1,88 @@
 database_name: datalake_credit_analysis
 table_name: credit_analysis
+description: "Enrich table with the credit analysis information"
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
 columns:
   id_credit_analysis:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
+    description: "Credit analysis id coming from credit analysis clean table(sorting hat)"
   id_proposal:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_proposal
+    description: "proposal id from sorting hat microsservice, the same on EBDB and Rental Guarantee."
   id_analyst:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_analyst
+    description: "Analyst id coming from credit analysis clean table(sorting hat)"
   bypass:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.bypass
+    description: "Bypass reason"
   category:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.category
+    description: "Category information coming from credit analysis clean table(sorting hat)"
   category_within_ca:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis_version.category
+    description: "Same as the category but with the max_ca_category information when the category is null"
   category_within_proposal:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis_version.category
+    description: "Same as the category_within_ca but with the last category available on credit_analysis_proposals when the category_within_ca is null"
   documentation_policy:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.type
+    description: "Type information coming from credit analysis clean table(sorting hat)"
   guarantee_category:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.guarantee_category
+    description: "Category information coming from credit analysis proposals."
   level:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.level
+    description: "level information of the guarantee"
   liquidity:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.liquidity
+    description: "Liquidity information of the proposal."
   paid_guarantee_type:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
+    description: "Type of the paid guarantee"
   reason:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.reason
+    description: "Reason of the analysis"
   risk_category:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.risk_category
+    description: "Risk score given by the model result plus the credit policy. Useful, but deprecated in favor to risk_category_canon."
   internal_score:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.internal_score
+    description: "Old credit model (internal-score) deprecated."
   max_bypass:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.max_bypass
+    description: "Bypass reason, if there is one, aggregated by proposal."
   max_ca_category:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis_version.category
+    description: "Max ca_category information of the guarantee"
   result:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.result
+    description: "Result of the analysis"
+  credit_decision_cluster:
+    description: "Credit decision cluster of the analysis"
+  is_manual_analysis:
+    description: "True if the analysis is manual"
+  is_reprocessed:
+    description: "True if the analysis is reprocessed"
   ts_credit_analysis_created:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.ts_created
+    description: "Credit analysdis creation timestamp."

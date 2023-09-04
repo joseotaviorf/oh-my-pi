@@ -1,63 +1,86 @@
 database_name: datalake_docx
 table_name: address_documentation
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+description: "Table with the address documentation of the tenant"
 columns:
   id:
     lineage:
       - datalake_docx_clean.document.id
+    description: "Id of the addres documentation"  
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
+    description: "Id of the folder"  
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
+    description: "Id of the document type"  
   id_document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
+    description: "Id of the document context"  
   id_context_external:
     lineage:
       - datalake_docx_clean.document.id_context_external
+    description: "Id external of the document context"  
   zip_code:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Zip code of the address" 
   state:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "State of the address" 
   city:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "City of the address" 
   neighborhood:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Neighborhood of the address" 
   address:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Address information" 
   address_number:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Number of the address" 
   address_complement:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Complement of the address" 
   years_in_current_residence:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Number of years in current residence" 
   current_living_situation:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Current living situation" 
   real_estate_or_owner_name:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Real estate or owner name" 
   real_estate_or_owner_phone_number:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Real estate or owner phone number"
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
+    description: "Documentation attributes"
   attachments:
     lineage:
       - datalake_docx_clean.document.attachments
+    description: "Documentation attachments"
   ts_created:
     lineage:
       - datalake_docx_clean.document.ts_created
+    description: "Creation timestamp"
   ts_updated:
     lineage:
       - datalake_docx_clean.document.ts_updated
+    description: "Updated timestamp"

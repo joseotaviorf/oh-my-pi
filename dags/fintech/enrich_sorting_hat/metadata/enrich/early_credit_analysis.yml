@@ -1,64 +1,87 @@
 ---
 database_name: datalake_sorting_hat
 table_name: early_credit_analysis
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+description: "Table with the early credit analysis information of the tenant"
 columns:
   id:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id
+    description: "ID of the credit analysis"
   id_credit_evaluation:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_credit_evaluation
+    description: "ID of the credit evaluation"
   id_user:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_user
+    description: "ID of the user"
   id_house:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_house
+    description: "ID of the house"
   id_variant:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_variant
+    description: "ID of the variant"
   id_model_variant:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "ID of the model variant"
   city:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.city
+    description: "City of the tenant" 
   score:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Score of the analysis"
   bypass:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Bypass reason"
   errors:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Analysis errors"
   result:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Analysis result"
   category:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Analysis category"
   range_start:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Value range start"
   range_end:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Value range end"
   model_variant:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Model variant related to the analysis"
   risk_category:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Risk score given by the model result plus the credit policy. Useful, but deprecated in favor to risk_category_canon."
   rejection_reason:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Reason of the analysis rejection."
   version:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.version
+    description: "Credit analysis version"
   ts_created:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_created
+    description: "Creation timestamp"
   ts_expired:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
+    description: "Expiration timestamp"
