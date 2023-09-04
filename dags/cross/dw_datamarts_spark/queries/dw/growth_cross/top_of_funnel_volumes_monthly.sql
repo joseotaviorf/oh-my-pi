@@ -159,12 +159,15 @@ events AS (
                         AND mkt_channel IN ('CRM/Notification', 'CRM/Notifications'))
                     OR (LOWER(utm_campaign) LIKE '%whatsapp_homes%' AND LOWER(utm_term) LIKE '%sale%')
                     OR (LOWER(utm_campaign) LIKE '%5a-alerts-v1%' AND LOWER(utm_term) LIKE '%sale%')
-                    OR (LOWER(utm_campaign) LIKE '%cronut%'))
+                    OR (LOWER(utm_campaign) IN ('cronut', 'cronut_sale')))
                 THEN 'Sale'
             WHEN LOWER(ui.business_context) = 'sale'
                 AND (NULLIF(utm_campaign, '') IS NULL
                     OR LOWER(utm_campaign) LIKE '%branded%')
                 THEN 'Organic'
+            WHEN
+                (LOWER(utm_campaign) = 'cronut_rent')
+                THEN  'Rental'
             ELSE 'Rental'
         END AS campaign_context,
         ui.mkt_origin,
