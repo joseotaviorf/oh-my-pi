@@ -125,28 +125,16 @@ for table in tables:
     )
 
 
-    chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
+    if has_raw == True:
+        chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
 
-    chain(
-        create_cluster_task,
-        DatalakeTaskGroup.all_first_tasks(raw_task_groups),
-    )
+        chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups),)
 
-    chain(
-        DatalakeTaskGroup.all_last_tasks(clean_task_groups),
-        terminate_cluster_task,
-    )
-    TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
+        chain(DatalakeTaskGroup.all_last_tasks(clean_task_groups),terminate_cluster_task,)
 
+        TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 
-    if has_raw == False:
-        create_cluster_task.set_downstream(
-            DatalakeTaskGroup.first_tasks(clean_task_groups)
-        )
     else:
-        cross_downstream(
-            DatalakeTaskGroup.last_tasks(raw_task_groups),
-            DatalakeTaskGroup.first_tasks(clean_task_groups),
-        )
+        chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(clean_task_groups))
 
-    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_groups))
+        chain(DatalakeTaskGroup.all_last_tasks(clean_task_groups),terminate_cluster_task,)
