@@ -8,6 +8,7 @@ tables:
   - table_name: adjustments
     source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
     format: "csv"
+    has_raw: True
     col_names:
       - col_1
       - col_2
@@ -57,6 +58,7 @@ tables:
   - table_name: financial
     source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
     format: "csv"
+    has_raw: True
     col_names:
       - col_1
       - col_2
@@ -115,6 +117,7 @@ tables:
   - table_name: inadvance
     source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
     format: "csv"
+    has_raw: True
     col_names:
       - col_1
       - col_2
@@ -142,6 +145,7 @@ tables:
   - table_name: sales
     source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
     format: "csv"
+    has_raw: True
     col_names:
       - col_1
       - col_2
@@ -200,6 +204,7 @@ tables:
   - table_name: transaction
     source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
     format: "csv"
+    has_raw: True
     col_names:
       - col_1
       - col_2
@@ -255,12 +260,27 @@ tables:
       - col_52
       - col_53
       - col_54
-  - table_name: ext
-    source_root_path: "s3://5a-datalake-forno/temp/nexxera/"
+  - table_name: financial_extracts
+    source_root_path: "s3://5a-datalake-forno/temp/nexxera/ext"
     format: "txt"
+    has_raw: True
     col_names:
       - col_1
       - col_2
       - col_3
       - col_4
+  - table_name: financial_legacy
+    has_raw: False
+  - table_name: acquirer_header
+    has_raw: False
+  - table_name: acquirer_trailer
+    has_raw: False
+  - table_name: establishment_header
+    has_raw: False
+  - table_name: establishment_trailer
+    has_raw: False
+  - table_name: group_header
+    has_raw: False
+  - table_name: group_trailer
+    has_raw: False
 partition_cols: ["year", "month", "day"]

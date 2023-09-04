@@ -8,10 +8,10 @@ from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -87,31 +87,36 @@ task_group = DatalakeTaskGroup(
 
 tables = config_service.get_config("tables")
 
+raw_task_groups = {}
+clean_task_groups = {}
+
 for table in tables:
     table_name = table["table_name"]
-    SOURCE_ROOT_PATH = table["source_root_path"]
-    format = table["format"]
-    col_names = table["col_names"]
+    has_raw = table["has_raw"]
 
-    raw_task_group = task_group.build_raw_task_group_for_single_table(
-        source=SOURCE,
-        table_name=table_name,
-        target_database_base_name=SOURCE,
-        extraction_spark_job_file=f"{CUSTOM_SPARK_JOB_PATH}/load_csv_into_datalake.py",
-        raw_spark_job_extra_args=[
-            SOURCE,
-            SOURCE_ROOT_PATH,
-            "{{ ds }}",
-            table_name,
-            json.dumps(CONSUMER_EXTRA_ARGS),
-            format,
-            json.dumps(col_names)
-        ],
-    )
+    if has_raw == True:
+        SOURCE_ROOT_PATH = table["source_root_path"]
+        format = table["format"]
+        col_names = table["col_names"]
+        raw_task_groups[table_name] = task_group.build_raw_task_group_for_single_table(
+            source=SOURCE,
+            table_name=table_name,
+            target_database_base_name=SOURCE,
+            extraction_spark_job_file=f"{CUSTOM_SPARK_JOB_PATH}/load_csv_into_datalake.py",
+            raw_spark_job_extra_args=[
+                SOURCE,
+                SOURCE_ROOT_PATH,
+                "{{ ds }}",
+                table_name,
+                json.dumps(CONSUMER_EXTRA_ARGS),
+                format,
+                json.dumps(col_names)
+            ],
+        )
 
     partition_columns = config_service.get_config("partition_cols")
 
-    clean_task_group = task_group.build_clean_task_group(
+    clean_task_groups[table_name] = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
@@ -120,11 +125,28 @@ for table in tables:
     )
 
 
-    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+    chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
 
-    cross_downstream(
-        DatalakeTaskGroup.last_tasks(raw_task_group),
-        DatalakeTaskGroup.first_tasks(clean_task_group),
+    chain(
+        create_cluster_task,
+        DatalakeTaskGroup.all_first_tasks(raw_task_groups),
     )
 
-    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+    chain(
+        DatalakeTaskGroup.all_last_tasks(clean_task_groups),
+        terminate_cluster_task,
+    )
+    TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
+
+
+    if has_raw == False:
+        create_cluster_task.set_downstream(
+            DatalakeTaskGroup.first_tasks(clean_task_groups)
+        )
+    else:
+        cross_downstream(
+            DatalakeTaskGroup.last_tasks(raw_task_groups),
+            DatalakeTaskGroup.first_tasks(clean_task_groups),
+        )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_groups))

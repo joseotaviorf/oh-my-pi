@@ -6,9 +6,12 @@ SELECT
     SUBSTRING(metadata, 6, 1) AS segment_type,
     SUBSTRING(metadata, 7, 3) AS instruction_code,
     SUBSTRING(metadata, 10, 3) AS compensation_code,
-    metadata AS description
+    metadata AS description,
+    year,
+    month,
+    day
 FROM
-    datalake_nexxera_raw.ext
+    datalake_nexxera_raw.financial_extracts
 WHERE
     year = {year}
     AND month = {month}

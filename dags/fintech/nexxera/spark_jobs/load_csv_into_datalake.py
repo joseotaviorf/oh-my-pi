@@ -47,7 +47,7 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
-    parser.add_argument("source_root_path", help="name of the source")
+    parser.add_argument("source_root_path", help="name of the source", default=None)
     parser.add_argument(
         "date_to_ingest",
         help="Date to be used in filtering the files. Format: '%Y-%m-%d'",
@@ -57,20 +57,20 @@ if __name__ == "__main__":
         "consumer_extra_args",
         help="extra arguments to pass to get_data_from_file of S3Consumer",
     )
-    parser.add_argument("format", help="file format")
+    parser.add_argument("format", help="file format", default=None)
     parser.add_argument("col_names", help="new names of the columns", default=None)
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    source_root_path = args.source_root_path
+    source_root_path = args.source_root_path if args.source_root_path != "None" else None
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
     consumer_extra_args = json.loads(args.consumer_extra_args)
     partition_cols = ["year", "month", "day"]
     datetime_to_ingest = datetime.strptime(date_to_ingest, "%Y-%m-%d")
-    format = args.format
+    format = args.format if args.format != "None" else None
     col_names = json.loads(args.col_names) if args.col_names != "None" else None
 
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
             .output()
         )
     elif format == 'txt':
-        s3_files_path = f"{source_root_path}{table_name}"
+        s3_files_path = f"{source_root_path}"
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
         pattern = re.compile(f".*{datetime_to_ingest.strftime('%y%m%d')}.*")
         filtered_files = list(filter(pattern.match, files))
