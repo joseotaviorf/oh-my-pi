@@ -106,6 +106,10 @@ def get_cash_flows_missing_cols():
         "cHrAlt",
         "cUsAlt",
         "categorias",
+        "nValAberto",
+        "nValLiquido",
+        "nValPago",
+        "cLiquidado",
     ]
     return {k: None for k in all_columns_from_api}
 
