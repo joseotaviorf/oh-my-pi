@@ -44,6 +44,11 @@ WITH fact_house_listing_flows_adjust AS (
         dhl.ts_house_first_publication,
         FROM_UTC_TIMESTAMP(dhl.ts_house_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
         CASE
+            WHEN LOWER(om.sales_company) = 'mensageria' 
+                OR LOWER(olc.sales_company) = 'mensageria' 
+                OR LOWER(dl.sales_company) = 'mensageria'
+                OR LOWER(du.sales_company) = 'mensageria'
+                THEN 'MENSAGERIA'
             WHEN om.sales_company IS NOT NULL
                 THEN om.sales_company
             WHEN olc.sales_company IS NOT NULL
@@ -111,6 +116,7 @@ source_ops_rent AS (
                     OR (hlf.has_isales_intervention = false))
                     AND photo_job_by_isales >= 1
                     AND sk_first_photo_job_date = hlf.sk_opportunity_date THEN 'FSS IS PhotoJob'
+            WHEN hlf.sales_company = 'MENSAGERIA' THEN 'MENSAGERIA'
             WHEN hlf.sales_company IN ('QUINTO_ANDAR','OLOS','QUINTO_ANDAR_INBOUND','QUINTO_ANDAR_OUTBOUND','') THEN 'IS Int'
             WHEN hlf.sales_company IN ('ACTION_LINE','ATENTO','ALGAR','AEC') THEN 'IS Ext'
             ELSE  'Other'
@@ -207,6 +213,11 @@ sale_fact_listing_flows_adjust AS (
         FROM_UTC_TIMESTAMP(dl.ts_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
         COALESCE(dl.is_casa_mineira_migration, false) as is_casa_mineira_migration,
         CASE
+            WHEN LOWER(om.sales_company) = 'mensageria' 
+                OR LOWER(olc.sales_company) = 'mensageria' 
+                OR LOWER(dl.sales_company) = 'mensageria'
+                OR LOWER(du.sales_company) = 'mensageria'
+                THEN 'MENSAGERIA'
             WHEN om.sales_company IS NOT NULL
                 THEN om.sales_company
             WHEN olc.sales_company IS NOT NULL
@@ -274,6 +285,7 @@ source_ops_sale AS (
                     OR (ssf.has_isales_intervention = false))
                 AND photo_job_by_isales >= 1
                 AND sk_first_photo_job_date = ssf.sk_opportunity_date THEN 'FSS IS PhotoJob'
+            WHEN ssf.sales_company = 'MENSAGERIA' THEN 'MENSAGERIA'
             WHEN ssf.sales_company IN ('QUINTO_ANDAR','OLOS','QUINTO_ANDAR_INBOUND','QUINTO_ANDAR_OUTBOUND','') THEN 'IS Int'
             WHEN ssf.sales_company IN ('ACTION_LINE','ATENTO','ALGAR','AEC') THEN 'IS Ext'
             ELSE  'Other'
