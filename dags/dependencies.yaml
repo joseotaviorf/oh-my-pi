@@ -761,7 +761,6 @@ bietlejuice.dw_tickets:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-contact-types
   - bietlejuice.zendesk_tickets:load-clean-tickets
   - bietlejuice.zendesk_tickets:load-clean-users
 bietlejuice.dw_tracksale:
@@ -1417,11 +1416,11 @@ bietlejuice.enrich_greenseer:
   - bietlejuice.journey_flow:load-clean-journey-flow
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_gsheets:
+  - bietlejuice.gsheets_fintech:done-clean-fdic-acquisition-2023
   - bietlejuice.gsheets_fintech:done-clean-fdic-liquidation-2023
   - bietlejuice.gsheets_for_rent:done-clean-demand-targets-2022
   - bietlejuice.gsheets_for_rent:done-clean-supply-targets-2022
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
-  - bietlejuice.gsheets_fintech:done-clean-fdic-acquisition-2023
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity
 bietlejuice.enrich_house_feature_inference:
