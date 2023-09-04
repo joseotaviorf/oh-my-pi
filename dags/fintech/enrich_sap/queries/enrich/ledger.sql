@@ -1130,6 +1130,14 @@ SELECT
         WHEN '61101.01.80' THEN 'Corretores - Hubs'
         WHEN '61101.01.81' THEN 'Projeto Reparos'
         WHEN '61101.01.82' THEN 'Revenue Share Corretor Select'
+        WHEN '21107.03.01' THEN 'Contas a repassar - Corretores e imobiliárias (Taxa de Ativação)'
+        WHEN '21107.03.02' THEN 'Adiantamento de Clientes - Garantias'
+        WHEN '31101.07.07' THEN 'Serviços Prestados - Velo'
+        WHEN '61101.01.86' THEN 'Gross Revenue Corretagem - Taxa de Ativação'
+        WHEN '61101.01.87' THEN 'Comissões - Taxa de Ativação (Imobiliária)'
+        WHEN '31201.01.12' THEN 'ISS sobre Serviços (3%)'
+        WHEN '51101.08.09' THEN 'Perdão de Dívida'
+        WHEN '11202.03.02' THEN 'Garantias a receber - Velo'
         ELSE 'Unknown: ' || db.account
     END AS account_name,
     dh.series AS series,
