@@ -5,6 +5,6 @@ SELECT
     month,
     day
 FROM 
-    datalake_rene_descartes_raw.revinfo
+    datalake_property_dedup_raw.revinfo
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY rev ORDER BY dt DESC) = 1
