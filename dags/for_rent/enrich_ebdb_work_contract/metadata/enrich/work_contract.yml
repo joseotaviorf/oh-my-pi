@@ -1,29 +1,46 @@
 ---
 database_name: datalake_ebdb_work_contract
 table_name: work_contract
+description: Table with information of partner's work contracts.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id:
+    description: ID of the work contract.
     lineage:
       - datalake_ebdb_clean.work_contract.id
   id_company_hubspot:
+    description: ID of the company hubspot.
     lineage:
       - datalake_hubspot_clean.company.id_company
   id_hub_teams:
+    description: ID of the business unit team.
     lineage:
       - datalake_gsheets_clean.sale_business_unit_standardization.id_business_unit_teams
   hub_name_teams:
+    description: Name of the hub team.
     lineage:
       - datalake_gsheets_clean.sale_business_unit_standardization.hub_name_teams
   contract_name:
+    description: Name of the work contract.
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
   3p_partner:
+    description: Name of 3p partner.
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
       - datalake_hubspot_clean.company.properties
+  is_3p_contract:
+    description: Flag to indicate if it is a 3p partner (based on contract name).
+  is_3p_5a_contract:
+    description: Flag to indicate if it is a 3p partner not from the state of Minas Gerais - BR.
+  is_3p_bh_contract:
+    description: Flag to indicate if it is a 3p partner from the state of Minas Gerais - BR.
   ts_created:
+    description: Timestamp of when the work contract was created.
     lineage:
       - datalake_ebdb_clean.work_contract.ts_created
   ts_updated:
+    description: Timestamp of when the work contract was updated.
     lineage:
       - datalake_ebdb_clean.work_contract.ts_updated
