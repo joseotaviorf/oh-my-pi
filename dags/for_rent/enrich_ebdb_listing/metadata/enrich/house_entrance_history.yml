@@ -1,30 +1,49 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: house_entrance_history
+description: Information related to changes in the house's entry condition.
+  Every line represents a house's entry condition and the period such condition was active.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.access_type_aud.id_house
       - datalake_ebdb_clean.house_aud.id_house
+    description: ID of the house.
   id_occupant:
     lineage:
       - datalake_ebdb_clean.access_type_aud.id_occupant
+    description: ID to represent who is occupying the house.
+    categories:
+      '1': None
+      '2': Tenant
+      '3': Owner      
+      '4': Empty
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
+    description: Country code of the house.
   rev:
     lineage:
       - datalake_ebdb_clean.access_type_aud.rev
       - datalake_ebdb_clean.house_aud.rev
+    description: ID of the revision.
   doorman_type:
     lineage:
       - datalake_ebdb_clean.house_aud.doorman_type
+    description: Type of doorman of the listing.
   key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
+    description: Location of the listing's key.
+  is_last_status_of_day:
+    description: Flag to indicate if the entry condition status is the last one of the day.
   ts_entrance_started:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the entry condition started.
   ts_entrance_ended:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the entry condition ended.
