@@ -1,5 +1,7 @@
 metadata_files_out_of_pattern:
   - cross/gsheets_by_context/metadata/clean/for_rent/proj_agent_manager.yml
+  - growth/enrich_rent_potential_listing/metadata/enrich/potential_listing_b2b.yml
+  - growth/enrich_rent_potential_listing/metadata/enrich/potential_listings_reprocessed_leads.yml
   - growth/enrich_supply_outbound_flows/metadata/enrich/supply_outbound_contacts.yml
   - growth/rene_descartes/metadata/clean/lead_rejection_aud.yml
   - growth/rene_descartes/metadata/clean/lead_rejection.yml
