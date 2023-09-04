@@ -50,12 +50,12 @@ agents_control AS (
             WHEN t.id_assignee = "5124274148" THEN COALESCE(a.id_agent, 5124274148)
             ELSE t.id_assignee
         END AS id_agent,
-        COALESCE(a.email, a2.email) AS email,
-        COALESCE(a.name, a2.name) AS name,
-        COALESCE(a.phone, a2.phone) AS phone,
-        COALESCE(a.organization, a2.organization) AS organization,
-        COALESCE(a.ts_created, a2.ts_created) AS ts_created,
-        COALESCE(a.ts_updated, a2.ts_updated) AS ts_updated
+        COALESCE(a2.email, a.email) AS email,
+        COALESCE(a2.name, a.name) AS name,
+        COALESCE(a2.phone, a.phone) AS phone,
+        COALESCE(a2.organization, a.organization) AS organization,
+        COALESCE(a2.ts_created, a.ts_created) AS ts_created,
+        COALESCE(a2.ts_updated, a.ts_updated) AS ts_updated
     FROM
         datalake_zendesk_tickets_clean.tickets AS t
     LEFT JOIN
