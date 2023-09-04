@@ -55,34 +55,50 @@ columns:
     description: The volume of the visits completed within the aggregation.
   diff_vc:
     description: The volume difference of the visits completed within the aggregation, compared to the present day load of the target type.
+  percentage_diff_vb:
+    description: The difference amount of VBs in percentage.
   offers_submitted:
     description: The volume of the offers submitted within the aggregation.
   diff_os:
     description: The volume difference of the offers submitted within the aggregation, compared to the present day load of the target type.
+  percentage_diff_os:
+    description: The difference amount of OSs in percentage.
   offers_approved:
     description: The volume of the offers approved within the aggregation.
   diff_oa:
     description: The volume difference of the offers approved within the aggregation, compared to the present day load of the target type.
+  percentage_diff_oa:
+    description: The difference amount of OAs in percentage.
   evaluation_started:
     description: The volume of the evaluation started within the aggregation.
   diff_es:
     description: The volume difference of the evaluation started within the aggregation, compared to the present day load of the target type.
+  percentage_diff_es:
+    description: The difference amount of ESs in percentage.
   evaluation_positive:
     description: The volume of the evaluation positive within the aggregation.
   diff_ep:
     description: The volume difference of the evaluation positive within the aggregation, compared to the present day load of the target type.
+  percentage_diff_ep:
+    description: The difference amount of EPs in percentage.
   documentation_sent:
     description: The volume of the documentation sent within the aggregation.
   diff_ds:
     description: The volume difference of the documentation sent within the aggregation, compared to the present day load of the target type.
+  percentage_diff_ds:
+    description: The difference amount of DSs in percentage.
   credit_approved:
     description: The volume of the credit approved within the aggregation.
   diff_ca:
     description: The volume difference of the credit approved within the aggregation, compared to the present day load of the target type.
+  percentage_diff_ca:
+    description: The difference amount of CAs in percentage.
   contracts_signed:
     description: The volume of the contracts signed within the aggregation.
   diff_cs:
     description: The volume difference of the contracts signed within the aggregation, compared to the present day load of the target type.
+  percentage_diff_cs:
+    description: The difference amount of CSs in percentage.
   dt_target:
     description: Date of when the present event happened (could be a VC, OS, CS, etc.)
     lineage:
