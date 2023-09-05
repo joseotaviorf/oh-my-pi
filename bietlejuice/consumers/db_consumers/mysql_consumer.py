@@ -66,7 +66,7 @@ class MySqlConsumer(DBConsumer):
         """
         query = """
         SELECT
-          table_name,
+          table_name AS table_name,
           round(((data_length + index_length) / 1024 / 1024), 2) AS `size`,
           TABLE_ROWS as rows_count
         FROM
