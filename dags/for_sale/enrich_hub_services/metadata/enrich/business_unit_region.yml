@@ -1,7 +1,8 @@
 ---
 database_name: datalake_hub_services
 table_name: business_unit_region
-description: Table with the BU information and its coverage periods on each region.
+description: Table with the BU information and its coverage periods on each region. Information from 2022-05 and previous are from a Gsheet and because of that this
+  this period does not have all the information for some rows.
 domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 columns:
@@ -12,14 +13,17 @@ columns:
   id_region:
     lineage:
       - datalake_hub_services_clean.business_unit_region_aud.id_region
+      - datalake_gsheets_clean.business_unit_region.id_region
     description: 5A Region ID that this BU is attending.
   hub_name:
     lineage:
       - datalake_hub_services_clean.business_unit.hub_name
+      - datalake_gsheets_clean.business_unit_region.business_unit
     description: Last BU name. So if this BU had a different name in the past it won't be considered.
   business_model:
     lineage:
       - datalake_hub_services_clean.business_unit.sdr_type
+      - datalake_gsheets_clean.business_unit_region.business_model
     description: BU business model.
   lead_types:
     lineage:
@@ -32,8 +36,10 @@ columns:
   ts_start_coverage:
     lineage:
       - datalake_hub_services_clean.business_unit_region_aud.ts_created
+      - datalake_gsheets_clean.business_unit_region.dt_start
     description: Timestamp indicating when this BU started attending this region.
   ts_end_coverage:
     lineage:
       - datalake_hub_services_clean.business_unit_region_aud.ts_created
+      - datalake_gsheets_clean.business_unit_region.dt_end
     description: Timestamp indicating when this BU stopped attending this region.

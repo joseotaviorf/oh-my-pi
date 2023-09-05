@@ -1,9 +1,7 @@
 WITH member_profile_order AS (
     SELECT
         *,
-        ROW_NUMBER() OVER(
-                PARTITION BY id ORDER BY ts_updated DESC
-        ) AS r
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS r
     FROM
         datalake_hub_services_clean.member_profile
 ),
@@ -43,23 +41,20 @@ member_profile AS (
             ON mp_p.id = mp.id_parent_member_profile
             AND mp_p.r = 1
 ),
-business_unit_order AS (
-    SELECT
-        id,
-        MAX(version) AS version
-    FROM
-        datalake_hub_services_clean.business_unit
-    GROUP BY 1
-),
 business_units AS (
     SELECT
-        bu.*
+        id AS id_business_unit,
+        hub_name,
+        business_context,
+        negotiation_type,
+        sdr_type,
+        lead_types,
+        ts_updated,
+        ts_created
     FROM
         datalake_hub_services_clean.business_unit AS bu
-    JOIN
-        business_unit_order AS buo
-            ON bu.id = buo.id
-            AND bu.version = buo.version
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_business_unit ORDER BY version DESC) = 1
 ),
 users_order AS (
     SELECT
@@ -82,7 +77,7 @@ users AS (
 teams_relations AS (
     SELECT
         mp.id,
-        bu.id AS id_business_unit,
+        bu.id_business_unit,
         bu.hub_name,
         u1.id_external AS id_user_agent,
         u2.id_external AS id_user_en,
@@ -92,7 +87,7 @@ teams_relations AS (
         member_profile AS mp
     LEFT JOIN
         business_units AS bu
-            ON mp.id_business_unit = bu.id
+            ON mp.id_business_unit = bu.id_business_unit
     LEFT JOIN
         users AS u1
             ON mp.id_user = u1.id
@@ -115,31 +110,26 @@ work_contract AS (
 wc_hubs_padronization AS (
     SELECT
         wc.id_user_agent,
-        IF (wc.work_contract_name = bus.hub_name_wc, bus.id_business_unit_teams, NULL) AS id_hub,
-        IF (wc.work_contract_name = bus.hub_name_wc, bus.hub_name_teams, NULL) AS hub_name,
+        IF (wc.work_contract_name = bus.hub_name, bus.id_business_unit, NULL) AS id_hub,
+        IF (wc.work_contract_name = bus.hub_name, bus.hub_name, NULL) AS hub_name,
         wc.ts_started,
         wc.ts_ended
     FROM
         work_contract AS wc
     LEFT JOIN
-        datalake_gsheets_clean.sale_business_unit_standardization AS bus
-            ON bus.hub_name_wc = wc.work_contract_name
-            AND bus.is_work_contract = true
+        business_units AS bus
+            ON bus.hub_name = wc.work_contract_name
 ),
 
 business_unit_region_relations AS (
     SELECT
-        IF (bur.business_unit = bus.hub_name_bur, bus.id_business_unit_teams, NULL) AS id_hub,
+        bur.id_business_unit AS id_hub,
         bur.id_region,
-        bur.business_unit AS hub_name,
-        bur.dt_start,
-        COALESCE(bur.dt_end, CURRENT_DATE) AS dt_end
+        bur.hub_name,
+        DATE(bur.ts_start_coverage) AS dt_start,
+        COALESCE(DATE(bur.ts_end_coverage), CURRENT_DATE) AS dt_end
     FROM
-        datalake_gsheets_clean.business_unit_region AS bur
-    LEFT JOIN
-        datalake_gsheets_clean.sale_business_unit_standardization AS bus
-            ON bus.hub_name_bur = bur.business_unit
-            AND bus.is_business_unit_region = true
+        datalake_hub_services.business_unit_region AS bur
 ),
 
 visit_relation AS (

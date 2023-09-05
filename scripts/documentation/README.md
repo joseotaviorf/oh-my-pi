@@ -18,8 +18,8 @@ The script, by default, considers that we are copying the description backwards 
 
 - For backward copy:
 
-    `python3 copy_description.py <origin_dag> <origin_table> <destination_dag> <destination_table>`
+    `python3 copy_description.py -od <origin_dag> -ot <origin_table> -dd <destination_dag> -dt <destination_table>`
 
 - For forward copy:
 
-    `python3 copy_description.py <origin_dag> <origin_table> <destination_dag> <destination_table> True`
+    `python3 copy_description.py -od <origin_dag> -ot <origin_table> -dd <destination_dag> -dt <destination_table> -f`

@@ -33,7 +33,7 @@ booking AS (
         b.is_canceled,
         b.is_hub_flow,
         b.user_sale_booking_creator,
-        bur.business_unit,
+        bur.hub_name AS business_unit,
         b.ts_created AS ts_booking_created,
         ROW_NUMBER() OVER (PARTITION BY b.id_visitor ORDER BY b.ts_created) AS rw_asc,
         ROW_NUMBER() OVER (PARTITION BY b.id_visitor ORDER BY b.ts_created DESC) AS rw_desc
@@ -43,9 +43,9 @@ booking AS (
         datalake_ebdb_clean.house AS h
             ON h.id = b.id_house
     LEFT JOIN
-        datalake_gsheets_clean.business_unit_region AS bur
+        datalake_hub_services.business_unit_region AS bur
             ON h.id_region = bur.id_region
-            AND (DATE(b.ts_created) BETWEEN bur.dt_start AND COALESCE(bur.dt_end, date_sub(current_date(), 1)))
+            AND (DATE(b.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
     WHERE
         b.visit_intent = 'SALE'
         AND UPPER(b.type) = 'VISITA'
@@ -279,7 +279,7 @@ visit_intent AS (
         e.ts_visit_intent,
         e.id_house,
         h.id_region,
-        bur.business_unit,
+        bur.hub_name AS business_unit,
         ROW_NUMBER() OVER (PARTITION BY e.id_user ORDER BY e.ts_visit_intent) AS rw_asc,
         ROW_NUMBER() OVER (PARTITION BY e.id_user ORDER BY e.ts_visit_intent DESC) AS rw_desc
     FROM
@@ -288,7 +288,7 @@ visit_intent AS (
         datalake_ebdb_clean.house AS h
             ON e.id_house = h.id
     LEFT JOIN
-        datalake_gsheets_clean.business_unit_region AS bur
+        datalake_hub_services.business_unit_region AS bur
             ON h.id_region = bur.id_region
 ),
 

@@ -1,130 +1,178 @@
----
 database_name: datalake_sale_lead_flows
 table_name: quintoandar_lead_flow
+description: Enriched table to track the lead from 5A journey.
+domain: Data ForSale
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id_user:
+    description: SK User on 5A main table. JOINs with dw_public.dim_user
     lineage:
-      - datalake_ebdb_clean.user_aud.id_user
+    - datalake_ebdb_clean.user_aud.id_user
   id_region_first_booking:
+    description: Booking first region ID.
     lineage:
-      - datalake_booking.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_region_last_booking:
+    description: Booking last region ID.
     lineage:
-      - datalake_booking.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_region_first_visit_intent:
+    description: Visit first region ID.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_region_last_visit_intent:
+    description: Visit last region ID.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_region_first_offer:
+    description: Offer first region ID.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_region_last_offer:
+    description: Offer last region ID.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_first_region:
+    description: Offer first region ID.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_house_first_booking:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of property/house when the first booking were created.
   id_house_last_booking:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of property/house when the last booking were created.
   id_house_first_visit_intent:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of property/house on the first visit intent.
   id_house_last_visit_intent:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of property/house on the last visit intent.
   id_house_first_offer:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of property/house of the first offer.
   id_house_last_offer:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of property/house of the last offer.
   id_house_first_sale_agreement:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of property/house for the first CCV.
   id_house_last_sale_agreement:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of property/house for the last CCV.
   id_first_house:
     lineage:
-      - datalake_booking.booking.id_house
+    - datalake_booking.booking.id_house
+    description: Key of first property/house.
   email:
+    description: User email
     lineage:
-      - datalake_ebdb_clean.user_aud.email
+    - datalake_ebdb_clean.user_aud.email
   phone_number:
+    description: User phone
     lineage:
-      - datalake_ebdb_clean.user_aud.phone_number
+    - datalake_ebdb_clean.user_aud.phone_number
   first_offer_flow:
     lineage:
-      - datalake_offer.sale_offer.offer_flow
+    - datalake_offer.sale_offer.offer_flow
+    description: Information about which flow this offer is following
   first_ccv_flow:
     lineage:
-      - datalake_offer.sale_offer.offer_flow
+    - datalake_offer.sale_offer.offer_flow
+    description: Information about which flow this offer is following
   first_offer_business_unit:
     lineage:
-      - datalake_offer.sale_offer.business_unit
+    - datalake_offer.sale_offer.business_unit
+    description: Name of the business unit where the buyer was served.
   first_ccv_business_unit:
     lineage:
-      - datalake_offer.sale_offer.business_unit
+    - datalake_offer.sale_offer.business_unit
+    description: Name of the business unit where the buyer was served.
   first_business_unit_region_new_buyer_prospect:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.business_unit
+    - datalake_hub_services.business_unit_region.hub_name
+    description: Last BU name. So if this BU had a different name in the past it won't
+      be considered.
   last_business_unit_region_new_buyer_prospect:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.business_unit
+    - datalake_hub_services.business_unit_region.hub_name
+    description: Last BU name. So if this BU had a different name in the past it won't
+      be considered.
   first_business_unit_region_intent_lead:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.business_unit
+    - datalake_hub_services.business_unit_region.hub_name
+    description: Last BU name. So if this BU had a different name in the past it won't
+      be considered.
   last_business_unit_region_intent_lead:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.business_unit
+    - datalake_hub_services.business_unit_region.hub_name
+    description: Last BU name. So if this BU had a different name in the past it won't
+      be considered.
   ts_first_event:
+    description: Timestamp indicating this user fisrt event on sale flow.
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_sale_flows.sale_flow.ts_first_event
   ts_first_visit_scheduling_event:
+    description: Timestamp indicating the first visit intent event on Amplitude
     lineage:
-      - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
+    - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
   ts_last_visit_scheduling_event:
+    description: Timestamp indicating the last visit intent event on Amplitude
     lineage:
-      - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
+    - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
   ts_first_tta_message_sent:
     lineage:
-      - datalake_talk_to_agent.talk_to_agent_events.ts_event
+    - datalake_talk_to_agent.talk_to_agent_events.ts_event
+    description: Timestamp of when the event happened.
   ts_last_tta_message_sent:
     lineage:
-      - datalake_talk_to_agent.talk_to_agent_events.ts_event
+    - datalake_talk_to_agent.talk_to_agent_events.ts_event
+    description: Timestamp of when the event happened.
   ts_first_sale_agreement_signed:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+    - datalake_offer.sale_offer.dt_sale_agreement_signed
+    description: Date when the CCV was signed
   ts_last_sale_agreement_signed:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+    - datalake_offer.sale_offer.dt_sale_agreement_signed
+    description: Date when the CCV was signed
   ts_first_offer_submitted:
     lineage:
-      - datalake_offer.sale_offer.ts_offer_submitted
+    - datalake_offer.sale_offer.ts_offer_submitted
+    description: Timestamp when the offer was sent by the buyer
   ts_last_offer_submitted:
     lineage:
-      - datalake_offer.sale_offer.ts_offer_submitted
+    - datalake_offer.sale_offer.ts_offer_submitted
+    description: Timestamp when the offer was sent by the buyer
   ts_first_offer_accepted:
     lineage:
-      - datalake_offer.sale_offer.dt_offer_accepted
+    - datalake_offer.sale_offer.dt_offer_accepted
+    description: Date when the offer was accepted by the owner
   ts_last_offer_accepted:
     lineage:
-      - datalake_offer.sale_offer.dt_offer_accepted
+    - datalake_offer.sale_offer.dt_offer_accepted
+    description: Date when the offer was accepted by the owner
   ts_first_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
+    - datalake_booking.booking.ts_created
+    description: Datetime of the booking creation.
   ts_last_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
+    - datalake_booking.booking.ts_created
+    description: Datetime of the booking creation.
   ts_first_visit_completed:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.ts_booking_utc
+    description: Timestamp when the first visit happened.
   ts_last_visit_completed:
     lineage:
-      - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.ts_booking_utc
+    description: Timestamp when the last visit happened.

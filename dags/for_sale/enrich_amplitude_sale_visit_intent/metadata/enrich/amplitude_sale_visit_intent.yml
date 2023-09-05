@@ -1,25 +1,35 @@
 ---
 database_name: datalake_amplitude_sale_visit_intent
 table_name: amplitude_sale_visit_intent
+description: Enriched table identify sale visit intent events from Amplitude.
+domain: Data ForSale
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id_user:
+    description: User ID
     lineage:
       - datalake_amplitude_clean.events.id_user
   id_app:
+    description: App ID
     lineage:
       - datalake_amplitude_clean.events.id_app
   id_house:
+    description: House ID
     lineage:
       - datalake_amplitude_clean.events.event_properties
   ts_visit_intent:
+    description: Timestamp when this sale visit intent event happened
     lineage:
       - datalake_amplitude_clean.events.ts_event
   year:
+    description: Event year
     lineage:
       - datalake_amplitude_clean.events.year
   month:
+    description: Event month
     lineage:
       - datalake_amplitude_clean.events.month
   day:
+    description: Event day
     lineage:
       - datalake_amplitude_clean.events.day

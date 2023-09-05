@@ -31,20 +31,60 @@ last_business_unit_info AS (
         datalake_hub_services_clean.business_unit
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_business_unit ORDER BY version DESC) = 1
+),
+hub_services_cte AS (
+    SELECT
+        rcd.id_business_unit,
+        rcd.id_region,
+        l_hub.hub_name,
+        l_hub.business_model,
+        l_hub.lead_types,
+        l_hub.negotiation_type,
+        rcd.ts_start AS ts_start_coverage,
+        rcd.ts_end AS ts_end_coverage
+    FROM
+        regions_coverage_dates AS rcd
+    LEFT JOIN
+        last_business_unit_info AS l_hub
+            ON l_hub.id_business_unit = rcd.id_business_unit
+    WHERE
+        rcd.rev_type != 2
+),
+historical_data AS (
+    SELECT
+        "null" AS id_business_unit,
+        bur_g.id_region,
+        bur_g.business_unit AS hub_name,
+        bur_g.business_model,
+        ARRAY() AS lead_types,
+        "null" AS negotiation_type,
+        TIMESTAMP(bur_g.dt_start) AS ts_start_coverage,
+        LEAST(TIMESTAMP(NULLIF(bur_g.dt_end, "2022-05-23T17:25:17")), TO_TIMESTAMP("2022-05-23 17:25:17", "yyyy-MM-dd HH:mm:ss")) AS ts_end_coverage
+    FROM
+        datalake_gsheets_clean.business_unit_region AS bur_g
+    WHERE
+        bur_g.dt_start <= "2022-05-23T17:25:17"
 )
 SELECT
-    rcd.id_business_unit,
-    rcd.id_region,
-    l_hub.hub_name,
-    l_hub.business_model,
-    l_hub.lead_types,
-    l_hub.negotiation_type,
-    rcd.ts_start AS ts_start_coverage,
-    rcd.ts_end AS ts_end_coverage
+    id_business_unit,
+    id_region,
+    hub_name,
+    business_model,
+    lead_types,
+    negotiation_type,
+    ts_start_coverage,
+    ts_end_coverage
 FROM
-    regions_coverage_dates AS rcd
-LEFT JOIN
-    last_business_unit_info AS l_hub
-        ON l_hub.id_business_unit = rcd.id_business_unit
-WHERE
-    rcd.rev_type != 2
+    hub_services_cte
+UNION ALL
+SELECT
+    id_business_unit,
+    id_region,
+    hub_name,
+    business_model,
+    lead_types,
+    negotiation_type,
+    ts_start_coverage,
+    ts_end_coverage
+FROM
+    historical_data

@@ -16,7 +16,7 @@ house AS (
     id,
     id_region,
     city
-  FROM 
+  FROM
     datalake_ebdb_clean.house AS h
 ),
 
@@ -27,7 +27,7 @@ talk_to_secretariat AS (
     ts_created,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated) AS rw_asc,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated DESC) AS rw_desc
-  FROM 
+  FROM
     datalake_hub_services_clean.lead_aud AS l
   WHERE
     lead_type = 'TALK_TO_SECRETARIA'
@@ -64,7 +64,7 @@ contact_prospect AS (
     l.ts_created,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated) AS rw_asc,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated DESC) AS rw_desc
-  FROM 
+  FROM
     datalake_hub_services_clean.lead_aud AS l
   LEFT JOIN
     house AS h
@@ -114,7 +114,7 @@ last_business_unit AS (
 
 -- LEADS
 leads AS (
-  SELECT 
+  SELECT
     l.id_visitor,
     v.id_external,
     l.id_house,
@@ -122,14 +122,14 @@ leads AS (
     l.id_business_unit,
     v.email,
     v.phone_number,
-    COALESCE(bu.hub_name, bur.business_unit, 'not_mapped') AS business_unit_hub_name,
+    COALESCE(bur.hub_name, bu.hub_name, 'not_mapped') AS business_unit_hub_name,
     l.lead_type,
     l.lead_status,
     l.ts_created,
     l.ts_updated,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated) AS rw_offer_asc,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated DESC) AS rw_offer_desc
-  FROM 
+  FROM
     datalake_hub_services_clean.lead_aud AS l
   LEFT JOIN
     visitor AS v
@@ -142,31 +142,31 @@ leads AS (
       ON l.id_business_unit = bu.id
       AND bu.rw_hub_desc = 1
   LEFT JOIN
-    datalake_gsheets_clean.business_unit_region AS bur
+    datalake_hub_services.business_unit_region AS bur
       ON h.id_region = bur.id_region
-      AND (DATE(l.ts_created) BETWEEN bur.dt_start AND COALESCE(bur.dt_end, DATE_SUB(CURRENT_DATE, 1)))
-  WHERE 
+      AND (DATE(l.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
+  WHERE
     l.business_context = 'SALE'
     AND v.rw_asc = 1
 ),
 
 first_lead AS (
-  SELECT * 
+  SELECT *
   FROM
     leads
-  WHERE 
+  WHERE
     rw_offer_asc = 1
 ),
 
 last_lead AS (
-  SELECT * 
+  SELECT *
   FROM
     leads
-  WHERE 
+  WHERE
     rw_offer_desc = 1
 )
 
-SELECT 
+SELECT
   fl.id_visitor,
   fl.id_external,
   fl.id_house AS id_first_house,
@@ -195,7 +195,7 @@ SELECT
   lts.ts_created AS ts_last_talk_to_secretariat,
   fcp.ts_created AS ts_first_contact_prospect,
   lcp.ts_created AS ts_last_contact_prospect
-FROM 
+FROM
   first_lead AS fl
 INNER JOIN
   last_lead AS ll

@@ -28,7 +28,7 @@ WITH all_contacts AS (
         id_client,
         email,
         CASE
-            WHEN RIGHT(phone_number, 7) 
+            WHEN RIGHT(phone_number, 7)
                 IN (
                     '1111111',
                     '9999999',
@@ -78,15 +78,15 @@ secretariat_contact AS (
             ELSE oc.origin_contact_name
         END AS secretariat_contact_origin,
         mc.media_contact_name AS secretariat_contact_media,
-        COALESCE(bur.business_unit, 'BH') AS business_unit,
+        COALESCE(bur.hub_name, 'BH') AS business_unit,
         ROW_NUMBER() OVER (
-            PARTITION BY 
+            PARTITION BY
                 uu.id_secretariat_client
             ORDER BY
                 c.ts_created
         ) AS rw_asc,
         ROW_NUMBER() OVER (
-            PARTITION BY 
+            PARTITION BY
                 uu.id_secretariat_client
             ORDER BY
                 c.ts_created
@@ -95,7 +95,7 @@ secretariat_contact AS (
         TO_UTC_TIMESTAMP(c.ts_created, 'America/Sao_Paulo') AS ts_secretariat_contact
     FROM
         unique_users_list_ids AS uu
-    JOIN 
+    JOIN
         datalake_casa_mineira_crm_clean.contact AS c
             ON c.id_client = uu.id_secretariat_client
     LEFT JOIN
@@ -117,9 +117,9 @@ secretariat_contact AS (
         datalake_ebdb_clean.house AS qah
             ON qah.id = h.id_house_quintoandar
     LEFT JOIN
-        datalake_gsheets_clean.business_unit_region AS bur
+        datalake_hub_services.business_unit_region AS bur
             ON qah.id_region = bur.id_region
-            AND (DATE(c.ts_created) BETWEEN bur.dt_start AND COALESCE(bur.dt_end, DATE_SUB(CURRENT_DATE(), 1)))
+            AND (DATE(c.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
 ),
 first_secretariat_contact AS (
     SELECT *
@@ -165,7 +165,7 @@ booking AS (
         CAST(h.id_house_quintoandar AS BIGINT) AS id_house_5a,
         qah.id_region AS id_region_booking,
         cth.city_name AS city_booking,
-        COALESCE(bur.business_unit, 'BH') AS business_unit,
+        COALESCE(bur.hub_name, 'BH') AS business_unit,
         validation_type,
         ROW_NUMBER() OVER (
             PARTITION BY
@@ -199,9 +199,9 @@ booking AS (
         datalake_ebdb_clean.house AS qah
             ON qah.id = h.id_house_quintoandar
     LEFT JOIN
-        datalake_gsheets_clean.business_unit_region AS bur
+        datalake_hub_services.business_unit_region AS bur
             ON qah.id_region = bur.id_region
-            AND (DATE(v.ts_created) BETWEEN bur.dt_start AND COALESCE(bur.dt_end, DATE_SUB(CURRENT_DATE(), 1)))
+            AND (DATE(v.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
 ),
 first_booking AS (
     SELECT *
@@ -244,7 +244,7 @@ visit AS (
             PARTITION BY
                 uu.id_secretariat_client
             ORDER BY
-                v.ts_visited 
+                v.ts_visited
             DESC
         ) AS rw_desc,
         TO_UTC_TIMESTAMP(v.ts_visited, 'America/Sao_Paulo') AS ts_visit_completed
@@ -281,7 +281,7 @@ last_visit AS (
         visit
     WHERE
         rw_desc = 1
-), 
+),
 offers_and_ccvs AS (
     SELECT
         id_secretariat_client,
@@ -293,7 +293,7 @@ offers_and_ccvs AS (
         'BH' AS business_unit,
         ROW_NUMBER() OVER (
             PARTITION BY
-                id_secretariat_client 
+                id_secretariat_client
             ORDER BY
                 s.ts_created
         ) AS rw_offer_asc,
@@ -413,21 +413,21 @@ SELECT
                       fb.ts_booking_created) = fc.ts_sale_agreement_signed
             THEN 'sale_agreement_signed'
         WHEN GREATEST(fsc.ts_secretariat_contact,
-                      fc.ts_sale_agreement_signed, 
+                      fc.ts_sale_agreement_signed,
                       fo.ts_offer_submitted,
-                      fv.ts_visit_completed, 
+                      fv.ts_visit_completed,
                       fb.ts_booking_created) = fo.ts_offer_submitted
             THEN 'offer_submitted'
         WHEN GREATEST(fsc.ts_secretariat_contact,
-                      fc.ts_sale_agreement_signed, 
+                      fc.ts_sale_agreement_signed,
                       fo.ts_offer_submitted,
-                      fv.ts_visit_completed, 
+                      fv.ts_visit_completed,
                       fb.ts_booking_created) = fv.ts_visit_completed
             THEN 'visit_completed'
         WHEN GREATEST(fsc.ts_secretariat_contact,
-                      fc.ts_sale_agreement_signed, 
+                      fc.ts_sale_agreement_signed,
                       fo.ts_offer_submitted,
-                      fv.ts_visit_completed, 
+                      fv.ts_visit_completed,
                       fb.ts_booking_created) = fb.ts_booking_created
             THEN 'booking_created'
         ELSE

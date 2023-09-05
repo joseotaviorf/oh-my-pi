@@ -37,10 +37,10 @@ columns:
   is_3p_bh_contract:
     description: Flag to indicate if it is a 3p partner from the state of Minas Gerais - BR.
   ts_created:
-    description: Timestamp of when the work contract was created.
+    description: Timestamp which this contract was created.
     lineage:
       - datalake_ebdb_clean.work_contract.ts_created
   ts_updated:
-    description: Timestamp of when the work contract was updated.
+    description: Timestamp which this contract had an update.
     lineage:
-      - datalake_ebdb_clean.work_contract.ts_updated
+      - datalake_ebdb_clean.work_contract.ts_created

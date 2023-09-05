@@ -1,25 +1,37 @@
----
 database_name: dw_sale
 table_name: fact_business_unit_region
+description: Table indicating BUs coverage on each region over the time.
+domain: Data ForSale
+owner: herivelto.junior@quintoandar.com.br
 columns:
   sk_region:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.id_region
+    - datalake_hub_services.business_unit_region.id_region
+    description: 5A Region ID that this BU is attending.
   sk_coverage_started_date:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.dt_start
+    - datalake_hub_services.business_unit_region.ts_start_coverage
+    description: Timestamp indicating when this BU started attending this region.
   sk_coverage_ended_date:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.dt_end
+    - datalake_hub_services.business_unit_region.ts_end_coverage
+    description: Timestamp indicating when this BU stopped attending this region.
   business_model:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.business_model
+    - datalake_hub_services.business_unit_region.business_model
+    description: BU business model.
   business_unit:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.business_unit
+    - datalake_hub_services.business_unit_region.hub_name
+    description: Last BU name. So if this BU had a different name in the past it won't
+      be considered.
   dt_coverage_started:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.start_date
+    - datalake_hub_services.business_unit_region.ts_start_coverage
+    description: Timestamp indicating when this BU started attending this region.
   dt_coverage_ended:
     lineage:
-      - datalake_gsheets_clean.business_unit_region.end_date
+    - datalake_hub_services.business_unit_region.ts_end_coverage
+    description: Timestamp indicating when this BU stopped attending this region.
+  ts_load:
+    description: Timestamp indicating when this table data was last refreshed.
