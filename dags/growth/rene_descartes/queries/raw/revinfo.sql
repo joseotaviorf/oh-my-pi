@@ -1,5 +1,6 @@
 SELECT 
     rev,
+    revtstmp,
     DATE(TO_TIMESTAMP(CAST(revtstmp/1000 AS BIGINT))) AS dt
 FROM 
     revinfo
