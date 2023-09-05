@@ -1,60 +1,84 @@
 database_name: datalake_kill_queue
 table_name: house
+description: The table contains the houses of Kill Queue micro-service. It receives the
+  last update of a record. We're deduplicating the repeated IDs in this table, because
+  our raw/clean DAG makes the ingestion via incremental load.
+domain: For Rent
+owner: bruna.prates@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_clean.house.id
+    description: ID of the house from Kill Queue micro-service. It's the primary key of this table.
   id_main:
     lineage:
       - datalake_kill_queue_clean.house.id_main
+    description: ID of the house from EBDB (Main) source.
   id_owner:
     lineage:
       - datalake_kill_queue_clean.house.id_owner
+    description: ID user of the owner. It can be joined with user table through the id_main field.
   id_region:
     lineage:
       - datalake_kill_queue_clean.house.id_region
+    description: ID of the region where the house is located.
   city:
     lineage:
       - datalake_kill_queue_clean.house.city
+    description: City of the house address.
   complement:
     lineage:
       - datalake_kill_queue_clean.house.complement
+    description: Complement of the house address.
   house_number:
     lineage:
       - datalake_kill_queue_clean.house.house_number
+    description: Number of the house.
   street_address:
     lineage:
       - datalake_kill_queue_clean.house.street_address
+    description: Street of the house address.
   state:
     lineage:
       - datalake_kill_queue_clean.house.state
+    description: State of the house address.
   version:
     lineage:
       - datalake_kill_queue_clean.house.version
+    description: Version number of the house in Kill Queue.
   floor:
     lineage:
       - datalake_kill_queue_clean.house.floor
+    description: The floor/level number of the house.
   rent_price:
     lineage:
       - datalake_kill_queue_clean.house.rent_price
+    description: Rent price of the house.
   reservation_fee:
     lineage:
       - datalake_kill_queue_clean.house.reservation_fee
+    description: Fee (in percentage) to be paid for the reservation.
   is_reservation_allowed:
     lineage:
       - datalake_kill_queue_clean.house.is_reservation_allowed
+    description: Boolean indicating whether the reservation is allowed for the house.
   ts_created:
     lineage:
       - datalake_kill_queue_clean.house.ts_created
+    description: Timestamp when the house was created.
   ts_updated:
     lineage:
       - datalake_kill_queue_clean.house.ts_updated
+    description: Timestamp when the house was updated for the last time.
   year:
     lineage:
       - datalake_kill_queue_clean.house.year
+    description: Year value of the timestamp update. It's not a partition!
   month:
     lineage:
       - datalake_kill_queue_clean.house.month
+    description: Month value of the timestamp update. It's not a partition!
   day:
     lineage:
       - datalake_kill_queue_clean.house.day
+    description: Day value of the timestamp update. It's not a partition!
