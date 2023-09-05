@@ -25,6 +25,20 @@ columns:
       - datalake_vespucio.condo.city
   output_address:
     description: Address output by Google Geocoding API.
+  address:
+    description: Address output by Google Geocoding API.
+  number:
+    description: Number output by Google Geocoding API.
+  neighborhood:
+    description: Neighborhood output by Google Geocoding API.
+  zip_code:
+    description: Zip code output by Google Geocoding API.
+  city:
+    description: City output by Google Geocoding API.
+  state:
+    description: State output by Google Geocoding API.
+  country:
+    description: Country output by Google Geocoding API.
   latitude:
     description: Latitude output by Google Geocoding API.
   longitude:

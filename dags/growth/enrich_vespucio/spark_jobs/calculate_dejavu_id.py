@@ -59,6 +59,46 @@ def _prepare_address(row):
         "input_address": ", ".join([row[key] for key in desired_keys if row[key]])
     }
 
+def _extract_address_components(response):
+    """"
+    This function extracts address components from a given API response.
+    
+    Parameters:
+    response (tuple): A tuple containing the status of the API request and the data returned by and
+    API request.
+
+    Returns:
+    dict: A dictionary containing the address components. The keys are "id_address", "input_address",
+    "geocode_address", "address", "number", "zip_code", "neighborhood", "city", "state", and "country".
+    """
+
+    address_components = {
+        'route': 'address',
+        'postal_code': 'zip_code',
+        'street_number': 'number',
+        'sublocality_level_1': 'neighborhood',
+        'administrative_area_level_2': 'city',
+        'administrative_area_level_1': 'state',
+        'country': 'country'
+    }
+
+    address_info = {}
+
+    for component in response.get('address_components', []):
+        
+        for api_type, key in address_components.items():
+        
+            if api_type in component['types']:
+        
+                if api_type == 'administrative_area_level_1':
+                    address_info[key] = component.get('short_name')
+        
+                else:
+                    address_info[key] = component.get('long_name')
+    
+    return address_info
+
+
 def _make_api_request(api_keys, input):
     """
     This function makes an API request to the Google Maps Geocoding API.
@@ -104,12 +144,21 @@ def _make_api_request(api_keys, input):
         if response["status"] == "OK":
             results = response["results"]
             best_geocode_match = sorted(results, key=get_priority, reverse=True)[0]
+            address_info = _extract_address_components(best_geocode_match)
+
             return (
                 True,
                 (
                     input["id_address"],
                     input["input_address"],
                     best_geocode_match["formatted_address"],
+                    address_info.get('address'),
+                    address_info.get('number'),
+                    address_info.get('zip_code'),
+                    address_info.get('neighborhood'),
+                    address_info.get('city'),
+                    address_info.get('state'),
+                    address_info.get('country'),
                     float(best_geocode_match["geometry"]["location"]["lat"]),
                     float(best_geocode_match["geometry"]["location"]["lng"]),
                     datetime.now()
@@ -179,6 +228,13 @@ if __name__ == "__main__":
         StructField("id_address", StringType(), nullable=False),
         StructField("input_address", StringType(), nullable=False),
         StructField("output_address", StringType(), nullable=False),
+        StructField("address", StringType(), nullable=True),
+        StructField("number", StringType(), nullable=True),
+        StructField("zip_code", StringType(), nullable=True),
+        StructField("neighborhood", StringType(), nullable=True),
+        StructField("city", StringType(), nullable=True),
+        StructField("state", StringType(), nullable=True),
+        StructField("country", StringType(), nullable=True),
         StructField("latitude", DoubleType(), nullable=True),
         StructField("longitude", DoubleType(), nullable=True),
         StructField("ts_updated", TimestampType(), nullable=False)
@@ -356,7 +412,7 @@ if __name__ == "__main__":
                                       .withColumn("polygon_order", row_number().over(Window.partitionBy("id_address").orderBy("ts_region_created")))
                                       .filter("polygon_order = 1"))
         
-        column_order = ["id_dejavu", "id_address", "id_region", "input_address", "output_address", "latitude", "longitude", "ts_updated"]
+        column_order = ["id_dejavu", "id_address", "id_region", "input_address", "output_address", "address", "number", "zip_code", "neighborhood", "city", "state", "country","latitude", "longitude", "ts_updated"]
         new_data_reordered = new_data_with_region_dedup.select(column_order)
 
         df1 = spark_client.conn.table(f"{database_name}.{addresses_s2_geometry_mapping_table}")
