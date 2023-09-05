@@ -65,6 +65,7 @@ Produces the following output tables:
     `conservation_item_status`
     `conservation_item`
     `conservation_room`
+    `consumption_bill`
     `contract`
     `contract_aud`
     `contract_negotiation`

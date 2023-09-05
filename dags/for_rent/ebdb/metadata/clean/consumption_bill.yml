@@ -1,0 +1,87 @@
+database_name: datalake_ebdb_clean
+table_name: consumption_bill
+description: Consumptions bill table from EBDB source.
+  It registers the consumptions types of the houses with it's and owner's info.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.id
+    description: ID of the consumption bill. It's the primary key of the table.
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.imovel_id
+    description: ID of the house from EBDB source.
+  id_supplier:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.supplier_id
+    description: ID of the bill supplier.
+  id_state:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.endereco_estado_id
+    description: ID of the house's state.
+  installation_code:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.codigoinstalacao
+    description: Installation code.
+  type:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.tipo
+    description: Type of the consumption bill.
+  type_charging_bill:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.chargingBillType
+    description: Type of the charging bill.
+  titularity:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.titularidade
+    description: Name of the company or person that is responsible for the bill.
+  transfer_register:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.transferRegister
+    description: Register transfer record to check if the bill was transfered.
+  cpf_holder:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.cpftitular
+    description: CPF (Individal Taxpayer Registration) of the holder.
+  zip_code:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.endereco_cep
+    description: Zip code of the house.
+  address:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.endereco_logradouro
+    description: House's address.
+  number:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.endereco_numero
+    description: House's number.
+  complement:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.endereco_complemento
+    description: House's complement.
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.endereco_bairro
+    description: House's neighborhood.
+  city:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.endereco_cidade
+    description: House's city.
+  is_condo_included:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.isInclusaCondominio
+    description: Boolean flag to check if the consumption is included on condominium.
+  is_turned_on:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.isligado
+    description: Boolean flag to check if the consumption is turned on.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.criadoem
+    description: Timestamp of the register's creation.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.contaconsumo.atualizadoem
+    description: Timestamp of the last register's update.
