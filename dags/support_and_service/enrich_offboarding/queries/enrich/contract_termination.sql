@@ -470,7 +470,7 @@ SELECT
     cc.is_answered,
     ci.is_exit_inspection_opted_out,
     tw.has_automatically_closed_task,
-    term.dt_termination,
+    term.dt_vacancy AS dt_termination,
     tm.dt_last_updated AS dt_last_rescheduled,
     TO_DATE(lis.dt_last_inspection_synch) AS dt_last_inspection_synched,
     ci.dt_start AS dt_contract_started,
