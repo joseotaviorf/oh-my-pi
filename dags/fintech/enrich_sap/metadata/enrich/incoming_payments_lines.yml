@@ -29,6 +29,10 @@ columns:
     description: "Identification number of the document"
     lineage:
       - datalake_pas_clean.incoming_payments_lines.id_document
+  id_branch:
+    description: "ID that indicates which company from 5A group"
+    lineage:
+      - datalake_pas_clean.incoming_payments_lines.id_branch
   cost_center_code:
     description: "Identification number of the cost center"
     lineage:
@@ -49,6 +53,10 @@ columns:
     description: "Memo line description"
     lineage:
       - datalake_pas_clean.incoming_payments_lines.memo_line
+  sap_document_number:
+    description: "References the input or output sap document table"
+    lineage:
+      - datalake_pas_clean.incoming_payments_lines.sap_document_number
   source_document_number:
     description: "Source document number"
     lineage:

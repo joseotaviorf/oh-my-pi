@@ -23,6 +23,7 @@ SELECT
     finance_entity_entry_id_u_financeentityentryid AS id_finance_entity_entry,
     financial_entity_id_u_financeentityid AS id_finance_entity,
     document AS id_document,
+    branch_id AS id_branch,
     cost_center_ocrcode2 AS cost_center_code,
     contraact_contraact AS contra_act,
     location_profitcode AS location_profit_code,
@@ -32,6 +33,7 @@ SELECT
     --     ELSE REGEXP_EXTRACT(memo_linememo, '^"?.*(?<clean>(?:CI|CR|FC|FP|CP)[^ -]+)[ -]?.*"?$')
     -- END AS memo_line,
     memo_linememo AS memo_line,
+    sap_document_number,
     number_number AS source_document_number,
     series_series AS series,
     account_account AS account,

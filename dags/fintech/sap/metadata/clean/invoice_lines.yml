@@ -20,6 +20,9 @@ columns:
   id_document:
     lineage:
       - datalake_pas_raw.invoice_lines.document
+  id_branch:
+    lineage:
+      - datalake_pas_raw.invoice_lines.branch_id
   cost_center_code:
     lineage:
       - datalake_pas_raw.invoice_lines.cost_center_ocrcode2
@@ -35,6 +38,9 @@ columns:
   memo_line:
     lineage:
       - datalake_pas_raw.invoice_lines.memo_linememo
+  sap_document_number:
+    lineage:
+      - datalake_pas_raw.invoice_lines.sap_document_number
   source_document_number:
     lineage:
       - datalake_pas_raw.invoice_lines.number_number

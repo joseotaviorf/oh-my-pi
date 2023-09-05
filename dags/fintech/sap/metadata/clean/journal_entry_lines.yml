@@ -17,6 +17,9 @@ columns:
   id_finance_entity:
     lineage:
       - datalake_pas_raw.journal_entry_lines.finance_entity_id_ref2
+  id_branch:
+    lineage:
+      - datalake_pas_raw.journal_entry_lines.branch_id
   cost_center_code:
     lineage:
       - datalake_pas_raw.journal_entry_lines.cost_center_ocrcode2
@@ -32,6 +35,9 @@ columns:
   memo_line:
     lineage:
       - datalake_pas_raw.journal_entry_lines.memo_linememo
+  sap_document_number:
+    lineage:
+      - datalake_pas_raw.journal_entry_lines.sap_document_number
   source_document_number:
     lineage:
       - datalake_pas_raw.journal_entry_lines.number_number

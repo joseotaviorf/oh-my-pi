@@ -120,11 +120,13 @@ db AS (
             je.id_business_entity,
             je.id_finance_entity_entry,
             je.id_finance_entity,
+            je.id_branch,
             je.cost_center_code,
             je.contra_act,
             je.location_profit_code,
             je.managerial_code,
             je.memo_line,
+            je.sap_document_number,
             je.source_document_number,
             je.series,
             je.account,
@@ -150,11 +152,13 @@ db AS (
             iin.id_business_entity,
             iin.id_finance_entity_entry,
             iin.id_finance_entity,
+            iin.id_branch,
             iin.cost_center_code,
             iin.contra_act,
             iin.location_profit_code,
             iin.managerial_code,
             iin.memo_line,
+            iin.sap_document_number,
             iin.source_document_number,
             iin.series,
             iin.account,
@@ -178,6 +182,7 @@ SELECT
     db.id_finance_entity_entry,
     dh.id_external_payment,
     db.id_document,
+    db.id_branch,
     CASE
         SUBSTR(db.account, 1, 1)
         WHEN '1' THEN 'Ativo'
@@ -1084,6 +1089,7 @@ SELECT
         ELSE 'Unknown: ' || db.account
     END AS account_name,
     dh.series AS series,
+    db.sap_document_number,
     dh.transaction_type || ' ' || dh.source_document_number AS document_number,
     db.memo_line AS comments,
     (db.debit - db.credit) AS debit_credit,

@@ -20,6 +20,9 @@ columns:
   id_document:
     lineage:
       - datalake_pas_raw.incoming_payments_lines.document
+  id_branch:
+    lineage:
+      - datalake_pas_raw.incoming_payments_lines.branch_id
   cost_center_code:
     lineage:
       - datalake_pas_raw.incoming_payments_lines.cost_center_ocrcode2
@@ -35,6 +38,9 @@ columns:
   memo_line:
     lineage:
       - datalake_pas_raw.incoming_payments_lines.memo_linememo
+  sap_document_number:
+    lineage:
+      - datalake_pas_raw.incoming_payments_lines.sap_document_number
   source_document_number:
     lineage:
       - datalake_pas_raw.incoming_payments_lines.number_number
