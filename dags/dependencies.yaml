@@ -1286,6 +1286,7 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
+  - bietlejuice.terminator:load-clean-termination
 bietlejuice.enrich_ebdb_country:
   - bietlejuice.ebdb:load-clean-country
   - bietlejuice.ebdb:load-clean-house

@@ -107,8 +107,8 @@ ongoing_contracts as (
 ),
 tenant_service_fee_opt_out_info as (
   with contract_aud_join_rev as (
-    select 
-      ure.ts_revision, 
+    select
+      ure.ts_revision,
       c_aud.id_contract,
       c_aud.tenant_service_fee as tenant_service_fee,
       c_aud.rev
@@ -118,14 +118,14 @@ tenant_service_fee_opt_out_info as (
     where c_aud.mod_tenant_service_fee = true
 )
 , tenant_service_fee_history as (
-    select distinct 
+    select distinct
       car.id_contract,
       first_value(car.tenant_service_fee) over (partition by car.id_contract order by car.rev rows between unbounded preceding and unbounded following) as first_tenant_service_fee,
       last_value(car.tenant_service_fee) over (partition by car.id_contract order by car.rev rows between unbounded preceding and unbounded following) as last_tenant_service_fee,
       last_value(car.ts_revision) over (partition by car.id_contract order by car.rev rows between unbounded preceding and unbounded following) as dt_last_tenant_service_fee_change
     from contract_aud_join_rev car
 )
-    select 
+    select
       sfh.id_contract,
       sfh.dt_last_tenant_service_fee_change
     from tenant_service_fee_history sfh
@@ -133,13 +133,13 @@ tenant_service_fee_opt_out_info as (
     and sfh.last_tenant_service_fee = 0
 ),
 first_rent AS (
-  SELECT DISTINCT 
+  SELECT DISTINCT
     ca.id_contract,
     FIRST_VALUE(rent) OVER (partition by id_contract ORDER BY rev rows BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) first_rent
   FROM
     datalake_ebdb_clean.contract_aud AS ca
   WHERE
-    status_closing = 'ContratoAssinado' 
+    status_closing = 'ContratoAssinado'
 )
 SELECT
   c.id,
@@ -186,7 +186,7 @@ SELECT
   aad.ts_analyst_annulment_input,
   c.dt_started,
   c.dt_entered,
-  c.dt_termination,
+  IF(t.status = 'DONE' AND c.dt_termination > DATE('2020-01-07'), t.dt_vacancy, c.dt_termination) AS dt_termination,  -- The date filter is when Terminator became the source for terminations
   c.ts_signed,
   c.ts_expected_termination,
   c.ts_contract_expected_end AS dt_contract_expected_end, -- TODO [ODS] rename col to dt_contract_expected_end in clean
@@ -214,7 +214,7 @@ LEFT JOIN
   datalake_ebdb_clean.full_contract AS fc
     ON fc.id = c.id
 LEFT JOIN
-  tenant_service_fee_opt_out_info AS sfo 
+  tenant_service_fee_opt_out_info AS sfo
     ON c.id = sfo.id_contract
 LEFT JOIN
   first_rent AS fre
@@ -222,3 +222,6 @@ LEFT JOIN
 JOIN
   datalake_ebdb_country.house AS ch
     ON ch.id_house = c.id_house
+LEFT JOIN
+  datalake_terminator_clean.termination AS t
+    ON t.id_contract = c.id
