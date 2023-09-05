@@ -119,7 +119,7 @@ LEFT JOIN
     ON re.rev = era.rev_end
 ),
 sorting_hat_proponent AS (
-SELECT 
+SELECT
   cpf,
   id_proposal,
   MAX(id) AS id_proponent_sorting_hat
@@ -127,7 +127,7 @@ FROM datalake_sorting_hat_clean.proponent
 GROUP BY 1,2
 ),
 ebdb_proponent AS (
-SELECT 
+SELECT
    id_proposal,
    cpf,
    MAX(id) AS id_proponent_ebdb
@@ -147,7 +147,7 @@ SELECT /*+ RANGE_JOIN(bigid, 9123) */
     cep.occupation_area,
     bt.is_going_to_reside,
     bt.csba_score AS serasa_csba_score,
-    bt.hspi_score AS serasa_hspi_socre,
+    bt.hspi_score AS serasa_hspi_score,
     bt.bv_score AS boavista_old_score,
     bt.boavista_positive_score,
     bt.scr_mob1_operation_data,
@@ -171,7 +171,7 @@ JOIN
 LEFT JOIN
   sorting_hat_proponent AS shp
     ON shp.id_proposal = lce.id_proposal AND shp.cpf = cep.cpf
-LEFT JOIN 
+LEFT JOIN
   ebdb_proponent AS epp
     ON epp.id_proposal = lce.id_proposal AND epp.cpf = cep.cpf
 LEFT JOIN

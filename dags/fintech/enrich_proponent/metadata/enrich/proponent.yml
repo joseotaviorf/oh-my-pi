@@ -25,7 +25,7 @@ columns:
   cpf:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.cpf
-    description: "EBDB Proponent ID"
+    description: "CPF"
   name:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.name
