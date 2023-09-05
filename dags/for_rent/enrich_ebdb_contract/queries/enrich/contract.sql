@@ -140,6 +140,16 @@ first_rent AS (
     datalake_ebdb_clean.contract_aud AS ca
   WHERE
     status_closing = 'ContratoAssinado'
+),
+terminations AS (
+    SELECT
+        id_contract,
+        status,
+        dt_vacancy
+    FROM
+        datalake_terminator_clean.termination
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) = 1
 )
 SELECT
   c.id,
@@ -223,5 +233,5 @@ JOIN
   datalake_ebdb_country.house AS ch
     ON ch.id_house = c.id_house
 LEFT JOIN
-  datalake_terminator_clean.termination AS t
+  terminations AS t
     ON t.id_contract = c.id
