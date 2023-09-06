@@ -677,6 +677,7 @@ bietlejuice.enrich_velo:
 bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region
+    - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
 bietlejuice.enrich_zendesk_ticket_funnels:
   remove:
     - bietlejuice.zendesk_tickets:load-clean-groups

@@ -266,6 +266,24 @@ if __name__ == "__main__":
                 FROM
                     datalake_vespucio.condo_full
             ),
+            golden_set AS (
+                SELECT 
+                    MD5(CONCAT(
+                            COALESCE(INITCAP(address_type || ' ' || address), 'N/A'), 
+                            COALESCE(number, 'N/A'),
+                            COALESCE(neighborhood, 'N/A'),
+                            COALESCE(zipcode, 'N/A'),
+                            COALESCE(city, 'N/A')
+                     )) AS id_address,
+                     'golden_set' AS source,
+                     INITCAP(address_type || ' ' || address) AS address,
+                     number,
+                     neighborhood,
+                     zipcode,
+                     city
+                FROM 
+                    datalake_gsheets_clean.vespucio_condo_golden_set
+            ),
             itbi AS (
                 SELECT 
                     id_address,
@@ -295,6 +313,11 @@ if __name__ == "__main__":
                 FROM 
                     condo 
                 UNION ALL 
+                SELECT 
+                    *
+                FROM 
+                    golden_set
+                UNION ALL
                 SELECT 
                     *
                 FROM 

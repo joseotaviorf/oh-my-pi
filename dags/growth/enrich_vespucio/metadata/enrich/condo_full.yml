@@ -16,12 +16,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.condo.name
       - datalake_sindico_net_clean.condominium.condo
-      - datalake_gsheets_clean.vespucio_condo_golden_set.condo_name
   cnpj:
     description: "The CNPJ (National Registry of Legal Entities) of the condo."
     lineage:
       - datalake_sindico_net_clean.condominium.cnpj
-      - datalake_gsheets_clean.vespucio_condo_golden_set.condo_cnpj
   address:
     description: "The address of the condo."
     lineage:
@@ -32,13 +30,11 @@ columns:
     lineage:
       - datalake_ebdb_clean.condo.number
       - datalake_sindico_net_clean.condominium.number
-      - datalake_gsheets_clean.vespucio_condo_golden_set.number
   neighborhood:
     description: "The address neighborhood of the condo."
     lineage:
       - datalake_ebdb_clean.condo.neighborhood
       - datalake_sindico_net_clean.condominium.neighborhood
-      - datalake_gsheets_clean.vespucio_condo_golden_set.neighborhood
   zip_code:
     description: "The address zipcode of the condo."
     lineage:
@@ -49,12 +45,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.condo.city
       - datalake_sindico_net_clean.condominium.city
-      - datalake_gsheets_clean.vespucio_condo_golden_set.city
   state:
     description: "The address state of the condo."
     lineage:
       - datalake_sindico_net_clean.condominium.state
-      - datalake_gsheets_clean.vespucio_condo_golden_set.state
   lat:
     description: "The latitude coordinate of the condo."
     lineage:
@@ -193,4 +187,3 @@ columns:
     lineage:
       - datalake_ebdb_clean.condo.ts_updated
       - datalake_sindico_net_clean.condominium.ts_updated
-      - datalake_gsheets_clean.vespucio_condo_golden_set.dt_created
