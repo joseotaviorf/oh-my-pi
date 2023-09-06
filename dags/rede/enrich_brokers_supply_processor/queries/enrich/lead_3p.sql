@@ -86,7 +86,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.constructionYear'), '') AS construction_year,
     NULLIF(GET_JSON_OBJECT(l.details, '$.frontDoorType'), '') AS front_door_type,
     NULLIF(GET_JSON_OBJECT(l.details, '$.description'), '') AS house_description,
-    NULLIF(GET_JSON_OBJECT(l.brokers, '$.country'), '') AS country,
+    NULLIF(COALESCE(GET_JSON_OBJECT(l.location, '$.country'), GET_JSON_OBJECT(l.brokers, '$.country')), '') AS country,
     COALESCE(
         NULLIF(GET_JSON_OBJECT(l.location, '$.state'), ''),
         NULLIF(GET_JSON_OBJECT(l.location, '$.stateAcronym'), '')
@@ -131,7 +131,7 @@ SELECT
         'array<struct<name: string, email: string, phone: string, mainId: bigint>>'
     ) AS administrators,
     FROM_JSON(
-        NULLIF(GET_JSON_OBJECT(l.pricing, '$.iptuList'), '[]'), 
+        NULLIF(GET_JSON_OBJECT(l.pricing, '$.iptuList'), '[]'),
         'array<struct<installmentAmount: int, installmentQuantity: int>>'
     ) AS iptu_installment_informations,
     FROM_JSON(

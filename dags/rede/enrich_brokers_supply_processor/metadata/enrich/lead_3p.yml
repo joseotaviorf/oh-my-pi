@@ -136,6 +136,7 @@ columns:
     description: Description of the house.
   country:
     lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.location
       - datalake_brokers_supply_processor_clean.lead_3p.brokers
     description: Country where the house is located.
   state:
