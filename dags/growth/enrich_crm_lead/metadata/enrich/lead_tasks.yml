@@ -1,8 +1,8 @@
 database_name: datalake_crm_lead
 table_name: lead_tasks
 description: CRM task information about leads
-domain: Support and Service
-owner: data-ae-ss@quintoandar.com.br
+domain: Growth
+owner: '@data-growth'
 columns:
   id_lead:
     lineage:
