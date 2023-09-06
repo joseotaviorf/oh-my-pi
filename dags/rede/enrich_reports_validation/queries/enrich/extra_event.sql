@@ -63,6 +63,15 @@ WITH all_events AS (
         year = {year}
         AND month = {month}
         AND day = {day}
+    UNION ALL
+    SELECT
+        id
+    FROM
+        reverse_listings_report.sale_listing_published
+    WHERE 
+        year = {year}
+        AND month = {month}
+        AND day = {day}
 )
 SELECT
     pe.id_event,
