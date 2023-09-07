@@ -1,0 +1,19 @@
+---
+dag_documentation:
+  dag_purpose: "[Amazon Cognito](https://aws.amazon.com/pt/cognito/) is an
+    identity platform made to authenticate and authorize users. This DAG is
+    responsible for ingesting some of its user pools into the data lake, so we
+    can know which users actually have access to our services."
+tables:
+  - table_name: rede_user_pool
+    user_pool_id: us-east-1_7nT6JT2v3
+custom_cluster:
+  driver_node_type_id: m5a.xlarge
+  node_type_id: m5a.xlarge
+  autoscale:
+    max_workers: 3
+    min_workers: 1
+  spark_version: 10.4.x-scala2.12
+  aws_attributes:
+    ebs_volume_size: 200
+    instance_profile_arn: "{{ var.value.instance_profile_secret_arn_cognito_ingestion }}"
