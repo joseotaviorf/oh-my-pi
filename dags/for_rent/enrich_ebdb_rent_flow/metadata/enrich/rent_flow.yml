@@ -1,85 +1,113 @@
 database_name: datalake_ebdb_rent_flow
 table_name: rent_flow
+description: Table that contains events (visit(s), offer(s), etc.) of a rent flow, starting the flow on the booking creation or direct offer submitted. It's very important to keep in mind that every line of this table is related to an event of the rent flow and it's possible to occur more than one event per type in the same rent flow, e.g. multiple bookings within the same rent flow. Each line is a rent flow composed by house listing + tenant prospect + event related to the rent flow.
+domain: For Rent
+owner: gustavo.geiger@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.contract.id_house
       - datalake_ebdb_clean.house.id
+    description: Key of the house related to the rent flow.
   id_booking:
     lineage:
       - datalake_ebdb_clean.booking.id
+    description: Key of the booking (visit scheduled) related to the rent flow. A rent flow can have none, one or more bookings related.
   id_owner:
     lineage:
       - datalake_ebdb_clean.house.id_user
+    description: Key of the user who is the house owner/responsible. The key can also be the partner user related to the property.
   id_user_agent:
     lineage:
       - datalake_ebdb_clean.user.id
+    description: Key of the agent related to a visit during the rent flow, if it has one. A rent flow can have none, one or more agents related.
   id_client:
     lineage:
       - datalake_ebdb_clean.rent_flow.id_client
+    description: Key of the tenant prospect that booked the first vist or sent the direct offer.
   id_visit:
     lineage:
       - datalake_ebdb_clean.visit.id
+    description: Key of the visit scheduled on the rent flow. A rent flow can have none, one or more visits related.
   id_rent_flow:
     lineage:
       - datalake_ebdb_clean.rent_flow.id
+    description: Key that identifies the rent flow.
   id_offer:
     lineage:
       - datalake_ebdb_clean.proposal.id_offer
       - datalake_ebdb_clean.offer.id
+    description: Key of the offer related to the rent flow. A rent flow can have none, one or more offers related.
   id_pre_proposal:
     lineage:
       - datalake_ebdb_clean.proposal.id_pre_proposal
       - datalake_ebdb_clean.pre_proposal.id
+    description: Key of the pre proposal related to the rent flow.
   id_proposal:
     lineage:
       - datalake_ebdb_clean.contract.id_proposal
       - datalake_ebdb_clean.proposal.id
+    description: Key of the proposal related to the rent flow, an offer that was accepted. A rent flow can have none, one or more proposals related.
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract.id
+    description: Key of the contract related to the rent flow. A rent flow can have none, one or more contracts related.
   id_offer_context:
     lineage:
       - datalake_ebdb_clean.offer.id
       - datalake_ebdb_clean.pre_proposal.id
       - datalake_ebdb_clean.proposal.id_offer
       - datalake_ebdb_clean.proposal.id_pre_proposal
+    description: Key related to the context. Can be key from offer, pre proposal or proposal.
   visit_created_type:
     lineage:
       - datalake_ebdb_clean.visit_origin.name
+    description: Origin of visit.
   is_visit_created_from_app:
     lineage:
       - datalake_ebdb_clean.visit_origin.is_app
+    description: If the visit was created directly from the mobile app.
   is_visit_last_updated_from_app:
     lineage:
       - datalake_ebdb_clean.visit_origin.is_app
+    description: If the visit was updated from the mobile app.
   dt_proposal_approved:
     lineage:
       - datalake_ebdb_clean.proposal.ts_approved
+    description: Date when the proposal was approved, which means that all steps (documentation and credit analysis) are approved. A rent flow can have none, one or more proposal's approved dates.
   dt_house_first_listing:
     lineage:
       - datalake_ebdb_clean.house.dt_first_publication
+    description: First listing date of the property related to the rent flow.
   dt_booking_created:
     lineage:
       - datalake_ebdb_clean.booking.ts_created
+    description: Booking's date when the visit was scheduled. A rent flow can have none, one or more booking creation dates.
   dt_visit:
     lineage:
       - datalake_ebdb_clean.booking.dt_booking
+    description: Date when the visit is intended to happen. A rent flow can have none, one or more visit dates.
   dt_client_sign_up:
     lineage:
       - datalake_ebdb_clean.user.ts_created
+    description: Date when the client created an account.
   dt_agent_sign_up:
     lineage:
       - datalake_ebdb_clean.user.ts_created
+    description: Date when the agent created an account.
   dt_rent_flow_created:
     lineage:
       - datalake_ebdb_clean.rent_flow.ts_created
+    description: Date when the rent flow was created, this date represents the first touchpoint of the client in the funnel.
   dt_contract_created:
     lineage:
       - datalake_ebdb_clean.contract.ts_created
+    description: Date when the contract was created.
   dt_contract_signed:
     lineage:
       - datalake_ebdb_clean.contract.ts_signed
+    description: Date when the contract was signed.
   dt_contract_annulment:
     lineage:
       - datalake_ebdb_clean.contract.dt_termination
+    description: Date when the contract was terminated.
