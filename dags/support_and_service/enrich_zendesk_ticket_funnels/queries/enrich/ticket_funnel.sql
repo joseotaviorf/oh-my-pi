@@ -67,6 +67,22 @@ agents_control AS (
     LEFT JOIN
         datalake_zendesk_users.agents AS a2
             ON t.id_assignee = a2.id_agent
+    WHERE
+        t.id_assignee IS NOT NULL
+    UNION ALL
+    SELECT
+        id_ticket,
+        id_assignee AS id_agent,
+        NULL AS email,
+        NULL AS name,
+        NULL AS phone,
+        NULL AS organization,
+        NULL AS ts_created,
+        NULL AS ts_updated
+    FROM
+        datalake_zendesk_tickets_clean.tickets
+    WHERE
+        id_assignee IS NULL
 ),
 custom_fields_exploded AS (
     SELECT
