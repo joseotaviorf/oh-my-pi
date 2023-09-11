@@ -236,7 +236,7 @@ divergences_m AS (
     WHERE
         DATE(ts_snapshot) = DATE(DATE_TRUNC('month', DATE('{year}-{month}-{day}')))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
         AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE('{year}-{month}-{day}'), -1)))  -- Gets the events truncated by the previous month start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 13, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 final_m AS (
     SELECT
@@ -322,7 +322,7 @@ metrics_q AS (
         AND month = {month}
         AND day = {day}
         AND DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE('{year}-{month}-{day}'), -3))  -- Gets the events truncated by the beginning of the previous quarter
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 13, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 divergences_q AS (
     SELECT
@@ -354,7 +354,7 @@ divergences_q AS (
     WHERE
         DATE(ts_snapshot) = DATE(DATE_TRUNC('quarter', DATE('{year}-{month}-{day}')))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
         AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE('{year}-{month}-{day}'), -3)))  -- Gets the events truncated by the previous quarter start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 13, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 final_q AS (
     SELECT
@@ -440,7 +440,7 @@ metrics_y AS (
         AND month = {month}
         AND day = {day}
         AND DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE('{year}-{month}-{day}'), -12))   -- Gets the events truncated by the beginning of the previous year
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 13, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 divergences_y AS (
     SELECT
@@ -475,7 +475,7 @@ divergences_y AS (
     WHERE
         DATE(ts_snapshot) = DATE(DATE_TRUNC('year', DATE('{year}-{month}-{day}')))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
         AND DATE(DATE_TRUNC('year', dt_event)) = MAKE_DATE(YEAR(d.last_year), 1, 1)   -- Gets the events truncated by the previous year start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 13, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 final_y AS (
     SELECT
