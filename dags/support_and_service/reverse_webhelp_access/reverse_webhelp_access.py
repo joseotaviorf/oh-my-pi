@@ -71,7 +71,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 external_bucket_task= []
-for table_name in tables:
+for table_name, table_config in tables.items():
     external_bucket_task.append(
         QuintoAndarDatabricksSubmitRunOperator(
             task_id=f"load_{table_name}_table_into_azure_blob_storage",
@@ -84,7 +84,8 @@ for table_name in tables:
                         SOURCE, 
                         database_name, 
                         table_name, 
-                        azure_container_name, 
+                        azure_container_name,
+                        table_config['context'],
                         "{{ ds }}"
                     ],
                 }

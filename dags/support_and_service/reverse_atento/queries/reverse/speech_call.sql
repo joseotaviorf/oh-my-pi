@@ -1,0 +1,21 @@
+SELECT DISTINCT 
+    bc.id_source_unique,
+    bc.caller_phone_number,
+    bc.destination_phone_number,
+    c.direction,
+    bc.provider,
+    c.agent_email,
+    bc.recording_url,
+    bc.ts_started,
+    bc.ts_ended
+FROM 
+    datalake_bigfone_clean.call AS bc
+LEFT JOIN
+    datalake_customer_support.call AS c
+        ON bc.id_source_unique = c.sk_call
+LEFT JOIN
+    datalake_zendesk_users.agents AS a
+        ON c.agent_email = a.email
+WHERE 
+    a.organization IN ('atento', 'atn')
+    AND DATE(bc.ts_started) = CURRENT_DATE() - 1

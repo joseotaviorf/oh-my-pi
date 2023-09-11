@@ -89,7 +89,12 @@ if __name__ == "__main__":
 
         if df is not None:
             df = df.drop("year", "month", "day")
-            destination_path = f"to_atento_{table}/"
+
+            if 'speech' in table:
+                destination_path = f"speech_analytics/{table}/"
+            else:
+                destination_path = f"to_atento_{table}/"
+
             file_name = f'{table}_{(execution_date.strftime("%Y%m%d"))}.csv'
             with io.StringIO() as csv_buffer:
                 df.toPandas().to_csv(csv_buffer, index=False, header=True)

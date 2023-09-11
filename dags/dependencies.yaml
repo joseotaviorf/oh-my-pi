@@ -2459,6 +2459,7 @@ bietlejuice.reports:
 bietlejuice.reverse_app_installed:
   - bietlejuice.enrich_app_installed:load-enrich-events
 bietlejuice.reverse_atento:
+  - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
@@ -2469,6 +2470,11 @@ bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
+  - bietlejuice.enrich_customer_support:load-enrich-call
+  - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.enrich_zendesk_users:load-enrich-agents
+  - bietlejuice.quinto_messenger:load-clean-channel
+  - bietlejuice.quinto_messenger:load-clean-channel-event
 bietlejuice.reverse_customer_journey:
   - bietlejuice.enrich_customer_journey:load-enrich-users
 bietlejuice.reverse_dashboard_governance:
@@ -2550,6 +2556,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.terminator:load-clean-termination
 bietlejuice.reverse_webhelp:
+  - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_call:load-dw-call-dim-call
   - bietlejuice.dw_call:load-dw-call-fact-calls
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
@@ -2563,10 +2570,15 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-tags
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
+  - bietlejuice.enrich_customer_support:load-enrich-call
+  - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
+  - bietlejuice.enrich_zendesk_users:load-enrich-agents
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
+  - bietlejuice.quinto_messenger:load-clean-channel
+  - bietlejuice.quinto_messenger:load-clean-channel-event
 bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
   - bietlejuice.reverse_webhelp:load-reverse-csat-front

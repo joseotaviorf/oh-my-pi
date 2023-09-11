@@ -14,12 +14,13 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 def main():
-    environment, source, database_name, table_name, azure_container_name, execution_date = (
+    environment, source, database_name, table_name, azure_container_name, table_context, execution_date = (
         parse_arguments()
     )
     logger.info(
         f"""m=__main__, environment={environment}, source={source}, database_name={database_name},
-        table_name={table_name}, azure_container_name={azure_container_name}, execution_date={execution_date}"""
+        table_name={table_name}, azure_container_name={azure_container_name}, execution_date={execution_date}
+        table_context={table_context}"""
     )
 
     storage_account_name, storage_account_access_key = get_azure_credentials()
@@ -27,7 +28,7 @@ def main():
     blob_storage_path = f"wasbs://{azure_container_name}@{storage_account_name}.blob.core.windows.net/"
 
     load_table_in_azure_blob_storage(
-        source, database_name, table_name, blob_storage_path, execution_date
+        source, database_name, table_name, blob_storage_path, table_context, execution_date
     )
 
 
@@ -44,6 +45,7 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     parser.add_argument("database_name")
     parser.add_argument("table_name")
     parser.add_argument("azure_container_name")
+    parser.add_argument("table_context")
     parser.add_argument(
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
@@ -55,6 +57,7 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     database_name = args.database_name
     table_name = args.table_name
     azure_container_name = args.azure_container_name
+    table_context = args.table_context
     execution_date = datetime.fromisoformat(args.execution_date)
 
     return environment, source, database_name, table_name, azure_container_name, execution_date
@@ -78,6 +81,7 @@ def load_table_in_azure_blob_storage(
     database_name: str,
     table_name: str,
     blob_storage_path: str,
+    table_context: str,
     execution_date: datetime,
 ):
     """
@@ -97,12 +101,17 @@ def load_table_in_azure_blob_storage(
         """
     )
 
+    if table_name == "speech_analytics":
+        path_to_save = f"{blob_storage_path}/quinto_andar/{table_context}/to_webhelp_{table_name}/"
+    else:
+        path_to_save = f"{blob_storage_path}/quinto_andar/to_webhelp_{table_name}/"
+
     df.coalesce(1) \
         .write.partitionBy('year', 'month', 'day') \
         .mode('overwrite') \
         .format('parquet') \
         .option("partitionOverwriteMode", "dynamic") \
-        .save(f"{blob_storage_path}/quinto_andar/to_webhelp_{table_name}/")
+        .save(path_to_save)
 
 if __name__ == "__main__":
     main()

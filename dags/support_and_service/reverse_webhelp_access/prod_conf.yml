@@ -2,15 +2,28 @@ database_name: reverse_webhelp
 azure_container_name: lake-quinto-andar-prod
 
 tables:
-  - backlog_metric
-  - csat_front
-  - demand_metric
-  - fcr_metric
-  - general_metric
-  - taxonomia_call
-  - taxonomia_chat
-  - taxonomia_email
-  - twilio_chat_aht
+  backlog_metric:
+    context: metrics
+  csat_front:
+    context: csat
+  demand_metric:
+    context: metrics
+  fcr_metric:
+    context: metrics
+  general_metric:
+    context: metrics
+  speech_call:
+    context: speech_analytics
+  speech_chat:
+    context: speech_analytics
+  taxonomia_call:
+    context: taxonomia
+  taxonomia_chat:
+    context: taxonomia
+  taxonomia_email:
+    context: taxonomia
+  twilio_chat_aht:
+    context: metrics
 
 custom_cluster:
   driver_node_type_id: m5a.2xlarge
