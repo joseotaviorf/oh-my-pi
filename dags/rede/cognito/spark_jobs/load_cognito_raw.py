@@ -121,11 +121,11 @@ def get_deleted_users(users_df: DataFrame, table_name: str, execution_date: date
     If they were not returned, they are marked as deleted.
     """
 
-    raw_table = spark.table(f'datalake_cognito_raw.{table_name}').where(f''' 
-                            year != {execution_date.year}
-                            OR month != {execution_date.month}
-                            OR day != {execution_date.day}
-                    ''') # To avoid writing over a partition that is being read, if the DAG is being reexecuted
+    raw_table = spark.table(f'datalake_cognito_raw.{table_name}').where(
+        f"""year < {execution_date.year}
+        OR (year = {execution_date.year} AND month < {execution_date.month})
+        OR (year = {execution_date.year} AND month = {execution_date.month} AND day < {execution_date.day})"""
+    ) # To avoid writing over a partition that is being read, if the DAG is being reexecuted
                      
     window_spec = Window.partitionBy("Username").orderBy(raw_table.UserLastModifiedDate.desc())
     deduped_raw_table = raw_table.withColumn('rw', row_number().over(window_spec))\
