@@ -1,15 +1,15 @@
 SELECT
-    id, 
-    repair_request_item_id AS id_repair_request_item, 
-    asset_url, 
+    id,
+    repair_request_item_id AS id_repair_request_item,
+    asset_url,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    year, 
+    year,
     month,
     day
-FROM 
-    datalake_repairs_raw.repair_evidence 
-WHERE 
+FROM
+    datalake_repairs_raw.repair_evidence
+WHERE
     year = {year}
     AND month = {month}
     AND day = {day}
