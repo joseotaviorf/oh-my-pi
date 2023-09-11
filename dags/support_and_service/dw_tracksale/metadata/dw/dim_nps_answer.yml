@@ -42,6 +42,7 @@ columns:
     lineage:
     - datalake_tracksale.customer_conversions.is_customer_identified
     - datalake_casa_mineira_tracksale.customer_conversions.is_customer_identified
-    description: ''
+    description: Boolean that indicates if the customer is identified through the
+      id_customer, if the id_customer exists then it is True.
   ts_load:
     description: Timestamp in which data was loaded into database.

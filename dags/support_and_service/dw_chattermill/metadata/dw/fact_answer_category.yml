@@ -1,33 +1,49 @@
 database_name: dw_chattermill
 table_name: fact_answer_category
+description: Fact table whose objective is to consolidate the relationship rules between answers <> category. 
+  The granularity of this table is a concatenation between response id and category id.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_answer_category:
     lineage:
       - datalake_chattermill.responses.id_response_tag
+    description: The model's primary key comes from a concatenation between the response id and the category id.
   sk_answer_classification:
     lineage:
       - datalake_chattermill.responses.id
+    description: Key that identifies the classification linked to the answer.
   sk_answer:
     lineage:
       - datalake_chattermill.responses.id_response
+    description: Key that identifies the sent response.
   sk_category:
     lineage:
       - datalake_chattermill.responses.id_tag_theme
+    description: Key that indicates the category in which the answer is related.
   sk_answer_classification_created_date:
     lineage:
       - datalake_chattermill.responses.ts_created
+    description: Date key that indicates when the classification was created.
   sk_answer_classification_updated_date:
     lineage:
       - datalake_chattermill.responses.ts_updated
+    description: Date key that indicates when the classification was updated.
   sentiment:
     lineage:
       - datalake_chattermill.responses.tag_sentiment
+    description: Information received through the chattermill API indicates a feeling of satisfaction/dissatisfaction with the service.
   score:
     lineage:
       - datalake_chattermill.responses.score
+    description: Service score, from 1 to 10.
   original_comment:
     lineage:
       - datalake_chattermill.responses.original_comment
+    description: Original comment, in the respondent's native language and without treatment.
   comment:
     lineage:
       - datalake_chattermill.responses.comment
+    description: Standardized commentary in English.
+  ts_load:
+    description: Date of the last load of this base, in timestamp format.

@@ -18,7 +18,7 @@ columns:
   identification:
     lineage:
       - datalake_tracksale_clean.dispatch.customers
-    description: ''
+    description: User identifier.
   email:
     lineage:
       - datalake_tracksale_clean.dispatch.customers

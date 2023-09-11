@@ -1,68 +1,93 @@
 database_name: datalake_chattermill
 table_name: responses
+description:
+  Base responsible for processing NPS survey response data, with id_response_tag as its main key.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_response_tag:
     lineage:
       - datalake_chattermill_clean.responses.user_attributes
       - datalake_chattermill_clean.responses.themes
+    description: Key used in the fact_answer_category model, comes from the concatenation between the response id and the category id.
   id:
     lineage:
       - datalake_chattermill_clean.responses.id
+    description: Key that identifies the classification linked to the answer.
   id_response:
     lineage:
       - datalake_chattermill_clean.responses.user_attributes
+    description: Key that identifies the sent response.
   id_tag_theme:
     lineage:
       - datalake_chattermill_clean.responses.themes
+    description: Key that indicates the category in which the answer is related.
   id_tag_parent:
     lineage:
       - datalake_chattermill_clean.responses.themes
+    descriprion: Key that identifies secondary tags to the main tag.
   name:
     lineage:
       - datalake_chattermill_clean.responses.user_attributes
+    description: Name of the user who submitted the response.
   email:
     lineage:
       - datalake_chattermill_clean.responses.user_attributes
+    description: Email of the user who submitted the response.
   telephone:
     lineage:
       - datalake_chattermill_clean.responses.user_attributes
+    description: Phone of the user who submitted the response.
   collected_by:
     lineage:
       - datalake_chattermill_clean.responses.user_attributes
+    description: How to send the response, email for example.
   previous_score:
     lineage:
       - datalake_chattermill_clean.responses.user_attributes
+    description: Score sent in the user's last reply.
   score:
     lineage:
       - datalake_chattermill_clean.responses.score
+    description: Score sent in the user's reply.
   comment:
     lineage:
       - datalake_chattermill_clean.responses.comment
+    description: Comment sent by the user regarding the survey, in English.
   original_comment:
     lineage:
       - datalake_chattermill_clean.responses.original_comment
+    description: comment sent by the user regarding the survey, in his/her native language.
   data_type:
     lineage:
       - datalake_chattermill_clean.responses.data_type
+    description: Research data type, NPS for example.
   data_source:
     lineage:
       - datalake_chattermill_clean.responses.data_source
+    description: Source where the survey was submitted.
   dataset:
     lineage:
       - datalake_chattermill_clean.responses.dataset
+    description: Descriptive data about what concatenates the data type and its source.
   tag_parent:
     lineage:
       - datalake_chattermill_clean.responses.themes
+    description: Secondary tag, related to tag_name.
   tag_name:
     lineage:
       - datalake_chattermill_clean.responses.themes
+    description: Descriptive data about the category related to its identification key.
   tag_sentiment:
     lineage:
       - datalake_chattermill_clean.responses.themes
+    description: Information received through the chattermill API indicates a feeling of satisfaction/dissatisfaction with the service.
   ts_created:
     lineage:
       - datalake_chattermill_clean.responses.created_at
+    description: Date that indicates when the classification was created.
   ts_updated:
     lineage:
       - datalake_chattermill_clean.responses.updated_at
+    description: Date that indicates when the classification was updated.
     

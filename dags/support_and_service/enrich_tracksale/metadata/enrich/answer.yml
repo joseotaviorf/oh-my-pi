@@ -26,7 +26,7 @@ columns:
   identification:
     lineage:
       - datalake_tracksale_clean.answer.identification
-    description: ''
+    description: User identifier.
   email:
     lineage:
       - datalake_tracksale_clean.answer.email
@@ -46,7 +46,7 @@ columns:
   priority:
     lineage:
       - datalake_tracksale_clean.answer.priority
-    description: ''
+    description: Descriptive information about the research priority level.
   type:
     lineage:
       - datalake_tracksale_clean.answer.type
@@ -68,7 +68,7 @@ columns:
   last_nps_answer:
     lineage:
       - datalake_tracksale_clean.answer.last_nps_answer
-    description: ''
+    description: Last research score sent.
   nps_comment:
     lineage:
       - datalake_tracksale_clean.answer.nps_comment
@@ -86,7 +86,7 @@ columns:
   assignee:
     lineage:
       - datalake_tracksale_clean.answer.assignee
-    description: ''
+    description: Area responsible for the research.
   tags:
     lineage:
       - datalake_tracksale_clean.answer.tags
@@ -94,7 +94,8 @@ columns:
   categories:
     lineage:
       - datalake_tracksale_clean.answer.categories
-    description: ''
+    description: Array that indicates the category of answers
+                 Example - name = Business Model
   seconds_spent_answering:
     lineage:
       - datalake_tracksale_clean.answer.seconds_spent_answering
@@ -102,7 +103,7 @@ columns:
   ts_deadline:
     lineage:
       - datalake_tracksale_clean.answer.ts_deadline
-    description: ''
+    description: Date indicating the last day to answer the survey.
   ts_reminder:
     lineage:
       - datalake_tracksale_clean.answer.ts_reminder
