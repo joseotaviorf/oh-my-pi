@@ -2,18 +2,18 @@ database_name: metric_rent
 table_name: coincident_events_time_variations
 description: This table contains the aggregated sum of coincident events of For Rent, based on a time variation which allows
   to understand data updates through time (historical data being retroactively updated).
-  The D-1 target type refers to the current day load looking to the events that happened on the day before. The columns that shows the volume
+  The D-1 reference type refers to the current day load looking to the events that happened on the day before. The columns that shows the volume
   differences for this time visualization are always null;
-  The W1-W5 target type refers to the current day load looking to the events that happened one to five weeks ago. The column that shows the
+  The W1-W5 reference type refers to the current day load looking to the events that happened one to five weeks ago. The column that shows the
   volume differences for this time visualization is comparing to the end of week's load of the related week. For example, if we're currently on
   the week of 28/08/23. The W1-W5 weeks goes from 24/07/23 to 21/08/23. In order to check the load differences, we're calculating the current day load
   volume for the mentioned related weeks minus the load volume that happened on the last day of each week (which in this case would be the load of
   the days 30/07 for the W1 week, 06/08 for the W2, 13/08 for the W3, 20/08 for the W4 and 27/08 for the W5);
-  The LM (Last Month) target type refers to the current day load looking to the events that happened on the past month. The columns that shows the
+  The LM (Last Month) reference type refers to the current day load looking to the events that happened on the past month. The columns that shows the
   volume differences for this time visualization are comparing to the load that happened on the last day of the previous month;
-  The LQ (Last Quarter) target type refers to the current day load looking to the events that happened on the past quarter. The columns that shows the
+  The LQ (Last Quarter) reference type refers to the current day load looking to the events that happened on the past quarter. The columns that shows the
   volume differences for this time visualization are comparing to the load that happened on the last day of the previous quarter;
-  The LY (Last Year) target type refers to the current day load looking to the events that happened on the past year. The columns that shows the
+  The LY (Last Year) reference type refers to the current day load looking to the events that happened on the past year. The columns that shows the
   volume differences for this time visualization are comparing to the load that happened on the last day of the previous year (e.g. the load of
   December 31 of the past year).
   This table is partitioned by country_code, year, month and day columns -- which should be used in analysis, following that order, to improve the
@@ -22,10 +22,10 @@ description: This table contains the aggregated sum of coincident events of For 
 domain: For Rent
 owner: isadora.gallerani@quintoandar.com.br
 columns:
-  target_type:
+  reference_type:
     lineage:
-      - dw_rent_snapshot.coincident_events_time_variations_snapshot.target_type
-    description: Target type of the current time visualization.
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.reference_type
+    description: Reference type of the current time visualization.
     categories:
       D-1: Current day load looking to the events that happened on the day before (D-1).
       W1-W5: Current day load looking to the events that happened on one to five weeks ago.
@@ -59,8 +59,8 @@ columns:
   diff_vb:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_vb
-    description: The volume difference of the visits booked within the aggregation, compared to the present day load of the target type.
-      Every target type has a different time window to visualize the differences (e.g. for D-1 it has no difference check (it's always null),
+    description: The volume difference of the visits booked within the aggregation, compared to the present day load of the reference type.
+      Every reference type has a different time window to visualize the differences (e.g. for D-1 it has no difference check (it's always null),
       but for W1-W5 it checks the data volume load of the end of the week of each week in focus, comparing to the present day load related to
       these weeks. For LM, it checks the data volume load of the last day of the previous month, comparing to the present day load related to
       the past month. For LQ, it checks the data volume load of the last day of the previous quarter, comparing to the present day load related to
@@ -88,7 +88,7 @@ columns:
   diff_vc:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_vc
-    description: The volume difference of the visits completed within the aggregation, compared to the present day load of the target type.
+    description: The volume difference of the visits completed within the aggregation, compared to the present day load of the reference type.
     dimension: True
   percentage_diff_vc:
     lineage:
@@ -111,7 +111,7 @@ columns:
   diff_os:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_os
-    description: The volume difference of the offers submitted within the aggregation, compared to the present day load of the target type.
+    description: The volume difference of the offers submitted within the aggregation, compared to the present day load of the reference type.
     dimension: True
   percentage_diff_os:
     lineage:
@@ -134,7 +134,7 @@ columns:
   diff_oa:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_oa
-    description: The volume difference of the offers accepted within the aggregation, compared to the present day load of the target type.
+    description: The volume difference of the offers accepted within the aggregation, compared to the present day load of the reference type.
     dimension: True
   percentage_diff_oa:
     lineage:
@@ -157,7 +157,7 @@ columns:
   diff_es:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_es
-    description: The volume difference of the evaluations started within the aggregation, compared to the present day load of the target type.
+    description: The volume difference of the evaluations started within the aggregation, compared to the present day load of the reference type.
     dimension: True
   percentage_diff_es:
     lineage:
@@ -180,7 +180,7 @@ columns:
   diff_ep:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_ep
-    description: The volume difference of the evaluations positive within the aggregation, compared to the present day load of the target type.
+    description: The volume difference of the evaluations positive within the aggregation, compared to the present day load of the reference type.
     dimension: True
   percentage_diff_ep:
     lineage:
@@ -203,7 +203,7 @@ columns:
   diff_ds:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_ds
-    description: The volume difference of the documentation sent within the aggregation, compared to the present day load of the target type.
+    description: The volume difference of the documentation sent within the aggregation, compared to the present day load of the reference type.
     dimension: True
   percentage_diff_ds:
     lineage:
@@ -226,7 +226,7 @@ columns:
   diff_ca:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_ca
-    description: The volume difference of the credits approved within the aggregation, compared to the present day load of the target type.
+    description: The volume difference of the credits approved within the aggregation, compared to the present day load of the reference type.
     dimension: True
   percentage_diff_ca:
     lineage:
@@ -249,16 +249,16 @@ columns:
   diff_cs:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.diff_cs
-    description: The volume difference of the contracts signed within the aggregation, compared to the present day load of the target type.
+    description: The volume difference of the contracts signed within the aggregation, compared to the present day load of the reference type.
     dimension: True
   percentage_diff_cs:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.percentage_diff_cs
     description: The difference amount of CSs in percentage.
     dimension: True
-  dt_target:
+  dt_reference:
     lineage:
-      - dw_rent_snapshot.coincident_events_time_variations_snapshot.dt_target
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.dt_reference
     description: Date of when the present event happened (could be a VC, OS, CS, etc.)
     dimension: True
   dt_snapshot:

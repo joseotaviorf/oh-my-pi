@@ -1,5 +1,5 @@
 SELECT
-    target_type,
+    reference_type,
     business_type,
     rent_flow_origin,
     visits_booked,
@@ -29,7 +29,7 @@ SELECT
     contracts_signed,
     diff_cs,
     percentage_diff_cs,
-    dt_target,
+    dt_reference,
     dt_snapshot,
     country_code,
     NOW() AS ts_load
