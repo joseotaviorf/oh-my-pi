@@ -233,6 +233,7 @@ if __name__ == "__main__":
         StructField("address", StringType(), nullable=True),
         StructField("number", StringType(), nullable=True),
         StructField("zip_code", StringType(), nullable=True),
+        StructField("condo_name", StringType(), nullable=True),
         StructField("neighborhood", StringType(), nullable=True),
         StructField("city", StringType(), nullable=True),
         StructField("state", StringType(), nullable=True),
