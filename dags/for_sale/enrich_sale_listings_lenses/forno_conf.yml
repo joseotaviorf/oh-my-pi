@@ -8,12 +8,17 @@ tables:
     is_incremental: false
   pricing_lens:
     is_incremental: false
+  sellability_lens:
+    is_incremental: false
   listing_lenses:
     is_incremental: false
     
 inner_dependencies:
+  sellability_lens:
+    - segmentation_bins
   listing_lenses:
     - availability_lens
     - demand_lens
     - pricing_lens
+    - sellability_lens
     - segmentation_bins

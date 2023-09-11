@@ -69,6 +69,16 @@ avaiability AS (
   WHERE 
     is_last_tier
 ),
+sellability AS (
+  SELECT 
+    id_house,
+    tier AS sellability_tier,
+    tier_name AS sellability_name
+  FROM
+    datalake_sale_listings_lenses.sellability_lens
+  WHERE 
+    is_last_tier
+),
 dataset AS (
   SELECT 
     id_house,
@@ -79,12 +89,11 @@ dataset AS (
     COALESCE(p.pricing_tier, 'P-') AS pricing_tier,
     COALESCE(d.demand_tier, 'D-') AS demand_tier,
     COALESCE(a.availability_tier, 'A-') AS availability_tier,
+    COALESCE(se.sellability_tier, 'S-') AS sellability_tier,
     COALESCE(p.pricing_name, 'Undefined') AS pricing_name,
     COALESCE(d.demand_name, 'Undefined') AS demand_name,
     COALESCE(a.availability_name, 'Undefined') AS availability_name,
-    p.pricing_tier || ' - ' || p.pricing_name AS pricing_full_name,
-    d.demand_tier || ' - ' || d.demand_name AS demand_full_name,
-    a.availability_tier || ' - ' || a.availability_name AS availability_full_name,
+    COALESCE(se.sellability_name, 'Undefined') AS sellability_name,
     p.pricing_disclaimer,
     d.demand_disclaimer,
     a.availability_disclaimer,
@@ -103,6 +112,9 @@ dataset AS (
   LEFT JOIN 
     avaiability AS a
       USING(id_house)
+  LEFT JOIN 
+    sellability AS se
+      USING(id_house)
 ),
 full_name AS (
   SELECT 
@@ -114,12 +126,15 @@ full_name AS (
     pricing_tier,
     demand_tier,
     availability_tier,
+    sellability_tier,
     pricing_name,
     demand_name,
     availability_name,
+    sellability_name,
     pricing_tier || ': ' || pricing_name AS pricing_full_name,
     demand_tier || ': ' || demand_name AS demand_full_name,
     availability_tier || ': ' || availability_name AS availability_full_name,
+    sellability_tier || ': ' || sellability_name AS sellability_full_name,
     pricing_disclaimer,
     demand_disclaimer,
     availability_disclaimer,
@@ -138,12 +153,15 @@ SELECT
   pricing_tier,
   demand_tier,
   availability_tier,
+  sellability_tier,
   pricing_name,
   demand_name,
   availability_name,
+  sellability_name,
   pricing_full_name,
   demand_full_name,
   availability_full_name,
+  sellability_full_name,
   pricing_disclaimer,
   demand_disclaimer,
   availability_disclaimer,

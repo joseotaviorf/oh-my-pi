@@ -255,6 +255,29 @@ columns:
         Listings that have the Availability Score less than -100000. Meaning that this listing is possibly not even available for the visit.
       'A-: Undefined': > 
         Listings that we can't identify your tier. This could be because they don't have enough days in publication or another reason.
+  sellability_lens_tier:
+    lineage:
+      - datalake_sale_listings_lenses.listing_lenses.sellability_full_name
+    description: >
+      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level".
+       We used the entire history of listings that have been published and signed CCVs, with some cuts such as the number of bathrooms, region cluster, price bins, total area bins and m2 price bins. We then defined a `factor' value for each listing in relation to its characteristics. 
+       In other words, we compare it with QuintoAndar's history and classify whether that listing is similar to listings that have already been sold'
+    categories:
+      S5: > 
+        It represents listings with a very high degree of sellability, i.e. it is a listing that is very similar to most of the listings that have already been sold. 
+        To be considered S5, the listing must have a sellability factor greater than 3.
+      S4: > 
+        It represents listings with a high degree of sellability, i.e. it is a listing that is quite similar to most of the listings that have already been sold.
+        To be considered S4, the listing must have a sellability factor greater than 2 and less than or equal to 3.
+      S3: > 
+        It represents listings with a moderate degree of sellability, i.e. it is a listing that is moderately similar to most of the listings that have already been sold.
+        To be considered S3, the listing must have a sellability factor greater than 1 and less than or equal to 2.
+      S2: > 
+        It represents listings with a low degree of sellability, i.e. it is a listing that is slightly similar to most of the listings that have already been sold.
+        To be considered S2, the listing must have a sellability factor greater than 0.3 and less than or equal to 1.
+      S1: > 
+        It represents listings with a very low degree of sellability, i.e. is a listing typology that is totally different from the listings sold on QuintoAndar.
+        To be considered S1, the listing must have a sellability factor less than or equal to 0.3.
   pricing_lens_disclaimer:
     lineage:
       - datalake_sale_listings_lenses.listing_lenses.pricing_disclaimer

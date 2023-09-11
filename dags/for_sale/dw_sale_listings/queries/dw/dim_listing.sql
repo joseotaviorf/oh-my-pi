@@ -18,6 +18,7 @@ SELECT
   ll.pricing_full_name AS pricing_lens_tier,
   ll.demand_full_name AS demand_lens_tier,
   ll.availability_full_name AS availability_lens_tier,
+  ll.sellability_full_name AS sellability_lens_tier,
   ll.pricing_disclaimer AS pricing_lens_disclaimer,
   ll.demand_disclaimer AS demand_lens_disclaimer,
   ll.availability_disclaimer AS availability_lens_disclaimer,

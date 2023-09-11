@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_marketplace_region_clusters
+columns:
+  id_region:
+    lineage:
+      - datalake_gsheets_raw.for_sale_marketplace_region_clusters.id_region
+  name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_marketplace_region_clusters.name
+  cluster_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_marketplace_region_clusters.cluster_name

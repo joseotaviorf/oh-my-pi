@@ -29,6 +29,7 @@ Via **Full Load**:
     - `demand_lens`
     - `listing_lenses`
     - `pricing_lens`
+    - `sellability_lens`
     - `segmentation_bins`
 
 </details>

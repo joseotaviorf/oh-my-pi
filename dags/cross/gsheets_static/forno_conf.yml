@@ -137,6 +137,12 @@ sheets_info:
     clean_table_name: fdic_liquidation_2022
     sheet_context: static
 
+  for_sale_marketplace_region_clusters:
+    sheet_id: 1kuE-ymre0dKQLH7hyEzIUGwdInfISHQnTO_hl9EVYb0
+    sheet_name: Clusters
+    clean_table_name: for_sale_marketplace_region_clusters
+    sheet_context: static
+
   for_sale_segmentation_survey:
     sheet_id: 1rpHRTqCaI1RtwH2OY4WStWGB9uj7YPaGQsJAL2EIaCo
     sheet_name: responses
