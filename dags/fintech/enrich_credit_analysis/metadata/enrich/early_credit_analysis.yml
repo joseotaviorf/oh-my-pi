@@ -57,3 +57,7 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_created
     description: "Early credit analysis creation timestamp"
+  ts_early_credit_analysis_expired:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
+    description: "Early credit analysis expiration timestamp"

@@ -37,6 +37,7 @@ SELECT
     rf.dt_visit,
     rf.dt_booking_created AS ts_booking_created,
     rf.ts_offer_created,
+    eca.ts_expired AS ts_early_credit_analysis_expired,
     eca.ts_created AS ts_early_credit_analysis_created
 FROM datalake_sorting_hat_clean.early_credit_analysis AS eca
 JOIN evaluation AS eval

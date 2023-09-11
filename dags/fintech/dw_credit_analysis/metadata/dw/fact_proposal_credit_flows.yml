@@ -14,6 +14,10 @@ columns:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_house_listing
     description: "Listining identification, created by data team. A new version is given to a house after it was rented or unpublished."
+  sk_house:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+    description: "Id of the house."
   sk_contract_signed_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_contract_signed_date
@@ -96,6 +100,14 @@ columns:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
     description: "Key of date when client sent first documentation."
+  sk_ec_created_date:
+    lineage:
+      - datalake_credit_analysis.early_credit_analysis.ts_early_credit_analysis_created
+    description: "Key of date when early credit analysis was created."
+  sk_ec_expired_date:
+    lineage:
+      - datalake_credit_analysis.early_credit_analysis.ts_early_credit_analysis_expired
+    description: "Key of date when early credit analysis was expired."
   funnel_step:
     lineage:
       - dw_public.fact_listing_rent_flows.funnel_step
@@ -104,5 +116,7 @@ columns:
     description: "Indicates if the row presents the first credit evaluation."
   is_last_credit_evaluation:
     description: "Indicates if the row presents the last credit evaluation."
+  has_early_credit:
+    description: "Indicates if the offer had an early credit analysis."
   ts_load:
     description: "Timestamp of data recorded in the table"

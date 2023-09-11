@@ -120,8 +120,10 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
 bietlejuice.dw_credit_analysis:
   - bietlejuice.dw_crm:load-dw-crm-fact-credit-tasks
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
+  - bietlejuice.enrich_credit_analysis:load-enrich-early-credit-analysis
   - bietlejuice.sorting_hat:load-clean-experiment
   - bietlejuice.sorting_hat:load-clean-variant
 bietlejuice.dw_crm:
