@@ -20,6 +20,7 @@ More information about run time [here]({chart_url}{dag_id}).
 
 
 2. In datalake clean:
+    - `datalake_alert_manager_clean.alerts`
     - `datalake_alert_manager_clean.alerts_databricks_cluster`
 
 </details>
