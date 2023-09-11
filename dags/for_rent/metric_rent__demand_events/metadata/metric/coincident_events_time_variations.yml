@@ -33,15 +33,35 @@ columns:
       LQ: Current day load looking to the events that happened on the last quarter.
       LY: Current day load looking to the events that happened on the last year.
     dimension: True
+  city_group:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.city_group
+    description: Group which the city of the event belongs to.
+    dimension: True
+  tier:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.tier
+    description: Tier information based on the city group of the event.
+    dimension: True
   business_type:
-    description: Business type related to the event.
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.business_type
+    description: Business type of the related event.
+    dimension: True
+  listing_category_start:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.listing_category_start
+    description: Listing category start information related to the event.
     dimension: True
   rent_flow_origin:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.rent_flow_origin
-    description: Funnel first touchpoint information related to the event.
+    description: The rent flow origin (touchpoint) of the related event.
+    dimension: True
+  rental_administrator:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.rental_administrator
+    description: Rental administrator related to the event.
     dimension: True
   visits_booked:
     lineage:
@@ -255,6 +275,13 @@ columns:
     lineage:
       - dw_rent_snapshot.coincident_events_time_variations_snapshot.percentage_diff_cs
     description: The difference amount of CSs in percentage.
+    dimension: True
+  has_guarantee:
+    lineage:
+      - dw_rent_snapshot.coincident_events_time_variations_snapshot.has_guarantee
+    description: Boolean indicating if the event has a guarantee related.
+      It's important to notice that if the event is from VB til OA, the guarantee flag is automatically false.
+      If the event type is from EA to CS, the flag is related to the proposal's guarantee type if it's RentalGuarantee.
     dimension: True
   dt_reference:
     lineage:
