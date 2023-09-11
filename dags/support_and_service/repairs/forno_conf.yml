@@ -36,3 +36,6 @@ tables:
   service_request:
     is_incremental: True
     date_column: updated_at
+  attachment: {}
+  repair_request_budget: {}
+  repair_request_budget_attachment: {}
