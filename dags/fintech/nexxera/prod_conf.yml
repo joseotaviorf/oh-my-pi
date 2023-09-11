@@ -261,7 +261,7 @@ tables:
       - col_53
       - col_54
   - table_name: financial_extracts
-    source_root_path: "s3://5a-datalake-forno/temp/nexxera/ext"
+    source_root_path: "s3://5a-vans-prod/prod/cnab/nexxera/return/ext"
     format: "txt"
     has_raw: True
     col_names:
