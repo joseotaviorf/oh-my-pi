@@ -718,6 +718,10 @@ bietlejuice.reverse_atento:
     - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
     - bietlejuice.gsheets_support_and_service:done-clean-agents-control
     - bietlejuice.gsheets_support_and_service:done-clean-department-control
+bietlejuice.reverse_bic_ss:
+  add:
+    - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
+    - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
 bietlejuice.reverse_dashboard_governance:
   add:
     - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata

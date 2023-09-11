@@ -2479,6 +2479,9 @@ bietlejuice.reverse_atento:
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
+bietlejuice.reverse_bic_ss:
+  - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
+  - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
 bietlejuice.reverse_customer_journey:
   - bietlejuice.enrich_customer_journey:load-enrich-users
 bietlejuice.reverse_dashboard_governance:

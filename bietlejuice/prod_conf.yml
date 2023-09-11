@@ -77,6 +77,7 @@ dags_out_of_pattern:
         "regions_polygon",
         "reverse_atento",
         "reverse_listings_report_access",
+        "reverse_bic_ss",
         "reverse_listings_report_load",
         "reverse_navent_bigquery",
         "reverse_nazare",
@@ -93,7 +94,7 @@ dags_out_of_pattern:
         "wonka.user_agg_search_filters",
         "wonka.user_region_listing_page_viewed",
         "wonka.user_most_viewed_city",
-        "wonka.user_most_viewed_region"
+        "wonka.user_most_viewed_region",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks

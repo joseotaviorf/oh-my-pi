@@ -1,0 +1,20 @@
+---
+dag_documentation:
+  dag_purpose: This DAG is responsible for sending data from BIC to minority_report.
+
+minority_request_header:
+  Content-Type: application/json
+
+batch_size: 100
+
+tables_to_send:
+  bic_ss:
+    key_name: userId
+    type: CUSTOMER_DATA
+
+custom_cluster:
+  driver_node_type_id: r5dn.12xlarge
+  node_type_id: r5dn.4xlarge
+  num_workers: 4
+  aws_attributes:
+    ebs_volume_size: 200
