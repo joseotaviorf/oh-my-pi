@@ -76,6 +76,7 @@ def _extract_address_components(response):
         'route': 'address',
         'postal_code': 'zip_code',
         'street_number': 'number',
+        'premise': 'condo_name',
         'sublocality_level_1': 'neighborhood',
         'administrative_area_level_2': 'city',
         'administrative_area_level_1': 'state',
@@ -155,6 +156,7 @@ def _make_api_request(api_keys, input):
                     address_info.get('address'),
                     address_info.get('number'),
                     address_info.get('zip_code'),
+                    address_info.get('condo_name'),
                     address_info.get('neighborhood'),
                     address_info.get('city'),
                     address_info.get('state'),
@@ -435,7 +437,7 @@ if __name__ == "__main__":
                                       .withColumn("polygon_order", row_number().over(Window.partitionBy("id_address").orderBy("ts_region_created")))
                                       .filter("polygon_order = 1"))
         
-        column_order = ["id_dejavu", "id_address", "id_region", "input_address", "output_address", "address", "number", "zip_code", "neighborhood", "city", "state", "country","latitude", "longitude", "ts_updated"]
+        column_order = ["id_dejavu", "id_address", "id_region", "input_address", "output_address", "address", "number", "zip_code", "condo_name", "neighborhood", "city", "state", "country","latitude", "longitude", "ts_updated"]
         new_data_reordered = new_data_with_region_dedup.select(column_order)
 
         df1 = spark_client.conn.table(f"{database_name}.{addresses_s2_geometry_mapping_table}")

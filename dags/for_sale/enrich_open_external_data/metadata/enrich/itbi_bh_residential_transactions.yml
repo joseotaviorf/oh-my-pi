@@ -16,6 +16,7 @@ columns:
       2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which region that zipcode is predominantly in."
   address:
     lineage:
+      - datalake_vespucio.dejavu.address
       - datalake_itbi_clean.itbi_bh.address
     description: "Most likely address for that listing
       For ITBI, we retrieve it in 3 different ways: 
@@ -24,6 +25,7 @@ columns:
       3 - Lastly, we use what comes directly from ITBI."
   number:
     lineage:
+      - datalake_vespucio.dejavu.number
       - datalake_itbi_clean.itbi_bh.address
     description: "Unit number of the property.
       For ITBI, we retrieve in 2 different ways: 
@@ -33,8 +35,13 @@ columns:
     lineage:
       - datalake_itbi_clean.itbi_bh.address
     description: 'Completion of the property address.'
+  condo_name:
+    lineage:
+      - datalake_vespucio.dejavu.condo_name
+    description: 'Name of the condominium.'
   zipcode:
     lineage:
+      - datalake_vespucio.dejavu.zip_code
       - datalake_itbi_clean.itbi_bh.address
     description: "Zip code of the property address.
       For ITBI, we retrieve in 2 different ways: 
@@ -63,8 +70,12 @@ columns:
     description: 'City of the property, where in the case of this table, it is Belo Horizonte.'
   state:
     lineage:
-      - datalake_itbi_clean.itbi_bh.address
+      - datalake_vespucio.dejavu.state
     description: 'State of the property, where in the case of this table, it is Minas Gerais.'
+  country:
+    lineage: 
+      - datalake_vespucio.dejavu.country
+    description: 'Country of the property, where in the case of this table, it is Brazil.'
   occupation_description:
     lineage:
       - datalake_itbi_clean.itbi_bh.ocupation_description

@@ -33,6 +33,8 @@ columns:
     description: Neighborhood output by Google Geocoding API.
   zip_code:
     description: Zip code output by Google Geocoding API.
+  condo_name:
+    description: Condo name output by Google Geocoding API.
   city:
     description: City output by Google Geocoding API.
   state:

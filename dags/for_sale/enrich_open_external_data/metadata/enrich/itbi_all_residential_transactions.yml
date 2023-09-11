@@ -45,6 +45,11 @@ columns:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_reference
     description: 'Reference of the property address.'
+  condo_name:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_condo_name
+      - datalake_open_external_data.itbi_bh_residential_transactions.condo_name
+    description: 'Condo name of the property address.'
   zipcode:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_zipcode

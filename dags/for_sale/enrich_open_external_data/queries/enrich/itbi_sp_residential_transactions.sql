@@ -3,7 +3,7 @@ WITH itbi_enriched AS (
         REPLACE(TRIM(source_tab), '-', '') || TRIM(iptu_sql_registration_number) || '-' || ROW_NUMBER() OVER (PARTITION BY iptu_sql_registration_number,  REPLACE(source_tab, '-', '') ORDER BY 1) AS id_itbi_transaction,
         TRIM(CAST(iptu_sql_registration_number AS STRING)) AS iptu_sql_registration_number,
         TRIM(CAST(house_registry_number AS STRING)) AS house_registry_number,
-        'São Paulo' AS address_city,
+        'São Paulo' AS address_city, 
         address_neighborhood,
         address_street_name,
         CASE
@@ -58,19 +58,6 @@ WITH itbi_enriched AS (
         OR (TRIM(iptu_standard_description) = 'COMERCIAL VERTICAL' AND TRIM(iptu_use_description) IN ('FLAT DE USO COMERCIAL (SEMELHANTE À HOTEL)', 'FLAT RESIDENCIAL EM CONDOMÍNIO (EXIGE FRAÇÃO IDEAL)', 'RESIDÊNCIA', 'RESIDÊNCIA E OUTRO USO (PREDOMINÂNCIA RESIDENCIAL)'))
         OR (TRIM(iptu_standard_description) = 'RESIDENCIAL HORIZONTAL' AND TRIM(iptu_use_description) IN ('', 'APARTAMENTO EM CONDOMÍNIO (EXIGE FRAÇÃO IDEAL)', 'RESIDÊNCIA', 'RESIDÊNCIA COLETIVA, EXCLUSIVE CORTIÇO (MAIS DE UMA RESIDÊNCIA NO LOTE)', 'RESIDÊNCIA E OUTRO USO (PREDOMINÂNCIA RESIDENCIAL)'))
         OR (TRIM(iptu_standard_description) = 'RESIDENCIAL VERTICAL' AND TRIM(iptu_use_description) IN ('APARTAMENTO EM CONDOMÍNIO (EXIGE FRAÇÃO IDEAL)', 'RESIDÊNCIA', 'RESIDÊNCIA COLETIVA, EXCLUSIVE CORTIÇO (MAIS DE UMA RESIDÊNCIA NO LOTE)', 'RESIDÊNCIA E OUTRO USO (PREDOMINÂNCIA RESIDENCIAL)', 'FLAT DE USO COMERCIAL (SEMELHANTE À HOTEL)', 'FLAT RESIDENCIAL EM CONDOMÍNIO (EXIGE FRAÇÃO IDEAL)')))
-),
-dejavu AS (
-    SELECT 
-        id_address,
-        id_region,
-        SPLIT(output_address, ', ')[0] AS address,
-        SPLIT(SPLIT(output_address, ', ')[1], ' - ')[0] AS number,
-        SPLIT(SPLIT(output_address, ', ')[1], ' - ')[1] AS neighborhood,
-        SPLIT(output_address, ', ')[3] AS zipcode,
-        latitude,
-        longitude
-    FROM 
-        datalake_vespucio.dejavu
 )
 SELECT 
     i.id_itbi_transaction,
@@ -82,7 +69,11 @@ SELECT
     COALESCE(d.number, i.address_number) AS address_number,
     i.address_complement,
     i.address_reference,
-    COALESCE(d.zipcode, i.address_zipcode) AS address_zipcode,
+    d.condo_name AS address_condo_name,
+    COALESCE(d.zip_code, i.address_zipcode) AS address_zipcode,
+    d.city AS address_city,
+    IF(d.state = 'SP', 'São Paulo', d.state) AS address_state,
+    d.country AS address_country,
     d.latitude,
     d.longitude,
     i.financing_type,
@@ -118,7 +109,7 @@ SELECT
 FROM 
     itbi_enriched AS i
 LEFT JOIN 
-    dejavu AS d 
+    datalake_vespucio.dejavu AS d 
         ON MD5(CONCAT(i.address_street_name, i.address_number, i.address_city)) = d.id_address
 LEFT JOIN 
     datalake_region.region AS r 

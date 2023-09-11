@@ -58,19 +58,6 @@ WITH transactions_raw AS (
         year
     FROM
         datalake_itbi_clean.itbi_bh
-),
-dejavu AS (
-    SELECT 
-        id_address,
-        id_region,
-        SPLIT(output_address, ', ')[0] AS address,
-        SPLIT(SPLIT(output_address, ', ')[1], ' - ')[0] AS number,
-        SPLIT(SPLIT(output_address, ', ')[1], ' - ')[1] AS neighborhood,
-        SPLIT(output_address, ', ')[3] AS zipcode,
-        latitude,
-        longitude
-    FROM 
-        datalake_vespucio.dejavu
 )
 SELECT 
     t.id_itbi_transaction,
@@ -78,12 +65,14 @@ SELECT
     COALESCE(d.address, INITCAP(t.address)) AS address,
     COALESCE(d.number, t.number) AS number,
     INITCAP(t.complement) AS complement,
-    COALESCE(d.zipcode, t.zipcode) AS zipcode,
+    d.condo_name,
+    COALESCE(d.zip_code, t.zipcode) AS zipcode,
     COALESCE(r.name, d.neighborhood, t.neighborhood) AS neighborhood,
-    t.city,
+    COALESCE(d.city, t.city) AS city,
+    IF(d.state = 'MG', 'Minas Gerais', d.state) AS state,
+    d.country,
     d.latitude,
     d.longitude,
-    t.state,
     t.occupation_description,
     t.standard_finish,
     t.urban_zoning_code,
@@ -104,7 +93,7 @@ SELECT
 FROM 
     transactions_raw AS t
 LEFT JOIN 
-    dejavu AS d
+    datalake_vespucio.dejavu AS d
         ON MD5(CONCAT(t.address, t.number, t.city)) = d.id_address
 LEFT JOIN 
     datalake_region.region AS r 
