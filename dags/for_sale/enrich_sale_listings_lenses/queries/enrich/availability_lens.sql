@@ -419,6 +419,6 @@ SELECT
   ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_last_tier,
   ts_tier_ended IS NULL AND ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_active,
   ts_tier_started,
-  ts_tier_ended
+  DATE_SUB(ts_tier_ended, 1) AS ts_tier_ended
 FROM
   aux

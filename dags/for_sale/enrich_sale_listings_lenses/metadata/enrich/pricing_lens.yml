@@ -68,7 +68,7 @@ columns:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.ts_price_started
     description: Date of the price change that caused the change in the Listing Pricing score.
-  ts_score_ended:
+  ts_tier_ended:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.ts_price_started
     description: Date of the second-to-last price change (for the observed row) that caused the Listing Pricing Score to change.

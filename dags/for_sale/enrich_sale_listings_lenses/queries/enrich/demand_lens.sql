@@ -400,6 +400,6 @@ SELECT
   tier_disclaimer,
   ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_last_tier,
   ts_tier_started,
-  LEAD(ts_tier_started) OVER (PARTITION BY id_house ORDER BY ts_tier_started) AS ts_tier_ended
+  DATE_SUB(LEAD(ts_tier_started) OVER (PARTITION BY id_house ORDER BY ts_tier_started), 1) AS ts_tier_ended
 FROM
   grouping_tiers

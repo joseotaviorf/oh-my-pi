@@ -135,6 +135,28 @@ grouping_tiers AS (
   QUALIFY 
     ts_price_started = MIN(ts_price_started) OVER (PARTITION BY id_house) 
     OR tier != LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_price_started) 
+),
+aux AS (
+  SELECT 
+    id_house, 
+    id_region,
+    pricing_bins,
+    certainty_calculator_bins,
+    tier,
+    CASE  
+      WHEN tier = 'P5' THEN 'Great Price'
+      WHEN tier = 'P4' THEN 'Good Price'
+      WHEN tier = 'P3' THEN 'Fair Price'
+      WHEN tier = 'P2' THEN 'Slightly Overpriced '
+      WHEN tier = 'P1' THEN 'Significantly Overpriced'
+      WHEN tier = 'P-' THEN 'Undefined'
+    END AS tier_name,
+    tier_disclaimer,
+    has_great_price_tag,
+    TO_DATE(ts_tier_started) AS ts_tier_started,
+    TO_DATE(LEAD(ts_tier_started) OVER (PARTITION BY id_house ORDER BY ts_tier_started)) AS ts_tier_ended
+  FROM
+    grouping_tiers
 )
 SELECT 
   id_house, 
@@ -142,18 +164,11 @@ SELECT
   pricing_bins,
   certainty_calculator_bins,
   tier,
-  CASE  
-    WHEN tier = 'P5' THEN 'Great Price'
-    WHEN tier = 'P4' THEN 'Good Price'
-    WHEN tier = 'P3' THEN 'Fair Price'
-    WHEN tier = 'P2' THEN 'Slightly Overpriced '
-    WHEN tier = 'P1' THEN 'Significantly Overpriced'
-    WHEN tier = 'P-' THEN 'Undefined'
-  END AS tier_name,
+  tier_name,
   tier_disclaimer,
   has_great_price_tag,
-  ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_tier_started DESC) = 1 AS is_last_tier,
+  ts_tier_ended IS NULL AS is_last_tier,
   ts_tier_started,
-  LEAD(ts_tier_started) OVER (PARTITION BY id_house ORDER BY ts_tier_started) AS ts_score_ended
+  DATE_SUB(ts_tier_ended, 1) AS ts_tier_ended
 FROM
-  grouping_tiers
+  aux
