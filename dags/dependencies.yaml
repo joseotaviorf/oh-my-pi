@@ -1549,6 +1549,10 @@ bietlejuice.enrich_legaut:
   - bietlejuice.legaut:load-clean-meusite-project
   - bietlejuice.legaut:load-clean-meusite-state
   - bietlejuice.legaut:load-clean-meusite-unit
+bietlejuice.enrich_listing_contracts:
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.terminator:load-clean-termination
 bietlejuice.enrich_listing_flow:
   - bietlejuice.ebdb:load-clean-lead-aud
   - bietlejuice.ebdb:load-clean-lead-reason
