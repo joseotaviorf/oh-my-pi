@@ -26,6 +26,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(c.properties, '$.company'), '') AS company,
     NULLIF(GET_JSON_OBJECT(c.properties, '$.email'), '') AS email,
     NULLIF(GET_JSON_OBJECT(c.properties, '$.hs_email_domain'), '') AS hs_email_domain,
+    NULLIF(GET_JSON_OBJECT(c.properties, '$.hs_whatsapp_phone_number'), '') AS hs_whatsapp_phone_number,
     NULLIF(GET_JSON_OBJECT(c.properties, '$.mobilephone'), '') AS mobile_phone,
     NULLIF(GET_JSON_OBJECT(c.properties, '$.phone'), '') AS phone,
     NULLIF(GET_JSON_OBJECT(c.properties, '$.website'), '') AS website,
@@ -35,6 +36,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(c.properties, '$.lifecyclestage'), '') AS life_cycle_stage,
     NULLIF(GET_JSON_OBJECT(c.properties, '$.origem_do_lead__uso_restrito_'), '') AS lead_origin_restricted_use,
     NULLIF(GET_JSON_OBJECT(c.properties, '$.recent_conversion_event_name'), '') AS recent_conversion_event_name,
+    NULLIF(GET_JSON_OBJECT(c.properties, '$.responsavel_pelo_nps'), '') AS nps_responsible,
     NULLIF(GET_JSON_OBJECT(c.properties, '$.hs_lead_status'), '') AS lead_status,
     FROM_JSON(
         GET_JSON_OBJECT(c.properties_with_history, '$.hs_lead_status'),

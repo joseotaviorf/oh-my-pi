@@ -93,6 +93,16 @@ tables:
         - status_do_lead___for_rent
         - categoria_do_membro___for_rent
         - demand_only__data_da_live
+        - qualificacao_farming___quantidade_de_imoveis_a_venda
+        - qualificacao_farming___quantidade_de_imoveis_para_locacao
+        - qualificacao_farming___quantidade_de_corretores
+        - qualificacao_farming___quantidade_de_gerentes
+        - qualificacao_farming___ticket_medio_de_imoveis_de_venda
+        - qualificacao_farming___ticket_medio_de_imoveis_para_locacao
+        - link_do_relatorio_consolidado
+        - perfil_do_estoque
+        - ccv_medio_mensal
+        - ccvs_mes_da_imobiliaria_sem_ser_com_rede_5a
       propertiesWithHistory:
         - hs_lead_status
         - categoria_do_membro
@@ -113,6 +123,7 @@ tables:
         - hs_analytics_source_data_2
         - hs_latest_source_data_1
         - hs_latest_source_data_2
+        - hs_whatsapp_phone_number
         - first_conversion_date
         - first_conversion_event_name
         - hs_sequences_is_enrolled
@@ -144,6 +155,7 @@ tables:
         - hubspot_owner_id
         - demand_only__corretor_participou_da_live_de_onboarding_
         - demand_only__data_da_live
+        - responsavel_pelo_nps
       propertiesWithHistory:
         - hs_lead_status
       associations:

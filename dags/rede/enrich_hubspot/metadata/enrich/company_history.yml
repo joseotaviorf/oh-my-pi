@@ -266,6 +266,46 @@ columns:
     lineage:
       - datalake_hubspot_clean.company.properties_with_history
     description: History of the rent status of the company lead in HubSpot.
+  report_link:
+      lineage:
+        - datalake_hubspot_clean.company.properties
+      description: Link to the company's consolidated report.
+  inventory_profile:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Type of company inventory.
+  average_monthly_ccvs:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: The company's average number of monthly CCVs.
+  average_monthly_ccvs_outside_rede_quintoandar:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Monthly average number of CCVs performed by the company.
+  num_properties_for_sale_farming_qualification:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Number of properties for sale. 
+  num_properties_for_rent_farming_qualification:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Number of properties for rent. 
+  num_real_estate_agents_farming_qualification:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Number of real estate agents. 
+  num_managers_farming_qualification:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Number of real estate agents managers. 
+  average_sale_property_ticket_farming_qualification:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Average ticket of a property for sale (R$).
+  average_rent_property_ticket_farming_qualification:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Average ticket of a property for rent (R$).
   num_associated_deals:
     lineage:
       - datalake_hubspot_clean.company.properties

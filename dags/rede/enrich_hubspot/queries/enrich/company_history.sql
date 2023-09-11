@@ -139,6 +139,16 @@ SELECT
             updatedByUserId:string
         >>'
     ) AS rent_lead_status_history,
+    NULLIF(GET_JSON_OBJECT(properties, '$.link_do_relatorio_consolidado'), '') AS report_link,
+    NULLIF(GET_JSON_OBJECT(properties, '$.perfil_do_estoque'), '') AS inventory_profile,
+    GET_JSON_OBJECT(properties, '$.ccv_medio_mensal')::INT AS average_monthly_ccvs,
+    GET_JSON_OBJECT(properties, '$.ccvs_mes_da_imobiliaria_sem_ser_com_rede_5a')::INT AS average_monthly_ccvs_outside_rede_quintoandar,
+    GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_imoveis_a_venda')::INT AS num_properties_for_sale_farming_qualification,
+    GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_imoveis_para_locacao')::INT AS num_properties_for_rent_farming_qualification,
+    GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_corretores')::INT AS num_real_estate_agents_farming_qualification,
+    GET_JSON_OBJECT(properties, '$.qualificacao_farming___quantidade_de_gerentes')::INT AS num_managers_farming_qualification,
+    GET_JSON_OBJECT(properties, '$.qualificacao_farming___ticket_medio_de_imoveis_de_venda')::INT AS average_sale_property_ticket_farming_qualification,
+    GET_JSON_OBJECT(properties, '$.qualificacao_farming___ticket_medio_de_imoveis_para_locacao')::INT AS average_rent_property_ticket_farming_qualification,
     COALESCE(GET_JSON_OBJECT(properties, '$.num_associated_deals')::INT, 0) AS num_associated_deals,
     COALESCE(GET_JSON_OBJECT(properties, '$.num_associated_contacts')::INT, 0) AS num_associated_contacts,
     GET_JSON_OBJECT(properties, '$.qual_a_media_de_novos_contratos_de_locacao_mes_')::INT AS monthly_average_new_rental_contracts,

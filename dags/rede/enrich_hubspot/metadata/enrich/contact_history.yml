@@ -100,6 +100,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.contact.properties
     description: Domain of the email of the contact.
+  hs_whatsapp_phone_number:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+    description: Whatsapp phone number for the owner/CEO, partner or manager. 
   mobile_phone:
     lineage:
       - datalake_hubspot_clean.contact.properties
@@ -136,6 +140,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.contact.properties
     description: Name of the most recent conversion event for the contact.
+  nps_responsible:
+    lineage: 
+      - datalake_hubspot_clean.contact.properties
+    description: Person responsible for the NPS.
   lead_status:
     lineage:
       - datalake_hubspot_clean.contact.properties
