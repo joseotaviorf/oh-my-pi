@@ -6,3 +6,5 @@ inner_dependencies:
     - entry
   invoice_info:
     - invoice
+  invoice:
+    - entry

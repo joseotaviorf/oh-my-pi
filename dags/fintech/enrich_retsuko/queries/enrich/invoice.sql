@@ -4,7 +4,7 @@ WITH latest_audit AS (
     id_audit,
     MAX(ts_retsuko_updated)
   FROM
-    datalake_retsuko_clean.entry
+    datalake_retsuko.entry
   GROUP BY
     id_invoice,
     id_audit
