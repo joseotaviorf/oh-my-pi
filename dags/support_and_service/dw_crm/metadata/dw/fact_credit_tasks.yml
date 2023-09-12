@@ -110,11 +110,14 @@ columns:
   year:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
+    description: Integer type data that indicates the year in which we had the task action in the crm.
   month:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
+    description: Integer type data that indicates the month in which we had the task action in the crm.
   day:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
+    description: Integer type data that indicates the day in which we had the task action in the crm.
   ts_load:
     description: Timestamp of data load event (UTC timezone)

@@ -1,6 +1,7 @@
 database_name: dw_crm
 table_name: fact_collection_tasks
-description: ''
+description: Fact table that consolidates task information and metrics, 
+  each line is a task and its relationship with the house, tenant, owner, etc.
 domain: Support and Service
 owner: nathalia.paula@quintoandar.com.br
 columns:
@@ -27,7 +28,7 @@ columns:
   sk_house_owner:
     lineage:
     - dw_public.fact_listing_rent_flows.sk_owner
-    description: ''
+    description: House owner identification key.
   sk_origin:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
@@ -56,7 +57,7 @@ columns:
   sk_tenant:
     lineage:
     - dw_public.fact_listing_rent_flows.sk_client
-    description: ''
+    description: Resident identification key.
   sk_user_action:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
@@ -106,11 +107,14 @@ columns:
   year:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
+    description: Integer type data that indicates the year in which we had the task in the crm.
   month:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
+    description: Integer type data that indicates the month in which we had the task in the crm.
   day:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
+    description: Integer type data that indicates the day in which we had the task in the crm.
   ts_load:
     description: Timestamp of data load event (UTC timezone)

@@ -1,6 +1,7 @@
 database_name: dw_crm
 table_name: fact_visit_tasks
-description: ''
+description: Fact table that consolidates information about CRM actions tasks 
+  within the visits stage, each line is a task.
 domain: Support and Service
 owner: cassio.bastos@quintoandar.com.br
 columns:
@@ -109,11 +110,14 @@ columns:
   year:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
+    description: Integer type data that indicates the year in which we had the task in the crm.
   month:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
+    description: Integer type data that indicates the month in which we had the task in the crm.
   day:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
+    description: Integer type data that indicates the day in which we had the task in the crm.
   ts_load:
     description: Timestamp of data load event (UTC timezone)

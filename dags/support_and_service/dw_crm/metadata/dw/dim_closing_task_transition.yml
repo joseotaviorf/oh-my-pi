@@ -55,11 +55,14 @@ columns:
   year:
     lineage:
     - datalake_crm_tasks_transitions.tasks_transitions.year
+    description: Integer type data that indicates the year in which we had the transaction in the crm.
   month:
     lineage:
     - datalake_crm_tasks_transitions.tasks_transitions.month
+    description: Integer type data that indicates the month in which we had the transaction in the crm.
   day:
     lineage:
     - datalake_crm_tasks_transitions.tasks_transitions.day
+    description: Integer type data that indicates the day in which we had the transaction in the crm.
   ts_load:
     description: Timestamp of when the data was last loaded in this table
