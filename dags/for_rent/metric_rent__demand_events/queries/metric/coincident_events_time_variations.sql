@@ -4,7 +4,6 @@ SELECT
     tier,
     business_type,
     listing_category_start,
-    rent_flow_origin,
     rental_administrator,
     rent_flow_origin,
     visits_booked,
