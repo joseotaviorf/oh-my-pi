@@ -136,6 +136,7 @@ SELECT
   ts_first_booking_created,
   ts_first_visit_completed,
   ts_first_visit_performed,
+  IF(ts_first_offer_submitted < ts_first_booking_created, ts_first_offer_submitted, NULL) AS ts_first_direct_offer,
   ts_first_offer_submitted,
   ts_first_offer_approved,
   ts_first_contract_created,

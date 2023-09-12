@@ -201,6 +201,10 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.ts_visit_performed
     description: Timestamp of when happened the first visit performed of the rent flow.
+  ts_first_direct_offer:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+    description: Timestamp of when happened the first direct offer (DO) submission of the rent flow, if it had any.
   ts_first_offer_submitted:
     lineage:
       - datalake_rent_flows.rent_flows.ts_offer_submitted
