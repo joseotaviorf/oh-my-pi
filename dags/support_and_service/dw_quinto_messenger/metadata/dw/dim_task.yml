@@ -71,3 +71,5 @@ columns:
     lineage:
       - datalake_quinto_messenger.task_event.ts_twilio_updated_local
     description: ts_twilio_updated on UTC-3 timezone
+  ts_load:
+    description: Timestamp indicating when the data was loaded into the datalake

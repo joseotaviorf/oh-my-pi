@@ -33,3 +33,5 @@ columns:
     lineage:
       - datalake_quinto_messenger.task.task_number
     description: Number of the task inside a conversation
+  ts_load:
+    description: Timestamp indicating when the data was loaded into the datalake

@@ -29,3 +29,5 @@ columns:
     lineage:
       - datalake_quinto_messenger.task_event.ts_updated
     description: Timestamp of when the agent was last updated
+  ts_load:
+    description: Timestamp indicating when the data was loaded into the datalake
