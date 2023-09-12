@@ -101,7 +101,7 @@ def load_table_in_azure_blob_storage(
         """
     )
 
-    if table_name == "speech_analytics":
+    if table_context == "speech_analytics":
         path_to_save = f"{blob_storage_path}/quinto_andar/{table_context}/to_webhelp_{table_name}/"
     else:
         path_to_save = f"{blob_storage_path}/quinto_andar/to_webhelp_{table_name}/"
