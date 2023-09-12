@@ -33,6 +33,22 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def list_files(table_name, source_root_path, format, datetime_to_ingest):
+    if format == 'csv':
+        s3_files_path = f"{source_root_path}{table_name}"
+        files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
+        pattern = re.compile(f".*{datetime_to_ingest.strftime('%Y%m%d')}.*")
+        filtered_files = list(filter(pattern.match, files))
+
+    elif format == 'txt':
+        s3_files_path = f"{source_root_path}"
+        files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
+        pattern = re.compile(f".*{datetime_to_ingest.strftime('%y%m%d')}.*")
+        filtered_files = list(filter(pattern.match, files))
+
+    return filtered_files
+
+
 def generate_schema(col_names: list):
     fields = []
     for col in col_names:
@@ -92,78 +108,75 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    if format == 'csv':
-        s3_files_path = f"{source_root_path}{table_name}"
-        files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
-        pattern = re.compile(f".*{datetime_to_ingest.strftime('%Y%m%d')}.*")
-        filtered_files = list(filter(pattern.match, files))
+    filtered_files = list_files(table_name, source_root_path, format, datetime_to_ingest)
 
-        schema = generate_schema(col_names)
+    if len(filtered_files) > 0:
+        if format == 'csv':
+            schema = generate_schema(col_names)
+            dfs = []
 
-        dfs = []
-        for file_path in filtered_files:
-            df = (
-                spark.read.format("csv")
-                .schema(schema)
-                .option("encoding", "ISO-8859-1")
-                .load(file_path)
-            )
-            dfs.append(df)
-
-        df = reduce(DataFrame.unionAll, dfs)
-
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .create_year_month_day_columns_from_date(datetime_to_ingest)
-            .output()
-        )
-    elif format == 'txt':
-        s3_files_path = f"{source_root_path}"
-        files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
-        pattern = re.compile(f".*{datetime_to_ingest.strftime('%y%m%d')}.*")
-        filtered_files = list(filter(pattern.match, files))
-
-        dfs = []
-
-        for path in filtered_files:
-            df = spark.read.text(filtered_files)
-            df = df.select(
-                df.value.substr(1,3).alias('id_bank'),
-                df.value.substr(4,4).alias('id_service_batch'),
-                df.value.substr(8,1).alias('record_type'),
-                df.value.substr(9,240).alias('metadata'),
-
+            for file_path in filtered_files:
+                df = (
+                    spark.read.format("csv")
+                    .schema(schema)
+                    .option("encoding", "ISO-8859-1")
+                    .load(file_path)
                 )
-            dfs.append(df)
+                dfs.append(df)
+
             df = reduce(DataFrame.unionAll, dfs)
             df = (
-                    SparkDataFrameService()
-                    .input(df)
-                    .create_year_month_day_columns_from_date(datetime_to_ingest)
-                    .output()
-                )
+                SparkDataFrameService()
+                .input(df)
+                .create_year_month_day_columns_from_date(datetime_to_ingest)
+                .output()
+            )
+        elif format == 'txt':
+            dfs = []
 
+            for path in filtered_files:
+                df = spark.read.text(filtered_files)
+                df = df.select(
+                    df.value.substr(1,3).alias('id_bank'),
+                    df.value.substr(4,4).alias('id_service_batch'),
+                    df.value.substr(8,1).alias('record_type'),
+                    df.value.substr(9,240).alias('metadata'),
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+                    )
+                dfs.append(df)
 
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    database_name = db_info["db_raw_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    database_location = db_info["db_raw_path"]
-    spark_metastore_service.create_database(database_name)
+            df = reduce(DataFrame.unionAll, dfs)
+            df = (
+                SparkDataFrameService()
+                .input(df)
+                .create_year_month_day_columns_from_date(datetime_to_ingest)
+                .output()
+            )
 
-    s3_loader = S3Loader()
+        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    s3_path = f"{database_location}{table_name}"
+        logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+        database_name = db_info["db_raw_databricks"]
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
+        database_location = db_info["db_raw_path"]
+        spark_metastore_service.create_database(database_name)
 
-    IncrementalTableLoaderPipeline(
-        database_name,
-        table_name,
-        database_location,
-        LayerEnum.RAW,
-        None,
-        partition_cols,
-    ).load_and_register(df, format_options)
+        s3_loader = S3Loader()
+
+        s3_path = f"{database_location}{table_name}"
+
+        IncrementalTableLoaderPipeline(
+            database_name,
+            table_name,
+            database_location,
+            LayerEnum.RAW,
+            None,
+            partition_cols,
+        ).load_and_register(df, format_options)
+
+    else:
+        logger.warning(
+            "m=__main__, msg= No files were found on S3 bucket. Ending process without loading anything."
+        )
