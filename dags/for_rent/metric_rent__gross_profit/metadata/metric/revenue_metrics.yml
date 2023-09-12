@@ -1,0 +1,232 @@
+---
+database_name: metric_rent
+table_name: revenue_metrics
+description: Monthly table that contains the aggregated value about revenue lines of QuintoAndar
+domain: For Rent
+owner: camila.simoes@quintoandar.com.br
+columns:
+  accrual_year_month:
+    lineage:
+      - dw_rental_contribution_margin.fact_house_listing_revenues.accrual_year_month
+    description: Date of competence (YYYYMM).
+    dimension: True
+  rental_management:
+    description: Revenue of Rental Management Fee.
+    metric:
+      name: Rental Management
+      description: Revenue of Rental Management Fee (considers only the revenue that remains for QuintoAndar and only brazilian listings )
+      acronym: RM
+      is_additive: True
+      business_stage: Post Contract
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  rental_brokerage:
+    description: Revenue of Rental Brokerage Fee.
+    metric:
+      name: Rental Brokerage
+      description: Revenue of Rental Brokerage Fee (considers only the revenue that remains for QuintoAndar and only brazilian listings )
+      acronym: RB
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  partner_share_management:
+    description: Revenue of Rental Management Fee to Partner.
+    metric:
+      name: Partner Share Management
+      description: Revenue of Rental Management Fee (considers only the revenue that remains for Partner and only brazilian listings )
+      acronym: PSM
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  partner_share_brokerage:
+      description: Revenue of Rental Brokerage Fee to Partner.
+      metric:
+        name: Partner Share Brokerage
+        description: Revenue of Rental Brokerage Fee (considers only the revenue that remains for Partner and only brazilian listings )
+        acronym: PSB
+        is_additive: True
+        business_stage: Other
+        hierarchy: User analysis
+        approved_by: camila.simoes@quintoandar.com.br
+        link_to_metric: ''
+  insurance_commission:
+    description: Revenue from Rental Insurance.
+    metric:
+      name: Insurance Commission
+      description: Revenue from Rental Insurance (ex. home insurance)
+      acronym: IC
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  late_payments:
+    description: Revenue from Rental Late Payments
+    metric:
+      name: Late Payments
+      description: Revenue from Rental Late Payments (considers only brazilian listings)
+      acronym: LP
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_guarantee:
+    description: Addons Revenue from Rental Guarantees
+    metric:
+      name: Addons Guarantees
+      description: Addons Revenue from Rental Guarantees (ignore brokerage only and considers only brazilian listings)
+      acronym: AG
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_service_fee:
+    description: Addons Revenue from Service Fee
+    metric:
+      name: Service Fee
+      description: Addons Revenue from Service Fee (considers only brazilian listings)
+      acronym: SF
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_lra:
+    description: Addons Revenue from Long Rental Antecipation (LRA)
+    metric:
+      name: LRA
+      description: Addons Revenue from Long Rental Antecipation (LRA) (considers only brazilian listings) - Means n rentals antecipation
+      acronym: LRA
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_reserve:
+    description: Addons Revenue from Reserves
+    metric:
+      name: Reserves
+      description: Addons Revenue from Reserves that generated a contract or not (considers only brazilian listings)
+      acronym: Res
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_mra:
+    description: Addons Revenue from Month Rental Antecipation (MRA)
+    metric:
+      name: MRA
+      description: Addons Revenue from an one rental antecipation for PP (considers only brazilian listings)
+      acronym: MRA
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_bfi:
+    description: Addons Revenue from Brokerage Finance (BFI)
+    metric:
+      name: BFI
+      description: Addons Revenue from Brokerage Finance (considers only brazilian listings)
+      acronym: BFI
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_ccp:
+    description: Addons Revenue from Credit Card Payment (CCP)
+    metric:
+      name: CCP
+      description: Addons Revenue from Credit Card Payment (considers only brazilian listings)
+      acronym: CCP
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_new_business_revenue:
+    description: Addons Revenue from Brokerage Only
+    metric:
+      name: New Business Revenue
+      description: Addons Revenue from Brokerage Only (Guarantee type = STANDALONE and considers only brazilian listings)
+      acronym: NBR
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  addons_revenue:
+    description: Consolidated Addons Revenue
+    metric:
+      name: New Business Revenue
+      description: Consolidated Addons Revenue ( total of brazilian listings)
+      acronym: AR
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  agents_commission:
+    description: Part of Revenue directed to Agents.
+    metric:
+      name: Agents Commission
+      description: Part of Revenue directed to Agents (ignore agents select, ciq and considers only brazilian listings)
+      acronym: PSB
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  affiliates_commission:
+    description: Part of Revenue directed to Agents (CIQ and SELECT).
+    metric:
+      name: Affiliates Commission
+      description: Part of Revenue directed to Agents (considers only CIQ, SELECT and brazilian listings)
+      acronym: AC
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  revenue_share_total:
+    description: Total of agents discounts .
+    metric:
+      name: Revenue Share
+      description:  Total of agents discounts (considers all of agents and brazilian listings)
+      acronym: RS
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  gross_revenue:
+    description: Positive balance in QuintoAndar's revenue
+    metric:
+      name: Gross Revenue
+      description:  positive balance in QuintoAndar's revenue (considers only brazilian listings)
+      acronym: GR
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''
+  net_revenue_pre_taxes:
+    description: Balance in QuintoAndar's revenue without sales tax discount
+    metric:
+      name: Net Revenue (Pre Taxes)
+      description: Balance in QuintoAndar's revenue without sales tax discount ( (Gross Revenue - Revenue Share) considers only brazilian listings)
+      acronym: GR
+      is_additive: True
+      business_stage: Other
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ''

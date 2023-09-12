@@ -1,0 +1,66 @@
+---
+table_name: metric_rent.revenue_metrics
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  accrual_year_month:
+    is_complete:
+  rental_management:
+    has_min_value:
+      greater_than: 0
+  rental_brokerage:
+    has_min_value:
+      greater_than: 0
+  partner_share_management:
+    has_min_value:
+      greater_than: 0
+  partner_share_brokerage:
+    has_min_value:
+      greater_than: 0
+  insurance_commission:
+    has_min_value:
+      greater_than: 0
+  late_payments:
+    has_min_value:
+      greater_than: 0
+  addons_guarantee:
+    has_min_value:
+      greater_than: 0
+  addons_service_fee:
+    has_min_value:
+      greater_than: 0
+  addons_lra:
+    has_min_value:
+      greater_than: 0
+  addons_reserve:
+    has_min_value:
+      greater_than: 0
+  addons_mra:
+    has_min_value:
+      greater_than: 0
+  addons_bfi:
+    has_min_value:
+      greater_than: 0
+  addons_ccp:
+    has_min_value:
+      greater_than: 0
+  addons_new_business_revenue:
+    has_min_value:
+      greater_than: 0
+  addons_revenue:
+    has_min_value:
+      greater_than: 0
+  agents_commission:
+    has_min_value:
+      greater_than: 0
+  affiliates_commission:
+    has_min_value:
+      greater_than: 0
+  revenue_share_total:
+    has_min_value:
+      greater_than: 0
+  gross_revenue:
+    has_min_value:
+      greater_than: 0
+  net_revenue_pre_taxes:
+    has_min_value:
+      greater_than: 0

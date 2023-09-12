@@ -2415,6 +2415,7 @@ bietlejuice.metric_rent__demand_events:
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-cohort-conversions-snapshot
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
 bietlejuice.metric_rent__gross_profit:
+  - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
   - bietlejuice.enrich_sap:load-enrich-ledger
 bietlejuice.metric_rent__listings:
