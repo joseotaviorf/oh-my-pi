@@ -26,17 +26,16 @@ tables:
     is_incremental: false
 
 custom_cluster:
-  driver_node_type_id: r5d.12xlarge
-  node_type_id: r5d.12xlarge
+  driver_node_type_id: r5d.8xlarge
+  node_type_id: r5d.16xlarge
   runtime_engine: PHOTON
-  autoscale:
-    min_workers: 3
-    max_workers: 6
+  num_workers: 4
   aws_attributes:
     ebs_volume_size: 500
   spark_conf:
-    spark.executor.memory: "240g"
-    spark.executor.memoryOverhead: "23g"
     spark.driver.maxResultSize: "0"
-    spark.driver.memory: "240g"
-    spark.driver.memoryOverhead: "23g"
+    spark.executor.memory: "400g"
+    spark.executor.memoryOverhead: "32g"
+    spark.driver.memory: "100g"
+    spark.driver.memoryOverhead: "16g"
+    spark.sql.shuffle.partitions: "1024"
