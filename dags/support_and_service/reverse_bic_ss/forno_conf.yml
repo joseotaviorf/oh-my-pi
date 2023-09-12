@@ -18,3 +18,5 @@ custom_cluster:
   num_workers: 4
   aws_attributes:
     ebs_volume_size: 200
+  spark_conf:
+    spark.driver.maxResultSize: "0"
