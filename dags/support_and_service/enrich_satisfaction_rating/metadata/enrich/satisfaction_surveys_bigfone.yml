@@ -19,7 +19,7 @@ columns:
     description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
-  id_respondent:
+  id_user:
     description: Identifier of the person who answered the form.
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
