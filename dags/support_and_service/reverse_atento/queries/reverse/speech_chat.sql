@@ -61,6 +61,9 @@ SELECT
     CASE 
         WHEN message_from LIKE '%whatsapp%' THEN 'client' 
         ELSE message_from 
-    END AS message_from
+    END AS message_from,
+    YEAR(CURRENT_DATE - 1) AS year,
+    MONTH(CURRENT_DATE - 1) AS month,
+    DAY(CURRENT_DATE - 1) AS day
 FROM 
     message_summary

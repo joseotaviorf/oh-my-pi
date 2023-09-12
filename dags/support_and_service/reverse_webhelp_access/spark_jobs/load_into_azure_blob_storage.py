@@ -60,7 +60,7 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     table_context = args.table_context
     execution_date = datetime.fromisoformat(args.execution_date)
 
-    return environment, source, database_name, table_name, azure_container_name, execution_date
+    return environment, source, database_name, table_name, azure_container_name, table_context, execution_date
 
 def get_azure_credentials():
     DATABRICKS_SCOPE = "quintoandar"

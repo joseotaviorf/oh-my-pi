@@ -7,7 +7,10 @@ SELECT DISTINCT
     c.agent_email,
     bc.recording_url,
     bc.ts_started,
-    bc.ts_ended
+    bc.ts_ended,
+    YEAR(CURRENT_DATE - 1) AS year,
+    MONTH(CURRENT_DATE - 1) AS month,
+    DAY(CURRENT_DATE - 1) AS day
 FROM 
     datalake_bigfone_clean.call AS bc
 LEFT JOIN

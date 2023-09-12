@@ -759,6 +759,8 @@ bietlejuice.reverse_webhelp_access:
     - bietlejuice.reverse_webhelp:load-reverse-demand-metric
     - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
     - bietlejuice.reverse_webhelp:load-reverse-general-metric
+    - bietlejuice.reverse_webhelp:load-reverse-speech-call
+    - bietlejuice.reverse_webhelp:load-reverse-speech-chat
     - bietlejuice.reverse_webhelp:load-reverse-taxonomia-call
     - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
     - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
