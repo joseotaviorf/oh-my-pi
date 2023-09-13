@@ -1856,6 +1856,15 @@ bietlejuice.enrich_recommendations:
   - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
   - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
   - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
+bietlejuice.enrich_recupera:
+  - bietlejuice.recupera:load-clean-complementary-records
+  - bietlejuice.recupera:load-clean-historical-records
+  - bietlejuice.recupera:load-clean-installment
+  - bietlejuice.recupera:load-clean-installments-indicators
+  - bietlejuice.recupera:load-clean-operational-records
+  - bietlejuice.recupera:load-clean-records
+  - bietlejuice.recupera:load-clean-records-distributed-channels
+  - bietlejuice.recupera:load-clean-status
 bietlejuice.enrich_rede_company:
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

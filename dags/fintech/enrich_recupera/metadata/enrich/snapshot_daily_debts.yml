@@ -1,0 +1,91 @@
+---
+database_name: datalake_fintech_snapshot
+table_name: accounts_payable
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Daily snapshot to report debts"
+columns:
+  id_creditor:
+    lineage:
+      - datalake_recupera_clean.records.id_creditor
+    description: Creditor code
+  id_customer:
+    lineage:
+      - datalake_recupera_clean.records.id_customer
+    description: Customer ID
+  id_contract:
+    lineage:
+      - datalake_recupera_clean.complementary_records.id_contract
+    description: Contract ID
+  id_installment:
+    lineage:
+      - datalake_recupera_clean.installment.id_installment
+    description: Installment ID
+  id_invoice:
+    lineage:
+      - datalake_recupera_clean.complementary_record.id_installment
+    description: Invoice ID
+  customer_name:
+    lineage:
+      - datalake_recupera_clean.records.customer_name
+    description: Customer name
+  status:
+    lineage:
+      - datalake_recupera_clean.status.status_description
+    description: Invoice status description
+  operator:
+    lineage:
+      - datalake_recupera_clean.operational_records.id_operator
+    description: Operator ID
+  distributor:
+    lineage:
+      - datalake_recupera_clean.operational_records.distributor_code
+    description: Distributor code.
+  occurrence:
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+    description: History Code
+  observation:
+    lineage:
+      - datalake_recupera_clean.historical_records.occurence_description
+    description: Description in the occurrence
+  invoice_type:
+    lineage:
+      - datalake_recupera_clean.installments_indicators.indicator_content
+    description: Indicator content
+  advisory:
+    lineage:
+      - datalake_recupera_clean.operational_records.advisory_code
+    description: Advisory ID
+  installment_number:
+    lineage:
+      - datalake_recupera_clean.installment.installment_number
+    description: Installment number
+  invoice_amount:
+    lineage:
+      - datalake_recupera_clean.complementary_record.main_amount
+    description: Invoice main amount
+  deal_amount:
+    lineage:
+      - datalake_recupera_clean.installment.amount_to_pay
+    description: Total amount to be paid in the installment
+  ts_occurrence:
+    lineage:
+      - datalake_recupera_clean.historical_records.ts_occurrence
+    description: Date of occurrence
+  dt_due_agreement:
+    lineage:
+      - datalake_recupera_clean.installment.dt_due
+    description: Due date
+  dt_due_invoice:
+    lineage:
+      - datalake_recupera_clean.complementary_record.dt_debt_due
+    description: Invoice debt due date
+  ts_snapshot:
+    description: Timestamp when the data was loaded
+  year:
+    description: Year when the data was loaded
+  month:
+    description: Month when the data was loaded
+  day:
+    description: Day when the data was loaded
