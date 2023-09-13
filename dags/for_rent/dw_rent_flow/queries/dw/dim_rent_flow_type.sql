@@ -6,6 +6,7 @@ SELECT
     is_step_rejected,
     has_visit_flow,
     has_offer_flow,
+    has_direct_offer_flow,
     has_tta_flow,
     had_contract_signed,
     NOW() AS ts_load
