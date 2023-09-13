@@ -617,6 +617,12 @@ sheets_info:
     clean_table_name: unit_economics_amortization_curve
     sheet_context: growth
 
+  unique_volume_targets_day:
+    sheet_id: 1SjcFoTw-306AFjs1a0JEBWy6gpFZG4jYstBrZ1umY1M
+    sheet_name: Unique (Not Official) - Target 
+    clean_table_name: unique_volume_targets_day
+    sheet_context: growth
+
   voucherify_users:
     sheet_id: 1qvnfJswKdOvscd9hhGBsCThVzimTIOEP47sJWBeyqiY
     sheet_name: voucherify_users
