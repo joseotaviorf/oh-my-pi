@@ -69,6 +69,7 @@ LEFT JOIN
     datalake_company_clean.document AS d2
         ON c.uuid_company = d2.uuid_company
         AND d2.document_type = 'CNPJ'
+        AND d2.status = 'ACTIVE'
 LEFT JOIN
     activation
         ON c.id = activation.id_real_estate
