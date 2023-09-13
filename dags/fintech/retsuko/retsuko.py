@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 import pendulum
 import os
@@ -54,6 +54,9 @@ def get_date_param(dag_run, ds, date_param_name):
     date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
     if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
         return date_param
+    dsc = datetime.strptime(ds,"%Y-%m-%d")
+    dsc = dsc + timedelta(days=1)
+    ds = dsc.strftime("%Y-%m-%d")
     return ds
 
 dag = DAG(

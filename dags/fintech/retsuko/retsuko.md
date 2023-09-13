@@ -39,4 +39,11 @@ We load the following tables into the datalake:
     * recurrent_credit_card
     * sap_entity
 
+This dag is using execution day on the load not D-1, you can pass the following JSON to the DAG Config arguments to change the date parameter:
+
+```
+{{"date_param_name":"DATE_YYYY-MM-DD"}}
+```
+
+
 </details>
