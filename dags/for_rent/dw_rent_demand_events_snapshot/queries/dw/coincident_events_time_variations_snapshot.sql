@@ -38,16 +38,16 @@ WITH metrics_d1 AS (
         DATE(dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        year,
-        month,
-        day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
         year = {year}
         AND month = {month}
         AND day = {day}
-        AND dt_event = DATE_ADD(DATE('{year}-{month}-{day}'), -1)
+        AND dt_event = DATE_ADD(DATE(ts_snapshot), -1)
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 35, 36, 37, 38, 39, 40, 41
 ),
 metrics_5w AS (
@@ -72,18 +72,15 @@ metrics_5w AS (
         DATE_TRUNC('week', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        year,
-        month,
-        day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
-        AND DATE_TRUNC('week', dt_event)
-            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -35))
-                AND DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -7)) -- Between -1 to -5 weeks
+        DATE_TRUNC('week', dt_event)
+            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE(ts_snapshot), -35))
+                AND DATE_TRUNC('week', DATE_ADD(DATE(ts_snapshot), -7)) -- Between -1 to -5 weeks
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 divergences_5w AS (
@@ -108,16 +105,16 @@ divergences_5w AS (
         DATE_TRUNC('week', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        year,
-        month,
-        day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
         DATE(ts_snapshot) = DATE_TRUNC('week', DATE_ADD(dt_event, 7)) -- The snapshot should be from the week start of the following week
         AND DATE_TRUNC('week', dt_event)
-            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -35))
-                AND DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -7)) -- Between -1 to -5 weeks
+            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE(ts_snapshot), -35))
+                AND DATE_TRUNC('week', DATE_ADD(DATE(ts_snapshot), -7)) -- Between -1 to -5 weeks
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 final_5w AS (
@@ -194,16 +191,13 @@ metrics_m AS (
         DATE_TRUNC('month', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        year,
-        month,
-        day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
-        AND DATE_TRUNC('month', dt_event) = DATE_TRUNC('month', ADD_MONTHS(DATE('{year}-{month}-{day}'), -1))  -- Gets the events truncated by the beginning of the previous month
+        DATE_TRUNC('month', dt_event) = DATE_TRUNC('month', ADD_MONTHS(DATE(ts_snapshot), -1))  -- Gets the events truncated by the beginning of the previous month
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 divergences_m AS (
@@ -228,14 +222,14 @@ divergences_m AS (
         DATE_TRUNC('month', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        year,
-        month,
-        day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('month', DATE('{year}-{month}-{day}')))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
-        AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE('{year}-{month}-{day}'), -1)))  -- Gets the events truncated by the previous month start date
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('month', DATE(ts_snapshot)))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
+        AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE(ts_snapshot), -1)))  -- Gets the events truncated by the previous month start date
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 final_m AS (
@@ -312,16 +306,13 @@ metrics_q AS (
         DATE_TRUNC('quarter', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        year,
-        month,
-        day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
-        AND DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE('{year}-{month}-{day}'), -3))  -- Gets the events truncated by the beginning of the previous quarter
+        DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE(ts_snapshot), -3))  -- Gets the events truncated by the beginning of the previous quarter
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 divergences_q AS (
@@ -346,14 +337,14 @@ divergences_q AS (
         DATE_TRUNC('quarter', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        year,
-        month,
-        day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('quarter', DATE('{year}-{month}-{day}')))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
-        AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE('{year}-{month}-{day}'), -3)))  -- Gets the events truncated by the previous quarter start date
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('quarter', DATE(ts_snapshot)))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
+        AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE(ts_snapshot), -3)))  -- Gets the events truncated by the previous quarter start date
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 final_q AS (
@@ -430,16 +421,13 @@ metrics_y AS (
         DATE_TRUNC('year', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        year,
-        month,
-        day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
-        AND DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE('{year}-{month}-{day}'), -12))   -- Gets the events truncated by the beginning of the previous year
+        DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE(ts_snapshot), -12))   -- Gets the events truncated by the beginning of the previous year
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
 divergences_y AS (
@@ -464,16 +452,16 @@ divergences_y AS (
         DATE_TRUNC('year', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
         country_code,
-        r.year,
-        r.month,
-        r.day
+        YEAR(ts_snapshot) AS year,
+        MONTH(ts_snapshot) AS month,
+        DAy(ts_snapshot) AS day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     JOIN
         dw_public.dim_date AS d
             ON d.date = r.dt_event
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('year', DATE('{year}-{month}-{day}')))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('year', DATE(ts_snapshot)))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
         AND DATE(DATE_TRUNC('year', dt_event)) = MAKE_DATE(YEAR(d.last_year), 1, 1)   -- Gets the events truncated by the previous year start date
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
