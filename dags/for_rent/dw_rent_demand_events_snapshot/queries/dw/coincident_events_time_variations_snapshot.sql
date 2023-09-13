@@ -1,3 +1,11 @@
+/** Brief disclaimer about the partitioning choosen:
+    In every DAG run, we want to look to an specific snapshot file, in order to compare the historical events.
+    In our DAG run, we always have the D-1 date (for example, on the day 2023-09-13, the DAG run will be 2023-09-12).
+    In every snapshot from rent_demand_events, we create it using the current date (for example, on the day 2023-09-13,
+    the snapshot date will also be 2023-09-13).
+    So in this case, if we used the DAG run date (purely year-month-day), we would have a D-1 date when the snapshot date is D.
+    In order to avoid this behaviour, in every partition we're adding +1 day, so we'll be looking for the right snapshot file.
+**/
 WITH metrics_d1 AS (
     SELECT
         'D-1' AS reference_type,
@@ -40,7 +48,8 @@ WITH metrics_d1 AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        dt_event = DATE_ADD(DATE('{year}-{month}-{day}'), -1)
+        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)   -- It's necessary to add 1 day because the execution date is always D-1 but we create the snapshot date based on the current day
+        AND dt_event = DATE_ADD(DATE('{year}-{month}-{day}'))   -- As the execution date is always D-1, it's exactly the event date that we want
     GROUP BY 1, 2, 3, 31, 32, 33, 34, 35, 36, 37
 ),
 metrics_5w AS (
@@ -67,9 +76,10 @@ metrics_5w AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE_TRUNC('week', dt_event)
-            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -35))
-                AND DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -7)) -- Between -1 to -5 weeks
+        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
+        AND DATE_TRUNC('week', dt_event)
+            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -35))
+                AND DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -7)) -- Between -1 to -5 weeks
     GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 divergences_5w AS (
@@ -98,8 +108,8 @@ divergences_5w AS (
     WHERE
         DATE(ts_snapshot) = DATE_TRUNC('week', DATE_ADD(dt_event, 7)) -- The snapshot should be from the week start of the following week
         AND DATE_TRUNC('week', dt_event)
-            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -35))
-                AND DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -7)) -- Between -1 to -5 weeks
+            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -35))
+                AND DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -7)) -- Between -1 to -5 weeks
     GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 final_5w AS (
@@ -174,7 +184,8 @@ metrics_m AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE_TRUNC('month', dt_event) = DATE_TRUNC('month', ADD_MONTHS(DATE('{year}-{month}-{day}'), -1))  -- Gets the events truncated by the beginning of the previous month
+        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
+        AND DATE_TRUNC('month', dt_event) = DATE_TRUNC('month', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -1))  -- Gets the events truncated by the beginning of the previous month
     GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 divergences_m AS (
@@ -201,8 +212,8 @@ divergences_m AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('month', DATE('{year}-{month}-{day}')))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
-        AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE('{year}-{month}-{day}'), -1)))  -- Gets the events truncated by the previous month start date
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('month', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
+        AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -1)))  -- Gets the events truncated by the previous month start date
     GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 final_m AS (
@@ -277,7 +288,8 @@ metrics_q AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE('{year}-{month}-{day}'), -3))  -- Gets the events truncated by the beginning of the previous quarter
+        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
+        AND DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -3))  -- Gets the events truncated by the beginning of the previous quarter
     GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 divergences_q AS (
@@ -304,8 +316,8 @@ divergences_q AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('quarter', DATE('{year}-{month}-{day}')))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
-        AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE('{year}-{month}-{day}'), -3)))  -- Gets the events truncated by the previous quarter start date
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('quarter', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
+        AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -3)))  -- Gets the events truncated by the previous quarter start date
     GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 final_q AS (
@@ -380,7 +392,8 @@ metrics_y AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE('{year}-{month}-{day}'), -12))   -- Gets the events truncated by the beginning of the previous year
+        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
+        AND DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -12))   -- Gets the events truncated by the beginning of the previous year
     GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 divergences_y AS (
@@ -410,7 +423,7 @@ divergences_y AS (
         dw_public.dim_date AS d
             ON d.date = r.dt_event
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('year', DATE('{year}-{month}-{day}')))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('year', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
         AND DATE(DATE_TRUNC('year', dt_event)) = MAKE_DATE(YEAR(d.last_year), 1, 1)   -- Gets the events truncated by the previous year start date
     GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
