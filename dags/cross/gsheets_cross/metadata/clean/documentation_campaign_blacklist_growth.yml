@@ -11,9 +11,9 @@ columns:
   layer:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_blacklist_growth.layer
-  recomendacao_3:
+  observacao:
     lineage:
-      - datalake_gsheets_raw.documentation_campaign_blacklist_growth.recomendacao_3
+      - datalake_gsheets_raw.documentation_campaign_blacklist_growth.observacao
   ts_load:
     lineage:
       - datalake_gsheets_raw.documentation_campaign_blacklist_growth.ts_load
