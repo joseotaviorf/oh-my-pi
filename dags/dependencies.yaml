@@ -1955,6 +1955,7 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.ebdb:load-clean-key-type
   - bietlejuice.ebdb:load-clean-occupant-type
   - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -1962,6 +1963,7 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
   - bietlejuice.enrich_ebdb_smart_price:load-enrich-rental-price-history
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
 bietlejuice.enrich_rental_listing_metrics:

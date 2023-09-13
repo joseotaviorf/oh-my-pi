@@ -22,6 +22,11 @@ columns:
     - datalake_ebdb_listing.house_listing.id_contract
     description: The Id of the last contract associated to the listing in a specific
       day.
+  id_owner:
+    lineage:
+    - datalake_ebdb_listing.house.id_user
+    description: The landlord's/owner's ID user.
+      day.
   id_occupant:
     lineage:
     - datalake_ebdb_listing.house_entrance_history.id_occupant
@@ -43,6 +48,10 @@ columns:
     lineage:
     - datalake_ebdb_listing.house.id_region
     description: The Id of the region related to the house.
+  rental_administrator:
+    lineage:
+    - datalake_ebdb_listing.rent_listing.rental_administrator
+    description: Type of administration of the property.
   consultant_type:
     lineage:
     - datalake_big_agent.house_consultant_history.consultant_type
@@ -98,6 +107,18 @@ columns:
     description: Boolean that indicates if this house is for rent.
   is_for_sale:
     description: Boolean that indicates if this house is for sale.
+  is_rent_3p_supply:
+    lineage:
+    - datalake_ebdb_listing.house.is_rent_3p_supply
+    description: Boolean that indicates if house is from Rede QuintoAndar, in the context of ForRent.
+  is_sale_3p_supply:
+    lineage:
+    - datalake_ebdb_listing.house.is_sale_3p_supply
+    description: Boolean that indicates house is from Rede QuintoAndar, in the context of ForSale.
+  is_b2b:
+    lineage:
+    - datalake_b2b.house_listing.is_b2b
+    description: Boolean that indicates if house is B2B.
   is_month_start:
     description: Boolean that indicates if the day is a month start.
   is_month_end:

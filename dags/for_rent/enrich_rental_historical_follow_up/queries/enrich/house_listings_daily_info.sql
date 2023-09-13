@@ -55,6 +55,22 @@ last_ciq_of_day AS (
     WHERE
         hch.is_last_status_of_day = True
 ),
+rent_listing as (
+    SELECT
+        id_house,
+        MAX(rental_administrator) AS rental_administrator
+    FROM
+        datalake_ebdb_listing.rent_listing
+    GROUP BY 1
+),
+b2b as (
+    SELECT
+        id_house,
+        MAX(is_b2b) AS is_b2b
+    FROM
+        datalake_b2b.house_listing
+    GROUP BY 1
+),
 listings_states_per_day AS (
     SELECT /*+ RANGE_JOIN(heh, 1180) */
         CONCAT(hl.id_house_listing, DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
@@ -62,10 +78,12 @@ listings_states_per_day AS (
         hl.id_house,
         h.id_country,
         hl.id_contract,
+        h.id_user AS id_owner,
         heh.id_occupant,
         hbh.id_partner,
         lcod.id_partner AS id_partner_big_agent,
         h.id_region,
+        COALESCE(rl.rental_administrator, 'QUINTOANDAR') AS rental_administrator,
         lcod.consultant_type,
         heh.doorman_type,
         awk.first_key_location,
@@ -80,6 +98,9 @@ listings_states_per_day AS (
             ELSE COALESCE(lbc.is_for_rent, FALSE)
         END AS is_for_rent,
         COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
+        h.is_rent_3p_supply,
+        h.is_sale_3p_supply,
+        b2b.is_b2b,
         /* is_last_status_of_day (house_listing_status) isn't enough to tell what is the last status
            when we extended it using the dim_date.
         */
@@ -135,6 +156,12 @@ listings_states_per_day AS (
     LEFT JOIN
         datalake_ebdb_listing.agents_with_keys AS awk
             ON hl.id_house_listing = awk.id_house_listing
+    LEFT JOIN
+        rent_listing AS rl
+            ON hl.id_house = rl.id_house
+    JOIN
+        b2b
+            ON hl.id_house = b2b.id_house
     /* 
     This table is used for For_Rent and
     should be similar to fact_house_listing_status, so
@@ -150,10 +177,12 @@ SELECT
     id_house,
     id_country,
     id_contract,
+    id_owner,
     id_occupant,
     id_partner,
     id_partner_big_agent,
     id_region,
+    rental_administrator,
     consultant_type,
     doorman_type,
     first_key_location,
@@ -165,6 +194,9 @@ SELECT
     is_exclusive,
     is_for_rent,
     is_for_sale,
+    is_rent_3p_supply,
+    is_sale_3p_supply,
+    is_b2b,
     is_month_start,
     is_month_end,
     is_week_start,
