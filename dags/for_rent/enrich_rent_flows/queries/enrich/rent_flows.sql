@@ -72,6 +72,7 @@ flow_type AS (
     END AS first_touchpoint,
     IF(COUNT(rf.ts_booking_created) > 0, TRUE, FALSE) AS has_visit_flow,
     IF(COUNT(rf.ts_offer_submitted) > 0, TRUE, FALSE) AS has_offer_flow,
+    IF(MIN(rf.ts_offer_submitted) < MIN(rf.ts_booking_created), TRUE, FALSE) AS has_direct_offer_flow,
     IF(COUNT(tta.first_message_ts) > 0, TRUE, FALSE) AS has_tta_flow
   FROM
     rent_flow_base AS rf
@@ -105,6 +106,7 @@ SELECT
     rf.is_step_rejected,
     ft.has_visit_flow,
     ft.has_offer_flow,
+    ft.has_direct_offer_flow,
     ft.has_tta_flow,
     rf.ts_created,
     rf.ts_updated,

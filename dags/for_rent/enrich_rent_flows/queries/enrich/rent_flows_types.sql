@@ -6,6 +6,7 @@ WITH types AS (
         is_step_rejected,
         has_visit_flow,
         has_offer_flow,
+        has_direct_offer_flow,
         has_tta_flow,
         IF(ts_contract_signed IS NOT NULL, TRUE, FALSE) AS had_contract_signed
     FROM
@@ -19,6 +20,7 @@ SELECT
     is_step_rejected,
     has_visit_flow,
     has_offer_flow,
+    has_direct_offer_flow,
     has_tta_flow,
     had_contract_signed
 FROM

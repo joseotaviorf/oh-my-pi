@@ -40,6 +40,9 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.has_offer_flow
     description: Boolean flag indicating if the rent flow had offer event.
+  has_direct_offer_flow:
+    description: "Boolean flag indicating if the rent flow had any direct offer (DO) event, which means that the first event
+      of the rent flow was a DO."
   has_tta_flow:
     lineage:
       - datalake_rent_flows.rent_flows.country_code

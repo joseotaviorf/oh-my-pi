@@ -103,6 +103,9 @@ columns:
     description: "Boolean flag indicating if the rent flow had any visit event."
   has_offer_flow:
     description: "Boolean flag indicating if the rent flow had any offer event."
+  has_direct_offer_flow:
+    description: "Boolean flag indicating if the rent flow had any direct offer (DO) event, which means that the first event
+      of the rent flow was a DO."
   has_tta_flow:
     description: "Boolean flag indicating if the rent flow had any Talk to Agent event."
   ts_created:
