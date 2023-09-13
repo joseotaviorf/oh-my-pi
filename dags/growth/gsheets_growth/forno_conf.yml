@@ -480,7 +480,7 @@ sheets_info:
     sheet_context: growth
 
   supply_listing_cross_historical:
-    sheet_id: 1fO1pp9KkZxpNzEc-kAt5QA9iwrWRJB4r5SNiY-XSB4Y
+    sheet_id: 1qmr2_MBz86YmvAxHzTs_oAktnbPBBqRaA9SOPsrj8NE
     sheet_name: listing_cruzado_historico
     clean_table_name: supply_listing_cross_historical
     sheet_context: growth
@@ -615,6 +615,12 @@ sheets_info:
     sheet_id: 1Xoc-FhCfD3QgXiCSze3XT95BGr1SWqLqLyYTmyUGnHI
     sheet_name: amortization_curve
     clean_table_name: unit_economics_amortization_curve
+    sheet_context: growth
+  
+  unique_volume_targets_day:
+    sheet_id: 1SjcFoTw-306AFjs1a0JEBWy6gpFZG4jYstBrZ1umY1M
+    sheet_name: unique_not_official_target
+    clean_table_name: unique_volume_targets_day
     sheet_context: growth
 
   voucherify_users:
