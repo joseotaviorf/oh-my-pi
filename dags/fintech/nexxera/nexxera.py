@@ -86,6 +86,7 @@ task_group = DatalakeTaskGroup(
 )
 
 tables = config_service.get_config("tables")
+inner_dependencies = config_service.get_config("inner_dependencies")
 
 raw_task_groups = {}
 clean_task_groups = {}
@@ -125,16 +126,26 @@ for table in tables:
     )
 
 
-    if has_raw == True:
-        chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
 
-        chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups),)
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=clean_task_groups,
+    dag_inner_dependencies=inner_dependencies,
+)
 
-        chain(DatalakeTaskGroup.all_last_tasks(clean_task_groups),terminate_cluster_task,)
+chain(
+    create_cluster_task,
+    DatalakeTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+)
 
-        TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
-
-    else:
-        chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(clean_task_groups))
-
-        chain(DatalakeTaskGroup.all_last_tasks(clean_task_groups),terminate_cluster_task,)
+chain(
+    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+)
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)

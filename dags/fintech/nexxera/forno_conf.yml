@@ -283,4 +283,43 @@ tables:
     has_raw: False
   - table_name: group_trailer
     has_raw: False
+inner_dependencies:
+  acquirer_header:
+    - adjustments
+    - financial
+    - inadvance
+    - sales
+    - transaction
+  acquirer_trailer:
+    - adjustments
+    - financial
+    - inadvance
+    - sales
+    - transaction
+  establishment_header:
+    - adjustments
+    - financial
+    - inadvance
+    - sales
+    - transaction
+  establishment_trailer:
+    - adjustments
+    - financial
+    - inadvance
+    - sales
+    - transaction
+  group_header:
+    - adjustments
+    - financial
+    - inadvance
+    - sales
+    - transaction
+  group_trailer:
+    - adjustments
+    - financial
+    - inadvance
+    - sales
+    - transaction
+  financial_legacy:
+    - financial
 partition_cols: ["year", "month", "day"]
