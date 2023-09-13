@@ -1,12 +1,8 @@
 WITH metrics_d1 AS (
     SELECT
         'D-1' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         NULL AS diff_vb,
         NULL AS percentage_diff_vb,
@@ -34,31 +30,24 @@ WITH metrics_d1 AS (
         SUM(contracts_signed) AS contracts_signed,
         NULL AS diff_cs,
         NULL AS percentage_diff_cs,
-        has_guarantee,
         DATE(dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        year,
+        month,
+        day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
-        AND dt_event = DATE_ADD(DATE(ts_snapshot), -1)
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 35, 36, 37, 38, 39, 40, 41
+        dt_event = DATE_ADD(DATE('{year}-{month}-{day}'), -1)
+    GROUP BY 1, 2, 3, 31, 32, 33, 34, 35, 36, 37
 ),
 metrics_5w AS (
     SELECT
         'W1-W5' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -68,30 +57,26 @@ metrics_5w AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('week', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        year,
+        month,
+        day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
         DATE_TRUNC('week', dt_event)
-            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE(ts_snapshot), -35))
-                AND DATE_TRUNC('week', DATE_ADD(DATE(ts_snapshot), -7)) -- Between -1 to -5 weeks
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -35))
+                AND DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -7)) -- Between -1 to -5 weeks
+    GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 divergences_5w AS (
     SELECT
         'W1-W5' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -101,31 +86,27 @@ divergences_5w AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('week', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        year,
+        month,
+        day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
         DATE(ts_snapshot) = DATE_TRUNC('week', DATE_ADD(dt_event, 7)) -- The snapshot should be from the week start of the following week
         AND DATE_TRUNC('week', dt_event)
-            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE(ts_snapshot), -35))
-                AND DATE_TRUNC('week', DATE_ADD(DATE(ts_snapshot), -7)) -- Between -1 to -5 weeks
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -35))
+                AND DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), -7)) -- Between -1 to -5 weeks
+    GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 final_5w AS (
     SELECT
         m.reference_type,
-        m.city_group,
-        m.tier,
         m.business_type,
-        m.listing_category_start,
         m.rent_flow_origin,
-        m.rental_administrator,
         m.visits_booked,
         m.visits_booked-d.visits_booked AS diff_vb,
         COALESCE(ROUND(100*(1-(m.visits_booked/d.visits_booked)), 2), 0) AS percentage_diff_vb,
@@ -153,9 +134,9 @@ final_5w AS (
         m.contracts_signed,
         m.contracts_signed-d.contracts_signed AS diff_cs,
         COALESCE(ROUND(100*(1-(m.contracts_signed/d.contracts_signed)), 2), 0) AS percentage_diff_cs,
-        m.has_guarantee,
         DATE(m.dt_reference) AS dt_reference,
         m.dt_snapshot,
+        m.ts_load,
         m.country_code,
         m.year,
         m.month,
@@ -172,12 +153,8 @@ final_5w AS (
 metrics_m AS (
     SELECT
         'LM' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -187,28 +164,24 @@ metrics_m AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('month', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        year,
+        month,
+        day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE_TRUNC('month', dt_event) = DATE_TRUNC('month', ADD_MONTHS(DATE(ts_snapshot), -1))  -- Gets the events truncated by the beginning of the previous month
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+        DATE_TRUNC('month', dt_event) = DATE_TRUNC('month', ADD_MONTHS(DATE('{year}-{month}-{day}'), -1))  -- Gets the events truncated by the beginning of the previous month
+    GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 divergences_m AS (
     SELECT
         'LM' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -218,29 +191,25 @@ divergences_m AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('month', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        year,
+        month,
+        day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('month', DATE(ts_snapshot)))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
-        AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE(ts_snapshot), -1)))  -- Gets the events truncated by the previous month start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('month', DATE('{year}-{month}-{day}')))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
+        AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE('{year}-{month}-{day}'), -1)))  -- Gets the events truncated by the previous month start date
+    GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 final_m AS (
     SELECT
         m.reference_type,
-        m.city_group,
-        m.tier,
         m.business_type,
-        m.listing_category_start,
         m.rent_flow_origin,
-        m.rental_administrator,
         m.visits_booked,
         m.visits_booked-d.visits_booked AS diff_vb,
         COALESCE(ROUND(100*(1-(m.visits_booked/d.visits_booked)), 2), 0) AS percentage_diff_vb,
@@ -268,9 +237,9 @@ final_m AS (
         m.contracts_signed,
         m.contracts_signed-d.contracts_signed AS diff_cs,
         COALESCE(ROUND(100*(1-(m.contracts_signed/d.contracts_signed)), 2), 0) AS percentage_diff_cs,
-        m.has_guarantee,
         DATE(m.dt_reference) AS dt_reference,
         m.dt_snapshot,
+        m.ts_load,
         m.country_code,
         m.year,
         m.month,
@@ -287,12 +256,8 @@ final_m AS (
 metrics_q AS (
     SELECT
         'LQ' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -302,28 +267,24 @@ metrics_q AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('quarter', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        year,
+        month,
+        day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE(ts_snapshot), -3))  -- Gets the events truncated by the beginning of the previous quarter
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+        DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE('{year}-{month}-{day}'), -3))  -- Gets the events truncated by the beginning of the previous quarter
+    GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 divergences_q AS (
     SELECT
         'LQ' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -333,29 +294,25 @@ divergences_q AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('quarter', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        year,
+        month,
+        day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('quarter', DATE(ts_snapshot)))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
-        AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE(ts_snapshot), -3)))  -- Gets the events truncated by the previous quarter start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('quarter', DATE('{year}-{month}-{day}')))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
+        AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE('{year}-{month}-{day}'), -3)))  -- Gets the events truncated by the previous quarter start date
+    GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 final_q AS (
     SELECT
         m.reference_type,
-        m.city_group,
-        m.tier,
         m.business_type,
-        m.listing_category_start,
         m.rent_flow_origin,
-        m.rental_administrator,
         m.visits_booked,
         m.visits_booked-d.visits_booked AS diff_vb,
         COALESCE(ROUND(100*(1-(m.visits_booked/d.visits_booked)), 2), 0) AS percentage_diff_vb,
@@ -383,9 +340,9 @@ final_q AS (
         m.contracts_signed,
         m.contracts_signed-d.contracts_signed AS diff_cs,
         COALESCE(ROUND(100*(1-(m.contracts_signed/d.contracts_signed)), 2), 0) AS percentage_diff_cs,
-        m.has_guarantee,
         DATE(m.dt_reference) AS dt_reference,
         m.dt_snapshot,
+        m.ts_load,
         m.country_code,
         m.year,
         m.month,
@@ -402,12 +359,8 @@ final_q AS (
 metrics_y AS (
     SELECT
         'LY' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -417,28 +370,24 @@ metrics_y AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('year', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        year,
+        month,
+        day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE(ts_snapshot), -12))   -- Gets the events truncated by the beginning of the previous year
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+        DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE('{year}-{month}-{day}'), -12))   -- Gets the events truncated by the beginning of the previous year
+    GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 divergences_y AS (
     SELECT
         'LY' AS reference_type,
-        city_group,
-        tier,
         business_type,
-        listing_category_start,
         rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -448,32 +397,28 @@ divergences_y AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('year', dt_event) AS dt_reference,
         DATE(ts_snapshot) AS dt_snapshot,
+        NOW() AS ts_load,
         country_code,
-        YEAR(ts_snapshot) AS year,
-        MONTH(ts_snapshot) AS month,
-        DAy(ts_snapshot) AS day
+        r.year,
+        r.month,
+        r.day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     JOIN
         dw_public.dim_date AS d
             ON d.date = r.dt_event
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('year', DATE(ts_snapshot)))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
+        DATE(ts_snapshot) = DATE(DATE_TRUNC('year', DATE('{year}-{month}-{day}')))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
         AND DATE(DATE_TRUNC('year', dt_event)) = MAKE_DATE(YEAR(d.last_year), 1, 1)   -- Gets the events truncated by the previous year start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 2, 3, 13, 14, 15, 16, 17, 18, 19
 ),
 final_y AS (
     SELECT
         m.reference_type,
-        m.city_group,
-        m.tier,
         m.business_type,
-        m.listing_category_start,
         m.rent_flow_origin,
-        m.rental_administrator,
         m.visits_booked,
         m.visits_booked-d.visits_booked AS diff_vb,
         COALESCE(ROUND(100*(1-(m.visits_booked/d.visits_booked)), 2), 0) AS percentage_diff_vb,
@@ -501,9 +446,9 @@ final_y AS (
         m.contracts_signed,
         m.contracts_signed-d.contracts_signed AS diff_cs,
         COALESCE(ROUND(100*(1-(m.contracts_signed/d.contracts_signed)), 2), 0) AS percentage_diff_cs,
-        m.has_guarantee,
         DATE(m.dt_reference) AS dt_reference,
         m.dt_snapshot,
+        m.ts_load,
         m.country_code,
         m.year,
         m.month,
@@ -517,12 +462,12 @@ final_y AS (
             AND d.business_type = m.business_type
             AND d.rent_flow_origin = m.rent_flow_origin
 )
-SELECT *, NOW() AS ts_load FROM metrics_d1
+SELECT * FROM metrics_d1
 UNION ALL
-SELECT *, NOW() AS ts_load FROM final_5w
+SELECT * FROM final_5w
 UNION ALL
-SELECT *, NOW() AS ts_load FROM final_m
+SELECT * FROM final_m
 UNION ALL
-SELECT *, NOW() AS ts_load FROM final_q
+SELECT * FROM final_q
 UNION ALL
-SELECT *, NOW() AS ts_load FROM final_y
+SELECT * FROM final_y

@@ -6,7 +6,7 @@ column_level_validations:
     is_complete:
   rent_flow_origin:
     is_complete:
-  target_type:
+  reference_type:
     is_complete:
       severity_level: Error
   country_code:
