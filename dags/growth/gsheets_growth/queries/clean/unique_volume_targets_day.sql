@@ -9,8 +9,8 @@ SELECT
     CAST(NULLIF(first_listings, '') AS DOUBLE) AS first_listings,
     CAST(NULLIF(date, '') AS DATE) AS date,
     CAST(NULLIF(month, '') AS INTEGER) AS month,
-    CAST(NULLIF(quarter, '') AS DATE) AS quarter,
-    CAST(NULLIF(halfyear, '') AS DATE) AS half_year,
-    CAST(NULLIF(week_start, '') AS DATE) AS week_start,
+    CAST(NULLIF(quarter, '') AS INTEGER) AS quarter,
+    CAST(NULLIF(halfyear, '') AS INTEGER) AS half_year,
+    CAST(NULLIF(week_start, '') AS DATE) AS week_start
 FROM
     datalake_gsheets_raw.unique_volume_targets_day
