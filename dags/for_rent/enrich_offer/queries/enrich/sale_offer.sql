@@ -862,7 +862,9 @@ SELECT
     id_business_unit,
     id_company_supply,
     uuid_company_supply,
+    cs_supply.sk_company AS sk_company_supply,
     id_company_demand,
+    cs_demand.sk_company AS sk_company_demand,
     pendency,
     CASE
         WHEN current_payment_method = "INSTANT_MORTGAGE" THEN (
@@ -995,4 +997,24 @@ SELECT
     ts_last_updated_pendency,
     ts_updated
 FROM
-    business_rules
+    business_rules AS br
+LEFT JOIN
+    datalake_rede_company.company_sks AS cs_demand
+        ON (br.id_company_demand IS NOT NULL
+        AND br.id_company_demand = cs_demand.id_hubspot)
+        OR (br.id_company_demand IS NULL
+        AND br.partner_3p_demand = cs_demand.extracted_3p_tag)
+LEFT JOIN
+    datalake_rede_company.company_sks AS cs_supply
+        ON (
+        br.uuid_company_supply IS NOT NULL
+        AND br.uuid_company_supply = cs_supply.uuid_company
+        ) OR (
+        br.uuid_company_supply IS NULL
+        AND br.id_company_supply IS NOT NULL
+        AND br.id_company_supply = cs_supply.id_hubspot
+        ) OR (
+        br.uuid_company_supply IS NULL
+        AND br.id_company_supply IS NULL
+        AND br.partner_3p_supply = cs_supply.extracted_3p_tag
+    )
