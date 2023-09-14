@@ -50,14 +50,16 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 25, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 8 * * *"
 
+
 def get_date_param(dag_run, ds, date_param_name):
     date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
     if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
         return date_param
-    dsc = datetime.strptime(ds,"%Y-%m-%d")
+    dsc = datetime.strptime(ds, "%Y-%m-%d")
     dsc = dsc + timedelta(days=1)
     ds = dsc.strftime("%Y-%m-%d")
     return ds
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -124,6 +126,7 @@ for table in tables:
         table_name=table_name,
         is_incremental=extraction_type == "incremental",
         partitions=partition_cols,
+        execution_date="{{ get_date_param(dag_run, ds, 'execution_date') }}",
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
@@ -133,7 +136,7 @@ for table in tables:
         DatalakeTaskGroup.first_tasks(clean_task_group),
     )
 
-        # Set data quality tasks if exists
+    # Set data quality tasks if exists
     independent_tasks = DatalakeTaskGroup.independent_tasks(raw_task_group)
     if independent_tasks:
         terminate_cluster_task.set_upstream(independent_tasks)
