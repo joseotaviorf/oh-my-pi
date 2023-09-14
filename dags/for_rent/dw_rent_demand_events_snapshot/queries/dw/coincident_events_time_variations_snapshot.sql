@@ -49,7 +49,7 @@ WITH metrics_d1 AS (
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
         DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)   -- It's necessary to add 1 day because the execution date is always D-1 but we create the snapshot date based on the current day
-        AND dt_event = DATE_ADD(DATE('{year}-{month}-{day}'))   -- As the execution date is always D-1, it's exactly the event date that we want
+        AND dt_event = DATE('{year}-{month}-{day}')   -- As the execution date is always D-1, it's exactly the event date that we want
     GROUP BY 1, 2, 3, 31, 32, 33, 34, 35, 36, 37
 ),
 metrics_5w AS (
