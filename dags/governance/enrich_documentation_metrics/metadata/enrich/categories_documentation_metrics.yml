@@ -1,36 +1,55 @@
 ---
 database_name: datalake_documentation_metrics
 table_name: categories_documentation_metrics
+owner: augusto.torres@quintoandar.com.br
+domain: DataOps & Governance
+description: Table with stats of category columns documentation.
 columns:
   layer:
+    description: Indicates the data architecture layer of the tables
+    categories: 
+      raw: Datalake raw layer.
+      clean: Datalake clean layer.
+      enrich: Datalake enrich layer.
+      dw: DW table 
+      metric: Business metrics materialized in tables.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.layer
   database_name:
+    description: Database name, indicate the first part of the full table name in the format <database_name>.<table_name>.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.database_name
   table_name:
+    description: Table name, indicate the second part of the full table name in the format <database_name>.<table_name>.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.table_name
   column_name:
+    description: Column name.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.column_name
   value:
+    description: The value of the categories. Possible values for the column.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.value
   has_description:
+    description: Indicate if a category has description.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.has_description
   dt_ingested:
+    description: Ingestion datetime.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.year
       - datalake_documentation_metrics_clean.categories_documentation.month
       - datalake_documentation_metrics_clean.categories_documentation.day
   year:
+    description: Ingestion year.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.year
   month:
+    description: Ingestion month.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.month
   day:
+    description: Ingestion day.
     lineage:
       - datalake_documentation_metrics_clean.categories_documentation.day

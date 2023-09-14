@@ -10,7 +10,7 @@ columns:
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.name
     metric_acronym:
-      description: Summary or abbreviation that identifies the metric..
+      description: Summary or abbreviation that identifies the metric.
       lineage:
         - datalake_metrics_governance_raw.metrics_registration.acronym
     metric_description:
