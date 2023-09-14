@@ -18,32 +18,25 @@ We load the following tables into the datalake:
 1. In datalake raw:
 
     * account
-    * boleto (incremental)
+    * boleto
     * contract
     * credit_card_payment
-    * entry (incremental)
+    * entry
     * file
-    * invoice (incremental)
+    * invoice
     * recurrent_credit_card
     * sap_entity
 
 2. In datalake clean
 
     * account
-    * boleto (incremental)
+    * boleto
     * contract
     * credit_card_payment
-    * entry (incremental)
-    * file 
-    * invoice (incremental)
+    * entry
+    * file
+    * invoice
     * recurrent_credit_card
     * sap_entity
-
-This dag is using execution day on the load not D-1, you can pass the following JSON to the DAG Config arguments to change the date parameter:
-
-```
-{{"date_param_name":"DATE_YYYY-MM-DD"}}
-```
-
 
 </details>
