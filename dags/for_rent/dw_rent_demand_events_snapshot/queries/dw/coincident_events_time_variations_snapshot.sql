@@ -173,8 +173,13 @@ final_5w AS (
         divergences_5w AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
+            AND d.city_group = m.city_group
+            AND d.tier = m.tier
             AND d.business_type = m.business_type
+            AND d.listing_category_start = m.listing_category_start
             AND d.rent_flow_origin = m.rent_flow_origin
+            AND d.rental_administrator = m.rental_administrator
+            AND d.has_guarantee = m.has_guarantee
 ),
 metrics_m AS (
     SELECT
@@ -289,8 +294,13 @@ final_m AS (
         divergences_m AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
+            AND d.city_group = m.city_group
+            AND d.tier = m.tier
             AND d.business_type = m.business_type
+            AND d.listing_category_start = m.listing_category_start
             AND d.rent_flow_origin = m.rent_flow_origin
+            AND d.rental_administrator = m.rental_administrator
+            AND d.has_guarantee = m.has_guarantee
 ),
 metrics_q AS (
     SELECT
@@ -405,8 +415,13 @@ final_q AS (
         divergences_q AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
+            AND d.city_group = m.city_group
+            AND d.tier = m.tier
             AND d.business_type = m.business_type
+            AND d.listing_category_start = m.listing_category_start
             AND d.rent_flow_origin = m.rent_flow_origin
+            AND d.rental_administrator = m.rental_administrator
+            AND d.has_guarantee = m.has_guarantee
 ),
 metrics_y AS (
     SELECT
@@ -524,8 +539,13 @@ final_y AS (
         divergences_y AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
+            AND d.city_group = m.city_group
+            AND d.tier = m.tier
             AND d.business_type = m.business_type
+            AND d.listing_category_start = m.listing_category_start
             AND d.rent_flow_origin = m.rent_flow_origin
+            AND d.rental_administrator = m.rental_administrator
+            AND d.has_guarantee = m.has_guarantee
 )
 SELECT *, NOW() AS ts_load FROM metrics_d1
 UNION ALL
