@@ -40,7 +40,7 @@ old_gateway AS (
 SELECT DISTINCT
     p.id AS id_payment,
     p.id_propose,
-    NULL AS id_occurrence,
+    CAST(NULL AS BIGINT) AS id_occurrence,
     pv.id_propose_values AS id_propose_values,
     jk1.id_junk AS id_billing_type, -- p.billing_type
     jk2.id_junk AS id_payment_type,
