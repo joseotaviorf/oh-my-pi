@@ -40,6 +40,11 @@ columns:
     lineage:
       - datalake_pas.invoice_lines.id_document
       - datalake_pas.incoming_payments_lines.id_document
+  id_branch:
+    description: "ID that indicates which company from 5A group"
+    lineage:
+      - datalake_pas.invoice_lines.id_branch
+      - datalake_pas.journal_entry_lines.id_branch
   account_type:
     description: "Account type description"
   account_number:

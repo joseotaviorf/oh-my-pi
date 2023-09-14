@@ -149,6 +149,7 @@ db AS (
             je.id_business_entity,
             je.id_finance_entity_entry,
             je.id_finance_entity,
+            je.id_branch,
             je.cost_center_code,
             je.contra_act,
             je.location_profit_code,
@@ -179,6 +180,7 @@ db AS (
             iin.id_business_entity,
             iin.id_finance_entity_entry,
             iin.id_finance_entity,
+            iin.id_branch,
             iin.cost_center_code,
             iin.contra_act,
             iin.location_profit_code,
@@ -207,6 +209,7 @@ db AS (
             ip.id_business_entity,
             ip.id_finance_entity_entry,
             ip.id_finance_entity,
+            ip.id_branch,
             ip.cost_center_code,
             ip.contra_act,
             ip.location_profit_code,
@@ -235,6 +238,7 @@ SELECT
     db.id_finance_entity_entry,
     dh.id_external_payment,
     db.id_document,
+    db.id_branch,
     CASE
         SUBSTR(db.account, 1, 1)
         WHEN '1' THEN 'Ativo'
