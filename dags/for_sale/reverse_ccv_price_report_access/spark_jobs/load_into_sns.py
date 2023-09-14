@@ -7,7 +7,6 @@ from argparse import ArgumentParser
 
 from pyspark.sql.window import Window
 from pyspark.sql import functions as F
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType, ArrayType, TimestampType
 
 from bietlejuice.clients.db_clients import SparkClient
 
@@ -68,16 +67,6 @@ def prepare_table(database_name: str, table_name: str, event_type: str):
     - table_name (str): Name of the table to retrieve and process.
     - execution_date (datetime): Date used to filter the table's rows. Rows with a matching year, month, and day are selected.
     """
-    def zip_dates_counts(period, ccv_period, ccv_end_period, avg_price_m2):
-        return [{"period_name": period, "ccv_period": ccv_period, "end_period": ccv_end_period, "avg_price_m2": avg_price_m2} for period, ccv_period, ccv_end_period, avg_price_m2 in zip(period, ccv_period, ccv_end_period, avg_price_m2)] 
-
-    schema = ArrayType(
-        StructType([StructField("period_name", StringType()), 
-                    StructField("ccv_period", TimestampType()),
-                    StructField("ccv_end_period", TimestampType()),
-                    StructField("avg_price_m2", IntegerType())]))
-    zip_udf = F.udf(zip_dates_counts, schema)
-
     df = (
         spark.table(f"{database_name}.{table_name}")
         .selectExpr(
@@ -126,7 +115,7 @@ def prepare_table(database_name: str, table_name: str, event_type: str):
         df
         .withColumn(
             'data', 
-            zip_udf(F.col('period_name'), F.col('ccv_period'), F.col('ccv_end_period'), F.col('avg_price_m2'))
+            F.arrays_zip(F.col('period_name'), F.col('ccv_period'), F.col('ccv_end_period'), F.col('avg_price_m2'))
         )
         .select('id', 'id_region', 'city_group', 'city', 'neighborhood', 'tier', 'tier_type', 'region_used_for_m2_average', 'ts_load', 'data')
     )
@@ -135,7 +124,7 @@ def prepare_table(database_name: str, table_name: str, event_type: str):
         f"m=__main__, message=Table retrieved: {formatted_df.count()} rows and {len(formatted_df.columns)} columns."
     )
 
-    historical_data = [json.loads(region) for region in formatted_df.toJSON().collect()]
+    historical_data = [region.asDict(recursive=True) for region in formatted_df.collect()]
     payload = []
 
     for region in historical_data:
