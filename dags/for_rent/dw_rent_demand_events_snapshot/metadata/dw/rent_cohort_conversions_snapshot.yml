@@ -33,7 +33,7 @@ columns:
     description: "Listing category start information coming from the house listing."
   rent_flow_origin:
     lineage:
-      - dw_datamarts.funnel_demand_flows.funnel_first_touchpoint
+      - dw_rent.dim_rent_flow_type.first_touchpoint
     description: "Funnel first touchpoint information based on the information available on the column with the same name from funnel_demand_flows."
   rental_administrator:
     lineage:
@@ -125,7 +125,7 @@ columns:
     description: "Week date of the event."
   ts_snapshot:
     description: "Load timestamp, which is the snapshot timestamp."
-  country_code: 
+  country_code:
     lineage:
     - dw_rent.fact_rent_cohort_conversions.country_code
     description: "Country code information, also a partition."

@@ -1,22 +1,22 @@
 SELECT
     DATE_FORMAT(CURRENT_DATE, 'yyyyMMdd') AS id_snapshot,
-    CASE 
+    CASE
         WHEN MONTH(TO_DATE(CAST(fc.sk_base_event_date AS STRING), 'yyyyMMdd')) <= 6 THEN 1
         ELSE 2
     END AS halfyear,
     EXTRACT(quarter FROM dt.date) AS quarter,
     dr.city_group,
     dr.tier,
-    CASE 
+    CASE
         WHEN dhl.is_b2b = TRUE THEN 'B2B'
         WHEN dhl.first_consultant_type = 'CIQ_MANAGER' THEN 'ASP'
         WHEN dhl.is_for_rent = TRUE AND (dhl.first_consultant_type IS NOT NULL AND dhl.first_consultant_type <> 'Core') THEN dhl.first_consultant_type
         WHEN dhl.is_b2b = FALSE OR (dhl.first_consultant_type IS NULL OR dhl.first_consultant_type = 'Core') THEN 'CORE'
     END AS business_type,
     dhl.listing_category_start,
-    CASE 
-        WHEN fdf.funnel_first_touchpoint = 'DIRECT' THEN fdf.funnel_first_touchpoint
-        ELSE 'VISIT' 
+    CASE
+        WHEN drf.first_touchpoint = 'DIRECT' THEN drf.first_touchpoint
+        ELSE 'VISIT'
     END AS rent_flow_origin,
     dhl.rental_administrator,
     fc.days_to_conversion,
@@ -62,7 +62,7 @@ SELECT
         WHEN fc.sk_base_event_type > 4 AND dp.guarantee = 'RentalGuarantee' THEN TRUE
         ELSE FALSE
     END AS has_guarantee,
-    TO_DATE(dt.date, 'yyyy-mm-dd') AS dt_event,  
+    TO_DATE(dt.date, 'yyyy-mm-dd') AS dt_event,
     TO_DATE(DATE_TRUNC('week', dt.date), 'yyyy-mm-dd') AS dt_week_started,
     NOW() AS ts_snapshot,
     fc.country_code,
@@ -71,7 +71,7 @@ SELECT
     DAY(fc.ts_load) AS day
 FROM
     dw_rent.fact_rent_cohort_conversions AS fc
-JOIN 
+JOIN
     dw_public.dim_date AS dt
         ON dt.sk_date = fc.sk_base_event_date
 LEFT JOIN
@@ -79,17 +79,19 @@ LEFT JOIN
         ON fd.sk_event = fc.sk_base_event
         AND fd.sk_event_type = fc.sk_base_event_type
         AND fd.sk_event_date = fc.sk_base_event_date
-LEFT JOIN 
+LEFT JOIN
     dw_public.dim_region AS dr
         ON dr.sk_region = fd.sk_region
-LEFT JOIN 
+LEFT JOIN
     dw_public.dim_house_listing AS dhl
-        ON fd.sk_house_listing = dhl.sk_house_listing 
-LEFT JOIN 
-    dw_datamarts.funnel_demand_flows AS fdf
-        ON fd.sk_rent_flow = fdf.sk_rent_flow        
-        AND fd.sk_house_listing = fdf.sk_house_listing
-LEFT JOIN 
+        ON fd.sk_house_listing = dhl.sk_house_listing
+LEFT JOIN
+  dw_rent.fact_rent_flows AS frf
+    ON fd.sk_rent_flow = frf.sk_rent_flow
+LEFT JOIN
+  dw_rent.dim_rent_flow_type AS drf
+    ON frf.sk_rent_flow_type = drf.sk_rent_flow_type
+LEFT JOIN
     dw_public.dim_proposal AS dp
         ON fd.sk_proposal = dp.sk_proposal
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 48, 49, 50, 51, 52, 53, 54, 55

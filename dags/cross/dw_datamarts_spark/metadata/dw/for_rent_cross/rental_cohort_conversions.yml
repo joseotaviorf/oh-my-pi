@@ -50,7 +50,7 @@ columns:
     description: The detailed market channel in demand context.
   first_touchpoint:
     lineage:
-      - dw_datamarts.funnel_demand_flows.funnel_first_touchpoint
+      - dw_rent.dim_rent_flow_type.first_touchpoint
     description: The first touchpoint of the rental cohort in the marketing funnel.
   is_b2b_demand:
     lineage:

@@ -467,12 +467,7 @@ rent_flow_adjusted AS (
         rf.sk_contract,
         rf.sk_contract_created_date,
         rf.sk_contract_signed_date,
-        fdf.funnel_flow,
-        fdf.funnel_first_touchpoint,
-        fdf.had_flow_visit,
-        fdf.had_flow_direct,
-        fdf.had_flow_tta,
-        fdf.flow_type,
+        drf.first_touchpoint AS funnel_first_touchpoint,
         dp.guarantee,
         CASE
             WHEN dhl.is_b2b = TRUE THEN 'B2B'
@@ -508,8 +503,11 @@ rent_flow_adjusted AS (
         dw_public.dim_offer dof
             ON rf.sk_offer = dof.sk_offer
     LEFT JOIN
-        dw_datamarts.funnel_demand_flows fdf
-            ON rf.sk_rent_flow = fdf.sk_rent_flow
+        dw_rent.fact_rent_flows AS frf
+            ON rf.sk_rent_flow = frf.sk_rent_flow
+    LEFT JOIN
+        dw_rent.dim_rent_flow_type AS drf
+            ON frf.sk_rent_flow_type = drf.sk_rent_flow_type
 ),
 vb2vc AS (
     SELECT
