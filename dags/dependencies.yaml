@@ -2507,6 +2507,8 @@ bietlejuice.reverse_atento:
 bietlejuice.reverse_bic_ss:
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
   - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
+bietlejuice.reverse_ccv_price_report_access:
+  - bietlejuice.reverse_ccv_price_report_load:load-reverse-ccv-price-by-region
 bietlejuice.reverse_customer_journey:
   - bietlejuice.enrich_customer_journey:load-enrich-users
 bietlejuice.reverse_dashboard_governance:
