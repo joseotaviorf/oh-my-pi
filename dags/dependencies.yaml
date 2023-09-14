@@ -480,12 +480,12 @@ bietlejuice.dw_lead:
   - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:load-clean-condo
-  - bietlejuice.ebdb:load-clean-contract
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
@@ -495,6 +495,7 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
+  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
 bietlejuice.dw_listing_jobs:
   - bietlejuice.ebdb:load-clean-contract
   - bietlejuice.enrich_booking:load-enrich-booking
