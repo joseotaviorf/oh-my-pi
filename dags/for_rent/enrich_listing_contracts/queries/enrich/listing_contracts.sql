@@ -48,7 +48,6 @@ contracts_base AS (
     JOIN
         datalake_ebdb_listing.house_listing AS hl
             ON lc.id_house_listing = hl.id_house_listing
-            AND hl.version > 0  -- Only listings that were already published
     LEFT JOIN
         terminations AS t
             ON t.id_contract = c.id
