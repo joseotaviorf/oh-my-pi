@@ -44,7 +44,7 @@ WITH metrics_d1 AS (
         NULL AS percentage_diff_cs,
         has_guarantee,
         DATE(dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
         year,
         month,
@@ -52,7 +52,7 @@ WITH metrics_d1 AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)   -- It's necessary to add 1 day because the execution date is always D-1 but we create the snapshot date based on the current day
+        MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)   -- It's necessary to add 1 day because the execution date is always D-1 but we create the snapshot date based on the current day
         AND dt_event = DATE('{year}-{month}-{day}')   -- As the execution date is always D-1, it's exactly the event date that we want
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 35, 36, 37, 38, 39, 40, 41
 ),
@@ -76,7 +76,7 @@ metrics_5w AS (
         SUM(contracts_signed) AS contracts_signed,
         has_guarantee,
         DATE_TRUNC('week', dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
         year,
         month,
@@ -84,7 +84,7 @@ metrics_5w AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
+        MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
         AND DATE_TRUNC('week', dt_event)
             BETWEEN DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -35))
                 AND DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -7)) -- Between -1 to -5 weeks
@@ -110,7 +110,7 @@ divergences_5w AS (
         SUM(contracts_signed) AS contracts_signed,
         has_guarantee,
         DATE_TRUNC('week', dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
         year,
         month,
@@ -118,7 +118,7 @@ divergences_5w AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE_TRUNC('week', DATE_ADD(dt_event, 7)) -- The snapshot should be from the week start of the following week
+        MAKE_DATE(year, month, day) = DATE_TRUNC('week', DATE_ADD(dt_event, 7)) -- The snapshot should be from the week start of the following week
         AND DATE_TRUNC('week', dt_event)
             BETWEEN DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -35))
                 AND DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -7)) -- Between -1 to -5 weeks
@@ -201,7 +201,7 @@ metrics_m AS (
         SUM(contracts_signed) AS contracts_signed,
         has_guarantee,
         DATE_TRUNC('month', dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
         year,
         month,
@@ -209,7 +209,7 @@ metrics_m AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
+        MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
         AND DATE_TRUNC('month', dt_event) = DATE_TRUNC('month', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -1))  -- Gets the events truncated by the beginning of the previous month
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
@@ -233,7 +233,7 @@ divergences_m AS (
         SUM(contracts_signed) AS contracts_signed,
         has_guarantee,
         DATE_TRUNC('month', dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
         year,
         month,
@@ -241,7 +241,7 @@ divergences_m AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('month', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
+        MAKE_DATE(year, month, day) = DATE(DATE_TRUNC('month', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
         AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -1)))  -- Gets the events truncated by the previous month start date
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
@@ -322,7 +322,7 @@ metrics_q AS (
         SUM(contracts_signed) AS contracts_signed,
         has_guarantee,
         DATE_TRUNC('quarter', dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
         year,
         month,
@@ -330,7 +330,7 @@ metrics_q AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
+        MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
         AND DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -3))  -- Gets the events truncated by the beginning of the previous quarter
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
@@ -354,7 +354,7 @@ divergences_q AS (
         SUM(contracts_signed) AS contracts_signed,
         has_guarantee,
         DATE_TRUNC('quarter', dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
         year,
         month,
@@ -362,7 +362,7 @@ divergences_q AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('quarter', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
+        MAKE_DATE(year, month, day) = DATE(DATE_TRUNC('quarter', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
         AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -3)))  -- Gets the events truncated by the previous quarter start date
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
@@ -443,7 +443,7 @@ metrics_y AS (
         SUM(contracts_signed) AS contracts_signed,
         has_guarantee,
         DATE_TRUNC('year', dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
         year,
         month,
@@ -451,7 +451,7 @@ metrics_y AS (
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot
     WHERE
-        DATE(ts_snapshot) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
+        MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
         AND DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -12))   -- Gets the events truncated by the beginning of the previous year
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
@@ -475,7 +475,7 @@ divergences_y AS (
         SUM(contracts_signed) AS contracts_signed,
         has_guarantee,
         DATE_TRUNC('year', dt_event) AS dt_reference,
-        DATE(ts_snapshot) AS dt_snapshot,
+        MAKE_DATE(r.year, r.month, r.day) AS dt_snapshot,
         country_code,
         r.year,
         r.month,
@@ -486,7 +486,7 @@ divergences_y AS (
         dw_public.dim_date AS d
             ON d.date = r.dt_event
     WHERE
-        DATE(ts_snapshot) = DATE(DATE_TRUNC('year', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
+        MAKE_DATE(r.year, r.month, r.day) = DATE(DATE_TRUNC('year', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
         AND DATE(DATE_TRUNC('year', dt_event)) = MAKE_DATE(YEAR(d.last_year), 1, 1)   -- Gets the events truncated by the previous year start date
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
 ),
@@ -547,12 +547,12 @@ final_y AS (
             AND d.rental_administrator = m.rental_administrator
             AND d.has_guarantee = m.has_guarantee
 )
-SELECT *, NOW() AS ts_load FROM metrics_d1
+SELECT *, CURRENT_DATE AS dt_load FROM metrics_d1
 UNION ALL
-SELECT *, NOW() AS ts_load FROM final_5w
+SELECT *, CURRENT_DATE AS dt_load FROM final_5w
 UNION ALL
-SELECT *, NOW() AS ts_load FROM final_m
+SELECT *, CURRENT_DATE AS dt_load FROM final_m
 UNION ALL
-SELECT *, NOW() AS ts_load FROM final_q
+SELECT *, CURRENT_DATE AS dt_load FROM final_q
 UNION ALL
-SELECT *, NOW() AS ts_load FROM final_y
+SELECT *, CURRENT_DATE AS dt_load FROM final_y

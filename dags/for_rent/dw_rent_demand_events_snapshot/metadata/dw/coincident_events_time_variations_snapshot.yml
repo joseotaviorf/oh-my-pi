@@ -145,5 +145,5 @@ columns:
     description: Day of the present data load. Also, a partition of the table and should be used to improve analysis' performance.
     lineage:
       - dw_rent_snapshot.rent_demand_events_snapshot.day
-  ts_load:
-    description: Timestamp of when the present data was loaded into our systems.
+  dt_load:
+    description: Date of when the present data was loaded into our systems.
