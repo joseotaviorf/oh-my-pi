@@ -29,7 +29,7 @@ custom_cluster:
   driver_node_type_id: r5d.8xlarge
   node_type_id: r5d.16xlarge
   runtime_engine: PHOTON
-  num_workers: 4
+  num_workers: 5
   aws_attributes:
     ebs_volume_size: 500
     availability: ON_DEMAND
@@ -39,4 +39,5 @@ custom_cluster:
     spark.executor.memoryOverhead: "32g"
     spark.driver.memory: "100g"
     spark.driver.memoryOverhead: "16g"
-    spark.sql.shuffle.partitions: "1024"
+    spark.sql.shuffle.partitions: "1280"
+  spark_version: 13.3.x-scala2.12
