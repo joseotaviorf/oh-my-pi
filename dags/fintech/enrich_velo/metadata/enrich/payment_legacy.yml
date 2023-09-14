@@ -1,0 +1,94 @@
+---
+database_name: datalake_velo
+table_name: payment_legacy
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Enriched table focused on the Payments context for Velo (Not migrated payments from 2.0 only).
+columns:
+  id_payment:
+    description: Table's unique ID.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.id
+  id_propose_values:
+    description: ID connecting table to propose_values table.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.id
+      - datalake_rental_guarantee_platform_clean.company_plan.id
+      - datalake_rental_guarantee_platform_clean.plan.id
+  id_propose:
+    description: ID connecting table to propose table.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.id_propose
+  id_occurrence:
+    description: ID connecting table to occurrence table.
+  id_billing_type:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_payment_type:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_status:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_payment_gateway:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
+  id_customer:
+    description: Business ID for Customer.
+  id_unicid:
+    description: Business ID for UNICID.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.unicid
+  id_subscription:
+    description: Business ID for Subscription.
+  invoice_url:
+    description: URL of charged invoice.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.invoice_url
+  description:
+    description: Description comments for this invoice.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.description
+  due_amount:
+    description: Amount that is due.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.value
+  net_amount:
+    description: Amount that Velo receives after removing payment gateway taxes.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.netvalue
+  is_paid_late:
+    description: Boolean flag for when dt_paid if after dt_due.
+  is_due_modified:
+    description: Boolean flag for when dt_due has been modified.
+  is_occurrence:
+    description: Boolean flag for when there is an occurrence related to this invoice.
+  is_recurring_subscription:
+    description: Boolean flag for when there is an recurring subscription related to this invoice.
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+  dt_created:
+    description: Date that invoice was created.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.ts_created
+  dt_due:
+    description: Date that invoice was due.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.ts_due
+  dt_due_original:
+    description: Date that invoice was due originally, if was changed in the middle time.
+  dt_paid:
+    description: Date that invoice was paid.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.ts_client_payment
+  dt_payment_confirmed:
+    description: Date that invoice had it's payment confirmed by the payment gateway.
+    lineage:
+  ts_updated:
+    description: Timestamp that the invoice register was last updated on the database.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy.ts_updated

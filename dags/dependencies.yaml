@@ -817,6 +817,7 @@ bietlejuice.dw_velo:
   - bietlejuice.enrich_velo:load-enrich-omie-bank-account
   - bietlejuice.enrich_velo:load-enrich-omie-client
   - bietlejuice.enrich_velo:load-enrich-payment
+  - bietlejuice.enrich_velo:load-enrich-payment-legacy
   - bietlejuice.enrich_velo:load-enrich-propose
   - bietlejuice.enrich_velo:load-enrich-propose-company
   - bietlejuice.enrich_velo:load-enrich-propose-person

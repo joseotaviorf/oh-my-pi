@@ -684,6 +684,7 @@ bietlejuice.enrich_velo:
   remove:
     - bietlejuice.velo:load-clean-fiancavelo-fianca
     - bietlejuice.velo:load-clean-fiancavelo-proposecompany
+    - bietlejuice.velo:load-clean-fiancavelo-occurrence
 bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region
