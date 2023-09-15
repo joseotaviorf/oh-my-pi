@@ -39,7 +39,7 @@ SELECT
     country_code,
     NOW() AS ts_load
 FROM
-    dw_rent_snapshot.coincident_events_time_variations_snapshot
+    dw_rent_snapshot.coincident_events_volume_changes_snapshot
 WHERE
     year = YEAR(NOW())
     AND month = MONTH(NOW())
