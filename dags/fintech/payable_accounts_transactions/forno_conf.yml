@@ -9,6 +9,8 @@ columns_to_read:
         - Fornecedor
         - Cost And Profit Center
         - Revenue and Cost Elements
+        - Banco
+        - Conta
 cluster_extra_libs:
         - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.3.0-py2.py3-none-any.whl"
         - pypi:

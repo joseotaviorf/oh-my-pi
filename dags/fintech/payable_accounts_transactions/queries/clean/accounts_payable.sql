@@ -7,6 +7,7 @@ SELECT
     NULLIF(TRIM(REGEXP_REPLACE(cost_and_profit_center,'\\p{{Z}}', ' ' )), '') AS payment_source,
     NULLIF(TRIM(REGEXP_REPLACE(revenue_and_cost_elements,'\\p{{Z}}', ' ' )), '') AS payment_reason,
     REGEXP_REPLACE(banco,'\\p{{Z}}', '' ) AS bank_description,
+    REGEXP_REPLACE(conta,'\\p{{Z}}', '' ) AS account_number,
     CAST(REPLACE(REGEXP_REPLACE(valor_bruto,'\\p{{Z}}', '' ), ',', '') AS NUMERIC(38, 2)) AS paid_amount,
     DATE_FORMAT(TO_DATE(competencia, 'yyyy-MM-dd HH:mm:ss'), 'yyyyMM') AS accrual_year_month,
     TO_DATE(pagamento, 'yyyy-MM-dd HH:mm:ss') AS dt_paid,

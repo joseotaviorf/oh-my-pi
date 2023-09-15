@@ -8,6 +8,9 @@ columns:
   bank_description:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.banco
+  account_number:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.conta
   dt_paid:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.pagamento

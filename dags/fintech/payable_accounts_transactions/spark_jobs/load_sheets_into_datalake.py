@@ -300,17 +300,13 @@ if __name__ == "__main__":
     # Create a pattern and union all sheets
     df_itau = (
         reduce(DataFrame.unionAll, dfs["itau"])
-        .withColumn("banco", functions.lit("itau"))
         .drop("")
     )
     df_bradesco = (
         reduce(DataFrame.unionAll, dfs["bradesco"])
-        .withColumn("banco", functions.lit("bradesco"))
         .drop("")
     )
-    df_citi = reduce(DataFrame.unionAll, dfs["citi"]).withColumn(
-        "banco", functions.lit("citi")
-    )
+    df_citi = reduce(DataFrame.unionAll, dfs["citi"])
 
     df_itau = __columns_to_alphanumeric_snake_case(df_itau)
     df_bradesco = __columns_to_alphanumeric_snake_case(df_bradesco)
