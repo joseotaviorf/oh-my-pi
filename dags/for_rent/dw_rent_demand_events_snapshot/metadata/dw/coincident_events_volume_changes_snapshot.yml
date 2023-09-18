@@ -33,30 +33,6 @@ columns:
       LM: Current day load looking to the events that happened on the last month.
       LQ: Current day load looking to the events that happened on the last quarter.
       LY: Current day load looking to the events that happened on the last year.
-  city_group:
-    description: Group which the city of the event belongs to.
-    lineage:
-      - dw_rent_snapshot.rent_demand_events_snapshot.city_group
-  tier:
-    description: Tier information based on the city group of the event.
-    lineage:
-      - dw_rent_snapshot.rent_demand_events_snapshot.tier
-  business_type:
-    description: Business type of the related event.
-    lineage:
-      - dw_rent_snapshot.rent_demand_events_snapshot.business_type
-  listing_category_start:
-    description: Listing category start information coming from the house listing related to the event.
-    lineage:
-      - dw_rent_snapshot.rent_demand_events_snapshot.listing_category_start
-  rent_flow_origin:
-    description: The rent flow origin (touchpoint) of the related event.
-    lineage:
-      - dw_rent_snapshot.rent_demand_events_snapshot.rent_flow_origin
-  rental_administrator:
-    description: Rental administrator related to the event.
-    lineage:
-      - dw_rent_snapshot.rent_demand_events_snapshot.rental_administrator
   visits_booked:
     description: The volume of the visits booked within the aggregation.
   diff_vb:
@@ -115,12 +91,6 @@ columns:
     description: The volume difference of the contracts signed within the aggregation, compared to the present day load of the reference type.
   percentage_diff_cs:
     description: The difference amount of CSs in percentage.
-  has_guarantee:
-    description: Boolean indicating if the event has a guarantee related.
-      It's important to notice that if the event is from VB til OA, the guarantee flag is automatically false.
-      If the event type is from EA to CS, the flag is related to the proposal's guarantee type if it's RentalGuarantee.
-    lineage:
-      - dw_rent_snapshot.rent_demand_events_snapshot.has_guarantee
   dt_reference:
     description: Reference date of when the present event happened (could be a VC, OS, CS, etc..
     lineage:

@@ -9,12 +9,6 @@
 WITH metrics_d1 AS (
     SELECT
         'D-1' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         NULL AS diff_vb,
         NULL AS percentage_diff_vb,
@@ -42,7 +36,6 @@ WITH metrics_d1 AS (
         SUM(contracts_signed) AS contracts_signed,
         NULL AS diff_cs,
         NULL AS percentage_diff_cs,
-        has_guarantee,
         DATE(dt_event) AS dt_reference,
         MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
@@ -54,17 +47,11 @@ WITH metrics_d1 AS (
     WHERE
         MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)   -- It's necessary to add 1 day because the execution date is always D-1 but we create the snapshot date based on the current day
         AND dt_event = DATE('{year}-{month}-{day}')   -- As the execution date is always D-1, it's exactly the event date that we want
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 35, 36, 37, 38, 39, 40, 41
+    GROUP BY 1, 29, 30, 31, 32, 33, 34
 ),
 metrics_5w AS (
     SELECT
         'W1-W5' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -74,7 +61,6 @@ metrics_5w AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('week', dt_event) AS dt_reference,
         MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
@@ -88,17 +74,11 @@ metrics_5w AS (
         AND DATE_TRUNC('week', dt_event)
             BETWEEN DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -35))
                 AND DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -7)) -- Between -1 to -5 weeks
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 11, 13, 14, 15, 16
 ),
 divergences_5w AS (
     SELECT
         'W1-W5' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -108,7 +88,6 @@ divergences_5w AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('week', dt_event) AS dt_reference,
         MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
@@ -122,17 +101,11 @@ divergences_5w AS (
         AND DATE_TRUNC('week', dt_event)
             BETWEEN DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -35))
                 AND DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -7)) -- Between -1 to -5 weeks
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 11, 13, 14, 15, 16
 ),
 final_5w AS (
     SELECT
         m.reference_type,
-        m.city_group,
-        m.tier,
-        m.business_type,
-        m.listing_category_start,
-        m.rent_flow_origin,
-        m.rental_administrator,
         m.visits_booked,
         m.visits_booked-d.visits_booked AS diff_vb,
         COALESCE(ROUND(100*(1-(m.visits_booked/d.visits_booked)), 2), 0) AS percentage_diff_vb,
@@ -160,7 +133,6 @@ final_5w AS (
         m.contracts_signed,
         m.contracts_signed-d.contracts_signed AS diff_cs,
         COALESCE(ROUND(100*(1-(m.contracts_signed/d.contracts_signed)), 2), 0) AS percentage_diff_cs,
-        m.has_guarantee,
         DATE(m.dt_reference) AS dt_reference,
         m.dt_snapshot,
         m.country_code,
@@ -173,23 +145,10 @@ final_5w AS (
         divergences_5w AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
-            AND d.city_group = m.city_group
-            AND d.tier = m.tier
-            AND d.business_type = m.business_type
-            AND d.listing_category_start = m.listing_category_start
-            AND d.rent_flow_origin = m.rent_flow_origin
-            AND d.rental_administrator = m.rental_administrator
-            AND d.has_guarantee = m.has_guarantee
 ),
 metrics_m AS (
     SELECT
         'LM' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -199,7 +158,6 @@ metrics_m AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('month', dt_event) AS dt_reference,
         MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
@@ -211,17 +169,11 @@ metrics_m AS (
     WHERE
         MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
         AND DATE_TRUNC('month', dt_event) = DATE_TRUNC('month', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -1))  -- Gets the events truncated by the beginning of the previous month
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 11, 13, 14, 15, 16
 ),
 divergences_m AS (
     SELECT
         'LM' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -231,7 +183,6 @@ divergences_m AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('month', dt_event) AS dt_reference,
         MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
@@ -243,17 +194,11 @@ divergences_m AS (
     WHERE
         MAKE_DATE(year, month, day) = DATE(DATE_TRUNC('month', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
         AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -1)))  -- Gets the events truncated by the previous month start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 11, 13, 14, 15, 16
 ),
 final_m AS (
     SELECT
         m.reference_type,
-        m.city_group,
-        m.tier,
-        m.business_type,
-        m.listing_category_start,
-        m.rent_flow_origin,
-        m.rental_administrator,
         m.visits_booked,
         m.visits_booked-d.visits_booked AS diff_vb,
         COALESCE(ROUND(100*(1-(m.visits_booked/d.visits_booked)), 2), 0) AS percentage_diff_vb,
@@ -281,7 +226,6 @@ final_m AS (
         m.contracts_signed,
         m.contracts_signed-d.contracts_signed AS diff_cs,
         COALESCE(ROUND(100*(1-(m.contracts_signed/d.contracts_signed)), 2), 0) AS percentage_diff_cs,
-        m.has_guarantee,
         DATE(m.dt_reference) AS dt_reference,
         m.dt_snapshot,
         m.country_code,
@@ -294,23 +238,10 @@ final_m AS (
         divergences_m AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
-            AND d.city_group = m.city_group
-            AND d.tier = m.tier
-            AND d.business_type = m.business_type
-            AND d.listing_category_start = m.listing_category_start
-            AND d.rent_flow_origin = m.rent_flow_origin
-            AND d.rental_administrator = m.rental_administrator
-            AND d.has_guarantee = m.has_guarantee
 ),
 metrics_q AS (
     SELECT
         'LQ' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -320,7 +251,6 @@ metrics_q AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('quarter', dt_event) AS dt_reference,
         MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
@@ -332,17 +262,11 @@ metrics_q AS (
     WHERE
         MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
         AND DATE_TRUNC('quarter', dt_event) = DATE_TRUNC('quarter', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -3))  -- Gets the events truncated by the beginning of the previous quarter
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 11, 13, 14, 15, 16
 ),
 divergences_q AS (
     SELECT
         'LQ' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -352,7 +276,6 @@ divergences_q AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('quarter', dt_event) AS dt_reference,
         MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
@@ -364,17 +287,11 @@ divergences_q AS (
     WHERE
         MAKE_DATE(year, month, day) = DATE(DATE_TRUNC('quarter', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
         AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -3)))  -- Gets the events truncated by the previous quarter start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 11, 13, 14, 15, 16
 ),
 final_q AS (
     SELECT
         m.reference_type,
-        m.city_group,
-        m.tier,
-        m.business_type,
-        m.listing_category_start,
-        m.rent_flow_origin,
-        m.rental_administrator,
         m.visits_booked,
         m.visits_booked-d.visits_booked AS diff_vb,
         COALESCE(ROUND(100*(1-(m.visits_booked/d.visits_booked)), 2), 0) AS percentage_diff_vb,
@@ -402,7 +319,6 @@ final_q AS (
         m.contracts_signed,
         m.contracts_signed-d.contracts_signed AS diff_cs,
         COALESCE(ROUND(100*(1-(m.contracts_signed/d.contracts_signed)), 2), 0) AS percentage_diff_cs,
-        m.has_guarantee,
         DATE(m.dt_reference) AS dt_reference,
         m.dt_snapshot,
         m.country_code,
@@ -415,23 +331,10 @@ final_q AS (
         divergences_q AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
-            AND d.city_group = m.city_group
-            AND d.tier = m.tier
-            AND d.business_type = m.business_type
-            AND d.listing_category_start = m.listing_category_start
-            AND d.rent_flow_origin = m.rent_flow_origin
-            AND d.rental_administrator = m.rental_administrator
-            AND d.has_guarantee = m.has_guarantee
 ),
 metrics_y AS (
     SELECT
         'LY' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -441,7 +344,6 @@ metrics_y AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('year', dt_event) AS dt_reference,
         MAKE_DATE(year, month, day) AS dt_snapshot,
         country_code,
@@ -453,17 +355,11 @@ metrics_y AS (
     WHERE
         MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
         AND DATE_TRUNC('year', dt_event) = DATE_TRUNC('year', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -12))   -- Gets the events truncated by the beginning of the previous year
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 11, 13, 14, 15, 16
 ),
 divergences_y AS (
     SELECT
         'LY' AS reference_type,
-        city_group,
-        tier,
-        business_type,
-        listing_category_start,
-        rent_flow_origin,
-        rental_administrator,
         SUM(visits_booked) AS visits_booked,
         SUM(visits_completed) AS visits_completed,
         SUM(offers_submitted) AS offers_submitted,
@@ -473,7 +369,6 @@ divergences_y AS (
         SUM(documentation_sent) AS documentation_sent,
         SUM(credit_approved) AS credit_approved,
         SUM(contracts_signed) AS contracts_signed,
-        has_guarantee,
         DATE_TRUNC('year', dt_event) AS dt_reference,
         MAKE_DATE(r.year, r.month, r.day) AS dt_snapshot,
         country_code,
@@ -488,17 +383,11 @@ divergences_y AS (
     WHERE
         MAKE_DATE(r.year, r.month, r.day) = DATE(DATE_TRUNC('year', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
         AND DATE(DATE_TRUNC('year', dt_event)) = MAKE_DATE(YEAR(d.last_year), 1, 1)   -- Gets the events truncated by the previous year start date
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23
+    GROUP BY 1, 11, 13, 14, 15, 16
 ),
 final_y AS (
     SELECT
         m.reference_type,
-        m.city_group,
-        m.tier,
-        m.business_type,
-        m.listing_category_start,
-        m.rent_flow_origin,
-        m.rental_administrator,
         m.visits_booked,
         m.visits_booked-d.visits_booked AS diff_vb,
         COALESCE(ROUND(100*(1-(m.visits_booked/d.visits_booked)), 2), 0) AS percentage_diff_vb,
@@ -526,7 +415,6 @@ final_y AS (
         m.contracts_signed,
         m.contracts_signed-d.contracts_signed AS diff_cs,
         COALESCE(ROUND(100*(1-(m.contracts_signed/d.contracts_signed)), 2), 0) AS percentage_diff_cs,
-        m.has_guarantee,
         DATE(m.dt_reference) AS dt_reference,
         m.dt_snapshot,
         m.country_code,
@@ -539,13 +427,6 @@ final_y AS (
         divergences_y AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
-            AND d.city_group = m.city_group
-            AND d.tier = m.tier
-            AND d.business_type = m.business_type
-            AND d.listing_category_start = m.listing_category_start
-            AND d.rent_flow_origin = m.rent_flow_origin
-            AND d.rental_administrator = m.rental_administrator
-            AND d.has_guarantee = m.has_guarantee
 )
 SELECT *, CURRENT_DATE AS dt_load FROM metrics_d1
 UNION ALL
