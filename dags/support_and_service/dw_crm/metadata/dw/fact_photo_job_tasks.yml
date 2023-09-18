@@ -3,7 +3,7 @@ table_name: fact_photo_job_tasks
 description: Fact table that contains data and foreign keys related to "agendarjobdefotografo"
   and "fupfoto" task event
 domain: Support and Service
-owner: ''
+owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_action_date:
     lineage:
@@ -50,9 +50,11 @@ columns:
   sk_task_action_end_date:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
+    description: Date key, identifies the task action completion date.
   sk_task_action_start_date:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_start_date
+    description: Date key, identifies the task action start date.
   sk_user_action:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
@@ -80,9 +82,11 @@ columns:
   task_action_type:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_type
+    description: The task's action categories on tasks
   task_user_action_resolve_hours:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_resolve_hours
+    description: Number of hours taken to resolve a ticket action.
   ts_action:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_action
@@ -90,18 +94,23 @@ columns:
   ts_task_action_end:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_end
+    description: Timestamp data, identifies the task action completion date.
   ts_task_action_start:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_start
+    description: Timestamp data, identifies the task action start date.
   year:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
+    description: Integer type data that indicates the year in which we had the action task in the crm.
   month:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
+    description: Integer type data that indicates the month in which we had the action task in the crm.
   day:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
+    description: Integer type data that indicates the day in which we had the action task in the crm.
   sk_task_user_end_date:
     description: Key of action event on the task ended
   sk_task_user_start_date:
