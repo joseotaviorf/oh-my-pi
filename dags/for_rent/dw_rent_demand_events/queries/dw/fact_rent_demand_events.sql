@@ -15,6 +15,7 @@ SELECT
     COALESCE(id_owner, -1) AS sk_owner,
     COALESCE(CAST(DATE_FORMAT(ts_event, "yyyyMMdd") AS BIGINT), -1) AS sk_event_date,
     country_code,
+    is_during_termination,
     NOW() AS ts_load
 FROM
     datalake_rent_demand_events.rent_demand_events

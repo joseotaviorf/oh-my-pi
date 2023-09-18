@@ -27,7 +27,7 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.id_proposal
       - datalake_proposal.proposal.id
     description: "Id of the proposal."
-  id_contract: 
+  id_contract:
     lineage:
       - datalake_ebdb_contract.contract.id
       - datalake_ebdb_rent_flow.rent_flow.id_contract
@@ -80,6 +80,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.id_user
     description: "Id of the property owner."
+  is_during_termination:
+    description: "Boolean flag indicating if the event happened between the listing's version start date and the listing's
+      previous version contract end date.
+      This flag may help understanding events during Early Demand, for example."
   ts_event:
     lineage:
       - datalake_booking.booking.ts_created
@@ -88,10 +92,10 @@ columns:
       - datalake_offer.offer.ts_first_sent
       - datalake_offer.offer.ts_analyzed
       - datalake_proposal.proposal.ts_credit_evaluation_first_init
-      - datalake_proposal.proposal.ts_first_credit_evaluation_positive 
+      - datalake_proposal.proposal.ts_first_credit_evaluation_positive
       - datalake_proposal.proposal.ts_tenant_auto_first_doc_sent
-      - datalake_proposal.proposal.ts_tenant_first_doc_sent         
-      - datalake_proposal.proposal.ts_credit_approved_last         
+      - datalake_proposal.proposal.ts_tenant_first_doc_sent
+      - datalake_proposal.proposal.ts_credit_approved_last
     description: "Id of the event date."
   country_code:
     lineage:

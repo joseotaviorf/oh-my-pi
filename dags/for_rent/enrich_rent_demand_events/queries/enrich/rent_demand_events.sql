@@ -3,9 +3,9 @@ WITH rent_flow_house_listing AS (
   It was necessary to add some validations related to what's coming from this first CTE (based on the rent flows enriched table) because there
   we can find several bookings, offers, proposals and contracts that not necessarily are following the rules used for this table.
   If we don't apply these filters since the beginning, we can end up having on events like VB already having an id_contract that would not be
-  the same contract found when the rent flow event is CS. 
+  the same contract found when the rent flow event is CS.
   In order to not create any trouble and messy analisys, we decided to filter all ids based on the many possible filters since the beginning.
-  **/ 
+  **/
   SELECT
     rf.id_rent_flow,
     rf.id_house,
@@ -72,8 +72,8 @@ WITH rent_flow_house_listing AS (
       AND con.id = rf.id_contract
   LEFT JOIN
     datalake_ebdb_listing.house_listing AS hl_contract
-      ON con.id_house = hl_contract.id_house 
-      AND con.ts_created BETWEEN COALESCE(hl_contract.ts_listing_version_start, '2000-01-01 00:00:00') 
+      ON con.id_house = hl_contract.id_house
+      AND con.ts_created BETWEEN COALESCE(hl_contract.ts_listing_version_start, '2000-01-01 00:00:00')
         AND COALESCE(hl_contract.ts_listing_version_end, CURRENT_DATE)
   LEFT JOIN
     datalake_ebdb_listing.house AS h
@@ -90,7 +90,7 @@ WITH rent_flow_house_listing AS (
   LEFT JOIN
     datalake_proposal.proposal AS pp
       ON pp.id = rf.id_proposal
-  WHERE 
+  WHERE
     (lbc.business_context = 'RENT'
     OR lbc.business_context IS NULL)
     /** Some properties exists on the House table but not on LBC. In order to keep the same rule/results
@@ -104,22 +104,22 @@ WITH rent_flow_house_listing AS (
       )
     )
 ),
-rent_demand_events AS (                                                                  
+rent_demand_events AS (
   SELECT --visits_booked
     bk.id AS id_event,
     bk.id AS id_booking,
     rf.id_offer,
     rf.id_proposal,
-    rf.id_contract,                                                                          
-    1 AS id_event_type,                                                                                  
-    bk.id_visitor AS id_client,                                                                      
-    bk.id_house,                                                                        
+    rf.id_contract,
+    1 AS id_event_type,
+    bk.id_visitor AS id_client,
+    bk.id_house,
     bk.id_agent,
-    bk.id_rent_flow,                                                                    
-    bk.ts_created AS ts_event,                                                                      
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
+    bk.id_rent_flow,
+    bk.ts_created AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
     rf.country_code,
     YEAR(ts_created) AS year,
     MONTH(ts_created) AS month,
@@ -129,25 +129,25 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_booking = bk.id
-  WHERE 
+  WHERE
     bk.type = 'Visita'
     AND bk.ts_created IS NOT NULL
   UNION ALL
-  SELECT --visits_completed 
+  SELECT --visits_completed
     bk.id AS id_event,
     bk.id AS id_booking,
     rf.id_offer,
     rf.id_proposal,
-    rf.id_contract,                                                                           
-    2 AS id_event_type,                                                                                   
-    bk.id_visitor AS id_client,                                                                       
-    bk.id_house,                                                                        
-    bk.id_agent,                                                                        
-    bk.id_rent_flow,                                                                    
-    bk.ts_booking_utc AS ts_event,                                                                  
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
+    rf.id_contract,
+    2 AS id_event_type,
+    bk.id_visitor AS id_client,
+    bk.id_house,
+    bk.id_agent,
+    bk.id_rent_flow,
+    bk.ts_booking_utc AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
     rf.country_code,
     YEAR(ts_booking_utc) AS year,
     MONTH(ts_booking_utc) AS month,
@@ -159,29 +159,29 @@ rent_demand_events AS (
       ON rf.id_booking = bk.id
   WHERE
     bk.type = 'Visita'
-    AND bk.is_visit_completed = TRUE 
+    AND bk.is_visit_completed = TRUE
     AND bk.visit_fup IN ('VaiNegociar',
           'NaoGostou',
           'VisitouSozinho',
           'Talvez')
     AND bk.dt_booking IS NOT NULL
   UNION ALL
-  SELECT --offer_submitted 
+  SELECT --offer_submitted
     off.id_offer_context AS id_event,
     rf.id_booking,
     off.id_offer_context AS id_offer,
     rf.id_proposal,
-    rf.id_contract,                                                                         
-    3 AS id_event_type,                                                                                   
-    off.id_client,                                                                      
-    off.id_house,                                                                       
-    rf.id_agent,                                                                   
-    off.id_rent_flow,                                                                   
-    off.ts_first_sent AS ts_event,                                                                 
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
-    rf.country_code, 
+    rf.id_contract,
+    3 AS id_event_type,
+    off.id_client,
+    off.id_house,
+    rf.id_agent,
+    off.id_rent_flow,
+    off.ts_first_sent AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
+    rf.country_code,
     YEAR(ts_first_sent) AS year,
     MONTH(ts_first_sent) AS month,
     DAY(ts_first_sent) AS day
@@ -190,7 +190,7 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_offer = off.id_offer_context
-  WHERE 
+  WHERE
     ts_first_sent IS NOT NULL
     /** We're not implementing the incremental load for OS since this date information comes from Firestore.
       We noticed that the data is extracted in a certain day but the offer's first sent date is from days before,
@@ -202,16 +202,16 @@ rent_demand_events AS (
     rf.id_booking,
     off.id_offer_context AS id_offer,
     rf.id_proposal,
-    rf.id_contract,                                                                           
-    4 AS id_event_type,                                                                                 
-    off.id_client,                                                                      
-    off.id_house,                                                                       
-    rf.id_agent,                                                                   
-    off.id_rent_flow,                                                                   
-    off.ts_analyzed AS ts_event,                                                                    
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
+    rf.id_contract,
+    4 AS id_event_type,
+    off.id_client,
+    off.id_house,
+    rf.id_agent,
+    off.id_rent_flow,
+    off.ts_analyzed AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
     rf.country_code,
     YEAR(ts_analyzed) AS year,
     MONTH(ts_analyzed) AS month,
@@ -221,7 +221,7 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_offer = off.id_offer_context
-  WHERE 
+  WHERE
     off.status = 'Aprovada'
     AND ts_analyzed IS NOT NULL
   UNION ALL
@@ -230,16 +230,16 @@ rent_demand_events AS (
     rf.id_booking,
     rf.id_offer,
     pp.id AS id_proposal,
-    rf.id_contract,                                                                          
-    5 AS id_event_type,                                                                                 
-    off.id_client,                                                                      
-    off.id_house,                                                                       
-    rf.id_agent,                                                                   
-    off.id_rent_flow,                                                                   
-    pp.ts_credit_evaluation_first_init AS ts_event,                                                
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
+    rf.id_contract,
+    5 AS id_event_type,
+    off.id_client,
+    off.id_house,
+    rf.id_agent,
+    off.id_rent_flow,
+    pp.ts_credit_evaluation_first_init AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
     rf.country_code,
     YEAR(ts_credit_evaluation_first_init) AS year,
     MONTH(ts_credit_evaluation_first_init) AS month,
@@ -252,7 +252,7 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
-  WHERE 
+  WHERE
     pp.ts_credit_evaluation_first_init IS NOT NULL
   UNION ALL
   SELECT --evaluation_positive
@@ -260,17 +260,17 @@ rent_demand_events AS (
     rf.id_booking,
     rf.id_offer,
     pp.id AS id_proposal,
-    rf.id_contract,                                                                              
-    6 AS id_event_type,                                                                                 
-    off.id_client,                                                                      
-    off.id_house,                                                                       
-    rf.id_agent,                                                                   
-    off.id_rent_flow,                                                                   
-    pp.ts_first_credit_evaluation_positive AS ts_event,                                              
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
-    rf.country_code,     
+    rf.id_contract,
+    6 AS id_event_type,
+    off.id_client,
+    off.id_house,
+    rf.id_agent,
+    off.id_rent_flow,
+    pp.ts_first_credit_evaluation_positive AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
+    rf.country_code,
     YEAR(ts_first_credit_evaluation_positive) AS year,
     MONTH(ts_first_credit_evaluation_positive) AS month,
     DAY(ts_first_credit_evaluation_positive) AS day
@@ -278,11 +278,11 @@ rent_demand_events AS (
     datalake_proposal.proposal AS pp
    JOIN
     datalake_offer.offer AS off
-      ON off.id = pp.id_offer 
+      ON off.id = pp.id_offer
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
-  WHERE 
+  WHERE
     pp.ts_first_credit_evaluation_positive IS NOT NULL
   UNION ALL
   SELECT --document_sent
@@ -290,16 +290,16 @@ rent_demand_events AS (
     rf.id_booking,
     rf.id_offer,
     pp.id AS id_proposal,
-    rf.id_contract,                                                                           
-    7 AS id_event_type,                                                                                 
+    rf.id_contract,
+    7 AS id_event_type,
     COALESCE(off.id_client, rf.id_client) AS id_client,
     COALESCE(off.id_house, rf.id_house) AS id_house,
-    rf.id_agent,                                                                   
+    rf.id_agent,
     COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
-    COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent) AS ts_event,             
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
+    COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent) AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
     rf.country_code,
     YEAR(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS year,
     MONTH(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS month,
@@ -311,30 +311,30 @@ rent_demand_events AS (
       ON rf.id_proposal = pp.id
   LEFT JOIN -- We have properties from portability that don't have an offer but have a proposal and contract signed
     datalake_offer.offer AS off
-      ON off.id = pp.id_offer 
-  WHERE 
+      ON off.id = pp.id_offer
+  WHERE
     pp.has_tenant_sent_documentation = TRUE
-    OR (pp.ts_tenant_auto_first_doc_sent IS NOT NULL 
+    OR (pp.ts_tenant_auto_first_doc_sent IS NOT NULL
       OR pp.ts_tenant_first_doc_sent IS NOT NULL)
     /** Some proposals already had a documentation sent (which will be marked by the ts_tenant_first_doc_sent)
         but the boolean flag could turn into false. This behavior is mostly seen from 2022 backwards
     **/
   UNION ALL
-  SELECT --credit_approved 
+  SELECT --credit_approved
     pp.id AS id_event,
     rf.id_booking,
     rf.id_offer,
     pp.id AS id_proposal,
-    rf.id_contract,                                                                             
-    8 AS id_event_type,                                                                                   
-    COALESCE(off.id_client, rf.id_client) AS id_client,                                                                   
-    COALESCE(off.id_house, rf.id_house) AS id_house,                                                                  
-    rf.id_agent,                                                                   
-    COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,                                                               
-    pp.ts_credit_approved_last AS ts_event,                                                         
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
+    rf.id_contract,
+    8 AS id_event_type,
+    COALESCE(off.id_client, rf.id_client) AS id_client,
+    COALESCE(off.id_house, rf.id_house) AS id_house,
+    rf.id_agent,
+    COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
+    pp.ts_credit_approved_last AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
     rf.country_code,
     YEAR(ts_credit_approved_last) AS year,
     MONTH(ts_credit_approved_last) AS month,
@@ -346,8 +346,8 @@ rent_demand_events AS (
       ON rf.id_proposal = pp.id
   LEFT JOIN   -- We have properties from portability that don't have an offer but have a proposal and contract signed
     datalake_offer.offer AS off
-      ON off.id = pp.id_offer 
-  WHERE 
+      ON off.id = pp.id_offer
+  WHERE
     pp.ts_credit_approved_last IS NOT NULL
   UNION ALL
   SELECT --contract_signed
@@ -355,16 +355,16 @@ rent_demand_events AS (
     rf.id_booking,
     rf.id_offer,
     rf.id_proposal,
-    ct.id AS id_contract,                                                                           
-    9 AS id_event_type,                                                                                  
-    COALESCE(off.id_client, rf.id_client) AS id_client,                                                                  
-    ct.id_house,                                                                        
-    rf.id_agent,                                                                   
-    COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,                                                               
-    ct.ts_signed AS ts_event,                                                                     
-    rf.id_house_listing,                                                                
-    rf.id_region,                                                                       
-    rf.id_user,                                                                         
+    ct.id AS id_contract,
+    9 AS id_event_type,
+    COALESCE(off.id_client, rf.id_client) AS id_client,
+    ct.id_house,
+    rf.id_agent,
+    COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
+    ct.ts_signed AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
     rf.country_code,
     YEAR(ts_signed) AS year,
     MONTH(ts_signed) AS month,
@@ -379,33 +379,59 @@ rent_demand_events AS (
       ON ct.id_proposal = pp.id
   LEFT JOIN
     datalake_offer.offer AS off
-      ON off.id = pp.id_offer 
-  WHERE 
+      ON off.id = pp.id_offer
+  WHERE
     ct.ts_signed IS NOT NULL
     AND ct.is_active_or_ended = TRUE
+),
+termination_period AS (
+  /** We need to understand if a demand event happened during a contract termination process.
+    This CTE exists because we have the same listing version with different contracts related (that are active or ended).
+    As this is an issue to be investigated and if directly used here would duplicate our events, we decided to use the most
+    recent contract.
+  **/
+  SELECT
+    lc.id_house_listing,
+    lc.ts_listing_version_started,
+    lc.dt_previous_contract_termination,
+    ROW_NUMBER() OVER(PARTITION BY lc.id_house_listing ORDER BY lc.ts_contract_created DESC) AS rank_order
+  FROM
+    datalake_listing_contracts.listing_contracts AS lc
+  JOIN
+    datalake_ebdb_contract.contract AS c
+      ON c.id = lc.id_contract
+      AND c.status IN ('Ativo', 'Finalizado')
+  WHERE
+    c.dt_termination IS NULL  -- Contracts that weren't terminated
+    OR c.dt_started < c.dt_termination  -- Contracts that were finished before even starting should be filtered out
 )
 SELECT DISTINCT
   /** As a rent flow may have N times the same booking/proposal/offer appearing related to different demand steps
   (e.g. a same booking related to different offers) and we want to every booking/proposal/offer follow the rules proposed
   on the first CTE, we need to apply a distinct in order to deduplicate it as events start to happen.
-  **/ 
-  id_event,
-  id_booking,
-  id_offer,
-  id_proposal,
-  id_contract,
-  id_event_type,
-  id_client AS id_tenant_prospect,
-  id_house,
-  id_agent,
-  id_rent_flow,
-  id_house_listing,
-  id_region,
-  id_user AS id_owner,
-  ts_event,
-  country_code,
-  year AS event_year,
-  month AS event_month,
-  day AS event_day
+  **/
+  rde.id_event,
+  rde.id_booking,
+  rde.id_offer,
+  rde.id_proposal,
+  rde.id_contract,
+  rde.id_event_type,
+  rde.id_client AS id_tenant_prospect,
+  rde.id_house,
+  rde.id_agent,
+  rde.id_rent_flow,
+  rde.id_house_listing,
+  rde.id_region,
+  rde.id_user AS id_owner,
+  COALESCE(IF(rde.ts_event BETWEEN t.ts_listing_version_started AND t.dt_previous_contract_termination, TRUE, FALSE), FALSE) AS is_during_termination,
+  rde.ts_event,
+  rde.country_code,
+  rde.year AS event_year,
+  rde.month AS event_month,
+  rde.day AS event_day
 FROM
-  rent_demand_events
+  rent_demand_events AS rde
+LEFT JOIN
+  termination_period AS t
+    ON t.id_house_listing = rde.id_house_listing
+    AND t.rank_order = 1

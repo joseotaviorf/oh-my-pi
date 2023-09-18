@@ -22,7 +22,7 @@ columns:
   sk_offer:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.id_offer
-    description: Id of the offer. 
+    description: Id of the offer.
   sk_proposal:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.id_proposal
@@ -71,6 +71,11 @@ columns:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.country_code
     description: Country code information.
+  is_during_termination:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.is_during_termination
+    description: Boolean flag indicating if the event happened between the listing's version start date and the listing's
+      previous version contract end date.
+      This flag may help understanding events during Early Demand, for example.
   ts_load:
     description: Load date.
-    
