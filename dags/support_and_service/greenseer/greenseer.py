@@ -1,3 +1,4 @@
+import json
 import os
 import pendulum
 from datetime import datetime
@@ -22,14 +23,15 @@ SOURCE = "greenseer"
 CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = os.environ.get("ENVIRONMENT")
+DAG_OWNER = DAGOwnerEnum.DATA_SS
+
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2021, 2, 18, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 config_service = ConfigurationService(SOURCE)
-partition_cols = config_service.get_config("partition_cols")
 
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -49,17 +51,26 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 default_libraries = config_service.get_config("default_libraries")
 
+tables = config_service.get_config("tables")
+partition_cols = config_service.get_config("partition_cols")
+dag_documentation = config_service.get_config("dag_documentation")
+max_records_per_file = config_service.get_config("max_records_per_file")
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 
@@ -81,28 +92,38 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_groups = task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=SOURCE,
-    extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=[SOURCE, "{{ ds }}"],
-)
+for raw_table_name, table_details in tables.items():
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=raw_table_name,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=[
+            SOURCE,
+            json.dumps(table_details),
+            raw_table_name,
+            json.dumps(partition_cols),
+            max_records_per_file,
+            "{{ ds }}",
+        ],
+    )
 
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
-    is_incremental=True,
-    has_create_external_table_task=False,
-    partitions=partition_cols,
-)
+    clean_table_name = table_details.get("clean_table_name", raw_table_name)
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=clean_table_name,
+        partitions=partition_cols if table_details.get("is_incremental") else None,
+        is_incremental=True if table_details.get("is_incremental") else False,
+    )
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_groups),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

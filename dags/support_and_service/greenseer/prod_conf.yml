@@ -1,3 +1,21 @@
 ---
 lineage_product_database_name: greenseer
+max_records_per_file: 25000
 partition_cols: ["year", "month", "day"]
+
+dag_documentation:
+  dag_purpose:
+    Retrieve data from Greenseer database (postgresql). [Greenseer](https://github.com/quintoandar/greenseer) is our specific-purpose chatbot!
+    Greenseer interacts with Sauron, orchestrating all automatic text-based customer support in QuintoAndar. When an user tries to contact us via WhatsApp,
+    Greenseer is the receptionist that asks the contact reason and routes the ticket to the best possible human agent.
+
+tables:
+  # <raw_table_name>:
+  #   clean_table_name: <clean_table_name> #optional
+  #   is_incremental: <is_incremental> #optional
+  #   date_column: <date_column> #optional
+  #   unixtime_measure: <unixtime_measure> #optional
+  Session:
+    clean_table_name: session
+    is_incremental: True
+    date_column: update_timestamp

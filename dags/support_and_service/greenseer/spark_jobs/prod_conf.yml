@@ -1,4 +1,0 @@
----
-max_records_per_file: 25000
-partitioned_by: "update_timestamp"
-allow_list: ["session"]
