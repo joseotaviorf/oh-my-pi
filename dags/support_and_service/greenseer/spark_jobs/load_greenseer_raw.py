@@ -14,7 +14,11 @@ from quintoandar_logger import QuintoAndarLogger
 
 
 def _load_dataframe_in_datalake(
-    df, table_name, is_incremental=False, force_recreate=True, max_records_per_file=None
+    df,
+    table_name,
+    is_incremental=False,
+    force_recreate=False,
+    max_records_per_file=None,
 ):
     """
     This method loads the dataframe into the s3 bucket and updates the metastore.
@@ -43,7 +47,7 @@ def _load_dataframe_in_datalake(
     )
 
 
-def _load_table_data(raw_table_name, table_details):
+def _load_table_data(db_table_name, raw_table_name, table_details):
     """
     This method takes the data from the table in the Postgres database, considering the
     parameters if it is incremental or full load.
@@ -55,10 +59,8 @@ def _load_table_data(raw_table_name, table_details):
         unixtime_measure = table_details.get("unixtime_measure")
 
         df = postgres_consumer.get_incremental_data_by_granularity_from_table(
-            raw_table_name, date_column, execution_date, unixtime_measure
+            db_table_name, date_column, execution_date, unixtime_measure
         )
-
-        raw_table_name = raw_table_name.lower()
 
         _load_dataframe_in_datalake(
             df=df, table_name=raw_table_name, is_incremental=True, force_recreate=False
@@ -71,9 +73,9 @@ def _load_table_data(raw_table_name, table_details):
             partition_cols=partition_cols,
         )
     else:
-        df = postgres_consumer.get_data_from_table(raw_table_name)
+        df = postgres_consumer.get_data_from_table(db_table_name)
 
-        _load_dataframe_in_datalake(df=df, table_name=raw_table_name.lower())
+        _load_dataframe_in_datalake(df=df, table_name=raw_table_name)
 
 
 JOB_NAME = "load_greenseer_raw"
@@ -88,6 +90,7 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("table_details")
+    parser.add_argument("db_table_name")
     parser.add_argument("raw_table_name")
     parser.add_argument("partition_cols")
     parser.add_argument("max_records_per_file")
@@ -99,6 +102,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     table_details = json.loads(args.table_details)
+    db_table_name = args.db_table_name
     raw_table_name = args.raw_table_name
     partition_cols = json.loads(args.partition_cols)
     max_records_per_file = args.max_records_per_file
@@ -107,7 +111,8 @@ if __name__ == "__main__":
     logger.info(
         f""""
         m=load_greenseer_raw, environment={environment}, datalake_bucket={datalake_bucket},
-        source={source}, raw_table_name={raw_table_name}. msg=Starting spark job...
+        source={source}, db_table_name={db_table_name}, raw_table_name={raw_table_name}.
+        msg=Starting spark job...
         """
     )
 
@@ -134,4 +139,4 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    _load_table_data(raw_table_name, table_details)
+    _load_table_data(db_table_name, raw_table_name, table_details)

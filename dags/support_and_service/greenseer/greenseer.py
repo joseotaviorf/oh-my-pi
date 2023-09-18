@@ -97,7 +97,10 @@ task_group = DatalakeTaskGroup(
     spark_jobs_path=base_spark_jobs_path,
 )
 
-for raw_table_name, table_details in tables.items():
+for db_table_name, table_details in tables.items():
+
+    raw_table_name = table_details.get("raw_table_name", db_table_name.lower())
+
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
@@ -106,6 +109,7 @@ for raw_table_name, table_details in tables.items():
         raw_spark_job_extra_args=[
             SOURCE,
             json.dumps(table_details),
+            db_table_name,
             raw_table_name,
             json.dumps(partition_cols),
             max_records_per_file,
