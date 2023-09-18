@@ -344,7 +344,7 @@ if __name__ == "__main__":
 
     df_itau = __columns_to_alphanumeric_snake_case(df_itau)
     df_bradesco = __columns_to_alphanumeric_snake_case(df_bradesco)
-    df_cit = __columns_to_alphanumeric_snake_case(df_citi)
+    df_citi = __columns_to_alphanumeric_snake_case(df_citi)
 
     df_itau = df_itau.withColumnRenamed("itau", "saldo_total")
     df_bradesco = df_bradesco.withColumnRenamed("bradesco", "saldo_total")
@@ -377,7 +377,7 @@ if __name__ == "__main__":
     # Remove non-standard 'saldo inicial' rows and remove 'Description' only present in 2021 files and used for removing 'saldo inicial
     filter_all_columns = [
         functions.lower(functions.col(col)).contains("saldo inicial")
-        for col in df.columns
+        for col in df_2021.columns
     ]
     df_2021 = df_2021.filter(~functions.greatest(*filter_all_columns)).drop("description")
 
