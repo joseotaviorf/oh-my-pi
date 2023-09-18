@@ -2,6 +2,14 @@
 partition_cols: ["year", "month", "day"]
 max_records_per_file: 250000
 lineage_product_database_name: saruman
+dag_documentation:
+  dag_purpose: |
+    Retrieves data from the Saruman database (PostgreSQL).
+
+    [Saruman](https://github.com/quintoandar/saruman) is a service that concentrates events from multiple sources
+    and builds a timeline used to provide context for support sessions. Some of these events are tagging, routing,
+    creation, ending, comment events about a session and about workflows.
+
 tables:
   # <raw_table_name>:
   #   clean_table_name: <clean_table_name>

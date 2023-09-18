@@ -1,6 +1,11 @@
 ---
 lineage_product_database_name: chatfup
 partition_cols: [year, month, day]
+dag_documentation:
+  dag_purpose: |
+    Extraction of [Chat FUP](https://github.com/quintoandar/chatfup) tables into data lake.
+    Chat FUP is a service to manage followups for whatsapp chats.
+
 tables:
   chats_chat:
     partitioned: False

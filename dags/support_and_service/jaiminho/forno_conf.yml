@@ -4,3 +4,7 @@ tables:
     raw_table_name: user_notifications_view
     date_filter_column: updated_at
 partition_cols: [year, month, day]
+dag_documentation:
+  dag_purpose: |
+    Retrieves data from the Jaiminho database (PostgreSQL). [Jaiminho](https://github.com/quintoandar/jaiminho)
+    is a microservice that handles notification schedule processing.

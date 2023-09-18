@@ -1,5 +1,8 @@
 lineage_product_database_name: taskmaster
 partition_cols: ["year", "month", "day"]
+dag_documentation:
+  dag_purpose: This DAG imports the tables from [Taskmaster](https://github.com/quintoandar/taskmaster)
+
 custom_cluster:
   driver_node_type_id: m5a.xlarge
   node_type_id: m5a.xlarge

@@ -43,13 +43,16 @@ base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 
+default_libraries = config_service.get_config("default_libraries")
+dag_documentation = config_service.get_config("dag_documentation")
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-default_libraries = config_service.get_config("default_libraries")
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 tables = config_service.get_config("tables")
 partition_cols = config_service.get_config("partition_cols")

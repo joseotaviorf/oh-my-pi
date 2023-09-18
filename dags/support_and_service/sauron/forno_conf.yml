@@ -3,6 +3,10 @@ lineage_product_database_name: sauron
 partition_cols: [year, month, day]
 max_records_per_file: 250000
 update_col: updated_at
+dag_documentation:
+  dag_purpose: |
+    Retrieve data from Sauron database (postgresql). [Sauron](https://github.com/quintoandar/sauron)
+    is a internal message orchestration service that manages our sessions.
 
 custom_cluster:
   driver_node_type_id: m5a.xlarge

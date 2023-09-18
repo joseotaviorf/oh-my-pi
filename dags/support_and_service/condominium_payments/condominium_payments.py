@@ -39,9 +39,12 @@ raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 tables_list = config_service.get_config("tables_list")
+dag_documentation = config_service.get_config("dag_documentation")
 
 # databricks var
-cluster_description = config_service.get_config("databricks_10_4_min_memory_photon_cluster")
+cluster_description = config_service.get_config(
+    "databricks_10_4_min_memory_photon_cluster"
+)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -49,18 +52,23 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

@@ -1,3 +1,9 @@
+---
+dag_documentation:
+  dag_purpose: |
+    Load data of the Zendesk to the Clean layer, the Raw layer is loaded by Stitch.
+    Zendesk is responsible for the tickets of the customer services.
+
 inner_dependencies:
   tickets:
     - tickets_history

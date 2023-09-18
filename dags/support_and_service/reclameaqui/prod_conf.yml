@@ -1,0 +1,3 @@
+---
+dag_documentation:
+  dag_purpose: Extracts the reclameaqui information using [hugme api](https://developer.hugme.com.br/)

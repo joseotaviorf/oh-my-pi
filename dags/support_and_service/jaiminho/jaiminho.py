@@ -23,10 +23,12 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 11, 30, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 ENV = os.environ.get("ENVIRONMENT")
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 config_service = ConfigurationService(SOURCE)
 partition_cols = config_service.get_config("partition_cols")
 tables = config_service.get_config("tables")
+dag_documentation = config_service.get_config("dag_documentation")
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
@@ -55,14 +57,18 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

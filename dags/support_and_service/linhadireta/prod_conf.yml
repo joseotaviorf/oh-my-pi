@@ -1,2 +1,6 @@
 ---
 lineage_product_database_name: linhadireta
+dag_documentation:
+  dag_purpose: |
+    This DAG imports the tables from [LinhaDireta](https://github.com/quintoandar/linha-direta),
+    our service for chat management.

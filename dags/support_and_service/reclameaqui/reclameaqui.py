@@ -27,10 +27,12 @@ MAIN_START_DATE = datetime(
     2022, 4, 26, 0, 0, 0, tzinfo=pendulum.timezone("America/Sao_Paulo")
 )
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 config_service = ConfigurationService(DAG_NAME)
 tickets_endpoint_config = config_service.get_config("tickets")
 partition_cols = tickets_endpoint_config.get("partition_cols")
+dag_documentation = config_service.get_config("dag_documentation")
 
 # s3 paths setup
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -62,14 +64,18 @@ custom_libraries = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

@@ -40,6 +40,7 @@ SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 
 cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
+dag_documentation = config_service.get_config("dag_documentation")
 
 CUSTOM_LIBRARIES = [
     {
@@ -53,6 +54,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 # Job params
 ENDPOINTS = {"answer": "incremental", "campaign": "full", "dispatch": "incremental"}
@@ -72,13 +74,19 @@ CAMPAIGNS_TO_BLOCK = "248,326,327,356"
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=DOC_MD_BASE_URL,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
