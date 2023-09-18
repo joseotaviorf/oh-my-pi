@@ -155,3 +155,9 @@ columns:
   up_platform:
     lineage:
       - datalake_amplitude_clean_staging.170698_rm_invoice_page_viewed_events.user_properties
+  up_active_contracts:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_rm_myrent_page_viewed_events.user_properties
+  up_ab_postcontract_dynamic_home:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_rm_myrent_page_viewed_events.user_properties

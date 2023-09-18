@@ -38,6 +38,8 @@ SELECT
     event_properties,
     user_properties,
     STRING(GET_JSON_OBJECT(user_properties, '$.platform')) AS up_platform,
+    STRING(GET_JSON_OBJECT(user_properties, '$.active_contracts')) AS up_active_contracts,
+    STRING(GET_JSON_OBJECT(user_properties, '$.ab_postcontract_dynamic_home')) AS up_ab_postcontract_dynamic_home,
     is_paying,
     is_attribution_event,
     ts_server_received,
