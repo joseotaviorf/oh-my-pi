@@ -251,39 +251,61 @@ if __name__ == "__main__":
 
     # Retrieve all sheets
     dfs = {"itau": [], "bradesco": [], "citi": []}
+    dfs_2021 = {"itau": [], "bradesco": [], "citi": []}
 
     for i in infos_sheets:
-        if (
-            not i["name"].lower().endswith(".tmp")
-            and "Controle Financeiro - CAP" in i["name"]
-        ):
-            after_2021 = False if "2021" in i["name"] else True
-            engine = None if "xlsb" not in i["name"] else "pyxlsb"
-            if "Terceiros" in i["name"]:
-                if str(datetime.now().year) in i["name"]:
-                    sheetname = str(datetime.now().year)  # 2023
-                elif str(datetime.now().year - 1) in i["name"]:
-                    sheetname = str(datetime.now().year - 1)  # 2022
+
+        if "2021" in i["name"]:
+            if (
+                not i["name"].lower().endswith(".tmp")
+                and "Controle Financeiro - CAP" in i["name"]
+            ):
+                engine = None if "xlsb" not in i["name"] else "pyxlsb"
+                if "Terceiros" in i["name"]:
+                    if str(datetime.now().year) in i["name"]:
+                        sheetname = str(datetime.now().year)  # 2023
+                    elif str(datetime.now().year - 1) in i["name"]:
+                        sheetname = str(datetime.now().year - 1)  # 2022
+                    else:
+                        sheetname = str(datetime.now().year - 2)  # 2021 (not in sheet name)
+                    usecols = columns_to_read + ["Itaú"] + ["Description"]
+                    df_2021 = pd.read_excel(
+                        __drive_file_download(gdrive_client, i["id"]),
+                        dtype=str,
+                        header=1,
+                        sheet_name=sheetname,
+                        usecols=usecols,
+                        engine=engine,
+                    )
+                    df_2021 = spark_client.create_dataframe(df_2021, __generate_schema(df_2021))
+                    dfs_2021["itau"].append(df_2021)
                 else:
-                    sheetname = str(datetime.now().year - 2)  # 2021 (not in sheet name)
-                usecols = columns_to_read + ["Itaú"]
-                usecols = usecols if after_2021 else usecols + ["Description"]
-                df = pd.read_excel(
-                    __drive_file_download(gdrive_client, i["id"]),
-                    dtype=str,
-                    header=1,
-                    sheet_name=sheetname,
-                    usecols=usecols,
-                    engine=engine,
-                )
-                df = spark_client.create_dataframe(df, __generate_schema(df))
-                if after_2021:
-                    df = df.withColumn("Description", functions.lit(None))
-                dfs["itau"].append(df)
-            else:
-                for sheetname in ["Bradesco", "Citi"]:
-                    usecols = columns_to_read + [sheetname]
-                    usecols = usecols if after_2021 else usecols + ["Description"]
+                    for sheetname in ["Bradesco", "Citi"]:
+                        usecols = columns_to_read + [sheetname] + ["Description"]
+                        df_2021 = pd.read_excel(
+                            __drive_file_download(gdrive_client, i["id"]),
+                            dtype=str,
+                            header=1,
+                            sheet_name=sheetname,
+                            usecols=usecols,
+                            engine=engine,
+                        )
+                        df_2021 = spark_client.create_dataframe(df_2021, __generate_schema(df_2021))
+                        dfs_2021[sheetname.lower()].append(df_2021)
+        else:
+            if (
+                not i["name"].lower().endswith(".tmp")
+                and "Controle Financeiro - CAP" in i["name"]
+            ):
+                engine = None if "xlsb" not in i["name"] else "pyxlsb"
+                if "Terceiros" in i["name"]:
+                    if str(datetime.now().year) in i["name"]:
+                        sheetname = str(datetime.now().year)  # 2023
+                    elif str(datetime.now().year - 1) in i["name"]:
+                        sheetname = str(datetime.now().year - 1)  # 2022
+                    else:
+                        sheetname = str(datetime.now().year - 2)  # 2021 (not in sheet name)
+                    usecols = columns_to_read + ["Itaú"]
                     df = pd.read_excel(
                         __drive_file_download(gdrive_client, i["id"]),
                         dtype=str,
@@ -293,11 +315,23 @@ if __name__ == "__main__":
                         engine=engine,
                     )
                     df = spark_client.create_dataframe(df, __generate_schema(df))
-                    if after_2021:
-                        df = df.withColumn("Description", functions.lit(None))
-                    dfs[sheetname.lower()].append(df)
+                    dfs["itau"].append(df)
+                else:
+                    for sheetname in ["Bradesco", "Citi"]:
+                        usecols = columns_to_read + [sheetname]
+                        df = pd.read_excel(
+                            __drive_file_download(gdrive_client, i["id"]),
+                            dtype=str,
+                            header=1,
+                            sheet_name=sheetname,
+                            usecols=usecols,
+                            engine=engine,
+                        )
+                        df = spark_client.create_dataframe(df, __generate_schema(df))
+                        dfs[sheetname.lower()].append(df)
 
-    # Create a pattern and union all sheets
+
+    # Create a pattern and union all sheets for not 2021 files
     df_itau = (
         reduce(DataFrame.unionAll, dfs["itau"])
         .drop("")
@@ -318,6 +352,39 @@ if __name__ == "__main__":
 
     df = reduce(DataFrame.unionAll, [df_itau, df_bradesco, df_citi])
 
+    # Create a pattern and union all sheets for 2021 files
+
+    df_itau_2021 = (
+        reduce(DataFrame.unionAll, dfs_2021["itau"])
+        .drop("")
+    )
+    df_bradesco_2021 = (
+        reduce(DataFrame.unionAll, dfs_2021["bradesco"])
+        .drop("")
+    )
+    df_citi_2021 = reduce(DataFrame.unionAll, dfs_2021["citi"])
+
+    df_itau_2021 = __columns_to_alphanumeric_snake_case(df_itau_2021)
+    df_bradesco_2021 = __columns_to_alphanumeric_snake_case(df_bradesco_2021)
+    df_citi_2021 = __columns_to_alphanumeric_snake_case(df_citi_2021)
+
+    df_itau_2021 = df_itau_2021.withColumnRenamed("itau", "saldo_total")
+    df_bradesco_2021 = df_bradesco_2021.withColumnRenamed("bradesco", "saldo_total")
+    df_citi_2021 = df_citi_2021.withColumnRenamed("citi", "saldo_total")
+
+    df_2021 = reduce(DataFrame.unionAll, [df_itau_2021, df_bradesco_2021, df_citi_2021])
+    
+    # Remove non-standard 'saldo inicial' rows and remove 'Description' only present in 2021 files and used for removing 'saldo inicial
+    filter_all_columns = [
+        functions.lower(functions.col(col)).contains("saldo inicial")
+        for col in df.columns
+    ]
+    df_2021 = df_2021.filter(~functions.greatest(*filter_all_columns)).drop("description")
+
+    # Union 2021 and not 2021 files
+
+    df = reduce(DataFrame.unionAll, [df, df_2021])
+
     # Fix ordinal excel dates
     convert_numeric_date_udf = functions.udf(__convert_excel_numeric_date, StringType())
 
@@ -328,13 +395,6 @@ if __name__ == "__main__":
     # Add ts_load column
 
     df = df.withColumn("ts_load", functions.current_timestamp())
-
-    # Remove non-standard 'saldo inicial' rows and remove 'Description' only present in 2021 files and used for removing 'saldo inicial
-    filter_all_columns = [
-        functions.lower(functions.col(col)).contains("saldo inicial")
-        for col in df.columns
-    ]
-    df = df.filter(~functions.greatest(*filter_all_columns)).drop("description")
 
     # loaders
     s3_loader = S3Loader()
