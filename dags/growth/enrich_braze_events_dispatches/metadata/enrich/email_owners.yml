@@ -1,43 +1,59 @@
 database_name: datalake_braze_dispatches
 table_name: email_owners
+owner: leticia.lima@quintoandar.com.br
+domain: Data Growth
+description: This table contains data about events related to emails sent to owners.
 columns:
   id_user_dispatch:
+    description: The combination of id_dispatch and id_user.
     lineage:
       - datalake_braze.events_owners.id_user_dispatch
   id_user_braze:
+    description: Unique code to identify an user created by Braze.
     lineage:
       - datalake_braze.events_owners.id_user_braze
   event_channel:
+    description: Channel related to the event. In this case, only email's channel events. 
     lineage:
       - datalake_braze.events_owners.event_channel
   ts_email_sent:
+    description: Timestamp when the email was sent to the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_email_delivered:
+    description: Timestamp when the email was delivered to the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_email_opened:
+    description: Timestamp when the email was opened by the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_email_clicked:
+    description: Timestamp when the email was clicked by the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_email_bounced:
+    description: Timestamp when the email was bounced back to the sender.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_email_spammed:
+    description: Timestamp when the owner marked the email as spam or the email goes directly to spambox.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_email_unsubscribed:
+    description: Timestamp when the owner unsubscribed to stop receving more emails.
     lineage:
       - datalake_braze.events_owners.ts_event
   year:
+    description: Year of when the event occurred.
     lineage:
       - datalake_braze.events_owners.year
   month:
+    description: Month of when the event occurred.
     lineage:
       - datalake_braze.events_owners.month
   day:
+    description: Day of when the event occurred.
     lineage:
       - datalake_braze.events_owners.day
   
