@@ -423,6 +423,18 @@ prop_values AS (
 ),
 -- cte to get propose_values from propose_legacy proposes
 old_prop_values AS (
+    WITH old_duplicated_company_plan AS (
+        SELECT
+            pl.id AS id_plan,
+            cp.id_company,
+            COUNT(*) AS count_company_plan
+        FROM
+            datalake_rental_guarantee_platform_clean.plan AS pl
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.company_plan AS cp
+                ON pl.id = cp.id_plan
+        GROUP BY 1, 2
+    )
     SELECT
         p.id AS id_propose,
         CONCAT(p.id, COALESCE(cp.id, ''), pl.id) AS id_propose_values,
@@ -433,9 +445,14 @@ old_prop_values AS (
         datalake_rental_guarantee_platform_clean.plan AS pl
             ON p.id_plan = pl.id_legacy
     LEFT JOIN
+        old_duplicated_company_plan AS odcp
+            ON pl.id = odcp.id_plan
+            AND p.id_quintocred_company = odcp.id_company
+    LEFT JOIN
         datalake_rental_guarantee_platform_clean.company_plan AS cp
             ON p.id_quintocred_company = cp.id_company
             AND pl.id = cp.id_plan
+            AND odcp.count_company_plan = 1
     LEFT JOIN
         prop_values_structure AS pv
             ON p.id = pv.id_propose
