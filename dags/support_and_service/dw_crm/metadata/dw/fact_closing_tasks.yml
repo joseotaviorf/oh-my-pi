@@ -66,6 +66,7 @@ columns:
   id_house_listing:
     lineage:
     - dw_public.fact_listing_rent_flows.sk_house_listing
+    description: The house listing related to the task.
   sk_house_owner:
     lineage:
     - datalake_ebdb_clean.house.id_user
@@ -101,7 +102,7 @@ columns:
   minutes_task_created_to_started:
     lineage:
     - datalake_crm_tasks_history_flows.tasks_history_users_flow.minutes_task_created_to_started
-    description: ''
+    description: Time (in minutes) the task took after being created until it started.
   task_user_action_resolve_hours:
     lineage:
     - datalake_crm_tasks_history_flows.tasks_history_users_flow.task_user_resolve_hours
@@ -131,7 +132,7 @@ columns:
   action_reason:
     lineage:
     - datalake_crm_tasks_history_flows.tasks_history_users_flow.action_reason
-    description: ''
+    description: Motivator for the action taken on the task.
     categories:
       Estou aguardando data segura: '#N/A'
       Estou aguardando direcionamento interno: '#N/A'
@@ -156,7 +157,7 @@ columns:
   task_status:
     lineage:
     - datalake_crm_tasks_history_flows.tasks_history_users_flow.task_status
-    description: ''
+    description: Task progress identifier.
     categories:
       FINISHED: '#N/A'
       NOT_STARTED: '#N/A'
@@ -177,12 +178,15 @@ columns:
   year:
     lineage:
     - datalake_crm_tasks_history_flows.tasks_history_users_flow.year
+    description: Integer type data that indicates the year in which we had the task in the crm.
   month:
     lineage:
     - datalake_crm_tasks_history_flows.tasks_history_users_flow.month
+    description: Integer type data that indicates the month in which we had the task in the crm.
   day:
     lineage:
     - datalake_crm_tasks_history_flows.tasks_history_users_flow.day
+    description: Integer type data that indicates the day in which we had the task in the crm.
   sk_house_listing:
     description: House Listing ID related to closing task
   ts_load:

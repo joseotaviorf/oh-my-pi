@@ -40,12 +40,12 @@ columns:
     lineage:
     - dw_public.dim_offer.sk_offer
     - dw_public.fact_listing_rent_flows.sk_offer
-    description: ''
+    description: Offer identification key.
   sk_proposal:
     lineage:
     - datalake_ebdb_clean.proposal.id
     - dw_public.fact_listing_rent_flows.sk_proposal
-    description: ''
+    description: Identification key of the proposal sent in the task event.
   sk_contract:
     lineage:
     - dw_public.dim_contract.sk_contract
@@ -71,7 +71,7 @@ columns:
     lineage:
     - dw_public.fact_listing_rent_flows.sk_client
     - dw_public.fact_listing_rent_flows.sk_proposal
-    description: ''
+    description: Proponent identification from EBDB's proposal_document table.
   sk_action_date:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_action_date
@@ -131,11 +131,14 @@ columns:
   year:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
+    description: Integer type data that indicates the year in which we had the task in the crm.
   month:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
+    description: Integer type data that indicates the month in which we had the task in the crm.
   day:
     lineage:
     - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
+    description: Integer type data that indicates the day in which we had the task in the crm.
   ts_load:
     description: Timestamp of data load event (UTC timezone).

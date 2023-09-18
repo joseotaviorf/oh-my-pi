@@ -12,21 +12,27 @@ columns:
   sk_activity:
     lineage:
     - datalake_heimdall.activity.id
+    description: Activity identification key, coming from the heimdall base.
   user_name_activity:
     lineage:
     - datalake_heimdall.activity.user_name
+    description: User name related to the activity.
   event_name_activity:
     lineage:
     - datalake_heimdall.activity.event_name
+    description: Name of the event that indicates the type of activity.
   class_activity:
     lineage:
     - datalake_heimdall.activity.class
+    description: Descriptive and more "raw" data about the type of activity.
   previous_status_activity:
     lineage:
     - datalake_heimdall.activity.previous_status
+    description: Step of the last activity related to the task.
   type_activity:
     lineage:
     - datalake_heimdall.activity.type
+    description: Type of activity related to the task.
   score_factor:
     lineage:
     - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.score_factor

@@ -1,20 +1,37 @@
 ---
 database_name: datalake_support_and_service_kpis_targets
 table_name: kpis_targets
+description: Enrich, which unifies the monitoring data of S&S indicators, 
+  has 2 gsheets as its source and its granularity is the monitoring date.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   metric_name:
     lineage:
       - datalake_gsheets_clean.target_service_kpis.metric_name
       - datalake_gsheets_clean.target_support_kpis.metric_name
+    description: Name related to the tracking indicator.
   team:
     lineage:
       - datalake_gsheets_clean.target_service_kpis.team
       - datalake_gsheets_clean.target_support_kpis.team
+    description: Descriptive information that indicates the type and region of operation of the team.
   granularity:
     lineage:
       - datalake_gsheets_clean.target_service_kpis.granularity
       - datalake_gsheets_clean.target_support_kpis.granularity
+    description: Time interval in which the indicator is monitored.
+  vertical:
+    description: Front of action related to the indicator.
+    categories:
+      Support: ''
+      Service: ''
   target:
     lineage:
       - datalake_gsheets_clean.target_service_kpis.target
       - datalake_gsheets_clean.target_support_kpis.target
+    description:
+      Inspection execution target. Indicates the maximum interval of days before or after a
+      pre-defined period, in which the inspection must take place.
+  dt_target:
+    description: Indicator monitoring date.
