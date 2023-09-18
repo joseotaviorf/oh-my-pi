@@ -92,3 +92,7 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
     description: Date of when the contract was terminated.
+  dt_previous_contract_termination:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_termination
+    description: Date of when the previous contract related to the listing was terminated.

@@ -70,6 +70,7 @@ SELECT
     ts_early_demand_started,
     ts_contract_created,
     ts_termination_created,
-    dt_termination
+    dt_termination,
+    LAG(dt_termination) OVER(PARTITION BY id_house ORDER BY id_house_listing, ts_contract_created, ts_termination_created) AS dt_previous_contract_termination
 FROM
     contracts_base
