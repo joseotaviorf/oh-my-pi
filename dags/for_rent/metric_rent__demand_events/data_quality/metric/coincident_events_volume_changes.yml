@@ -1,11 +1,7 @@
 ---
-table_name: metric_rent.coincident_events_time_variations
+table_name: metric_rent.coincident_events_volume_changes
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  business_type:
-    is_complete:
-  rent_flow_origin:
-    is_complete:
   reference_type:
     is_complete:
       severity_level: Error

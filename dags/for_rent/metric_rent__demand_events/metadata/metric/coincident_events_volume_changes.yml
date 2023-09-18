@@ -1,5 +1,5 @@
 database_name: metric_rent
-table_name: coincident_events_time_variations
+table_name: coincident_events_volume_changes
 description: This table contains the aggregated sum of coincident events of For Rent, based on a time variation which allows
   to understand data updates through time (historical data being retroactively updated).
   The D-1 reference type refers to the current day load looking to the events that happened on the day before. The columns that shows the volume
