@@ -21,7 +21,15 @@ main_inspection_aud_sync as(
         ia.status = 'Revisada'
 ),
 union_inspection_history AS (
-    WITH main_exception AS (
+    WITH last_inspection_update AS (
+        SELECT
+            *
+        FROM
+            datalake_inspections_clean.inspection_aud AS ia
+        QUALIFY
+            ia.ts_updated = FIRST(ia.ts_updated) OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC)
+    ),
+    main_exception AS (
         SELECT
             DISTINCT i.id AS id_inspection
         FROM
@@ -30,7 +38,7 @@ union_inspection_history AS (
         SELECT
             DISTINCT i.id_external AS id_inspection
         FROM
-            datalake_inspections_clean.inspection AS i
+            last_inspection_update AS i
     )
     SELECT
         i.id_inspection,
@@ -55,9 +63,7 @@ union_inspection_history AS (
         i.ts_created,
         i.ts_updated
     FROM
-        datalake_inspections_clean.inspection AS i
-    QUALIFY
-        i.ts_updated = FIRST(i.ts_updated) OVER (PARTITION BY i.id_inspection ORDER BY i.ts_updated DESC)
+        last_inspection_update AS i
     UNION
     SELECT
         MD5(CONCAT(i.id, 'PWA')) AS id_inspection,

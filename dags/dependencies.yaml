@@ -1471,7 +1471,7 @@ bietlejuice.enrich_inspections:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.inspections:load-clean-assessment
-  - bietlejuice.inspections:load-clean-inspection
+  - bietlejuice.inspections:load-clean-inspection-aud
   - bietlejuice.inspections:load-clean-issue-type
   - bietlejuice.inspections:load-clean-item
   - bietlejuice.inspections:load-clean-item-group
