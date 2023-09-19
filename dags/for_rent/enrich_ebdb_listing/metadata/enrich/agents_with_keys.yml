@@ -1,71 +1,100 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: agents_with_keys
+description: Information related to Agents. Information  about key location, agents and listings.
+domain: For Rent
+owner: gustavo.geiger@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking_aud.id_agent
+    description: Unique ID of an agent related to the house.
   id_house:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house
+    description: House key.
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
+    description: House version key.
   all_id_agents:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking_aud.id_agent
+    description: All agents IDs.
   country_code:
     lineage:
       - datalake_ebdb_listing.house_listing.country_code
       - datalake_ebdb_country.user.country_code
+    description: Country code.
   first_key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
+    description: The first key location type of a house.
   house_key_location:
     lineage:
       - datalake_ebdb_listing.house.key_location
+    description: The actual key location type of a house.
   last_key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
+    description: The last key location type of a house.
   who_is_living:
     lineage:
       - datalake_ebdb_listing.house.occupant_type
+    description: Flag to indicate who is living in the house.
   has_keys_with_agent_attributed:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking.status
+    description: Flag to indicate if the agent was attributed.
   has_keys_with_agent_delivered:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking.status
+    description: Flag to indicate if the keys were delivered to agent.
   has_keys_with_agent_returned:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking.status
+    description: Flag to indicate if the key was returned.
   is_delivered_on_another_listing:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking_aud.comments
+    description: Flag to indicate if the key was delivered to another address.
   is_keys_with_agent_opt_in:
     lineage:
       - datalake_ebdb_clean.access_type_aud.has_opted_keys_with_agent
+    description: Flag to indicate if the key was with agent opt in.
   ts_attributed:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the agent was attributed.
   ts_contract_signed:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_contract_signed
+    description: Timestamp of when the contract was signed.
   ts_delivered:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the key was delivered.
   ts_listing_version_start:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_listing_version_start
+    description: Timestamp of when the status of the listings started.
   ts_listing_version_end:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_listing_version_end
+    description: Timestamp of when the status of the listings ended.
   ts_optin:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
-  ts_publicated:
-    lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the owner has opted for keys with agent.
   ts_returned:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the key was returned.
+  ts_publicated:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+    description: Timestamp of when the listing version was started.
+  days_cs_to_return:
+    description: Date difference between the house contract signed and the return of the keys.
+  days_publication_to_attribution:
+    description: Date difference between the house publication and the attribution of agent with keys.
