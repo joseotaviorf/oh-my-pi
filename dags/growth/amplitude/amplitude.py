@@ -46,7 +46,7 @@ cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 
 # Testing Granulate script for Spark job auto optimization
 # TODO Remove after PoV complete (reach out to either Ribs, Mario or Edu for any clarification and cleansing)
-cluster_description["init_scripts"].append('{"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}}')
+cluster_configuration["init_scripts"].append('{"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}}')
 
 cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
 default_libraries = config_service.get_config("default_libraries")
