@@ -428,12 +428,12 @@ final_y AS (
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
 )
-SELECT *, CURRENT_DATE AS dt_load, NOW() AS ts_load FROM metrics_d1
+SELECT *, NOW() AS ts_load FROM metrics_d1
 UNION ALL
-SELECT *, CURRENT_DATE AS dt_load, NOW() AS ts_load FROM final_5w
+SELECT *, NOW() AS ts_load FROM final_5w
 UNION ALL
-SELECT *, CURRENT_DATE AS dt_load, NOW() AS ts_load FROM final_m
+SELECT *, NOW() AS ts_load FROM final_m
 UNION ALL
-SELECT *, CURRENT_DATE AS dt_load, NOW() AS ts_load FROM final_q
+SELECT *, NOW() AS ts_load FROM final_q
 UNION ALL
-SELECT *, CURRENT_DATE AS dt_load, NOW() AS ts_load FROM final_y
+SELECT *, NOW() AS ts_load FROM final_y

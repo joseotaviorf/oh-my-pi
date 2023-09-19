@@ -6,12 +6,18 @@ workflow:
   type: query
   layer: dw
   custom_schema: rent_snapshot
-  default_partitions: ["country_code", "year", "month", "day"]
   default_extraction_type: incremental
+  default_partitions: ["country_code", "year", "month", "day"]
   has_load_to_redshift_task: false
   inner_dependencies:
     coincident_events_volume_changes_snapshot:
       - rent_demand_events_snapshot
+  tables_customization:
+    coincident_events_volume_changes_snapshot:
+      extra_query_template_params:
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
 cluster:
   type: databricks_10_4_med_2xlarge_general_photon_cluster
   access_control_list:
