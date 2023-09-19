@@ -1,0 +1,40 @@
+database_name: datalake_pro_owners
+table_name: daily_owner_category
+description: Historical daily enriched table for rent context.
+  Each row is presented with the category of the owner, which can have less or more than 5 houses.
+  The owner be classified as amateur ou multi.
+  And it contains the version of the owner. Each change in this table about the owner results in a new version.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id_owner_version:
+    description: Id of the owner with it's version. It's the concatenation of id_owner + 0 + version.
+  id_owner:
+    lineage:
+    - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
+    description: Id user of the owner.
+  category:
+    description: Category of the owner based on the number of ongoing houses (status published, rented or suspended)
+      that the user had in a date.
+  owner_version:
+    description: Version of the owner. Any change in this table results a new version of the user.
+  is_amateur:
+    description: Boolean value to check if the owner is Amateur, which is not participating in the PP Multi program.
+  is_pp_multi_active:
+    description: Boolean value to check if the owner is participating in the PP Multi program and is active.
+  dt_houses_owned:
+    lineage:
+    - datalake_pro_owners.daily_owner_houses_quantity_history.dt_houses_owned
+    description: Reference date of the table.
+  year:
+    lineage:
+    - datalake_pro_owners.daily_owner_houses_quantity_history.year
+    description: Year value of the date reference. Also, it's a partition.
+  month:
+    lineage:
+    - datalake_pro_owners.daily_owner_houses_quantity_history.month
+    description: Month value of the date reference. Also, it's a partition.
+  day:
+    lineage:
+    - datalake_pro_owners.daily_owner_houses_quantity_history.day
+    description: Day value of the date reference. Also, it's a partition.
