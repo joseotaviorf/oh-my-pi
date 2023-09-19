@@ -72,7 +72,7 @@ columns:
   net_revenue_pre_taxes:
     description: The net revenue calculated from all the revenues (gross_revenue + addons_revenue + total_revenue_discounts).
   gross_revenue:
-    description: Gross revenue calculated by adding the management_fee, brokerage_fee, insurance_commission and insurance_commission columns.
+    description: Gross revenue calculated by adding the management_fee, brokerage_fee, insurance_commission and addons revenues columns.
   addons_revenue_total:
     description: Addons revenue calculated by adding the addons_service_fee, addons_mra, addons_lra, addons_bfi, addons_ccp, addons_guarantee, addons_new_business_revenue, addons_reserve columns.
   revenue_share_total:

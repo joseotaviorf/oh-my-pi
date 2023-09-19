@@ -364,7 +364,7 @@ SELECT
     (addons_service_fee + addons_mra + addons_lra + addons_bfi + late_payments + addons_ccp + addons_reserve + addons_guarantee + addons_new_business_revenue) +
     (agents_commission + affiliates_commission + partner_share_brokerage + partner_share_management) AS net_revenue_pre_taxes,
   (rental_management + rental_brokerage + insurance_commission) +
-    (addons_service_fee + addons_mra + addons_lra + addons_bfi + late_payments + addons_ccp + addons_reserve) AS gross_revenue,
+    (addons_service_fee + addons_mra + addons_lra + addons_bfi + late_payments + addons_ccp + addons_reserve + addons_guarantee + addons_new_business_revenue) AS gross_revenue,
   addons_service_fee + addons_mra + addons_lra + addons_bfi + addons_ccp + addons_reserve + addons_guarantee + addons_new_business_revenue AS addons_revenue_total,
   agents_commission + affiliates_commission + partner_share_brokerage + partner_share_management AS revenue_share_total,
   quarter,
