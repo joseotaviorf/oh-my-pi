@@ -67,6 +67,7 @@ dags_out_of_pattern:
         "gsheets.growth_intraday",
         "gsheets.static",
         "gsheets.support_and_service",
+        "homolog_retsuko",
         "marketing_costs",
         "metric_rent__bookings",
         "metric_rent_benvi__demand",
