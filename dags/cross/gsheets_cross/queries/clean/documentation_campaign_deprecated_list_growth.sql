@@ -5,4 +5,4 @@ SELECT
     observacao,
     ts_load
 FROM
-    datalake_gsheets_raw.documentation_campaign_blacklist_growth
+    datalake_gsheets_raw.documentation_campaign_deprecated_list_growth

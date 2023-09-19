@@ -89,16 +89,16 @@ sheets_info:
     clean_table_name: data_analytics_training_gabarito
     sheet_context: cross
 
-  documentation_campaign_blacklist_growth:
-    sheet_id: 1HfP_lTNP15hMP-9yot1GogYXKtEih6V5XTKSMVJBd0k
-    sheet_name: datasets_fora
-    clean_table_name: documentation_campaign_blacklist_growth
-    sheet_context: cross
-
   documentation_campaign_datasets:
     sheet_id: 1-dUVLZ00CI2bPUJ2fDssJTsd1mg4jsbiJ5AKIqBY1fM
     sheet_name: datasets
     clean_table_name: documentation_campaign_datasets
+    sheet_context: cross
+
+  documentation_campaign_deprecated_list_growth:
+    sheet_id: 1HfP_lTNP15hMP-9yot1GogYXKtEih6V5XTKSMVJBd0k
+    sheet_name: datasets_fora
+    clean_table_name: documentation_campaign_deprecated_list_growth
     sheet_context: cross
 
   documentation_campaign_looker_dashboards:
