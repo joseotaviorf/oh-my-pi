@@ -38,6 +38,10 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 cluster_configuration = Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True)
 
+# Testing Granulate script for Spark job auto optimization
+# TODO Remove after PoV complete (reach out to either Ribs, Mario or Edu for any clarification and cleansing)
+cluster_description["init_scripts"].append('{"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}}')
+
 EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"
 CLEAN_SPARK_JOB_PATH = EBDB_SPARK_JOBS_PATH + "load_ebdb_clean.py"

@@ -37,6 +37,11 @@ raw_spark_job_path = s3_prefix + f"/spark_jobs/{SOURCE}/add_partitions_to_raw_ta
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 cluster_description = config_service.get_config("custom_cluster")
+
+# Testing Granulate script for Spark job auto optimization
+# TODO Remove after PoV complete (reach out to either Ribs, Mario or Edu for any clarification and cleansing)
+cluster_description["init_scripts"].append('{"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}}')
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
