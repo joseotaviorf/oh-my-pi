@@ -32,7 +32,10 @@ columns:
     lineage:
       - datalake_inspections.item.id_room
   sk_assessment:
-    description: Assessment unique identifier.
+    description: Unique identifier of an Assessment.
+      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
+      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique.
+      It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspections.item.id_assessment
   sk_inspection:

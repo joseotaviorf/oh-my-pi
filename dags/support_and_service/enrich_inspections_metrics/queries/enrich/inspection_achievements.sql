@@ -27,6 +27,7 @@ WITH sla_target AS (
 )
 SELECT
     i.id_inspection,
+    i.id_assessment,
     i.id_external,
     i.id_city,
     i.city_name,

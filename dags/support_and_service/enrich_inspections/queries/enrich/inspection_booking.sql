@@ -1,17 +1,4 @@
-WITH assessment AS ( --There should only be a single assessment for an inspection, but there are some duplications that should be removed.
-    SELECT DISTINCT
-        a.id_inspection,
-        a.id_assessment,
-        a.source,
-        a.ts_finished,
-        a.ts_started,
-        a.ts_created
-    FROM
-        datalake_inspections_clean.assessment AS a
-    QUALIFY
-        a.ts_created = FIRST(a.ts_created) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_created DESC)
-),
-main_inspection_aud_sync as(
+WITH main_inspection_aud_sync as(
     SELECT DISTINCT
         ia.id_inspection,
         FIRST_VALUE(ia.ts_last_synced) OVER (PARTITION BY ia.id_inspection, status ORDER BY ia.ts_last_synced ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ts_first_synced
@@ -211,7 +198,7 @@ SELECT
 FROM
     union_inspection_history AS i
 LEFT JOIN
-    assessment AS a
+    datalake_inspections_clean.assessment AS a
         ON a.id_inspection = i.id_inspection
 LEFT JOIN
     main_inspection_aud_sync AS mias

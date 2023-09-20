@@ -1,8 +1,12 @@
 ---
 database_name: datalake_inspections
 table_name: inspection_booking
-description: This table brings data from each inspection scheduled through the
+description: |
+  This table brings data from each inspection scheduled through the
   Inspection Service and historical data from the PWA.
+  The granularity of the table is given by the id_inspection, which will be unique.
+  This is just not true for data prior to August 19, 2023, because of a bug in the product
+  (read the description of the id_assessment column for more details).
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -26,7 +30,10 @@ columns:
       - datalake_inspections_clean.inspection_aud.id_external
       - datalake_ebdb_clean.inspection.id
   id_assessment:
-    description: Assessment unique identifier.
+    description: Unique identifier of an Assessment.
+      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
+      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique.
+      It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspections_clean.assessment.id_assessment
   id_booking:

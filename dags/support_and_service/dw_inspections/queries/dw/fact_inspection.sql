@@ -36,4 +36,4 @@ FROM
     datalake_inspections.inspection_booking i
 LEFT JOIN
     datalake_inspections_metrics.inspection_achievements im
-        ON im.id_inspection = i.id_inspection
+        ON im.id_assessment = i.id_assessment

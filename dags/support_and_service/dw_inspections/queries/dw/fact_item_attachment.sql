@@ -33,7 +33,7 @@ SELECT
     ir.id_assessment AS sk_assessment,
     ir.id_inspection AS sk_inspection,
     ir.id_user AS sk_user,
-    ir.id_review_media IS NOT NULL AS is_review_media,
+    TRUE AS is_review_media,
     ir.ts_media_created AS ts_created,
     ir.ts_media_updated AS ts_updated,
     NOW() AS ts_load,

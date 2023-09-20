@@ -41,7 +41,10 @@ columns:
       - datalake_inspections.item_media.id_external_media
       - datalake_inspections.item_review.id_external_media
   sk_assessment:
-    description: Unique identifier of assessment.
+    description: Unique identifier of an Assessment.
+      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
+      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique.
+      It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspections.item_media.id_assessment
       - datalake_inspections.item_review.id_assessment

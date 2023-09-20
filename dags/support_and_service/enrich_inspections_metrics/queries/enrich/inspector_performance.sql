@@ -1,3 +1,14 @@
+WITH distinct_inspections_per_inspector AS (
+    SELECT DISTINCT
+        ib.id_inspector,
+        ib.status,
+        ib.is_not_canceled_by_inspector,
+        ib.ts_inspected,
+        ib.ts_booking_created_local_tz,
+        ib.ts_booking_inspected_utc
+    FROM
+        datalake_inspections.inspection_booking AS ib
+)
 SELECT
     ib.id_inspector,
     ic.inspector_name,
@@ -27,7 +38,7 @@ SELECT
     {month} AS month,
     {day} AS day
 FROM
-    datalake_inspections.inspection_booking AS ib
+    distinct_inspections_per_inspector AS ib
 LEFT JOIN
     datalake_gsheets_clean.inspectors_control AS ic
         ON ib.id_inspector = ic.id_inspector

@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     i.id_inspection AS sk_inspection,
     i.inspection_type,
     i.source,
