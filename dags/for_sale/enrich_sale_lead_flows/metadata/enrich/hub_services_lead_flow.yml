@@ -93,6 +93,10 @@ columns:
     lineage:
       - datalake_gsheets_clean.business_unit_region.business_unit
       - datalake_hub_services_clean.business_unit_aud
+  has_secretariat_contact_created:
+    description: Flag to indicate if this lead has a contact with Secretariat. Always TRUE in this table.
+    lineage:
+      - datalake_hub_services_clean.lead_aud.id_business_unit
   ts_first_visit_lead_intent:
     description: Timestamp for this lead first visit intent contact.
     lineage:
