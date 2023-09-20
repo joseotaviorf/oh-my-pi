@@ -1441,6 +1441,10 @@ bietlejuice.enrich_hub_services:
   - bietlejuice.gsheets_for_sale:done-clean-business-unit-region
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.hub_services:load-clean-business-unit-region-aud
+  - bietlejuice.hub_services:load-clean-lead
+  - bietlejuice.hub_services:load-clean-responsible
+  - bietlejuice.hub_services:load-clean-users
+  - bietlejuice.hub_services:load-clean-visitor
 bietlejuice.enrich_hubspot:
   - bietlejuice.company:load-clean-address
   - bietlejuice.company:load-clean-company
