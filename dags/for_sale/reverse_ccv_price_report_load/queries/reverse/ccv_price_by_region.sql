@@ -199,45 +199,61 @@ median_price_by_region AS (
   GROUP BY 
     1, 2
 ),
-aux AS (
+tabular_data AS (
   SELECT 
-    r.sk_region,
+    r.sk_region AS id_region,
     r.city_group,
-    r.city_name,
+    r.city_name AS city,
     r.neighborhood, 
-    region_group AS region_tier,
-    r.region_group_type as region_tier_type,
-    r.region_display_name,
-    p.dt_quarter_ccv AS start_period, 
-    p.median_price_per_m2
+    region_group AS tier,
+    r.region_group_type as tier_type,
+    r.region_display_name AS region_used_for_m2_average,
+    DATE_FORMAT(p.dt_quarter_ccv, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") AS ccv_period,
+    DATE_FORMAT(ADD_MONTHS(p.dt_quarter_ccv, 2), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") AS ccv_end_period,
+    CASE 
+      WHEN d.month =  1 THEN 'Mar/' || RIGHT(CAST(d.year AS STRING), 2)
+      WHEN d.month =  4 THEN 'Jun/' || RIGHT(CAST(d.year AS STRING), 2)
+      WHEN d.month =  7 THEN 'Set/' || RIGHT(CAST(d.year AS STRING), 2)
+      WHEN d.month =  10 THEN 'Dez/' || RIGHT(CAST(d.year AS STRING), 2)
+    END AS period_name,
+    p.median_price_per_m2 AS avg_price_m2
   FROM 
     region_display_name AS r
   LEFT JOIN 
     median_price_by_region AS p
       USING(region_group)
+  INNER JOIN 
+    dw_public.dim_date AS d
+      ON p.dt_quarter_ccv = d.date
+  WHERE
+    r.sk_region != -1
+    AND ADD_MONTHS(p.dt_quarter_ccv, 2) <= DATE_TRUNC('MONTH', CURRENT_DATE)
+),
+result_format AS (
+  SELECT 
+      id_region, 
+      city_group,
+      city,
+      neighborhood, 
+      tier,
+      tier_type,
+      region_used_for_m2_average,
+      COLLECT_LIST(STRUCT(period_name, ccv_period, ccv_end_period, avg_price_m2)) AS data
+  FROM
+    tabular_data
+  GROUP BY 
+      1, 2, 3, 4, 5, 6, 7
 )
 SELECT 
-  a.sk_region,
-  a.city_group,
-  a.city_name,
-  a.neighborhood, 
-  a.region_tier,
-  a.region_tier_type,
-  a.region_display_name,
-  DATE_FORMAT(a.start_period, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") AS start_period,
-  DATE_FORMAT(ADD_MONTHS(a.start_period, 2), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") AS end_period,
-  CASE 
-    WHEN d.month =  1 THEN 'Mar/' || RIGHT(CAST(d.year AS STRING), 2)
-    WHEN d.month =  4 THEN 'Jun/' || RIGHT(CAST(d.year AS STRING), 2)
-    WHEN d.month =  7 THEN 'Set/' || RIGHT(CAST(d.year AS STRING), 2)
-    WHEN d.month =  10 THEN 'Dez/' || RIGHT(CAST(d.year AS STRING), 2)
-  END AS period_name,
-  median_price_per_m2 AS measure
+  CONCAT(UNIX_TIMESTAMP(), LPAD(CAST(ROW_NUMBER() OVER (ORDER BY id_region) AS STRING), 6, '0')) AS id,
+  id_region, 
+  city_group,
+  city,
+  neighborhood, 
+  tier,
+  tier_type,
+  region_used_for_m2_average,
+  data,
+  DATE_FORMAT(CURRENT_TIMESTAMP, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") AS ts_load
 FROM 
-  aux AS a
-INNER JOIN 
-  dw_public.dim_date AS d
-    ON a.start_period = d.date
-WHERE
-  a.sk_region != -1
-  AND ADD_MONTHS(a.start_period, 2) <= DATE_TRUNC('MONTH', CURRENT_DATE)
+  result_format

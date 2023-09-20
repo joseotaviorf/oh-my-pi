@@ -69,61 +69,17 @@ def prepare_table(database_name: str, table_name: str, event_type: str):
     """
     df = (
         spark.table(f"{database_name}.{table_name}")
-        .selectExpr(
-            'sk_region AS id_region', 
-            'city_group AS city_group',
-            'city_name AS city',
-            'neighborhood AS neighborhood',
-            'region_tier AS tier',
-            'region_tier_type AS tier_type',
-            'region_display_name AS region_used_for_m2_average',
-            'period_name AS period_name',
-            'start_period AS ccv_period',
-            'end_period AS ccv_end_period',
-            'measure AS avg_price_m2'
-        )
-        .groupBy(
-            'id_region', 
-            'city_group',
-            'city',
-            'neighborhood', 
-            'tier',
-            'tier_type',
-            'region_used_for_m2_average'
-        )
-        .agg(
-            F.collect_list('period_name').alias('period_name'),
-            F.collect_list('ccv_period').alias('ccv_period'),
-            F.collect_list('ccv_end_period').alias('ccv_end_period'),
-            F.collect_list('avg_price_m2').alias('avg_price_m2')
-        )
         .withColumn(
-            'row_number', 
-            F.row_number().over(Window.orderBy('id_region'))
-        )
-        .withColumn(
-            'id',
-            F.concat(F.unix_timestamp().cast("string"), F.lpad(F.col("row_number").cast("string"), 6, "0")).cast("bigint")
-        )
-        .withColumn(
-            'ts_load',
-            F.date_format(F.current_timestamp(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-        )
-    )
-
-    formatted_df = (
-        df
-        .withColumn(
-            'data', 
-            F.arrays_zip(F.col('period_name'), F.col('ccv_period'), F.col('ccv_end_period'), F.col('avg_price_m2'))
+            'id', 
+            F.col("id").cast("bigint")
         )
         .select('id', 'id_region', 'city_group', 'city', 'neighborhood', 'tier', 'tier_type', 'region_used_for_m2_average', 'ts_load', 'data')
     )
 
     logger.info(
-        f"m=__main__, message=Table retrieved: {formatted_df.count()} rows and {len(formatted_df.columns)} columns."
+        f"m=__main__, message=Table retrieved: {df.count()} rows and {len(df.columns)} columns."
     )
-
+    
     historical_data = [region.asDict(recursive=True) for region in formatted_df.collect()]
     payload = []
 
@@ -131,8 +87,7 @@ def prepare_table(database_name: str, table_name: str, event_type: str):
         pattern = {"event_type": event_type, "payload": region}
         payload.append(pattern)
 
-    return payload
-    
+    return payload    
 
 def send_message_dict_to_sns(messages: list, sns_client, sns_topic_arn: str):
     """
