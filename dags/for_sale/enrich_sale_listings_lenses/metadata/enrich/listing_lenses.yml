@@ -1,3 +1,4 @@
+---
 database_name: datalake_sale_listings_lenses
 table_name: listing_lenses
 description: 'Table enrich that gathers the listing lens status of all sale listings. Lensing the listings is a project developed by the Listing Conversion team, where we abstracted various concepts and ways of looking at listings into a few lenses. For more information, check: https://docs.google.com/presentation/d/1E8VO0ulQ5-W5BKoI3C8cYPpFo7cmOP6TFzyUS27vHMg/edit'
@@ -188,6 +189,11 @@ columns:
         It represents the A2 tier category. Listings that have an availability score between -100000 and 4000.
       Possibly Unavailable: >
         It represents the A1 tier category. Listings that have an availability score less than -100000.
+  availability_drill_down:
+    lineage: 
+      - datalake_sale_listings_lenses.availability_lens.tier_drill_down
+    description: >
+      The drill down of the availability tier, where we can see the factors/bins that make up the listing's tier.
   sellability_name:
     lineage:
       - datalake_sale_listings_lenses.sellability_lens.tier_name
