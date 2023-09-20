@@ -1,10 +1,22 @@
-/** Brief disclaimer about the partitioning choosen:
+/** Brief disclaimer about the creation of this table:
+    About the choosen partitions:
     In every DAG run, we want to look to an specific snapshot file, in order to compare the historical events.
     In our DAG run, we always have the D-1 date (for example, on the day 2023-09-13, the DAG run will be 2023-09-12).
     In every snapshot from rent_demand_events, we create it using the current date (for example, on the day 2023-09-13,
     the snapshot date will also be 2023-09-13).
     So in this case, if we used the DAG run date (purely year-month-day), we would have a D-1 date when the snapshot date is D.
     In order to avoid this behaviour, in every partition we're adding +1 day, so we'll be looking for the right snapshot file.
+
+    About the checks of enough snapshots:
+    In order to guarantee that we're doing a fair comparision of results, we decided to add some rules related to each time window vision.
+    Related to the last 5 weeks metrics, we'll only bring the results if in these last 5 weeks (which has in total 35 days), we
+    have at least 32 snapshots;
+    Related to the last month metric, we'll only bring the results if in the last month (which has usually around 30 days), we
+    have at least 26 snapshots;
+    Related to the last quarter metric, we'll only bring the results if in the last quarter (which has usually around 90 days), we
+    have at least 83 snapshots;
+    Related to the last year metric, we'll only bring the results if in the last quarter (which has usually around 90 days), we
+    have at least 340 snapshots.
 **/
 WITH metrics_d1 AS (
     SELECT
@@ -48,6 +60,18 @@ WITH metrics_d1 AS (
         MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)   -- It's necessary to add 1 day because the execution date is always D-1 but we create the snapshot date based on the current day
         AND dt_event = DATE('{year}-{month}-{day}')   -- As the execution date is always D-1, it's exactly the event date that we want
     GROUP BY 1, 29, 30, 31, 32, 33, 34
+),
+checking_weekly_snapshots AS (
+    -- Checking if we have at least 32 snapshots of the previous 5 weeks, which has 35 days in total
+    SELECT
+        'W1-W5' AS reference_type,
+        IF(COUNT(DISTINCT MAKE_DATE(year, month, day)) > 31, TRUE, FALSE) AS has_enough_snapshots
+    FROM
+        dw_rent_snapshot.rent_demand_events_snapshot
+    WHERE
+        MAKE_DATE(year, month, day)
+            BETWEEN DATE_TRUNC('week', DATE_ADD(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -35))
+                AND DATE_TRUNC('week', DATE_ADD(DATE('{year}-{month}-{day}'), 1))
 ),
 metrics_5w AS (
     SELECT
@@ -96,6 +120,10 @@ divergences_5w AS (
         day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
+    JOIN
+        checking_weekly_snapshots AS c
+            ON c.reference_type = 'W1-W5'
+            AND c.has_enough_snapshots = TRUE
     WHERE
         MAKE_DATE(year, month, day) = DATE_TRUNC('week', DATE_ADD(dt_event, 7)) -- The snapshot should be from the week start of the following week
         AND DATE_TRUNC('week', dt_event)
@@ -146,6 +174,18 @@ final_5w AS (
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
 ),
+checking_monthly_snapshots AS (
+    -- Checking if we have at least 26 snapshots of the previous month, since a month usually has around 30 days
+    SELECT
+        'LM' AS reference_type,
+        IF(COUNT(DISTINCT MAKE_DATE(year, month, day)) > 25, TRUE, FALSE) AS has_enough_snapshots
+    FROM
+        dw_rent_snapshot.rent_demand_events_snapshot
+    WHERE
+        MAKE_DATE(year, month, day)
+            BETWEEN DATE_TRUNC('month', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -1))
+            AND DATE_TRUNC('month', DATE_ADD(DATE('{year}-{month}-{day}'), 1))
+),
 metrics_m AS (
     SELECT
         'LM' AS reference_type,
@@ -191,6 +231,10 @@ divergences_m AS (
         day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
+    JOIN
+        checking_monthly_snapshots AS c
+            ON c.reference_type = 'LM'
+            AND c.has_enough_snapshots = TRUE
     WHERE
         MAKE_DATE(year, month, day) = DATE(DATE_TRUNC('month', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))  -- Gets the snapshot of the first day of the next month (it'll have data of the whole previous month, til its last day)
         AND DATE(DATE_TRUNC('month', dt_event)) = DATE_TRUNC('month', (ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -1)))  -- Gets the events truncated by the previous month start date
@@ -239,6 +283,18 @@ final_m AS (
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
 ),
+checking_quarterly_snapshots AS (
+    -- Checking if we have at least 83 snapshots of the previous quarter, since a quarter usually have around 90 days
+    SELECT
+        'LQ' AS reference_type,
+        IF(COUNT(DISTINCT MAKE_DATE(year, month, day)) > 82, TRUE, FALSE) AS has_enough_snapshots
+    FROM
+        dw_rent_snapshot.rent_demand_events_snapshot
+    WHERE
+        MAKE_DATE(year, month, day)
+            BETWEEN DATE_TRUNC('quarter', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -3))
+            AND DATE_TRUNC('quarter', DATE_ADD(DATE('{year}-{month}-{day}'), 1))
+),
 metrics_q AS (
     SELECT
         'LQ' AS reference_type,
@@ -284,6 +340,10 @@ divergences_q AS (
         day
     FROM
         dw_rent_snapshot.rent_demand_events_snapshot AS r
+    JOIN
+        checking_quarterly_snapshots AS c
+            ON c.reference_type = 'LQ'
+            AND c.has_enough_snapshots = TRUE
     WHERE
         MAKE_DATE(year, month, day) = DATE(DATE_TRUNC('quarter', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))    -- Gets the snapshot of the first day of the next quarter (it'll have data of the whole previous quarter, til its last day)
         AND DATE(DATE_TRUNC('quarter', dt_event)) = DATE_TRUNC('quarter', (ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -3)))  -- Gets the events truncated by the previous quarter start date
@@ -331,6 +391,18 @@ final_q AS (
         divergences_q AS d
             ON d.country_code = m.country_code
             AND d.dt_reference = m.dt_reference
+),
+checking_yearly_snapshots AS (
+    -- Checking if we have at least 340 snapshots of the previous year, since a year may have 365 or 366 days
+    SELECT
+        'LY' AS reference_type,
+        IF(COUNT(DISTINCT MAKE_DATE(year, month, day)) > 339, TRUE, FALSE) AS has_enough_snapshots
+    FROM
+        dw_rent_snapshot.rent_demand_events_snapshot
+    WHERE
+        MAKE_DATE(year, month, day)
+            BETWEEN DATE_TRUNC('year', ADD_MONTHS(DATE_ADD(DATE('{year}-{month}-{day}'), 1), -12))
+            AND DATE_TRUNC('year', DATE_ADD(DATE('{year}-{month}-{day}'), 1))
 ),
 metrics_y AS (
     SELECT
@@ -380,6 +452,10 @@ divergences_y AS (
     JOIN
         dw_public.dim_date AS d
             ON d.date = r.dt_event
+    JOIN
+        checking_yearly_snapshots AS c
+            ON c.reference_type = 'LY'
+            AND c.has_enough_snapshots = TRUE
     WHERE
         MAKE_DATE(r.year, r.month, r.day) = DATE(DATE_TRUNC('year', DATE_ADD(DATE('{year}-{month}-{day}'), 1)))   -- Gets the snapshot of the first day of the year (it'll have data of the whole previous year, til its last day)
         AND DATE(DATE_TRUNC('year', dt_event)) = MAKE_DATE(YEAR(d.last_year), 1, 1)   -- Gets the events truncated by the previous year start date

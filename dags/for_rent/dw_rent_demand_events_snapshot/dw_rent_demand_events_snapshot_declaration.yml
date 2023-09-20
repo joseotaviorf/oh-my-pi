@@ -15,9 +15,7 @@ workflow:
   tables_customization:
     coincident_events_volume_changes_snapshot:
       extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
+        "MAKE_DATE(year, month, day)": "DATE_ADD(MAKE_DATE({year}, {month}, {day}), 1)"
 cluster:
   type: databricks_10_4_med_2xlarge_general_photon_cluster
   access_control_list:
