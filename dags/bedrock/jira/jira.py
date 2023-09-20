@@ -44,6 +44,12 @@ CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_med_general_cluster", deserialize_json=True
 )
 
+# Testing Granulate script for Spark job auto optimization
+# TODO Remove after PoV complete (reach out to either Ribs, Mario or Edu for any clarification and cleansing)
+
+CLUSTER_DESCRIPTION['init_scripts'].append({"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}})
+
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
