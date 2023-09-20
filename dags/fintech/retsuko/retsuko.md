@@ -24,6 +24,7 @@ We load the following tables into the datalake:
     * entry
     * file
     * invoice
+    * manual_entry
     * recurrent_credit_card
     * sap_entity
 
@@ -36,6 +37,7 @@ We load the following tables into the datalake:
     * entry
     * file
     * invoice
+    * manual_entry
     * recurrent_credit_card
     * sap_entity
 

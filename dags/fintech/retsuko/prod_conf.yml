@@ -8,5 +8,6 @@ tables:
   - entry
   - file
   - invoice
+  - manual_entry
   - recurrent_credit_card
   - sap_entity
