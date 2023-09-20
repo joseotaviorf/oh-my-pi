@@ -1,52 +1,95 @@
 ---
 database_name: datalake_ebdb_proposal
 table_name: proposal_person
+description: Information related to ForRent proposals and the client/property owner related. Each line is an unique proposal
+  with the personal information about the client or owner related to such proposal.
+domain: For Rent
+owner: gustavo.geiger@quintoandar.com.br
 columns:
   id_proposal_person:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.id
+    description: Id of the client related to the proposal.
   id_personal_document:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.cpf
+    description: Id of the personal document.
   id_proposal:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.id_proposal
+    description: Proposal ID.
   country_code:
     lineage:
       - datalake_ebdb_country.user.country_code
+    description: Country code.
   email:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.email
+    description: Client email.
   full_name:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.name
+    description: Client full name.
+  gender:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.gender
+    description: Client gender.
   marital_status:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.marital_status
+    description: If the client is single or married.
   personal_document:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.cpf
+    description: Id of the personal document.
   phone_number:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.phone_number
+    description: Client phone number.
   state_code:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.id_estado
+    description: State code.
   number_of_dependents:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.number_of_dependents
+    description: The total number of dependents of the client.
   is_going_to_live:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.will_live
+    description: If this client will live in the house.
   has_contributed_to_current_house:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.has_contributed_to_current_house
+    description: If this client has contributed to this house.
   dt_birth:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.dt_birth
+    description: Birth date of the client.
   ts_created:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.ts_created
+    description: Timestamp of when the proposal was created
   ts_updated:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.ts_updated
+    description: Timestamp of when the proposal was updated
+  current_house_situation:
+    description: The status of the current house of the client. If they live with their family , their own house or in a rented house.
+  employment_bond:
+    description: Source of revenue from the client.
+  expected_contract_role:
+    description: The type of te client, it can be landlord, sponsor or tenant.
+  rental_motive:
+    description: The motive of renting a house.
+  brl_total_income:
+    lineage:
+    description: Sum of total income from client, which is the sum of the monthly salary and additional income value, if it has one.
+  is_first_proposal:
+    description: If this represents the first proposal sent.
+  is_last_proposal:
+    description: If this represents the last proposal sent.
+  is_valid_cpf:
+    description: Checking if the personal document registered is in a compatible format.
+  is_valid_cnpj:
+    description: Checking if the company document registered is in a compatible format.
