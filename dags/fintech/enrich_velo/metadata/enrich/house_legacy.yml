@@ -7,34 +7,34 @@ columns:
   id_house:
     description: "House identification number (ID)"
     lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.id
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.id
   type:
     description: "Property type description"
   street:
     description: Property address street
     lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.street
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.street
   number:
     description: Property address number
     lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.number
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.number
   complement:
     description: Property address complement
     lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.complement
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.complement
   neighborhood:
     description: Property address neighborhood
     lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.neighborhood
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.neighborhood
   city:
     description: "City where the property is located"
     lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.city
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.city
   state:
     description: "State where the property is located"
     lineage:
       - datalake_ebdb_clean.state.abbreviation
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.state
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.state
   country_code:
     description: "Country Code where the property is located"
     lineage:
@@ -42,10 +42,10 @@ columns:
   zipcode:
     description: "ZIPCODE"
     lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.zip_code
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.zip_code
   geolocation:
     description: "Geolocation"
     lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_property.geolocation
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.geolocation
   is_legacy:
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)

@@ -13,7 +13,7 @@ SELECT
         py.geolocation,
         TRUE AS is_legacy
     FROM
-        datalake_rental_guarantee_platform_clean.fiancavelo_property AS py
+        datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy AS py
     LEFT JOIN
         datalake_ebdb_clean.country AS ct
             ON IF(REPLACE(py.country, '\'', '') = '', NULL, UPPER(REPLACE(py.country, '\'', ''))) = UPPER(ct.name)
