@@ -5,6 +5,10 @@ domain: Growth
 owner: henrique.miamoto@quintoandar.com.br
 description: This table contains information about amplitude events for the tenants main project.
 columns:
+  event_type_sanitized:
+    description: name of the amplitude event, in lower and snake case.
+    lineage:
+      - datalake_amplitude_clean.events.event_type
   event_type:
     description: name of the amplitude event
     lineage:

@@ -25,11 +25,33 @@ columns:
     description: affiliate cluster.
     lineage:
       - dw_datamarts.affiliates_clusters.cluster
+  cnt_first_conversion_rent_only:
+    description: volume of rent first_listings
+    lineage:
+      - dw_datamarts.lead_listing_flows
+  cnt_first_conversion_sale_only:
+    description: volume of sale first_listings
+    lineage:
+      - dw_datamarts.lead_listing_flows
+  cnt_first_conversion_hybrid:
+    description: volume of hybrid first_listings
+    lineage:
+      - dw_datamarts.lead_listing_flows
+  total_listings:
+    description: volume of hybrid first_listings
+    lineage:
+      - dw_datamarts.lead_listing_flows
   target_base:
     description: the target base for the affiliate gain the bonus base
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
+  diff_base:
+    description: the volume need to the affiliate hit the base bonus
+    lineage:
+      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
+      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
+      - dw_datamarts.lead_listing_flows
   bonus_base:
     description: the value of the bonus base
     lineage:
@@ -40,11 +62,29 @@ columns:
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_boost
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_boost
+  diff_boost:
+    description: the volume need to the affiliate hit the boost bonus
+    lineage:
+      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
+      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
+      - dw_datamarts.lead_listing_flows
   bonus_boost:
     description: the value of the bonus boost
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_boost
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_boost
+  has_hit_base:
+    description: flag that indicates if the affiliate has hitted the base bonus
+    lineage:
+      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
+      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
+      - dw_datamarts.lead_listing_flows
+  has_hit_boost:
+    description: flag that indicates if the affiliate has hitted the boost bonus
+    lineage:
+      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
+      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
+      - dw_datamarts.lead_listing_flows
   promotional_bonus:
     description: the value of the promotional bonus.
     lineage:
@@ -52,3 +92,7 @@ columns:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_boost
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_base
+  commission_listing:
+    description: the value of the commission that the affiliate needs to receive.
+    lineage:
+      - dw_datamarts.lead_listing_flows
