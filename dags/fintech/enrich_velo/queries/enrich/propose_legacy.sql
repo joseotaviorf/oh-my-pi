@@ -218,163 +218,6 @@ propose_company AS (
     FROM
         datalake_rental_guarantee_platform_clean.fiancavelo_proposecompany_legacy
     ),
-propose_canceled_date AS (
-    SELECT
-        id_propose,
-        MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_ended
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Contrato Cancelado', 'Proposta Cancelada')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_waiting_new_docs_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Mais documentos', 'Mais proponentes')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_evaluation_started_date AS (
-    WITH cte_propose_history AS (
-            SELECT
-                id_propose,
-                MIN(ts_updated) AS ts_evaluation_started
-            FROM
-                datalake_rental_guarantee_platform_clean.propose_history
-            WHERE
-                value NOT IN ('Rascunho', 'Proposta Cancelada')
-                AND id_history_type = 5
-            GROUP BY 1
-    ),
-    cte_propose_aud AS (
-            SELECT
-                p.id AS id_propose,
-                MIN(r.ts_created) AS ts_evaluation_started
-            FROM
-                datalake_rental_guarantee_platform_clean.propose_aud AS p
-            LEFT JOIN
-                datalake_rental_guarantee_platform_clean.rev_info AS r
-                    ON r.rev = p.rev
-            LEFT JOIN
-                datalake_rental_guarantee_platform_clean.propose_status AS ps
-                    ON ps.id = p.id_propose_status
-            WHERE
-                ps.name NOT IN ('Rascunho', 'Proposta Cancelada')
-            GROUP BY 1
-    )
-    SELECT
-        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
-        COALESCE(ph.ts_evaluation_started, a.ts_evaluation_started) AS ts_evaluation_started
-    FROM
-        cte_propose_aud AS a
-    FULL OUTER JOIN
-        cte_propose_history AS ph
-            ON ph.id_propose = a.id_propose
-),
-propose_rejected_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Reprovado pelo analista','Reprovado na análise humanizada')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_sign_started_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Aprovada pelo analista','Análise aprovada')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_signed_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_signed
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Contrato Assinado mas não pago')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_paid_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Contrato pago mas não assinado','Contrato assinado e pago')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_activation_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value = 'Contrato assinado e pago'
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_secured_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value = 'Contrato aprovado'
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_activation_analysis_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value = 'Análise humana do contrato de locação'
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
-propose_secure_pending_date AS (
-    SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
-    FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value = 'Reenviar contrato de aluguel'
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
-),
 prop_values_structure AS (
     WITH cte_values AS (
         SELECT
@@ -387,7 +230,6 @@ prop_values_structure AS (
             datalake_rental_guarantee_platform_clean.item_type AS it
                 ON pi.id_item_type = it.id
     )
-
     SELECT
         *
     FROM
@@ -475,40 +317,37 @@ old_prop_values AS (
     SELECT
         pp.id_propose,
         pp.id_person AS id_primary_person,
-        prs.declared_income,
         ROW_NUMBER() OVER(PARTITION BY pp.id_propose ORDER BY pp.ts_updated DESC) AS rn
         FROM
         datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy AS pp
-        LEFT JOIN
-            person_score AS prs
-            ON prs.id_person = pp.id_person
-            AND prs.rn = 1
         WHERE
         pp.is_active
             AND pp.id_type = 1 -- bringing only main IQ
     ),
+    main_person AS (
+        SELECT
+            id_person,
+            id_propose,
+            declared_income
+        FROM
+            datalake_velo.propose_person_legacy
+        WHERE
+            is_primary_person IS TRUE
+    ),
     old_persons_metrics AS (
     SELECT
         pp.id_propose,
-        MAX(mc.declared_income) / SUM(prs.declared_income) AS percentage_income_from_primary_person,
-        COUNT(cp.id) AS count_persons_included,
-        AVG(prs.score_value) AS avg_serasa_score,
-        AVG(prs.risk) AS avg_risk_score,
-        AVG(prs.declared_income) AS avg_declared_income,
-        SUM(prs.declared_income) AS total_declared_income
+        MAX(mp.declared_income) / SUM(pp.declared_income) AS percentage_income_from_primary_person,
+        COUNT(pp.id_person) AS count_persons_included,
+        AVG(pp.serasa_score) AS avg_serasa_score,
+        AVG(pp.risk_score) AS avg_risk_score,
+        AVG(pp.declared_income) AS avg_declared_income,
+        SUM(pp.declared_income) AS total_declared_income
     FROM
-        datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy AS pp
+        datalake_velo.propose_person_legacy AS pp
     LEFT JOIN
-        datalake_rental_guarantee_platform_clean.clientes_person_legacy AS cp
-        ON cp.id = pp.id_person
-    LEFT JOIN
-        person_score AS prs
-        ON prs.id_person = cp.id
-            AND prs.rn = 1
-    LEFT JOIN
-        main_client AS mc
-        ON mc.id_propose = pp.id_propose
-        AND mc.rn = 1
+        main_person AS mp
+            ON mp.id_propose = pp.id_propose
     GROUP BY 1
     ),
 old_payments_metrics AS (
@@ -526,16 +365,6 @@ old_payments_metrics AS (
         datalake_velo.payment_legacy
     GROUP BY 1
 ),
-main_person AS (
-    SELECT
-        id_person,
-        id_propose,
-        declared_income
-    FROM
-        datalake_velo.propose_person
-    WHERE
-        is_primary_person IS TRUE
-),
 persons_metrics AS (
     SELECT
         pp.id_propose,
@@ -546,7 +375,7 @@ persons_metrics AS (
         AVG(pp.declared_income) AS avg_declared_income,
         SUM(pp.declared_income) AS total_declared_income
     FROM
-        datalake_velo.propose_person AS pp
+        datalake_velo.propose_person_legacy AS pp
     LEFT JOIN
         main_person AS mp
             ON mp.id_propose = pp.id_propose
@@ -559,7 +388,7 @@ SELECT DISTINCT
     pv.id_propose_values AS id_propose_values,
     p.id_quintocred_company AS id_broker,
     h.id_house * -1 AS id_house,
-    p.realtor AS id_agent,
+    p.realtor * -1 AS id_agent,
     pc.id_company AS id_propose_company,
     mc.id_primary_person * -1 AS id_primary_person,
     jk1.id_junk AS id_origin,
@@ -643,5 +472,8 @@ LEFT JOIN
 LEFT JOIN
     old_system_dates AS old
         ON old.id_propose = p.id
+LEFT JOIN
+    persons_metrics AS pm
+        ON pm.id_propose = p.id
 WHERE
     p.id NOT IN (SELECT id FROM datalake_rental_guarantee_platform_clean.propose)
