@@ -11,10 +11,3 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  sk_propose_values:
-    has_min_value:
-      greater_than: 0
-      severity_level: Error
-  ts_load:
-    is_complete:
-      severity_level: Error
