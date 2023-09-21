@@ -727,12 +727,7 @@ bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
 bietlejuice.dw_sale_visits:
-  - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.ebdb:load-clean-real-estate-agent-rating
-  - bietlejuice.enrich_offer:load-enrich-sale-offer
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
-  - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
-  - bietlejuice.insider:load-clean-review
+  - bietlejuice.enrich_sale_visit:load-enrich-sale-visit
 bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
 bietlejuice.dw_sauron:
