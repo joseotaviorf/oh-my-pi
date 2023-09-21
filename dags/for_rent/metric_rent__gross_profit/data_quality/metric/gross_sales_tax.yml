@@ -1,8 +1,0 @@
----
-table_name: metric_rent.gross_sales_tax
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  cost_center_code:
-    is_complete:
-  accrual_year_month:
-    is_complete:

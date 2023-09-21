@@ -64,3 +64,9 @@ column_level_validations:
   net_revenue_pre_taxes:
     has_min_value:
       greater_than: 0
+  sales_tax:
+    has_min_value:
+      greater_than: 0
+  net_revenue:
+    has_min_value:
+      greater_than: 0

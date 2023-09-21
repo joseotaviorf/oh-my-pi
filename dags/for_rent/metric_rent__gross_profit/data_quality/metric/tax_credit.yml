@@ -1,9 +1,0 @@
----
-table_name: metric_rent.tax_credit
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  accrual_year_month:
-    is_complete:
-  tax_credit:
-    has_min_value:
-      greater_than: 0

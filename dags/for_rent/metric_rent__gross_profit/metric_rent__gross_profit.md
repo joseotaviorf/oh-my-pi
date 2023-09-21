@@ -13,6 +13,5 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output tables in the metric layer:
 
-- `gross_sales_tax`
 - `revenue_metrics`
-- `tax_credit`
+

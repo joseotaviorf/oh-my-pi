@@ -230,3 +230,25 @@ columns:
       hierarchy: User analysis
       approved_by: camila.simoes@quintoandar.com.br
       link_to_metric: ''
+  sales_tax:
+    description: Sales tax discount
+    metric:
+        name: Sales Tax
+        description: Sales tax = Gross Sales Tax - Tax Credit (considers only brazilian listings)
+        acronym: ST
+        is_additive: True
+        business_stage: Other
+        hierarchy: User analysis
+        approved_by: camila.simoes@quintoandar.com.br
+        link_to_metric: ''
+  net_revenue:
+    description: KPI composed of gross revenue and discounts (agents commission and sales tax)
+    metric:
+        name: Net Revenue
+        description:  Net Revenue = Gross Revenue - Revenue Share- Sales Tax (considers only brazilian listings)
+        acronym: NR
+        is_additive: True
+        business_stage: Other
+        hierarchy: User analysis
+        approved_by: camila.simoes@quintoandar.com.br
+        link_to_metric: ''
