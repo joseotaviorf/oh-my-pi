@@ -537,7 +537,7 @@ business_rules AS (
         COALESCE(ds.id_buyer,ds.ohc_id_buyer) AS id_buyer,
         COALESCE(ds.id_house,ds.ohc_id_house) AS id_house,
         dr.id_owner AS id_owner,
-        dr.id_region AS id_region,
+        COALESCE(dr.id_region, h.id_region) AS id_region,
         CASE
             WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                 THEN ds.vo_id_user_agent

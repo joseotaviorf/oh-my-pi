@@ -5,9 +5,9 @@ SELECT
   	eso.id_buyer AS sk_buyer,
   	eso.id_owner AS sk_owner,
 	COALESCE(eso.id_business_unit, -1) AS sk_business_unit,
-	COALESCE(cs_supply.sk_company, -1) AS sk_company_supply,
-	COALESCE(cs_demand.sk_company, -1) AS sk_company_demand,
-	COALESCE(h.id_region,-1) AS sk_region,
+	COALESCE(eso.sk_company_supply, -1) AS sk_company_supply,
+	COALESCE(eso.sk_company_demand, -1) AS sk_company_demand,
+	COALESCE(eso.id_region,-1) AS sk_region,
   	COALESCE(eso.id_booking,-1) AS sk_booking,
   	COALESCE(eso.id_agent,-1) AS sk_agent,
 	COALESCE(eso.id_user_agent, -1) AS sk_user_agent,
@@ -52,26 +52,3 @@ SELECT
 	NOW() AS ts_load
 FROM
     datalake_offer.sale_offer AS eso
-LEFT JOIN
-    datalake_ebdb_clean.house AS h
-        ON eso.id_house = h.id
-LEFT JOIN
-    datalake_rede_company.company_sks AS cs_demand
-        ON (eso.id_company_demand IS NOT NULL
-        AND eso.id_company_demand = cs_demand.id_hubspot)
-        OR (eso.id_company_demand IS NULL
-        AND eso.partner_3p_demand = cs_demand.extracted_3p_tag)
-LEFT JOIN
-    datalake_rede_company.company_sks AS cs_supply
-    ON (
-      eso.uuid_company_supply IS NOT NULL
-      AND eso.uuid_company_supply = cs_supply.uuid_company
-    ) OR (
-      eso.uuid_company_supply IS NULL
-      AND eso.id_company_supply IS NOT NULL
-      AND eso.id_company_supply = cs_supply.id_hubspot
-    ) OR (
-      eso.uuid_company_supply IS NULL
-      AND eso.id_company_supply IS NULL
-      AND eso.partner_3p_supply = cs_supply.extracted_3p_tag
-    )

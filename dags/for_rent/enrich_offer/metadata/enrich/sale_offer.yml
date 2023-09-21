@@ -35,6 +35,7 @@ columns:
     lineage:
       - datalake_firestore.sale_offer.id_region
       - datalake_gsheets.sale_hub_offer.id_region
+      - datalake_ebdb_listing.house.id_region
     description: Identification key of the region where the house in question is located.
   id_agent:
     lineage:

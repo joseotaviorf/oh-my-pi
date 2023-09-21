@@ -32,15 +32,15 @@ columns:
     description: ID of the business unit.
   sk_company_supply:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+    - datalake_offer.sale_offer.sk_company_supply
     description: Surrogate Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
   sk_company_demand:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+    - datalake_offer.sale_offer.sk_company_demand
     description: Surrogate Key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company.
   sk_region:
     lineage:
-    - datalake_ebdb_clean.house.id_region
+    - datalake_offer.sale_offer.id_region
     description: ID of house region
   sk_booking:
     lineage:
