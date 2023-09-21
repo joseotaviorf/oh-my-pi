@@ -84,7 +84,7 @@ datalake_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.REVERSE,
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
-    is_incremental=True,
+    is_incremental=False,
 )
 
 
