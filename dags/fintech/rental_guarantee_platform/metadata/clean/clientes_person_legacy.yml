@@ -1,0 +1,57 @@
+---
+database_name: datalake_velo_clean
+table_name: clientes_person_legacy
+domain: fintech
+owner: data-ae-fintech@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.id
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.userupdate
+  name:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.name
+  document:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.document
+  email:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.email
+  mother:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.mother
+  phone:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.phone
+  rental:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.rental
+  is_foreigner:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.estrangeiro
+  is_active:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.active
+  dt_birth:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.birth
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.dateupdate
+  year:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.year
+  month:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.month
+  day:
+    lineage:
+      - datalake_velo_raw.clientes_person_legacy.day

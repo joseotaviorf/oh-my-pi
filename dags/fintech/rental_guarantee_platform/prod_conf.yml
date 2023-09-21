@@ -241,4 +241,22 @@ tables:
   - table_name: fiancavelo_proposehistory_legacy
     date_filter_column: dateupdate
     extraction_type: incremental
+  - table_name: fiancavelo_proposecompany_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
+  - table_name: fiancavelo_fianca_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
+  - table_name: fiancavelo_object_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
+  - table_name: fiancavelo_property_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
+  - table_name: fiancavelo_proposeperson_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
+  - table_name: clientes_person_legacy
+    date_filter_column: dateupdate
+    extraction_type: incremental
 partition_cols: ["year", "month", "day"]

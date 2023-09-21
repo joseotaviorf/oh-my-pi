@@ -6,11 +6,13 @@ owner: ae-fintech@quintoandar.com.br
 columns:
   sk_house:
     lineage:
-    - datalake_velo.house.id_house
+      - datalake_velo.house.id_house
+      - datalake_velo.house_legacy.id_house
     description: ID house
   type:
     lineage:
-    - datalake_velo.house.type
+      - datalake_velo.house.type
+      - datalake_velo.house_legacy.type
     description: Property category type
     categories:
       Apartamento: apartament
@@ -24,37 +26,46 @@ columns:
     description: Property address street
     lineage:
       - datalake_velo.house.street
+      - datalake_velo.house_legacy.street
   number:
     description: Property address number
     lineage:
       - datalake_velo.house.number
+      - datalake_velo.house_legacy.number
   complement:
     description: Property address complement
     lineage:
       - datalake_velo.house.complement
+      - datalake_velo.house_legacy.complement
   neighborhood:
     description: Property address neighborhood
     lineage:
       - datalake_velo.house.neighborhood
+      - datalake_velo.house_legacy.neighborhood
   city:
     lineage:
-    - datalake_velo.house.city
+      - datalake_velo.house.city
+      - datalake_velo.house_legacy.city
     description: Property city
   state:
     lineage:
-    - datalake_velo.house.state
+      - datalake_velo.house.state
+      - datalake_velo.house_legacy.state
     description: Property state
   country_code:
     lineage:
-    - datalake_velo.house.country_code
+      - datalake_velo.house.country_code
+      - datalake_velo.house_legacy.country_code
     description: Property country
   zipcode:
     lineage:
-    - datalake_velo.house.zipcode
+      - datalake_velo.house.zipcode
+      - datalake_velo.house_legacy.zipcode
     description: Property zipcode
   is_legacy:
     lineage:
-    - datalake_velo.house.is_legacy
+      - datalake_velo.house.is_legacy
+      - datalake_velo.house_legacy.is_legacy
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_load:
     description: Load timestamp

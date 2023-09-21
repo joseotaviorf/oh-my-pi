@@ -1,13 +1,13 @@
 database_name: datalake_velo
-table_name: propose
+table_name: propose_legacy
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: "Table containing Velo's proposes and contracts"
+description: "Table containing Velo's 2.0 not migrated proposes and contracts"
 columns:
   id_propose:
     description: Propose's identification number (ID)
     lineage:
-      - datalake_rental_guarantee_platform_clean.propose.id
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.id
   id_propose_values:
     description: Propose values' identification number (ID). This key connects to the table datalake_velo.propose_values
     lineage:
@@ -17,23 +17,23 @@ columns:
   id_broker:
     description: Broker's identification number (ID). This key connects to the table datalake_velo.broker
     lineage:
-      - datalake_rental_guarantee_platform_clean.propose.id_real_estate
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.id_quintocred_company
   id_house:
     description: House's identification number (ID). This key connects to the table datalake_velo.house
     lineage:
-      - datalake_rental_guarantee_platform_clean.property_propose.id
+      - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.id
   id_agent:
     description: Agent's identification number (ID). This key connects to the table datalake_velo.user
     lineage:
-      - datalake_rental_guarantee_platform_clean.user_account.id
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.realtor
   id_propose_company:
     description: Company's identification number (ID). This key connects to the table datalake_velo.propose_company
     lineage:
-      - datalake_rental_guarantee_platform_clean.propose.id_tenant_company
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposecompany_legacy.id_company
   id_primary_person:
     description: Primary person's identification number (ID). This key connects to the table datalake_velo.propose_person considering only propose's primary person
     lineage:
-      - datalake_rental_guarantee_platform_clean.propose_person.id_person
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy.id_person
   id_origin:
     description: Origin's identification number (ID). It indicates if the the propose was made by a person or by a business and this key connects to the table datalake_velo.junk
     lineage:
@@ -96,23 +96,23 @@ columns:
     description: If the propose's comes from 3P flow
   dt_last_payment:
     lineage:
-      - datalake_velo.payment.dt_paid
+      - datalake_velo.payment_legacy.dt_paid
     description: Propose's last payment date
   dt_contract_started:
     description: Date of when status of the contract started
     lineage:
-      - datalake_velo_clean.fiancavelo_fianca.dt_begin
+      - datalake_rental_guarantee_platform_clean.fiancavelo_fianca_legacy.dt_begin
       - datalake_rental_guarantee_platform_clean.contract.ts_began
   dt_ended:
     description: Date when the broker opened a ticket to end the propose/contract
     lineage:
-      - datalake_rental_guarantee_platform_clean.contract.ts_ended
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.fiancavelo_fianca_legacy.dt_ended
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory.ts_updated
   dt_analyst_annulment_input:
     description: Date when the information of propose/contract ended was entered into the system
     lineage:
-      - datalake_rental_guarantee_platform_clean.contract.ts_ended
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.fiancavelo_fianca_legacy.dt_ended
+      - datalake_rental_guarantee_platform_clean.fiancavelo_fianca_legacy.ts_updated
   ts_propose_started:
     description: Timestamp of when the propose has started
     lineage:
@@ -122,49 +122,39 @@ columns:
     description: Timestamp of when the propose has started waiting for new docs
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_evaluation_started:
     description: Timestamp of when the propose's evaluation has started
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_rejected:
     description: Timestamp of when the propose has been rejected
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_sign_started:
     description: Timestamp of when the propose has opened to be sign
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_paid:
     description: Timestamp of when the propose has been paid (to turn into a contract)
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_signed:
     description: Timestamp of when the propose has been finished signing (to turn into a contract)
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_activation:
     description: Timestamp of when the propose has been activated
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_secured:
     description: Timestamp of when the propose has been secured
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_activation_analysis:
     description: Timestamp of when the propose had been activated, but was still in analysis
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
   ts_secure_pending:
     description: Timestamp of when the propose has started waiting to be secured
     lineage:
-      - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated

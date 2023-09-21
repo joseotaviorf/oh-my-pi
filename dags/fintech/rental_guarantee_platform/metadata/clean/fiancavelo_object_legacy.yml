@@ -1,0 +1,45 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_object_legacy
+domain: fintech
+owner: data-ae-fintech@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.id
+  id_propose:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.propose
+  id_object_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.objecttype
+  id_property:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.property
+  description:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.description
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.userupdate
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.dateupdate
+  year:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.year
+  month:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.month
+  day:
+    lineage:
+      - datalake_velo_raw.fiancavelo_object_legacy.day

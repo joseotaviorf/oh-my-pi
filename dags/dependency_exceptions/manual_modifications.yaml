@@ -682,9 +682,14 @@ bietlejuice.enrich_unified_listing_flow:
     - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_velo:
   remove:
-    - bietlejuice.velo:load-clean-fiancavelo-fianca
-    - bietlejuice.velo:load-clean-fiancavelo-proposecompany
     - bietlejuice.velo:load-clean-fiancavelo-occurrence
+  add:
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposecompany-legacy
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-fianca-legacy
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-object-legacy
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-property-legacy
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposeperson-legacy
+    - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy
 bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region

@@ -210,6 +210,14 @@ WITH old_system_dates AS (
         propose_secure_pending_date AS spd
             ON spd.id_propose = p.id
 ),
+propose_company AS (
+    SELECT
+        id_propose,
+        id_company,
+        ROW_NUMBER() OVER(PARTITION BY id_propose ORDER BY ts_updated DESC) AS rn
+    FROM
+        datalake_rental_guarantee_platform_clean.fiancavelo_proposecompany_legacy
+    ),
 propose_canceled_date AS (
     SELECT
         id_propose,
@@ -413,6 +421,111 @@ prop_values AS (
         prop_values_structure AS pv
             ON p.id = pv.id_propose
 ),
+-- cte to get propose_values from propose_legacy proposes
+old_prop_values AS (
+    WITH old_duplicated_company_plan AS (
+        SELECT
+            pl.id AS id_plan,
+            cp.id_company,
+            COUNT(*) AS count_company_plan
+        FROM
+            datalake_rental_guarantee_platform_clean.plan AS pl
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.company_plan AS cp
+                ON pl.id = cp.id_plan
+        GROUP BY 1, 2
+    )
+    SELECT
+        p.id AS id_propose,
+        CONCAT(p.id, COALESCE(cp.id, ''), pl.id) AS id_propose_values,
+        COALESCE((pv.rent_amount + pv.condo_amount + pv.light_amount + pv.iptu_amount + pv.other_amount)*pl.pricing,0) AS monthly_guarantee
+    FROM
+        datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS p
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.plan AS pl
+            ON p.id_plan = pl.id_legacy
+    LEFT JOIN
+        old_duplicated_company_plan AS odcp
+            ON pl.id = odcp.id_plan
+            AND p.id_quintocred_company = odcp.id_company
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.company_plan AS cp
+            ON p.id_quintocred_company = cp.id_company
+            AND pl.id = cp.id_plan
+            AND odcp.count_company_plan = 1
+    LEFT JOIN
+        prop_values_structure AS pv
+            ON p.id = pv.id_propose
+),
+    old_house AS (
+    SELECT
+        o.id_propose AS id_propose,
+        py.id AS id_house,
+        ROW_NUMBER() OVER (PARTITION BY o.id_propose ORDER BY o.ts_updated DESC, o.id_property DESC) AS rn -- House update order, there was a bug in product that created a new id for every update. To solve, order by the latest update date.
+    FROM
+        datalake_rental_guarantee_platform_clean.fiancavelo_object_legacy AS o
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy AS py
+        ON py.id = o.id_property
+            AND py.is_active
+    WHERE
+        o.is_active
+    ),
+    old_main_client AS (
+    SELECT
+        pp.id_propose,
+        pp.id_person AS id_primary_person,
+        prs.declared_income,
+        ROW_NUMBER() OVER(PARTITION BY pp.id_propose ORDER BY pp.ts_updated DESC) AS rn
+        FROM
+        datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy AS pp
+        LEFT JOIN
+            person_score AS prs
+            ON prs.id_person = pp.id_person
+            AND prs.rn = 1
+        WHERE
+        pp.is_active
+            AND pp.id_type = 1 -- bringing only main IQ
+    ),
+    old_persons_metrics AS (
+    SELECT
+        pp.id_propose,
+        MAX(mc.declared_income) / SUM(prs.declared_income) AS percentage_income_from_primary_person,
+        COUNT(cp.id) AS count_persons_included,
+        AVG(prs.score_value) AS avg_serasa_score,
+        AVG(prs.risk) AS avg_risk_score,
+        AVG(prs.declared_income) AS avg_declared_income,
+        SUM(prs.declared_income) AS total_declared_income
+    FROM
+        datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy AS pp
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.clientes_person_legacy AS cp
+        ON cp.id = pp.id_person
+    LEFT JOIN
+        person_score AS prs
+        ON prs.id_person = cp.id
+            AND prs.rn = 1
+    LEFT JOIN
+        main_client AS mc
+        ON mc.id_propose = pp.id_propose
+        AND mc.rn = 1
+    GROUP BY 1
+    ),
+old_payments_metrics AS (
+    SELECT
+        id_propose,
+        SUM(IF(dt_paid IS NOT NULL, due_amount, 0)) AS total_paid_amount,
+        SUM(due_amount) AS total_expected_amount,
+        SUM(IF(dt_paid IS NULL, due_amount, 0)) AS total_due_amount,
+        -- CAST(NULL AS DOUBLE) AS lmi,
+        COUNT(id_payment) AS total_payments,
+        SUM(IF(dt_paid IS NOT NULL, 1, 0)) AS total_payments_paid,
+        SUM(IF(dt_paid IS NULL AND dt_due < current_date, 1, 0)) AS total_payments_expired,
+        MAX(dt_paid) AS dt_last_payment
+    FROM
+        datalake_velo.payment_legacy
+    GROUP BY 1
+),
 main_person AS (
     SELECT
         id_person,
@@ -438,167 +551,85 @@ persons_metrics AS (
         main_person AS mp
             ON mp.id_propose = pp.id_propose
     GROUP BY 1
-),
-payments_metrics AS (
-    SELECT
-        id_propose,
-        SUM(IF(dt_paid IS NOT NULL, due_amount, 0)) AS total_paid_amount,
-        SUM(due_amount) AS total_expected_amount,
-        SUM(IF(dt_paid IS NULL, due_amount, 0)) AS total_due_amount,
-        -- CAST(NULL AS DOUBLE) AS lmi,
-        COUNT(id_payment) AS total_payments,
-        SUM(IF(dt_paid IS NOT NULL, 1, 0)) AS total_payments_paid,
-        SUM(IF(dt_paid IS NULL AND dt_due < current_date, 1, 0)) AS total_payments_expired,
-        MAX(dt_paid) AS dt_last_payment
-    FROM
-        datalake_velo.payment
-    GROUP BY 1
-),
-occurrence_metrics AS (
-    SELECT
-        id_propose,
-        SUM(IF(paid_amount IS NOT NULL, paid_amount, 0)) AS total_occurrences_paid_amount,
-        SUM(due_amount) AS total_occurrences_due_amount,
-        COUNT(id_occurrence) AS total_occurrences,
-        COUNT(ts_paid) AS occurrences_solved
-    FROM
-        datalake_velo.occurrence AS o
-    GROUP BY 1
-),
-property_propose AS (
-    SELECT
-        id_propose,
-        id
-    FROM
-        datalake_rental_guarantee_platform_clean.property_propose
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_propose ORDER BY ts_updated DESC) = 1
-),
-3p_proposes AS (
-    SELECT
-        pr.id AS id_propose
-    FROM
-        datalake_rental_guarantee_platform_clean.propose AS pr
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.company_plan AS cp
-            ON pr.id_company_plan = cp.id
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.plan AS pl
-            ON cp.id_plan = pl.id
-    WHERE
-        pl.plan_name LIKE '%3P%'
 )
 
+--query containing proposes from legacy table
 SELECT DISTINCT
     p.id AS id_propose,
     pv.id_propose_values AS id_propose_values,
-    p.id_real_estate AS id_broker,
-    pp.id AS id_house,
-    ua.id AS id_agent,
-    p.id_tenant_company AS id_propose_company,
-    mp.id_person AS id_primary_person,
+    p.id_quintocred_company AS id_broker,
+    h.id_house * -1 AS id_house,
+    p.realtor AS id_agent,
+    pc.id_company AS id_propose_company,
+    mc.id_primary_person * -1 AS id_primary_person,
     jk1.id_junk AS id_origin,
     jk2.id_junk AS id_propose_status,
-    jk3.id_junk AS id_guarantee_status,
+    CAST(NULL AS INT) AS id_guarantee_status,
     jk4.id_junk AS id_propose_type,
     pm.count_persons_included,
-    pm.percentage_income_from_primary_person,
-    pm.avg_serasa_score,
-    pm.avg_risk_score,
-    pm.avg_declared_income,
-    pm.total_declared_income,
-    CAST(pv.monthly_guarantee / pm.total_declared_income AS DECIMAL(32,2)) AS dti,
+    CAST(NULL AS DECIMAL(38,6)) AS percentage_income_from_primary_person,
+    CAST(NULL AS DECIMAL(14,4)) AS avg_serasa_score,
+    CAST(NULL AS DOUBLE) AS avg_risk_score,
+    CAST(NULL AS DECIMAL(38,22)) AS avg_declared_income,
+    CAST(NULL AS DECIMAL(38,18)) total_declared_income,
+    CAST(NULL AS DECIMAL(32,2)) AS dti,
     pym.total_paid_amount,
     pym.total_expected_amount,
     pym.total_due_amount,
-    om.total_occurrences_due_amount,
-    om.total_occurrences_paid_amount,
+    CAST(NULL AS DECIMAL(20,2)) AS total_occurrences_due_amount,
+    CAST(NULL AS DECIMAL(22,2)) AS total_occurrences_paid_amount,
     pym.total_payments,
     pym.total_payments_paid,
     pym.total_payments_expired,
-    om.total_occurrences,
-    om.occurrences_solved,
-    c.id IS NOT NULL AS is_contract,
-    IFNULL(DATEDIFF(COALESCE(DATE(pcd.ts_ended), c.ts_done), DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
-    p.id < 5000000 AS is_legacy,
-    IF(3p.id_propose IS NULL, FALSE, TRUE) AS is_3p,
+    CAST(NULL AS BIGINT) AS total_occurrences,
+    CAST(NULL AS BIGINT) AS occurrences_solved,
+    old.id_contract IS NOT NULL AS is_contract,
+    IFNULL(DATEDIFF(old.dt_ended, DATE(old.dt_contract_started)) <= 10, False) AS is_grace_period_cancelled,
+    TRUE AS is_legacy,
+    FALSE AS is_3p,
     pym.dt_last_payment,
-    COALESCE(DATE(c.ts_began), old.dt_contract_started) AS dt_contract_started,
-    COALESCE(COALESCE(c.ts_done, DATE(pcd.ts_ended)), old.dt_ended) AS dt_ended,
-    COALESCE(COALESCE(DATE(pcd.ts_ended), c.ts_done), old.dt_analyst_annulment_input) AS dt_analyst_annulment_input,
+    old.dt_contract_started AS dt_contract_started,
+    old.dt_ended AS dt_ended,
+    old.dt_analyst_annulment_input AS dt_analyst_annulment_input,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
-    IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
-    IF(p.id < 5000000, old.ts_evaluation_started, esd.ts_evaluation_started) AS ts_evaluation_started,
-    IF(p.id < 5000000, old.ts_rejected, rd.ts_rejected) AS ts_rejected,
-    IF(p.id < 5000000, old.ts_sign_started, ssd.ts_sign_started) AS ts_sign_started,
-    IF(p.id < 5000000, old.ts_signed, psd.ts_signed) AS ts_signed,
-    IF(p.id < 5000000, old.ts_paid, pd.ts_paid) AS ts_paid,
-    IF(p.id < 5000000, old.ts_activation, ad.ts_activation) AS ts_activation,
-    IF(p.id < 5000000, old.ts_secured, sed.ts_secured) AS ts_secured,
-    IF(p.id < 5000000, old.ts_activation_analysis, aad.ts_activation_analysis) AS ts_activation_analysis,
-    IF(p.id < 5000000, old.ts_secure_pending, spd.ts_secure_pending) AS ts_secure_pending
+    old.ts_waiting_new_docs AS ts_waiting_new_docs,
+    old.ts_evaluation_started AS ts_evaluation_started,
+    old.ts_rejected AS ts_rejected,
+    old.ts_sign_started AS ts_sign_started,
+    old.ts_signed AS ts_signed,
+    old.ts_paid AS ts_paid,
+    old.ts_activation AS ts_activation,
+    old.ts_secured AS ts_secured,
+    old.ts_activation_analysis AS ts_activation_analysis,
+    old.ts_secure_pending AS ts_secure_pending
 FROM
-    datalake_rental_guarantee_platform_clean.propose AS p
-LEFT JOIN
-    property_propose AS pp
-        ON p.id = pp.id_propose
-LEFT JOIN
-    datalake_rental_guarantee_platform_clean.contract AS c
-        ON p.id = c.id_propose
+    datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS p
 LEFT JOIN
     datalake_rental_guarantee_platform_clean.propose_status AS ps
-        ON p.id_propose_status = ps.id
+        ON p.id_quintocred_status = ps.id
 LEFT JOIN
-    propose_canceled_date AS pcd
-        ON pcd.id_propose = p.id
+    old_house AS h
+        ON h.id_propose = p.id
+        AND h.rn = 1 -- Gets only the latest updated id
 LEFT JOIN
-    propose_waiting_new_docs_date AS wndd
-        ON wndd.id_propose = p.id
+    old_main_client AS mc
+        ON mc.id_propose = p.id
+        AND mc.rn = 1 -- Gets only the latest updated id
 LEFT JOIN
-    propose_evaluation_started_date AS esd
-        ON esd.id_propose = p.id
+    old_payments_metrics AS pym
+        ON pym.id_propose = p.id
 LEFT JOIN
-    propose_rejected_date AS rd
-        ON rd.id_propose = p.id
-LEFT JOIN
-    propose_sign_started_date AS ssd
-        ON ssd.id_propose = p.id
-LEFT JOIN
-    propose_paid_date AS pd
-        ON pd.id_propose = p.id
-LEFT JOIN
-    propose_signed_date AS psd
-        ON psd.id_propose = p.id
-LEFT JOIN
-    propose_activation_date AS ad
-        ON ad.id_propose = p.id
-LEFT JOIN
-    propose_secured_date AS sed
-        ON sed.id_propose = p.id
-LEFT JOIN
-    propose_activation_analysis_date AS aad
-        ON aad.id_propose = p.id
-LEFT JOIN
-    propose_secure_pending_date AS spd
-        ON spd.id_propose = p.id
-LEFT JOIN
-    main_person AS mp
-        ON p.id = mp.id_propose
+    propose_company AS pc
+        ON pc.id_propose = p.id
+        AND pc.rn = 1
 LEFT JOIN
     datalake_velo.junk AS jk1
-        ON jk1.id_lvl_1 = IF(p.id_tenant_company IS NOT NULL, 1, 2)
+        ON jk1.id_lvl_1 = IF(pc.id_propose IS NOT NULL, 1, 2)
         AND jk1.desc_master_type = 'Origin'
 LEFT JOIN
     datalake_velo.junk AS jk2
         ON jk2.desc_lvl_1 = ps.name
         AND jk2.desc_master_type = 'Propose Status'
-LEFT JOIN
-    datalake_rental_guarantee_platform_clean.contract_status AS cts
-    ON cts.id = c.id_status
-LEFT JOIN
-    datalake_velo.junk AS jk3
-        ON jk3.desc_lvl_1 = cts.name
-        AND jk3.desc_master_type = 'Guarantee Status'
 LEFT JOIN
     datalake_rental_guarantee_platform_clean.bussines_type AS pbt
     ON pbt.id = p.id_business_type
@@ -607,24 +638,10 @@ LEFT JOIN
         ON jk4.desc_lvl_1 = pbt.name
         AND jk4.desc_master_type = 'Propose Type'
 LEFT JOIN
-    datalake_rental_guarantee_platform_clean.user_account AS ua
-        ON ua.uuid_person = p.realtor
-LEFT JOIN
-    prop_values AS pv
+    old_prop_values AS pv
         ON pv.id_propose = p.id
-lEFT JOIN
-    persons_metrics AS pm
-        ON pm.id_propose = p.id
-lEFT JOIN
-    payments_metrics AS pym
-        ON pym.id_propose = p.id
-lEFT JOIN
-    occurrence_metrics AS om
-        ON om.id_propose = p.id
-lEFT JOIN
-    3p_proposes AS 3p
-        ON 3p.id_propose = p.id
 LEFT JOIN
     old_system_dates AS old
         ON old.id_propose = p.id
-        AND p.id < 5000000
+WHERE
+    p.id NOT IN (SELECT id FROM datalake_rental_guarantee_platform_clean.propose)

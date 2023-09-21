@@ -6,59 +6,73 @@ owner: ae-fintech@quintoandar.com.br
 columns:
   sk_person:
     lineage:
-    - datalake_velo.propose_person.id_person
+      - datalake_velo.propose_person.id_person
+      - datalake_velo.propose_person_legacy.id_person
     description: Person's identification number (ID)
   name:
     lineage:
-    - datalake_velo.propose_person.name
+      - datalake_velo.propose_person.name
+      - datalake_velo.propose_person_legacy.name
     description: Person's name
   email:
     lineage:
-    - datalake_velo.propose_person.email
+      - datalake_velo.propose_person.email
+      - datalake_velo.propose_person_legacy.email
     description: Person's email
   phone:
     lineage:
-    - datalake_velo.propose_person.phone
+      - datalake_velo.propose_person.phone
+      - datalake_velo.propose_person_legacy.phone
     description: Person's phone
   bureau_name:
     lineage:
-    - datalake_velo.propose_person.bureau_name
+      - datalake_velo.propose_person.bureau_name
+      - datalake_velo.propose_person_legacy.bureau_name
     description: Name of the bureau that analysed the person score
   document:
     lineage:
-    - datalake_velo.propose_person.document
+      - datalake_velo.propose_person.document
+      - datalake_velo.propose_person_legacy.document
     description: Person's document number (CPF)
   serasa_score:
     lineage:
-    - datalake_velo.propose_person.serasa_score
+      - datalake_velo.propose_person.serasa_score
+      - datalake_velo.propose_person_legacy.serasa_score
     description: Person's Serasa Score in the moment of propose's credit score evaluation
   risk_score:
     lineage:
-    - datalake_velo.propose_person.risk_score
+      - datalake_velo.propose_person.risk_score
+      - datalake_velo.propose_person_legacy.risk_score
     description: Person's risk score cluster ID
   risk_classification:
     lineage:
-    - datalake_velo.propose_person.risk_classification
+      - datalake_velo.propose_person.risk_classification
+      - datalake_velo.propose_person_legacy.risk_classification
     description: Person's risk score cluster description
   score_personal_value:
     lineage:
-    - datalake_velo.propose_person.score_personal_value
+      - datalake_velo.propose_person.score_personal_value
+      - datalake_velo.propose_person_legacy.score_personal_value
     description: Person's bureau score in the moment of propose's credit score evaluation
   declared_income:
     lineage:
-    - datalake_velo.propose_person.declared_income
+      - datalake_velo.propose_person.declared_income
+      - datalake_velo.propose_person_legacy.declared_income
     description: Person's declared income
   requested_income:
     lineage:
-    - datalake_velo.propose_person.requested_income
+      - datalake_velo.propose_person.requested_income
+      - datalake_velo.propose_person_legacy.requested_income
     description: Person's requested income
   dt_birth:
     lineage:
-    - datalake_velo.propose_person.dt_birth
+      - datalake_velo.propose_person.dt_birth
+      - datalake_velo.propose_person_legacy.dt_birth
     description: Person's date of birth
   is_legacy:
     lineage:
-    - datalake_velo.propose_person.is_legacy
+      - datalake_velo.propose_person.is_legacy
+      - datalake_velo.propose_person_legacy.is_legacy
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_load:
     description: Moment (timestamp) when the table was last loaded

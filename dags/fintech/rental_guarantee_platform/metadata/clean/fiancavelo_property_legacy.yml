@@ -1,0 +1,63 @@
+---
+database_name: datalake_velo_clean
+table_name: fiancavelo_property_legacy
+domain: fintech
+owner: data-ae-fintech@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.id
+  id_property_type:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.propertytype
+  id_user_insert:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.userinsert
+  id_user_update:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.userupdate
+  neighborhood:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.neighborhood
+  street:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.street
+  number:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.number
+  complement:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.complement
+  zipcode:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.zipcode
+  city:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.city
+  state:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.state
+  country:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.country
+  geolocation:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.geolocation
+  is_active:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.active
+  ts_inserted:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.dateinsert
+  ts_updated:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.dateupdate
+  year:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.year
+  month:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.month
+  day:
+    lineage:
+      - datalake_velo_raw.fiancavelo_property_legacy.day

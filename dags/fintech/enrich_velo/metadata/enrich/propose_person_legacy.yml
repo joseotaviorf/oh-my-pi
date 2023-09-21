@@ -1,0 +1,53 @@
+database_name: datalake_velo
+table_name: propose_person_legacy
+description: Details of persons related to the contract (only 2.0 ids)
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  id_person:
+    description: Person's identification number (ID)
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy.id
+  id_propose:
+    description: Propose identification number (ID)
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy.id_propose
+  name:
+    description: Person's name
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy.name
+  email:
+    description: Person's email
+    lineage:
+      - datalake_rental_guarantee_platform_clean.clientes_person_legacy.email
+  phone:
+    description: Person's phone
+    lineage:
+      - datalake_rental_guarantee_platform_clean.clientes_person_legacy.phone
+  bureau_name:
+    description: Name of the bureau that analysed the person score
+    lineage:
+  document:
+    description: Person's document number (CPF)
+    lineage:
+      - datalake_rental_guarantee_platform_clean.clientes_person_legacy.document
+  serasa_score:
+    description: Person's Serasa Score in the moment of propose's credit score evaluation
+  risk_score:
+    description: Person's risk score cluster ID
+  risk_classification:
+    description: Person's risk score cluster description
+  score_personal_value:
+    description: Person's bureau score in the moment of propose's credit score evaluation
+  declared_income:
+    description: Person's declared income
+  requested_income:
+    description: Person's requested income
+  is_primary_person:
+    description: Flag to indicate if the person is the primary on propose
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+  dt_birth:
+    description: Person's date of birth
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy.dt_birth

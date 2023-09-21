@@ -813,6 +813,7 @@ bietlejuice.dw_user_affiliate:
 bietlejuice.dw_velo:
   - bietlejuice.enrich_velo:load-enrich-broker
   - bietlejuice.enrich_velo:load-enrich-house
+  - bietlejuice.enrich_velo:load-enrich-house-legacy
   - bietlejuice.enrich_velo:load-enrich-junk
   - bietlejuice.enrich_velo:load-enrich-occurrence
   - bietlejuice.enrich_velo:load-enrich-omie-bank-account
@@ -821,7 +822,9 @@ bietlejuice.dw_velo:
   - bietlejuice.enrich_velo:load-enrich-payment-legacy
   - bietlejuice.enrich_velo:load-enrich-propose
   - bietlejuice.enrich_velo:load-enrich-propose-company
+  - bietlejuice.enrich_velo:load-enrich-propose-legacy
   - bietlejuice.enrich_velo:load-enrich-propose-person
+  - bietlejuice.enrich_velo:load-enrich-propose-person-legacy
   - bietlejuice.enrich_velo:load-enrich-propose-values
   - bietlejuice.enrich_velo:load-enrich-transaction-category
   - bietlejuice.enrich_velo:load-enrich-transaction-entries
@@ -2355,6 +2358,7 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-address
   - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment
   - bietlejuice.rental_guarantee_platform:load-clean-bussines-type
+  - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-company
   - bietlejuice.rental_guarantee_platform:load-clean-company-plan
   - bietlejuice.rental_guarantee_platform:load-clean-company-user-account
@@ -2362,8 +2366,13 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-contract-status
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
+  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-fianca-legacy
+  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-object-legacy
+  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-property-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-propose-legacy
+  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposecompany-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposehistory-legacy
+  - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposeperson-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-item-type
   - bietlejuice.rental_guarantee_platform:load-clean-omie-occurrence-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-payment
