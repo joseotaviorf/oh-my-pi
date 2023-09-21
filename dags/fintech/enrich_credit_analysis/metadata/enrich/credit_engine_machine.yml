@@ -1,0 +1,77 @@
+database_name: datalake_credit_analysis
+table_name: credit_engine_machine
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "Enrich table with credit engine machine analysis state data. The analysis machine is composed by state groups, which are composed by analysis sates. The analysis state is the smallest unit of the analysis machine."
+columns:
+  id_machine:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.id
+    description: Incremental column identifier of the machine"
+  id_analysis_request:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.id_analysis_request
+    description: "Foreign key which associates the analysis machine to an analysis request. It is the analysis request ID"
+  id_subject:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.id_subject
+    description: "Subject ID. Ex: if the subject type is CHECKLIST, the subject id would be the id of the checklist"
+  id_state_group:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state_group.id
+    description: "State group ID"
+  subject_type:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.subject_type
+    description: "This column represents the type of the subject the machine is related to. Ex: CHECKLIST"
+  machine_status:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.status
+    description: "Machine status"
+    categories:
+      CREATED: "When the machine is created"
+      FINISHED: "When the machine analysis is finished"
+      RETRY: "When the machine analysis is going to be retried for any reason"
+  machine_type:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.type
+    description: "This column identifies the machine type, such as TENANT_RENT_DOCUMENTATION_COMPLETED_ANALYSIS for tenant documentation analysis "
+  is_current_machine:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.is_current_machine
+    description: "Identifies if the machine is the current one"
+  group_type:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state_group.group_type
+    description: "This column represents the type of the group processed by the machine"
+    categories:
+      RULE: "When the group is a rule"
+      POLICY: "When the group is a policy"
+      MACHINE_CONTROL: "When the group is a machine control"
+  group_name:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state_group.group_name
+    description: "This column represents the name of the group processed by the machine. Ex: if the processor group type is RULE, the processor name could be the name of the rule, and if the subject type is POLICY, the name could be the policy name"
+  state_group_result:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state_group.result
+    description: "This column represents the result of the group. Ex: if it is a rule group, if some state from the group is not compliant the result of the group would reflect it"
+  input:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Input used in the analysis state"
+  analysis_state_status:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.status
+    description: "Analysis state status"
+    categories:
+      FINISHED: "When the analysis state has been run with success the status is finished"
+      RETRY: "When the analysis state has been run with error the status is retry"
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state_group.ts_updated
+    description: "Analysis state group updated timestamp"
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.ts_created
+    description: "Analysis machine creation timestamp"

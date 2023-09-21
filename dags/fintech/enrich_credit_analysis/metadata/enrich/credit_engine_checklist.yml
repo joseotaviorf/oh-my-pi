@@ -1,0 +1,118 @@
+database_name: datalake_credit_analysis
+table_name: credit_engine_checklist
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "This table unifies all the data related to the checklist from a credit analysis request processed by the credit engine. The checklist can be filled manually by the analyst or automatically by the credit engine. The checklist is composed by checklist groups, which are composed by checklist items. The checklist item is the smallest unit of the checklist."
+columns:
+  id_checklist:
+    lineage:
+      - datalake_sorting_hat_clean.checklist.id
+    description: "Incremental column identifier of the checklist"
+  id_analysis_request:
+    lineage:
+      - datalake_sorting_hat_clean.checklist.id_analysis_request
+    description: "Foreign key which associates the checklist to an analysis request. It is the analysis request ID"
+  id_checklist_group:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_group.id
+    description: "Checklist group ID"
+  id_checklist_item:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_item.id
+    description: "Checklist item ID"
+  id_input_source:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_item.id_input_source
+    description: "Input source ID. It can be the analyst ID when the cheklist was answered by the analyst (manual input source) or the analysis state ID when the checklist was answered by the credit engine (automatic input source)."
+  id_subject:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_group.id_subject
+    description: "Subject ID. If the subject type is PROPOSAL, the subject id could be the id of the proposal, and if the subject type is TENANT, the subject id could be the document number of the tenant (CPF)"
+  checklist_type:
+    lineage:
+      - datalake_sorting_hat_clean.checklist.type
+    description: "This column identifies the checklist type"
+    categories:
+      TENANT_RENT_DOCUMENTATION_ANALYSIS: "Tenant documentation analysis in the renting process"
+  checklist_decision_type:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_decision.checklist_decision_type
+    description: "This column identifies the type of the checklist decision"
+    categories:
+      MANUAL: "Manual decision"
+      AUTOMATIC: "Automatic decision"
+  checklist_status:
+    lineage:
+      - datalake_sorting_hat_clean.checklist.status
+    description: "This column represents the checklist status"
+    categories:
+      DONE: "When the analyst concludes the analysis"
+      IN_PROGRESS: "When some checklist group is in progress or when the checklist decision is made"
+      TERMINATED: "When the checklist is terminated"
+      PENDING: "When the checklist is created"
+  checklist_group_status:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_group.status
+    description: "This column represents the checklist group status"
+    categories:
+      IN_PROGRESS: "When some checklist item is completed or when a comment is made in the group"
+      COMPLETED: "When all the checklist items from the group are completed"
+      PENDING: "When the checklist group is created"
+  checklist_group_subject_type:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_group.subject_type
+    description: "This column represents the type of the subject that the group is related to"
+    categories:
+      PROPOSAL: "When the subject type is a proposal"
+      PROPOSAL_DECISION: "When the subject type is a proposal decision"
+      TENANT: "When the subject type is a tenant"
+  input_description:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_item.input_description
+    description: "Description of the input"
+  input_type:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_item.input_type
+    description: "It represents the type of the input"
+    categories:
+      MANUAL: "Manual input"
+      AUTOMATIC: "Automatic input"
+  input_value:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_item.input_value
+    description: "This column represents the input given to the check. It is the choice to the given input. Ex: blocklist check could have IN_BLOCKLIST and NOT_IN_BLOCKLIST inputs"
+  checklist_item_type:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_item.type
+    description: "It represents the type of the checklist item. Ex: a checklist item that verifies if a selfie is valid, the type could be SELFIE_VALID."
+  is_current_checklist:
+    lineage:
+      - datalake_sorting_hat_clean.checklist.is_current_checklist
+    description: "This flag is a boolean which identifies if the checklist is the current one"
+  is_checklist_group_compliant:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_group.is_compliant
+    description: "This flag is a boolean which indicates if there is any item from the group that is not compliant."
+  is_checklist_item_compliant:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_item.is_compliant
+    description: "This flag is boolean field which indicates if given the input the item is compliant or not"
+  checklist_decision:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_decision.decision
+    description: "Final checklist decision"
+    categories:
+      APPROVED: "When the checklist is approved"
+      REJECTED: "When the checklist is rejected"
+  ts_checklist_created:
+    lineage:
+      - datalake_sorting_hat_clean.checklist.ts_created
+    description: "Checklist created timestamp"
+  ts_checklist_updated:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_item.ts_updated
+    description: "Checklist updated timestamp"
+  ts_checklist_decision:
+    lineage:
+      - datalake_sorting_hat_clean.checklist_decision.ts_checklist_decision
+    description: "Checklist decision timestamp"

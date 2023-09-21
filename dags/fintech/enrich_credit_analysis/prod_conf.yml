@@ -3,6 +3,9 @@ tables:
   - table_name: credit_analysis
   - table_name: credit_analysis_proposals
   - table_name: early_credit_analysis
+  - table_name: credit_engine_analysis_request
+  - table_name: credit_engine_machine
+  - table_name: credit_engine_checklist
 
 inner_dependencies:
   credit_analysis:

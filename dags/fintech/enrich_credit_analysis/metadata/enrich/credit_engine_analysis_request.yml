@@ -1,0 +1,118 @@
+database_name: datalake_credit_analysis
+table_name: credit_engine_analysis_request
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "This table unifies all the data submitted to the credit engine for analysis. The data is related to an external source, info about this external source is retrieved in order to decide if the request could be approved or rejected. Possible external sources are PROPOSAL for tenant documentation analysis flow or CREDIT_EVALUATION for credit analysis flow."
+columns:
+  id_analysis_request:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request.id
+    description: "Incremental column identifier of the analysis request."
+  id_external:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request.id_external
+    description: "External entity id related to external source. For external source CREDIT_EVALUATION the external id would be credit_evaluation’s id stored in docx, and for external source PROPOSAL the external id would be proposal id stored in main."
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request.id_external
+    description: "Proposal ID. The proposal_id is equal to the external_id when the source is of type PROPOSAL. It is the same ID from Proposal table."
+  id_state_machine:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.id_state_machine
+    description:  "Foreign key to the related state machine id that retrieved the data. Since there will be a machine for each event, this field identifies the flow that collected the info"
+  id_source:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.id_source
+    description: "Entity ID related to the source. Ex: ‘1234’ could be the unico check process id stored in docx."
+  id_credit_analysis:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Credit analysis ID"
+  id_house:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "House ID"
+  id_offer_firestore:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Offer firestore ID. It is the same ID from an offer from Firestore"
+  bypass:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Bypass reason"
+  internal_score:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Internal 5A score"
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Risk score given by the model result plus the credit policy"
+  documentation_policy:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Documentation analysis type"
+    categories:
+      LIGHT_APPROVAL: ""
+      FLEX: ""
+      FULL: ""
+      FULL_CONTROL_GROUP: ""
+  category:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Category information"
+  guarantee_type:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Type of the guarantee"
+    categories:
+      INSURANCE: ""
+      DEPOSIT: ""
+      PRO_GUARANTOR: ""
+      STANDALONE: ""
+      THIRD_PARTY_GUARANTEE: ""
+  package_value:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.attributes
+    description: "Total rent value, which includes the rent fee, IPTU, 5A fees and other fees"
+  analysis_request_result:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request.result
+    description: "Result of the analysis request. It can be null when no automatic or manual result is available"
+    categories:
+      APPROVED: ""
+      REJECTED: ""
+  business_context:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request.business_context
+    description: "Business context of the analysis request"
+  version:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.version
+    description: "Incremental integer identifying the change of version of the analysis request"
+  source_entity:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.source_entity
+    description: "Source entity of the analysis request"
+    categories:
+      PROPOSAL_DOCUMENTATION: ""
+      CONTRACT: ""
+      INVOICE: ""
+      UNICO_CHECK_PROCESS: ""
+      IDWALL_REPORT: ""
+      EMAILAGE_RESULT: ""
+      INTEGRATION_REPORT: ""
+      PROPOSAL: ""
+      OFFER: ""
+      PROPOSAL_TENANT_DOC_STATUS: ""
+      PROPOSAL_CREDIT_ANALYSIS_RESULT: ""
+      GUARANTEE: ""
+      RECENTLY_ANALYZED_PROPOSALS: ""
+  ts_analysis_request_created:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request.ts_created
+    description: "Analysis request created timestamp"
+  ts_analysis_request_updated:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request_data.ts_updated
+    description: "Analysis request updated timestamp"
