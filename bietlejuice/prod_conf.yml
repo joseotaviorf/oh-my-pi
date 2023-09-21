@@ -91,6 +91,7 @@ dags_out_of_pattern:
         "wonka.house_amenities",
         "wonka.house_condo_amenities",
         "wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition",
+        "wonka.searched_house_main",
         "wonka.user_listing_page_viewed_cross_devices",
         "wonka.user_sale_listing_page_viewed_cross_devices",
         "wonka.user_sale_agg_search_filters",

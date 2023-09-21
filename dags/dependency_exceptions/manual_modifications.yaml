@@ -807,3 +807,11 @@ wonka.user_region_listing_page_viewed:
     - bietlejuice.ebdb:load-clean-house
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
     - bietlejuice.amplitude:load-clean-170698-user-merge
+
+wonka.house_rent_search_page_viewed:
+  add:
+    - wonka.searched_house_main:load-searched_house_main
+
+wonka.house_sale_search_page_viewed:
+  add:
+    - wonka.searched_house_main:load-searched_house_main
