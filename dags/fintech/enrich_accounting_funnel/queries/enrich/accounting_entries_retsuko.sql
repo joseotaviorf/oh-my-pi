@@ -151,7 +151,7 @@ SELECT DISTINCT
   ii.closing_mode,
   e.producer,
   i.paid_via,
-  e.bill_item AS entry_type,
+  REPLACE(regexp_extract(e.bill_item, 'entry.bill-item/(.+)', 1), '-', ' ') AS entry_type,
   e.description AS entry_description,
   e.amount AS entry_due_amount,
   i.due_amount AS invoice_due_amount,

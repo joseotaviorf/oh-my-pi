@@ -230,6 +230,10 @@ bietlejuice.dw_tickets:
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent
+bietlejuice.enrich_accounting_funnel:
+  remove:
+    - bietlejuice.sap:load-clean-users
+    - bietlejuice.sap:load-clean-chart-of-accounts
 bietlejuice.enrich_amplitude_lead:
   remove:
     - bietlejuice.amplitude:load-clean-events

@@ -56,9 +56,7 @@ columns:
   account_name:
     description: "Description of the account"
     lineage:
-      - datalake_pas.journal_entry_lines.account
-      - datalake_pas.invoice_lines.account
-      - datalake_pas.incoming_payments_lines.account
+      - datalake_pas_clean.chart_of_accounts
   series:
     description: "Series description"
     lineage:
@@ -92,9 +90,7 @@ columns:
   created_by:
     description: "Name of the user who created the register"
     lineage:
-      - datalake_pas.journal_entries.id_user_sign
-      - datalake_pas.invoices.id_user_sign
-      - datalake_pas.incoming_payments.id_user_sign
+      - datalake_pas_clean.users
   location_profit_code:
     description: "Location profit code"
     lineage:
