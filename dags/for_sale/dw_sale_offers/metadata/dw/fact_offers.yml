@@ -94,6 +94,14 @@ columns:
     lineage:
     - datalake_offer.sale_offer.dt_sale_agreement_signed
     description: Sk date of sale agreement signature
+  sk_seller_fup_date:
+    lineage:
+      - datalake_offer.sale_offer.ts_seller_fup
+    description: Date when the Closing Analyst sent a message to the Seller.
+  sk_buyer_fup_date:
+    lineage:
+      - datalake_offer.sale_offer.ts_buyer_fup
+    description: Date when the Closing Analyst sent a message to the Buyer.
   is_buyer_first_offer:
     lineage:
     - datalake_offer.sale_offer.is_buyer_first_offer
@@ -195,5 +203,13 @@ columns:
     lineage:
     - datalake_offer.sale_offer.dt_sale_agreement_signed
     description: Timestamp of sale agreement signature
+  ts_seller_fup:
+    lineage:
+      - datalake_offer.sale_offer.ts_seller_fup
+    description: Date when the Closing Analyst sent a message to the Seller.
+  ts_buyer_fup:
+    lineage:
+      - datalake_offer.sale_offer.ts_buyer_fup
+    description: Date when the Closing Analyst sent a message to the Buyer.
   ts_load:
     description: 'Timestamp of when the table was last loaded'

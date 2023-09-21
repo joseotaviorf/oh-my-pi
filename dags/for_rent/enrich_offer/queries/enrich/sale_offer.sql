@@ -337,6 +337,8 @@ data_sources AS (
                 THEN 'ID_vendas_' || vo.sk_team_lead
             END AS vo_sk_team_lead,
         vo.sk_user_team_lead AS vo_id_user_team_lead,
+        vo.ts_seller_fup AS vo_ts_seller_fup,
+        vo.ts_buyer_fup AS vo_ts_buyer_fup,
         -- data from monday
         mo.id_offer AS mo_id_offer,
         mo.offer_status AS monday_offer_status,
@@ -812,7 +814,9 @@ business_rules AS (
         ds.vo_is_a_rescued_offer AS is_a_rescued_offer,
         ds.vo_is_ccv_5a_model AS is_ccv_5a_model,
         ds.vo_dt_sale_agreement_rescued AS dt_sale_agreement_rescued,
-        ds.vo_dt_offer_rescued AS dt_offer_rescued
+        ds.vo_dt_offer_rescued AS dt_offer_rescued,
+        ds.vo_ts_seller_fup AS ts_seller_fup,
+        ds.vo_ts_buyer_fup AS ts_buyer_fup
     FROM
         data_sources AS ds
     LEFT JOIN
@@ -995,6 +999,8 @@ SELECT
     CURRENT_TIMESTAMP() AS ts_load,
     ts_offer_submitted,
     ts_last_updated_pendency,
+    ts_seller_fup,
+    ts_buyer_fup,
     ts_updated
 FROM
     business_rules AS br

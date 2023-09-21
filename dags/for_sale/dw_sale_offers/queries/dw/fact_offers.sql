@@ -21,6 +21,8 @@ SELECT
 	COALESCE(CAST(REPLACE(SUBSTRING(eso.dt_offer_rescued,1, 10),'-','') AS BIGINT), -1) AS sk_offer_rescued_date,
 	COALESCE(CAST(REPLACE(SUBSTRING(eso.dt_sale_agreement_created,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_created_date,
 	COALESCE(CAST(REPLACE(SUBSTRING(eso.dt_sale_agreement_signed,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_signed_date,
+	COALESCE(CAST(REPLACE(SUBSTRING(eso.ts_seller_fup,1, 10),'-','') AS BIGINT), -1) AS sk_seller_fup_date,
+	COALESCE(CAST(REPLACE(SUBSTRING(eso.ts_buyer_fup,1, 10),'-','') AS BIGINT), -1) AS sk_buyer_fup_date,
 	eso.is_buyer_first_offer,
 	eso.is_house_first_offer,
 	eso.flg_visit_completed_before_offer AS has_completed_visit_before_offer,
@@ -45,6 +47,8 @@ SELECT
 	eso.dt_offer_rescued::TIMESTAMP AS ts_offer_rescued,
 	eso.dt_sale_agreement_created::TIMESTAMP AS ts_sale_agreement_created,
 	eso.dt_sale_agreement_signed::TIMESTAMP AS ts_sale_agreement_signed,
+	eso.ts_seller_fup,
+	eso.ts_buyer_fup,
 	NOW() AS ts_load
 FROM
     datalake_offer.sale_offer AS eso

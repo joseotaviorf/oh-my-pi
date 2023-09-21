@@ -822,6 +822,8 @@ SELECT
     NULLIF(off.ts_created, '0001-01-1') AS ts_offer_created,
     NULLIF(off.ts_accepted, '0001-01-1') AS ts_accepted,
     NULLIF(off.ts_discarded, '0001-01-1') AS ts_discarded,
+    sfd.ts_seller_fup,
+    sfd.ts_buyer_fup,
     ccv.ts_signed,
     ccv.ts_created,
     sfp.ts_updated AS ts_last_updated_pendency

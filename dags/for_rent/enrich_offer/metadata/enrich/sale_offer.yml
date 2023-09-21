@@ -506,6 +506,14 @@ columns:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.ts_last_updated_pendency
     description: Timestamp when the last pendency was updated
+  ts_seller_fup:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.ts_seller_fup
+    description: Date when the Closing Analyst sent a message to the Seller.
+  ts_buyer_fup:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.ts_buyer_fup
+    description: Date when the Closing Analyst sent a message to the Buyer.
   ts_updated:
     lineage:
       - datalake_firestore.sale_offer.ts_updated

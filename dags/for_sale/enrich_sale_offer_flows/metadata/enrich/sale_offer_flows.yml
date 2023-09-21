@@ -537,6 +537,14 @@ columns:
     lineage:
       - datalake_sales_flow_clean.offer.ts_discarded
     description: Date when the offer was rejected by the owner
+  ts_seller_fup:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_details.ts_seller_fup
+    description: Date when the Closing Analyst sent a message to the Seller.
+  ts_buyer_fup:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_details.ts_buyer_fup
+    description: Date when the Closing Analyst sent a message to the Buyer.
   ts_signed:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_signed
