@@ -1,10 +1,17 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
 table_name: a009a
+owner: '@data-growth'
+domain: Growth
+description: Allocation based on prospects from the last week, coming from new affiliate users who joined in the prospect's month, with tracking sources Facebook or Google, and non-branded campaigns.
 columns:
   id_date:
+    description: Date of applied share
     lineage:
       - datalake_quintoandar.aux_date.id_date
   city_group:
+    description: city_group segmentation
     lineage:
       - datalake_region.region.city_group
+  business_context:
+    description: Business context of the rule.

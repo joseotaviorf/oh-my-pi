@@ -1,10 +1,17 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
 table_name: s031s
+owner: '@data-growth'
+domain: Growth
+description: Allocation of classified ad campaign costs among Florianópolis, Sorocaba, and Uberlândia.
 columns:
   id_date:
+    description: Date of applied share  
     lineage:
       - datalake_quintoandar.aux_date.id_date
   city_group:
+    description: city_group segmentation
     lineage:
       - datalake_region.region.city_group
+  business_context:
+    description: Business context of the rule.

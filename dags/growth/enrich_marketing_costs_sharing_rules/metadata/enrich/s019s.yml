@@ -1,10 +1,17 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
 table_name: s019s
+owner: '@data-growth'
+domain: Growth
+description: Allocation of classified ad campaign costs among RMSP, Rio de Janeiro, Campinas, Belo Horizonte, Brasília, Goiânia, Porto Alegre, Curitiba, Florianópolis, Recife, Salvador, and Santos.
 columns:
   id_date:
+    description: Date of applied share  
     lineage:
       - datalake_quintoandar.aux_date.id_date
   city_group:
+    description: city_group segmentation
     lineage:
       - datalake_region.region.city_group
+  business_context:
+    description: Business context of the rule.
