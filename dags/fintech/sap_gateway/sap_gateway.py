@@ -48,7 +48,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 25, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 8 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 
 def get_date_param(dag_run, ds, date_param_name):
