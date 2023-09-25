@@ -49,7 +49,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,       
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM 
         datalake_top_of_funnel_supply.top_of_funnel_supply
     WHERE 
@@ -108,7 +112,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM 
         datalake_top_of_funnel_supply.top_of_funnel_supply
     WHERE 
@@ -167,7 +175,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM 
         datalake_gsheets_clean.tof_supply_targets
     GROUP BY
@@ -230,7 +242,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-		SUM(CAST(0 AS FLOAT)) AS budget_rental
+		SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
@@ -304,7 +320,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-		SUM(CAST(0 AS FLOAT)) AS budget_rental
+		SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
@@ -377,7 +397,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-		SUM(CAST(0 AS FLOAT)) AS budget_rental
+		SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
@@ -451,7 +475,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-		SUM(CAST(0 AS FLOAT)) AS budget_rental
+		SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
@@ -525,7 +553,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-		SUM(CAST(0 AS FLOAT)) AS budget_rental
+		SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
@@ -599,7 +631,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
 		SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-		SUM(CAST(0 AS FLOAT)) AS budget_rental
+		SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         dw_datamarts.lead_listing_flows AS f
     JOIN dw_public.dim_lead AS dl
@@ -1047,7 +1083,11 @@ costs_targets_results_combined AS (
                 SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-                SUM(CAST(0 AS FLOAT)) AS budget_rental
+                SUM(CAST(0 AS FLOAT)) AS budget_rental,
+                SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
             FROM
                 affiliates
             WHERE
@@ -1103,7 +1143,11 @@ costs_targets_results_combined AS (
                 SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-                SUM(CAST(0 AS FLOAT)) AS budget_rental
+                SUM(CAST(0 AS FLOAT)) AS budget_rental,
+                SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
             FROM
                 affiliates
             WHERE
@@ -1159,7 +1203,11 @@ costs_targets_results_combined AS (
                 SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-                SUM(CAST(0 AS FLOAT)) AS budget_rental
+                SUM(CAST(0 AS FLOAT)) AS budget_rental,
+                SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
             FROM
                 datalake_marketing_costs.daily_costs co
             JOIN
@@ -1220,7 +1268,11 @@ costs_targets_results_combined AS (
                 SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-                SUM(CAST(0 AS FLOAT)) AS budget_rental
+                SUM(CAST(0 AS FLOAT)) AS budget_rental,
+                SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
             FROM
                 datalake_marketing_costs.daily_costs co
             JOIN
@@ -1279,7 +1331,11 @@ costs_targets_results_combined AS (
                 SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
                 SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-                SUM(CAST(0 AS FLOAT)) AS budget_rental
+                SUM(CAST(0 AS FLOAT)) AS budget_rental,
+                SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+                SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
             FROM
                 datalake_marketing_costs.daily_costs co
             JOIN
@@ -1363,7 +1419,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         datalake_gsheets_clean.daily_target_supply_sale str
     WHERE
@@ -1422,7 +1482,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(str.opportunities) AS opportunities_target_rental,
         SUM(str.first_listings) AS first_listings_target_rental,
-        SUM(str.cost_per_source) AS budget_rental
+        SUM(str.cost_per_source) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         datalake_gsheets_clean.daily_target_supply_rental str
     WHERE
@@ -1487,7 +1551,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         datalake_gsheets_clean.sale_supply_targets str
     WHERE str.mkt_channel NOT IN ('All', 'Branded')
@@ -1559,7 +1627,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         datalake_gsheets_clean.sale_supply_targets str
     WHERE str.mkt_channel NOT IN ('All', 'Branded')
@@ -1616,7 +1688,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         dw_datamarts.daily_target_volumes_supply str
     WHERE
@@ -1678,7 +1754,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(REPLACE(str.opportunity,',','') AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(REPLACE(str.first_listing,',','') AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         dw_datamarts.daily_target_volumes_supply str
    GROUP BY
@@ -1745,7 +1825,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(0 AS FLOAT)) AS budget_rental
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         datalake_gsheets_clean.costs_targets sct
     WHERE
@@ -1820,7 +1904,11 @@ costs_targets_results_combined AS (
         SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
         SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
         SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
-        SUM(CAST(REPLACE(sct.monthly_budget,',','') AS FLOAT)) AS budget_rental
+        SUM(CAST(REPLACE(sct.monthly_budget,',','') AS FLOAT)) AS budget_rental,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_unique,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_unique
     FROM
         datalake_gsheets_clean.costs_targets sct
     WHERE
@@ -1832,6 +1920,67 @@ costs_targets_results_combined AS (
             AND business = 'Rental'
             AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY
+        1,2,3,4,5,6,7,8,9,10,11
+    
+    UNION ALL
+
+  -----------------------------------------
+  -- Supply Unique Targets
+  -----------------------------------------
+    SELECT 
+        CAST(DATE_FORMAT(uvt.date, 'yyyyMMdd') as BIGINT) AS sk_date,
+        CAST(COALESCE(nullif(uvt.city_group,''),'Not Mapped') AS STRING) AS city_group,
+        CAST(NULL AS STRING) AS affiliate_volumetry,
+        CAST(NULL AS STRING) AS mkt_origin,
+        CAST(NULL AS STRING) AS mkt_channel,
+        CAST(NULL AS STRING) AS mkt_medium,
+        CAST(NULL AS STRING) AS mkt_source,
+        CAST(NULL AS STRING) AS utm_campaign,
+        CAST(NULL AS STRING) AS utm_content,
+        CAST(NULL AS STRING) AS utm_term,
+        CAST(NULL AS STRING) AS origin_phone,
+        SUM(CAST(0 AS FLOAT)) AS tof_rent,
+        SUM(CAST(0 AS FLOAT)) AS tof_sale,
+        COUNT(NULL) AS leads_rent,
+        COUNT(NULL) AS leads_sale,
+        COUNT(NULL) AS leads_hybrid,
+        COUNT(NULL) AS prospects_rent,
+        COUNT(NULL) AS prospects_sale,
+        COUNT(NULL) AS prospects_hybrid,
+        COUNT(NULL) AS qualifieds_rent,
+        COUNT(NULL) AS qualifieds_sale,
+        COUNT(NULL) AS qualifieds_hybrid,
+        COUNT(NULL) AS available_qualifieds_rent,
+        COUNT(NULL) AS available_qualifieds_sale,
+        COUNT(NULL) AS available_qualifieds_hybrid,
+        COUNT(NULL) AS opportunities_rent,
+        COUNT(NULL) AS opportunities_sale,
+        COUNT(NULL) AS opportunities_hybrid,
+        COUNT(NULL) AS first_listings_rent,
+        COUNT(NULL) AS first_listings_sale,
+        COUNT(NULL) AS first_listings_hybrid,
+        SUM(CAST(0 AS FLOAT)) AS cost_sale,
+        SUM(CAST(0 AS FLOAT)) AS cost_rental,
+        SUM(CAST(0 AS FLOAT)) AS tof_target,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_sale,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_sale,
+        SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_sale,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_sale,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_sale,
+        SUM(CAST(0 AS FLOAT)) AS budget_sale,
+        SUM(CAST(0 AS FLOAT)) AS prospects_target_rental,
+        SUM(CAST(0 AS FLOAT)) AS qualifieds_target_rental,
+        SUM(CAST(0 AS FLOAT)) AS available_qualifieds_target_rental,
+        SUM(CAST(0 AS FLOAT)) AS opportunities_target_rental,
+        SUM(CAST(0 AS FLOAT)) AS first_listings_target_rental,
+        SUM(CAST(0 AS FLOAT)) AS budget_rental,
+        SUM(prospects) AS prospects_target_unique,
+        SUM(qualifieds) AS qualifieds_target_unique,
+        SUM(opportunities) AS opportunities_target_unique,
+        SUM(first_listings) AS first_listings_target_unique
+    FROM 
+        datalake_gsheets_clean.unique_volume_targets_day uvt 
+    GROUP BY 
         1,2,3,4,5,6,7,8,9,10,11
 
 )
@@ -1897,7 +2046,11 @@ SELECT
     SUM(CAST(available_qualifieds_target_rental AS FLOAT)) AS available_qualifieds_target_rental,
     SUM(CAST(opportunities_target_rental AS FLOAT)) AS opportunities_target_rental,
     SUM(CAST(first_listings_target_rental AS FLOAT)) AS first_listings_target_rental,
-    SUM(CAST(budget_rental AS FLOAT)) AS budget_rental
+    SUM(CAST(budget_rental AS FLOAT)) AS budget_rental,
+    SUM(prospects_target_unique) AS prospects_target_unique,
+    SUM(qualifieds_target_unique) AS qualifieds_target_unique,
+    SUM(opportunities_target_unique) AS opportunities_target_unique,
+    SUM(first_listings_target_unique) AS first_listings_target_unique
 FROM
     costs_targets_results_combined
 JOIN

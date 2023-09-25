@@ -408,6 +408,7 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.gsheets_growth:done-clean-rental-tof-weekly-targets
   - bietlejuice.gsheets_growth:done-clean-sale-flows-targets
   - bietlejuice.gsheets_growth:done-clean-tof-supply-targets
+  - bietlejuice.gsheets_growth:done-clean-unique-volume-targets-day
   - bietlejuice.gsheets_growth:done-clean-unit-economics-amortization-curve
   - bietlejuice.gsheets_growth:done-clean-week-volumes-supply
   - bietlejuice.gsheets_growth:done-clean-weekday-holiday-share-supply
@@ -1112,8 +1113,8 @@ bietlejuice.enrich_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-analysis-state-group
   - bietlejuice.sorting_hat:load-clean-checklist
   - bietlejuice.sorting_hat:load-clean-checklist-decision
-  - bietlejuice.sorting_hat:load-clean-checklist-item
   - bietlejuice.sorting_hat:load-clean-checklist-group
+  - bietlejuice.sorting_hat:load-clean-checklist-item
   - bietlejuice.sorting_hat:load-clean-credit-analysis
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
   - bietlejuice.sorting_hat:load-clean-proponent
