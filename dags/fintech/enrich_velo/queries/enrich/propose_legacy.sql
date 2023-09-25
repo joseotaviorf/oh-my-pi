@@ -390,7 +390,7 @@ SELECT DISTINCT
     h.id_house * -1 AS id_house,
     p.realtor * -1 AS id_agent,
     pc.id_company AS id_propose_company,
-    mc.id_primary_person * -1 AS id_primary_person,
+    (mc.id_primary_person + 100) * -1 AS id_primary_person,
     jk1.id_junk AS id_origin,
     jk2.id_junk AS id_propose_status,
     CAST(NULL AS INT) AS id_guarantee_status,

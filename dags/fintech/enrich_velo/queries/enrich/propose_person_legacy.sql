@@ -11,13 +11,13 @@ WITH main_client AS (
   )
 
   SELECT DISTINCT
-    cp.id * -1 AS id_person,
+    (cp.id + 100) * -1 AS id_person,
     pp.id_propose,
     TRIM(UPPER(cp.name)) AS name,
     cp.email,
     cp.phone,
     CAST(NULL AS STRING) AS bureau_name,
-    cp.document,
+    IF(cp.document IS NULL, 0, cp.document) AS document,
     CAST(NULL AS INT) AS serasa_score,
     CAST(NULL AS INT) AS risk_score,
     CAST(NULL AS INT) AS risk_classification,
