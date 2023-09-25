@@ -771,7 +771,7 @@ bietlejuice.reverse_listings_report_access:
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.reverse_sale_unavailable_listings_access:
   add:
-    - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-sale-unavailable-listings
+    - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
 bietlejuice.reverse_navent_bigquery:
   override: []
 bietlejuice.reverse_nps_reversion:
