@@ -15,5 +15,4 @@ SELECT
 FROM 
     datalake_alert_manager_raw.alerts
 WHERE
-    alerts.labels.app = 'databricks-clusters'
-    AND DATE(`@timestamp`) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')    
+    DATE(`@timestamp`) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')    
