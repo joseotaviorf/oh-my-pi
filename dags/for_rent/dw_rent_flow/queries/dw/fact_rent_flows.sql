@@ -16,7 +16,7 @@ WITH counts AS (
     COUNT(DISTINCT id_proposal) FILTER (WHERE ts_guarantee_paid IS NOT NULL) AS nbr_guarantees_paid,
     COUNT(DISTINCT id_contract) FILTER (WHERE ts_contract_created IS NOT NULL) AS nbr_contracts_created,
     COUNT(DISTINCT id_contract) FILTER (WHERE ts_contract_signed IS NOT NULL) AS nbr_contracts_signed,
-    COUNT(DISTINCT id_contract) FILTER (WHERE ts_contract_terminated IS NOT NULL) AS nbr_contracts_terminated,
+    COUNT(DISTINCT id_contract) FILTER (WHERE dt_contract_terminated IS NOT NULL) AS nbr_contracts_terminated,
     SUM(tta_messages) AS nbr_tta_messages
   FROM
     datalake_rent_flows.rent_flows
@@ -73,8 +73,10 @@ last_rent_flow_event AS (
         first_touchpoint,
         status,
         is_step_rejected,
+        is_valid_rent_flow,
         has_visit_flow,
         has_offer_flow,
+        has_direct_offer_flow,
         has_tta_flow,
         ts_created,
         ts_updated
@@ -171,7 +173,9 @@ JOIN
         AND rf.first_touchpoint <=> rt.first_touchpoint
         AND rf.status <=> rt.status
         AND rf.is_step_rejected <=> rt.is_step_rejected
+        AND rf.is_valid_rent_flow <=> rt.is_valid_rent_flow
         AND rf.has_visit_flow <=> rt.has_visit_flow
         AND rf.has_offer_flow <=> rt.has_offer_flow
+        AND rf.has_direct_offer_flow <=> rt.has_direct_offer_flow
         AND rf.has_tta_flow <=> rt.has_tta_flow
         AND IF(c.nbr_contracts_signed > 0, TRUE, FALSE) <=> rt.had_contract_signed

@@ -205,7 +205,7 @@ columns:
   dt_contract_terminated:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
-    description: "Timestamp of when the contract related to the rent flow was terminated."
+    description: "Date of when the contract related to the rent flow was terminated."
   ts_rent_flow_event:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.ts_event
