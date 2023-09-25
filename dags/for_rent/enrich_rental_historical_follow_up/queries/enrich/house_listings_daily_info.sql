@@ -63,7 +63,7 @@ rent_listing as (
         datalake_ebdb_listing.rent_listing
     GROUP BY 1
 ),
-b2b as (
+b2b AS (
     SELECT
         id_house,
         MAX(is_b2b) AS is_b2b
@@ -83,6 +83,7 @@ listings_states_per_day AS (
         hbh.id_partner,
         lcod.id_partner AS id_partner_big_agent,
         h.id_region,
+        h.country_code,
         COALESCE(rl.rental_administrator, 'QUINTOANDAR') AS rental_administrator,
         lcod.consultant_type,
         heh.doorman_type,
@@ -182,6 +183,7 @@ SELECT
     id_partner,
     id_partner_big_agent,
     id_region,
+    country_code,
     rental_administrator,
     consultant_type,
     doorman_type,
