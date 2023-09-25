@@ -38,7 +38,7 @@ DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 default_libraries = config_service.get_config("default_libraries")
 cluster_description = config_service.get_config(
-    "databricks_10_4_min_general_photon_cluster"
+    "databricks_10_4_med_general_photon_cluster"
 )
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
