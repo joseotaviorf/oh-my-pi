@@ -80,7 +80,7 @@ def prepare_table(database_name: str, table_name: str, event_type: str):
         f"m=__main__, message=Table retrieved: {df.count()} rows and {len(df.columns)} columns."
     )
     
-    historical_data = [region.asDict(recursive=True) for region in formatted_df.collect()]
+    historical_data = [region.asDict(recursive=True) for region in df.collect()]
     payload = []
 
     for region in historical_data:
