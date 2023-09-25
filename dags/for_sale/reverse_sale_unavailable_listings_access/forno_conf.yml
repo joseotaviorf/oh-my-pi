@@ -1,0 +1,4 @@
+---
+bucket: 5a-sale-unavailable-listings-forno
+database_name: reverse_sale_unavailable_listings
+table_name: suspected_unavailable_listings

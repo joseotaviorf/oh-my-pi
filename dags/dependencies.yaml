@@ -2583,6 +2583,17 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_for_sale:done-clean-forbrokers-3p-partner-conditions
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers
   - bietlejuice.hub_services:load-clean-business-unit
+bietlejuice.reverse_sale_unavailable_listings_access:
+  - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-sale-unavailable-listings
+bietlejuice.reverse_sale_unavailable_listings_load:
+  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p
+  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-context
+  - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-flows
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
+  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
 bietlejuice.reverse_tracksale:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.dw_booking:load-dw-public-dim-booking

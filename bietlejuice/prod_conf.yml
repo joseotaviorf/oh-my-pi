@@ -84,6 +84,8 @@ dags_out_of_pattern:
         "reverse_listings_report_load",
         "reverse_navent_bigquery",
         "reverse_nazare",
+        "reverse_sale_unavailable_listings_access",
+        "reverse_sale_unavailable_listings_load",
         "reverse_tracksale",
         "reverse_webhelp",
         "reverse_webhelp_access",
