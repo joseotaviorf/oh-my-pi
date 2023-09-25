@@ -581,10 +581,22 @@ sheets_info:
     clean_table_name: taxonomy_demand
     sheet_context: growth
 
+  taxonomy_demand_exception_flow:
+    sheet_id: 1jsKC8asgTWByr8C8Rz1RHccvsOaVG8XqluIlCfItEE4
+    sheet_name: classification_exception_flow
+    clean_table_name: taxonomy_demand_exception_flow
+    sheet_context: growth
+
   taxonomy_growth:
     sheet_id: 1kqsc1xCs4y9Q7HMBl5XiXaBPHsBYS0jA-PJi9Sgp_UY
     sheet_name: taxonomy_growth
     clean_table_name: taxonomy_growth
+    sheet_context: growth
+
+  taxonomy_levels_values:
+    sheet_id: 1YcRJpy2PiNgZ1J0_FgimkAxY1W6TjTmaUI_-HWS-apY
+    sheet_name: taxonomy_levels_values
+    clean_table_name: taxonomy_levels_values
     sheet_context: growth
 
   taxonomy_portal_casa_mineira:
