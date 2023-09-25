@@ -1,5 +1,5 @@
-with all_apps_events(
-    select
+WITH deduplicated_offer_events AS (
+    SELECT
         id_user,
         id_app,
         ep_id_house AS id_house,
@@ -12,10 +12,17 @@ with all_apps_events(
         up_utm_campaign AS utm_campaign,
         up_utm_content AS utm_content,
         up_utm_term AS utm_term,
-        dt_event
-    from datalake_amplitude_clean.170698_offer_submitted_events
-    union all
-    select
+        dt_event,
+        ts_event,
+        year,
+        month,
+        day
+    FROM
+        datalake_amplitude_clean.170698_offer_submitted_events
+    WHERE
+        DATE(CONCAT_WS('-', year, month, day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+    UNION
+    SELECT
         id_user,
         id_app,
         ep_id_house AS id_house,
@@ -28,10 +35,17 @@ with all_apps_events(
         up_utm_campaign AS utm_campaign,
         up_utm_content AS utm_content,
         up_utm_term AS utm_term,
-        dt_event
-    from datalake_amplitude_clean.170135_offer_submitted_events
-    union all
-    select
+        dt_event,
+        ts_event,
+        year,
+        month,
+        day
+    FROM
+        datalake_amplitude_clean.170135_offer_submitted_events
+    WHERE
+        DATE(CONCAT_WS('-', year, month, day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+    UNION
+    SELECT
         id_user,
         id_app,
         ep_id_house AS id_house,
@@ -44,13 +58,20 @@ with all_apps_events(
         up_utm_campaign AS utm_campaign,
         up_utm_content AS utm_content,
         up_utm_term AS utm_term,
-        dt_event
-    from datalake_amplitude_clean.183049_offer_submitted_events
+        dt_event,
+        ts_event,
+        year,
+        month,
+        day
+    FROM 
+        datalake_amplitude_clean.183049_offer_submitted_events
+    WHERE
+        DATE(CONCAT_WS('-', year, month, day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
-select
-    id_user,
+SELECT
+    CAST(id_user AS BIGINT) AS id_user,
+    CAST(id_house AS BIGINT) AS id_house,
     id_app,
-    id_house,
     id_firestore,
     GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     user_country,
@@ -60,17 +81,20 @@ select
     utm_campaign,
     utm_content,
     utm_term,
-    case
-        when (upper(utm_campaign) like '%BRANDED%' or upper(utm_campaign) like '%INSTITUCIONAL%') and
-            lower(utm_campaign) not like '%non-branded%'
-            then 'Branded'
-        else 'Outro'
-    end as branded,
-    coalesce(
-        (
-            (upper(utm_campaign) like '%BRANDED%' or upper(utm_campaign) like '%INSTITUCIONAL%')
-            and lower(utm_campaign) not like '%non-branded%'
-        ), false
-    ) as is_branded,
-    dt_event
-from all_apps_events
+    CASE
+        WHEN (UPPER(utm_campaign) LIKE '%BRANDED%'
+        OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%')
+        AND UPPER(utm_campaign) NOT LIKE '%NON-BRANDED%'
+            THEN 'Branded'
+        ELSE 'Outro'
+    END AS branded,
+    COALESCE(((UPPER(utm_campaign) LIKE '%BRANDED%'
+        OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%')
+        AND LOWER(utm_campaign) NOT LIKE '%non-branded%'), FALSE) AS is_branded,
+    dt_event,
+    ts_event,
+    year,
+    month,
+    day
+FROM
+    deduplicated_offer_events

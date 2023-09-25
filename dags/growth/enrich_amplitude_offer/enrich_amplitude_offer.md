@@ -13,7 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Produces the following output tables, via full load:
+Produces the following output tables, via incremental load with a 6 days window:
 
 - `offer_submitted_events`
 - `sale_offer_raw_events`
