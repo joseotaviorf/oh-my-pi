@@ -4,6 +4,7 @@ SELECT
     first_touchpoint,
     status,
     is_step_rejected,
+    is_valid_rent_flow,
     has_visit_flow,
     has_offer_flow,
     has_direct_offer_flow,
