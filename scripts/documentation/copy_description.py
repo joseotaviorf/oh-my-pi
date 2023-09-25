@@ -56,22 +56,25 @@ def copy_from_origin_to_destination(origin_metadata: dict, destination_metadata:
 
 
 def copy_description(origin_metadata: dict, destination_metadata: dict, origin_column_name: str, destination_column_name: str) -> Dict:
-    if origin_column_name not in origin_metadata["columns"]:
-        print(f"Column {origin_column_name} does not exist on origin metadata.")
-        return destination_metadata
-    if destination_column_name not in destination_metadata["columns"]:
-        destination_metadata["columns"][destination_column_name] = {}
-    if "description" in destination_metadata["columns"][destination_column_name]:
-        print(f"Description already exists for column {destination_column_name}")
-        return destination_metadata
-    if len(destination_metadata["columns"][destination_column_name]['lineage']) > 1:
-        print(f"Column {destination_column_name} has more than 1 column on lineage. Check it manually.")
-        # Skipping lineages with more than 1 column may avoid copying description from
-        # calculated columns.
-        return destination_metadata
-    if "description" not in origin_metadata["columns"][origin_column_name]:
-        print(f"Column {destination_column_name} has no description on origin table")
-        return destination_metadata
+    try:
+        if origin_column_name not in origin_metadata["columns"]:
+            print(f"Column {origin_column_name} does not exist on origin metadata.")
+            return destination_metadata
+        if destination_column_name not in destination_metadata["columns"]:
+            destination_metadata["columns"][destination_column_name] = {}
+        if "description" in destination_metadata["columns"][destination_column_name]:
+            print(f"Description already exists for column {destination_column_name}")
+            return destination_metadata
+        if len(destination_metadata["columns"][destination_column_name]['lineage']) > 1:
+            print(f"Column {destination_column_name} has more than 1 column on lineage. Check it manually.")
+            # Skipping lineages with more than 1 column may avoid copying description from
+            # calculated columns.
+            return destination_metadata
+        if "description" not in origin_metadata["columns"][origin_column_name]:
+            print(f"Column {destination_column_name} has no description on origin table")
+            return destination_metadata
+    except KeyError as e:
+        print(f"Key 'lineage' probably does not exist on destination metadata for column {destination_column_name}")
 
     print(f"Copying {origin_column_name} FROM {origin_metadata['table_name']} TO {destination_column_name} ON {destination_metadata['table_name']}")
     destination_metadata["columns"][destination_column_name]["description"] = origin_metadata["columns"][origin_column_name]["description"]
@@ -83,7 +86,7 @@ def write_metadata(dag_name: str, table_name: str, metadata: dict) -> None:
         glob.iglob(f"{DAG_PACKAGES_ROOT}/**/{dag_name}/metadata/**/{table_name}.y*ml", recursive=True)
     )[0]
     with open(metadata_path, "w") as f:
-        yaml.safe_dump(data=metadata, stream=f, sort_keys=False)
+        yaml.safe_dump(data=metadata, stream=f, sort_keys=False, allow_unicode=True)
         f.close()
 
 
