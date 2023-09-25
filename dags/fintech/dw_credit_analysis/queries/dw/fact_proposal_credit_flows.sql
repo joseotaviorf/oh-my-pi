@@ -12,7 +12,7 @@ early_credit_analysis AS (
     ec.id_user,
     ec.id_house,
     MIN(DATE(ec.ts_early_credit_analysis_created)) AS dt_created,
-    MAX(DATE(ec.ts_early_credit_analysis_expired)) AS dt_expired
+    DATE_ADD(MAX(DATE(ec.ts_early_credit_analysis_created)), 30) AS dt_expired
   FROM
     datalake_credit_analysis.early_credit_analysis AS ec
   LEFT JOIN

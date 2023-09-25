@@ -106,8 +106,8 @@ columns:
     description: "Key of date when early credit analysis was created."
   sk_ec_expired_date:
     lineage:
-      - datalake_credit_analysis.early_credit_analysis.ts_early_credit_analysis_expired
-    description: "Key of date when early credit analysis was expired."
+      - datalake_credit_analysis.early_credit_analysis.ts_early_credit_analysis_created
+    description: "Key of date when early credit analysis was expired. The expiration date happens 30 days after the early credit creation date."
   funnel_step:
     lineage:
       - dw_public.fact_listing_rent_flows.funnel_step
