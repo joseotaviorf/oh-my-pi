@@ -1,6 +1,7 @@
-from datetime import datetime
-import pendulum
+import json
 import os
+import pendulum
+from datetime import datetime
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
@@ -10,7 +11,6 @@ from airflow.operators.quintoandar_databricks import (
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -26,8 +26,11 @@ CONTEXT = SOURCE
 DAG_NAME = CONTEXT
 ENDPOINTS = "responses"  # comma-delimited items
 DAG_ID = f"bietlejuice.{SOURCE}"
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-MAIN_START_DATE = datetime(2020, 10, 1, 0, 0, 0, tzinfo=local_tz)
+DAG_OWNER = DAGOwnerEnum.DATA_SS
+
+MAIN_START_DATE = datetime(
+    2020, 10, 1, 0, 0, 0, tzinfo=pendulum.timezone("America/Sao_Paulo")
+)
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 config_service = ConfigurationService(DAG_NAME)
@@ -38,14 +41,18 @@ databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_incremental_data_into_datalake_raw.py"
+raw_spark_job_path = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+)
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 
 cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
+
 partition_cols = config_service.get_config("partition_cols")
+dag_documentation = config_service.get_config("dag_documentation")
+tables = config_service.get_config("tables")
 
 dag_documentation = config_service.get_config("dag_documentation")
 
@@ -101,30 +108,39 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
-raw_task_groups = task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=SOURCE,
-    extraction_spark_job_file=raw_spark_job_path,
-    has_hive_sync=False,
-    raw_spark_job_extra_args=[SOURCE, ENDPOINTS, "{{ ds }}"],
-)
+for raw_table_name, table_details in tables.items():
 
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
-    is_incremental=True,
-    partitions=partition_cols,
-)
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=raw_table_name,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=[
+            SOURCE,
+            raw_table_name,
+            "{{ ds }}",
+            json.dumps(partition_cols),
+            json.dumps(table_details),
+        ],
+    )
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
+    clean_table_name = table_details.get("clean_table_name", raw_table_name)
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        has_create_external_table_task=False,
+        table_name=clean_table_name,
+        partitions=partition_cols if table_details.get("is_incremental") else None,
+        is_incremental=True if table_details.get("is_incremental") else False,
+    )
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_groups),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
