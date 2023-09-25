@@ -15,7 +15,7 @@ MAIN_START_DATE = datetime(2023, 7, 15, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 20 * * *"
 
 BIETLEJUICE_JOB_PREFIX = "bietlejuice-"
-JOBS_REMOVAL_TIMEDELTA = timedelta(days=14)
+JOBS_REMOVAL_TIMEDELTA = timedelta(days=60)
 
 
 def delete_databricks_jobs(remove_before_timedelta: timedelta, name_filter: str):
