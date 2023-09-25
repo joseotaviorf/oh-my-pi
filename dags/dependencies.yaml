@@ -1943,9 +1943,11 @@ bietlejuice.enrich_rent_demand_events:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_proposal:load-enrich-proposal
 bietlejuice.enrich_rent_flows:
+  - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-rent-flow
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_proposal:load-enrich-proposal

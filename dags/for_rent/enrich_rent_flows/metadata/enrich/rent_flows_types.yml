@@ -32,6 +32,14 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.is_step_rejected
     description: Boolean flag indicating if the present step in which the rent flow is, was rejected.
+  is_valid_rent_flow:
+    lineage:
+      - datalake_rent_flows.rent_flows.is_valid_rent_flow
+    description: "Boolean flag indicating if the rent flow is valid and also its events.
+      A rent flow is only present on the RDE if the property has as context Rent or null and if it has any visit with
+      Rent intent or it could have Sale intent but is related to a rent contract at the end.
+      A rent flow event will only be valid if it follows several rules: for example, to count a visit booked, it has to be type = Visit,
+      otherwise it won't be counted as a valid visit booked."
   has_visit_flow:
     lineage:
       - datalake_rent_flows.rent_flows.has_visit_flow

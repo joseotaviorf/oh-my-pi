@@ -1,30 +1,41 @@
 ---
 database_name: datalake_rent_flows
 table_name: rent_flows
-description: "This table has information related to a rent flow and its dimensions.
+description: "This table has information related to a rent flow and its events (visits, offers, contracts, etc.).
   A rent flow is the tuple [property, tenant prospect] and has all its events interactions through time.
+  In this table, you may find a flag is_valid_rent_flow, which indicates if the present rent flow has events that follows
+  all our rules to be counted as valids (presents on the Rent Demand Events), or if it's a rent flow that has events that aren't
+  valid (for example, if the rent flow is related to a property that hasn't listing business context as Rent, or if it hasn't any
+  event that we count as VB, VC, OS, etc. -- e.g. a rent flow that only has offer as event and it wasn't sent, so it's a rent flow
+  that was created but has no visits booked and the only offer wasn't sent yet).
   The id_rent_flow must not be unique, since it can have several visits, offers, etc."
 domain: For Rent
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_rent_flow:
     lineage:
+      - datalake_ebdb_clean.rent_flow.id
       - datalake_rent_demand_events.rent_demand_events.id_rent_flow
-    description: "Id of the rent flow. It may not be unique due to being related to several other dimensions."
+    description: "Id of the rent flow. It may not be unique due to being related to several other dimensions
+      (such as N visits, N offers, etc.)."
   id_house:
     lineage:
+      - datalake_ebdb_clean.rent_flow.id_house
       - datalake_rent_demand_events.rent_demand_events.id_house
     description: "Id of the property related to the rent flow."
   id_tenant_prospect:
     lineage:
+      - datalake_ebdb_clean.rent_flow.id_client
       - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
     description: "Id of the tenant prospect (TP) related to the rent flow."
   id_owner:
     lineage:
+      - datalake_ebdb_clean.house.id_user
       - datalake_rent_demand_events.rent_demand_events.id_owner
     description: "Id of the property owner of rent flow's property."
   id_booking:
     lineage:
+      - datalake_booking.booking.id
       - datalake_rent_demand_events.rent_demand_events.id_booking
     description: "Id of the booking related to the rent flow."
   id_reservation:
@@ -33,21 +44,27 @@ columns:
     description: "Id of the reservation related to the rent flow."
   id_offer:
     lineage:
+      - datalake_offer.offer.id_offer_context
       - datalake_rent_demand_events.rent_demand_events.id_offer
     description: "Id of the offer related to the rent flow (it's the id_offer_context, created on the offer's pipeline)."
   id_proposal:
     lineage:
+      - datalake_proposal.proposal.id
       - datalake_rent_demand_events.rent_demand_events.id_proposal
     description: "Id of the proposal related to the rent flow."
   id_contract:
     lineage:
+      - datalake_ebdb_contract.contract.id
       - datalake_rent_demand_events.rent_demand_events.id_contract
     description: "Id of the contract related to the rent flow."
   id_region:
     lineage:
+      - datalake_ebdb_listing.house.id_region
       - datalake_rent_demand_events.rent_demand_events.id_region
     description: "Id of the region related to the rent flow's property."
   id_event_type:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_event_type
     description: "Id of the rent flow's event type."
     categories:
       '1': "Id of the visit booked (VB) event."
@@ -61,6 +78,7 @@ columns:
       '9': "Id of the contract signed (CS) event."
   country_code:
     lineage:
+      - datalake_ebdb_listing.house.country_code
       - datalake_rent_demand_events.rent_demand_events
     description: "Country code information, it's related to the property's country. Also, a partition of the table."
   first_touchpoint:
@@ -99,6 +117,12 @@ columns:
     lineage:
       - datalake_ebdb_clean.rent_flow.is_step_rejected
     description: "Boolean flag indicating if the present step in which the rent flow is, was rejected."
+  is_valid_rent_flow:
+    description: "Boolean flag indicating if the rent flow is valid and also its events.
+      A rent flow is only present on the RDE if the property has as context Rent or null and if it has any visit with
+      Rent intent or it could have Sale intent but is related to a rent contract at the end.
+      A rent flow event will only be valid if it follows several rules: for example, to count a visit booked, it has to be type = Visit,
+      otherwise it won't be counted as a valid visit booked."
   has_visit_flow:
     description: "Boolean flag indicating if the rent flow had any visit event."
   has_offer_flow:
@@ -118,7 +142,7 @@ columns:
     description: "Timestamp of when the rent flow suffered any update, as for example new events."
   ts_booking_created:
     lineage:
-      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_booking.booking.ts_created
     description: "Timestamp of when the booking related to the rent flow was created."
   ts_booking_canceled:
     lineage:
@@ -126,39 +150,48 @@ columns:
     description: "Timestamp of when the booking related to the rent flow was canceled."
   ts_visit_completed:
     lineage:
+      - datalake_booking.booking.dt_booking
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: "Timestamp of when the visit related to the rent flow was completed."
   ts_visit_performed:
     lineage:
+      - datalake_booking.booking.dt_booking
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: "Timestamp of when the visit related to the rent flow was performed."
   ts_reservation_created:
     lineage:
       - datalake_kill_queue.reservation.ts_created
     description: "Timestamp of when the reservation related to the rent flow was created."
+  ts_direct_offer_submitted:
+    lineage:
+      - datalake_offer.offer.ts_first_sent
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: "Timestamp of when the direct offer (DO) related to the rent flow was submitted."
   ts_offer_submitted:
     lineage:
+      - datalake_offer.offer.ts_first_sent
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: "Timestamp of when the offer related to the rent flow was submitted."
   ts_offer_approved:
     lineage:
+      - datalake_offer.offer.ts_analyzed
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: "Timestamp of when the offer related to the rent flow was approved."
   ts_proposal_created:
     lineage:
-      - datalake_proposal.ts_created.ts_created
+      - datalake_proposal.proposal.ts_created
     description: "Timestamp of when the proposal related to the rent flow was created."
   ts_proposal_approved:
     lineage:
-      - datalake_proposal.ts_created.ts_approved
+      - datalake_proposal.proposal.ts_approved
     description: "Timestamp of when the proposal related to the rent flow was approved."
   ts_guarantee_processed:
     lineage:
-      - datalake_datalake_proposal.ts_created.ts_guarantee
+      - datalake_proposal.proposal.ts_guarantee
     description: "Timestamp of when the guarantee related to the rent flow was processed."
   ts_guarantee_paid:
     lineage:
-      - datalake_datalake_proposal.ts_created.ts_guarantee_paid
+      - datalake_proposal.proposal.ts_guarantee_paid
     description: "Timestamp of when the booking related to the rent flow was created."
   ts_contract_created:
     lineage:
@@ -166,9 +199,10 @@ columns:
     description: "Timestamp of when the contract related to the rent flow was created."
   ts_contract_signed:
     lineage:
+      - datalake_ebdb_contract.contract.ts_signed
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: "Timestamp of when the contract related to the rent flow was signed."
-  ts_contract_terminated:
+  dt_contract_terminated:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
     description: "Timestamp of when the contract related to the rent flow was terminated."
