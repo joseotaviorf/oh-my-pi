@@ -112,7 +112,7 @@ people_bucket: people-s3-data-quintoandar-com-br
 inmetro_bucket: s3://inmetro-s3-data-quintoandar-com-br
 metrics_bucket: 5a-business-metrics-com-br-prod
 minority_report_endpoint: http://minority-report-api.quintoandar.com.br/profile/batch
-datahub_host: https://datahub.quintoandar.com.br
+datahub_host: https://datahub.data.quintoandar.com.br
 spectrum_iam_role: arn:aws:iam::206390561754:role/SpectrumCrossAccount
 spark_jobs_logs_path: s3://5a-databricks/logs/jobs/
 default_libraries:
