@@ -15,8 +15,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output table:
  
+- `daily_owner_category`
 - `daily_owner_houses_quantity_history`
-- `daily_owner_version`
 - `house_b2b_history`
 - `owner_houses_quantity_history`
 - `pro_owner_history`
