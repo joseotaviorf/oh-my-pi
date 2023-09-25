@@ -161,7 +161,7 @@ columns:
     description: Number of visits canceled in the rent flow.
   nbr_reservations_created:
     description: Number of reservations created in the rent flow.
-  nbr_direct_offer_submitted:
+  nbr_direct_offers_submitted:
     description: Number of direct offers submitted in the rent flow.
   nbr_offers_submitted:
     description: Number of offers submitted in the rent flow.
