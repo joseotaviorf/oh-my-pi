@@ -37,7 +37,7 @@ WITH rent_flows_adap AS (
     rf.sk_contract_created_date,
     rf.sk_contract_signed_date,
     CASE
-      WHEN frf.ts_first_direct_offer IS NOT NULL AND drf.has_visit_flow = FALSE AND drf.has_tta_flow = FALSE THEN 'DIRECT'
+      WHEN frf.ts_first_direct_offer_submitted IS NOT NULL AND drf.has_visit_flow = FALSE AND drf.has_tta_flow = FALSE THEN 'DIRECT'
       WHEN drf.has_tta_flow = TRUE AND drf.has_visit_flow = FALSE THEN 'TTA'
       WHEN drf.has_visit_flow = TRUE THEN 'VISIT'
       ELSE 'UNKNOWN'
@@ -47,14 +47,14 @@ WITH rent_flows_adap AS (
     drf.has_direct_offer_flow AS had_flow_direct,
     drf.has_tta_flow AS had_flow_tta,
     CASE
-      WHEN frf.ts_first_direct_offer IS NOT NULL AND drf.has_visit_flow = FALSE AND drf.has_tta_flow = FALSE THEN '(1) ONLY DIRECT OFFER'
-      WHEN has_visit_flow = FALSE AND ts_first_direct_offer IS NULL AND has_tta_flow = TRUE THEN '(2) ONLY TALK TO AGENT'
-      WHEN has_visit_flow = TRUE AND ts_first_direct_offer IS NULL AND has_tta_flow = FALSE THEN '(3) ONLY VISIT'
-      WHEN has_visit_flow = FALSE AND ts_first_direct_offer IS NOT NULL AND has_tta_flow = TRUE THEN '(1) DIRECT OFFER + (2) TALK TO AGENT'
-      WHEN has_visit_flow = TRUE AND ts_first_direct_offer IS NOT NULL AND has_tta_flow = FALSE THEN '(1) DIRECT OFFER + (3) VISIT'
-      WHEN has_visit_flow = TRUE AND ts_first_direct_offer IS NULL AND has_tta_flow = TRUE THEN '(2) TALK TO AGENT + (3) VISIT'
-      WHEN has_visit_flow = TRUE AND ts_first_direct_offer IS NOT NULL AND has_tta_flow = TRUE THEN '(1) DO + (2) TTA + (3) VISIT'
-      WHEN has_visit_flow = TRUE AND ts_first_direct_offer IS NULL AND has_tta_flow = FALSE THEN 'NO ONE'
+      WHEN frf.ts_first_direct_offer_submitted IS NOT NULL AND drf.has_visit_flow = FALSE AND drf.has_tta_flow = FALSE THEN '(1) ONLY DIRECT OFFER'
+      WHEN has_visit_flow = FALSE AND ts_first_direct_offer_submitted IS NULL AND has_tta_flow = TRUE THEN '(2) ONLY TALK TO AGENT'
+      WHEN has_visit_flow = TRUE AND ts_first_direct_offer_submitted IS NULL AND has_tta_flow = FALSE THEN '(3) ONLY VISIT'
+      WHEN has_visit_flow = FALSE AND ts_first_direct_offer_submitted IS NOT NULL AND has_tta_flow = TRUE THEN '(1) DIRECT OFFER + (2) TALK TO AGENT'
+      WHEN has_visit_flow = TRUE AND ts_first_direct_offer_submitted IS NOT NULL AND has_tta_flow = FALSE THEN '(1) DIRECT OFFER + (3) VISIT'
+      WHEN has_visit_flow = TRUE AND ts_first_direct_offer_submitted IS NULL AND has_tta_flow = TRUE THEN '(2) TALK TO AGENT + (3) VISIT'
+      WHEN has_visit_flow = TRUE AND ts_first_direct_offer_submitted IS NOT NULL AND has_tta_flow = TRUE THEN '(1) DO + (2) TTA + (3) VISIT'
+      WHEN has_visit_flow = TRUE AND ts_first_direct_offer_submitted IS NULL AND has_tta_flow = FALSE THEN 'NO ONE'
       ELSE 'UNK'
     END AS flow_type,
     tta_c.first_message_date,
