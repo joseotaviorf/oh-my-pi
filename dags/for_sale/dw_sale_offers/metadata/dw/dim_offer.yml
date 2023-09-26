@@ -75,6 +75,7 @@ columns:
   offer_platform:
     lineage:
     - datalake_offer.sale_offer.offer_platform
+    description: Offer model on the old google sheet.
   offer_flow:
     lineage:
     - datalake_offer.sale_offer.offer_flow
@@ -83,9 +84,11 @@ columns:
   agent_work_contract:
     lineage:
     - datalake_offer.sale_offer.agent_work_contract
+    description: Work contract of the agent
   team_lead_name:
     lineage:
     - datalake_offer.sale_offer.team_lead_name
+    description: Team lead name
   deal_maker_name:
     lineage:
     - datalake_offer.sale_offer.consultant_name
@@ -93,6 +96,7 @@ columns:
   agent_name:
     lineage:
     - datalake_offer.sale_offer.agent_name
+    description: Broker name on main (EBDB) tables
   partner_3p_supply:
     lineage:
     - datalake_offer.sale_offer.partner_3p_supply
@@ -104,6 +108,7 @@ columns:
   credit_model:
     lineage:
     - datalake_offer.sale_offer.credit_model
+    description: Offer credit model
   sale_price:
     lineage:
     - datalake_offer.sale_offer.sale_price
@@ -173,6 +178,7 @@ columns:
   final_attribution_origin:
     lineage:
     - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
+    description: Used to identify the category of the final attribution origin
   mkt_category:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.category
@@ -256,16 +262,20 @@ columns:
   is_3p_supply_5a:
     lineage:
     - datalake_offer.sale_offer.is_3p_supply_5a
+    description: Flag indicating if this offer came from a 5A supply partner
   is_3p_supply_bh:
     lineage:
     - datalake_offer.sale_offer.is_3p_supply_bh
+    description: Flag indicating if this offer has an supply partner from BH
   is_3p_demand:
     lineage:
     - datalake_offer.sale_offer.is_3p_demand
-    description: 'Flag if offer was submitted by a 3P demand agent '
+    description: Flag if offer was submitted by a 3P demand agent
   is_a_rescued_offer:
     lineage:
     - datalake_offer.sale_offer.is_a_rescued_offer
+    description: Boolean to identify if this offer is a rescued one (An offer that
+      was cancelled and opened again)
   has_used_fgts_in_payment:
     lineage:
     - datalake_offer.sale_offer.has_used_fgts_in_payment
@@ -283,6 +293,4 @@ columns:
     - datalake_offer.sale_offer.ts_updated
     description: Datetime of offer last update
   ts_load:
-    description: ''
-  business_unit_sales_flow:
-    description: The business unit that originated the offer (HUB service info).
+    description: Timestamp when the data was loaded on datalake

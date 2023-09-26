@@ -36,7 +36,6 @@ def read_metadata(dag_name: str, table_name: str) -> Dict:
     with open(metadata_path, "r") as f:
         return yaml.load(f, Loader=yaml.FullLoader)
 
-
 def copy_from_origin_to_destination(origin_metadata: dict, destination_metadata: dict, is_forward: bool) -> None:
     # If it is forward, the lineage we need to look at is the destination
     metadata_to_look_at_lineage = destination_metadata if is_forward else origin_metadata
