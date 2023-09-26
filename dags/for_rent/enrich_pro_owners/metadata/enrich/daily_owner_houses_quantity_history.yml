@@ -8,6 +8,7 @@ owner: data-for-rent@quintoandar.com.br
 columns:
   id_owner:
     lineage:
+    - datalake_ebdb_user.user_merge.id_user
     - datalake_pro_owners.house_b2b_history.id_user
     description: Id user of the owner.
   id_account_manager:

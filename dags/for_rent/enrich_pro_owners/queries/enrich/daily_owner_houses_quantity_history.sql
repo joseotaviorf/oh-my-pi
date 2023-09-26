@@ -28,10 +28,18 @@ house_portability AS (
       AND por.ts_created < COALESCE(hl.ts_listing_version_end, NOW())
 ),
 
+user_merge AS (
+  SELECT
+    id_user,
+    EXPLODE(predecessor_user_list) AS id_predecessor_user
+  FROM
+    datalake_ebdb_user.user_merge
+),
+
 owner_houses_history AS (
   SELECT /*+ RANGE_JOIN(hbh, 2000) */
     h.id AS id_house,
-    hbh.id_user AS id_owner,
+    COALESCE(um.id_user, hbh.id_user) AS id_owner,
     ur.country_code,
     IF(lbc.is_rent_context OR lbc.id_house IS NULL, TRUE, FALSE) AS is_for_rent,
     IF((((hbh.affiliate_type = 'B2BPartner') OR (pa.id_partner IS NOT NULL AND p.type = 'PRIME') OR (hbh.id_house_listing IS NOT NULL)) AND pa.status = 'ACTIVE'), TRUE, FALSE) OR por.id_house IS NOT NULL AS is_b2b,
@@ -62,8 +70,8 @@ owner_houses_history AS (
     datalake_ebdb_listing.listing_business_context AS lbc
       ON h.id = lbc.id_house
   LEFT JOIN
-    datalake_ebdb_user.user_merge AS um
-      ON ARRAY_CONTAINS(um.predecessor_user_list, hbh.id_user)
+    user_merge AS um
+      ON um.id_predecessor_user = hbh.id_user
   LEFT JOIN
     datalake_ebdb_clean.partner_agent AS pa
       ON COALESCE(um.id_user, hbh.id_user) = pa.id_user
