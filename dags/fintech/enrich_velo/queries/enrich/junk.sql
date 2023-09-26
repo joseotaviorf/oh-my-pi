@@ -61,9 +61,15 @@ WITH cte_join AS (
     (
         WITH cte_billing_type AS (
             SELECT
-                DISTINCT billing_type AS desc_lvl_1
+                name AS desc_lvl_1
                 FROM
-                    datalake_rental_guarantee_platform_clean.payment
+                    datalake_velo_clean.fiancavelo_billingtype
+            WHERE name NOT IN (SELECT DISTINCT billing_type FROM datalake_rental_guarantee_platform_clean.payment)
+            UNION ALL
+            SELECT
+                DISTINCT billing_type AS desc_lvl_1
+            FROM
+                datalake_rental_guarantee_platform_clean.payment
             )
         SELECT
             'Billing Type' AS desc_master_type,
@@ -111,6 +117,12 @@ WITH cte_join AS (
     UNION ALL
     (
         WITH cte_payment_gateway AS (
+            SELECT
+                name AS desc_lvl_1
+            FROM
+                datalake_velo_clean.fiancavelo_gateway
+            WHERE name NOT IN (SELECT DISTINCT gateway FROM datalake_rental_guarantee_platform_clean.payment)
+            UNION ALL
             SELECT
                 DISTINCT gateway AS desc_lvl_1
             FROM

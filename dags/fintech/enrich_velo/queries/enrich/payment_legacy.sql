@@ -1,104 +1,146 @@
--- cte to get propose_values from propose_legacy proposes
-WITH old_prop_values AS (
-    SELECT
-        p.id AS id_propose,
-        CONCAT(p.id, COALESCE(cp.id, ''), pl.id) AS id_propose_values
-    FROM
-        datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS p
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.plan AS pl
-            ON p.id_plan = pl.id_legacy
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.company_plan AS cp
-            ON p.id_quintocred_company = cp.id_company
-            AND pl.id = cp.id_plan
-),
-
-old_gateway AS (
-    WITH cte_payment_gateway AS (
+WITH payment AS (
         SELECT
-            DISTINCT gateway AS desc_lvl_1
+            p.id AS id_payment,
+            NULLIF(p.id_propose,0) AS id_propose,
+            p.customer AS id_customer,
+            p.id_billing_type,
+            p.id_status,
+            p.id_gateway,
+            p.unicid,
+            p.subscription,
+            p.invoice_url,
+            p.description,
+            p.value AS due_amount,
+            p.netvalue AS net_amount,
+            p.dt_created,
+            p.dt_due,
+            p.dt_original_due AS dt_due_original,
+            p.dt_client_payment AS dt_paid,
+            p.dt_confirmed AS dt_payment_confirmed,
+            p.is_active,
+            p.ts_updated,
+            ROW_NUMBER() OVER(PARTITION BY p.invoice_url, p.description ORDER BY p.id_status DESC, p.ts_updated DESC) AS rn
+        FROM
+            datalake_velo_clean.fiancavelo_payment AS p
+    ), pack_values AS (
+        SELECT
+            pk.id_propose AS id_propose,
+            SUM(COALESCE(pk.value,0)) AS total_package_amount
+        FROM
+            datalake_velo_clean.fiancavelo_packvalues AS pk
+        WHERE
+            pk.is_active
+        GROUP BY
+            1
+    ),
+    occurrence AS (
+        SELECT DISTINCT
+            o.id AS id_occurrence,
+            p.id AS id_payment
+        FROM
+            datalake_velo_clean.fiancavelo_occurrence AS o
+        LEFT JOIN
+            datalake_velo_clean.fiancavelo_payment AS p
+                ON TRIM(p.invoice_url) = TRIM(o.invoice_url)
+                OR TRIM(p.unicid) = TRIM(o.unicid)
+    ),
+    migrated_ids AS (
+        SELECT
+            id AS id_payment
         FROM
             datalake_rental_guarantee_platform_clean.payment
-
-        UNION ALL
-
-        SELECT
-            name AS desc_lvl_1
+    ),
+    old_status_to_quintocred AS (
+        SELECT *
         FROM
-            VALUES ('IUGU') AS gateway(name))
-
+        VALUES
+            (0,'SUCCESS'),
+            (1,'PROCESSING'),
+            (2,'SUCCESS'),
+            (3,'SUCCESS'),
+            (4,'PROCESSING'),
+            (5,'REVERSED'),
+            (6,'SUCCESS'),
+            (7,'SCHEDULED_REVERSAL'),
+            (8,'ERROR') AS t (old_id, new_status)
+    )
     SELECT
-        'Payment Gateway' AS desc_master_type,
-        ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
-        desc_lvl_1
+        p.id_payment,
+        p.id_propose,
+        CAST(NULL AS BIGINT) AS id_occurrence,
+        CAST(NULL AS BIGINT) AS id_propose_values,
+        jk1.id_junk AS id_billing_type,
+        jk2.id_junk AS id_payment_type,
+        jk3.id_junk AS id_status,
+        jk4.id_junk AS id_payment_gateway,
+        p.id_customer,
+        p.unicid AS id_unicid,
+        p.subscription AS id_subscription,
+        p.invoice_url,
+        p.description,
+        p.due_amount,
+        p.net_amount,
+        p.dt_paid > p.dt_due AS is_paid_late,
+        p.dt_due_original IS NOT NULL AND p.dt_due_original <> p.dt_due AS is_due_modified,
+        ISNOTNULL(o.id_occurrence) AS is_occurrence,
+        p.subscription IS NOT NULL AS is_recurring_subscription,
+        TRUE is_legacy,
+        p.dt_created,
+        p.dt_due,
+        p.dt_due_original,
+        p.dt_paid,
+        p.dt_payment_confirmed,
+        p.ts_updated
     FROM
-        cte_payment_gateway
-    GROUP BY desc_lvl_1
-)
-
-SELECT DISTINCT
-    p.id AS id_payment,
-    p.id_propose,
-    CAST(NULL AS BIGINT) AS id_occurrence,
-    pv.id_propose_values AS id_propose_values,
-    jk1.id_junk AS id_billing_type, -- p.billing_type
-    jk2.id_junk AS id_payment_type,
-    jk3.id_junk AS id_status, -- p.status
-    jk4.id_lvl_1 AS id_payment_gateway,
-    CAST(NULL AS STRING) AS id_customer, -- legacy customer id not matching correctly with 3.0 gateway
-    p.unicid AS id_unicid,
-    CAST(NULL AS INT) AS id_subscription, -- legacy subscription id not matching correctly with 3.0 gateway
-    p.invoice_url,
-    p.description,
-    p.value AS due_amount,
-    p.netvalue AS net_amount,
-    DATE(p.ts_client_payment) > DATE(p.ts_due) AS is_paid_late,
-    p.ts_due_original IS NOT NULL AND p.ts_due_original <> p.ts_due AS is_due_modified,
-    TRUE AS is_legacy,
-    o.id IS NOT NULL AS is_occurrence,
-    p.id_subscription IS NOT NULL AS is_recurring_subscription,
-    DATE(p.ts_created) AS dt_created,
-    DATE(p.ts_due) AS dt_due,
-    CAST(NULL AS STRING) AS dt_due_original,
-    p.ts_client_payment AS dt_paid,
-    CAST(NULL AS STRING) as dt_payment_confirmed,
-    p.ts_updated
-FROM
-    datalake_rental_guarantee_platform_clean.fiancavelo_payment_legacy AS p
-LEFT JOIN
-    datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS pp
-    ON p.id_propose = pp.id
-LEFT JOIN
-    datalake_velo_clean.fiancavelo_occurrence AS o
-    ON TRIM(o.invoice_url) = TRIM(p.invoice_url)
-        AND TRIM(o.unicid) = TRIM(p.unicid)
-LEFT JOIN
-    datalake_velo.junk AS jk1
-    ON jk1.desc_lvl_1 = p.quintocred_billing_type
-        AND jk1.desc_master_type = 'Billing Type'
-LEFT JOIN
-    datalake_velo.junk AS jk2
-    ON jk2.desc_lvl_1 = CASE
-                            WHEN p.quintocred_billing_type = 'PIX' THEN 'annual'
-                            WHEN p.quintocred_billing_type = 'CREDIT_CARD' THEN 'monthly'
-                            WHEN pp.billing = 1 THEN 'billing'
-                        END
-        AND jk2.desc_master_type = 'Payment Type'
-LEFT JOIN
-    datalake_velo.junk AS jk3
-    ON jk3.desc_lvl_1 = p.quintocred_status
-        AND jk3.desc_master_type = 'Payment Status'
-LEFT JOIN
-    old_prop_values AS pv
-    ON pv.id_propose = p.id_propose
-LEFT JOIN
-    old_gateway AS jk4
-    ON jk4.desc_lvl_1 = p.gateway
-        AND jk4.desc_master_type = 'Payment Gateway'
-
-
-WHERE p.id NOT IN (SELECT id FROM datalake_rental_guarantee_platform_clean.payment)
-
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY p.invoice_url, p.description ORDER BY p.status DESC, p.ts_updated DESC) = 1
+        payment AS p
+    LEFT JOIN
+        datalake_velo_clean.fiancavelo_propose AS fp
+            ON fp.id = p.id_propose
+    LEFT JOIN
+        datalake_velo_clean.fiancavelo_activator AS a
+            ON a.id = fp.id_activator
+    LEFT JOIN
+        pack_values AS pk
+            ON pk.id_propose = fp.id
+    LEFT JOIN
+        occurrence AS o
+            ON o.id_occurrence = p.id_payment
+    LEFT JOIN
+        datalake_velo_clean.fiancavelo_plans AS pl
+            ON pl.id = fp.id_plan
+    LEFT JOIN
+        datalake_velo_clean.fiancavelo_billingtype AS bt
+            ON bt.id = p.id_billing_type
+    LEFT JOIN
+        datalake_velo.junk AS jk1
+            ON jk1.desc_lvl_1 = bt.name
+            AND jk1.desc_master_type = 'Billing Type'
+    LEFT JOIN
+        datalake_velo.junk AS jk2
+            ON jk2.id_lvl_1 = CASE
+                                WHEN (p.due_amount/COALESCE(pk.total_package_amount*pl.percent/100.00,0) BETWEEN 0.9 AND 1.1) OR (p.due_amount/(COALESCE(pk.total_package_amount*pl.percent/100.00,0) + COALESCE(a.value,0)) BETWEEN 0.9 AND 1.1) THEN 1
+                                WHEN (p.due_amount/COALESCE(pk.total_package_amount*pl.percent*12.00/100.00,0) BETWEEN 0.9 AND 1.1) OR (p.due_amount/(COALESCE(pk.total_package_amount*pl.percent*12.00/100.00,0) + COALESCE(a.value,0)) BETWEEN 0.9 AND 1.1) THEN 2
+                                WHEN p.due_amount/COALESCE(a.value,0) BETWEEN 0.9 AND 1.1 THEN 3
+                            ELSE 4
+                            END
+            AND jk2.desc_master_type = 'Payment Type'
+    LEFT JOIN
+        old_status_to_quintocred AS ps
+            ON ps.old_id = p.id_status
+    LEFT JOIN
+        datalake_velo.junk AS jk3
+            ON jk3.desc_lvl_1 = ps.new_status
+            AND jk3.desc_master_type = 'Payment Status'
+    LEFT JOIN
+        datalake_velo_clean.fiancavelo_gateway AS pg
+            ON pg.id = p.id_gateway
+    LEFT JOIN
+        datalake_velo.junk AS jk4
+            ON jk4.desc_lvl_1 = pg.name
+            AND jk4.desc_master_type = 'Payment Gateway'
+    LEFT JOIN
+        migrated_ids AS mi
+            ON mi.id_payment = p.id_payment
+    WHERE
+        p.rn = 1
+        AND mi.id_payment IS NULL
