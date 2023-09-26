@@ -111,3 +111,5 @@ FROM
     dispatch_rules 
 WHERE
     need_to_check_available = TRUE
+LIMIT 
+    1000
