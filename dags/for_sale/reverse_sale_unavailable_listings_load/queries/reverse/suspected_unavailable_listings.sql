@@ -1,7 +1,8 @@
 WITH listings_1p AS (
     SELECT 
         sk_house,
-        sk_region, 
+        sk_region,
+        "1P" AS flag,
         CAST(ts_first_publication AS DATE) dt_first_publication,
         CAST(ts_last_publication AS DATE)  AS dt_last_quintoandar_publication
     FROM 
@@ -17,6 +18,7 @@ listings_3p AS (
     SELECT 
         sk_house,
         sk_region,
+        "3P" AS flag,
         CAST(ts_house_created AS DATE) AS dt_first_publication,
         CAST(ts_last_publication AS DATE) AS dt_last_quintoandar_publication
     FROM 
@@ -38,6 +40,7 @@ published_listings AS (
     SELECT
         sk_house,
         sk_region,
+        flag,
         dt_first_publication,
         dt_last_quintoandar_publication
     FROM 
@@ -46,6 +49,7 @@ published_listings AS (
     SELECT 
         sk_house,
         sk_region,
+        flag,
         dt_first_publication,
         dt_last_quintoandar_publication
     FROM
@@ -75,6 +79,7 @@ suspected_unavailability_listings AS (
 suspected_unavailable_listings AS (
     SELECT DISTINCT
         ol.sk_house,
+        flag,
         dt_last_quintoandar_publication
     FROM 
         published_listings AS ol
@@ -98,6 +103,7 @@ suspected_unavailable_listings AS (
 dispatch_rules (
     SELECT 
         sk_house,
+        flag,
         MOD(DATEDIFF(CAST(CURRENT_DATE AS DATE), CAST(dt_last_quintoandar_publication AS DATE)), 30) = 0 AS need_to_check_available
     FROM 
         suspected_unavailable_listings
@@ -111,5 +117,8 @@ FROM
     dispatch_rules 
 WHERE
     need_to_check_available = TRUE
+/* This below is temporary, until the product is fixed */ 
+ORDER BY 
+    flag DESC
 LIMIT 
     1000

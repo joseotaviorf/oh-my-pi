@@ -3,7 +3,7 @@ import boto3
 import logging
 
 from typing import Tuple
-from datetime import datetime
+from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from http.client import HTTPException
 
@@ -77,7 +77,7 @@ def prepare_table(database_name: str, table_name: str, execution_date: datetime)
         f"m=__main__, message=Table retrieved: {len(houses)} rows"
     )
 
-    return json.dumps({"table": table_name, "dt_load": execution_date.strftime('%Y-%m-%d'), "payload": houses})
+    return json.dumps({"table": table_name, "dt_load": (execution_date + timedelta(days=1)).strftime('%Y-%m-%d'), "payload": houses})
 
 def create_s3_path(bucket: str, table_name: str, execution_date: datetime):
     """
@@ -88,7 +88,8 @@ def create_s3_path(bucket: str, table_name: str, execution_date: datetime):
     - table_name (str): The name of the table, which will be part of the constructed path.
     - execution_date (datetime): The date for which the path needs to be created. The year, month, and day are extracted from this.
     """
-    path = f"s3://{bucket}/reverse/{table_name}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
+    tomorrow = execution_date + timedelta(days=1)
+    path = f"s3://{bucket}/reverse/{table_name}/year={tomorrow.year}/month={tomorrow.month}/day={tomorrow.day}"
     return path
 
 def send_to_s3_bucket(file: str, table_name: str, path: str):
