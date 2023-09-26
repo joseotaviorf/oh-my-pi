@@ -65,6 +65,10 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.accrual_year_month
+  sispag_file:
+    description: "File that Seu Barriga created with Vans to communicate with bank"
+    lineage:
+      - datalake_retsuko_raw.invoice.sispag_file
   ts_paid:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:

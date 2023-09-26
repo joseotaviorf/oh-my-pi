@@ -13,6 +13,10 @@ columns:
     lineage:
     - datalake_retsuko.invoice_entry.id_external_reversed_entry
     description: When a entry is created to cancel another entry, this field is filled with the Id of the canceled one
+  accounting_transaction_identifier:
+    description: "Transactional entries are created in pairs (on the IQ and PP invoice). This hash can identify this pair."
+    lineage:
+    - datalake_retsuko.invoice_entry.accounting_transaction_identifier
   entry_type:
     lineage:
     - datalake_retsuko.invoice_entry.entry_type

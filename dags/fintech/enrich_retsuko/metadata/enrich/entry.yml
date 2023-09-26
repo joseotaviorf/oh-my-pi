@@ -30,13 +30,17 @@ columns:
     lineage:
       - datalake_retsuko_clean.entry.id_to_account
   id_external_reversed_entry:
-    description: "External reversed entry ID"
+    description: "If the entry was created to cancel (reverse) other entry, with this ID you can track the original one that was reversed"
     lineage:
       - datalake_retsuko_clean.entry.id_external_reversed_entry
   id_audit:
     description: "Audit ID associated with an entry"
     lineage:
       - datalake_retsuko_clean.entry.id_audit
+  accounting_transaction_identifier:
+    description: "Transactional entries are created in pairs (on the IQ and PP invoice). This hash can identify this pair."
+    lineage:
+      - datalake_retsuko_clean.entry.accounting_transaction_identifier
   amount:
     description: "Entry amount"
     lineage:

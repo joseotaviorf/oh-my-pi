@@ -26,6 +26,7 @@ SELECT
     in.due_amount,
     in.paid_amount,
     in.accrual_year_month,
+    in.sispag_file,
     in.ts_paid,
     in.ts_canceled,
     in.ts_sent,

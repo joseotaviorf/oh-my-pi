@@ -7,6 +7,7 @@ SELECT
     from_account_id AS id_from_account,
     to_account_id AS id_to_account,
     reversed_entry_external_id AS id_external_reversed_entry,
+    accounting_transaction_identifier,
     amount,
     bill_item,
     description,
@@ -18,3 +19,4 @@ SELECT
     retsuko_updated_at AS ts_retsuko_updated
 FROM
     datalake_retsuko_raw.entry
+    

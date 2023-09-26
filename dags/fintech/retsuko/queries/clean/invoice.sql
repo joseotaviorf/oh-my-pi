@@ -13,6 +13,7 @@ select
     due_amount,
     paid_amount,
     accrual_year_month,
+    sispag_file,
     timestamp(paid_date) as ts_paid,
     timestamp(canceled_at) as ts_canceled,
     timestamp(sent_at) as ts_sent,

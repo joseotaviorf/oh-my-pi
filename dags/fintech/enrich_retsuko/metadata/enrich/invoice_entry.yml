@@ -14,9 +14,13 @@ columns:
     lineage:
       - datalake_retsuko.entry.id_invoice
   id_external_reversed_entry:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "If the entry was created to cancel (reverse) other entry, with this ID you can track the original one that was reversed"
     lineage:
       - datalake_retsuko.entry.id_external_reversed_entry
+  accounting_transaction_identifier:
+    description: "Transactional entries are created in pairs (on the IQ and PP invoice). This hash can identify this pair."
+    lineage:
+      - datalake_retsuko.entry.accounting_transaction_identifier
   id_contract:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:

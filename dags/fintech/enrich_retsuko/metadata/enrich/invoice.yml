@@ -121,6 +121,10 @@ columns:
     description: "Expense reference month"
     lineage:
       - datalake_retsuko_clean.invoice.accrual_year_month
+  sispag_file:
+    description: "File that Seu Barriga created with Vans to communicate with bank"
+    lineage:
+      - datalake_retsuko_clean.invoice.sispag_file
   ts_paid:
     description: "Timestamp in which invoice was paid, for payable invoices"
     lineage:

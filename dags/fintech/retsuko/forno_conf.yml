@@ -9,5 +9,6 @@ tables:
   - file
   - invoice
   - manual_entry
+  - monthly_closing_checks
   - recurrent_credit_card
   - sap_entity

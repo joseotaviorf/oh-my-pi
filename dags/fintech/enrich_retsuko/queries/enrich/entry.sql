@@ -7,6 +7,7 @@ SELECT
     e.id_to_account,
     e.id_external_reversed_entry,
     e.id_audit,
+    e.accounting_transaction_identifier,
     ROUND(CASE
           WHEN af.type = 'contract'
               AND at.type <> 'contract' THEN -1.0 * e.amount

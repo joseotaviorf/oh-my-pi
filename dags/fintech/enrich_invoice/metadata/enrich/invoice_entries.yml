@@ -44,6 +44,10 @@ columns:
     description: "Pay date ID"
     lineage:
       - datalake_retsuko.invoice.ts_paid
+  accounting_transaction_identifier:
+    description: "Transactional entries are created in pairs (on the IQ and PP invoice). This hash can identify this pair."
+    lineage:
+      - datalake_retsuko.entry.accounting_transaction_identifier
   brl_entry_due_amount:
     description: "Entry due amount in BRL"
     lineage:

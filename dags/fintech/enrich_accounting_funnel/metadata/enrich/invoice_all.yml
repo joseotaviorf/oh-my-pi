@@ -21,6 +21,10 @@ columns:
     lineage:
       - dw_payment.fact_invoice_entries.sk_contract
     description: "Contract related to an invoice"
+  accounting_transaction_identifier:
+    lineage:
+      - dw_payment.dim_invoice_entry.accounting_transaction_identifier
+    description: "Transactional entries are created in pairs (on the IQ and PP invoice). This hash can identify this pair."
   version:
     lineage:
       - dw_public.dim_contract.version

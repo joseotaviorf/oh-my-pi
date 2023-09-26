@@ -33,6 +33,7 @@ SELECT DISTINCT
   ie.sk_invoice_reversed_entry,
   fie.sk_invoice AS id_invoice,
   fie.sk_contract,
+  ie.accounting_transaction_identifier,
   CASE
     WHEN CHARINDEX('.', c.version)> 0 THEN  SUBSTRING(c.version, 1, CHARINDEX('.', c.version)-1)
     ELSE COALESCE(c.version, 'no info')
