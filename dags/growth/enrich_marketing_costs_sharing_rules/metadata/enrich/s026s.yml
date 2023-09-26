@@ -9,9 +9,15 @@ columns:
     description: Date of applied share  
     lineage:
       - datalake_quintoandar.aux_date.id_date
+  id_rule:
+    description: Id rule            
   city_group:
     description: city_group segmentation
     lineage:
       - datalake_region.region.city_group
+  share:
+    description: Percentage of cost that will be applied to specific city_group
+  funnel_side:
+    description: Marketplace side of business      
   business_context:
     description: Business context of the rule.

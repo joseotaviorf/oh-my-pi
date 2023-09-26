@@ -24,3 +24,5 @@ columns:
     categories: 
       demand: ''
       supply: ''
+  business_context:
+    description: Business context of the rule.
