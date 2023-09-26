@@ -63,11 +63,11 @@ owner_category AS (
 ) 
 
 SELECT
-  ohc.id_owner || 0 || COALESCE(ov.owner_category, 1) AS id_owner_category,
+  ohc.id_owner || 0 || COALESCE(ov.owner_category, 0) AS id_owner_category,
   ohc.id_owner,
   ohc.category,
   ohc.country_code,
-  COALESCE(ov.owner_category, 1) AS owner_category,
+  COALESCE(ov.owner_category, 0) AS owner_category,
   ohc.is_amateur,
   ohc.is_pp_multi_active,
   ohc.dt_houses_owned AS dt_owner_category,

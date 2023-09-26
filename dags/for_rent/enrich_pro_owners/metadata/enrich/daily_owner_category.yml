@@ -23,6 +23,7 @@ columns:
   owner_category:
     description: Integer with the number of the owner.
       Any change in this table results a new category of the user, even if the owner had the same category previously.
+      It starts at 0.
   is_amateur:
     description: Boolean value to check if the owner is Amateur, which is not participating in the PP Multi program.
   is_pp_multi_active:
