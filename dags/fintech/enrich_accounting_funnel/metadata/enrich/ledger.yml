@@ -87,6 +87,8 @@ columns:
     lineage:
       - datalake_pas.journal_entry_lines.memo_line
       - datalake_pas.invoice_lines.memo_line
+      - datalake_pas.journal_entries.memo
+      - datalake_pas.invoice.memo
   debit_credit:
     description: "Debit - Credit value"
     lineage:

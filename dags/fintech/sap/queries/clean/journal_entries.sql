@@ -18,7 +18,7 @@ SELECT
     --         ) THEN REGEXP_EXTRACT(memo, '((?:CI|CR|FC|FP|CP|FQ).*)')
     --     ELSE REGEXP_EXTRACT(memo, '^"?.*(?<clean>(?:CI|CR|FC|FP|CP)[^ -]+)[ -]?.*"?$')
     -- END AS memo,
-    memo,
+    NULLIF(TRIM(memo), '') as memo,
     number_number AS source_document_number,
     series_series AS series,
     source_client_u_sourceclient AS source_client,

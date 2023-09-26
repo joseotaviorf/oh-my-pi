@@ -253,7 +253,7 @@ SELECT
     coa.name AS account_name,
     dh.series AS series,
     dh.transaction_type || ' ' || dh.source_document_number AS document_number,
-    db.memo_line AS comments,
+    COALESCE(dh.memo, db.memo_line) AS comments,
     (db.debit - db.credit) AS debit_credit,
     u.name AS created_by,
     db.location_profit_code,

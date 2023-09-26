@@ -207,7 +207,7 @@ SELECT
     db.accounting_rule,
     db.accounting_type,
     db.user_type,
-    db.memo_line AS comments,
+    COALESCE(dh.memo, db.memo_line) AS comments,
     (db.debit - db.credit) AS debit_credit,
     db.debit,
     db.credit,
