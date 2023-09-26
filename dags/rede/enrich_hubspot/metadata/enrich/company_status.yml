@@ -34,6 +34,10 @@ columns:
     lineage:
       - datalake_hubspot.company.lead_status_history
     description: The new lead status in HubSpot.
+  days_in_status:
+    lineage:
+      - datalake_hubspot.company.
+    description: The number of days the company has been in the status.
   is_partner:
     description: Whether the company is a partner or not at that point.
   ts_status_started:

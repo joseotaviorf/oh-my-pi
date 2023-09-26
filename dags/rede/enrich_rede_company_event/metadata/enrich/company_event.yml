@@ -58,6 +58,14 @@ columns:
   event:
     description: Treated name of the event. For example, "Membership Started", "Lead"
       or "Deal Lost".
+  event_type:
+    description: Type of the event.
+    categories:
+      Contract Transition: "Rede used to have a quite different contract model when it began. That changed, which put all partners in a transition process to become members with the new contract model. Not all partners agreed to become members."
+      Deal: "Events linked to dealing with the company. These can range from contact attempts, growth nurturing, meetings, documentation and contract signing."
+      Demand Onboarding: "Events linked to the demand onboarding process. For example: onboarding, first demand received and etc."
+      Status: "Referring to the company's journey through the funnel steps of the Rede QuintoAndar business model."
+      Supply Onboarding: "Events linked to the supply onboarding process. For example: onboarding, integration, first listings and etc."
   hubspot_event_detail:
     lineage:
       - datalake_hubspot.company_status.lead_status
