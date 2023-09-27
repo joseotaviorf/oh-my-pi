@@ -1,20 +1,26 @@
 ---
 database_name: dw_datamarts
 table_name: rent_flow_interactions
+description: reservations, offers and conversations with agents. 
+domain: Growth
+owner: cristina.cardoso@quintoandar.com.br
 columns:
   sk_client:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_client
       - datalake_talk_to_agent.talk_to_agent.tenant_id
+    description: key of the client user.
   sk_house_listing:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_house_listing
       - datalake_talk_to_agent.talk_to_agent.sk_house_listing
+    description: key of the listing of the house after prospect.
   id_house:
     lineage:
       - dw_public.dim_booking.id_property
       - dw_public.dim_offer.id_property
       - datalake_talk_to_agent.talk_to_agent.house_id
+    description: key of the house.
   sk_rf:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_client
@@ -22,62 +28,75 @@ columns:
       - dw_public.dim_booking.id_property
       - dw_public.dim_offer.id_property
       - datalake_talk_to_agent.talk_to_agent.house_id
+    description: key of the rent flow.
   sk_region:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_region
       - dw_public.fact_house_listings.sk_region
+    description: key of the region of the QuintoAndar.
   mkt_origin:
     lineage:
       - dw_public.dim_booking.mkt_origin
       - dw_public.dim_offer.mkt_origin
       - datalake_talk_to_agent.talk_to_agent.mkt_origin
+    description: Marketing origin as defined by the lead taxonomy.
   mkt_channel:
     lineage:
       - dw_public.dim_booking.mkt_channel
       - dw_public.dim_offer.mkt_channel
       - datalake_talk_to_agent.talk_to_agent.mkt_channel
+    description: Marketing channel as defined by the lead taxonomy.
   mkt_medium:
     lineage:
       - dw_public.dim_booking.mkt_medium
       - dw_public.dim_offer.mkt_medium
       - datalake_talk_to_agent.talk_to_agent.mkt_medium
+    description: Marketing medium as defined by the lead taxonomy.
   mkt_source:
     lineage:
       - dw_public.dim_booking.mkt_source
       - dw_public.dim_offer.mkt_source
       - datalake_talk_to_agent.talk_to_agent.mkt_source
+    description: Marketing source as defined by the lead taxonomy.
   utm_medium:
     lineage:
       - dw_public.dim_booking.utm_medium
       - dw_public.dim_offer.utm_medium
       - datalake_talk_to_agent.talk_to_agent.utm_medium
+    description: Shows the medium or location where the link was shared.
   utm_source:
     lineage:
       - dw_public.dim_booking.utm_source
       - dw_public.dim_offer.utm_source
       - datalake_talk_to_agent.talk_to_agent.utm_source
+    description: The origin of the traffic, which website, advertiser or publication the user came from.
   utm_campaign:
     lineage:
       - dw_public.dim_booking.utm_campaign
       - dw_public.dim_offer.utm_campaign
       - datalake_talk_to_agent.talk_to_agent.utm_campaign
+    description: Parameter defined at campaing configuration at marketing platforms.
   utm_term:
     lineage:
       - dw_public.dim_booking.utm_term
       - dw_public.dim_offer.utm_term
       - datalake_talk_to_agent.talk_to_agent.utm_term
+    description: Used to differentiate different keywords in paid search ads.
   utm_content:
     lineage:
       - dw_public.dim_booking.utm_content
       - dw_public.dim_offer.utm_content
       - datalake_talk_to_agent.talk_to_agent.utm_content
+    description: Shows content related to the link, especially when similar content is made for different audiences.
   dt_event:
     lineage:
       - dw_public.dim_booking.dt_created
       - dw_public.dim_offer.dt_first_sent
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
+    description: Date of when the event occurred.
   ts_event:
     lineage:
       - dw_public.dim_booking.dt_created
       - dw_public.dim_offer.dt_first_sent
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
+    description: Timestamp of when the event occurred.
