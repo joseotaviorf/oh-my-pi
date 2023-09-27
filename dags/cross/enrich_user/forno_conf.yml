@@ -10,6 +10,6 @@ inner_dependencies:
     - broker_user
     - tenant_user
     - photographer_user
-    - property_owner
+    - landlord
 
 partition_cols: [country_code, year, month, day]
