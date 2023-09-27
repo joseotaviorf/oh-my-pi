@@ -110,9 +110,9 @@ dispatch_rules (
 )
 SELECT 
     sk_house,
-    YEAR(CURRENT_DATE) AS year,
-    MONTH(CURRENT_DATE) AS month,
-    DAY(CURRENT_DATE) AS day
+    {year} AS year,
+    {month} AS month,
+    {day} AS day
 FROM 
     dispatch_rules 
 WHERE
