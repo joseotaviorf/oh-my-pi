@@ -283,6 +283,20 @@ tables:
     has_raw: False
   - table_name: group_trailer
     has_raw: False
+  - table_name: batch_header
+    has_raw: False
+  - table_name: batch_trailer_030
+    has_raw: False
+  - table_name: batch_trailer_050
+    has_raw: False
+  - table_name: file_header
+    has_raw: False
+  - table_name: file_trailer
+    has_raw: False
+  - table_name: financial_extracts_030e
+    has_raw: False
+  - table_name: financial_extracts_050e
+    has_raw: False
 inner_dependencies:
   acquirer_header:
     - adjustments
