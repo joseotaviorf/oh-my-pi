@@ -1,0 +1,10 @@
+SELECT
+    id,
+    id_contract,
+    status,
+    dt_vacancy,
+    dt_ended_termination,
+    ts_created,
+    ts_canceled
+FROM
+    datalake_terminator_clean.termination

@@ -1,0 +1,36 @@
+---
+database_name: datalake_terminator
+table_name: termination
+description: Enriched table that has information related to a contract termination.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_terminator_clean.termination.
+    description: Id of the termination. Must be unique.
+  id_contract:
+    lineage:
+      - datalake_terminator_clean.termination.id_contract
+    description: Id of the contract related to the termination. It could not be unique.
+  status:
+    lineage:
+      - datalake_terminator_clean.termination.status
+    description: Status of the termination.
+  dt_vacancy:
+    lineage:
+      - datalake_terminator_clean.termination.dt_vacancy
+    description: Date of when the property related to the termination was vacated.
+      It's the most reliable date related to the contract annullment.
+  dt_ended_termination:
+    lineage:
+      - datalake_terminator_clean.termination.dt_ended_termination
+    description: Date of when the termination finished all the steps necessary.
+  ts_created:
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+    description: Timestamp of when the termination was created.
+  ts_canceled:
+    lineage:
+      - datalake_terminator_clean.termination.ts_canceled
+    description: Timestam of when the termination was canceled.

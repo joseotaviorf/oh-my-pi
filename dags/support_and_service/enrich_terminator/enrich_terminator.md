@@ -15,6 +15,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there are the following output tables in our enrich layer:
 
+- `termination`
 - `termination_aud`
 
 ​</details>

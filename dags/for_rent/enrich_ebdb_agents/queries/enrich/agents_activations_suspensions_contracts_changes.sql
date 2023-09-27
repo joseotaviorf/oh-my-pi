@@ -1,5 +1,5 @@
 WITH agent_work_contract_revision AS (
-    SELECT 
+    SELECT
         awc.id,
         id_work_contract,
         LAG(id_work_contract) OVER (PARTITION BY awc.id ORDER BY rev ASC) AS id_previous_work_contract,
@@ -14,7 +14,7 @@ WITH agent_work_contract_revision AS (
     FROM
         datalake_ebdb_clean.agent_data_aud AS awc
     INNER JOIN
-        datalake_ebdb_clean.user_revision_entity AS revision 
+        datalake_ebdb_clean.user_revision_entity AS revision
             ON awc.rev = revision.id
 ),
 agent_work_contract_info AS (
@@ -46,19 +46,19 @@ agent_work_contract_info AS (
     FROM
         agent_work_contract_revision AS awc
     LEFT JOIN
-        datalake_ebdb_clean.user AS user 
+        datalake_ebdb_clean.user AS user
             ON awc.id_user_change = user.id
     LEFT JOIN
-        datalake_ebdb_clean.user AS agent 
+        datalake_ebdb_clean.user AS agent
             ON awc.id = agent.id_agent
     LEFT JOIN
-        datalake_ebdb_clean.work_contract AS cwc 
+        datalake_ebdb_clean.work_contract AS cwc
             ON awc.id_work_contract = cwc.id
     LEFT JOIN
-        datalake_ebdb_clean.work_contract AS pwc 
+        datalake_ebdb_clean.work_contract AS pwc
             ON awc.id_previous_work_contract = pwc.id
     LEFT JOIN
-        datalake_ebdb_clean.agent_data_types AS at 
+        datalake_ebdb_clean.agent_data_types AS at
             ON at.id_agent_data = agent.id_agent
     WHERE
         has_changed_work_contract = TRUE OR has_changed_activated = TRUE
