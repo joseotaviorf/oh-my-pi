@@ -20,7 +20,7 @@ SELECT DISTINCT
     ljs.is_listing_and_search,
     ljs.is_pre_contract,
     ljs.is_post_contract,
-    ljs.is_pp_multi_active AS is_pp_multi,
+    ljs.is_pp_multi,
     DATE(u.dt_birth) AS dt_birth,
     u.ts_created AS ts_user_created,
     u.ts_updated AS ts_user_updated,
