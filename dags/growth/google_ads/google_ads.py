@@ -21,7 +21,10 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_min_io-memory_cluster"
-CUSTOM_LIBRARIES = [{"pypi": {"package": "google-ads"}}]
+CUSTOM_LIBRARIES = [
+    {"pypi": {"package": "google-ads"}},
+    {"pypi": {"package": "google-auth==2.23"}},
+]
 
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols")
@@ -93,7 +96,6 @@ datalake_task_group = DatalakeTaskGroup(
 )
 
 for report_type in REPORTS_LIST:
-
     raw_task_group = datalake_task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
