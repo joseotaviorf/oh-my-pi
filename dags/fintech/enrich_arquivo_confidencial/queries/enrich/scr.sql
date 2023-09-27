@@ -3,7 +3,7 @@ WITH scr_data AS (
     id,
     cpf,
     `version`,
-    EXPLODE(FROM_JSON(raw_data:analysis_output:scr.scr_data,
+    explode_outer(FROM_JSON(raw_data:analysis_output:scr.scr_data,
         'array<
         struct<
             source:string,
@@ -56,7 +56,7 @@ operation_items_exploded AS (
     scr_data.reference_date,
     scr_data.financial_institution_count,
     scr_data.start_relationship_date,
-    EXPLODE(scr_data.operation_items) AS dat,
+    explode_outer(scr_data.operation_items) AS dat,
     ts_created,
     ts_updated,
     ts_next_updated
