@@ -24,6 +24,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from quintoandar_logger import QuintoAndarLogger
 
 import boto3
+from pyspark.sql.functions import lit
 from pyspark.sql.types import StructType, StringType, StructField
 from pyspark.sql import DataFrame
 
@@ -47,7 +48,6 @@ def list_files(table_name, source_root_path, format, datetime_to_ingest):
         filtered_files = list(filter(pattern.match, files))
 
     return filtered_files
-
 
 def generate_schema(col_names: list):
     fields = []
@@ -135,7 +135,7 @@ if __name__ == "__main__":
             dfs = []
 
             for path in filtered_files:
-                df = spark.read.text(filtered_files)
+                df = spark.read.text(path)
                 df = df.select(
                     df.value.substr(1,3).alias('id_bank'),
                     df.value.substr(4,4).alias('id_service_batch'),
@@ -143,6 +143,7 @@ if __name__ == "__main__":
                     df.value.substr(9,240).alias('metadata'),
 
                     )
+                df = df.withColumn('file_name', lit(path))
                 dfs.append(df)
 
             df = reduce(DataFrame.unionAll, dfs)

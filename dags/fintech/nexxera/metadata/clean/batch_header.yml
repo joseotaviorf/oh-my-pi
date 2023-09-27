@@ -1,0 +1,89 @@
+---
+database_name: datalake_nexxera_clean
+table_name: batch_header
+description: "Table containing all batch headers from financial extract files from itaú and bradesco with layout 030 and 050 and segment 'e'. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+columns:
+  id_bank:
+    lineage:
+      - datalake_nexxera_raw.ext.col_1
+  id_service_batch:
+    lineage:
+      - datalake_nexxera_raw.ext.col_2
+  record_type:
+    lineage:
+      - datalake_nexxera_raw.ext.col_3
+  operation_type:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  service_type:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  launch_type:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  file_layout_version:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  company_register_type:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  company_register_number:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  account_type:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  bank_insurance_code:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  company_agency_number:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  company_agency_digit:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  company_account_number:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  company_account_digit:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  agency_account_digit:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  company_name:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  second_line_extract:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  inicial_balance_value:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  inicial_balance_situation:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  inicial_balance_position:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  extract_currency:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  extract_sequence_number:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  cnab_reserved_field:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  dt_inicial_balance:
+    lineage:
+      - datalake_nexxera_raw.ext.col_4
+  year:
+    lineage:
+      - datalake_nexxera_raw.ext.year
+  month:
+    lineage:
+      - datalake_nexxera_raw.ext.month
+  day:
+    lineage:
+      - datalake_nexxera_raw.ext.day
