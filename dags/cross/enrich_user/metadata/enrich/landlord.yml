@@ -1,28 +1,25 @@
 ---
 database_name: datalake_user
-table_name: tenant_user
+table_name: property_owner
 description:
-  Tenant users and their respective journey step. Each row in the table represents a
-  specific customer on a daily snapshot.
+  Ebdb Users daily snapshot classified as active property owners, considering houses
+  with the status of alugado, suspenso, aguardando_publicacao, edicao or publicado.
+  The house id_user should not be an active partner agent.
 domain: Cross
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_snapshot:
-    lineage:
-      - datalake_tenant_journey.tenant_journey_step.id_snapshot
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"
   id_user:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.id_client
-    description:
-      The client id, which is the user id that has searched a house in the amplitude
-      events or the tenant prospect id that has an event in the rent demand funnel
+      - datalake_ebdb_clean.user.id
+    description: The user id in the main.
   id_country:
     lineage:
       - datalake_ebdb_clean.user.id_country
     description: The user country id.
   client_type:
-    description: Client type defined as tenant.
+    description: Client type defined as property owner.
   country_code:
     lineage:
       - datalake_ebdb_clean.country.country_code
@@ -45,10 +42,8 @@ columns:
     description: The user individual brazilian registry.
   journey_step:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.journey_step
-    description:
-      The tenant journey step, respecting how deep the customer is on their
-      rental journey
+      - datalake_landlord_journey.landlord_journey_step.journey_step
+    description: How deep the customer is on their rental journey
     categories:
       Offboarding:
         Indicates if the client is currently in the offboarding step in
@@ -74,7 +69,7 @@ columns:
         in the rental context
   persona_step:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.persona_step
+      - datalake_landlord_journey.landlord_journey_step.persona_step
     description:
       Indicates if the user is in any step before signing a contract or after signing a
       contract. If the user is in the post_contract step,it will not assume the
@@ -95,29 +90,31 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.is_blocked
     description: If the user is blocked or not.
+  is_pp_multi:
+    description: If the user is part of pp_multi program or not.
   is_offboarding:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.is_offboarding
+      - datalake_landlord_journey.landlord_journey_step.is_offboarding
     description:
       If the user has an active termination, it indicates that the user is currently
       in the offboarding step of the rental journey
   is_ongoing:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.is_ongoing
+      - datalake_landlord_journey.landlord_journey_step.is_ongoing
     description:
       If the user has at least one active contract and the last contract signed occurred
       past the last 40 days, with the snapshot date serving as the reference point, then the
       user is currently in the ongoing step of the rental journey
   is_onboarding:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.is_onboarding
+      - datalake_landlord_journey.landlord_journey_step.is_onboarding
     description:
       If the user has at least one active contract and the last contract signed occurred
       within the last 40 days, with the snapshot date serving as the reference point, then the
       user is currently in the onboarding step of the rental journey
   is_contract_to_entrance:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.is_contract_to_entrance
+      - datalake_landlord_journey.landlord_journey_step.is_contract_to_entrance
     description:
       If the user has had events such as the last evaluation start, last evaluation approval,
       last document sending, last credit approval, or last proposal rejection within the
@@ -125,7 +122,7 @@ columns:
       currently in the contract to entrance step of the rental journey
   is_visits_to_offer:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.is_visits_to_offer
+      - datalake_landlord_journey.landlord_journey_step.is_visits_to_offer
     description:
       If the user has had events such as the last booking, last canceled booking,
       last visiting, last offer sending, last offer rejected, last reservation created,
@@ -134,20 +131,20 @@ columns:
       the rental journey
   is_listing_and_search:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.is_listing_and_search
+      - datalake_landlord_journey.landlord_journey_step.is_listing_and_search
     description:
       If the user has had a last house searching event within the last 40 days, with
       the snapshot date as the reference point, then the user is currently in the
       listing and search step of the rental journey
   is_pre_contract:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.is_pre_contract
+      - datalake_landlord_journey.landlord_journey_step.is_pre_contract
     description:
       If the user has taken any step in contract to entrance, visits to offer, or
       listing and search, it signifies that the user is in a pre-contract step
   is_post_contract:
     lineage:
-      - datalake_tenant_journey.tenant_journey_step.is_post_contract
+      - datalake_landlord_journey.landlord_journey_step.is_post_contract
     description:
       If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
       that the user is in a post-contract step
@@ -164,14 +161,8 @@ columns:
       - datalake_ebdb_clean.user.ts_updated
     description: The user last updated date in the system.
   year:
-    lineage:
-      - datalake_tenant_journey.tenant_journey_step.year
     description: Snapshot year, partition column.
   month:
-    lineage:
-      - datalake_tenant_journey.tenant_journey_step.month
     description: Snapshot month, partition column.
   day:
-    lineage:
-      - datalake_tenant_journey.tenant_journey_step.day
     description: Snapshot day, partition column.

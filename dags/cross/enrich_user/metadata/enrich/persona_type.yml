@@ -75,9 +75,9 @@ columns:
       - datalake_user.photographer_user.cpf
       - datalake_user.property_owner.cpf
     description: The user individual brazilian registry.
-  tenant_journey_step:
+  journey_step:
     lineage:
-      - datalake_user.tenant_user.tenant_journey_step
+      - datalake_user.tenant_user.journey_step
     description:
       The tenant journey step, respecting how deep the customer is on their
       rental journey. Only tenants has this column filled.
@@ -104,7 +104,7 @@ columns:
       Default:
         Indicates if the client is not currently active in any of the journey steps
         in the rental context
-  tenant_persona_step:
+  persona_step:
     lineage:
       - datalake_user.tenant_user.tenant_persona_step
     description:

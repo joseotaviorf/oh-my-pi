@@ -29,7 +29,7 @@ pp_post AS (
   INNER JOIN
     datalake_user.persona_type AS pt
       ON pt.id_user = du.sk_user
-      AND pt.client_type = 'property_owner'
+      AND pt.client_type = 'landlord'
       AND pt.year = {year}
       AND pt.month = {month}
       AND pt.day = {day}
@@ -45,7 +45,7 @@ pp_pre AS (
   INNER JOIN
     datalake_user.persona_type AS pt
       ON pt.id_user = du.sk_user
-      AND pt.client_type = 'property_owner'
+      AND pt.client_type = 'landlord'
       AND pt.year = {year}
       AND pt.month = {month}
       AND pt.day = {day}
