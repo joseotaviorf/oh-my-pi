@@ -7,7 +7,7 @@ column_level_validations:
   city_group:
     is_complete:
   tier:
-    is_completed:
+    is_complete:
   dt_day:
     is_complete:
   dt_week_started:
