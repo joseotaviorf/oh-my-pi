@@ -1,0 +1,47 @@
+WITH account_manager AS (
+  SELECT DISTINCT
+    id_owner,
+    id_account_manager,
+    DATE(ts_account_manager_started) AS dt_account_manager_started,
+    DATE(ts_account_manager_ended) AS dt_account_manager_ended
+  FROM
+    datalake_pro_owners.pro_owner_history
+)
+SELECT
+  hldi.id_house_listing_day AS sk_house_listing_day,
+  hldi.id_house_listing AS sk_house_listing,
+  hldi.id_house AS sk_house,
+  COALESCE(hldi.id_contract, -1) AS sk_contract,
+  COALESCE(hldi.id_owner, -1) AS sk_owner,
+  COALESCE(am.id_account_manager, -1) AS sk_account_manager,
+  COALESCE(doc.id_owner_category, -1) AS sk_owner_category,
+  COALESCE(hldi.id_occupant, -1) AS sk_occupant,
+  COALESCE(hldi.id_partner, -1) AS sk_partner,
+  COALESCE(hldi.id_partner_big_agent, -1) AS sk_partner_big_agent,
+  COALESCE(hldi.id_region, -1) AS sk_region,
+  DATE_FORMAT(DATE(ts_status_started), 'yyyyMMdd') AS sk_status_started_date,
+  COALESCE(DATE_FORMAT(DATE(ts_status_ended), 'yyyyMMdd'), -1) AS sk_status_ended_date,
+  DATE_FORMAT(dt_day, 'yyyyMMdd') AS sk_date,
+  hldi.country_code,
+  hldi.year,
+  hldi.month,
+  hldi.day,
+  NOW() AS ts_load
+FROM
+  datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
+LEFT JOIN
+  datalake_pro_owners.daily_owner_category AS doc
+    ON hldi.id_owner = doc.id_owner
+    AND hldi.year = doc.year
+    AND hldi.month = doc.month
+    AND hldi.day = doc.day
+LEFT JOIN
+  account_manager AS am
+    ON hldi.id_owner = am.id_owner
+    AND MAKE_DATE(hldi.year, hldi.month, hldi.day) >= am.dt_account_manager_started
+    AND MAKE_DATE(hldi.year, hldi.month, hldi.day) < COALESCE(am.dt_account_manager_started, CURRENT_DATE())
+WHERE
+  hldi.year = {year}
+  AND hldi.month = {month}
+  AND hldi.day = {day}
+  AND hldi.is_for_rent = TRUE

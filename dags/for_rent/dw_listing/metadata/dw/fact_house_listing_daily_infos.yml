@@ -1,0 +1,85 @@
+---
+database_name: dw_rent
+table_name: fact_house_listing_daily_infos
+description: Daily snapshot information related to rental house listings. Each line is a listing
+  related to a house in a specific date with it's information about the agents, contract, account manager (PP Multi).
+  The sk_house_listing is not unique in this table, but the sk_house_listing_day is unique. This column is the
+  concatenation of sk_house_listing + sk_day.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_house_listing_day:
+    lineage:
+    - datalake_rental_historical_follow_up.house_listings_daily_info.id_house_listing_day
+    description: Unique key of table. It's the concatenation of sk_house_listing with the competence date (yyyymmdd).
+  sk_house_listing:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_house_listing
+    description: Key of house listing.
+  sk_house:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_house
+    description: Key of house.
+  sk_contract:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_contract
+    description: Key of the contract.
+  sk_owner:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_owner
+    description: Key of user who's the house owner.
+  sk_account_manager:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_account_manager
+    description: Key of user who's responsible to manage the user if the user is a PP Multi.
+  sk_owner_category:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_owner_category
+    description: Key of user version who's the house owner. It can be joined with dw_rent.dim_owner_category
+      to check the owner's category.
+  sk_occupant:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_occupant
+    description: Key of the occupant type.
+  sk_partner:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_partner
+    description: Key of partner if the house listing was added by a partner.
+  sk_partner_big_agent:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_partner_big_agent
+    description: Key of partner from Big Agent source.
+  sk_region:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_region
+    description: Key of house's region.
+  sk_status_started_date:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.ts_status_started
+    description: Key of listing status started date.
+  sk_status_ended_date:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.ts_status_ended
+    description: Key of listing status ended date.
+  sk_date:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.dt_day
+    description: Key of reference date.
+  country_code:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.country_code
+    description: Country code of the house.
+  year:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.year
+    description: Year of the reference date. Also it's a partition.
+  month:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.month
+    description: Month of the reference date. Also it's a partition.
+  day:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.day
+    description: Day of the reference date. Also it's a partition.
+  ts_load:
+    description: Timestamp of when the table was updated.

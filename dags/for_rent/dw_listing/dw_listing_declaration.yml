@@ -10,6 +10,14 @@ workflow:
   tables_customization:
     dim_condo:
       partitions: []
+    fact_house_listing_daily_infos:
+      custom_schema: rent
+      partitions: ["country_code", "year", "month", "day"]
+      extraction_type: incremental
+      extra_query_template_params:
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
 cluster:
   type: databricks_10_4_med_general_photon_cluster
   access_control_list:
