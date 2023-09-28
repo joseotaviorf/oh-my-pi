@@ -29,7 +29,10 @@ SELECT
 FROM
     datalake_nexxera_raw.financial_extracts
 WHERE
-    id_bank IN (341, 237)
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+    AND id_bank IN (341, 237)
     AND id_service_batch = '0000'
     AND record_type = 0
     AND SUBSTRING(metadata, 156, 3) IN ('050', '030')

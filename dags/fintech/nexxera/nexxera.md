@@ -17,10 +17,16 @@ In datalake raw and clean, via incremental load:
 - `adjustments`
 - `acquirer_header`
 - `acquirer_trailer`
+- `batch_header`
+- `batch_trailer_030`
+- `batch_trailer_050`
 - `establishment_header`
 - `establishment_trailer`
+- `file_header`
+- `file_trailer`
 - `financial`
-- `financial_extracts`
+- `financial_extracts_030e`
+- `financial_extracts_050e`
 - `financial_legacy`
 - `group_header`
 - `group_trailer`

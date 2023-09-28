@@ -12,7 +12,10 @@ SELECT
 FROM
     datalake_nexxera_raw.financial_extracts
 WHERE
-    id_bank IN (341, 237)
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+    AND id_bank IN (341, 237)
     AND id_service_batch = '9999'
     AND record_type = 9
     AND CONCAT(year,month,day) <> 20181120 -- on this date we have the layouts 081 and 080, these versions need a different structure of fields

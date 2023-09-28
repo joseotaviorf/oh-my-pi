@@ -31,6 +31,9 @@ SELECT
 FROM
     datalake_nexxera_raw.financial_extracts
 WHERE
-    id_bank IN (341, 237)
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+    AND id_bank IN (341, 237)
     AND record_type = 1
     AND SUBSTRING(metadata, 6, 3) NOT IN ('080', '081')

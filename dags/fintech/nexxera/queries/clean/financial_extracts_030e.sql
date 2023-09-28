@@ -29,7 +29,10 @@ SELECT
 FROM
     datalake_nexxera_raw.financial_extracts
 WHERE
-    id_bank IN (341, 237)
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+    AND id_bank IN (341, 237)
     AND record_type = 3
     AND SUBSTRING(metadata, 6, 1) = 'E'
-    AND SUBSTRING(file_name, 41, 14) = 'ext_237_93738_'
+    AND SUBSTRING(file_name, 48, 14) = 'ext_237_93738_'
