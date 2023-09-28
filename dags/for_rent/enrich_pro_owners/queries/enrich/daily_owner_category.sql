@@ -11,10 +11,13 @@ owner_house_category AS(
   SELECT
     ohqh.id_owner,
     ohqh.country_code,
-    IF(ohqh.ongoing_houses < 5, '<5', '>=5') AS category,
-    poh.id_owner IS NULL
-      OR poh.is_pro_owner = FALSE AS is_amateur,
-    COALESCE(poh.is_pro_owner, FALSE) AS is_pp_multi_active,
+    ohqh.ongoing_houses >= 5 AS has_5_or_more_ongoing_houses,
+    CASE 
+      WHEN poh.is_pro_owner THEN TRUE
+      WHEN (poh.id_owner IS NULL 
+        OR poh.is_pro_owner) THEN FALSE
+      ELSE FALSE
+    END AS is_pp_multi,
     ohqh.dt_houses_owned,
     ohqh.year,
     ohqh.month,
@@ -30,12 +33,10 @@ owner_house_category AS(
 owner_house_category_changes AS (
   SELECT
     id_owner,
-    category,
-    LAG(category) OVER (PARTITION BY id_owner ORDER BY year, month, day) AS previous_category,
-    is_amateur,
-    LAG(is_amateur) OVER (PARTITION BY id_owner ORDER BY year, month, day) AS previous_is_amateur,
-    is_pp_multi_active,
-    LAG(is_pp_multi_active) OVER (PARTITION BY id_owner ORDER BY year, month, day) AS previous_is_pp_multi_active,
+    has_5_or_more_ongoing_houses,
+    LAG(has_5_or_more_ongoing_houses) OVER (PARTITION BY id_owner ORDER BY year, month, day) AS previous_has_5_or_more_ongoing_houses,
+    is_pp_multi,
+    LAG(is_pp_multi) OVER (PARTITION BY id_owner ORDER BY year, month, day) AS previous_is_pp_multi,
     dt_houses_owned,
     year,
     month,
@@ -47,29 +48,32 @@ owner_category AS (
   SELECT
     id_owner,
     ROW_NUMBER() OVER (PARTITION BY id_owner ORDER BY year, month, day) AS owner_category,
-    category,
-    is_amateur,
-    is_pp_multi_active,
-    year, 
-    month, 
-    day,
+    has_5_or_more_ongoing_houses,
+    is_pp_multi,
+    MAKE_DATE(year, month, day) AS dt_owner_category_started,
     LEAD(dt_houses_owned) OVER (PARTITION BY id_owner ORDER BY year, month, day) AS dt_owner_category_ended
   FROM
     owner_house_category_changes
   WHERE
-    category <> previous_category
-    OR is_amateur <> previous_is_amateur
-    OR is_pp_multi_active <> previous_is_pp_multi_active
-) 
-
+    has_5_or_more_ongoing_houses <> previous_has_5_or_more_ongoing_houses
+    OR is_pp_multi <> previous_is_pp_multi
+),
+current_category AS (
+  SELECT
+    id_owner,
+    MAX(owner_category) AS last_category
+  FROM
+    owner_category
+  GROUP BY 1
+)
 SELECT
-  ohc.id_owner || 0 || COALESCE(ov.owner_category, 0) AS id_owner_category,
+  ohc.id_owner || 0 || COALESCE(oc.owner_category, 0) AS id_owner_category,
   ohc.id_owner,
-  ohc.category,
   ohc.country_code,
-  COALESCE(ov.owner_category, 0) AS owner_category,
-  ohc.is_amateur,
-  ohc.is_pp_multi_active,
+  COALESCE(oc.owner_category, 0) AS owner_category,
+  ohc.has_5_or_more_ongoing_houses,
+  ohc.is_pp_multi,
+  COALESCE(oc.owner_category, 0) = COALESCE(cc.last_category, 0) AS is_current_category,
   ohc.dt_houses_owned AS dt_owner_category,
   ohc.year,
   ohc.month,
@@ -77,7 +81,10 @@ SELECT
 FROM
   owner_house_category AS ohc
 LEFT JOIN
-  owner_category AS ov
-    ON ohc.id_owner = ov.id_owner
-    AND MAKE_DATE(ohc.year, ohc.month, ohc.day) >= MAKE_DATE(ov.year, ov.month, ov.day)
-    AND MAKE_DATE(ohc.year, ohc.month, ohc.day) < COALESCE(dt_owner_category_ended, CURRENT_DATE())
+  owner_category AS oc
+    ON ohc.id_owner = oc.id_owner
+    AND MAKE_DATE(ohc.year, ohc.month, ohc.day) >= oc.dt_owner_category_started
+    AND MAKE_DATE(ohc.year, ohc.month, ohc.day) < COALESCE(oc.dt_owner_category_ended, CURRENT_DATE())
+LEFT JOIN
+  current_category AS cc
+    ON ohc.id_owner = cc.id_owner

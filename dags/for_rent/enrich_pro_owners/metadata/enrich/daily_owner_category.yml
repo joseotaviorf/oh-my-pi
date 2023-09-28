@@ -13,9 +13,6 @@ columns:
     lineage:
     - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
     description: Id user of the owner.
-  category:
-    description: Category of the owner based on the number of ongoing houses (status published, rented or suspended)
-      that the user had in a date.
   country_code:
     lineage:
     - datalake_pro_owners.daily_owner_houses_quantity_history.country_code
@@ -24,10 +21,15 @@ columns:
     description: Integer with the number of the owner.
       Any change in this table results a new category of the user, even if the owner had the same category previously.
       It starts at 0.
-  is_amateur:
-    description: Boolean value to check if the owner is Amateur, which is not participating in the PP Multi program.
-  is_pp_multi_active:
+  has_5_or_more_ongoing_houses:
+    description: Boolean value to check if the owner has 5 or more ongoing houses (status published, rented or suspended) in a date.
+  is_pp_multi:
     description: Boolean value to check if the owner is participating in the PP Multi program and is active.
+    categories:
+      "true": The owner is participating in PP Multi program and is active.
+      "false": The owner is not participating in PP Multi program, so it's amateur.
+  is_current_category:
+    description: Boolean value to check if the owner's category is the most recent.
   dt_owner_category:
     lineage:
     - datalake_pro_owners.daily_owner_houses_quantity_history.dt_houses_owned
