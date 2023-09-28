@@ -11,7 +11,6 @@ subscriptions:
   rent_offer: "offers-audit-data-engineering-subscription"
   monday: "mondayBoard-audit-data-engineering-subscription"
 custom_libraries: [
-    {
-        "pypi": {"package": "google-cloud-pubsub==2.5.0"}
-    }
+    {"pypi": {"package": "google-cloud-pubsub==2.5.0"}},
+    {"pypi": {"package": "google-auth==2.23"}},
 ]
