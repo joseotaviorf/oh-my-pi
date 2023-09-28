@@ -56,6 +56,10 @@ def copy_from_origin_to_destination(origin_metadata: dict, destination_metadata:
 
 def copy_description(origin_metadata: dict, destination_metadata: dict, origin_column_name: str, destination_column_name: str) -> Dict:
     try:
+        description = origin_metadata["columns"][origin_column_name].get("description")
+        if not description:
+            print(f"There is no description to copy on origin table for column {origin_column_name}")
+            return destination_metadata
         if origin_column_name not in origin_metadata["columns"]:
             print(f"Column {origin_column_name} does not exist on origin metadata.")
             return destination_metadata
@@ -72,11 +76,11 @@ def copy_description(origin_metadata: dict, destination_metadata: dict, origin_c
         if "description" not in origin_metadata["columns"][origin_column_name]:
             print(f"Column {destination_column_name} has no description on origin table")
             return destination_metadata
-    except KeyError as e:
+    except KeyError:
         print(f"Key 'lineage' probably does not exist on destination metadata for column {destination_column_name}")
 
     print(f"Copying {origin_column_name} FROM {origin_metadata['table_name']} TO {destination_column_name} ON {destination_metadata['table_name']}")
-    destination_metadata["columns"][destination_column_name]["description"] = origin_metadata["columns"][origin_column_name]["description"]
+    destination_metadata["columns"][destination_column_name].update({"description" : description})
     return destination_metadata
 
 
