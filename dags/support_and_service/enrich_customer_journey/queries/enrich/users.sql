@@ -5,7 +5,7 @@ WITH iq_post AS (
   FROM
     datalake_user.tenant_user
   WHERE
-    is_tenant_post_contract IS TRUE
+    is_post_contract IS TRUE
     AND year = {year}
     AND month = {month}
     AND day = {day}
@@ -16,7 +16,7 @@ iq_pre AS (
   FROM
     datalake_user.tenant_user
   WHERE
-    is_tenant_pre_contract IS TRUE
+    is_pre_contract IS TRUE
     AND year = {year}
     AND month = {month}
     AND day = {day}
