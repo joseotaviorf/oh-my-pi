@@ -1,0 +1,16 @@
+---
+table_name: metric_rent.contracts_life_cycle
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  country_code:
+    is_complete:
+  city_group:
+    is_complete:
+  tier:
+    is_completed:
+  dt_day:
+    is_complete:
+  dt_week_started:
+    is_complete:
+  dt_month:
+    is_complete:

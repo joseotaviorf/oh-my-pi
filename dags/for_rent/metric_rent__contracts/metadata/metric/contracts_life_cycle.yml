@@ -1,0 +1,105 @@
+database_name: metric_rent
+table_name: contracts_life_cycle
+description: Table that consolidates coincident metrics related to contracts lifecycle, such as new contracts signed, new rentals,
+  terminations created, terminations canceled, terminations ended and ended rentals.
+  All these metrics are open by some dimensions, such as country code, city group, tier, date, week start and month.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  country_code:
+    lineage:
+      - dw_public.dim_region.country_code
+    description: Country code related to the contract.
+    dimension: True
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+    description: City group related to the contract.
+    dimension: True
+  tier:
+    lineage:
+      - dw_public.dim_region.tier
+    description: Tier related to the contract.
+    dimension: True
+  new_contracts_signed:
+    description: Amount of new contracts signed, which are contracts that are not necessarily generating revenue.
+    metric:
+      name: New Contracts Signed
+      description: Amount of contracts that were signed (not necessarily generated revenue).
+      acronym: NCS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: https://quintoandar.sa.looker.com/looks/4734
+  new_rentals:
+    description: Amount of new signed contracts that already started and are generating revenue.
+    metric:
+      name: New Rentals
+      description: Amount of signed contracts that started (generated revenue)
+      acronym: NR
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: https://quintoandar.sa.looker.com/looks/4737
+  terminations_created:
+    description: Amount of contract terminations that were requested.
+    metric:
+      name: Terminations Created
+      description: Amount of contract terminations that were requested.
+      acronym: TC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  terminations_canceled:
+    description: Amount of contract terminations that were requested but ended up being canceled.
+    metric:
+      name: Terminations Canceled
+      description: Amount of contract terminations that were requested but ended up being canceled.
+      acronym: TCL
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  terminations_ended:
+    description: Amount of contract terminations that were requested and already ended all the steps necessary.
+    metric:
+      name: Terminations Ended
+      description: Amount of contract terminations that were requested and already ended all the steps necessary.
+      acronym: TE
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  ended_rentals:
+    description: Amount of contracts that were annulled/ended (based on annulment date).
+    metric:
+      name: Ended Rentals
+      description: Amount of contracts that were annulled (based on annulment date).
+        Due to the nature of the product, this metric can change retroactively.
+      acronym: ER
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: 'https://quintoandar.sa.looker.com/looks/4740'
+  dt_day:
+    lineage:
+      - dw_public.dim_date.date
+    description: Date in which the event happened.
+    dimension: True
+  dt_week_started:
+    lineage:
+      - dw_public.dim_date.week_start
+    description: The week start related to the event's date.
+    dimension: True
+  dt_month:
+    lineage:
+      - dw_public.dim_date.month
+    description: The month related to the event's date.
+    dimension: True

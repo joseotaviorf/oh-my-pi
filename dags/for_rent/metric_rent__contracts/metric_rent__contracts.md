@@ -12,6 +12,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output tables in the metric layer
 
+- `contracts_life_cycle`
 - `ended_rentals_confirmed_daily`
 - `ended_rentals_confirmed_daily_by_sk_region`
 - `ended_rentals_confirmed_monthly`
