@@ -6,7 +6,7 @@ description: In this table, each line represents the daily availability in a spe
   id_house_date is the PK, built by the concatenation of id_house, dt_available_started
   and day_of_week.
 domain: For Rent
-owner: ''
+owner: gustavo.geiger@quintoandar.com.br
 columns:
   id_house:
     lineage:
@@ -14,6 +14,14 @@ columns:
     - datalake_ebdb_clean.house_weekly_schedule.id_house
     - datalake_ebdb_clean.house_weekly_schedule_aud.id_house
     description: Key for house.
+  id_house_date:
+    lineage:
+      - datalake_ebdb_clean.house.id
+      - datalake_ebdb_clean.house_weekly_schedule.id_house
+      - datalake_ebdb_clean.house_weekly_schedule_aud.id_house
+      - datalake_ebdb_clean.house_weekly_schedule.ts_created
+      - datalake_ebdb_clean.house_weekly_schedule_aud.ts_revision
+    description:
   id_user:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.id_user
@@ -111,3 +119,5 @@ columns:
       and day_of_weeek.
   day_hours_available:
     description: Amount of hours available in the day.
+  has_artificial_schedule:
+    description: Created a flag to flag schedules present in the product base and schedules arithmetically created to make sense with the business.

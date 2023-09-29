@@ -4,7 +4,7 @@ table_name: onboarding_task
 owner: 'kleber.inoue@quintoandar.com.br'
 domain: For Rent
 description: Tasks that tenants and owners should do when they're in onboarding step.
-  These tasks can be an inspection booking, change the bills ownership, etc.]
+  These tasks can be an inspection booking, change the bills ownership, etc.
 columns:
   id:
     description: ID of the task.

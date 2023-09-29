@@ -76,6 +76,8 @@ columns:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.number_evaluations
     description: "Evaluations done on docx for a given proposal."
+  tenant_doc_sent_count:
+    description: "How many times the tenant tried to send the document."
   has_tenant_sent_documentation:
     lineage:
       - datalake_ebdb_clean.proposal.has_tenant_sent_documentation

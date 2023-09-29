@@ -22,12 +22,10 @@ columns:
     lineage:
     - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
     - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
+    description: Ending of the period in which that row is valid.
   is_agent_for_sale:
     description: Boolean to tell if an agent belonged to ForSale business context
       at that moment.
   is_agent_for_rent:
     description: Boolean to tell if an agent belonged to ForRent business context
       at that moment.
-  ts_agent_business_context_end:
-    description: Ending of the period in which that row is valid. Null if it is still
-      valid.

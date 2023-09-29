@@ -2,7 +2,7 @@ database_name: datalake_airtable
 table_name: cr_occurrences
 description: This table contains information about cr_occurences.
 domain: For Rent
-owner: guilherme.cunha@quintoandar.com.br
+owner: gustavo.geiger@quintoandar.com.br
 columns:
   id_airtable_record:
     lineage:
@@ -72,6 +72,7 @@ columns:
   ts_updated:
     lineage:
     - datalake_airtable_clean.cr_occurrences.ts_updated
+    description: When this issue was updated.
   year:
     lineage:
     - datalake_airtable_clean.cr_occurrences.year

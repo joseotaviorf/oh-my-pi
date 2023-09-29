@@ -15,7 +15,7 @@ columns:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event
       - dw_rent.fact_rent_demand_events.sk_event_type
-    description: "Unique key consolidated with the base event id + base event type id + 
+    description: "Unique key consolidated with the base event id + base event type id +
       base event coverted id + base event type converted id. Every id is splitted by a single 0
       (e.g sk_base_event + 0 + sk_base_event_type + 0 + sk_conversion_event + 0 + sk_conversion_event_type)."
   sk_cohort_type:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event
     description: "Key of the base event. It joins with dw_rent.fact_rent_demand_events."
-  sk_base_event_type: 
+  sk_base_event_type:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event_type
     description: "Key of the base event type (indicating if the event is a VB, OS, etc.). It joins with dw_rent.fact_rent_demand_events."
@@ -34,7 +34,7 @@ columns:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event
     description: "Key of the conversion event. It joins with dw_rent.fact_rent_demand_events."
-  sk_conversion_type: 
+  sk_conversion_event_type:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event_type
     description: "Key of the conversion event type (indicating if the event is a VC, OS, etc.). It joins with dw_rent.fact_rent_demand_events."

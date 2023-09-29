@@ -3,7 +3,7 @@ table_name: activations
 description: This table contains information about the activation. We still having
   some information about agents, but the main subject here is the activation.
 domain: For Rent
-owner: guilherme.cunha@quintoandar.com.br
+owner: gustavo.geiger@quintoandar.com.br
 columns:
   id_activations:
     lineage:
@@ -49,6 +49,7 @@ columns:
   giving_up_reason:
     lineage:
     - datalake_airtable_clean.activations.giving_up_reason
+    description: The reason why agent gave up the activation.
   model:
     lineage:
     - datalake_airtable_clean.activations.model
@@ -88,7 +89,7 @@ columns:
   dt_birth:
     lineage:
     - datalake_airtable_clean.activations.dt_birth
-    description: Agent's bithday.
+    description: Agent's birthday.
   dt_contract_sent:
     lineage:
     - datalake_airtable_clean.activations.dt_contract_sent

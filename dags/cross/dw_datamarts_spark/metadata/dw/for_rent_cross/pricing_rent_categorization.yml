@@ -1,9 +1,9 @@
 ---
 database_name: dw_datamarts
 table_name: pricing_rent_categorization
-owner: '@data-for-rent'
-domain: Data For Rent
 description: A datamart to tracking pricing in rent context
+domain: For Rent
+owner: gustavo.geiger@quintoandar.com.br
 columns:
   sk_house_listing:
     description: "Identifier for the house listing and they version flow."
@@ -119,45 +119,47 @@ columns:
     description: "Total number of contracts for comparison."
     lineage:
       - dw_public.dim_contract.sk_contract
+  match_type:
+    description: "The similarity used to match the listing and the contract"
   diff_first_listing_contracts:
     description: "Difference between the first listing and the number of contracts."
     lineage:
       - dw_public.dim_contract.rent
       - datalake_ebdb_clean.house_aud.rent
   first_prediction_p_10:
-    description: "First prediction - 10th percentile." 
+    description: "First prediction - 10th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_10
   first_prediction_p_20:
-    description: "First prediction - 20th percentile." 
+    description: "First prediction - 20th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_20
   first_prediction_p_30:
-    description: "First prediction - 30th percentile." 
+    description: "First prediction - 30th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_30
   first_prediction_p_40:
-    description: "First prediction - 40th percentile." 
+    description: "First prediction - 40th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_40
   first_prediction_p_50:
-    description: "First prediction - 50th percentile." 
+    description: "First prediction - 50th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_50
   first_prediction_p_60:
-    description: "First prediction - 60th percentile." 
+    description: "First prediction - 60th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_60
   first_prediction_p_70:
-    description: "First prediction - 70th percentile." 
+    description: "First prediction - 70th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_70
   first_prediction_p_80:
-    description: "First prediction - 80th percentile." 
+    description: "First prediction - 80th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_80
   first_prediction_p_90:
-    description: "First prediction - 90th percentile." 
+    description: "First prediction - 90th percentile."
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_90
   first_prediction_certainty:
