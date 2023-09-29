@@ -1,58 +1,81 @@
 ---
 database_name: datalake_ebdb_agents
 table_name: agents_activations_suspensions_contracts_changes
+description: Enriched table that consolidates the changes made to the agents' contracts and who made them.
+domain: For Rent
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id
+    description: ID of the agent.
   id_work_contract:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
+    description: ID of the work contract of the agent.
   id_previous_work_contract:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.id_work_contract
+    description: Previous work contract ID of the agent.
   id_user_change:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
+    description: ID of the user who made the change.
   rev:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.rev
+    description: Unique ID for the change and can be joined with table rev_info to get more details.
   rev_type:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.rev_type
+    description: Type of the change made.
+    categories:
+      "0": Create
+      "1": Update
+      "2": Delete
   work_contract_name:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
+    description: Name of the work contract.
   previous_work_contract_name:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
+    description: Previous work contract name.
   agent_name:
     lineage:
       - datalake_ebdb_clean.user.name
+    description: Name of the agent.
   agent_type:
     lineage:
       - datalake_ebdb_clean.agent_data_types.types
+    description: Type of the agent.
   user_change_name:
     lineage:
       - datalake_ebdb_clean.user.name
+    description: Name of the user who made the change.
   user_change_email:
     lineage:
       - datalake_ebdb_clean.user.email
+    description: Email of the user who made the change.
   is_agent_active:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.is_active
+    description: Boolean indicating if the agent is active.
   has_changed_activated:
-    lineage:
-      - datalake_ebdb_clean.agent_data_aud.is_active
+    description: Boolean indicating whether is_agent_active has been changed.
   ts_revision:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the change.
   year:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Year of the change. It's a partition key, so it's performatic to filter or join by this column.
   month:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Month of the change. It's a partition key, so it's performatic to filter or join by this column.
   day:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Day of the change. It's a partition key, so its performatic to filter or join by this column.
