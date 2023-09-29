@@ -29,7 +29,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/"
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-
+DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
@@ -51,7 +51,7 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION, libraries=DEFAULT_LIBRARIES
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
