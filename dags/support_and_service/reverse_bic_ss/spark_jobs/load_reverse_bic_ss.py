@@ -119,6 +119,20 @@ def create_data_payload(item):
             "is_tenant_listing_and_search": item.get("is_tenant_listing_and_search"),
             "is_tenant_pre_contract": item.get("is_tenant_pre_contract"),
             "is_tenant_post_contract": item.get("is_tenant_post_contract"),
+            "landlord_journey_step": item.get("landlord_journey_step"),
+            "landlord_persona_step": item.get("landlord_persona_step"),
+            "is_landlord_offboarding": item.get("is_landlord_offboarding"),
+            "is_landlord_ongoing": item.get("is_landlord_ongoing"),
+            "is_landlord_onboarding": item.get("is_landlord_onboarding"),
+            "is_landlord_contract_to_entrance": item.get(
+                "is_landlord_contract_to_entrance"
+            ),
+            "is_landlord_visits_to_offer": item.get("is_landlord_visits_to_offer"),
+            "is_landlord_listing_and_search": item.get(
+                "is_landlord_listing_and_search"
+            ),
+            "is_landlord_pre_contract": item.get("is_landlord_pre_contract"),
+            "is_landlord_post_contract": item.get("is_landlord_post_contract"),
             "total_bookings": item.get("total_bookings"),
             "total_reservations": item.get("total_reservations"),
             "total_canceled_bookings": item.get("total_canceled_bookings"),
@@ -144,6 +158,9 @@ def create_data_payload(item):
                 "total_active_termination_contracts"
             ),
             "has_searched_house": item.get("has_searched_house"),
+            "has_published_listings": item.get("has_published_listings"),
+            "has_opted_out_listings_only": item.get("has_opted_out_listings_only"),
+            "has_pending_listings_only": item.get("has_pending_listings_only"),
             "has_funnel_step": item.get("has_funnel_step"),
             "has_booked_visit": item.get("has_booked_visit"),
             "has_completed_visit": item.get("has_completed_visit"),
@@ -157,6 +174,7 @@ def create_data_payload(item):
             "has_finished_contract": item.get("has_finished_contract"),
             "has_active_termination": item.get("has_active_termination"),
             "ts_last_house_searching": item.get("ts_last_house_searching"),
+            "ts_last_listing_updated": item.get("ts_last_listing_updated"),
             "ts_last_booking": item.get("ts_last_booking"),
             "ts_last_reservation": item.get("ts_last_reservation"),
             "ts_last_booking_canceled": item.get("ts_last_booking_canceled"),

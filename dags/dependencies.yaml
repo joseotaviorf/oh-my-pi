@@ -2580,6 +2580,7 @@ bietlejuice.reverse_atento:
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
 bietlejuice.reverse_bic_ss:
+  - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
   - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
 bietlejuice.reverse_ccv_price_report_access:
