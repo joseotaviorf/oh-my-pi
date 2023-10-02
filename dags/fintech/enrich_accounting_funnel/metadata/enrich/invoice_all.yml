@@ -67,6 +67,10 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.is_rental_paid_in_advance
     description: "Some versions of contracts have variation in the payment method (aka mora/paga, paga/mora)"
+  is_reversed:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice_entry
+    description: "Flag that indicates if a entry was create to reverse (cancel) another entry or if that entry was reversed by another entry"
   bill_item:
     lineage:
       - dw_payment.dim_invoice_entry.entry_type

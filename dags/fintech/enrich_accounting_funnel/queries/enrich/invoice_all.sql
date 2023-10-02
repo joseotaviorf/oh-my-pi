@@ -1,5 +1,4 @@
-WITH locale_ids AS
-(
+WITH locale_ids AS (
   SELECT
     DISTINCT city,
     min(id_locale) AS id_locale
@@ -14,19 +13,36 @@ deduplicate_sap_entity AS (
   FROM
     datalake_retsuko_clean.sap_entity
 ),
+remove_reversed AS (
+  SELECT 
+  sk_invoice_reversed_entry AS id_entry
+  FROM 
+    dw_payment.dim_invoice_entry
+  WHERE 
+    sk_invoice_reversed_entry IS NOT NULL
+
+  UNION ALL
+
+  SELECT 
+    sk_invoice_entry AS id_entry
+  FROM 
+    dw_payment.dim_invoice_entry
+  WHERE 
+    sk_invoice_reversed_entry IS NOT NULL
+),
 next_business_day AS (
-    SELECT
-      dd.date,
-      MIN(dd_next.date) AS date_next_bd
-    FROM
-      dw_public.dim_date AS dd
-    LEFT JOIN
-      dw_public.dim_date AS dd_next
-        ON dd_next.working_days_in_month <> dd.working_days_in_month
-        AND dd_next.date > dd.date
-        AND dd_next.working_days_in_month > 0
-    GROUP BY
-      1
+  SELECT
+    dd.date,
+    MIN(dd_next.date) AS date_next_bd
+  FROM
+    dw_public.dim_date AS dd
+  LEFT JOIN
+    dw_public.dim_date AS dd_next
+      ON dd_next.working_days_in_month <> dd.working_days_in_month
+      AND dd_next.date > dd.date
+      AND dd_next.working_days_in_month > 0
+  GROUP BY
+    1
 )
 SELECT DISTINCT
   fie.sk_invoice_entry AS id_entry,
@@ -54,6 +70,7 @@ SELECT DISTINCT
         c.status END
     AS contract_status,
   ie.is_rental_paid_in_advance,
+  IF(rr.id_entry IS NULL, False, True) AS is_reversed,
   ie.entry_type AS bill_item,
   ie.description,
   CASE
@@ -142,7 +159,10 @@ LEFT JOIN
     ON nbd.date = i.dt_paid
 LEFT JOIN 
     deduplicate_sap_entity sap 
-        on fie.sk_invoice_entry = sap.id_finance_entity
+    ON fie.sk_invoice_entry = sap.id_finance_entity
+LEFT JOIN 
+    remove_reversed rr 
+    ON rr.id_entry = fie.sk_invoice_entry
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')
