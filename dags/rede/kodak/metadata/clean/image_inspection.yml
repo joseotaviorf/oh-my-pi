@@ -14,6 +14,12 @@ columns:
   id_group:
     lineage:
       - datalake_kodak_raw.image_inspection.id_group
+  id_duplicate:
+    lineage:
+      - datalake_kodak_raw.image_inspection.duplicate_id
+  deduplication_hash:
+    lineage:
+      - datalake_kodak_raw.image_inspection.dhash
   url:
     lineage:
       - datalake_kodak_raw.image_inspection.url
@@ -77,6 +83,12 @@ columns:
   has_red_flag_casamineira:
     lineage:
       - datalake_kodak_raw.image_inspection.red_flag_casamineira
+  has_red_flag_media_modification:
+    lineage:
+    - datalake_kodak_raw.image_inspection.red_flag_media_modification
+  has_red_flag_duplicate_image:
+    lineage:
+    - datalake_kodak_raw.image_inspection.red_flag_duplicate_image
   has_fault_brightness:
     lineage:
       - datalake_kodak_raw.image_inspection.fault_brightness

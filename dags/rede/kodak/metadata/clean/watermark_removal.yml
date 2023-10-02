@@ -20,6 +20,12 @@ columns:
   path:
     lineage:
       - datalake_kodak_raw.watermark_removal.path
+  mask_active_pixels_ratio:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.mask_active_pixels_ratio
+  is_noise_detected:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.noise_detected
   is_successful:
     lineage:
       - datalake_kodak_raw.watermark_removal.successful

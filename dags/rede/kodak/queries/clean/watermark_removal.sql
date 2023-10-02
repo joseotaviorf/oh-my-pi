@@ -4,6 +4,8 @@ SELECT
     provider,
     url,
     path,
+    mask_active_pixels_ratio,
+    noise_detected AS is_noise_detected,
     successful AS is_successful,
     chosen AS is_chosen,
     created_at AS ts_created,
