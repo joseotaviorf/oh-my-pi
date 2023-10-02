@@ -13,6 +13,10 @@ columns:
     lineage:
     - datalake_house_listing.house_listing.id_house_listing
     description: ID house listing of the house.
+  id_contract:
+    lineage:
+    - datalake_house_listing.house_listing.id_contract
+    description: ID of the contract created for this house during this listing version.
   b2b_type:
     description: Type of the B2B.
     categories:

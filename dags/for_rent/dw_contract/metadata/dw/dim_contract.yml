@@ -220,6 +220,7 @@ columns:
   is_b2b:
     lineage:
     - datalake_ebdb_contract.contract_b2b.is_b2b
+    - datalake_b2b.house_listing.is_b2b
     description: Boolean indicating if the contract comes from B2B business.
   is_contract_b2b:
     lineage:

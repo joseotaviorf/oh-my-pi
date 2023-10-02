@@ -1,18 +1,4 @@
-WITH house_b2b_portability AS ( -- TODO [ODS] Move to an enrich
-    SELECT
-        hl.id_house_listing
-    FROM
-        datalake_ebdb_listing.house_listing hl
-    JOIN
-        datalake_ebdb_clean.house h
-            ON h.id = hl.id_house
-    JOIN
-        datalake_ebdb_listing.portability p
-            ON p.id_house = hl.id_house AND p.is_owner_b2b
-    WHERE
-        p.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, NOW())
-)
-SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   c.id AS sk_contract,
   c.id AS id_contract,
   c.country_code,
@@ -41,7 +27,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   c.status_closing AS closing_status,
   c.cancellation_reason,
   c.contract_version AS version,
-  (hp.id_house_listing IS NOT NULL) OR contract_b2b.is_b2b AS is_b2b,
+  b2b.is_b2b OR contract_b2b.is_b2b AS is_b2b,
   contract_b2b.is_contract_b2b,
   contract_b2b.contract_partner_type,
   contract_b2b.b2b_type,
@@ -70,10 +56,6 @@ FROM
 LEFT JOIN
     datalake_ebdb_contract.contract_b2b contract_b2b
         ON contract_b2b.id_contract = c.id
-LEFT JOIN
-    datalake_ebdb_listing.house_listing hl
-	    ON hl.id_house = c.id_house
-	    AND c.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01') AND COALESCE(hl.ts_listing_version_end, NOW())
-LEFT JOIN
-    house_b2b_portability hp
-        ON hp.id_house_listing = hl.id_house_listing
+LEFT JOIN 
+    datalake_b2b.house_listing b2b
+      ON b2b.id_contract = c.id

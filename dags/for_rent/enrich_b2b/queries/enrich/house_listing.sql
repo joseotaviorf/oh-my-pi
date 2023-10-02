@@ -1,7 +1,8 @@
 WITH house_portability AS (
     SELECT
         hl.id_house,
-        hl.id_house_listing
+        hl.id_house_listing,
+        hl.id_contract
     FROM 
         datalake_ebdb_listing.house_listing hl
     JOIN 
@@ -15,6 +16,7 @@ WITH house_portability AS (
 SELECT DISTINCT
     h.id AS id_house,
     hl.id_house_listing,
+    hl.id_contract,
     CASE
         WHEN partner_agent.status = 'INACTIVE' THEN NULL
         WHEN COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' THEN 'online'
