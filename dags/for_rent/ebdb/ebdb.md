@@ -92,6 +92,8 @@ Produces the following output tables:
     `house`
     `house_agent_aud`
     `house_aud`
+    `house_enrichment`
+    `house_enrichment_aud`
     `house_guarantees_aud`
     `house_maintenance_condition`
     `house_maintenance_condition_aud`
