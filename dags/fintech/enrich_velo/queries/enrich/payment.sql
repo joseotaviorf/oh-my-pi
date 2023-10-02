@@ -10,6 +10,43 @@ WITH cte_prop_values AS (
     LEFT JOIN
         datalake_rental_guarantee_platform_clean.plan AS pl
             ON cp.id_plan = pl.id
+),
+cte_billing_type AS (
+    WITH billing_type_windows AS (
+        SELECT
+            id AS id_propose,
+            billing_model,
+            MIN(rs.ts_created) AS ts_started,
+            IFNULL(MAX(re.ts_created), NOW()) AS ts_ended
+        FROM
+            datalake_rental_guarantee_platform_clean.propose_aud AS p
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.rev_info AS rs
+            ON rs.rev = p.rev
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.rev_info AS re
+            ON re.rev = p.rev_end
+        GROUP BY 1,2
+    )
+    SELECT
+        p.id AS id_payment,
+        IFNULL(b.billing_model, 'DEFAULT') AS billing_model -- p.ts_created is < b.ts_started
+    FROM
+        datalake_rental_guarantee_platform_clean.payment AS p
+    LEFT JOIN
+        billing_type_windows AS b
+        ON p.id_propose = b.id_propose
+        AND (p.ts_created BETWEEN b.ts_started AND b.ts_ended)
+),
+cte_pix_payment_date AS (
+    SELECT
+        id AS id_payment,
+        FIRST_VALUE(ts_client_payment) OVER (PARTITION BY payment_link ORDER BY ts_client_payment) AS ts_pix_payment
+    FROM
+        datalake_rental_guarantee_platform_clean.payment
+    WHERE
+        billing_type = 'PIX'
+        AND gateway = 'PIXAR'
 )
 SELECT DISTINCT
     p.id AS id_payment,
@@ -25,23 +62,21 @@ SELECT DISTINCT
     p.id_subscription,
     p.invoice_url,
     p.description,
-    p.value AS due_amount,
+    IF(p.billing_type = 'ANNUAL_CREDIT_CARD', p.value / p.installments, p.value) AS due_amount,
     CAST(NULL AS DOUBLE) AS net_amount,
     DATE(p.ts_client_payment) > DATE(p.ts_due) AS is_paid_late,
     p.ts_due_original IS NOT NULL AND p.ts_due_original <> p.ts_due AS is_due_modified,
     FALSE AS is_occurrence,
+    IF(bt.billing_model = 'BROKER', TRUE, FALSE) AS is_direct_billing,
     p.id <= 5000000 AS is_legacy,
     DATE(p.ts_created) AS dt_created,
     DATE(p.ts_due) AS dt_due,
     CAST(NULL AS STRING) AS dt_due_original,
-    p.ts_client_payment AS dt_paid,
+    IFNULL(ppd.ts_pix_payment, p.ts_client_payment) AS dt_paid,
     CAST(NULL AS STRING) as dt_payment_confirmed,
     p.ts_updated
 FROM
     datalake_rental_guarantee_platform_clean.payment AS p
-LEFT JOIN
-    datalake_rental_guarantee_platform_clean.propose AS pp
-    ON p.id_propose = pp.id
 LEFT JOIN
     datalake_velo.junk AS jk1
     ON jk1.desc_lvl_1 = p.billing_type
@@ -49,9 +84,10 @@ LEFT JOIN
 LEFT JOIN
     datalake_velo.junk AS jk2
     ON jk2.desc_lvl_1 = CASE
-                            WHEN p.billing_type = 'PIX' THEN 'annual'
+                            WHEN p.billing_type = 'PIX' AND p.gateway = 'PIXAR' THEN 'annual'
+                            WHEN p.billing_type = 'ANNUAL_CREDIT_CARD' THEN 'annual'
                             WHEN p.billing_type = 'CREDIT_CARD' THEN 'monthly'
-                            WHEN pp.billing_model = 'BROKER' THEN 'billing'
+                            ELSE NULL
                         END
         AND jk2.desc_master_type = 'Payment Type'
 LEFT JOIN
@@ -65,6 +101,16 @@ LEFT JOIN
 LEFT JOIN
     cte_prop_values AS pv
     ON pv.id_propose = p.id_propose
+LEFT JOIN
+    cte_billing_type AS bt
+    ON p.id = bt.id_payment
+LEFT JOIN
+    cte_pix_payment_date AS ppd
+    ON ppd.id_payment = p.id
+    AND p.billing_type = 'PIX'
+    AND p.gateway = 'PIXAR'
+
+
 UNION ALL
 
 SELECT DISTINCT
@@ -86,6 +132,7 @@ SELECT DISTINCT
     DATE(ap.dt_paid) > DATE(ap.dt_due) AS is_paid_late,
     NULL AS is_due_modified,
     TRUE AS is_occurrence,
+    FALSE AS is_direct_billing,
     FALSE AS is_legacy,
     DATE(ap.ts_created) AS dt_created,
     ap.dt_due AS dt_due,
@@ -116,4 +163,4 @@ LEFT JOIN
 LEFT JOIN
     cte_prop_values AS pv
     ON pv.id_propose = d.id_propose
-GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
+GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26

@@ -77,6 +77,10 @@ columns:
     description: Boolean flag for when the is an occurrence linked to this invoice.
     lineage:
       - datalake_velo.payment.is_occurrence
+  is_direct_billing:
+    description: Boolean flag for when this payment is from the direct billing model.
+    lineage:
+      - datalake_velo.payment.is_direct_billing
   is_legacy:
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
     lineage:

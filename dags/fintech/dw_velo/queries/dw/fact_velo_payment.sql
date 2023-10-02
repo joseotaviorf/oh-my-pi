@@ -17,6 +17,7 @@ SELECT
     is_paid_late,
     is_due_modified,
     is_occurrence,
+    is_direct_billing,
     dt_created,
     dt_due,
     dt_due_original,

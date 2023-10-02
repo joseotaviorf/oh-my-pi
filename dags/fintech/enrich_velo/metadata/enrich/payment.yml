@@ -75,6 +75,8 @@ columns:
     description: Boolean flag for when dt_due has been modified.
   is_occurrence:
     description: Boolean flag for when there is an occurrence related to this invoice.
+  is_direct_billing:
+    description: Boolean flag for when this payment is from the direct billing model.
   is_legacy:
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   dt_created:
