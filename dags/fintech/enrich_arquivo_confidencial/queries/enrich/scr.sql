@@ -7,10 +7,10 @@ WITH scr_data AS (
         'array<
         struct<
             source:string,
-            indirect_risk:int,
+            indirect_risk:double,
             reference_date:string,
-            operation_count:int,
-            operation_items:array<struct<value:int,
+            operation_count:double,
+            operation_items:array<struct<value:double,
             domain:string,
             modality:string,
             submodality:string,
