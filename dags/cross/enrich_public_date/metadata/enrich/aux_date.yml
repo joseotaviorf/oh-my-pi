@@ -1,5 +1,5 @@
 ---
-database_name: datalake_date
+database_name: datalake_quintoandar
 table_name: aux_date
 description: Table that prepares base structure for dim_date
 domain: Cross
@@ -27,7 +27,7 @@ columns:
     description: The quarter of the year.
     categories:
       "1": January to March
-      "2": April to June 
+      "2": April to June
       "3": July to September
       "4": October to December
   brz_season:

@@ -1,0 +1,45 @@
+---
+database_name: datalake_mexico_cib_segmentation
+table_name: cib_segmentation
+description: This table contains information about the segmentation of CIBs (Benvi real estate consultant), calculated
+  according to the number of months registered and behavior in each month since the registration (number of first listings
+  and contracts signed).
+domain: International
+owner: bruna.prates@quintoandar.com.br
+columns:
+  id_cib:
+    lineage:
+      - datalake_big_agent.agent.details
+    description: ID of the CIB, from EBDB. It's the user external ID from Big Agent
+  cib_name:
+    lineage:
+      - datalake_ebdb_user.user.name
+    description: Name of the CIB.
+  cib_email:
+    lineage:
+      - datalake_ebdb_user.user.email
+    description: Email of the CIB.
+  level:
+    description: Level of the CIB in the corresponding month.
+    categories:
+      MASTER: 'CIB registered at least 3 months ago, that closed 2 or more contracts and brought 8 or more first listings'
+      LOYAL: 'CIB registered at least a month ago, that closed at least 1 contract and brought 2 or more first listings'
+      INTER: 'CIB that is neither MASTER nor LOYAL'
+  first_listings:
+    description: Number of CIB's first listings in the corresponding month.
+  contracts_signed:
+    description: Number of CIB's contracts signed in the corresponding month.
+  months_registered:
+    description: Number of months that the CIB has been registered.
+  dt_registered:
+    lineage:
+      - datalake_big_agent.agent.details
+    description: Date when the CIB was registered.
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+    description: Year in which the behavior of the CIB will be analyzed. Also, it's a partition of this table.
+  month:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+    description: Month in which the behavior of the CIB will be analyzed. Also, it's a partition of this table.
