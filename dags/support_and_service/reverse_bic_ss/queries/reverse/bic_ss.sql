@@ -45,7 +45,7 @@ SELECT
     usm.is_pp_multi,
     usm.is_tenant,
     usm.is_broker,
-    usm.is_property_owner,
+    usm.is_landlord,
     usm.is_photographer,
     usm.is_tenant_offboarding,
     usm.is_tenant_ongoing,

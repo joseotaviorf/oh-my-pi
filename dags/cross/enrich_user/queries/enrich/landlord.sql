@@ -35,3 +35,7 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.country AS ct
         ON ct.id = u.id_country
+WHERE
+  ljs.year = {year}
+  AND ljs.month = {month}
+  AND ljs.day = {day}

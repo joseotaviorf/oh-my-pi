@@ -39,7 +39,7 @@ def create_data_payload(item):
             "is_pp_multi": item.get("is_pp_multi"),
             "is_tenant": item.get("is_tenant"),
             "is_broker": item.get("is_broker"),
-            "is_property_owner": item.get("is_property_owner"),
+            "is_property_owner": item.get("is_landlord"),
             "is_photographer": item.get("is_photographer"),
         },
         "support": {
