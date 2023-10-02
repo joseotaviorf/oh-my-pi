@@ -38,6 +38,29 @@ columns:
       - datalake_vans_clean.payment.status
       - datalake_vans_clean.boleto.status
     description: "Last status of the payment in the payment platform"
+  reference_1:
+    lineage:
+      - datalake_vans_clean.payment_boleto.company_use
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.boleto.company_use
+    description: "Dynamic column to be fill with useful information about each product"
+  reference_2:
+    lineage:
+      - datalake_vans_clean.payment_boleto.our_number
+      - datalake_vans_clean.payment.our_number
+      - datalake_vans_clean.boleto.our_number
+    description: "Dynamic column to be fill with useful information about each product"
+  reference_3:
+    description: "Dynamic column to be fill with useful information about each product"
+  reference_4:
+    lineage:
+      - datalake_vans_clean.payment_boleto.style
+      - datalake_vans_clean.payment.style
+    description: "Dynamic column to be fill with useful information about each product"
+  reference_5:
+    lineage:
+      - datalake_vans_clean.bank.name
+    description: "Dynamic column to be fill with useful information about each product"
   paid_amount:
     lineage:
       - datalake_trato_feito_clean.payment.metadata
