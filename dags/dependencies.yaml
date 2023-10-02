@@ -1234,6 +1234,15 @@ bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
+bietlejuice.enrich_demand_conversion_events:
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
+  - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
+  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
+  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
 bietlejuice.enrich_docato:
   - bietlejuice.gsheets_static:done-clean-legal-base-docato
 bietlejuice.enrich_documentation_metrics:
