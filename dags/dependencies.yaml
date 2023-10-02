@@ -800,6 +800,7 @@ bietlejuice.dw_user:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
   - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep
+  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
 bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_amplitude_user:load-enrich-user-affiliate-origin
