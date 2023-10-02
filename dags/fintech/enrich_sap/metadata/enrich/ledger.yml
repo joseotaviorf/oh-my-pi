@@ -90,6 +90,18 @@ columns:
       - datalake_pas.journal_entry_lines.credit
       - datalake_pas.invoice_lines.credit
       - datalake_pas.incoming_payments_lines.credit
+  debit:
+    description: "Debit value"
+    lineage:
+      - datalake_pas.journal_entry_lines.debit
+      - datalake_pas.invoice_lines.debit
+      - datalake_pas.incoming_payments.debit
+  credit:
+    description: "Credit value"
+    lineage:
+      - datalake_pas.journal_entry_lines.credit
+      - datalake_pas.invoice_lines.credit
+      - datalake_pas.incoming_payments.credit
   created_by:
     description: "Name of the user who created the register"
     lineage:

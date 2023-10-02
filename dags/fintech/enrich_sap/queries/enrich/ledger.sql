@@ -255,6 +255,8 @@ SELECT
     dh.transaction_type || ' ' || dh.source_document_number AS document_number,
     COALESCE(dh.memo, db.memo_line) AS comments,
     (db.debit - db.credit) AS debit_credit,
+    db.debit,
+    db.credit,
     u.name AS created_by,
     db.location_profit_code,
     db.cost_center_code,
