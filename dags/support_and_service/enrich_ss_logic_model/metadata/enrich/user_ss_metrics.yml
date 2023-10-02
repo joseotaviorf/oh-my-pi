@@ -87,6 +87,14 @@ columns:
         If the user has taken any step in offboarding, ongoing, or onboarding, it
         indicates that the user is in a post-contract step
       Not_Apply: If the user is not in the pre or post contract steps
+  landlord_persona_step:
+    lineage:
+      - datalake_user.persona_type.persona_step
+    description: Same logic and categories of the tenant_persona_step, but only for landlord users
+  landlord_journey_step:
+    lineage:
+      - datalake_user.persona_type.journey_step
+    description: Same logic and categories of the tenant_journey_step, but only for landlord users
   last_bot_csat_answered_score:
     lineage:
       - datalake_ss_logic_model.user_csat_bot_metric.last_bot_csat_answered_score
@@ -213,38 +221,38 @@ columns:
       - datalake_user.persona_type.is_pp_multi
     description:
       If the user is part of pp_multi program or not. Assumes TRUE or FALSE for only
-      the property owner client type.
+      the landlord client type.
   is_tenant:
     description: If the user is a tenant then it is TRUE, else is FALSE.
   is_broker:
     description: If the user is a broker then it is TRUE, else is FALSE.
-  is_property_owner:
-    description: If the user is a property owner then it is TRUE, else is FALSE.
+  is_landlord:
+    description: If the user is a landlord then it is TRUE, else is FALSE.
   is_photographer:
     description: If the user is a photographer then it is TRUE, else is FALSE.
   is_tenant_offboarding:
     lineage:
-      - datalake_user.persona_type.is_tenant_offboarding
+      - datalake_user.persona_type.is_offboarding
     description:
       If the user has an active termination, it indicates that the user is currently
       in the offboarding step of the rental journey.
   is_tenant_ongoing:
     lineage:
-      - datalake_user.persona_type.is_tenant_ongoing
+      - datalake_user.persona_type.is_ongoing
     description:
       If the user has at least one active contract and the last contract signed occurred
       past the last 40 days, with the snapshot date serving as the reference point, then the
       user is currently in the ongoing step of the rental journey
   is_tenant_onboarding:
     lineage:
-      - datalake_user.persona_type.is_tenant_onboarding
+      - datalake_user.persona_type.is_onboarding
     description:
       If the user has at least one active contract and the last contract signed occurred
       within the last 40 days, with the snapshot date serving as the reference point, then the
       user is currently in the onboarding step of the rental journey
   is_tenant_contract_to_entrance:
     lineage:
-      - datalake_user.persona_type.is_tenant_contract_to_entrance
+      - datalake_user.persona_type.is_contract_to_entrance
     description:
       If the user has had events such as the last evaluation start, last evaluation approval,
       last document sending, last credit approval, or last proposal rejection within the
@@ -252,7 +260,7 @@ columns:
       currently in the contract to entrance step of the rental journey
   is_tenant_visits_to_offer:
     lineage:
-      - datalake_user.persona_type.is_tenant_visits_to_offer
+      - datalake_user.persona_type.is_visits_to_offer
     description:
       If the user has had events such as the last booking, last canceled booking,
       last visiting, last offer sending, last offer rejected, last reservation created,
@@ -261,24 +269,80 @@ columns:
       the rental journey. It assumes value only for tenants.
   is_tenant_listing_and_search:
     lineage:
-      - datalake_user.persona_type.is_tenant_listing_and_search
+      - datalake_user.persona_type.is_listing_and_search
     description:
       If the user has had a last house searching event within the last 40 days, with
       the snapshot date as the reference point, then the user is currently in the
       listing and search step of the rental journey. It assumes value only for tenants.
   is_tenant_pre_contract:
     lineage:
-      - datalake_user.persona_type.is_tenant_pre_contract
+      - datalake_user.persona_type.is_pre_contract
     description:
       If the user has taken any step in contract to entrance, visits to offer, or
       listing and search, it signifies that the user is in a pre-contract step.
       It assumes value only for tenants.
   is_tenant_post_contract:
     lineage:
-      - datalake_user.persona_type.is_tenant_post_contract
+      - datalake_user.persona_type.is_post_contract
     description:
       If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
       that the user is in a post-contract step. It assumes value only for tenants.
+
+  is_landlord_offboarding:
+    lineage:
+      - datalake_user.persona_type.is_offboarding
+    description:
+      If the user has an active termination, it indicates that the user is currently
+      in the offboarding step of the rental journey.
+  is_landlord_ongoing:
+    lineage:
+      - datalake_user.persona_type.is_ongoing
+    description:
+      If the user has at least one active contract and the last contract signed occurred
+      past the last 40 days, with the snapshot date serving as the reference point, then the
+      user is currently in the ongoing step of the rental journey
+  is_landlord_onboarding:
+    lineage:
+      - datalake_user.persona_type.is_onboarding
+    description:
+      If the user has at least one active contract and the last contract signed occurred
+      within the last 40 days, with the snapshot date serving as the reference point, then the
+      user is currently in the onboarding step of the rental journey
+  is_landlord_contract_to_entrance:
+    lineage:
+      - datalake_user.persona_type.is_contract_to_entrance
+    description:
+      If the user has had events such as the last evaluation start, last evaluation approval,
+      last document sending, last credit approval, or last proposal rejection within the
+      last 40 days, with the snapshot date as the reference point, then the user is
+      currently in the contract to entrance step of the rental journey
+  is_landlord_visits_to_offer:
+    lineage:
+      - datalake_user.persona_type.is_visits_to_offer
+    description:
+      If the user has had events such as the last booking, last canceled booking,
+      last visiting, last offer sending, last offer rejected, last reservation created,
+      or last offer approval within the last 40 days, with the snapshot date as the
+      reference point, then the user is currently in the visits to offer step of
+      the rental journey..
+  is_landlord_listing_and_search:
+    lineage:
+      - datalake_user.persona_type.is_listing_and_search
+    description:
+      If the user has published listing or if the user had a non OPTED_OUT listing status
+      within the last 40 days, with the snapshot date as the reference point.
+  is_landlord_pre_contract:
+    lineage:
+      - datalake_user.persona_type.is_pre_contract
+    description:
+      If the user has taken any step in contract to entrance, visits to offer, or
+      listing and search, it signifies that the user is in a pre-contract step.
+  is_landlord_post_contract:
+    lineage:
+      - datalake_user.persona_type.is_post_contract
+    description:
+      If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
+      that the user is in a post-contract step.
   is_active:
     lineage:
       - datalake_user.persona_type.is_active
