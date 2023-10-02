@@ -2,7 +2,6 @@ import re
 from glob import glob
 from os import path, scandir
 
-import boto3
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
@@ -89,17 +88,22 @@ class DAGPackagesPathService:
 
         :return: file content.
         """
+        from pyspark import SparkFiles
+        from bietlejuice.base.spark import sc
+
         global_confs = HierarchicalConf([BIETLEJUICE_PROJECT_ROOT])
         dags_packages_files_prefix = global_confs.get_config(
             "dags_packages_files_path_in_s3"
         )
 
-        s3_client = boto3.client("s3")
         sql_file_key = path.join(dags_packages_files_prefix, sql_file_relative_path)
-        data = s3_client.get_object(
-            Bucket=global_confs.get_config("databricks_bucket"), Key=sql_file_key
+        sc.addFile(
+            "s3a://{}/{}".format(
+                global_confs.get_config("databricks_bucket"), sql_file_key
+            )
         )
-        query = data["Body"].read().decode("utf-8")
+        with open(SparkFiles.get(sql_file_relative_path.split("/")[-1])) as s3_file:
+            query = s3_file.read()
 
         return query
 
@@ -222,38 +226,6 @@ class DAGPackagesPathService:
             table_names.append(re.search(filename_regex, file_path).group(1))
 
         return table_names
-
-    @staticmethod
-    def list_queries_files_in_spark_jobs(
-        dag_name: str, layer: str, intermediate_path: str = ""
-    ) -> list:
-        """
-        List the SQL files according to the place it is stored (if it is in
-        legacy path or in the DAGs packages)
-
-        * Method used only in Databricks *
-
-        :param dag_name: the DAG name
-        :param table_name: the name of the table that the file is related to
-        :param layer: the layer that the file is related to.
-        :param intermediate_path: off intermediate path structure used in some DAGs
-        :return: query content (the SQL)
-        """
-        global_confs = HierarchicalConf([BIETLEJUICE_PROJECT_ROOT])
-        dags_packages_files_prefix = global_confs.get_config(
-            "dags_packages_files_path_in_s3"
-        )
-
-        sql_files_folder = path.join("queries", dag_name, layer, intermediate_path)
-
-        s3_client = boto3.client("s3")
-        sql_files_key = path.join(dags_packages_files_prefix, sql_files_folder)
-        data = s3_client.list_objects(
-            Bucket=global_confs.get_config("databricks_bucket"), Prefix=sql_files_key
-        )
-        files = [key["Key"] for key in data["Contents"]]
-
-        return files
 
     @staticmethod
     def get_data_quality_file_content_in_spark_jobs(
