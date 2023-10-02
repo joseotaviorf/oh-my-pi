@@ -49,6 +49,10 @@ columns:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.id_by_real_estate
     description: 'Identifier of the lead within the real estate agency.'
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+    description: 'Identifier of the house in QuintoAndar, if it has already been created.'
   id_house_partner:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.brokers

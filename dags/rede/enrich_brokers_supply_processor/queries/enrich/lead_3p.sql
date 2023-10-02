@@ -51,6 +51,17 @@ recurrency AS (
         END AS recurrency_type
     FROM
         recurrency_aux
+),
+houses AS (
+    SELECT
+        id,
+        id_external
+    FROM
+        datalake_ebdb_clean.house
+    WHERE
+        id_external IS NOT NULL
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_external ORDER BY dt_creation) = 1
 )
 SELECT
     l.id,
@@ -64,6 +75,7 @@ SELECT
     l.uuid_company,
     l.id_real_estate,
     l.id_by_real_estate,
+    h.id AS id_house,
     NULLIF(GET_JSON_OBJECT(l.brokers, '$.housePartnerId'), '') AS id_house_partner,
     GET_JSON_OBJECT(l.location, '$.regionId')::BIGINT AS id_region,
     hc.id_company AS id_company_hubspot,
@@ -201,3 +213,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_company_clean.company AS c_integrator_rent
         ON c_integrator_rent.uuid_company = rent_bcd.id_partner
+LEFT JOIN
+    houses AS h
+        ON l.uuid_lead = h.id_external

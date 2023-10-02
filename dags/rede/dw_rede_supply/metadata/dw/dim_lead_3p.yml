@@ -27,6 +27,15 @@ columns:
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column identifies the ID of the first lead that contains this lead hash sent by this particular company, in Supply Processor. It might have been
       sent by other companies before, which would make the id_lead_first_version_global different from this one.'
+  id_house:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.id_house
+    description: 'Identifier of the house in QuintoAndar, if it has already been created. Can be joined with dw_quintoandar.dim_house.'
+  id_by_real_estate:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.id_by_real_estate
+    - datalake_brokers_supply_processor.lead_3p.id_house_partner
+    description: 'Identifier of the lead within the real estate agency.'
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor.lead_3p.lead_hash

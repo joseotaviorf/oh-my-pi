@@ -12,6 +12,8 @@ SELECT
     l.id AS id_lead_3p,
     l.id_lead_first_version_global,
     l.id_lead_first_version_by_company,
+    l.id_house,
+    COALESCE(l.id_by_real_estate, l.id_house_partner) AS id_by_real_estate,
     l.lead_hash,
     COALESCE(lsc_sale.status, 'N/A') AS sale_status,
     COALESCE(lsc_rent.status, 'N/A') AS rent_status,

@@ -1033,6 +1033,7 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-file
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
   - bietlejuice.company:load-clean-company
+  - bietlejuice.ebdb:load-clean-house
   - bietlejuice.enrich_hubspot:load-enrich-company
 bietlejuice.enrich_bureaus:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
@@ -2492,7 +2493,6 @@ bietlejuice.metric_rent__bookings:
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
 bietlejuice.metric_rent__contracts:
-  - bietlejuice.enrich_terminator:load-enrich-termination
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-public-dim-contract
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
@@ -2500,6 +2500,7 @@ bietlejuice.metric_rent__contracts:
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+  - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.metric_rent__demand_events:
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-coincident-events-volume-changes-snapshot
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-cohort-conversions-snapshot
