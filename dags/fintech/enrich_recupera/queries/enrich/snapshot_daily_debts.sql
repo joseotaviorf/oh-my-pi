@@ -93,7 +93,6 @@ INNER JOIN
 WHERE
     i.is_installment_active IS TRUE
     AND i.installment_situation = 'Parcela em aberta'
-    AND i.dt_due < current_date
 
 UNION
 
@@ -127,5 +126,4 @@ LEFT JOIN
     datalake_recupera_clean.installment AS i
         ON i.id_installment = d.installment_code
 WHERE
-    d.dt_due_invoice < current_date
-    AND d.installment_code IS NULL
+    d.installment_code IS NULL
