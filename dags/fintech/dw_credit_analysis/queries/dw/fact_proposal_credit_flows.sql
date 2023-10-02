@@ -9,21 +9,15 @@ WITH credit_analysis AS (
 ),
 early_credit_analysis AS (
   SELECT
-    ec.id_user,
-    ec.id_house,
-    MIN(DATE(ec.ts_early_credit_analysis_created)) AS dt_created,
-    DATE_ADD(MAX(DATE(ec.ts_early_credit_analysis_created)), 30) AS dt_expired
+    id_user,
+    id_house,
+    MIN(DATE(ts_early_credit_analysis_created)) AS dt_created,
+    DATE_ADD(MAX(DATE(ts_early_credit_analysis_created)), 30) AS dt_expired
   FROM
-    datalake_credit_analysis.early_credit_analysis AS ec
-  LEFT JOIN
-    dw_public.dim_house_listing AS hl
-      ON ec.id_house = hl.id_house
-  WHERE
-    hl.country_code = 'BR'
-    AND hl.rental_administrator = 'QUINTOANDAR'
+    datalake_credit_analysis.early_credit_analysis
   GROUP BY
-    ec.id_user,
-    ec.id_house
+    id_user,
+    id_house
 ),
 rent_flows AS (
   SELECT
@@ -75,7 +69,10 @@ rent_flows AS (
       TRUE,
       FALSE
     ) AS is_last_credit_evaluation,
-    dd.date AS dt_offer_submitted
+    dd.date AS dt_offer_submitted,
+    hl.country_code,
+    hl.rental_administrator,
+    hl.version
   FROM
     dw_public.fact_listing_rent_flows AS flrf
   LEFT JOIN
@@ -87,6 +84,9 @@ rent_flows AS (
   LEFT JOIN
     dw_public.dim_date AS dd 
       ON flrf.sk_offer_submitted_date = dd.sk_date
+  LEFT JOIN
+    dw_public.dim_house_listing AS hl
+      ON hl.sk_house_listing = flrf.sk_house_listing
 ),
 proposal_credit_flows AS (
   SELECT
@@ -137,7 +137,10 @@ proposal_credit_flows AS (
     END AS has_early_credit,
     eca.dt_created AS dt_ec_created,
     eca.dt_expired AS dt_ec_expired,
-    rf.dt_offer_submitted
+    rf.dt_offer_submitted,
+    rf.country_code,
+    rf.rental_administrator,
+    ROW_NUMBER() OVER (PARTITION BY rf.sk_client, rf.sk_credit_analysis, rf.sk_house ORDER BY rf.version DESC) AS linsting_rank
   FROM
     rent_flows AS rf
   LEFT JOIN
@@ -175,9 +178,12 @@ SELECT
   is_first_credit_evaluation,
   is_last_credit_evaluation,
   has_early_credit,
+  country_code,
+  rental_administrator,
   NOW() AS ts_load
 FROM
   proposal_credit_flows
 WHERE
   sk_last_credit_evaluation_init > 0
   AND sk_proposal > 0
+  AND linsting_rank = 1

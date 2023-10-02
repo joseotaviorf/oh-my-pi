@@ -118,5 +118,20 @@ columns:
     description: "Indicates if the row presents the last credit evaluation."
   has_early_credit:
     description: "Indicates if the offer had an early credit analysis."
+  country_code:
+    lineage:
+    - dw_public.dim_house_listing.country_code
+    description: Country code related to the listing's country of origin.
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
+  rental_administrator:
+    lineage:
+    - dw_public.dim_house_listing.rental_administrator
+    description: The rental administrator of the house.
+    categories:
+      OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.
+      QUINTOANDAR: Default rental administrator, which is QuintoAndar.
+      THIRD_PARTY: The rental administrator is a third party real estate agency.
   ts_load:
     description: "Timestamp of data recorded in the table"
