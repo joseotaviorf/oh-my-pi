@@ -325,6 +325,12 @@ columns:
   is_partner:
     description: Whether or not the company is currently a partner. This means the
       lead status is either "Membro", "Parceiro" or "Em processo tombamento".
+  is_sale_partner:
+    description: Whether or not the company is currently a partner in Sale. This means the
+      sale lead status is either "Membro", "Parceiro" or "Em processo tombamento".
+  is_rent_partner:
+    description: Whether or not the company is currently a partner in Rent. This means the
+      rent lead status is either "Membro", "Parceiro" or "Em processo tombamento".
   is_3p_bh:
     description: Whether or not the team responsible for the deal is either "BH Sul"
       or "BH Norte".
