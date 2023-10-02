@@ -117,8 +117,3 @@ FROM
     dispatch_rules 
 WHERE
     need_to_check_available = TRUE
-/* This below is temporary, until the product is fixed */ 
-ORDER BY 
-    flag DESC
-LIMIT 
-    1000
