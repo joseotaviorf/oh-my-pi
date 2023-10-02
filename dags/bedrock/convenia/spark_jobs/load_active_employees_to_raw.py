@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark import Row
-from pyspark.sql.types import StructType, StringType, StructField
+from pyspark.sql.types import StructType, StringType, StructField, DateType
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_convenia_api_client.clients import ConveniaClient
 from quintoandar_convenia_api_client.consumers import CONSUMERS
@@ -49,6 +49,15 @@ def create_df_from_active_employees(results, spark_client, token_name):
                 dt_hiring=employee["hiring_date"],
                 intern=str(employee["intern"]),
                 foreign=str(employee["foreign"]),
+                driver_license_id=str(employee["driver_license"]["id"]),
+                driver_license_number=str(employee["driver_license"]["number"]),
+                driver_license_emission_date=str(
+                    employee["driver_license"]["emission_date"]
+                ),
+                driver_license_validate_date=str(
+                    employee["driver_license"]["validate_date"]
+                ),
+                driver_license_category=str(employee["driver_license"]["category"]),
                 source=token_name,
             )
         )
@@ -70,6 +79,11 @@ def create_df_schema():
             StructField("dt_hiring", StringType(), True),
             StructField("intern", StringType(), True),
             StructField("foreign", StringType(), True),
+            StructField("driver_license_id", StringType(), True),
+            StructField("driver_license_number", StringType(), True),
+            StructField("driver_license_emission_date", DateType(), True),
+            StructField("driver_license_validate_date", DateType(), True),
+            StructField("driver_license_category", StringType(), True),
             StructField("source", StringType(), True),
         ]
     )
