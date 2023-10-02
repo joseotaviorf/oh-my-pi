@@ -8,6 +8,8 @@ SELECT
     task_manager,
     status,
     version,
-    created_at AS ts_created
+    type,
+    created_at AS ts_created,
+    updated_at AS ts_updated
 FROM
     datalake_terminator_raw.termination_task
