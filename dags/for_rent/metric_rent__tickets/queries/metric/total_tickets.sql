@@ -29,7 +29,7 @@ base_tickets AS (
     dw_customer_support.dim_channel AS dc
       ON ft.sk_channel = dc.sk_channel
   WHERE
-    ft.main_department NOT IN ('Offboarding Reparos [OFF] [POS] [BACK]', 'Offboarding pré saída [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão 1 [OFF] [POS] [BACK]')
+    ft.main_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]', 'Offboarding Reparos [OFF] [POS] [BACK]', 'Offboarding pré saída [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão 1 [OFF] [POS] [BACK]')
     AND ft.ts_solved >= CAST('2022-01-01' AS DATE)
     AND dd.front_or_back IN ('back', 'front')
     AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
@@ -61,7 +61,7 @@ missing_tickets AS (
     dw_customer_support.dim_channel AS dc
       ON ft.sk_channel = dc.sk_channel
   WHERE
-    ft.main_department NOT IN ('Offboarding Reparos [OFF] [POS] [BACK]', 'Offboarding pré saída [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão 1 [OFF] [POS] [BACK]')
+    ft.main_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]', 'Offboarding Reparos [OFF] [POS] [BACK]', 'Offboarding pré saída [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão 1 [OFF] [POS] [BACK]')
     AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
     AND ft.ts_solved >= CAST('2022-01-01' AS DATE)
     AND dd.front_or_back IN ('back', 'front')
