@@ -5,13 +5,11 @@ from urllib.parse import unquote
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.athena import TableStorageFormat
-from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.spark import spark, sqlContext
-from bietlejuice.clients.db_clients import AthenaClient, SparkClient
-from bietlejuice.formatters import StringFormatter
-from bietlejuice.services.metastore_services import (
-    AthenaMetastoreService,
+from bietlejuice.clients.db_clients.spark_client import SparkClient
+from bietlejuice.formatters.string_formatter import StringFormatter
+from bietlejuice.services.metastore_services.spark_metastore_service import (
     SparkMetastoreService,
 )
 
@@ -23,11 +21,8 @@ parser = ArgumentParser(JOB_NAME)
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
-parser.add_argument("athena_query_result_location")
 parser.add_argument("source")
 parser.add_argument("source_table_name")
-parser.add_argument("--spark", action="store_true", dest="spark_flag")
-parser.add_argument("--athena", action="store_true", dest="athena_flag")
 
 ddl_template = """
     CREATE TABLE IF NOT EXISTS
@@ -39,10 +34,10 @@ ddl_template = """
 """
 
 
-def create_subpartitioned_table_in_spark(subpartitioned_table_name, row):
+def create_subpartitioned_table(subpartitioned_table_name, row):
     replace_map = ("/", "%2F"), ("[", "%5B"), ("]", "%5D")
     ddl = ddl_template.format(
-        clean_staging_db=db_clean_staging_spark,
+        clean_staging_db=db_clean_staging,
         subpartitioned_table_name=subpartitioned_table_name,
         clean_db=db_info["db_clean_databricks"],
         source_table_name=source_table_name,
@@ -58,40 +53,13 @@ def create_subpartitioned_table_in_spark(subpartitioned_table_name, row):
     )
     spark.sql(ddl)
     spark_metastore_service.repair_table_partitions(
-        db_clean_staging_spark, subpartitioned_table_name
+        db_clean_staging, subpartitioned_table_name
     )
     logger.info(
         f"m=__main__, msg=Table '{subpartitioned_table_name}' created and updated"
         " in Spark metastore."
     )
-    spark_metastore_service.refresh_table(
-        db_clean_staging_spark, subpartitioned_table_name
-    )
-
-
-def create_subpartitioned_table_in_athena(subpartitioned_table_name):
-    table_location = spark_metastore_service.get_table_path(
-        db_clean_staging_spark, subpartitioned_table_name
-    )
-    table_schema = spark_metastore_service.get_table_schema(
-        db_clean_staging_spark, subpartitioned_table_name
-    )
-    athena_metastore_service.create_external_table(
-        database_name=db_clean_staging_athena,
-        table_name=subpartitioned_table_name,
-        table_location=table_location,
-        table_schema=table_schema,
-        partition_cols=["year", "month", "day"],
-        format_options=TableStorageFormat.DEFAULT_CLEAN,
-    )
-
-    athena_metastore_service.repair_table_partitions(
-        db_clean_staging_athena, subpartitioned_table_name
-    )
-
-    logger.info(
-        "m=__main__, msg=Table created in athena metastore and partitions repaired"
-    )
+    spark_metastore_service.refresh_table(db_clean_staging, subpartitioned_table_name)
 
 
 def create_subpartitioned_tables(row, subpartitioned_table_name):
@@ -104,11 +72,7 @@ def create_subpartitioned_tables(row, subpartitioned_table_name):
             subpartitioned_table_name
         )
     )
-    if spark_flag and subpartitioned_table_name not in spark_existing_tables:
-        create_subpartitioned_table_in_spark(subpartitioned_table_name, row)
-
-    if athena_flag and subpartitioned_table_name not in athena_existing_tables:
-        create_subpartitioned_table_in_athena(subpartitioned_table_name)
+    create_subpartitioned_table(subpartitioned_table_name, row)
 
 
 if __name__ == "__main__":
@@ -117,51 +81,30 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     env = args.env
     datalake_bucket = args.datalake_bucket
-    athena_query_result_location = args.athena_query_result_location
     source = args.source
     source_table_name = args.source_table_name
-    spark_flag = args.spark_flag
-    athena_flag = args.athena_flag
 
     logger.info(
         f"m=__main__, date={execution_date}, source={source}, "
-        f"source_table_name={source_table_name}, spark_flag={spark_flag}, "
-        f"athena_flag={athena_flag}, msg=Job started"
+        f"source_table_name={source_table_name}, msg=Job started"
     )
 
     date = datetime.strptime(execution_date, "%Y-%m-%d")
     year, month, day = date.year, date.month, date.day
 
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
-    db_clean_staging_athena = db_info["db_clean_staging_athena"]
-    db_clean_staging_spark = db_info["db_clean_staging_databricks"]
+    db_clean_staging = db_info["db_clean_staging_databricks"]
 
     # get subpartitions values
     subpartitions_values = sqlContext.table(
-        f"{db_clean_staging_spark}.subpartitions_values"
+        f"{db_clean_staging}.subpartitions_values"
     ).collect()
 
     spark_metastore_service = SparkMetastoreService(SparkClient())
 
-    athena_metastore_service = AthenaMetastoreService(
-        AthenaClient(athena_query_result_location)
-    )
-
     # get existing tables
-    if spark_flag:
-        spark_metastore_service.create_database(db_clean_staging_spark)
-        spark_existing_tables = spark_metastore_service.get_table_names(
-            db_clean_staging_spark
-        )
-
-    if athena_flag:
-        athena_metastore_service.create_database(db_clean_staging_athena)
-        athena_existing_tables = [
-            row["Data"][0]["VarCharValue"]
-            for row in athena_metastore_service.get_table_names(
-                db_clean_staging_athena
-            )["ResultSet"]["Rows"]
-        ]
+    spark_metastore_service.create_database(db_clean_staging)
+    spark_existing_tables = spark_metastore_service.get_table_names(db_clean_staging)
 
     # create clean staging subpartitioned tables
     for row in subpartitions_values:

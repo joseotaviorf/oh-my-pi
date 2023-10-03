@@ -6,12 +6,11 @@ from functools import reduce
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.formatters import StringFormatter
+from bietlejuice.formatters.string_formatter import StringFormatter
 from bietlejuice.base.spark import sqlContext
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.clients.db_clients import SparkClient, AthenaClient
-from bietlejuice.services.metastore_services import (
-    AthenaMetastoreService,
+from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
+from bietlejuice.clients.db_clients.spark_client import SparkClient
+from bietlejuice.services.metastore_services.spark_metastore_service import (
     SparkMetastoreService,
 )
 
@@ -23,15 +22,12 @@ parser = ArgumentParser(JOB_NAME)
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
-parser.add_argument("athena_query_result_location")
 parser.add_argument("source")
-parser.add_argument("--spark", action="store_true", dest="spark_flag")
-parser.add_argument("--athena", action="store_true", dest="athena_flag")
 
 NB_THREADS = 8
 
 
-def update_daily_partition(row):
+def update_date_partitions(row):
     replace_map = ("/", "%2F"), ("[", "%5B"), ("]", "%5D")
     subpartitioned_table_name = "_".join(str(col) for col in row) + "_events"
     subpartitioned_table_name = reduce(
@@ -42,31 +38,18 @@ def update_daily_partition(row):
     )
     partitions = [{"year": year, "month": month, "day": day}]
 
-    if spark_flag and subpartitioned_table_name in spark_existing_tables:
+    if subpartitioned_table_name in existing_tables:
         spark_metastore_service.add_partitions(
             database_name=db_info["db_clean_staging_databricks"],
             table_name="{}".format(subpartitioned_table_name),
             partitions=partitions,
         )
-        logger.info("m=__main__, msg=Table in Spark metastore daily partition repaired")
-    elif spark_flag and subpartitioned_table_name not in spark_existing_tables:
         logger.info(
-            f"m=__main__, msg=Table {subpartitioned_table_name} do not exist in spark_existing_tables"
+            "m=__main__, msg=Added partitions for execution date "
+            f"'{execution_date}' on table '{subpartitioned_table_name}'."
         )
-
-    if athena_flag and subpartitioned_table_name in athena_existing_tables:
-        athena_metastore_service.add_partitions(
-            database_name=db_info["db_clean_staging_athena"],
-            table_name="{}".format(subpartitioned_table_name),
-            partitions=partitions,
-        )
-        logger.info(
-            "m=__main__, msg=Table in Athena metastore daily partition repaired"
-        )
-    elif athena_flag and subpartitioned_table_name not in athena_existing_tables:
-        logger.info(
-            f"m=__main__, msg=Table {subpartitioned_table_name} do not exist in athena_existing_tables"
-        )
+    else:
+        logger.info(f"m=__main__, msg=Table {subpartitioned_table_name} do not exist.")
 
 
 if __name__ == "__main__":
@@ -75,16 +58,11 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     env = args.env
     datalake_bucket = args.datalake_bucket
-    athena_query_result_location = args.athena_query_result_location
     source = args.source
-    spark_flag = args.spark_flag
-    athena_flag = args.athena_flag
 
     logger.info(
-        "m=__main__, date={}, env={}, source={}, spark_flag={}, "
-        "athena_flag={}, msg=Job started".format(
-            execution_date, env, source, spark_flag, athena_flag
-        )
+        f"m=__main__, execution_date={execution_date}, env={env}, source={source}, "
+        "msg=Job started"
     )
 
     date = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -95,28 +73,16 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
 
-    athena_client = AthenaClient(athena_query_result_location)
-    athena_metastore_service = AthenaMetastoreService(athena_client)
-
     # get subpartitions values
     subpartitions_values = sqlContext.table(
         "{}.subpartitions_values".format(db_info["db_clean_staging_databricks"])
     ).collect()
 
     # get existing tables
-    if spark_flag:
-        spark_existing_tables = spark_metastore_service.get_table_names(
-            db_info["db_clean_staging_databricks"]
-        )
-
-    if athena_flag:
-        athena_existing_tables = [
-            row["Data"][0]["VarCharValue"]
-            for row in athena_metastore_service.get_table_names(
-                db_info["db_clean_staging_athena"]
-            )["ResultSet"]["Rows"]
-        ]
+    existing_tables = spark_metastore_service.get_table_names(
+        db_info["db_clean_staging_databricks"]
+    )
 
     # update clean staging subpartitioned tables daily partition
     with Pool(NB_THREADS) as p:
-        p.map(update_daily_partition, [(row) for row in subpartitions_values])
+        p.map(update_date_partitions, [(row) for row in subpartitions_values])
