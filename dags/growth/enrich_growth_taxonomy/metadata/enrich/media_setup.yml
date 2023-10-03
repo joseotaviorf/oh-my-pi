@@ -1,0 +1,97 @@
+---
+database_name: datalake_growth_taxonomy
+table_name: media_setup
+owner: thiago.jesus@quintoandar.com.br
+domain: growth
+description: Each row of this table is a combination of growth media setup taxonomy values (campaign_strategy_intent, funnel_side, campaign_business_context, landing_page, behavior_type, medium and source).
+  This table's surrogate key should be used as input to identify campaign' results and costs according to the appropriate combination of media setup parameters.
+  More info about Growth Taxonomy and media setup params in this doc https://docs.google.com/presentation/d/1BylJwYp9-yoqEqNvzcIvzHLVhZbOOomAjDH5XmIaXtY/edit?usp=sharing
+columns:
+  sk_media_setup:
+    description: 'Unique id for the combination of (campaign_strategy_intent & campaign_business_context & landing_page & behavior_type & medium & source). Used as input in the campaigns UTM parameters.'
+  naming_convention_sufix:
+    description: 'Acronym generated from the values of the taxonomy levels, used as input in the campaigns UTM parameters.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  campaign_business_context:
+    description: 'Intention of the actions/campaigns adopted in relation to the business context.'
+    categories: 
+      rent: 'Campaign/Action aims to generate results in Rent'
+      sale: 'Campaign/Action aims to generate results in Sale'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  campaign_strategy_intent:
+    description: 'Intention of the actions/campaigns adopted in relation to the growth strategy.'
+    categories: 
+      Brand Awareness: 'One of these objectives is to get people to know QuintoAndar and consider the company as an option at some point: Reach people, drive traffic to the website regardless of the page or generate brand recognition.'
+      Acquisition: 'It aims to bring people to QuintoAndar who are already in the consideration phase'
+      Activation: 'Its objective is to make people perform their 1st flow at QuintoAndar.'
+      Engagement: 'Its objective is to keep people engaged through flows on QuintoAndar.'
+      Recovery: 'Its objective is to make people who have become churned users carry out new flows.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  behavior_type:
+    description: 'Type of user behavior in relation to their search decision and entry into the QuintoAndar environment.'
+    categories: 
+      Organic: 'Conversions in which the decision to search for and enter the QuintoAndar environment was made by the user.'
+      Non Organic: 'Conversions in which entry into the QuintoAndar environment was forced by QuintoAndar.'    
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  landing_page:
+    description: 'Landing page/domain of QuintoAndar to which the campaign directs.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  funnel_side:
+    description: 'Side of the funnel to which that campaign was directed.'
+    categories:
+      demand: 'Campaign made to bring potential buyers or tenants to our platform.'
+      supply: 'Campaign made to bring potential house owners to our platform.'
+      affiliates: 'Campaign made to bring affiliates to our platform.'
+      branding: 'Campaign created by the Branding team.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  medium:
+    description: 'Combination of platform intent, media package, branded and recovery audience status dimensions. Where the average package size is mandatory and the others are applied when convenient. More information in the Doc indicated in the table description.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  source:
+    description: 'QuintoAndar s external platform/operation responsible for generating the result.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  prefix_campaign_business_context:
+    description: 'Acronym generated from the values of campaign_business_context.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  prefix_campaign_strategy_intent:
+    description: 'Acronym generated from the values of campaign_strategy_intent.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  prefix_behavior_type:
+    description: 'Acronym generated from the values of behavior_type.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  prefix_landing_page:
+    description: 'Acronym generated from the values of landing_page.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  prefix_funnel_side:
+    description: 'Acronym generated from the values of funnel_side.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  prefix_medium:
+    description: 'Acronym generated from the values of medium.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  prefix_source:
+    description: 'Acronym generated from the values of source.'
+    lineage:
+    - datalake_gshets_clean.taxonomy_levels_values.value
+  ts_load:
+    description: 'Timestamp of the table load.'
