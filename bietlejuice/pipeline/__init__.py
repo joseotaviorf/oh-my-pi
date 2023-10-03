@@ -1,6 +1,3 @@
-from bietlejuice.pipeline.create_external_table_pipeline import (
-    CreateExternalTablePipeline,
-)
 from bietlejuice.pipeline.default_row_addition_pipeline import (
     DefaultRowAdditionPipeline,
 )
