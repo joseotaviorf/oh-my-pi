@@ -42,6 +42,7 @@ cluster_description = config_service.get_config("custom_cluster")
 # TODO Remove after PoV complete (reach out to either Ribs, Mario or Edu for any clarification and cleansing)
 
 cluster_description['init_scripts'].append({"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}})
+cluster_description['custom_tags'].append({"key": "granulate-cluster-name", "value": "{{ dag.dag_id }}"})
 
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

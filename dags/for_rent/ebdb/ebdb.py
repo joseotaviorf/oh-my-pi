@@ -42,6 +42,8 @@ cluster_configuration = Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True)
 # TODO Remove after PoV complete (reach out to either Ribs, Mario or Edu for any clarification and cleansing)
 
 cluster_configuration['init_scripts'].append({"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}})
+cluster_configuration['custom_tags'].append({"key": "granulate-cluster-name", "value": "{{ dag.dag_id }}"})
+
 
 EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"
