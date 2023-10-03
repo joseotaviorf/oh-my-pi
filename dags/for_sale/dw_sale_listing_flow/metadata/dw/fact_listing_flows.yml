@@ -1,6 +1,6 @@
 database_name: dw_sale
 table_name: fact_listing_flows
-description: This table covers the entire pre-publication part of the funnel, where we can find all the tags for channels, campaigns, media and other characteristics from the Marketing tables. 
+description: This table covers the entire pre-publication part of the funnel, where we can find all the tags for channels, campaigns, media and other characteristics from the Marketing tables.
   Table showing all the events and conversion dates from the pre-publication of a listing (from lead to publication).
   Each row is a listing and all the events up to publication
 domain: For Sale
@@ -420,13 +420,9 @@ columns:
       Only Rent: ''
       Only Sale: ''
       Organic: ''
-  listing_sale_status:
+  ts_opt_out_sale:
     lineage:
-    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.listing_sale_status
-    description: 'Identifies the listing status in the ForSale business model.'
-  ts_opted_out_rent:
-    lineage:
-    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_opt_out_rent
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_opt_out_sale
     description: 'Timestamp relative to when the listing opted out of the Sale business model.'
   funnel_step:
     description: Listing flow step that the lead or house is currently in or stopped.
@@ -497,5 +493,3 @@ columns:
       Web Mobile: ''
   ts_load:
     description: Last model refresh timestamp.
-  ts_opt_out_sale:
-    description: 'Timestamp relative to when the listing opted out of the Sale business model'
