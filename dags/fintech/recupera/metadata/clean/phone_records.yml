@@ -2,15 +2,19 @@
 database_name: datalake_recupera_clean
 table_name: phone_records
 description: |
-  "Tables with customer phone numbers. It is charged by customer 
-  charge and can also be updated via telecharging. telephone types 
-  can be registered, however those inserted by the load are automatically 
+  "Tables with customer phone numbers. It is charged by customer
+  charge and can also be updated via telecharging. telephone types
+  can be registered, however those inserted by the load are automatically
   registered by the system"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.phone_records.id_creditor
   id_customer:

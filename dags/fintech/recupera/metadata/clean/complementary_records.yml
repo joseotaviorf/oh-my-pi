@@ -2,15 +2,19 @@
 database_name: datalake_recupera_clean
 table_name: complementary_records
 description: |
-  "This table contains all the customer's active debts. 
-  When paid in installments, the debt will only be written off (excluded from this table) 
-  when the installment payment is settled or canceled (in the event that, with the amortization 
+  "This table contains all the customer's active debts.
+  When paid in installments, the debt will only be written off (excluded from this table)
+  when the installment payment is settled or canceled (in the event that, with the amortization
   of the amount paid, this installment has been settled)."
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.complementary_records.id_creditor
   id_customer:

@@ -2,10 +2,10 @@
 database_name: datalake_recupera_clean
 table_name: installment_detail
 description: |
-  "Contains the "dismemberment" of the installments according to the contract. 
-  There is a row for each contract and installment. 
-  Thus, it is possible to identify how the installment values are divided by contract. 
-  This table is complementary to table 'installment' and the sum of the amounts per installment 
+  "Contains the "dismemberment" of the installments according to the contract.
+  There is a row for each contract and installment.
+  Thus, it is possible to identify how the installment values are divided by contract.
+  This table is complementary to table 'installment' and the sum of the amounts per installment
   must be the same in both tables."
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
@@ -20,6 +20,10 @@ columns:
       - datalake_recupera_raw.installment_detail.dt_expiration_installment_agreement
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.installment_detail.id_creditor
   id_customer:

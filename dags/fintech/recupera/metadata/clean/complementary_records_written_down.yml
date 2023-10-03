@@ -2,8 +2,8 @@
 database_name: datalake_recupera_clean
 table_name: complementary_records_written_down
 description: |
-  "This table contains all of the customer's written-off debts. 
-  The structure is identical to that of table 'complementary_records'. 
+  "This table contains all of the customer's written-off debts.
+  The structure is identical to that of table 'complementary_records'.
   When the debt is written off, it is removed from it and inserted in table 'complementary_records_written_down'.
   At this time the amount_paid and discount_amount fields are updated."
 owner: bianca.martins@quintoandar.com.br
@@ -11,6 +11,10 @@ domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.id_creditor
   id_customer:

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_recupera_clean
 table_name: trato_feito_payment
-description: "Stores the payments to be integrated with the deal_feito"
+description: "The table stores the payments to be integrated with Trato Feito. It only contains the installments that have been paid."
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

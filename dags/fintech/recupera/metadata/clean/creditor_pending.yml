@@ -2,12 +2,12 @@
 database_name: datalake_recupera_clean
 table_name: creditor_pending
 description: |
-  "Table listing the original installments (records found in the 'complementary_records' or 'complementary_records_written_down' tables) 
+  "Table listing the original installments (records found in the 'complementary_records' or 'complementary_records_written_down' tables)
   of each receipt generated. The originals of the installments are also included in this table.
   Receipt originals (without installments): the 'installment_code' field is null and the 'is_installment' field = N
-  Installment originals: the installment_code field, when filled in, indicates which installment includes these originals. 
+  Installment originals: the installment_code field, when filled in, indicates which installment includes these originals.
   In this case, the 'receipt_code' field remains blank, as there is a possibility that an original installment is
-  divided into more than one receipt. Ex: an original installment and 3 installments accordingly, there will be one row in the table and 
+  divided into more than one receipt. Ex: an original installment and 3 installments accordingly, there will be one row in the table and
   three receipts for just one field. therefore the receipt code must be searched in the 'installment' table. The field 'is_installment' = s
   indicates that it is the original of an installment."
 owner: bianca.martins@quintoandar.com.br
@@ -23,6 +23,10 @@ columns:
       - datalake_recupera_raw.creditor_pending.id_sequence_number
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.creditor_pending.id_creditor
   id_customer:
@@ -143,10 +147,10 @@ columns:
       - datalake_recupera_raw.creditor_pending.id_operator
   main_amount_paid:
     description: |
-      "Principal amount paid. controls how much has already been deducted 
-      from the installment for the payment of installments accordingly. 
-      As an agreement installment is paid, the main_amount_paid of the installments 
-      that make up this agreement is filled. in the breach of agreement, 
+      "Principal amount paid. controls how much has already been deducted
+      from the installment for the payment of installments accordingly.
+      As an agreement installment is paid, the main_amount_paid of the installments
+      that make up this agreement is filled. in the breach of agreement,
       this field is observed to know if the installment must be written off, amortized or left open."
     lineage:
       - datalake_recupera_raw.creditor_pending.main_amount_paid

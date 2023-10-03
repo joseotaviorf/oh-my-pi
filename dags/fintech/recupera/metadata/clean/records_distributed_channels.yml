@@ -7,6 +7,10 @@ domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.records_distributed_channels.id_creditor
   id_customer:

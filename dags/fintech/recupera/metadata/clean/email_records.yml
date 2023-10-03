@@ -2,13 +2,17 @@
 database_name: datalake_recupera_clean
 table_name: email_records
 description: |
-  "Tables with customer emails. It is charged by customer charge and can also be updated via telecharging. 
+  "Tables with customer emails. It is charged by customer charge and can also be updated via telecharging.
   Email types can be registered, however those inserted by the load are automatically registered by the system."
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.email_records.id_creditor
   id_customer:

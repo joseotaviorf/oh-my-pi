@@ -2,11 +2,11 @@
 database_name: datalake_recupera_clean
 table_name: detail_movement
 description: |
-  "Contains all the original installments (from table 'complementary_records') received through 
-  Recupera. Whenever a payment is made, whether in accordance with or on receipt made for original installments. 
-  The original installments written off by this payment are entered in this table. 
-  In the event of an agreement, an installment may not be paid off in full. In this case, 
-  a line is inserted with amortization information and with the amount paid and the principal proportional to the payment. 
+  "Contains all the original installments (from table 'complementary_records') received through
+  Recupera. Whenever a payment is made, whether in accordance with or on receipt made for original installments.
+  The original installments written off by this payment are entered in this table.
+  In the event of an agreement, an installment may not be paid off in full. In this case,
+  a line is inserted with amortization information and with the amount paid and the principal proportional to the payment.
   When there is another payment, a new line is inserted, with another receipt number."
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
@@ -21,14 +21,18 @@ columns:
       - datalake_recupera_raw.detail_movement.dt_written_down
   id_sequence_number:
     description: |
-      "Sequence number - for the case of amortization of agreement. 
-      In this case we can have the same original installment several times, 
+      "Sequence number - for the case of amortization of agreement.
+      In this case we can have the same original installment several times,
       one for each receipt and this field prevents the key from duplicating.
       . It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.detail_movement.id_sequence_number
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.detail_movement.id_creditor
   id_customer:
@@ -124,7 +128,7 @@ columns:
       - datalake_recupera_raw.detail_movement.refund_reason_description
   payment_type:
     description: |
-      "Indicates if it is payment of entry, settlement or payment of 
+      "Indicates if it is payment of entry, settlement or payment of
       intermediate installment (for installment)"
     categories:
       "Liquidação": "payment of the last installment of the agreement or payment of receipt for original installment"

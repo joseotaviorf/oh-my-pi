@@ -7,6 +7,10 @@ domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.records.id_creditor
   id_customer:
@@ -194,6 +198,6 @@ columns:
     lineage:
       - datalake_recupera_raw.records.guarantor_address_complement
   type_boleto_delivery:
-    description: "Indicates the type of 'Boleto' delivery."
+    description: "Indicates the type of 'Boleto' delivery, i.e, how to send the invoice to the Customer."
     lineage:
       - datalake_recupera_raw.records.type_boleto_delivery

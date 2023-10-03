@@ -2,15 +2,19 @@
 database_name: datalake_recupera_clean
 table_name: historical_records
 description: |
-  "This table contains the occurrences made. 
-  They can be system occurrences (automatically inserted by 
-  the automatic execution programs, as can be the occurrences inserted 
+  "This table contains the occurrences made.
+  They can be system occurrences (automatically inserted by
+  the automatic execution programs, as can be the occurrences inserted
   by the operators directly in the telecobrança."
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.historical_records.id_creditor
   id_customer:
@@ -22,11 +26,11 @@ columns:
     lineage:
       - datalake_recupera_raw.historical_records.ts_occurrence
   historical_code:
-    description: "History Code - registered on table 'historical'"
+    description: "Occurence. Get the description of all values at https://drive.google.com/drive/folders/1mXSEjDl7Sc-fkQC9GANJlGsmy2-VRy3w?usp=drive_link"
     lineage:
       - datalake_recupera_raw.historical_records.historical_code
   situation_occurrence:
-    description: "Situação da ocorrência – para a qual a ocorrência está associada, se houver. campo id_historical_situation na tbl_historicos"
+    description: "Occurrence status – to which the occurrence is associated, if any. Field id_historical_situation table 'historical' "
     lineage:
       - datalake_recupera_raw.historical_records.situation_occurrence
   operator_name:

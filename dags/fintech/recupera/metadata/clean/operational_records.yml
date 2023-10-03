@@ -2,7 +2,7 @@
 database_name: datalake_recupera_clean
 table_name: operational_records
 description: |
-  "This table is the customer's operational data. 
+  "This table is the customer's operational data.
   These are the data referring to their characteristics within the system
   and the billing process."
 owner: bianca.martins@quintoandar.com.br
@@ -10,6 +10,10 @@ domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.operational_records.id_creditor
   id_customer:
@@ -17,7 +21,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operational_records.id_customer
   balance_update_routine_indicator:
-    description: "Balance update routine handling indicator. 
+    description: "Balance update routine handling indicator.
       The value 'Registro de trânsito' is a transit record, only for internal use by Recupera, and it can be disregard. The value will be changed to 'Aguardando processamento' or 'Já processado' in the next execution."
     lineage:
       - datalake_recupera_raw.operational_records.balance_update_routine_indicator
@@ -98,7 +102,13 @@ columns:
     lineage:
       - datalake_recupera_raw.operational_records.last_customer_history_code
   advisory_code:
-    description: "Advisory Code where the customer is located"
+    description: "Advisory Code. Read more about it at https://drive.google.com/drive/folders/16D-Vlq_rpJS6UcopwysJGcWtEU_h-fHY?usp=drive_link"
+    categories:
+      QPASCHWS: Assessoria Paschoalotto, Operação de Cobrança QuintoAndar
+      V5IAFWS: Assessoria IAF, Operação de Cobrança QuintoCred para Credor 5 (Plataforma 3.0)
+      V5PASCHW: Assessoria Paschoalotto, Operação de Cobrança QuintoCred para Credor 5 (Plataforma 3.0)
+      VPASCHWS: Assessoria Paschoalotto, Operação de Cobrança QuintoCred para Credor 3 (Plataforma 2.0)
+      VIAFWS: Assessoria IAF, Operação de Cobrança QuintoCred para Credor 3 (Plataforma 2.0)
     lineage:
       - datalake_recupera_raw.operational_records.advisory_code
   product_code:
@@ -106,7 +116,41 @@ columns:
     lineage:
       - datalake_recupera_raw.operational_records.product_code
   distributor_code:
-    description: "Distributor code where the customer was sought"
+    description: "Distributor code. Get the updates list and more details at: https://drive.google.com/drive/folders/1RRgiOjAVyo_Nv2okeKOfM_Z0KZzliCcG?usp=drive_link"
+    categories:
+      DACOBLGQ: Clientes com acordo celebrado pela Quitei Pré-Integração
+      DVESPBX: Clientes da Velo com problemas nas faturas
+      DESPBXQT: Clientes aguardando baixa de acordo celebrado pela Quitei
+      DPCOBFR: Clientes onde a cobrança deve ser pausada devido a constatação de Fraude contratual
+      DFINALIZA: Clientes finalizados, cobrança interna.
+      DAT130: Clientes Ativos, Aging 1-30
+      DAT3160: Clientes Ativos, Aging 31-60
+      DAT61: Clientes Ativos, Aging 61+
+      DBOLPULA: Clientes ativos com boletos pulados
+      DVCOBINT: Clientes da Velo com acordo celebrado internamente
+      DCBINTQT: Clientes aguardando baixa de acordo celebrado pela Quitei
+      DCARGA: Distribuidor para recebimento de faturas vencidas dos produtos Quinto Andar
+      DBAIXAS: Distribuidor para processamento de baixa de pagamento processado pelo Recupera.
+      DLEGAL: Distribuidor para clientes que possuem processo contra QuintoAndar
+      DFRAUDE: Clientes onde a cobrança deve ser pausada para análise interna devido a possibilidade de fraude.
+      DPCOB: Clientes onde a cobrança deve ser pausada para análise interna
+      DASSES: Clientes distribuídos para escritórios de assessoria de cobrança
+      DACORDEV: Clientes de Evictions com acordo em andamento
+      DEVICEMF: Clientes de Evictions com promessa de finalização de contrato
+      DEVICTIO: Clientes com processo de despejo em andamento
+      DEVICEX: Clientes com ação de execução em andamento.
+      DEVICFIN: Clientes de Evictions com contrato finalizado
+      DPREEVIC: Clientes em situação de pré despejo.
+      DACOINTE: Clientes com acordos celebrados internamente.
+      DACOVNQB: Clientes internos com acordos vencidos ou quebrados
+      DONBOARD: Clientes Ativos, Onboarding
+      DVESPBX2: Clientes da QuintoCred com problemas de conciliação
+      DVNCOB: Clientes com contrato finalizado de assinaturas
+      DVACOINT: Clientes com acordos celebrados internamente.
+      DVAT130: Clientes da QuintoCred em atraso ≤30 dias
+      DVAT3160: Clientes da QuintoCred em atraso entre 31-60 dias
+      DVAT6190: Clientes da QuintoCred em atraso entre 61-90 dias
+      DCAMPVEL: Clientes da QuintoCred em atraso para atuação pontual no discador (campanhas esporádicas)
     lineage:
       - datalake_recupera_raw.operational_records.distributor_code
   operator_code_last_contact:

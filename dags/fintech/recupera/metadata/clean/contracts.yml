@@ -2,13 +2,17 @@
 database_name: datalake_recupera_clean
 table_name: contracts
 description: |
-  "Contains all contracts loaded in recupera. 
+  "Contains all contracts loaded in recupera.
   Once a contract is included in this table, it will never be deleted, even if it is settled."
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
     lineage:
       - datalake_recupera_raw.contracts.id_creditor
   id_customer:
