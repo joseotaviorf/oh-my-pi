@@ -15,20 +15,28 @@ deduplicate_sap_entity AS (
 ),
 remove_reversed AS (
   SELECT 
-  sk_invoice_reversed_entry AS id_entry
+    die.sk_invoice_reversed_entry AS id_entry,
+    DATE(fie.ts_created) AS dt_reversal
   FROM 
-    dw_payment.dim_invoice_entry
+    dw_payment.fact_invoice_entries fie
+  INNER JOIN 
+    dw_payment.dim_invoice_entry die 
+      ON fie.sk_invoice_entry = die.sk_invoice_entry
   WHERE 
     sk_invoice_reversed_entry IS NOT NULL
 
   UNION ALL
 
   SELECT 
-    sk_invoice_entry AS id_entry
+    die.sk_invoice_entry AS id_entry,
+    DATE(fie.ts_created) AS dt_reversal
   FROM 
-    dw_payment.dim_invoice_entry
+    dw_payment.fact_invoice_entries fie
+  INNER JOIN 
+    dw_payment.dim_invoice_entry die 
+      ON fie.sk_invoice_entry = die.sk_invoice_entry
   WHERE 
-    sk_invoice_reversed_entry IS NOT NULL
+    die.sk_invoice_reversed_entry IS NOT NULL
 ),
 next_business_day AS (
   SELECT
@@ -127,6 +135,7 @@ SELECT DISTINCT
   DATE_FORMAT(i.dt_sent, 'yyyy-MM-dd') AS invoice_sent_date,
   DATE_FORMAT(i.dt_paid, 'yyyy-MM-dd') AS invoice_paid_date,
   DATE_FORMAT(i.ts_canceled, 'yyyy-MM-dd') AS invoice_canceled_date,
+  DATE_FORMAT(rr.dt_reversal, 'yyyy-MM-dd') AS invoice_reversal_date,
   DATE_FORMAT(nbd.date_next_bd, 'yyyy-MM-dd') AS invoice_paid_date_next_business_day,
   c.dt_start AS contract_start,
   c.dt_annulment AS contract_annulment,

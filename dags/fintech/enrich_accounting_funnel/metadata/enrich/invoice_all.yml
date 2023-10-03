@@ -175,6 +175,10 @@ columns:
     lineage:
       - dw_payment.dim_invoice.ts_canceled
     description: "Date when the invoice was canceled"
+  invoice_reversal_date:
+    lineage:
+      - dw_payment.fact_invoice_entries.ts_created
+    description: "Date when a entry was reversed (canceled) by another one"
   invoice_paid_date_next_business_day:
     lineage:
       - dw_public.dim_date.date
