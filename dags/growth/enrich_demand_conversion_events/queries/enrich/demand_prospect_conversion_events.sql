@@ -1,4 +1,3 @@
-CREATE OR REPLACE TEMPORARY VIEW datalake_demand_flows_demand_prospect_conversion_events  AS 
 WITH conversion_events AS (
   -- SALE VISIT BOOKED
   SELECT
