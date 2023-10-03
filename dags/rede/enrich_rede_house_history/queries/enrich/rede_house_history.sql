@@ -70,7 +70,7 @@ house_history_aux AS (
 ),
 house_history AS (
     SELECT
-        id_house,
+        h.id_house,
         pa.id_company AS id_company_hubspot_extracted,
         COALESCE(
             pa.partner_3p_supply,
