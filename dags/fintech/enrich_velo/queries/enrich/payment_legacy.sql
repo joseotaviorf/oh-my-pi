@@ -73,6 +73,7 @@ WITH payment AS (
         jk2.id_junk AS id_payment_type,
         jk3.id_junk AS id_status,
         jk4.id_junk AS id_payment_gateway,
+        jk5.id_junk AS id_payment_category,
         p.id_customer,
         p.unicid AS id_unicid,
         p.subscription AS id_subscription,
@@ -138,6 +139,16 @@ WITH payment AS (
         datalake_velo.junk AS jk4
             ON jk4.desc_lvl_1 = pg.name
             AND jk4.desc_master_type = 'Payment Gateway'
+    LEFT JOIN
+        datalake_velo.junk AS jk5
+            ON jk5.desc_lvl_1 = (
+                CASE
+                  WHEN p.subscription IS NOT NULL THEN 'RECURRING_SUBSCRIPTION'
+                  WHEN ISNOTNULL(o.id_occurrence) THEN 'AGREEMENT'
+                  ELSE 'NO INFO'
+                END
+              )
+            AND jk5.desc_master_type = 'Payment Category'
     LEFT JOIN
         migrated_ids AS mi
             ON mi.id_payment = p.id_payment

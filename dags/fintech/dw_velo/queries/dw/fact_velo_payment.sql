@@ -7,6 +7,7 @@ SELECT
     COALESCE(id_payment_type, -1) AS sk_payment_type,
     COALESCE(id_status, -1) AS sk_status,
     COALESCE(id_payment_gateway, -1) AS sk_payment_gateway,
+    COALESCE(id_payment_category, -1) AS sk_payment_category,
     id_customer,
     id_unicid,
     id_subscription,

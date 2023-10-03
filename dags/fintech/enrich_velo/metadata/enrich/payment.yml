@@ -42,6 +42,10 @@ columns:
     description: ID connecting table to junk table.
     lineage:
       - datalake_velo.junk.id_junk
+  id_payment_category:
+    description: ID connecting table to junk table.
+    lineage:
+      - datalake_velo.junk.id_junk
   id_customer:
     description: Business ID for Customer.
     lineage:

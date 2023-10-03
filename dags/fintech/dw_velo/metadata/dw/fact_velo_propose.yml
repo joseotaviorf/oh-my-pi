@@ -151,6 +151,11 @@ columns:
       - datalake_velo.propose.is_contract
       - datalake_velo.propose_legacy.is_contract
     description: If the propose has been turned into a contract
+  is_direct_billing:
+    lineage:
+      - datalake_velo.propose.is_direct_billing
+      - datalake_velo.propose_legacy.is_direct_billing
+    description: If the propose uses the direct billing model
   is_grace_period_cancelled:
     lineage:
       - datalake_velo.propose.is_grace_period_cancelled

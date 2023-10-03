@@ -413,6 +413,7 @@ SELECT DISTINCT
     CAST(NULL AS BIGINT) AS total_occurrences,
     CAST(NULL AS BIGINT) AS occurrences_solved,
     old.id_contract IS NOT NULL AS is_contract,
+    FALSE AS is_direct_billing,
     IFNULL(DATEDIFF(old.dt_ended, DATE(old.dt_contract_started)) <= 10, False) AS is_grace_period_cancelled,
     TRUE AS is_legacy,
     FALSE AS is_3p,

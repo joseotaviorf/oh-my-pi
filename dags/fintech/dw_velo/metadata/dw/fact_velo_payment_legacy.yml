@@ -37,6 +37,10 @@ columns:
     description: SK connecting table to dim_velo_junk table.
     lineage:
       - datalake_velo.payment_legacy.id_payment_gateway
+  sk_payment_category:
+    description: SK connecting table to dim_velo_junk table.
+    lineage:
+      - datalake_velo.payment_legacy.id_payment_category
   id_customer:
     description: Business ID for Customer.
     lineage:

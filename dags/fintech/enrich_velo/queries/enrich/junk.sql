@@ -138,6 +138,30 @@ WITH cte_join AS (
     )
     UNION ALL
     (
+        WITH cte_payment_category AS (
+            SELECT DISTINCT
+                product_type AS desc_lvl_1
+            FROM
+                datalake_rental_guarantee_platform_clean.payment
+            WHERE product_type NOT IN ('GUARANTEE')
+            UNION ALL
+            SELECT
+                name AS desc_lvl_1
+            FROM
+                VALUES ('AGREEMENT'),
+                        ('NO INFO'),
+                        ('RECURRING_SUBSCRIPTION') AS origin(name)
+        )
+        SELECT
+            'Payment Category' AS desc_master_type,
+            ROW_NUMBER() OVER( ORDER BY desc_lvl_1 ASC) AS id_lvl_1,
+            desc_lvl_1
+        FROM
+            cte_payment_category
+        GROUP BY desc_lvl_1
+    )
+    UNION ALL
+    (
         WITH cte_occurrence_status AS (
             SELECT
                 name AS desc_lvl_1

@@ -57,6 +57,7 @@ SELECT DISTINCT
     jk2.id_junk AS id_payment_type,
     jk3.id_junk AS id_status, -- p.status
     jk4.id_junk AS id_payment_gateway, -- p.gateway
+    jk5.id_junk AS id_payment_category, -- p.product_type
     p.customer AS id_customer,
     p.unicid AS id_unicid,
     p.id_subscription,
@@ -99,6 +100,10 @@ LEFT JOIN
     ON jk4.desc_lvl_1 = p.gateway
         AND jk4.desc_master_type = 'Payment Gateway'
 LEFT JOIN
+    datalake_velo.junk AS jk5
+    ON jk5.desc_lvl_1 = IF(p.product_type = 'GUARANTEE', 'RECURRING_SUBSCRIPTION', p.product_type)
+        AND jk5.desc_master_type = 'Payment Category'
+LEFT JOIN
     cte_prop_values AS pv
     ON pv.id_propose = p.id_propose
 LEFT JOIN
@@ -122,6 +127,7 @@ SELECT DISTINCT
     jk2.id_junk AS id_payment_type,
     jk3.id_junk AS id_status,
     NULL AS id_payment_gateway,
+    jk4.id_junk AS id_payment_category,
     NULL AS id_customer,
     NULL AS id_unicid,
     NULL AS id_subscription,
@@ -161,6 +167,10 @@ LEFT JOIN
     ON jk3.desc_lvl_1 = ap.status
         AND jk3.desc_master_type = 'Payment Status'
 LEFT JOIN
+    datalake_velo.junk AS jk4
+    ON jk4.desc_lvl_1 = 'AGREEMENT'
+        AND jk4.desc_master_type = 'Payment Category'
+LEFT JOIN
     cte_prop_values AS pv
     ON pv.id_propose = d.id_propose
-GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
+GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27
