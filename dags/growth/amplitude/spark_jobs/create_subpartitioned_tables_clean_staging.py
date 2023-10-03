@@ -35,6 +35,9 @@ ddl_template = """
 
 
 def create_subpartitioned_table(subpartitioned_table_name, row):
+    logger.info(
+        f"m=__main__, msg=Creating and repairing table '{subpartitioned_table_name}'..."
+    )
     replace_map = ("/", "%2F"), ("[", "%5B"), ("]", "%5D")
     ddl = ddl_template.format(
         clean_staging_db=db_clean_staging,
@@ -56,23 +59,9 @@ def create_subpartitioned_table(subpartitioned_table_name, row):
         db_clean_staging, subpartitioned_table_name
     )
     logger.info(
-        f"m=__main__, msg=Table '{subpartitioned_table_name}' created and updated"
-        " in Spark metastore."
+        f"m=__main__, msg=Table '{subpartitioned_table_name}' created and repaired."
     )
     spark_metastore_service.refresh_table(db_clean_staging, subpartitioned_table_name)
-
-
-def create_subpartitioned_tables(row, subpartitioned_table_name):
-    subpartitioned_table_name = StringFormatter.set_alphanumeric_snake_case(
-        unquote(subpartitioned_table_name.replace("-", "_"))
-    )
-
-    logger.info(
-        "m=__main__, subpartitioned_table_name={}, msg=Creating table...".format(
-            subpartitioned_table_name
-        )
-    )
-    create_subpartitioned_table(subpartitioned_table_name, row)
 
 
 if __name__ == "__main__":
@@ -104,9 +93,17 @@ if __name__ == "__main__":
 
     # get existing tables
     spark_metastore_service.create_database(db_clean_staging)
-    spark_existing_tables = spark_metastore_service.get_table_names(db_clean_staging)
+    existing_tables = spark_metastore_service.get_table_names(db_clean_staging)
 
     # create clean staging subpartitioned tables
     for row in subpartitions_values:
-        subpartitioned_table_name = "_".join(str(col) for col in row) + "_events"
-        create_subpartitioned_tables(row, subpartitioned_table_name)
+        suffixed_table_name = "_".join(str(col) for col in row) + "_events"
+        subpartitioned_table_name = StringFormatter.set_alphanumeric_snake_case(
+            unquote(suffixed_table_name.replace("-", "_"))
+        )
+        if subpartitioned_table_name not in existing_tables:
+            create_subpartitioned_table(subpartitioned_table_name, row)
+        else:
+            logger.info(
+                f"m=__main__, msg=Table '{subpartitioned_table_name}' already exists."
+            )
