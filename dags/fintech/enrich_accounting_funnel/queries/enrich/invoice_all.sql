@@ -41,10 +41,10 @@ remove_reversed AS (
 remove_first_reversed AS (
 SELECT 
     id_entry, 
-    dt_reversal,
-    RANK() OVER (PARTITION BY id_entry ORDER BY dt_reversal) AS rk
+    dt_reversal
 FROM 
     remove_reversed
+QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entry ORDER BY dt_reversal) = 1
 ),
 next_business_day AS (
   SELECT
@@ -179,7 +179,7 @@ LEFT JOIN
     ON fie.sk_invoice_entry = sap.id_finance_entity
 LEFT JOIN 
     remove_first_reversed rr 
-    ON rr.id_entry = fie.sk_invoice_entry and rr.rk = 1
+    ON rr.id_entry = fie.sk_invoice_entry
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')
