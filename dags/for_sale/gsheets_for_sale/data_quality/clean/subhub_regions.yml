@@ -13,6 +13,15 @@ column_level_validations:
       greater_than: 0
     has_max_value:
       less_than: 8000
+  city:
+    is_complete:
+      severity_level: Error
+  centre:
+    is_complete:
+      severity_level: Error
+  region:
+    is_complete:
+      severity_level: Error
   hub_name:
     is_complete:
       severity_level: Error

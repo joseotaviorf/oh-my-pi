@@ -5,9 +5,25 @@ columns:
   id_region:
     lineage:
       - datalake_gsheets_raw.subhub_regions.id_bairro
+    description: Subhub region ID.
+  city:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.cidade
+    description: Subhub city.
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.praca
+    description: Subhub city group.
+  region:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.bairro
+    description: Subhub region.
   hub_name:
     lineage:
       - datalake_gsheets_raw.subhub_regions.hub
+    description: Hub name.
   subhub_name:
     lineage:
       - datalake_gsheets_raw.subhub_regions.subhub
+    description: Subhub name.
+
