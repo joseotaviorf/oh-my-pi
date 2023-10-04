@@ -38,6 +38,14 @@ remove_reversed AS (
   WHERE 
     die.sk_invoice_reversed_entry IS NOT NULL
 ),
+remove_first_reversed AS (
+SELECT 
+    id_entry, 
+    dt_reversal,
+    RANK() OVER (PARTITION BY id_entry ORDER BY dt_reversal) AS rk
+FROM 
+    remove_reversed
+),
 next_business_day AS (
   SELECT
     dd.date,
@@ -170,8 +178,8 @@ LEFT JOIN
     deduplicate_sap_entity sap 
     ON fie.sk_invoice_entry = sap.id_finance_entity
 LEFT JOIN 
-    remove_reversed rr 
-    ON rr.id_entry = fie.sk_invoice_entry
+    remove_first_reversed rr 
+    ON rr.id_entry = fie.sk_invoice_entry and rr.rk = 1
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')
