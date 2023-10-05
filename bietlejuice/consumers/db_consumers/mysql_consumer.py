@@ -84,6 +84,32 @@ class MySqlConsumer(DBConsumer):
         return df
 
     @logger
+    def get_single_table_names_and_sizes(self, table):
+        """
+        Gets the table names and sizes of a MySql database.
+        :return: A Spark DataFrame with cols: table_name and size
+        """
+        query = """
+        SELECT
+          table_name AS table_name,
+          round(((data_length + index_length) / 1024 / 1024), 2) AS `size`,
+          TABLE_ROWS as rows_count
+        FROM
+          information_schema.TABLES
+        where
+          table_schema = '{db}'
+          AND LOWER(table_name) = LOWER('{table}')
+        ORDER BY
+          (data_length + index_length) DESC
+        """.format(
+            db=self.conn_config["db"], table=table
+        )
+
+        df = self.get_data_from_query(query)
+
+        return df
+
+    @logger
     def get_data_from_table(self, table_name):
         """
         Gets all data from a table in a MySql database.

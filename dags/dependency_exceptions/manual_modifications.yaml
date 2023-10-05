@@ -360,6 +360,11 @@ bietlejuice.enrich_docato:
 bietlejuice.enrich_ebdb_affiliates_cost:
   remove:
     - bietlejuice.ebdb:load-clean-conversion-lead
+bietlejuice.enrich_ebdb_listing:
+  remove:
+    - bietlejuice.ebdb_out_of_context:load-clean-restriction-type
+  add:
+    - bietlejuice.ebdb:load-clean-restriction-type
 bietlejuice.enrich_ebdb_listing_jobs:
   add:
     - bietlejuice.ebdb:load-clean-country
