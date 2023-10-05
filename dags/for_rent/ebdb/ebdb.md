@@ -154,6 +154,8 @@ Produces the following output tables:
     `pre_proposal`
     `pre_proposal_aud`
     `pre_proposal_condition`
+    `pro_owner_fee`
+    `pro_owner_fee_aud`
     `property_fee`
     `property_fee_assigned`
     `property_fee_assigned_aud`

@@ -177,7 +177,6 @@ table_block_list:
   - ContratoDeal
   - Aquisicao
   - PaymentRules
-  - ProOwnerFee_AUD
   - Device_NotificationOptOut
   - FeaturedRegion
   - Aux

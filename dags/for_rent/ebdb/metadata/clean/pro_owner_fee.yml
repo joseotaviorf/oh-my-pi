@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: pro_owner_fee
+owner: kleber.inoue@quintoandar.com.br
+description: Table that contains the PP Multi's owners/landlords adminstration fee.
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.pro_owner_fee.id
+    description: ID of the PP Multi's owners/landlords administration fee. Also this table's primary key.
+  id_pro_owner:
+    lineage:
+      - datalake_ebdb_raw.pro_owner_fee.user_pro_owner_id
+    description: ID user of the PP Multi (ProOwner). May contains duplicated ids!
+  adm_fee:
+    lineage:
+      - datalake_ebdb_raw.pro_owner_fee.adm_fee
+    description: Owner's/Landlord's administration fee.
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.pro_owner_fee.active
+    description: Boolean flag to check if it's active.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.pro_owner_fee.created_at
+    description: Timestamp of when the record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.pro_owner_fee.updated_at
+    description: Timestamp of when the record was updated for the last time.
