@@ -5,6 +5,7 @@ dag:
 workflow:
   type: query
   layer: metric
+  default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
   has_load_to_redshift_task: false
 cluster:
