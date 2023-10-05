@@ -1,0 +1,45 @@
+---
+database_name: datalake_ebdb_condo
+table_name: condo_amenities
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
+description: Every row of this table corresponds to a condo amenity associated with a house.
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities_aud.id_house
+    description: Id of the house associated with the amenity.
+  id_condo_parent:
+    lineage:
+      - datalake_ebdb_clean.house.id_condo_parent
+    description: Id of the condo associated with the amenity.
+  id_user_revisor:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.id_user
+    description: Id of the user who set the amenity.
+  code:
+    lineage:
+      - datalake_ebdb_clean.condo_amenities.code
+    description: Code of the amenity, such as PISCINA, CHURRASQUEIRA, etc.
+  revisor:
+    description: Role of the user who set the amenity.
+    categories:
+      Enrichment Module: System that uses Vespucio to enrich houses.
+      Owner: Owner of the house.
+      Photographer: Photographer who took the pictures of the house.
+      Agent: Real estate agent.
+      Affiliate: QuintoAndar's affiliate.
+      System: No user associated with the revision.
+      Admin: Admin user.
+      Supply Processor: Supply processor user.
+      Migration: Migration user.
+      Other Internal: Another category of internal user (with @quintoandar email).
+      Other External: Another category of external user (without @quintoandar email).
+  has_feature:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities_aud.has_feature
+    description: Whether the amenity is present in the house or not.
+  ts_revision:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the revision.
