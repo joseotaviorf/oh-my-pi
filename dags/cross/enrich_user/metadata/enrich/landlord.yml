@@ -1,10 +1,7 @@
 ---
 database_name: datalake_user
-table_name: property_owner
-description:
-  Ebdb Users daily snapshot classified as active property owners, considering houses
-  with the status of alugado, suspenso, aguardando_publicacao, edicao or publicado.
-  The house id_user should not be an active partner agent.
+table_name: landlord
+description: Landlord users and their respective journey step. Each row is a daily snapshot of a user
 domain: Cross
 owner: data-ae-ss@quintoandar.com.br
 columns:
