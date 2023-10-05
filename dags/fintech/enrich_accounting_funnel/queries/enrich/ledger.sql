@@ -202,6 +202,7 @@ SELECT
     db.account AS account_number,
     coa.name AS account_name,
     dh.series AS series,
+    db.contra_act,
     db.sap_document_number,
     dh.transaction_type || ' ' || dh.source_document_number AS document_number,
     db.accounting_rule,
@@ -217,6 +218,7 @@ SELECT
     dh.uuid AS hash,
     dh.dt_reference,
     dh.dt_due,
+    dh.dt_tax,
     dh.accrual_year_month
 FROM
     dh

@@ -55,6 +55,11 @@ columns:
     lineage:
       - datalake_pas.journal_entries.series
       - datalake_pas.invoices.series
+  contra_act:
+    description: "Indicates the opposite entry account number. If a debit, indicates the credit account number and vice versa"
+    lineage:
+      - datalake_pas.invoice_lines.contra_act
+      - datalake_pas.journal_entry_lines.contra_act
   sap_document_number:
     description: "References the input or output sap document table"
     lineage:
@@ -139,6 +144,11 @@ columns:
     lineage:
       - datalake_pas.journal_entries.dt_due
       - datalake_pas.invoices.dt_due
+  dt_tax:
+    description: "Tax date"
+    lineage:
+      - datalake_pas.journal_entries.dt_tax
+      - datalake_pas.invoices.dt_tax
   accrual_year_month:
     description: "Accrual date"
     lineage:
