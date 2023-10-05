@@ -102,6 +102,18 @@ columns:
     lineage:
       - datalake_offer.sale_offer.ts_buyer_fup
     description: Date when the Closing Analyst sent a message to the Buyer.
+  brokerage_fee:
+    lineage:
+      - datalake_offer.sale_offer.brokerage_fee
+    description: Percentage of brokerage fee
+  sale_price_agreed:
+    lineage:
+      - datalake_offer.sale_offer.sale_price_agreed
+    description: Sale price agreed in the sale contract
+  has_used_fgts_in_payment:
+    lineage:
+      - datalake_offer.sale_offer.has_used_fgts_in_payment
+    description: Has used (or will use) FGTS in payment
   is_buyer_first_offer:
     lineage:
     - datalake_offer.sale_offer.is_buyer_first_offer
