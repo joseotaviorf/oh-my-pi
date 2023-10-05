@@ -1,11 +1,13 @@
 SELECT
     id,
-    businessContext AS business_context,
-    businessContext_MOD AS mod_business_context,
-    isEnabled AS is_enabled,
-    isEnabled_MOD AS mod_is_enabled,
     rev,
     revtype as rev_type,
+    businessContext AS business_context,
+    origin,
+    isEnabled AS is_enabled,
+    businessContext_MOD AS mod_business_context,
+    isEnabled_MOD AS mod_is_enabled,
+    origin_MOD AS mod_origin,
     criadoEm AS ts_created,
     atualizadoEm AS ts_updated
 FROM

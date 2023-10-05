@@ -16,6 +16,9 @@ columns:
   business_context:
     lineage:
       - datalake_ebdb_raw.preferredfixedagent.businesscontext
+  origin:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.origin
   is_enabled:
     lineage:
       - datalake_ebdb_raw.preferredfixedagent.isenabled
