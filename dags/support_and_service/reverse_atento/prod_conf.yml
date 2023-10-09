@@ -9,6 +9,22 @@ dag_documentation:
     Atento is an external QuintoAndar partner for managing customer support.
   additional_information: This pipeline also exports results do atento bucket (`s3://atento-s3-data-quintoandar-com-br`).
 
+schema:
+  fields:
+    - metadata: {}
+      name: table_name
+      nullable: true
+      type: string
+    - metadata: {}
+      name: ts_last_updated
+      nullable: true
+      type: string
+    - metadata: {}
+      name: ts_execution
+      nullable: true
+      type: string
+  type: struct
+
 custom_cluster:
   driver_node_type_id: m5a.2xlarge
   node_type_id: m5a.2xlarge

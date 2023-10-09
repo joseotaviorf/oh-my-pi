@@ -2,6 +2,7 @@ from datetime import datetime
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from pendulum import timezone
 import os
+import json
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain
@@ -25,10 +26,12 @@ MAIN_START_DATE = datetime(2023, 8, 23, 0, 0, 0, tzinfo=timezone("America/Sao_Pa
 
 config_service = ConfigurationService(DAG_NAME)
 
+datalake_bucket = config_service.get_config("datalake_bucket")
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 reverse_spark_job_path = f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_into_azure_blob_storage.py"
+execution_tracking_spark_job_path = f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_execution_tracking.py"
 
 cluster_description = config_service.get_config("custom_cluster")
 
@@ -43,6 +46,7 @@ default_libraries = config_service.get_config("default_libraries")
 database_name = config_service.get_config("database_name")
 tables = config_service.get_config("tables")
 azure_container_name = config_service.get_config("azure_container_name")
+table_schema = config_service.get_config("schema")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -74,7 +78,7 @@ external_bucket_task= []
 for table_name, table_config in tables.items():
     external_bucket_task.append(
         QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"load_{table_name}_table_into_azure_blob_storage",
+            task_id=f"load-{table_name}-table-into-azure-blob-storage",
             dag=dag,
             json={
                 "spark_python_task": {
@@ -93,5 +97,27 @@ for table_name, table_config in tables.items():
         )
     )
 
+execution_tracking_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"load-execution-tracking",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": execution_tracking_spark_job_path,
+            "parameters": [
+                        ENV, 
+                        SOURCE, 
+                        database_name, 
+                        table_name, 
+                        azure_container_name,
+                        table_config['context'],
+                        datalake_bucket,
+                        json.dumps(table_schema),
+                        "{{ ds }}"
+                ],
+        }
+    },
+)
+
 chain(create_cluster_task, external_bucket_task)
-chain(external_bucket_task, terminate_cluster_task)
+chain(external_bucket_task, execution_tracking_task)
+chain(execution_tracking_task, terminate_cluster_task)

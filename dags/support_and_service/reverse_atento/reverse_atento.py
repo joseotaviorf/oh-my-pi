@@ -2,6 +2,7 @@ from datetime import datetime
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from pendulum import timezone
 import os
+import json
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain
@@ -40,6 +41,9 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 reverse_spark_job_path = (
     f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_s3_data_into_external_bucket.py"
 )
+execution_tracking_spark_job_path = (
+    f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_execution_tracking.py"
+)
 
 cluster_description = config_service.get_config("custom_cluster")
 
@@ -56,6 +60,7 @@ external_s3_bucket = config_service.get_config("external_s3_bucket")
 
 partition_cols = config_service.get_config("partition_cols")
 dag_documentation = config_service.get_config("dag_documentation")
+table_schema = config_service.get_config("schema")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -115,7 +120,18 @@ external_bucket_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+execution_tracking_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"load-execution-tracking",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": execution_tracking_spark_job_path,
+            "parameters": [ENV, datalake_bucket, SOURCE, external_s3_bucket, json.dumps(table_schema)],
+        }
+    },
+)
 
 chain(create_cluster_task, ReverseTaskGroup.all_first_tasks(datalake_task_groups))
 chain(ReverseTaskGroup.all_last_tasks(datalake_task_groups), external_bucket_task)
-chain(external_bucket_task, terminate_cluster_task)
+chain(external_bucket_task, execution_tracking_task)
+chain(execution_tracking_task, terminate_cluster_task)

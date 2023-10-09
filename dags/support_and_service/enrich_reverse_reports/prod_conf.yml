@@ -1,0 +1,4 @@
+---
+dag_documentation:
+  dag_purpose: "Enrich created with the aim of consolidating data from reverse executions, the data is generated in the reverse layer looking at its destination buckets. In 
+      principle, this dag has the purpose of consolidating information about the last modification in the destination bucket, but we can enrich this base with new information."
