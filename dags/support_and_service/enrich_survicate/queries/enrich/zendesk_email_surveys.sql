@@ -13,7 +13,7 @@ SELECT
     WHEN answers[1].survey_point.pretty_type = 'Smiley scale' AND answers[1].content = 'Extremely unsatisfied' THEN 1
     ELSE CAST(answers[1].content AS INT)
   END AS csat_score,
-  LOWER(answers[0].content) = 'sim' AS is_solved,
+  LOWER(answers[0].content) IN ('sim', "si", "sí") AS is_solved,
   ts_first_seen,
   ts_first_response,
   year,
