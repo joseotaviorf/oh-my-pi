@@ -7,6 +7,7 @@ SELECT
     company_use,
     our_number,
     occurrence_code,
+    occurrence_reason,
     payee_name,
     timestamp(created_at) AS ts_created,
     timestamp(updated_at) AS ts_updated,

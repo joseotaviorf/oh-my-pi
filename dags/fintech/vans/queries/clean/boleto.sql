@@ -10,6 +10,7 @@ SELECT
     fine_due_date AS dt_fine_due,
     fine_amount,
     occurrence_code,
+    occurrence_reason,
     payer_name,
     payer_document,
     payer_address,

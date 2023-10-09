@@ -7,6 +7,7 @@ SELECT
     company_use,
     our_number,
     occurrence_code,
+    occurrence_reason,
     payee_name,
     payee_document,
     payee_agency,

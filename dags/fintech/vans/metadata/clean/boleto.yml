@@ -34,6 +34,9 @@ columns:
   occurrence_code:
     lineage:
       - datalake_vans_raw.boleto.occurrence_code
+  occurrence_reason:
+    lineage:
+      - datalake_vans_raw.boleto.occurrence_reason
   payer_name:
     lineage:
       - datalake_vans_raw.boleto.payer_name

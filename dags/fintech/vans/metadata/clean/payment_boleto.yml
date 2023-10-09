@@ -25,6 +25,9 @@ columns:
   occurrence_code:
     lineage:
       - datalake_vans_raw.paymentboleto.occurrence_code
+  occurrence_reason:
+    lineage:
+      - datalake_vans_raw.paymentboleto.occurrence_reason
   payee_name:
     lineage:
       - datalake_vans_raw.paymentboleto.payee_name
