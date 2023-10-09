@@ -252,6 +252,7 @@ chat AS (
     completion_reason,
     CASE
       WHEN completion_reason = 'task idled' THEN 'IDLED'
+      WHEN completion_reason = 'session expired' THEN 'EXPIRED'
       WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
