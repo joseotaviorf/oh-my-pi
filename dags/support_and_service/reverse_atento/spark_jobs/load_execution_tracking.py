@@ -78,4 +78,4 @@ if __name__ == "__main__":
             query=None,
         ).load_and_register(dataframe, format_options)
     except:
-        logger.warn(f"{dir_path.path}")
+        logger.warn(f"An error occurred while trying to save the data.")
