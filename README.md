@@ -26,14 +26,17 @@ Repository with implementation of Airflow DAGs and Spark Jobs.
 
 ## Table of contents
 
-- [Getting Started](#getting-started)
-  - [Local Setup Instructions](#local-setup-instructions)
-- [Useful commands](#useful-commands)
-  - [Lint & Check Style](#lint--check-style)
-  - [Local Tests](#local-tests)
-- [Monitoring](#monitoring)
-- [Airflow extra features](#airflow-extra-features)
-- [Hotfix Flow](#hotfixes-deployment-flow-fire)
+- [Bi-etl-ejuice](#bi-etl-ejuice)
+  - [Table of contents](#table-of-contents)
+  - [Project Overview](#project-overview)
+  - [Getting Started](#getting-started)
+    - [⚙️ Local Setup Instructions](#️-local-setup-instructions)
+  - [Useful Commands](#useful-commands)
+    - [Lint \& Check Style](#lint--check-style)
+    - [Local Tests](#local-tests)
+  - [Monitoring](#monitoring)
+  - [Airflow extra features](#airflow-extra-features)
+  - [Hotfixes deployment flow :fire:](#hotfixes-deployment-flow-fire)
 
 ## Project Overview
 
@@ -82,4 +85,4 @@ Please refer to the Monitoring page section to check the active monitorings we h
 You can enable some extra features like an _Auto Refresh_ button on the DAG's page with [this chrome extension](https://chrome.google.com/webstore/detail/airflow-lifunf/eloabhccocaamibhganmeogabcenidfa)
 
 ## Hotfixes deployment flow :fire:
-If you need to urgent deploy a change you can use the _hotfix_ flow. Please check it out in the [Wiki page](https://www.notion.so/productquintoandar/Hotfix-fecf126b9dcd44d491ab35dbd1f73632).
+If you need to urgent deploy a change you can use the _hotfix_ flow. Please check it out in the [Wiki page](https://docs.google.com/document/d/13_0MoPv_R5eYk647v7BRQSp4O6P-mcr3AdouC8gwXVk/edit#heading=h.otmv9f3bbomh).

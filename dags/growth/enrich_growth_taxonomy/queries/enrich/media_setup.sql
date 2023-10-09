@@ -99,3 +99,4 @@ LEFT JOIN
       AND nc.behavior_type = ms.behavior_type
       AND nc.medium = ms.medium
       AND nc.source = ms.source
+      AND nc.funnel_side = ms.funnel_side
