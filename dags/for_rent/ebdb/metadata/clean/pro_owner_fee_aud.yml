@@ -7,19 +7,20 @@ domain: For Rent
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.id
+      - datalake_ebdb_raw.proownerfee_aud.id
     description: ID of the PP Multi's owners/landlords administration fee. Also this table's primary key.
-  id_pro_owner:
+  id_user_pro_owner:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.user_pro_owner_id
-    description: ID user of the PP Multi (ProOwner). May contains duplicated ids!
+      - datalake_ebdb_raw.proownerfee_aud.user_pro_owner_id
+    description: ID related to UserProOwner table.
+      It can be joined with the ID table from datalake_ebdb_clean.user_pro_owner
   rev:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.rev
+      - datalake_ebdb_raw.proownerfee_aud.rev
     description: ID of the change. It can be joined with user_revision_entity table using the id column.
   revtype:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.revtype
+      - datalake_ebdb_raw.proownerfee_aud.revtype
     description: Type of the table update.
     categories:
       "0": The record was inserted.
@@ -27,21 +28,21 @@ columns:
       "2": The record was deleted.
   adm_fee:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.adm_fee
+      - datalake_ebdb_raw.proownerfee_aud.adm_fee
     description: Owner's/Landlord's administration fee.
   is_active:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.active
+      - datalake_ebdb_raw.proownerfee_aud.active
     description: Boolean flag to check if it's active.
   mod_id_user_pro_owner:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.user_pro_owner_id_mod
+      - datalake_ebdb_raw.proownerfee_aud.user_pro_owner_id_mod
     description: Column to check if the id_user_pro_owner column was updated.
   mod_adm_fee:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.adm_fee_mod
+      - datalake_ebdb_raw.proownerfee_aud.adm_fee_mod
     description: Column to check if the adm_fee column was updated.
   mod_is_active:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee_aud.active_mod
-    description: Column to check if the is_active column was updated.""
+      - datalake_ebdb_raw.proownerfee_aud.active_mod
+    description: Column to check if the is_active column was updated.

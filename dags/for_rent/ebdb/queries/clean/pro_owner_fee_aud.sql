@@ -1,6 +1,6 @@
 SELECT
     id,
-    user_pro_owner_id AS id_pro_owner,
+    user_pro_owner_id AS id_user_pro_owner,
     rev,
     revtype,
     adm_fee,

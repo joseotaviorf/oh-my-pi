@@ -1888,7 +1888,9 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-partner-agent-aud
   - bietlejuice.ebdb:load-clean-portability
+  - bietlejuice.ebdb:load-clean-pro-owner-fee-aud
   - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb:load-clean-user-pro-owner
   - bietlejuice.ebdb:load-clean-user-pro-owner-aud
   - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_country:load-enrich-user

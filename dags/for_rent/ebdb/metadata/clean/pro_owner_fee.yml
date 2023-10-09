@@ -6,25 +6,26 @@ domain: For Rent
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee.id
+      - datalake_ebdb_raw.proownerfee.id
     description: ID of the PP Multi's owners/landlords administration fee. Also this table's primary key.
-  id_pro_owner:
+  id_user_pro_owner:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee.user_pro_owner_id
-    description: ID user of the PP Multi (ProOwner). May contains duplicated ids!
+      - datalake_ebdb_raw.proownerfee.user_pro_owner_id
+    description: ID related to UserProOwner table.
+      It can be joined with the ID table from datalake_ebdb_clean.user_pro_owner
   adm_fee:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee.adm_fee
+      - datalake_ebdb_raw.proownerfee.adm_fee
     description: Owner's/Landlord's administration fee.
   is_active:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee.active
+      - datalake_ebdb_raw.proownerfee.active
     description: Boolean flag to check if it's active.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee.created_at
+      - datalake_ebdb_raw.proownerfee.created_at
     description: Timestamp of when the record was created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.pro_owner_fee.updated_at
+      - datalake_ebdb_raw.proownerfee.updated_at
     description: Timestamp of when the record was updated for the last time.
