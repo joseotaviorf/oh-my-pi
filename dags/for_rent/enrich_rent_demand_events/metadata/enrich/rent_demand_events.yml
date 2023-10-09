@@ -80,6 +80,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.id_user
     description: "Id of the property owner."
+  id_owner_version:
+    lineage:
+      - datalake_pro_owners.daily_owner_version.id_owner_version
+    description: "ID of the property owner's version. We're not versioning the owners that are B2B, so a NULL values can exist."
   is_during_termination:
     description: "Boolean flag indicating if the event happened between the listing's version start date and the listing's
       previous version contract end date.

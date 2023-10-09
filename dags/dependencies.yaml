@@ -2002,6 +2002,8 @@ bietlejuice.enrich_rent_demand_events:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
   - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category
+  - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
   - bietlejuice.enrich_proposal:load-enrich-proposal
 bietlejuice.enrich_rent_flows:
   - bietlejuice.ebdb:load-clean-house

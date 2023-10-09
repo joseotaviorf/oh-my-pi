@@ -120,6 +120,7 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
     YEAR(ts_created) AS year,
     MONTH(ts_created) AS month,
@@ -129,6 +130,11 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_booking = bk.id
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON bk.id_house = hbh.id_house
+      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
+      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     bk.type = 'Visita'
     AND bk.ts_created IS NOT NULL
@@ -148,6 +154,7 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
     YEAR(ts_booking_utc) AS year,
     MONTH(ts_booking_utc) AS month,
@@ -157,6 +164,11 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_booking = bk.id
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON bk.id_house = hbh.id_house
+      AND DATE(bk.ts_booking_utc) >= DATE(hbh.ts_started)
+      AND DATE(bk.ts_booking_utc) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     bk.type = 'Visita'
     AND bk.is_visit_completed = TRUE
@@ -181,6 +193,7 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
     YEAR(ts_first_sent) AS year,
     MONTH(ts_first_sent) AS month,
@@ -190,6 +203,11 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_offer = off.id_offer_context
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON off.id_house = hbh.id_house
+      AND DATE(off.ts_first_sent) >= DATE(hbh.ts_started)
+      AND DATE(off.ts_first_sent) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     ts_first_sent IS NOT NULL
     /** We're not implementing the incremental load for OS since this date information comes from Firestore.
@@ -212,6 +230,7 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
     YEAR(ts_analyzed) AS year,
     MONTH(ts_analyzed) AS month,
@@ -221,6 +240,11 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_offer = off.id_offer_context
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON off.id_house = hbh.id_house
+      AND DATE(off.ts_analyzed) >= DATE(hbh.ts_started)
+      AND DATE(off.ts_analyzed) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     off.status = 'Aprovada'
     AND ts_analyzed IS NOT NULL
@@ -240,6 +264,7 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
     YEAR(ts_credit_evaluation_first_init) AS year,
     MONTH(ts_credit_evaluation_first_init) AS month,
@@ -252,6 +277,11 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON off.id_house = hbh.id_house
+      AND DATE(pp.ts_credit_evaluation_first_init) >= DATE(hbh.ts_started)
+      AND DATE(pp.ts_credit_evaluation_first_init) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     pp.ts_credit_evaluation_first_init IS NOT NULL
   UNION ALL
@@ -270,10 +300,11 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
-    YEAR(ts_first_credit_evaluation_positive) AS year,
-    MONTH(ts_first_credit_evaluation_positive) AS month,
-    DAY(ts_first_credit_evaluation_positive) AS day
+    YEAR(pp.ts_first_credit_evaluation_positive) AS year,
+    MONTH(pp.ts_first_credit_evaluation_positive) AS month,
+    DAY(pp.ts_first_credit_evaluation_positive) AS day
   FROM
     datalake_proposal.proposal AS pp
    JOIN
@@ -282,6 +313,11 @@ rent_demand_events AS (
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON off.id_house = hbh.id_house
+      AND DATE(pp.ts_first_credit_evaluation_positive) >= DATE(hbh.ts_started)
+      AND DATE(pp.ts_first_credit_evaluation_positive) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     pp.ts_first_credit_evaluation_positive IS NOT NULL
   UNION ALL
@@ -300,6 +336,7 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
     YEAR(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS year,
     MONTH(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS month,
@@ -312,6 +349,11 @@ rent_demand_events AS (
   LEFT JOIN -- We have properties from portability that don't have an offer but have a proposal and contract signed
     datalake_offer.offer AS off
       ON off.id = pp.id_offer
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON COALESCE(off.id_house, rf.id_house) = hbh.id_house
+      AND DATE(pp.ts_tenant_auto_first_doc_sent) >= DATE(hbh.ts_started)
+      AND DATE(pp.ts_tenant_auto_first_doc_sent) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     pp.has_tenant_sent_documentation = TRUE
     OR (pp.ts_tenant_auto_first_doc_sent IS NOT NULL
@@ -335,6 +377,7 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
     YEAR(ts_credit_approved_last) AS year,
     MONTH(ts_credit_approved_last) AS month,
@@ -347,6 +390,11 @@ rent_demand_events AS (
   LEFT JOIN   -- We have properties from portability that don't have an offer but have a proposal and contract signed
     datalake_offer.offer AS off
       ON off.id = pp.id_offer
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON COALESCE(off.id_house, rf.id_house) = hbh.id_house
+      AND DATE(pp.ts_credit_approved_last) >= DATE(hbh.ts_started)
+      AND DATE(pp.ts_credit_approved_last) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     pp.ts_credit_approved_last IS NOT NULL
   UNION ALL
@@ -365,6 +413,7 @@ rent_demand_events AS (
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
+    hbh.id_user AS id_owner_on_event,
     rf.country_code,
     YEAR(ts_signed) AS year,
     MONTH(ts_signed) AS month,
@@ -380,6 +429,11 @@ rent_demand_events AS (
   LEFT JOIN
     datalake_offer.offer AS off
       ON off.id = pp.id_offer
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON ct.id_house = hbh.id_house
+      AND DATE(ct.ts_signed) >= DATE(hbh.ts_started)
+      AND DATE(ct.ts_signed) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     ct.ts_signed IS NOT NULL
     AND ct.is_active_or_ended = TRUE
@@ -423,6 +477,7 @@ SELECT DISTINCT
   rde.id_house_listing,
   rde.id_region,
   rde.id_user AS id_owner,
+  doc.id_owner_category,
   COALESCE(IF(rde.ts_event BETWEEN t.ts_listing_version_started AND t.dt_previous_contract_termination, TRUE, FALSE), FALSE) AS is_during_termination,
   rde.ts_event,
   rde.country_code,
@@ -435,3 +490,9 @@ LEFT JOIN
   termination_period AS t
     ON t.id_house_listing = rde.id_house_listing
     AND t.rank_order = 1
+LEFT JOIN
+  datalake_pro_owners.daily_owner_category AS doc
+    ON COALESCE(rde.id_owner_on_event, rde.id_user) = doc.id_owner
+    AND rde.year = doc.year
+    AND rde.month = doc.month
+    AND rde.day = doc.day
