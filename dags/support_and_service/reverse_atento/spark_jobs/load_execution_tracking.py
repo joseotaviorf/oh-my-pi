@@ -5,6 +5,7 @@ from bietlejuice.pipeline import FullTableLoaderPipeline
 from argparse import ArgumentParser
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
+from quintoandar_logger import QuintoAndarLogger
 from datetime import *
 from pyspark.sql.types import DataType, StructType
 
