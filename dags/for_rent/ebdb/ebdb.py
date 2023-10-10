@@ -43,8 +43,8 @@ cluster_configuration = Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True)
 
 cluster_configuration['init_scripts'].append({"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}})
 cluster_configuration['custom_tags'].append({"key": "granulate-cluster-name", "value": "{{ dag.dag_id }}"})
-cluster_configuration['spark_env_vars']['GRANULATE_DBX_WORKSPACE_URL'] = "{{secrets/granulate/dbx-workspace-url}}"
-cluster_configuration['spark_env_vars']['GRANULATE_DBX_TOKEN'] = "{{secrets/granulate/dbx-token}}"
+cluster_configuration['spark_env_vars']['GRANULATE_DBX_WORKSPACE_URL'] = "{{ var.value.GRANULATE_DBX_WORKSPACE_URL_PATH }}"
+cluster_configuration['spark_env_vars']['GRANULATE_DBX_TOKEN'] = "{{ var.value.GRANULATE_DBX_TOKEN_PATH }}"
 
 
 EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"

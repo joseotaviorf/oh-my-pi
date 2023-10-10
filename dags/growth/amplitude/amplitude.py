@@ -54,8 +54,8 @@ cluster_configuration["init_scripts"].append(
         }
     }
 )
-cluster_configuration['spark_env_vars']['GRANULATE_DBX_WORKSPACE_URL'] = "{{secrets/granulate/dbx-workspace-url}}"
-cluster_configuration['spark_env_vars']['GRANULATE_DBX_TOKEN'] = "{{secrets/granulate/dbx-token}}"
+cluster_configuration['spark_env_vars']['GRANULATE_DBX_WORKSPACE_URL'] = "{{ var.value.GRANULATE_DBX_WORKSPACE_URL_PATH }}"
+cluster_configuration['spark_env_vars']['GRANULATE_DBX_TOKEN'] = "{{ var.value.GRANULATE_DBX_TOKEN_PATH }}"
 
 cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
 default_libraries = config_service.get_config("default_libraries")
