@@ -115,7 +115,12 @@ external_bucket_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": reverse_spark_job_path,
-            "parameters": [ENV, datalake_bucket, SOURCE, external_s3_bucket],
+            "parameters": [
+                ENV, 
+                datalake_bucket, 
+                SOURCE, 
+                external_s3_bucket
+            ],
         }
     },
 )
@@ -126,7 +131,13 @@ execution_tracking_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": execution_tracking_spark_job_path,
-            "parameters": [ENV, datalake_bucket, SOURCE, external_s3_bucket, json.dumps(table_schema)],
+            "parameters": [
+                ENV, 
+                datalake_bucket, 
+                SOURCE, 
+                external_s3_bucket,
+                json.dumps(table_schema)
+            ],
         }
     },
 )

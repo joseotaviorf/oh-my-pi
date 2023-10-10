@@ -14,28 +14,23 @@ JOB_NAME = "load_execution_tracking"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def get_s3_bucket_folders(bucket):
+def get_tracking_data(bucket):
     folders = set()
     for obj in bucket.objects.all():
         prefix, delimiter, _ = obj.key.rpartition('/')
         if prefix not in ("from_atento", "to_atento"):
-            try:
-                folder = prefix.split("to_atento_")[1]
-            except:
-                folder = prefix.split("/")[1]
-            folders.add(folder)
-
-    return folders
-
-def get_tracking_data(bucket):
-    folders = get_s3_bucket_folders(bucket)
+          folders.add(prefix)
 
     tracking_data = list()
     for folder in folders:
         last_modified_list = list()
+        try:
+          folder_clean = folder.split("to_atento_")[1]
+        except:
+          folder_clean = folder.split("/")[1]
         for object_summary in bucket.objects.filter(Prefix=f"{folder}"):
             last_modified_list.append(object_summary.last_modified)
-        tracking_data.append((folder, sorted(last_modified_list)[-1], datetime.now()))
+        tracking_data.append((folder_clean, sorted(last_modified_list)[-1], datetime.now()))
 
     return tracking_data
 
@@ -78,4 +73,4 @@ if __name__ == "__main__":
             query=None,
         ).load_and_register(dataframe, format_options)
     except:
-        logger.warn(f"An error occurred while trying to save the data.")
+        logger.error(f"An error occurred while trying to save the data.")
