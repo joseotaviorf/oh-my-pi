@@ -8,6 +8,7 @@ from bietlejuice.base.spark import SparkTableStorageFormat
 from quintoandar_logger import QuintoAndarLogger
 from datetime import *
 from pyspark.sql.types import DataType, StructType
+from dateutil import tz
 
 
 JOB_NAME = "load_execution_tracking"
@@ -30,7 +31,7 @@ def get_tracking_data(bucket):
           folder_clean = folder.split("/")[1]
         for object_summary in bucket.objects.filter(Prefix=f"{folder}"):
             last_modified_list.append(object_summary.last_modified)
-        tracking_data.append((folder_clean, sorted(last_modified_list)[-1], datetime.now()))
+        tracking_data.append((folder_clean, sorted(last_modified_list)[-1], datetime.now().replace(tzinfo=tz.tzutc())))
 
     return tracking_data
 
@@ -54,6 +55,7 @@ if __name__ == "__main__":
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(external_bucket)
+    spark.conf.set('spark.sql.session.timeZone', 'UTC')
 
     try:
         tracking_data = get_tracking_data(bucket)
