@@ -141,10 +141,20 @@ def get_data(
     return dataframe
 
 
+def extract_urls(request_response, source_format):
+    return re.findall(r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?\{source_format})"'.format(source_format = source_format), request_response.text, re.IGNORECASE)
+
+
+def extract_google_drive_urls(request_response):
+    drive_ids = re.findall(r'docs\.google\.com/spreadsheets/d/([a-zA-Z0-9_-]+)', request_response.text)
+    return ['https://drive.google.com/uc?export=download&id={}'.format(drive_id) for drive_id in drive_ids]
+
+
 def scrap_files_url(source_download_page_url, source_format):
     u = requests.get(source_download_page_url)
-    urls = re.findall(r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?\{source_format})"'.format(source_format = source_format), u.text, re.IGNORECASE)
-    return urls
+    xslx_urls = extract_urls(u, source_format)
+    drive_urls = extract_google_drive_urls(u)
+    return xslx_urls + drive_urls
 
 
 def rename_columns(dataframe, columns_rename_mapped):
