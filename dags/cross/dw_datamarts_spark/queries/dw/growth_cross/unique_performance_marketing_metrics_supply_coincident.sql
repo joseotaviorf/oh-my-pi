@@ -15,9 +15,6 @@ costs_targets_results_combined AS (
         COALESCE(utm_content,'') AS utm_content,
         COALESCE(utm_term,'') AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(traffic) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -62,7 +59,7 @@ costs_targets_results_combined AS (
     WHERE 
         mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
         
     UNION ALL
 
@@ -81,9 +78,6 @@ costs_targets_results_combined AS (
         COALESCE(utm_content,'') AS utm_content,
         COALESCE(utm_term,'') AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(traffic) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -128,7 +122,7 @@ costs_targets_results_combined AS (
     WHERE 
         mkt_origin NOT IN ('Owner PWA - Sale', 'Price Calculator - Sale')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
         
     UNION ALL
 
@@ -147,9 +141,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -192,7 +183,7 @@ costs_targets_results_combined AS (
     FROM 
         datalake_gsheets_clean.tof_supply_targets
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -217,9 +208,6 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
 		COALESCE(p.origin_phone,'') AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
 		COUNT(DISTINCT CASE WHEN sk_lead_date > 0 AND f.context_lead = 'Rent' THEN f.sk_house_listing_flow ELSE NULL END) AS leads_rent,
@@ -273,7 +261,7 @@ costs_targets_results_combined AS (
     WHERE
         f.sk_lead_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -298,9 +286,6 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
 		COALESCE(p.origin_phone,'') AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
 		COUNT(NULL) AS leads_rent,
@@ -354,7 +339,7 @@ costs_targets_results_combined AS (
     WHERE
         f.sk_prospect_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
     --------------------------------------
@@ -378,9 +363,6 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
 		COALESCE(p.origin_phone,'') AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
 		COUNT(NULL) AS leads_rent,
@@ -434,7 +416,7 @@ costs_targets_results_combined AS (
     WHERE
         f.sk_qualified_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -459,9 +441,6 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
 		COALESCE(p.origin_phone,'') AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
 		COUNT(NULL) AS leads_rent,
@@ -515,7 +494,7 @@ costs_targets_results_combined AS (
     WHERE
         f.sk_available_qualified_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -540,9 +519,6 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
 		COALESCE(p.origin_phone,'') AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
 		COUNT(NULL) AS leads_rent,
@@ -596,7 +572,7 @@ costs_targets_results_combined AS (
     WHERE
         f.sk_opportunity_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -621,9 +597,6 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
 		COALESCE(p.origin_phone,'') AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
 		COUNT(NULL) AS leads_rent,
@@ -679,7 +652,7 @@ costs_targets_results_combined AS (
     WHERE
         f.sk_first_listing_date > 0
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1076,9 +1049,6 @@ costs_targets_results_combined AS (
                 utm_content,
                 utm_term,
                 CAST(NULL AS STRING) AS origin_phone,
-                CAST(NULL AS STRING) AS supply_origin,
-                CAST(NULL AS STRING) AS supply_medium,
-                CAST(NULL AS STRING) AS supply_source,
                 SUM(CAST(0 AS FLOAT)) AS tof_rent,
                 SUM(CAST(0 AS FLOAT)) AS tof_sale,
                 COUNT(NULL) AS leads_rent,
@@ -1124,7 +1094,7 @@ costs_targets_results_combined AS (
                 business_context = 'Sale'
                 OR (business_context is NULL AND mkt_origin IN ('Doorman Sale','Indica Aí - Agents Sale','Indica Aí - General Sale'))
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10,11,12,13,14
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         supply_affiliates_cost AS (
             SELECT
@@ -1139,9 +1109,6 @@ costs_targets_results_combined AS (
                 utm_content,
                 utm_term,
                 CAST(NULL AS STRING) AS origin_phone,
-                CAST(NULL AS STRING) AS supply_origin,
-                CAST(NULL AS STRING) AS supply_medium,
-                CAST(NULL AS STRING) AS supply_source,
                 SUM(CAST(0 AS FLOAT)) AS tof_rent,
                 SUM(CAST(0 AS FLOAT)) AS tof_sale,
                 COUNT(NULL) AS leads_rent,
@@ -1187,7 +1154,7 @@ costs_targets_results_combined AS (
                 business_context = 'Rent'
                 OR (business_context is NULL AND mkt_origin IN ('Doorman','Indica Aí - Agents','Indica Aí - General'))
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10,11,12,13,14
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         supply_landlords_cost AS (
             SELECT
@@ -1202,9 +1169,6 @@ costs_targets_results_combined AS (
                 co.utm_content AS utm_content,
                 co.utm_term AS utm_term,
                 CAST(NULL AS STRING) AS origin_phone,
-                CAST(NULL AS STRING) AS supply_origin,
-                CAST(NULL AS STRING) AS supply_medium,
-                CAST(NULL AS STRING) AS supply_source,
                 SUM(CAST(0 AS FLOAT)) AS tof_rent,
                 SUM(CAST(0 AS FLOAT)) AS tof_sale,
                 COUNT(NULL) AS leads_rent,
@@ -1255,7 +1219,7 @@ costs_targets_results_combined AS (
                 AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels')
                 AND co.mkt_channel != 'Girafa'
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10,11,12,13,14
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         supply_sale_cost AS (
             SELECT
@@ -1270,9 +1234,6 @@ costs_targets_results_combined AS (
                 co.utm_content AS utm_content,
                 co.utm_term AS utm_term,
                 CAST(NULL AS STRING) AS origin_phone,
-                CAST(NULL AS STRING) AS supply_origin,
-                CAST(NULL AS STRING) AS supply_medium,
-                CAST(NULL AS STRING) AS supply_source,
                 SUM(CAST(0 AS FLOAT)) AS tof_rent,
                 SUM(CAST(0 AS FLOAT)) AS tof_sale,
                 COUNT(NULL) AS leads_rent,
@@ -1321,7 +1282,7 @@ costs_targets_results_combined AS (
                 co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords', 'imovelweb_supply')
                 AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10,11,12,13,14
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         supply_ciq_cost AS (
             SELECT
@@ -1336,9 +1297,6 @@ costs_targets_results_combined AS (
                 co.utm_content AS utm_content,
                 co.utm_term AS utm_term,
                 CAST(NULL AS STRING) AS origin_phone,
-                CAST(NULL AS STRING) AS supply_origin,
-                CAST(NULL AS STRING) AS supply_medium,
-                CAST(NULL AS STRING) AS supply_source,
                 SUM(CAST(0 AS FLOAT)) AS tof_rent,
                 SUM(CAST(0 AS FLOAT)) AS tof_sale,
                 COUNT(NULL) AS leads_rent,
@@ -1386,7 +1344,7 @@ costs_targets_results_combined AS (
             WHERE
                 co.mkt_origin = 'CIQ'
             GROUP BY
-                1,2,3,4,5,6,7,8,9,10,11,12,13,14
+                1,2,3,4,5,6,7,8,9,10,11
         ),
         cost_union AS (
             SELECT * FROM supply_affiliates_cost
@@ -1427,9 +1385,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -1474,7 +1429,7 @@ costs_targets_results_combined AS (
     WHERE
         str.dt_target >= DATE('2021-04-01')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1493,9 +1448,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -1540,7 +1492,7 @@ costs_targets_results_combined AS (
     WHERE
         str.dt_target >= DATE('2021-04-01')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1565,9 +1517,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -1611,7 +1560,7 @@ costs_targets_results_combined AS (
         datalake_gsheets_clean.sale_supply_targets str
     WHERE str.mkt_channel NOT IN ('All', 'Branded')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
     )
     SELECT
         *
@@ -1644,9 +1593,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -1690,7 +1636,7 @@ costs_targets_results_combined AS (
         datalake_gsheets_clean.sale_supply_targets str
     WHERE str.mkt_channel NOT IN ('All', 'Branded')
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
   -------------------------------------------
@@ -1708,9 +1654,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -1758,7 +1701,7 @@ costs_targets_results_combined AS (
         AND str.supply_origin NOT IN ('Price Calculator', 'Price Calculator - Sale', 'New Channels')
         AND NOT(str.supply_origin='Owner PWA' AND str.supply_channel='Paid'))
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1777,9 +1720,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -1822,7 +1762,7 @@ costs_targets_results_combined AS (
     FROM
         dw_datamarts.daily_target_volumes_supply str
    GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1851,9 +1791,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -1904,7 +1841,7 @@ costs_targets_results_combined AS (
             AND business = 'Sale'
             AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
     UNION ALL
 
@@ -1933,9 +1870,6 @@ costs_targets_results_combined AS (
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        CAST(NULL AS STRING) AS supply_origin,
-        CAST(NULL AS STRING) AS supply_medium,
-        CAST(NULL AS STRING) AS supply_source,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -1986,7 +1920,7 @@ costs_targets_results_combined AS (
             AND business = 'Rental'
             AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
     
     UNION ALL
 
@@ -1997,17 +1931,14 @@ costs_targets_results_combined AS (
         CAST(DATE_FORMAT(uvt.date, 'yyyyMMdd') as BIGINT) AS sk_date,
         CAST(COALESCE(nullif(uvt.city_group,''),'Not Mapped') AS STRING) AS city_group,
         CAST(NULL AS STRING) AS affiliate_volumetry,
-        CAST(NULL AS STRING) AS mkt_origin,
-        CAST(NULL AS STRING) AS mkt_channel,
-        CAST(NULL AS STRING) AS mkt_medium,
+        COALESCE(uvt.supply_origin,'') AS mkt_origin,
+        COALESCE(uvt.supply_channel,'') AS mkt_channel,
+        COALESCE(uvt.supply_medium,'') AS mkt_medium,
         CAST(NULL AS STRING) AS mkt_source,
         CAST(NULL AS STRING) AS utm_campaign,
         CAST(NULL AS STRING) AS utm_content,
         CAST(NULL AS STRING) AS utm_term,
         CAST(NULL AS STRING) AS origin_phone,
-        COALESCE(uvt.supply_origin,'') AS supply_origin,
-        COALESCE(uvt.supply_medium,'') AS supply_medium,
-        COALESCE(uvt.supply_channel,'') AS supply_channel,
         SUM(CAST(0 AS FLOAT)) AS tof_rent,
         SUM(CAST(0 AS FLOAT)) AS tof_sale,
         COUNT(NULL) AS leads_rent,
@@ -2050,7 +1981,7 @@ costs_targets_results_combined AS (
     FROM 
         datalake_gsheets_clean.unique_volume_targets_day uvt 
     GROUP BY 
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14
+        1,2,3,4,5,6,7,8,9,10,11
 
 )
 
@@ -2081,9 +2012,6 @@ SELECT
     utm_content,
     utm_term,
     NULLIF(origin_phone,'') AS origin_phone,
-    supply_origin,
-    supply_medium,
-    supply_source,
     SUM(tof_rent) AS tof_rent,
     SUM(tof_sale) AS tof_sale,
     SUM(leads_rent) AS leads_rent,
@@ -2129,4 +2057,4 @@ JOIN
     dw_public.dim_date AS dd
     USING(sk_date)
 GROUP BY
-    1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+    1,2,3,4,5,6,7,8,9,10,11,12
