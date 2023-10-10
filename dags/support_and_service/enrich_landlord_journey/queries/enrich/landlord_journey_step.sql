@@ -13,6 +13,7 @@ WITH house_owner AS (
     AND day = {day}
 ),
 -- Define a status for the owner based on the status of the owner listings
+-- Also, selects only B2C owners, with properties managed by 5A only
 owner_listing_status AS (
   WITH owner_status AS (
     SELECT
@@ -166,9 +167,6 @@ landlord_events_timestamp AS (
       AND r.id_house = rde.id_house
       AND rde.id_event_type = 4
       AND r.max_id = r.id_reservation
-  LEFT JOIN
-    owner_listing_status AS ols
-      ON ols.id_owner = rde.id_owner
 ),
 landlord_journey_agg AS (
   SELECT
