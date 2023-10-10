@@ -149,12 +149,6 @@ sheets_info:
     clean_table_name: for_sale_segmentation_survey_responses
     sheet_context: static
 
-  great_price_tag_test_groups:
-    sheet_id: 1IelEYQr306slcOrkyM8ELVRCq8UML6k27lixgjkEAfo
-    sheet_name: base_20220808
-    clean_table_name: great_price_tag_test_groups
-    sheet_context: static
-
   kong_ss_endpoints:
     sheet_id: 1uHWW90GUAxXHKI27EGtde7bkP-wK948Nt7YlfunadZI
     sheet_name: kong_ss_endpoints
