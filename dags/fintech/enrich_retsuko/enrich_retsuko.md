@@ -27,5 +27,6 @@ This pipeline produces the following output tables enriched on enrich layer:
 - `invoice_entry`
 - `invoice_info`
 - `monthly_closing_checks`
+- `debt_forgiveness`
 
 ​</details>
