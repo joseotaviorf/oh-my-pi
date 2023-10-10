@@ -72,7 +72,7 @@ rent_flow_type AS (
     END AS first_touchpoint,
     IF(COUNT(rf.ts_booking_created) > 0, TRUE, FALSE) AS has_visit_flow,
     IF(COUNT(rf.ts_offer_submitted) > 0, TRUE, FALSE) AS has_offer_flow,
-    IF(MIN(rf.ts_offer_submitted) < MIN(rf.ts_booking_created), TRUE, FALSE) AS has_direct_offer_flow,
+    IF(COUNT(rf.ts_offer_submitted) > 0 AND MIN(rf.ts_offer_submitted) < COALESCE(MIN(rf.ts_booking_created), CURRENT_DATE), TRUE, FALSE) AS has_direct_offer_flow,
     IF(COUNT(tta.first_message_ts) > 0, TRUE, FALSE) AS has_tta_flow,
     MIN(rf.ts_booking_created) AS ts_first_booking_created,
     MIN(rf.ts_offer_submitted) AS ts_first_offer_submitted
@@ -120,8 +120,8 @@ valid_rent_flows AS (
       rf.ts_visit_performed,
       rf.ts_reservation_created,
       CASE
-        WHEN of.ts_first_sent < ft.ts_first_booking_created THEN of.ts_first_sent
-        WHEN of.ts_first_sent IS NULL AND ft.ts_first_offer_submitted < ft.ts_first_booking_created THEN ft.ts_first_offer_submitted
+        WHEN of.ts_first_sent IS NOT NULL AND of.ts_first_sent < COALESCE(ft.ts_first_booking_created, CURRENT_DATE) THEN of.ts_first_sent
+        WHEN of.ts_first_sent IS NULL AND ft.ts_first_offer_submitted < COALESCE(ft.ts_first_booking_created, CURRENT_DATE) THEN ft.ts_first_offer_submitted
         ELSE NULL
       END AS ts_direct_offer_submitted,
       rf.ts_offer_submitted,
@@ -231,7 +231,7 @@ invalid_rent_flows AS (
         END AS first_touchpoint,
         IF(COUNT(rf.ts_booking_created) > 0, TRUE, FALSE) AS has_visit_flow,
         IF(COUNT(rf.ts_offer_submitted) > 0, TRUE, FALSE) AS has_offer_flow,
-        IF(MIN(rf.ts_offer_submitted) < MIN(rf.ts_booking_created), TRUE, FALSE) AS has_direct_offer_flow,
+        IF(COUNT(rf.ts_offer_submitted) > 0 AND MIN(rf.ts_offer_submitted) < COALESCE(MIN(rf.ts_booking_created), CURRENT_DATE), TRUE, FALSE) AS has_direct_offer_flow,
         IF(COUNT(tta.first_message_ts) > 0, TRUE, FALSE) AS has_tta_flow,
         MIN(rf.ts_booking_created) AS ts_first_booking_created,
         MIN(rf.ts_offer_submitted) AS ts_first_offer_submitted
@@ -278,8 +278,8 @@ invalid_rent_flows AS (
       rf.ts_visit_performed,
       rf.ts_reservation_created,
       CASE
-        WHEN of.ts_first_sent < ft.ts_first_booking_created THEN of.ts_first_sent
-        WHEN of.ts_first_sent IS NULL AND ft.ts_first_offer_submitted < ft.ts_first_booking_created THEN ft.ts_first_offer_submitted
+        WHEN of.ts_first_sent IS NOT NULL AND of.ts_first_sent < COALESCE(ft.ts_first_booking_created, CURRENT_DATE) THEN of.ts_first_sent
+        WHEN of.ts_first_sent IS NULL AND ft.ts_first_offer_submitted < COALESCE(ft.ts_first_booking_created, CURRENT_DATE) THEN ft.ts_first_offer_submitted
         ELSE NULL
       END AS ts_direct_offer_submitted,
       rf.ts_offer_submitted,
