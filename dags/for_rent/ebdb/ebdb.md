@@ -181,7 +181,6 @@ Produces the following output tables:
     `rent_flow_aud`
     `rental_administrator_change_request`
     `rental_administrator_change_request_aud`
-    `restriction_type`
     `restriction_type_aud`
     `sale_operation_management`
     `sales_rep`

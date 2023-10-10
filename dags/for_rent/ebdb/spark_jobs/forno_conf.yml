@@ -285,6 +285,7 @@ table_block_list:
   - LeadCampaign_targetPropertyTypes_AUD
   - MensagemSMS
   - Imagem_AUD
+  - RestrictionType
 
 view_allow_list:
   - MapRegiao

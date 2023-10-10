@@ -1361,11 +1361,11 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-clean-property-fee-assigned
   - bietlejuice.ebdb:load-clean-property-fee-assigned-aud
   - bietlejuice.ebdb:load-clean-property-fee-aud
-  - bietlejuice.ebdb:load-clean-restriction-type
   - bietlejuice.ebdb:load-clean-special-condition
   - bietlejuice.ebdb:load-clean-special-condition-aud
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_out_of_context:load-clean-restriction-type
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
@@ -2103,8 +2103,8 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-credit-card-payment
 bietlejuice.enrich_reverse_reports:
-    - bietlejuice.reverse_webhelp_access:load-execution-tracking
-    - bietlejuice.reverse_atento:load-execution-tracking
+  - bietlejuice.reverse_atento:load-execution-tracking
+  - bietlejuice.reverse_webhelp_access:load-execution-tracking
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-payee
