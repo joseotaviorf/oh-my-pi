@@ -27,6 +27,9 @@ tables:
   attachment_aud:
     is_incremental: True
     date_column: updated_at
+  checklist_item:
+    is_incremental: True
+    date_column: updated_at
   contract: {}
   # contract_aud:
   #   is_incremental: True
@@ -53,6 +56,9 @@ tables:
   termination_aud:
     is_incremental: True
     date_column: updated_at
+  termination_characteristics:
+    is_incremental: True
+    date_column: updated_at
   termination_fee: {}
   termination_fee_aud:
     is_incremental: True
@@ -62,7 +68,9 @@ tables:
     is_incremental: True
     date_column: updated_at
   # termination_history: {}
-  termination_step: {}
+  termination_step:
+    is_incremental: True
+    date_column: updated_at
   termination_task: {}
   # termination_task_aud:
   #   is_incremental: True

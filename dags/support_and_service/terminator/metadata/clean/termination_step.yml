@@ -18,9 +18,9 @@ columns:
     description: The step in the termination process.
   ts_created:
     lineage:
-      - datalake_terminator_raw.negotiation.created_at
+      - datalake_terminator_raw.termination_step.created_at
     description: The creation timestamp of the termination step.
   ts_updated:
     lineage:
-      - datalake_terminator_raw.negotiation.updated_at
+      - datalake_terminator_raw.termination_step.updated_at
     description: The update timestamp of the termination step.
