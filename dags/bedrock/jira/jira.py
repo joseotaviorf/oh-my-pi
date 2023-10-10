@@ -49,6 +49,8 @@ CLUSTER_DESCRIPTION = Variable.get(
 
 CLUSTER_DESCRIPTION['init_scripts'].append({"s3": {"destination": "s3://artifacts.s3.data.quintoandar.com.br/granulate/sagent_installer_Databricks.sh", "region": ""}})
 CLUSTER_DESCRIPTION['custom_tags'].append({"key": "granulate-cluster-name", "value": "{{ dag.dag_id }}"})
+CLUSTER_DESCRIPTION['spark_env_vars']['GRANULATE_DBX_WORKSPACE_URL'] = "{{secrets/granulate/dbx-workspace-url}}"
+CLUSTER_DESCRIPTION['spark_env_vars']['GRANULATE_DBX_TOKEN'] = "{{secrets/granulate/dbx-token}}"
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
