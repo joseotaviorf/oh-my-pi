@@ -18,5 +18,6 @@ Produces the following output table in enrich layer, via full load:
 
     - `credit_evers`
     - `credit_evers_original_due_date`
+    - `credit_evers_full_original_due_date`
 
 </details>
