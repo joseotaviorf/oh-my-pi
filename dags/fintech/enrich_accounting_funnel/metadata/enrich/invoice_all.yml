@@ -189,7 +189,7 @@ columns:
     description: "Begining of contract date"
   contract_annulment:
     lineage:
-      - dw_public.dim_contract.dt_annulment
+      - datalake_ebdb_clean.contract.dt_termination
     description: "Annulment of contract date"
   ts_load:
     description: "Timestamp when the data was loaded"

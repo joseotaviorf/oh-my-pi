@@ -72,7 +72,7 @@ SELECT DISTINCT
   END AS version,
   IF(sap.version IS NULL, 'v1', sap.version) as accounting_version,
   c.is_contract_b2b,
-  c.dt_start > c.dt_annulment AND c.dt_annulment IS NOT NULL AS ended_before_started,
+  c.dt_start > c1.dt_termination AND c1.dt_termination IS NOT NULL AS ended_before_started,
   r.city_name AS locale,
   cl.id_locale AS localidade,
   c.guarantee,
@@ -146,13 +146,16 @@ SELECT DISTINCT
   DATE_FORMAT(rr.dt_reversal, 'yyyy-MM-dd') AS invoice_reversal_date,
   DATE_FORMAT(nbd.date_next_bd, 'yyyy-MM-dd') AS invoice_paid_date_next_business_day,
   c.dt_start AS contract_start,
-  c.dt_annulment AS contract_annulment,
+  c1.dt_termination AS contract_annulment,
   NOW()       AS ts_load
 FROM
   dw_payment.fact_invoice_entries AS fie
 LEFT JOIN
   dw_public.dim_contract AS c
     ON c.sk_contract = fie.sk_contract
+LEFT JOIN 
+  datalake_ebdb_clean.contract AS c1
+    ON c1.id = fie.sk_contract
 LEFT JOIN
   dw_public.dim_region AS r
     ON fie.sk_region = r.sk_region
