@@ -876,6 +876,13 @@ bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.gsheets_growth:done-clean-affiliates-cost-tradecom-configuration
   - bietlejuice.gsheets_growth:done-clean-affiliates-manual-cost-engagement
   - bietlejuice.gsheets_growth:done-clean-affiliates-manual-cost-engagement-history
+bietlejuice.enrich_agreement_negotiation:
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-negotiation
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
   - bietlejuice.airtable:load-clean-activations
