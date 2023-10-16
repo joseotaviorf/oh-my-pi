@@ -1,5 +1,5 @@
 SELECT -- TODO [ODS] we are following ODS current structure. The table structure should be updated later
-    id_booking AS sk_agentreview,
+    id_booking AS sk_agent_review,
     id_booking AS sk_booking,
     rating,
     tag_other,
@@ -13,7 +13,7 @@ SELECT -- TODO [ODS] we are following ODS current structure. The table structure
     CAST(is_other_negative_reason AS INTEGER) AS flg_other_reason_negative,
     CAST(is_agent_late AS INTEGER) AS flg_agent_late,
     CAST(is_agent_without_info AS INTEGER) AS flg_agent_with_no_info,
-    ts_rating_created AS dt_rating,
-    now() AS dt_timestamp
+    ts_rating_created AS ts_created,
+    NOW() AS ts_load
 FROM
   datalake_ebdb_agents.agents_review
