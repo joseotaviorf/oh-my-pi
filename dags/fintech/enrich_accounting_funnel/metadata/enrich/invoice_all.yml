@@ -135,6 +135,10 @@ columns:
     lineage:
       - dw_payment.fact_invoice_entries.due_amount
     description: "Invoice due value, considering debit or credit related to the contract cash flow"
+  invoice_paid_amount:
+    lineage:
+      - dw_payment.fact_invoice_entries.paid_amount
+    description: "Invoice paid value"
   accrual_year_month:
     lineage:
       - dw_payment.dim_invoice.accrual_year_month

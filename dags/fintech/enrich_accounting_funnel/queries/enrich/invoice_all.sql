@@ -126,6 +126,7 @@ SELECT DISTINCT
   i.paid_via,
   ROUND(fie.brl_entry_due_amount,2) AS due_amount,
   ROUND(-1.0*i.due_amount,2) AS invoice_due_amount,
+  ROUND(i.paid_amount,2) AS invoice_paid_amount,
   CASE
     WHEN
         i.payment_status IS NULL
@@ -189,5 +190,5 @@ WHERE
     AND ( (ie.from_account_type IN ('contract', 'tenant','landlord')) OR 
         (ie.from_account_type = 'contract expenses' AND ie.entry_type IN ('condominium fine', 'condominium 5A paid')))
     AND ( (ie.to_account_type IN ('contract', 'tenant','landlord')) OR
-        (ie.to_account_type = 'quinto andar' AND ie.entry_type IN ('condominium' , 'condominium usage', 'condominium defaulting', 'condominium fine')) OR
-        (ie.to_account_type = 'contract expenses' AND ie.entry_type IN ('postponement', 'condominium fine')))
+        (ie.to_account_type = 'quinto andar' AND ie.entry_type IN ('condominium' , 'condominium usage', 'condominium defaulting', 'condominium fine', 'condominium 5A paid')) OR
+        (ie.to_account_type = 'contract expenses' AND ie.entry_type IN ('postponement', 'condominium fine', 'condominium 5A paid')))
