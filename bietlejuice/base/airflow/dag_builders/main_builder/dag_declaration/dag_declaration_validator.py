@@ -79,6 +79,12 @@ class DAGDeclarationValidator(Validator):
                         }
                     },
                 },
+                "has_hive_sync": {"type": "boolean", "empty": False, "required": False},
+                "credentials_scope": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
             },
         },
         "cluster": {

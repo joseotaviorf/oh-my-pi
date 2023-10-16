@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: currency_quote_people
+columns:
+  euro_cotation:
+    lineage:
+      - datalake_gsheets_raw.currency_quote_people.euro
+  dolar_cotation:
+    lineage:
+      - datalake_gsheets_raw.currency_quote_people.dolar
+  mexican_peso_cotation:
+    lineage:
+      - datalake_gsheets_raw.currency_quote_people.mexico

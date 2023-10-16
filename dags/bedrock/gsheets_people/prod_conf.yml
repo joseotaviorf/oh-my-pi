@@ -1,0 +1,8 @@
+datalake_bucket: people-s3-data-quintoandar-com-br
+
+sheets_info:
+    currency_quote_people:
+      sheet_id: 1LWaXqELmMkpld4LrvtfVX0tKntRkXYKhr2Qh_9OPr4c
+      sheet_name: currency
+      clean_table_name: currency_quote_people
+      sheet_context: bedrock

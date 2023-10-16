@@ -19,6 +19,7 @@ from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.formatters import StringFormatter
+from bietlejuice.base.api import APIEnum
 
 
 def get_run_param(dag_run, param_name):
@@ -62,7 +63,14 @@ class RawGsheetsWorkflow(BaseWorkflow):
         self.base_spark_jobs_path = (
             f"{self.databricks_bietlejuice_repo_path}/spark_jobs/base/"
         )
+        self.has_hive_sync = workflow_args.get("has_hive_sync", True)
 
+        CREDENTIALS_SCOPE = {
+            "quintoandar": APIEnum.GSHEETS_CREDENTIALS,
+            "people": APIEnum.GSHEETS_CREDENTIALS_PEOPLE,
+        }
+        self.credentials_scope = workflow_args.get("credentials_scope", "quintoandar")
+        self.credentials_key = CREDENTIALS_SCOPE[self.credentials_scope]
         self.dag = self.dag_instance()
 
     def build_dag(self):
@@ -114,6 +122,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
             layer=LayerEnum.CLEAN,
             source_database_base_name=schema,
             target_database_base_name=schema,
+            has_hive_sync=self.has_hive_sync,
         )
 
         done_tasks = self._set_done_tasks(tables_customization)
@@ -346,8 +355,11 @@ class RawGsheetsWorkflow(BaseWorkflow):
                     table_name,
                     json.dumps(sheet_details),
                     self.dag_name,
+                    self.credentials_key,
+                    self.credentials_scope,
                 ],
                 pool=task_pool,
+                has_hive_sync=self.has_hive_sync,
             )
             raw_task_groups[sheet_details["clean_table_name"]] = raw_task_group
 

@@ -24,14 +24,14 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def __get_auth(dbutils):
+def __get_auth(dbutils, credentials_scope, credentials_key):
     """
     This method gets credentials from the Gsheets API.
     @param dbutils: DBUtils.
     @return: dict and str
     """
     credentials = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.GSHEETS_CREDENTIALS)
+        dbutils.secrets.get(scope=credentials_scope, key=credentials_key)
     )
     scope = credentials.pop("scope")
     return credentials, scope
@@ -71,6 +71,8 @@ if __name__ == "__main__":
         help="gsheets sheet name, sheet id, and (optional) preload time in seconds",
     )
     parser.add_argument("dag_name", help="DAG name")
+    parser.add_argument("credentials_key", help="credentials to access gsheets API")
+    parser.add_argument("credentials_scope", help="credentials scope to access gsheets API")
 
     args = parser.parse_args()
 
@@ -81,6 +83,8 @@ if __name__ == "__main__":
     sheet_details = json.loads(args.sheet_details)
     partitions_cols = ["year", "month", "day"]
     dag_name = args.dag_name
+    credentials_key = args.credentials_key
+    credentials_scope = args.credentials_scope
 
     logger.info(
         f"""
@@ -94,7 +98,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    credentials, scope = __get_auth(dbutils)
+    credentials, scope = __get_auth(dbutils, credentials_scope, credentials_key)
     gsheets_client = GoogleSheetsClient(credentials, scope, timeout=TIMEOUT_LIMIT)
     spark_client = SparkClient()
     gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
