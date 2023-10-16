@@ -280,6 +280,7 @@ columns:
   current_payment_method:
     lineage:
       - datalake_firestore.sale_offer.current_payment_method
+      - datalake_sale_offer_flows.sale_offer_flows.payment_method
     description: Current payment method of the offer.
   offer_acceptance_probability:
     lineage:
