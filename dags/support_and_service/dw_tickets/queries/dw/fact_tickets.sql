@@ -40,6 +40,7 @@ SELECT
     t.id_zendesk_requester_user AS sk_zendesk_requester_user,
     t.id_zendesk_submitter_user AS sk_zendesk_submitter_user,
     t.id_zendesk_assignee_user AS sk_zendesk_assignee_user,
+    MD5(tf.agent_email) AS sk_agent,
     CAST(COALESCE(t.id_session, -1) AS BIGINT) AS sk_session,
     COALESCE(t.id_call, '-1') AS sk_call,
     COALESCE(CAST(DATE_FORMAT(t.ts_created, 'yMMdd') AS INTEGER), -1) AS sk_created_date,

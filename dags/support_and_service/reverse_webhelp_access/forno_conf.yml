@@ -12,6 +12,8 @@ tables:
     context: metrics
   general_metric:
     context: metrics
+  repair_tickets:
+    context: repair
   speech_call:
     context: speech_analytics
   speech_chat:
