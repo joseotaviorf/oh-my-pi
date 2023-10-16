@@ -65,7 +65,6 @@ SELECT
     dt.client_type,
     dt.status,
     dt.custom_fields,
-    ft.agent_email,
     ft.reopens,
     dt.tags,
     dt.ticket_via,
