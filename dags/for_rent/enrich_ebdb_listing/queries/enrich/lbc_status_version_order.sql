@@ -1,4 +1,21 @@
 WITH 
+first_lbc_state AS (
+  SELECT 
+    bch.id_house,
+    bch.status,
+    bch.status_reason,
+    bch.ts_state_started,
+    bch.ts_state_ended,
+    DATEDIFF(bch.ts_state_ended, bch.ts_state_started) AS days_in_state,
+    DATEDIFF(bch.ts_state_ended, bch.ts_state_started) AS days_in_status,
+    bch.country_code
+  FROM
+    datalake_ebdb_listing.business_context_history AS bch
+  WHERE 
+    bch.business_context = 'RENT'
+  QUALIFY 
+    ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC) = 1   
+),
 house AS (
   SELECT 
     house.id_house,
@@ -9,7 +26,24 @@ house AS (
     house.order_version AS listing_version,
     house.order_status AS state_order,
     house.events_change_status,
-    IF((house.events_change_status IS NOT NULL OR house.ts_status_changed = house.ts_first_publication), 1, 0) AS trigger_new_version,
+    IF(
+        (
+          house.events_change_status IS NOT NULL 
+          OR house.ts_status_changed_next = house.ts_first_publication 
+          OR (
+              (house.order_version = 0 OR house.order_status=1)
+              AND 
+              LEAD(house.status_history) OVER(PARTITION BY house.id_house ORDER BY house.ts_status_changed, house.ts_status_changed_next) = 'publicado'
+          )
+          OR (
+            house.order_status=1 
+            AND 
+            house.order_version=1
+          )
+        ), 
+        1, 
+        0
+      ) AS trigger_new_version,
     MAX(house.order_status) OVER(PARTITION BY house.id_house) AS max_house_state_order,
     house.country_code,
     house.ts_first_publication,
@@ -33,16 +67,28 @@ last_house_state AS (
     DATEDIFF(h.ts_state_ended, h.ts_state_started) AS days_in_state,
     DATEDIFF(h.ts_state_ended, h.ts_state_started) AS days_in_status,
     IF(h.state_order=1, TRUE, FALSE) AS is_first_status,
-    IF(events_change_status IS NOT NULL, 1, 0) AS trigger_new_version,
+    IF(
+      (
+        (h.status = 'alugado' AND flbc.status = 'SUSPENDED' AND flbc.status_reason = 'RENTED')
+        OR
+        (h.status = 'despublicado' AND h.trigger_new_version=1 AND flbc.status = 'UNPUBLISHED')
+      )
+      , 0
+      , h.trigger_new_version
+    ) AS trigger_new_version,
     h.listing_version,
     h.state_order,
     h.max_house_state_order,
     h.country_code,
-    h.ts_first_publication
+    h.ts_first_publication,
+    flbc.status AS lbc_first_status,
+    flbc.status_reason AS lbc_first_status_reason
   FROM
     house AS h
+  LEFT JOIN first_lbc_state AS flbc
+    ON flbc.id_house = h.id_house
   WHERE 
-    state_order = max_house_state_order
+    h.state_order = h.max_house_state_order
 ),
 first_publication AS (
   SELECT
@@ -121,7 +167,7 @@ business_context_history AS (
     first_publication AS fp
       ON fp.id_house = bch.id_house
   WHERE
-      bch.business_context = 'RENT'
+    bch.business_context = 'RENT'
 ), 
 status_change_time AS (
   SELECT 
@@ -194,9 +240,9 @@ trigger AS (
           (
             (-- First Listing
               (--There is no publication event previous to LBC
-                lhs.ts_first_publication IS NULL
+                bch.ts_first_publication IS NULL
                 OR
-                lhs.ts_first_publication >= '2020-01-06 19:04:25'
+                bch.ts_first_publication >= '2020-01-06 19:04:25'
               )
               AND
               (
@@ -230,11 +276,6 @@ trigger AS (
                 AND so.next_status = 'PUBLISHED'
                 AND lhs.status = 'alugado'
             )
-            OR
-            ( --Relisting
-                bch.status = 'PUBLISHED'
-                AND lhs.status = 'alugado'
-            )
           )
         )
         OR
@@ -245,70 +286,72 @@ trigger AS (
             lhs.id_house IS NULL
           )
           AND
-          ( --First Listing
-              (
-                lhs.ts_first_publication IS NULL 
-                OR 
-                lhs.ts_first_publication >= '2020-01-06 19:04:25'
-              )
-              AND
-              (
-                (
-                    bch.status = 'EDITING'
-                    AND bch.lbc_state_order = 1
-                    AND bch.next_status = 'PUBLISHED'
-                )
-                OR
-                (
-                    bch.status = 'PUBLISHED'
-                    AND lhs.id_house IS NULL
-                    AND bch.previous_state_status IS NULL
-                )
-                OR
-                (
-                  so.prev_status = 'EDITING'
-                  AND bch.is_previous_first_status IS TRUE
-                  AND bch.next_status = 'PUBLISHED'
-                )
-                OR
-                (
-                  bch.next_status = 'PUBLISHED'
-                  AND bch.ts_first_publication = bch.ts_next_status_change
-                )
-              )
-          )
-          OR 
-          ( --Recovered
-              bch.next_status = 'PUBLISHED' 
-              AND bch.status = 'UNPUBLISHED' 
-              AND so.days_in_status >= 84
-          )
-          OR
-          ( --Relisting
-              bch.next_status = 'PUBLISHED'
-              AND ( --Remove available_soon cases
-                      bch.next_status_reason <> 'RELISTING' 
-                      OR bch.next_status_reason IS NULL
-                  )
-              AND bch.status = 'SUSPENDED'
-              AND bch.status_reason = 'RENTED'
-          )
-          OR
-          ( --Relisting
-              bch.status = 'UNPUBLISHED'
-              AND so.next_status = 'PUBLISHED'
-              AND bch.previous_state_status = 'SUSPENDED'
-              AND bch.previous_status_reason = 'RENTED'
-          )
-          OR --Early demand
           (
-              bch.next_status = 'PUBLISHED'
-              AND bch.next_status_reason LIKE 'RELISTING_%'
-              AND (
-                bch.status = 'SUSPENDED' 
-                AND 
-                bch.status_reason = 'RENTED'
-              )
+            ( --First Listing
+                (
+                  bch.ts_first_publication IS NULL 
+                  OR 
+                  bch.ts_first_publication >= '2020-01-06 19:04:25'
+                )
+                AND
+                (
+                  (
+                      bch.status = 'EDITING'
+                      AND bch.lbc_state_order = 1
+                      AND bch.next_status = 'PUBLISHED'
+                  )
+                  OR
+                  (
+                      bch.status = 'PUBLISHED'
+                      AND lhs.id_house IS NULL
+                      AND bch.previous_state_status IS NULL
+                  )
+                  OR
+                  (
+                    so.prev_status = 'EDITING'
+                    AND bch.is_previous_first_status IS TRUE
+                    AND bch.next_status = 'PUBLISHED'
+                  )
+                  OR
+                  (
+                    bch.next_status = 'PUBLISHED'
+                    AND bch.ts_first_publication = bch.ts_next_status_change
+                  )
+                )
+            )
+            OR 
+            ( --Recovered
+                bch.next_status = 'PUBLISHED' 
+                AND bch.status = 'UNPUBLISHED' 
+                AND so.days_in_status >= 84
+            )
+            OR
+            ( --Relisting
+                bch.next_status = 'PUBLISHED'
+                AND ( --Remove available_soon cases
+                        bch.next_status_reason <> 'RELISTING' 
+                        OR bch.next_status_reason IS NULL
+                    )
+                AND bch.status = 'SUSPENDED'
+                AND bch.status_reason = 'RENTED'
+            )
+            OR
+            ( --Relisting
+                bch.status = 'UNPUBLISHED'
+                AND so.next_status = 'PUBLISHED'
+                AND bch.previous_state_status = 'SUSPENDED'
+                AND bch.previous_status_reason = 'RENTED'
+            )
+            OR --Early demand
+            (
+                bch.next_status = 'PUBLISHED'
+                AND bch.next_status_reason LIKE 'RELISTING_%'
+                AND (
+                  bch.status = 'SUSPENDED' 
+                  AND 
+                  bch.status_reason = 'RENTED'
+                )
+            )
           )
         ),
         1,
@@ -329,24 +372,27 @@ trigger AS (
   
 ), merge_version AS (
   SELECT 
-    id_house,
-    country_code,
-    status,
-    status_reason,
-    ts_state_started,
-    ts_state_ended,
-    DATEDIFF(ts_state_ended, ts_state_started)  AS days_in_state,
-    DATEDIFF(ts_state_ended, ts_state_started)  AS days_in_status,
-    IF(LAG(status) OVER(PARTITION BY id_house ORDER BY ts_state_started) IS NULL, TRUE, FALSE) AS is_first_status,
-    trigger_new_version,
-    listing_version,
-    state_order,
-    max_house_state_order AS max_state_order,
-    rev,
-    revision_reason,
-    ts_first_publication
+    h.id_house,
+    h.country_code,
+    h.status,
+    h.status_reason,
+    h.ts_state_started,
+    h.ts_state_ended,
+    DATEDIFF(h.ts_state_ended, h.ts_state_started)  AS days_in_state,
+    DATEDIFF(h.ts_state_ended, h.ts_state_started)  AS days_in_status,
+    IF(LAG(h.status) OVER(PARTITION BY h.id_house ORDER BY h.ts_state_started) IS NULL, TRUE, FALSE) AS is_first_status,
+    IF(h.state_order = h.max_house_state_order, lhs.trigger_new_version, 0) AS trigger_new_version,
+    h.listing_version,
+    NULL AS lbc_state_order,
+    h.state_order,
+    h.max_house_state_order AS max_state_order,
+    h.rev,
+    h.revision_reason,
+    h.ts_first_publication
   FROM 
-    house
+    house AS h
+  JOIN last_house_state AS lhs
+    ON lhs.id_house = h.id_house
 
   UNION ALL
 
@@ -361,15 +407,8 @@ trigger AS (
     t.days_in_status,
     IF(bch.previous_state_status IS NULL, TRUE, FALSE) AS is_first_status,
     t.trigger_new_version,
-    COALESCE(
-        COALESCE(lhs.listing_version, 0)
-        +
-        SUM(
-            t.trigger_new_version
-        ) OVER (PARTITION BY bch.id_house ORDER BY bch.ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
-        , IF(bch.lbc_state_order = 1 AND bch.status = 'PUBLISHED' AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL), COALESCE(lhs.listing_version, 0) + 1, COALESCE(lhs.listing_version, 0) + 0)
-        , 0
-    ) AS listing_version,
+    NULL AS listing_version,
+    bch.lbc_state_order,
     bch.state_order,
     MAX(bch.state_order) OVER(PARTITION BY bch.id_house) AS max_state_order,
     bch.rev,
@@ -384,26 +423,66 @@ trigger AS (
         AND t.status = bch.status
         AND COALESCE(t.status_reason, '') = COALESCE(bch.status_reason, '')
         AND t.ts_state_started = bch.ts_state_started
-  LEFT JOIN 
-    last_house_state AS lhs
-      ON lhs.id_house = bch.id_house
 )
 SELECT 
-  id_house,
-  country_code,
-  status,
-  status_reason,
-  rev,
-  revision_reason,
-  IF(listing_version > 0,ts_first_publication, NULL) AS ts_first_publication,
-  CAST(ts_state_started AS TIMESTAMP) AS ts_state_started,
-  CAST(ts_state_ended AS TIMESTAMP) AS ts_state_ended,
-  days_in_state,
-  days_in_status,
-  trigger_new_version,
-  listing_version,
-  IF(revision_reason LIKE '%TERMINATION_CANCELED%', TRUE, FALSE) AS is_extended_rental,
-  state_order,
-  MAX(max_state_order) OVER(PARTITION BY id_house) AS max_state_order
+  m.id_house,
+  m.country_code,
+  m.status,
+  m.status_reason,
+  m.rev,
+  m.revision_reason,
+  IF(
+      COALESCE( 
+        m.listing_version,
+        COALESCE(
+          COALESCE(lhs.listing_version, 0)
+          +
+          SUM(
+              m.trigger_new_version
+          ) OVER (PARTITION BY m.id_house ORDER BY m.ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+          , IF(
+              m.lbc_state_order = 1 
+              AND m.status = 'PUBLISHED' 
+              AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL)
+              , COALESCE(lhs.listing_version, 0) + 1
+              , COALESCE(lhs.listing_version, 0) + 0
+            ) 
+          , 0
+        )
+      ) > 0
+      , m.ts_first_publication
+      , NULL
+  ) AS ts_first_publication,
+  CAST(m.ts_state_started AS TIMESTAMP) AS ts_state_started,
+  CAST(m.ts_state_ended AS TIMESTAMP) AS ts_state_ended,
+  m.days_in_state,
+  m.days_in_status,
+  m.trigger_new_version,
+  COALESCE( 
+    m.listing_version,
+    COALESCE(
+      COALESCE(lhs.listing_version, 0)
+      +
+      SUM(
+          m.trigger_new_version
+      ) OVER (PARTITION BY m.id_house ORDER BY m.ts_state_started ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+      , IF(
+          m.lbc_state_order = 1 
+          AND m.status = 'PUBLISHED' 
+          AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL)
+          , COALESCE(lhs.listing_version, 0) + 1
+          , COALESCE(lhs.listing_version, 0) + 0
+        )
+      , 0
+    )
+  ) AS listing_version,
+  IF(m.revision_reason LIKE '%TERMINATION_CANCELED%', TRUE, FALSE) AS is_extended_rental,
+  m.lbc_state_order,
+  m.state_order,
+  MAX(m.max_state_order) OVER(PARTITION BY m.id_house) AS max_state_order
 FROM 
-  merge_version
+  merge_version AS m
+LEFT JOIN 
+    last_house_state AS lhs
+      ON lhs.id_house = m.id_house
+order by id_house, state_order
