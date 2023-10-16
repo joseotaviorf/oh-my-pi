@@ -122,6 +122,7 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_credit_analysis:load-enrich-early-credit-analysis
+  - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
   - bietlejuice.sorting_hat:load-clean-experiment
   - bietlejuice.sorting_hat:load-clean-variant
 bietlejuice.dw_crm:

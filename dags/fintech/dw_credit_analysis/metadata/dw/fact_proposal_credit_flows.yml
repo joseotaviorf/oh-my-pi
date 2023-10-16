@@ -118,6 +118,10 @@ columns:
     description: "Indicates if the row presents the last credit evaluation."
   has_early_credit:
     description: "Indicates if the offer had an early credit analysis."
+  guarantee_not_accepted:
+    lineage:
+    - datalake_rental_guarantee.guarantee
+    description: "Indicates if a paid guarantee offered was accepted (FALSE) or not (TRUE) by the tenant."
   country_code:
     lineage:
     - dw_public.dim_house_listing.country_code

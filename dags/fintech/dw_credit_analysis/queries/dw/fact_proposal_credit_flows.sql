@@ -19,6 +19,51 @@ early_credit_analysis AS (
     id_user,
     id_house
 ),
+guarantees AS (
+  SELECT
+    flrf.sk_proposal,
+    COUNT(
+      DISTINCT CASE
+        WHEN (
+          CASE
+            WHEN g.guarantee_type IN (
+              'PRO_GUARANTOR',
+              'STANDALONE',
+              'DEPOSIT'
+            )
+            AND TO_DATE(
+              CAST(
+                NULLIF(flrf.sk_last_credit_evaluation_positive, -1) AS VARCHAR(8)
+              ),
+              'yyyyMMdd'
+            ) IS NULL THEN TO_DATE(
+              CAST(
+                NULLIF(flrf.sk_last_credit_evaluation_negative, -1) AS VARCHAR(8)
+              ),
+              'yyyyMMdd'
+            )
+            ELSE TO_DATE(
+              CAST(
+                NULLIF(flrf.sk_last_credit_evaluation_positive, -1) AS VARCHAR(8)
+              ),
+              'yyyyMMdd'
+            )
+          END
+        ) IS NULL
+        AND g.guarantee_type IS NOT NULL THEN flrf.sk_proposal
+        ELSE NULL
+      END
+    ) AS guarantee_not_accepted
+  FROM
+    dw_public.fact_listing_rent_flows AS flrf
+    LEFT JOIN
+      datalake_rental_guarantee.guarantee AS g
+        ON g.id_documentation_ebdb = flrf.sk_proposal
+  WHERE
+    g.guarantee_type != 'THIRD_PARTY_GUARANTEE'
+  GROUP BY
+    flrf.sk_proposal
+),
 rent_flows AS (
   SELECT
     flrf.sk_client,
@@ -72,7 +117,8 @@ rent_flows AS (
     dd.date AS dt_offer_submitted,
     hl.country_code,
     hl.rental_administrator,
-    hl.version
+    hl.version,
+    IF(g.guarantee_not_accepted = 1, TRUE, FALSE) AS guarantee_not_accepted
   FROM
     dw_public.fact_listing_rent_flows AS flrf
   LEFT JOIN
@@ -87,6 +133,9 @@ rent_flows AS (
   LEFT JOIN
     dw_public.dim_house_listing AS hl
       ON hl.sk_house_listing = flrf.sk_house_listing
+  LEFT JOIN
+    guarantees AS g
+      ON g.sk_proposal = flrf.sk_proposal
 ),
 proposal_credit_flows AS (
   SELECT
@@ -140,7 +189,14 @@ proposal_credit_flows AS (
     rf.dt_offer_submitted,
     rf.country_code,
     rf.rental_administrator,
-    ROW_NUMBER() OVER (PARTITION BY rf.sk_client, rf.sk_credit_analysis, rf.sk_house ORDER BY rf.version DESC) AS linsting_rank
+    rf.guarantee_not_accepted,
+    ROW_NUMBER() OVER (
+      PARTITION BY rf.sk_client,
+      rf.sk_credit_analysis,
+      rf.sk_house
+      ORDER BY
+        rf.version DESC
+    ) AS linsting_rank
   FROM
     rent_flows AS rf
   LEFT JOIN
@@ -178,6 +234,7 @@ SELECT
   is_first_credit_evaluation,
   is_last_credit_evaluation,
   has_early_credit,
+  guarantee_not_accepted,
   country_code,
   rental_administrator,
   NOW() AS ts_load
