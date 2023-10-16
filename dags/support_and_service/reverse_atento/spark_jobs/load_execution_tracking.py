@@ -8,14 +8,13 @@ from bietlejuice.base.spark import SparkTableStorageFormat
 from quintoandar_logger import QuintoAndarLogger
 from datetime import *
 from pyspark.sql.types import DataType, StructType
-from dateutil import tz
 
 
 JOB_NAME = "load_execution_tracking"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def get_tracking_data(bucket):
+def get_tracking_data(bucket, execution_date):
     folders = set()
     for obj in bucket.objects.all():
         prefix, delimiter, _ = obj.key.rpartition('/')
@@ -31,7 +30,7 @@ def get_tracking_data(bucket):
           folder_clean = folder.split("/")[1]
         for object_summary in bucket.objects.filter(Prefix=f"{folder}"):
             last_modified_list.append(object_summary.last_modified)
-        tracking_data.append((folder_clean, sorted(last_modified_list)[-1], datetime.now().replace(tzinfo=tz.tzutc())))
+        tracking_data.append((folder_clean, sorted(last_modified_list)[-1], execution_date))
 
     return tracking_data
 
@@ -43,6 +42,7 @@ if __name__ == "__main__":
     parser.add_argument("source", help="source name")
     parser.add_argument("external_bucket", help="bucket destination for files")
     parser.add_argument("table_schema", help="Dataframe schema")
+    parser.add_argument("execution_date", help="date of sparkjob execution")
 
     args = parser.parse_args()
 
@@ -52,10 +52,10 @@ if __name__ == "__main__":
     external_bucket = args.external_bucket
     table_schema = json.loads(args.table_schema)
     table_schema = StructType.fromJson(table_schema)
+    execution_date = args.execution_date
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(external_bucket)
-    spark.conf.set('spark.sql.session.timeZone', 'UTC')
 
     try:
         tracking_data = get_tracking_data(bucket)

@@ -136,7 +136,8 @@ execution_tracking_task = QuintoAndarDatabricksSubmitRunOperator(
                 datalake_bucket, 
                 SOURCE, 
                 external_s3_bucket,
-                json.dumps(table_schema)
+                json.dumps(table_schema),
+                "{{ ts }}"
             ],
         }
     },
