@@ -1,86 +1,86 @@
 ---
-database_name: datalake_fintech_snapshot
-table_name: accounts_payable
+database_name: datalake_recupera
+table_name: snapshot_daily_debts
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "Daily snapshot to report debts"
+description: "Daily snapshot to report debts. It represents the Recupera report called P6"
 columns:
   id_creditor:
     lineage:
       - datalake_recupera_clean.records.id_creditor
-    description: Creditor code
+    description: Creditor code. Original field name = CREDOR
   id_customer:
     lineage:
       - datalake_recupera_clean.records.id_customer
-    description: Customer ID
+    description: Customer ID. Original field name = COD CLIENTE
   id_contract:
     lineage:
       - datalake_recupera_clean.complementary_records.id_contract
-    description: Contract ID
-  id_installment:
-    lineage:
-      - datalake_recupera_clean.installment.id_installment
-    description: Installment ID
+    description: Contract ID. Original field name = CONTRATO
   id_invoice:
     lineage:
       - datalake_recupera_clean.complementary_record.id_installment
-    description: Invoice ID
+    description: Invoice ID. Original field name = ID FATURA
+  id_installment:
+    lineage:
+      - datalake_recupera_clean.installment.id_installment
+    description: Installment ID. Original field name = CODIGO PARCELAMENTO
   customer_name:
     lineage:
       - datalake_recupera_clean.records.customer_name
-    description: Customer name
+    description: Customer name. Original field name = NOME CLIENTE
   status:
     lineage:
       - datalake_recupera_clean.status.status_description
-    description: Invoice status description
+    description: Invoice status description. Original field name = SITUACAO
   operator:
     lineage:
       - datalake_recupera_clean.operational_records.id_operator
-    description: Operator ID
+    description: Operator ID. Original field name = OPERADOR
   distributor:
     lineage:
       - datalake_recupera_clean.operational_records.distributor_code
-    description: Distributor code.
-  occurrence:
-    lineage:
-      - datalake_recupera_clean.historical_records.historical_code
-    description: History Code
-  observation:
-    lineage:
-      - datalake_recupera_clean.historical_records.occurence_description
-    description: Description in the occurrence
-  invoice_type:
-    lineage:
-      - datalake_recupera_clean.installments_indicators.indicator_content
-    description: Indicator content
+    description: Distributor code. Original field name = DISTRIBUIDOR
   advisory:
     lineage:
       - datalake_recupera_clean.operational_records.advisory_code
-    description: Advisory ID
+    description: Advisory ID. Original field name = ASESSORIA
+  occurrence:
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+    description: History Code. Original field name = OCORRENCIA
+  observation:
+    lineage:
+      - datalake_recupera_clean.historical_records.occurence_description
+    description: Description in the occurrence. Original field name = OBSERVAÇOES
+  invoice_type:
+    lineage:
+      - datalake_recupera_clean.installments_indicators.indicator_content
+    description: Indicator content. Original field name = TIPO FATURA
   installment_number:
     lineage:
       - datalake_recupera_clean.installment.installment_number
-    description: Installment number
+    description: Installment number. Original field name = NUMERO PRESTRACAO
   invoice_amount:
     lineage:
       - datalake_recupera_clean.complementary_record.main_amount
-    description: Invoice main amount
+    description: Invoice main amount. Original field name = VALOR DA FATURA
   deal_amount:
     lineage:
       - datalake_recupera_clean.installment.amount_to_pay
-    description: Total amount to be paid in the installment
-  ts_occurrence:
-    lineage:
-      - datalake_recupera_clean.historical_records.ts_occurrence
-    description: Date of occurrence
-  dt_due_agreement:
-    lineage:
-      - datalake_recupera_clean.installment.dt_due
-    description: Due date
+    description: Total amount to be paid in the installment. Original field name = VALOR DO ACORDO
   dt_due_invoice:
     lineage:
       - datalake_recupera_clean.complementary_record.dt_debt_due
-    description: Invoice debt due date
+    description: Invoice debt due date. Original field name = DATA VENCIMENTO FATURA
+  dt_due_agreement:
+    lineage:
+      - datalake_recupera_clean.installment.dt_due
+    description: Due date. Original field name = DATA VENCIMENTO ACORDO
+  ts_occurrence:
+    lineage:
+      - datalake_recupera_clean.historical_records.ts_occurrence
+    description: Date of occurrence. Original field name = DATA
   ts_snapshot:
     description: Timestamp when the data was loaded
   year:

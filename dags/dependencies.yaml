@@ -1950,8 +1950,15 @@ bietlejuice.enrich_recupera:
   - bietlejuice.recupera:load-clean-installments-indicators
   - bietlejuice.recupera:load-clean-operational-records
   - bietlejuice.recupera:load-clean-records
-  - bietlejuice.recupera:load-clean-records-distributed-channels
   - bietlejuice.recupera:load-clean-status
+  - bietlejuice.recupera:load-clean-creditor-pending
+  - bietlejuice.recupera:load-clean-installment-detail
+  - bietlejuice.recupera:load-clean-installment-canceled
+  - bietlejuice.recupera:load-clean-detail-movement
+  - bietlejuice.recupera:load-clean-indicator-contracts
+  - bietlejuice.recupera:load-clean-receipt
+  - bietlejuice.recupera:load-clean-operators
+  - bietlejuice.recupera:load-clean-records-distributed-channels
 bietlejuice.enrich_rede_company:
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

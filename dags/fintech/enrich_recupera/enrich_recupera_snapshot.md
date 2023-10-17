@@ -19,5 +19,12 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables, in Enrich layer, incrementally:​​
 
 - `datalake_recupera.snapshot_daily_debts`
+
+and the following output tables, in Enrich layer, full load:​​
+
+- `datalake_recupera.collection`
+- `datalake_recupera.installment`
+- `datalake_recupera.negotiation`
+​
 ​
 </details>

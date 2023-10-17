@@ -1,0 +1,128 @@
+---
+database_name: datalake_recupera
+table_name: negotiation
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table represents the Recupera report called NEGOCIAC. It contains information about the negotiation."
+columns:
+  customer_document:
+    description: Customer Document. Original field name = CPF
+    lineage:
+      - datalake_recupera_clean.records.customer_document
+  id_contract:
+    description: Contract ID. Original field name = CONTRATO
+    lineage:
+      - datalake_recupera_clean.installment_detail.id_contract
+  id_negotiation:
+    description: Negotiation ID. Original field name = CODIGO_PARCELAMENTO
+    lineage:
+      - datalake_recupera_clean.installment.id_installment
+  id_operator:
+    description: Operator ID. Original field name = Operador
+    lineage:
+      - datalake_recupera_clean.installment.id_operator
+  customer_name:
+    description: Customer Name. Original field name = NOME
+    lineage:
+      - datalake_recupera_clean.records.customer_name
+  status:
+    description: Negotiation Status ID. Original field name = Status
+    lineage:
+      - datalake_recupera_clean.operational_records.collesction_customer_situation
+  status_description:
+    description: Negotiation Status Description. Original field name = DESCRICAO_STATUS
+    lineage:
+      - datalake_recupera_clean.status.status_description
+  negotiation_status:
+    description: Negotiation Status. Original field name = STATUS_ACORDO
+    lineage:
+      - datalake_recupera_clean.installment_canceled.id_installment
+      - datalake_recupera_clean.installment.installment_situation
+  campaign_code:
+    description: Campaign Code. It is filled in if the origin_agreement is carta_campanha. Original field name = CODIGO_CAMPANHA
+    lineage:
+      - datalake_recupera_clean.historical_records.occurence_description
+  promisse_payment_method:
+    description: Type of promise to pay. Original field name = FORMA_PAGTO_PROMESSA
+    lineage:
+      - datalake_recupera_clean.installment.boleto_emission_indicator
+  number_of_installments:
+    description: Total number of installlments. Original field name = Qtde_Parcelas
+    lineage:
+      - datalake_recupera_clean.installment.installments_amount
+  origin_agreement:
+    description: Origin of the agreement. Original field name = Origem_Acordo
+    lineage:
+      - datalake_recupera_clean.operators.operator_type
+      - datalake_recupera_clean.historical_records.occurence_description
+      - datalake_recupera_clean.installment.id_operator
+  advisory:
+    description: Advisory. Original field name = Assessoria
+    lineage:
+      - datalake_recupera_clean.records.advisory_code
+  original_debit_amount:
+    description: Original debt amount. Original field name = valor_debito_original
+    lineage:
+      - datalake_recupera_clean.installment_detail.main_amount
+  total_negotiated_amount:
+    description: Total negotiated amount. Original field name = Valor_Total_Negociado
+    lineage:
+      - datalake_recupera_clean.installment.amount_to_pay
+  agreement_discount_amount:
+    description: Agreement Discount Amount. Original field name = Valor_Desconto_Acordo
+    lineage:
+      - datalake_recupera_clean.installment.discount_amount
+  down_payment:
+    description: Indicates whether the initial payment was made. Original field name = ENTRADA_PAGA
+    lineage:
+      - datalake_recupera_clean.receipt.id_receipt
+  down_payment_amount:
+    description: Indicated the down payment amount. Original field name = Valor_Entrada
+    lineage:
+      - datalake_recupera_clean.installment.installment_number
+      - datalake_recupera_clean.installment.amount_to_pay
+  due_amount:
+    description: Due Amount. Original field name = VALOR_A_VENCER
+    lineage:
+      - datalake_recupera_clean.installment.amount_to_pay
+      - datalake_recupera_clean.installment.installment_situation
+  outstanding_amount:
+    description: Outstanding amount. Original field name = VALOR_EM_ATRASO
+    lineage:
+      - datalake_recupera_clean.installment.amount_to_pay
+      - datalake_recupera_clean.installment.installment_situation
+  total_amount_paid:
+    description: Total paid amount. Original field name = TOTAL_PAGO
+    lineage:
+      - datalake_recupera_clean.installment.amount_to_pay
+  total_next_due:
+    description: Total amount on the next due date . Original field name = Total_Proximo_vencimento
+    lineage:
+      - datalake_recupera_clean.installment.amount_to_pay
+  agreement_in_delay:
+    description: Delayed agreement. Original field name = ACORDO_EM_ATRASO
+    lineage:
+      - datalake_recupera_clean.installment.installment_situation
+      - datalake_recupera_clean.installment.dt_due
+  agreement_promise:
+    description: Promisse agreement. Original field name = PROMESSA_ACORDO
+    lineage:
+      - datalake_recupera_clean.installment.installment_number
+      - datalake_recupera_clean.installment.installment_situation
+  dt_cancellation:
+    description: Cancelation date. Original field name = Data_Cancelamento
+    lineage:
+      - datalake_recupera_clean.installment_canceled.ts_canceled_installment
+  dt_next_due:
+    description: Next due date. Original field name = Proximo_vencimento
+    lineage:
+      - datalake_recupera_clean.installment.installment_situation
+      - datalake_recupera_clean.installment.dt_due
+  dt_promisse:
+    description: Installment Creation Date. Original field name = DATA_DA_PROMESSA
+    lineage:
+      - datalake_recupera_clean.installment.dt_installment
+  dt_due_promisse:
+    description: Installment Due date. Original field name = Vencimento_da_Promessa
+    lineage:
+      - datalake_recupera_clean.installment.dt_due
