@@ -26,12 +26,7 @@ SELECT
     END AS bill_item_cluster_name,
     rca.type AS from_account_type,
     rcab.type AS to_account_type,
-    CASE
-      WHEN (
-        rca.type = 'contract'
-        AND rcab.type <> 'contract') THEN (-1.0) * rce.amount
-      ELSE 1.0 * rce.amount
-    END AS value_sign_bill_item,
+    rce.amount AS value_sign_bill_item,
     rci.due_amount,
     rce.accrual_year_month AS accrual_year_month,
     rci.accrual_year_month AS accrual_year_month_invoice,
