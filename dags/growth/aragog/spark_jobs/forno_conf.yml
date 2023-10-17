@@ -1,0 +1,3 @@
+---
+aragog_bucket: '5a-datalake-forno'
+bucket_path: "s3://{aragog_bucket}"
