@@ -3,7 +3,7 @@ database_name: datalake_recupera
 table_name: negotiation
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "This table represents the Recupera report called NEGOCIAC. It contains information about the negotiation."
+description: "This table represents the Recupera report called NEGOCIAC and contains information about the negotiation. It stores daily snapshots to capture changes in the negotiation (example: number of installment, advisory..). The first snapshots started on 2023-10-18."
 columns:
   customer_document:
     description: Customer Document. Original field name = CPF
@@ -126,3 +126,11 @@ columns:
     description: Installment Due date. Original field name = Vencimento_da_Promessa
     lineage:
       - datalake_recupera_clean.installment.dt_due
+  ts_snapshot:
+    description: Timestamp when the data was loaded
+  year:
+    description: Year when the data was loaded
+  month:
+    description: Month when the data was loaded
+  day:
+    description: Day when the data was loaded

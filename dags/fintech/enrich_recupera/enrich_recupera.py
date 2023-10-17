@@ -36,6 +36,9 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 
+tables = config_service.get_config("tables")
+
+
 CLUSTER_DESCRIPTION = config_service.get_config(
     "databricks_10_4_med_general_photon_cluster"
 )
@@ -46,8 +49,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-
-partition_cols = config_service.get_config("partition_cols")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -84,14 +85,20 @@ datalake_task_group = DatalakeTaskGroup(
     spark_jobs_path=base_spark_jobs_path,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-    is_incremental=True,
-    has_create_external_table_task=False,
-    partitions=partition_cols,
-)
+enrich_task_groups = {}
+for table in tables:
+    table_name = table["table_name"]
+    is_incremental = table["is_incremental"]
+    partitions = table.get("partitions")
+    task_group = datalake_task_group.build_enrich_task_group(
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        table_name=table_name,
+        partitions=partitions,
+        is_incremental=is_incremental,
+    )
+    enrich_task_groups[table_name] = task_group
+
 
 
 chain(

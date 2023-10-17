@@ -1,5 +1,14 @@
 WITH
- collection_base AS (
+records_distributed_channels AS (
+    SELECT
+        id_creditor,
+        id_customer,
+        id_digital_channel,
+        COUNT(*) OVER (PARTITION BY id_creditor, id_customer) count_multiples_records
+    FROM datalake_recupera_clean.records_distributed_channels
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_creditor, id_customer ORDER BY DATE(ts_current_registration) DESC) = 1
+),
+collection_base AS (
     SELECT
         opr.id_creditor,
         opr.id_customer,
@@ -16,7 +25,11 @@ WITH
         hr.historical_code AS occurrence,
         REPLACE(REPLACE(REPLACE(hr.occurence_description, CHAR(124),' - '), CHAR(13),''), CHAR(10), '') AS observation,
         hr.ts_occurrence,
-        ii.indicator_content AS invoice_type
+        ii.indicator_content AS invoice_type,
+        CASE
+            WHEN rdc.count_multiples_records > 1 THEN "AMBOS"
+            ELSE rdc.id_digital_channel
+        END AS digital_channel
     FROM
        datalake_recupera_clean.operational_records AS opr
     INNER JOIN datalake_recupera_clean.complementary_records AS cr
@@ -36,6 +49,8 @@ WITH
             AND cr.id_contract = ii.id_contract
             AND cr.id_installment = ii.id_installment
             AND ii.id_indicator = "TIPOFAT"
+    LEFT JOIN records_distributed_channels AS rdc
+        ON rdc.id_creditor = cr.id_creditor AND rdc.id_customer = cr.id_customer
     QUALIFY ROW_NUMBER() OVER(PARTITION BY hr.id_creditor, hr.id_customer, cr.id_installment  ORDER BY hr.ts_occurrence DESC) = 1
 )
 SELECT DISTINCT
@@ -52,6 +67,7 @@ SELECT DISTINCT
     cb.occurrence,
     cb.observation,
     cb.invoice_type,
+    cb.digital_channel,
     i.installment_number,
     NULL AS invoice_amount,
     IFNULL(i.amount_to_pay,0) AS deal_amount,
@@ -88,6 +104,7 @@ SELECT DISTINCT
     cb.occurrence,
     cb.observation,
     cb.invoice_type,
+    cb.digital_channel,
     i.installment_number,
     cb.invoice_amount,
     IFNULL(i.amount_to_pay,0) AS deal_amount,

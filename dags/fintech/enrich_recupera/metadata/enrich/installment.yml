@@ -3,7 +3,7 @@ database_name: datalake_recupera
 table_name: installment
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "This table represents the Recupera report called MISACO. It contains information about the installment of a negotiation."
+description: "This table represents the Recupera report called MISACO. It contains information about the installment of a negotiation. This table is overwritten every day with the most recent data"
 columns:
   id_negotiation:
     description: Negotiation ID. Original field name = id_acordo

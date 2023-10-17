@@ -159,7 +159,11 @@ SELECT DISTINCT
   ) AS dt_cancellation,
   a.dt_next_due,
   a.dt_promisse,
-  a.dt_due_promisse
+  a.dt_due_promisse,
+  NOW() AS ts_snapshot,
+  YEAR(NOW()) AS year,
+  MONTH(NOW()) AS month,
+  DAY(NOW()) AS day
 FROM deduplicate_records AS r
 INNER JOIN agreements AS a
   ON r.id_customer = a.id_customer
