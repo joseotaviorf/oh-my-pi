@@ -263,6 +263,9 @@ SELECT
     dh.uuid,
     dh.dt_reference,
     dh.dt_due,
+    dh.dt_tax,
+    dh.dt_updated,
+    dh.dt_created,
     dh.accrual_year_month
 FROM
     dh

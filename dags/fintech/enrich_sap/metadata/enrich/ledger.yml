@@ -136,6 +136,24 @@ columns:
       - datalake_pas.journal_entries.dt_due
       - datalake_pas.invoices.dt_due
       - datalake_pas.incoming_payments.dt_due
+  dt_tax:
+    description: "Tax date"
+    lineage:
+      - datalake_pas.journal_entries.dt_tax
+      - datalake_pas.invoices.dt_tax
+      - datalake_pas.incoming_payments.dt_tax
+  dt_created:
+    description: "Created date"
+    lineage:
+      - datalake_pas.journal_entries.dt_created
+      - datalake_pas.invoices.dt_created
+      - datalake_pas.incoming_payments.dt_created
+  dt_updated:
+    description: "Updated date"
+    lineage:
+      - datalake_pas.journal_entries.dt_updated
+      - datalake_pas.invoices.dt_updated
+      - datalake_pas.incoming_payments.dt_updated
   accrual_year_month:
     description: "Accrual date"
     lineage:
