@@ -28,6 +28,10 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_variant
     description: "Last credit model+policy variant identifier that evaluated the proposal."
+  income:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.monthly_income
+    description: "Monthly income of the proponent."
   first_category:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.category
@@ -67,6 +71,10 @@ columns:
       PRE_APPROVED: "Eligible credit evaluation to light approval or a approved credit analysis on Sorting Hat."
       PRE_REJECTED: "Marked as Rejected on Sorting Hat."
       "null": "Means that the credit evaluation has not reached end."
+  package:
+    lineage:
+      - datalake_sorting_hat_clean.proposal
+    description: "Package information, which can be calculated as: rent_value + condo_value + home_insurance_value"
   risk_category:
     lineage:
       - datalake_sorting_hat_clean.screening_result.risk_category

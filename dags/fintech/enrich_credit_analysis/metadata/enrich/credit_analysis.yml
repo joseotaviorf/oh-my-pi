@@ -52,6 +52,10 @@ columns:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
     description: "Type of the paid guarantee"
+  standalone_factor:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.category_level
+    description: "Standalone factor of the proposal"
   reason:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.reason

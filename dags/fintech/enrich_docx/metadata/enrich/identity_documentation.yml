@@ -23,7 +23,33 @@ columns:
   id_context_external:
     lineage:
       - datalake_docx_clean.document.id_context_external
-    description: "Id external of the document context" 
+    description: "Id external of the document context"
+  document_number:
+    lineage:
+      - datalake_docx_clean.document.attributes
+    description: "Tenant document number"
+  document_type:
+    lineage:
+      - datalake_docx_clean.document.id_document_type
+    description: "Document type"
+    categories:
+      RG: ""
+      CPF: ""
+      CNH: ""
+      RNE: ""
+      PERSONAL_DATA: ""
+      INCOME_DATA: ""
+      ADDRESS: ""
+  document_context:
+    lineage:
+      - datalake_docx_clean.document.id_document_context
+    description: "Document context"
+    categories:
+      Owner: ""
+      Tenant: ""
+      Affiliate: ""
+      Buyer: ""
+      Seller: ""  
   mother_name:
     lineage:
       - datalake_docx_clean.document.attributes
