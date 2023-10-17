@@ -476,7 +476,13 @@ SELECT
       , 0
     )
   ) AS listing_version,
-  IF(m.revision_reason LIKE '%TERMINATION_CANCELED%', TRUE, FALSE) AS is_extended_rental,
+  IF(
+    m.revision_reason LIKE '%TERMINATION_CANCELED%' 
+    OR 
+    m.revision_reason LIKE '[TEMPORARY OPT-OUT RELISTING]%' --Manually removed from relisting by our Product Team
+    , TRUE
+    , FALSE
+  ) AS is_extended_rental,
   m.lbc_state_order,
   m.state_order,
   MAX(m.max_state_order) OVER(PARTITION BY m.id_house) AS max_state_order
