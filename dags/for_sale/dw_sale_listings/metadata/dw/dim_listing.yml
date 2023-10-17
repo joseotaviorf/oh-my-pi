@@ -390,27 +390,27 @@ columns:
        Timestamp of the last unpublishing of the listing.
   ts_first_booking:
     lineage:
-    - datalake_sale_listings.sale_listing.ts_first_booking
+    - datalake_sale_listing_demand.sale_listing_demand.ts_first_booking
     description: >
       Timestamp of first booking (VB) of the listing, if any.
   ts_first_visit_completed:
     lineage:
-    - datalake_sale_listings.sale_listing.ts_first_visit_completed
+    - datalake_sale_listing_demand.sale_listing_demand.ts_first_visit_completed
     description: >
       Timestamp of first visit completed (VC) by listing, if any.
   ts_first_offer_submitted:
     lineage:
-    - datalake_sale_listings.sale_listing.ts_first_offer_submitted
+    - datalake_sale_listing_demand.sale_listing_demand.ts_first_offer_submitted
     description: > 
       Timestamp of first offer received (OS) by listing, if any.
   dt_first_offer_accepted:
     lineage:
-    - datalake_sale_listings.sale_listing.dt_first_offer_accepted
+    - datalake_sale_listing_demand.sale_listing_demand.dt_first_offer_accepted
     description: >
       Date of first offer accepted (OA) by listing, if any.
   dt_first_sale_agreement_signed:
     lineage:
-    - datalake_sale_listings.sale_listing.dt_first_sale_agreement_signed
+    - datalake_sale_listing_demand.sale_listing_demand.dt_first_sale_agreement_signed
     description: > 
       Date of first sale agreement (CCV) signed by listing, if any.
   ts_updated:

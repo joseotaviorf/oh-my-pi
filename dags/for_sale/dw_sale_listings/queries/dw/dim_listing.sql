@@ -43,11 +43,11 @@ SELECT
   lbc.ts_last_listing AS ts_last_publication,
   sl.ts_first_depublication,
   sl.ts_last_depublication,
-  sl.ts_first_booking,
-  sl.ts_first_visit_completed,
-  sl.ts_first_offer_submitted,
-  sl.dt_first_offer_accepted,
-  sl.dt_first_sale_agreement_signed,
+  sld.ts_first_booking,
+  sld.ts_first_visit_completed,
+  sld.ts_first_offer_submitted,
+  sld.dt_first_offer_accepted,
+  sld.dt_first_sale_agreement_signed,
   lbc.ts_updated,
   NOW() AS ts_load
 FROM
@@ -58,6 +58,9 @@ JOIN
 JOIN
   datalake_sale_listings.sale_listing AS sl
     ON lbc.id_house = sl.id_house
+JOIN
+  datalake_sale_listing_demand.sale_listing_demand AS sld
+    ON lbc.id_house = sld.id_house
 LEFT JOIN
   datalake_ebdb_clean.house_registration_status AS hrs
     ON hrs.id_house = lbc.id_house

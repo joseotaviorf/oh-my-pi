@@ -71,24 +71,6 @@ FROM
     lbc.business_context = 'RENT'
   GROUP BY 1
  )
- -- Get information about first demand dates
- , first_sale_flows AS (
-   SELECT
-     id_house,
-     MIN(ts_first_event) AS ts_first_sale_flow,
-     MIN(ts_first_booking_created) AS ts_first_booking,
-     MIN(dt_sale_agreement_signed) AS dt_first_sale_agreement_signed,
-     MIN(dt_house_registry_ended) AS dt_house_registry_ended,
-     MIN(ts_first_offer_submitted) AS ts_first_offer_submitted,
-     MIN(ts_first_visit_completed) AS ts_first_visit_completed,
-     MIN(dt_first_offer_accepted) AS dt_first_offer_accepted,
-     COUNT(ts_first_visit_completed) AS total_listings_visit_completed,
-     COUNT(ts_first_offer_submitted) AS total_listings_offer_submited,
-     COUNT(dt_first_offer_accepted) AS total_listings_offer_accepted
-   FROM
-     datalake_sale_flows.sale_flow
-   GROUP BY 1
- )
 SELECT
   sls.id_sale_listing,
   lc.id_house,
@@ -102,32 +84,11 @@ SELECT
   ) AS days_last_publication_to_depublication,
   DATEDIFF(lc.ts_first_depublication, lc.ts_first_publication) AS days_first_publication_to_first_depublication,
   DATEDIFF(lc.ts_last_depublication, lc.ts_first_publication) AS days_first_publication_to_last_depublication,
-  DATEDIFF(sf.ts_first_sale_flow, lc.ts_first_publication) AS days_first_publication_to_first_sale_flow,
-  DATEDIFF(sf.ts_first_booking, lc.ts_first_publication) AS days_first_publication_to_first_booking,
-  DATEDIFF(sf.ts_first_visit_completed, lc.ts_first_publication) AS days_first_publication_to_visit_completed,     
-  DATEDIFF(sf.ts_first_offer_submitted, lc.ts_first_publication) AS days_first_publication_to_first_offer_submitted,  
-  DATEDIFF(sf.dt_first_offer_accepted, lc.ts_first_publication) AS days_first_publication_to_first_offer_accepted,
-  DATEDIFF(sf.dt_first_sale_agreement_signed, lc.ts_first_publication) AS days_first_publication_to_first_sale_agreement_signed,
-  DATEDIFF(sf.dt_house_registry_ended, lc.ts_first_publication) AS days_first_publication_to_house_registry_ended,
-  DATEDIFF(sf.ts_first_visit_completed, sf.ts_first_booking) AS days_first_booking_to_first_visit_completed,
-  DATEDIFF(sf.ts_first_offer_submitted, sf.ts_first_visit_completed) AS days_first_visit_completed_to_first_offer_submitted,
-  DATEDIFF(sf.dt_first_offer_accepted, sf.ts_first_offer_submitted) AS days_first_offer_submitted_to_first_offer_accepted,
-  DATEDIFF(sf.dt_first_sale_agreement_signed, sf.ts_first_offer_submitted) AS days_first_offer_accepted_to_first_sale_agreement_signed,
   lc.unpublications,
-  COALESCE(sf.total_listings_visit_completed, 0) AS total_listings_visit_completed,
-  COALESCE(sf.total_listings_offer_submited, 0) AS total_listings_offer_submited,
-  COALESCE(sf.total_listings_offer_accepted, 0) AS total_listings_offer_accepted,  
   lc.ts_first_publication,
   lc.ts_last_publication,
   lc.ts_first_depublication,
   lc.ts_last_depublication,
-  sf.ts_first_sale_flow,
-  sf.ts_first_booking,
-  sf.ts_first_visit_completed,  
-  sf.ts_first_offer_submitted,
-  sf.dt_first_offer_accepted,
-  sf.dt_first_sale_agreement_signed,
-  sf.dt_house_registry_ended,
   IF(lc.ts_first_publication IS NULL, NULL, DATEDIFF(NOW(), lc.ts_first_publication) - COALESCE(np.days_not_published,0)) AS days_as_published
 FROM
   listing_columns AS lc
@@ -139,8 +100,5 @@ LEFT JOIN
   not_published AS np
     ON np.id_house = lc.id_house
 LEFT JOIN
-  rental_context rc
+  rental_context AS rc
     ON rc.id_house = lc.id_house
-LEFT JOIN
-  first_sale_flows sf
-    ON sf.id_house = lc.id_house

@@ -1,3 +1,4 @@
+---
 database_name: datalake_sale_listings
 table_name: sale_listing
 description: This table contains the information of all the listings we have had in QuintoAndar ForSale. It shows the current information of features such as price, status, consultant type, etc. 
@@ -41,71 +42,10 @@ columns:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Number of days between the first publication and the last depublication of the listing.
-  days_first_publication_to_first_sale_flow:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first publication and the first sale flow event of the listing.
-  days_first_publication_to_first_booking:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_sale_flows.sale_flow.ts_first_booking_created
-    description: Number of days between the first publication and the first booking of the listing.
-  days_first_publication_to_visit_completed:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_sale_flows.sale_flow.ts_first_visit_completed
-    description: Number of days between the first publication and the first visit completed of the listing.
-  days_first_publication_to_first_sale_agreement_signed:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
-    description: Number of days between the first publication and the first sale agreement signed of the listing.
-  days_first_publication_to_house_registry_ended:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_sale_flows.sale_flow.dt_house_registry_ended
-    description: Number of days between the first publication and the house registry ended of the listing.
-  days_first_publication_to_first_offer_submitted:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
-    description: Number of days between the first publication and the first offer submitted of the listing.
-  days_first_publication_to_first_offer_accepted:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
-    description: Number of days between the first publication and the first offer accepted of the listing.
-  days_first_booking_to_first_visit_completed:
-    lineage:
-      - datalake_sale_flows.sale_flow.ts_first_booking_created
-      - datalake_sale_flows.sale_flow.ts_first_visit_completed
-    description: Number of days between the first booking and the first visit completed of the listing.
-  days_first_visit_completed_to_first_offer_submitted:
-    lineage:
-      - datalake_sale_flows.sale_flow.ts_first_visit_completed
-      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
-    description: Number of days between the first visit completed and the first offer submitted of the listing.
-  days_first_offer_submitted_to_first_offer_accepted:
-    lineage:
-      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
-      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
-    description: Number of days between the first offer submitted and the first offer accepted of the listing.
-  days_first_offer_accepted_to_first_sale_agreement_signed:
-    lineage:
-      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
-      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
-    description: Number of days between the first offer accepted and the first sale agreement signed of the listing.
   unpublications:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id
     description: Number of times the listing has been unpublished.
-  total_listings_visit_completed:
-    description: Number of times the listing has been visited.
-  total_listings_offer_submited:
-    description: Number of times the listing has been offered.
-  total_listings_offer_accepted:
-    description: Number of times the listing has been accepted.
   ts_first_publication:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
@@ -122,34 +62,6 @@ columns:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Timestamp of the last depublication of the listing.
-  ts_first_sale_flow:
-    lineage:
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Timestamp of the first sale flow event of the listing.
-  ts_first_offer_submitted:
-    lineage:
-      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
-    description: Timestamp of the first offer submitted of the listing.
-  ts_first_booking:
-    lineage:
-      - datalake_sale_flows.sale_flow.ts_first_booking_created
-    description: Timestamp of the first booking of the listing.
-  ts_first_visit_completed:
-    lineage:
-      - datalake_sale_flows.sale_flow.ts_first_visit_completed
-    description: Timestamp of the first visit completed of the listing.
-  dt_first_offer_accepted:
-    lineage:
-      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
-    description: Date of the first offer accepted of the listing.
-  dt_first_sale_agreement_signed:
-    lineage:
-      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
-    description: Date of the first sale agreement signed of the listing.
-  dt_house_registry_ended:
-    lineage:
-      - datalake_sale_flows.sale_flow.dt_house_registry_ended
-    description: Date of the house registry ended of the listing.
   days_as_published:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing

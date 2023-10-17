@@ -59,15 +59,15 @@ columns:
     description: Date of last depublication in the Sale context. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_first_visit_completed: 
     lineage:
-    - datalake_sale_listings.sale_listing.ts_first_visit_completed
+    - datalake_sale_listing_demand.sale_listing_demand.ts_first_visit_completed
     description: Date of the first visit completed by the listing in the context of Sale. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_first_offer_submitted_date:
     lineage:
-    - datalake_sale_listings.sale_listing.ts_first_offer_submitted
+    - datalake_sale_listing_demand.sale_listing_demand.ts_first_offer_submitted
     description: Date of the first offer received by the listing in the context of Sale. Can be joined with dw_public.dim_date to retrieve in date format.
   sk_first_offer_accepted:
     lineage:
-    - datalake_sale_listings.sale_listing.dt_first_offer_accepted
+    - datalake_sale_listing_demand.sale_listing_demand.dt_first_offer_accepted
     description: Date of the first offer accepted by the listing in the context of Sale. Can be joined with dw_public.dim_date to retrieve in date format.
   days_last_publication_to_depublication:
     lineage:
@@ -86,47 +86,47 @@ columns:
       of the listing, in the context of Sale.
   days_first_publication_to_first_sale_flow:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_flow
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_sale_flow
     description: Difference of days between the first publication and listing first sale flow.
   days_first_publication_to_first_booking:
     lineage:
-      - datalake_sale_listings.sale_listing.days_first_publication_to_first_booking
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_booking
     description: Number of days between the first publication and listing first booking in Sale.
   days_first_publication_to_visit_completed:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_publication_to_visit_completed
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_visit_completed
     description: Number of days between the first publication and listing first visit completed in Sale.
   days_first_publication_to_first_offer_submitted:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_publication_to_first_offer_submitted
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_offer_submitted
     description: Number of days between the first publication and first offer submitted in Sale.
   days_first_publication_to_first_offer_accepted:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_publication_to_first_offer_accepted
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_offer_accepted
     description: Number of days between the first publication and listing first offer accepted in Sale.
   days_first_publication_to_first_sale_agreement_signed:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_agreement_signed
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_sale_agreement_signed
     description: Number of days between the first publication and listing first CCV in Sale.
   days_first_publication_to_house_registry_ended:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_publication_to_house_registry_ended
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_house_registry_ended
     description: Number of days between the first publication and house registry ended in Sale. 
   days_first_booking_to_first_visit_completed:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_booking_to_first_visit_completed
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_booking_to_first_visit_completed
     description: Number of days between the first booking and first visit completed in Sale.
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_visit_completed_to_first_offer_submitted
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_visit_completed_to_first_offer_submitted
     description: Number of days between the first visit completed and first offer submitted in Sale.
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_offer_submitted_to_first_offer_accepted
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_offer_submitted_to_first_offer_accepted
     description: Number of days between the first offer submitted and first offer accepted in Sale.
   days_first_offer_accepted_to_first_sale_agreement_signed:
     lineage:
-    - datalake_sale_listings.sale_listing.days_first_offer_accepted_to_first_sale_agreement_signed
+    - datalake_sale_listing_demand.sale_listing_demand.days_first_offer_accepted_to_first_sale_agreement_signed
     description: Number of days between the first offer accepted and first sale agreement signed in Sale.
   total_depublications:
     lineage:
@@ -134,15 +134,15 @@ columns:
     description: Number of times that listings was unpublished.
   total_listings_visit_completed:
     lineage:
-    - datalake_sale_listings.sale_listing.total_listings_visit_completed
+    - datalake_sale_listing_demand.sale_listing_demand.total_listings_visit_completed
     description: Quantity of completed visits generated by listing.
   total_listings_offer_submited:
     lineage:
-    - datalake_sale_listings.sale_listing.total_listings_offer_submited
+    - datalake_sale_listing_demand.sale_listing_demand.total_listings_offer_submited
     description: Quantity of submitted offers generated by listing.
   total_listings_offer_accepted:
     lineage:
-    - datalake_sale_listings.sale_listing.total_listings_offer_accepted
+    - datalake_sale_listing_demand.sale_listing_demand.total_listings_offer_accepted
     description: Quantity of accepted offers generated by listing.
   days_as_published:
     lineage:

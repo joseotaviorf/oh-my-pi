@@ -707,6 +707,7 @@ bietlejuice.dw_sale_listings:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
+  - bietlejuice.enrich_sale_listing_demand:load-enrich-sale-listing-demand
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
   - bietlejuice.enrich_sale_listings_lenses:load-enrich-listing-lenses
@@ -1863,6 +1864,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_gsheets:load-enrich-sale-hub-offer
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.godfather:load-clean-offer
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
@@ -2132,8 +2134,10 @@ bietlejuice.enrich_sale_demand_events:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_visit:load-enrich-sale-visit
 bietlejuice.enrich_sale_flows:
+  - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
@@ -2177,6 +2181,9 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.hub_services:load-clean-responsible
   - bietlejuice.hub_services:load-clean-users
   - bietlejuice.hub_services:load-clean-visitor
+bietlejuice.enrich_sale_listing_demand:
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
 bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:load-clean-house-predicted-price-aud
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
