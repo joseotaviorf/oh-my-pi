@@ -1,7 +1,7 @@
 dag:
   name: dw_atta
   schedule_start_date: 2020,08,29
-  owner: Data Fintech
+  owner: Data ForSale
 workflow:
   type: query
   layer: dw
