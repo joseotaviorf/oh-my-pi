@@ -52,6 +52,6 @@ SELECT
 FROM
     datalake_amplitude_clean_staging.183047_help_center_faq_clicked_events
 WHERE
-    year = {year}
-    month = {month}
-    day = {day}
+    year = {}
+    AND month = {}
+    AND day = {}
