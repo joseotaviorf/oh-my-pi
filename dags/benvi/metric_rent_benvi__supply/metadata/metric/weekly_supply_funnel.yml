@@ -7,107 +7,307 @@ owner: data-international@quintoandar.com.br
 columns:
   country_code:
     lineage:
-    - datalake_region.city_groups_per_periods.country_code
+      - datalake_region.city_groups_per_periods.country_code
     description: Country code of the lead origin. Also, it's a partition for this
       table.
+    dimension: True
   city_group:
     lineage:
-    - datalake_region.city_groups_per_periods.city_group
+      - datalake_region.city_groups_per_periods.city_group
     description: City group of the lead origin.
+    dimension: True
   supply_mkt_origin:
     lineage:
-    - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
-    - datalake_mexico_rent_supply.coincident_funnel.supply_mkt_origin
+      - datalake_mexico_rent_supply.coincident_funnel.supply_mkt_origin
     description: Origin of the lead in the marketing funnel.
+    dimension: True
   supply_mkt_origin_detailed:
     lineage:
-    - datalake_gsheets_clean.mexico_supply_targets_2022.supply_channel
-    - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
-    - datalake_mexico_rent_supply.coincident_funnel.supply_mkt_origin_detailed
+      - datalake_mexico_rent_supply.coincident_funnel.supply_mkt_origin_detailed
     description: Marketing origin detailed of the lead.
+    dimension: True
   mexico_channel:
     lineage:
-    - datalake_gsheets_clean.mexico_supply_targets_2022.supply_origin
-    - datalake_mexico_rent_supply.coincident_funnel.mexico_channel
+      - datalake_mexico_rent_supply.coincident_funnel.mexico_channel
     description: Name of the marketing channel on the Mexico operation.
-  dt_week_started:
-    lineage:
-    - datalake_region.city_groups_per_periods.dt_week_started
-    - datalake_gsheets_clean.mexico_supply_targets_2022.dt_target
-    description: Date of the week start based on the lead creation.
-  actual_cost:
-    description: Actual total budget cost.
-  actual_cost_comission:
-    description: Comission's actual budget cost.
-  aq2o_cohort:
-    description: Available qualified to opportunity cohort conversion.
-  aq2o_coincident:
-    description: Available qualified to opportunitiy coincident "conversion".
-  available_qualifieds:
-    description: Volume of available qualifieds.
-  available_qualifieds_targets:
-    description: Volume of available qualified targets.
-  budget_comission_target:
-    description: Comission's actual budget target volume.
-  budget_target:
-    description: Actual budget target volume without comission.
-  budget_total_target:
-    description: Actual total budget target volume.
-  cost:
-    description: Actual budget cost without comission cost.
-  first_listings:
-    description: Volume of first listings.
-  first_listings_cohort:
-    description: Volume of first listings cohort.
-  first_listings_targets:
-    description: Volume of target first_listings.
-  l2p_cohort:
-    description: Lead to prospect cohort conversion.
-  l2p_coincident:
-    description: Lead to prospect coincident "conversion".
+    dimension: True
   leads:
     description: Volume of leads.
-  leads_targets:
-    description: Volume of target leads.
-  net_churn:
-    description: Net churn volume.
-  o2fl_cohort:
-    description: Opportunity to first listing cohort conversion.
-  o2fl_coincident:
-    description: Opportunity to first listing coincident "conversion".
-  ongoing_listings:
-    description: Ongoing listings volume.
-  opportunities:
-    description: Volume of opportunities.
-  opportunities_cohort:
-    description: Volume of opportunities cohort.
-  opportunities_targets:
-    description: Volume of target opportunities.
-  p2fl_coincident:
-    description: Prospect to first listing coincident "conversion".
-  p2q_cohort:
-    description: Prospect to qualified cohort conversion.
-  p2q_coincident:
-    description: Prospect to qualified coincident "conversion".
+    metric:
+      name: Leads
+      description: Total volume of leads.
+      acronym: L
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   prospects:
     description: Volume of prospects.
-  prospects_cohort:
-    description: Volume of prospects cohort.
-  prospects_targets:
-    description: Volume of target prospects.
-  q2aq_cohort:
-    description: Qualified to available qualified cohort conversion.
-  q2aq_coincident:
-    description: Qualified to available qualified coincident "conversion".
-  q2fl_coincident:
-    description: Qualified to first listing coincident "conversion".
-  q2o_cohort:
-    description: Qualified to opportunity cohort conversion.
-  q2o_coincident:
-    description: Qualified to opportunity coincident "conversion".
+    metric:
+      name: Prospects
+      description: Total volume of prospects.
+      acronym: P
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   qualifieds:
     description: Volume of qualifieds.
+    metric:
+      name: Qualifieds
+      description: Total volume of qualifieds.
+      acronym: Q
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  available_qualifieds:
+    description: Volume of available qualifieds.
+    metric:
+      name: Available Qualifieds
+      description: Total volume of available qualifieds.
+      acronym: AQ
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  opportunities:
+    description: Volume of opportunities.
+    metric:
+      name: Opportunities
+      description: Total volume of opportunites.
+      acronym: O
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  first_listings:
+    description: Volume of first listings.
+    metric:
+      name: First Listings
+      description: Total volume of first listings.
+      acronym: FL
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  prospects_cohort:
+    description: Volume of prospects cohort.
+    metric:
+      name: Prospects
+      description: Total cohort volume of prospects.
+      acronym: P
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   qualifieds_cohort:
     description: Volume of qualifieds cohort.
-  qualifieds_targets:
-    description: Volume of target qualifieds.
+    metric:
+      name: Qualifieds
+      description: Total cohort volume of qualifieds.
+      acronym: Q
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  available_qualifieds_cohort:
+    description: Volume of available qualifieds cohort.
+    metric:
+      name: Available Qualifieds
+      description: Total cohort volume of prospects.
+      acronym: AQ
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  opportunities_cohort:
+    description: Volume of opportunities cohort.
+    metric:
+      name: Opportunities
+      description: Total cohort volume of opportunities.
+      acronym: O
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  first_listings_cohort:
+    description: Volume of first listings cohort.
+    metric:
+      name: Firs Listings
+      description: Total cohort volume of first listings.
+      acronym: FL
+      is_additive: True
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  l2p_coincident:
+    description: Lead to prospect coincident "conversion".
+    metric:
+      name: Leads to Prospects
+      description: Coincident conversion of leads to prospects.
+      acronym: L2P
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  p2q_coincident:
+    description: Prospect to qualified coincident "conversion".
+    metric:
+      name: Prospects to Qualifieds
+      description: Coincident conversion of prospects to qualifieds.
+      acronym: P2Q
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  q2aq_coincident:
+    description: Qualified to available qualified coincident "conversion".
+    metric:
+      name: Qualifieds to Available Qualifieds
+      description: Coincident conversion of qualifieds to available qualifieds.
+      acronym: Q2AQ
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  q2o_coincident:
+    description: Qualified to opportunity coincident "conversion".
+    metric:
+      name: Qualifieds to Opportunities
+      description: Coincident conversion of qualifieds to opportunities.
+      acronym: Q2O
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  aq2o_coincident:
+    description: Available qualified to opportunitiy coincident "conversion".
+    metric:
+      name: Available Qualifieds to Opoortunities
+      description: Coincident conversion of available qualifieds to oportunities.
+      acronym: AQ2O
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  o2fl_coincident:
+    description: Opportunity to first listing coincident "conversion".
+    metric:
+      name: Opportunities to First Listings
+      description: Coincident conversion of opoortunities to first listings.
+      acronym: O2FL
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  q2fl_coincident:
+    description: Qualified to first listing coincident "conversion".
+    metric:
+      name: Qualifieds to First Listings
+      description: Coincident conversion of qualifieds to first listings.
+      acronym: Q2FL
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  p2fl_coincident:
+    description: Prospect to first listing coincident "conversion".
+    metric:
+      name: Prospects to First Listings
+      description: Coincident conversion of prospects to first listings.
+      acronym: P2FL
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: laura.theotonio@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
+  l2p_cohort:
+    description: Lead to prospect cohort conversion.
+    metric:
+      name: Leads to Prospects
+      description: Cohort conversion of prospects to first listings.
+      acronym: L2P
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  p2q_cohort:
+    description: Prospect to qualified cohort conversion.
+    metric:
+      name: Prospects to Qualifieds
+      description: Cohort conversion of prospects to qualifieds.
+      acronym: P2Q
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  q2aq_cohort:
+    description: Qualified to available qualified cohort conversion.
+    metric:
+      name: Qualifieds to Available Qualifieds
+      description: Cohort conversion of qualifieds to available qualifieds.
+      acronym: Q2AQ
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  q2o_cohort:
+    description: Qualified to opportunity cohort conversion.
+    metric:
+      name: Qualifieds to Opportunities
+      description: Cohort conversion of qualifieds to opportunities.
+      acronym: Q2O
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  aq2o_cohort:
+    description: Available qualified to opportunity cohort conversion.
+    metric:
+      name: Available Qualifieds to Opportunities
+      description: Cohort conversion of available qualifieds to opportunities.
+      acronym: AQ2O
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  o2fl_cohort:
+    description: Opportunity to first listing cohort conversion.
+    metric:
+      name: Opportunities to First Listings
+      description: Cohort conversion of opportunities to first listings.
+      acronym: O2FL
+      is_additive: False
+      business_stage: Supply
+      hierarchy: Operations Mgmt
+      approved_by: gustavo.machado@quintoandar.com.br
+      link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
+  dt_week_started:
+    lineage:
+      - datalake_region.city_groups_per_periods.dt_week_started
+    description: Date of the week start based on the lead creation.
+    dimension: True

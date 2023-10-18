@@ -2584,15 +2584,9 @@ bietlejuice.metric_rent_benvi__demand:
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
   - bietlejuice.gsheets_for_rent:done-clean-mexico-demand-targets-2022
 bietlejuice.metric_rent_benvi__supply:
-  - bietlejuice.dw_datamarts_spark.for_rent_cross:load-dw-datamarts-rental-marketplace-flows
-  - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel
-  - bietlejuice.enrich_mexico_rent_supply:load-enrich-listing-flow
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
-  - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
-  - bietlejuice.gsheets_growth:done-clean-mexico-supply-costs-financial-and-actual
 bietlejuice.regions_polygon:
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.enrich_region:load-enrich-region
