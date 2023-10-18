@@ -18,6 +18,9 @@ Load the following tables into the datalake clean (via full load):
 - `collector`
 - `debt`
 - `debtor`
+- `eviction`
+- `eviction_data`
+- `evictions_report`
 - `installment`
 - `negotiation`
 - `payment`

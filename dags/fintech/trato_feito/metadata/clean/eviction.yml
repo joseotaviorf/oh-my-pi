@@ -1,0 +1,42 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: eviction
+domain: fintech
+description: "This table stores all the data produced by Conka system for the eviction process."
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.eviction.id
+  id_external:
+    lineage:
+      - datalake_trato_feito_raw.eviction.external_id
+  context:
+    lineage:
+      - datalake_trato_feito_raw.eviction.context
+  law_firm:
+    lineage:
+      - datalake_trato_feito_raw.eviction.law_firm
+  status:
+    lineage:
+      - datalake_trato_feito_raw.eviction.status
+  user_registered:
+    lineage:
+      - datalake_trato_feito_raw.eviction.user_registered
+  status_recommendation:
+    lineage:
+      - datalake_trato_feito_raw.eviction.status_recommendation
+  status_reason:
+    lineage:
+      - datalake_trato_feito_raw.eviction.status_reason
+  snapshot:
+    lineage:
+      - datalake_trato_feito_raw.eviction.snapshot
+  ts_status_updated:
+    lineage:
+      - datalake_trato_feito_raw.eviction.status_updated_at
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.eviction.created_at
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_raw.eviction.updated_at

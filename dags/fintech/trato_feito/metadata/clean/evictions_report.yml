@@ -1,0 +1,27 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: evictions_report
+domain: fintech
+description: "This table is mainly used by the SWE team. It contains the data that support the tracking of the eviction process."
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.evictions_report.id
+  id_track:
+    lineage:
+      - datalake_trato_feito_raw.evictions_report.track_id
+  file_storage_key:
+    lineage:
+      - datalake_trato_feito_raw.evictions_report.file_storage_key
+  document_type:
+    lineage:
+      - datalake_trato_feito_raw.evictions_report.document_type
+  status:
+    lineage:
+      - datalake_trato_feito_raw.evictions_report.status
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.evictions_report.created_at
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_raw.evictions_report.updated_at

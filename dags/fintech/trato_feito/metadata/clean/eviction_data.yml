@@ -1,0 +1,36 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: eviction_data
+domain: fintech
+description: "Overtuning data for the eviction process."
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.id
+  id_external:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.external_id
+  context:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.context
+  cpf_client:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.cpf_client
+  distributor_code_external:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.distributor_code_external
+  occurrence_code_external:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.occurrence_code_external
+  has_occurrence_problem_external:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.has_occurrence_problem_external
+  dt_occurrence_due_date_external:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.occurrence_due_date_external
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.created_at
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_raw.eviction_data.updated_at
