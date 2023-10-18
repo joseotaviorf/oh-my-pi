@@ -92,6 +92,7 @@ SELECT
     dt_last_payment,
     dt_contract_started,
     dt_ended,
+    dt_next_renewal,
     dt_analyst_annulment_input,
     ts_propose_started,
     ts_waiting_new_docs,

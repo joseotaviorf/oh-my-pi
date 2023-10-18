@@ -210,15 +210,49 @@ WITH old_system_dates AS (
         propose_secure_pending_date AS spd
             ON spd.id_propose = p.id
 ),
-propose_canceled_date AS (
+ended_date AS (
     SELECT
-        id_propose,
-        MAX(CAST(ts_updated AS TIMESTAMP)) AS ts_ended
+        p.id AS id_propose,
+        DATE(
+          COALESCE(
+            COALESCE(
+              MAX(c.ts_done),MAX(CAST(h.ts_updated AS TIMESTAMP))
+            ),
+            MAX(old.dt_ended)
+          )
+        ) AS dt_ended
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
+        datalake_rental_guarantee_platform_clean.propose AS p
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.propose_history AS h
+        ON p.id = h.id_propose
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.propose_status AS ps
+        ON p.id_propose_status = ps.id
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.contract AS c
+        ON c.id_propose = p.id
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.contract_status AS cs
+        ON c.id_status = cs.id
+    LEFT JOIN
+        old_system_dates AS old
+            ON old.id_propose = p.id
+            AND p.id < 5000000
     WHERE
-        value IN ('Contrato Cancelado', 'Proposta Cancelada')
-        AND id_history_type = 5 -- Status update type
+        (
+            (
+                h.value IN ('Contrato Cancelado', 'Proposta Cancelada')
+                AND h.id_history_type = 5 -- Status update type
+            )
+            OR (
+                old.dt_ended IS NOT NULL
+            )
+        )
+        AND (
+        ps.name IN ('Contrato Cancelado', 'Contrato cancelado pela analise humana', 'Proposta Cancelada', 'Reprovado na análise humanizada', 'Reprovado pelo analista')
+        OR cs.name IN ('Cancelado', 'Finalizado')
+        ) -- there are proposes that have ts_updated for cancellation history but are reopen
     GROUP BY
         1 -- some proposes can have multiple same status
 ),
@@ -520,13 +554,14 @@ SELECT DISTINCT
     om.occurrences_solved,
     c.id IS NOT NULL AS is_contract,
     IF(p.billing_model = 'BROKER', TRUE, FALSE) AS is_direct_billing,
-    IFNULL(DATEDIFF(COALESCE(DATE(pcd.ts_ended), c.ts_done), DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
+    IFNULL(DATEDIFF(pcd.dt_ended, DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
     p.id < 5000000 AS is_legacy,
     IF(3p.id_propose IS NULL, FALSE, TRUE) AS is_3p,
     pym.dt_last_payment,
     COALESCE(DATE(c.ts_began), old.dt_contract_started) AS dt_contract_started,
-    COALESCE(COALESCE(c.ts_done, DATE(pcd.ts_ended)), old.dt_ended) AS dt_ended,
-    COALESCE(COALESCE(DATE(pcd.ts_ended), c.ts_done), old.dt_analyst_annulment_input) AS dt_analyst_annulment_input,
+    pcd.dt_ended AS dt_ended,
+    c.dt_next_renewal,
+    COALESCE(pcd.dt_ended, old.dt_analyst_annulment_input) AS dt_analyst_annulment_input,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
     IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
     IF(p.id < 5000000, old.ts_evaluation_started, esd.ts_evaluation_started) AS ts_evaluation_started,
@@ -550,7 +585,7 @@ LEFT JOIN
     datalake_rental_guarantee_platform_clean.propose_status AS ps
         ON p.id_propose_status = ps.id
 LEFT JOIN
-    propose_canceled_date AS pcd
+    ended_date AS pcd
         ON pcd.id_propose = p.id
 LEFT JOIN
     propose_waiting_new_docs_date AS wndd
