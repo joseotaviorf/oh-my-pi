@@ -2,8 +2,8 @@
 database_name: datalake_atta
 table_name: partner_info
 description: Table containing the details from atta partners
-domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+domain: Data ForSale
+owner: ae-for-sale@quintoandar.com.br
 columns:
   id_partner:
     lineage:

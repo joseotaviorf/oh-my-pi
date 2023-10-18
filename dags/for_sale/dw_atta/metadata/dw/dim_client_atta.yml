@@ -1,8 +1,8 @@
 database_name: dw_atta
 table_name: dim_client_atta
 description: dimension with the details from atta clients
-domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+domain: Data ForSale
+owner: ae-for-sale@quintoandar.com.br
 columns:
     sk_client:
         lineage:

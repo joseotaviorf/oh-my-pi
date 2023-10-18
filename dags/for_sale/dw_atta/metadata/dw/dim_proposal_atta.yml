@@ -1,8 +1,8 @@
 database_name: dw_atta
 table_name: dim_proposal_atta
 description: dimension with the details from atta proposals
-domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+domain: Data ForSale
+owner: ae-for-sale@quintoandar.com.br
 columns:
     sk_proposal:
         lineage:

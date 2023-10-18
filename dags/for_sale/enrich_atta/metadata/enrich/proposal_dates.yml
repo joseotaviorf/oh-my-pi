@@ -1,8 +1,8 @@
 ---
 database_name: datalake_atta
 table_name: proposal_dates
-owner: juliana.hocihara@quintoandar.com.br
-domain: fintech
+domain: Data ForSale
+owner: ae-for-sale@quintoandar.com.br
 description: "Table containing dates for each proposal situation"
 columns:
   id_proposal:

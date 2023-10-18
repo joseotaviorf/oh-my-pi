@@ -1,8 +1,8 @@
 database_name: dw_atta
 table_name: fact_pre_analysis_proposal_flow
 description: Fact table containing data from pre analysis and proposal flows
-domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+domain: Data ForSale
+owner: ae-for-sale@quintoandar.com.br
 columns:
     sk_pre_analysis_proposal_flow:
         description: "Table primary key, union of proposal and pre analysis IDs"
