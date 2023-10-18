@@ -189,7 +189,7 @@ columns:
   dt_next_renewal:
     description: Date when the contract will next be renewed
     lineage:
-      - datalake_rental_guarantee_platform_clean.contract.dt_next_renewal
+      - datalake_velo.propose_legacy.dt_next_renewal
   dt_analyst_annulment_input:
     lineage:
       - datalake_velo.propose.dt_analyst_annulment_input
