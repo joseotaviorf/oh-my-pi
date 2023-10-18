@@ -26,6 +26,7 @@ MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 config_service = ConfigurationService(SOURCE)
 
 CRAWLERS_LIST = config_service.get_config("extracted_tables")
+CLEAN_PARTITION_COLS = config_service.get_config("clean_partition_cols")
 
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
@@ -33,7 +34,6 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 )
 CLUSTER_DESCRIPTION = config_service.get_config("cluster_description")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
-TABLES_LIST = config_service.get_config("extracted_tables")
 
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
@@ -110,6 +110,7 @@ for crawler in CRAWLERS_LIST.keys():
             target_database_base_name=SOURCE,
             is_incremental=False,
             has_create_external_table_task=False,
+            partitions=CLEAN_PARTITION_COLS,
         )
 
         chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))

@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     spark_metastore_service.create_database(database_name)
 
-    logger.info(f"""m={JOB_NAME}, source_bucket={aragog_bucket}, table_name={table_name}, msg=Getting data from bucket...""")
+    logger.info(f"""m={JOB_NAME}, source_bucket={bucket_path}, table_name={table_name}, msg=Getting data from bucket...""")
 
     df = None
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
                     .output()
                 )
 
-            logger.info(f"""m={JOB_NAME}, source_bucket={aragog_bucket}, table_name={table_name}, msg=Loading raw data on bucket...""")
+            logger.info(f"""m={JOB_NAME}, source_bucket={bucket_path}, table_name={table_name}, msg=Loading raw data on bucket...""")
             s3_loader.load_df(
                 df=df,
                 format_options=SparkTableStorageFormat.DEFAULT_RAW,
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             )
             
             
-            logger.info(f"""m={JOB_NAME}, source_bucket={aragog_bucket}, table_name={table_name}, msg=Update metastore...""")
+            logger.info(f"""m={JOB_NAME}, source_bucket={bucket_path}, table_name={table_name}, msg=Update metastore...""")
             spark_metastore_loader.update_metastore(
                 df=df,
                 database_name=database_name,
@@ -110,7 +110,7 @@ if __name__ == "__main__":
             ) 
 
         else:
-            logger.info(f"""m={JOB_NAME}, source_bucket={aragog_bucket}, table_name={table_name}, msg=These dataframe is empty...""")
+            logger.info(f"""m={JOB_NAME}, source_bucket={bucket_path}, table_name={table_name}, msg=These dataframe is empty...""")
     
     except Exception as e:
         logger.warning(f"""m={JOB_NAME}, table_name={table_name}, msg={e}.""")

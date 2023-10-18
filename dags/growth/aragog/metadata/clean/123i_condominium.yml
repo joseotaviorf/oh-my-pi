@@ -204,7 +204,7 @@ columns:
     description: "Month when the data was accessed by the crawler."
     lineage:
       - datalake_aragog_raw.123i_condominium.month
-  date:
+  day:
     description: "Date when the data was accessed by the crawler."
     lineage:
-      - datalake_aragog_raw.123i_condominium.date
+      - datalake_aragog_raw.123i_condominium.day

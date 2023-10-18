@@ -1,3 +1,4 @@
 ---
 aragog_bucket: '5a-aragog-raw-data-prod'
 bucket_path: "s3://{aragog_bucket}"
+raw_partition_cols: ["year","month","day"]

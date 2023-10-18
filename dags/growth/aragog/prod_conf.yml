@@ -3,3 +3,7 @@ extracted_tables:
   123i:
     - condominium
 cluster_description: databricks_10_4_min_general_cluster
+clean_partition_cols:
+  - year
+  - month
+  - day
