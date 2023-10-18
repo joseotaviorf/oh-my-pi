@@ -1,4 +1,9 @@
 ---
+dag_documentation:
+  dag_purpose: |
+    This is the first layer of the enrichment phase of the Zendesk data preparation. The `custom_fields` column is a key-value data structure,
+    the keys are IDs and the value can be many different things as _client type_, IDs of other systems and etc.. Zendesk is responsible for the
+    tickets of the customer services.
 custom_cluster:
   driver_node_type_id: r5d.12xlarge
   node_type_id: r5d.12xlarge

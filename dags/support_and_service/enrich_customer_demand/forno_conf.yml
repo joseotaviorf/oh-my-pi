@@ -1,4 +1,7 @@
 ---
+dag_documentation:
+  dag_purpose: Tranform and centralize tasks from different sources to calculate the backoffice demand and SLA rate.
+
 inner_dependencies:
   demand_metrics_tasks:
     - base_tasks

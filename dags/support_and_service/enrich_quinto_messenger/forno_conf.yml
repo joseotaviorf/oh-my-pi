@@ -1,3 +1,9 @@
+---
+dag_documentation:
+  dag_purpose: |
+    Prepares **chat** data from the [Quinto Messenger](github.com/quintoandar/big-fone) for business utilization.
+    [Quinto Messenger](https://github.com/quintoandar/quinto-messenger) is the service built to be the connection between Twilio and QuintoAndar's system.
+
 inner_dependencies:
   message:
     - task

@@ -1,4 +1,7 @@
 ---
+dag_documentation:
+  dag_purpose: Compile different tables of offboading context, to better elaborate questions about it.
+
 inner_dependencies:
   customer_support:
     - ongoing

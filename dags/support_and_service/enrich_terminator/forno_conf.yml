@@ -1,0 +1,3 @@
+---
+dag_documentation:
+  dag_purpose: Enrich pipe for Terminator, a service to orchestrate the offboard contract process.

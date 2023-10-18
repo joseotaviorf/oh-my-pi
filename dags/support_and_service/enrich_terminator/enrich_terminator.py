@@ -20,8 +20,11 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 CONTEXT = "terminator"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+DAG_OWNER = DAGOwnerEnum.DATA_SS
+
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 12, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = None
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -31,11 +34,14 @@ athena_query_result_location = config_service.get_config("athena_query_results_b
 
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
+dag_documentation = config_service.get_config("dag_documentation")
 
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 
 SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base"
-cluster_description = config_service.get_config("databricks_10_4_min_general_photon_cluster")
+cluster_description = config_service.get_config(
+    "databricks_10_4_min_general_photon_cluster"
+)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -47,14 +53,18 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

@@ -1,0 +1,3 @@
+---
+dag_documentation:
+  dag_purpose: Creates CRM (Customer Relationship Management) base tasks flows tables. These tables will be used to generate models in Tasks context.

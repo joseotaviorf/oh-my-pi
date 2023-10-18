@@ -1,4 +1,6 @@
 ---
+dag_documentation:
+  dag_purpose: Creation of workday windows, considering holidays at city level, for construction and calculation of SLA metrics.
 inner_dependencies:
   workday_window:
     - cities_calendar

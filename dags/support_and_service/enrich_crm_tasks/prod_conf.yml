@@ -1,0 +1,3 @@
+---
+dag_documentation:
+  dag_purpose: Creates CRM (Customer Relationship Management) enrich tasks (migrated tables from bi-crm-tasks).

@@ -1,0 +1,4 @@
+---
+dag_documentation:
+  dag_purpose: |
+    Prepares [Tracksale](https://www.tracksale.co/) data for business utilization. Tracksale is an external service that manages NPS data.

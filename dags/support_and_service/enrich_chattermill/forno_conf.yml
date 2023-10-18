@@ -1,0 +1,5 @@
+---
+dag_documentation:
+  dag_purpose: |
+    Prepares Chattermill information for business utilization. Chattermill is an external service that does unified
+    customer feedback analytics. In our case, we mostly use it to process NPS data.

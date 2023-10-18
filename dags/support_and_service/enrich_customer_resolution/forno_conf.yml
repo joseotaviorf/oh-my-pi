@@ -1,4 +1,6 @@
 ---
+dag_documentation:
+  dag_purpose: Construction of resolution metrics as FCR Customer above the customer support model.
 inner_dependencies:
   customer_resolution_static: ["customer_resolution"]
 tables:

@@ -19,10 +19,13 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = None
 
 CONTEXT = "tracksale"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+DAG_OWNER = DAGOwnerEnum.DATA_SS
+
 ENV = os.environ.get("ENVIRONMENT")
 config_service = ConfigurationService(DAG_NAME)
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
@@ -35,6 +38,7 @@ SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_compute_cluster")
 
 default_libraries = config_service.get_config("default_libraries")
+dag_documentation = config_service.get_config("dag_documentation")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -54,14 +58,18 @@ INNER_DEPENDENCIES = {
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=DOC_MD_BASE_URL,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

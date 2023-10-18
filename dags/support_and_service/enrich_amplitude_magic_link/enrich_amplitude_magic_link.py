@@ -24,25 +24,31 @@ ENV = os.environ.get("ENVIRONMENT")
 CONTEXT = "amplitude_magic_link"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+DAG_OWNER = DAGOwnerEnum.DATA_SS
+
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2022, 9, 22, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = None
 
 config_service = ConfigurationService(DAG_NAME)
 
 # DAG and Jobs params setup
 datalake_bucket = config_service.get_config("datalake_bucket")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
-doc_md_base_url = config_service.get_config("doc_md_chart_url")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 inner_dependencies = config_service.get_config("inner_dependencies")
 partitions_cols = config_service.get_config("partitions_cols")
+dag_documentation = config_service.get_config("dag_documentation")
 
 # s3 paths setup
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 
 # databricks var
-cluster_description = config_service.get_config("databricks_10_4_med_io-memory_photon_cluster")
+cluster_description = config_service.get_config(
+    "databricks_10_4_med_io-memory_photon_cluster"
+)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -54,14 +60,18 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_SS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=doc_md_base_url, dag_id=DAG_ID
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=DAG_NAME,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 

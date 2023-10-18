@@ -1,4 +1,8 @@
 ---
+dag_documentation:
+  dag_purpose: |
+    Expanding columns from `heimdall` datalake table `activity` to facilitate the analysis.
+
 inner_dependencies:
   ongoing_refund_requests:
     - activity

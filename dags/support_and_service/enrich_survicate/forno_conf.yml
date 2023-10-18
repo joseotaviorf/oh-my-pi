@@ -1,4 +1,6 @@
 ---
+dag_documentation:
+  dag_purpose: Transform survey response collected from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys).
 custom_cluster:
   driver_node_type_id: m5a.2xlarge
   node_type_id: m5a.xlarge

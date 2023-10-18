@@ -1,2 +1,3 @@
+---
 dag_documentation:
   dag_purpose: "DAG that determines strategies related to the InApp Chat adoption"

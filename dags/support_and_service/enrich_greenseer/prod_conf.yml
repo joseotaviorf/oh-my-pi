@@ -1,0 +1,4 @@
+---
+dag_documentation:
+  dag_purpose: |
+    Extract relevant fields from greenseer memory json and add relevant business rules to reduce the analysis.
