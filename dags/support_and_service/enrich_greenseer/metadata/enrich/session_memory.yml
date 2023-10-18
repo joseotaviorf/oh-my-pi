@@ -22,6 +22,10 @@ columns:
     lineage:
       - datalake_greenseer_clean.session.memory
     description: User legacy unique identifier.
+  memory:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: JSON field containing all relevant data from the Chatbot interaction
   strategy:
     lineage:
       - datalake_greenseer_clean.session.memory
@@ -42,6 +46,22 @@ columns:
     lineage:
       - datalake_greenseer_clean.session.memory
     description: Jon Snow data
+  before_reception:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: DialogFlow intent identifier of the active support flow.
+  after_reception:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: DialogFlow intent identifier of the after reception flow.
+  last_hsm_type:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: Type of the last HSM
+  secs_since_last_hsm:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+    description: Time, in seconds, passed since the last HSM
   taxonomy:
     lineage:
       - datalake_greenseer_clean.session.memory

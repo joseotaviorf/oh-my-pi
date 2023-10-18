@@ -15,6 +15,7 @@ WITH last_session_update AS (
 SELECT
   id_session,
   id_pipeline,
+  memory,
   GET_JSON_OBJECT(memory, '$.basic.user.id') AS id_user,
   GET_JSON_OBJECT(memory, '$.legacy.user_data.user.id') AS id_user_legacy,
   GET_JSON_OBJECT(memory, '$.business_rules.internal_chat.whatsapp_strategy') AS strategy,
@@ -26,6 +27,10 @@ SELECT
   GET_JSON_OBJECT(memory, '$.business_rules.more_help_required.after_reception.value') AS need_more_help_after_reception,
   GET_JSON_OBJECT(memory, '$.business_rules.tags.added') AS tags,
   GET_JSON_OBJECT(memory, '$.business_rules.internal_chat.has_access') AS has_chat_inapp_access,
+  GET_JSON_OBJECT(memory, '$.predictions.intents.before_reception.intent') AS before_reception,
+  GET_JSON_OBJECT(memory, '$.predictions.intents.after_reception.intent') AS after_reception,
+  GET_JSON_OBJECT(memory, '$.basic.session.last_hsm.type') AS last_hsm_type,
+  GET_JSON_OBJECT(memory, '$.basic.session.last_hsm.secs_since') AS secs_since_last_hsm,
   ts_started,
   ts_ended
 FROM
