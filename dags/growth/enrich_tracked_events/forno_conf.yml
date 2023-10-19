@@ -1,5 +1,9 @@
 ---
 partition_cols:
+  plaquinhas_offline_touchpoints:
+    - year
+    - month
+    - day
   offline_attribution:
     - year
     - month

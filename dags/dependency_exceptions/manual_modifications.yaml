@@ -662,8 +662,8 @@ bietlejuice.enrich_top_of_funnel_supply:
     - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_tracked_events:
   remove:
-    - bietlejuice.enrich_customer_support:load-enrich-call
-    - bietlejuice.enrich_customer_support:load-enrich-chat
+    - bietlejuice.enrich_greenseer:load-enrich-greenseer-session
+    - bietlejuice.greenseer:load-clean-session
 bietlejuice.enrich_tracksale:
   remove:
     - bietlejuice.ebdb:load-clean-booking

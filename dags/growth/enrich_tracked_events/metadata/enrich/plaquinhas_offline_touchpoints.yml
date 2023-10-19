@@ -1,0 +1,55 @@
+---
+database_name: datalake_tracked_events
+table_name: plaquinhas_offline_touchpoints
+owner: thiago.jesus@quintoandar.com.br
+domain: Growth
+description: Each row in this table is a contact made to the Plaquinhas number, via phone call or chat (Whatsapp).
+columns:
+  id_user:
+    description: EBDB's id user of the contactant.
+    lineage:
+      - datalake_ebdb_user.user.id
+      - datalake_gsheets_clean.users_cx_plaquinhas.id_user
+      - datalake_greenseer.greenseer_session.id_user
+  id_contact:
+    description: Unique identifier of the contact.
+  event_name:
+    description: Event name that will be used further in the attribution pipeline.
+  origin:
+    description: Media that made the user get in touch with the company.
+  agent:
+    description: Operations team that assisted the user in contact.
+  channel:
+    description: Channel through which the user contacted the company.
+    lineage:
+      - datalake_gsheets_clean.users_cx_plaquinhas.canal
+  year:
+    description: Year of the contact.
+    lineage:
+      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
+      - datalake_quinto_messenger.channel.ts_created
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+  month:
+    description: Month of the contact.
+    lineage:
+      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
+      - datalake_quinto_messenger.channel.ts_created
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+  day:
+    description: Day of the contact.
+    lineage:
+      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
+      - datalake_quinto_messenger.channel.ts_created
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+  ts_event:
+    description: Timestamp of the contact.
+    lineage:
+      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
+      - datalake_quinto_messenger.channel.ts_created
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+
+
