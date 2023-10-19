@@ -12,7 +12,7 @@ columns:
   column_old:
     description: ''
     lineage:
-    - datalake_gsheets_raw.people_reference_column.col_convenia
+    - datalake_gsheets_raw.people_reference_column.col_old
   column_new:
     description: ''
     lineage:
