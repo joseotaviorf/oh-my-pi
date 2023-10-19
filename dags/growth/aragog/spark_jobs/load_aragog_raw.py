@@ -78,7 +78,6 @@ if __name__ == "__main__":
                     .input(df)
                     .create_year_month_day_columns_from_dataframe_column("accessed_at")
                     .format_column_names()
-                    .convert_struct_type_to_json()
                     .output()
                 )
 
