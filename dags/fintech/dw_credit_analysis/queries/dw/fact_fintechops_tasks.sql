@@ -2,25 +2,24 @@ WITH task_start AS (
   SELECT
     sk_task,
     sk_proposal,
-    MIN(ts_action - INTERVAL '3 hours') AS ts_task_started
+    (ts_action - INTERVAL '3 hours') AS ts_task_started,
+    ROW_NUMBER() OVER (PARTITION BY sk_task ORDER BY ts_action ASC) AS rank_ts
   FROM
-    dw_crm.fact_credit_tasks AS crm 
-  WHERE
-    action_type = 'CREATE'
-  GROUP BY 1, 2
+    dw_crm.fact_credit_tasks AS crm
 ),
 
 task_finish AS (
   SELECT
     sk_task,
     sk_proposal,
+    sk_assignee,
     action_user_name,
-    MAX(ts_action - INTERVAL '3 hours') AS ts_task_finished
+    (ts_action - INTERVAL '3 hours') AS ts_task_finished,
+    ROW_NUMBER() OVER (PARTITION BY sk_task ORDER BY ts_action DESC) AS rank_tf
   FROM
-    dw_crm.fact_credit_tasks AS crm 
+    dw_crm.fact_credit_tasks AS crm
   WHERE
-    action_type = 'REALIZE'
-  GROUP BY 1, 2, 3
+    action_type IN ('REALIZE', 'RESOLVE')
 ),
 
 last_credit_analysis AS (
@@ -49,6 +48,7 @@ tasks AS (
   SELECT
     ts.sk_task,
     ts.sk_proposal,
+    tf.sk_assignee,
     tf.action_user_name,
     ca.type,
     ts.ts_task_started,
@@ -58,16 +58,20 @@ tasks AS (
   LEFT JOIN
     task_finish AS tf
       ON ts.sk_task = tf.sk_task
+      AND ts.sk_proposal = tf.sk_proposal
   LEFT JOIN
     credit_analysis AS ca
       ON ts.sk_proposal = ca.id_proposal
   WHERE
     tf.ts_task_finished IS NOT NULL
+    AND tf.rank_tf = 1
+    AND ts.rank_ts = 1
 )
 
-SELECT 
+SELECT DISTINCT
   sk_task,
   sk_proposal,
+  sk_assignee,
   action_user_name,
   type AS documentation_policy,
   CAST((UNIX_TIMESTAMP(ts_task_finished) - UNIX_TIMESTAMP(ts_task_started)) / 60.0 AS FLOAT) AS task_total_min,

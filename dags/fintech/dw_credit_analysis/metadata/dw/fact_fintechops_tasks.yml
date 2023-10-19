@@ -12,6 +12,10 @@ columns:
     lineage:
     - dw_crm.fact_credit_tasks.sk_proposal
     description: Proposal key
+  sk_assignee:
+    lineage:
+    - dw_crm.fact_credit_tasks.sk_assignee
+    description: Assignee key
   action_user_name:
     lineage:
     - dw_crm.fact_credit_tasks.action_user_name
