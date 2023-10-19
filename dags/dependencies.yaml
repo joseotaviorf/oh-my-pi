@@ -998,6 +998,9 @@ bietlejuice.enrich_booking:
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature
+bietlejuice.enrich_bpo_reports:
+  - bietlejuice.reverse_atento:terminate-cluster
+  - bietlejuice.reverse_webhelp:terminate-cluster
 bietlejuice.enrich_brand_tracking:
   - bietlejuice.brand_tracking:load-clean-brandtracking
   - bietlejuice.brand_tracking:load-clean-brandtracking-unpivoted
@@ -1947,20 +1950,20 @@ bietlejuice.enrich_recommendations:
   - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
 bietlejuice.enrich_recupera:
   - bietlejuice.recupera:load-clean-complementary-records
+  - bietlejuice.recupera:load-clean-creditor-pending
+  - bietlejuice.recupera:load-clean-detail-movement
   - bietlejuice.recupera:load-clean-historical-records
+  - bietlejuice.recupera:load-clean-indicator-contracts
   - bietlejuice.recupera:load-clean-installment
+  - bietlejuice.recupera:load-clean-installment-canceled
+  - bietlejuice.recupera:load-clean-installment-detail
   - bietlejuice.recupera:load-clean-installments-indicators
   - bietlejuice.recupera:load-clean-operational-records
-  - bietlejuice.recupera:load-clean-records
-  - bietlejuice.recupera:load-clean-status
-  - bietlejuice.recupera:load-clean-creditor-pending
-  - bietlejuice.recupera:load-clean-installment-detail
-  - bietlejuice.recupera:load-clean-installment-canceled
-  - bietlejuice.recupera:load-clean-detail-movement
-  - bietlejuice.recupera:load-clean-indicator-contracts
-  - bietlejuice.recupera:load-clean-receipt
   - bietlejuice.recupera:load-clean-operators
+  - bietlejuice.recupera:load-clean-receipt
+  - bietlejuice.recupera:load-clean-records
   - bietlejuice.recupera:load-clean-records-distributed-channels
+  - bietlejuice.recupera:load-clean-status
 bietlejuice.enrich_rede_company:
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -2111,9 +2114,6 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.rental_guarantee:load-clean-guarantee-aud
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-credit-card-payment
-bietlejuice.enrich_bpo_reports:
-  - bietlejuice.reverse_atento:terminate-cluster
-  - bietlejuice.reverse_webhelp:terminate-cluster
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-payee
@@ -2603,6 +2603,8 @@ bietlejuice.reverse_app_installed:
   - bietlejuice.enrich_app_installed:load-enrich-events
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
+  - bietlejuice.dw_call:load-dw-call-dim-call
+  - bietlejuice.dw_call:load-dw-call-fact-calls
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
@@ -2612,12 +2614,30 @@ bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-tags
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
+  - bietlejuice.enrich_quinto_messenger:load-enrich-task
+  - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
+  - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
+  - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
+bietlejuice.reverse_atento_access:
+  - bietlejuice.reverse_atento:load-reverse-backlog-metric
+  - bietlejuice.reverse_atento:load-reverse-csat-front
+  - bietlejuice.reverse_atento:load-reverse-demand-metric
+  - bietlejuice.reverse_atento:load-reverse-fcr-metric
+  - bietlejuice.reverse_atento:load-reverse-general-metric
+  - bietlejuice.reverse_atento:load-reverse-speech-call
+  - bietlejuice.reverse_atento:load-reverse-speech-chat
+  - bietlejuice.reverse_atento:load-reverse-taxonomia-call
+  - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
+  - bietlejuice.reverse_atento:load-reverse-taxonomia-email
+  - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.reverse_bic_ss:
   - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
@@ -2751,6 +2771,7 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-demand-metric
   - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
   - bietlejuice.reverse_webhelp:load-reverse-general-metric
+  - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
   - bietlejuice.reverse_webhelp:load-reverse-speech-call
   - bietlejuice.reverse_webhelp:load-reverse-speech-chat
   - bietlejuice.reverse_webhelp:load-reverse-taxonomia-call

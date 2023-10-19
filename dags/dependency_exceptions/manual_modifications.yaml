@@ -734,17 +734,19 @@ bietlejuice.reverse_app_installed:
     - bietlejuice.enrich_app_installed:load-enrich-events
   remove:
     - bietlejuice.enrich_app_installed:load-enrich-user-app-installed-event
-bietlejuice.reverse_atento:
-  remove:
-    - bietlejuice.dw_call:load-dw-call-dim-call
-    - bietlejuice.dw_call:load-dw-call-fact-calls
-    - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-tags
-    - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
-    - bietlejuice.enrich_quinto_messenger:load-enrich-task
-    - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
-    - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
-    - bietlejuice.gsheets_support_and_service:done-clean-agents-control
-    - bietlejuice.gsheets_support_and_service:done-clean-department-control
+bietlejuice.reverse_atento_access:
+  add:
+    - bietlejuice.reverse_atento:load-reverse-backlog-metric
+    - bietlejuice.reverse_atento:load-reverse-csat-front
+    - bietlejuice.reverse_atento:load-reverse-demand-metric
+    - bietlejuice.reverse_atento:load-reverse-fcr-metric
+    - bietlejuice.reverse_atento:load-reverse-general-metric
+    - bietlejuice.reverse_atento:load-reverse-speech-call
+    - bietlejuice.reverse_atento:load-reverse-speech-chat
+    - bietlejuice.reverse_atento:load-reverse-taxonomia-call
+    - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
+    - bietlejuice.reverse_atento:load-reverse-taxonomia-email
+    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.reverse_bic_ss:
   add:
     - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
@@ -795,6 +797,7 @@ bietlejuice.reverse_webhelp_access:
     - bietlejuice.reverse_webhelp:load-reverse-demand-metric
     - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
     - bietlejuice.reverse_webhelp:load-reverse-general-metric
+    - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
     - bietlejuice.reverse_webhelp:load-reverse-speech-call
     - bietlejuice.reverse_webhelp:load-reverse-speech-chat
     - bietlejuice.reverse_webhelp:load-reverse-taxonomia-call
