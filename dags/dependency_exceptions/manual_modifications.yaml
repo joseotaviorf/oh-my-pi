@@ -535,10 +535,10 @@ bietlejuice.enrich_reports_validation:
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-confirmed
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-scheduled
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
-bietlejuice.enrich_reverse_reports:
+bietlejuice.enrich_bpo_reports:
   add:
-    - bietlejuice.reverse_webhelp_access:load-execution-tracking
-    - bietlejuice.reverse_atento:load-execution-tracking
+    - bietlejuice.reverse_atento:terminate-cluster
+    - bietlejuice.reverse_webhelp:terminate-cluster
 bietlejuice.enrich_retsuko:
   remove:
     - bietlejuice.retsuko:load-clean-boleto

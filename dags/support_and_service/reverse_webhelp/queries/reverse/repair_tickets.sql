@@ -93,7 +93,8 @@ SELECT
     ft.ts_closed_local,
     YEAR(CURRENT_DATE - 1) AS year,
     MONTH(CURRENT_DATE - 1) AS month,
-    DAY(CURRENT_DATE - 1) AS day
+    DAY(CURRENT_DATE - 1) AS day,
+    NOW() AS ts_load
 FROM 
     dw_tickets.fact_tickets AS ft
 LEFT JOIN 

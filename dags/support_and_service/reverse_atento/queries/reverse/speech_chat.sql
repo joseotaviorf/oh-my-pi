@@ -64,6 +64,7 @@ SELECT
     END AS message_from,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
-    DAY(CURRENT_DATE) AS day
+    DAY(CURRENT_DATE) AS day,
+    NOW() AS ts_load
 FROM 
     message_summary

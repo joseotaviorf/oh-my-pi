@@ -10,7 +10,8 @@ SELECT
     dc.team AS area_aux,
     YEAR(CURRENT_DATE - 1) AS year,
     MONTH(CURRENT_DATE - 1) AS month,
-    DAY(CURRENT_DATE - 1) AS day
+    DAY(CURRENT_DATE - 1) AS day,
+    NOW() AS ts_load
 FROM
     datalake_quinto_messenger.chat_aht AS ca
 LEFT JOIN

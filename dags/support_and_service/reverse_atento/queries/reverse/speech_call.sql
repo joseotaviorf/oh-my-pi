@@ -10,7 +10,8 @@ SELECT DISTINCT
     bc.ts_ended,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
-    DAY(CURRENT_DATE) AS day
+    DAY(CURRENT_DATE) AS day,
+    NOW() AS ts_load
 FROM 
     datalake_bigfone_clean.call AS bc
 LEFT JOIN

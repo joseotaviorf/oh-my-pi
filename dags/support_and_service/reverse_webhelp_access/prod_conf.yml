@@ -27,22 +27,6 @@ tables:
   twilio_chat_aht:
     context: metrics
 
-schema:
-  fields:
-    - metadata: {}
-      name: table_name
-      nullable: true
-      type: string
-    - metadata: {}
-      name: dt_last_updated
-      nullable: true
-      type: string
-    - metadata: {}
-      name: ts_execution
-      nullable: true
-      type: string
-  type: struct
-
 custom_cluster:
   driver_node_type_id: m5a.2xlarge
   node_type_id: m5a.2xlarge

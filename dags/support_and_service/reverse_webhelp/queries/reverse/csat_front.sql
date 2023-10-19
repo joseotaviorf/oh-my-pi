@@ -17,7 +17,8 @@ SELECT DISTINCT
     DATE(ts_csat_response) AS ts_response,
     YEAR(CURRENT_DATE - 1) AS year,
     MONTH(CURRENT_DATE - 1) AS month,
-    DAY(CURRENT_DATE - 1) AS day
+    DAY(CURRENT_DATE - 1) AS day,
+    NOW() AS ts_load
 FROM
     dw_customer_support.fact_ticket AS ft
 LEFT JOIN

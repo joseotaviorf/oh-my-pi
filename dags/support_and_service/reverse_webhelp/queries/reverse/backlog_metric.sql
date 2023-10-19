@@ -27,7 +27,8 @@ SELECT DISTINCT
     bmt.ts_solved,
     YEAR(CURRENT_DATE - 1) AS year,
     MONTH(CURRENT_DATE - 1) AS month,
-    DAY(CURRENT_DATE - 1) AS day
+    DAY(CURRENT_DATE - 1) AS day,
+    NOW() AS ts_load 
 FROM
     dw_customer_support.fact_backlog_metrics_tasks AS bmt
 LEFT JOIN
