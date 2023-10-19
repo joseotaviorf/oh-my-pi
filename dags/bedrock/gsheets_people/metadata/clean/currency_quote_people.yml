@@ -1,13 +1,23 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: currency_quote_people
+owner: leonardo.soares@quintoandar.com.br
+domain: bedrock
+description: null
 columns:
   euro_cotation:
+    description: ''
     lineage:
-      - datalake_gsheets_raw.currency_quote_people.euro
+    - datalake_gsheets_raw.currency_quote_people.euro
   dolar_cotation:
+    description: ''
     lineage:
-      - datalake_gsheets_raw.currency_quote_people.dolar
+    - datalake_gsheets_raw.currency_quote_people.dolar
   mexican_peso_cotation:
+    description: ''
     lineage:
-      - datalake_gsheets_raw.currency_quote_people.mexico
+    - datalake_gsheets_raw.currency_quote_people.mexico
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.currency_quote_people.ts_load

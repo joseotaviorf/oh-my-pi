@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: layoffs
+owner: leonardo.soares@quintoandar.com.br
+domain: bedrock
+description: null
+columns:
+  id_employee:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.layoffs.id_colaborador
+  is_layoff:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.layoffs.layoffs
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.layoffs.ts_load
