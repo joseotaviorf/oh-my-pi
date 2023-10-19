@@ -214,13 +214,21 @@ ended_date AS (
     SELECT
         p.id AS id_propose,
         DATE(
-          COALESCE(
             COALESCE(
-              MAX(c.ts_done),MAX(CAST(h.ts_updated AS TIMESTAMP))
-            ),
-            MAX(old.dt_ended)
-          )
-        ) AS dt_ended
+                COALESCE(
+                    MAX(c.ts_done),MAX(CAST(h.ts_updated AS TIMESTAMP))
+                ),
+                MAX(old.dt_ended)
+            )
+        ) AS dt_ended_contract, -- condition when prioritizing contract table date (dt_ended on fact table)
+        DATE(
+            COALESCE(
+                COALESCE(
+                    MAX(CAST(h.ts_updated AS TIMESTAMP)), MAX(c.ts_done)
+                ),
+                MAX(old.dt_ended)
+            )
+        ) AS dt_ended_propose -- condition when prioritizing contract table date (dt_analyst_annulment_input on fact table)
     FROM
         datalake_rental_guarantee_platform_clean.propose AS p
     LEFT JOIN
@@ -255,6 +263,20 @@ ended_date AS (
         ) -- there are proposes that have ts_updated for cancellation history but are reopen
     GROUP BY
         1 -- some proposes can have multiple same status
+),
+analyst_annulment_input AS (
+    SELECT
+        p.id AS id_propose,
+        COALESCE(pcd.dt_ended_propose, old.dt_analyst_annulment_input) AS dt_analyst_annulment_input
+    FROM
+        datalake_rental_guarantee_platform_clean.propose AS p
+    LEFT JOIN
+        ended_date AS pcd
+            ON pcd.id_propose = p.id
+    LEFT JOIN
+        old_system_dates AS old
+            ON old.id_propose = p.id
+            AND p.id < 5000000
 ),
 propose_waiting_new_docs_date AS (
     SELECT
@@ -554,14 +576,14 @@ SELECT DISTINCT
     om.occurrences_solved,
     c.id IS NOT NULL AS is_contract,
     IF(p.billing_model = 'BROKER', TRUE, FALSE) AS is_direct_billing,
-    IFNULL(DATEDIFF(pcd.dt_ended, DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
+    IFNULL(DATEDIFF(aai.dt_analyst_annulment_input, DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
     p.id < 5000000 AS is_legacy,
     IF(3p.id_propose IS NULL, FALSE, TRUE) AS is_3p,
     pym.dt_last_payment,
     COALESCE(DATE(c.ts_began), old.dt_contract_started) AS dt_contract_started,
-    pcd.dt_ended AS dt_ended,
+    pcd.dt_ended_contract AS dt_ended,
     c.dt_next_renewal,
-    COALESCE(pcd.dt_ended, old.dt_analyst_annulment_input) AS dt_analyst_annulment_input,
+    aai.dt_analyst_annulment_input,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
     IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
     IF(p.id < 5000000, old.ts_evaluation_started, esd.ts_evaluation_started) AS ts_evaluation_started,
@@ -587,6 +609,9 @@ LEFT JOIN
 LEFT JOIN
     ended_date AS pcd
         ON pcd.id_propose = p.id
+LEFT JOIN
+    analyst_annulment_input AS aai
+        ON aai.id_propose = p.id
 LEFT JOIN
     propose_waiting_new_docs_date AS wndd
         ON wndd.id_propose = p.id
