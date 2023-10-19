@@ -6,3 +6,14 @@ SELECT DISTINCT
     NOW() AS ts_load
 FROM
     datalake_velo.propose_person
+
+UNION ALL
+
+SELECT DISTINCT
+    id_person AS sk_person,
+    id_propose AS sk_propose,
+    is_primary_person,
+    is_legacy,
+    NOW() AS ts_load
+FROM
+    datalake_velo.propose_person_legacy
