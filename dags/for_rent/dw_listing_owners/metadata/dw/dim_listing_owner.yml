@@ -1,102 +1,109 @@
 database_name: dw_quintoandar
 table_name: dim_listing_owner
-description: ''
+description: Dimension table containing information about the house listing owner.
 domain: For Rent
-owner: ''
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_listing_owner:
     lineage:
     - datalake_ebdb_listing.house.id_user
-    description: ''
+    description: ID of the user who owns the house.
   name:
     lineage:
     - datalake_ebdb_user.user.name
-    description: ''
+    description: Name of the user who owns the house.
   personal_document:
     lineage:
     - datalake_ebdb_user.user.cpf
-    description: ''
+    description: Personal document (CPF) of the user who owns the house.
   email:
     lineage:
     - datalake_ebdb_user.user.email
-    description: ''
+    description: Email of the user who owns the house.
   phone:
     lineage:
     - datalake_ebdb_user.user.main_phone
-    description: ''
+    description: Phone of the user who owns the house.
   address_street:
     lineage:
     - datalake_ebdb_user.user.address
-    description: ''
+    description: Street where the user who owns the house lives.
   address_number:
     lineage:
     - datalake_ebdb_user.user.number
-    description: ''
+    description: Address number where the user who owns the house lives.
   address_complement:
     lineage:
     - datalake_ebdb_user.user.complement
-    description: ''
+    description: Address complement where the user who owns the house lives.
   address_neighborhood:
     lineage:
     - datalake_ebdb_user.user.neighborhood
-    description: ''
+    description: Neighborhood where the user who owns the house lives.
   city:
     lineage:
     - datalake_ebdb_user.user.city
-    description: ''
+    description: City where the user who owns the house lives.
   uf:
     lineage:
     - datalake_ebdb_user.user.uf
-    description: ''
+    description: UF where the user who owns the house lives.
     categories:
-      AL: ''
-      BA: ''
-      DF: ''
-      ES: ''
-      GO: ''
-      MG: ''
-      MT: ''
-      PR: ''
-      RJ: ''
-      RS: ''
-      SC: ''
-      SE: ''
-      SP: ''
+      AC: 'Acre state acronym'
+      AL: 'Alagoas state acronym'
+      AM: 'Amazonas state acronym'
+      BA: 'Bahia state acronym'
+      CE: 'Ceará state acronym'
+      DF: 'Distrito Federal state acronym'
+      ES: 'Espírito Santo state acronym'
+      GO: 'Goiás state acronym'
+      MG: 'Minas Gerais state acronym'
+      MS: 'Mato Grosso do Sul state acronym'
+      MT: 'Mato Grosso state acronym'
+      PA: 'Pará state acronym'
+      PE: 'Pernambuco state acronym'
+      PR: 'Paraná state acronym'
+      RJ: 'Rio de Janeiro state acronym'
+      RN: 'Rio Grande do Norte state acronym'
+      RS: 'Rio Grande do Sul state acronym'
+      SC: 'Santa Catarina state acronym'
+      SE: 'Sergipe state acronym'
+      SP: 'São Paulo state acronym'
   address_postal_code:
     lineage:
     - datalake_ebdb_user.user.zip_code
-    description: ''
+    description: Address postal code where the user who owns the house lives.
   is_b2b:
     lineage:
     - datalake_ebdb_clean.partner_agent.id_user
-    description: ''
+    description: Boolean indicating whether the house comes from a b2b partner agent.
   has_rent_listings:
     lineage:
     - datalake_ebdb_listing.listing_business_context.is_rent_context
-    description: ''
+    description: Boolean indicating whether the house is a rent listing.
   has_sale_listings:
     lineage:
     - datalake_ebdb_listing.listing_business_context.is_sale_context
-    description: ''
+    description: Boolean indicating whether the house is a sale listing.
   has_sms_notifications_enabled:
     lineage:
     - datalake_ebdb_clean.user_preferences.is_receiving_sms
-    description: ''
+    description: Boolean indicating whether the user who owns the house receives SMS notifications.
   has_whatsapp_notifications_enabled:
     lineage:
     - datalake_ebdb_clean.user_preferences.is_receiving_whatsapp
-    description: ''
+    description: Boolean indicating whether the user who owns the house receives WhatsApp notifications.
   dt_birth:
     lineage:
     - datalake_ebdb_user.user.dt_birth
-    description: ''
+    description: Date of birth of the user who owns the house.
   ts_user_signed_up:
     lineage:
     - datalake_ebdb_user.user.ts_created
-    description: ''
+    description: Timestamp of when the user was created.
   ts_first_house_created:
     lineage:
     - datalake_ebdb_listing.house.dt_creation
-    description: ''
+    description: Timestamp of when the house was created.
   ts_load:
-    description: ''
+    description: Timestamp of when this table was loaded.
