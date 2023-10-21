@@ -38,4 +38,4 @@ WHERE
     AND device.mobile_app = 'Inquilinos'
     AND booking.visit_fup IS NOT NULL
 GROUP BY
-    1, 2, 3, 4
+    1, 2, 3, 14
