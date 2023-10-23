@@ -24,7 +24,7 @@ WITH union_surveys_answers AS (
         ssg.month,
         ssg.day
     FROM
-        datalake_satisfaction_rating.satisfaction_surveys_gsheets AS ssg
+        datalake_satisfaction_rating.gsheets_surveys AS ssg
     WHERE
         ssg.year = {year}
         AND ssg.month = {month}
@@ -55,7 +55,7 @@ WITH union_surveys_answers AS (
         ssz.month,
         ssz.day
     FROM
-        datalake_satisfaction_rating.satisfaction_surveys_zendesk AS ssz
+        datalake_satisfaction_rating.zendesk_surveys AS ssz
     WHERE
         ssz.year = {year}
         AND ssz.month = {month}
@@ -86,7 +86,7 @@ WITH union_surveys_answers AS (
         ssb.month,
         ssb.day
     FROM
-        datalake_satisfaction_rating.satisfaction_surveys_bigfone AS ssb
+        datalake_satisfaction_rating.bigfone_surveys AS ssb
     WHERE
         ssb.year = {year}
         AND ssb.month = {month}
@@ -117,7 +117,7 @@ WITH union_surveys_answers AS (
         sscf.month,
         sscf.day
     FROM
-        datalake_satisfaction_rating.satisfaction_surveys_chat_fup AS sscf
+        datalake_satisfaction_rating.chat_fup_surveys AS sscf
     WHERE
         sscf.year = {year}
         AND sscf.month = {month}
@@ -141,35 +141,37 @@ WITH union_surveys_answers AS (
         sss.score_description,
         sss.secondary_satisfaction_score,
         sss.secondary_score_description,
-        TO_JSON(sss.custom_attributes) AS custom_attributes,
+        sss.custom_attributes AS custom_attributes,
         sss.ts_first_seen,
         sss.ts_submitted,
         sss.year,
         sss.month,
         sss.day
     FROM
-        datalake_satisfaction_rating.satisfaction_surveys_survicate AS sss
+        datalake_satisfaction_rating.survicate_surveys AS sss
     WHERE
         sss.year = {year}
         AND sss.month = {month}
         AND sss.day = {day}
 ),
 users AS (
-  SELECT
-    id AS id_user,
-    LOWER(email) AS email
-  FROM
-    datalake_ebdb_user.user u
-  QUALIFY
-    ts_updated = FIRST(ts_updated) OVER(PARTITION BY LOWER(email) ORDER BY ts_updated DESC)
+    SELECT
+        u.id AS id_user,
+        LOWER(u.email) AS email
+    FROM
+        datalake_ebdb_user.user AS u
+    WHERE
+        DATE(u.ts_updated) <= DATE('{year}-{month}-{day}')
+    QUALIFY
+        u.ts_updated = FIRST(u.ts_updated) OVER(PARTITION BY LOWER(u.email) ORDER BY u.ts_updated DESC)
 )
-SELECT
+SELECT DISTINCT
     usa.id_answer,
     usa.id_survey,
     usa.id_contract,
     usa.id_ticket,
     COALESCE(usa.id_respondent, ue.id_user) AS id_respondent,
-    COALESCE(usa.respondent_email, ui.email) AS respondent_email,
+    COALESCE(usa.respondent_email, ue.email) AS respondent_email,
     usa.respondent_type,
     usa.service_type,
     usa.service_context,
@@ -192,6 +194,4 @@ FROM
 LEFT JOIN
     users AS ue
         ON ue.email = LOWER(usa.respondent_email)
-LEFT JOIN
-    users AS ui
-        ON ui.id_user = usa.id_respondent
+        OR ue.id_user = usa.id_respondent

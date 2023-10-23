@@ -85,9 +85,15 @@ call_csat AS (
   LEFT JOIN
     datalake_bigfone_twilio.call_flex_events AS cs
       ON ce.id_call = cs.id_call
+      AND cs.year <= {year}
+      AND cs.month <= {month}
+      AND cs.day <= {day}
   LEFT JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics ftm
       ON ce.id_call = ftm.id_call
+      AND ftm.year <= {year}
+      AND ftm.month <= {month}
+      AND ftm.day <= {day}
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY ce.id_call ORDER BY ce.ts_created_local DESC) = 1
 )

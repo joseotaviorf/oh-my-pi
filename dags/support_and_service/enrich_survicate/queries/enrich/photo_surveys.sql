@@ -4,6 +4,7 @@ SELECT
     PARSE_URL(page_url, 'QUERY', 'sk_owner') AS id_owner,
     'OWNER' AS respondent_type,
     'photos' AS service_type,
+    'listing' AS service_context,
     'survicate' AS survey_source,
     answers[1].content AS improvement_tags,
     answers[2].content AS user_comment,

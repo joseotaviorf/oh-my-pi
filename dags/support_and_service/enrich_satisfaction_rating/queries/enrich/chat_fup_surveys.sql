@@ -1,6 +1,6 @@
 WITH chat_fup_surveys AS (
     SELECT
-        r.id_rating AS id_answer,
+        MD5(CONCAT(r.id_rating, r.year, r.month, r.day)) AS id_answer,
         NULL AS id_ticket,
         r.id_user AS id_respondent,
         NULL AS respondent_email,
@@ -13,7 +13,7 @@ WITH chat_fup_surveys AS (
         "satisfaction evaluation" AS score_description,
         NULL AS secondary_satisfaction_score,
         NULL AS secondary_score_description,
-        TO_JSON(NAMED_STRUCT('id_origin', r.id_origin, 'evaluated_tool', r.evaluated_tool, 'csat_version', r.csat_version)) AS custom_attributes,
+        TO_JSON(NAMED_STRUCT('id_rating', r.id_rating, 'id_origin', r.id_origin, 'evaluated_tool', r.evaluated_tool, 'csat_version', r.csat_version)) AS custom_attributes,
         r.ts_created AS ts_submitted,
         r.year,
         r.month,
@@ -64,7 +64,7 @@ SELECT DISTINCT
     MD5(cfs.source_name) AS id_survey,
     tfm.id_contract,
     cfs.id_ticket,
-    COALESCE(cfs.id_respondent, tfm.id_user) AS id_respondent,
+    cfs.id_respondent AS id_respondent,
     cfs.respondent_email AS respondent_email,
     cfs.service_type,
     cfs.service_context,
@@ -85,3 +85,6 @@ FROM
 LEFT JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
         ON tfm.id_ticket = cfs.id_ticket
+        AND tfm.year <= {year}
+        AND tfm.month <= {month}
+        AND tfm.day <= {day}

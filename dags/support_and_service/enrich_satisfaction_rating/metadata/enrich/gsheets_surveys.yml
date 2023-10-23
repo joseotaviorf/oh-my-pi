@@ -1,6 +1,6 @@
 ---
 database_name: datalake_satisfaction_rating
-table_name: satisfaction_surveys_gsheets
+table_name: gsheets_surveys
 description: Unifies and enriches form satisfaction responses coming from Gsheets.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
@@ -84,7 +84,6 @@ columns:
   custom_attributes:
     description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
     lineage:
-      - datalake_gsheets_clean.tenant_entrance_inspection_csat.id_csat
       - datalake_gsheets_clean.csat_reimbursement_true.token
       - datalake_gsheets_clean.csat_reimbursement_true.id_contract
       - datalake_gsheets_clean.csat_reimbursement_true.id_user

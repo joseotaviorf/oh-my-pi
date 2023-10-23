@@ -1,6 +1,6 @@
 ---
 database_name: datalake_satisfaction_rating
-table_name: satisfaction_surveys_chat_fup
+table_name: chat_fup_surveys
 description: Unifies and enriches form satisfaction responses coming from Chat FUP.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
@@ -9,6 +9,9 @@ columns:
     description: Unique identifier of the satisfaction response.
     lineage:
       - datalake_chat_fup_clean.rating.id_rating
+      - datalake_chat_fup_clean.rating.year
+      - datalake_chat_fup_clean.rating.month
+      - datalake_chat_fup_clean.rating.day
       - datalake_chat_fup_clean.surveys_answer.id
   id_survey:
     description: Unique identifier of the satisfaction survey.
@@ -24,7 +27,6 @@ columns:
     description: Identifier of the person who answered the form.
     lineage:
       - datalake_chat_fup_clean.rating.id_user
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
   respondent_email:
     description: Email of the person who answered the form.
     lineage:
@@ -62,6 +64,7 @@ columns:
   custom_attributes:
     description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
     lineage:
+      - datalake_chat_fup_clean.rating.id_rating
       - datalake_chat_fup_clean.rating.id_origin
       - datalake_chat_fup_clean.rating.evaluated_tool
       - datalake_chat_fup_clean.rating.csat_version

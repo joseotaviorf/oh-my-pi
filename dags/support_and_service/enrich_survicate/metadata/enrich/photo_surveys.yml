@@ -25,6 +25,11 @@ columns:
     description:
       "For which flow/service we are evaluating satisfaction. For example:
       inspections, repairs, customer support, etc."
+  service_context:
+    description:
+      "For which context are we evaluating satisfaction. Here we can refer
+      to the journey, for example: onboarding, offboarding. Or we can refer to the
+      related microservice, for example: lockbox."
   survey_source:
     description: Data source
   improvement_tags:

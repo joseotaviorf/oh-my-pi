@@ -1,4 +1,17 @@
-SELECT
+WITH zendesk_users_contact AS (
+    SELECT
+        zuc.id_zendesk_user,
+        zuc.id_user,
+        zuc.email,
+        zuc.role
+    FROM
+        datalake_zendesk_tickets.zendesk_users_contact AS zuc
+    WHERE
+        DATE(zuc.ts_updated) <= DATE('{year}-{month}-{day}')
+    QUALIFY
+        zuc.id_user = MAX(zuc.id_user) OVER(PARTITION BY zuc.id_zendesk_user)
+)
+SELECT DISTINCT
     sr.id AS id_answer,
     tfm.id_contract,
     sr.id_ticket,
@@ -24,8 +37,11 @@ FROM
 LEFT JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
         ON tfm.id_ticket = sr.id_ticket
+        AND tfm.year <= {year}
+        AND tfm.month <= {month}
+        AND tfm.day <= {day}
 LEFT JOIN
-    datalake_zendesk_tickets.zendesk_users_contact AS zuc
+    zendesk_users_contact AS zuc
         ON zuc.id_zendesk_user = tfm.id_zendesk_requester_user
 WHERE
     sr.year = {year}

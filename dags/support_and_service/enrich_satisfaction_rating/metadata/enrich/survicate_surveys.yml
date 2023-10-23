@@ -1,6 +1,6 @@
 ---
 database_name: datalake_satisfaction_rating
-table_name: satisfaction_surveys_survicate
+table_name: survicate_surveys
 description: Unifies and enriches form satisfaction responses coming from Survicate.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
@@ -9,11 +9,29 @@ columns:
     description: Unique identifier of the satisfaction response.
     lineage:
       - datalake_survicate.inspections_surveys.id_answer
+      - datalake_survicate.inspections_surveys.year
+      - datalake_survicate.inspections_surveys.month
+      - datalake_survicate.inspections_surveys.day
       - datalake_survicate.repairs_surveys.id_answer
+      - datalake_survicate.repairs_surveys.year
+      - datalake_survicate.repairs_surveys.month
+      - datalake_survicate.repairs_surveys.day
       - datalake_survicate.lockbox_surveys.id_answer
+      - datalake_survicate.lockbox_surveys.year
+      - datalake_survicate.lockbox_surveys.month
+      - datalake_survicate.lockbox_surveys.day
       - datalake_survicate.scheduling_surveys.id_answer
+      - datalake_survicate.scheduling_surveys.year
+      - datalake_survicate.scheduling_surveys.month
+      - datalake_survicate.scheduling_surveys.day
       - datalake_survicate.keys_surveys.id_answer
+      - datalake_survicate.keys_surveys.year
+      - datalake_survicate.keys_surveys.month
+      - datalake_survicate.keys_surveys.day
       - datalake_survicate.photo_surveys.id_response
+      - datalake_survicate.photo_surveys.year
+      - datalake_survicate.photo_surveys.month
+      - datalake_survicate.photo_surveys.day
   id_survey:
     description: Unique identifier of the satisfaction survey.
     lineage:

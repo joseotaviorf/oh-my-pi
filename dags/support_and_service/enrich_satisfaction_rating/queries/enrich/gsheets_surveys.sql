@@ -61,7 +61,7 @@ WITH gsheets_surveys AS (
         'satisfaction evaluation' AS score_description,
         house_satisfation AS secondary_satisfaction_score,
         'house satisfaction' AS secondary_score_description,
-        TO_JSON(NAMED_STRUCT('id_csat', id_csat)) AS custom_attributes,
+        NULL AS custom_attributes,
         ts_submitted,
         YEAR(ts_submitted) AS year,
         MONTH(ts_submitted) AS month,
