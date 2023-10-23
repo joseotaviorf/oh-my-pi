@@ -14,23 +14,32 @@ negotiation_status AS (
 ),
 deduplicate_installment_detail AS (
     SELECT
-        id_installment,
         id_contract,
         id_creditor,
-        id_product,
         id_customer,
-        dt_expiration_installment_agreement
-    FROM
-        datalake_recupera_clean.installment_detail
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, id_customer, id_contract ORDER BY ts_load DESC, year DESC, month desc, day desc) = 1
+        id_product,
+        id_installment,
+        dt_expiration_installment_agreement,
+        MAX(DATE(CONCAT(year,"-",month,"-",day))) AS report_date
+    FROM datalake_recupera_clean.installment_detail
+    GROUP BY 1,2,3,4,5,6
+),
+deduplicated_installment_canceled AS (
+    SELECT
+        id_installment,
+        ts_canceled_installment,
+        MAX(DATE(CONCAT(year,"-",month,"-",day))) AS report_date
+    FROM  datalake_recupera_clean.installment_canceled
+    GROUP BY 1,2
 ),
 detail_movement AS (
     SELECT
+        id_customer,
         receipt_code,
         dt_paid,
         SUM(amount_paid) AS paid_amount
     FROM datalake_recupera_clean.detail_movement
-    GROUP BY 1, 2
+    GROUP BY 1, 2, 3
 ),
 creditor_pending AS (
     SELECT
@@ -45,7 +54,7 @@ SELECT
     i.id_operator,
     i.id_customer AS customer_document,
     CASE
-        WHEN i.installment_number = 0 AND LOWER(i.installment_situation) = "parcela paga" THEN CAST(i.id_installment AS INT)
+        WHEN CAST(i.installment_number AS INT) = 0 AND LOWER(i.installment_situation) = "parcela paga" THEN CAST(i.id_installment AS INT)
         ELSE null
     END id_first_installment_paid,
     CASE
@@ -71,7 +80,7 @@ SELECT
     END AS negotiation_status,
     CAST(i.installments_amount AS INT) AS number_of_installments,
     (i.installments_amount+1) AS adjusted_number_of_installments,
-    i.installment_number AS installment_number,
+    i.installment_number+1 AS installment_number,
     DATEDIFF(i.dt_installment, cp.dt_due) AS delay_days,
     i.main_amount,
     i.transfer_amount AS updated_balance,
@@ -87,14 +96,16 @@ FROM
 LEFT JOIN
     deduplicate_installment_detail AS isd
         ON i.id_installment = isd.id_installment
+        AND i.dt_due = isd.dt_expiration_installment_agreement
 LEFT JOIN
     negotiation_status AS ns
         ON i.id_installment = ns.id_negotiation
 LEFT JOIN
     detail_movement AS dm
         ON i.receipt_code = dm.receipt_code
+        AND i.id_customer = dm.id_customer
 LEFT JOIN
-    datalake_recupera_clean.installment_canceled AS cd
+    deduplicated_installment_canceled AS cd
         ON cd.id_installment = i.id_installment
 LEFT JOIN
     creditor_pending AS cp
