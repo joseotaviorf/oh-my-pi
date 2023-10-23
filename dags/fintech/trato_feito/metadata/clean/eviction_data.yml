@@ -1,36 +1,47 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: eviction_data
+owner: isabella.santos@quintoandar.com.br
 domain: fintech
-description: "Overtuning data for the eviction process."
+description: Overtuning data for the eviction process.
 columns:
   id:
     lineage:
       - datalake_trato_feito_raw.eviction_data.id
+    description: ID of the table.
   id_external:
     lineage:
       - datalake_trato_feito_raw.eviction_data.external_id
+    description: ID of the contract.
   context:
     lineage:
       - datalake_trato_feito_raw.eviction_data.context
+    description: Buisiness context, such as QUINTOANDAR.
   cpf_client:
     lineage:
       - datalake_trato_feito_raw.eviction_data.cpf_client
+    description: CPF of the client who is in the process of eviction.
   distributor_code_external:
     lineage:
       - datalake_trato_feito_raw.eviction_data.distributor_code_external
+    description: Code of the distributor. This column corresponds to the status in Recupera.
   occurrence_code_external:
     lineage:
       - datalake_trato_feito_raw.eviction_data.occurrence_code_external
+    description: Code of the occurrence. This column corresponds to the substatus in Recupera.
   has_occurrence_problem_external:
     lineage:
       - datalake_trato_feito_raw.eviction_data.has_occurrence_problem_external
+    description: Boolean that indicates if the occurrence has any occurrence problem.
   dt_occurrence_due_date_external:
     lineage:
       - datalake_trato_feito_raw.eviction_data.occurrence_due_date_external
+    description: Date of the occurrence due date.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.eviction_data.created_at
+    description: Timestamp of the creation of the entry.
   ts_updated:
     lineage:
       - datalake_trato_feito_raw.eviction_data.updated_at
+    description: Timestamp of the update of the entry.
