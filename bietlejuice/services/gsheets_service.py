@@ -127,7 +127,10 @@ class GsheetsService:
             sheet_id = sheet["sheet_id"]
             sheet_name = sheet["sheet_name"]
 
-            if sheet.get("sheet_context") == "static":
+            if sheet.get("sheet_context") == "static" or sheet["dag_name"] in (
+                "gsheets_people",
+                "gsheets_people_static",
+            ):
                 continue
             try:
                 sheet_data = gsheets_consumer.read_sheet_rows(
