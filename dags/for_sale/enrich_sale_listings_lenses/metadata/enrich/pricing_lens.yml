@@ -45,15 +45,30 @@ columns:
       We use two components to define this tier: the difference from the published price to the calculator price, and the degree of certainty of the prediction. With this, we were able to understand the pricing tier of a listing by its seller and how this would affect demand
       Example: A listing with the publication price exactly equal to the calculator price and with a high degree of prediction will be classified as P5 - Great Price.'
     categories:
-      P5: It means that QuintoAndar has a high degree of certainty that the property in question is worth less than it actually is.
-      P4: It means that the listing may be either overpriced or even cheaper than the real value of the property.
-      P3: It means that the price is OK in relation to the calculator. A little higher than the calculator, but nothing out of the normal.
-      P2: It means that the property is reasonably above the price estimated by the calculator.
-      P1: Listing that is way above the calculated price, over 50% of the published price. Extremely overpriced .
+      P5: |
+        The P5 tier indicates that the Listing has an excellent price. In technical terms: the Listing's price is below the prediction (P50), we have high confidence in the prediction and/or the Listing has the Great Price Tag active.
+      P4: |
+        The P4 tier indicates that the listing has a good publication price. It fits at least one of the following criteria:
+          1 - The listing's publication price is lower than the price predicted by the calculator, and we have medium confidence in this prediction (P50).
+          2 - The listing's publication price is up to 15% higher than the price estimated by the calculator, but we have high confidence in this prediction (P50).
+      P3: |
+        The P3 tier indicates that the listing is priced fairly or slightly above the ideal. It fits at least one of the following criteria:
+          1 - The listing's publication price is up to 15% higher than the price estimated by the calculator, and we have medium confidence in this prediction.
+          2 - The listing price is up to 25% higher than the price estimated by the calculator, and we have high confidence in this prediction.
+          3 - The listing price is lower than the price estimated by the calculator, but we have no confidence in this prediction.
+      P2: |
+        The P2 tier indicates that the listing is priced above the ideal. It fits at least one of the following criteria:
+          1 - The listing's publication price is up to 25% higher than the price estimated by the calculator, and we have medium confidence in this prediction.
+          2 - The listing's publication price is up to 50% higher than the price estimated by the calculator, and we have high confidence in this prediction.
+      P1: | 
+        The P1 tier indicates that the listing is priced well above the ideal. It fits at least one of the following criteria:
+          1 - The listing's publication price is up to 25% higher than the price estimated by the calculator, but we have no confidence in this prediction.
+          2 - The listing price is up to 50% higher than the price estimated by the calculator, and we have medium confidence in this prediction.
+          3 - The listing does not fit any of the criteria of the other tiers.
   tier_name:
     description: Just a long name for the expensive Tier segment.
     categories:
-      Great Price: It represents P5. Listings that are below the value calculated by QuintoAndar.
+      Great Price: It represents P5. Listings that we're pretty sure are below their market price.
       Good Price: It represents P4. Listings that are well priced.
       Fair Price: It represents P3. Listings are slightly above the price indicated by the calculator.
       Slightly Overpriced:  It represents P2. Listings that are above the price indicated by the calculator.
