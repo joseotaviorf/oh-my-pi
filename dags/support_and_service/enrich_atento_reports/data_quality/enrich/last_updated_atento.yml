@@ -1,5 +1,5 @@
 ---
-table_name: datalake_bpo_reports.last_updated_reverses
+table_name: datalake_atento_reports.last_updated_atento
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
@@ -9,5 +9,6 @@ column_level_validations:
   table_name:
     is_complete:
       severity_level: Error
-    is_unique:
+  bpo:
+    is_complete:
       severity_level: Error

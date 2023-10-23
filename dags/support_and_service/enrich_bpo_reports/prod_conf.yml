@@ -1,4 +1,0 @@
----
-dag_documentation: 
-  dag_purpose: |
-    "Enrichment table with the aim of unifying the execution data of the reverse load dag."

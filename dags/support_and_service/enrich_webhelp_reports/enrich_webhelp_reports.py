@@ -24,7 +24,7 @@ from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2023, 9, 22, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "bpo_reports"
+CONTEXT = "webhelp_reports"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 

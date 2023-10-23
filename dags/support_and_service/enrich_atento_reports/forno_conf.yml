@@ -1,0 +1,4 @@
+---
+dag_documentation: 
+  dag_purpose: |
+    "Reverse atento context enrichment table. The objective of this table is to be able to maintain daily monitoring of the execution of the bases."
