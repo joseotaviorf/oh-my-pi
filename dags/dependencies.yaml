@@ -1374,6 +1374,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-clean-special-condition-aud
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_out_of_context:load-clean-restriction-type
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
