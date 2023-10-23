@@ -323,6 +323,18 @@ tenant_journey_agg AS (
     COUNT(
       DISTINCT
         CASE
+          WHEN tet.id_event_type = 9 AND tet.contract_status = 'Ativo' AND DATEDIFF(DATE('2023-10-18'), tet.ts_event) <= 40 THEN tet.id_contract
+        END
+    ) AS total_onboarding_active_contracts,
+    COUNT(
+      DISTINCT
+        CASE
+          WHEN tet.id_event_type = 9 AND tet.contract_status = 'Ativo' AND DATEDIFF(DATE('2023-10-18'), tet.ts_event) > 40 THEN tet.id_contract
+        END
+    ) AS total_ongoing_active_contracts,
+    COUNT(
+      DISTINCT
+        CASE
           WHEN tet.id_event_type = 9
             AND tet.contract_status = 'Finalizado' THEN tet.id_contract
         END
@@ -516,35 +528,33 @@ tenant_journey_agg AS (
 ),
 step_journey AS (
   SELECT
-    tj.*,
-    COALESCE(tj.total_days_since_last_house_searching <= 40, FALSE) AS is_listing_and_search,
+    *,
+    COALESCE(total_days_since_last_house_searching <= 40, FALSE) AS is_listing_and_search,
     COALESCE(
-      tj.total_days_since_last_booking <= 40
-        OR tj.total_days_since_last_canceled_booking <= 40
-        OR tj.total_days_since_last_visiting <= 40
-        OR tj.total_days_since_last_offer_sending <= 40
-        OR tj.total_days_since_last_offer_rejected <= 40
-        OR tj.total_days_since_last_reservation_created <= 40
-        OR tj.total_days_since_last_offer_approval <= 40, FALSE
+      total_days_since_last_booking <= 40
+        OR total_days_since_last_canceled_booking <= 40
+        OR total_days_since_last_visiting <= 40
+        OR total_days_since_last_offer_sending <= 40
+        OR total_days_since_last_offer_rejected <= 40
+        OR total_days_since_last_reservation_created <= 40
+        OR total_days_since_last_offer_approval <= 40, FALSE
     ) AS is_visits_to_offer,
     COALESCE(
-      tj.total_days_since_last_evaluation_start <= 40
-        OR tj.total_days_since_last_evaluation_approval <= 40
-        OR tj.total_days_since_last_doc_sending <= 40
-        OR tj.total_days_since_last_credit_approval <= 40
-        OR tj.total_days_since_last_proposal_rejected <= 40, FALSE
+      total_days_since_last_evaluation_start <= 40
+        OR total_days_since_last_evaluation_approval <= 40
+        OR total_days_since_last_doc_sending <= 40
+        OR total_days_since_last_credit_approval <= 40
+        OR total_days_since_last_proposal_rejected <= 40, FALSE
     ) AS is_contract_to_entrance,
     COALESCE(
-      tj.total_active_contracts > 0
-        AND tj.total_days_since_last_contract_signing <= 40, FALSE
+      total_onboarding_active_contracts > 0, FALSE
     ) AS is_onboarding,
     COALESCE(
-      tj.total_active_contracts > 0
-        AND tj.total_days_since_last_contract_signing > 40, FALSE
+      total_ongoing_active_contracts > 0, FALSE
     ) AS is_ongoing,
-    tj.has_active_termination AS is_offboarding
+    has_active_termination AS is_offboarding
   FROM
-    tenant_journey_agg AS tj
+    tenant_journey_agg
 )
 SELECT
   DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd') AS id_snapshot,

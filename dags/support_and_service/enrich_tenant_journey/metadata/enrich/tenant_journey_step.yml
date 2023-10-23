@@ -23,7 +23,7 @@ columns:
     description:
       The client id, which is the user id that has searched a house in the amplitude
       events or the tenant prospect id that has an event in the rent demand funnel
-  tenant_journey_step:
+  journey_step:
     description:
       The tenant journey step, respecting how deep the customer is on their
       rental journey
@@ -50,7 +50,7 @@ columns:
       Default:
         Indicates if the client is not currently active in any of the journey steps
         in the rental context
-  tenant_persona_step:
+  persona_step:
     description:
       Indicates if the user is in any step before signing a contract or after signing a
       contract. If the user is in the post_contract step,it will not assume the
@@ -229,6 +229,14 @@ columns:
       The volume of active contracts signed per user. It considers only events of
       type equal to 9, indicating that the contract has been signed by the user, and
       the contract status must be equal to "Ativo"
+  total_onboarding_active_contracts:
+    description:
+      Amount of active contracts in the onboarding journey. Same rule as total_active_contracts,
+      but the contract must have been signed in the last 40 days
+  total_ongoing_active_contracts:
+    description:
+      Amount of active contracts in the ongoing journey. Same rule as total_active_contracts,
+      but the contract must have been signed for more than 40 days
   total_finished_contracts:
     description:
       The volume of finished contracts that have been signed per user. It considers

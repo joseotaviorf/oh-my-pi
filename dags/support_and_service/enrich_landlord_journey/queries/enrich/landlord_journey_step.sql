@@ -340,6 +340,18 @@ landlord_journey_agg AS (
     COUNT(
       DISTINCT
         CASE
+          WHEN let.id_event_type = 9 AND let.contract_status = 'Ativo' AND DATEDIFF(DATE('2023-10-18'), let.ts_event) <= 40 THEN let.id_contract
+        END
+    ) AS total_onboarding_active_contracts,
+    COUNT(
+      DISTINCT
+        CASE
+          WHEN let.id_event_type = 9 AND let.contract_status = 'Ativo' AND DATEDIFF(DATE('2023-10-18'), let.ts_event) > 40 THEN let.id_contract
+        END
+    ) AS total_ongoing_active_contracts,
+    COUNT(
+      DISTINCT
+        CASE
           WHEN let.id_event_type = 9 AND let.contract_status = 'Finalizado' THEN let.id_contract
         END
     ) AS total_finished_contracts,
@@ -564,12 +576,10 @@ step_journey AS (
         OR total_days_since_last_proposal_rejected <= 40, FALSE
     ) AS is_contract_to_entrance,
     COALESCE(
-      total_active_contracts > 0
-        AND total_days_since_last_contract_signing <= 40, FALSE
+      total_onboarding_active_contracts > 0, FALSE
     ) AS is_onboarding,
     COALESCE(
-      total_active_contracts > 0
-        AND total_days_since_last_contract_signing > 40, FALSE
+      total_ongoing_active_contracts > 0, FALSE
     ) AS is_ongoing,
     has_active_termination AS is_offboarding
   FROM

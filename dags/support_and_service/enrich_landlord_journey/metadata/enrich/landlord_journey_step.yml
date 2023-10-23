@@ -16,7 +16,7 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_snapshot:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"
-  id_client:
+  id_owner:
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_user
       - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
@@ -61,11 +61,8 @@ columns:
         If the user has taken any step in offboarding, ongoing, or onboarding, it
         indicates that the user is in a post-contract step
       Not_Apply: If the user is not in the pre or post contract steps
-  total_days_since_last_house_searching:
-    description:
-      By considering the user's most recent search event for rental houses, this
-      calculation determines the total number of days that have elapsed since the
-      last house search, with the snapshot date serving as the reference point
+  total_days_since_last_listing_update:
+    description: Days passed since the last update on a listing for a house owned by the user
   total_days_since_last_booking:
     description:
       This calculation considers the user's most recent booking event for rental houses
@@ -229,6 +226,14 @@ columns:
       The volume of active contracts signed per user. It considers only events of
       type equal to 9, indicating that the contract has been signed by the user, and
       the contract status must be equal to "Ativo"
+  total_onboarding_active_contracts:
+    description:
+      Amount of active contracts in the onboarding journey. Same rule as total_active_contracts,
+      but the contract must have been signed in the last 40 days
+  total_ongoing_active_contracts:
+    description:
+      Amount of active contracts in the ongoing journey. Same rule as total_active_contracts,
+      but the contract must have been signed for more than 40 days
   total_finished_contracts:
     description:
       The volume of finished contracts that have been signed per user. It considers
