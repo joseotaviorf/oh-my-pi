@@ -36,7 +36,7 @@ call AS (
     FROM
       datalake_bigfone_twilio.call_flex_events
     WHERE
-      direction = 'inbound'
+      direction IN ('inbound', 'outbound-api')
   ),
   reservations_ts AS (
     SELECT
