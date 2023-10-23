@@ -77,3 +77,10 @@ columns:
       - datalake_vans_clean.payment.dt_paid
       - datalake_vans_clean.boleto.dt_paid
     description: "Last record payment date in the payment platform"
+  dt_receipt:
+    lineage:
+      - datalake_trato_feito_clean.payment.metadata
+      - datalake_wall_street_clean.charge.ts_paid
+      - datalake_robin_hood_clean.payment_request.dt_paid
+      - datalake_vans_clean.payment.dt_paid
+    description: "Date that we receive the payment in our bank account and is register in SAP, in payable cases, the date is the payment date"

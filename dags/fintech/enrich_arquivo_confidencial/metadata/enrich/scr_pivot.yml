@@ -12,6 +12,14 @@ columns:
     description: "Months on Booking."
   reference_date:
     description: "Year month indicating to when the data is relevant."
+  financial_institution_count:
+    lineage:
+        - datalake_arquivo_confidencial.scr.financial_institution_count
+    description: "Count of financial institution."
+  start_relationship_date:
+    lineage:
+        - datalake_arquivo_confidencial.scr.start_relationship_date
+    description: "Start date of the relationship"
   Saldo a vencer de Cartões (até 30 dias):
     description: "Saldo pra vencer até 30 dias considerando
                   crédito rotativo vinculado a cartão de crédito,
@@ -125,7 +133,7 @@ columns:
     description: "Limite de cheque especial disponível no período acima de 360 dias"
   Limite de Cartão de Crédito (vencimento acima de 360 dias):
     description: "Limite para uso de cartão de crédito disponível no período de mais de 360 dias"
-  Limite de Crédito Pessoal (vencimento acima de 360 dias:
+  Limite de Crédito Pessoal (vencimento acima de 360 dias):
     description: "Limite de crédito pessoal disponível no período acima de 360 dias"
   Saldo a vencer de Outros Empréstimos (até 30 dias):
     description: "Saldo a vencer de Outros Empréstimos (até 30 dias)"
