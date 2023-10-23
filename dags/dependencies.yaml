@@ -2574,14 +2574,6 @@ bietlejuice.metric_rent__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-bietlejuice.metric_rent_benvi__demand:
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-monthly
-  - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-weekly
-  - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
-  - bietlejuice.enrich_mexico_marketing_automatic_daily_costs:load-enrich-daily-costs
-  - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
-  - bietlejuice.gsheets_for_rent:done-clean-mexico-demand-targets-2022
 bietlejuice.metric_rent_benvi__supply:
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel
