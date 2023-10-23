@@ -27,7 +27,6 @@ metadata_files_out_of_pattern:
   - support_and_service/enrich_offboarding/metadata/enrich/budgeting_window.yml
   # TODO: Migrated datamarts pending documentation
   - cross/dw_datamarts_spark/metadata/dw/cross/buyer_prospect_status.yml
-  - cross/dw_datamarts_spark/metadata/dw/cross/funnel_demand_flows.yml
   - cross/dw_datamarts_spark/metadata/dw/growth/casa_mineira_top_of_funnel_volumes_daily.yml
   - cross/dw_datamarts_spark/metadata/dw/growth/casa_mineira_top_of_funnel_volumes_monthly.yml
   - cross/dw_datamarts_spark/metadata/dw/growth/performance_marketing_metrics_imobiliaria_casa_mineira.yml

@@ -83,7 +83,6 @@ bietlejuice.dw_datamarts_spark.fintech_cross:
   remove:
     - bietlejuice.dw_region:load-dw-public-dim-region
     - bietlejuice.dw_contract:load-dw-public-dim-contract
-    - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-funnel-demand-flows
     - bietlejuice.dw_listing:load-dw-public-dim-house-listing
     - bietlejuice.dw_offer:load-dw-public-dim-offer
     - bietlejuice.dw_proposal:load-dw-public-dim-proposal

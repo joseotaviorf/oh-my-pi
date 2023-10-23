@@ -11,7 +11,6 @@
 
 cross:
   buyer_prospect_status: {}
-  funnel_demand_flows: {}
   lead_listing_flows: {}
   affiliates_clusters:
     depends_on:
