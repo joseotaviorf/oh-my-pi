@@ -6,18 +6,18 @@ dag_documentation:
 
 inner_dependencies:
   satisfaction_answers:
-    - satisfaction_surveys_gsheets
-    - satisfaction_surveys_zendesk
-    - satisfaction_surveys_bigfone
-    - satisfaction_surveys_survicate
-    - satisfaction_surveys_chat_fup
+    - bigfone_surveys
+    - chat_fup_surveys
+    - gsheets_surveys
+    - survicate_surveys
+    - zendesk_surveys
 
 partitions_cols: [year, month, day]
 
 incremental_tables:
+  - bigfone_surveys
+  - chat_fup_surveys
+  - gsheets_surveys
   - satisfaction_answers
-  - satisfaction_surveys_gsheets
-  - satisfaction_surveys_zendesk
-  - satisfaction_surveys_bigfone
-  - satisfaction_surveys_survicate
-  - satisfaction_surveys_chat_fup
+  - survicate_surveys
+  - zendesk_surveys
