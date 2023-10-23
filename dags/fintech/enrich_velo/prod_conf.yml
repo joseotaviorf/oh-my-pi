@@ -10,7 +10,9 @@ inner_dependencies:
     - propose_person
   payment:
     - junk
-    - occurrence
+  propose_values:
+    - junk
+    - payment
   payment_legacy:
     - junk
   occurrence:

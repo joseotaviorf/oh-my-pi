@@ -28,15 +28,6 @@ WITH prop_values AS (
         )
     )
 ),
-cte_payment AS (
-    SELECT
-        id_propose,
-        billing_type
-    FROM
-        datalake_rental_guarantee_platform_clean.payment
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_propose ORDER BY ts_updated DESC) = 1
-),
 old_duplicated_company_plan AS (
     SELECT
         pl.id AS id_plan,
@@ -48,23 +39,30 @@ old_duplicated_company_plan AS (
         datalake_rental_guarantee_platform_clean.company_plan AS cp
             ON pl.id = cp.id_plan
     GROUP BY 1, 2
-    )
-
+),
+cte_payment_type AS (
+    SELECT
+        id_propose,
+        pt.desc_lvl_1 AS payment_type
+    FROM
+        datalake_velo.payment AS p
+    LEFT JOIN
+        datalake_velo.junk AS pt
+        ON p.id_payment_type = pt.id_junk
+    WHERE
+        p.is_occurrence IS FALSE
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY p.id_propose ORDER BY p.ts_updated DESC) = 1
+)
 SELECT DISTINCT
     CONCAT(p.id, cp.id, pl.id) AS id_propose_values,
-    CASE py.billing_type
-      WHEN 'CREDIT_CARD' THEN 'monthly'
-      WHEN 'PIX' THEN 'annual'
-      WHEN 'ANNUAL_CREDIT_CARD' THEN 'annual'
-      ELSE 'no info'
-    END AS subscription_type,
+    pt.payment_type AS subscription_type,
     bt.name AS plan_type,
     CAST(NULL AS STRING) AS activator_type,
     pl.plan_name AS plan,
     CAST(NULL AS BIGINT) AS subscription_installments,
     p.activator_value AS activator_amount,
-    COALESCE((COALESCE(pv.rent_amount,0) + COALESCE(pv.condo_amount,0) + COALESCE(pv.light_amount,0) + COALESCE(pv.iptu_amount,0) + COALESCE(pv.other_amount,0))*pl.pricing,0) AS monthly_guarantee,
-    COALESCE((COALESCE(pv.rent_amount,0) + COALESCE(pv.condo_amount,0) + COALESCE(pv.light_amount,0) + COALESCE(pv.iptu_amount,0) + COALESCE(pv.other_amount,0))*pl.pricing*12,0) AS annual_guarantee,
+    COALESCE(p.monthly_value,0) AS monthly_guarantee,
+    COALESCE(p.annual_value,0) AS annual_guarantee,
     pv.rent_amount,
     pv.condo_amount,
     pv.light_amount,
@@ -93,8 +91,8 @@ LEFT JOIN
     prop_values AS pv
         ON p.id = pv.id_propose
 LEFT JOIN
-    cte_payment AS py
-      ON p.id = py.id_propose
+    cte_payment_type AS pt
+        ON p.id = pt.id_propose
 
 UNION ALL
 
