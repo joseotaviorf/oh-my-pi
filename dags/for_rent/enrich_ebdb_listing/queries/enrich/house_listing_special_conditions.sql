@@ -61,7 +61,7 @@ listing_special_conditions AS (
             ON hl.id_house = sc.id_house
             AND GREATEST(sc.dt_opted_in, DATE(hl.ts_listing_version_start)) >= DATE(hl.ts_listing_version_start)
             AND GREATEST(sc.dt_opted_in, DATE(hl.ts_listing_version_start)) < COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW()))
-            AND COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)) >= COALESCE(DATE(hl.ts_listing_version_end), '2100-01-01')
+            AND COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)) >= COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW() - INTERVAL '1' DAY))
             AND COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)) >= DATE(hl.ts_listing_version_start)
     GROUP BY 1, 2, 3
 )
