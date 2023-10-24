@@ -42,21 +42,6 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 
-# Testing Granulate script for Spark job auto optimization
-# TODO Remove after PoV complete (reach out to either Ribs, Mario or Edu for any clarification and cleansing)
-
-cluster_configuration['custom_tags'].append({"key": "granulate-cluster-name", "value": "{{ dag.dag_id }}"})
-cluster_configuration["init_scripts"].append(
-    {
-        "s3": {
-            "destination": f"{artifacts_bucket}/granulate/sagent_installer_Databricks.sh",
-            "region": "",
-        }
-    }
-)
-cluster_configuration['spark_env_vars']['GRANULATE_DBX_WORKSPACE_URL'] = "{{ var.value.GRANULATE_DBX_WORKSPACE_URL_PATH }}"
-cluster_configuration['spark_env_vars']['GRANULATE_DBX_TOKEN'] = "{{ var.value.GRANULATE_DBX_TOKEN_PATH }}"
-
 cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
 default_libraries = config_service.get_config("default_libraries")
 
