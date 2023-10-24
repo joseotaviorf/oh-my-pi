@@ -59,19 +59,16 @@ house_listing AS (
 ),
 base_comment AS (
     SELECT
-        fib.sk_contract,
-        MAX(CASE
-                WHEN di.has_tenant_comment = True THEN 1
-                ELSE 0
-            END
-        ) AS has_tenant_comment_inpection
+        ib.id_contract,
+        MAX(CAST(ir.user_comment IS NOT NULL AS SMALLINT)) AS has_tenant_comment_inpection
     FROM
-        dw_public.fact_inspection_bookings AS fib
-    LEFT JOIN
-        datalake_ebdb_listing_jobs.inspection AS di
-            ON di.id = fib.sk_inspection
+        datalake_inspections.item_review AS ir
+    JOIN
+        datalake_inspections.inspection_booking AS ib
+            ON ib.id_inspection = ir.id_inspection
     WHERE
-        di.type = 'Entrada'
+        ir.user_type = 'TENANT'
+        AND ib.inspection_type = 'onboarding'
     GROUP BY 1
 ),
 base_comment_adj AS (
@@ -82,7 +79,7 @@ base_comment_adj AS (
         contract_termination AS ct
     LEFT JOIN
         base_comment AS com
-            ON ct.id_contract = com.sk_contract
+            ON ct.id_contract = com.id_contract
 ),
 contract_hist AS (
     SELECT
