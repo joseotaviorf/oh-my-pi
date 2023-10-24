@@ -4,6 +4,8 @@ SELECT
     journey,
     sub_journey,
     line_owner,
+    micro_taxonomy_description,
+    ops_focal_point,
     is_active
 FROM
     datalake_gsheets_raw.ticket_rate_classification

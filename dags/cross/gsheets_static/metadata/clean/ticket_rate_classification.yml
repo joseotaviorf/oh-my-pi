@@ -16,6 +16,12 @@ columns:
   line_owner:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.line_owner
+  micro_taxonomy_description:
+    lineage:
+      - datalake_gsheets_raw.ticket_rate_classification.micro_taxonomy_description
+  ops_focal_point:
+    lineage:
+      - datalake_gsheets_raw.ticket_rate_classification.ops_focal_point
   is_active:
     lineage:
       - datalake_gsheets_raw.ticket_rate_classification.is_active
