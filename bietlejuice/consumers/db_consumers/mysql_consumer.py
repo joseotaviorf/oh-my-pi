@@ -158,13 +158,13 @@ class MySqlConsumer(DBConsumer):
             partition_column = self._get_partition_column_from_table(table_name)
 
         if not partition_column:
-            df = self.get_data_from_table(table_name)
+            df = self.get_data_from_table_via_query(table_name)
         else:
-            query = "select max({}) from {}".format(partition_column, table_name)
+            query = "select max({}) from `{}`".format(partition_column, table_name)
             df = self.get_data_from_query(query)
             upper_bound = df.collect()[0][0]
 
-            query = "select min({}) from {}".format(partition_column, table_name)
+            query = "select min({}) from `{}`".format(partition_column, table_name)
             df = self.get_data_from_query(query)
             lower_bound = df.collect()[0][0]
 
@@ -361,9 +361,29 @@ class MySqlConsumer(DBConsumer):
                     CAST({dt_filter_value.month} AS UNSIGNED) AS month,
                     CAST({dt_filter_value.day} AS UNSIGNED) AS day
                 FROM
-                    {table_name}
+                    `{table_name}`
                 WHERE
                     {filter_condition}
                     """
+
+        return self.get_data_from_query(query)
+
+    def get_data_from_table_via_query(self, table_name):
+        """
+        Gets all data from table in a MySQL database.
+        The method was created due to the MySQL's version 8.
+        i.e. some reserved words must be written between crasis (`) and
+        when Spark tries to infer the schema, it doesn't put the crasis between
+        the table.
+        :param table_name: Name of the table
+        :return: A Spark DataFrame with the table data
+        """
+
+        query = f"""
+                SELECT
+                    *
+                FROM
+                    `{table_name}`
+            """
 
         return self.get_data_from_query(query)

@@ -48,7 +48,7 @@ EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/
 RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"
 CLEAN_SPARK_JOB_PATH = EBDB_SPARK_JOBS_PATH + "load_ebdb_clean.py"
 
-CUSTOM_LIBRARIES = [{"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}}]
+CUSTOM_LIBRARIES = [{"maven": {"coordinates": "mysql:mysql-connector-java:8.0.30"}}]
 RAW_EXECUTION_TIMEOUT_HOURS = 3.5
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

@@ -67,7 +67,10 @@ def load_relation_into_datalake(args):
             math.ceil(float(rel.rows_count) / num_partitions * 6)
         )
     else:
-        df = consumer.get_data_from_table(rel.name)
+        # We're using this method due to some keywords in EBDB database.
+        # Words like "lead" should be used between crasis (`).
+        # https://stackoverflow.com/questions/48827041
+        df = consumer.get_data_from_table_via_query(rel.name)
 
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
