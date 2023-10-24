@@ -110,30 +110,29 @@ task_group = DatalakeTaskGroup(
     spark_jobs_path=base_spark_jobs_path,
 )
 
-for raw_table_name, table_details in tables.items():
+for table_name, table_details in tables.items():
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
-        table_name=raw_table_name,
+        table_name=table_name,
         extraction_spark_job_file=raw_spark_job_path,
         raw_spark_job_extra_args=[
             SOURCE,
-            raw_table_name,
+            table_name,
             "{{ ds }}",
             json.dumps(partition_cols),
             json.dumps(table_details),
         ],
     )
 
-    clean_table_name = table_details.get("clean_table_name", raw_table_name)
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
         has_create_external_table_task=False,
-        table_name=clean_table_name,
+        table_name=table_name,
         partitions=partition_cols if table_details.get("is_incremental") else None,
-        is_incremental=True if table_details.get("is_incremental") else False,
+        is_incremental=table_details.get("is_incremental"),
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
