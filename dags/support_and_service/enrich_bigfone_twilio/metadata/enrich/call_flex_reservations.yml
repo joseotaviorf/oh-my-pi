@@ -1,54 +1,74 @@
 database_name: datalake_bigfone_twilio
 table_name: call_flex_reservations
+description: A table originated in Twilio containing calls, tasks, reservations, queues, and agents that had initiated and completed interactions.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_call:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each call.
   id_task:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each task.
   id_reservation:
     lineage:
-      - datalake_bigfone_events.events.metadata
+      - datalake_bigfone_events.events.metadata.
+    description: Unique identifier for each reservation.
   id_agent:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description:  Unique identifier for each agent.
   id_queue:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description:  Unique identifier for each queue.
   queue_name:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Name of the task queue.
   seconds_duration:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Total service time (waiting time + talking time) in seconds.
   seconds_wait_time:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Time waiting for service in seconds.
   seconds_talk_time:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Time spent talking to the attendant ins seconds.
   ts_created:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: UTC task creation date in Twilio, in timestamp format.
   ts_created_local:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Timezone Brazil/East task creation date, in timestamp format.
   ts_ended:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: UTC end date related to the task, in timestamp format.
   ts_ended_local:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Timezone Brazil/East end date related to the task, in timestamp.
   ts_created_unix:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Format Unix Date task creation date in Twilio, in timestamp format.
   year:
     lineage:
       - datalake_bigfone_events.events.year
+    description: Partition Year, Use this partition to speed up query.
   month:
     lineage:
       - datalake_bigfone_events.events.month
+    description: Partition Month, Use this partition to speed up query.
   day:
     lineage:
       - datalake_bigfone_events.events.day
+    description: Partition Day, Use this partition to speed up query.
