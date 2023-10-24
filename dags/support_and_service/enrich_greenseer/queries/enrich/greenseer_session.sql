@@ -45,17 +45,17 @@ greenseer_sessions AS (
     GET_JSON_OBJECT(g.memory, '$.basic.flags') AS flags,
     CAST(
       COALESCE(
-        GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.no_answer_needed.value'), 
+        GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.no_answer_needed.value'),
         GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.before_reception.value'),
         GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.confirm_bypass_hsm.value')
       ) AS BOOLEAN
-    ) AS more_help_required, 
+    ) AS more_help_required,
     CAST(
       COALESCE(
-        GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.after_reception.value'), 
+        GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.after_reception.value'),
         GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.direct_answer.value')
       ) AS BOOLEAN
-    ) AS problem_solved, 
+    ) AS problem_solved,
     COALESCE(
       NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.menu_taxonomies.selected_taxonomy'),''),
       NULLIF(GET_JSON_OBJECT(g.memory,'$.business_rules.confused_class.selected_theme_detail'),''),
@@ -75,6 +75,7 @@ greenseer_sessions AS (
       WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_automatic_selection_theme_detail') THEN 'bot_menu_automatic_selection_taxonomy_v4'
       ELSE NULL
     END AS automatic_selection,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.has_retention_response') AS has_emma_response,
     g.current_state,
     g.ts_started,
     g.ts_ended
@@ -93,7 +94,8 @@ greenseer_tried_retention AS (
       NULLIF(after_reception, 'fallback'),
       response_key,
       automatic_selection,
-      fired_response
+      fired_response,
+      has_emma_response
     ) IS NOT NULL AS tried_retention
   FROM
     greenseer_sessions
