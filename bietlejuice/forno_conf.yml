@@ -90,6 +90,7 @@ dags_out_of_pattern:
         "reverse_webhelp",
         "reverse_webhelp_access",
         "wonka.house_main",
+        "wonka.house_listing_business_context",
         "wonka.house_amenities",
         "wonka.house_condo_amenities",
         "wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition",
@@ -101,6 +102,9 @@ dags_out_of_pattern:
         "wonka.user_region_listing_page_viewed",
         "wonka.user_most_viewed_region",
         "wonka.user_most_viewed_city",
+        "wonka.house_embeddings_main",
+        "wonka.user_embeddings_main",
+        "quintoml.recs.house_user_embeddings.inference",
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
 databricks_bucket: databricks.s3.forno.data.quintoandar.com.br
@@ -454,7 +458,7 @@ databricks_10_4_med_people_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
-        
+
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: SLACK_DE_TESTS_WEBHOOK

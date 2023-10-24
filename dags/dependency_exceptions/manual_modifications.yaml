@@ -861,3 +861,26 @@ wonka.house_rent_search_page_viewed:
 wonka.house_sale_search_page_viewed:
   add:
     - wonka.searched_house_main:load-searched_house_main
+
+wonka.house_embeddings_main:
+  add:
+    - quintoml.recs.house_user_embeddings.inference:batch-predict
+
+wonka.user_embeddings_main:
+  add:
+    - quintoml.recs.house_user_embeddings.inference:batch-predict
+
+wonka.house_listing_business_context:
+  add:
+    - bietlejuice.ebdb:load-clean-listing-business-context-aud
+    - bietlejuice.ebdb:load-clean-user-revision-entity
+
+quintoml.recs.house_user_embeddings.inference:
+  add:
+    - wonka.house_listing_business_context:load-house_listing_business_context
+    - wonka.house_main:load-house_main
+    - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
+    - wonka.user_agg_search_filters:load-user_agg_search_filters
+    - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
+    - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
+    - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices

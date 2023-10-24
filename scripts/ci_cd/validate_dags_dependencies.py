@@ -140,7 +140,7 @@ class CrossDAGDependenciesValidator:
         """
         dependent_dags = []
         for dag_name in dependencies_dict.keys():
-            if dag_name.startswith("wonka."):
+            if dag_name.startswith("wonka.") or dag_name.startswith("quintoml."):
                 continue
             match = re.search("bietlejuice\.(\w*)", dag_name)
             dependent_dags.append(match.group(1))

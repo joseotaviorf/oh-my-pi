@@ -25,7 +25,7 @@ class BietlejuiceDependencyHelper:
         """
         Parses the DAG and table name from task name
         """
-        if "wonka" in task_name:
+        if ("wonka" in task_name) or ("quintoml" in task_name):
             # Temporary workaround for bypassing this function
             # in case Wonka DAGs are used as dependencies
             dag_name, _ = task_name.split(":")
