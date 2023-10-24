@@ -1,3 +1,13 @@
+WITH revenues AS (
+  SELECT 
+    id_invoice_entry, 
+    invoice_entry_revenue, 
+    count(*) 
+  FROM 
+    datalake_invoice.invoice_revenues 
+  GROUP BY 1,2 
+  HAVING count(*) <= 1
+)  
 SELECT
     ie.id AS sk_invoice_entry,
     ie.id_external_reversed_entry AS sk_invoice_reversed_entry,
@@ -15,5 +25,5 @@ SELECT
 FROM
     datalake_retsuko.invoice_entry AS ie
 LEFT JOIN
-    datalake_invoice.invoice_revenues AS ir
-        ON ie.id = ir.id_invoice_entry
+  revenues AS ir
+    ON ie.id = ir.id_invoice_entry
