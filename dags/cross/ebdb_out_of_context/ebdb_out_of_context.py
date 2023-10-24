@@ -52,7 +52,7 @@ CLEAN_SPARK_JOB_FILE = BASE_SPARK_JOBS_PATH + "load_ebdb_clean.py"
 CUSTOM_LIBRARIES = [
     {
         "maven": {
-            "coordinates": "mysql:mysql-connector-java:8.0.30"
+            "coordinates": "mysql:mysql-connector-java:5.1.47"
         }
     }
 ]

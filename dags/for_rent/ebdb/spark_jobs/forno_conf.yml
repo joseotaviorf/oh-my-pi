@@ -288,7 +288,8 @@ table_block_list:
   - RestrictionType
 
 view_allow_list:
-  - vteste_utf8mb3
+  - MapRegiao
+  - vw_lead_reason
 
 block_list:
   - PoligonoRegiao
