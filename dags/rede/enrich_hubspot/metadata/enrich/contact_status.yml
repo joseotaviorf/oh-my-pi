@@ -1,22 +1,46 @@
 ---
 database_name: datalake_hubspot
 table_name: contact_status
+description: This table shows the status changes of contacts registered in HubSpot. Each row is a status of a contact.
+owner: data-for-sale@quintoandar.com.br
+domain: Rede 
 columns:
   id_contact:
     lineage:
       - datalake_hubspot.contact.id_contact
+    description: Unique identifier for a contact.
   id_user_updated_by:
     lineage:
       - datalake_hubspot.contact.lead_status_history
+    description: User ID of the user who updated the contact's status.
   source_type:
     lineage:
       - datalake_hubspot.contact.lead_status_history
+    description: The source where the status change was made.
+    categories: 
+      API: ''
+      CRM_UI: ''
+      EXTENSION: ''
+      MOBILE_IOS: ''
+      'null': ''
+  days_in_status:
+    description:  Number of days the contact has been in the current status.
   lead_status:
     lineage:
       - datalake_hubspot.contact.lead_status_history
-  ts_status_started:
+    description: The current status of the contact.
+    categories: 
+      CONNECTED: ''
+      IN_PROGRESS: ''
+      NEW: ''
+      OPEN: ''
+      OPEN_DEAL: ''
+      UNQUALIFIED: ''
+  ts_status_started: 
     lineage:
       - datalake_hubspot.contact.lead_status_history
+    description: The timestamp the contact entered the current status.
   ts_status_ended:
     lineage:
       - datalake_hubspot.contact.lead_status_history
+    description: The timestamp the contact left the current status. Is null if the contact is still in the current status.
