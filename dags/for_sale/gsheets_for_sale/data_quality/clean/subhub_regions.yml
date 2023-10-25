@@ -16,7 +16,7 @@ column_level_validations:
   city:
     is_complete:
       severity_level: Error
-  centre:
+  city_group:
     is_complete:
       severity_level: Error
   region:
