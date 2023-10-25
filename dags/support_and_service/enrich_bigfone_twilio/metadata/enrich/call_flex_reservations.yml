@@ -14,7 +14,7 @@ columns:
     description: Unique identifier for each task.
   id_reservation:
     lineage:
-      - datalake_bigfone_events.events.metadata.
+      - datalake_bigfone_events.events.metadata
     description: Unique identifier for each reservation.
   id_agent:
     lineage:
@@ -28,6 +28,18 @@ columns:
     lineage:
       - datalake_bigfone_events.events.metadata
     description: Name of the task queue.
+  is_answered:
+    lineage:
+      - datalake_bigfone_events.events.event
+    description: Field boolean indicate if reservation is accepted.
+  is_timeout:
+    lineage:
+      - datalake_bigfone_events.events.event
+    description: Field boolean indicate if reservation is accepted.
+  is_rejected:
+    lineage:
+      - datalake_bigfone_events.events.event
+    description: Field boolean indicate if reservation is accepted.
   seconds_duration:
     lineage:
       - datalake_bigfone_events.events.metadata
