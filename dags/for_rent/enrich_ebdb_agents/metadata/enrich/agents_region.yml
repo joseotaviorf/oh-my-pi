@@ -1,27 +1,43 @@
 ---
 database_name: datalake_ebdb_agents
 table_name: agents_region
+description: Enrich table that contains audit data of the agent-region relations. 
+  Each row of this table is a revision.
+domain: Cross
+owner: matheus.baroni@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.id_agent_data
+    description: Agent ID (dados_agente_id)
   id_region:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.id_region
+    description: Region ID
   rev_type:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.rev_type
+    description: Revision type
+    categories:
+      "0" : Create (means that the region was added to the agent area of activity)
+      "2" : Delete (means that the region was removed of the agent area of activity)
   region_code:
     lineage:
       - datalake_gsheets_clean.auxiliary_region.region_code
+    description: Region code. A region code is a grouping of several sub-regions.
   ts_ended:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.rev_type
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the revision if this row indicates that the region was removed 
+      of the agent area of activity
   ts_revision:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the revision
   ts_started:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.rev_type
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the revision if this row indicates that the region was added 
+      to the agent area of activity

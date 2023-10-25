@@ -1,10 +1,16 @@
 ---
 database_name: datalake_ebdb_agents
 table_name: agents_specific_weekly_schedule
+description: Enrich table with the specific weekly schedule of the agents. 
+  Each row of this table is a time slot of the agent that has an exception. 
+  A slot is a 15 minute slice of an hour (e.g. 08:00, 08:15, 08:30 and 08:45).
+domain: Cross
+owner: matheus.baroni@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent_specific_hour.id_agent
+    description: Agent ID (dados_agente_id)
   slot_number:
     lineage:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_08_and_09
@@ -19,6 +25,7 @@ columns:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_17_and_18
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_18_and_19
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
+    description: Slot number (8:00 = 0, 08:15 = 1, 08:30 = 2...)
   is_available_slot:
     lineage:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_08_and_09
@@ -33,9 +40,11 @@ columns:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_17_and_18
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_18_and_19
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
+    description: Boolean indicating if this slot is or was available for booking
   is_off_work:
     lineage:
       - datalake_ebdb_clean.agent_specific_hour.is_off_work
+    description: Boolean indicating if this slot is unavailable because the agent is off work
   ts_slot:
     lineage:
       - datalake_ebdb_clean.agent_specific_hour.dt_agent_specific_hour
@@ -51,7 +60,8 @@ columns:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_17_and_18
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_18_and_19
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
+    description: Timestamp of the slot
   ts_updated:
     lineage:
       - datalake_ebdb_clean.agent_specific_hour.ts_updated
-      
+    description: Timestamp of the last update in the slot

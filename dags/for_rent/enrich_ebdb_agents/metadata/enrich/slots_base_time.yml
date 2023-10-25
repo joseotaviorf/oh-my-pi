@@ -1,3 +1,14 @@
 ---
 database_name: datalake_ebdb_agents
 table_name: slots_base_time
+description: Each row of this table is a possible time slot, starting on 2019-01-01. 
+  A slot is a 15 minute slice of an hour (e.g. 07:00, 07:15, 07:30 and 07:45).
+domain: Cross
+owner: matheus.baroni@quintoandar.com.br
+columns:
+  day_of_week:
+    description: Day of week (starting on mondays)
+  slot_number:
+    description: Slot number (8:00 = 0, 08:15 = 1, 08:30 = 2...)
+  ts_slot:
+    description: Timestamp of the slot

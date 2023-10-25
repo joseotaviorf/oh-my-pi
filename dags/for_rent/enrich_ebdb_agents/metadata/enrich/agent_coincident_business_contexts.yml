@@ -1,3 +1,4 @@
+---
 database_name: datalake_ebdb_agents
 table_name: agent_coincident_business_contexts
 description: Each row of this table is a period in which the agent belonged to certain
@@ -6,7 +7,7 @@ description: Each row of this table is a period in which the agent belonged to c
   This is different from the table agent_business_context_history, since that one
   generates a row for each different context, whereas this one merges both in a single
   row with a specified validity period.
-domain: For Rent
+domain: Cross
 owner: gustavo.miller@quintoandar.com.br
 columns:
   id_agent_data:
@@ -22,7 +23,7 @@ columns:
     lineage:
     - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
     - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
-    description: Ending of the period in which that row is valid.
+    description: End of the period in which that row is valid (null if it is currently valid).
   is_agent_for_sale:
     description: Boolean to tell if an agent belonged to ForSale business context
       at that moment.
