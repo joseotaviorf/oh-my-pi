@@ -31,6 +31,9 @@ columns:
   is_standalone_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.allow_standalone
+  is_third_party_guarantee_allowed:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category.allow_third_party_guarantee
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.created_at

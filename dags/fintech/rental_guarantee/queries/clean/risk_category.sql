@@ -9,6 +9,7 @@ SELECT
   allow_guarantee AS is_guarantee_allowed,
   allow_pro_guarantor AS is_pro_guarantor_allowed,
   allow_standalone AS is_standalone_allowed,
+  allow_third_party_guarantee AS is_third_party_guarantee_allowed,
   created_at AS ts_created,
   disabled_at AS ts_disabled,
   enabled_at AS ts_enabled,

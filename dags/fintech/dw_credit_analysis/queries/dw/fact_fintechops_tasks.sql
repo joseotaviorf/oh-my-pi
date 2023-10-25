@@ -19,7 +19,7 @@ task_finish AS (
   FROM
     dw_crm.fact_credit_tasks AS crm
   WHERE
-    action_type IN ('REALIZE', 'RESOLVE')
+    action_type IN ('REALIZE')
 ),
 
 last_credit_analysis AS (
