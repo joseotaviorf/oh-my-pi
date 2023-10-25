@@ -3,29 +3,29 @@ azure_container_name: lake-quinto-andar-prod
 
 tables:
   backlog_metric:
-    context: metrics
+    context: cx
   csat_front:
-    context: csat
+    context: cx
   demand_metric:
-    context: metrics
+    context: cx
   fcr_metric:
-    context: metrics
+    context: cx
   general_metric:
-    context: metrics
+    context: cx
   repair_tickets:
-    context: repair
+    context: services
   speech_call:
     context: speech_analytics
   speech_chat:
     context: speech_analytics
   taxonomia_call:
-    context: taxonomia
+    context: cx
   taxonomia_chat:
-    context: taxonomia
+    context: cx
   taxonomia_email:
-    context: taxonomia
+    context: cx
   twilio_chat_aht:
-    context: metrics
+    context: cx
 
 custom_cluster:
   driver_node_type_id: m5a.2xlarge
