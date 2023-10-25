@@ -190,7 +190,8 @@ WITH cte_join AS (
                 VALUES ('SIGNATURE'),
                         ('GUARANTEE'),
                         ('TERMINATION'),
-                        ('BILLING') AS origin(name)
+                        ('BILLING'),
+                        ('RENEWAL') AS origin(name)
         )
         SELECT
             'Occurrence Type' AS desc_master_type,
