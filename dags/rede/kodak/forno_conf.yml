@@ -2,6 +2,12 @@
 dag_documentation:
   dag_purpose: This flow is intended to retrieve data related to images and videos used on our platforms.
 
+custom_cluster:
+  driver_node_type_id: m5a.xlarge
+  node_type_id: m5a.xlarge
+  num_workers: 3
+  spark_version: 10.4.x-scala2.12
+  
 tables:
   image_inspection:
     raw_extraction_type: incremental
