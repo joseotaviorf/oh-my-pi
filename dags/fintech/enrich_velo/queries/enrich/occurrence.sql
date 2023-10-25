@@ -29,6 +29,7 @@ LEFT JOIN
                                 WHEN o.id_type = 1 THEN 'GUARANTEE'
                                 WHEN o.id_type = 2 THEN 'TERMINATION'
                                 WHEN o.id_type = 3 THEN 'BILLING'
+                                WHEN o.id_type = 4 THEN 'RENEWAL'
                                 ELSE NULL
                             END
         AND jk1.desc_master_type = 'Occurrence Type'
@@ -53,12 +54,7 @@ SELECT DISTINCT
     ol.id * -1 AS id_occurrence,
     ol.propose AS id_propose,
     CAST(NULL AS BIGINT) AS id_client,
-    CASE
-        WHEN ol.type = 'Garantia' THEN 21
-        WHEN ol.type = 'Assinatura' THEN 22
-        WHEN ol.type = 'Rescisao' THEN 23
-        ELSE NULL
-    END AS id_occurrence_type,
+    jk1.id_junk AS id_occurrence_type,
     CAST(NULL AS INTEGER) AS id_occurrence_status,
     CAST(NULL AS STRING) AS id_unicid,
     CAST(NULL AS STRING) AS description,
