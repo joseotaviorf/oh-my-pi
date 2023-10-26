@@ -47,6 +47,10 @@ columns:
         - datalake_bigfone_clean.event.metadata
         - datalake_quinto_messenger_clean.task.assigned_to
       description: Name of the company where the analyst works.
+    role:
+      lineage: 
+        - datalake_zendesk_tickets_clean.users.role
+      description: Descriptive information coming from Zendesk that indicates the user's role, in the case of this table it should always be agent.
     is_active:
       lineage:
         - datalake_zendesk_tickets_clean.users.is_active
