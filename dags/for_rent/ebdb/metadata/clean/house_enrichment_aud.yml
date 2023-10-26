@@ -11,12 +11,18 @@ columns:
   id_house:
     lineage:
     - datalake_ebdb_raw.houseenrichment_aud.house_id
+  id_dejavu:
+    lineage:
+    - datalake_ebdb_raw.houseenrichment_aud.dejavu_id
   status:
     lineage:
     - datalake_ebdb_raw.houseenrichment_aud.status
   event_trigger:
     lineage:
     - datalake_ebdb_raw.houseenrichment_aud.event_trigger
+  version_id_dejavu:
+    lineage:
+    - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_version
   rev:
     lineage:
     - datalake_ebdb_raw.houseenrichment_aud.rev
@@ -26,12 +32,18 @@ columns:
   mod_id_house:
     lineage:
     - datalake_ebdb_raw.houseenrichment_aud.house_id_MOD
+  mod_id_dejavu:
+    lineage:
+    - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_MOD
   mod_status:
     lineage:
     - datalake_ebdb_raw.houseenrichment_aud.status_MOD
   mod_event_trigger:
     lineage:
     - datalake_ebdb_raw.houseenrichment_aud.event_trigger_MOD
+  mod_version_id_dejavu:
+    lineage:
+    - datalake_ebdb_raw.houseenrichment_aud.dejavu_id_version_MOD
   ts_created:
     lineage:
     - datalake_ebdb_raw.houseenrichment_aud.created_at

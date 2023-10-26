@@ -11,12 +11,18 @@ columns:
   id_house:
     lineage:
     - datalake_ebdb_raw.houseenrichment.house_id
+  id_dejavu:
+    lineage:
+    - datalake_ebdb_raw.houseenrichment.dejavu_id
   status:
     lineage:
     - datalake_ebdb_raw.houseenrichment.status
   event_trigger:
     lineage:
     - datalake_ebdb_raw.houseenrichment.event_trigger
+  version_id_dejavu:
+    lineage:
+    - datalake_ebdb_raw.houseenrichment.dejavu_id_version
   ts_created:
     lineage:
     - datalake_ebdb_raw.houseenrichment.created_at
