@@ -583,11 +583,15 @@ SELECT
     acq.id_user_has_indicated,
     acq.id_user_lead_first_discarder,
     acq.id_user_lead_last_discarder,
+    IF(h.is_rent_3p_supply, h.uuid_company, NULL) AS uuid_company,
+    IF(h.is_rent_3p_supply, h.id_company_hubspot, NULL) AS id_company_hubspot,
+    IF(h.is_rent_3p_supply, h.partner_3p_supply, NULL) AS partner_3p_supply,
     acq.country_code,
     acq.is_self_service_photo_job_scheduled,
     acq.is_not_reprocessed,
     acq.is_b2b,
     acq.is_agent_referral,
+    h.is_rent_3p_supply AS is_3p_supply,
     CASE
         WHEN ld.id_house IS NOT NULL
             AND acq.is_not_reprocessed
@@ -657,5 +661,9 @@ SELECT
     acq.ts_sales_company_sent
 FROM
     acquisition_channels_dt_diffs AS acq
-LEFT JOIN legacy_doorman AS ld
-    ON acq.id_house = ld.id_house
+LEFT JOIN
+    legacy_doorman AS ld
+        ON acq.id_house = ld.id_house
+LEFT JOIN
+    datalake_ebdb_listing.house AS h
+        ON acq.id_house = h.id
