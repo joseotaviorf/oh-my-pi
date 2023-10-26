@@ -36,8 +36,11 @@ def main() -> None:
     if csv_content is None:
         return
 
-    dataframe = get_spark_dataframe_from_csv_content(csv_content)
-    load_table_dataframes_into_datalake(dataframe, args)
+    try:
+        dataframe = get_spark_dataframe_from_csv_content(csv_content)
+        load_table_dataframes_into_datalake(dataframe, args)
+    except ValueError as e:
+        logger.info(f"Empty CSV file. Complete error: {e}")
 
 
 def get_credentials_dict() -> dict:
