@@ -61,8 +61,8 @@ listing_special_conditions AS (
             ON hl.id_house = sc.id_house
             AND GREATEST(sc.dt_opted_in, DATE(hl.ts_listing_version_start)) >= DATE(hl.ts_listing_version_start)
             AND GREATEST(sc.dt_opted_in, DATE(hl.ts_listing_version_start)) < COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW()))
-            AND COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)) >= COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW() - INTERVAL '1' DAY))
-            AND COALESCE(sc.dt_opted_out, DATE(NOW() - INTERVAL '1' DAY)) >= DATE(hl.ts_listing_version_start)
+            AND COALESCE(sc.dt_opted_out, DATE(NOW())) >= COALESCE(DATE(hl.ts_listing_version_end), DATE(NOW()))
+            AND COALESCE(sc.dt_opted_out, DATE(NOW())) >= DATE(hl.ts_listing_version_start)
     GROUP BY 1, 2, 3
 )
 -- in case a house listing has more than one Special Condition types: exclusivity, ready and reno on the same version
