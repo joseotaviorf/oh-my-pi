@@ -64,8 +64,11 @@ prev_max_realized_by_user AS (
     FROM
         prev_tasks
     WHERE
+        (
         action_type = 'REALIZE'
         AND id_user_action != -1
+        )
+        OR type = 'EnviarCardiff'
     GROUP BY 1, 2
 ),
 max_realized_by_user AS (
@@ -157,3 +160,4 @@ WHERE
           t.id_user_action = -1
           AND t.action_type = 'REALIZE'
     )
+    OR t.type = 'EnviarCardiff'
