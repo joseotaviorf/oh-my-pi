@@ -16,8 +16,8 @@ spec:
   tier: T0
 
   ownership:
-    line: data
-    tribe: data_platform_engineering
+    line: tech_platform
+    tribe: data_platform_engineering_and_governance
     squad: data_ingestion
     owner: mario.abreu@quintoandar.com.br
 
