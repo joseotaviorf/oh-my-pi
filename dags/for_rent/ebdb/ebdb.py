@@ -50,7 +50,7 @@ CUSTOM_LIBRARIES = [
     }
 ]
 
-RAW_EXECUTION_TIMEOUT_HOURS = 5 # Temporarily increased from 3.5 to 5h to allow the first execution on the new replica (with MySQL 8)
+RAW_EXECUTION_TIMEOUT_HOURS = 3.5
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
