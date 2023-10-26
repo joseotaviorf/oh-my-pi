@@ -1258,6 +1258,8 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
   - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
   - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
