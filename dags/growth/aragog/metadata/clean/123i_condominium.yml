@@ -52,7 +52,7 @@ columns:
     description: "The state where the condo is located."
     lineage:
       - datalake_aragog_raw.123i_condominium.location.state
-  zip_cpde:
+  zip_code:
     description: "The zip code of the condo location."
     lineage:
       - datalake_aragog_raw.123i_condominium.location.zipcode
@@ -84,6 +84,10 @@ columns:
     description: "JSON containing the metadata"
     lineage:
       - datalake_aragog_raw.123i_condominium.metadata
+  amenities_list:
+    description: "List containing all amenities"
+    lineage:
+      - datalake_aragog_raw.123i_condominium.amenities    
   has_party_hall:
     description: "Boolean value to indicate if the condominium has a party hall."
     lineage:
