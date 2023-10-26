@@ -52,10 +52,11 @@ columns:
   device_brand:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.device_brand
+    description: Brand of the device
   device_carrier:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.device_carrier
-    description: Brand of the device
+    description: Carrier of the device
   device_family:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.device_family
