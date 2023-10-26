@@ -51,6 +51,7 @@ guarantees AS (
           END
         ) IS NULL
         AND g.guarantee_type IS NOT NULL THEN flrf.sk_proposal
+        WHEN g.cancellation_reason = 'TenantStalled' then flrf.sk_proposal
         ELSE NULL
       END
     ) AS guarantee_not_accepted
