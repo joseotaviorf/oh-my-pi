@@ -2729,6 +2729,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
   - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
@@ -2744,6 +2745,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb:load-clean-user-pro-owner
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.terminator:load-clean-termination
 bietlejuice.reverse_webhelp:
