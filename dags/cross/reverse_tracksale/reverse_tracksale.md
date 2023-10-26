@@ -13,7 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 We incrementally load the following table into the Datalake Reverse bucket, for backup pourposes:
 
-- `benvi_iq_lost_proposals` 
+- `benvi_iq_lost_proposals`
 - `benvi_iq_lost_visits`
 - `benvi_iq_offboarding`
 - `benvi_pp_offboarding`
@@ -24,10 +24,8 @@ We incrementally load the following table into the Datalake Reverse bucket, for 
 - `benvi_pp_ongoing`
 - `lost_buyer_proposals`
 - `lost_buyer_visits`
-- `lost_iq_proposals`
+- `lost_iq`
 - `lost_iq_proposals_bo`
-- `lost_iq_rejected`
-- `lost_iq_visitas`
 - `lost_iq_visitas_bo`
 - `lost_pp`
 - `lost_pp_bo`
