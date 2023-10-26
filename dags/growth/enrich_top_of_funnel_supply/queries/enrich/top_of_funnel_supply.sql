@@ -37,6 +37,32 @@ WITH page_view_events AS (
         AND up_utm_medium IN ('cpc', 'display', 'performance_max')
         AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
         AND LOWER(up_utm_campaign) NOT LIKE '%demand%'
+    UNION ALL
+    SELECT DISTINCT
+        DATE(ts_event) AS dt_event,
+        up_utm_campaign AS utm_campaign,
+        id_amplitude
+    FROM
+        datalake_amplitude_clean.183047_price_report_landing_rent_page_viewed_events
+    WHERE
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND up_utm_source IN ('google', 'facebook')
+        AND up_utm_medium IN ('cpc', 'display', 'performance_max')
+        AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
+        AND LOWER(up_utm_campaign) NOT LIKE '%demand%'
+    UNION ALL
+    SELECT DISTINCT
+        DATE(ts_event) AS dt_event,
+        up_utm_campaign AS utm_campaign,
+        id_amplitude
+    FROM
+        datalake_amplitude_clean.183047_price_report_landing_sale_page_viewed_events
+    WHERE
+        DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND up_utm_source IN ('google', 'facebook')
+        AND up_utm_medium IN ('cpc', 'display', 'performance_max')
+        AND LOWER(up_utm_campaign) NOT LIKE '%branded%'
+        AND LOWER(up_utm_campaign) NOT LIKE '%demand%'
 ),
 page_view_unique_users AS (
     SELECT
