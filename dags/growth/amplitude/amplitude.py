@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
@@ -25,6 +25,8 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
 CLUSTER_DESCRIPTION = "custom_cluster"
+
+EXECUTION_TIMEOUT_HOURS = 3
 
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols_dag")
@@ -88,6 +90,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
             "parameters": [ENV, datalake_bucket, SOURCE, "{{ ds }}"],
         }
     },
+    execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
 
 propagate_table_metadata_raw_events_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -130,6 +133,7 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
             + INCREMENTAL_PARTITIONS,
         }
     },
+    execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
 
 sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -551,6 +555,7 @@ load_subpartitioned_events_clean_task = QuintoAndarDatabricksSubmitRunOperator(
             + INCREMENTAL_PARTITIONS,
         }
     },
+    execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
 
 sync_metastore_clean_subpartitioned_events_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
