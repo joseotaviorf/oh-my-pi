@@ -16,6 +16,8 @@ columns:
       - datalake_customer_demand.demand_metrics_tasks.id_task
   sk_agent:
     description: SK generated to uniquely identify an agent based on teh agent's email
+    lineage: 
+      - datalake_customer_demand.demand_metrics_tasks.id_agent
   sk_taxonomy:
     description:
       The id taxonomy is used to represent the task taxonomy. For CRM tasks, the

@@ -1,8 +1,8 @@
 WITH base_crm_analyst_info AS (
   SELECT DISTINCT
     turf.id_task,
-    ac.id_assignee AS id_agent,
-    LOWER(ac.email) AS agent_email,
+    MD5(a.email) AS id_agent,
+    a.email AS agent_email,
     action_type
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
@@ -10,8 +10,8 @@ WITH base_crm_analyst_info AS (
     datalake_ebdb_user.user AS du
       ON du.id = turf.id_assignee
   INNER JOIN
-    datalake_gsheets_clean.agents_control AS ac
-      ON LOWER(ac.email) = LOWER(du.email)
+    datalake_zendesk_users.agents AS a
+      ON a.email = du.email
 ),
 crm_tasks AS (
   WITH last_updated_task AS (
@@ -51,7 +51,7 @@ ticket_tasks AS (
   WITH ticket_started AS (
     SELECT
       e.id_ticket,
-      e.id_agent,
+      MD5(e.agent_email) AS id_agent,
       MD5(
         CONCAT(
           COALESCE(e.step_tag, ''),
