@@ -114,9 +114,6 @@ tables:
   - table_name: document_status
     date_filter_column: dateupdate
     extraction_type: incremental
-  - table_name: document_type
-    date_filter_column: dateupdate
-    extraction_type: incremental
   - table_name: documents
     date_filter_column: dateupdate
     extraction_type: incremental

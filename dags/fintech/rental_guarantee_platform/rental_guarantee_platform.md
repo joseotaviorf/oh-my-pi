@@ -64,7 +64,6 @@ Velo 3.0 tables:
     - `plans`
     - `propose_history`
     - `history_type`
-    - `document_type`
     - `document_status`
     - `documents`
     - `person_documents`
