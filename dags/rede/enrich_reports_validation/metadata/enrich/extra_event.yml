@@ -15,3 +15,9 @@ columns:
     lineage:
       - datalake_reports_clean.processed_event.ts_created
     description: Timestamp of when the event was processed by the Reports Service.
+  year: 
+    description: Year related to the execution of this validation. It is also a partition of this table.
+  month:
+    description: Month related to the execution of this validation. It is also a partition of this table.
+  day:
+    description: Day related to the execution of this validation. It is also a partition of this table.

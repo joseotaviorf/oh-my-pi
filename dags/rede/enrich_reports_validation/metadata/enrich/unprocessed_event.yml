@@ -37,3 +37,9 @@ columns:
       - reverse_listings_report.sale_listing_visit_scheduled.ts_event
       - reverse_listings_report.sale_ongoing_listings.ts_event
     description: Timestamp of when the event happened.
+  year: 
+    description: Year related to the execution of this validation. It is also a partition of this table.
+  month:
+    description: Month related to the execution of this validation. It is also a partition of this table.
+  day:
+    description: Day related to the execution of this validation. It is also a partition of this table.
