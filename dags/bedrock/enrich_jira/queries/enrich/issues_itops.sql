@@ -21,7 +21,7 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields,'$.assignee.emailAddress') AS assignee_email,
         CASE
             WHEN GET_JSON_OBJECT(fields,'$.customfield_11686.value') = "Sim" THEN True
-            ELSE False 
+            ELSE False
         END AS is_reopened,
         CAST(REPLACE(GET_JSON_OBJECT(fields,'$.customfield_10100'), '-0300', '') AS TIMESTAMP) AS ts_first_response,
         GET_JSON_OBJECT(fields,'$.customfield_10529.value') AS support_level,
@@ -34,7 +34,7 @@ WITH record_selection AS (
         COALESCE(
           CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10660.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
           CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10660.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
-        ) AS sla_hours,	
+        ) AS sla_hours_old,
         COALESCE(
           CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_11974.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
           CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_11974.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
@@ -43,6 +43,10 @@ WITH record_selection AS (
           CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_12006.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
           CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_12006.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
         ) AS sla_renewal_hours,
+        COALESCE(
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_18135.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_18135.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
+        ) AS sla_hours,
         CAST(GET_JSON_OBJECT(fields,'$.customfield_10202.rating') AS INT) AS satisfaction,
         GET_JSON_OBJECT(fields,'$.customfield_11270.value') AS sub_category,
         GET_JSON_OBJECT(fields,'$.customfield_11300.value') AS incident_type_old,
@@ -51,14 +55,14 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields,'$.customfield_11321.value') AS software_access_old,
         GET_JSON_OBJECT(fields,'$.customfield_11302.value') AS software_category_old,
         GET_JSON_OBJECT(fields,'$.customfield_11977') AS access_software_name_others,
-        CASE 
+        CASE
           WHEN GET_JSON_OBJECT(fields,'$.customfield_11860.value') = 'Sim' THEN True
-          ELSE False 
+          ELSE False
         END AS is_temporary_access,
         GET_JSON_OBJECT(fields,'$.customfield_11589.value') AS access_software_name,
         GET_JSON_OBJECT(fields,'$.customfield_11693[0].name') AS access_approval_groups,
         GET_JSON_OBJECT(fields,'$.customfield_11476.value') as company,
-        GET_JSON_OBJECT(fields,'$.customfield_12455.value') as service_category,     
+        GET_JSON_OBJECT(fields,'$.customfield_12455.value') as service_category,
         GET_JSON_OBJECT(fields,'$.resolution.name') AS resolution,
         GET_JSON_OBJECT(fields,'$.customfield_12635.value') AS queue,
         GET_JSON_OBJECT(fields,'$.customfield_12445.value') AS incidents_activity,
@@ -68,17 +72,18 @@ WITH record_selection AS (
           CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_16745.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
         ) AS slo_hours,
         GET_JSON_OBJECT(fields,'$.customfield_16603.value') AS sla_target,
+        GET_JSON_OBJECT(fields,'$.customfield_18126.value') AS native_language,
         ROW_NUMBER() OVER (PARTITION BY key ORDER BY GET_JSON_OBJECT(fields,'$.updated') DESC) AS row_num
     FROM
         datalake_jira_clean.issues
-    WHERE 
+    WHERE
         KEY like 'TI-%' AND GET_JSON_OBJECT(fields,'$.issuetype.name') != 'Sub-task'  AND
         KEY NOT IN ('TI-95756','TI-95753','TI-95752','TI-95755','TI-95754','TI-95669','TI-95386','TI-95365','TI-95358',
         'TI-95367',	'TI-95362',	'TI-95379',	'TI-95079',	'TI-95096',	'TI-95060',	'TI-91223',	'TI-74439',	'TI-50257',
         'TI-50256',	'TI-50261',	'TI-50271',	'TI-50262',	'TI-50264',	'TI-50267',	'TI-50280',	'TI-50263',	'TI-50260',
         'TI-50273',	'TI-50272',	'TI-50266',	'TI-50249',	'TI-50268',	'TI-50248',	'TI-50265')
 )
-SELECT 
+SELECT
     id,
     id_issue,
     request_type,
@@ -113,8 +118,10 @@ SELECT
     queue,
     incidents_activity,
     services_activity,
+    native_language,
     sla_time_first_response_hours,
     sla_hours,
+    sla_hours_old,
     sla_access_approval_hours,
     sla_renewal_hours,
     slo_hours,

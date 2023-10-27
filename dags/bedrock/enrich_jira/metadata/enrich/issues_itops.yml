@@ -5,15 +5,15 @@ domain: BedRock
 owner: marcelo.farinaro@quintoandar.com.br
 description: this table contains the help desk tickets of the ITOps team
 columns:
-  id: 
+  id:
     lineage:
       - datalake_jira_clean.issues.id
-    description: primary key of the table 
+    description: primary key of the table
   id_issue:
     lineage:
       - datalake_jira_clean.issues.key
     description: Key of issue on Jira
-  request_type: 
+  request_type:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Issue request type
@@ -60,11 +60,11 @@ columns:
   assignee_name:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Name of assignee to resolve the issue 
+    description: Name of assignee to resolve the issue
   assignee_email:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Email of Assignee to resolve the issue 
+    description: Email of Assignee to resolve the issue
   support_level:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -128,7 +128,7 @@ columns:
   resolution:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Type of reolution of the issue 
+    description: Type of reolution of the issue
   queue:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -141,6 +141,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Further details about Services requests
+  native_language:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: Requester's language
   sla_time_first_response_hours:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -149,6 +153,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Remaining Hours for resolution for the issue
+  sla_hours_old:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: Remaining Hours for resolution for the issue, the legacy field
   sla_access_approval_hours:
     lineage:
       - datalake_jira_clean.issues.fields
