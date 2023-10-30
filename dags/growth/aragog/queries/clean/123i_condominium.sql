@@ -7,7 +7,7 @@ SELECT
     construction_year,
     description,
     location.street AS address,
-    location.number,
+    CAST(location.number AS STRING) AS number,
     location.neighborhood,
     location.city,
     location.state,
