@@ -2,8 +2,8 @@
 database_name: dw_public
 table_name: dim_country
 description: Contains information about each country QuintoAndar is present.
-domain: cross
-owner: time-data-engineers@quintoandar.com.br
+domain: Cross
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_country_code:
     lineage:
@@ -37,3 +37,5 @@ columns:
     lineage:
       - datalake_ebdb_clean.country.ts_updated
     description: Timestamp of when the row was updated
+  ts_load:
+    description: Timestamp of when the data was loaded into our systems.

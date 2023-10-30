@@ -63,7 +63,7 @@ columns:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.id_owner
     description: Id of the owner.
-  sk_owner_version:
+  sk_owner_category:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.id_owner_version
     description: "ID of the property owner's version. We're not versioning the owners that are B2B, so a -1 values can exist."
