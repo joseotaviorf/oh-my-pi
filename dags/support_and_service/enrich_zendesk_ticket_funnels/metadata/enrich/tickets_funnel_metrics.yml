@@ -212,6 +212,8 @@ columns:
     lineage:
       - datalake_zendesk_tickets.ticket_measurements.ts_updated_local
     description: Date when the ticket was updated, in UTC-3.
+  ts_load:
+    description: Timestamp of when the table was last processed.
   year:
     lineage:
       - datalake_zendesk_tickets.ticket_measurements.ts_updated

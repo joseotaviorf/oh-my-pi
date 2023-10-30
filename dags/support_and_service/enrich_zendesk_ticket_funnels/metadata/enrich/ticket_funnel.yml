@@ -136,6 +136,10 @@ columns:
     lineage:
       - datalake_zendesk_custom_fields.custom_fields.custom_fields
     description: Specific custom_fields associated with ticket taxonomy
+  ts_agent_started:
+    lineage:
+      - datalake_zendesk_users.agents.ts_created
+    description: Date in timestamp format that indicates when the analyst related to the service was registered.
   ts_created:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ts_created
