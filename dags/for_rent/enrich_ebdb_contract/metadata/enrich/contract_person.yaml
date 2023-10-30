@@ -1,57 +1,103 @@
 database_name: datalake_ebdb_contract
 table_name: contract_person
+description: Enriched table containing information about the contract and the person related to it.
+domain: For Rent
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_contract_person:
     lineage:
       - datalake_ebdb_clean.contract_person.id
+    description: ID that relates the contract to the person.
   id_user_contract_person:
     lineage:
       - datalake_ebdb_clean.contract_person.id_user
+    description: ID of the user related to the contract. It can be joined with dw_public.dim_user.
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract_person.id_contract
+    description: ID of the contract. It can be joined with dw_public.dim_contract.
   id_user:
     lineage:
       - datalake_ebdb_clean.user.id
+    description: ID of the user related to the contract, which is the same as the id_user_contract_person. It can be joined with dw_public.dim_user.
   country_code:
     lineage:
       - datalake_ebdb_country.user.country_code
+    description: Code of the country where the person related to the contract lives.
   full_name:
     lineage:
       - datalake_ebdb_clean.contract_person.name
+    description: Full name of the person related to the contract.
   phone_number:
     lineage:
       - datalake_ebdb_clean.contract_person.phone_number
+    description: Phone number of the person related to the contract.
   email:
     lineage:
       - datalake_ebdb_clean.contract_person.email
+    description: Email of the person related to the contract
   personal_document_type:
-    lineage:
-      - datalake_ebdb_clean.contract_person.cpf
+    description: The type of the document of the person related to the contract. It can be 'CPF' or 'CNPJ'.
   personal_document:
     lineage:
       - datalake_ebdb_clean.contract_person.cpf
+    description: The document number (in varchar format) of the person related to the contract.
   gender:
     lineage:
       - datalake_ebdb_clean.contract_person.gender
+    description: The gender of the person related to the contract.
   marital_status:
     lineage:
       - datalake_ebdb_clean.contract_person.marital_status
+    description: The marital status of the person related to the contract.
+    categories:
+      common-law marriage: The person is in a stable relationship.
+      married: The person is married.
+      separated: The person is separated.
+      divorced: The person is divorced.
+      single: The person is single.
+      widower: The person is a widower.
   state_code:
     lineage:
       - datalake_ebdb_clean.contract_person.state_id
+    description: ID of the state where the person related to the contract lives.
   contract_role:
     lineage:
       - datalake_ebdb_clean.contract_person.type
+    description: The way in which the person is related to the contract.
+    categories:
+      sponsor: The person is a sponsor.
+      tenant: The person is a tenant.
+      dweller: The person is a dweller.
+      partner: The person is a partner.
+      landlord: The person is a landlord.
   is_living:
     lineage:
       - datalake_ebdb_clean.contract_person.will_live
+    description: Boolean indicating whether the person related to the contract will live in the property.
+  is_valid_cpf:
+    description: Boolean indicating whether the CPF of the person related to the contract is valid.
+  is_valid_cnpj:
+    description: Boolean indicating whether the CNPJ of the person related to the contract is valid.
+  is_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+    description: Boolean indicating whether the person related to the contract is an user.
+  is_contract_user:
+    description: Boolean indicating whether the person's user matches the user related to the contract and property.
+  is_first_contract:
+    description: Boolean indicating whether the contract is the first one related to the person.
+  is_last_contract:
+    description: Boolean indicating whether the contract is the last one related to the person.
   dt_birth:
     lineage:
       - datalake_ebdb_clean.contract_person.dt_birth
+    description: Date of birth of the person related to the contract.
   ts_created:
     lineage:
       - datalake_ebdb_clean.contract_person.ts_created
+    description: Timestamp of when the contract was created.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.contract_person.ts_updated
+    description: Timestamp of when the contract was updated.
