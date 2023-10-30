@@ -90,7 +90,7 @@ class AmplitudeCleanLoader():
 
         logger.info(
             f"m=__main__, date={self.execution_date}, source={self.source}, "
-            f"table_name={self.table_name}, msg=Loading records into datalake..."
+            f"table_name={table_name}, msg=Loading records into datalake..."
         )
 
         df = (
