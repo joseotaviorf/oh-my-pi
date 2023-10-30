@@ -7,7 +7,9 @@ description: |
   The original installments written off by this payment are entered in this table.
   In the event of an agreement, an installment may not be paid off in full. In this case,
   a line is inserted with amortization information and with the amount paid and the principal proportional to the payment.
-  When there is another payment, a new line is inserted, with another receipt number."
+  When there is another payment, a new line is inserted, with another receipt number.
+
+  Original table name: TBL_MOVIMENTO_DETALHE"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

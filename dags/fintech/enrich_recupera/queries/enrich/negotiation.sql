@@ -122,6 +122,7 @@ deduplicate_records AS (
 )
 SELECT DISTINCT
   r.customer_document,
+  a.id_creditor,
   pd.id_contract,
   a.id_negotiation,
   a.id_operator,

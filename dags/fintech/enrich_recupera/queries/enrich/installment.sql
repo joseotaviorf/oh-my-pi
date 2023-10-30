@@ -63,7 +63,7 @@ SELECT
     END AS id_paid_customer_document,
     CASE
         WHEN i.id_creditor = 1 THEN 'QuintoAndar'
-        WHEN i.id_creditor = 3 THEN 'Velo'
+        WHEN i.id_creditor IN (3,5) THEN 'Velo'
         ELSE 'PP'
     END AS creditor,
     ci.indicator_content AS contract_status,

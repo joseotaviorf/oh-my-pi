@@ -9,7 +9,9 @@ description: |
   In this case, the 'receipt_code' field remains blank, as there is a possibility that an original installment is
   divided into more than one receipt. Ex: an original installment and 3 installments accordingly, there will be one row in the table and
   three receipts for just one field. therefore the receipt code must be searched in the 'installment' table. The field 'is_installment' = s
-  indicates that it is the original of an installment."
+  indicates that it is the original of an installment.
+
+  Original table name: TBL_CREDOR_PENDENCIA"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

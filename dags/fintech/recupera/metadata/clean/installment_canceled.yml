@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: installment_canceled
-description: "Stores canceled installments in Recupera"
+description: |
+  "Stores canceled installments in Recupera.
+
+  Original table name: TBL_PARCELAMENTO_CANCELADO"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

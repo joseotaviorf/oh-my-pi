@@ -21,7 +21,7 @@ columns:
     description: History Code
     lineage:
       - datalake_recupera_clean.historical_records.historical_code
-  occurence_description:
+  occurrence_description:
     description: Description in the occurrence
     lineage:
       - datalake_recupera_clean.historical_records.occurence_description

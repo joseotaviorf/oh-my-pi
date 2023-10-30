@@ -4,7 +4,9 @@ table_name: operational_records
 description: |
   "This table is the customer's operational data.
   These are the data referring to their characteristics within the system
-  and the billing process."
+  and the billing process.
+
+  Original table name: TBL_REGISTROS_OPERACIONAL"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

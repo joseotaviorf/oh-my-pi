@@ -6,7 +6,9 @@ description: |
   There is a row for each contract and installment.
   Thus, it is possible to identify how the installment values are divided by contract.
   This table is complementary to table 'installment' and the sum of the amounts per installment
-  must be the same in both tables."
+  must be the same in both tables.
+
+  Original table name: TBL_PARCELAMENTO_DETALHE"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

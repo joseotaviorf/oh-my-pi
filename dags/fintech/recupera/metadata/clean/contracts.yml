@@ -3,7 +3,9 @@ database_name: datalake_recupera_clean
 table_name: contracts
 description: |
   "Contains all contracts loaded in recupera.
-  Once a contract is included in this table, it will never be deleted, even if it is settled."
+  Once a contract is included in this table, it will never be deleted, even if it is settled.
+
+  Original table name: TBL_CONTRATOS"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

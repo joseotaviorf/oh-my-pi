@@ -3,7 +3,9 @@ database_name: datalake_recupera_clean
 table_name: email_records
 description: |
   "Tables with customer emails. It is charged by customer charge and can also be updated via telecharging.
-  Email types can be registered, however those inserted by the load are automatically registered by the system."
+  Email types can be registered, however those inserted by the load are automatically registered by the system.
+
+  Original table name: TBL_REGISTROS_EMAIL"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

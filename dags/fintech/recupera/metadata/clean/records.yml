@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: records
-description: "This table contains customer data such as address, name."
+description: |
+  "This table contains customer data such as address, name.
+
+  Original table name: TBL_REGISTROS"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

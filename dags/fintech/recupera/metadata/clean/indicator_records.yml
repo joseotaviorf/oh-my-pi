@@ -1,7 +1,9 @@
 ---
 database_name: datalake_recupera_clean
 table_name: indicator_records
-description: "This table contains all customer indicators."
+description: |
+  "This table contains all customer indicators.
+  Original table name: TBL_REGISTROS_INDICADORES"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

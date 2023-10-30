@@ -5,7 +5,9 @@ description: |
   "Contains the installments of the agreements.
   In this table we will have a line for each installment of the agreement made.
   In the case of reversing the installment receipt, there will be more than one line
-  per installment The records are never deleted, the flag being changed in the case of cancellation."
+  per installment The records are never deleted, the flag being changed in the case of cancellation.
+
+  Original table name: TBL_PARCELAMENTO"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

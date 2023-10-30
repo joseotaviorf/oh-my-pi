@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: operators
-description: "Contains all registered operators"
+description: |
+  "Contains all registered operators.
+
+  Original table name: TBL_OPERADORES"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
@@ -36,7 +39,7 @@ columns:
   type_search:
     description: |
       "Type of search that the active operator will make (is used in the manager to select the next record).
-      The value 'Flag temporária - Não buscar nova ficha' is a temporary flag used only to not look for a new record (cpf), 
+      The value 'Flag temporária - Não buscar nova ficha' is a temporary flag used only to not look for a new record (cpf),
       as the Operator already has a record on screen."
     lineage:
       - datalake_recupera_raw.operators.type_search

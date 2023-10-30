@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: address_records
-description: "This table contains the customer's third address data."
+description: |
+  "This table contains the customer's third address data.
+
+  Original table name: TBL_REGISTROS_ENDERECOS"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

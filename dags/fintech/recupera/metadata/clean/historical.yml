@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: historical
-description: "Table containing registered occurrences"
+description: |
+  "Table containing registered occurrences.
+
+  Original table name: TBL_HISTORICOS"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
@@ -16,7 +19,7 @@ columns:
   has_complement:
     description: |
       "Indicates whether or not the historical requests a complement.
-      If yes (True), a screen to fill in the text will be displayed when 
+      If yes (True), a screen to fill in the text will be displayed when
       the occurrence is made. If not (False) then typing a complement will not be allowed. "
     lineage:
       - datalake_recupera_raw.historical.has_complement
@@ -42,8 +45,8 @@ columns:
       - datalake_recupera_raw.historical.operator_name
   is_preferencial_phone_updated:
     description: |
-      "Indicates whether it updates the preferred phone or not. 
-      If you update after making the occurrence the 
+      "Indicates whether it updates the preferred phone or not.
+      If you update after making the occurrence the
       phone used for dialing will be placed as the preferred phone"
     lineage:
       - datalake_recupera_raw.historical.is_preferencial_phone_updated
@@ -65,7 +68,7 @@ columns:
       - datalake_recupera_raw.historical.is_scheduled_agenda
   is_next_call_triggered:
     description: |
-      "Indicates whether the next call is triggered or not. After making the occurrence, 
+      "Indicates whether the next call is triggered or not. After making the occurrence,
       it calls the next customer automatically (active operator)"
     lineage:
       - datalake_recupera_raw.historical.is_next_call_triggered
@@ -93,16 +96,16 @@ columns:
       - datalake_recupera_raw.historical.historical_type
   is_contract_linked:
     description: |
-      "Indicates whether or not the contract is linked (calls or not the contract selection screen and 
+      "Indicates whether or not the contract is linked (calls or not the contract selection screen and
       inserts in the table of historical contracts)"
     lineage:
       - datalake_recupera_raw.historical.is_contract_linked
   is_withdrawn_property:
     description: |
       "Indicates whether to withdraw property or not.
-      When the operator calls a record, the id_operator field 
-      of table 'operational_records' is changed to his code, with this flag it is indicated that 
-      when performing this historical the id_operator field is changed to the distributor 
+      When the operator calls a record, the id_operator field
+      of table 'operational_records' is changed to his code, with this flag it is indicated that
+      when performing this historical the id_operator field is changed to the distributor
       from which the operator picked up the customer. This prevents the operator from forming a 'wallet'.
       Note: It is known from which distributor the customer came from the field
       distributor_code from table 'operational_records'"

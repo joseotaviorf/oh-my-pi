@@ -3,9 +3,10 @@ database_name: datalake_recupera_clean
 table_name: complementary_records
 description: |
   "This table contains all the customer's active debts.
-  When paid in installments, the debt will only be written off (excluded from this table)
-  when the installment payment is settled or canceled (in the event that, with the amortization
-  of the amount paid, this installment has been settled)."
+  When paid in installments, the debt will be written down when the installment is settled (liquidado)
+  or canceled (in the event that, with the amortization of the amount paid, this installment has been paid).
+
+  Original table name: TBL_REGISTROS_COMPLEMENTOS"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

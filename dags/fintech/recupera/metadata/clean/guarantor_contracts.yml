@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: guarantor_contracts
-description: "It contains contact data for a contract"
+description: |
+  "It contains contact data for a contract.
+
+  Original table name: TBL_CONTRATOS_AVALISTA"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

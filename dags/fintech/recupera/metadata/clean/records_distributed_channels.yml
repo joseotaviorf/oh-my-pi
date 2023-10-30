@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: records_distributed_channels
-description: "stores distribution data for digital channels – currently not being populated"
+description: |
+  "stores distribution data for digital channels.
+
+  Original table name: TBL_REGISTROS_CANAIS_DISTRIB"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

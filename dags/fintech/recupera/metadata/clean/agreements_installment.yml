@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: agreements_installment
-description: "Stores the deal with a unique key of the deal part"
+description: |
+  " Stores the deal with a unique key of the deal part.
+
+  Original Table Name: TBL_DEPARA_ACORDOS_PARC_5A"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

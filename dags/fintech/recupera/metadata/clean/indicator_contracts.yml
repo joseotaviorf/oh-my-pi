@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: indicator_contracts
-description: "This table contains all contract indicators"
+description: |
+  "This table contains all contract indicators.
+
+  Original table name: TBL_CONTRATOS_INDICADORES"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

@@ -4,8 +4,10 @@ table_name: complementary_records_written_down
 description: |
   "This table contains all of the customer's written-off debts.
   The structure is identical to that of table 'complementary_records'.
-  When the debt is written off, it is removed from it and inserted in table 'complementary_records_written_down'.
-  At this time the amount_paid and discount_amount fields are updated."
+  When the debt is written off, it is removed from table 'complementary_records' and inserted in table 'complementary_records_written_down'.
+  At this time the amount_paid and discount_amount fields are updated.
+
+  Original table name: TBL_REGISTROS_COMPL_BAIXAS"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

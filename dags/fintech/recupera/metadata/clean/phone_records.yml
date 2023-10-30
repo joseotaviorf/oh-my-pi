@@ -5,7 +5,9 @@ description: |
   "Tables with customer phone numbers. It is charged by customer
   charge and can also be updated via telecharging. telephone types
   can be registered, however those inserted by the load are automatically
-  registered by the system"
+  registered by the system.
+
+  Original table name: TBL_REGISTROS_TELEFONES"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

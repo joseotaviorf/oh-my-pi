@@ -1,7 +1,10 @@
 ---
 database_name: datalake_recupera_clean
 table_name: installments_indicators
-description: "stores data from performance level indicators (invoices)"
+description: |
+  "stores data from performance level indicators (invoices).
+
+  Original table name: TBL_PRESTACOES_INDICADORES"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

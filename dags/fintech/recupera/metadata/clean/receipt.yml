@@ -2,10 +2,12 @@
 database_name: datalake_recupera_clean
 table_name: receipt
 description: |
-  "Stores all receipts issued by the system. 
-  Receipts can be a bank slip, a DI, a cash receipt at the counter, a check. 
-  In this table there is only one line per receipt. 
-  Once a receipt has been issued, it will never be deleted from this table."
+  "Stores all receipts issued by the system.
+  Receipts can be a bank slip, a DI, a cash receipt at the counter, a check.
+  In this table there is only one line per receipt.
+  Once a receipt has been issued, it will never be deleted from this table.
+
+  Original table name: TBL_RECEBIMENTOS"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
