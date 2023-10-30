@@ -54,8 +54,10 @@ WITH rent_flow_house_listing AS (
       -    Proposals that have tenant's documentation manual sent or auto doc sent dates (which indicates DS event)
       -    Proposals that have a credit approved last date (which indicates CA event)
     **/
-    IF(con.ts_signed IS NOT NULL AND con.is_active_or_ended = TRUE, rf.id_contract, NULL) AS id_contract,
+    IF(con.ts_created IS NOT NULL
+      OR (con.ts_signed IS NOT NULL AND con.is_active_or_ended = TRUE), rf.id_contract, NULL) AS id_contract,
     /** Conditions to accept a contract:
+      -    Contracts that were created and have a timestamp of creation (which indicates CC event)
       -    Contracts that have signed date and status like active or ended (which indicates CS event)
     **/
     IF(h.is_rent_3p_supply, h.uuid_company, NULL) AS uuid_company,
@@ -467,6 +469,48 @@ rent_demand_events AS (
   WHERE
     ct.ts_signed IS NOT NULL
     AND ct.is_active_or_ended = TRUE
+  UNION ALL
+  SELECT -- Contract Created (CC)
+    ct.id AS id_event,
+    rf.id_booking,
+    rf.id_offer,
+    rf.id_proposal,
+    ct.id AS id_contract,
+    10 AS id_event_type,
+    COALESCE(off.id_client, rf.id_client) AS id_client,
+    ct.id_house,
+    rf.id_agent,
+    COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
+    ct.ts_created AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
+    hbh.id_user AS id_owner_on_event,
+    rf.uuid_company,
+    rf.id_company_hubspot,
+    rf.partner_3p_supply,
+    rf.country_code,
+    YEAR(ct.ts_created) AS year,
+    MONTH(ct.ts_created) AS month,
+    DAY(ct.ts_created) AS day
+  FROM
+    datalake_ebdb_contract.contract AS ct
+  JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_contract = ct.id
+  LEFT JOIN -- We may have several contracts without offer and proposal (portability). In order to don't lose track of them, we're applying a left join.
+    datalake_proposal.proposal AS pp
+      ON ct.id_proposal = pp.id
+  LEFT JOIN
+    datalake_offer.offer AS off
+      ON off.id = pp.id_offer
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON ct.id_house = hbh.id_house
+      AND DATE(ct.ts_created) >= DATE(hbh.ts_started)
+      AND DATE(ct.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+  WHERE
+    ct.ts_created IS NOT NULL
 ),
 termination_period AS (
   /** We need to understand if a demand event happened during a contract termination process.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_rent_demand_events
 table_name: rent_demand_events
-description: "This table shows the demand events of For Rent, each line is an event related to the scope and its partitioned by the country_code."
+description: "This table shows the demand events of For Rent, each line is an event related to the scope and is partitioned by the country_code."
 domain: For Rent
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -11,7 +11,7 @@ columns:
       - datalake_ebdb_contract.contract.id
       - datalake_offer.offer.id_offer_context
       - datalake_proposal.proposal.id
-    description: "Id of the event."
+    description: "Id of the event (which could be the id of a booking, offer, proposal or contract)."
   id_booking:
     lineage:
       - datalake_booking.booking.id
@@ -44,6 +44,7 @@ columns:
       '7': "Id of the documentation sent (DS) event."
       '8': "Id of the credit approved (CA) event."
       '9': "Id of the contract signed (CS) event."
+      '10': "Id of the contract created (CC) event."
   id_tenant_prospect:
     lineage:
       - datalake_booking.booking.id_visitor
@@ -83,7 +84,7 @@ columns:
   id_owner_category:
     lineage:
       - datalake_pro_owners.daily_owner_version.id_owner_category
-    description: "ID of the property owner's version. We're not versioning the owners that are B2B, so a NULL values can exist."
+    description: "ID of the property owner's version. We're not versioning the owners that are B2B, so NULL values can exist."
   uuid_company:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
@@ -104,6 +105,7 @@ columns:
     lineage:
       - datalake_booking.booking.ts_created
       - datalake_booking.booking.ts_booking_utc
+      - datalake_ebdb_contract.contract.ts_created
       - datalake_ebdb_contract.contract.ts_signed
       - datalake_offer.offer.ts_first_sent
       - datalake_offer.offer.ts_analyzed
@@ -112,11 +114,12 @@ columns:
       - datalake_proposal.proposal.ts_tenant_auto_first_doc_sent
       - datalake_proposal.proposal.ts_tenant_first_doc_sent
       - datalake_proposal.proposal.ts_credit_approved_last
-    description: "Id of the event date."
+    description: "Timestamp of when the event happened."
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
-    description: "Country code information. Also, a partition of the table."
+    description: "Country code information. Also, a partition of the table.
+      Use it as the first filter of your query in order to improve the performance of your results."
   event_year:
     description: "Year information of the event date."
   event_month:
