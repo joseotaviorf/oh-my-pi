@@ -24,7 +24,7 @@ columns:
   rev:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.rev
-    description: Unique ID for the change and can be joined with table rev_info to get more details.
+    description: Unique ID for the change. It can be joined with table rev_info to get more details.
   rev_type:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.rev_type
@@ -57,10 +57,24 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.email
     description: Email of the user who made the change.
+  action:
+    description: The change action made.
+    categories:
+      ACTIVATED: A creation was made or the agent became active.
+      DEACTIVATED: The agent has been deactivated.
+      SUSPENDED: The agent's contract ID has been changed to 6.
+      UNSUSPENDED: The agent's contract has been changed, previously having ID 6.
+      ALTERED_CONTRACT: The agent's contract has been changed and the ID was not 6 and has not been changed to 6.
   is_agent_active:
     lineage:
       - datalake_ebdb_clean.agent_data_aud.is_active
-    description: Boolean indicating if the agent is active.
+    description: Boolean indicating whether the agent is active.
+  is_previous_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.is_active
+    description: Boolean indicating whether the agent was previously active.
+  has_changed_work_contract:
+    description: Boolean indicating whether the agent's contract has been changed.
   has_changed_activated:
     description: Boolean indicating whether is_agent_active has been changed.
   ts_revision:
