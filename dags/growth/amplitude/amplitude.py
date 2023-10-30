@@ -31,6 +31,7 @@ EXECUTION_TIMEOUT_HOURS = 3
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols_dag")
 INCREMENTAL_PARTITIONS = config_service.get_config("incremental_partitions")
+EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
 CLEAN_STAGING_BLOCK_TABLES = config_service.get_config("clean_staging_block_tables")
 
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -42,6 +43,7 @@ raw_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
 
 default_libraries = config_service.get_config("default_libraries")
 

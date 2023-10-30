@@ -8,6 +8,8 @@ custom_cluster:
   aws_attributes:
     availability: ON_DEMAND
   spark_version: 12.2.x-scala2.12
+spark_conf:
+  spark.driver.maxResultSize: "0"
 clean_staging_block_tables:
   - 170698_user_merge
   - 183047_user_merge
