@@ -32,6 +32,8 @@ columns:
     description: Name of the marketing channel on the Mexico operation.
     dimension: True
   leads:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.leads
     description: Volume of leads.
     metric:
       name: Leads
@@ -43,6 +45,8 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   prospects:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.prospects
     description: Volume of prospects.
     metric:
       name: Prospects
@@ -54,6 +58,8 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   qualifieds:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.qualifieds
     description: Volume of qualifieds.
     metric:
       name: Qualifieds
@@ -65,6 +71,8 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   available_qualifieds:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.available_qualifieds
     description: Volume of available qualifieds.
     metric:
       name: Available Qualifieds
@@ -76,6 +84,8 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   opportunities:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.opportunities
     description: Volume of opportunities.
     metric:
       name: Opportunities
@@ -87,6 +97,8 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   first_listings:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.first_listings
     description: Volume of first listings.
     metric:
       name: First Listings
@@ -98,6 +110,8 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   prospects_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.prospects_cohort
     description: Volume of prospects cohort.
     metric:
       name: Prospects
@@ -109,6 +123,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   qualifieds_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.qualifieds_cohort
     description: Volume of qualifieds cohort.
     metric:
       name: Qualifieds
@@ -120,6 +136,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   available_qualifieds_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.available_qualifieds_cohort
     description: Volume of available qualifieds cohort.
     metric:
       name: Available Qualifieds
@@ -131,6 +149,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   opportunities_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.opportunities_cohort
     description: Volume of opportunities cohort.
     metric:
       name: Opportunities
@@ -142,6 +162,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   first_listings_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.first_listings_cohort
     description: Volume of first listings cohort.
     metric:
       name: Firs Listings
@@ -153,6 +175,9 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   l2p_coincident:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.prospects
+      - datalake_mexico_rent_supply.coincident_funnel.leads
     description: Lead to prospect coincident "conversion".
     metric:
       name: Leads to Prospects
@@ -164,6 +189,9 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   p2q_coincident:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.qualifieds
+      - datalake_mexico_rent_supply.coincident_funnel.prospects
     description: Prospect to qualified coincident "conversion".
     metric:
       name: Prospects to Qualifieds
@@ -175,6 +203,9 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   q2aq_coincident:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.available_qualifieds
+      - datalake_mexico_rent_supply.coincident_funnel.qualifieds
     description: Qualified to available qualified coincident "conversion".
     metric:
       name: Qualifieds to Available Qualifieds
@@ -186,6 +217,9 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   q2o_coincident:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.opportunities
+      - datalake_mexico_rent_supply.coincident_funnel.qualifieds
     description: Qualified to opportunity coincident "conversion".
     metric:
       name: Qualifieds to Opportunities
@@ -197,6 +231,9 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   aq2o_coincident:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.opportunities
+      - datalake_mexico_rent_supply.coincident_funnel.available_qualifieds
     description: Available qualified to opportunitiy coincident "conversion".
     metric:
       name: Available Qualifieds to Opoortunities
@@ -208,6 +245,9 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   o2fl_coincident:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.first_listings
+      - datalake_mexico_rent_supply.coincident_funnel.opportunities
     description: Opportunity to first listing coincident "conversion".
     metric:
       name: Opportunities to First Listings
@@ -219,6 +259,9 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   q2fl_coincident:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.first_listings
+      - datalake_mexico_rent_supply.coincident_funnel.qualifieds
     description: Qualified to first listing coincident "conversion".
     metric:
       name: Qualifieds to First Listings
@@ -230,6 +273,9 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   p2fl_coincident:
+    lineage:
+      - datalake_mexico_rent_supply.coincident_funnel.first_listings
+      - datalake_mexico_rent_supply.coincident_funnel.prospects
     description: Prospect to first listing coincident "conversion".
     metric:
       name: Prospects to First Listings
@@ -241,6 +287,8 @@ columns:
       approved_by: laura.theotonio@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/60980-60980-actual-supply'
   l2p_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.l2p_cohort
     description: Lead to prospect cohort conversion.
     metric:
       name: Leads to Prospects
@@ -252,6 +300,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   p2q_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.p2q_cohort
     description: Prospect to qualified cohort conversion.
     metric:
       name: Prospects to Qualifieds
@@ -263,6 +313,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   q2aq_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.q2aq_cohort
     description: Qualified to available qualified cohort conversion.
     metric:
       name: Qualifieds to Available Qualifieds
@@ -274,6 +326,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   q2o_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.q2o_cohort
     description: Qualified to opportunity cohort conversion.
     metric:
       name: Qualifieds to Opportunities
@@ -285,6 +339,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   aq2o_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.aq2o_cohort
     description: Available qualified to opportunity cohort conversion.
     metric:
       name: Available Qualifieds to Opportunities
@@ -296,6 +352,8 @@ columns:
       approved_by: gustavo.machado@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/74647-benvi-supply-funnel-metrics'
   o2fl_cohort:
+    lineage:
+      - datalake_mexico_rent_supply.cohort_funnel.o2fl_cohort
     description: Opportunity to first listing cohort conversion.
     metric:
       name: Opportunities to First Listings
