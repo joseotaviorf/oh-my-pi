@@ -12,6 +12,8 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from pyspark.sql import DataFrame
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
@@ -33,6 +35,86 @@ parser.add_argument("--tables_list", nargs="+", dest="tables_list", required=Tru
 parser.add_argument("--partition_by", nargs="+", dest="partition_by", required=False)
 
 
+class AmplitudeCleanLoader():
+
+    def __init__(
+            self,
+            env: str,
+            source: str,
+            layer: str,
+            execution_date: datetime,
+            datalake_bucket: str,
+        ) -> None:
+
+        self.env = env
+        self.source = source
+        self.layer = layer
+        self.execution_date = execution_date
+        self.datalake_bucket = datalake_bucket
+
+        db_info = DatalakeMetastoreService.get_db_info(self.env, self.source, self.datalake_bucket)
+
+        self.database_name = db_info["db_clean_databricks"]
+        self.database_path = db_info["db_clean_path"]
+
+        self.s3_loader = S3Loader()
+        self.spark_client = SparkClient()
+        self.spark_metastore_service = SparkMetastoreService(self.spark_client)
+        self.spark_metastore_loader = SparkMetastoreLoader(self.spark_metastore_service)
+        self.file_format = SparkTableStorageFormat.DEFAULT_CLEAN
+    
+
+    def fetch_data(self, table_name:str) -> DataFrame:
+        """
+        Function to fetch data from Ampltiude table clean query.
+        """
+        logger.info(
+            f"m=__main__, date={self.execution_date}, source={self.source}, "
+            f"table_name={table_name}, msg=Retrieving records..."
+        )
+
+        query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+            dag_name=self.source, table_name=table_name, layer=self.layer
+        ).format(self.execution_date.year, self.execution_date.month, self.execution_date.day)
+
+        df = self.spark_client.get_records(query)
+
+        return df 
+
+    def load_data_into_datalake(
+            self, 
+            df: DataFrame, 
+            table_name: str, 
+            partition_by: list
+        ):
+
+        logger.info(
+            f"m=__main__, date={self.execution_date}, source={self.source}, "
+            f"table_name={self.table_name}, msg=Loading records into datalake..."
+        )
+
+        df = (
+            SparkDataFrameService(df)
+            .optimize_partitions_by_partition_columns(partition_by)
+            .output()
+        )
+
+        self.s3_loader.load_df(
+            df=df,
+            s3_path=f"{self.database_path}{table_name}",
+            format_options=self.file_format,
+            optimize_dataframe=False,
+            partitions=partition_by,
+        )
+        self.spark_metastore_loader.update_metastore(
+            df=df,
+            database_name=self.database_name,
+            table_name=table_name,
+            format_options=self.file_format,
+            database_location=self.database_path,
+            partitions=partition_by,
+        )
+
 if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
@@ -48,46 +130,19 @@ if __name__ == "__main__":
     )
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
-    spark_client = SparkClient()
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    s3_loader = S3Loader()
 
-    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
-    db_clean_name = db_info["db_clean_databricks"]
-    db_clean_path = db_info["db_clean_path"]
-    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
+    amplitude_clean_loader = AmplitudeCleanLoader(
+        env=env, 
+        source=source,
+        layer="clean",
+        execution_date=execution_date,
+        datalake_bucket=datalake_bucket
+    )
 
-    for table_name in tables_list:
+    # fetch Amplitude cean tables args
+    tables_args = [
+        (amplitude_clean_loader.fetch_data(table), table, partition_by) for table in tables_list
+    ]
 
-        logger.info(
-            f"m=__main__, date={execution_date}, source={source}, "
-            f"table_name={table_name}, msg=Retrieving records..."
-        )
-
-        query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-            dag_name=source, table_name=table_name, layer="clean"
-        ).format(execution_date.year, execution_date.month, execution_date.day)
-
-        df = spark_client.get_records(query)
-        df = (
-            SparkDataFrameService(df)
-            .optimize_partitions_by_partition_columns(partition_by)
-            .output()
-        )
-
-        s3_loader.load_df(
-            df=df,
-            s3_path=f"{db_clean_path}{table_name}",
-            format_options=format_options,
-            optimize_dataframe=False,
-            partitions=partition_by,
-        )
-        spark_metastore_loader.update_metastore(
-            df=df,
-            database_name=db_clean_name,
-            table_name=table_name,
-            format_options=format_options,
-            database_location=db_clean_path,
-            partitions=partition_by,
-        )
+    # load Amplitude clean data into datalake
+    [amplitude_clean_loader.load_data_into_datalake(*args) for args in tables_args]
