@@ -70,6 +70,10 @@ columns:
       VC_after_OS: Performed a visit in the listing after the offer.
       TTA_after_OS: Talked to the agent after the offer.
       "null": If the buyer didn't perform any event after the offer or not even made an offer.
+  rank_buyer_sale_flow:
+    description: This number indicates the sequence of sale flows the buyer has made on the platform. For example, if the number is '2', it means that this is the second sale flow the buyer has made on the platform, not necessarily for the same house.
+  rank_house_sale_flow:
+    description: This number indicates the sequence of sale flows the house has had on the platform. For example, if the number is '2', it means that this is the second sale flow the house has had on the platform, not necessarily with the same buyer.
   is_buyer_first_sale_flow:
     lineage:
       - datalake_talk_to_agent.talk_to_agent_events.id_user
