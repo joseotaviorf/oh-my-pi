@@ -14,6 +14,10 @@ columns:
     lineage:
       - datalake_app_installed.events.id_user
     description: ID of the user. It does not consider NULL values.
+  app_version:
+    lineage:
+      - datalake_app_installed.events.app_version
+    description: Version of the app installed on the users device at the time of the event
   has_app_installed:
     description:
       Whether the user has the app installed or not, the following conditions determine

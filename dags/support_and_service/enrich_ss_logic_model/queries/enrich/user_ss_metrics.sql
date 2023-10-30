@@ -88,6 +88,7 @@ SELECT
   chm.total_human_csat_neutral_within_three_months,
   chm.total_human_csat_promoter_within_three_months,
   chm.total_human_csat_answered_within_three_months,
+  aim.app_version,
   ptp.is_pp_multi,
   ptp.is_tenant,
   ptp.is_broker,

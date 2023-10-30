@@ -11,6 +11,13 @@ columns:
       - datalake_amplitude_clean_staging.170698_search_page_viewed_events.id_user
       - datalake_amplitude_clean_staging.170698_login_page_viewed_events.id_user
     description: ID of the user
+  app_version:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_af_app_opened_events.user_properties
+      - datalake_amplitude_clean_staging.170698_home_page_viewed_events.user_properties
+      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.user_properties
+      - datalake_amplitude_clean_staging.170698_login_page_viewed_events.user_properties
+    description: Version of the app installed on the users device at the time of the event
   ts_event:
     lineage:
       - datalake_amplitude_clean_staging.170698_af_app_opened_events.ts_client_event

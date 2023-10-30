@@ -34,6 +34,7 @@ def create_data_payload(item):
         "app": {
             "ts_last_app_installed": item.get("ts_last_app_installed"),
             "has_app_installed": item.get("has_app_installed"),
+            "app_version": item.get("app_version"),
         },
         "persona": {
             "is_pp_multi": item.get("is_pp_multi"),

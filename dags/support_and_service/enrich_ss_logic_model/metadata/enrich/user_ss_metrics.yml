@@ -216,6 +216,10 @@ columns:
     lineage:
       - datalake_ss_logic_model.user_csat_human_metric.total_human_csat_answered_within_three_months
     description: The volume of human csat answers within the last 3 months.
+  app_version:
+    lineage:
+      - datalake_ss_logic_model.user_app_installed_metrics.app_version
+    description: Version of the app installed on the users device at the time of the event
   is_pp_multi:
     lineage:
       - datalake_user.persona_type.is_pp_multi
