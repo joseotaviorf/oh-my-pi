@@ -2185,6 +2185,8 @@ bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.ebdb:load-clean-listing-business-context-aud
   - bietlejuice.ebdb:load-clean-listing-sale-model
+  - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
+  - bietlejuice.ebdb:load-clean-suspected-unavailability-listings-aud
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_offer:load-enrich-sale-offer

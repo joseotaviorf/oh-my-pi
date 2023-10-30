@@ -57,7 +57,6 @@ columns:
       "-3000":
         If the owner has any cancellation, we penalize him/her with -3000 score points.
   has_active_rental_contract_score:
-    lineage:
     description: >
       If the listing has an active rental contract we believe that this makes it a little more difficult for the listing to be available, and slightly more difficult to make a visit.
     categories:
@@ -65,6 +64,24 @@ columns:
         If there is no contract, we do not take down the listing's score.
       "-1000": >
         If there is a contract, we deduct -1000 from the listing's score.
+  cancel_by_unauthorized_entry_score:
+    description: >
+      If the listing has any visit canceled due to unauthorized entry, we understand that the availability of that listing may be affected by that behavior.
+    categories:
+      "0": >
+        If there is no cancellation due to unauthorized entry, we do not take down the listing's score.
+      "-5000": >
+        If there is one or more than one cancellation due to unauthorized entry, we deduct -5000 from the listing's score.
+      "-10000": > 
+        If there is one or more than one cancellation due to unauthorized entry and no visits in the previous 45 days, we deduct -10000 from the listing's score.
+  suspicious_listing_contact_score:
+    description: >
+      If the listing has received an HSM for suspected unavailability of the listing by product, we will understand that this listing has non-standard availability and we will deduct its score.
+    categories:
+      "0": >
+        If he has not received this HSM in the previous 45 days.
+      "-3500": >
+        If he has received one or more than one HSM in the previous 45 days.
   tier:
     description: >
       'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". This score is based on all the elements that can alter the availability of a listing on the visit. That is, it takes into account factors such as key location, seller behavior, canceled visits, hours available for visits, and rental status.

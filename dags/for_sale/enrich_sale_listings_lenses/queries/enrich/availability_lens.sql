@@ -30,7 +30,7 @@ key_location_by_day AS (
     datalake_ebdb_user.user_revision_entity AS rev
       ON a.rev = rev.id
   QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY id_house, DATE_TRUNC('DAY', ts_revision) ORDER BY rev DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id_house, DATE(ts_revision) ORDER BY rev DESC) = 1
 ),
 key_location_aux AS (
   SELECT 
@@ -98,6 +98,35 @@ visits_unauthorized_entry AS (
   GROUP BY 
     1, 2
 ),
+suspected_unavailability_listings_aux AS (
+  SELECT 
+    l_aud.id_house,
+    DATE(r.ts_revision) AS date
+  FROM
+    datalake_ebdb_clean.suspected_unavailability_listings_aud AS l_aud
+  INNER JOIN 
+    datalake_ebdb_clean.suspected_unavailability_listings AS l
+      ON l_aud.id_house = l.id_house
+  INNER JOIN
+    datalake_ebdb_user.user_revision_entity AS r
+      ON l_aud.rev = r.id
+  QUALIFY 
+    LAST(r.ts_revision) OVER (PARTITION BY l_aud.id_house, DATE(r.ts_revision)) = r.ts_revision
+    AND l_aud.is_confirmed IS FALSE
+    AND l.is_confirmed IS FALSE 
+),
+suspected_unavailability_listings AS (
+  SELECT 
+    id_house,
+    1 AS contact_attempts_from_suspicious_listings,
+    date
+  FROM
+    suspected_unavailability_listings_aux
+  WHERE 
+    date <= DATE_SUB(CURRENT_DATE, 3)
+  GROUP BY
+    1, 2, 3
+),
 rent_contracts AS ( 
     SELECT
     id AS id_contract,
@@ -106,6 +135,9 @@ rent_contracts AS (
     LEAST(TO_DATE(ts_analyst_annulment_input), dt_termination) AS dt_contract_ended
   FROM
     datalake_ebdb_contract.contract
+  WHERE 
+    status_closing = 'ContratoAssinado'
+    AND is_canceled IS FALSE
 ),
 status_change_by_day AS (
   SELECT
@@ -124,7 +156,7 @@ status_change_by_day AS (
   WHERE
     lbc.business_context = 'SALE'
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY lbc.id_house, DATE_TRUNC('DAY', ure.ts_revision) ORDER BY ure.ts_revision DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY lbc.id_house, DATE(ure.ts_revision) ORDER BY ure.ts_revision DESC) = 1
 ),
 status_changes_aux AS (
   SELECT
@@ -172,6 +204,7 @@ dataset AS (
     SUM(COALESCE(vc.visits_completed, 0)) OVER (PARTITION BY t.id_house ORDER BY t.date ROWS BETWEEN 45 PRECEDING AND CURRENT ROW) AS visits_completed_last_45_days,
     SUM(COALESCE(cl.vbs_canceled_by_owner, 0)) OVER (PARTITION BY t.id_house ORDER BY t.date ROWS BETWEEN 45 PRECEDING AND CURRENT ROW) AS visits_canceled_by_owner_last_45_days,
     SUM(COALESCE(vu.visits_unauthorized_entry, 0)) OVER (PARTITION BY t.id_house ORDER BY t.date ROWS BETWEEN 45 PRECEDING AND CURRENT ROW) AS visits_unauthorized_entry_last_45_days,
+    SUM(COALESCE(sul.contact_attempts_from_suspicious_listings, 0)) OVER (PARTITION BY t.id_house ORDER BY t.date ROWS BETWEEN 45 PRECEDING AND CURRENT ROW) AS contact_attempts_from_suspicious_listings_last_45_days,
     rc.id_contract IS NOT NULL AS has_active_rental_contract,
     COUNT_IF(rc.id_contract IS NOT NULL) OVER (PARTITION BY t.id_house) > 0 AS has_house_been_rented,
     t.date
@@ -189,6 +222,10 @@ dataset AS (
     visits_unauthorized_entry AS vu 
       ON t.id_house = vu.id_house
       AND t.date = vu.date
+  LEFT JOIN 
+    suspected_unavailability_listings AS sul
+      ON t.id_house = sul.id_house
+      AND t.date = sul.date
   LEFT JOIN 
     available_hours AS ah 
       ON t.id_house = ah.id_house
@@ -224,11 +261,15 @@ business_logic AS (
     END AS has_active_rental_contract_score,
     IF(visits_canceled_by_owner_last_45_days >= 1, -3000, 0) AS cancel_by_owner_score,
     visits_unauthorized_entry_last_45_days,
-    CASE 
+    CASE
+      WHEN visits_unauthorized_entry_last_45_days >= 1 AND visits_completed_last_45_days = 0 THEN -100000 
       WHEN visits_unauthorized_entry_last_45_days >= 1 THEN -5000
-      WHEN visits_unauthorized_entry_last_45_days >= 1 AND visits_completed_last_45_days = 0 THEN -100000
       ELSE 0 
     END AS cancel_by_unauthorized_entry_score,
+    CASE 
+      WHEN contact_attempts_from_suspicious_listings_last_45_days >= 1 THEN -3500
+      ELSE 0 
+    END AS suspicious_listing_contact_score,
     week_available_hours_bins,
     CASE week_available_hours_bins
       WHEN '[0]' THEN -100000
@@ -256,7 +297,11 @@ business_logic AS (
       WHEN visits_canceled_by_owner_last_45_days= 0 THEN 'no visits canceled by the owner in the last 45 days, '
       WHEN visits_canceled_by_owner_last_45_days BETWEEN 1 AND 3 THEN CONCAT('has ', CAST(visits_canceled_by_owner_last_45_days AS STRING), ' visit canceled by the owner in the last 45 days, ') 
       WHEN visits_canceled_by_owner_last_45_days > 3 THEN 'more than 3 visits canceled by the owner in the last 45 days, '
-    END AS cancel_by_owner_score_disclaimer,     
+    END AS cancel_by_owner_score_disclaimer,
+    CASE 
+      WHEN contact_attempts_from_suspicious_listings_last_45_days >= 1 THEN 'not has confirmed in our whatsapp message about availability of the house, '
+      ELSE ''
+    END AS suspicious_listing_contact_score_disclaimer, 
     CASE week_available_hours_bins
       WHEN '[0]' THEN 'The listing has no available hours this week, '
       WHEN '[1-9]' THEN 'The listing has between 1 and 9 available hours this week, '
@@ -273,31 +318,34 @@ score AS (
     id_house,
     id_region,
     status,
-    (key_location_score + has_active_rental_contract_score + week_available_hours_score + cancel_by_owner_score + cancel_by_unauthorized_entry_score) AS availability_score,
+    (key_location_score + has_active_rental_contract_score + week_available_hours_score + cancel_by_owner_score + cancel_by_unauthorized_entry_score + suspicious_listing_contact_score) AS availability_score,
     key_location_score,
     week_available_hours_score,
     cancel_by_owner_score,
     has_active_rental_contract_score,
     cancel_by_unauthorized_entry_score,
+    suspicious_listing_contact_score,
     key_location_score_disclaimer,
     week_available_hours_score_disclaimer,
     cancel_by_owner_score_disclaimer,
+    suspicious_listing_contact_score_disclaimer,
     has_active_rental_contract_score_disclaimer,
-    CASE LEAST(week_available_hours_score, cancel_by_owner_score, has_active_rental_contract_score, cancel_by_unauthorized_entry_score, key_location_score)
+    CASE LEAST(week_available_hours_score, cancel_by_owner_score, has_active_rental_contract_score, cancel_by_unauthorized_entry_score,suspicious_listing_contact_score, key_location_score)
       WHEN 0 THEN 'Everything looks Great.'
       WHEN week_available_hours_score THEN 'The house could have more available hours to visit. Currently, it has ' || week_available_hours_bins || ' available hours.'
       WHEN cancel_by_owner_score THEN 'The main reason is because the owner canceled ' || visits_canceled_by_owner_last_45_days || 'visits booked in the last 45 days.' 
       WHEN has_active_rental_contract_score THEN 'We know that having a tenant in the house is worse for VB2VC Conversion.'
       WHEN cancel_by_unauthorized_entry_score THEN 'The main reason is because the house had ' || visits_unauthorized_entry_last_45_days || ' unauthorized entries in the last 45 days.' 
+      WHEN suspicious_listing_contact_score THEN 'The main reason is because the owner did not reply to our whatsapp message about the house availability'
       WHEN key_location_score THEN 'The owners provided key location is worse for VB2VC Conversion.'
     END AS main_detractor,
     SIZE(
       FILTER(
-        ARRAY(week_available_hours_score, cancel_by_owner_score, has_active_rental_contract_score, cancel_by_unauthorized_entry_score, key_location_score), 
-        x -> x == ARRAY_MIN(ARRAY(week_available_hours_score, cancel_by_owner_score, has_active_rental_contract_score, cancel_by_unauthorized_entry_score, key_location_score))
+        ARRAY(week_available_hours_score, cancel_by_owner_score, has_active_rental_contract_score, cancel_by_unauthorized_entry_score, suspicious_listing_contact_score, key_location_score), 
+        x -> x == ARRAY_MIN(ARRAY(week_available_hours_score, cancel_by_owner_score, has_active_rental_contract_score, cancel_by_unauthorized_entry_score, suspicious_listing_contact_score, key_location_score))
       )
     ) > 1 AS multi_detractors, 
-    week_available_hours_score_disclaimer || cancel_by_owner_score_disclaimer || has_active_rental_contract_score_disclaimer || key_location_score_disclaimer AS drill_down,
+    week_available_hours_score_disclaimer || cancel_by_owner_score_disclaimer || has_active_rental_contract_score_disclaimer || suspicious_listing_contact_score || key_location_score_disclaimer AS drill_down,
     date
   FROM 
     business_logic
@@ -313,10 +361,7 @@ create_tiers AS (
     cancel_by_owner_score,
     has_active_rental_contract_score,
     cancel_by_unauthorized_entry_score,
-    key_location_score_disclaimer,
-    week_available_hours_score_disclaimer,
-    cancel_by_owner_score_disclaimer,
-    has_active_rental_contract_score_disclaimer,
+    suspicious_listing_contact_score,
     CASE 
       WHEN status = 'UNPUBLISHED' THEN 'DISCARD'
       WHEN availability_score < -100000 THEN 'A1'
@@ -344,10 +389,8 @@ grouping_tiers AS (
     week_available_hours_score,
     cancel_by_owner_score,
     has_active_rental_contract_score,
-    key_location_score_disclaimer,
-    week_available_hours_score_disclaimer,
-    cancel_by_owner_score_disclaimer,
-    has_active_rental_contract_score_disclaimer,
+    cancel_by_unauthorized_entry_score,
+    suspicious_listing_contact_score,
     tier,
     tier_disclaimer,
     tier_drill_down,
@@ -369,6 +412,8 @@ tier_status AS (
     week_available_hours_score,
     cancel_by_owner_score,
     has_active_rental_contract_score,
+    cancel_by_unauthorized_entry_score,
+    suspicious_listing_contact_score,
     CASE 
       WHEN tier = 'A5' THEN 'Great Availability'
       WHEN tier = 'A4' THEN 'Good Availability'
@@ -393,6 +438,8 @@ aux AS (
     week_available_hours_score,
     cancel_by_owner_score,
     has_active_rental_contract_score,
+    cancel_by_unauthorized_entry_score,
+    suspicious_listing_contact_score,
     tier,
     tier_name,
     tier_disclaimer,
@@ -412,6 +459,8 @@ SELECT
   week_available_hours_score,
   cancel_by_owner_score,
   has_active_rental_contract_score,
+  cancel_by_unauthorized_entry_score,
+  suspicious_listing_contact_score,
   tier,
   tier_name,
   tier_disclaimer,
