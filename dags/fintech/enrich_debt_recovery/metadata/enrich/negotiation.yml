@@ -9,6 +9,10 @@ columns:
     description: "Negotiation unique ID"
     lineage:
       - datalake_trato_feito_clean.negotiation.id
+  id_negotiation_recupera:
+    description: "The negotiation ID from Recupera"
+    lineage:
+      - datalake_trato_feito_clean.negotiation.id_collector_external
   id_contract:
     description: "Contract unique ID"
     lineage:
@@ -36,38 +40,38 @@ columns:
   negotiation_original_amount:
     description: "Negotiation original amount"
     lineage:
-      -  datalake_trato_feito_clean.debt.original_amount
+      - datalake_trato_feito_clean.debt.original_amount
   negotiation_discount_amount:
     description: "Negotiation discount amount"
     lineage:
-      -  datalake_trato_feito_clean.debt.discount_amount
+      - datalake_trato_feito_clean.debt.discount_amount
   negotiation_fees_amount:
     description: "Negotiation fees amount"
     lineage:
-      -  datalake_trato_feito_clean.debt.interest_fee_amount
-      -  datalake_trato_feito_clean.debt.fine_fee_amount
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+      - datalake_trato_feito_clean.debt.fine_fee_amount
   breached_installment:
     description: "Breached installment number"
   is_contract_recurrent_debtor:
     description: "Indicates if it is a recurrent contract debtor"
     lineage:
-      -  datalake_trato_feito_clean.negotiation.id_debtor_external
+      - datalake_trato_feito_clean.negotiation.id_debtor_external
   has_renegotiated:
     description: "Indicates if there was a renegotiation"
     lineage:
-      -  datalake_trato_feito_clean.accounting_installment.id
+      - datalake_trato_feito_clean.accounting_installment.id
   dt_expected_end:
     description: "Installment due date"
     lineage:
-      -  datalake_trato_feito_clean.installment.dt_due
+      - datalake_trato_feito_clean.installment.dt_due
   ts_paid_all:
     description: "Timestamp indicating when all installments have been paid"
     lineage:
-      -  datalake_trato_feito_clean.installment.ts_updated
+      - datalake_trato_feito_clean.installment.ts_updated
   ts_breach:
     description: "Timestamp indicating when a breach occurred"
     lineage:
-      -  datalake_trato_feito_clean.installment.ts_expired
+      - datalake_trato_feito_clean.installment.ts_expired
   ts_created_at:
     description: "Timestamp for when negotiation was created"
     lineage:

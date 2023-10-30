@@ -90,6 +90,7 @@ cte_debts AS (
 
 SELECT
     n.`id` AS id_negotiation,
+    n.id_collector_external AS id_negotiation_recupera,
     n.id_debtor_external AS id_contract,
     n.status,
     ci.qt_installments,
