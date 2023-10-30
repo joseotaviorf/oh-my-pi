@@ -276,23 +276,6 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.wololo:load-clean-prospect
 bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.casa_mineira_amplitude:load-clean-329001-portal
-  - bietlejuice.casa_mineira_crm:load-clean-city
-  - bietlejuice.casa_mineira_crm:load-clean-contact
-  - bietlejuice.casa_mineira_crm:load-clean-house
-  - bietlejuice.casa_mineira_crm:load-clean-house-type
-  - bietlejuice.casa_mineira_crm:load-clean-media-contact
-  - bietlejuice.casa_mineira_crm:load-clean-neighborhood
-  - bietlejuice.casa_mineira_crm:load-clean-origin-contact
-  - bietlejuice.casa_mineira_crm:load-clean-uf
-  - bietlejuice.casa_mineira_crm:load-clean-visit
-  - bietlejuice.casa_mineira_portal:load-clean-city
-  - bietlejuice.casa_mineira_portal:load-clean-contact
-  - bietlejuice.casa_mineira_portal:load-clean-house
-  - bietlejuice.casa_mineira_portal:load-clean-neighborhood
-  - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
-  - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-budget
-  - bietlejuice.casa_mineira_portal:load-clean-uf
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
@@ -309,14 +292,12 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-search-results-page-viewed
-  - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:load-enrich-daily-costs
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
   - bietlejuice.enrich_listing_temp:load-enrich-dim-house-listing-house
   - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
   - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listings-house
   - bietlejuice.enrich_lost_listings:load-enrich-lost-listings
   - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
-  - bietlejuice.enrich_top_of_funnel_portal_cm:load-enrich-top-of-funnel-users-portal-casa-mineira
   - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets
   - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.gsheets_growth:done-clean-city-share
@@ -337,7 +318,6 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.gsheets_growth:done-clean-weekday-supply-channel-share
 bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.casa_mineira_crm:load-clean-house
   - bietlejuice.dw_affiliate_costs:load-dw-quintoandar-dim-affiliate-cost
   - bietlejuice.dw_affiliate_costs:load-dw-quintoandar-fact-affiliate-costs
   - bietlejuice.dw_booking:load-dw-public-dim-booking

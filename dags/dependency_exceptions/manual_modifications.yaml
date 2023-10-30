@@ -146,6 +146,25 @@ bietlejuice.dw_datamarts_spark.growth:
     - bietlejuice.enrich_marketing_manual_daily_costs:load-enrich-daily-costs
     - bietlejuice.gsheets_growth:done-clean-costs-targets
     - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-targets
+    - bietlejuice.casa_mineira_amplitude:load-clean-329001-portal
+    - bietlejuice.casa_mineira_crm:load-clean-city
+    - bietlejuice.casa_mineira_crm:load-clean-contact
+    - bietlejuice.casa_mineira_crm:load-clean-house
+    - bietlejuice.casa_mineira_crm:load-clean-house-type
+    - bietlejuice.casa_mineira_crm:load-clean-media-contact
+    - bietlejuice.casa_mineira_crm:load-clean-neighborhood
+    - bietlejuice.casa_mineira_crm:load-clean-origin-contact
+    - bietlejuice.casa_mineira_crm:load-clean-uf
+    - bietlejuice.casa_mineira_crm:load-clean-visit
+    - bietlejuice.casa_mineira_portal:load-clean-city
+    - bietlejuice.casa_mineira_portal:load-clean-contact
+    - bietlejuice.casa_mineira_portal:load-clean-house
+    - bietlejuice.casa_mineira_portal:load-clean-neighborhood
+    - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
+    - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-budget
+    - bietlejuice.casa_mineira_portal:load-clean-uf
+    - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:load-enrich-daily-costs
+    - bietlejuice.enrich_top_of_funnel_portal_cm:load-enrich-top-of-funnel-users-portal-casa-mineira
 bietlejuice.dw_datamarts_spark.growth_cross:
   add:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -172,6 +191,7 @@ bietlejuice.dw_datamarts_spark.growth_cross:
     - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
     - bietlejuice.rene_descartes:load-clean-house-lead
     - bietlejuice.rene_descartes:load-clean-lead-rejection
+    - bietlejuice.casa_mineira_crm:load-clean-house
 bietlejuice.dw_datamarts_spark.static:
   override: []
 bietlejuice.dw_datamarts_spark.support_and_service:
