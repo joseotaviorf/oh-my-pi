@@ -19,6 +19,8 @@ columns:
     description: "Number of days in this specific status."
   is_extended_rental:
     description: "Boolean indicating if the contract termination was canceled after relisting as early demand."
+  lbc_state_order:
+    description: "Position of this particular state in the listing_business_context history."
   listing_version:
     description: "Number of the listing version."
   max_state_order:
