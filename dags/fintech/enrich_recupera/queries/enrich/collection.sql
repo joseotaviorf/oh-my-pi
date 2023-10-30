@@ -29,3 +29,6 @@ FROM
 WHERE
     operator_name <> 'SISTEMA'
     AND historical_code <> 'WSATUAL'
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}

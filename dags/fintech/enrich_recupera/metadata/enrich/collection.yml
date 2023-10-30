@@ -3,7 +3,7 @@ database_name: datalake_recupera
 table_name: collection
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "This table represents the Recupera report called MISOCO. It contains the data about 'acionamentos'. The data will be appended to table every day, since the original table historical_records is also updated in the same way."
+description: "This table represents the Recupera report called MISOCO. It contains the data about 'acionamentos'. New data based on the date of occurrence will be appended to the table every day"
 columns:
   id_creditor:
     description: Creditor code
