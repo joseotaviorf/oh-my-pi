@@ -1,11 +1,11 @@
 ---
+custom_cluster:
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
 partition_cols:
   - year
   - month
   - day
-spark_conf:
-  spark.executor.cores: 5
-  spark.driver.memory: 54g
-  spark.driver.memoryOverhead: 7g
-  spark.executor.memory: 54g
-  spark.executor.memoryOverhead: 7g

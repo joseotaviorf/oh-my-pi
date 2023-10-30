@@ -5,14 +5,7 @@ custom_cluster:
   driver_node_type_id: r5a.24xlarge
   node_type_id: r5a.8xlarge
   num_workers: 6
-spark_conf:
-  spark.driver.maxResultSize: "0"
-  spark.driver.memory: "420g"
-  spark.driver.memoryOverhead: "250g"
-  spark.executor.memory: "150g"
-  spark.executor.memoryOverhead: "40g"
-  spark.network.timeout: "480"
-  spark.sql.shuffle.partitions: "768" # total num of cores * 4
+  spark_version: 12.2.x-scala2.12
 clean_staging_block_tables:
   - 170698_user_merge
   - 183047_user_merge
