@@ -22,3 +22,6 @@ tables:
     partitioned: False
   surveys_survey:
     partitioned: False
+  message_voting:
+    partitioned: True
+    incremental_col: updated_at
