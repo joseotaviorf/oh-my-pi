@@ -31,13 +31,11 @@ config_service = ConfigurationService(DAG_NAME)
 
 # s3 paths setup
 datalake_bucket = config_service.get_config("datalake_bucket")
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 base_spark_jobs_path = f"{s3_prefix}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("custom_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -62,7 +60,7 @@ dag = DAG(
         dag_name=DAG_NAME,
         doc_md_chart_url=doc_md_chart_url,
         dag_documentation=dag_documentation,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        schedule_interval=None,
         dag_owner=DAG_OWNER,
     ),
 )
@@ -81,7 +79,6 @@ datalake_task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
