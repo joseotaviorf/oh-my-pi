@@ -1,45 +1,68 @@
 database_name: datalake_ebdb_listing
 table_name: house_status_version_order
+description: "[DEPRECATED] Information related to ForRent listings using the table 'Imovel' from EBDB. 
+  Each line represent a state of a house in time and identify the states that should trigger a new listing version."
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
+    description: Id of the house.
   id_region:
     lineage:
       - datalake_ebdb_clean.house_aud.id_region
+    description: Id of the region.
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
+    description: Code of the house country.
   rev:
     lineage:
       - datalake_ebdb_clean.house_aud.rev
+    description: Identification of when this registry was created. Can be joined with datalake_ebdb_clean.user_revision_entity.id.
   reason:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.reason
+    description: Reason of this registry creation.
   status_history:
     lineage:
       - datalake_ebdb_clean.house_aud.status
+    description: Old status of the house.
   status_history_new:
     lineage:
       - datalake_ebdb_clean.house_aud.status
+    description: New status of the house.
   ts_first_publication:
     lineage:
       - datalake_ebdb_clean.house_aud.dt_first_publication
+    description: Timestamp of the first time this house was publicated.
   ts_status_changed:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the old status change.
   ts_status_changed_new:
     lineage:
       - datalake_ebdb_clean.house_aud.dt_first_publication
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the new status change.
   ts_status_changed_next:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the next status change.
+  order_status:
+    description: Position of this status in the sequential order.
+  max_order_status:
+    description: Number of status changes.
   events_change_status:
     lineage:
       - datalake_ebdb_clean.house_aud.status
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Status that motivated the versioning.
   publication_version_date:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
       - datalake_ebdb_clean.house_aud.dt_first_publication
+    description: Timestamp of when this version started.
+  order_version:
+    description: Version number.
