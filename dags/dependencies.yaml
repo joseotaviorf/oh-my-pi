@@ -2349,6 +2349,8 @@ bietlejuice.enrich_tenant_journey:
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud
+bietlejuice.enrich_ticket_rate_classification_snapshot:
+  - bietlejuice.gsheets_static:load-clean-ticket-rate-classification
 bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates

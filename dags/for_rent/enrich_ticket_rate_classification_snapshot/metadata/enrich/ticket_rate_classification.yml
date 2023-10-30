@@ -1,0 +1,40 @@
+---
+database_name: datalake_ticket_rate_classification_snapshot
+table_name: ticket_rate_classification
+description: Table with snapshot of the data loaded into datalake_gsheet_clean.ticket_rate_classification 
+  to keep track of changes and be able to rollback in case of undesired changes on past ticket_rate metrics.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  macro_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.macro_taxonomy
+    description: "Macro taxonomy of the ticket."
+  micro_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.micro_taxonomy
+    description: "Micro taxonomy of the ticket."
+  journey:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.journey
+    description: "Journey of the ticket."
+  sub_journey:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.sub_journey
+    description: "Sub journey of the ticket."
+  line_owner:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.line_owner
+    description: "Line responsible for the ticket."
+  micro_taxonomy_description:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.micro_taxonomy_description
+    description: "Description of the ticket's micro taxonomy."
+  ops_focal_point:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.ops_focal_point
+    description: "Focal point of this ticket on the Operations Team"
+  is_active:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.is_active
+    description: "Boolean indicating if this taxonomy is active"

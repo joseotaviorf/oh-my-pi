@@ -567,6 +567,9 @@ bietlejuice.enrich_atento_reports:
     - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
     - bietlejuice.reverse_atento:load-reverse-taxonomia-email
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+bietlejuice.enrich_ticket_rate_classification_snapshot:
+  add:
+    - bietlejuice.gsheets_static:load-clean-ticket-rate-classification
 bietlejuice.enrich_webhelp_reports:
   add:
     - bietlejuice.reverse_webhelp:load-reverse-backlog-metric

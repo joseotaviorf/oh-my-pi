@@ -1,0 +1,5 @@
+---
+tables:
+  - table_name: ticket_rate_classification
+    is_incremental: false
+    partitions: [year, month, day]
