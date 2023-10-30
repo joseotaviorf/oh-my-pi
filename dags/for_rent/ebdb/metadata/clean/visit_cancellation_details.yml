@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: visit_cancellation_details
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.VisitCancellationDetails.id
+  id_visit:
+    lineage:
+      - datalake_ebdb_raw.VisitCancellationDetails.visita_id
+  reason:
+    lineage:
+      - datalake_ebdb_raw.VisitCancellationDetails.reason
+  on_behalf_of:
+    lineage:
+      - datalake_ebdb_raw.VisitCancellationDetails.on_behalf_of
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.VisitCancellationDetails.criadoEm
+  ts_updated:
+      lineage:
+        - datalake_ebdb_raw.VisitCancellationDetails.atualizadoEm

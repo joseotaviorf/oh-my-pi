@@ -208,6 +208,8 @@ Produces the following output tables:
     `user_revision_entity`
     `visit`
     `visit_aud`
+    `visit_cancellation_details`
+    `visit_cancellation_details_aud`
     `visit_origin`
     `visitor`
     `agent_region_data_aud`
