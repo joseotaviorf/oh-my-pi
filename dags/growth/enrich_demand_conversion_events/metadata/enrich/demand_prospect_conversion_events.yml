@@ -5,7 +5,7 @@ owner: thiago.jesus@quintoandar.com.br
 domain: growth
 description: Each row of this table is a demand prospect conversion event (visit booked, offer submited or talk to agent) from both Rent and Sale busness contexts.
 columns:
-  sk_demand_prospect_conversion_event:
+  id_demand_prospect_conversion_event:
     description: 'Unique identifier for demand prospect conversion event'
   id_rent_flow:
     description: 'Identifier of a user flow with a house in rent context.'
@@ -15,10 +15,10 @@ columns:
     description: 'Identifier of a user flow with a house in sale context.'
     lineage:
     - datalake_demand_flows.demand_prospect_conversion_events_staging.id_sale_flow
-  sk_event_type:
+  id_event_type:
     description: 'Identifier of the event type'
     lineage:
-    - datalake_demand_flows.demand_prospect_conversion_events_staging.sk_event_type
+    - datalake_demand_flows.demand_prospect_conversion_events_staging.id_event_type
   event_name:
     description: 'Name of the demand prospect conversion event'
   id_booking:

@@ -5,7 +5,7 @@ owner: thiago.jesus@quintoandar.com.br
 domain: growth
 description: Each row of this table is a demand prospect conversion event (visit booked, offer submited or talk to agent) from both Rent and Sale busness contexts. This staging table is used to create surrogate keys for this flow.
 columns:
-  sk_demand_prospect_conversion_event:
+  id_demand_prospect_conversion_event:
     description: 'Unique identifier for demand prospect conversion event'
   id_rent_flow:
     description: 'Identifier of a user flow with a house in rent context.'
@@ -18,7 +18,7 @@ columns:
     lineage:
     - datalake_sale_demand_events.sale_demand_events.id_sale_flow
     - datalake_talk_to_agent.talk_to_agent.id_sale_flow
-  sk_event_type:
+  id_event_type:
     description: 'Identifier of the event type'
     lineage:
     - datalake_sale_demand_events.sale_demand_events.sk_event_type
@@ -134,7 +134,7 @@ columns:
   country_code:
     description: 'Country code of the house.'
     lineage:
-    - datalake_region.region.country_code
+    - datalake_ebdb_listing.house.country_code
   dt_event:
     description: 'Date of the conversion event'
     lineage:

@@ -3,7 +3,7 @@ WITH conversion_events AS (
   SELECT
     NULL AS id_rent_flow,
     id_sale_flow,
-    sk_event_type,
+    sk_event_type AS id_event_type,
     "VISIT BOOKED" AS event_name,
     id_booking,
     id_offer,
@@ -25,7 +25,7 @@ WITH conversion_events AS (
   SELECT
     NULL AS id_rent_flow,
     id_sale_flow,
-    sk_event_type,
+    sk_event_type AS id_event_type,
     "OFFER SUBMITTED" AS event_name,
     id_booking,
     id_offer,
@@ -47,7 +47,7 @@ WITH conversion_events AS (
   SELECT DISTINCT
     id_rent_flow,
     NULL AS id_sale_flow, 
-    id_event_type AS sk_event_type,
+    id_event_type,
     "VISIT BOOKED" AS event_name,
     id_booking,
     NULL AS id_offer,
@@ -70,7 +70,7 @@ WITH conversion_events AS (
   SELECT DISTINCT
     id_rent_flow,
     NULL AS id_sale_flow, 
-    id_event_type AS sk_event_type,
+    id_event_type,
     "OFFER SUBMITTED" AS event_name,
     id_booking,
     id_offer,
@@ -94,7 +94,7 @@ booking_attribution AS (
   SELECT 
       bce.id_rent_flow,
       bce.id_sale_flow, 
-      bce.sk_event_type,
+      bce.id_event_type,
       bce.event_name,
       bce.id_booking,
       bce.id_offer,
@@ -126,14 +126,14 @@ booking_attribution AS (
         AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')
         AND DATE(CONCAT_WS('-', acc.year, acc.month, acc.day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
   WHERE
-      bce.sk_event_type = 1
+      bce.id_event_type = 1
 ),
 
 sale_offer_attribution AS (
   SELECT
     soce.id_rent_flow,
     soce.id_sale_flow, 
-    soce.sk_event_type,
+    soce.id_event_type,
     soce.event_name,
     soce.id_booking,
     soce.id_offer,
@@ -163,7 +163,7 @@ sale_offer_attribution AS (
         AND acc.event_name = 'sale_offer_form_accepted' 
         AND DATE(CONCAT_WS('-', acc.year, acc.month, acc.day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
   WHERE
-    soce.sk_event_type = 3
+    soce.id_event_type = 3
     AND soce.business_context = 'sale'
 ),
 
@@ -171,7 +171,7 @@ rent_offer_attribution AS (
   SELECT
     roce.id_rent_flow,
     roce.id_sale_flow, 
-    roce.sk_event_type,
+    roce.id_event_type,
     roce.event_name,
     roce.id_booking,
     off.id_firestore AS id_offer,
@@ -204,7 +204,7 @@ rent_offer_attribution AS (
         AND acc.event_name = 'offer_submitted'
         AND DATE(CONCAT_WS('-', acc.year, acc.month, acc.day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
   WHERE
-    roce.sk_event_type = 3
+    roce.id_event_type = 3
     AND roce.business_context = 'rent'
 ),
 
@@ -213,7 +213,7 @@ legacy_data_talk_to_agent AS (
       (COALESCE(agent_id,10) || coalesce(a.tenant_id,0) || COALESCE(a.sk_house_listing,0) || unix_timestamp(first_message_ts)) AS id_talk_to_agent,
       IF(a.business_context = 'RENT', tenant_id || '_' || house_id, NULL) AS id_rent_flow,
       IF(a.business_context = 'SALE', tenant_id || '_' || house_id, NULL) AS id_sale_flow,
-      99 AS sk_event_type,
+      99 AS id_event_type,
       "TALK TO AGENT" AS event_name,
       NULL AS id_booking,
       NULL AS id_offer,
@@ -244,7 +244,7 @@ events_with_attribution AS (
     INT(DATE_FORMAT(dt_event,'yyyyMMdd')) AS id_event_date,
     id_rent_flow,
     id_sale_flow, 
-    sk_event_type,
+    id_event_type,
     event_name,
     id_booking,
     id_offer,
@@ -269,7 +269,7 @@ events_with_attribution AS (
     INT(DATE_FORMAT(dt_event,'yyyyMMdd')) AS id_event_date,
     id_rent_flow,
     id_sale_flow, 
-    sk_event_type,
+    id_event_type,
     event_name,
     id_booking,
     id_offer,
@@ -294,7 +294,7 @@ events_with_attribution AS (
     INT(DATE_FORMAT(dt_event,'yyyyMMdd')) AS id_event_date,
     id_rent_flow,
     id_sale_flow, 
-    sk_event_type,
+    id_event_type,
     event_name,
     id_booking,
     id_offer,
@@ -319,7 +319,7 @@ events_with_attribution AS (
     INT(DATE_FORMAT(dt_event,'yyyyMMdd')) AS id_event_date,
     id_rent_flow,
     id_sale_flow, 
-    sk_event_type,
+    id_event_type,
     event_name,
     id_booking,
     id_offer,
@@ -341,22 +341,22 @@ events_with_attribution AS (
     legacy_data_talk_to_agent
 ),
 
-last_sk_values AS (
+last_id_values AS (
     SELECT
-        COALESCE(MAX(sk_demand_prospect_conversion_event), 0) AS max_sk_demand_prospect_conversion_event
+        COALESCE(MAX(id_demand_prospect_conversion_event), 0) AS max_id_demand_prospect_conversion_event
     FROM
         datalake_demand_flows.demand_prospect_conversion_events
 )
 
 SELECT
   COALESCE(
-      f.sk_demand_prospect_conversion_event,
-      lsv.max_sk_demand_prospect_conversion_event + MONOTONICALLY_INCREASING_ID() + 1
-  ) AS sk_demand_prospect_conversion_event,
+      f.id_demand_prospect_conversion_event,
+      liv.max_id_demand_prospect_conversion_event + MONOTONICALLY_INCREASING_ID() + 1
+  ) AS id_demand_prospect_conversion_event,
   e.id_event_date,
   e.id_rent_flow,
   e.id_sale_flow, 
-  e.sk_event_type,
+  e.id_event_type,
   e.event_name,
   e.id_booking,
   e.id_offer,
@@ -375,7 +375,7 @@ SELECT
   e.utm_source,
   e.utm_campaign,
   e.branded,
-  r.country_code,
+  COALESCE(h.country_code, 'Undefined') AS country_code,
   e.dt_event,
   e.ts_event,
   YEAR(e.dt_event) AS year,
@@ -388,16 +388,16 @@ LEFT JOIN
     ON e.id_booking = b.id
     AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 LEFT JOIN
-  datalake_region.region AS r
-    ON e.id_region = r.id
+  datalake_ebdb_listing.house AS h
+    ON e.id_house = h.id
 CROSS JOIN
-  last_sk_values AS lsv
+  last_id_values AS liv
 LEFT JOIN
   datalake_demand_flows.demand_prospect_conversion_events AS f
     ON e.id_event_date = f.id_event_date
-      AND e.sk_event_type = f.sk_event_type
+      AND e.id_event_type = f.id_event_type
       AND (
-          (e.sk_event_type = 1 AND e.id_booking = f.id_booking)
-          OR (e.sk_event_type = 3 AND e.id_offer = f.id_offer)
-          OR (e.sk_event_type = 99 AND e.id_talk_to_agent = f.id_talk_to_agent)
+          (e.id_event_type = 1 AND e.id_booking = f.id_booking)
+          OR (e.id_event_type = 3 AND e.id_offer = f.id_offer)
+          OR (e.id_event_type = 99 AND e.id_talk_to_agent = f.id_talk_to_agent)
       )
