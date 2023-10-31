@@ -40,7 +40,6 @@ This pipeline produces the following output tables, all via **full load**:
 - `offer_agent`
 - `offer_partner`
 - `partner`
-- `partner_revision`
 - `revenue_share_by_participant`
 - `revenue_share_file`
 - `revenue_share_file_importation_error`
