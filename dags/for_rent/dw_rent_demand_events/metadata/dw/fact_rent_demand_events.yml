@@ -65,8 +65,13 @@ columns:
     description: Id of the owner.
   sk_owner_category:
     lineage:
-    - datalake_rent_demand_events.rent_demand_events.id_owner_version
+    - datalake_rent_demand_events.rent_demand_events.id_owner_category
     description: "ID of the property owner's version. We're not versioning the owners that are B2B, so a -1 values can exist."
+  sk_company_supply:
+    lineage:
+    - datalake_rede_company.company_sks.sk_company
+    description: Foreign key of the Rede company associated with the event. Can be joined with
+      dw_rede.dim_company.
   sk_event_date:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.ts_event

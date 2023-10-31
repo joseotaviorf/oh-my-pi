@@ -555,6 +555,7 @@ bietlejuice.dw_region:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.dw_rent_demand_events:
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
 bietlejuice.dw_rent_demand_events_snapshot:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
