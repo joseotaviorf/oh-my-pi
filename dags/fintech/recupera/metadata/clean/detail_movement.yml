@@ -2,14 +2,17 @@
 database_name: datalake_recupera_clean
 table_name: detail_movement
 description: |
-  "Contains all the original installments (from table 'complementary_records') received through
-  Recupera. Whenever a payment is made, whether in accordance with or on receipt made for original installments.
-  The original installments written off by this payment are entered in this table.
-  In the event of an agreement, an installment may not be paid off in full. In this case,
-  a line is inserted with amortization information and with the amount paid and the principal proportional to the payment.
-  When there is another payment, a new line is inserted, with another receipt number.
+  "It stores all the payments of a debt.
 
-  Original table name: TBL_MOVIMENTO_DETALHE"
+  It contains all the original invoices (from table 'complementary_records') received through Recupera.
+  Whenever a payment is made, whether with a negotiation or not (receipt made for original invoice), the original paid
+  invoices are inserted in this table.
+  In the event of an agreement, an installment may not be paid off in full. In this case,
+  a line is inserted with amortization information and with the amount paid and the principal proportional to the payment. When
+  there is another payment, a new line is inserted, with another receipt number.
+
+  Original table name: TBL_MOVIMENTO_DETALHE.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
@@ -26,7 +29,10 @@ columns:
       "Sequence number - for the case of amortization of agreement.
       In this case we can have the same original installment several times,
       one for each receipt and this field prevents the key from duplicating.
-      . It is the PK (Primary Key) of the table."
+
+      It represents the processing sequence as import control.
+
+      It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.detail_movement.id_sequence_number
   id_creditor:

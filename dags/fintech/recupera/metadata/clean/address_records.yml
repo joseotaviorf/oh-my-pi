@@ -4,7 +4,8 @@ table_name: address_records
 description: |
   "This table contains the customer's third address data.
 
-  Original table name: TBL_REGISTROS_ENDERECOS"
+  Original table name: TBL_REGISTROS_ENDERECOS.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
@@ -21,7 +22,7 @@ columns:
     lineage:
       - datalake_recupera_raw.address_records.id_customer
   id_sequence_number:
-    description: "Sequential number of the load file. It is the PK (Primary Key) of the table."
+    description: "Sequential number of the load file. It represents the processing sequence as import control. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.address_records.id_sequence_number
   address_description:

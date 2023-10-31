@@ -2,10 +2,11 @@
 database_name: datalake_recupera_clean
 table_name: status
 description: |
-  "Table containing the registered statuss.
-  statuss 00 and 99 are from the system and cannot be excluded.
+  "Table containing the registered status.
+  Statuss 00 and 99 are from the system and cannot be deleted.
 
-  Original table name: TBL_STATUS"
+  Original table name: TBL_STATUS.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:

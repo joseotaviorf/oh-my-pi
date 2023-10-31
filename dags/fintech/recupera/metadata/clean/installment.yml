@@ -3,11 +3,19 @@ database_name: datalake_recupera_clean
 table_name: installment
 description: |
   "Contains the installments of the agreements.
-  In this table we will have a line for each installment of the agreement made.
-  In the case of reversing the installment receipt, there will be more than one line
-  per installment The records are never deleted, the flag being changed in the case of cancellation.
+  In this table we will have a line for each installment of the agreement.
+  In the case of reversing (refund) the installment receipt, there will be more than one line
+  per installment.
+  The records are never delete.
 
-  Original table name: TBL_PARCELAMENTO"
+  Discount amount composition (only registered for id_sequence_number=000):
+  - If paid_amount <= main_amount:  the discount value is the accounting discount (desconto contábil), i.e, only the discount on the main amount.
+  - If paid amount > main_amount: the discount on the financial, i.e, the difference between the total correct balance and the amount to be paid in the negotiation.
+    The correct balance is the main_amount_paid in 'creditor_pending' table where installment_code is not null.
+  - If paid_amount < main_amount:  the discount is the accounting (contábil), i.e, main_amount - paid_amount.
+
+  Original table name: TBL_PARCELAMENTO.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
@@ -20,7 +28,7 @@ columns:
     lineage:
       - datalake_recupera_raw.installment.dt_due
   id_sequence_number:
-    description: "Sequence number (in the event of reversal, new line is inserted to the portion with this different field). It is the PK (Primary Key) of the table."
+    description: "Sequence number of service/receipt. It represents the processing sequence as import control. In the event of reversal, new line is inserted to the portion with this different field). It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.installment.id_sequence_number
   id_creditor:
@@ -80,7 +88,7 @@ columns:
     lineage:
       - datalake_recupera_raw.installment.discount_amount
   expense_amount:
-    description: "Expense value"
+    description: "Expense value. Total value of negotiation/agreement"
     lineage:
       - datalake_recupera_raw.installment.expense_amount
   default_interest_amount:

@@ -2,20 +2,26 @@
 database_name: datalake_recupera_clean
 table_name: operational_records
 description: |
-  "This table is the customer's operational data.
-  These are the data referring to their characteristics within the system
-  and the billing process.
+  "Is contains the customers operational data, the data regarding their
+  characteristics within the system and the collection process.
 
-  Original table name: TBL_REGISTROS_OPERACIONAL"
+  Original table name: TBL_REGISTROS_OPERACIONAL.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) of the table."
     categories:
-      "1": QuintoAndar
-      "3": QuintoCred, faturas da plataforma 2.0
-      "5": QuintoCred, faturas da plataforma 3.0
+      "1": IQ QuintoAndar. Status - valid
+      "2": PP QuintoAndar. Status - discontinued
+      "3": IQ QuintoCred 2.0. Status - valid
+      "4": IQ QuintoAndar. Status - discontinued
+      "5": QuintoCred 3.0. Status - valid
+      "6": PP QuintoAndar. Status - discontinued (test API)
+      "7": IQ QuintoAndar. Status - discontinued (test API)
+      "8": IQ QuintoAndar. Status - discontinued (test API)
+      "9": IQ QuintoAndar. Status - discontinued (test API)
     lineage:
       - datalake_recupera_raw.operational_records.id_creditor
   id_customer:

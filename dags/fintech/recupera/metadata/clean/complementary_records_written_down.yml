@@ -2,21 +2,28 @@
 database_name: datalake_recupera_clean
 table_name: complementary_records_written_down
 description: |
-  "This table contains all of the customer's written-off debts.
+  "This table contains all of the customer's written-down debts.
   The structure is identical to that of table 'complementary_records'.
-  When the debt is written off, it is removed from table 'complementary_records' and inserted in table 'complementary_records_written_down'.
-  At this time the amount_paid and discount_amount fields are updated.
+  When the debt is written down, it is removed from table 'complementary_records' and inserted in table 'complementary_records_written_down', and
+  the amount_paid and discount_amount fields are updated.
 
-  Original table name: TBL_REGISTROS_COMPL_BAIXAS"
+  Original table name: TBL_REGISTROS_COMPL_BAIXAS.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
     categories:
-      "1": QuintoAndar
-      "3": QuintoCred, faturas da plataforma 2.0
-      "5": QuintoCred, faturas da plataforma 3.0
+      "1": IQ QuintoAndar. Status - valid
+      "2": PP QuintoAndar. Status - discontinued
+      "3": IQ QuintoCred 2.0. Status - valid
+      "4": IQ QuintoAndar. Status - discontinued
+      "5": QuintoCred 3.0. Status - valid
+      "6": PP QuintoAndar. Status - discontinued (test API)
+      "7": IQ QuintoAndar. Status - discontinued (test API)
+      "8": IQ QuintoAndar. Status - discontinued (test API)
+      "9": IQ QuintoAndar. Status - discontinued (test API)
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.id_creditor
   id_customer:
@@ -88,10 +95,10 @@ columns:
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.type_pendency_debt
   installment_code:
-    description: "Installment code: when there is an installment payment in progress, the installment code will be in this field (at the same time the tip_pende is 'PA')."
+    description: "Installment ID. When there is an installment payment in progress, the installment code will be in this field (at the same time the tip_pende is 'PA')."
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.installment_code
   id_installment:
-    description: "Installment unique id. It is the PK (Primary Key) of the table."
+    description: "Original Seu Barriga invoice. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.id_installment

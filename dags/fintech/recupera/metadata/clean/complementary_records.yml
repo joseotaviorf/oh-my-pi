@@ -6,16 +6,23 @@ description: |
   When paid in installments, the debt will be written down when the installment is settled (liquidado)
   or canceled (in the event that, with the amortization of the amount paid, this installment has been paid).
 
-  Original table name: TBL_REGISTROS_COMPLEMENTOS"
+  Original table name: TBL_REGISTROS_COMPLEMENTOS.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
   id_creditor:
     description: "Creditor code. It is the PK (Primary Key) of the table."
     categories:
-      "1": QuintoAndar
-      "3": QuintoCred, faturas da plataforma 2.0
-      "5": QuintoCred, faturas da plataforma 3.0
+      "1": IQ QuintoAndar. Status - valid
+      "2": PP QuintoAndar. Status - discontinued
+      "3": IQ QuintoCred 2.0. Status - valid
+      "4": IQ QuintoAndar. Status - discontinued
+      "5": QuintoCred 3.0. Status - valid
+      "6": PP QuintoAndar. Status - discontinued (test API)
+      "7": IQ QuintoAndar. Status - discontinued (test API)
+      "8": IQ QuintoAndar. Status - discontinued (test API)
+      "9": IQ QuintoAndar. Status - discontinued (test API)
     lineage:
       - datalake_recupera_raw.complementary_records.id_creditor
   id_customer:
@@ -91,10 +98,10 @@ columns:
     lineage:
       - datalake_recupera_raw.complementary_records.type_pendency_debt
   installment_code:
-    description: "Installment code: quando houver parcelamento em andamento o código do parcelamento ficará neste campo (ao mesmo tempo que o type_pendency_debt fica 'PA'). Com o cancelamento do acordo este campo volta a ser nulo"
+    description: "Installment ID. When there is an installment in progress, the this field will be filled in and the field type_pendency_debt is filled in with 'parcelamento' value. Upon cancellation of the agreement, this field becomes NULL again."
     lineage:
       - datalake_recupera_raw.complementary_records.installment_code
   id_installment:
-    description: "Installment unique id. It is the PK (Primary Key) of the table."
+    description: "Original Seu Barriga invoice. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.complementary_records.id_installment

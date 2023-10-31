@@ -2,16 +2,21 @@
 database_name: datalake_recupera_clean
 table_name: creditor_pending
 description: |
-  "Table listing the original installments (records found in the 'complementary_records' or 'complementary_records_written_down' tables)
-  of each receipt generated. The originals of the installments are also included in this table.
-  Receipt originals (without installments): the 'installment_code' field is null and the 'is_installment' field = N
-  Installment originals: the installment_code field, when filled in, indicates which installment includes these originals.
-  In this case, the 'receipt_code' field remains blank, as there is a possibility that an original installment is
-  divided into more than one receipt. Ex: an original installment and 3 installments accordingly, there will be one row in the table and
-  three receipts for just one field. therefore the receipt code must be searched in the 'installment' table. The field 'is_installment' = s
-  indicates that it is the original of an installment.
+  "It contains the original invoices of each receipt (records found in the 'complementary_records' or 'complementary_records_written_down' tables) and its
+  installments.
 
-  Original table name: TBL_CREDOR_PENDENCIA"
+  Receipt originals (without installments): the 'installment_code' field is null and the value of 'is_installment' field is False.
+  Installment originals: the installment_code field, when filled in, indicates which installment includes these originals. In this case,
+  the 'receipt_code' field remains blank, as there is a possibility that an original installment is
+  divided into more than one receipt.
+
+  Example
+  An original invoice and 3 installments of the agreement: there will be one row in the table and there will be receipt for just one field.
+  Therefore the receipt code must be searched in the 'installment' table.
+  The value True for field 'is_installment' indicates that it is the original of an installment.
+
+  Original table name: TBL_CREDOR_PENDENCIA.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
@@ -20,7 +25,7 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.dt_table_insertion
   id_sequence_number:
-    description: "Sequence of calls/receipts on the day (from tbl_cliente_creditor). It is the PK (Primary Key) of the table."
+    description: "Sequence of calls/receipts on the day (from TBL_CLIENTE_CREDOR). It represents the processing sequence as import control. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.creditor_pending.id_sequence_number
   id_creditor:
@@ -132,7 +137,7 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.is_installment
   installment_code:
-    description: "Installment code"
+    description: "Installment ID"
     lineage:
       - datalake_recupera_raw.creditor_pending.installment_code
   interest_fee_discount_amount:
@@ -169,6 +174,6 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.expense_amount
   id_installment:
-    description: "Installment unique id. It is the PK (Primary Key) of the table."
+    description: "Original Seu Barriga invoice. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.creditor_pending.id_installment

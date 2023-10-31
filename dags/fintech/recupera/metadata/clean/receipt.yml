@@ -7,7 +7,8 @@ description: |
   In this table there is only one line per receipt.
   Once a receipt has been issued, it will never be deleted from this table.
 
-  Original table name: TBL_RECEBIMENTOS"
+  Original table name: TBL_RECEBIMENTOS.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
 columns:
