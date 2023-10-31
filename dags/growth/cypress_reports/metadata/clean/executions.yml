@@ -1,0 +1,74 @@
+database_name: datalake_cypress_reports_clean
+table_name: executions
+description: This table contains information of the Cypress tests executions.
+domain: Platform
+owner: thiago.nakamura@quintoandar.com.br
+columns:
+  pwa:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results
+    description: The name of the project of this execution.
+  dt:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results
+    description: The date the tests were executed.
+  test_execution_id:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results
+    description: The ID of the execution.
+  suites:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Number of suites in the execution.
+  tests:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Number of tests in the execution.
+  passes:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Number of passing tests.
+  pending:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Number of pending tests.
+  failures:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Number of failures.
+  start:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Time when the execution started.
+  end:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Time when the execution ended.
+  duration:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Duration of the execution in ms.
+  tests_registered:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Number of registered tests.
+  pass_percentage:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Percentage of tests passing.
+  pending_percentage:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: Percentage of tests pending.
+  other:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+  has_other:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+  skipped:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+  has_skipped:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats

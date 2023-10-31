@@ -1,0 +1,3 @@
+---
+tables_list: ["cypress_reports"]
+cluster_description: databricks_10_4_min_general_cluster

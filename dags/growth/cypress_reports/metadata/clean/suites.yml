@@ -1,0 +1,60 @@
+database_name: datalake_cypress_reports_clean
+table_name: suites
+description: This table contains information of the Cypress suites in a given executions.
+domain: Platform
+owner: thiago.nakamura@quintoandar.com.br
+columns:
+  pwa:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.pwa
+    description: The name of the project of this execution.
+  dt:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.dt
+    description: The date the tests were executed.
+  test_execution_id:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results
+    description: The ID of the execution.
+  file:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.file
+  full_file:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.fullfile
+  suite_id:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.uuid
+  timeout:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites._timeout
+  after_hooks:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.afterhooks
+  before_hooks:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.beforehooks
+  duration:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.duration
+  failures:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.failures
+  passes:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.passes
+  pending:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.pending
+  is_root:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.root
+  is_root_empty:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.rootempty
+  skipped:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.skipped
+  title:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results.suites.title

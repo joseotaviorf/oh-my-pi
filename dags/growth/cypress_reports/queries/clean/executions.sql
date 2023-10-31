@@ -1,0 +1,20 @@
+SELECT
+  SPLIT(INPUT_FILE_NAME(), '/')[5] AS id_test_execution,
+  SPLIT(INPUT_FILE_NAME(), '/')[3] AS pwa,
+  stats.suites,
+  stats.tests,
+  stats.passes,
+  stats.pending,
+  stats.failures,
+  stats.duration,
+  stats.testsRegistered AS tests_registered,
+  stats.passPercent AS pass_percent,
+  stats.pendingPercent AS pending_percent,
+  stats.other,
+  stats.skipped,
+  stats.hasOther AS has_other,
+  stats.hasSkipped AS has_skipped,
+  stats.start AS ts_start,
+  stats.end AS ts_end,
+  SPLIT(INPUT_FILE_NAME(), '/')[4] AS dt_created
+FROM datalake_cypress_reports_raw.cypress_reports
