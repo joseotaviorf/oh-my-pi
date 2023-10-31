@@ -28,3 +28,12 @@ columns:
   ts_updated:
     lineage:
       - datalake_chat_fup_raw.message_voting.updated_at
+  year:
+    lineage:
+      - datalake_chat_fup_raw.message_voting.year
+  month:
+    lineage:
+      - datalake_chat_fup_raw.message_voting.month
+  day:
+    lineage:
+      - datalake_chat_fup_raw.message_voting.day
