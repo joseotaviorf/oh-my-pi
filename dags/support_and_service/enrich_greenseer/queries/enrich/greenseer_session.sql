@@ -75,7 +75,7 @@ greenseer_sessions AS (
       WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_automatic_selection_theme_detail') THEN 'bot_menu_automatic_selection_taxonomy_v4'
       ELSE NULL
     END AS automatic_selection,
-    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.has_retention_response') AS has_emma_response,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.emma_try') AS has_emma_response,
     g.current_state,
     g.ts_started,
     g.ts_ended
