@@ -1,7 +1,7 @@
 ---
 custom_cluster:
   driver_node_type_id: m5d.2xlarge
-  node_type_id: m5d.2xlarge
+  node_type_id: m5d.4xlarge
   runtime_engine: PHOTON
   num_workers: 3
   spark_version: 11.3.x-scala2.12
