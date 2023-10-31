@@ -53,6 +53,8 @@ columns:
     description: "Total volume of documentations sent within the aggregation."
   credit_approved:
     description: "Total volume of credits approved within the aggregation."
+  contracts_created:
+    description: "Total volume of contracts created within the aggregation."
   contracts_signed:
     description: "Total volume of contracts signed within the aggregation."
   has_guarantee:

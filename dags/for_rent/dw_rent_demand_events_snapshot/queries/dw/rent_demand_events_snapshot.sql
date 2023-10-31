@@ -28,6 +28,7 @@ SELECT
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 7) AS documentation_sent,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 8) AS credit_approved,
   COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 9) AS contracts_signed,
+  COUNT(DISTINCT sk_event) FILTER (WHERE fde.sk_event_type = 10) AS contracts_created,
   CASE
     WHEN fde.sk_event_type BETWEEN 1 AND 4 THEN FALSE
     WHEN fde.sk_event_type > 4 AND dp.guarantee = 'RentalGuarantee' THEN TRUE
@@ -60,4 +61,4 @@ LEFT JOIN
 LEFT JOIN
   dw_public.dim_proposal AS dp -- guarantee
     ON fde.sk_proposal = dp.sk_proposal
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 19, 20, 21, 22, 23, 24, 25, 26
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 21, 22, 23, 24, 25, 26, 27

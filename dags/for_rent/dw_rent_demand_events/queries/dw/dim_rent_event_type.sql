@@ -51,3 +51,9 @@ SELECT
       'CONTRACT_SIGNED' AS event_name,
       'CS' AS abbreviation,
       'CONTRACT' AS stage
+  UNION ALL
+  SELECT
+      10 AS sk_event_type,
+      'CONTRACT_CREATED' AS event_name,
+      'CC' AS abbreviation,
+      'CONTRACT' AS stage

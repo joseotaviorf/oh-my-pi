@@ -15,13 +15,14 @@ SELECT
   evaluation_positive,
   documentation_sent,
   credit_approved,
+  contracts_created,
   contracts_signed,
   has_guarantee,
-  dt_event,  
+  dt_event,
   dt_week_started,
   country_code,
   NOW() AS ts_load
-FROM 
+FROM
   dw_rent_snapshot.rent_demand_events_snapshot
 WHERE
   year = YEAR(NOW())

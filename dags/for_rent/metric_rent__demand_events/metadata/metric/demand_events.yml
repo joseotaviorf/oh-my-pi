@@ -148,6 +148,19 @@ columns:
       hierarchy: Operations Mgmt
       approved_by: bruno.choumar@quintoandar.com.br
       link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  contracts_created:
+    lineage:
+      - dw_rent_snapshot.rent_demand_events_snapshot.contracts_created
+    description: Total volume of contracts created within the aggregation.
+    metric:
+      name: Contract Created
+      description: Total volume of contracts created within the aggregation.
+      acronym: CC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
   contracts_signed:
     lineage:
     - dw_rent_snapshot.rent_demand_events_snapshot.contracts_signed
@@ -176,7 +189,7 @@ columns:
     - dw_rent_snapshot.rent_demand_events_snapshot.dt_week_started
     description: Week date of the event.
     dimension: True
-  country_code: 
+  country_code:
     lineage:
     - dw_rent_snapshot.rent_demand_events_snapshot.country_code
     description: Country code information.

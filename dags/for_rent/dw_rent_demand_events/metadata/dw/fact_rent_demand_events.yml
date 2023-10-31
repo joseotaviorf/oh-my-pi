@@ -1,6 +1,9 @@
 database_name: dw_rent
 table_name: fact_rent_demand_events
-description: This factless table is related to the demand events of For Rent, used to stablish event trackings relations.
+description: This fact table is related to the demand events of For Rent, used to stablish event trackings relations.
+  Using the column sk_event_type, is possible to join with the dw_rent.dim_rent_event_type and understand which type of event it is.
+  By understanding the event type, it's possible to join with other models (example, if sk_event_type 9 or 10, then it's a contract event
+  and it's possible to use the sk_event column to join with the dw_public.dim_contract).
   Each line is the most recent update of an event related to the scope.
 domain: For Rent
 owner: isadora.gallerani@quintoandar.com.br
@@ -14,7 +17,8 @@ columns:
   sk_event:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.id_event
-    description: Id of the event.
+    description: Id of the event. It could be a sk_booking, sk_offer, sk_proposal or sk_contract, and it can be used to join with different models
+      based in which type of event it is.
   sk_booking:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.id_booking
@@ -62,11 +66,12 @@ columns:
   sk_owner:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.id_owner
-    description: Id of the owner.
+    description: Id of the owner. It can be joined with dw_rent.fact_house_listing_daily_infos.
   sk_owner_category:
     lineage:
     - datalake_rent_demand_events.rent_demand_events.id_owner_category
-    description: "ID of the property owner's version. We're not versioning the owners that are B2B, so a -1 values can exist."
+    description: Id of the property owner's version. We're not versioning the owners that are B2B, so a -1 values can exist.
+      It can be joined with dw_rent.dim_owner_category to check the owner's category.
   sk_company_supply:
     lineage:
     - datalake_rede_company.company_sks.sk_company
