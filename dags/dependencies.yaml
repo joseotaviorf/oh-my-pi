@@ -475,6 +475,7 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category
   - bietlejuice.enrich_pro_owners:load-enrich-pro-owner-history
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
 bietlejuice.dw_listing_jobs:
   - bietlejuice.ebdb:load-clean-contract
@@ -576,6 +577,7 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand

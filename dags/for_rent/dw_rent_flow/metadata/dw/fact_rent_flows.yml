@@ -77,6 +77,10 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.id_region
     description: Id of the property region. Joins with dw_public.dim_region.
+  sk_company_supply:
+    lineage:
+    - datalake_rede_company.company_sks.sk_company
+    description: Key of the Rede company that owns the house related to the rent flow. Can be joined with dw_rede.dim_company.
   sk_first_event_date:
     lineage:
       - datalake_rent_flows.rent_flows.ts_rent_flow_event

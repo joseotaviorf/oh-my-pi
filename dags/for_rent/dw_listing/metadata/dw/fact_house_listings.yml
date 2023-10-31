@@ -53,6 +53,10 @@ columns:
     lineage:
     - datalake_big_agent.house_rent_listing_consultant.id_user
     description: User key of consultant.
+  sk_company_supply:
+    lineage:
+    - datalake_rede_company.company_sks.sk_company
+    description: Key of the Rede company that owns the house. Can be joined with dw_rede.dim_company.
   sk_stranded_date:
     lineage:
     - datalake_ebdb_listing.house_listing.dt_stranded

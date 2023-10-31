@@ -19,6 +19,7 @@ SELECT
   COALESCE(hldi.id_partner, -1) AS sk_partner,
   COALESCE(hldi.id_partner_big_agent, -1) AS sk_partner_big_agent,
   COALESCE(hldi.id_region, -1) AS sk_region,
+  COALESCE(cs.sk_company, -1) AS sk_company_supply,
   DATE_FORMAT(DATE(ts_status_started), 'yyyyMMdd') AS sk_status_started_date,
   COALESCE(DATE_FORMAT(DATE(ts_status_ended), 'yyyyMMdd'), -1) AS sk_status_ended_date,
   DATE_FORMAT(dt_day, 'yyyyMMdd') AS sk_date,
@@ -40,6 +41,21 @@ LEFT JOIN
     ON hldi.id_owner = am.id_owner
     AND MAKE_DATE(hldi.year, hldi.month, hldi.day) >= am.dt_account_manager_started
     AND MAKE_DATE(hldi.year, hldi.month, hldi.day) < COALESCE(am.dt_account_manager_started, CURRENT_DATE())
+LEFT JOIN
+  datalake_rede_company.company_sks AS cs
+    ON hldi.is_rent_3p_supply 
+    AND ((
+      hldi.uuid_company IS NOT NULL
+      AND hldi.uuid_company = cs.uuid_company
+    ) OR (
+      hldi.uuid_company IS NULL
+      AND hldi.id_company_hubspot IS NOT NULL
+      AND hldi.id_company_hubspot = cs.id_hubspot
+    ) OR (
+      hldi.uuid_company IS NULL
+      AND hldi.id_company_hubspot IS NULL
+      AND hldi.partner_3p_supply = cs.extracted_3p_tag
+    ))
 WHERE
   hldi.year = {year}
   AND hldi.month = {month}

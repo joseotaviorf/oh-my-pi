@@ -31,6 +31,10 @@ columns:
     lineage:
     - datalake_ebdb_listing.house_listing_status.id_region
     description: Key of region where house listing is located in.
+  sk_company_supply:
+    lineage:
+    - datalake_rede_company.company_sks.sk_company
+    description: Key of the Rede company that owns the house. Can be joined with dw_rede.dim_company.
   sk_status_end_date:
     lineage:
     - datalake_ebdb_listing.house_listing_status.ts_status_ended

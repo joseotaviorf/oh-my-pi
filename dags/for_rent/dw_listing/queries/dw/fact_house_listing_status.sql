@@ -9,6 +9,7 @@ WITH listing_business_context AS (
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
     hls.id_house_listing AS sk_house_listing,
     COALESCE(hls.id_region, -1) AS sk_region,
+    COALESCE(cs.sk_company, -1) AS sk_company_supply,
     COALESCE(CAST(DATE_FORMAT(hls.ts_first_publication, "yyyyMMdd") AS BIGINT), -1) AS sk_first_publication_date,
     COALESCE(CAST(DATE_FORMAT(hls.ts_status_started, "yyyyMMdd") AS BIGINT), -1) AS sk_status_start_date,
     COALESCE(CAST(DATE_FORMAT(hls.ts_status_ended, "yyyyMMdd") AS BIGINT), -1) AS sk_status_end_date,
@@ -32,6 +33,21 @@ JOIN datalake_ebdb_listing.house h
     ON h.id = hl.id_house
 LEFT JOIN listing_business_context lbc
     ON lbc.id_house = h.id
+LEFT JOIN
+    datalake_rede_company.company_sks AS cs
+        ON h.is_rent_3p_supply 
+        AND ((
+            h.uuid_company IS NOT NULL
+            AND h.uuid_company = cs.uuid_company
+        ) OR (
+            h.uuid_company IS NULL
+            AND h.id_company_hubspot IS NOT NULL
+            AND h.id_company_hubspot = cs.id_hubspot
+        ) OR (
+            h.uuid_company IS NULL
+            AND h.id_company_hubspot IS NULL
+            AND h.partner_3p_supply = cs.extracted_3p_tag
+        ))
 WHERE
     lbc.id_house IS NULL
     OR lbc.is_for_rent

@@ -39,6 +39,7 @@ WITH listing_rent_flows AS (
             COALESCE(dim_contract.sk_contract, -1) AS sk_contract,
             COALESCE(reservation.id_reservation, -1) AS sk_reservation,
             COALESCE(dim_booking.sk_rent_flow_taxonomy, -1) AS sk_rent_flow_taxonomy,
+            COALESCE(cs.sk_company, -1) AS sk_company_supply,
             COALESCE(h.country_code, 'Undefined') AS country_code,
             dim_proposal.status AS proposal_status,
             rent_flow.visit_created_type,
@@ -200,6 +201,21 @@ WITH listing_rent_flows AS (
                 AND COALESCE(dim_proposal.ts_processed, dim_proposal.dt_updated)
         LEFT JOIN dw_public.dim_booking
             ON dim_booking.sk_booking = rent_flow.id_booking
+        LEFT JOIN
+            datalake_rede_company.company_sks AS cs
+                ON h.is_rent_3p_supply 
+                AND ((
+                    h.uuid_company IS NOT NULL
+                    AND h.uuid_company = cs.uuid_company
+                ) OR (
+                    h.uuid_company IS NULL
+                    AND h.id_company_hubspot IS NOT NULL
+                    AND h.id_company_hubspot = cs.id_hubspot
+                ) OR (
+                    h.uuid_company IS NULL
+                    AND h.id_company_hubspot IS NULL
+                    AND h.partner_3p_supply = cs.extracted_3p_tag
+                ))
         WHERE dim_house_listing.is_for_rent
             AND (
                 COALESCE(dim_booking.visit_intent, '') <> 'SALE'
@@ -380,6 +396,7 @@ SELECT
     sk_proposal,
     sk_contract,
     sk_rent_flow_taxonomy,
+    sk_company_supply,
     sk_house_first_listing_date,
     sk_house_listing_date,
     sk_house_listing_de_publication_date,
