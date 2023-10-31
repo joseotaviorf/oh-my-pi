@@ -10,16 +10,20 @@ WITH task_start AS (
 
 task_finish AS (
   SELECT
-    sk_task,
-    sk_proposal,
-    sk_assignee,
-    action_user_name,
-    (ts_action - INTERVAL '3 hours') AS ts_task_finished,
-    ROW_NUMBER() OVER (PARTITION BY sk_task ORDER BY ts_action DESC) AS rank_tf
+    crm.sk_task,
+    crm.sk_proposal,
+    crm.sk_assignee,
+    crm.action_user_name,
+    (crm.ts_action - INTERVAL '3 hours') AS ts_task_finished,
+    ROW_NUMBER() OVER (PARTITION BY crm.sk_task ORDER BY crm.ts_action DESC) AS rank_tf
   FROM
     dw_crm.fact_credit_tasks AS crm
+  LEFT JOIN
+    datalake_credit_analysis.credit_analysis AS ca
+      ON ca.id_proposal = crm.sk_proposal 
   WHERE
-    action_type IN ('REALIZE')
+    crm.action_type IN ('REALIZE')
+    OR ca.reason IN ('AUTOMATIC_APPROVAL_WITH_MANUAL_INTERVENTION', 'AUTOMATIC_REJECTION_WITH_MANUAL_INTERVENTION')
 ),
 
 last_credit_analysis AS (
