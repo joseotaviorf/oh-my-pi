@@ -31,7 +31,7 @@ parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
 parser.add_argument("source")
-parser.add_argument("--tables_list", nargs="+", dest="tables_list", required=True)
+parser.add_argument("table")
 parser.add_argument("--partition_by", nargs="+", dest="partition_by", required=False)
 
 
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     env = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
-    tables_list = args.tables_list
+    table_name = args.table
     partition_by = args.partition_by
 
     logger.info(
@@ -140,9 +140,7 @@ if __name__ == "__main__":
     )
 
     # fetch Amplitude cean tables args
-    tables_args = [
-        (amplitude_clean_loader.fetch_data(table), table, partition_by) for table in tables_list
-    ]
+    table_args = (amplitude_clean_loader.fetch_data(table_name), table_name, partition_by)
 
     # load Amplitude clean data into datalake
-    [amplitude_clean_loader.load_data_into_datalake(*args) for args in tables_args]
+    amplitude_clean_loader.load_data_into_datalake(*table_args)

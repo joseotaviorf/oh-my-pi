@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -537,25 +538,41 @@ update_subpartitioned_events_clean_staging_task = QuintoAndarDatabricksSubmitRun
 tables_list = DAGPackagesPathService.list_queries_files_in_composer(
     dag_name=SOURCE, layer="clean"
 )
-load_subpartitioned_events_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="load-subpartitioned-event-tables-to-clean",
+subpartitioned_table_list = list(set(tables_list) - set(CLEAN_STAGING_BLOCK_TABLES))
+
+load_subpartitioned_clean_tables_tasks = []
+for table in subpartitioned_table_list:
+
+    load_subpartitioned_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+            task_id=DatalakeTaskGroup.generate_default_task_id(
+            task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
+            layer=LayerEnum.CLEAN,
+            schema=SOURCE,
+            table_name=table,
+        ),
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": raw_spark_jobs_path + "load_subpartitioned_events_clean.py",
+                "parameters": [
+                    "{{ ds }}",
+                    ENV,
+                    datalake_bucket,
+                    "amplitude",
+                    table,
+                ]
+                + ["--partition_by"]
+                + INCREMENTAL_PARTITIONS,
+            }
+        },
+        execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
+    )
+
+    load_subpartitioned_clean_tables_tasks.append(load_subpartitioned_clean_table_task)
+
+load_subpartitioned_all_clean_tables_done_tasks = DummyOperator(
     dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": raw_spark_jobs_path + "load_subpartitioned_events_clean.py",
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                datalake_bucket,
-                "amplitude",
-                "--tables_list",
-            ]
-            + list(set(tables_list) - set(CLEAN_STAGING_BLOCK_TABLES))
-            + ["--partition_by"]
-            + INCREMENTAL_PARTITIONS,
-        }
-    },
-    execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
+    task_id="load-subpartitioned-event-tables-to-clean",
 )
 
 sync_metastore_clean_subpartitioned_events_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -654,7 +671,8 @@ airflow_helpers.chain(
     [create_clean_staging_events_task, update_subpartitions_table_clean_staging_task],
     create_subpartitioned_tables_clean_staging_task,
     update_subpartitioned_events_clean_staging_task,
-    load_subpartitioned_events_clean_task,
+    load_subpartitioned_clean_tables_tasks,
+    load_subpartitioned_all_clean_tables_done_tasks,
     sync_metastore_clean_subpartitioned_events_tables_structure_task,
     sync_metastore_clean_subpartitioned_events_tables_partitions_task,
     propagate_tables_metadata_clean_task,
