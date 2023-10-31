@@ -168,14 +168,9 @@ cluster_template:
               value: c052
             - key: provisioner
               value: databricks
-            - key: granulate-cluster-name
-              value: "{{ dag.dag_id }}"
         init_scripts:
             - s3:
                   destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
-                  region: ""
-            - s3:
-                  destination: "{{ var.value.artifacts_bucket }}/granulate/sagent_installer_Databricks.sh"
                   region: ""
         spark_conf:
             spark.rpc.message.maxSize: "2000"
@@ -203,8 +198,6 @@ cluster_template:
         spark_env_vars:
             PYSPARK_PYTHON: "/databricks/python3/bin/python3"
             ENVIRONMENT: "{{ var.value.environment }}"
-            GRANULATE_DBX_WORKSPACE_URL: "{{ var.value.GRANULATE_DBX_WORKSPACE_URL_PATH }}"
-            GRANULATE_DBX_TOKEN: "{{ var.value.GRANULATE_DBX_TOKEN_PATH }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
         ssh_public_keys: []
         node_type_id: m5a.large
