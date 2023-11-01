@@ -8,6 +8,8 @@ description: |
   per installment.
   The records are never delete.
 
+  To get the most up-to-date installment, you need to filter is_installment_active = TRUE
+
   Discount amount composition (only registered for id_sequence_number=000):
   - If paid_amount <= main_amount:  the discount value is the accounting discount (desconto contábil), i.e, only the discount on the main amount.
   - If paid amount > main_amount: the discount on the financial, i.e, the difference between the total correct balance and the amount to be paid in the negotiation.

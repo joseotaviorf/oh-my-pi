@@ -9,6 +9,14 @@ columns:
     description: Customer Document. Original field name = CPF
     lineage:
       - datalake_recupera_clean.records.customer_document
+  id_creditor:
+    description: Creditor ID
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
+    lineage:
+      - datalake_recupera_clean.records.customer_document
   id_contract:
     description: Contract ID. Original field name = CONTRATO
     lineage:
