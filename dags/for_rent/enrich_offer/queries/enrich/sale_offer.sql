@@ -2,7 +2,7 @@
 WITH visit_before_offer AS (
     WITH vc_aux AS (
         SELECT
-            so.id AS id_offer,
+            COALESCE(g.id, vo.id_offer) AS id_offer,
             bs.id AS id_booking,
             bs.id_agent,
             du.id AS id_user_agent,
@@ -11,27 +11,30 @@ WITH visit_before_offer AS (
             bs.partner_3p_demand,
             bs.is_3p_demand,
             TRUE AS flg_visit_completed_before_offer,
-            (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
-            (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
+            (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
+            (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
             ROW_NUMBER() OVER (
                 PARTITION BY
-                    so.id
+                    COALESCE(g.id, vo.id_offer)
                 ORDER BY
-                    (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_booking_utc))
+                    (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_booking_utc))
             ) AS rw_visit_completed
         FROM
-            datalake_firestore.sale_offer AS so
+            datalake_firestore.sale_offer AS g
+        FULL OUTER JOIN
+            datalake_sale_offer_flows.sale_offer_flows AS vo
+                    ON vo.id_offer = g.id
         JOIN
             datalake_booking.booking AS bs
-                ON bs.id_house = so.id_house
-                AND bs.id_visitor = so.id_buyer
+                ON bs.id_house = COALESCE(g.id, vo.id_offer)
+                AND bs.id_visitor = COALESCE(g.id_buyer, vo.id_buyer)
         LEFT JOIN
             datalake_ebdb_user.user AS du
                 ON bs.id_agent = du.id_agent
         WHERE
             bs.visit_intent = 'SALE'
             AND bs.type = 'Visita'
-            AND bs.ts_booking_utc < so.ts_created
+            AND bs.ts_booking_utc < COALESCE(g.ts_created, vo.ts_offer_created)
             AND bs.visit_fup ='VaiNegociar'
     )
     SELECT
@@ -44,7 +47,7 @@ WITH visit_before_offer AS (
 booking_before_offer AS (
     WITH bk_aux AS (
         SELECT
-            so.id AS id_offer,
+            COALESCE(g.id, vo.id_offer) AS id_offer,
             bs.id AS id_booking,
             bs.id_agent,
             du.id AS id_user_agent,
@@ -53,28 +56,31 @@ booking_before_offer AS (
             bs.partner_3p_demand,
             bs.is_3p_demand,
             TRUE AS flg_booking_before_offer,
-            (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
-            (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
+            (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
+            (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
             ROW_NUMBER() OVER (
                 PARTITION BY
-                    so.id
+                    COALESCE(g.id, vo.id_offer)
                 ORDER BY
                     is_canceled,
-                    (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_created))
+                    (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_created))
             ) AS rw_booking
         FROM
-            datalake_firestore.sale_offer AS so
+            datalake_firestore.sale_offer AS g
+        FULL OUTER JOIN
+            datalake_sale_offer_flows.sale_offer_flows AS vo
+                    ON vo.id_offer = g.id
         JOIN
             datalake_booking.booking AS bs
-                ON bs.id_house = so.id_house
-                AND bs.id_visitor = so.id_buyer
+                ON bs.id_house = COALESCE(g.id_house, vo.id_house)
+                AND bs.id_visitor = COALESCE(g.id_buyer, vo.id_house)
         LEFT JOIN
             datalake_ebdb_user.user AS du
                 ON bs.id_agent = du.id_agent
         WHERE
             bs.visit_intent = 'SALE'
             AND bs.type = 'Visita'
-            AND bs.ts_created < so.ts_created
+            AND bs.ts_created < COALESCE(g.ts_created,vo.ts_offer_created)
     )
     SELECT
         bk.*
@@ -130,14 +136,17 @@ work_contract AS (
 regions AS (
     WITH giroffer_regions AS (
         SELECT
-            id AS id_offer,
-            id_buyer,
-            id_house,
-            id_owner,
-            ts_created AS ts_offer_created,
-            last_price_offered_by_buyer
+            COALESCE(g.id, vo.id_offer) AS id_offer,
+            COALESCE(g.id_buyer, vo.id_buyer) AS id_buyer,
+            COALESCE(g.id_house, vo.id_house) AS id_house,
+            COALESCE(g.id_owner, vo.id_seller) AS id_owner,
+            COALESCE(g.ts_created, vo.ts_offer_created) AS ts_offer_created,
+            COALESCE(g.last_price_offered_by_buyer, vo.last_price_offered_by_buyer) AS last_price_offered_by_buyer
         FROM
-            datalake_firestore.sale_offer AS fso
+            datalake_firestore.sale_offer AS g
+        FULL OUTER JOIN
+            datalake_sale_offer_flows.sale_offer_flows AS vo
+                ON vo.id_offer = g.id
     ),
     aux_sale_listings AS (
         SELECT
@@ -209,29 +218,29 @@ aux_monday_users AS (
 data_sources AS (
     SELECT
         -- data from giroffer
-        g.id AS id_offer,
-        g.id_buyer,
-        g.id_house,
-        g.id_owner,
-        g.ts_created AS ts_offer_created,
-        g.sale_price,
-        g.first_price_offered_by_buyer,
-        g.last_price_offered_by_buyer,
-        g.ts_updated,
-        g.has_used_fgts_in_payment,
-        g.has_used_negotiation_chat,
-        g.last_discount_proposed,
-        g.first_discount_proposed,
-        g.current_payment_method,
-        g.planned_payment_method,
-        g.registry_price,
-        g.itbi_price,
-        g.payment_entry_amount,
-        g.financing_value,
-        g.fgts_value,
-        g.earnest_value,
-        g.brokerage_fee AS giroffer_brokerage_fee,
-        g.id_sale_flow,
+        COALESCE(g.id, vo.id_offer) AS id_offer,
+        COALESCE(g.id_buyer, vo.id_buyer) AS id_buyer,
+        COALESCE(g.id_house, vo.id_house) AS id_house,
+        COALESCE(g.id_owner, vo.id_seller) AS id_owner,
+        COALESCE(g.ts_created, vo.ts_offer_created) AS ts_offer_created,
+        COALESCE(g.sale_price, vo.sale_listing_price) AS sale_price,
+        COALESCE(g.first_price_offered_by_buyer, vo.first_price_offered_by_buyer) AS first_price_offered_by_buyer,
+        COALESCE(g.last_price_offered_by_buyer, vo.last_price_offered_by_buyer) AS last_price_offered_by_buyer,
+        COALESCE(g.ts_updated, vo.ts_offer_updated) AS ts_updated,
+        COALESCE(g.has_used_fgts_in_payment, vo.has_used_fgts_in_payment) AS has_used_fgts_in_payment,
+        COALESCE(g.has_used_negotiation_chat, vo.has_used_negotiation_chat) AS has_used_negotiation_chat,
+        COALESCE(g.last_discount_proposed, vo.last_discount_proposed) AS last_discount_proposed,
+        COALESCE(g.first_discount_proposed, vo.first_discount_proposed) AS first_discount_proposed,
+        COALESCE(g.current_payment_method, vo.payment_method) AS current_payment_method,
+        COALESCE(g.planned_payment_method, vo.planned_payment_method) AS planned_payment_method,
+        COALESCE(g.registry_price, vo.registry_price) AS registry_price,
+        COALESCE(g.itbi_price, vo.itbi_price) AS itbi_price,
+        COALESCE(g.payment_entry_amount, vo.entry_amount) AS payment_entry_amount,
+        COALESCE(g.financing_value, vo.financing_value) AS financing_value,
+        COALESCE(g.fgts_value, vo.fgts_value) AS fgts_value,
+        COALESCE(g.earnest_value, vo.down_payment_value) AS earnest_value,
+        COALESCE(g.brokerage_fee, vo.brokerage_fee) AS giroffer_brokerage_fee,
+        COALESCE(g.id_sale_flow, vo.id_sale_flow) AS id_sale_flow,
         -- data from relation_booking_offer
         rbo.id_user_agent AS rbo_id_user_agent,
         rbo.id_booking,
@@ -390,28 +399,28 @@ data_sources AS (
         END AS mo_id_consultant
     FROM
         datalake_firestore.sale_offer AS g
-    LEFT JOIN
-        relation_booking_offer AS rbo
-            ON rbo.id_offer = g.id
     FULL OUTER JOIN
-        datalake_gsheets.sale_hub_offer AS ohc
-            ON ohc.id_offer = g.id
-    LEFT JOIN
         datalake_sale_offer_flows.sale_offer_flows AS vo
             ON vo.id_offer = g.id
+    LEFT JOIN
+        relation_booking_offer AS rbo
+            ON rbo.id_offer = COALESCE(g.id, vo.id_offer)
+    FULL OUTER JOIN
+        datalake_gsheets.sale_hub_offer AS ohc
+            ON ohc.id_offer = COALESCE(g.id, vo.id_offer)
     LEFT JOIN
         datalake_ebdb_user.user AS du_vo
             ON vo.id_user_agent = du_vo.id
             AND vo.id_user_agent IS NOT NULL
     LEFT JOIN
         datalake_firestore.monday AS mo
-            ON mo.id_offer = g.id
+            ON mo.id_offer = COALESCE(g.id, vo.id_offer)
     LEFT JOIN
         work_contract AS wc
             ON wc.id_user_agent = rbo.id_user_agent
-            AND g.ts_created >= wc.ts_work_contract_start
+            AND COALESCE(g.ts_created, vo.ts_offer_created) >= wc.ts_work_contract_start
             AND (
-                (g.ts_created <= wc.ts_work_contract_end)
+                (COALESCE(g.ts_created, vo.ts_offer_created) <= wc.ts_work_contract_end)
                 OR (wc.ts_work_contract_end IS NULL)
             )
     LEFT JOIN
@@ -516,24 +525,27 @@ offer_portfolio AS (
 -- RANK OFFER
 rank_offers AS (
   SELECT
-    so.id,
+    COALESCE(g.id, vo.id_offer) AS id,
     ROW_NUMBER() OVER (
         PARTITION BY
-            so.id_buyer
-                ORDER BY so.ts_created
+            COALESCE(g.id_buyer, vo.id_buyer)
+                ORDER BY COALESCE(g.ts_created, vo.ts_offer_created)
     ) AS buyer_rank_offers,
     ROW_NUMBER() OVER (
         PARTITION BY
-            so.id_house
-                ORDER BY so.ts_created
+            COALESCE(g.id_house, vo.id_house)
+                ORDER BY COALESCE(g.ts_created, vo.ts_offer_created)
     ) AS house_rank_offers
   FROM
-    datalake_firestore.sale_offer AS so
+        datalake_firestore.sale_offer AS g
+    FULL OUTER JOIN
+        datalake_sale_offer_flows.sale_offer_flows AS vo
+            ON vo.id_offer = g.id
 ),
 -- BUSINESS RULES
 business_rules AS (
     SELECT
-        COALESCE(ds.id_offer,ds.ohc_id_offer) AS id_offer,
+        COALESCE(ds.vo_id_offer, ds.id_offer,ds.ohc_id_offer) AS id_offer,
         ds.id_sale_flow,
         COALESCE(ds.id_buyer,ds.ohc_id_buyer) AS id_buyer,
         COALESCE(ds.id_house,ds.ohc_id_house) AS id_house,
@@ -578,7 +590,7 @@ business_rules AS (
         CASE
             WHEN COALESCE(ds.vo_tags_from_salesflow, ds.mo_tags_from_salesflow) LIKE "%no-protocolo%" THEN true
             WHEN COALESCE(ds.vo_dt_sale_agreement_created, ds.mo_dt_sale_agreement_created) >= "2022-03-14"
-                AND ds.current_payment_method = "FINANCED"
+                AND ds.current_payment_method LIKE "FINANCED%"
                 AND COALESCE(ds.vo_financing_bank, ds.mo_financing_bank) = "Itaú"
                 AND COALESCE(ds.vo_credit_model, ds.mo_credit_model) = "ATTA"
                 AND dr.city_group = "RMSP" THEN true

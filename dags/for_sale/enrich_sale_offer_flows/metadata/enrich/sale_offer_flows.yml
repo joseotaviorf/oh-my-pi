@@ -17,10 +17,32 @@ columns:
     lineage:
       - datalake_sales_flow.offer_specialists.id_consultant
     description: Deal Maker user ID on SalesFlow tables
+  id_buyer:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id_buyer
+      - datalake_sales_flow_clean.users.id_external
+    description: Identification key of the user who sent the offer.
+  id_seller:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id_seller
+      - datalake_sales_flow_clean.users.id_external
+    description: House owner to whom an offer has been sent.
+  id_house:
+    lineage:
+      - datalake_sales_flow_clean.house.id_external
+    description: Identification key of the house linked to the offer.
+  id_sale_flow:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_buyer
+      - datalake_sales_flow_clean.users.id_external
+      - datalake_sales_flow_clean.house.id_external
+    description: Identification key for the sales flow linked to an offer. Concat buyer and house.
+
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_clean.offer.id_sales_flow
+      - datalake_firestore.sale_offer.id_sale_flow
     description: Identification key for the sales flow linked to an offer.
+
   sk_user_team_lead:
     lineage:
       - datalake_sales_flow.offer_specialists.id_user_team_lead
@@ -165,6 +187,10 @@ columns:
       - datalake_sales_flow_clean.sales_flow.flow_type
   vendas_offer_flow:
     description: Information about which flow this offer is following
+  has_used_negotiation_chat:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_type
+    description: If the buyer has used the negotiation chat
   sale_agreement_cancellation_reason:
     lineage:
       - datalake_sales_flow_clean.rescission.comment
@@ -189,6 +215,14 @@ columns:
     description: Offer payment method.
     lineage:
       - datalake_sales_flow_clean.payment.payment_method
+  planned_payment_method:
+    lineage:
+      - datalake_sales_flow_clean.payment.payment_method
+    description: Planned payment method of the offer.
+  financing_value:
+    lineage:
+      - datalake_monopoly_clean.sale_revision.financed_amount
+    description: Value that will be financed.
   consultant_name:
     description: Consultant Name
     lineage:
@@ -325,6 +359,14 @@ columns:
     lineage:
       - datalake_sales_flow_clean.payment.fgts_value
     description: Fgts value used in the purchase.
+  down_payment_value:
+    lineage:
+      - datalake_sales_flow_clean.payment.down_payment_value
+    description: Entry amount paid by the buyer
+  has_used_fgts_in_payment:
+    lineage:
+      - datalake_sales_flow_clean.payment.payment_method
+    description: If the buyer has used FGTS in the payment
   entry_amount:
     lineage:
       - datalake_sales_flow_clean.payment.entry_amount
@@ -361,6 +403,14 @@ columns:
     lineage:
       - datalake_sales_flow_clean.offer.sale_price
     description: House price sent in the publication by the seller.
+  registry_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.registry_price
+    description: Registry value paid on the purchase
+  itbi_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.itbi_price
+    description: ITBI value paid on the purchase
   first_price_offered_by_buyer:
     lineage:
       - datalake_sales_flow_clean.offer.offer_price
@@ -552,7 +602,11 @@ columns:
   ts_created:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_created
-    description: Date when the CCV was created.
+    description: Date when the CCV was created
+  ts_offer_updated:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_updated
+    description: Timestamp when the offer was updated
   ts_last_updated_pendency:
     description: Date when the pendency was last updated
     lineage:

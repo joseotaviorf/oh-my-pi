@@ -60,11 +60,14 @@ offers AS (
         f.offer_price AS first_price_offered_by_buyer,
         l.offer_price AS last_price_offered_by_buyer,
         l.final_price,
+        l.registry_price,
+        l.itbi_price,
         l.status,
         COALESCE(lre.reason, l.discard_reason) AS discard_reason,
         lre.source AS reject_source,
         l.ts_created,
         l.ts_accepted,
+        l.ts_updated,
         l.ts_discarded
     FROM
         last_offer_entry AS l
@@ -79,15 +82,23 @@ offers AS (
 -- SALES FLOW CTE
 last_update_sales_flow AS (
     SELECT
-        *,
-        ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS ROW
+        sf.*,
+        buyer.id_external AS buyer_id_external,
+        seller.id_external AS seller_id_external,
+        ROW_NUMBER() OVER (PARTITION BY sf.id ORDER BY sf.ts_updated DESC) AS ROW
     FROM
-        datalake_sales_flow_clean.sales_flow
+        datalake_sales_flow_clean.sales_flow sf
+    LEFT JOIN datalake_sales_flow_clean.users AS seller
+      ON sf.id_seller = seller.id
+    LEFT JOIN datalake_sales_flow_clean.users AS buyer
+      ON sf.id_buyer = buyer.id
 ),
 sales_flow AS (
     SELECT
         sf.id,
         sf.id_house,
+        buyer_id_external AS id_buyer,
+        seller_id_external AS id_seller,
         sf.flow_type,
         sf.status,
         sf.flow_step,
@@ -284,10 +295,20 @@ mortgage AS (
 -- PAYMENT CTE
 last_update_payment AS (
     SELECT
-        *,
-        ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) AS ROW
+        *
     FROM
         datalake_sales_flow_clean.payment
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
+),
+first_update_payment AS (
+    SELECT
+        *,
+        payment_method AS planned_payment_method
+    FROM
+        datalake_sales_flow_clean.payment
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated ASC) = 1
 ),
 payment AS (
     SELECT
@@ -296,16 +317,18 @@ payment AS (
         p.status,
         p.payment_model,
         p.payment_method,
+        fpm.planned_payment_method,
         p.fgts_value,
         p.entry_amount,
         p.down_payment_value
     FROM
         last_update_payment AS p
     INNER JOIN
+        first_update_payment AS fpm
+            ON p.id = fpm.id
+    INNER JOIN
         offers AS sfo
             ON sfo.id_sales_flow = p.id_sales_flow
-    WHERE
-        ROW = 1
 ),
 -- CASH PAYMENT CTE
 last_update_cash_payment AS (
@@ -411,12 +434,29 @@ last_update_house AS (
 house AS (
     SELECT
         h.id,
+        h.id_external,
         h.has_seller_debt_payments,
         h.house_registration_status
     FROM
         last_update_house AS h
     WHERE
         ROW =1
+),
+-- MONOPOLY CTE
+last_update_offer_monopoly AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_event DESC) AS ROW
+    FROM
+        datalake_monopoly_clean.sale_revision
+),
+monopoly AS (
+    SELECT
+         id_external_offer AS id_offer,
+         financed_amount AS financing_value
+    FROM
+        last_update_offer_monopoly
+    WHERE ROW = 1
 ),
 -- RESCISION CTE
 last_update_rescission AS (
@@ -628,6 +668,10 @@ SELECT
     off.id_offer,
     sp.id_user_consultant,
     sp.id_consultant,
+    sf.id_buyer,
+    sf.id_seller,
+    h.id_external AS id_house,
+    CONCAT(sf.id_buyer,'_', h.id_external) AS id_sale_flow,
     off.id_sales_flow,
     sp.id_user_team_lead AS sk_user_team_lead,
     sp.id_team_lead AS sk_team_lead,
@@ -694,6 +738,10 @@ SELECT
         WHEN ft.flow_type = 'DEFAULT'
         THEN 'DEAL_MAKING'
     END AS vendas_offer_flow,
+      CASE WHEN ft.flow_type = 'DEFAULT'
+           THEN TRUE
+           ELSE FALSE
+      END AS has_used_negotiation_chat,
     COALESCE(sf.closing_canceled_reason, r.comment) AS sale_agreement_cancellation_reason,
     off.discard_reason AS drop_reason,
     CASE
@@ -706,6 +754,8 @@ SELECT
     mg.credit_model AS credit_model,
     p.payment_model,
     p.payment_method,
+    p.planned_payment_method,
+    mpl.financing_value,
     sp.consultant_name,
     sp.consultant_email,
     sp.team_lead_name,
@@ -740,6 +790,11 @@ SELECT
     mg.status AS bank_analysis_status,
     p.status AS payment_status,
     p.fgts_value,
+    p.down_payment_value,
+    CASE WHEN p.payment_method = 'FINANCED_USING_FGTS'
+         THEN TRUE
+         ELSE FALSE
+    END AS has_used_fgts_in_payment,
     p.entry_amount,
     COALESCE(cas.credit_analysis_status_name, mg.credit_status) AS credit_status,
     n.status AS real_estate_register_office_status,
@@ -748,6 +803,8 @@ SELECT
     tag.label AS tags_from_salesflow,
     b.brokerage_fee_payer,
     off.sale_price AS sale_listing_price,
+    off.registry_price,
+    off.itbi_price,
     off.first_price_offered_by_buyer,
     off.last_price_offered_by_buyer,
     CASE
@@ -826,6 +883,7 @@ SELECT
     sfd.ts_buyer_fup,
     ccv.ts_signed,
     ccv.ts_created,
+    off.ts_updated AS ts_offer_updated,
     sfp.ts_updated AS ts_last_updated_pendency
 FROM
     offers AS off
@@ -892,6 +950,9 @@ LEFT JOIN
 LEFT JOIN
     brokerage AS b
         ON b.id_sales_flow = off.id_sales_flow
+LEFT JOIN
+    monopoly AS mpl
+        ON off.id_offer = mpl.id_offer
 WHERE
     tag.label IS NULL
     OR tag.label NOT LIKE '%#offertestedeproduto%'

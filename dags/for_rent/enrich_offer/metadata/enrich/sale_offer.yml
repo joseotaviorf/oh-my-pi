@@ -10,25 +10,30 @@ columns:
   id_offer:
     lineage:
       - datalake_firestore.sale_offer.id
+      - datalake_sale_offer_flows.sale_offer_flows.id_offer
       - datalake_gsheets.sale_hub_offer.id_offer
     description: Offer unique identifier.
   id_sale_flow:
     lineage:
       - datalake_firestore.sale_offer.id_sale_flow
+      - datalake_sale_offer_flows.sale_offer_flows.id_sale_flow
     description: Identification key for the sales flow linked to an offer.
   id_buyer:
     lineage:
       - datalake_firestore.sale_offer.id_buyer
+      - datalake_sale_offer_flows.sale_offer_flows.id_buyer
       - datalake_gsheets.sale_hub_offer.id_buyer
     description: Identification key of the user who sent the offer.
   id_house:
     lineage:
       - datalake_firestore.sale_offer.id_house
+      - datalake_sale_offer_flows.sale_offer_flows.id_house
       - datalake_gsheets.sale_hub_offer.id_house
     description: Identification key of the house linked to the offer.
   id_owner:
     lineage:
       - datalake_firestore.sale_offer.id_owner
+      - datalake_sale_offer_flows.sale_offer_flows.id_seller
       - datalake_gsheets.sale_hub_offer.id_owner
     description: House owner to whom an offer has been sent.
   id_region:
@@ -281,6 +286,7 @@ columns:
     lineage:
       - datalake_firestore.sale_offer.current_payment_method
       - datalake_sale_offer_flows.sale_offer_flows.payment_method
+      - datalake_sale_offer_flows.sale_offer_flows.payment_method
     description: Current payment method of the offer.
   offer_acceptance_probability:
     lineage:
@@ -289,21 +295,25 @@ columns:
   sale_price:
     lineage:
       - datalake_firestore.sale_offer.sale_price
+      - datalake_sale_offer_flows.sale_offer_flows.sale_listing_price
     description: Sale listing price
   first_price_offered_by_buyer:
     lineage:
       - datalake_firestore.sale_offer.first_price_offered_by_buyer
+      - datalake_sale_offer_flows.sale_offer_flows.first_price_offered_by_buyer
       - datalake_firestore.monday.price_offered_by_buyer
     description: First value offered by the buyer
   last_price_offered_by_buyer:
     lineage:
       - datalake_firestore.sale_offer.last_price_offered_by_buyer
+      - datalake_sale_offer_flows.sale_offer_flows.last_price_offered_by_buyer
       - datalake_firestore.monday.sale_price_agreed
       - datalake_gsheets.sale_hub_offer.sale_price_agreed
     description: Last value offered by the buyer
   sale_price_agreed:
     lineage:
       - datalake_firestore.sale_offer.last_price_offered_by_buyer
+      - datalake_sale_offer_flows.sale_offer_flows.last_price_offered_by_buyer
       - datalake_firestore.monday.sale_price_agreed
       - datalake_gsheets.sale_hub_offer.sale_price_agreed
     description: Final price agreed for this offer
@@ -315,47 +325,58 @@ columns:
   earnest_value:
     lineage:
       - datalake_firestore.sale_offer.earnest_value
+      - datalake_sale_offer_flows.sale_offer_flows.down_payment_value
     description: Entry amount paid by the buyer
   fgts_value:
     lineage:
       - datalake_firestore.sale_offer.fgts_value
+      - datalake_sale_offer_flows.sale_offer_flows.fgts_value
     description: FGTS value used on the purchase
   financing_value:
     lineage:
       - datalake_firestore.sale_offer.financing_value
+      - datalake_sale_offer_flows.sale_offer_flows.financing_value
     description: Value that will be financed.
   payment_entry_amount:
     lineage:
       - datalake_firestore.sale_offer.payment_entry_amount
+      - datalake_sale_offer_flows.sale_offer_flows.entry_amount
     description: Entry amount paid by the buyer.
   itbi_price:
     lineage:
       - datalake_firestore.sale_offer.itbi_price
+      - datalake_sale_offer_flows.sale_offer_flows.itbi_price
     description: ITBI value paid on the purchase
   registry_price:
     lineage:
       - datalake_firestore.sale_offer.registry_price
+      - datalake_sale_offer_flows.sale_offer_flows.registry_price
     description: Registry value paid on the purchase
   planned_payment_method:
     lineage:
       - datalake_firestore.sale_offer.planned_payment_method
+      - datalake_sale_offer_flows.sale_offer_flows.planned_payment_method
     description: Planned payment method of the offer.
   first_discount_proposed:
     lineage:
       - datalake_firestore.sale_offer.first_discount_proposed
+      - datalake_sale_offer_flows.sale_offer_flows.first_discount_proposed
     description: First discount offered
   last_discount_proposed:
     lineage:
       - datalake_firestore.sale_offer.last_discount_proposed
+      - datalake_sale_offer_flows.sale_offer_flows.last_discount_proposed
     description: Last discount offered
   hours_booking_to_offer:
     lineage:
       - datalake_firestore.sale_offer.ts_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
       - datalake_booking.booking.ts_created
     description: Hours difference between booking event and offer created
   hours_visit_to_offer:
     lineage:
       - datalake_firestore.sale_offer.ts_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
       - datalake_booking.booking.ts_booking_utc
     description: Hours difference between visit event and offer created
   has_credit_pre_analysis:
@@ -372,6 +393,7 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
       - datalake_gsheets.sale_hub_offer.dt_offer_accepted
       - datalake_firestore.sale_offer.ts_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
     description: Date difference between offer created and offer accepted
   days_offer_submitted_to_offer_dismissed:
@@ -380,6 +402,7 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.ts_discarded
       - datalake_gsheets.sale_hub_offer.dt_offer_dismissed
       - datalake_firestore.sale_offer.ts_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
     description: Date difference between offer created and offer dismissed
   days_offer_submitted_to_sale_agreement_created:
@@ -387,6 +410,7 @@ columns:
       - datalake_firestore.monday.dt_sale_agreement_created
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_created
       - datalake_firestore.sale_offer.ts_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
     description: Date difference between offer created and sale agreement created
   days_offer_submitted_to_sale_agreement_signed:
@@ -395,6 +419,7 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_signed
       - datalake_gsheets.sale_hub_offer.dt_sale_agreement_signed
       - datalake_firestore.sale_offer.ts_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
     description: Date difference between offer created and sale agreement signed
   days_offer_accepted_to_offer_dismissed:
@@ -422,10 +447,12 @@ columns:
   has_used_negotiation_chat:
     lineage:
       - datalake_firestore.sale_offer.has_used_negotiation_chat
+      - datalake_sale_offer_flows.sale_offer_flows.has_used_negotiation_chat
     description: If the buyer has used the negotiation chat
   has_used_fgts_in_payment:
     lineage:
       - datalake_firestore.sale_offer.has_used_fgts_in_payment
+      - datalake_sale_offer_flows.sale_offer_flows.has_used_fgts_in_payment
     description: If the buyer has used FGTS in the payment
   has_seller_debt_payments:
     lineage:
@@ -526,6 +553,7 @@ columns:
   ts_offer_submitted:
     lineage:
       - datalake_firestore.sale_offer.ts_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
     description: Timestamp when the offer was sent by the buyer
   ts_last_updated_pendency:
@@ -543,4 +571,5 @@ columns:
   ts_updated:
     lineage:
       - datalake_firestore.sale_offer.ts_updated
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_updated
     description: Timestamp when the offer was updated
