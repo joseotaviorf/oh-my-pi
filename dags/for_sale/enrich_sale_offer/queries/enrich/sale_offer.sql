@@ -1,9 +1,9 @@
 WITH users_base AS (
     SELECT
         so.id_offer,
-        u_by.id_external AS id_buyer,
-        u_sl.id_external AS id_seller,
-        u_by.id_house,
+        u_by.id_external AS u_by_id_buyer,
+        u_sl.id_external AS u_sl_id_seller,
+        u_by.id_house AS u_by_id_house,
         so.*
     FROM
         datalake_sale_offer_flows.sale_offer_flows AS so
@@ -26,6 +26,7 @@ visit_before_offer AS (
         so.id_offer,
         bs.id AS id_booking,
         bs.id_agent,
+        so.id_house,
         du.id AS id_user_agent,
         bs.id_company_demand,
         bs.is_3p_demand,
@@ -39,7 +40,7 @@ visit_before_offer AS (
     JOIN
         datalake_booking.booking AS bs
             ON bs.id_house = so.id_house
-            AND bs.id_visitor = so.id_buyer
+            AND bs.id_visitor = so.u_by_id_buyer
     LEFT JOIN
         datalake_ebdb_user.user AS du
             ON bs.id_agent = du.id_agent
@@ -68,7 +69,7 @@ booking_before_offer AS (
     JOIN
         datalake_booking.booking AS bs
             ON bs.id_house = so.id_house
-            AND bs.id_visitor = so.id_buyer
+            AND bs.id_visitor = so.u_by_id_buyer
     LEFT JOIN
         datalake_ebdb_user.user AS du
             ON bs.id_agent = du.id_agent
@@ -115,7 +116,7 @@ regions_base AS (
         so.id_offer,
         so.id_house,
         sl.id_region,
-        so.id_seller AS id_owner,
+        so.u_sl_id_seller AS id_owner,
         r.city_group
     FROM
         users_base AS so
