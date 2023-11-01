@@ -16,7 +16,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 from bietlejuice.services.gsheets_service import GsheetsService
-from bietlejuice.services.slack_service import SlackService
+from bietlejuice.services.messaging_services.slack_service import SlackService
 
 JOB_NAME = "load_gsheets_by_context_into_datalake"
 

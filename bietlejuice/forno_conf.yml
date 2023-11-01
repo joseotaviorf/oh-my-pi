@@ -461,4 +461,4 @@ databricks_10_4_med_people_cluster:
 
 ### Notification Configs ###
 notification_webhooks_keys:
-    data_quality: SLACK_DE_TESTS_WEBHOOK
+    data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK

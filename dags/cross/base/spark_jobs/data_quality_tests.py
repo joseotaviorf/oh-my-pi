@@ -16,7 +16,6 @@ from inmetro.clients import (
 )
 from inmetro.config_reader import ConfigReader
 from inmetro.loaders import S3Loader as InmetroS3Loader
-from inmetro.messengers import SlackMessenger
 from inmetro.validators import PyDeequValidator
 from quintoandar_logger import QuintoAndarLogger
 
@@ -31,8 +30,9 @@ from bietlejuice.metadata_propagator_pipeline.atlas_quality_metrics_pipeline imp
 
 from pyspark.sql.functions import col, to_timestamp
 
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
-from bietlejuice.services.slack_service import SlackService
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.services.messaging_services.gchat_service import GChatService
+from bietlejuice.services.messaging_services.message import Message
 from bietlejuice.services import ConfigurationService
 
 JOB_NAME = "data_quality_tests"
@@ -64,11 +64,11 @@ def create_message_from_validation_results(
         DATAHUB_HOST=datahub_host, DATABASE_NAME=database_name, TABLE_NAME=table_name
     )
     message = (
-        f":warning:\n"
+        f"⚠️\n"
         f"Validation suite: *`{suite_name}`*\n"
         f"Status: *`{status}`*\n\n"
         f"*{n_failures}* out of *{n_failures + n_success}* validations have failed\n"
-        f"These are the columns that have failed in at least one check :point_down:\n"
+        f"These are the columns that have failed in at least one check 👇\n"
     )
     for column in failed_columns:
         message += f"\t• *`{column}`*\n"
@@ -234,14 +234,14 @@ if __name__ == "__main__":
 
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
+    
+    config_service = ConfigurationService()
+    webhook_key = config_service.get_config("notification_webhooks_keys")[
+        "data_quality"
+    ]
 
-    if env == 'prod':
-        key = SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
-    else:
-        key = SlackWebhooksEnum.DE_TESTS
-
-    slack_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=key
+    gchat_webhook = dbutils.secrets.get(
+        scope="quintoandar", key=webhook_key
     )
 
     # ############################# Getting Validation Results ###############################
@@ -292,8 +292,8 @@ if __name__ == "__main__":
     """
     if df.rdd.isEmpty():
 
-        message = (
-            f":warning:\n"
+        message_content = (
+            f"⚠️\n"
             f"Validation suite: `Pipeline Validations:`\n"
             f"`{database_name}.{table_name}`\n"
             f"Status: `ERROR`\n\n"
@@ -301,9 +301,10 @@ if __name__ == "__main__":
         )
 
         if is_incremental:
-            message += f" No data found for the date {execution_date}."
+            message_content += f" No data found for the date {execution_date}."
+        message = Message(content=message_content, destination=gchat_webhook)
 
-        SlackService.send_slack_errors([(message,slack_webhook)])
+        GChatService.send_message(message)
 
     else:
 
@@ -352,21 +353,15 @@ if __name__ == "__main__":
             validation_results=validation_results,
         ).run()
 
-        # #################################### Slack Alert ######################################
-        config_service = ConfigurationService()
-        webhook_key = config_service.get_config("notification_webhooks_keys")[
-            "data_quality"
-        ]
+        # #################################### GChat Alert ######################################
         datahub_host = config_service.get_config("datahub_host")
 
         if validation_results["metadata"]["suite_result"] != "SUCCESS":
-            slack_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
-
-            messenger = SlackMessenger(slack_webhook)
-            message = create_message_from_validation_results(
+            message_content = create_message_from_validation_results(
                 datahub_host, database_name, table_name, validation_results
             )
-            messenger.send_message(message)
+            message = Message(content=message_content, destination=gchat_webhook)
+            GChatService.send_message(message)
 
         logger.info(
             f"m={JOB_NAME}, msg=Data quality tests executed for table {table_name}."

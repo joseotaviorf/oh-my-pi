@@ -11,7 +11,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
-from bietlejuice.services.slack_service import SlackService
+from bietlejuice.services.messaging_services.slack_service import SlackService
 
 JOB_NAME = "load_cozy_metrics_raw"
 

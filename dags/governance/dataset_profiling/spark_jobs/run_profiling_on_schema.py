@@ -26,7 +26,7 @@ from bietlejuice.metadata_propagator_pipeline.dataset_profiling_pipeline import 
 from bietlejuice.base.udfs.udf_enum import UDFEnum
 
 from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
-from bietlejuice.services.slack_service import SlackService
+from bietlejuice.services.messaging_services.slack_service import SlackService
 
 
 JOB_NAME = "dataset_profiling"

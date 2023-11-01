@@ -15,7 +15,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.slack_service import SlackService
+from bietlejuice.services.messaging_services.slack_service import SlackService
 
 from quintoandar_velo_neurotech_api_client.clients import VeloNeurotechClient
 from quintoandar_velo_neurotech_api_client.consumers import VeloNeurotechConsumer
