@@ -75,7 +75,12 @@ greenseer_sessions AS (
       WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_automatic_selection_theme_detail') THEN 'bot_menu_automatic_selection_taxonomy_v4'
       ELSE NULL
     END AS automatic_selection,
-    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.emma_try') AS has_emma_response,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.emma_try') AS has_emma_try,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.has_retention_response') AS has_emma_response,
+    CASE
+      WHEN CONTAINS(g.current_state, 'RETENTION_EMMA') THEN 'has_emma_flow'
+      ELSE NULL
+    END AS has_emma_flow,
     g.current_state,
     g.ts_started,
     g.ts_ended
@@ -95,7 +100,9 @@ greenseer_tried_retention AS (
       response_key,
       automatic_selection,
       fired_response,
-      has_emma_response
+      has_emma_response,
+      has_emma_try,
+      has_emma_flow
     ) IS NOT NULL AS tried_retention
   FROM
     greenseer_sessions
