@@ -34,7 +34,6 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket", type=str, help="target bucket")
     parser.add_argument("source")
-    parser.add_argument("table_name")
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
 
@@ -43,7 +42,6 @@ if __name__ == "__main__":
     env = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
-    table_name = args.table_name
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
 
@@ -54,8 +52,8 @@ if __name__ == "__main__":
     schema = config_service.get_config("schema")
 
     logger.info(
-        f"""m={JOB_NAME}, environment={env}, source={source}, datalake_bucket={datalake_bucket},
-        table_name={table_name}, msg=Starting spark job..."""
+        f"""m={JOB_NAME}, environment={env}, source={source}, datalake_bucket={datalake_bucket}, 
+        msg=Starting spark job..."""
     )
 
     spark_client = SparkClient()
@@ -84,12 +82,12 @@ if __name__ == "__main__":
 
     spark_metastore_service.create_database(database_name)
 
-    logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={table_name}, msg=Getting data from bucket...""")
-    metric = table_name.replace("_","-")
+    logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Getting data from bucket...""")
+    metric = source.replace("_","-")
 
     for execution_date in _generate_date_range(load_start_date=load_start_date, load_end_date = load_end_date):
         date = execution_date.strftime('%Y-%m-%d')
-        logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={table_name}, msg=Getting data on date: {date}""")
+        logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Getting data on date: {date}""")
 
         df = None
         
@@ -102,20 +100,20 @@ if __name__ == "__main__":
             )
 
             if df is not None:
-                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={table_name}, msg=Loading raw data on bucket...""")
+                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Loading raw data on bucket...""")
                 s3_loader.load_df(
                     df=df,
                     format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                    s3_path=f"{database_location}{table_name}",
+                    s3_path=f"{database_location}{source}",
                     partitions=raw_partition_cols,
                     compression="gzip"
                 )
                 
-                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={table_name}, msg=Update metastore...""")
+                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Update metastore...""")
                 spark_metastore_loader.update_metastore(
                     df=df,
                     database_name=database_name,
-                    table_name=table_name,
+                    table_name=source,
                     format_options=SparkTableStorageFormat.DEFAULT_RAW,
                     database_location=database_location,
                     partitions=raw_partition_cols,
@@ -129,18 +127,17 @@ if __name__ == "__main__":
                 ) 
 
             else:
-                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={table_name}, msg=These dataframe is empty...""")
+                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=These dataframe is empty...""")
 
                 continue
             
         except Exception as e:
-            logger.warning(f"""m={JOB_NAME}, table_name={table_name}, msg={e}.""")
+            logger.warning(f"""m={JOB_NAME}, msg={e}.""")
 
             message = (
                 f":warning:\n"
                 f"DAG: *{source}*\n"
                 f"Owner: @ae-growth\n"
-                f"Report: *{table_name}*\n"
                 f"Environment: *{env}*\n"
                 f"Status: *FAILED*\n"
                 f"Existence validation failed for `{dt.datetime.now().strftime('%Y-%m-%d')}`\n"

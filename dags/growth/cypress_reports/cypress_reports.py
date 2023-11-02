@@ -31,7 +31,6 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 )
 CLUSTER_DESCRIPTION = config_service.get_config("cluster_description")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
-TABLES_LIST = config_service.get_config("tables_list")
 
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
