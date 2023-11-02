@@ -1,6 +1,5 @@
 SELECT
-  SPLIT(INPUT_FILE_NAME(), '/')[5] AS id_test_execution,
-  SPLIT(INPUT_FILE_NAME(), '/')[3] AS pwa,
+  id_test_execution,
   stats.suites,
   stats.tests,
   stats.passes,
@@ -16,5 +15,6 @@ SELECT
   stats.hasSkipped AS has_skipped,
   stats.start AS ts_start,
   stats.end AS ts_end,
-  SPLIT(INPUT_FILE_NAME(), '/')[4] AS dt_created
+  pwa,
+  dt
 FROM datalake_cypress_reports_raw.cypress_reports

@@ -1,32 +1,33 @@
 WITH results_set AS (
   SELECT
+    id_test_execution,
     EXPLODE(results) AS results,
-    SPLIT(INPUT_FILE_NAME(), '/') AS split_path
+    pwa,
+    dt
   FROM
     datalake_cypress_reports_raw.cypress_reports
 ),
 suites_set AS (
   SELECT
-    split_path[3] AS pwa,
-    split_path[4] AS dt,
-    split_path[5] AS test_execution_id,
-    EXPLODE(results.suites) AS suites
+    id_test_execution,
+    EXPLODE(results.suites) AS suites,
+    pwa,
+    dt
   FROM results_set
 ),
 tests_set AS (
   SELECT
+    id_test_execution,
+    EXPLODE(suites.tests) AS tests,
     pwa,
-    dt,
-    test_execution_id,
-    EXPLODE(suites.tests) AS tests
+    dt
   FROM
     suites_set
 )
 SELECT
-  test_execution_id AS id_test_execution,
+  id_test_execution,
   tests.parentUUID AS id_suite,
   tests.uuid AS id_test,
-  pwa,  
   tests.code,
   tests.context,
   tests.duration,
@@ -42,5 +43,6 @@ SELECT
   tests.state,
   tests.title,
   COALESCE(GET_JSON_OBJECT(tests.context, '$.value'), 0) as retry_count,
-  dt AS dt_created
+  pwa,
+  dt
 FROM tests_set

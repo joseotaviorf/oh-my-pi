@@ -1,24 +1,25 @@
 WITH results_set AS (
   SELECT
+    id_test_execution,
     EXPLODE(results) AS results,
-    SPLIT(INPUT_FILE_NAME(), '/') AS split_path
+    pwa,
+    dt
   FROM
     datalake_cypress_reports_raw.cypress_reports
 ),
 suites_set AS (
   SELECT
-    split_path[3] AS pwa,
-    split_path[4] AS dt,
-    split_path[5] AS id_test_execution,
+    id_test_execution,
     results.file AS file,
     results.fullFile AS full_file,
-    EXPLODE(results.suites) AS suites
+    EXPLODE(results.suites) AS suites,
+    pwa,
+    dt
   FROM results_set
 )
 SELECT
   id_test_execution,
   suites.uuid AS id_suite,
-  pwa,
   file,
   full_file,
   suites._timeout AS timeout,
@@ -32,5 +33,6 @@ SELECT
   suites.title,
   suites.root AS is_root,
   suites.rootEmpty AS is_root_empty,
-  dt AS dt_created
+  pwa,
+  dt
 FROM suites_set

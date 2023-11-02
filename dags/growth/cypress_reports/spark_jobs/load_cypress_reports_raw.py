@@ -50,6 +50,7 @@ if __name__ == "__main__":
     raw_partition_cols = config_service.get_config("raw_partition_cols")
     cypress_bucket = config_service.get_config("cypress_bucket")
     schema = config_service.get_config("schema")
+    raw_sql = config_service.get_config("raw_sql")
 
     logger.info(
         f"""m={JOB_NAME}, environment={env}, source={source}, datalake_bucket={datalake_bucket}, 
@@ -100,6 +101,10 @@ if __name__ == "__main__":
             )
 
             if df is not None:
+                temp_table_raw = "temp_raw"
+                df.createOrReplaceTempView(temp_table_raw)
+                df = spark_client.conn.sql(raw_sql.format(table_name=temp_table_raw))
+
                 logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Loading raw data on bucket...""")
                 s3_loader.load_df(
                     df=df,
