@@ -15,7 +15,6 @@ SELECT
     last_condominium_responsible,
     tenant_pending_tasks,
     category,
-    vacancy_ab_test,
     exit_inspection_required AS has_exit_inspection,
     relisting_enabled AS is_relisting,
     date AS dt_termination,

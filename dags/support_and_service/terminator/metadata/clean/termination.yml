@@ -49,9 +49,6 @@ columns:
   category:
     lineage:
       - datalake_terminator_raw.termination.category
-  vacancy_ab_test:
-    lineage:
-      - datalake_terminator_raw.termination.vacancy_ab_test
   has_exit_inspection:
     lineage:
       - datalake_terminator_raw.termination.exit_inspection_required
