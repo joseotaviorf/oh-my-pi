@@ -56,6 +56,28 @@ relisting_distinct AS (
     WHERE
         sk_contract <> -1
     GROUP BY 1
+),
+repairs_interaction AS (
+    SELECT
+        rr.id AS id_request,
+        IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation,
+        CASE 
+            WHEN MIN(rr.ts_updated) <= rc.ts_started THEN MIN(rr.ts_updated) - INTERVAL 3 HOUR
+            WHEN MIN(rr.ts_updated) > rc.ts_started THEN rc.ts_started - INTERVAL 3 HOUR
+            ELSE COALESCE(MIN(rr.ts_updated) - INTERVAL 3 HOUR, rc.ts_started - INTERVAL 3 HOUR) 
+        END AS first_interaction,
+        MIN(DATE(rr.ts_updated)) AS definition_date
+    FROM
+        datalake_repairs_clean.repair_request AS rr
+    LEFT JOIN
+        datalake_repairs_clean.repair_request_chat AS rc
+            ON rr.id = rc.id_repair_request
+    WHERE
+        (STRING(GET_JSON_OBJECT(rr.owner_approval, '$.approved')) IS NOT NULL)
+        AND CAST(rr.ts_created AS DATE) >= DATE('2023-01-01')
+        AND rr.id_third_party_crm_ticket_external IS NOT NULL
+    GROUP BY 
+        rr.id, rc.ts_started 
 )
 SELECT 
     ft.sk_ticket,
@@ -75,18 +97,24 @@ SELECT
     da.agent_organization,
     ft.replies,
     rr.service_provider,
+    ri.has_chat_negociation,
+    ri.first_interaction,
     tax.theme,
     tax.theme_detail,
     tax.request_type,
     tax.customer_type_tag,
     tax.motivation,
     cs.front_or_back,
-    csat.csat_score,
+    csat.satisfaction_score AS csat_score,
+    csat.respondent_comments AS comment_csat,
+    csat.improvement_tags AS csat_tags,
+    csat.secondary_satisfaction_score AS csat_partes,
     CAST(dc.dt_entrance AS DATE) AS entrance_date,
     CAST(dt.ts_created_local AS DATE) AS created_date,
     CAST(ft.ts_solved_local AS DATE) AS solved_date,
     CAST(rr.ts_created AS DATE) request_date,
-    CAST(csat.ts_first_response AS DATE) AS csat_response_date,
+    CAST(csat.ts_submitted AS DATE) AS csat_response_date,
+    ri.definition_date,
     ft.ts_updated_local,
     ft.ts_last_assigned_local,
     ft.ts_initially_assigned_local,
@@ -115,18 +143,22 @@ LEFT JOIN
 LEFT JOIN 
     datalake_repairs_clean.repair_request AS rr 
         ON rr.id_third_party_crm_ticket_external = ft.sk_ticket
+LEFT JOIN 
+    repairs_interaction AS ri
+        ON ri.id_request = rr.id
 LEFT JOIN
     relisting_distinct AS rd
         ON rd.sk_contract = ft.sk_contract
 LEFT JOIN
-    datalake_survicate.zendesk_email_surveys AS csat
+    datalake_survicate.repairs_surveys AS csat
         ON csat.id_ticket = ft.sk_ticket
 WHERE 
-    dt.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]') 
+    dt.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
     AND (dt.ts_created >= DATE_ADD(CURRENT_DATE,-20*7) OR ft.ts_solved >= date('2023-01-01') OR ft.ts_solved IS NULL)
     AND dt.channel NOT IN ('call')
     AND dt.status NOT IN ('deleted')
     AND dt.tags NOT LIKE '%caso_ticket_agregador%'
     AND ft.sk_ticket NOT IN (SELECT sk_ticket FROM pp_tickets_test)
+    AND da.agent_organization IN ('webhelp', 'webhelpbr')
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY ft.sk_ticket ORDER BY dt.ts_created_local DESC) = 1
