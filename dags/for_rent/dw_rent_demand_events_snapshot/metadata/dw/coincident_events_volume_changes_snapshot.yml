@@ -43,22 +43,24 @@ columns:
       the past month. For LQ, it checks the data volume load of the last day of the previous quarter, comparing to the present day load related to
       the past quarter. For LY, it checks the data volume load of the last day of the previous year, comparing to the present day load related to
       the past year. Follows the same rule for all difference check columns).
+  percentage_diff_vb:
+    description: The difference amount of VBs in percentage.
   visits_completed:
     description: The volume of the visits completed within the aggregation.
   diff_vc:
     description: The volume difference of the visits completed within the aggregation, compared to the present day load of the reference type.
-  percentage_diff_vb:
-    description: The difference amount of VBs in percentage.
+  percentage_diff_vc:
+    description: The difference amount of VCs in percentage.
   offers_submitted:
     description: The volume of the offers submitted within the aggregation.
   diff_os:
     description: The volume difference of the offers submitted within the aggregation, compared to the present day load of the reference type.
   percentage_diff_os:
     description: The difference amount of OSs in percentage.
-  offers_approved:
-    description: The volume of the offers approved within the aggregation.
+  offers_accepted:
+    description: The volume of the offers accepted within the aggregation.
   diff_oa:
-    description: The volume difference of the offers approved within the aggregation, compared to the present day load of the reference type.
+    description: The volume difference of the offers accepted within the aggregation, compared to the present day load of the reference type.
   percentage_diff_oa:
     description: The difference amount of OAs in percentage.
   evaluation_started:

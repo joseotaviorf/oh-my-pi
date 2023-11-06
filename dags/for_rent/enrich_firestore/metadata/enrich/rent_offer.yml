@@ -116,6 +116,10 @@ columns:
     description: Boolean flag indicating if the offer was visualized.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
+  ts_email_sent_to_owner:
+    description: Timestamp of when the email related to the offer was sent to the property owner.
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
   ts_first_sent:
     description: Timestamp of when the offer was first sent.
     lineage:
@@ -145,3 +149,5 @@ columns:
       Firestore is a messaging solution, so every chunk of data comes in a message format.
     lineage:
       - datalake_firestore_clean.rent_offer.ts_updated
+  ts_load:
+    description: Timestamp of when the data was loaded into our systems.

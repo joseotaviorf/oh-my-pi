@@ -39,6 +39,15 @@ columns:
     lineage:
       - dw_public.dim_house_listing.rental_administrator
     description: "Rental administrator related to the event."
+  days_to_conversion:
+    lineage:
+      - dw_rent.fact_rent_cohort_conversions.days_to_conversion
+    description: "How many days took the event to be converted."
+  weeks_to_conversion:
+    lineage:
+      - dw_rent.fact_rent_cohort_conversions.weeks_to_conversion
+    description: "How many weeks took the event to be converted.
+      Events with 'unnatural conversion' (e.g. event was a VC before being a VB) will be assigned as week zero (0)."
   vb_converted_vc:
     description: "Total volume of the conversion visit booked to visit completed."
   vb_converted_os:
