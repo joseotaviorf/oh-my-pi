@@ -4,6 +4,9 @@ columns:
   id_ivr:
     lineage:
       - datalake_bigfone_raw.ivr_closed_history.id
+  id_user:
+    lineage:
+      - datalake_bigfone_raw.ivr_closed_history.user_id
   user_phone:
     lineage:
       - datalake_bigfone_raw.ivr_closed_history.user_phone

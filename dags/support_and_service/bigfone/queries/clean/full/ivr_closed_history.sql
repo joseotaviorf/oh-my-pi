@@ -1,5 +1,6 @@
 SELECT
     id AS id_ivr,
+    user_id AS id_user,
     user_phone,
     origin,
     strategy,

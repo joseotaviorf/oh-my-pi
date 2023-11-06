@@ -22,7 +22,6 @@ config_service = ConfigurationService(SOURCE)
 
 # default configs
 ENV = os.environ.get("ENVIRONMENT")
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -91,7 +90,6 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_groups = task_group.build_raw_task_group_for_all_tables(
