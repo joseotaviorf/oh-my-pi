@@ -1,49 +1,73 @@
 database_name: datalake_ebdb_contract
 table_name: ongoing_contracts
+description: Enriched table that contains information about the ongoing contract and the person related to it.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
 columns:
   id_contract_person:
     lineage:
       - datalake_ebdb_clean.contract_person.id
+    description: ID that relates the contract to the person.
   id_user_contract_person:
     lineage:
       - datalake_ebdb_clean.contract_person.id_user
+    description: ID of the user related to the contract. It can be joined with dw_public.dim_user.
   id_user:
     lineage:
       - datalake_ebdb_clean.contract.id_user
       - datalake_ebdb_clean.house.id_user
+    description: ID of the user related to the contract, which can be the same as the id_user_contract_person.
+      This column can have NULL values because it brings the id_user if the tenant or landlord has an ongoing contract.
+      It can be joined with dw_public.dim_user.
   id_max_ongoing_contract_user:
     lineage:
       - datalake_ebdb_clean.contract.id
+    description: ID of the latest contract related to the id_user.
+      This column can have NULL values because it brings the id_user if the tenant or landlord has an ongoing contract.
+      It can be joined with dw_public.dim_contract.
   id_max_ongoig_contract_cpf:
     lineage:
       - datalake_ebdb_clean.contract.id
+    description: ID of the latest contract related to the user's CPF (Individual Taxpayer Registration).
+      This column can have NULL values because it brings the id_user if the tenant or landlord has an ongoing contract.
+      It can be joined with dw_public.dim_contract.
   country_code:
     lineage:
       - datalake_ebdb_country.user.country_code
+    description: Country code of the user related to the contract.
   full_name:
     lineage:
       - datalake_ebdb_clean.contract_person.name
+    description: Full name of the person related to the contract.
   personal_document:
     lineage:
       - datalake_ebdb_clean.contract_person.cpf
+    description: CPF (Individual Taxpayer Registration).
   phone_number:
     lineage:
       - datalake_ebdb_clean.contract_person.phone_number
+    description: Phone number of the person related to the contract.
   email:
     lineage:
       - datalake_ebdb_clean.contract_person.email
+    description: Email of the person related to the contract.
   state_code:
     lineage:
       - datalake_ebdb_clean.contract_person.state_id
+    description: ID of the state where the person related to the contract lives.
   has_ongoing_contract:
     lineage:
       - datalake_ebdb_clean.contract.id
+    description: Boolean value to check if the person has an ongoing contract.
   dt_birth:
     lineage:
       - datalake_ebdb_clean.contract_person.dt_birth
+    description: Date of birth of the person related to the contract.
   ts_created:
     lineage:
       - datalake_ebdb_clean.contract_person.ts_created
+    description: Timestamp of when the contract was created.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.contract_person.ts_updated
+    description: Timestamp of when the contract was updated.
