@@ -25,7 +25,7 @@ CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{CONTEXT}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 6, 17, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 config_service = ConfigurationService(SOURCE)
 
