@@ -2677,6 +2677,7 @@ bietlejuice.reverse_listings_report_load:
 bietlejuice.reverse_nazare:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
+  - bietlejuice.dw_rede_company:load-dw-rede-dim-company
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer

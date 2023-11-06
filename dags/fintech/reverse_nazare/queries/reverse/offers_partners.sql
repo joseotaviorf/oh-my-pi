@@ -128,6 +128,7 @@ cte_partner_supply AS (
 
 SELECT
     dim.sk_offer AS offer_id,
+    dc.uuid_company,
     CASE
         WHEN demand.partner_short_name IS NOT NULL THEN demand.partner_short_name
         WHEN pc_s.partner_short_name IS NOT NULL THEN pc_s.partner_short_name
@@ -153,6 +154,11 @@ LEFT JOIN
 LEFT JOIN
     datalake_gsheets_clean.forbrokers_3p_partner_conditions pc_s
         ON UPPER(pc_s.partner_short_name) = UPPER(cc.partner)
+LEFT JOIN
+    dw_rede.dim_company AS dc
+        ON pc_s.partner_short_name = dc.extracted_3p_tag
+        AND NOT dc.is_archived
+        AND dc.uuid_company is not null
 WHERE
     demand.partner_short_name IS NOT NULL
     OR pc_s.partner_short_name IS NOT NULL
