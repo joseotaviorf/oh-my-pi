@@ -1836,7 +1836,6 @@ bietlejuice.enrich_offboarding_repairs_probability:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
-  - bietlejuice.ebdb:load-clean-inspection-item
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections:load-enrich-item-review
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination

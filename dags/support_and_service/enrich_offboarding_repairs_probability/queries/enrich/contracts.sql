@@ -84,22 +84,16 @@ onb_inspection_infos AS (
 inspection_counts AS (
   SELECT
     i.id_external AS sk_inspection,
-    COUNT(DISTINCT it.id_item_group) + COUNT(DISTINCT it2.id) AS contract_qty_inspection_itens,
-    COUNT(DISTINCT ir.id_item) FILTER(WHERE ir.user_type = 'TENANT' AND ir.user_comment IS NOT NULL)
-    + COUNT(it2.tenant_comment) AS tenant_qty_entry_comment
+    COUNT(DISTINCT it.id_item_group) AS contract_qty_inspection_itens,
+    COUNT(DISTINCT ir.id_item) FILTER(WHERE ir.user_type = 'TENANT' AND ir.user_comment IS NOT NULL) AS tenant_qty_entry_comment
   FROM
     datalake_inspections.inspection_booking i
   LEFT JOIN
     datalake_inspections.item it
       ON it.id_inspection = i.id_inspection
-      AND i.source = 'IS'
   LEFT JOIN
     datalake_inspections.item_review ir
       ON ir.id_item = it.id_item
-  LEFT JOIN
-    datalake_ebdb_clean.inspection_item it2
-      ON it2.id_inspection = i.id_external
-      AND i.source = 'PWA'
   GROUP BY 1
 ),
 onb_inspections AS (
