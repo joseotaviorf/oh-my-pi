@@ -2492,6 +2492,18 @@ bietlejuice.enrich_vespucio:
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
   - bietlejuice.sindico_net:load-clean-condominium
+bietlejuice.enrich_vespucio_sources:
+  - bietlejuice.ebdb:load-clean-amenities
+  - bietlejuice.ebdb:load-clean-condo
+  - bietlejuice.ebdb:load-clean-condo-contact
+  - bietlejuice.ebdb:load-clean-country
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.ebdb:load-clean-info-amenities
+  - bietlejuice.ebdb:load-clean-state
+  - bietlejuice.enrich_ebdb_condo:load-enrich-condo-amenities
+  - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
+  - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
+  - bietlejuice.sindico_net:load-clean-condominium
 bietlejuice.enrich_webhelp_reports:
   - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
   - bietlejuice.reverse_webhelp:load-reverse-csat-front

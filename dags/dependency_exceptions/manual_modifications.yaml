@@ -745,6 +745,19 @@ bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region
     - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
+bietlejuice.enrich_vespucio_sources:
+  add:
+    - bietlejuice.ebdb:load-clean-amenities
+    - bietlejuice.ebdb:load-clean-condo
+    - bietlejuice.ebdb:load-clean-condo-contact
+    - bietlejuice.ebdb:load-clean-country
+    - bietlejuice.ebdb:load-clean-house
+    - bietlejuice.ebdb:load-clean-info-amenities
+    - bietlejuice.ebdb:load-clean-state
+    - bietlejuice.enrich_ebdb_condo:load-enrich-condo-amenities
+    - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
+    - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
+    - bietlejuice.sindico_net:load-clean-condominium
 bietlejuice.enrich_zendesk_ticket_funnels:
   remove:
     - bietlejuice.zendesk_tickets:load-clean-groups
