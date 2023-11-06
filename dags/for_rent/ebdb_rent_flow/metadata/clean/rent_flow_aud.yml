@@ -1,0 +1,75 @@
+database_name: datalake_ebdb_clean
+table_name: rent_flow_aud
+columns:
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.id
+  id_client:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.cliente_id
+  id_manager:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.gerente_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.imovel_id
+  id_current_offer:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.currentoffer_id
+  id_current_contract:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.currentcontrato_id
+  id_current_proposal:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.currentproposta_id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.revtype
+  mod_ts_ignore_before:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.ignorarantesde_mod
+  status:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.status_mod
+  mod_agents:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.agentes_mod
+  mod_id_client:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.cliente_mod
+  mod_id_manager:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.gerente_mod
+  mod_id_house:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.imovel_mod
+  is_step_rejected:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.etaparejeitada
+  mod_is_step_rejected:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.etaparejeitada_mod
+  has_no_iptu:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.withoutiptu
+  mod_has_no_iptu:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.withoutiptu_mod
+  mod_id_current_offer:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.currentofferid_mod
+  mod_id_current_contract:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.currentcontratoid_mod
+  mod_id_current_proposal:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.currentpropostaid_mod
+  ts_ignore_before:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_aud.ignorarantesde

@@ -1,0 +1,9 @@
+database_name: datalake_ebdb_clean
+table_name: agent_rent_flow
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_dadosagente.agentes_id
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_dadosagente.fluxolocacao_id
