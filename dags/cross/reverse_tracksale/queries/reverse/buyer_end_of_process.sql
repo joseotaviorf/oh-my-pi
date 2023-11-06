@@ -13,7 +13,8 @@ WITH closing_infos AS (-- get all ccv with info about cancelled and rescued ccv
             WHEN cf.sk_sale_agreement_rescued_date != -1 THEN TRUE
             ELSE FALSE
         END AS ccv_rescued,
-        payment_method
+        payment_method,
+        ts_house_registry_ended
     FROM
         dw_sale.fact_closing_flows AS cf
     LEFT JOIN
@@ -27,7 +28,8 @@ ev AS (
         fo.sk_offer,
         sf.sk_seller,
         sf.sk_buyer,
-        ci.payment_method
+        ci.payment_method,
+        ci.ts_house_registry_ended
     FROM
         dw_sale.fact_sale_flows AS sf
     INNER JOIN
@@ -44,7 +46,7 @@ ev AS (
         closing_infos AS ci
             ON fo.sk_offer = ci.sk_offer
     WHERE
-        sf.sk_sale_agreement_signed_date >= 20200101
+        fo.ts_sale_agreement_signed >= DATE("2020-01-01")
         AND ci.ccv_cancelled = FALSE
         AND ci.ccv_rescued = FALSE
 ),
@@ -73,7 +75,8 @@ base AS (
         du.telefone_principal,
         du.cidade,
         du.estado_nome,
-        ev.payment_method
+        ev.payment_method,
+        ev.ts_house_registry_ended
     FROM
         ev
     LEFT JOIN
@@ -97,7 +100,8 @@ customers_info AS (
             WHEN rv.id_visitor IS null THEN 'Sale'
             ELSE 'Híbrido'
         END AS business_context,
-        b.dt_event
+        b.dt_event,
+        b.ts_house_registry_ended
     FROM
         base AS b
     LEFT JOIN
@@ -123,9 +127,6 @@ SELECT
 FROM
     customers_info
 WHERE
-    (payment_method IS NULL OR payment_method  = 'FINANCED')
-    AND DATEDIFF(CURRENT_DATE, dt_event) = 114
-    OR (
-        payment_method  = 'CASH'
-        AND DATEDIFF(CURRENT_DATE, dt_event) = 45
-    )
+  (ts_house_registry_ended IS NOT NULL AND DATEDIFF(CURRENT_DATE, ts_house_registry_ended) = 2)
+  OR ((payment_method IS NULL OR payment_method  = 'FINANCED') AND ts_house_registry_ended IS NULL AND DATEDIFF(CURRENT_DATE, dt_event) = 114)
+  OR (payment_method  = 'CASH' AND ts_house_registry_ended IS NULL AND DATEDIFF(CURRENT_DATE, dt_event) = 45)
