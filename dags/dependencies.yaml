@@ -1543,7 +1543,6 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
   - bietlejuice.enrich_proposal:load-enrich-proposal
-  - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry

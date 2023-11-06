@@ -1,96 +1,47 @@
 ---
 database_name: datalake_invoice
 table_name: overdue_portfolio_timeline
-owner: athos.sampayo@quintoandar.com.br
+owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: The table contains information about the daily timeline of overdue invoices
+description: |
+  The table contains information about the daily timeline of overdue tenant (IQ) invoices.
+  The table does not include canceled invoices and canceled contracts.
+  An invoice is inserted into the table 1 day after its due date, and it's replicated every day until the day the debt is paid or written down.
 columns:
   id_contract:
     lineage:
-      - datalake_invoice.invoice_entries.id_contract
+      - datalake_retsuko.invoice.id_contract_external
     description: Contract ID
+  id_proposal:
+    lineage:
+      - datalake_proposal.proposal.id
+    description: Proposal ID. Use it as key to dw_public.dim_proposal
   id_invoice:
     lineage:
-      - datalake_invoice.invoice_entries.id_invoice
+      - datalake_retsuko.invoice.id_external
     description: Invoice ID
   contract_status:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
-      - datalake_quintoandar.aux_date.date
+      - datalake_ebdb_contract.contract.status
     description: Contract status
-  contract_version:
-    lineage:
-      - datalake_ebdb_contract.contract.contract_version
-    description: Version of the contract
-  contract_guarantee:
-    lineage:
-      - datalake_ebdb_contract.contract.guarantee_type
-    description: Original guarantee type of the contract
-  contract_guarantee_type:
-    lineage:
-      - datalake_ebdb_contract.contract.guarantee_type
-    description: Contract Guarantee Type
-    categories:
-      Paid: Paid guarantee
-      Brokerage Only: Contract is brokerage only
-      Free: Without paid guarantee
-  contract_age:
-    lineage:
-      - datalake_quintoandar.aux_date.date
-      - datalake_ebdb_contract.contract.dt_started
-    description: Age of contract
-  condo_payer:
-    lineage:
-      - datalake_ebdb_contract.contract.paying_condo
-    description: Who is responsible to make the payment of the condo
-    categories:
-      Inquilino: The tenant is responsible for making the payment of the condo.
-      Proprietario: The property owner is responsible for making the payment of the condo.
-      QuintoAndar: QuintoAndar is responsible for making the payment of the condo.
-      "null": If the responsible for making the payment of the condo is null.
-  city_name:
-    lineage:
-      - datalake_region.region.city_name
-    description: City name of the region.
-  short_region_name:
-    lineage:
-      - datalake_region.region.short_region_name
-    description: Short region name.
-  city_group:
-    lineage:
-      - datalake_region.region.city_group
-    description: City group of the region.
   invoice_type:
     lineage:
-      - datalake_retsuko.invoice_info.invoice_frequency
+      - datalake_retsuko.invoice.purpose
     description: Invoice's type frequency - monthly, extra, pos rental, onboarding, early termination...
-  user:
-    lineage:
-      - datalake_retsuko.invoice_info.invoice_user
-    description: Who is responsible for paying the invoice
-  bill_items:
-    lineage:
-      - datalake_retsuko.invoice_entry.entry_type
-      - datalake_retsuko.invoice_entry.brl_entry_due_amount
-    description: Bill items
   payment_status:
     lineage:
-      - datalake_retsuko.invoice_info.payment_status
+      - datalake_retsuko.invoice.status
     description: Payment status on the reference date
+  substatus:
+    lineage:
+      - datalake_retsuko.invoice.substatus
+    description: Invoice Substatus - debt, ongoing-negotiation or none.
   debtor_type:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_quintoandar.aux_date.month_start
     description: "Debtor type: Flow or Stock"
-  monthly_income_declared:
-    lineage:
-      - datalake_proposal.proposal.income
-    description: Total income declared by tenants prospects
-  package_amount:
-    lineage:
-      - datalake_proposal.proposal.package
-    description: Total package value, rent + condominium + iptu + home_insurance
-  dti:
-    lineage:
-      - datalake_proposal.proposal.dti
-    description: Debt-to-income, fraction between package value over tenants' total declared revenue
   due_amount:
     lineage:
       - datalake_retsuko.invoice.due_amount
@@ -102,35 +53,46 @@ columns:
   recovered_amount:
     lineage:
       - datalake_retsuko.invoice.due_amount
-      - datalake_retsuko.invoice.ts_paid
-      - datalake_quintoandar.aux_date.date
     description: Amount recovered between reference month start and reference date
   contract_overdue_invoices:
-    description: Contract overdue invoices
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: Total number of overdue invoices in a contract on the reference date
   contract_debt:
-    description: Contract debt
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+    description: The total debt of a contract on the reference date. It is the sum of all overdue invoices due amount (i.e those that have already expired and have not been paid by the reference date)
   delay_invoice_at_reference:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
     description: Delay invoice at reference
   delay_invoice_at_closure:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice.ts_paid
     description: Delay invoice at closure
   delay_contamined_at_closure:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_quintoandar.aux_date.month_start
     description: Delay contamined at closure
   delay_contamined_range:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_quintoandar.aux_date.month_start
     description: Delay contamined range
   business_day:
     lineage:
       - datalake_quintoandar.aux_date.working_days_in_month
     description: Number of business day on reference months
-  ts_invoice_created:
+  is_last_business_days:
     lineage:
-      - datalake_retsuko.invoice.ts_created
-    description: Invoice date of creation
+      - datalake_quintoandar.aux_date.working_days_in_month
+    description: Boolean to inform whether it is the most recent date among days with the same business day, same invoice and month. It deduplicates the calculations per business day.
   dt_contract_due_date_min:
-    description: Minimum due date of contract
-  dt_contract_started:
     lineage:
-      - datalake_ebdb_contract.contract.dt_started
-    description: Contract starting date
+      - datalake_retsuko.invoice.ts_due
+    description: The minimum due date among all invoices in a contract
   dt_contract_annulled:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
@@ -157,14 +119,6 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.month_end
     description: The last day of the month of reference date
-  dt_week_start:
-    lineage:
-      - datalake_quintoandar.aux_date.week_start
-    description: The date the week starts based of the reference date
-  dt_week_end:
-    lineage:
-      - datalake_quintoandar.aux_date.week_end
-    description: The date the week ends based of the reference date
   dt_reference:
     lineage:
       - datalake_quintoandar.aux_date.date
