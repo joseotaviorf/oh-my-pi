@@ -54,8 +54,11 @@ def main():
     table_name = ITBI_REGION
     source_download_page_url = itbi_configs["source"]["site_download_page_url"]
     source_format = itbi_configs["source"]["format"]
+    source_blacklist_urls = itbi_configs["source"]["blacklist_urls"]
     is_incremental = itbi_configs["is_incremental"]
-    columns_rename_mapped = itbi_configs["columns_to_rename"].items()
+    columns_rename_mapped = itbi_configs["columns_to_rename"]
+    problematic_columns_rename_mapped = itbi_configs["problematic_columns_to_rename"]
+
 
     logger.info(
         f"""
@@ -67,7 +70,9 @@ def main():
     dataframe = get_data(
         source_download_page_url,
         source_format,
+        source_blacklist_urls,
         columns_rename_mapped,
+        problematic_columns_rename_mapped
     )
 
     if dataframe:
@@ -91,13 +96,16 @@ def main():
 def get_data(
     source_download_page_url,
     source_format,
+    source_blacklist_urls,
     columns_rename_mapped,
+    problematic_columns_rename_mapped,
 ):
     udf_transform_month_to_portuguese_relative = udf(
         transform_month_to_portuguese_relative, StringType()
     )
 
     urls = scrap_files_url(source_download_page_url, source_format)
+    urls = [url for url in urls if url not in source_blacklist_urls]
 
     dataframes = []
 
@@ -126,7 +134,7 @@ def get_data(
         df = df.withColumn("dt_load", lit(date.today()))
 
         if columns_rename_mapped:
-            df = rename_columns(df, columns_rename_mapped)
+            df = rename_columns(df, columns_rename_mapped, problematic_columns_rename_mapped)
 
         dataframes.append(df)
 
@@ -157,12 +165,18 @@ def scrap_files_url(source_download_page_url, source_format):
     return xslx_urls + drive_urls
 
 
-def rename_columns(dataframe, columns_rename_mapped):
+def rename_columns(dataframe, columns_rename_mapped, problematic_columns_rename_mapped):
+  columns_rename_mapped = dict(columns_rename_mapped)
+  problematic_columns = set(dataframe.columns) & set(problematic_columns_rename_mapped)
 
-    for old_name, new_name in columns_rename_mapped:
-        dataframe = dataframe.withColumnRenamed(old_name, new_name)
+  if problematic_columns:
+    for column in problematic_columns:
+      columns_rename_mapped = {**columns_rename_mapped, **problematic_columns_rename_mapped[column]}
 
-    return dataframe
+  for old_name, new_name in columns_rename_mapped.items():
+      dataframe = dataframe.withColumnRenamed(old_name, new_name)
+
+  return dataframe
 
 
 def transform_month_to_portuguese_relative(month, reverse=True):

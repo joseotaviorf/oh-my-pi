@@ -5,6 +5,17 @@ tables:
     source:
       site_download_page_url: "https://www.prefeitura.sp.gov.br/cidade/secretarias/fazenda/acesso_a_informacao/index.php?p=31501"
       format: ".xlsx"
+      blacklist_urls: [
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2006.xlsx",
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2007.xlsx", 
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2008.xlsx",
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2009.xlsx",
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2010.xlsx",
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2011.xlsx",
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2012.xlsx",
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2013.xlsx",
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2014.xlsx"
+      ]
     columns_to_rename:
       N° do Cadastro (SQL): "n_cadastro_sql"
       Nome do Logradouro: "nome_logradouro"
@@ -33,8 +44,11 @@ tables:
       Descrição do uso (IPTU): "descricao_uso_iptu"
       Padrão (IPTU): "padrao_iptu"
       Descrição do padrão (IPTU): "descricao_padrao_iptu"
-      ACC (IPTU): "descricao_padrao_iptu"
-      ACC (IPTU).1: "acc_iptu"
+      ACC (IPTU): "acc_iptu"
+    problematic_columns_to_rename:
+      ACC (IPTU).1:
+        ACC (IPTU): "descricao_padrao_iptu"
+        ACC (IPTU).1: "acc_iptu"
     
   itbi_bh:
     is_incremental: false
@@ -82,4 +96,5 @@ tables:
       Data Quitação Transacao: data_inclusao_transacao
       Data Quitacao Transacao: data_inclusao_transacao
       Data_quitacao: data_inclusao_transacao
+      Data quitacao: data_inclusao_transacao
       Valor Imposto Cobrado (sumarizado): valor_imposto_cobrado_sumarizado
