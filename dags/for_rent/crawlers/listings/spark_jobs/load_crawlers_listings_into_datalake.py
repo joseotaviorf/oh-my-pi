@@ -18,7 +18,8 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from inmetro.messengers import SlackMessenger
+from bietlejuice.services.messaging_services.gchat_service import GChatService
+from bietlejuice.services.messaging_services.message import Message
 
 JOB_NAME = "load_crawler_listings_into_datalake"
 
@@ -113,10 +114,13 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    slack_webhook_credentials = dbutils.secrets.get(
-        scope="quintoandar", key=APIEnum.AIRFLOW_ALERTS_INMETRO_SLACK_WEBHOOK
+    webhook_key = config_service.get_config("notification_webhooks_keys")[
+        "data_quality"
+    ]
+
+    gchat_webhook = dbutils.secrets.get(
+        scope="quintoandar", key=webhook_key
     )
-    messenger = SlackMessenger(slack_webhook_credentials)
 
     logger.info(
         f"""
@@ -182,8 +186,9 @@ if __name__ == "__main__":
             source_root_path={source_root_path}, execution_date={execution_date_str}, msg=An exception occurred, e={e}.
             """
         )
-        message = f"{origin} crawler s3 folder/file validation failed for date {execution_date_str}\n Error: {e}"
-        messenger.send_message(message)
+        message_content = f"{origin} crawler s3 folder/file validation failed for date {execution_date_str}\n Error: {e}"
+        message = Message(content=message_content, destination=gchat_webhook)
+        GChatService.send_message(message)
         df = None
 
     if df is not None:
