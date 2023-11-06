@@ -84,7 +84,6 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(database_name)
 
     logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Getting data from bucket...""")
-    metric = source.replace("_","-")
 
     for execution_date in _generate_date_range(load_start_date=load_start_date, load_end_date = load_end_date):
         date = execution_date.strftime('%Y-%m-%d')
@@ -127,7 +126,7 @@ if __name__ == "__main__":
                 spark_metastore_service.create_new_partitions_from_df(
                     df=df,
                     database_name=database_name,
-                    table_name=table_name,
+                    table_name=source,
                     partition_cols=raw_partition_cols,
                 ) 
 
@@ -139,10 +138,11 @@ if __name__ == "__main__":
         except Exception as e:
             logger.warning(f"""m={JOB_NAME}, msg={e}.""")
 
+            # TO-DO: Refact to GChat
             message = (
                 f":warning:\n"
                 f"DAG: *{source}*\n"
-                f"Owner: @ae-growth\n"
+                f"Owner: ae-growth\n"
                 f"Environment: *{env}*\n"
                 f"Status: *FAILED*\n"
                 f"Existence validation failed for `{dt.datetime.now().strftime('%Y-%m-%d')}`\n"
