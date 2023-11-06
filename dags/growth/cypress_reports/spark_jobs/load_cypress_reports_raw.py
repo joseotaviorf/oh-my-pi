@@ -10,8 +10,9 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
-from bietlejuice.services.messaging_services.slack_service import SlackService
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.services.messaging_services.gchat_service import GChatService
+from bietlejuice.services.messaging_services.message import Message
 
 JOB_NAME = "load_cypress_reports_raw"
 
@@ -73,12 +74,12 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     if env == 'prod':
-        key = SlackWebhooksEnum.ALERTS_DE_AIRFLW_DGS
+        key = GchatWebhooksEnum.AE_ALERTS_PROD
     else:
-        key = SlackWebhooksEnum.DE_TESTS
+        key = GchatWebhooksEnum.AE_ALERTS_FORNO
 
-    slack_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=key
+    gchat_webhook = dbutils.secrets.get(
+        scope="quintoandar", key=key
     )
 
     spark_metastore_service.create_database(database_name)
@@ -138,18 +139,19 @@ if __name__ == "__main__":
         except Exception as e:
             logger.warning(f"""m={JOB_NAME}, msg={e}.""")
 
-            # TO-DO: Refact to GChat
-            message = (
-                f":warning:\n"
+            message_content = (
+                f"⚠️\n"
                 f"DAG: *{source}*\n"
-                f"Owner: ae-growth\n"
+                f"Owner: @ae-growth\n"
                 f"Environment: *{env}*\n"
                 f"Status: *FAILED*\n"
                 f"Existence validation failed for `{dt.datetime.now().strftime('%Y-%m-%d')}`\n"
                 f"Error:'{e}'\n"
             )
 
+            message = Message(content=message_content, destination=gchat_webhook)
+
             if execution_date.weekday() < 5:
-                SlackService.send_slack_errors([(message,slack_webhook)])
+                GChatService.send_message(message)
 
             continue

@@ -6,11 +6,13 @@ from argparse import ArgumentParser
 from http.client import HTTPException
 
 from quintoandar_logger import QuintoAndarLogger
-from inmetro.messengers import SlackMessenger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.services.messaging_services.gchat_service import GChatService
+from bietlejuice.services.messaging_services.message import Message
 
 import boto3
 from pyspark.sql.utils import AnalysisException
@@ -26,7 +28,7 @@ def __build_warning_messages(environment, s3_path_prefix, table_list):
     messages = []
     for table_name in table_list:
         messages.append(
-            f":warning:\n"
+            f"⚠️\n"
             f"Validation: `{s3_path_prefix}/{table_name}`\n"
             f"Environment: *{environment}*\n"
             f"Status: *FAILED*\n"
@@ -110,17 +112,23 @@ if __name__ == "__main__":
         base_dbutils = BaseDBUtils()
         if base_dbutils.get_dbutils() is not None:
             dbutils = base_dbutils.get_dbutils()
-        slack_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
+
+        if environment == 'prod':
+            key = GchatWebhooksEnum.AE_ALERTS_PROD
+        else:
+            key = GchatWebhooksEnum.AE_ALERTS_FORNO
+
+        gchat_webhook = dbutils.secrets.get(
+            scope="quintoandar", key=key
         )
 
-        messenger = SlackMessenger(slack_webhook)
         messages = __build_warning_messages(
             environment,
             f"s3://{datalake_bucket}/{datalake_path_prefix}",
             tables_to_send_warning,
         )
-        messages_status = []
-        for message in messages:
+
+        for message_content in messages:
+            message = Message(content=message_content, destination=gchat_webhook)
             logger.info(f"m=__main__, message=sending slack message: {message}")
-            messenger.send_message(message)
+            GChatService.send_message(message)
