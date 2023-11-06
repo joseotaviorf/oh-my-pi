@@ -392,22 +392,6 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.wololo:load-clean-context-discard
   - bietlejuice.wololo:load-clean-conversion
   - bietlejuice.wololo:load-clean-prospect
-bietlejuice.dw_datamarts_spark.support_and_service:
-  - bietlejuice.amplitude:load-clean-170698-user-merge
-  - bietlejuice.amplitude:load-clean-events
-  - bietlejuice.chat_fup:load-clean-chats-chat
-  - bietlejuice.chat_fup:load-clean-rating
-  - bietlejuice.chat_fup:load-clean-surveys-answer
-  - bietlejuice.dw_contract:load-dw-public-dim-contract
-  - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
-  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
-  - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.enrich_customer_support:load-enrich-chat
-  - bietlejuice.enrich_greenseer:load-enrich-greenseer-session
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.greenseer:load-clean-session
-  - bietlejuice.jira:load-clean-issues
-  - bietlejuice.sauron:load-clean-session
 bietlejuice.dw_date:
   - bietlejuice.enrich_public_date:load-enrich-aux-date
 bietlejuice.dw_debt_recovery:

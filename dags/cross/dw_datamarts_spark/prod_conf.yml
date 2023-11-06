@@ -74,6 +74,3 @@ dags:
     cluster_name: databricks_10_4_max_memory_cluster
     load_to_redshift: True
     custom_schema: datamarts
-  support_and_service:
-    owner: Data SS
-    cluster_name: databricks_10_4_max_io-memory_photon_cluster

@@ -196,14 +196,6 @@ bietlejuice.dw_datamarts_spark.growth_cross:
     - bietlejuice.casa_mineira_crm:load-clean-house
 bietlejuice.dw_datamarts_spark.static:
   override: []
-bietlejuice.dw_datamarts_spark.support_and_service:
-  add:
-    - bietlejuice.dw_listing:load-dw-public-fact-house-listings
-    - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.greenseer:load-clean-session
-    - bietlejuice.jira:load-clean-issues
-  remove:
-    - bietlejuice.enrich_greenseer:load-enrich-session-memory
 bietlejuice.dw_date:
   add:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
