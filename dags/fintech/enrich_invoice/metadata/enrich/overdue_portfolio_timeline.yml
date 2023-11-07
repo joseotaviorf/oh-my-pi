@@ -25,6 +25,10 @@ columns:
       - datalake_ebdb_contract.contract.dt_termination
       - datalake_ebdb_contract.contract.status
     description: Contract status
+  user:
+    lineage:
+      - datalake_retsuko.invoice_info.invoice_user
+    description: User. It will always be 'tenant'
   invoice_type:
     lineage:
       - datalake_retsuko.invoice.purpose

@@ -3,6 +3,7 @@ WITH target_invoices AS (
         i.id_contract_external AS id_contract,
         p.id AS id_proposal,
         i.id_external AS id_invoice,
+        ii.invoice_user AS user,
         i.purpose AS invoice_type,
         i.status AS payment_status,
         i.substatus,
@@ -53,6 +54,7 @@ invoices_timeline AS (
         i.id_contract,
         i.id_proposal,
         i.id_invoice,
+        i.user,
         i.invoice_type,
         CASE
             WHEN i.payment_status = "not-payable" THEN "not-payable"
@@ -166,6 +168,7 @@ SELECT
     id_proposal,
     id_invoice,
     contract_status,
+    user,
     invoice_type,
     payment_status,
     substatus,
