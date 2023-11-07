@@ -47,8 +47,7 @@ stock_contracts AS (  -- Contracts that must be filtered out due to being stock 
     -- We're not considering this table as a dependency for the DAG due to being a context that runs during by the day and is out of our SLA.
     -- So related to this data, we're only dealing here with D-2 results.
   WHERE
-    op.user = 'tenant'
-    AND op.debtor_type = 'Stock'
+    op.debtor_type = 'Stock'
     AND op.dt_reference BETWEEN (DATE(NOW()) - INTERVAL '180' DAY) AND DATE(NOW())
 ),
 status_send AS (

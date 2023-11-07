@@ -31,8 +31,7 @@ stock_contracts AS (  -- Contracts that must be filtered out due to being stock 
   FROM
     datalake_invoice.overdue_portfolio_timeline AS op
   WHERE
-    op.user = 'tenant'
-    AND op.debtor_type = 'Stock'
+    op.debtor_type = 'Stock'
     AND op.dt_reference BETWEEN (DATE(NOW()) - INTERVAL '180' DAY) AND DATE(NOW())
 ),
 status_send AS (--Evaluat every ticket related to an birthday contract ORcontract in recap
