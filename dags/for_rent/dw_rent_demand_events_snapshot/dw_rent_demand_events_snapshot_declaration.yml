@@ -17,7 +17,7 @@ workflow:
       extra_query_template_params:
         "MAKE_DATE(year, month, day)": "DATE_ADD(MAKE_DATE({year}, {month}, {day}), 1)"
 cluster:
-  type: databricks_10_4_med_fixed_workers_2xlarge_general_photon_cluster
+  type: databricks_10_4_med_fixed_workers_4xlarge_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
