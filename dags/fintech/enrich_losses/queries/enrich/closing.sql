@@ -118,6 +118,7 @@ BASE_CLOSING_DRAFT AS (
       LEFT JOIN 
             CONTRACT_AUX as c_backup
                   ON c_backup.id = cr.id_external
+)
 SELECT 
       sk_invoice AS id_invoice,
       id AS id_contract,

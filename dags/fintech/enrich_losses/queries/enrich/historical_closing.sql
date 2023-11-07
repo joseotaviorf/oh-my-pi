@@ -46,7 +46,7 @@ BASE_INVOICES_SNAPSHOT_CLEAN_HISTORY AS (
     due_amount,
     frequency,
     payment_status,
-    null as paid_amount,
+    cast(null AS DOUBLE) as paid_amount,
     user,
     cast(dt_due_retsuko as date) as dt_due,
     cast(dt_paid_og as date) as dt_paid,
@@ -110,7 +110,7 @@ SELECT
   contract_signature_date as dt_contract_signature,
   dt_due, 
   dt_paid,
-  null as dt_sent, 
+  CAST(null as DATE) as dt_sent, 
   dt_snapshot
 FROM 
   BASE_CLOSING_HISTORY_RAW
