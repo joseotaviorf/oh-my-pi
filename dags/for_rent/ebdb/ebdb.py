@@ -304,9 +304,6 @@ contract_model_dependencies.extend(
 contract_model_dependencies.extend(
     task_list_last_tasks(clean_task_list.pop("contract_person"))
 )
-contract_model_dependencies.extend(
-    task_list_last_tasks(clean_task_list.pop("rent_flow"))
-)
 contract_model_dependencies.extend(task_list_last_tasks(clean_task_list.pop("house")))
 contract_model_dependencies.extend(
     task_list_last_tasks(clean_task_list.pop("partner_agent"))
