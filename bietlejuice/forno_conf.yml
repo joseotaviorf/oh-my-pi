@@ -420,6 +420,17 @@ databricks_10_4_med_2xlarge_general_photon_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_10_4_med_fixed_workers_2xlarge_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_10_4_med_io-general_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5d.2xlarge
@@ -470,7 +481,7 @@ databricks_13_3_med_general_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
-        
+
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
