@@ -384,7 +384,8 @@ base_step4_delay AS(
     END AS flag_risk
   FROM 
     base_step3_delay
-)
+),
+base_step5_delay AS(
 SELECT 
   id_invoice,
   id_contract,
@@ -443,12 +444,6 @@ SELECT
       WHEN deal_delay_rule_e >= -180 THEN 'g. 151-180'
       ELSE 'h. acima de 180'
   END AS delay_invoice_range_e,
-  CASE 
-      WHEN date_trunc('month', dt_snapshot) - interval '1' month <= date('2022-12-01') THEN delay_invoice_range_b
-      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2023-01-01') THEN delay_invoice_range_a
-      WHEN date_trunc('month', dt_snapshot) - interval '1' month between date('2023-02-01') and date('2023-05-01') THEN delay_invoice_range_b
-      WHEN date_trunc('month', dt_snapshot) - interval '1' month >= date('2023-06-01') THEN delay_invoice_range_e
-  END AS delay_invoice_range,
   CASE
       WHEN pd_range_rule_a = 'TotalCurrent' THEN 'a. Current'
       WHEN pd_range_rule_a = 'TotalM +0 (1-30 days)' THEN 'b. 1-30'
@@ -489,12 +484,6 @@ SELECT
       WHEN pd_range_rule_e = 'TotalM +5 (151-180 days)' THEN 'g. 151-180'
       WHEN pd_range_rule_e = 'TotalM +6 (>181 days)' THEN 'h. acima de 180'
   END AS delay_contamined_range_e,
-  CASE 
-      WHEN date_trunc('month', dt_snapshot) - interval '1' month <= date('2022-12-01') THEN delay_contamined_range_b
-      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2023-01-01') THEN delay_contamined_range_a
-      WHEN date_trunc('month', dt_snapshot) - interval '1' month between date('2023-02-01') and date('2023-05-01') THEN delay_contamined_range_b
-      WHEN date_trunc('month', dt_snapshot) - interval '1' month >= date('2023-06-01') THEN delay_contamined_range_e
-  END AS delay_contamined_range,
   delta_days,
   due_amount,
   frequency,
@@ -522,3 +511,69 @@ SELECT
   dt_snapshot
 FROM 
   base_step4_delay
+)
+SELECT 
+  id_invoice,
+  id_contract,
+  accrual_year_month,
+  deal_delay_rule_a,
+  deal_delay_rule_b,
+  deal_delay_rule_c,
+  deal_delay_rule_d,
+  deal_delay_rule_e,
+  deal_order,
+  deal_status,
+  bigger_anchor_deal_at_contract,
+  delay_at_deal_creation,
+  delay_contaminated_range_rule_a,
+  delay_contaminated_range_rule_b,
+  delay_contaminated_range_rule_c,
+  delay_contaminated_range_rule_d,
+  delay_contaminated_range_rule_e,
+  delay_invoice_range_a,
+  delay_invoice_range_b,
+  delay_invoice_range_d,
+  delay_invoice_range_e,
+  CASE 
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH <= DATE('2022-12-01') THEN delay_invoice_range_b
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH = DATE('2023-01-01') THEN delay_invoice_range_a
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH BETWEEN DATE('2023-02-01') AND DATE('2023-05-01') THEN delay_invoice_range_b
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH >= DATE('2023-06-01') THEN delay_invoice_range_e
+  END AS delay_invoice_range,
+  delay_contamined_range_a,
+  delay_contamined_range_b,
+  delay_contamined_range_d,
+  delay_contamined_range_e,
+  CASE 
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH <= DATE('2022-12-01') THEN delay_contamined_range_b
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH = DATE('2023-01-01') THEN delay_contamined_range_a
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH BETWEEN DATE('2023-02-01') AND DATE('2023-05-01') THEN delay_contamined_range_b
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH >= DATE('2023-06-01') THEN delay_contamined_range_e
+  END AS delay_contamined_range,
+  delta_days,
+  due_amount,
+  frequency,
+  full_delay_at_deal,
+  guarantee_type,
+  invoice_competence_renegotiated,
+  payment_status,
+  pd_range_rule_a,
+  pd_range_rule_b,
+  pd_range_rule_c,
+  pd_range_rule_d,
+  pd_range_rule_e,
+  risk_type,
+  user,
+  is_before_started,
+  is_contract_with_deal,
+  is_hr,
+  is_invoice_deal,
+  dt_closing,
+  dt_created_deal,
+  dt_due_adjs,
+  dt_due_deal_anchor,
+  dt_due_general_accrual,
+  dt_paid_adjs,
+  dt_snapshot
+FROM 
+  base_step5_delay
