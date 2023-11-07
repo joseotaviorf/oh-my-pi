@@ -145,7 +145,6 @@ closing_union AS(
     * 
   FROM 
     datalake_losses.historical_closing 
-
 ),
 base_step0_delay AS(
   SELECT 
@@ -404,12 +403,105 @@ SELECT
   delay_contaminated_range_rule_c,
   delay_contaminated_range_rule_d,
   delay_contaminated_range_rule_e,
+  CASE
+      WHEN deal_delay_rule_a >= 0 THEN 'a. Current'
+      WHEN deal_delay_rule_a >= -30 THEN 'b. 1-30'
+      WHEN deal_delay_rule_a >= -60 THEN 'c. 31-60'
+      WHEN deal_delay_rule_a >= -90 THEN 'd. 61-90'
+      WHEN deal_delay_rule_a >= -120 THEN 'e. 91-120'
+      WHEN deal_delay_rule_a >= -150 THEN 'f. 121-150'
+      WHEN deal_delay_rule_a >= -180 THEN 'g. 151-180'
+      ELSE 'h. acima de 180'
+  END AS delay_invoice_range_a,
+  CASE
+      WHEN deal_delay_rule_b >= 0 THEN 'a. Current'
+      WHEN deal_delay_rule_b >= -30 THEN 'b. 1-30'
+      WHEN deal_delay_rule_b >= -60 THEN 'c. 31-60'
+      WHEN deal_delay_rule_b >= -90 THEN 'd. 61-90'
+      WHEN deal_delay_rule_b >= -120 THEN 'e. 91-120'
+      WHEN deal_delay_rule_b >= -150 THEN 'f. 121-150'
+      WHEN deal_delay_rule_b >= -180 THEN 'g. 151-180'
+      ELSE 'h. acima de 180'
+  END AS delay_invoice_range_b,
+  CASE
+      WHEN deal_delay_rule_d >= 0 THEN 'a. Current'
+      WHEN deal_delay_rule_d >= -30 THEN 'b. 1-30'
+      WHEN deal_delay_rule_d >= -60 THEN 'c. 31-60'
+      WHEN deal_delay_rule_d >= -90 THEN 'd. 61-90'
+      WHEN deal_delay_rule_d >= -120 THEN 'e. 91-120'
+      WHEN deal_delay_rule_d >= -150 THEN 'f. 121-150'
+      WHEN deal_delay_rule_d >= -180 THEN 'g. 151-180'
+      ELSE 'h. acima de 180'
+  END AS delay_invoice_range_d,
+  CASE
+      WHEN deal_delay_rule_e >= 0 THEN 'a. Current'
+      WHEN deal_delay_rule_e >= -30 THEN 'b. 1-30'
+      WHEN deal_delay_rule_e >= -60 THEN 'c. 31-60'
+      WHEN deal_delay_rule_e >= -90 THEN 'd. 61-90'
+      WHEN deal_delay_rule_e >= -120 THEN 'e. 91-120'
+      WHEN deal_delay_rule_e >= -150 THEN 'f. 121-150'
+      WHEN deal_delay_rule_e >= -180 THEN 'g. 151-180'
+      ELSE 'h. acima de 180'
+  END AS delay_invoice_range_e,
+  CASE 
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month <= date('2022-12-01') THEN delay_invoice_range_b
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2023-01-01') THEN delay_invoice_range_a
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month between date('2023-02-01') and date('2023-05-01') THEN delay_invoice_range_b
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month >= date('2023-06-01') THEN delay_invoice_range_e
+  END AS delay_invoice_range,
+  CASE
+      WHEN pd_range_rule_a = 'TotalCurrent' THEN 'a. Current'
+      WHEN pd_range_rule_a = 'TotalM +0 (1-30 days)' THEN 'b. 1-30'
+      WHEN pd_range_rule_a = 'TotalM +1 (31-60 days)' THEN 'c. 31-60'
+      WHEN pd_range_rule_a = 'TotalM +2 (61-90 days)' THEN 'd. 61-90'
+      WHEN pd_range_rule_a = 'TotalM +3 (91-120 days)' THEN 'e. 91-120'
+      WHEN pd_range_rule_a = 'TotalM +4 (121-150 days)' THEN 'f. 121-150'
+      WHEN pd_range_rule_a = 'TotalM +5 (151-180 days)' THEN 'g. 151-180'
+      WHEN pd_range_rule_a = 'TotalM +6 (>181 days)' THEN 'h. acima de 180'
+  END AS delay_contamined_range_a,
+  CASE
+      WHEN pd_range_rule_b = 'TotalCurrent' THEN 'a. Current'
+      WHEN pd_range_rule_b = 'TotalM +0 (1-30 days)' THEN 'b. 1-30'
+      WHEN pd_range_rule_b = 'TotalM +1 (31-60 days)' THEN 'c. 31-60'
+      WHEN pd_range_rule_b = 'TotalM +2 (61-90 days)' THEN 'd. 61-90'
+      WHEN pd_range_rule_b = 'TotalM +3 (91-120 days)' THEN 'e. 91-120'
+      WHEN pd_range_rule_b = 'TotalM +4 (121-150 days)' THEN 'f. 121-150'
+      WHEN pd_range_rule_b = 'TotalM +5 (151-180 days)' THEN 'g. 151-180'
+      WHEN pd_range_rule_b = 'TotalM +6 (>181 days)' THEN 'h. acima de 180'
+  END AS delay_contamined_range_b,
+  CASE
+      WHEN pd_range_rule_d = 'TotalCurrent' THEN 'a. Current'
+      WHEN pd_range_rule_d = 'TotalM +0 (1-30 days)' THEN 'b. 1-30'
+      WHEN pd_range_rule_d = 'TotalM +1 (31-60 days)' THEN 'c. 31-60'
+      WHEN pd_range_rule_d = 'TotalM +2 (61-90 days)' THEN 'd. 61-90'
+      WHEN pd_range_rule_d = 'TotalM +3 (91-120 days)' THEN 'e. 91-120'
+      WHEN pd_range_rule_d = 'TotalM +4 (121-150 days)' THEN 'f. 121-150'
+      WHEN pd_range_rule_d = 'TotalM +5 (151-180 days)' THEN 'g. 151-180'
+      WHEN pd_range_rule_d = 'TotalM +6 (>181 days)' THEN 'h. acima de 180'
+  END AS delay_contamined_range_d,
+  CASE
+      WHEN pd_range_rule_e = 'TotalCurrent' THEN 'a. Current'
+      WHEN pd_range_rule_e = 'TotalM +0 (1-30 days)' THEN 'b. 1-30'
+      WHEN pd_range_rule_e = 'TotalM +1 (31-60 days)' THEN 'c. 31-60'
+      WHEN pd_range_rule_e = 'TotalM +2 (61-90 days)' THEN 'd. 61-90'
+      WHEN pd_range_rule_e = 'TotalM +3 (91-120 days)' THEN 'e. 91-120'
+      WHEN pd_range_rule_e = 'TotalM +4 (121-150 days)' THEN 'f. 121-150'
+      WHEN pd_range_rule_e = 'TotalM +5 (151-180 days)' THEN 'g. 151-180'
+      WHEN pd_range_rule_e = 'TotalM +6 (>181 days)' THEN 'h. acima de 180'
+  END AS delay_contamined_range_e,
+  CASE 
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month <= date('2022-12-01') THEN delay_contamined_range_b
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2023-01-01') THEN delay_contamined_range_a
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month between date('2023-02-01') and date('2023-05-01') THEN delay_contamined_range_b
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month >= date('2023-06-01') THEN delay_contamined_range_e
+  END AS delay_contamined_range,
   delta_days,
   due_amount,
   frequency,
   full_delay_at_deal,
   IF(is_guarantee_paid is TRUE, 'PAID','FREE') as guarantee_type,
-   payment_status,
+  DATE_FORMAT(deal_anchor_due_date, 'MMyyyy') as invoice_competence_renegotiated,
+  payment_status,
   pd_range_rule_a,
   pd_range_rule_b,
   pd_range_rule_c,

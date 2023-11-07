@@ -93,6 +93,14 @@ columns:
     lineage:
       - datalake_losses.delay.guarantee_type
     description: Guarantee information related to the invoice.
+  invoice_account_type:
+    description: Account type information associated with the user information.
+  payment_status:
+    lineage:
+      - datalake_losses.delay.payment_status
+    description: Invoice status of payment i.e if it is open, paid, canceled or was written down
+  invoice_status:
+    description: Invoice status information related to the payment status.
   pd_range_rule_a:
     lineage:
       - datalake_losses.delay.pd_range_rule_a
@@ -153,6 +161,10 @@ columns:
     description: Provision balance for the rule e on fev/2023.
   provision_balance_p4_delay_e:
     description: Current provision balance for the rule e.
+  provision_balance:
+    description: Provision balance being applied to the invoice.
+  provision_factor:
+    description: Provision factor being applied to the invoice.
   risk_type:
     lineage:
       - datalake_losses.delay.risk_type

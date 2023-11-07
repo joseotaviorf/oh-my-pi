@@ -2,6 +2,9 @@ SELECT
     COALESCE(id_contract, -1) AS sk_contract,
     COALESCE(id_invoice, -1) AS sk_invoice,
     due_amount,
+    invoice_account_type,
+    payment_status,
+    invoice_status,
     provision_balance_p1_delay_d,
     provision_balance_p2_delay_d,
     provision_balance_p3_delay_d,
@@ -22,6 +25,8 @@ SELECT
     provision_balance_p2_delay_e,
     provision_balance_p3_delay_e,
     provision_balance_p4_delay_e,
+    provision_balance,
+    provision_factor,
     user,
     dt_closing,
     NOW() AS ts_load

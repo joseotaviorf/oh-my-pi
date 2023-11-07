@@ -17,6 +17,8 @@ columns:
     lineage:   
     - dw_payment_snapshot.dim_invoice_snapshot.accrual_year_month
     description: String with Year number and Month number 'yyyymm' related to the sent date.
+  closing_month_status:
+    description: Status of the closing month. 
   due_amount:
     lineage:   
     - dw_payment_snapshot.dim_invoice_snapshot.due_amount
@@ -25,6 +27,8 @@ columns:
     lineage:   
     - dw_payment_snapshot.dim_invoice_snapshot.frequency
     description: Frequency of the payment. 
+  invoice_type:
+    description: Type of the invoice according to the frequency information. 
   is_guarantee_paid:
     description: Flag to show if the guarantee is paid. 
   is_before_started:
@@ -39,6 +43,10 @@ columns:
     description: Flag to show if the invoice is paid within the closing day.
   is_writtendown_in_dead_time:
     description: Flag to show if the invoice is writtendown in the deadtime.
+  paid_amount:
+    lineage: 
+    - dw_payment_snapshot.dim_invoice_snapshot 
+    description: Total paid amount fo the invoice. 
   payment_status:
     lineage:   
     - dw_payment_snapshot.dim_invoice_snapshot.payment_status
@@ -53,6 +61,8 @@ columns:
     lineage:
       - dw_public.dim_date.month_end
     description: Last day of the month.
+  dt_contract_signature:
+    description: Date of the contract signature.
   dt_due: 
     lineage:   
     - dw_payment_snapshot.dim_invoice_snapshot.dt_due
@@ -61,6 +71,10 @@ columns:
     lineage:   
     - dw_payment_snapshot.dim_invoice_snapshot.dt_paid
     description: Payment completed date of the invoice. 
+  dt_sent: 
+    lineage:   
+    - dw_payment_snapshot.dim_invoice_snapshot.dt_sent
+    description: Sent date of the invoice. 
   dt_snapshot:
     lineage:
     - dw_payment_snapshot.dim_invoice_snapshot.ts_snapshot

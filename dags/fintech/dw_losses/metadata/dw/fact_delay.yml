@@ -13,10 +13,98 @@ columns:
     lineage:   
     - datalake_losses.delay.id_contract
     description: Id of the contract. 
+  deal_delay_rule_a:
+    lineage:   
+    - datalake_losses.delay.deal_delay_rule_a
+    description: Rule A related to the delay of the payment. In this rule we contaminate all deals invoices by the anchor in the negoation and keep the natural debt rolling despite the deal being paid
+  deal_delay_rule_b:
+    lineage:   
+    - datalake_losses.delay.deal_delay_rule_b
+    description: Rule B related to the delay of the payment. In this rule if the deal is broken we only worsen the roll rate if the deal invoice surpasses the delay at the moment in the negotiation.
+  deal_delay_rule_c:
+    lineage:   
+    - datalake_losses.delay.deal_delay_rule_c
+    description: Rule C related to the delay of the payment. In this rule if the deal is broken then the dealis contaminated as of rule A, if not we maintain at the delay at the moment in the negotiation.
+  deal_delay_rule_d:
+    lineage:   
+    - datalake_losses.delay.deal_delay_rule_d
+    description: Rule D related to the delay of the payment. In this rule if the deal is broken then the invoice is contaminated as the delay of the invoice plus the delay at the moment in the negotiation.
+  deal_delay_rule_e:
+    lineage:   
+    - datalake_losses.delay.deal_delay_rule_e
+    description: Rule E related to the delay of the payment. In this rule if ANY INVOICE is delayed and the contract has a active negotiation then the invoice is contaminated as the delay of the invoice plus the delay at the moment in the negotiation.
+  delay_contaminated_range_rule_a:
+    lineage:   
+    - datalake_losses.delay.delay_contaminated_range_rule_a
+    description: Minimun value for deal_delay_rule_A.
+  delay_contaminated_range_rule_b:
+    lineage:   
+    - datalake_losses.delay.delay_contaminated_range_rule_b
+    description: Minimun value for deal_delay_rule_B.
+  delay_contaminated_range_rule_c:
+    lineage:   
+    - datalake_losses.delay.delay_contaminated_range_rule_c
+    description: Minimun value for deal_delay_rule_C.
+  delay_contaminated_range_rule_d:
+    lineage:   
+    - datalake_losses.delay.delay_contaminated_range_rule_d
+    description: Minimun value for deal_delay_rule_D.
+  delay_contaminated_range_rule_e:
+    lineage:   
+    - datalake_losses.delay.delay_contaminated_range_rule_e
+    description: Minimun value for deal_delay_rule_E.
+  delay_invoice_range_a:
+    lineage:   
+    - datalake_losses.delay.delay_invoice_range_a
+    description: Delay invoice applied range according to the deal_delay_rule information.
+  delay_invoice_range_b:
+    lineage:   
+    - datalake_losses.delay.delay_invoice_range_b
+    description: Delay invoice applied range according to the deal_delay_rule information.
+  delay_invoice_range_d:
+    lineage:   
+    - datalake_losses.delay.delay_invoice_range_d
+    description: Delay invoice applied range according to the deal_delay_rule information.
+  delay_invoice_range_e:
+    lineage:   
+    - datalake_losses.delay.delay_invoice_range_e
+    description: Delay invoice applied range according to the deal_delay_rule information.
+  delay_invoice_range:
+    lineage:   
+    - datalake_losses.delay.delay_invoice_range
+    description: Delay invoice range being applied to the invoice.
+  delay_contamined_range_a:
+    lineage:   
+    - datalake_losses.delay.delay_contamined_range_a
+    description: Range of the delay in days according to the pd_range_rule information.
+  delay_contamined_range_b:
+    lineage:   
+    - datalake_losses.delay.delay_contamined_range_b
+    description: Range of the delay in days according to the pd_range_rule information.
+  delay_contamined_range_d:
+    lineage:   
+    - datalake_losses.delay.delay_contamined_range_d
+    description: Range of the delay in days according to the pd_range_rule information.
+  delay_contamined_range_e:
+    lineage:   
+    - datalake_losses.delay.delay_contamined_range_e
+    description: Range of the delay in days according to the pd_range_rule information.
+  delay_contamined_range:
+    lineage:   
+    - datalake_losses.delay.delay_contamined_range
+    description: Range of the delay in days being applied to the invoice.
   due_amount:
     lineage:   
     - datalake_losses.delay.due_amount
     description: Total value of the invoice. 
+  invoice_competence_renegotiated:
+    lineage:   
+    - datalake_losses.delay.invoice_competence_renegotiated
+    description:  Competence information of the renegotiation of the invoice.
+  payment_status: 
+    lineage:   
+    - datalake_losses.delay.payment_status
+    description: Invoice status of payment i.e if it is open, paid, canceled or was written down
   pd_range_rule_a:
     lineage:
     - datalake_losses.delay.pd_range_rule_a
@@ -37,6 +125,10 @@ columns:
     lineage:
     - datalake_losses.delay.pd_range_rule_e
     description: Range of the delay in days related to Rule E. In this rule if ANY INVOICE is delayed and the contract has a active negotiation then the invoice is contaminated as the delay of the invoice plus the delay at the moment in the negotiation.
+  risk_type:
+    lineage:
+    - datalake_losses.delay.risk_type
+    description: Risk type of the deal.
   user:
     lineage:
     - datalake_losses.delay.user

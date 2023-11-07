@@ -21,6 +21,19 @@ SELECT
   m.frequency,
   m.full_delay_at_deal,
   m.guarantee_type,
+  CASE
+      WHEN m.user = 'tenant' THEN 'Inquilino'
+      WHEN m.user = 'landlord' THEN 'Proprietario'
+      ELSE ''
+  END AS invoice_account_type,
+  payment_status,
+  CASE
+      WHEN m.payment_status = 'paid' THEN 'Pago'
+      WHEN m.payment_status = 'open' THEN 'Em aberto'
+      WHEN m.payment_status = 'canceled' THEN 'Cancelado'
+      WHEN m.payment_status = 'written down' THEN 'Baixado'
+      ELSE m.payment_status
+  END AS invoice_status,
   m.pd_range_rule_a,
   m.pd_range_rule_b,
   m.pd_range_rule_c,
@@ -45,7 +58,23 @@ SELECT
   p1E.provision_factor*due_amount AS provision_balance_p1_delay_e,
   p2E.provision_factor*due_amount AS provision_balance_p2_delay_e,
   p3E.provision_factor*due_amount AS provision_balance_p3_delay_e,
-  p4E.provision_factor*due_amount AS provision_balance_p4_delay_e,    
+  p4E.provision_factor*due_amount AS provision_balance_p4_delay_e,   
+  CASE 
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month <= date('2022-11-01') THEN provision_balance_p1_delay_b
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2022-12-01') THEN provision_balance_p4_delay_b
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2023-01-01') THEN provision_balance_p2_delay_a
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2023-02-01') THEN provision_balance_p3_delay_b
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month between date('2023-03-01') and date('2023-05-01') THEN provision_balance_p4_delay_b
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month >= date('2023-06-01') THEN provision_balance_p4_delay_e
+  END AS provision_balance, 
+  CASE 
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month <= date('2022-11-01') THEN p1B.provision_factor
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2022-12-01') THEN p4B.provision_factor
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2023-01-01') THEN p2A.provision_factor
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month = date('2023-02-01') THEN p3B.provision_factor
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month between date('2023-03-01') and date('2023-05-01') THEN p4B.provision_factor
+      WHEN date_trunc('month', dt_snapshot) - interval '1' month >= date('2023-06-01') THEN p4E.provision_factor
+  END AS provision_factor, 
   m.risk_type,
   m.user,
   m.is_before_started,

@@ -48,6 +48,26 @@ columns:
     description: Minimun value for deal_delay_rule_D.
   delay_contaminated_range_rule_e:
     description: Minimun value for deal_delay_rule_E.
+  delay_invoice_range_a:
+    description: Delay invoice applied range according to the deal_delay_rule information.
+  delay_invoice_range_b:
+    description: Delay invoice applied range according to the deal_delay_rule information.
+  delay_invoice_range_d:
+    description: Delay invoice applied range according to the deal_delay_rule information.
+  delay_invoice_range_e:
+    description: Delay invoice applied range according to the deal_delay_rule information.
+  delay_invoice_range:
+    description: Delay invoice range being applied to the invoice.
+  delay_contamined_range_a:
+    description: Range of the delay in days according to the pd_range_rule information.
+  delay_contamined_range_b:
+    description: Range of the delay in days according to the pd_range_rule information.
+  delay_contamined_range_d:
+    description: Range of the delay in days according to the pd_range_rule information.
+  delay_contamined_range_e:
+    description: Range of the delay in days according to the pd_range_rule information.
+  delay_contamined_range:
+    description: Range of the delay in days being applied to the invoice.
   delta_days:
     description: Date difference between dt_due_adjs and dt_closing.
   due_amount:
@@ -65,6 +85,8 @@ columns:
     - datalake_losses.closing.payment_status
     - datalake_losses.historical_closing.payment_status
     description: Invoice status of payment i.e if it is open, paid, canceled or was written down
+  invoice_competence_renegotiated:
+    description:  Competence information of the renegotiation of the invoice.
   full_delay_at_deal:
     description:  Date difference between deal_anchor_due_date and dt_closing.
   guarantee_type:
