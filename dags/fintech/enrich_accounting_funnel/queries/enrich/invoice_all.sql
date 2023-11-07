@@ -110,8 +110,8 @@ SELECT DISTINCT
   CASE
     WHEN entry_type IN ('brokerage installment fee', 'brokerage loan fidc', 'brokerage fidc', 'property damage fine') THEN 'receivable'
     WHEN entry_type IN ('rental anticipation fee') THEN 'payable'
-    WHEN entry_type IN ('postponement', 'payment adjustment') AND (ie.from_account_type = 'tenant' OR ie.to_account_type = 'tenant') THEN 'receivable'
-    WHEN entry_type IN ('postponement', 'payment adjustment') AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord') THEN 'payable'
+    WHEN entry_type IN ('payment adjustment') AND (ie.from_account_type = 'tenant' OR ie.to_account_type = 'tenant') THEN 'receivable'
+    WHEN entry_type IN ('payment adjustment') AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord') THEN 'payable'
     WHEN (ROUND(-1.0*i.due_amount,2) > 0 OR (ROUND(-1.0*i.due_amount,2) = 0 AND NOT(from_account_type = 'landlord' OR to_account_type= 'landlord') )) THEN 'receivable'
     ELSE 'payable'
   END AS account_classification,
