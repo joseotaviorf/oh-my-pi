@@ -113,16 +113,16 @@ customers_info AS (
         b.sk_user IS NOT NULL
 )
 SELECT
-    id_user,
-    id_driver,
     customer_name,
     customer_email,
     customer_phone,
     campaign_step,
     customer_type,
     customer_cpf,
+    id_user,
     campaign_type,
     driver_type,
+    id_driver,
     business_context
 FROM
     customers_info
