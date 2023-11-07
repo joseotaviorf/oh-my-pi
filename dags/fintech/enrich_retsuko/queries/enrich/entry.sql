@@ -22,10 +22,10 @@ SELECT
     e.ts_retsuko_updated
 FROM
     datalake_retsuko_clean.entry e
-INNER JOIN
+LEFT JOIN
     datalake_retsuko_clean.account AS af
         ON e.id_from_account = af.id
-INNER JOIN
+LEFT JOIN
     datalake_retsuko_clean.account AS at
         ON e.id_to_account = at.id
 LEFT JOIN
