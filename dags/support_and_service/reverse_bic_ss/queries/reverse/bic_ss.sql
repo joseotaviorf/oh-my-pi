@@ -1,4 +1,6 @@
-SELECT
+WITH bic AS (
+  SELECT
+    usm.id_snapshot,
     usm.id_user,
     usm.id_last_csi_ticket,
     usm.tenant_journey_step,
@@ -108,7 +110,6 @@ SELECT
         WHEN usm.is_landlord IS TRUE THEN ljs.total_active_termination_contracts
         ELSE NULL
     END AS total_active_termination_contracts,
-    usm.app_version,
     usm.is_pp_multi,
     usm.is_tenant,
     usm.is_broker,
@@ -271,15 +272,30 @@ SELECT
         WHEN usm.is_tenant IS TRUE THEN tjs.ts_last_termination_finished
         WHEN usm.is_landlord IS TRUE THEN ljs.ts_last_termination_finished
     END AS ts_last_termination_finished
-FROM
+  FROM
     datalake_ss_logic_model.user_ss_metrics AS usm
-LEFT JOIN
+  LEFT JOIN
     datalake_tenant_journey.tenant_journey_step AS tjs
       ON tjs.id_client = usm.id_user
       AND tjs.id_snapshot = usm.id_snapshot
-LEFT JOIN
+  LEFT JOIN
     datalake_landlord_journey.landlord_journey_step AS ljs
       ON ljs.id_owner = usm.id_user
       AND ljs.id_snapshot = usm.id_snapshot
-WHERE
+  WHERE
     usm.id_snapshot = DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd')
+    OR usm.id_snapshot = DATE_FORMAT(DATE_SUB('{year}-{month}-{day}', 1), 'yyyyMMdd')
+)
+SELECT
+  * EXCEPT(id_snapshot)
+FROM
+  bic
+WHERE
+  id_snapshot = DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd')
+EXCEPT ALL
+SELECT
+  * EXCEPT(id_snapshot)
+FROM
+  bic
+WHERE
+  id_snapshot = DATE_FORMAT(DATE_SUB('{year}-{month}-{day}', 1), 'yyyyMMdd')
