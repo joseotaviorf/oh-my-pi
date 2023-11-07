@@ -62,6 +62,12 @@ columns:
     lineage:
       - datalake_ebdb_clean.access_type_aud.has_opted_keys_with_agent
     description: Flag to indicate if the key was with agent opt in.
+  is_fss:
+    description: Boolean indicating if the id_user is equal to id_user_registrant.
+  is_keys_with_agent_eligible:
+    description: Boolean indicating if the keys are with the agent.
+  is_returned_on_time:
+    description: Boolean indicating if the keys were returned in less than 3 days after the contract was signed.
   ts_attributed:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
