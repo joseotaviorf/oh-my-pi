@@ -58,11 +58,11 @@ published_listings AS (
 listings_without_bookings AS (
     SELECT
         sk_house, 
-        COUNT(DISTINCT sk_house) AS vbs_last_30_days
+        COUNT(DISTINCT sk_house) AS vbs_last_90_days
     FROM 
         dw_sale.fact_visits
     WHERE 
-        ts_booking_created >= CURRENT_DATE - INTERVAL '30 days'
+        ts_booking_created >= CURRENT_DATE - INTERVAL '90 days'
     GROUP BY 
         1
 ),
@@ -96,7 +96,7 @@ suspected_unavailable_listings AS (
         country_code = 'BR'
         AND DATEDIFF(CURRENT_DATE,dt_last_quintoandar_publication) >= 30
         AND DATEDIFF(CURRENT_DATE,dt_first_publication) >= 120
-        AND vbs_last_30_days IS NULL
+        AND vbs_last_90_days IS NULL
         AND (sl.is_confirmed IS NULL OR sl.is_confirmed = FALSE) -- If the house is not confirmed as available
         AND (sl.contact_attempts IS NULL OR sl.contact_attempts < 3) -- Can't have received this HSM more than twice and not replied to it
 ),
