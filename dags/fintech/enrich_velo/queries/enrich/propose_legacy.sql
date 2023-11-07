@@ -246,23 +246,7 @@ prop_values_structure AS (
         )
     )
 ),
-prop_values AS (
-    SELECT
-        p.id AS id_propose,
-        CONCAT(p.id, cp.id, pl.id) AS id_propose_values,
-        COALESCE((pv.rent_amount + pv.condo_amount + pv.light_amount + pv.iptu_amount + pv.other_amount)*pl.pricing,0) AS monthly_guarantee
-    FROM
-        datalake_rental_guarantee_platform_clean.propose AS p
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.company_plan AS cp
-            ON p.id_company_plan = cp.id
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.plan AS pl
-            ON cp.id_plan = pl.id
-    LEFT JOIN
-        prop_values_structure AS pv
-            ON p.id = pv.id_propose
-),
+
 -- cte to get propose_values from propose_legacy proposes
 old_prop_values AS (
     WITH old_duplicated_company_plan AS (
@@ -279,7 +263,7 @@ old_prop_values AS (
     )
     SELECT
         p.id AS id_propose,
-        CONCAT(p.id, COALESCE(cp.id, ''), pl.id) AS id_propose_values,
+        CONCAT(p.id, COALESCE(cp.id, ''), pl.id) * -1 AS id_propose_values,
         COALESCE((pv.rent_amount + pv.condo_amount + pv.light_amount + pv.iptu_amount + pv.other_amount)*pl.pricing,0) AS monthly_guarantee
     FROM
         datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy AS p

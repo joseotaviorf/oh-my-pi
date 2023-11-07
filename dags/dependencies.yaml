@@ -789,6 +789,7 @@ bietlejuice.dw_velo:
   - bietlejuice.enrich_velo:load-enrich-propose-person
   - bietlejuice.enrich_velo:load-enrich-propose-person-legacy
   - bietlejuice.enrich_velo:load-enrich-propose-values
+  - bietlejuice.enrich_velo:load-enrich-propose-values-legacy
   - bietlejuice.enrich_velo:load-enrich-transaction-category
   - bietlejuice.enrich_velo:load-enrich-transaction-entries
   - bietlejuice.enrich_velo:load-enrich-user

@@ -1,23 +1,21 @@
 database_name: datalake_velo
-table_name: propose_values
+table_name: propose_values_legacy
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: "Table containing Velo's proposes detailed info"
+description: "Table containing Velo's proposes detailed info (only 2.0 not migrated proposes)"
 columns:
   id_propose_values:
     description: ProposeValues's identification number (ID)
     lineage:
-      - datalake_rental_guarantee_platform_clean.propose.id
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.id
       - datalake_rental_guarantee_platform_clean.company_plan.id
       - datalake_rental_guarantee_platform_clean.plan.id
-    description: ID of the propose values.
   subscription_type:
     description: Category type of the subscription. Usually monthly or annual
   plan_type:
     description: Propose's plan type. Usually Business or Residential.
     lineage:
       - datalake_rental_guarantee_platform_clean.business_type.name
-    description: Category type of the real estate
   activator_type:
     description: Propose's activator type name. This may not exist in QuintoCred.
     lineage:
@@ -26,14 +24,12 @@ columns:
     description: Propose's plan name.
     lineage:
       - datalake_rental_guarantee_platform_clean.plan.plan_name
-    description: Name of the plan
   activator_amount:
     description: Propose's value paid to activate the contract. This marks the start of the propose as a contract.
     lineage:
-      - datalake_rental_guarantee_platform_clean.propose.activator_value
-    description: Amount paid to activate the guarantee
+      - datalake_rental_guarantee_platform_clean.fiancavelo_propose_legacy.activator_value
   subscription_installments:
-    description: Number of installments on the subscription.
+    description: Number of installments on the subscription
   activator_amount:
     description: Amount paid to activate the guarantee
   monthly_guarantee:
