@@ -130,9 +130,10 @@ bietlejuice.dw_crm:
   - bietlejuice.dw_listing_jobs:load-dw-public-fact-photo-job
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.ebdb:load-clean-inspection
-  - bietlejuice.ebdb:load-clean-onboarding
   - bietlejuice.ebdb:load-clean-pre-proposal
   - bietlejuice.ebdb:load-clean-proposal
+  - bietlejuice.ebdb_rent_flow:load-clean-onboarding
+  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_crm_tasks_transitions:load-enrich-tasks-transitions
@@ -751,10 +752,10 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:load-clean-photographer-data
   - bietlejuice.ebdb:load-clean-pre-proposal
   - bietlejuice.ebdb:load-clean-proposal
-  - bietlejuice.ebdb:load-clean-rent-flow
   - bietlejuice.ebdb:load-clean-sales-rep
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.ebdb:load-clean-visit
+  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
   - bietlejuice.enrich_amplitude_partner_taxonomy:load-enrich-amplitude-partner-taxonomy
   - bietlejuice.enrich_big_agent:load-enrich-agent-current-program
   - bietlejuice.enrich_booking:load-enrich-booking
@@ -1298,9 +1299,9 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-photographer-job
-  - bietlejuice.ebdb:load-clean-rent-flow
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -1390,11 +1391,11 @@ bietlejuice.enrich_ebdb_rent_flow:
   - bietlejuice.ebdb:load-clean-portability
   - bietlejuice.ebdb:load-clean-pre-proposal
   - bietlejuice.ebdb:load-clean-proposal
-  - bietlejuice.ebdb:load-clean-rent-flow
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb:load-clean-visit-origin
   - bietlejuice.ebdb:load-clean-visitor
+  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
 bietlejuice.enrich_ebdb_rental_administration:
   - bietlejuice.ebdb:load-clean-rental-administrator-change-request-aud
   - bietlejuice.enrich_ebdb_country:load-enrich-house
@@ -1521,8 +1522,8 @@ bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-lead
   - bietlejuice.ebdb:load-clean-partner-agent
-  - bietlejuice.ebdb:load-clean-rent-flow
   - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
@@ -1913,7 +1914,7 @@ bietlejuice.enrich_recommendations:
   - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-fact-campaign-user-dispatch
   - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-  - bietlejuice.ebdb:load-clean-rent-flow
+  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
   - bietlejuice.emlio:load-clean-emlio-logs
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
@@ -2004,7 +2005,7 @@ bietlejuice.enrich_rent_demand_events:
   - bietlejuice.enrich_proposal:load-enrich-proposal
 bietlejuice.enrich_rent_flows:
   - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.ebdb:load-clean-rent-flow
+  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

@@ -46,8 +46,6 @@ bietlejuice.dw_crm:
     - bietlejuice.enrich_crm_tasks_history_flows:load-enrich-tasks-history-users-flow
     - bietlejuice.enrich_heimdall:load-enrich-activity
     - bietlejuice.enrich_inspections:load-enrich-inspection-booking
-    - bietlejuice.ebdb_rent_flow:load-clean-onboarding
-    - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
 bietlejuice.dw_customer_support:
   add:
     - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
@@ -240,9 +238,6 @@ bietlejuice.dw_tickets:
   remove:
     - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements
     - bietlejuice.zendesk_tickets:load-clean-organizations
-bietlejuice.dw_user:
-  remove:
-    - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent
@@ -386,15 +381,6 @@ bietlejuice.enrich_ebdb_listing_jobs:
   remove:
     - bietlejuice.ebdb:load-clean-inspection-aud
     - bietlejuice.enrich_ebdb_country:load-enrich-house
-bietlejuice.enrich_ebdb_contract:
-  remove:
-    - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
-bietlejuice.enrich_ebdb_rent_flow:
-  remove:
-    - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
-bietlejuice.enrich_invoice:
-  remove:
-    - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
 bietlejuice.enrich_ebdb_user:
   add:
     - bietlejuice.ebdb:load-clean-user-merge
@@ -521,8 +507,6 @@ bietlejuice.enrich_recommendations:
     - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
     - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
     - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
-  remove:
-    - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
 bietlejuice.enrich_recupera:
   add:
     - bietlejuice.recupera:load-clean-records
@@ -546,9 +530,6 @@ bietlejuice.enrich_rental_crawlers_listings:
     - bietlejuice.listings.olx:load-clean-olx
     - bietlejuice.listings.viva_real:load-clean-viva-real
     - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
-bietlejuice.enrich_rent_flows:
-  remove:
-    - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
 bietlejuice.enrich_repairs:
   remove:
     - bietlejuice.repairs:load-clean-repair-expense

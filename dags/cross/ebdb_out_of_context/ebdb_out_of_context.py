@@ -1,6 +1,6 @@
 from functools import reduce
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from pendulum import timezone
 
 from airflow.models import DAG
@@ -13,19 +13,13 @@ from airflow.utils.helpers import cross_downstream, chain
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.airflow.helpers import TaskFlowHelper
-from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
-from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.formatters import StringFormatter
 from bietlejuice.services import ConfigurationService
-from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 # Pipeline inputs
 SOURCE = "ebdb"
 DAG_NAME = "ebdb_out_of_context"
-DAG_ID = "bietlejuice.{}_out_of_context".format(SOURCE)
+DAG_ID = "bietlejuice.{}".format(DAG_NAME)
 MAIN_START_DATE = datetime(2023, 8, 15, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 

@@ -35,7 +35,6 @@ Produces the following output tables:
     `agent_data_business_contexts_served_aud`
     `agent_data_types`
     `agent_region_data`
-    `agent_rent_flow`
     `agent_specific_hour`
     `agent_specific_hour_aud`
     `agent_support`
@@ -140,7 +139,6 @@ Produces the following output tables:
     `occupant_type`
     `offer`
     `offer_aud`
-    `onboarding`
     `ownerlead`
     `partner`
     `partner_agent`
@@ -177,8 +175,6 @@ Produces the following output tables:
     `region`
     `region_business_contexts_served`
     `region_business_contexts_served_aud`
-    `rent_flow`
-    `rent_flow_aud`
     `rental_administrator_change_request`
     `rental_administrator_change_request_aud`
     `restriction_type_aud`

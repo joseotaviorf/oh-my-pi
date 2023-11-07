@@ -286,6 +286,10 @@ table_block_list:
   - MensagemSMS
   - Imagem_AUD
   - RestrictionType
+  - fluxolocacao_dadosagente
+  - onboarding
+  - fluxolocacao
+  - fluxolocacao_aud
 
 view_allow_list:
   - MapRegiao
