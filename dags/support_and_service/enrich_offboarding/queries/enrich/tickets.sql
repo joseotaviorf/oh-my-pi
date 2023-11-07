@@ -30,7 +30,7 @@ ticket_funnel AS (
 )
 SELECT
     ong.id_contract,
-    MAX(tfma.id_ticket) as id_ticket,
+    MAX(tfma.id_ticket) AS id_ticket,
     tf.group_name,
     MAX(protection_agreement) AS protection_agreement,
     DATEDIFF(MAX(tfma.dt_closed_date), MIN(tfma.dt_created_date_local)) AS lead_time_activation,

@@ -1,39 +1,51 @@
 ---
 database_name: datalake_offboarding
 table_name: tickets
+description: Offboarding repair dispute analysis stage tickets
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
-  id:
+  id_contract:
     lineage:
       - datalake_offboarding.ongoing.id_contract
+    description: Contract unique identifier.
   id_ticket:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+    description: Ticket's unique identifier.
   group_name:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+    description: Ticket group - department associated with the ticket
   protection_agreement:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+    description: The protection agreement between interested parties and 5A
   lead_time_activation:
-    lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+    description: The time from the beginning of trading to trigger protection
   is_activation_protection:
-    lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+    description: Protection has been activated
+  is_property_eviction:
+    description: Indicates whether the ticket is an eviction of the tenant
   dt_created:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+    description: The creation date of the ticket in UTC-3.
   dt_started:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned_local
+    description:
+      The timestamp when a ticket is first assigned to an agent or group. This timestamp
+      represents the start of the first agent's response time for the ticket, in UTC-3.
   dt_solved:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+    description: The resolution date of the ticket in UTC-3.
   dt_completed:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed
+    description: The closure date of the ticket.
   dt_completed_local:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed_local
+    description: The closure date of the ticket in UTC-3.

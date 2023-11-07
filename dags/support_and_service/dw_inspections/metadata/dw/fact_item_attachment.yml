@@ -58,6 +58,8 @@ columns:
     lineage:
       - datalake_inspections.item_media.id_user
       - datalake_inspections.item_review.id_user
+  is_review_media:
+    description: Indicates whether the attachment is a media generated during the inspection review by the tenant or owner.
   ts_created:
     description: Item media datetime creation.
     lineage:
@@ -68,6 +70,8 @@ columns:
     lineage:
       - datalake_inspections.item_media.ts_updated
       - datalake_inspections.item_review.ts_updated
+  ts_load:
+    description: Date and time when the data was loaded.
   year:
     description: Year from the item media last update.
     lineage:

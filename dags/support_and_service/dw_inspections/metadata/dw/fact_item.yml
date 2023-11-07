@@ -42,6 +42,8 @@ columns:
     description: Inspection unique identifier.
     lineage:
       - datalake_inspections.item.id_inspection
+  has_inspector_comment:
+    description: Indicates whether the inspector made any comments about this item.
   is_present:
     description: Indicates if the issue checklist item was checked by the inspector.
     lineage:
