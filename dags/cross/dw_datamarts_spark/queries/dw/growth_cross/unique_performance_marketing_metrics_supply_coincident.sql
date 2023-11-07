@@ -1983,6 +1983,14 @@ costs_targets_results_combined AS (
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10,11
 
+),
+
+campaign_origin AS (
+  SELECT
+    utm_campaign,
+    MODE(mkt_origin) mkt_campaign_origin
+  FROM datalake_marketing_costs.daily_costs
+  GROUP BY 1
 )
 
 SELECT
@@ -2008,6 +2016,7 @@ SELECT
     END AS planning_mkt_channel,
     mkt_medium,
     mkt_source,
+    mkt_campaign_origin, -- adding the origin cost of the campaign
     utm_campaign,
     utm_content,
     utm_term,
@@ -2056,5 +2065,7 @@ FROM
 JOIN
     dw_public.dim_date AS dd
     USING(sk_date)
+LEFT JOIN
+    campaign_origin USING(utm_campaign)
 GROUP BY
-    1,2,3,4,5,6,7,8,9,10,11,12
+    1,2,3,4,5,6,7,8,9,10,11,12,13
