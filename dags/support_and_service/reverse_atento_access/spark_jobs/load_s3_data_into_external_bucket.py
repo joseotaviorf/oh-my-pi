@@ -8,6 +8,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
 
@@ -122,6 +123,8 @@ if __name__ == "__main__":
         if base_dbutils.get_dbutils() is not None:
             dbutils = base_dbutils.get_dbutils()
 
+        DAG_NAME = f"reverse_{source}_access"
+        config_service = ConfigurationService(DAG_NAME)
         webhook_key = config_service.get_config("notification_webhooks_keys")[
             "data_quality"
         ]
