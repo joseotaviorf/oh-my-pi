@@ -2,7 +2,7 @@ database_name: dw_credit
 table_name: fact_fintechops_tasks
 description: This table presents the task resolution SLAs for the FintechOps team
 domain: Fintech
-owner: fernando.araujo@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 columns:
   sk_task:
     lineage:

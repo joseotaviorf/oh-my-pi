@@ -242,6 +242,6 @@ SELECT
 FROM
   proposal_credit_flows
 WHERE
-  sk_last_credit_evaluation_init > 0
+  sk_offer_submitted_date > 0
   AND sk_proposal > 0
   AND linsting_rank = 1

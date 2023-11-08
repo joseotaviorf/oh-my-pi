@@ -3,7 +3,7 @@ table_name: dim_variant
 description: This table presents the details of each credit engine variant we have
   along with the experiment details and proper date calculation
 domain: Fintech
-owner: fernando.araujo@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 columns:
   id_variant:
     lineage:

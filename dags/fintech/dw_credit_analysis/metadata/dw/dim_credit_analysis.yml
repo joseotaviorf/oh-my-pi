@@ -3,7 +3,7 @@ table_name: dim_credit_analysis
 description: "This table takes all credit analysis from Sorting Hat to a given proposal
   and all of its properties."
 domain: Fintech
-owner: fernando.araujo@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 columns:
   id_credit_analysis:
     lineage:

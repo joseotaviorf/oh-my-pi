@@ -3,7 +3,7 @@ table_name: dim_guarantee_policy
 description: "This table brings the guarantee policy details based on what the model
   and user decide."
 domain: Fintech
-owner: fernando.araujo@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 columns:
   id_guarantee_category:
     lineage:

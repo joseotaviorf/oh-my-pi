@@ -3,7 +3,7 @@ table_name: dim_experiment
 description: "This table brings informations about the experiments made with our credit
   engine variants."
 domain: Fintech
-owner: fernando.araujo@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 columns:
   id_experiment:
     lineage:

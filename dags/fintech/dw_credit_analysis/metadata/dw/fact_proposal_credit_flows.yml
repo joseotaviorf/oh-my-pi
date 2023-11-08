@@ -4,7 +4,7 @@ description: This table presents each line as a proposal-credit_analysis with da
   from the process and partitions by user, personal document and listings, which facilitate
   the aggregation by different grains
 domain: Fintech
-owner: fernando.araujo@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 columns:
   sk_client:
     lineage:
