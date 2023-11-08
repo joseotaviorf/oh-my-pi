@@ -210,13 +210,48 @@ WITH old_system_dates AS (
         propose_secure_pending_date AS spd
             ON spd.id_propose = p.id
 ),
+prop_history AS (
+    WITH propose_history AS (
+        SELECT
+            h.id_propose,
+            h.value AS history_status,
+            h.ts_updated AS ts_history
+        FROM datalake_rental_guarantee_platform_clean.propose_history AS h
+        WHERE
+            h.value IN ('Contrato Cancelado', 'Proposta Cancelada')
+            AND h.id_history_type = 5 -- Status update type
+    )
+    SELECT *
+    FROM propose_history
+    UNION ALL
+    SELECT
+        p.id AS id_propose,
+        ps.name AS history_status,
+        r.ts_created AS ts_history
+    FROM
+        datalake_rental_guarantee_platform_clean.propose_aud AS p
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.propose_status AS ps
+            ON p.id_propose_status = ps.id
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.rev_info AS r
+            ON p.rev = r.rev
+    WHERE
+        ps.name IN ('Contrato Cancelado', 'Proposta Cancelada')
+        AND p.id NOT IN (
+            SELECT DISTINCT
+                id_propose
+            FROM
+                propose_history
+        )
+),
 ended_date AS (
     SELECT
         p.id AS id_propose,
         DATE(
             COALESCE(
                 COALESCE(
-                    MAX(c.ts_done),MAX(CAST(h.ts_updated AS TIMESTAMP))
+                    MAX(c.ts_done),MAX(CAST(h.ts_history AS TIMESTAMP))
                 ),
                 MAX(old.dt_ended)
             )
@@ -224,15 +259,15 @@ ended_date AS (
         DATE(
             COALESCE(
                 COALESCE(
-                    MAX(CAST(h.ts_updated AS TIMESTAMP)), MAX(c.ts_done)
+                    MAX(CAST(h.ts_history AS TIMESTAMP)), MAX(c.ts_done)
                 ),
                 MAX(old.dt_ended)
             )
-        ) AS dt_ended_propose -- condition when prioritizing contract table date (dt_analyst_annulment_input on fact table)
+        ) AS dt_ended_propose -- condition when prioritizing propose table date (dt_analyst_annulment_input on fact table)
     FROM
         datalake_rental_guarantee_platform_clean.propose AS p
     LEFT JOIN
-        datalake_rental_guarantee_platform_clean.propose_history AS h
+        prop_history AS h
         ON p.id = h.id_propose
     LEFT JOIN
         datalake_rental_guarantee_platform_clean.propose_status AS ps
@@ -249,13 +284,8 @@ ended_date AS (
             AND p.id < 5000000
     WHERE
         (
-            (
-                h.value IN ('Contrato Cancelado', 'Proposta Cancelada')
-                AND h.id_history_type = 5 -- Status update type
-            )
-            OR (
-                old.dt_ended IS NOT NULL
-            )
+            old.dt_ended IS NOT NULL
+            OR h.id_propose IS NOT NULL
         )
         AND (
         ps.name IN ('Contrato Cancelado', 'Contrato cancelado pela analise humana', 'Proposta Cancelada', 'Reprovado na análise humanizada', 'Reprovado pelo analista')
@@ -263,20 +293,6 @@ ended_date AS (
         ) -- there are proposes that have ts_updated for cancellation history but are reopen
     GROUP BY
         1 -- some proposes can have multiple same status
-),
-analyst_annulment_input AS (
-    SELECT
-        p.id AS id_propose,
-        COALESCE(pcd.dt_ended_propose, old.dt_analyst_annulment_input) AS dt_analyst_annulment_input
-    FROM
-        datalake_rental_guarantee_platform_clean.propose AS p
-    LEFT JOIN
-        ended_date AS pcd
-            ON pcd.id_propose = p.id
-    LEFT JOIN
-        old_system_dates AS old
-            ON old.id_propose = p.id
-            AND p.id < 5000000
 ),
 propose_waiting_new_docs_date AS (
     SELECT
@@ -583,7 +599,7 @@ SELECT DISTINCT
     COALESCE(DATE(c.ts_began), old.dt_contract_started) AS dt_contract_started,
     pcd.dt_ended_contract AS dt_ended,
     c.dt_next_renewal,
-    aai.dt_analyst_annulment_input,
+    pcd.dt_ended_propose AS dt_analyst_annulment_input,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
     IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
     IF(p.id < 5000000, old.ts_evaluation_started, esd.ts_evaluation_started) AS ts_evaluation_started,
@@ -609,9 +625,6 @@ LEFT JOIN
 LEFT JOIN
     ended_date AS pcd
         ON pcd.id_propose = p.id
-LEFT JOIN
-    analyst_annulment_input AS aai
-        ON aai.id_propose = p.id
 LEFT JOIN
     propose_waiting_new_docs_date AS wndd
         ON wndd.id_propose = p.id
@@ -673,16 +686,16 @@ LEFT JOIN
 LEFT JOIN
     prop_values AS pv
         ON pv.id_propose = p.id
-lEFT JOIN
+LEFT JOIN
     persons_metrics AS pm
         ON pm.id_propose = p.id
-lEFT JOIN
+LEFT JOIN
     payments_metrics AS pym
         ON pym.id_propose = p.id
-lEFT JOIN
+LEFT JOIN
     occurrence_metrics AS om
         ON om.id_propose = p.id
-lEFT JOIN
+LEFT JOIN
     3p_proposes AS 3p
         ON 3p.id_propose = p.id
 LEFT JOIN
