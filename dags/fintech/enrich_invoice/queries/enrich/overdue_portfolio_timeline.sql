@@ -66,8 +66,10 @@ invoices_timeline AS (
         END AS payment_status,
         i.substatus,
         CASE
-            WHEN dd.date < i.dt_contract_annulled THEN "Ativo"
-            WHEN dd.date >= i.dt_contract_annulled THEN "Finalizado"
+            WHEN dd.date < i.dt_contract_annulled THEN "Active"
+            WHEN dd.date >= i.dt_contract_annulled THEN "Finished"
+            WHEN contract_status = "Ativo" THEN "Active"
+            WHEN contract_status = "Finalizado" THEN "Finished"
             ELSE contract_status
         END AS contract_status,
         i.due_amount,
