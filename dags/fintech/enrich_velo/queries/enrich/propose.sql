@@ -592,7 +592,7 @@ SELECT DISTINCT
     om.occurrences_solved,
     c.id IS NOT NULL AS is_contract,
     IF(p.billing_model = 'BROKER', TRUE, FALSE) AS is_direct_billing,
-    IFNULL(DATEDIFF(aai.dt_analyst_annulment_input, DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
+    IFNULL(DATEDIFF(pcd.dt_ended_propose, DATE(c.ts_began)) <= 10, FALSE) AS is_grace_period_cancelled,
     p.id < 5000000 AS is_legacy,
     IF(3p.id_propose IS NULL, FALSE, TRUE) AS is_3p,
     pym.dt_last_payment,
