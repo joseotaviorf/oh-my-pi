@@ -4,15 +4,11 @@ import os
 
 from airflow.utils.helpers import chain
 from airflow.models import DAG
-from airflow.operators.python_operator import ShortCircuitOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
-    DAGRunDateValidators,
-)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
@@ -93,10 +89,6 @@ datalake_task_group = DatalakeTaskGroup(
 enrich_task_groups = {}
 inner_dependencies = {}
 
-# The execution date will always be the previous day, because this DAG runs daily.
-# However, it should be the previous week, because the source runs weekly. That is why we are subtracting 6 days.
-actual_execution_date = "{{macros.ds_add(ds, -6)}}"
-
 for crawler in crawlers:
     crawler_name = crawler["table_name"]
     is_incremental = crawler["is_incremental"]
@@ -108,7 +100,6 @@ for crawler in crawlers:
         table_name=crawler_name,
         is_incremental=is_incremental,
         partitions=partition_cols,
-        execution_date=actual_execution_date,
     )
     if "depends_on" in crawler:
         inner_dependencies[crawler_name] = crawler["depends_on"]
