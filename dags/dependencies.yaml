@@ -1051,12 +1051,6 @@ bietlejuice.enrich_casa_mineira_marketing_manual_daily_costs:
 bietlejuice.enrich_casa_mineira_portal:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
-bietlejuice.enrich_chat_inapp_strategies:
-  - bietlejuice.amplitude:load-clean-events
-  - bietlejuice.dw_contract:load-dw-quintoandar-fact-contract-people
-  - bietlejuice.enrich_app_installed:load-enrich-events
-  - bietlejuice.enrich_customer_support:load-enrich-chat
-  - bietlejuice.enrich_greenseer:load-enrich-session-memory
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-clean-responses
 bietlejuice.enrich_company:

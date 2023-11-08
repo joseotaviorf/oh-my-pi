@@ -310,17 +310,6 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
     - bietlejuice.casa_mineira_facebook_insights:load-clean-facebook-insights
     - bietlejuice.enrich_region:load-enrich-region
     - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
-bietlejuice.enrich_chat_inapp_strategies:
-  add:
-    - bietlejuice.amplitude:load-clean-events
-  remove:
-    - bietlejuice.chat_fup:load-clean-chats-chat
-    - bietlejuice.chat_fup:load-clean-rating
-    - bietlejuice.chat_fup:load-clean-surveys-answer
-    - bietlejuice.dw_contract:load-dw-public-dim-contract
-    - bietlejuice.enrich_greenseer:load-enrich-greenseer-session
-    - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-    - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_consolidated_marketing_metrics:
   remove:
     - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes
