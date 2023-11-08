@@ -5,18 +5,14 @@ owner: leonardo.soares@quintoandar.com.br
 domain: bedrock
 description: null
 columns:
-  euro_cotation:
+  currency:
     description: ''
     lineage:
-    - datalake_gsheets_raw.currency_quote_people.euro
-  dolar_cotation:
+    - datalake_gsheets_raw.currency_quote_people.moeda
+  cotation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.currency_quote_people.dolar
-  mexican_peso_cotation:
-    description: ''
-    lineage:
-    - datalake_gsheets_raw.currency_quote_people.mexico
+    - datalake_gsheets_raw.currency_quote_people.cotacao
   ts_load:
     description: ''
     lineage:
