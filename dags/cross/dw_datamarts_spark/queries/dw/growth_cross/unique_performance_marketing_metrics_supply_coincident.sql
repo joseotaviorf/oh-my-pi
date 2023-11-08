@@ -1986,11 +1986,20 @@ costs_targets_results_combined AS (
 ),
 
 campaign_origin AS (
-  SELECT
-    utm_campaign,
-    MODE(mkt_origin) mkt_campaign_origin
-  FROM datalake_marketing_costs.daily_costs
-  GROUP BY 1
+    WITH counting AS(
+        SELECT 
+            utm_campaign,
+            mkt_origin AS mkt_campaign_origin,
+            COUNT(*) AS row_count
+        FROM datalake_marketing_costs.daily_costs
+        GROUP BY 1,2
+    )
+    
+    SELECT
+        utm_campaign,
+        mkt_campaign_origin
+    FROM counting
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY utm_campaign ORDER BY row_count DESC) = 1
 )
 
 SELECT
