@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
     all_keys = json.loads(dbutils.secrets.get("quintoandar", APIEnum.AMPLITUDE))
 
-    keys = [key for key in all_keys if key['app_id'] not in (170698, 183047)]
+    keys = [key for key in all_keys if key['app_id'] == 183047]
 
     config_service = ConfigurationService(source)
     custom_records_per_file = config_service.get_config("custom_records_per_file")
@@ -83,8 +83,6 @@ if __name__ == "__main__":
 
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     s3_loader = S3Loader()
-
-    spark.sql("MSCK REPAIR TABLE datalake_amplitude_clean.events")
 
     for key in keys:
         logger.info(

@@ -4,6 +4,8 @@ athena_query_results_bucket: s3://aws-athena-query-results-713278628093-us-east-
 dags_out_of_pattern:
     [
         "amplitude",
+        "amplitude_demand",
+        "amplitude_supply",
         "dataset_profiling",
         "dw_affiliate_costs",
         "dw_agent",

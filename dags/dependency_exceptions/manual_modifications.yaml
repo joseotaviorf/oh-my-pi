@@ -1,4 +1,10 @@
 ---
+bietlejuice.amplitude:
+  add:
+    - bietlejuice.amplitude_supply:events-supply-to-datalake-raw
+bietlejuice.amplitude_supply:
+  add:
+    - bietlejuice.amplitude_demand:events-demand-to-datalake-raw
 bietlejuice.convenia_inactive_employee_details:
   add:
     - bietlejuice.convenia_active_employee_details:load-clean-active-employee-details
