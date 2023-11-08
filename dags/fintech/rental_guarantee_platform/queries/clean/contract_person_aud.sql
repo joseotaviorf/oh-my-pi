@@ -8,9 +8,6 @@ SELECT
     revtype AS rev_type,
     contract_id_mod AS mod_id_contract,
     person_id_mod AS mod_id_person,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.contract_person_aud

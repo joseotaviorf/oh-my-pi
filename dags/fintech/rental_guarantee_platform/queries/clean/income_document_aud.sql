@@ -23,9 +23,6 @@ SELECT
     validation_status_mod AS mod_validation_status,
     status_mod AS mod_status,
     created_at AS ts_created,
-    updated_at AS ts_updated,
-    year,
-    month,
-    day
+    updated_at AS ts_updated
 FROM
     datalake_rental_guarantee_platform_raw.income_document_aud

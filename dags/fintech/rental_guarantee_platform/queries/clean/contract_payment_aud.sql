@@ -30,9 +30,6 @@ SELECT
     subscription_status_last_update_mod AS mod_ts_subscription_status_last_updated,
     card_created_at AS ts_card_created,
     subscription_status_last_update AS ts_subscription_status_last_updated,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.contract_payment_aud

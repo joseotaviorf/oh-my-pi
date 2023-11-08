@@ -27,10 +27,7 @@ SELECT
     CAST(commission AS NUMERIC(7,4))    AS commission,
     created_at          AS ts_created,
     dateinsert          AS ts_inserted,
-    dateupdate          AS ts_updated,
-    year,
-    month,
-    day
+    dateupdate          AS ts_updated
 
 FROM
     datalake_rental_guarantee_platform_raw.plan_aud

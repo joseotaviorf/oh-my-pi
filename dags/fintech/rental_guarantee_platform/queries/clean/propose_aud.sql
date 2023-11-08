@@ -31,9 +31,6 @@ SELECT
     monthly_value_mod,
     total_coverage_mod,
     active AS is_active,
-    dateinsert AS ts_inserted,
-    year,
-    month,
-    day
+    dateinsert AS ts_inserted
 FROM
     datalake_rental_guarantee_platform_raw.propose_aud

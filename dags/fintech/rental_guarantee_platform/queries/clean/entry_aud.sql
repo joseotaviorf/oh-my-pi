@@ -12,10 +12,7 @@ SELECT
     propose_mod     AS mod_propose,
     amount_mod      AS mod_amount,
     type_mod        AS mod_type,
-    created_at      AS ts_created,
-    year,
-    month,
-    day
+    created_at      AS ts_created
 
 FROM
     datalake_rental_guarantee_platform_raw.entry_aud

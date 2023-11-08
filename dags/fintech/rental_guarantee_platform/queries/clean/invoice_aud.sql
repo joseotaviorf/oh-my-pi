@@ -18,9 +18,6 @@ SELECT
     boleto_mod          AS mod_bill,
     due_date_mod        AS mod_due_date,
     due_date            AS dt_due,
-    created_at          AS ts_created,
-    year,
-    month,
-    day
+    created_at          AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.invoice_aud

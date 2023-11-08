@@ -24,10 +24,7 @@ SELECT
     payment_code_mod        AS mod_payment_code,
     due_date                AS dt_due,
     paid_date               AS dt_paid,
-    created_at              AS ts_created,
-    year,
-    month,
-    day
+    created_at              AS ts_created
 
 FROM
 

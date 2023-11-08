@@ -14,9 +14,6 @@ SELECT
     card_brand_mod AS mod_card_brand,
     card_last_four_digits_mod AS mod_card_last_four_digits,
     active_mod AS mod_is_active,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.subscription_aud

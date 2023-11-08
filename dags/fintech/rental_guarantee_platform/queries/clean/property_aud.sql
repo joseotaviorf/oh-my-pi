@@ -12,9 +12,6 @@ SELECT
     type_mod AS mod_type,
     identification_mod AS mod_identification,
     business_line_mod AS mod_business_line,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.property_aud

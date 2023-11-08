@@ -19,38 +19,23 @@ This pipeline produces, in datalake_rental_guarantee_platform_raw:
 
 Via **incremental load**:
 
-    - `address_aud`
+    - `address`
     - `company`
-    - `company_aud`
     - `company_draft`
-    - `company_draft_aud`
     - `company_user_account`
-    - `company_user_account_aud`
     - `contract`
-    - `contract_aud`
     - `contract_item`
-    - `contract_item_aud`
     - `contract_payment`
-    - `contract_payment_aud`
     - `contract_payment_hook_history`
-    - `contract_payment_hook_history_aud`
     - `contract_person`
-    - `contract_person_aud`
     - `contract_status_history`
-    - `contract_status_history_aud`
     - `credit_analysis`
-    - `credit_analysis_aud`
     - `income_document`
-    - `income_document_aud`
     - `person`
-    - `person_aud`
     - `profile_account`
-    - `profile_account_aud`
     - `property`
-    - `property_aud`
     - `revinfo`
     - `user_account`
-    - `user_account_aud`
 
 Velo 3.0 tables:
 
@@ -78,44 +63,45 @@ Velo 3.0 tables:
 
 Via **full load**:
 
+    - `address_aud`
     - `omie_occurrence_legacy`
+    - `company_aud`
+    - `company_draft_aud`
+    - `company_user_account_aud`
+    - `contract_aud`
+    - `contract_item_aud`
+    - `contract_payment_aud`
+    - `contract_payment_hook_history_aud`
+    - `contract_person_aud`
+    - `contract_status_history_aud`
+    - `credit_analysis_aud`
+    - `income_document_aud`
+    - `person_aud`
+    - `profile_account_aud`
+    - `property_aud`
+    - `user_account_aud`
 
 This pipeline produces, in datalake_rental_guarantee_platform_clean:
 
 Via **incremental load**:
 
-    - `address_aud`
+    - `address`
     - `company`
-    - `company_aud`
     - `company_draft`
-    - `company_draft_aud`
     - `company_user_account`
-    - `company_user_account_aud`
     - `contract`
-    - `contract_aud`
     - `contract_item`
-    - `contract_item_aud`
     - `contract_payment`
-    - `contract_payment_aud`
     - `contract_payment_hook_history`
-    - `contract_payment_hook_history_aud`
     - `contract_person`
-    - `contract_person_aud`
     - `contract_status_history`
-    - `contract_status_history_aud`
     - `credit_analysis`
-    - `credit_analysis_aud`
     - `income_document`
-    - `income_document_aud`
     - `person`
-    - `person_aud`
     - `profile_account`
-    - `profile_account_aud`
     - `property`
-    - `property_aud`
-    - `rev_info`
+    - `revinfo`
     - `user_account`
-    - `user_account_aud`
 
 Velo 3.0 tables:
 
@@ -142,6 +128,22 @@ Velo 3.0 tables:
 
 Via **full load**:
 
+    - `address_aud`
     - `omie_occurrence_legacy`
+    - `company_aud`
+    - `company_draft_aud`
+    - `company_user_account_aud`
+    - `contract_aud`
+    - `contract_item_aud`
+    - `contract_payment_aud`
+    - `contract_payment_hook_history_aud`
+    - `contract_person_aud`
+    - `contract_status_history_aud`
+    - `credit_analysis_aud`
+    - `income_document_aud`
+    - `person_aud`
+    - `profile_account_aud`
+    - `property_aud`
+    - `user_account_aud`
 
 </details>

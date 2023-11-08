@@ -5,89 +5,74 @@ tables:
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: address_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: company
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: company_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: company_draft
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: company_draft_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: company_user_account
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: company_user_account_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: contract_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: contract_item
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: contract_item_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: contract_payment
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: contract_payment_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: contract_payment_hook_history
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: contract_payment_hook_history_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: contract_person
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: contract_person_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: contract_status_history
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: contract_status_history_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: credit_analysis
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: credit_analysis_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: income_document
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: income_document_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: person
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: person_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: profile_account
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: profile_account_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: property
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: property_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: revinfo
     clean_table_name: rev_info
     date_filter_column: revtstmp
@@ -97,8 +82,7 @@ tables:
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: user_account_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: payment
     date_filter_column: updated_at
     extraction_type: incremental
@@ -136,8 +120,7 @@ tables:
     date_filter_column: dateupdate
     extraction_type: incremental
   - table_name: propose_aud
-    date_filter_column: dateinsert
-    extraction_type: incremental
+    extraction_type: full
   - table_name: propose_documents
     date_filter_column: dateupdate
     extraction_type: incremental
@@ -166,8 +149,7 @@ tables:
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: agreement_payment_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: delinquency_has_agreement
     date_filter_column: created_at
     extraction_type: incremental
@@ -175,49 +157,41 @@ tables:
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: subscription_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: company_plan
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: company_plan_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: cancellation_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: cancellation
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: plan_aud
-    date_filter_column: dateinsert
-    extraction_type: incremental
+    extraction_type: full
   - table_name: plan
     date_filter_column: dateupdate
     extraction_type: incremental
   - table_name: boleto_aud
     clean_table_name: bill_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: boleto
     clean_table_name: bill
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: entry_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: entry
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: invoice_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: invoice
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: renewal_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: renewal
     date_filter_column: updated_at
     extraction_type: incremental

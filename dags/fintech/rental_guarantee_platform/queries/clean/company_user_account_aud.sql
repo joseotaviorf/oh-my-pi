@@ -14,9 +14,6 @@ SELECT
     active_mod AS mod_is_active,
     company_id_mod AS mod_id_company,
     agent_split_fee_mod AS mod_agent_split_fee,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.company_user_account_aud

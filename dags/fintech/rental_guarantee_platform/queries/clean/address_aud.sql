@@ -22,9 +22,6 @@ SELECT
     state_mod AS mod_state,
     country_mod AS mod_country,
     address_type_mod AS mod_address_type,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.address_aud

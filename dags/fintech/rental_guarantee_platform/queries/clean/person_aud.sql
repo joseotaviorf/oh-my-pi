@@ -18,9 +18,6 @@ SELECT
     person_name_mod AS mod_person_name,
     declared_income_mod AS mod_declared_income,
     is_foreign_mod AS mod_is_foreign,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.person_aud

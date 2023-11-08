@@ -12,9 +12,6 @@ SELECT
     hook_payload_response_mod AS mod_hook_payload_response,
     hook_date_mod AS mod_ts_hook,
     hook_date AS ts_hook,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.contract_payment_hook_history_aud

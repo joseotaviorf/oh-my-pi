@@ -10,9 +10,6 @@ SELECT
     email_mod AS mod_email,
     personuuid_mod AS mod_uuid_person,
     status_mod AS mod_status,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.user_account_aud

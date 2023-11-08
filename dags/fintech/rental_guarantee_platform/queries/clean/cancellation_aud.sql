@@ -17,9 +17,6 @@ SELECT
     active_mod                  AS mod_active,
     active                      AS is_active,
     created_at                  AS ts_created,
-    request_date                AS ts_requested,
-    year,
-    month,
-    day
+    request_date                AS ts_requested
 FROM
     datalake_rental_guarantee_platform_raw.cancellation_aud
