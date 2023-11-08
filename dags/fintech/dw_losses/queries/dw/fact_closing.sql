@@ -13,7 +13,7 @@ SELECT
     COALESCE(id_invoice, -1) AS sk_invoice,
     COALESCE(id_contract, -1) AS sk_contract,
     accrual_year_month,
-    closing_month_satus,
+    closing_month_status,
     due_amount,
     invoice_type,
     paid_amount as invoice_paid_amount,
