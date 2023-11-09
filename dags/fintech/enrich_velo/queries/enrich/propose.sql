@@ -220,25 +220,39 @@ prop_history AS (
         WHERE
             h.value IN ('Contrato Cancelado', 'Proposta Cancelada')
             AND h.id_history_type = 5 -- Status update type
+    ),
+    propose_aud AS (
+        SELECT
+            p.id AS id_propose,
+            ps.name AS history_status,
+            r.ts_created AS ts_history,
+            COALESCE(LAG (p.id_propose_status) OVER (PARTITION BY p.id ORDER BY r.ts_created) <> p.id_propose_status, TRUE) AS is_status_change
+        FROM
+            datalake_rental_guarantee_platform_clean.propose_aud AS p
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.propose_status AS ps
+                ON p.id_propose_status = ps.id
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.rev_info AS r
+                ON p.rev = r.rev
+        WHERE
+            ps.name IN ('Contrato Cancelado', 'Proposta Cancelada')
     )
+
     SELECT *
     FROM propose_history
+
     UNION ALL
+
     SELECT
-        p.id AS id_propose,
-        ps.name AS history_status,
-        r.ts_created AS ts_history
+        id_propose,
+        history_status,
+        ts_history
     FROM
-        datalake_rental_guarantee_platform_clean.propose_aud AS p
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.propose_status AS ps
-            ON p.id_propose_status = ps.id
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.rev_info AS r
-            ON p.rev = r.rev
+        propose_aud
     WHERE
-        ps.name IN ('Contrato Cancelado', 'Proposta Cancelada')
-        AND p.id NOT IN (
+        is_status_change IS TRUE
+        AND id_propose NOT IN (
             SELECT DISTINCT
                 id_propose
             FROM
