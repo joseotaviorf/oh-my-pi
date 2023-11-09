@@ -26,7 +26,7 @@ WITH base AS (
         dw_public.dim_region AS r
             ON h.sk_region = r.sk_region
     LEFT JOIN
-        datalake_terminator.termination AS t
+        datalake_terminator_clean.termination AS t
             ON c.sk_contract = t.id_contract
 ),
 -- As we may have different country code, city groups, tiers and dates in each type of event, it's necessary to cross join all options

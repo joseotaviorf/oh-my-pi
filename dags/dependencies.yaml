@@ -2332,9 +2332,6 @@ bietlejuice.enrich_tenant_journey:
   - bietlejuice.terminator:load-clean-negotiation
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud
-bietlejuice.enrich_terminator:
-  - bietlejuice.terminator:load-clean-termination
-  - bietlejuice.terminator:load-clean-termination-aud
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification
 bietlejuice.enrich_top_of_funnel_affiliates:
@@ -2557,7 +2554,7 @@ bietlejuice.metric_rent__contracts:
   - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
-  - bietlejuice.enrich_terminator:load-enrich-termination
+  - bietlejuice.terminator:load-clean-termination
 bietlejuice.metric_rent__demand_events:
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-coincident-events-volume-changes-snapshot
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-cohort-conversions-snapshot
