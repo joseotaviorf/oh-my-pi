@@ -226,7 +226,7 @@ prop_history AS (
             p.id AS id_propose,
             ps.name AS history_status,
             r.ts_created AS ts_history,
-            COALESCE(LAG (p.id_propose_status) OVER (PARTITION BY p.id ORDER BY r.ts_created) <> p.id_propose_status, TRUE) AS is_status_change
+            COALESCE(LAG (p.id_propose_status) OVER (PARTITION BY p.id ORDER BY r.ts_created) <> p.id_propose_status, FALSE) AS is_status_change
         FROM
             datalake_rental_guarantee_platform_clean.propose_aud AS p
         LEFT JOIN
