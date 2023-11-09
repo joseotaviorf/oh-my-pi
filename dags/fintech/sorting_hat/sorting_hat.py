@@ -46,7 +46,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 # dag params
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 dag = DAG(
     dag_id=DAG_ID,
