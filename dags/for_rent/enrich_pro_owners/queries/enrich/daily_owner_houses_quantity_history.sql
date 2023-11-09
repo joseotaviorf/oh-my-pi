@@ -141,22 +141,25 @@ owner_qtd_houses AS (
 ),
 
 pp_multi_history AS (
-SELECT /*+ RANGE_JOIN(aud, 50000) */
-  aud.id_user AS id_owner,
-  aud.id_account_manager,
-  aud.is_active,
-  TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000)) AS ts_event,
-  LEAD(TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000))) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS ts_next_event
-FROM 
-  datalake_ebdb_clean.user_pro_owner_aud AS aud
-LEFT JOIN 
-  datalake_ebdb_clean.user_revision_entity AS ure 
-    ON aud.rev = ure.id
+  SELECT /*+ RANGE_JOIN(aud, 50000) */
+    COALESCE(um.id_user, aud.id_user) AS id_owner,
+    aud.id_account_manager,
+    aud.is_active,
+    DATE(FROM_UNIXTIME(ure.ts_revision/1000)) AS dt_event,
+    LEAD(DATE(FROM_UNIXTIME(ure.ts_revision/1000))) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev) AS dt_next_event
+  FROM 
+    datalake_ebdb_clean.user_pro_owner_aud AS aud
+  LEFT JOIN 
+    datalake_ebdb_clean.user_revision_entity AS ure 
+      ON aud.rev = ure.id
+  LEFT JOIN
+    user_merge AS um
+      ON aud.id_user = um.id_predecessor_user
 )
   
 SELECT /*+ RANGE_JOIN(oqh, 800) */
   oqh.id_owner,
-  ppm.id_account_manager,
+  IF(ppm.is_active, ppm.id_account_manager, NULL) AS id_account_manager,
   oqh.country_code,
   oqh.houses_published,
   oqh.houses_suspended,
@@ -180,5 +183,5 @@ FROM
 LEFT JOIN
   pp_multi_history AS ppm
     ON oqh.id_owner = ppm.id_owner
-    AND oqh.dt_houses_owned >= DATE(ppm.ts_event)
-    AND oqh.dt_houses_owned < COALESCE(DATE(ppm.ts_next_event), CURRENT_DATE())
+    AND oqh.dt_houses_owned >= dt_event
+    AND oqh.dt_houses_owned < COALESCE(dt_next_event, CURRENT_DATE())
