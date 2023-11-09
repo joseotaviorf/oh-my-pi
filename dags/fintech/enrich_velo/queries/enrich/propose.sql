@@ -235,8 +235,6 @@ prop_history AS (
         LEFT JOIN
             datalake_rental_guarantee_platform_clean.rev_info AS r
                 ON p.rev = r.rev
-        WHERE
-            ps.name IN ('Contrato Cancelado', 'Proposta Cancelada')
     )
 
     SELECT *
@@ -252,6 +250,7 @@ prop_history AS (
         propose_aud
     WHERE
         is_status_change IS TRUE
+        AND history_status IN ('Contrato Cancelado', 'Proposta Cancelada')
         AND id_propose NOT IN (
             SELECT DISTINCT
                 id_propose
