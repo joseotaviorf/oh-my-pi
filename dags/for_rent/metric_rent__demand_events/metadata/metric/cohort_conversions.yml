@@ -258,6 +258,19 @@ columns:
       hierarchy: Operations Mgmt
       approved_by: 'bruno.choumar@quintoandar.com.br'
       link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  cc2cs:
+    description: The fraction of contracts created that resulted in a contract signed within the aggregation.
+    metric:
+      name: Contract Created to Contract Signed
+      description: The fraction of contracts created that resulted in a contract signed.
+        Fraction represented by the ratio between the total number of Contracts Signed and the
+        total number of Contracts Created.
+      acronym: CC2CS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'bruno.choumar@quintoandar.com.br'
+      link_to_metric: ''
   has_guarantee:
     lineage:
       - dw_rent_snapshot.rent_cohort_conversions_snapshot.has_guarantee

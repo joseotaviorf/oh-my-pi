@@ -177,3 +177,8 @@ SELECT
     809 AS sk_cohort_type,
     'CREDIT_APPROVED_TO_CONTRACT_SIGNED' AS cohort_name,
     'CA2CS' AS abbreviation
+UNION ALL
+SELECT
+    1009 AS sk_cohort_type,
+    'CONTRACT_CREATED_TO_CONTRACT_SIGNED' AS cohort_name,
+    'CC2CS' AS abbreviation

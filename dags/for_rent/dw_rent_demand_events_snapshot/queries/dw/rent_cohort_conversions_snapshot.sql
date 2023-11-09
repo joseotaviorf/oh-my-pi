@@ -57,6 +57,7 @@ SELECT
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 708) AS ds_converted_ca,
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 709) AS ds_converted_cs,
     COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 809) AS ca_converted_cs,
+    COUNT(DISTINCT fc.sk_cohort_conversion) FILTER (WHERE fc.sk_cohort_type = 1009) AS cc_converted_cs,
     CASE
         WHEN fc.sk_base_event_type BETWEEN 1 AND 4 THEN FALSE
         WHEN fc.sk_base_event_type > 4 AND dp.guarantee = 'RentalGuarantee' THEN TRUE

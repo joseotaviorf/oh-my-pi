@@ -120,6 +120,8 @@ columns:
     description: "Total volume of the conversion documentation sent to contract signed."
   ca_converted_cs:
     description: "Total volume of the conversion credit approved to contract signed."
+  cc_converted_cs:
+    description: "Total volume of the conversion contract created to contract signed."
   has_guarantee:
     description: "Boolean indicating if the event has a guarantee related.
       It's important to notice that if the event type is from 1 to 4 (VB til OA), the guarantee flag is automatically false.

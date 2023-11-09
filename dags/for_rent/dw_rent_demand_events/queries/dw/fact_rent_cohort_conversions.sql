@@ -1,3 +1,31 @@
+WITH event_type_adjusment AS (
+  /** As we have created the event type number as something fixed, so people can filter by using it, when creating an event type later,
+    we had to assign to it the last number possible.
+    In cases that the new event type happens before other event, it might be an issue to assure the right "natural conversion".
+    Because of that, we need to create an adjusted event type, so it won't break the logic of the query.
+    Real case as example:
+      We create the CC (contract created) event later. The CS (contract signed) was already created as event type 9, so CC got event type 10.
+      In order to fix the join here, we're creating an adjusted event type for both of them, in order that the adjusted event type of CC is
+      smaller than the CS.
+  **/
+  SELECT
+    sk_event,
+    sk_event_type,
+    CASE
+      WHEN sk_event_type = 10 THEN 99 -- Contract Created (event type 10) is a metric that happens before Contract Signed (event type 9)
+      WHEN sk_event_type = 9 THEN 100
+      ELSE sk_event_type
+    END AS sk_event_type_adjusted,
+    sk_rent_flow,
+    sk_booking,
+    sk_offer,
+    sk_proposal,
+    sk_contract,
+    sk_event_date,
+    country_code
+  FROM
+    dw_rent.fact_rent_demand_events
+)
 SELECT DISTINCT
   CONCAT(fde1.sk_event, '-', fde1.sk_event_type, '-', fde2.sk_event, '-', fde2.sk_event_type) AS sk_cohort_conversion,
   INT(CONCAT(fde1.sk_event_type, 0, fde2.sk_event_type)) AS sk_cohort_type,
@@ -12,15 +40,16 @@ SELECT DISTINCT
   IF(fde2.sk_event_date >= fde1.sk_event_date, DATEDIFF(dd2.week_start, dd1.week_start)/7, NULL) AS weeks_to_conversion,
   NOW() AS ts_load
 FROM
-  dw_rent.fact_rent_demand_events AS fde1
-JOIN 
-  dw_rent.fact_rent_demand_events AS fde2 
+  event_type_adjusment AS fde1
+JOIN
+  event_type_adjusment AS fde2
     ON fde1.sk_rent_flow = fde2.sk_rent_flow
-      AND fde1.sk_event_type < fde2.sk_event_type
+      AND fde1.sk_event_type_adjusted < fde2.sk_event_type_adjusted
       AND (
-        (fde1.sk_booking > 0 AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_offer = fde2.sk_offer AND fde1.sk_proposal = fde2.sk_proposal)
-        OR (fde1.sk_offer > 0 AND fde1.sk_offer = fde2.sk_offer AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_proposal = fde2.sk_proposal)
-        OR (fde1.sk_proposal > 0 AND fde1.sk_proposal = fde2.sk_proposal AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_offer = fde2.sk_offer)
+        (fde1.sk_booking > 0 AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_offer = fde2.sk_offer AND fde1.sk_proposal = fde2.sk_proposal AND fde1.sk_contract = fde2.sk_contract)
+        OR (fde1.sk_offer > 0 AND fde1.sk_offer = fde2.sk_offer AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_proposal = fde2.sk_proposal AND fde1.sk_contract = fde2.sk_contract)
+        OR (fde1.sk_proposal > 0 AND fde1.sk_proposal = fde2.sk_proposal AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_offer = fde2.sk_offer AND fde1.sk_contract = fde2.sk_contract)
+        OR (fde1.sk_contract > 0 AND fde1.sk_contract = fde2.sk_contract AND fde1.sk_booking = fde2.sk_booking AND fde1.sk_offer = fde2.sk_offer AND fde1.sk_proposal = fde2.sk_proposal)
     )
 JOIN
   dw_public.dim_date AS dd1

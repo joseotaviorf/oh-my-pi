@@ -24,18 +24,19 @@ SELECT
     CAST(rc.ep_converted_ds/rd.evaluation_positive AS DECIMAL (2,2)) AS ep2ds,
     CAST(rc.ds_converted_ca/rd.documentation_sent AS DECIMAL (2,2)) AS ds2ca,
     CAST(rc.ca_converted_cs/rd.credit_approved AS DECIMAL (2,2)) AS ca2cs,
+    CAST(rc.cc_converted_cs/rd.contract_created AS DECIMAL (2,2)) AS cc2cs,
     rc.has_guarantee,
-    rc.dt_event,  
+    rc.dt_event,
     rc.dt_week_started,
     rc.country_code,
     NOW() AS ts_load
-FROM 
+FROM
     dw_rent_snapshot.rent_cohort_conversions_snapshot AS rc
 JOIN
     dw_rent_snapshot.rent_demand_events_snapshot AS rd
         ON rc.year = YEAR(NOW())
         AND rc.month = MONTH(NOW())
-        AND rc.day = DAY(NOW()) 
+        AND rc.day = DAY(NOW())
         AND rc.halfyear = rd.halfyear
         AND rc.quarter = rd.quarter
         AND rc.business_type = rd.business_type
