@@ -77,12 +77,14 @@ columns:
   year:
     lineage:
       - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-    description: Year of the slot.
+    description: Year of the slot. This column is a table partition.
   month:
     lineage:
       - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-    description: Month of the slot.
+    description: Month of the slot. This column is a table partition.
   day:
     lineage:
       - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-    description: Day of the slot.
+    description: Day of the slot. This column is a table partition.
+  ts_load:
+    description: Timestamp of when this data was loaded.
