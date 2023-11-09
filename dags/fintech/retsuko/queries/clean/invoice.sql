@@ -1,10 +1,10 @@
-select
+SELECT
     id,
-    external_id as id_external,
-    account_id as id_account,
-    contract_id as id_contract,
+    external_id AS id_external,
+    account_id AS id_account,
+    contract_id AS id_contract,
     status,
-    sub_status as substatus,
+    sub_status AS substatus,
     CAST(NULL AS STRING) AS negotiation_status,
     paid_via,
     purpose,
@@ -14,12 +14,27 @@ select
     paid_amount,
     accrual_year_month,
     sispag_file,
-    timestamp(paid_date) as ts_paid,
-    timestamp(canceled_at) as ts_canceled,
-    timestamp(sent_at) as ts_sent,
-    timestamp(due_date) as ts_due,
-    timestamp(created_at) as ts_created,
-    retsuko_created_at AS ts_retsuko_created,
-    retsuko_updated_at AS ts_retsuko_updated
-from
+    timestamp(paid_date) AS ts_paid,
+    timestamp(canceled_at) AS ts_canceled,
+    timestamp(sent_at) AS ts_sent,
+    timestamp(due_date) AS ts_due,
+    timestamp(created_at) AS ts_created,
+    timestamp(retsuko_created_at) AS ts_retsuko_created,
+    timestamp(retsuko_updated_at) AS ts_retsuko_updated,
+    year,
+    month,
+    day
+FROM
     datalake_retsuko_raw.invoice
+WHERE
+    (
+        year = {year}
+        AND month = {month}
+        AND day = {day} - 1
+    )
+    OR
+    (
+        year = {year}
+        AND month = {month}
+        AND day = {day}
+    )
