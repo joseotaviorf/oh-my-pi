@@ -147,7 +147,7 @@ columns:
   agreement_type:
     description: "Indicates the type of agreement."
     categories:
-      Em assessoria por um operador interno: Cliente consta na carteira da assessoria, mas teve o acordo realizado internamente (operação interna de cobrança, acesso ao portal de autonegociacao, carta campanha [boletagem])
+      Em assessoria por um operador interno: Cliente consta na carteira da assessoria, mas teve o acordo realizado internamente (operação interna de cobrança, acesso ao portal de autonegociacao, carta campanha [boletagem]). Exemplo - cliente está distribuido, porém o próprio cliente ligou para pagar a dívida, nesse caso ele está na assessoria porém o acordo foi feito por um operador interno.
       Em assessoria por um operador de assessoria: Acordo gerado pela assessoria, pelos seus variados canais
       Fora de assessoria: Cliente não consta na carteira da assessoria, acordo gerado internamente
     lineage:

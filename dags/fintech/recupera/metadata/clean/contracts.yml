@@ -3,6 +3,7 @@ database_name: datalake_recupera_clean
 table_name: contracts
 description: |
   "Contains all contracts loaded in recupera.
+  Even if contract doesn't have a debt, it will include in this table but only the essencial fields are filled in.
   Once a contract is included in this table, it will never be deleted, even if it is finished (LIQUIDADO).
 
   Original table name: TBL_CONTRATOS.
