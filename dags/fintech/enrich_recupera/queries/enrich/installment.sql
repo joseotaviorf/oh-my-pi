@@ -19,18 +19,16 @@ deduplicate_installment_detail AS (
         id_customer,
         id_product,
         id_installment,
-        dt_expiration_installment_agreement,
-        MAX(DATE(CONCAT(year,"-",month,"-",day))) AS report_date
+        dt_expiration_installment_agreement
     FROM datalake_recupera_clean.installment_detail
-    GROUP BY 1,2,3,4,5,6
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY MAKE_DATE(year,month,day) DESC) = 1
 ),
 deduplicated_installment_canceled AS (
     SELECT
         id_installment,
-        ts_canceled_installment,
-        MAX(DATE(CONCAT(year,"-",month,"-",day))) AS report_date
+        ts_canceled_installment
     FROM  datalake_recupera_clean.installment_canceled
-    GROUP BY 1,2
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY MAKE_DATE(year,month,day) DESC) = 1
 ),
 detail_movement AS (
     SELECT
