@@ -26,7 +26,6 @@ MAIN_SCHEDULE_INTERVAL = None
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_photon_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
-PARTITION_COLS = config_service.get_config("partition_cols")
 
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
@@ -36,6 +35,9 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
+table_task_group_parameters = config_service.get_config("table_task_group_parameters")
+
+INNER_DEPENDENCIES = config_service.get_config("inner_dependencies")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -79,18 +81,41 @@ datalake_task_group = DatalakeTaskGroup(
     spark_jobs_path=base_spark_jobs_path,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-    is_incremental=False,
-    partitions=PARTITION_COLS,
-    has_create_external_table_task=False,
+tables = datalake_task_group._get_table_names_from_sql_files(layer=LayerEnum.ENRICH)
+
+enrich_task_groups = {}
+
+for table in tables:
+    enrich_task_groups[table] = datalake_task_group.build_enrich_task_group(
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        table_name=table,
+        partitions=table_task_group_parameters[table]["partition_cols"],
+        is_incremental=table_task_group_parameters[table]["is_incremental"],
+        has_create_external_table_task=False,
+        has_hive_sync=table_task_group_parameters[table]["has_hive_sync"],
+    )
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=INNER_DEPENDENCIES,
 )
 
-create_cluster_task.set_downstream(
-    DatalakeTaskGroup.all_first_tasks(enrich_task_groups)
+chain(
+    create_cluster_task,
+    datalake_task_group.all_first_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.first_tasks(inner_dependencies_task_groups_boundaries),
 )
-terminate_cluster_task.set_upstream(
-    DatalakeTaskGroup.all_last_tasks(enrich_task_groups)
-)
+
+chain(
+    datalake_task_group.all_last_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+) 

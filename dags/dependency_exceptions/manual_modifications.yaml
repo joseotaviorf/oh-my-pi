@@ -379,6 +379,11 @@ bietlejuice.enrich_ebdb_listing_jobs:
 bietlejuice.enrich_ebdb_user:
   add:
     - bietlejuice.ebdb:load-clean-user-merge
+bietlejuice.enrich_growth_taxonomy:
+  remove:
+    - bietlejuice.ebdb:load-clean-visit-origin
+    - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
+    - bietlejuice.enrich_booking:load-enrich-booking
 bietlejuice.enrich_health_metrics:
   override: []
 bietlejuice.enrich_house_feature_inference:

@@ -1,0 +1,10 @@
+SELECT
+  id_demand_product_interaction,
+  bk_product_interaction,
+  origin,
+  platform,
+  content_page,
+  ts_combination_created,
+  ts_load
+FROM
+  datalake_growth_taxonomy.demand_product_interaction_staging

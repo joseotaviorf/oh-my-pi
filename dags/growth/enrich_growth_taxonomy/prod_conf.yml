@@ -1,2 +1,29 @@
----
-partition_cols: ['funnel_side']
+table_task_group_parameters:
+  media_setup:
+    partition_cols: ['funnel_side']
+    has_hive_sync: True
+    is_incremental: False
+  media_setup_staging:
+    partition_cols: ['funnel_side']
+    has_hive_sync: True
+    is_incremental: False
+  demand_product_interaction:
+    partition_cols: []
+    has_hive_sync: True
+    is_incremental: False
+  demand_product_interaction_staging:
+    partition_cols: []
+    has_hive_sync: True
+    is_incremental: False
+  demand_operation_flow:
+    partition_cols: []
+    has_hive_sync: True
+    is_incremental: False
+  demand_operation_flow_staging:
+    partition_cols: []
+    has_hive_sync: True
+    is_incremental: False
+inner_dependencies:
+  media_setup: [media_setup_staging]
+  demand_product_interaction: [demand_product_interaction_staging]
+  demand_operation_flow: [demand_operation_flow_staging]
