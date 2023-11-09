@@ -130,6 +130,12 @@ sheets_info:
     sheet_name: demand_retention_ab_tests
     clean_table_name: demand_retention_ab_tests
     sheet_context: growth
+  
+  dict_taxonomy_supply:
+    sheet_id: 1xhbRZ_W4GIy78LlT_yBlYV-WN7LikLFM7I2wRgMogg4
+    sheet_name: mapped
+    clean_table_name: dict_taxonomy_supply
+    sheet_context: growth
 
   ecglobal_active_users:
     sheet_id: 1S4QBYxMLTAfjre0xd5jS9kaT5YjL4KsE3sRKmvHFNjM
