@@ -25,7 +25,7 @@ DAG_NAME = f"enrich_demand_conversion_events"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2023, 9, 25, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_photon_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_min_io-memory_photon_cluster"
 
 
 config_service = ConfigurationService(DAG_NAME)
@@ -109,27 +109,10 @@ for table in tables:
         },
 
     )
-(
-    task_groups_boundaries_without_inner_dependencies,
-    inner_dependencies_task_groups_boundaries,
-) = datalake_task_group.set_inner_dag_dependencies(
-    task_flow_helper=TaskFlowHelper(),
-    task_groups_boundaries=enrich_task_groups,
-    dag_inner_dependencies=INNER_DEPENDENCIES,
+    
+create_cluster_task.set_downstream(
+    DatalakeTaskGroup.all_first_tasks(enrich_task_groups)
 )
-
-chain(
-    create_cluster_task,
-    datalake_task_group.all_first_tasks(
-        task_groups_boundaries_without_inner_dependencies
-    )
-    + datalake_task_group.first_tasks(inner_dependencies_task_groups_boundaries),
+terminate_cluster_task.set_upstream(
+    DatalakeTaskGroup.all_last_tasks(enrich_task_groups)
 )
-
-chain(
-    datalake_task_group.all_last_tasks(
-        task_groups_boundaries_without_inner_dependencies
-    )
-    + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
-    terminate_cluster_task,
-) 

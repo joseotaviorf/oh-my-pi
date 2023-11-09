@@ -1,11 +1,7 @@
 table_task_group_parameters:
-  demand_prospect_conversion_events_staging:
-    partition_cols: ['country_code','id_event_date']
-    has_hive_sync: True
-    is_incremental: True
   demand_prospect_conversion_events:
     partition_cols: ['country_code','id_event_date']
     has_hive_sync: True
-    is_incremental: False
+    is_incremental: True
 inner_dependencies:
-  demand_prospect_conversion_events: [demand_prospect_conversion_events_staging]
+  demand_prospect_conversion_events: []
