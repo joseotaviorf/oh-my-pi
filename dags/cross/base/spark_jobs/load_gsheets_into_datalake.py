@@ -6,8 +6,6 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 
-from bietlejuice.base.api import APIEnum
-from bietlejuice.base.notification import SlackWebhooksEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
@@ -16,7 +14,9 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 from bietlejuice.services.gsheets_service import GsheetsService
-from bietlejuice.services.messaging_services.slack_service import SlackService
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.services.messaging_services.gchat_service import GChatService
+from bietlejuice.services.messaging_services.message import Message
 
 JOB_NAME = "load_gsheets_by_context_into_datalake"
 
@@ -37,12 +37,12 @@ def __get_auth(dbutils, credentials_scope, credentials_key):
     return credentials, scope
 
 
-SLACK_MSG_HEADER = ":alert: *Gsheet ingestion failures*\n>The following sheet have errors have not been ingested on this Run."
+MSG_HEADER = "⚠️ *Gsheet ingestion failures*\nThe following sheet have errors have not been ingested on this Run.\n"
 TIMEOUT_LIMIT = 5 * 60
 
 
-def __alert_not_ingesting_sheet(sheet_details, exeption, slack_channel):
-    msg = """:sheets: Sheet: <{}|{}> (ID: {})\n _Owner team: {}._\n\tError: ```{}```"""
+def __alert_not_ingesting_sheet(sheet_details, exeption, gchat_webhook):
+    msg = """🎲 Sheet: <{}|{}> (ID: {})\n _Owner team: {}._\n\tError: ```{}```"""
     sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_details['sheet_id']}"
     error_trace = str(exeption).split("\n")[0]
     # remove chars that break slack messaging and limit error msg to 150 chars
@@ -56,8 +56,9 @@ def __alert_not_ingesting_sheet(sheet_details, exeption, slack_channel):
         sheet_details["sheet_context"],
         error_trace,
     )
-    error_list = [(SLACK_MSG_HEADER, slack_channel), (msg, slack_channel)]
-    return SlackService.send_slack_errors(error_list)
+    message = MSG_HEADER + msg
+    message_error = Message(content=message, destination=gchat_webhook)
+    return GChatService.send_message(message_error)
 
 
 if __name__ == "__main__":
@@ -143,10 +144,17 @@ if __name__ == "__main__":
 
     except Exception as e:
         is_able_to_load = False
-        slack_channel = dbutils.secrets.get(
-            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_DE_AIRFLW_DGS
+
+        if environment == 'prod':
+            key = GchatWebhooksEnum.AE_ALERTS_PROD
+        else:
+            key = GchatWebhooksEnum.AE_ALERTS_FORNO
+
+        gchat_webhook = dbutils.secrets.get(
+            scope="quintoandar", key=key
         )
-        message_sent = __alert_not_ingesting_sheet(sheet_details, e, slack_channel)
+
+        message_sent = __alert_not_ingesting_sheet(sheet_details, e, gchat_webhook)
         logger.error(
             f"""
                 m={JOB_NAME}, table_name={table_name}, msg=Sheet was not loaded, message_sending_result={message_sent},
