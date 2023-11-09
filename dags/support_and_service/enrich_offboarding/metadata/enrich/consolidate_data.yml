@@ -1,174 +1,270 @@
----
 database_name: datalake_offboarding
 table_name: consolidate_data
+description: Table that consolidates offboarding information.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_offboarding.ongoing.id
+    description: Unique termination identifier.
   id_contract:
     lineage:
       - datalake_offboarding.ongoing.id_contract
+    description: Unique contract identifier.
   id_house:
     lineage:
       - datalake_offboarding.ongoing.id_house
+    description: Unique house identifier.
   category:
     lineage:
       - datalake_offboarding.ongoing.category
+    description: Categorization contract.
+  flow:
+    description: Contract flow typification
   repair_resolution:
     lineage:
       - datalake_offboarding.ongoing.repair_resolution
+    description: Typification of repair resolution.
   client_type:
     lineage:
       - datalake_offboarding.budgeting_window.client_type
+    description: Customer classification.
+  budgeting_window:
+    lineage:
+      - datalake_offboarding.budgeting_window.budget_range
+    description: Quote window categories.
+  stage_v2:
+    description: Budgeting window stages.
+  tags_analysis_2:
+    description: Workflow analysis marking.
+  agreement_between_parties:
+    lineage:
+      - datalake_offboarding.budgeting_window.agreement_between_parties
+    description: Typification of agreements between the parties.
   repair_cost:
     lineage:
       - datalake_offboarding.ongoing.repair_cost
+    description: Total repair cost.
   frt_ldt_greater_than_0:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_finished
-      - datalake_offboarding.ongoing.dt_termination
+    description: Difference in days for cases where the date of the first response and the date of the last response is greater than to zero days.
   frt:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_finished
-      - datalake_offboarding.ongoing.dt_termination
+    description: Time of the first response in days, considering that the end dates are not null.
   number_of_responses_nps:
     lineage:
       - datalake_offboarding.nps_agg.number_of_responses
+    description: Distinct amount of NPS responses.
   number_of_responses_pp:
     lineage:
       - datalake_offboarding.nps_agg.number_of_responses_pp
+    description: Distinct number of NPS responses from Owners.
   number_of_responses_iq:
     lineage:
       - datalake_offboarding.nps_agg.number_of_responses_iq
+    description: Distinct amount of tenant NPS responses.
   nps_pp:
     lineage:
       - datalake_offboarding.nps_agg.nps_pp
+    description: Sum of owners NPS score.
   nps_iq:
     lineage:
       - datalake_offboarding.nps_agg.nps_iq
+    description: Sum of tenant NPS scores.
   an_vt1_flag:
     lineage:
       - datalake_gsheets_clean.inspection_analysis_forms.status
+    description: Label for inspection analysis.
   contract_lifetime:
     lineage:
       - datalake_offboarding.ongoing.dt_termination
       - datalake_offboarding.ongoing.dt_contract_entrance
       - datalake_offboarding.ongoing.dt_contract_started
+    description: Contract lifespan in days based on contract end date minus contract entry/start date.
   ldt_td_inspect:
     lineage:
       - datalake_offboarding.ongoing.dt_last_inspection_synched
       - datalake_offboarding.ongoing.dt_termination
+    description: Delivery time for inspection of termination date in days based on the last inspection date and the end of the contract.
   ldt_erc_insp:
     lineage:
       - datalake_offboarding.ongoing.ts_analyst_annulment_input
       - datalake_offboarding.ongoing.dt_last_inspection_synched
+    description: Lead Time in Days of the Terminated Lease Contract - Contract completion data, normally this is the day on which the exit inspection is synchronized as it is the day on which we are sure that the tenant has left the property.
   ldt_an_vt2_Insp:
     lineage:
       - datalake_offboarding.inspection_analysis.dt_completed_date
       - datalake_offboarding.ongoing.dt_last_inspection_synched
+    description: Lead Time in days for analysis and inspection of the second inspection.
   ldt_tf_an_vt2:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_finished
       - datalake_offboarding.inspection_analysis.dt_completed_date
+    description: Lead Time in days for termination date and analysis of the second inspection.
   ldt_erc_tf:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_finished
       - datalake_offboarding.ongoing.ts_analyst_annulment_input
+    description: Lead Time in days for the difference between Ended Rental Contract and Termination Finished.
   ldt_td_erc:
     lineage:
       - datalake_offboarding.ongoing.ts_analyst_annulment_input
       - datalake_offboarding.ongoing.dt_termination
+    description: Lead Time in days for the difference between Termination Finished and Ended Rental Contract.
   ldt_erc_an_vt_end:
     lineage:
       - datalake_offboarding.inspection_analysis.dt_completed_date
       - datalake_offboarding.ongoing.ts_analyst_annulment_input
+    description: Lead Time in days for the difference between Termination Finished and the analyst's void entry.
   ldt_td_an_vt2:
     lineage:
       - datalake_offboarding.inspection_analysis.dt_completed_date
       - datalake_offboarding.ongoing.dt_termination
+    description: Lead Time in days for the difference between the inspection Termination date and the end date.
   today_td:
     lineage:
       - datalake_offboarding.ongoing.dt_termination
+    description: Duration in days of the difference of the complete analysis and the processing date of this table.
+  num_ticket_v2_satisfied:
+    lineage:
+      - datalake_offboarding.customer_support.num_ticket_satisfied
+    description: Sum of the number of tickets classified as satisfactory and where department = 'Offboarding Reparos [OFF] [POS] [BACK]'.
+  num_ticket_v2_neutral:
+    lineage:
+      - datalake_offboarding.customer_support.num_ticket_neutral
+    description: Sum of the number of tickets classified as neutral and where department = 'Offboarding Reparos [OFF] [POS] [BACK]'.
+  num_ticket_v2_dissatisfied:
+    lineage:
+      - datalake_offboarding.customer_support.num_ticket_dissatisfied
+    description: Sum of the number of tickets classified as dissatisfied and where department = 'Offboarding Reparos [OFF] [POS] [BACK]'.
+  num_ticket_off_front:
+    lineage:
+      - datalake_offboarding.customer_support.num_ticket_satisfied
+      - datalake_offboarding.customer_support.num_ticket_neutral
+      - datalake_offboarding.customer_support.num_ticket_dissatisfied
+    description: Sum of the number of tickets classified as satisfactory, neutral and dissatisfied where front_or_back = 'front'.
+  num_ticket_off_front_satisfied:
+    lineage:
+      - datalake_offboarding.customer_support.num_ticket_satisfied
+    description:  Sum of the number of tickets classified as satisfactory and where front_or_back = 'front'.
+  num_ticket_off_front_neutral:
+    lineage:
+      - datalake_offboarding.customer_support.num_ticket_neutral
+    description:   Sum of the number of tickets classified as neutral and where front_or_back = 'front'.
+  num_ticket_off_front_dissatisfied:
+    lineage:
+      - datalake_offboarding.customer_support.num_ticket_dissatisfied
+    description:  Sum of the number of tickets classified as dissatisfied and where front_or_back = 'front'.
   is_interaction_pp:
     lineage:
       - datalake_offboarding.budgeting_window.interaction_pp
+    description: Boolean marking if has interaction with PP.
   is_b2b:
     lineage:
       - datalake_offboarding.ongoing.is_b2b
+    description: Boolean marking if it is B2B.
   is_contract_b2b:
     lineage:
       - datalake_offboarding.ongoing.is_contract_b2b
+    description: Boolean marking if it is Contract with B2B.
   is_repair_tenant_duty:
     lineage:
       - datalake_offboarding.ongoing.is_repair_tenant_duty
+    description: Boolean marking if it is repair tenant duty.
   is_workflow:
     lineage:
       - datalake_offboarding.ongoing.is_workflow
+    description: Boolean marking if it is workflow.
   dt_inspected:
     lineage:
       - datalake_offboarding.ongoing.dt_last_inspection_synched
+    description: Inspection data when dt_last_inspection_synced is greater than dt_termination.
   dt_insp_analysis_completed:
     lineage:
       - datalake_offboarding.inspection_analysis.dt_completed_date
+    description: Inspection completion date.
   dt_created_budgeting_app:
     lineage:
       - datalake_offboarding.tickets.dt_created
+    description: Max date created budgeting app where group_name = 'QualiVisOrça [OFF] [POS] [BACK]'.
   dt_solved_budgeting_app:
     lineage:
       - datalake_offboarding.tickets.dt_solved
+    description: Max date solved budgeting app where group_name = 'QualiVisOrça [OFF] [POS] [BACK]'.
   dt_created_budgeting:
     lineage:
       - datalake_offboarding.tickets.dt_created
+    description: Max date created budgeting where group_name = 'Partner Providers [REP] [POS] [BACK]'
   dt_solved_budgeting:
     lineage:
       - datalake_offboarding.tickets.dt_solved
+    description: Max date solved budgeting where group_name = 'Partner Providers [REP] [POS] [BACK]'
   dt_ap_start:
     lineage:
       - datalake_offboarding.tickets.dt_created
+    description: Max date ap start where flow = 'New Repairs' and group_name = 'Novo Off - Reparos [POS] [BACK]' or (group_name = 'Proteção QuintoAndar [OFF] [POS] [BACK]'.
   dt_ap_solved:
     lineage:
       - datalake_offboarding.tickets.dt_solved
+    description: Max date ap solved where flow = 'New Repairs' and group_name = 'Novo Off - Reparos [POS] [BACK]' or (group_name = 'Proteção QuintoAndar [OFF] [POS] [BACK]'.
   dt_tf_v2:
     lineage:
       - datalake_offboarding.ongoing.ts_analyst_annulment_input
       - datalake_offboarding.ongoing.ts_termination_finished
       - datalake_offboarding.inspection_analysis.dt_completed_date
+    description: Date termination finished.
   dt_analysis_1:
     lineage:
       - datalake_offboarding.budgeting_window.dt_analysis
+    description: Repair date sent to PP.
   dt_analysis_2:
     lineage:
       - datalake_offboarding.budgeting_window.dt_reanalysis
+    description: Repair Reanalysis date.
   dt_budgeted:
     lineage:
       - datalake_offboarding.budgeting_window.dt_budgeted
+    description: Budget date carried out.
   dt_communicated_iq:
     lineage:
       - datalake_offboarding.budgeting_window.dt_communicated_iq
+    description: date of Communication sent to IQ.
   dt_intermediate:
     lineage:
       - datalake_offboarding.budgeting_window.dt_intermediate
+    description: date of Intermediation with the parties.
   dt_agreement_executed:
     lineage:
       - datalake_offboarding.budgeting_window.dt_agreement_executed
+    description: date of execution of the agreement.
   dt_finished:
     lineage:
       - datalake_offboarding.budgeting_window.dt_finished
+    description: budget window end date.
   dt_termination:
     lineage:
       - datalake_offboarding.ongoing.dt_termination
+    description: Max contract end date.
   ts_an_vt1:
     lineage:
       - datalake_gsheets_clean.inspection_analysis_forms.ts_input
+    description: inspection form input timestamp.
   ts_termination_request:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_request
+    description: Max timestamp termination request.
   ts_termination_finished:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_finished
+    description: Max timestamp termination finished.
   ts_ended_confirmed:
     lineage:
       - datalake_offboarding.ongoing.ts_analyst_annulment_input
+    description: Max timestamp ended confirmed.
   ts_created_inspection:
     lineage:
       - datalake_offboarding.ongoing.ts_created_inspection
+    description: Max timestamp created inspection.
