@@ -23,12 +23,14 @@ columns:
   ts_rec_created:
     description: |
       ts_rec_created
-  experiment:
-    description: |
-      experiment
-  experiment_variant:
-    description: |
-      experiment_variant
+  experiments:
+    lineage:
+        - datalake_recommendations.recommendation.experiments
+    description: A/B experiments associated with this recommendation
+  experiments_variants:
+    lineage:
+        - datalake_recommendations.recommendation.experiments_variants
+    description: A/B experiment variants associated with this recommendation
   dt_rec_received:
     description: |
       Timestamp of recommendation.

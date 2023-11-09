@@ -97,11 +97,11 @@ columns:
     description: User device platform when the recommendation was delivered
     lineage:
       - datalake_amplitude_clean.events.language
-  experiment:
+  experiments:
     description: A/B experiment associated with this recommendation
     lineage:
-      - dw_braze.dim_campaign.campaign_name
-  experiment_variant:
+      - datalake_emlio_clean.emlio_logs.inputs
+  experiments_variants:
     description: A/B experiment variant associated with this recommendation
     lineage:
-      - dw_braze.dim_campaign.campaign_name
+      - datalake_emlio_clean.emlio_logs.inputs

@@ -37,14 +37,14 @@ columns:
     description: Recommendation channel (similar-carousel, daily-feed-email, favorites-email, etc)
     lineage:
       - datalake_recommendations.recommendation_flow.display_type
-  experiment:
+  experiments:
     description: A/B experiment associated with this recommendation
     lineage:
-      - datalake_recommendations.recommendation_flow.experiment
-  experiment_variant:
+      - datalake_recommendations.recommendation_flow.experiments
+  experiments_variants:
     description: A/B experiment variant associated with this recommendation
     lineage:
-      - datalake_recommendations.recommendation_flow.experiment_variant
+      - datalake_recommendations.recommendation_flow.experiments_variants
   ml_model:
     description: Machine Learning model used for generating recommendation # should be more generic once we have the modular architecture
     lineage:

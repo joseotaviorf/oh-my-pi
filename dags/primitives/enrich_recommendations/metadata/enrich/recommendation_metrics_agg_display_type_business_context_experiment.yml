@@ -4,7 +4,7 @@ owner: lucas.cardozo@quintoandar.com.br
 domain: primitives
 description: |
   Recommendation Metrics. Each row is an aggregate of the recommendation metrics for
-  a day, business_context, display_type, experiment and experiment_variant
+  a day, business_context, display_type, experiments and experiments_variants
 columns:
   dt_rec_received:
     description: Date of recommendation delivery
@@ -18,14 +18,14 @@ columns:
     description: Recommendation channel (similar-carousel, daily-feed-email, favorites-email, etc)
     lineage:
       - datalake_recommendations.recommendation_metrics_agg_recset.display_type
-  experiment:
+  experiments:
     description: A/B experiment associated with this recommendation
     lineage:
-      - datalake_recommendations.recommendation_metrics_agg_recset.experiment
-  experiment_variant:
+      - datalake_recommendations.recommendation_metrics_agg_recset.experiments
+  experiments_variants:
     description: A/B experiment variant associated with this recommendation
     lineage:
-      - datalake_recommendations.recommendation_metrics_agg_recset.experiment_variant
+      - datalake_recommendations.recommendation_metrics_agg_recset.experiments_variants
   mean_precision_at_3:
     description: Mean Precision @3
     lineage:

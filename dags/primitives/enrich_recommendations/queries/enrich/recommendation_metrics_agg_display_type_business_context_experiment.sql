@@ -1,13 +1,13 @@
 /*
-Recommendation metrics aggregated by dt_rec_received, business_context, display_type, experiment, experiment_variant
+Recommendation metrics aggregated by dt_rec_received, business_context, display_type, experiments, experiments_variants
 Aggregation func: min, mean, max
 */
 
 SELECT
     r.business_context,
     r.display_type,
-    r.experiment,
-    r.experiment_variant,
+    r.experiments,
+    r.experiments_variants,
 
     SUM(count_recsets) AS count_recsets,
 
@@ -97,5 +97,5 @@ GROUP BY
     r.dt_rec_received,
     r.business_context,
     r.display_type,
-    r.experiment,
-    r.experiment_variant
+    r.experiments,
+    r.experiments_variants

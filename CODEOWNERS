@@ -13,3 +13,5 @@ dags/**/metric_*                                                        @quintoa
 dags/platform/**                                                        @quintoandar/data-ingestion-code-owners
 scripts/ci_cd/**                                                        @quintoandar/data-ingestion-code-owners
 CODEOWNERS                                                              @quintoandar/data-ingestion-code-owners
+dags/primitives/                                                        @quintoandar/personalization
+dags/mlops/                                                             @quintoandar/mlcops

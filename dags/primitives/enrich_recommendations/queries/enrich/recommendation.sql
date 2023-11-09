@@ -7,66 +7,7 @@ Assumptions:
     different channels/display types to coexist in this table
 */
 
-WITH carousel_recommendations AS (
-    SELECT DISTINCT
-        "house" AS type_subject,
-        "similar-carousel" AS display_type,
-        "house-similarity-embeddings" AS ml_model,
-        "house" AS type_item,
-        country,
-        region,
-        city,
-        device_family,
-        platform,
-        language,
-        NULL as experiment,
-        NULL as experiment_variant,
-        ts_client_event AS ts_rec_created,
-        ts_client_event AS ts_rec_received,
-        year,
-        month,
-        day,
-        COALESCE(id_user, id_amplitude) AS id_user,
-        ARRAY(
-            CAST(GET_JSON_OBJECT(event_properties, "$.house_id") AS INT)
-        ) AS id_subjects,
-        LOWER(
-            GET_JSON_OBJECT(
-                event_properties, "$.business_context"
-            )
-        ) AS business_context,
-        ARRAY(
-            CAST(GET_JSON_OBJECT(event_properties, "$.house_id") AS INT)
-        ) AS id_anchors,
-        POSEXPLODE(
-            ARRAY_DISTINCT(
-                CAST(
-                    SPLIT(
-                        REGEXP_REPLACE(
-                            GET_JSON_OBJECT(event_properties, "$.similar_listings"),
-                            '\\[|\\]|"',
-                            ""
-                        ),
-                        ",",
-                        -1
-                    ) AS ARRAY <INT>
-                )
-            )
-        ) AS (item_rank, id_item)
-    FROM
-        datalake_amplitude_clean.events
-    WHERE
-        event_type IN (
-            "similar_carousel_viewed",
-            "similar_carousel_viewed_native"
-        )
-        AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
-        AND YEAR(ts_client_event) = year
-        AND MONTH(ts_client_event) = month
-        AND DAY(ts_client_event) = day
-),
-
-yellow_pages_recommendation_logs AS (
+WITH yellow_pages_recommendation_logs AS (
     /*
         This CTE extracts recommendation metadata from emlio
         logs that are sent by yellow-pages during the recommendation
@@ -75,7 +16,7 @@ yellow_pages_recommendation_logs AS (
     WITH duplicated_yellow_pages_recommendations_logs AS (
         SELECT
             *,
-            DENSE_RANK() OVER (PARTITION BY id_user, business_context, display_type, dt_email_sent ORDER BY ts_log) AS log_index
+            DENSE_RANK() OVER (PARTITION BY id_user, business_context, display_type, dt_log ORDER BY ts_log) AS log_index
         FROM (
             SELECT
                 CAST(
@@ -115,15 +56,22 @@ yellow_pages_recommendation_logs AS (
                         ) AS ARRAY <INT>
                     )
                 ) AS similar_listings,
-                DATE(ts_log) AS dt_email_sent,
+                -- Multiple experiments can be active at the same time
+                MAP_KEYS(
+                  FROM_JSON(
+                    GET_JSON_OBJECT(inputs, "$.experiment_settings"), "map<string, string>"
+                  )
+                ) AS experiments,
+                MAP_VALUES(
+                  from_json(
+                    GET_JSON_OBJECT(inputs, "$.experiment_settings"), "map<string, string>"
+                  )
+                ) AS experiments_variants,
+                DATE(ts_log) AS dt_log,
                 ts_log
             FROM datalake_emlio_clean.emlio_logs AS emlio_logs
             WHERE
                 emlio_logs.id_service = "yellow-pages"
-                AND (
-                    GET_JSON_OBJECT(emlio_logs.inputs, "$.anchor_ids") != "[]" OR
-                    LOWER(GET_JSON_OBJECT(emlio_logs.inputs, "$.display_type")) = 'daily_feed'
-                )
                 AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
         )
     )
@@ -132,12 +80,111 @@ yellow_pages_recommendation_logs AS (
         id_user,
         business_context,
         display_type,
-        dt_email_sent,
         id_anchors,
-        similar_listings
+        similar_listings,
+        experiments,
+        experiments_variants,
+        ts_log,
+        dt_log
     FROM duplicated_yellow_pages_recommendations_logs
     WHERE log_index = 1 AND display_type != "not_provided"
 ),
+
+
+carousel_recommendations AS (
+    /*
+        This CTE extracts recommendation metadata from Amplitude
+        events that are sent by
+    */
+    WITH carousel_recommendation_delivered AS (
+        SELECT DISTINCT
+            "house" AS type_subject,
+            "similar-carousel" AS display_type,
+            null AS ml_model,
+            "house" AS type_item,
+            country,
+            region,
+            city,
+            device_family,
+            platform,
+            language,
+            ts_client_event AS ts_rec_created,
+            ts_client_event AS ts_rec_received,
+            year,
+            month,
+            day,
+            COALESCE(id_user, id_amplitude) AS id_user,
+            ARRAY(
+                CAST(GET_JSON_OBJECT(event_properties, "$.house_id") AS INT)
+            ) AS id_subjects,
+            LOWER(
+                GET_JSON_OBJECT(
+                    event_properties, "$.business_context"
+                )
+            ) AS business_context,
+            ARRAY(
+                CAST(GET_JSON_OBJECT(event_properties, "$.house_id") AS INT)
+            ) AS id_anchors,
+            POSEXPLODE(
+                ARRAY_DISTINCT(
+                    CAST(
+                        SPLIT(
+                            REGEXP_REPLACE(
+                                GET_JSON_OBJECT(event_properties, "$.similar_listings"),
+                                '\\[|\\]|"',
+                                ""
+                            ),
+                            ",",
+                            -1
+                        ) AS ARRAY <INT>
+                    )
+                )
+            ) AS (item_rank, id_item)
+        FROM
+            datalake_amplitude_clean.events
+        WHERE
+            /* TODO: include recommendation feed events */
+            event_type IN (
+                "similar_carousel_viewed",
+                "similar_carousel_viewed_native"
+            )
+            AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
+            AND YEAR(ts_client_event) = year
+            AND MONTH(ts_client_event) = month
+            AND DAY(ts_client_event) = day
+    ),
+
+    carousel_recommendation_enriched AS (
+        SELECT
+            carousel_recommendation_delivered.*,
+            yp_recs_logs.experiments,
+            yp_recs_logs.experiments_variants,
+            DENSE_RANK() OVER (
+                PARTITION BY
+                    yp_recs_logs.id_user,
+                    yp_recs_logs.business_context,
+                    yp_recs_logs.display_type,
+                    yp_recs_logs.dt_log
+                ORDER BY
+                    yp_recs_logs.ts_log
+            ) AS log_index
+        FROM carousel_recommendation_delivered
+        /*
+        TODO: once we have a recset identifier, we can perform a better join
+        directly by the recset_id, instead of performing the temporal join
+        */
+        INNER JOIN
+            yellow_pages_recommendation_logs AS yp_recs_logs
+          ON
+            carousel_recommendation_delivered.id_user = yp_recs_logs.id_user
+            AND carousel_recommendation_delivered.business_context = yp_recs_logs.business_context
+            AND carousel_recommendation_delivered.display_type = yp_recs_logs.display_type
+            AND carousel_recommendation_delivered.ts_rec_created >= yp_recs_logs.ts_log
+    )
+
+    SELECT * FROM carousel_recommendation_enriched WHERE log_index = 1
+),
+
 
 email_recommendation_delivered AS (
     /* This CTE takes event data from Braze */
@@ -170,19 +217,6 @@ email_recommendation_delivered AS (
                     THEN "rent"
                 WHEN LOWER(campaign_name) LIKE "%sale%" THEN "sale"
             END AS business_context,
-            CASE
-                WHEN
-                    campaign_name LIKE "%NEW[CAMPAIGNS.DEMAND] forsale.listing.7day.similar_algorithm%"
-                    THEN "hue-for-sale-v1-experiment"
-            END as experiment,
-            CASE
-                WHEN
-                    campaign_name LIKE "%NEW[CAMPAIGNS.DEMAND] forsale.listing.7day.similar_algorithm.HUE.v1.sale.variant%"
-                    THEN "treatment"
-                WHEN
-                    campaign_name LIKE "%NEW[CAMPAIGNS.DEMAND] forsale.listing.7day.similar_algorithm.baseline%"
-                    THEN "control"
-            END as experiment_variant,
             DATE(ts_email_sent) AS dt_email_sent,
             CASE WHEN ts_email_first_opened IS NOT NULL THEN least(ts_email_first_opened, ts_email_first_clicked) END AS ts_rec_created,
             COALESCE(ts_email_first_clicked, ts_email_first_opened) AS ts_rec_received
@@ -212,13 +246,11 @@ email_recommendation_delivered AS (
       id_user,
       display_type,
       business_context,
-      experiment,
-      experiment_variant,
       dt_email_sent,
       MAX(ts_rec_created) AS ts_rec_created,
       MAX(ts_rec_received) AS ts_rec_received
     FROM emails_sent
-    GROUP BY id_email, id_user, display_type, business_context, experiment, experiment_variant, dt_email_sent
+    GROUP BY id_email, id_user, display_type, business_context, dt_email_sent
 ),
 
 email_user_sessions AS (
@@ -315,8 +347,6 @@ email_recommendations AS (
         email_delivered.ts_rec_received,
         email_delivered.display_type,
         email_delivered.business_context,
-        email_delivered.experiment,
-        email_delivered.experiment_variant,
         "house" AS type_item,
         email_closest_session.country,
         email_closest_session.region,
@@ -325,6 +355,7 @@ email_recommendations AS (
         email_closest_session.platform,
         email_closest_session.language,
         POSEXPLODE(yp_recs_logs.similar_listings) AS (item_rank, id_item),
+        -- TODO: review this id_subjects assignment
         CASE
             WHEN
                 email_delivered.business_context = "sale"
@@ -333,18 +364,11 @@ email_recommendations AS (
                 email_delivered.business_context = "rent"
                 THEN CAST(ARRAY(yp_recs_logs.id_user) AS ARRAY <INT>)
         END AS id_subjects,
-        CASE
-            WHEN email_delivered.business_context = "sale" THEN "house"
-            WHEN email_delivered.business_context = "rent" THEN "user"
-        END AS type_subject,
-        CASE
-            WHEN
-                email_delivered.business_context = "sale"
-                THEN "house-similarity-embeddings"
-            WHEN
-                email_delivered.business_context = "rent"
-                THEN "house-user-embeddings"
-        END AS ml_model,
+        -- TODO: type_subject and ml_model should come from YP recs logs
+        NULL type_subject,
+        NULL AS ml_model,
+        yp_recs_logs.experiments,
+        yp_recs_logs.experiments_variants,
         YEAR(email_delivered.ts_rec_created) AS year,
         MONTH(email_delivered.ts_rec_created) AS month,
         DAY(email_delivered.ts_rec_created) AS day
@@ -356,7 +380,7 @@ email_recommendations AS (
         email_delivered.id_user = yp_recs_logs.id_user
         AND email_delivered.business_context = yp_recs_logs.business_context
         AND email_delivered.display_type = yp_recs_logs.display_type
-        AND email_delivered.dt_email_sent = yp_recs_logs.dt_email_sent
+        AND email_delivered.dt_email_sent = yp_recs_logs.dt_log
 ),
 
 recommendations AS (
@@ -383,8 +407,8 @@ recommendations AS (
         month,
         day,
         item_rank + 1 AS item_rank,
-        experiment,
-        experiment_variant
+        experiments,
+        experiments_variants
     FROM
         carousel_recommendations
     UNION ALL
@@ -411,8 +435,8 @@ recommendations AS (
         month,
         day,
         item_rank + 1 AS item_rank,
-        experiment,
-        experiment_variant
+        experiments,
+        experiments_variants
     FROM email_recommendations
 )
 
@@ -444,5 +468,4 @@ SELECT
 FROM recommendations
 WHERE
     recommendations.id_item IS NOT NULL
-    AND recommendations.id_anchors IS NOT NULL
     AND recommendations.business_context IS NOT NULL

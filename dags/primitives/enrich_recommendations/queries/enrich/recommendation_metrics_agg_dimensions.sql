@@ -1,8 +1,8 @@
 SELECT
     business_context,
     display_type,
-    experiment,
-    experiment_variant,
+    experiments,
+    experiments_variants,
     dt_rec_received,
 
     COUNT(1) AS count_recsets,
@@ -77,6 +77,6 @@ WHERE
 GROUP BY
     business_context,
     display_type,
-    experiment,
-    experiment_variant,
+    experiments,
+    experiments_variants,
     dt_rec_received
