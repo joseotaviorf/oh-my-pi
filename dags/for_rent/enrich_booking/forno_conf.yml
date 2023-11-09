@@ -1,7 +1,7 @@
 ---
 custom_cluster:
   driver_node_type_id: m5a.xlarge
-  node_type_id: c5a.4xlarge
-  autoscale:
-    min_workers: 1
-    max_workers: 2
+  node_type_id: c5ad.8xlarge
+  num_workers: 2
+  aws_attributes:
+    availability: ON_DEMAND
