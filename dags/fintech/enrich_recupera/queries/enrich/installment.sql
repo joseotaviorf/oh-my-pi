@@ -21,7 +21,7 @@ deduplicate_installment_detail AS (
         id_installment,
         dt_expiration_installment_agreement
     FROM datalake_recupera_clean.installment_detail
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY MAKE_DATE(year,month,day) DESC) = 1
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, id_customer, id_contract, dt_expiration_installment_agreement ORDER BY MAKE_DATE(year,month,day) DESC) = 1
 ),
 deduplicated_installment_canceled AS (
     SELECT
