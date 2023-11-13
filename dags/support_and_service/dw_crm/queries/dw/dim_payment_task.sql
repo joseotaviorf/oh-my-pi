@@ -9,10 +9,6 @@ WITH last_updated_task AS (
 SELECT DISTINCT
     tf.id_task AS sk_task,
     ac.id AS sk_activity,
-    ac.user_name AS user_name_activity,
-    ac.event_name AS event_name_activity,
-    ac.class AS class_activity,
-    ac.previous_status AS previous_status_activity,
     ac.type AS type_activity,
     tf.score_factor,
     tf.version,
