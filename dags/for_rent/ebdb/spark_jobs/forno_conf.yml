@@ -284,7 +284,6 @@ table_block_list:
   - AppVersion
   - LeadCampaign_targetPropertyTypes_AUD
   - MensagemSMS
-  - Imagem_AUD
   - RestrictionType
   - fluxolocacao_dadosagente
   - onboarding

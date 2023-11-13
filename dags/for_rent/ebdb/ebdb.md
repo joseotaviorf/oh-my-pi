@@ -114,6 +114,7 @@ Produces the following output tables:
     `house_weekly_schedule`
     `house_weekly_schedule_aud`
     `image`
+    `image_aud`
     `info_amenities`
     `info_amenities_aud`
     `info_condo_amenities`
