@@ -56,7 +56,7 @@ columns:
   creditor:
     lineage:
       - datalake_recupera_clean.installment.id_creditor
-    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP Quinto Andar
+    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
   is_special_installment:
     lineage:
       - datalake_recupera_clean.installment.is_special_installment

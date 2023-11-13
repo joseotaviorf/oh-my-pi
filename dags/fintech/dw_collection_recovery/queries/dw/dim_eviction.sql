@@ -22,7 +22,7 @@ contract AS (
     CASE
       WHEN id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
       WHEN id_creditor IN (3,5) THEN "IQ QuintoCred"
-      WHEN id_creditor IN (2,6) THEN "PP Quinto Andar"
+      WHEN id_creditor IN (2,6) THEN "PP QuintoAndar"
     END AS creditor
   FROM datalake_recupera_clean.contracts
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_customer, id_contract ORDER BY dt_contract_start DESC) = 1

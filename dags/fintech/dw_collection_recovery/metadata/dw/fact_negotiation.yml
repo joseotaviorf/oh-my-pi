@@ -27,7 +27,7 @@ columns:
   creditor:
     lineage:
       - datalake_recupera.negotiation.id_creditor
-    description: "Creditor. IQ QuintoAndar, IQ QuintoCred or PP Quinto Andar"
+    description: "Creditor. IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar"
   agreement_type:
     lineage:
       - datalake_recupera_clean.installment.agreement_type

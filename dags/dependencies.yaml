@@ -122,6 +122,8 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_recupera:load-enrich-installment
   - bietlejuice.enrich_recupera:load-enrich-negotiation
   - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_velo:load-enrich-junk
+  - bietlejuice.enrich_velo:load-enrich-occurrence
   - bietlejuice.recupera:load-clean-complementary-records
   - bietlejuice.recupera:load-clean-contracts
   - bietlejuice.recupera:load-clean-creditor-pending

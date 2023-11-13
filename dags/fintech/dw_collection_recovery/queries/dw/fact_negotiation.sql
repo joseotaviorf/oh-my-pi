@@ -81,7 +81,7 @@ SELECT
     CASE
       WHEN rn.id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
       WHEN rn.id_creditor IN (3,5) THEN "IQ QuintoCred"
-      WHEN rn.id_creditor IN (2,6) THEN "PP Quinto Andar"
+      WHEN rn.id_creditor IN (2,6) THEN "PP QuintoAndar"
     END AS creditor,
     ri.agreement_type,
     ri.advisory_code AS advisory,

@@ -53,7 +53,7 @@ SELECT DISTINCT
   CASE
       WHEN ri.id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
       WHEN ri.id_creditor IN (3,5) THEN "IQ QuintoCred"
-      WHEN ri.id_creditor IN (2,6) THEN "PP Quinto Andar"
+      WHEN ri.id_creditor IN (2,6) THEN "PP QuintoAndar"
     END AS creditor,
   ri.is_special_installment,
   tfi.installment_status,

@@ -19,7 +19,7 @@ columns:
   creditor:
     lineage:
       - datalake_recupera_clean.contracts.id_creditor
-    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP Quinto Andar
+    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
   status:
     lineage:
       - datalake_trato_feito_clean.eviction.status
