@@ -22,11 +22,10 @@ DAG_NAME = "enrich_marketing_automatic_daily_costs"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2021, 1, 17, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-PARTITION_COLS = ["id_date", "flow_type"]
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_photon_cluster"
+CLUSTER_DESCRIPTION = "custom_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+partition_cols = config_service.get_config("partition_cols")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
@@ -85,7 +84,6 @@ datalake_task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
@@ -93,7 +91,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
     is_incremental=True,
-    partitions=PARTITION_COLS,
+    partitions=partition_cols,
     execution_date="",
     extra_query_template_params={
         "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",

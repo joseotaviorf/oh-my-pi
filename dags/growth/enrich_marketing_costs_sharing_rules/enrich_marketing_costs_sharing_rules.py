@@ -22,12 +22,11 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_photon_cluster"
+CLUSTER_DESCRIPTION = "custom_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 MAIN_TABLE = config_service.get_config("main_table")
 
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
@@ -78,7 +77,6 @@ datalake_task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
     spark_jobs_path=base_spark_jobs_path,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 table_names = datalake_task_group._get_table_names_from_sql_files(
