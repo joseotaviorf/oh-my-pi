@@ -25,6 +25,10 @@ columns:
     description: Description in the occurrence
     lineage:
       - datalake_recupera_clean.historical_records.occurence_description
+  esforco:
+    description: Any dialer attempt, used to calculate the spin
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
   alo:
     description: Flag to indicate that a person answer the call.
     lineage:

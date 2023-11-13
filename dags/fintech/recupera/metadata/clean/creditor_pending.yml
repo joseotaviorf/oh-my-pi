@@ -4,7 +4,7 @@ table_name: creditor_pending
 description: |
   "It contains the original invoices of each receipt (records found in the 'complementary_records' or 'complementary_records_written_down' tables) and its
   installments.
-
+  
   Receipt originals (without installments): the 'installment_code' field is null and the value of 'is_installment' field is False.
   Installment originals: the installment_code field, when filled in, indicates which installment includes these originals. In this case,
   the 'receipt_code' field remains blank, as there is a possibility that an original installment is

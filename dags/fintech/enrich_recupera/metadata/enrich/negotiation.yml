@@ -38,7 +38,7 @@ columns:
     lineage:
       - datalake_recupera_clean.operational_records.collesction_customer_situation
   status_description:
-    description: Negotiation Status Description. Original field name = DESCRICAO_STATUS
+    description: Debt collection status description. Original field name = DESCRICAO_STATUS
     lineage:
       - datalake_recupera_clean.status.status_description
   negotiation_status:

@@ -114,6 +114,27 @@ bietlejuice.dw_casa_mineira_portal:
   - bietlejuice.enrich_casa_mineira_portal:load-enrich-real-estate-status
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses
+bietlejuice.dw_collection_recovery:
+  - bietlejuice.enrich_debt_recovery:load-enrich-installment
+  - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
+  - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
+  - bietlejuice.enrich_recupera:load-enrich-collection
+  - bietlejuice.enrich_recupera:load-enrich-installment
+  - bietlejuice.enrich_recupera:load-enrich-negotiation
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.recupera:load-clean-complementary-records
+  - bietlejuice.recupera:load-clean-contracts
+  - bietlejuice.recupera:load-clean-creditor-pending
+  - bietlejuice.recupera:load-clean-historical
+  - bietlejuice.recupera:load-clean-installment
+  - bietlejuice.recupera:load-clean-installment-detail
+  - bietlejuice.recupera:load-clean-operational-records
+  - bietlejuice.recupera:load-clean-operators
+  - bietlejuice.recupera:load-clean-records
+  - bietlejuice.recupera:load-clean-status
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-eviction
+  - bietlejuice.trato_feito:load-clean-eviction-data
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
