@@ -1,6 +1,7 @@
 SELECT
     fsde.sk_sale_demand_event * 1000 + 6 AS id,
     fsde.sk_region AS location_id,
+    fsde.sk_house AS property_id,
     dc.uuid_company AS company_uuid,
     'SALE' AS business_context,
     fsde.ts_event,

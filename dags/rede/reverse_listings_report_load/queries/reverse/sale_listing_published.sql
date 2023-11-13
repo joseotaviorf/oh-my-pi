@@ -5,6 +5,7 @@ SELECT
         3
     ) AS id,
     fls.sk_region AS location_id,
+    ROUND(fls.sk_sale_listing / 1000) AS property_id,
     dc.uuid_company AS company_uuid,
     'SALE' AS business_context,
     fls.ts_status_started AS ts_event,

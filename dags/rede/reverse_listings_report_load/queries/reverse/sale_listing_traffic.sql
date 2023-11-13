@@ -1,6 +1,7 @@
 SELECT
     MIN(fsse.sk_event) * 1000 + 1 AS id,
     fsse.sk_house_region AS location_id,
+    fsse.sk_house AS property_id,
     dc.uuid_company AS company_uuid,
     UPPER(dsset.business_context) AS business_context,
     COUNT(*) AS traffic_count,
@@ -25,6 +26,7 @@ WHERE
     AND dc.uuid_company IS NOT NULL
 GROUP BY
     location_id,
+    property_id,
     company_uuid,
     business_context,
     fsse.year,

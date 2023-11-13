@@ -1,6 +1,7 @@
 SELECT
     fv.sk_booking * 1000 + 4 AS id,
     fv.sk_region AS location_id,
+    fv.sk_house AS property_id,
     dc.uuid_company AS company_uuid,
     'SALE' AS business_context,
     fv.ts_booking_created AS ts_event,

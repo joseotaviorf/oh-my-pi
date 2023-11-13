@@ -1,6 +1,7 @@
 SELECT
     flsr.sk_reason_event * 1000 + 2 AS id,
     flsr.sk_region AS location_id,
+    dl.id_house AS property_id,
     dc.uuid_company AS company_uuid,
     dlc.business_context,
     dlr.reason,
@@ -22,6 +23,9 @@ JOIN
 JOIN
     dw_rede.dim_company AS dc
         ON dc.sk_company = flsr.sk_company
+JOIN
+    dw_rede.dim_lead_3p AS dl
+        ON dl.sk_lead_3p = flsr.sk_lead_3p
 WHERE
     dlc.business_context = 'SALE'
     AND dc.uuid_company IS NOT NULL

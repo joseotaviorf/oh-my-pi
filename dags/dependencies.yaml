@@ -2674,6 +2674,7 @@ bietlejuice.reverse_listings_report_access:
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.reverse_listings_report_load:
   - bietlejuice.dw_rede_company:load-dw-rede-dim-company
+  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-context
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-reason
   - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-status-reason
