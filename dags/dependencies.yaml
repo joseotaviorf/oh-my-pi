@@ -1642,9 +1642,12 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_crm_tasks:load-enrich-task-status
+  - bietlejuice.enrich_date:load-enrich-workday-window
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-photo-job
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+  - bietlejuice.kodak:load-clean-video
 bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:load-clean-proposal
   - bietlejuice.enrich_booking:load-enrich-booking
