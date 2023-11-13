@@ -8,6 +8,9 @@ workflow:
   custom_schema: credit
   spark_session_configs:
     udfs: [FINTECHOPS_WORK_MIN_SLA]
+  tables_customization:
+    dim_drop_reason:
+      custom_schema: public
 cluster:
   type: databricks_10_4_med_general_cluster
   access_control_list:
