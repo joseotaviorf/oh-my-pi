@@ -1,29 +1,45 @@
 database_name: datalake_crm_tasks
 table_name: task_status
+description: Enrichment table that consolidates information about the steps 
+  of a CRM task. Each row in this table represents a CRM task.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_task:
+    description: Unique identification key for the task in the crm.
     lineage:
       - datalake_crm.tasks.id
   id_workgroup:
+    description: Identification key used to relate the task context.
     lineage:
       - datalake_crm.tasks.id_workgroup
   id_rep:
+    description: Key of task assignee for a specific task
     lineage:
       - datalake_crm.tasks.id_assignee
   id_origin:
+    description: Identification key used for indicates the context that originated the task.
     lineage:
       - datalake_crm.tasks.id_origin
   id_first_rep:
+    description: Key of first task assignee for a specific task
     lineage:
       - datalake_crm.tasks_actions.metadata_old_value
       - datalake_crm.tasks.id_assignee
   type:
+    description: Descriptive information indicating the type of task.
     lineage:
       - datalake_crm.tasks.type
+  number_of_reschedules:
+    description: Numerical data used to identify the amount of rescheduling we had.
+  task_status:
+    description: Descriptive information indicating the stage of the task.
   ts_created:
+    description: Date that indicates when the task was created.
     lineage:
       - datalake_crm.tasks.ts_start
   ts_closed:
+    description: Date that indicates when the task was updated.
     lineage:
       - datalake_crm.tasks_actions.ts_action
       - datalake_crm.tasks.ts_completed
