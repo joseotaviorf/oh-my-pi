@@ -1,33 +1,47 @@
 database_name: datalake_bigfone_twilio
 table_name: call_agents
+description: Enrichment table that aims to consolidate information from analysts in 
+  the call context (bigfone). The granularity of this table is the analyst id.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_agent:
+    description: Analyst identification key.
     lineage:
       - datalake_bigfone_events.events.metadata
   email:
+    description: Analyst email related to the call context.
     lineage:
       - datalake_bigfone_events.events.metadata
   full_name:
+    description: Analyst name related to the call context.
     lineage:
       - datalake_bigfone_events.events.metadata
   location:
+    description: Company in which the analyst is allocated.
     lineage:
       - datalake_bigfone_events.events.metadata
   skills:
+    description: Data in array format that indicates the types/departments in which the analyst works.
     lineage:
       - datalake_bigfone_events.events.metadata
   ts_first_event:
+    description: Date in timestamp format that indicates when the analyst performed his first service event.
     lineage:
       - datalake_bigfone_events.events.ts_created_local
   ts_last_event:
+    description: Date in timestamp format that indicates when the analyst performed his last service event.
     lineage:
       - datalake_bigfone_events.events.ts_created_local
   year:
+    description: Information relating to the year of the execution date.
     lineage:
       - datalake_bigfone_events.events.year
   month:
+    description: Information relating to the month of the execution date.
     lineage:
       - datalake_bigfone_events.events.month
   day:
+    description: Information relating to the day of the execution date.
     lineage:
       - datalake_bigfone_events.events.day
