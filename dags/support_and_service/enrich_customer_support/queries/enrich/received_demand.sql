@@ -20,6 +20,18 @@ customer_email AS (
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY email ORDER BY id_user DESC) = 1
 ),
+sessions AS (
+  SELECT
+    id AS id_session,
+    user_data:["user_id"] AS id_user,
+    status,
+    source,
+    source_identity
+  FROM
+    datalake_sauron_clean.session
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_updated DESC) = 1
+),
 call AS (
   WITH twilio_call_flex_events AS (
     SELECT
@@ -95,44 +107,78 @@ call AS (
         AND r.ts_created < COALESCE(rts.ts_created_ended, CURRENT_TIMESTAMP())
     WHERE
       task_queue_name <> previous_task_queue_name
+  ),
+  call_sessions AS (
+    SELECT DISTINCT
+      crd.id_call,
+      s.id_session,
+      crd.id_task,
+      COALESCE(s.id_user, cp.id_user) AS id_user,
+      crd.id_reservation,
+      crd.agent_email,
+      crd.customer_phone,
+      crd.task_queue_name AS department,
+      crd.ts_created
+    FROM
+      call_received_demand AS crd
+    LEFT JOIN
+      sessions AS s
+        ON s.source_identity = crd.id_call
+    LEFT JOIN
+      customer_phone AS cp
+        ON cp.phone_number = crd.customer_phone
+  ),
+  call_tickets AS (
+    SELECT
+      id_ticket,
+      id_external_service,
+      id_segment,
+      client_type,
+      customer_type_tag,
+      contact_motivation_tag,
+      contact_theme_tag,
+      contact_theme_detail_tag,
+      step_tag,
+      request_type
+    FROM
+      datalake_customer_support.call
+    QUALIFY
+      ROW_NUMBER() OVER(PARTITION BY id_ticket, id_external_service, id_segment ORDER BY ts_segment_created DESC) = 1
   )
   SELECT DISTINCT
-    crd.id_call,
-    NULL AS id_session,
-    call.id_ticket AS id_ticket,
-    crd.id_task,
-    cp.id_user,
-    crd.id_reservation,
-    crd.agent_email,
-    'call' AS channel,
-    crd.customer_phone,
+    cs.id_call,
+    cs.id_session,
+    ct.id_ticket,
+    cs.id_task,
+    cs.id_user,
+    cs.id_reservation,
+    cs.agent_email,
+    "call" AS channel,
+    cs.customer_phone,
     NULL AS customer_email,
-    crd.task_queue_name AS department,
-    call.client_type,
-    call.customer_type_tag,
-    call.contact_motivation_tag,
-    call.contact_theme_tag,
-    call.contact_theme_detail_tag,
-    call.step_tag,
-    call.request_type,
+    cs.department,
+    ct.client_type,
+    ct.customer_type_tag,
+    ct.contact_motivation_tag,
+    ct.contact_theme_tag,
+    ct.contact_theme_detail_tag,
+    ct.step_tag,
+    ct.request_type,
     NULL AS completion_reason,
     CASE
-      WHEN call.id_external_service IS NULL THEN 'ABANDONED'
-      WHEN ROW_NUMBER() OVER(PARTITION BY crd.id_call ORDER BY crd.ts_created DESC) = 1 THEN 'COMPLETED'
+      WHEN ct.id_external_service IS NULL THEN 'ABANDONED'
+      WHEN ROW_NUMBER() OVER(PARTITION BY cs.id_call, cs.id_reservation ORDER BY cs.ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
-    call.id_external_service IS NOT NULL AS is_answered,
+    ct.id_external_service IS NOT NULL AS is_answered,
     NULL AS ts_reservation_created,
-    crd.ts_created
+    cs.ts_created
   FROM
-    call_received_demand AS crd
+    call_sessions AS cs
   LEFT JOIN
-    datalake_customer_support.call
-      ON crd.id_task = call.id_external_service
-      AND crd.id_reservation = call.id_segment
-  LEFT JOIN
-    customer_phone AS cp
-      ON cp.phone_number = crd.customer_phone
+    call_tickets AS ct
+      ON cs.id_task = ct.id_external_service
+      AND cs.id_reservation = ct.id_segment
 ),
 chat AS (
   WITH current_queue AS (
@@ -206,7 +252,6 @@ chat AS (
       COALESCE(tr.id_session_whats, tr.id_session_inapp) AS id_session,
       c.id_ticket AS id_ticket,
       tr.id_task,
-      cp.id_user,
       tr.agent_email,
       tr.customer_phone,
       tr.task_queue_name AS department,
@@ -226,16 +271,13 @@ chat AS (
     LEFT JOIN
       datalake_customer_support.chat AS c
         ON c.id_segment = tr.id_task
-    LEFT JOIN
-      customer_phone AS cp
-        ON cp.phone_number = tr.customer_phone
   )
   SELECT DISTINCT
     NULL AS id_call,
-    id_session,
+    ta.id_session,
     id_ticket,
     id_task,
-    id_user,
+    COALESCE(s.id_user, cp.id_user) AS id_user,
     NULL AS id_reservation,
     agent_email,
     'chat' AS channel,
@@ -253,6 +295,8 @@ chat AS (
     CASE
       WHEN completion_reason = 'task idled' THEN 'IDLED'
       WHEN completion_reason = 'session expired' THEN 'EXPIRED'
+      WHEN completion_reason = 'task completed' THEN 'COMPLETED'
+      WHEN completion_reason = 'task transferred' THEN 'TRANSFERRED'
       WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
@@ -260,7 +304,13 @@ chat AS (
     ts_reservation_created,
     ts_created
   FROM
-    ticket_assignment
+    ticket_assignment AS ta
+  LEFT JOIN
+    sessions AS s
+      ON s.id_session = ta.id_session
+  LEFT JOIN
+    customer_phone AS cp
+      ON cp.phone_number = ta.customer_phone
 ),
 email AS (
   SELECT DISTINCT

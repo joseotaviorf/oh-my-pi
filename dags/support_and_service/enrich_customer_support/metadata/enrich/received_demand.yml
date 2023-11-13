@@ -23,10 +23,13 @@ columns:
     lineage:
       - datalake_quinto_messenger.chat.id_session
       - datalake_quinto_messenger.channel.id_source
+      - datalake_sauron_clean.session.id
     description: ID from Sauron session. This column is filled exclusively for chat data
   id_ticket:
     lineage:
       - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.chat.id_ticket
     description: Zendesk's ticket ID.
   id_task:
     lineage:
@@ -39,10 +42,36 @@ columns:
       For call tasks, it considers all inbound tasks, whereas for chat tasks, it takes into account
       all tasks that have generated a reservation. Similarly, for email, all Zendesk
       E-mail Tickets are considered.
+  id_user:
+    lineage:
+      - datalake_sauron_clean.session.user_data
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+    description: User ID from main/EBDB
   id_reservation:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.id_reservation
     description: Reservation ID from Twilio, identifies an event which an agent has been assigned to a call
+  agent_email:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.id_task_external
+      - datalake_quinto_messenger_clean.task.assigned_to
+      - datalake_customer_support.email.agent_email
+    description: The agent email.
+  channel:
+    description: Channel name which customer got in touch with 5A
+    categories:
+      call: channel_name receives this value when the customer get in touch via call
+      chat: channel_name receives this value when the customer get in touch via chat
+      email: channel_name receives this value when the customer get in touch via email
+  customer_phone:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.customer_phone
+      - datalake_quinto_messenger_clean.task_event.event_payload
+    description: The customer phone associated with the id_user.
+  customer_email:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.customer_contact
+    description: The user customer email associated with the id_user.
   department:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.id_task_queue
@@ -53,23 +82,48 @@ columns:
       workers for processing. The name of the queue corresponds to the department for
       which the task is intended to be routed. For Zendesk E-mail, the department is
       the Zendesk group assigned to the ticket.
-  channel:
-    description: Channel name which customer got in touch with 5A
-    categories:
-      call: channel_name receives this value when the customer get in touch via call
-      chat: channel_name receives this value when the customer get in touch via chat
-      email: channel_name receives this value when the customer get in touch via email
-  agent_email:
+  client_type:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_task_external
-      - datalake_quinto_messenger_clean.task.assigned_to
-      - datalake_customer_support.email.agent_email
-    description: The agent email.
-  customer_phone:
+      - datalake_customer_suppor.call.client_type
+      - datalake_customer_suppor.chat.client_type
+      - datalake_customer_suppor.email.client_type
+    description: Field related to the ticket taxonomy
+  customer_type_tag:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.customer_phone
-      - datalake_quinto_messenger_clean.task_event.event_payload
-    description: The user customer phone. It is NULL for Zendesk E-mail Tickets.
+      - datalake_customer_suppor.call.customer_type_tag
+      - datalake_customer_suppor.chat.customer_type_tag
+      - datalake_customer_suppor.email.customer_type_tag
+    description: Field related to the ticket taxonomy
+  contact_motivation_tag:
+    lineage:
+      - datalake_customer_suppor.call.contact_motivation_tag
+      - datalake_customer_suppor.chat.contact_motivation_tag
+      - datalake_customer_suppor.email.contact_motivation_tag
+    description: Field related to the ticket taxonomy
+  contact_theme_tag:
+    lineage:
+      - datalake_customer_suppor.call.contact_theme_tag
+      - datalake_customer_suppor.chat.contact_theme_tag
+      - datalake_customer_suppor.email.contact_theme_tag
+    description: Field related to the ticket taxonomy
+  contact_theme_detail_tag:
+    lineage:
+      - datalake_customer_suppor.call.contact_theme_detail_tag
+      - datalake_customer_suppor.chat.contact_theme_detail_tag
+      - datalake_customer_suppor.email.contact_theme_detail_tag
+    description: Field related to the ticket taxonomy
+  step_tag:
+    lineage:
+      - datalake_customer_suppor.call.step_tag
+      - datalake_customer_suppor.chat.step_tag
+      - datalake_customer_suppor.email.step_tag
+    description: Field related to the ticket taxonomy
+  request_type:
+    lineage:
+      - datalake_customer_suppor.call.request_type
+      - datalake_customer_suppor.chat.request_type
+      - datalake_customer_suppor.email.request_type
+    description: Field related to the ticket taxonomy
   completion_reason:
     lineage:
       - datalake_quinto_messenger.task.completion_reason
