@@ -1,0 +1,47 @@
+database_name: dw_public
+table_name: dim_drop_reason
+description: "The dim_drop_reason works as a junk dimension. It was created to categorize the different types of rejection reasons from four main sources: booking, offer, proposal and contract."
+domain: Fintech
+owner: isabella.santos@quintoandar.com.br
+columns:
+  id:
+    description: "Incremental ID, which is the table PK."
+  id_drop_origin:
+    description: "ID of the origin of the drop reason. The rejection origin can be originated from booking, offer, proposal or contract."
+  id_original_drop_reason:
+    description: "ID of the funnel step of the drop reason."
+  desc_drop_origin:
+    description: "Description of the origin of the drop reason."
+    categories:
+      Booking Cancellation Reason: ""
+      Offer Rejection Reason: ""
+      Proposal Rejection Reason: ""
+      Contract Cancellation Reason: ""
+  desc_persona:
+    description: "Description of the persona who generated the drop."
+    categories:
+      OWNER: ""
+      TENANT: ""
+      AGENT: ""
+      5A: ""
+      LISTING: ""
+  desc_drop_reason:
+    description: "Description of the category in which the drop reason is."
+    categories:
+      CANCELLATION: "When the drop reason is related to a cancellation by the tenant, owner or agent."
+      CONTRACT ISSUES: "When the drop was motivated from a contract issue."
+      DELAYS: "When the drop was motivated from any delay."
+      DEMAND CONCENTRATION: "When the drop was motivated from a demand concentration, or internal competition."
+      DISAGREEMENT: "When the drop was motivated from a disagreement between the parties."
+      EXTERNAL COMPETITION: "When the drop was motivated from an external competition."
+      INCORRECT OR MODIFIED DATA: "When the drop happened because of incorrect or modified data."
+      NO CONTACT: "When the drop happened because of no contact."
+      NO RESERVED: "When the drop happened because of tenant no reserved."
+      PROPERTY FOR SALE: "When the drop happened because the property was on sale."
+      PROPERTY UNAVAILABLE: "When the drop happened because the property is no loger available."
+      REJECTED: "When the drop happened because of a rejection by the tenant, owner or agent."
+      STALLED: "When the drop happened because of a stalled by the tenant or owner."
+      WITHDRAWAL: "When the drop happened because of a withdrawal by the tenant, owner or agent."
+      OTHER: ""
+  desc_original_drop_reason:
+    description: "Original description of the drop reason, as it is found in the source (booking, offer, proposal or contract)."

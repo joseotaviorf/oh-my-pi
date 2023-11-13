@@ -144,10 +144,17 @@ bietlejuice.dw_contract:
 bietlejuice.dw_credit_analysis:
   - bietlejuice.dw_crm:load-dw-crm-fact-credit-tasks
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_credit_analysis:load-enrich-early-credit-analysis
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
+  - bietlejuice.rental_guarantee:load-clean-risk-category
+  - bietlejuice.sorting_hat:load-clean-credit-analysis
   - bietlejuice.sorting_hat:load-clean-experiment
   - bietlejuice.sorting_hat:load-clean-variant
 bietlejuice.dw_crm:

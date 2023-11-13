@@ -28,11 +28,6 @@ bietlejuice.dw_casa_mineira_portal:
     - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
 bietlejuice.dw_country:
   override: []
-bietlejuice.dw_credit_analysis:
-  remove:
-    - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
-    - bietlejuice.rental_guarantee:load-clean-risk-category
-    - bietlejuice.sorting_hat:load-clean-credit-analysis
 bietlejuice.dw_crm:
   add:
     - bietlejuice.ebdb:load-clean-inspection

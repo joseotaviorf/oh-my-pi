@@ -104,6 +104,7 @@ rent_flows AS (
     flrf.sk_region,
     flrf.sk_tenant_doc_complete_date,
     flrf.sk_tenant_first_doc_sent_date,
+    COALESCE(dp.id, -1) AS sk_drop_reason,
     flrf.funnel_step,
     IF(
       cap.id_first_credit_analysis = ca.id_credit_analysis,
@@ -137,6 +138,9 @@ rent_flows AS (
   LEFT JOIN
     guarantees AS g
       ON g.sk_proposal = flrf.sk_proposal
+  LEFT JOIN
+    dw_public.dim_drop_reason AS dp
+      ON dp.desc_original_drop_reason = flrf.funnel_step_drop_reason
 ),
 proposal_credit_flows AS (
   SELECT
@@ -163,6 +167,7 @@ proposal_credit_flows AS (
     rf.sk_region,
     rf.sk_tenant_doc_complete_date,
     rf.sk_tenant_first_doc_sent_date,
+    rf.sk_drop_reason,
     rf.funnel_step,
     CAST(
       COALESCE(
@@ -229,6 +234,7 @@ SELECT
   sk_region,
   sk_tenant_doc_complete_date,
   sk_tenant_first_doc_sent_date,
+  sk_drop_reason,
   sk_ec_created_date,
   sk_ec_expired_date,
   funnel_step,
