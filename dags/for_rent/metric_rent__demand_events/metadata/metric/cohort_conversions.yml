@@ -245,6 +245,19 @@ columns:
       hierarchy: Operations Mgmt
       approved_by: 'bruno.choumar@quintoandar.com.br'
       link_to_metric: 'https://quintoandar.sa.looker.com/looks/5320'
+  ca2cc:
+    description: The fraction of credit approvals that resulted in a contract created within the aggregation.
+    metric:
+      name: Credit Approved to Contract Created
+      description: The fraction of credit approvals that resulted in a contract created.
+        Fraction represented by the ratio between the total number of Contracts Created and the
+        total number of Credits Approved.
+      acronym: CA2CC
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Operations Mgmt
+      approved_by: 'matheus.madeira@quintoandar.com.br'
+      link_to_metric: ''
   ca2cs:
     description: The fraction of credit approvals that resulted in a contract signed within the aggregation.
     metric:

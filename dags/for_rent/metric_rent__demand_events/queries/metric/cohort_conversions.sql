@@ -23,6 +23,7 @@ SELECT
     CAST(rc.es_converted_ca/rd.evaluation_started AS DECIMAL (2,2)) AS es2ca,
     CAST(rc.ep_converted_ds/rd.evaluation_positive AS DECIMAL (2,2)) AS ep2ds,
     CAST(rc.ds_converted_ca/rd.documentation_sent AS DECIMAL (2,2)) AS ds2ca,
+    CAST(rc.ca_converted_cc/rd.credit_approved AS DECIMAL (2,2)) AS ca2cc,
     CAST(rc.ca_converted_cs/rd.credit_approved AS DECIMAL (2,2)) AS ca2cs,
     CAST(rc.cc_converted_cs/rd.contracts_created AS DECIMAL (2,2)) AS cc2cs,
     rc.has_guarantee,
