@@ -7,12 +7,12 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_listing_quality_sla:
-    id_unique:
+    is_unique:
       severity_level: Error
     is_complete:
       severity_level: Error
   business_key:
-    id_unique:
+    is_unique:
       severity_level: Error
     is_complete:
       severity_level: Error
