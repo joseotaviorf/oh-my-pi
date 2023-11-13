@@ -10,19 +10,19 @@ columns:
       - datalake_user.broker_user.id_snapshot
       - datalake_user.tenant_user.id_snapshot
       - datalake_user.photographer_user.id_snapshot
-      - datalake_user.property_owner.id_snapshot
+      - datalake_user.landlord.id_snapshot
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
   id_user:
     lineage:
       - datalake_user.broker_user.id_user
       - datalake_user.tenant_user.id_user
       - datalake_user.photographer_user.id_user
-      - datalake_user.property_owner.id_user
+      - datalake_user.landlord.id_user
     description: The user id in the main.
   id_user_type:
     description: The id for each user type
     categories:
-      "1": For property owner type
+      "1": For landlord type
       "2": For tenant type
       "3": For photographer type
       "4": For broker type
@@ -31,53 +31,54 @@ columns:
       - datalake_user.broker_user.id_country
       - datalake_user.tenant_user.id_country
       - datalake_user.photographer_user.id_country
-      - datalake_user.property_owner.id_country
+      - datalake_user.landlord.id_country
     description: The user country id.
   client_type:
     lineage:
       - datalake_user.broker_user.client_type
       - datalake_user.tenant_user.client_type
       - datalake_user.photographer_user.client_type
-      - datalake_user.property_owner.client_type
+      - datalake_user.landlord.client_type
     description: Client type assumed by the user.
   country_code:
     lineage:
       - datalake_user.broker_user.country_code
       - datalake_user.tenant_user.country_code
       - datalake_user.photographer_user.country_code
-      - datalake_user.property_owner.country_code
+      - datalake_user.landlord.country_code
     description: Country code of the user. Also, a partition of this table.
   main_phone:
     lineage:
       - datalake_user.broker_user.main_phone
       - datalake_user.tenant_user.main_phone
       - datalake_user.photographer_user.main_phone
-      - datalake_user.property_owner.main_phone
+      - datalake_user.landlord.main_phone
     description: The user main_phone.
   name:
     lineage:
       - datalake_user.broker_user.name
       - datalake_user.tenant_user.name
       - datalake_user.photographer_user.name
-      - datalake_user.property_owner.name
+      - datalake_user.landlord.name
     description: The user full_name.
   email:
     lineage:
       - datalake_user.broker_user.email
       - datalake_user.tenant_user.email
       - datalake_user.photographer_user.email
-      - datalake_user.property_owner.email
+      - datalake_user.landlord.email
     description: The user email.
   cpf:
     lineage:
       - datalake_user.broker_user.cpf
       - datalake_user.tenant_user.cpf
       - datalake_user.photographer_user.cpf
-      - datalake_user.property_owner.cpf
+      - datalake_user.landlord.cpf
     description: The user individual brazilian registry.
   journey_step:
     lineage:
       - datalake_user.tenant_user.journey_step
+      - datalake_user.landlord.journey_step
     description:
       The tenant journey step, respecting how deep the customer is on their
       rental journey. Only tenants has this column filled.
@@ -106,7 +107,8 @@ columns:
         in the rental context
   persona_step:
     lineage:
-      - datalake_user.tenant_user.tenant_persona_step
+      - datalake_user.tenant_user.persona_step
+      - datalake_user.landlord.persona_step
     description:
       Indicates if the user is in any step before signing a contract or after signing a
       contract. If the user is in the post_contract step,it will not assume the
@@ -124,75 +126,83 @@ columns:
       - datalake_user.broker_user.is_active
       - datalake_user.tenant_user.is_active
       - datalake_user.photographer_user.is_active
-      - datalake_user.property_owner.is_active
+      - datalake_user.landlord.is_active
     description: If the user is active or not.
   is_blocked:
     lineage:
       - datalake_user.broker_user.is_blocked
       - datalake_user.tenant_user.is_blocked
       - datalake_user.photographer_user.is_blocked
-      - datalake_user.property_owner.is_blocked
+      - datalake_user.landlord.is_blocked
     description: If the user is blocked or not.
   is_pp_multi:
     lineage:
-      - datalake_user.property_owner.is_pp_multi
+      - datalake_user.landlord.is_pp_multi
     description:
       If the user is part of pp_multi program or not. Assumes TRUE or FALSE for only
-      the property owner client type.
-  is_tenant_offboarding:
+      the landlord client type.
+  is_offboarding:
     lineage:
-      - datalake_user.tenant_user.is_tenant_offboarding
+      - datalake_user.tenant_user.is_offboarding
+      - datalake_user.landlord.is_offboarding
     description:
       If the user has an active termination, it indicates that the user is currently
       in the offboarding step of the rental journey.
-  is_tenant_ongoing:
+  is_ongoing:
     lineage:
-      - datalake_user.tenant_user.is_tenant_ongoing
+      - datalake_user.tenant_user.is_ongoing
+      - datalake_user.landlord.is_ongoing
     description:
       If the user has at least one active contract and the last contract signed occurred
       past the last 40 days, with the snapshot date serving as the reference point, then the
       user is currently in the ongoing step of the rental journey
-  is_tenant_onboarding:
+  is_onboarding:
     lineage:
-      - datalake_user.tenant_user.is_tenant_onboarding
+      - datalake_user.tenant_user.is_onboarding
+      - datalake_user.landlord.is_onboarding
     description:
       If the user has at least one active contract and the last contract signed occurred
       within the last 40 days, with the snapshot date serving as the reference point, then the
       user is currently in the onboarding step of the rental journey
-  is_tenant_contract_to_entrance:
+  is_contract_to_entrance:
     lineage:
-      - datalake_user.tenant_user.is_tenant_contract_to_entrance
+      - datalake_user.tenant_user.is_contract_to_entrance
+      - datalake_user.landlord.is_contract_to_entrance
     description:
       If the user has had events such as the last evaluation start, last evaluation approval,
       last document sending, last credit approval, or last proposal rejection within the
       last 40 days, with the snapshot date as the reference point, then the user is
       currently in the contract to entrance step of the rental journey
-  is_tenant_visits_to_offer:
+  is_visits_to_offer:
     lineage:
-      - datalake_user.tenant_user.is_tenant_visits_to_offer
+      - datalake_user.tenant_user.is_visits_to_offer
+      - datalake_user.landlord.is_visits_to_offer
     description:
       If the user has had events such as the last booking, last canceled booking,
       last visiting, last offer sending, last offer rejected, last reservation created,
       or last offer approval within the last 40 days, with the snapshot date as the
       reference point, then the user is currently in the visits to offer step of
       the rental journey. It assumes value only for tenants.
-  is_tenant_listing_and_search:
+  is_listing_and_search:
     lineage:
-      - datalake_user.tenant_user.is_tenant_listing_and_search
+      - datalake_user.tenant_user.is_listing_and_search
+      - datalake_user.landlord.is_listing_and_search
     description:
       If the user has had a last house searching event within the last 40 days, with
       the snapshot date as the reference point, then the user is currently in the
       listing and search step of the rental journey. It assumes value only for tenants.
-  is_tenant_pre_contract:
+  is_pre_contract:
     lineage:
-      - datalake_user.tenant_user.is_tenant_pre_contract
+      - datalake_user.tenant_user.is_pre_contract
+      - datalake_user.landlord.is_pre_contract
     description:
       If the user has taken any step in contract to entrance, visits to offer, or
       listing and search, it signifies that the user is in a pre-contract step.
       It assumes value only for tenants.
-  is_tenant_post_contract:
+  is_post_contract:
     lineage:
-      - datalake_user.tenant_user.is_tenant_post_contract
+      - datalake_user.tenant_user.is_post_contract
+      - datalake_user.landlord.is_post_contract
     description:
       If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
       that the user is in a post-contract step. It assumes value only for tenants.
@@ -201,40 +211,40 @@ columns:
       - datalake_user.broker_user.dt_birth
       - datalake_user.tenant_user.dt_birth
       - datalake_user.photographer_user.dt_birth
-      - datalake_user.property_owner.dt_birth
+      - datalake_user.landlord.dt_birth
     description: The user birth date.
   ts_user_created:
     lineage:
       - datalake_user.broker_user.ts_user_created
       - datalake_user.tenant_user.ts_user_created
       - datalake_user.photographer_user.ts_user_created
-      - datalake_user.property_owner.ts_user_created
+      - datalake_user.landlord.ts_user_created
     description: The user creation date in the system.
   ts_user_updated:
     lineage:
       - datalake_user.broker_user.ts_user_updated
       - datalake_user.tenant_user.ts_user_updated
       - datalake_user.photographer_user.ts_user_updated
-      - datalake_user.property_owner.ts_user_updated
+      - datalake_user.landlord.ts_user_updated
     description: The user last updated date in the system.
   year:
     lineage:
       - datalake_user.broker_user.year
       - datalake_user.tenant_user.year
       - datalake_user.photographer_user.year
-      - datalake_user.property_owner.year
+      - datalake_user.landlord.year
     description: Snapshot year, partition column.
   month:
     lineage:
       - datalake_user.broker_user.month
       - datalake_user.tenant_user.month
       - datalake_user.photographer_user.month
-      - datalake_user.property_owner.month
+      - datalake_user.landlord.month
     description: Snapshot month, partition column.
   day:
     lineage:
       - datalake_user.broker_user.day
       - datalake_user.tenant_user.day
       - datalake_user.photographer_user.day
-      - datalake_user.property_owner.day
+      - datalake_user.landlord.day
     description: Snapshot day, partition column.
