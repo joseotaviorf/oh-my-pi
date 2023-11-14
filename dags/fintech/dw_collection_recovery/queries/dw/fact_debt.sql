@@ -5,7 +5,11 @@ WITH deduplicate_creditor_pending AS (
       WHEN id_creditor IN (3,5) THEN "IQ QuintoCred"
       WHEN id_creditor IN (2,6) THEN "PP QuintoAndar"
     END AS creditor,
-    id_creditor,
+    CASE
+      WHEN id_creditor IN (1,4,7,8,9) THEN 1
+      WHEN id_creditor IN (2,6) THEN 2
+      ELSE id_creditor
+    END AS id_creditor,
     id_contract,
     id_installment,
     installment_code,
@@ -19,7 +23,11 @@ deduplicate_complementary_records AS (
       WHEN id_creditor IN (3,5) THEN "IQ QuintoCred"
       WHEN id_creditor IN (2,6) THEN "PP QuintoAndar"
     END AS creditor,
-    id_creditor,
+    CASE
+      WHEN id_creditor IN (1,4,7,8,9) THEN 1
+      WHEN id_creditor IN (2,6) THEN 2
+      ELSE id_creditor
+    END AS id_creditor,
     id_contract,
     id_installment,
     installment_code

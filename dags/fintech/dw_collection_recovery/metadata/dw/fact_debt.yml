@@ -34,19 +34,19 @@ columns:
     lineage:
       - datalake_retsuko.invoice.status
       - datalake_velo.junk.desc_lvl_1
-    description: When QuintoAndar, Retsuko's current invoice status; When QuintoCred, Rental Guarantee Platform current delinquency status;
+    description: When QuintoAndar, Retsuko's current invoice status; When QuintoCred, Rental Guarantee Platform current delinquency status; Read more about retsuko invoice status at https://docs.google.com/document/d/1EoWn1-aoJ_khoZNJUuMjp1uLQy32sH25JwjiRdbx8yk/edit#heading=h.70famyfdn89k
     categories:
       open: "QuintoAndar"
       paid: "QuintoAndar"
       written-down: "QuintoAndar"
       canceled: "QuintoAndar"
-      not-payable: "QuintoAndar"
-      divergent-payment: "QuintoAndar"
+      not-payable: "QuintoAndar - zero value invoice (due-amount=0). It behaves as an open invoice but there is no charge or transfer that can be done. "
+      divergent-payment: "QuintoAndar - invoice that was paid but the amount paid is different than the value of the invoice."
       registered: "QuintoCred - First status, when the delinquency is created"
       under_agreement: "QuintoCred - The delinquency was sent to Recupera"
       requested_agreement: "QuintoCred - Legacy status from 2.0, not used anymore"
-      progress: "QuintoCred - The delinquency was paid (with gain or loss)"
-      finished: "QuintoCred - A confirmed agreement between QuintoCred and the defaulter"
+      progress: "QuintoCred - A confirmed agreement between QuintoCred and the defaulter"
+      finished: "QuintoCred - The delinquency was paid (with gain or loss)"
       recovering: "QuintoCred - Agreement requested but not confirmed yet"
   invoice_status:
     lineage:

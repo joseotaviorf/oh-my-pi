@@ -17,10 +17,6 @@ columns:
     lineage:
       - datalake_recupera.installment.customer_document
     description: "Customer document (CPF). Foreign key to dim_debtor"
-  id_contract:
-    lineage:
-      - datalake_recupera.installment.id_contract
-    description: Negotiation ID
   id_installment:
     lineage:
       - datalake_debt_recovery.installment.id
@@ -45,10 +41,6 @@ columns:
       Recebimento Futuro (em aberto) - boleto, cheque-pre: ""
       Ficha de Compensação – Boleto confirmado (pago): ""
       Pix emitido: ""
-  receipt_written_down:
-    lineage:
-      - datalake_recupera_clean.receipt.written_down_indicator
-    description: Boolean to indicate where a receipt/installment has been written down or not. When the receipt is refunded this field will not change
   installment_number:
     lineage:
       - datalake_recupera.installment.installment_number
@@ -105,14 +97,6 @@ columns:
     lineage:
       - datalake_recupera_clean.installment.adm_fee_amount
     description: Administrative Fee Amount
-  charges:
-    lineage:
-      - datalake_recupera.installment.charges
-    description: Installment Charges (fees).
-  discount_amount:
-    lineage:
-      - datalake_recupera_clean.installment.discount_amount
-    description: Discount amount
   paid_amount:
     lineage:
       - datalake_recupera.installment.paid_amount

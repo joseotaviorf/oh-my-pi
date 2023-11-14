@@ -16,10 +16,6 @@ columns:
     lineage:
       - datalake_debt_recovery.negotiation.id_negotiation
     description: "Trato-Feito negotiation ID"
-  id_contract:
-    lineage:
-      - datalake_recupera.negotiation.id_contract
-    description: "Contract ID. A customer can have more than 1 contract."
   id_operator:
     lineage:
       - datalake_recupera.negotiation.id_operator

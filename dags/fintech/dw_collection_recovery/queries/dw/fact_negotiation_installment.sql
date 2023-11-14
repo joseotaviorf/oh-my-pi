@@ -37,8 +37,7 @@ recupera_installment AS (
     amount_fine,
     interest_fee_amount,
     default_interest_amount,
-    adm_fee_amount,
-    discount_amount
+    adm_fee_amount
   FROM datalake_recupera_clean.installment
   WHERE is_installment_active IS TRUE
 )
