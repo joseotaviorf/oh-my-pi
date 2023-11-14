@@ -7,39 +7,50 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_raw.dynamicpricinghouse.houseid
-  min_rent:
+  id_listing_business_context:
     lineage:
-      - datalake_ebdb_raw.dynamicpricinghouse.minrent
-  initial_rent:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricinghouse.initialrent
-  dt_last_price_updated:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricinghouse.lastpriceupdate
+      - datalake_ebdb_raw.dynamicpricinghouse.listingBusinessContextId
   id_dynamic_pricing_parameter:
     lineage:
       - datalake_ebdb_raw.dynamicpricinghouse.dynamicpricingparameterid
-  ts_created:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricinghouse.criadoem
-  ts_updated:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricinghouse.atualizadoem
   status:
     lineage:
       - datalake_ebdb_raw.dynamicpricinghouse.status
-  occurred_price_changes:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricinghouse.pricechangesoccurred
-  is_enabled:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricinghouse.enabled
   operation_mode:
     lineage:
       - datalake_ebdb_raw.dynamicpricinghouse.operationmode
   origin:
     lineage:
       - datalake_ebdb_raw.dynamicpricinghouse.origin
+  min_rent:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.minrent
+  initial_rent:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.initialrent
+  occurred_price_changes:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.pricechangesoccurred
   pre_publication_rent_probability:
     lineage:
       - datalake_ebdb_raw.dynamicpricinghouse.prepublicationrentprobability
+  is_enabled:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.enabled
+  dt_last_price_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.lastpriceupdate
+  dt_activated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.activatedAt
+  dt_deactivated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.deactivatedAt
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.criadoem
+
+

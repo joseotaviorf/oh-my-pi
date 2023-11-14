@@ -13,6 +13,9 @@ columns:
   days_threshold:
     lineage:
       - datalake_ebdb_raw.dynamicpricingparameters.daysthreshold
+  days_from_automatic_activation:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.daysFromAutomaticActivation
   offers_threshold:
     lineage:
       - datalake_ebdb_raw.dynamicpricingparameters.offersthreshold
@@ -25,18 +28,6 @@ columns:
   drops:
     lineage:
       - datalake_ebdb_raw.dynamicpricingparameters.dropscount
-  ts_started:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricingparameters.begindate
-  ts_ended:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricingparameters.enddate
-  ts_created:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricingparameters.criadoem
-  ts_updated:
-    lineage:
-      - datalake_ebdb_raw.dynamicpricingparameters.atualizadoem
   initial_rent_percentile:
     lineage:
       - datalake_ebdb_raw.dynamicpricingparameters.initialrentpercentile
@@ -49,3 +40,18 @@ columns:
   min_rent_ratio:
     lineage:
       - datalake_ebdb_raw.dynamicpricingparameters.minrentratio
+  max_value_per_reduction:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.maximumValuePerReduction
+  ts_started:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.begindate
+  ts_ended:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.enddate
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.atualizadoem

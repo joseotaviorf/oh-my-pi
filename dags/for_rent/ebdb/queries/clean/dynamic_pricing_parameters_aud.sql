@@ -1,20 +1,25 @@
-select
-  REV as rev,
-  REVTYPE as rev_type,
+SELECT
   id,
-  name as parameters_name,
+  REV AS rev,
+  REVTYPE AS rev_type,
+  name AS parameters_name,
   description AS parameters_description,
-  daysThreshold as days_threshold,
-  offersThreshold as offers_threshold,
-  visitsDaysThreshold as visits_days_threshold,
-  visitsThreshold as visits_threshold,
-  dropsCount as drops,
-  beginDate as ts_started,
-  endDate as ts_ended,
-  criadoEm as ts_created,
-  atualizadoEm as ts_updated,
-  initialRentPercentile as initial_rent_percentile,
-  minRentPercentile as min_rent_percentile,
-  initialrentratio as initial_rent_ratio,
-  minrentratio as min_rent_ratio
-from datalake_ebdb_raw.dynamicpricingparameters_aud
+  daysThreshold AS days_threshold,
+  daysFromAutomaticActivation AS days_from_automatic_activation,
+  offersThreshold AS offers_threshold,
+  visitsDaysThreshold AS visits_days_threshold,
+  visitsThreshold AS visits_threshold,
+  dropsCount AS drops,
+  initialRentPercentile AS initial_rent_percentile,
+  minRentPercentile AS min_rent_percentile,
+  initialrentratio AS initial_rent_ratio,
+  minrentratio AS min_rent_ratio,
+  maximumValuePerReduction AS max_value_per_reduction,
+  daysFromAutomaticActivation_MOD AS days_from_automatic_activation_mod,
+  maximumValuePerReduction_MOD AS max_value_per_reduction_mod,
+  beginDate AS ts_started,
+  endDate AS ts_ended,
+  criadoEm AS ts_created,
+  atualizadoEm AS ts_updated
+FROM 
+  datalake_ebdb_raw.dynamicpricingparameters_aud
