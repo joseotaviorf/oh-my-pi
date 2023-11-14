@@ -399,10 +399,6 @@ bietlejuice.enrich_listing_flow:
     - bietlejuice.wololo:load-clean-context-discard
     - bietlejuice.wololo:load-clean-conversion
 bietlejuice.enrich_listing_temp:
-  add:
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
-    - bietlejuice.enrich_ebdb_listing:load-enrich-lbc-status-version-order
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
     - bietlejuice.dw_contract:load-dw-public-dim-contract
