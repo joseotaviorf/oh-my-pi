@@ -28,6 +28,8 @@ SELECT
     COALESCE(l.rent_recurrency_type, 'N/A') AS rent_recurrency_type,
     COALESCE(la_sale.acquisition_team, 'N/A') AS sale_acquisition_team,
     COALESCE(la_rent.acquisition_team, 'N/A') AS rent_acquisition_team,
+    COALESCE(lf_sale.freshness, 'N/A') AS sale_freshness,
+    COALESCE(lf_rent.freshness, 'N/A') AS rent_freshness,
     COALESCE(l.house_category, 'Unknown') AS house_category,
     COALESCE(l.house_type, 'Unknown') AS house_type, 
     COALESCE(l.house_subtype, 'Unknown') AS house_subtype, 
@@ -58,7 +60,11 @@ SELECT
     COALESCE(l.password, 'Unknown') AS password,
     COALESCE(l.cnpj, 'Unknown') AS cnpj,
     l.version_global,
+    l.sale_version_global,
+    l.rent_version_global,
     l.version_by_company,
+    l.sale_version_by_company,
+    l.rent_version_by_company,
     l.iptu_installment_informations[0]['installmentAmount'] AS iptu_installment_amount,
     l.iptu_installment_informations[0]['installmentQuantity'] AS iptu_installment_quantity,
     l.latitude,
@@ -83,6 +89,10 @@ SELECT
     l.has_balcony,
     l.has_agency_key,
     l.has_concierge,
+    lf_sale.is_fresh AS is_fresh_in_sale,
+    lf_sale.is_early_fresh AS is_early_fresh_in_sale,
+    lf_rent.is_fresh AS is_fresh_in_rent,
+    lf_rent.is_early_fresh AS is_early_fresh_in_rent,
     GREATEST(lsc_sale.is_waiting_for_enrichment, lsc_rent.is_waiting_for_enrichment) AS is_waiting_for_enrichment,
     COALESCE(lsc_sale.is_waiting_for_enrichment, FALSE) AS is_waiting_for_enrichment_in_sale,
     COALESCE(lsc_rent.is_waiting_for_enrichment, FALSE) AS is_waiting_for_enrichment_in_rent,
@@ -94,11 +104,25 @@ SELECT
     COALESCE(lsc_rent.is_discarded, FALSE) AS is_discarded_in_rent,
     l.is_sent_to_main,
     l.is_first_version_global,
+    l.is_first_sale_version_global,
+    l.is_first_rent_version_global,
     l.is_first_version_by_company,
+    l.is_first_sale_version_by_company,
+    l.is_first_rent_version_by_company,
     l.is_last_version_global,
+    l.is_last_sale_version_global,
+    l.is_last_rent_version_global,
     l.is_last_version_by_company,
+    l.is_last_sale_version_by_company,
+    l.is_last_rent_version_by_company,
+    lf_sale.dt_crawler AS dt_crawler_in_sale,
+    lf_rent.dt_crawler AS dt_crawler_in_rent,
     l.ts_first_version_created_global,
+    l.ts_first_sale_version_created_global,
+    l.ts_first_rent_version_created_global,
     l.ts_first_version_created_by_company,
+    l.ts_first_sale_version_created_by_company,
+    l.ts_first_rent_version_created_by_company,
     l.ts_house_created,
     l.ts_house_updated,
     l.ts_created,
@@ -133,3 +157,11 @@ LEFT JOIN
     datalake_rede_lead_acquisition.lead_3p_acquisition AS la_rent
         ON la_rent.id_lead_3p = l.id
         AND la_rent.business_context = 'RENT'
+LEFT JOIN
+    datalake_rede_lead_crawler.lead_3p_freshness AS lf_sale
+        ON lf_sale.id_lead_3p = l.id
+        AND lf_sale.business_context = 'SALE'
+LEFT JOIN
+    datalake_rede_lead_crawler.lead_3p_freshness AS lf_rent
+        ON lf_rent.id_lead_3p = l.id
+        AND lf_rent.business_context = 'RENT'

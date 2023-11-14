@@ -32,6 +32,27 @@ columns:
     lineage:
       - datalake_company.company.trade_name
     description: 'Trade name of the company that integrated the lead.'
+  freshness:
+    description: 'Freshness of the lead, which is determined by the amount of days between when the lead was sent to Zap Imóveis, and when it was sent to
+      Supply Processor.'
+    lineage:
+      - datalake_rede_lead_crawler.lead_3p_freshness.freshness
+    categories:
+      'N/A': 'Does not apply. The lead was not found in Zap Imóveis.'
+      '< -14': 'The lead was sent to Supply Processor BEFORE Zap Imóveis by more than 14 days.'
+      'EARLY_FRESH': 'The lead was sent to Supply Processor BEFORE Zap Imóveis by up to 14 days.'
+      'FRESH': 'The lead was sent to Supply Processor AFTER Zap Imóveis by up to 14 days.'
+      '15 - 90': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 14 days, but up to 90 days.'
+      '91 - 180': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 90 days, but up to 180 days.'
+      '180+': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 180 days.'
+  is_fresh:
+    description: 'True if the lead is fresh, i.e., was sent to Supply Processor within two weeks of the creation in Zap Imóveis, either before or after.'
+    lineage:
+      - datalake_rede_lead_crawler.lead_3p_freshness.is_fresh
+  is_early_fresh:
+    description: 'True if the lead is early fresh, i.e., was sent to Supply Processor up to two weeks BEFORE the creation in Zap Imóveis.'
+    lineage:
+      - datalake_rede_lead_crawler.lead_3p_freshness.is_early_fresh
   is_for_sale:
     description: 'True if the lead flow is in the context of ForSale.'
   is_for_rent:

@@ -63,6 +63,8 @@ SELECT
     ls.sk_lead_3p_status,
     COALESCE(lsc.id_house, lh.id_house, -1) AS sk_house,
     COALESCE(l3p.id_region, -1) AS sk_region,
+    COALESCE(BIGINT(DATE_FORMAT(lf.dt_supply_processor, 'yyyyMMdd')), -1) AS sk_first_version_sent_date,
+    COALESCE(BIGINT(DATE_FORMAT(lf.dt_crawler, 'yyyyMMdd')), -1) AS sk_crawler_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_lead, 'yyyyMMdd')), -1) AS sk_lead_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_prospect, 'yyyyMMdd')), -1) AS sk_prospect_date,
     COALESCE(BIGINT(DATE_FORMAT(f.ts_qualified, 'yyyyMMdd')), -1) AS sk_qualified_date,
@@ -71,10 +73,13 @@ SELECT
     COALESCE(BIGINT(DATE_FORMAT(f.ts_first_listing, 'yyyyMMdd')), -1) AS sk_first_listing_date,
     COALESCE(BIGINT(DATE_FORMAT(fr.ts_first_unpublished, 'yyyyMMdd')), -1) AS sk_first_unpublished_date,
     total_house_updates,
+    lf.days_crawler_to_supply_processor AS days_crawler_to_first_version_sent,
     DATEDIFF(f.ts_prospect, f.ts_lead) AS days_lead_to_prospect,
     DATEDIFF(f.ts_qualified, f.ts_lead) AS days_lead_to_qualified,
     DATEDIFF(f.ts_opportunity, f.ts_lead) AS days_lead_to_opportunity,
     DATEDIFF(f.ts_first_listing, f.ts_lead) AS days_lead_to_first_listing,
+    lf.dt_supply_processor AS dt_first_version_sent,
+    lf.dt_crawler,
     f.ts_lead,
     f.ts_prospect,
     f.ts_qualified,
@@ -125,8 +130,13 @@ LEFT JOIN
         ON la.id_lead_3p = l3p.id
         AND la.business_context = f.business_context
 LEFT JOIN
+    datalake_rede_lead_crawler.lead_3p_freshness AS lf
+        ON lf.id_lead_3p = l3p.id
+        AND lf.business_context = f.business_context
+LEFT JOIN
     dw_rede.dim_lead_3p_context AS dl3c
         ON f.business_context = dl3c.business_context
         AND IF(f.business_context = 'SALE', l3p.sale_recurrency_type, l3p.rent_recurrency_type) = dl3c.recurrency_type
         AND IF(f.business_context = 'SALE', l3p.sale_integrator_trade_name, l3p.rent_integrator_trade_name) = dl3c.integrator_trade_name
         AND dl3c.acquisition_team = COALESCE(la.acquisition_team, 'N/A')
+        AND dl3c.freshness = COALESCE(lf.freshness, 'N/A')

@@ -153,6 +153,32 @@ columns:
       FARMING: Rent lead published after the first 30 days of membership of the company
         in that business context.
       N/A: Not applicable. The lead was not published.
+  sale_freshness:
+    description: 'Freshness of the lead in the sale context, which is determined by the amount of days between when the lead was sent to Zap Imóveis,
+      and when it was sent to Supply Processor.'
+    lineage:
+      - datalake_rede_lead_crawler.lead_3p_freshness.freshness
+    categories:
+      'N/A': 'Does not apply. The lead was not found in Zap Imóveis.'
+      '< -14': 'The lead was sent to Supply Processor BEFORE Zap Imóveis by more than 14 days.'
+      'EARLY_FRESH': 'The lead was sent to Supply Processor BEFORE Zap Imóveis by up to 14 days.'
+      'FRESH': 'The lead was sent to Supply Processor AFTER Zap Imóveis by up to 14 days.'
+      '15 - 90': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 14 days, but up to 90 days.'
+      '91 - 180': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 90 days, but up to 180 days.'
+      '180+': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 180 days.'
+  rent_freshness:
+    description: 'Freshness of the lead in the rent context, which is determined by the amount of days between when the lead was sent to Zap Imóveis,
+      and when it was sent to Supply Processor.'
+    lineage:
+      - datalake_rede_lead_crawler.lead_3p_freshness.freshness
+    categories:
+      'N/A': 'Does not apply. The lead was not found in Zap Imóveis.'
+      '< -14': 'The lead was sent to Supply Processor BEFORE Zap Imóveis by more than 14 days.'
+      'EARLY_FRESH': 'The lead was sent to Supply Processor BEFORE Zap Imóveis by up to 14 days.'
+      'FRESH': 'The lead was sent to Supply Processor AFTER Zap Imóveis by up to 14 days.'
+      '15 - 90': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 14 days, but up to 90 days.'
+      '91 - 180': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 90 days, but up to 180 days.'
+      '180+': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 180 days.'
   house_category:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.house_category
@@ -279,12 +305,34 @@ columns:
     - datalake_brokers_supply_processor.lead_3p.version_global
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column is a counter that indicates how many times the same lead hash has been sent until the current lead, which serves as its version.'
+  sale_version_global:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.sale_version_global
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is a counter that indicates how many times the same lead hash has been sent in the Sale context until the current lead, which serves as its version.'
+  rent_version_global:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.rent_version_global
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is a counter that indicates how many times the same lead hash has been sent in the Rent context until the current lead, which serves as its version.'
   version_by_company:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.version_by_company
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column is a counter that indicates how many times the same lead hash has been sent by this particular company until the current lead, which serves as its version.
       It is not equal to version_global, as the same lead hash might be sent by different companies.'
+  sale_version_by_company:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.sale_version_by_company
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is a counter that indicates how many times the same lead hash has been sent in the Sale context by this particular company until the current lead, which serves as its version.
+      It is not equal to sale_version_global, as the same lead hash might be sent by different companies.'
+  rent_version_by_company:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.rent_version_by_company
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is a counter that indicates how many times the same lead hash has been sent in the Rent context by this particular company until the current lead, which serves as its version.
+      It is not equal to rent_version_global, as the same lead hash might be sent by different companies.'
   iptu_installment_amount:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.iptu_installment_informations
@@ -390,6 +438,24 @@ columns:
     - datalake_brokers_supply_processor.lead_3p.has_concierge
     description: If the property has a concierge. As of August 2022, this field is
       completely false.
+  is_fresh_in_sale:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.is_fresh
+    description: 'True if the lead is fresh in the sale context, i.e., was sent to Supply Processor within two weeks of the
+      creation in Zap Imóveis, either before or after.'
+  is_early_fresh_in_sale:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.is_early_fresh
+    description: 'True if the lead is early fresh in the sale context, i.e., was sent to Supply Processor up to two weeks BEFORE the creation in Zap Imóveis.'
+  is_fresh_in_rent:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.is_fresh
+    description: 'True if the lead is fresh in the rent context, i.e., was sent to Supply Processor within two weeks of the
+      creation in Zap Imóveis, either before or after.'
+  is_early_fresh_in_rent:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.is_early_fresh
+    description: 'True if the lead is early fresh in the rent context, i.e., was sent to Supply Processor up to two weeks BEFORE the creation in Zap Imóveis.'
   is_waiting_for_enrichment:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.is_waiting_for_enrichment
@@ -438,31 +504,99 @@ columns:
     - datalake_brokers_supply_processor.lead_3p.is_first_version_global
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column is true if this is the first time this lead hash has been sent.'
+  is_first_sale_version_global:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_first_sale_version_global
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the first time this lead hash has been sent, in the context of ForSale.'
+  is_first_rent_version_global:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_first_rent_version_global
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the first time this lead hash has been sent, in the context of ForRent.'
   is_first_version_by_company:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.is_first_version_by_company
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column is true if this is the first time this lead hash has been sent by this particular company.'
+  is_first_sale_version_by_company:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_first_sale_version_by_company
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the first time this lead hash has been sent by this particular company, in the context of ForSale.'
+  is_first_rent_version_by_company:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_first_rent_version_by_company
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the first time this lead hash has been sent by this particular company, in the context of ForRent.'
   is_last_version_global:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.is_last_version_global
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column is true if this is the last time this lead hash has been sent.'
+  is_last_sale_version_global:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_last_sale_version_global
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the last time this lead hash has been sent, in the context of ForSale.'
+  is_last_rent_version_global:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_last_rent_version_global
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the last time this lead hash has been sent, in the context of ForRent.'
   is_last_version_by_company:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.is_last_version_by_company
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column is true if this is the last time this lead hash has been sent by this particular company.'
+  is_last_sale_version_by_company:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_last_sale_version_by_company
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the last time this lead hash has been sent by this particular company, in the context of ForSale.'
+  is_last_rent_version_by_company:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.is_last_rent_version_by_company
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is true if this is the last time this lead hash has been sent by this particular company, in the context of ForRent.'
+  dt_crawler_in_sale:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.dt_crawler
+    description: 'Date of when the lead was sent to Zap Imóveis, in the context of ForSale.'
+  dt_crawler_in_rent:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.dt_crawler
+    description: 'Date of when the lead was sent to Zap Imóveis, in the context of ForRent.'
   ts_first_version_created_global:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.ts_first_version_created_global
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column is the timestamp of when the first version of this lead hash was created.'
+  ts_first_sale_version_created_global:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.ts_first_sale_version_created_global
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is the timestamp of when the first version of this lead hash was created, in the context of ForSale.'
+  ts_first_rent_version_created_global:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.ts_first_rent_version_created_global
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is the timestamp of when the first version of this lead hash was created, in the context of ForRent.'
   ts_first_version_created_by_company:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.ts_first_version_created_by_company
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column is the timestamp of when the first version of this lead hash was created by this particular company.'
+  ts_first_sale_version_created_by_company:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.ts_first_sale_version_created_by_company
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is the timestamp of when the first version of this lead hash was created by this particular company, in the context of ForSale.'
+  ts_first_rent_version_created_by_company:
+    lineage:
+    - datalake_brokers_supply_processor.lead_3p.ts_first_rent_version_created_by_company
+    description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
+      This column is the timestamp of when the first version of this lead hash was created by this particular company, in the context of ForRent.'
   ts_house_created:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.ts_house_created

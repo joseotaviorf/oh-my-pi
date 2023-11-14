@@ -562,6 +562,7 @@ bietlejuice.dw_rede_supply:
   - bietlejuice.enrich_hubspot:load-enrich-company
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition
+  - bietlejuice.enrich_rede_lead_crawler:load-enrich-lead-3p-freshness
   - bietlejuice.enrich_rede_supply:load-enrich-file-sks
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reasons

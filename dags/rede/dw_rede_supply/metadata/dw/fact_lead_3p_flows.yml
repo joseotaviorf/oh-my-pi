@@ -46,6 +46,14 @@ columns:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.id_region
     description: Foreign Key to the region of the lead. Can be joined with dw_public.dim_region.
+  sk_first_version_sent_date:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.dt_supply_processor
+    description: Date key for when the first version of the lead was sent to Supply Processor by this company in this business context.
+  sk_crawler_date:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.dt_crawler
+    description: Date key for when the lead was sent to Zap Imóveis, monitored by a crawler.
   sk_lead_date:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started
@@ -76,6 +84,14 @@ columns:
     description: Date key for when the lead was first unpublished.
   total_house_updates:
     description: Total number of times the house was updated in Main.
+  dt_first_version_sent:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.dt_supply_processor
+    description: Date for when the first version of the lead was sent to Supply Processor by this company in this business context.
+  dt_crawler:
+    lineage:
+    - datalake_rede_lead_crawler.lead_3p_freshness.dt_crawler
+    description: Date for when the lead was sent to Zap Imóveis, monitored by a crawler.
   ts_lead:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started
@@ -104,6 +120,8 @@ columns:
     lineage:
     - datalake_rede_supply.lead_3p_status_changes.ts_status_started
     description: Timestamp for when the listing was first unpublished.
+  days_crawler_to_first_version_sent:
+    description: Number of days between the lead was sent to Zap Imóveis and the first version was sent to Supply Processor.
   days_lead_to_prospect:
     description: Amount of days between lead and prospect, rounded down.
   days_lead_to_qualified:

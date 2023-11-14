@@ -33,11 +33,20 @@ integrator_companies AS (
     SELECT
         -1 AS id_company_integrator,
         'N/A' AS integrator_trade_name
+),
+freshness_types AS (
+    SELECT DISTINCT
+        freshness,
+        is_fresh,
+        is_early_fresh
+    FROM
+        datalake_rede_lead_crawler.lead_3p_freshness
 )
 SELECT
     ROW_NUMBER() OVER (
         PARTITION BY 1
         ORDER BY
+            freshness DESC,
             id_company_integrator,
             acquisition_team DESC,
             business_context,
@@ -47,6 +56,7 @@ SELECT
     recurrency_type,
     acquisition_team,
     integrator_trade_name,
+    freshness,
     business_context = 'SALE' AS is_for_sale,
     business_context = 'RENT' AS is_for_rent,
     recurrency_type = 'FIRST_BATCH' AS is_first_batch,
@@ -55,7 +65,10 @@ SELECT
     recurrency_type = 'RECURRENT' AS is_recurrent,
     acquisition_team = 'HUNTING' AS is_hunting,
     acquisition_team = 'FARMING' AS is_farming,
+    is_fresh,
+    is_early_fresh,
     NOW() AS ts_load
 FROM
     acquisition_teams_separated_aux,
-    integrator_companies
+    integrator_companies,
+    freshness_types
