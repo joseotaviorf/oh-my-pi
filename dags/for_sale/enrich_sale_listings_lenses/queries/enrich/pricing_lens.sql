@@ -57,7 +57,7 @@ create_business_bins AS (
       ELSE hp.calculator_certainty 
     END AS certainty_calculator_bins, 
     CASE 
-      WHEN hp.calculator_sale_price IS NULL THEN 'T- Undefined'
+      WHEN hp.calculator_sale_price IS NULL OR hp.calculator_sale_price = 0 THEN 'T- Undefined'
       WHEN hp.diff_calculator_price < -0.25 THEN 'T6 < -25%'
       WHEN hp.diff_calculator_price BETWEEN -0.25 AND 0.00 THEN 'T5 (-25% | 0%]'
       WHEN hp.diff_calculator_price BETWEEN 0.00 AND 0.15 THEN 'T4 (0% | 15%]'

@@ -3,7 +3,7 @@ table_name: datalake_sale_listings_lenses.sellability_lens
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than_or_equal_to: 3000000
+    greater_than_or_equal_to: 1000000
 column_level_validations:
   id_house:
     is_complete:
