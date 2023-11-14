@@ -227,9 +227,9 @@ if __name__ == "__main__":
     spark_client = SparkClient()
 
     schema = StructType([
-        StructField("id_address", StringType(), nullable=False),
-        StructField("input_address", StringType(), nullable=False),
-        StructField("output_address", StringType(), nullable=False),
+        StructField("id_address", StringType(), nullable=True),
+        StructField("input_address", StringType(), nullable=True),
+        StructField("output_address", StringType(), nullable=True),
         StructField("address", StringType(), nullable=True),
         StructField("number", StringType(), nullable=True),
         StructField("zip_code", StringType(), nullable=True),
