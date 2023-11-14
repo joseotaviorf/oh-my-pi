@@ -1,5 +1,5 @@
 ---
-database_name: datalake_invoice
+database_name: dw_collection_recovery
 table_name: fact_overdue_portfolio_timeline
 description: The table contains information about the portfolio of overdue invoices. The invoice is inserted into the table 1 day after its due date, and it's replicated every day until the day the debt is paid or written down.
 domain: Fintech

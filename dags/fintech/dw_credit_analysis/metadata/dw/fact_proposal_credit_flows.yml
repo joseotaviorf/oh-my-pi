@@ -100,6 +100,10 @@ columns:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
     description: "Key of date when client sent first documentation."
+  sk_drop_reason:
+    lineage:
+      - dw_public.dim_drop_reason.id
+    description: "dw_public.dim_drop_reason Primary Key"
   sk_ec_created_date:
     lineage:
       - datalake_credit_analysis.early_credit_analysis.ts_early_credit_analysis_created
