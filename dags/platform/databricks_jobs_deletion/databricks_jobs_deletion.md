@@ -2,7 +2,7 @@
 
 ### Purpose
 
-Deletes Databricks jobs created over Jobs API 2.1 that are older than the provided `JOBS_REMOVAL_TIMEDELTA` and contains the provided `BIETLEJUICE_JOB_PREFIX` name filter. Uses DatabricksHook to directly call the jobs list API.
+Creates a task per project that deletes Databricks jobs created over Jobs API 2.1 that are older than the provided `JOBS_REMOVAL_TIMEDELTA` and which name matches the RegExp provided in `PROJECT_TO_JOB_NAME_REGEX_MAPPING` variable. Uses DatabricksHook to directly call the jobs list API.
 
 Built due to a Databricks resource limitation of 10,000 saved jobs per Workspace.
 

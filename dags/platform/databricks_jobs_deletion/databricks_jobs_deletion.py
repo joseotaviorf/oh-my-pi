@@ -1,5 +1,6 @@
 from datetime import timedelta
 from multiprocessing.pool import ThreadPool
+import re
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -14,11 +15,11 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2023, 7, 15, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 20 * * *"
 
-BIETLEJUICE_JOB_PREFIX = "bietlejuice-"
+PROJECT_TO_JOB_NAME_REGEX_MAPPING = {"bietlejuice": "^bietlejuice-", "wonka": "^wonka-"}
 JOBS_REMOVAL_TIMEDELTA = timedelta(days=60)
 
 
-def delete_databricks_jobs(remove_before_timedelta: timedelta, name_filter: str):
+def delete_databricks_jobs(remove_before_timedelta: timedelta, job_name_regex: str):
     databricks_hook = QuintoAndarDatabricksHook(
         databricks_conn_id="databricks_job_cluster"
     )
@@ -30,7 +31,7 @@ def delete_databricks_jobs(remove_before_timedelta: timedelta, name_filter: str)
         if job["created_time"]
         <= current_timestamp.subtract_timedelta(remove_before_timedelta).timestamp()
         * 1000
-        and name_filter in job["settings"]["name"]
+        and re.search(job_name_regex, job["settings"]["name"])
     }
     databricks_hook.log.info(
         "Quantity of jobs filtered to be deleted: {}".format(len(jobs_id_list))
@@ -53,12 +54,13 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME),
 )
 
-create_cluster_task = PythonOperator(
-    task_id="delete-databricks-jobs",
-    dag=dag,
-    python_callable=delete_databricks_jobs,
-    op_kwargs={
-        "remove_before_timedelta": JOBS_REMOVAL_TIMEDELTA,
-        "name_filter": BIETLEJUICE_JOB_PREFIX,
-    },
-)
+for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
+    delete_jobs_task = PythonOperator(
+        task_id=f"delete-{project}-databricks-jobs",
+        dag=dag,
+        python_callable=delete_databricks_jobs,
+        op_kwargs={
+            "remove_before_timedelta": JOBS_REMOVAL_TIMEDELTA,
+            "job_name_regex": job_name_regex,
+        },
+    )
