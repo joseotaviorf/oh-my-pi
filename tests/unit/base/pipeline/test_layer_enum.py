@@ -8,6 +8,7 @@ class TestLayerEnum:
 
         # assert
         assert list(returned_value) == [
+            LayerEnum.TRANSACTIONAL.value,
             LayerEnum.RAW.value,
             LayerEnum.CLEAN.value,
             LayerEnum.CLEAN_STAGING.value,

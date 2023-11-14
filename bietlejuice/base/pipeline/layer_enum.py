@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class LayerEnum(Enum):
+    TRANSACTIONAL = "transactional"
     RAW = "raw"
     CLEAN = "clean"
     CLEAN_STAGING = "clean_staging"
