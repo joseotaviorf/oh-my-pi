@@ -1,0 +1,3 @@
+---
+dag_documentation:
+  dag_purpose: Creates enriched tables focused on the context of Rede and its interaction with crawlers.

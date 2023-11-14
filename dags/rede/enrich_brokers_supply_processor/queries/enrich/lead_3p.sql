@@ -48,7 +48,8 @@ recurrency AS (
             WHEN ts_batch_sent < ts_first_batch + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
             WHEN ts_captured < ts_first_batch THEN 'COMPLEMENTARY'
             ELSE 'RECURRENT'
-        END AS recurrency_type
+        END AS recurrency_type,
+        ts_batch_sent
     FROM
         recurrency_aux
 ),
@@ -160,8 +161,12 @@ SELECT
     GET_JSON_OBJECT(l.pricing, '$.rent')::INT AS rent_price,
     GET_JSON_OBJECT(l.pricing, '$.salePrice')::INT AS sale_price,
     GET_JSON_OBJECT(l.pricing, '$.condoPrice')::INT AS condo_price,
-    COUNT(*) OVER(PARTITION BY l.lead_hash ORDER BY l.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS version_global,
-    COUNT(*) OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY l.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS version_by_company,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY l.ts_created) AS version_global,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY sale_recurrency.ts_batch_sent NULLS LAST, l.ts_created) = 1 AS sale_version_global,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY rent_recurrency.ts_batch_sent NULLS LAST, l.ts_created) = 1 AS rent_version_global,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY l.ts_created) AS version_by_company,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY sale_recurrency.ts_batch_sent NULLS LAST, l.ts_created) AS sale_version_by_company,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY rent_recurrency.ts_batch_sent NULLS LAST, l.ts_created) AS rent_version_by_company,
     sale_bcd.id IS NOT NULL AS is_for_sale,
     rent_bcd.id IS NOT NULL AS is_for_rent,
     GET_JSON_OBJECT(l.access, '$.optedKeysWithAgent')::BOOLEAN AS has_opted_keys_with_agent,
@@ -177,11 +182,25 @@ SELECT
     GET_JSON_OBJECT(l.brokers, '$.concierge')::BOOLEAN AS has_concierge,
     l.is_sent_to_main,
     ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY l.ts_created) = 1 AS is_first_version_global,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY sale_recurrency.ts_batch_sent NULLS LAST, l.ts_created) = 1 AS is_first_sale_version_global,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY rent_recurrency.ts_batch_sent NULLS LAST, l.ts_created) = 1 AS is_first_rent_version_global,
     ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY l.ts_created) = 1 AS is_first_version_by_company,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY sale_recurrency.ts_batch_sent NULLS LAST, l.ts_created) = 1 AS is_first_sale_version_by_company,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY rent_recurrency.ts_batch_sent NULLS LAST, l.ts_created) = 1 AS is_first_rent_version_by_company,
     ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY l.ts_created DESC) = 1 AS is_last_version_global,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY sale_recurrency.ts_batch_sent DESC NULLS LAST, l.ts_created) = 1 AS is_last_sale_version_global,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY rent_recurrency.ts_batch_sent DESC NULLS LAST, l.ts_created) = 1 AS is_last_rent_version_global,
     ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY l.ts_created DESC) = 1 AS is_last_version_by_company,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY sale_recurrency.ts_batch_sent DESC NULLS LAST, l.ts_created) = 1 AS is_last_sale_version_by_company,
+    ROW_NUMBER() OVER(PARTITION BY l.lead_hash, l.uuid_company ORDER BY rent_recurrency.ts_batch_sent DESC NULLS LAST, l.ts_created) = 1 AS is_last_rent_version_by_company,
     MIN(l.ts_created) OVER(PARTITION BY l.lead_hash) AS ts_first_version_created_global,
+    MIN(sale_recurrency.ts_batch_sent) OVER(PARTITION BY l.lead_hash) AS ts_first_sale_version_created_global,
+    MIN(rent_recurrency.ts_batch_sent) OVER(PARTITION BY l.lead_hash) AS ts_first_rent_version_created_global,
     MIN(l.ts_created) OVER(PARTITION BY l.lead_hash, l.uuid_company) AS ts_first_version_created_by_company,
+    MIN(sale_recurrency.ts_batch_sent) OVER(PARTITION BY l.lead_hash, l.uuid_company) AS ts_first_sale_version_created_by_company,
+    MIN(rent_recurrency.ts_batch_sent) OVER(PARTITION BY l.lead_hash, l.uuid_company) AS ts_first_rent_version_created_by_company,
+    sale_recurrency.ts_batch_sent AS ts_sale_lead_sent,
+    rent_recurrency.ts_batch_sent AS ts_rent_lead_sent,
     GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP AS ts_house_created,
     GET_JSON_OBJECT(l.brokers, '$.updatedAt')::TIMESTAMP AS ts_house_updated,
     l.ts_created,
