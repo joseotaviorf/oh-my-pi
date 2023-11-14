@@ -297,7 +297,7 @@ chat AS (
       WHEN completion_reason = 'session expired' THEN 'EXPIRED'
       WHEN completion_reason = 'task completed' THEN 'COMPLETED'
       WHEN completion_reason = 'task transferred' THEN 'TRANSFERRED'
-      WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'COMPLETED'
+      WHEN ROW_NUMBER() OVER(PARTITION BY ta.id_session ORDER BY ta.ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
     is_answered,
