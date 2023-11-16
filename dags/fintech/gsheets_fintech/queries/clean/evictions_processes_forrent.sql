@@ -69,8 +69,8 @@ SELECT
     TO_DATE(eviction_order_dt, 'dd/MM/yyyy') as dt_eviction_order,
     TO_DATE(change_ending_dt, 'dd/MM/yyyy') as dt_change_ending,
     TO_DATE(change_ended_dt, 'dd/MM/yyyy') as dt_change_ended,
-    TO_DATE(massive_dt, 'dd/MM/yyyy') as dt_massive,
-    TO_DATE(second_massive_dt, 'dd/MM/yyyy') as dt_second_massive,
+    TO_DATE(massive_dt, 'dd/MM/yyyy') as dt_registry_date,
+    TO_DATE(second_massive_dt, 'dd/MM/yyyy') as dt_process_closing,
     TO_DATE(validity, 'dd/MM/yyyy') as dt_validity
 
 FROM

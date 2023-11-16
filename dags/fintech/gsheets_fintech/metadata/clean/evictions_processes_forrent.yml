@@ -134,12 +134,14 @@ columns:
   dt_change_ended:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.change_ended_dt
-  dt_massive:
+  dt_registry_date:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.massive_dt
-  dt_second_massive:
+    description: Date in which the closing of the last update of the process was registred 
+  dt_process_closing:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.second_massive_dt
+    description: Date in which the process of eviction has ended (Data from manual upload by system E-LAW)
   dt_validity:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.validity
