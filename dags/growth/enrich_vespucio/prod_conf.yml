@@ -2,7 +2,7 @@
 cluster_description: databricks_10_4_med_io-memory_photon_cluster
 custom_libraries:
      - pypi:
-          package: s2cell 
+          package: "s2cell==1.6.0" 
      - maven:
           coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.0-incubating"
      - maven:
