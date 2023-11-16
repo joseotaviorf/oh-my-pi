@@ -2,6 +2,7 @@ WITH credit_analysis AS (
   SELECT
     id_credit_analysis,
     id_proposal,
+    guarantee_accepted,
     category,
     max_ca_category
   FROM
@@ -69,6 +70,7 @@ rent_flows AS (
   SELECT
     flrf.sk_client,
     flrf.sk_house_listing,
+    flrf.sk_contract,
     CAST(flrf.sk_house_listing / 1000 AS INTEGER) AS sk_house,
     flrf.sk_contract_signed_date,
     CAST(COALESCE(ca.id_credit_analysis, -1) AS INTEGER) AS sk_credit_analysis,
@@ -106,6 +108,7 @@ rent_flows AS (
     flrf.sk_tenant_first_doc_sent_date,
     COALESCE(dp.id, -1) AS sk_drop_reason,
     flrf.funnel_step,
+    COALESCE(ca.guarantee_accepted, -1) AS guarantee_accepted,
     IF(
       cap.id_first_credit_analysis = ca.id_credit_analysis,
       TRUE,
@@ -147,6 +150,7 @@ proposal_credit_flows AS (
     rf.sk_client,
     rf.sk_house_listing,
     rf.sk_house,
+    rf.sk_contract,
     rf.sk_contract_signed_date,
     rf.sk_credit_analysis,
     rf.sk_credit_analysis_approved_date,
@@ -169,6 +173,7 @@ proposal_credit_flows AS (
     rf.sk_tenant_first_doc_sent_date,
     rf.sk_drop_reason,
     rf.funnel_step,
+    rf.guarantee_accepted,
     CAST(
       COALESCE(
         REGEXP_REPLACE(CAST(eca.dt_created AS VARCHAR(8)), '-', ''),
@@ -214,6 +219,7 @@ SELECT
   sk_client,
   sk_house_listing,
   sk_house,
+  sk_contract,
   sk_contract_signed_date,
   sk_credit_analysis,
   sk_credit_analysis_approved_date,
@@ -238,6 +244,7 @@ SELECT
   sk_ec_created_date,
   sk_ec_expired_date,
   funnel_step,
+  guarantee_accepted,
   is_first_credit_evaluation,
   is_last_credit_evaluation,
   has_early_credit,

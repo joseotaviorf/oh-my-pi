@@ -18,6 +18,10 @@ columns:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_house_listing
     description: "Id of the house."
+  sk_contract:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_contract
+    description: "Key of contract. This column can be used to join with the table dw_public.dim_contract to get the contract details. When the sk_contract value is -1, it means that the contract has not been created yet."
   sk_contract_signed_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_contract_signed_date
@@ -120,6 +124,17 @@ columns:
     lineage:
       - dw_public.fact_listing_rent_flows.funnel_step
     description: "The funnel step where this flow is in/has stoppped."
+  guarantee_accepted:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
+    description: "This column indicates the guarantee type accepted by the tenant prospect after a positive evaluation. For paid guarantee, the TP has to accept the offered guarantee to move to the Document Sent step. Free guarantees are automatically accepted."
+    categories:
+      FREE: "The accepted guarantee is free"
+      PRO_GUARANTOR: "The accepted guarantee is the paid guarantee PRO_GUARANTOR"
+      DEPOSIT: "The accepted guarantee is the paid guarantee DEPOSIT"
+      INSURANCE: "The accepted guarantee is the paid guarantee INSURANCE"
+      STANDALONE: "The accepted guarantee is the paid guarantee STANDALONE"
+      THIRD_PARTY_GUARANTEE: "The accepted guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
   is_first_credit_evaluation:
     description: "Indicates if the row presents the first credit evaluation."
   is_last_credit_evaluation:

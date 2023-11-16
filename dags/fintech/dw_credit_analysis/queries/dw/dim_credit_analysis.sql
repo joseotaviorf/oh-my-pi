@@ -18,6 +18,7 @@ SELECT
   max_bypass,
   result,
   credit_decision_cluster,
+  guarantee_accepted,
   is_manual_analysis,
   is_reprocessed,
   ts_credit_analysis_created,

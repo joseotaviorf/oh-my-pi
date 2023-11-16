@@ -52,6 +52,13 @@ SELECT
     WHEN COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null) IS NULL THEN 'Clear-No'
     ELSE 'Error'
   END AS credit_decision_cluster,
+  CASE
+    WHEN (
+      cap.guarantee_type = 'SeguroFairfax'
+      OR cap.id_proposal_from_rg IS NULL
+    ) THEN 'FREE'
+    ELSE cap.paid_guarantee_type
+  END AS guarantee_accepted,
   IF(ca.id_analyst IS NULL, FALSE, TRUE) AS is_manual_analysis,
   CASE
     WHEN cap.guarantee_source = 'CRM_DOCUMENTATION_ANALYSIS' THEN TRUE

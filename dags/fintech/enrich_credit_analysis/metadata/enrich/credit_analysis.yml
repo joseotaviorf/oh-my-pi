@@ -82,6 +82,17 @@ columns:
     description: "Result of the analysis"
   credit_decision_cluster:
     description: "Credit decision cluster of the analysis"
+  guarantee_accepted:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
+    description: "This column indicates the guarantee type accepted by the tenant prospect after a positive evaluation. For paid guarantee, the TP has to accept the offered guarantee to move to the Document Sent step. Free guarantees are automatically accepted."
+    categories:
+      FREE: "The accepted guarantee is free"
+      PRO_GUARANTOR: "The accepted guarantee is the paid guarantee PRO_GUARANTOR"
+      DEPOSIT: "The accepted guarantee is the paid guarantee DEPOSIT"
+      INSURANCE: "The accepted guarantee is the paid guarantee INSURANCE"
+      STANDALONE: "The accepted guarantee is the paid guarantee STANDALONE"
+      THIRD_PARTY_GUARANTEE: "The accepted guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
   is_manual_analysis:
     description: "True if the analysis is manual"
   is_reprocessed:

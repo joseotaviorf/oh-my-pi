@@ -164,6 +164,17 @@ columns:
       bypass: "Proposals that end up with Free guarantee due to a special reason that leads to a special analysis."
       bypass max: "Proposals that end up with Free guarantee due to a special reason that leads to a special analysis, but reason is not on last credit analysis,"
       ea_approved: "Proposals with Evaluation positive date even though there isn't any category that indicates such situation."
+  guarantee_accepted:
+    lineage:
+      - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
+    description: "This column indicates the guarantee type accepted by the tenant prospect after a positive evaluation. For paid guarantee, the TP has to accept the offered guarantee to move to the Document Sent step. Free guarantees are automatically accepted."
+    categories:
+      FREE: "The accepted guarantee is free"
+      PRO_GUARANTOR: "The accepted guarantee is the paid guarantee PRO_GUARANTOR"
+      DEPOSIT: "The accepted guarantee is the paid guarantee DEPOSIT"
+      INSURANCE: "The accepted guarantee is the paid guarantee INSURANCE"
+      STANDALONE: "The accepted guarantee is the paid guarantee STANDALONE"
+      THIRD_PARTY_GUARANTEE: "The accepted guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
   is_manual_analysis:
     lineage:
       - datalake_credit_analysis.credit_analysis.is_manual_analysis
