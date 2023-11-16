@@ -2,6 +2,7 @@ import os
 
 from databricks_plugin import QuintoAndarDatabricksExecuteJobClusterOperator
 from airflow.operators.python_operator import ShortCircuitOperator
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
@@ -104,6 +105,10 @@ class DWQueryWorkflow(BaseWorkflow):
             access_control_list=cluster_params["access_control_list"],
         )
 
+        job_cluster_finished_task = DummyOperator(
+            dag=dag, task_id="job-cluster-finished"
+        )
+
         dw_task_groups_boundaries = (
             self._get_dw_task_groups_boundaries(dw_task_groups, dw_staging_task_groups)
             if inner_dependencies
@@ -118,6 +123,7 @@ class DWQueryWorkflow(BaseWorkflow):
             dw_staging_task_groups,
             dw_task_groups,
             dw_task_groups_boundaries,
+            job_cluster_finished_task,
         )
 
         return dag
@@ -159,6 +165,7 @@ class DWQueryWorkflow(BaseWorkflow):
         dw_staging_task_groups,
         dw_task_groups,
         dw_task_groups_boundaries,
+        job_cluster_finished_task,
     ):
 
         if skip_run_task:
@@ -188,4 +195,8 @@ class DWQueryWorkflow(BaseWorkflow):
 
         TaskFlowHelper.chain_task_groups_via_common_table(
             dw_staging_task_groups, dw_task_groups
+        )
+
+        job_cluster_finished_task.set_upstream(
+            DWTaskGroup.all_last_tasks(dw_task_groups)
         )
