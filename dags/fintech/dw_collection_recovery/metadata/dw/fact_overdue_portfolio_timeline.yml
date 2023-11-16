@@ -5,6 +5,11 @@ description: The table contains information about the portfolio of overdue invoi
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
 columns:
+  sk_overdue_portfolio_timeline:
+    lineage:
+      - datalake_invoice.overdue_portfolio_timeline.id_invoice
+      - datalake_invoice.overdue_portfolio_timeline.dt_reference
+    description: Surrogate key of table. It is the concat between id_invoice and dt_reference
   id_contract:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.id_contract
@@ -38,10 +43,13 @@ columns:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.debtor_type
     description: "Debtor type: Flow or Stock"
+    categories:
+      Flow: customers that are new in the Portfolio. The day the flow contracts enters the portfolio is the first day of the overdue (i.e first business day after the due date).
+      Stock: customers that were already in the portfolio in the last month. Important to notice that the cut off date to this reference is the first day of the month.
   delay_contamined_range:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.delay_contamined_range
-    description: Delay contamined range
+    description: Delay contamined range. We calculate it based on the contract and not the invoice
   contract_overdue_invoices:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.contract_overdue_invoices
@@ -66,6 +74,22 @@ columns:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.business_day
     description: Number of business day on reference months
+  is_last_business_days:
+    lineage:
+      - datalake_invoice.overdue_portfolio_timeline.is_last_business_days
+    description: Boolean to inform whether it is the most recent date among days with the same business day, same invoice and month. It deduplicates the calculations per business day.
+  dt_invoice_paid:
+    lineage:
+      - datalake_invoice.overdue_portfolio_timeline.dt_invoice_paid
+    description: Invoice paid date
+  dt_invoice_due:
+    lineage:
+      - datalake_invoice.overdue_portfolio_timeline.dt_invoice_due
+    description: Invoice due date
+  dt_invoice_due_adjust:
+    lineage:
+      - datalake_invoice.overdue_portfolio_timeline.dt_invoice_due_adjust
+    description: Invoice due date adjust for next business day
   dt_month_start:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.dt_month_start

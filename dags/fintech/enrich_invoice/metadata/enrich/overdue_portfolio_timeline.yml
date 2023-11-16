@@ -46,6 +46,9 @@ columns:
       - datalake_retsuko.invoice.ts_due
       - datalake_quintoandar.aux_date.month_start
     description: "Debtor type: Flow or Stock"
+    categories:
+      Flow: customers that are new in the Portfolio. The day the flow contracts enters the portfolio is the first day of the overdue (i.e first business day after the due date).
+      Stock: customers that were already in the portfolio in the last month. Important to notice that the cut off date to this reference is the first day of the month.
   due_amount:
     lineage:
       - datalake_retsuko.invoice.due_amount
@@ -84,7 +87,7 @@ columns:
     lineage:
       - datalake_retsuko.invoice.ts_due
       - datalake_quintoandar.aux_date.month_start
-    description: Delay contamined range
+    description: Delay contamined range. We calculate it based on the contract and not the invoice
   business_day:
     lineage:
       - datalake_quintoandar.aux_date.working_days_in_month

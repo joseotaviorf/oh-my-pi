@@ -1,4 +1,4 @@
-## DW Retsuko
+## DW Collection Recovery
 
 ### Purpose
 
@@ -22,4 +22,5 @@ This pipeline produces the following output tables:
 - `dw_collection_recovery.fact_negotiation_installment`
 - `dw_collection_recovery.fact_negotiation`
 - `dw_collection_recovery.fact_overdue_portfolio_timeline`
+- `dw_collection_recovery.bridge_map_debt_negotiation`
 </details>
