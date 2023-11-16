@@ -34,7 +34,7 @@ custom_libraries = [
     {"pypi": {"package": "hubspot-api-client==5.0.0"}},
     {"pypi": {"package": "google-auth==2.13.0"}},
     {"pypi": {"package": "google-api-python-client==2.55.0"}},
-    {"pypi": {"package": "validations-engine==1.0.1"}},
+    {"pypi": {"package": "validations-engine==2.0.0"}},
     {
         "whl": f"{artifacts_bucket}/facebook-api-client-python/"
         f"quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl"

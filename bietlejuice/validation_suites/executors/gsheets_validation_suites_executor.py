@@ -7,11 +7,9 @@ from validations_engine.base_validation_suites_executor import (
 )
 
 from bietlejuice.base.api import APIEnum
-from bietlejuice.base.notification import SLACK_USER_GROUPS_MAPPING_PATH
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 from bietlejuice.services.gsheets_service import GsheetsService
-from bietlejuice.services import FileService
 from bietlejuice.services.configuration_service import ConfigurationService
 
 from googleapiclient.discovery import build
@@ -51,9 +49,6 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
         self.delta = self.gsheets_service.get_recently_modified_gsheet(
             self.drive_service
         )
-        self.context_slack_owner_dict = FileService.get_dict_from_yaml_file(
-            SLACK_USER_GROUPS_MAPPING_PATH
-        )
 
     def get_all_sheets_info(self):
         sheets_info = {}
@@ -67,9 +62,6 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
             }
             sheets_info.update(context_sheets_info_completed)
         return sheets_info
-
-    def _get_slack_group_from_context(self, context_name: str = ""):
-        return self.context_slack_owner_dict.get(context_name, "")
 
     def get_credentials_and_scope(self) -> Tuple[dict, str]:
         credentials = self.auth[APIEnum.GSHEETS_CREDENTIALS]

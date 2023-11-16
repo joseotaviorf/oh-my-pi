@@ -12,7 +12,7 @@ from quintoandar_gsheets_api_client.exceptions.exceptions import (
     InternalErrorException,
     PermissionException,
 )
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from dags import DAG_PACKAGES_ROOT
 from bietlejuice.validation_suites.executors.gsheets_validation_suites_executor import (
     GsheetsValidationSuitesExecutor,
@@ -25,16 +25,16 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
     REPOSITORY_CONSUMER_CLASS = GoogleSheetsClient
 
     GSHEETS_BASE_URL = "https://docs.google.com/spreadsheets/d/"
-    SLACK_MSG_TEMPLATE = """
-    :sheets: Sheet: <{sheet_url}|{sheet_name}> (ID: {sheet_id})
-    *Last modifier*: {mod_user_name} - <@{mod_user_slack}> - {mod_user_email}.
-    *Sharing user*: {sharing_user_name} - <@{sharing_user_slack}> - {sharing_user_email}.
+    GCHAT_MSG_TEMPLATE = """
+    🎲 Sheet: <{sheet_url}|{sheet_name}> (ID: {sheet_id})
+    *Last modifier*: {mod_user_name} - <@{mod_user_gchat}> - {mod_user_email}.
+    *Sharing user*: {sharing_user_name} - <@{sharing_user_gchat}> - {sharing_user_email}.
     *Owner team*: {context_owner}
     Error: {error_message}
     ```{error_trace}```
     """
-    SLACK_SMALL_TEMPLATE = """
-    :sheets: Sheet: <{sheet_url}|{sheet_name}> (ID: {sheet_id})
+    GCHAT_SMALL_TEMPLATE = """
+    🎲 Sheet: <{sheet_url}|{sheet_name}> (ID: {sheet_id})
     *Owner team*: {context_owner}
     Error: {error_message}
     ```{error_trace}```
@@ -49,13 +49,13 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
             f"m=GSheetsByContextValidationSuite, msg= gsheets_dags_glob_path: {gsheets_dags_glob_path}, dags: {dags}"
         )
 
+        self.GCHAT_CHANNEL = auth[GchatWebhooksEnum.DATA_ALERTS]
+        self.GCHAT_MSG_HEADER = (
+            "⚠️ *Gsheet validations failures*\n"
+            "The following sheets have errors and will not be ingested on the next pipeline run if the issues are not resolved."
+        )
         super().__init__(auth, dags)
         self.append_validations_for_each_sheet()
-        self.SLACK_CHANNEL = auth[SlackWebhooksEnum.DATA_ALERTS]
-        self.SLACK_MSG_HEADER = (
-            ":alert: *Gsheet validations failures*\n"
-            ">The following sheets have errors and will not be ingested on the next pipeline run if the issues are not resolved."
-        )
 
     def _validate_sheet(self, _sheet_info: dict) -> None:
         """
@@ -66,7 +66,6 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
         """
         sheet_url = f"{self.GSHEETS_BASE_URL}{_sheet_info['sheet_id']}"
         context = _sheet_info.get("sheet_context")
-        context_owner = self._get_slack_group_from_context(context)
         try:
             self._run_sheet_validation(
                 dag_name=_sheet_info["dag_name"],
@@ -90,21 +89,21 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
             error_trace = str(e).split("\n")[0].replace("`", "")
             error_trace = error_trace.replace('"', "")[slice(0, 150)]
             error_message = e.__doc__
-            self.SLACK_MSG = self.SLACK_MSG_TEMPLATE.format(
+            self.GCHAT_MSG = self.GCHAT_MSG_TEMPLATE.format(
                 sheet_url=sheet_url,
                 sheet_name=_sheet_info.get("sheet_name"),
                 sheet_id=_sheet_info["sheet_id"],
                 mod_user_name=sheet_modification_info.get("modifier_user_name"),
-                mod_user_slack=sheet_modification_info.get("modifier_user_email").split(
+                mod_user_gchat=sheet_modification_info.get("modifier_user_email").split(
                     "@"
                 )[0],
                 mod_user_email=sheet_modification_info.get("modifier_user_email"),
                 sharing_user_name=sheet_modification_info.get("sharing_user_name"),
-                sharing_user_slack=sheet_modification_info.get(
+                sharing_user_gchat=sheet_modification_info.get(
                     "sharing_user_email"
                 ).split("@")[0],
                 sharing_user_email=sheet_modification_info.get("sharing_user_email"),
-                context_owner=context_owner,
+                context_owner=context,
                 error_message=error_message,
                 error_trace=error_trace,
             )
@@ -113,11 +112,11 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
             error_trace = str(e).split("\n")[0].replace("`", "")
             error_trace = error_trace.replace('"', "")[slice(0, 150)]
             error_message = e.__doc__
-            self.SLACK_MSG = self.SLACK_SMALL_TEMPLATE.format(
+            self.GCHAT_MSG = self.GCHAT_SMALL_TEMPLATE.format(
                 sheet_url=sheet_url,
                 sheet_name=_sheet_info.get("sheet_name"),
                 sheet_id=_sheet_info["sheet_id"],
-                context_owner=context_owner,
+                context_owner=context,
                 error_message=error_message,
                 error_trace=error_trace,
             )
@@ -127,11 +126,11 @@ class GSheetsByContextValidationSuite(GsheetsValidationSuitesExecutor):
             error_trace = str(e).split("\n")[0].replace("`", "")
             error_trace = error_trace.replace('"', "")[slice(0, 150)]
             error_message = e.__doc__
-            self.SLACK_MSG = self.SLACK_SMALL_TEMPLATE.format(
+            self.GCHAT_MSG = self.GCHAT_SMALL_TEMPLATE.format(
                 sheet_url=sheet_url,
                 sheet_name=_sheet_info.get("sheet_name"),
                 sheet_id=_sheet_info["sheet_id"],
-                context_owner=context_owner,
+                context_owner=context,
                 error_message=error_message,
                 error_trace=error_trace,
             )
