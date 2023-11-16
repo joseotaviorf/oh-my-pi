@@ -10,6 +10,10 @@ tables:
     extraction_type: incremental
     date_filter_column: updated_on
     clean_table_name: contract
+  - table_name: ContractPerson
+    extraction_type: incremental
+    date_filter_column: updated_on
+    clean_table_name: contract_person
   - table_name: Onboarding
     extraction_type: incremental
     date_filter_column: updated_on
@@ -30,5 +34,9 @@ tables:
     extraction_type: incremental
     date_filter_column: updated_on
     clean_table_name: onboarding_task_types
+  - table_name: User
+    extraction_type: incremental
+    date_filter_column: updated_on
+    clean_table_name: user
 partition_cols: ["year", "month", "day"]
 lineage_product_database_name: missioncontrol
