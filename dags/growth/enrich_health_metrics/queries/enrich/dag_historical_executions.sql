@@ -28,11 +28,11 @@ execution_logs AS (
         dag.dag_owner,
         dag.dag_layer,
         dag.dt_executed,
-        MIN(IF(log.event = 'running' AND log.id_task = 'create-cluster', 
+        MIN(IF(log.event = 'running' AND log.id_task IN ('create-cluster','execute-job-cluster'), 
                 log.id_log, 
                 NULL
               )) AS id_log_first_task,
-        MIN(IF(log.event = 'success' AND log.id_task = 'terminate-cluster', 
+        MIN(IF(log.event = 'success' AND log.id_task IN ('terminate-cluster','job-cluster-finished'), 
                 log.id_log, 
                 NULL
               )) AS id_log_last_task
