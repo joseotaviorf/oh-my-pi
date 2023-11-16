@@ -13,7 +13,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables, via full load:
 
-- `contract_rental_losses_npv`
 - `closing`
 - `delay`
 - `historical_closing`

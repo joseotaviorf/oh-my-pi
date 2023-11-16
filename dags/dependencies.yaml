@@ -1681,11 +1681,8 @@ bietlejuice.enrich_listing_temp:
 bietlejuice.enrich_losses:
   - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-snapshot
   - bietlejuice.dw_fintech_snapshot:load-dw-public-snapshot-dim-contract-snapshot
-  - bietlejuice.ebdb:load-clean-contract
-  - bietlejuice.ebdb:load-clean-contract-aud
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
-  - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-debt
