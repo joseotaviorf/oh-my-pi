@@ -1,9 +1,9 @@
 WITH aud_ts AS (
   SELECT /*+ RANGE_JOIN(aud, 50000) */
     COALESCE(um.id_user, aud.id_user) AS id_owner,
-    LAG(aud.id_account_manager) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev) AS id_previous_account_manager,
+    LAG(aud.id_account_manager) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev, aud.id DESC) AS id_previous_account_manager,
     aud.id_account_manager,
-    LAG(aud.is_active) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev) AS previous_status,
+    LAG(aud.is_active) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev, aud.id DESC) AS previous_status,
     aud.is_active,
     TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000)) AS ts_event
   FROM 
@@ -67,12 +67,13 @@ LEFT JOIN
   pro_owner_dates AS pod
     ON at.id_owner = pod.id_owner
     AND at.ts_event >= pod.ts_pro_owner_started
-    AND at.ts_event < COALESCE(pod.ts_pro_owner_ended, CURRENT_TIMESTAMP())
+    AND at.ts_event BETWEEN pod.ts_pro_owner_started AND COALESCE(pod.ts_pro_owner_ended, CURRENT_TIMESTAMP())
+    AND at.is_active = pod.is_active
     AND pod.is_active = True
 LEFT JOIN 
   account_manager_dates AS am
     ON at.id_owner = am.id_owner
     AND at.id_account_manager = am.id_account_manager
-    AND at.ts_event >= am.ts_account_manager_started 
-    AND at.ts_event < COALESCE(am.ts_account_manager_ended, CURRENT_TIMESTAMP())
+    AND at.ts_event BETWEEN am.ts_account_manager_started AND COALESCE(am.ts_account_manager_ended, CURRENT_TIMESTAMP())
+    AND at.is_active = am.is_active
     AND am.is_active = True
