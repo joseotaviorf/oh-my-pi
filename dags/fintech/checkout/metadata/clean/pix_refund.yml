@@ -1,0 +1,30 @@
+database_name: datalake_checkout_clean
+table_name: pix_refund
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.pix_refund.id
+  id_pix:
+    lineage:
+      - datalake_checkout_raw.pix_refund.pix_id
+  id_bank_refund:
+    lineage:
+      - datalake_checkout_raw.pix_refund.bank_refund_id
+  id_bank_return:
+    lineage:
+      - datalake_checkout_raw.pix_refund.bank_return_id
+  refunded_amount:
+    lineage:
+      - datalake_checkout_raw.pix_refund.refunded_amount
+  status:
+    lineage:
+      - datalake_checkout_raw.pix_refund.status
+  ts_started_processing:
+    lineage:
+      - datalake_checkout_raw.pix_refund.started_processing_at
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.pix_refund.refunded_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.pix_refund.updated_at

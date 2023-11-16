@@ -1,0 +1,141 @@
+database_name: datalake_checkout_clean
+table_name: bolecode
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.bolecode.id
+  id_charge:
+    lineage:
+      - datalake_checkout_raw.bolecode.charge_id
+  id_requester:
+    lineage:
+      - datalake_checkout_raw.bolecode.requester_id
+  id_transaction:
+    lineage:
+      - datalake_checkout_raw.bolecode.transaction_id
+  due_amount:
+    lineage:
+      - datalake_checkout_raw.bolecode.due_amount
+  interest_amount:
+    lineage:
+      - datalake_checkout_raw.bolecode.interest_amount
+  fine_amount:
+    lineage:
+      - datalake_checkout_raw.bolecode.fine_amount
+  paid_amount:
+    lineage:
+      - datalake_checkout_raw.bolecode.paid_amount
+  interest_amount_percentage:
+    lineage:
+      - datalake_checkout_raw.bolecode.interest_amount_percentage
+  fine_amount_percentage:
+    lineage:
+      - datalake_checkout_raw.bolecode.fine_amount_percentage
+  status:
+    lineage:
+      - datalake_checkout_raw.bolecode.status
+  payer_identifiable_document:
+    lineage:
+      - datalake_checkout_raw.bolecode.payer_identifiable_document
+  beneficiary_identifiable_document:
+    lineage:
+      - datalake_checkout_raw.bolecode.beneficiary_identifiable_document
+  your_number:
+    lineage:
+      - datalake_checkout_raw.bolecode.your_number
+  barcode:
+    lineage:
+      - datalake_checkout_raw.bolecode.barcode
+  payer_person_type:
+    lineage:
+      - datalake_checkout_raw.bolecode.payer_person_type
+  payer_email:
+    lineage:
+      - datalake_checkout_raw.bolecode.payer_email
+  payer_city:
+    lineage:
+      - datalake_checkout_raw.bolecode.payer_city
+  payer_neighborhood:
+    lineage:
+      - datalake_checkout_raw.bolecode.payer_neighborhood
+  payer_state:
+    lineage:
+      - datalake_checkout_raw.bolecode.payer_state
+  payer_street_address:
+    lineage:
+      - datalake_checkout_raw.bolecode.payer_street_address
+  payer_zipcode:
+    lineage:
+      - datalake_checkout_raw.bolecode.payer_zipcode
+  beneficiary_name:
+    lineage:
+      - datalake_checkout_raw.bolecode.beneficiary_name
+  interest_type:
+    lineage:
+      - datalake_checkout_raw.bolecode.interest_type
+  fine_type:
+    lineage:
+      - datalake_checkout_raw.bolecode.fine_type
+  beneficiary_account:
+    lineage:
+      - datalake_checkout_raw.bolecode.beneficiary_account
+  beneficiary_agency:
+    lineage:
+      - datalake_checkout_raw.bolecode.beneficiary_agency
+  beneficiary_dac:
+    lineage:
+      - datalake_checkout_raw.bolecode.beneficiary_dac
+  our_number_verification_digit:
+    lineage:
+      - datalake_checkout_raw.bolecode.our_number_verification_digit
+  charge_messages:
+    lineage:
+      - datalake_checkout_raw.bolecode.charge_messages
+  typeable_line:
+    lineage:
+      - datalake_checkout_raw.bolecode.typeable_line
+  requester_name:
+    lineage:
+      - datalake_checkout_raw.bolecode.requester_name
+  our_number:
+    lineage:
+      - datalake_checkout_raw.bolecode.our_number
+  pix_link:
+    lineage:
+      - datalake_checkout_raw.bolecode.pix_link
+  emv:
+    lineage:
+      - datalake_checkout_raw.bolecode.emv
+  qr_code:
+    lineage:
+      - datalake_checkout_raw.bolecode.qr_code
+  operation_history:
+    lineage:
+      - datalake_checkout_raw.bolecode.operation_history
+  dt_due:
+    lineage:
+      - datalake_checkout_raw.bolecode.due_date
+  dt_emission:
+    lineage:
+      - datalake_checkout_raw.bolecode.emission_date
+  ts_paid:
+    lineage:
+      - datalake_checkout_raw.bolecode.paid_at
+  dt_interest_start:
+    lineage:
+      - datalake_checkout_raw.bolecode.interest_start_at
+  dt_fine_start:
+    lineage:
+      - datalake_checkout_raw.bolecode.fine_start_at
+  dt_last_to_pay:
+    lineage:
+      - datalake_checkout_raw.bolecode.last_date_to_pay
+  ts_started_processing:
+    lineage:
+      - datalake_checkout_raw.bolecode.started_processing_at
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.bolecode.created_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.bolecode.updated_at

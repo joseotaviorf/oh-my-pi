@@ -1,0 +1,57 @@
+database_name: datalake_checkout_clean
+table_name: order
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.order.id
+  id_external:
+    lineage:
+      - datalake_checkout_raw.order.external_id
+  id_business_entity:
+    lineage:
+      - datalake_checkout_raw.order.business_entity_id
+  id_finance_entity:
+    lineage:
+      - datalake_checkout_raw.order.finance_entity_id
+  id_tracking:
+    lineage:
+      - datalake_checkout_raw.order.tracking_id
+  id_requester:
+    lineage:
+      - datalake_checkout_raw.order.requester_id
+  due_amount:
+    lineage:
+      - datalake_checkout_raw.order.due_amount
+  paid_amount:
+    lineage:
+      - datalake_checkout_raw.order.paid_amount
+  discount:
+    lineage:
+      - datalake_checkout_raw.order.discount
+  status:
+    lineage:
+      - datalake_checkout_raw.order.status
+  requester_name:
+    lineage:
+      - datalake_checkout_raw.order.requester_name
+  ts_started_processing:
+    lineage:
+      - datalake_checkout_raw.order.started_processing_at
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.order.created_at
+  dt_due:
+    lineage:
+      - datalake_checkout_raw.order.due_date
+  ts_paid:
+    lineage:
+      - datalake_checkout_raw.order.paid_at
+  ts_canceled:
+    lineage:
+      - datalake_checkout_raw.order.canceled_at
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.order.deleted_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.order.updated_at

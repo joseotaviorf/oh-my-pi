@@ -1,0 +1,72 @@
+database_name: datalake_checkout_clean
+table_name: charge
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.charge.id
+  order_id:
+    lineage:
+      - datalake_checkout_raw.charge.id_order
+  user_external_id:
+    lineage:
+      - datalake_checkout_raw.charge.id_user_external
+  due_amount:
+    lineage:
+      - datalake_checkout_raw.charge.due_amount
+  paid_amount:
+    lineage:
+      - datalake_checkout_raw.charge.paid_amount
+  status:
+    lineage:
+      - datalake_checkout_raw.charge.status
+  payment_method:
+    lineage:
+      - datalake_checkout_raw.charge.payment_method
+  user_name:
+    lineage:
+      - datalake_checkout_raw.charge.user_name
+  user_provider:
+    lineage:
+      - datalake_checkout_raw.charge.user_provider
+  user_identifiable_document:
+    lineage:
+      - datalake_checkout_raw.charge.user_identifiable_document
+  user_person_type:
+    lineage:
+      - datalake_checkout_raw.charge.user_person_type
+  user_email:
+    lineage:
+      - datalake_checkout_raw.charge.user_email
+  user_city:
+    lineage:
+      - datalake_checkout_raw.charge.user_city
+  user_neighborhood:
+    lineage:
+      - datalake_checkout_raw.charge.user_neighborhood
+  user_state:
+    lineage:
+      - datalake_checkout_raw.charge.user_state
+  user_street_address:
+    lineage:
+      - datalake_checkout_raw.charge.user_street_address
+  user_zipcode:
+    lineage:
+      - datalake_checkout_raw.charge.user_zipcode
+  ts_started_processing:
+    lineage:
+      - datalake_checkout_raw.charge.started_processing_at
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.charge.created_at
+  ts_paid:
+    lineage:
+      - datalake_checkout_raw.charge.paid_at
+  ts_canceled:
+    lineage:
+      - datalake_checkout_raw.charge.canceled_at
+  ts_deleted:
+    lineage:
+      - datalake_checkout_raw.charge.deleted_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.charge.updated_at

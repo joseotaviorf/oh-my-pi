@@ -1,0 +1,15 @@
+database_name: datalake_checkout_clean
+table_name: requester
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.requester.id
+  name:
+    lineage:
+      - datalake_checkout_raw.requester.name
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.requester.created_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.requester.updated_at

@@ -1,0 +1,21 @@
+database_name: datalake_checkout_clean
+table_name: bank_account
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.bank_account.id
+  account:
+    lineage:
+      - datalake_checkout_raw.bank_account.account
+  agency:
+    lineage:
+      - datalake_checkout_raw.bank_account.agency
+  dac:
+    lineage:
+      - datalake_checkout_raw.bank_account.dac
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.bank_account.created_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.bank_account.updated_at

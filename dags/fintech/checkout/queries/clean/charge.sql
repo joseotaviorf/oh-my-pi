@@ -1,0 +1,26 @@
+SELECT 
+    id,
+    order_id AS id_order,
+    user_external_id AS id_user_external,
+    due_amount,
+    paid_amount,
+    status,
+    payment_method,
+    user_name,
+    user_provider,
+    user_identifiable_document,
+    user_person_type,
+    user_email,
+    user_city,
+    user_neighborhood,
+    user_state,
+    user_street_address,
+    user_zipcode,
+    TIMESTAMP(started_processing_at) AS ts_started_processing,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(paid_at) AS ts_paid,
+    TIMESTAMP(canceled_at) AS ts_canceled,
+    TIMESTAMP(deleted_at) AS ts_deleted,
+    TIMESTAMP(updated_at) AS ts_updated
+FROM 
+    datalake_checkout_raw.charge

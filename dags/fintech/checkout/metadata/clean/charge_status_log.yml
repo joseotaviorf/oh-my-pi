@@ -1,0 +1,78 @@
+database_name: datalake_checkout_clean
+table_name: charge_status_log
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.id
+  charge_id:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.id_charge
+  order_id:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.id_order
+  user_external_id:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.id_user_external
+  requester_id:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.id_requester
+  due_amount:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.due_amount
+  paid_amount:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.paid_amount
+  status:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.status
+  payment_method:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.payment_method
+  user_name:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_name
+  user_provider:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_provider
+  user_identifiable_document:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_identifiable_document
+  user_person_type:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_person_type
+  user_email:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_email
+  user_city:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_city
+  user_neighborhood:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_neighborhood
+  user_state:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_state
+  user_street_address:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_street_address
+  user_zipcode:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.user_zipcode
+  ts_started_processing:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.started_processing_at
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.created_at
+  ts_paid:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.paid_at
+  ts_canceled:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.canceled_at
+  ts_deleted:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.deleted_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.charge_status_log.updated_at

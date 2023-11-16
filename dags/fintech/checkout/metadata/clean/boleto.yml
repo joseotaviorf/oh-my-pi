@@ -1,0 +1,138 @@
+database_name: datalake_checkout_clean
+table_name: boleto
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.boleto.id
+  id_business_entity:
+    lineage:
+      - datalake_checkout_raw.boleto.business_entity_id
+  id_finance_entity:
+    lineage:
+      - datalake_checkout_raw.boleto.finance_entity_id
+  id_charge:
+    lineage:
+      - datalake_checkout_raw.boleto.charge_id
+  id_requester:
+    lineage:
+      - datalake_checkout_raw.boleto.requester_id
+  due_amount:
+    lineage:
+      - datalake_checkout_raw.boleto.due_amount
+  interest_amount:
+    lineage:
+      - datalake_checkout_raw.boleto.interest_amount
+  fine_amount:
+    lineage:
+      - datalake_checkout_raw.boleto.fine_amount
+  paid_amount:
+    lineage:
+      - datalake_checkout_raw.boleto.paid_amount
+  interest_amount_percentage:
+    lineage:
+      - datalake_checkout_raw.boleto.interest_amount_percentage
+  fine_amount_percentage:
+    lineage:
+      - datalake_checkout_raw.boleto.fine_amount_percentage
+  status:
+    lineage:
+      - datalake_checkout_raw.boleto.status
+  payer_identifiable_document:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_identifiable_document
+  beneficiary_identifiable_document:
+    lineage:
+      - datalake_checkout_raw.boleto.beneficiary_identifiable_document
+  your_number:
+    lineage:
+      - datalake_checkout_raw.boleto.your_number
+  barcode:
+    lineage:
+      - datalake_checkout_raw.boleto.barcode
+  payer_name:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_name
+  payer_person_type:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_person_type
+  payer_email:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_email
+  payer_city:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_city
+  payer_neighborhood:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_neighborhood
+  payer_state:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_state
+  payer_street_address:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_street_address
+  payer_zipcode:
+    lineage:
+      - datalake_checkout_raw.boleto.payer_zipcode
+  beneficiary_name:
+    lineage:
+      - datalake_checkout_raw.boleto.beneficiary_name
+  interest_type:
+    lineage:
+      - datalake_checkout_raw.boleto.interest_type
+  fine_type:
+    lineage:
+      - datalake_checkout_raw.boleto.fine_type
+  beneficiary_account:
+    lineage:
+      - datalake_checkout_raw.boleto.beneficiary_account
+  beneficiary_agency:
+    lineage:
+      - datalake_checkout_raw.boleto.beneficiary_agency
+  beneficiary_dac:
+    lineage:
+      - datalake_checkout_raw.boleto.beneficiary_dac
+  our_number_verification_digit:
+    lineage:
+      - datalake_checkout_raw.boleto.our_number_verification_digit
+  charge_messages:
+    lineage:
+      - datalake_checkout_raw.boleto.charge_messages
+  typeable_line:
+    lineage:
+      - datalake_checkout_raw.boleto.typeable_line
+  requester_name:
+    lineage:
+      - datalake_checkout_raw.boleto.requester_name
+  our_number:
+    lineage:
+      - datalake_checkout_raw.boleto.our_number
+  operation_history:
+    lineage:
+      - datalake_checkout_raw.boleto.operation_history
+  dt_due:
+    lineage:
+      - datalake_checkout_raw.boleto.due_date
+  dt_emission:
+    lineage:
+      - datalake_checkout_raw.boleto.emission_date
+  ts_paid:
+    lineage:
+      - datalake_checkout_raw.boleto.paid_at
+  dt_interest_start:
+    lineage:
+      - datalake_checkout_raw.boleto.interest_start_at
+  dt_fine_start:
+    lineage:
+      - datalake_checkout_raw.boleto.fine_start_at
+  dt_last_to_pay:
+    lineage:
+      - datalake_checkout_raw.boleto.last_date_to_pay
+  ts_started_processing:
+    lineage:
+      - datalake_checkout_raw.boleto.started_processing_at
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.boleto.created_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.boleto.updated_at
