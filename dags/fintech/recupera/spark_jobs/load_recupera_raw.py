@@ -68,7 +68,8 @@ def unzip_file(ingestion_date: str, zip_file_bytes: bytes, tmp_folder: str):
         zip_file.extractall(os.path.join("/dbfs", tmp_folder), pwd=zip_password.encode())
         csv_files_name = zip_file.namelist()
         logger.info(f"m=unzip_file, msg=Files within zip file: {csv_files_name}")
-        return csv_files_name[0]
+        if len(csv_files_name) > 0: 
+          return csv_files_name[0]
         
 if __name__ == "__main__":
     
@@ -159,6 +160,10 @@ if __name__ == "__main__":
         
             zip_file_content = s3_resource.Bucket(bucket_name).Object(object_key).get()["Body"].read()
             csv_file = unzip_file(date_to_ingest_formatted, zip_file_content, tmp_folder)
+
+            if csv_file is None:
+                logger.info(f"""m=__main__, msg=No data was found at file {object_key}""")
+                continue
 
             df = spark.read \
                 .option("delimiter", "^") \
