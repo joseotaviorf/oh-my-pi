@@ -358,6 +358,11 @@ columns:
     - datalake_ebdb_listing.house.has_sale_smart_price_activated
     description: > 
       Boolean column that shows whether the listing currently has the smart price feature activated. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand.
+  has_price_by_smart_price_feature:
+    lineage:
+    - datalake_sale_listings.sale_listing_price_changes.is_smart_price_change
+    description: > 
+      Boolean that tells if the current sale price is determined by the Smart Price feature. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
   dt_consultant_started:
     lineage:
     - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started

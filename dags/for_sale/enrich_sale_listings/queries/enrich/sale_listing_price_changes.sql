@@ -9,6 +9,7 @@ WITH house_aud AS (
           WHEN lbc.ts_first_publication >= FROM_UNIXTIME(r.ts_revision/1000) THEN 'UNPUBLISHED' 
           ELSE 'PUBLISHED'
         END AS status_threshold,
+        r.reason,
         /* The purpose of creating this threshold is to take the last line before the listing is published, so that we have the first price. */
         ROW_NUMBER() OVER (PARTITION BY h_aud.id_house, IF(lbc.ts_first_publication >= FROM_UNIXTIME(r.ts_revision/1000), 'UNPUBLISHED', 'PUBLISHED') ORDER BY h_aud.rev DESC) AS threshold,
         -- We can't trust the mod_sale_price flag in 100% of cases, so we need to check if the price has changed manually.
@@ -35,6 +36,7 @@ price_changes_raw AS (
         id_owner,
         id_region,
         sale_price,
+        reason,
         dt_change,
         ts_revision,
         ts_first_publication
@@ -53,6 +55,7 @@ price_changes_clean AS (
         id_region,
         sale_price,
         LAG(sale_price) OVER (PARTITION BY id_house ORDER BY ts_revision) AS lag_sale_price,
+        reason,
         dt_change,
         ts_revision AS ts_price_started,
         ts_first_publication
@@ -77,6 +80,7 @@ price_changes_enriched AS (
         (sale_price - lag_sale_price)/NULLIF(lag_sale_price, 0) AS last_price_variation,
         (sale_price - MIN(IF(lag_sale_price IS NULL, sale_price, null)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_sale_price IS NULL, sale_price, null)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
         IF(lag_sale_price IS NULL, TRUE, FALSE) AS is_first_price,
+        IF(reason LIKE '%SmP%', TRUE, FALSE) AS is_smart_price_change,
         dt_change,
         ts_price_started,
         LEAD(ts_price_started) OVER (PARTITION BY id_house ORDER BY ts_price_started) AS ts_price_ended,
@@ -106,10 +110,12 @@ sale_price_changes AS (
                 ELSE first_price_variation
             END, 4) AS first_price_variation,
         change_type,
-        ts_price_ended IS NULL AS is_last_price,
-        is_first_price,
+
         ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_price_started ASC) AS change_number,
         DATEDIFF(COALESCE(ts_price_ended, CURRENT_DATE), ts_price_started) AS days_with_pricing_scheme,
+        ts_price_ended IS NULL AS is_last_price,
+        is_first_price,
+        is_smart_price_change,
         ts_price_started,
         ts_price_ended,
         ts_first_publication
@@ -141,7 +147,7 @@ sale_status_version_order AS (
 ),
 house_predicted_price_aud AS (
     SELECT 
-        ROW_NUMBER() OVER (PARTITION BY hpp_aud.id_house, DATE(FROM_UNIXTIME(r.ts_revision/1000)) ORDER BY FROM_UNIXTIME(r.ts_revision/1000) DESC) AS order_status,
+        ROW_NUMBER() OVER (PARTITION BY hpp_aud.id_house, DATE(FROM_UNIXTIME(r.ts_revision/1000)) ORDER BY hpp_aud.rev DESC) AS order_status,
         DATE(FROM_UNIXTIME(r.ts_revision/1000)) AS dt_change,
         FROM_UNIXTIME(r.ts_revision/1000) AS ts_change,
         hpp_aud.id_house, 
@@ -185,8 +191,6 @@ SELECT
     pc.lag_sale_price,
     pc.last_price_variation,
     pc.first_price_variation,
-    pc.is_last_price,
-    pc.is_first_price,
     pc.change_type,
     pc.change_number,
     pc.days_with_pricing_scheme,
@@ -196,6 +200,9 @@ SELECT
     cc.p_70 AS calculator_p70_sale_price,
     cc.p_90 AS calculator_max_sale_price,
     cc.certainty AS calculator_certainty,
+    pc.is_first_price,
+    pc.is_last_price,
+    pc.is_smart_price_change,
     pc.ts_price_started,
     pc.ts_price_ended
 FROM 

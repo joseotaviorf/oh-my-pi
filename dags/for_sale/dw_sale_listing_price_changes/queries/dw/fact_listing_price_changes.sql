@@ -20,8 +20,9 @@ SELECT
     calculator_sale_price AS predicted_price,
     calculator_p70_sale_price AS p70_predicted_price,
     calculator_max_sale_price AS max_predicted_price,
-    is_last_price,
     is_first_price,
+    is_last_price,
+    is_smart_price_change,
     NOW() AS ts_load
 FROM
     datalake_sale_listings.sale_listing_price_changes

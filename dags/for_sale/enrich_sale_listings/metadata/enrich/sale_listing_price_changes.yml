@@ -54,12 +54,6 @@ columns:
   first_price_variation:
     description: > 
       Percent difference between the published price for the row and the first published price.
-  is_last_price:
-    description: >
-      Boolean that tells if the price is the most recent publication price of the listing.
-  is_first_price:
-    description: >
-      Boolean that tells if the price is the first publication price of the listing.
   change_type:
     description: >
       'Describes the type of price change. We can have the price being increased or decreased.'
@@ -115,6 +109,15 @@ columns:
         If the prediction has a high confidence interval, having a low certainty in the prediction.
       NONE: >
         If the prediction has no certainty at all.
+  is_first_price:
+    description: >
+      Boolean that tells if the price is the first publication price of the listing.
+  is_last_price:
+    description: >
+      Boolean that tells if the price is the most recent publication price of the listing.
+  is_smart_price_change: 
+    description: >
+      Boolean that tells if the price change is a smart price change. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
   ts_price_started:
     lineage: 
       - datalake_ebdb_clean.user_revision_entity.ts_revision

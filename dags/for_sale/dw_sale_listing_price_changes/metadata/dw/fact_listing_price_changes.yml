@@ -133,13 +133,15 @@ columns:
     - datalake_sale_listings.sale_listing_price_changes.calculator_max_sale_price
     description: Calculator column. Tells the maximum price estimated by the calculator
       output. May also be referred to as 'p_90'.
-  is_last_price:
-    lineage:
-    - datalake_sale_listings.sale_listing_price_changes.is_last_price
-    description: Flag that signals the most recent publication price of the listing.
   is_first_price:
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.is_first_price
     description: Flag that signals the first publication price of the listing.
+  is_last_price:
+    lineage:
+    - datalake_sale_listings.sale_listing_price_changes.is_last_price
+    description: Flag that signals the most recent publication price of the listing.
+  is_smart_price_change: 
+    description: Boolean that tells if the price change is a smart price change. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
   ts_load:
     description: Timestamp of when the table was last processed.

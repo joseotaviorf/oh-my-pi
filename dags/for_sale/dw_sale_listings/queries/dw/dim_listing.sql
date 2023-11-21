@@ -37,6 +37,7 @@ SELECT
   sl.has_house_been_rented,
   h.has_sale_great_price_tag AS has_great_price_tag,
   h.has_sale_smart_price_activated AS has_smart_price_activated,
+  pc.is_smart_price_change AS has_price_by_smart_price_feature,
   hslc.dt_consultant_started, 
   hslc.ts_consultant_deleted,
   lbc.ts_created,
@@ -62,6 +63,10 @@ JOIN
 JOIN
   datalake_sale_listing_demand.sale_listing_demand AS sld
     ON lbc.id_house = sld.id_house
+LEFT JOIN 
+  datalake_sale_listings.sale_listing_price_changes AS pc
+    ON lbc.id_house = pc.id_house
+    AND pc.is_last_price IS TRUE
 LEFT JOIN
   datalake_ebdb_clean.house_registration_status AS hrs
     ON hrs.id_house = lbc.id_house
