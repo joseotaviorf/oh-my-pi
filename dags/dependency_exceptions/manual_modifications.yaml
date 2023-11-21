@@ -67,8 +67,8 @@ bietlejuice.dw_datamarts_spark.cross:
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
     - bietlejuice.dw_lead:load-dw-public-dim-lead
-    - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
-    - bietlejuice.dw_listing_jobs:load-dw-public-fact-photo-job
+    - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
+    - bietlejuice.dw_photo_jobs:load-dw-public-fact-photo-job
     - bietlejuice.dw_offer:load-dw-public-dim-offer
     - bietlejuice.dw_region:load-dw-public-dim-region
     - bietlejuice.dw_user:load-dw-quintoandar-dim-user-sales-rep
@@ -170,7 +170,7 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   add:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
     - bietlejuice.dw_house:load-dw-quintoandar-dim-house
-    - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
+    - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
     - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
     - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
     - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
@@ -200,7 +200,7 @@ bietlejuice.dw_date:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
 bietlejuice.dw_fact_conversion_metrics:
   override: []
-bietlejuice.dw_listing_jobs:
+bietlejuice.dw_photo_jobs:
   remove:
     - bietlejuice.ebdb:load-clean-booking
     - bietlejuice.ebdb:load-clean-house
@@ -361,7 +361,7 @@ bietlejuice.enrich_docato:
 bietlejuice.enrich_ebdb_affiliates_cost:
   remove:
     - bietlejuice.ebdb:load-clean-conversion-lead
-bietlejuice.enrich_ebdb_listing_jobs:
+bietlejuice.enrich_ebdb_photo_jobs:
   add:
     - bietlejuice.ebdb:load-clean-country
     - bietlejuice.ebdb:load-clean-house

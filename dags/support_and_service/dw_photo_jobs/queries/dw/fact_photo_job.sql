@@ -4,7 +4,7 @@ WITH base_jobs AS (
         (ts_created + interval 30 days) as ts_created_extended,
 		row_number() OVER (PARTITION BY id_house ORDER BY ts_created) AS rn
 	FROM
-		datalake_ebdb_listing_jobs.photo_job
+		datalake_ebdb_photo_jobs.photo_job
 )
 SELECT
     j.id AS id_photo_job,

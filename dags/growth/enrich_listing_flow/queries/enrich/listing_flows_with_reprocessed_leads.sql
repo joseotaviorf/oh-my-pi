@@ -74,7 +74,7 @@ first_job AS (
     SELECT
         id_house,
         MIN(id) AS id_job
-    FROM datalake_ebdb_listing_jobs.photo_job
+    FROM datalake_ebdb_photo_jobs.photo_job
     WHERE creation_origin <> 'Prop'
     GROUP by id_house
 ),
@@ -236,7 +236,7 @@ acquisition_channels AS (
         ON pj.id = lf.id_photo_job
     LEFT JOIN first_job
         ON first_job.id_house = h.id
-    LEFT JOIN datalake_ebdb_listing_jobs.photo_job AS fpj
+    LEFT JOIN datalake_ebdb_photo_jobs.photo_job AS fpj
         ON fpj.id = first_job.id_job
     WHERE
         (lbc.id_house IS NULL AND h.id IS NOT NULL) -- When house is not in listing_business_context, it is for rent
@@ -248,7 +248,7 @@ supply_2_0_prospect AS (
         ac.*,
         CASE -- filtering prospect rent
             WHEN drbc.lead_discard_rent IN (
-                'HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS', 
+                'HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS',
                 'ForaArea',
                 'DUPLICATED_LEAD',
                 'CONTACT_ON_BLOCK_LIST'
@@ -329,7 +329,7 @@ supply_2_0_available_qualified AS (
                 OR
                 lbc_is_for_rent = False
               )
-            
+
               AND ts_opportunity IS NULL
                 THEN NULL
             ELSE ts_qualified_rent

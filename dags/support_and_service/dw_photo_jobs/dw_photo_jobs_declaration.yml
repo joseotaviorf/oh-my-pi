@@ -1,5 +1,5 @@
 dag:
-  name: dw_listing_jobs
+  name: dw_photo_jobs
   schedule_start_date: 2020,08,29
   owner: Data SS
   documentation:

@@ -74,7 +74,7 @@ first_job AS (
     SELECT
         id_house,
         MIN(id) AS id_job
-    FROM datalake_ebdb_listing_jobs.photo_job
+    FROM datalake_ebdb_photo_jobs.photo_job
     WHERE creation_origin <> 'Prop'
     GROUP by id_house
 ),
@@ -211,7 +211,7 @@ acquisition_channels AS (
         ON pj.id = lf.id_photo_job
     LEFT JOIN first_job
         ON first_job.id_house = h.id
-    LEFT JOIN datalake_ebdb_listing_jobs.photo_job AS fpj
+    LEFT JOIN datalake_ebdb_photo_jobs.photo_job AS fpj
         ON fpj.id = first_job.id_job
 ),
 union_contexts AS (
@@ -227,9 +227,9 @@ union_contexts AS (
         acquisition_channels
     WHERE
         rent_table = True
-        
+
     UNION ALL
-    
+
     SELECT
         *,
         lbc_user_registrant_sale AS lbc_user_registrant,
@@ -242,7 +242,7 @@ union_contexts AS (
         acquisition_channels
     WHERE
         sale_table = True
-  
+
 ),
 funnel_ts_columns AS (
     SELECT
@@ -439,12 +439,12 @@ supply_2_0_qualified AS (
                     OR
                     (
                         listing_flow_business_context = 'RENT'
-                        AND lbc_is_for_rent = False   
+                        AND lbc_is_for_rent = False
                     )
                     OR
                     (
                         listing_flow_business_context = 'SALE'
-                        AND lbc_is_for_sale = False   
+                        AND lbc_is_for_sale = False
                     )
                 )
                 AND ts_opportunity IS NULL
@@ -494,12 +494,12 @@ supply_2_0_available_qualified AS (
                     OR
                     (
                         listing_flow_business_context = 'RENT'
-                        AND lbc_is_for_rent = False   
+                        AND lbc_is_for_rent = False
                     )
                     OR
                     (
                         listing_flow_business_context = 'SALE'
-                        AND lbc_is_for_sale = False   
+                        AND lbc_is_for_sale = False
                     )
                 )
                 AND ts_opportunity IS NULL

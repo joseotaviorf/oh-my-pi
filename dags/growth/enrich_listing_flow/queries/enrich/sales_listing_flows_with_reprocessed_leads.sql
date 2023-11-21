@@ -74,7 +74,7 @@ first_job AS (
     SELECT
         id_house,
         MIN(id) AS id_job
-    FROM datalake_ebdb_listing_jobs.photo_job
+    FROM datalake_ebdb_photo_jobs.photo_job
     WHERE creation_origin <> 'Prop'
     GROUP by id_house
 ),
@@ -236,7 +236,7 @@ acquisition_channels AS (
         ON pj.id = lf.id_photo_job
     LEFT JOIN first_job
         ON first_job.id_house = h.id
-    LEFT JOIN datalake_ebdb_listing_jobs.photo_job AS fpj -- todo ver se é o mesmo id do pj
+    LEFT JOIN datalake_ebdb_photo_jobs.photo_job AS fpj -- todo ver se é o mesmo id do pj
         ON fpj.id = first_job.id_job
     WHERE
         lbc.is_for_sale

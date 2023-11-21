@@ -4,7 +4,7 @@ SELECT
     MAX((task_status.type = 'FupFoto')) AS has_fup_photo
 FROM datalake_crm_tasks.task_status
 LEFT JOIN
-    datalake_ebdb_listing_jobs.photo_job AS pj
+    datalake_ebdb_photo_jobs.photo_job AS pj
     ON task_status.id_origin = pj.id
 LEFT JOIN
     datalake_ebdb_listing.house AS house_via_job
