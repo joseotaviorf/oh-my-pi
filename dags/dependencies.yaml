@@ -1785,11 +1785,13 @@ bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
 bietlejuice.enrich_mission_control:
   - bietlejuice.mission_control:load-clean-contract
+  - bietlejuice.mission_control:load-clean-contract-person
   - bietlejuice.mission_control:load-clean-onboarding
   - bietlejuice.mission_control:load-clean-onboarding-action
   - bietlejuice.mission_control:load-clean-onboarding-bill
   - bietlejuice.mission_control:load-clean-onboarding-task
   - bietlejuice.mission_control:load-clean-onboarding-task-types
+  - bietlejuice.mission_control:load-clean-user
 bietlejuice.enrich_money_laundering_prevention:
   - bietlejuice.docx:load-clean-credit-evaluation-proponent
   - bietlejuice.enrich_booking:load-enrich-booking

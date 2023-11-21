@@ -1,0 +1,32 @@
+---
+database_name: datalake_mission_control
+table_name: user
+owner: 'kleber.inoue@quintoandar.com.br'
+domain: For Rent
+description: Information about the people who can be associated in a contract.
+  This table deduplicates the IDs that comes from clean/clean layer due to incremental load.
+columns:
+  id_user:
+    description: ID of the user. It's the primary key of the table.
+    lineage:
+    - datalake_mission_control_clean.user.id_user
+  full_name:
+    description: Full name of the person.
+    lineage:
+    - datalake_mission_control_clean.user.full_name
+  phone_number:
+    description: Phone number of the person.
+    lineage:
+    - datalake_mission_control_clean.user.phone_number
+  is_deleted:
+    description: Boolean value to check if the record is deleted.
+    lineage:
+    - datalake_mission_control_clean.user.is_deleted
+  ts_created:
+    description: Timestamp of the contract creation.
+    lineage:
+    - datalake_mission_control_clean.user.ts_created
+  ts_updated:
+    description: Timestamp when the register was updated.
+    lineage:
+    - datalake_mission_control_clean.user.ts_updated
