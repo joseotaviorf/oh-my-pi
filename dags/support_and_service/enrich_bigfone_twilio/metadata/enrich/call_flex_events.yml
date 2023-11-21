@@ -1,117 +1,158 @@
 database_name: datalake_bigfone_twilio
 table_name: call_flex_events
+description: Enrichment table that aims to consolidate information from call flex service. The main source of the table is Twillio's call service base, and each line represents a service event.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_bigfone_events.events.id
+    description: Unique numeric identifier for each event.
   id_event:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each event.
   id_task:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each task.
   id_reservation:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each reservation.
   id_task_queue:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each task queue.
   id_task_queue_transferred:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each task queue transferred.
   id_call:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each call.
   id_conversation:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each conversation.
   id_agent:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each agent.
   id_agent_transferred:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Unique identifier for each agent transferred.
   from_number:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Associated with contacts made from the number.
   to_number:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Associated with contacts made to the number.
   customer_phone:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Customer phone number.
   agent_email:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Email of the agent responsible for the service.
   department_name:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Name of the department responsible for care.
   task_queue_name:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Task queue name.
   event_type:
     lineage:
       - datalake_bigfone_events.events.event
+    description: Event type name.
   direction:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Indicates the way in which the event will move.
   location:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Categorization of the event location.
   reason:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Reason for event.
   comment:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Event comments.
   metadata:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: General event info in json format.
   task_priority:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Task priority level.
   scheduling_source:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Scheduling source.
   seconds_waiting_time:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Waiting time in seconds.
   is_scheduled:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Boolean indicating whether a schedule was made.
   has_wrapup:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: boolean indicating whether there was a wrap.
   has_csat:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: boolean indicating whether there was a csat.
   ts_created_utc:
     lineage:
       - datalake_bigfone_events.events.ts_created_local
+    description: Timestamp for the event creation date and time in the UTC zone.
   ts_created_local:
     lineage:
       - datalake_bigfone_events.events.ts_created_local
+    description: timestamp for the event creation date and time in the local zone.
   ts_received_local:
     lineage:
       - datalake_bigfone_events.events.ts_received_local
+    description: Timestamp for the date and time the event was received in the local zone.
   ts_transfer_started:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Timestamp for the start date and time of the event transfer.
   ts_wrapup_event_local:
     lineage:
       - datalake_bigfone_events.events.ts_created_local
+    description: Timestamp for the event wrapup date and time in the local zone.
   ts_wrapup_event_local_unix:
     lineage:
       - datalake_bigfone_events.events.ts_created_local
+    description: Timestamp for the date and time of the event wrapup in the UNIX-formatted time zone.
   ts_created_local_unix:
     lineage:
       - datalake_bigfone_events.events.ts_created_local
+    description: Timestamp for the event creation date and time in the UNIX-formatted time zone.
   year:
     lineage:
       - datalake_bigfone_events.events.year
+    description: Partition year, Use this partition to speed up query.
   month:
     lineage:
       - datalake_bigfone_events.events.month
+    description: Partition month, Use this partition to speed up query.
   day:
     lineage:
       - datalake_bigfone_events.events.day
+    description: Partition Day, Use this partition to speed up query.
