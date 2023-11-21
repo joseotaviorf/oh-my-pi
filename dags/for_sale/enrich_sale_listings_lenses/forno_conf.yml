@@ -10,6 +10,8 @@ tables:
     is_incremental: false
   sellability_lens:
     is_incremental: false
+  listing_quality_lens:
+    is_incremental: false
   listing_lenses:
     is_incremental: false
     

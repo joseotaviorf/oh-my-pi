@@ -79,6 +79,18 @@ sellability AS (
   WHERE 
     is_last_tier
 ),
+listing_quality AS (
+  SELECT
+    id_house,
+    tier AS listing_quality_tier,
+    tier_name AS listing_quality_name,
+    tier_disclaimer AS listing_quality_disclaimer,
+    tier_drill_down AS listing_quality_drill_down
+  FROM 
+    datalake_sale_listings_lenses.listing_quality_lens
+  WHERE
+    is_last_tier
+),
 dataset AS (
   SELECT 
     id_house,
@@ -90,14 +102,18 @@ dataset AS (
     COALESCE(d.demand_tier, 'D-') AS demand_tier,
     COALESCE(a.availability_tier, 'A-') AS availability_tier,
     COALESCE(se.sellability_tier, 'S-') AS sellability_tier,
+    COALESCE(lq.listing_quality_tier, 'Q-') AS listing_quality_tier,
     COALESCE(p.pricing_name, 'Undefined') AS pricing_name,
     COALESCE(d.demand_name, 'Undefined') AS demand_name,
     COALESCE(a.availability_name, 'Undefined') AS availability_name,
     COALESCE(se.sellability_name, 'Undefined') AS sellability_name,
+    COALESCE(lq.listing_quality_name, 'Undefined') AS listing_quality_name,
     p.pricing_disclaimer,
     d.demand_disclaimer,
     a.availability_disclaimer,
-    a.availability_drill_down
+    a.availability_drill_down,
+    lq.listing_quality_disclaimer,
+    lq.listing_quality_drill_down
   FROM
     sale_listings AS l
   LEFT JOIN
@@ -115,6 +131,9 @@ dataset AS (
   LEFT JOIN 
     sellability AS se
       USING(id_house)
+  LEFT JOIN 
+    listing_quality AS lq
+      USING(id_house)
 ),
 full_name AS (
   SELECT 
@@ -127,18 +146,23 @@ full_name AS (
     demand_tier,
     availability_tier,
     sellability_tier,
+    listing_quality_tier,
     pricing_name,
     demand_name,
     availability_name,
     sellability_name,
+    listing_quality_name,
     pricing_tier || ': ' || pricing_name AS pricing_full_name,
     demand_tier || ': ' || demand_name AS demand_full_name,
     availability_tier || ': ' || availability_name AS availability_full_name,
     sellability_tier || ': ' || sellability_name AS sellability_full_name,
+    listing_quality_tier || ': ' || listing_quality_name AS listing_quality_full_name,
     pricing_disclaimer,
     demand_disclaimer,
     availability_disclaimer,
-    availability_drill_down
+    availability_drill_down,
+    listing_quality_disclaimer,
+    listing_quality_drill_down
   FROM
     dataset
 )
@@ -154,17 +178,22 @@ SELECT
   demand_tier,
   availability_tier,
   sellability_tier,
+  listing_quality_tier,
   pricing_name,
   demand_name,
   availability_name,
   sellability_name,
+  listing_quality_name,
   pricing_full_name,
   demand_full_name,
   availability_full_name,
   sellability_full_name,
+  listing_quality_full_name,
   pricing_disclaimer,
   demand_disclaimer,
   availability_disclaimer,
-  availability_drill_down
+  availability_drill_down,
+  listing_quality_disclaimer,
+  listing_quality_drill_down
 FROM
   full_name

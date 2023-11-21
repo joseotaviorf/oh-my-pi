@@ -141,6 +141,21 @@ columns:
       S1: > 
         It represents listings with a very low degree of sellability, i.e. is a listing typology that is totally different from the listings sold on QuintoAndar.
         To be considered S1, the listing must have a sellability factor less than or equal to 0.3.
+  listing_quality_tier: 
+    lineage: 
+      - datalake_sale_listings_lenses.listing_quality_lens.tier
+    description: > 
+      We use the entire history of changes to a property's features and condominiums to create a tier that tracks the level of completeness of a house's information.
+      We believe that a house with complete information performs much better on the platform. With this in mind, we used several variables and created a completeness score.
+    categories: 
+      Q5: Represents listings with full information on amenities and features. There is no penalty, i.e. all the information we considered was filled in.
+      Q4: Represents listings with almost complete information on amenities and features. There is a small penalty, i.e. some of the amenities or features that are not so critical have not been filled.
+        To be placed into this tier you must have a score between -1 and -500.
+      Q3: Represents listings with incomplete information on amenities and features. There is a medium penalty, i.e. some of the amenities or features have not been filled.
+        To be placed into this tier you must have a score between -501 and -1500.
+      Q2: Represents listings with very incomplete information on amenities and features. There is a large penalty, i.e. most of the amenities or features have not been filled.
+        To be placed into this tier you must have a score less than -1500.
+      Q1: Represents listings with no information on amenities and features. Represents listings that are missing one or more critical information. To be considered in this tier, we have a problem identifying its sale price and/or its condo value and/or its number of bedrooms and/or its total area.
   pricing_name:
     lineage:
       - datalake_sale_listings_lenses.pricing_lens.tier_name
@@ -189,11 +204,6 @@ columns:
         It represents the A2 tier category. Listings that have an availability score between -100000 and 4000.
       Possibly Unavailable: >
         It represents the A1 tier category. Listings that have an availability score less than -100000.
-  availability_drill_down:
-    lineage: 
-      - datalake_sale_listings_lenses.availability_lens.tier_drill_down
-    description: >
-      The drill down of the availability tier, where we can see the factors/bins that make up the listing's tier.
   sellability_name:
     lineage:
       - datalake_sale_listings_lenses.sellability_lens.tier_name
@@ -210,6 +220,17 @@ columns:
         It represents the S2 tier. Listings with typologies that are slightly similar to the listings already sold by QuintoAndar. It is the fourth highest tier.
       Not Very Similar:
         It represents the S1 tier. Listings with typologies totally different type to the listings that QuintoAndar sells. It is the lowest tier.
+  listing_quality_name: 
+    lineage:
+      - datalake_sale_listings_lenses.listing_quality_lens.tier_name
+    description: >
+      Just a full name of the listing quality tier.
+    categories: 
+      Great Accuracy: It represents the Q5 tier. Listings with full information on amenities and features.
+      Good Accuracy: It represents the Q4 tier. Listings with almost complete information on amenities and features.
+      Moderate Accuracy: It represents the Q3 tier. Listings with incomplete information on amenities and features.
+      Low Accuracy: It represents the Q2 tier. Listings with very incomplete information on amenities and features.
+      Critical Accuracy: It represents the Q1 tier. Listings with critical information missing, like sale price, condo, bedrooms and total area.
   pricing_full_name:
     description: > 
       Full name of pricing tier. Can be used for display purposes.
@@ -222,6 +243,9 @@ columns:
   sellability_full_name:
     description: > 
       Full name of sellability tier. Can be used for display purposes.
+  listing_quality_full_name:
+    description: > 
+      Full name of listing quality tier. Can be used for display purposes.
   pricing_disclaimer:
     lineage:
       - datalake_sale_listings_lenses.pricing_lens.tier_disclaimer
@@ -237,3 +261,18 @@ columns:
       - datalake_sale_listings_lenses.availability_lens.tier_disclaimer
     description: >
       Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a availability tier.
+  availability_drill_down:
+    lineage: 
+      - datalake_sale_listings_lenses.availability_lens.tier_drill_down
+    description: >
+      The drill down of the availability tier, where we can see the factors/bins that make up the listing's tier.
+  listing_quality_disclaimer:
+    lineage:
+      - datalake_sale_listings_lenses.listing_quality_lens.tier_disclaimer
+    description: >
+      Column that shows us, in full, the completeness of listing information, where with this, we classify it within a listing quality tier.
+  listing_quality_drill_down: 
+    lineage:
+      - datalake_sale_listings_lenses.listing_quality_lens.tier_drill_down
+    description: >
+      The drill down of the listing quality tier, where we can see the completeness of the listing information.
