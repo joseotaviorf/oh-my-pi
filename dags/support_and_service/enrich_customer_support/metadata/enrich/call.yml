@@ -304,6 +304,18 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
     description: The Zendesk Ticket custom field.
+  journey_step:
+    lineage:
+      - datalake_gsheets_clean.department_control.journey_step
+    description: Journey step in which the call is.
+  team:
+    lineage:
+      - datalake_gsheets_clean.department_control.team
+    description: Team of which the call belongs to.
+  area:
+    lineage:
+      - datalake_gsheets_clean.department_control.area
+    description: Area of which the call belongs to.
   is_last_segment:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.id_reservation

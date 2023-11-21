@@ -165,6 +165,18 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.status
     description: Current ticket status.
+  journey_step:
+    lineage:
+      - datalake_gsheets_clean.department_control.journey_step
+    description: Journey step in which the chat is.
+  team:
+    lineage:
+      - datalake_gsheets_clean.department_control.team
+    description: Team of which the chat belongs to.
+  area:
+    lineage:
+      - datalake_gsheets_clean.department_control.area
+    description: Area of which the chat belongs to.
   custom_fields:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
