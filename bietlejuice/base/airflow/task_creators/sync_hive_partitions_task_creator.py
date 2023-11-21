@@ -19,7 +19,7 @@ class SyncHivePartitionsTaskCreator(BaseTaskCreator):
         task_id = self.generate_task_id(table_attributes)
         parameters = [
             self.environment_attributes.bucket,
-            table_attributes.layer,
+            table_attributes.layer.value,
             table_attributes.schema,
             "--table-name",
             table_attributes.table_name,
