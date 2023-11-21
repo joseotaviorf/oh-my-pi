@@ -870,6 +870,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.vans:load-clean-boleto
   - bietlejuice.vans:load-clean-boleto-file
   - bietlejuice.vans:load-clean-file
+  - bietlejuice.vans:load-clean-file-payment
   - bietlejuice.vans:load-clean-payment
   - bietlejuice.vans:load-clean-payment-boleto
   - bietlejuice.wall_street:load-clean-charge

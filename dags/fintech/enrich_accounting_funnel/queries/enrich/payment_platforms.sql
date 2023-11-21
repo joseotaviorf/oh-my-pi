@@ -86,6 +86,7 @@ WITH boleto_file_response AS (
     f.type =':file.type/boleto'
   AND f.origin = ':file.origin/response'
 ),
+
 next_business_day AS (
   SELECT
     dd.date,
@@ -100,14 +101,29 @@ next_business_day AS (
   GROUP BY
     1
 ),
+
+file_payment AS (
+select 
+    company_use,
+    RANK() OVER (PARTITION BY company_use ORDER BY f.ts_created DESC) as rk
+from 
+    datalake_vans_clean.payment p2
+inner join 
+    datalake_vans_clean.file_payment fp on fp.id_payment=p2.id
+inner join 
+    datalake_vans_clean.file f on f.id = fp.id_file 
+where 
+    f.type=':file.type/payment.csv'
+),
+
 CAP AS (
 SELECT
   c.id AS id_payment_platform,
-  SPLIT(company_use, '[a-zA-Z]')[0] AS id_business_entity,
+  SPLIT(c.company_use, '[a-zA-Z!]')[0] AS id_business_entity,
   id_related_document AS id_finance_entity,
   'vans_cap' AS payment_platform,
   status as payment_status,
-  company_use AS reference_1,
+  c.company_use AS reference_1,
   our_number AS reference_2,
   CASE
     WHEN UPPER(pagamento) LIKE 'PROTEÇÃO 5A%' AND UPPER(our_number) LIKE 'MANUAL%' THEN 'Repasse Extra'
@@ -121,7 +137,7 @@ SELECT
     ELSE NULL
   END AS reference_3,
   TipoPagamento AS reference_4,
-  name AS reference_5,
+  CONCAT(id_bank_payment, ":", name) AS reference_5,
   paid_amount,
   dt_paid,
   dt_paid AS dt_receipt
@@ -135,7 +151,7 @@ FROM
     p.dt_paid,
     if (status = ':payment.status/chargeback', p.paid_amount, p.paid_amount*(-1)) as paid_amount,
     p.requested_by,
-    p.id_bank_payment as codigo,
+    p.id_bank_payment,
     p.ts_updated,
     CASE
           WHEN p.requested_by = 'sb-corretores' THEN 'Corretores'
@@ -175,7 +191,7 @@ FROM
     pb.dt_paid,
     pb.paid_amount*(-1) as paid_amount,
     pb.requested_by,
-    CAST((if(pb.id_bank_payment = null, '0', '1')) AS decimal(20,0)) as codigo,
+    CAST((if(pb.id_bank_payment = null, '0', '1')) AS decimal(20,0)) as id_bank_payment,
     pb.ts_updated,
     CASE
       WHEN pb.company_use = '00000000000000000000' THEN 'Ongoing - Boleto'
@@ -197,12 +213,15 @@ FROM
   WHERE
     pb.dt_paid >= '2022-12-01'
   ) c
+INNER JOIN 
+  file_payment fp
+      on fp.company_use = c.company_use and fp.rk = 1
 LEFT JOIN
-datalake_vans_clean.bank_payment bp
-    on c.codigo = bp.id
+  datalake_vans_clean.bank_payment bp
+      on c.id_bank_payment = bp.id
 LEFT JOIN
-datalake_vans_clean.bank b
-    on bp.id_bank = b.id
+  datalake_vans_clean.bank b
+      on bp.id_bank = b.id
 )
 
 SELECT *
@@ -213,7 +232,7 @@ UNION ALL
 
 SELECT
   CAST(b.id AS STRING) as id_payment_platform,
-  SPLIT(b.company_use, '[a-zA-Z]')[0] AS id_business_entity,
+  SPLIT(b.company_use, '[a-zA-Z!]')[0] AS id_business_entity,
   b.id_related_document AS id_finance_entity,
   'vans_car' AS payment_platform, 
   SPLIT(b.status, "/")[1] AS payment_status, 
