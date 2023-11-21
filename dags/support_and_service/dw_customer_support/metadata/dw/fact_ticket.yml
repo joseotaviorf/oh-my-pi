@@ -229,6 +229,23 @@ columns:
     description:
       Boolean column containing the last user answer if his problem was
       solved via CSAT survey. Null if the user has not answered.
+  ticket_rate_weight:
+    description: The weight applied to the ticket if it's part of the ticket rate calculation.
+    categories:
+      '1': Ticket rate weight is 1 and is based on being a front ticket.
+      '2': Ticket rate weight is 2 and is based on being a back ticket.
+      'Null': No weight applied if the ticket is not part of the ticket rate rules.
+  is_ticket_rate:
+    description: "Boolean flag indicating if the ticket is part of the ticket rate calculation.
+      In order to be part of, the ticket must follow several rules:
+        - The ticket area must be CX;
+        - The ticket team could be anyone but Ong Back;
+        - The ticket must be front or back, depending on the channel;
+        - The ticket must be outside the journey steps of Compra e Venda (Buy and Sell) or Cross;
+        - The ticket must not belong to a few departments (Rescisão por Inadimplência [OFF][POS][BACK], Offboarding Reparos [OFF] [POS] [BACK],
+          Offboarding pré saída [OFF] [POS] [BACK], Proteção QuintoAndar [OFF] [POS] [BACK], Rescisão - Despejo [OFF][POS][BACK]
+          or Rescisão 1 [OFF] [POS] [BACK]);
+        - The date in which the ticket was solved must be later than 1st January/2022."
   has_answered_csat:
     lineage:
       - datalake_customer_support.call.is_csat_answered

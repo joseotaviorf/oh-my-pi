@@ -35,6 +35,22 @@ WITH call_tickets AS (
     CAST(last_back_ticket AS BIGINT) AS last_back_ticket,
     back_ticket_list AS back_tickets,
     is_solved AS resolution_survey,
+    IF(
+      front_or_back = 'front'
+      AND DATE(ts_ticket_ended) >= DATE('2022-01-01')
+      AND journey_step NOT IN ('Compra e Venda', 'Cross')
+      AND team <> 'Ong Back'
+      AND area = 'CX'
+      AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+        'Offboarding Reparos [OFF] [POS] [BACK]',
+        'Offboarding pré saída [OFF] [POS] [BACK]',
+        'Proteção QuintoAndar [OFF] [POS] [BACK]',
+        'Rescisão - Despejo [OFF][POS][BACK]',
+        'Rescisão 1 [OFF] [POS] [BACK]'
+      ),
+      TRUE,
+      FALSE
+    ) AS is_ticket_rate,
     is_csat_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
@@ -86,7 +102,7 @@ WITH call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47
 ),
 chat_tickets AS (
   SELECT
@@ -125,6 +141,22 @@ chat_tickets AS (
     CAST(last_back_ticket AS BIGINT) AS last_back_ticket,
     back_ticket_list AS back_tickets,
     is_solved AS resolution_survey,
+    IF(
+      front_or_back = 'front'
+      AND DATE(ts_ticket_ended) >= DATE('2022-01-01')
+      AND journey_step NOT IN ('Compra e Venda', 'Cross')
+      AND team <> 'Ong Back'
+      AND area = 'CX'
+      AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+        'Offboarding Reparos [OFF] [POS] [BACK]',
+        'Offboarding pré saída [OFF] [POS] [BACK]',
+        'Proteção QuintoAndar [OFF] [POS] [BACK]',
+        'Rescisão - Despejo [OFF][POS][BACK]',
+        'Rescisão 1 [OFF] [POS] [BACK]'
+      ),
+      TRUE,
+      FALSE
+    ) AS is_ticket_rate,
     is_csat_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
@@ -176,7 +208,7 @@ chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47
 ),
 email_tickets AS (
   SELECT
@@ -215,6 +247,22 @@ email_tickets AS (
     CAST(last_back_ticket AS BIGINT) AS last_back_ticket,
     back_ticket_list AS back_tickets,
     is_solved AS resolution_survey,
+    IF(
+      front_or_back IN ('back', 'front')
+      AND DATE(ts_ticket_ended) >= DATE('2022-01-01')
+      AND journey_step NOT IN ('Compra e Venda', 'Cross')
+      AND team <> 'Ong Back'
+      AND area = 'CX'
+      AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+        'Offboarding Reparos [OFF] [POS] [BACK]',
+        'Offboarding pré saída [OFF] [POS] [BACK]',
+        'Proteção QuintoAndar [OFF] [POS] [BACK]',
+        'Rescisão - Despejo [OFF][POS][BACK]',
+        'Rescisão 1 [OFF] [POS] [BACK]'
+      ),
+      TRUE,
+      FALSE
+    ) AS is_ticket_rate,
     is_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
@@ -304,6 +352,7 @@ historical_call_tickets AS (
     NULL AS last_back_ticket,
     NULL AS back_tickets,
     NULL AS resolution_survey,
+    NULL AS is_ticket_rate,
     NULL AS has_answered_csat,
     NULL AS has_back_ticket,
     NULL AS is_back_ticket_open,
@@ -367,6 +416,7 @@ historical_chat_tickets AS (
     NULL AS last_back_ticket,
     NULL AS back_tickets,
     is_solved AS resolution_survey,
+    NULL AS is_ticket_rate,
     is_csat_answered AS has_answered_csat,
     NULL AS has_back_ticket,
     NULL AS is_back_ticket_open,
@@ -490,6 +540,12 @@ SELECT DISTINCT
     bt.last_back_ticket,
     bt.back_tickets,
     bt.resolution_survey,
+    CASE
+      WHEN bt.is_ticket_rate AND bt.front_or_back = 'front' THEN 1
+      WHEN bt.is_ticket_rate AND bt.front_or_back = 'back' THEN 2
+      ELSE NULL
+    END AS ticket_rate_weight,
+    bt.is_ticket_rate,
     bt.has_answered_csat,
     bt.has_back_ticket,
     bt.is_back_ticket_open,
