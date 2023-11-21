@@ -3,7 +3,6 @@ SELECT
     i.id_negotiation,
     i.total_amount,
     i.status,
-    i.purpose,
     i.payment_type,
     CASE
         WHEN i.ts_paid_difference <= 2 AND d.weekday_name = 'Saturday' THEN NULL

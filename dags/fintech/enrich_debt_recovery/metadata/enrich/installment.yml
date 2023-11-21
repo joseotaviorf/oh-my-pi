@@ -45,10 +45,6 @@ columns:
     description: "How the payment was made"
     lineage:
       - datalake_trato_feito_clean.payment.type
-  purpose:
-    description: "Purpose of the invoice"
-    lineage:
-      - datalake_retsuko.invoice.purpose
   dt_due:
     description: "Date Due"
     lineage:
