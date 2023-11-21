@@ -263,6 +263,12 @@ sheets_info:
     clean_table_name: survival_estimation_new_version
     sheet_context: static
 
+  tax_calculation:
+    sheet_id: 1HljRQN9W-7dHH5OHMz48NLUVX1vLVP4mfaRBrmMd9-s
+    sheet_name: tabela
+    clean_table_name: tax_calculation
+    sheet_context: static
+
   ticket_rate_classification:
     sheet_id: 1LCwmoOjlf8Yi8XdTt4GFTDm_uUIM3273rKOqY53Pbog
     sheet_name: ticket_rate_classification

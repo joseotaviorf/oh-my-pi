@@ -269,6 +269,12 @@ sheets_info:
     clean_table_name: ticket_rate_classification
     sheet_context: static
 
+  tax_calculation:
+    sheet_id: 1HljRQN9W-7dHH5OHMz48NLUVX1vLVP4mfaRBrmMd9-s
+    sheet_name: tabela
+    clean_table_name: tax_calculation
+    sheet_context: static
+
   tqc_registered_agents:
     sheet_id: 1FuN5jlN9pDvVfwPDJAqROfqXKF3tIhXDUvR6a6RGqYg
     sheet_name: tqc_registered_agents

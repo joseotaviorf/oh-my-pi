@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: tax_calculation
+columns:
+  gl_acctbp_code:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.gl_acctbp_code
+  name:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.name
+  grouper:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.agrupador1
+  subgrouper:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.agrupador2
+  fs_grouper:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.fs_grouper
+  entity_code:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.entity_code
+  city:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.city
+  regime:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.regime
+  iss_rate:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.iss_rate
+  pis_rate:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.pis_rate
+  cofins_rate:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.cof_rate
+  iss_account:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.iss_account
+  pis_account:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.pis_account
+  cofins_account:
+    lineage:
+      - datalake_gsheets_raw.tax_calculation.cofins_account
