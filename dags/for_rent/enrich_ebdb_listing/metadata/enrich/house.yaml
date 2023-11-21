@@ -577,6 +577,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.instant_offer.is_enabled
     description: 'True if the house has instant offer enabled'
+  has_sale_smart_price_activated:
+    description: 'True if the house has sale smart price feature activated'
+  has_rent_smart_price_activated:
+    description: 'True if the house has rent smart price feature activated'
   dt_built:
     lineage:
       - datalake_ebdb_clean.house.dt_built

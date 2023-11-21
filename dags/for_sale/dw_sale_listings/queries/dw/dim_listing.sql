@@ -36,6 +36,7 @@ SELECT
   sl.has_active_rental_contract,
   sl.has_house_been_rented,
   h.has_sale_great_price_tag AS has_great_price_tag,
+  h.has_sale_smart_price_activated AS has_smart_price_activated,
   hslc.dt_consultant_started, 
   hslc.ts_consultant_deleted,
   lbc.ts_created,

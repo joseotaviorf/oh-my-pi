@@ -1361,6 +1361,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-clean-access-type-aud
   - bietlejuice.ebdb:load-clean-condo
   - bietlejuice.ebdb:load-clean-contract
+  - bietlejuice.ebdb:load-clean-dynamic-pricing-house
   - bietlejuice.ebdb:load-clean-full-contract
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-house-agent-aud

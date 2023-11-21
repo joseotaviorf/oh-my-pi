@@ -1,16 +1,16 @@
 WITH special_condition AS (
-  -- there is a known bug that creates multiple rows for some houses
-  SELECT
-    hsc.id_house,
-    max(hsc.id_special_condition IS NOT NULL) AS is_exclusive
-  FROM
-    datalake_ebdb_clean.house_special_condition AS hsc
-  JOIN
-    datalake_ebdb_clean.special_condition AS sc
-      ON sc.id = hsc.id_special_condition
-      AND sc.special_condition_type = 'Exclusivity'
-      AND sc.special_condition_status IN ('OptedIn', 'Applied')
-  GROUP BY 1
+    -- there is a known bug that creates multiple rows for some houses
+    SELECT
+      hsc.id_house,
+      max(hsc.id_special_condition IS NOT NULL) AS is_exclusive
+    FROM
+      datalake_ebdb_clean.house_special_condition AS hsc
+    JOIN
+      datalake_ebdb_clean.special_condition AS sc
+        ON sc.id = hsc.id_special_condition
+        AND sc.special_condition_type = 'Exclusivity'
+        AND sc.special_condition_status IN ('OptedIn', 'Applied')
+    GROUP BY 1
 ),
 visit_info AS (
   SELECT
@@ -88,6 +88,19 @@ listing_ownership AS (
   LEFT JOIN
     datalake_hubspot.company AS hc
       ON hc.uuid_company = loa.uuid_company
+),
+smart_price AS (
+  SELECT 
+      l.id_house,
+      SOME(p.status = 'ACTIVE' AND l.business_context = 'SALE') AS has_sale_smart_price_activated,
+      SOME(p.status = 'ACTIVE' AND l.business_context = 'RENT') AS has_rent_smart_price_activated
+  FROM
+    datalake_ebdb_clean.dynamic_pricing_house AS p
+  INNER JOIN
+    datalake_ebdb_clean.listing_business_context AS l
+      ON l.id = p.id_listing_business_context 
+  GROUP BY 
+    1
 )
 SELECT
   h.id,
@@ -269,6 +282,8 @@ SELECT
   COALESCE(visit_info.need_owner_authorization, FALSE) AS need_owner_authorization,
   COALESCE(visit_info.has_key_box, FALSE) AS has_key_box,
   COALESCE(io.is_enabled, FALSE) AS has_instant_offer_enabled,
+  COALESCE(has_sale_smart_price_activated, FALSE) AS has_sale_smart_price_activated,
+  COALESCE(has_rent_smart_price_activated, FALSE) AS has_rent_smart_price_activated,
   h.dt_built,
   h.dt_expiration,
   h.dt_first_publication,
@@ -333,10 +348,10 @@ LEFT JOIN
     ON visit_info.id_house = h.id
 LEFT JOIN
   house_aud
-	ON house_aud.id_house = h.id
+  ON house_aud.id_house = h.id
 LEFT JOIN
   datalake_ebdb_clean.user_revision_entity AS ure
-	ON house_aud.rev = ure.id
+  ON house_aud.rev = ure.id
 LEFT JOIN
   datalake_ebdb_clean.instant_offer AS io
     ON h.id = io.id_house
@@ -346,3 +361,6 @@ LEFT JOIN
 LEFT JOIN
   listing_ownership AS lo
     ON lo.id_house = h.id
+LEFT JOIN 
+  smart_price AS sp
+    ON sp.id_house = h.id

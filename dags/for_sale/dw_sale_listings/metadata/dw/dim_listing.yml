@@ -353,6 +353,11 @@ columns:
     - datalake_ebdb_listing.house.has_great_sale_price_tag
     description: > 
       Boolean column that shows whether the listing currently has the great price tag. The great price tag is an ornament attached to the listing's image on our platform if it is priced below what we think it is worth (using calculator prices and similar properties).
+  has_smart_price_activated:
+    lineage:
+    - datalake_ebdb_listing.house.has_sale_smart_price_activated
+    description: > 
+      Boolean column that shows whether the listing currently has the smart price feature activated. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand.
   dt_consultant_started:
     lineage:
     - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
