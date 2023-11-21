@@ -47,6 +47,12 @@ metadata_files_out_of_pattern:
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/unique_supply_events_funnel.yml
   - cross/dw_datamarts_spark/metadata/dw/growth_cross/user_funnel.yml
   - cross/dw_datamarts_spark/queries/dw/growth_cross/unique_performance_marketing_metrics_supply_coincident.yml
+  # TODO: remove after moving heimdall to for_rent/
+  - for_rent/enrich_heimdall/metadata/enrich/activity.yml
+  - for_rent/enrich_heimdall/metadata/enrich/auditable_expenses.yml
+  - for_rent/enrich_heimdall/metadata/enrich/expenses.yml
+  - for_rent/enrich_heimdall/metadata/enrich/ongoing_refund_requests.yml
+  - for_rent/heimdall/metadata/clean/activity.yml
 queries_without_metadata_files:
   - for_rent/regions_polygon/queries/enrich_for_looker/regions_polygon.sql
   - for_rent/property_tax/queries/raw/tax_report.sql
