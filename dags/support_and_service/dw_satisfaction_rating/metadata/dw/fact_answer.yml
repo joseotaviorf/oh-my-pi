@@ -33,10 +33,6 @@ columns:
     description: Secondary satisfaction form responses.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.secondary_satisfaction_score
-  ts_first_seen:
-    description: Date when the form was first viewed by the respondent.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
   ts_submitted:
     description: Date the satisfaction response was submitted.
     lineage:

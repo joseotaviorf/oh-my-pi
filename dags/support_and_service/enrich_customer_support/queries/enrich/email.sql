@@ -66,7 +66,6 @@ csat AS (
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good') THEN TRUE
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
     END AS is_solved,
-    NULL AS ts_first_seen,
     NULL AS ts_first_response
   FROM
     datalake_zendesk_tickets_clean.tickets
@@ -80,7 +79,6 @@ csat AS (
     csat_score,
     COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL AS is_answered,
     is_solved,
-    ts_first_seen,
     ts_first_response
   FROM
     datalake_survicate.zendesk_email_surveys
@@ -96,7 +94,6 @@ last_csat_answer AS (
     csat_score,
     is_answered,
     is_solved,
-    ts_first_seen,
     ts_first_response,
     ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_first_response DESC) AS rw_number
   FROM
@@ -202,7 +199,6 @@ SELECT DISTINCT
   bt.back_ticket AS last_back_ticket,
   bt.total_backoffice_minutes_time,
   CAST((TO_UNIX_TIMESTAMP(bt.ts_first_created) - TO_UNIX_TIMESTAMP(ze.ts_ticket_solved))/60.0 AS DOUBLE) AS total_minutes_front_to_open_back_ticket_time,
-  cs.ts_first_seen AS ts_csat_first_seen,
   cs.ts_first_response AS ts_csat_first_response,
   ze.ts_initially_assigned_local,
   ze.ts_last_assigned_local,

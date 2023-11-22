@@ -1,31 +1,58 @@
+WITH explode_parse_url AS (
+  SELECT
+    id_response,
+    id_survey,
+    id_respondent,
+    EXPLODE(SPLIT(PARSE_URL(sr.response_url, 'QUERY'), '&')) AS parse
+  FROM
+    datalake_survicate.survey_responses AS sr
+  WHERE
+    sr.year = {year}
+    AND sr.month = {month}
+    AND sr.day = {day}
+),
+zendesk_tickets AS (
+  SELECT DISTINCT
+    id_response,
+    id_survey,
+    id_respondent,
+    SPLIT(parse, '=')[1] AS id_ticket
+  FROM
+    explode_parse_url
+  WHERE
+    SPLIT(parse, '=')[0] LIKE "%ticket_id%"
+    OR SPLIT(parse, '=')[0] IN ("t_id", "id_ticket")
+)
 SELECT
-  id AS id_survey,
-  CAST(COALESCE(custom_attributes.ticket_id, PARSE_URL(page_url, 'QUERY', 't_id')) AS BIGINT) AS id_ticket,
-  id_visitor,
-  response_uuid,
-  visitor_uuid,
-  answers[2].content AS user_comment,
-  CASE
-    WHEN answers[1].survey_point.pretty_type = 'Smiley scale' AND answers[1].content = 'Extremely happy' THEN 5
-    WHEN answers[1].survey_point.pretty_type = 'Smiley scale' AND answers[1].content = 'Happy' THEN 4
-    WHEN answers[1].survey_point.pretty_type = 'Smiley scale' AND answers[1].content = 'Neutral' THEN 3
-    WHEN answers[1].survey_point.pretty_type = 'Smiley scale' AND answers[1].content = 'Unsatisfied' THEN 2
-    WHEN answers[1].survey_point.pretty_type = 'Smiley scale' AND answers[1].content = 'Extremely unsatisfied' THEN 1
-    ELSE CAST(answers[1].content AS INT)
-  END AS csat_score,
-  LOWER(answers[0].content) IN ('sim', "si", "sí") AS is_solved,
-  ts_first_seen,
-  ts_first_response,
-  year,
-  month,
-  day
+  sr.id_survey,
+  CAST(sr.id_ticket AS BIGINT) AS id_ticket,
+  sr.id_respondent AS id_visitor,
+  rc.id_response AS response_uuid,
+  sr.id_respondent AS visitor_uuid,
+  LAST(rc.answer_content) FILTER (WHERE rc.question_type IN ("text", "single")) AS user_comment,
+  CAST(LAST(
+    CASE
+      WHEN answer_content = 'Extremely happy' THEN 5
+      WHEN answer_content = 'Happy' THEN 4
+      WHEN answer_content = 'Neutral' THEN 3
+      WHEN answer_content = 'Unsatisfied' THEN 2
+      WHEN answer_content = 'Extremely unsatisfied' THEN 1
+      ELSE answer_content
+    END
+  ) FILTER (WHERE rc.question_type IN ('rating', 'smiley_scale')) AS INT) AS csat_score,
+  LAST(rc.answer_content) FILTER (WHERE rc.question_type IN ("text", "single")) IN ('sim', "si", "sí") AS is_solved,
+  rc.ts_collected AS ts_first_response,
+  rc.dt_load,
+  rc.year,
+  rc.month,
+  rc.day
 FROM
-  datalake_survicate_clean.surveys
+  datalake_survicate.response_content AS rc
+JOIN
+  zendesk_tickets AS sr
+    ON sr.id_response = rc.id_response
 WHERE
-  (
-    custom_attributes.ticket_id IS NOT NULL
-    OR PARSE_URL(page_url, 'QUERY', 't_id') IS NOT NULL
-  )
-  AND year = {year}
-  AND month = {month}
-  AND day = {day}
+  rc.year = {year}
+  AND rc.month = {month}
+  AND rc.day = {day}
+GROUP BY 1, 2, 3, 4, 5, 9, 10, 11, 12, 13

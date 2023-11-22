@@ -12,9 +12,9 @@ from airflow.utils.helpers import chain, cross_downstream
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
 # Pipeline Inputs
@@ -37,9 +37,10 @@ raw_spark_job_path = f"{s3_prefix}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 cluster_description = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 
+tables = config_service.get_config("tables")
 partition_cols = config_service.get_config("partition_cols")
-tables_config = config_service.get_config("tables")
 dag_documentation = config_service.get_config("dag_documentation")
+inner_dependencies = config_service.get_config("inner_dependencies")
 
 CUSTOM_LIBRARIES = [
     {
@@ -95,31 +96,53 @@ task_group = DatalakeTaskGroup(
     spark_jobs_path=base_spark_job_path,
 )
 
-raw_task_groups = task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=SOURCE,
-    extraction_spark_job_file=raw_spark_job_path,
-    raw_spark_job_extra_args=[
-        SOURCE,
-        "{{ ds }}",
-        json.dumps(tables_config),
-        json.dumps(partition_cols),
-    ],
+raw_task_groups = {}
+clean_task_groups = {}
+for table_name, tables_config in tables.items():
+
+    raw_task_groups[table_name] = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=[
+            SOURCE,
+            json.dumps(tables_config),
+            table_name,
+            json.dumps(partition_cols),
+            "{{ ds }}",
+        ],
+    )
+
+    clean_task_groups[table_name] = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        has_create_external_table_task=False,
+        table_name=table_name,
+        partitions=partition_cols,
+        is_incremental=True,
+    )
+
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=raw_task_groups,
+    dag_inner_dependencies=inner_dependencies,
 )
 
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
-    is_incremental=True,
-    partitions=partition_cols,
+chain(
+    create_cluster_task,
+    DatalakeTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
 )
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
-
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_groups),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
+chain(
+    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
 )
-
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)

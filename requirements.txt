@@ -3,6 +3,7 @@
 #  through Pypi Packages tab in GCP panel interface.
 # Please, keep the dependencies sorted alphabetically.
 boto3==1.24.0
+bs4==0.0.1
 businesstimedelta==1.0.1
 Click==7.0
 deepmerge==0.3.0

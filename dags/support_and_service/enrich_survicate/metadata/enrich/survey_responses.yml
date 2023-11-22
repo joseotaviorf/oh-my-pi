@@ -1,0 +1,69 @@
+---
+database_name: datalake_survicate_clean
+table_name: survey_responses
+description: Responses to a specific survey identified by their unique ID.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_response:
+    description: A unique, unchangeable identifier for the response.
+    lineage:
+      - datalake_survicate_clean.survey_responses.response_uuid
+  id_survey:
+    description: The survey's unique unchangeable identifier.
+    lineage:
+      - datalake_survicate_clean.survey_responses.survey_id
+  id_respondent:
+    description: A unique unchangeable identifier for the respondent who submitted the response.
+    lineage:
+      - datalake_survicate_clean.survey_responses.respondent
+  response_url:
+    description: The URL where the survey was displayed to the respondent.
+    lineage:
+      - datalake_survicate_clean.survey_responses.url
+  device_type:
+    description: The type of device used by the respondent to submit the response.
+    categories:
+      Desktop: ""
+      Mobile: ""
+      Tablet: ""
+      Tv: ""
+    lineage:
+      - datalake_survicate_clean.survey_responses.device_type
+  operating_system:
+    description: The operating system of the device used by the respondent.
+    categories:
+      Android: ""
+      OS: ""
+      iOS: ""
+      Linux: ""
+      Desktop: ""
+      macOS: ""
+      Windows: ""
+      Other: ""
+    lineage:
+      - datalake_survicate_clean.survey_responses.operating_system
+  language:
+    description: If present, the language of the survey translation presented to the respondent.
+    lineage:
+      - datalake_survicate_clean.survey_responses.language
+  ts_collected:
+    description: This timestamp marks the moment a survey response was received.
+    lineage:
+      - datalake_survicate_clean.survey_responses.ts_collected
+  dt_load:
+    description: Date and time when the data was loaded.
+    lineage:
+      - datalake_survicate_clean.survey_responses.dt_load
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - datalake_survicate_clean.survey_responses.year
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - datalake_survicate_clean.survey_responses.month
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - datalake_survicate_clean.survey_responses.day

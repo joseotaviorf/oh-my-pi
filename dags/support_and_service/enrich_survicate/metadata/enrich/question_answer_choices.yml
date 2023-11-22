@@ -1,0 +1,35 @@
+---
+database_name: datalake_survicate
+table_name: question_answer_choices
+description: Pre-defined answer options for the survey question.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_answer_choice:
+    description: The answer choice unique unchangeable identifier.
+    lineage:
+      - datalake_survicate_clean.survey_questions.answer_choices
+  id_question:
+    description: The question's unique unchangeable identifier.
+    lineage:
+      - datalake_survicate_clean.survey_questions.id_question
+  answer_content:
+    description: Text of the answer option as displayed to the respondent.
+    lineage:
+      - datalake_survicate_clean.survey_questions.answer_choices
+  dt_load:
+    description: Date and time when the data was loaded.
+    lineage:
+      - datalake_survicate_clean.survey_questions.dt_load
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - datalake_survicate_clean.survey_questions.year
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - datalake_survicate_clean.survey_questions.month
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - datalake_survicate_clean.survey_questions.day

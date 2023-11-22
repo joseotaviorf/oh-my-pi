@@ -7,23 +7,27 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:
     lineage:
-      - datalake_survicate_clean.surveys.response_uuid
+      - datalake_survicate.response_content.id_response
     description: Answer unique identifier (uuid)
   id_survey:
     lineage:
-      - datalake_survicate_clean.surveys.id
+      - datalake_survicate.survey_responses.id_survey
+    description: Survey unique identifier
+  id_respondent:
+    lineage:
+      - datalake_survicate.survey_responses.id_respondent
     description: Survey unique identifier
   id_contract:
     lineage:
-      - datalake_survicate_clean.surveys.page_url
+      - datalake_survicate.survey_responses.response_url
     description: Contract unique identifier
   id_ticket:
     lineage:
-      - datalake_survicate_clean.surveys.page_url
+      - datalake_survicate.survey_responses.response_url
     description: Zendesk ticket unique identifier
   email:
     lineage:
-      - datalake_survicate_clean.surveys.page_url
+      - datalake_survicate.survey_responses.response_url
     description: Respondent's email
   respondent_type:
     description:
@@ -42,7 +46,7 @@ columns:
     description: Data source
   satisfaction_rating:
     lineage:
-      - datalake_survicate_clean.surveys.answers
+      - datalake_survicate.response_content.answer_content
       - datalake_gsheets_clean.tenant_onboarding_keys_csat.score
       - datalake_gsheets_clean.owner_offboarding_keys_csat.score
     description: Main satisfaction response score
@@ -50,47 +54,37 @@ columns:
     description: Main satisfaction response description
   improvement_tags:
     lineage:
-      - datalake_survicate_clean.surveys.answers
+      - datalake_survicate.response_content.answer_content
       - datalake_gsheets_clean.tenant_onboarding_keys_csat.improvement_tags
       - datalake_gsheets_clean.owner_offboarding_keys_csat.improvement_tags
     description: Predefined tags to categorize respondent satisfaction
   user_comment:
     lineage:
-      - datalake_survicate_clean.surveys.answers
+      - datalake_survicate.response_content.answer_content
       - datalake_gsheets_clean.tenant_onboarding_keys_csat.comments
       - datalake_gsheets_clean.owner_offboarding_keys_csat.comments
     description: Respondent open comment
-  custom_attributes:
-    lineage:
-      - datalake_survicate_clean.surveys.custom_attributes
-    description: List of all custom attributes, along with their values
-  ts_first_seen:
-    lineage:
-      - datalake_survicate_clean.surveys.ts_first_seen
-      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
-      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
-    description: Date and time of first time visitor encountered any of your surveys
   ts_first_response:
     lineage:
-      - datalake_survicate_clean.surveys.ts_first_response
+      - datalake_survicate.response_content.ts_collected
       - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
       - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: Date and time of first time visitor responded to a survey
   year:
     lineage:
-      - datalake_survicate_clean.surveys.year
+      - datalake_survicate.response_content.year
       - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
       - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: "Year of response submission date "
   month:
     lineage:
-      - datalake_survicate_clean.surveys.month
+      - datalake_survicate.response_content.month
       - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
       - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: Month of response submission date
   day:
     lineage:
-      - datalake_survicate_clean.surveys.day
+      - datalake_survicate.response_content.day
       - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
       - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
     description: Day of response submission date

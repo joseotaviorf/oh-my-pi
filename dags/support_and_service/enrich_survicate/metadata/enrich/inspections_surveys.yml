@@ -7,20 +7,24 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:
     lineage:
-      - datalake_survicate_clean.surveys.response_uuid
+      - datalake_survicate.response_content.id_response
     description: Answer unique identifier (uuid)
   id_survey:
     lineage:
-      - datalake_survicate_clean.surveys.id
+      - datalake_survicate.survey_responses.id_survey
     description: Survey unique identifier
   id_contract:
     lineage:
-      - datalake_survicate_clean.surveys.page_url
+      - datalake_survicate.survey_responses.response_url
     description: Contract unique identifier
   id_respondent:
     lineage:
       - datalake_ebdb_clean.contract.id_user
-    description: User unique identifier
+    description: User unique identifier (EBDB)
+  respondent_uuid:
+    lineage:
+      - datalake_survicate.survey_responses.id_respondent
+    description: User unique identifier (Survicate)
   respondent_type:
     description:
       "Respondent role/type, for example: owner, tenant, surveyor, photographer,
@@ -38,45 +42,37 @@ columns:
     description: Data source
   improvement_tags:
     lineage:
-      - datalake_survicate_clean.surveys.answers
+      - datalake_survicate.response_content.answer_content
     description: Predefined tags to categorize respondent satisfaction
   respondent_comments:
     lineage:
-      - datalake_survicate_clean.surveys.answers
+      - datalake_survicate.response_content.answer_content
     description: Respondent open comment
   satisfaction_score:
     lineage:
-      - datalake_survicate_clean.surveys.answers
+      - datalake_survicate.response_content.answer_content
     description: Main satisfaction response score
   score_description:
     description: Main satisfaction response description
   secondary_satisfaction_score:
     lineage:
-      - datalake_survicate_clean.surveys.answers
+      - datalake_survicate.response_content.answer_content
     description: Secondary satisfaction response score
   secondary_score_description:
     description: Secondary satisfaction response description
-  custom_attributes:
-    lineage:
-      - datalake_survicate_clean.surveys.custom_attributes
-    description: List of all custom attributes, along with their values
-  ts_first_seen:
-    lineage:
-      - datalake_survicate_clean.surveys.ts_first_seen
-    description: Date and time of first time visitor encountered any of your surveys
   ts_submitted:
     lineage:
-      - datalake_survicate_clean.surveys.ts_first_response
+      - datalake_survicate.response_content.ts_collected
     description: Date and time of first time visitor responded to a survey
   year:
     lineage:
-      - datalake_survicate_clean.surveys.year
+      - datalake_survicate.response_content.year
     description: "Year of response submission date "
   month:
     lineage:
-      - datalake_survicate_clean.surveys.month
+      - datalake_survicate.response_content.month
     description: Month of response submission date
   day:
     lineage:
-      - datalake_survicate_clean.surveys.day
+      - datalake_survicate.response_content.day
     description: Day of response submission date

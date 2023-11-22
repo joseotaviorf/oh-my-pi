@@ -1,16 +1,15 @@
 SELECT
-    id,
-    visitor_id AS id_visitor,
-    response_uuid,
-    visitor_uuid,
-    custom_attributes,
-    answers,
-    page_url,
-    CAST(first_seen_date AS TIMESTAMP) AS ts_first_seen,
-    CAST(first_response_date AS TIMESTAMP) AS ts_first_response,
-    year,
-    month,
-    day
+    id AS id_survey,
+    name AS survey_name,
+    type,
+    launch,
+    CAST(responses AS BIGINT) AS total_responses,
+    CAST(enabled AS BOOLEAN) AS is_enabled,
+    TIMESTAMP(created_at) AS ts_created,
+    DATE(dt_load) AS dt_load,
+    INT(year) AS year,
+    INT(month) AS month,
+    INT(day) AS day
 FROM
     datalake_survicate_raw.surveys
 WHERE

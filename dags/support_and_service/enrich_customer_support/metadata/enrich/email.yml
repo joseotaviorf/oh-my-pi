@@ -251,9 +251,6 @@ columns:
     description:
       Time in minutes to open the related back-office ticket after resolving the
       front-end ticket.
-  ts_csat_first_seen:
-    lineage:
-      - datalake_survicate.zendesk_email_surveys.ts_first_seen
     description: Timestamp indicating when the survey was first viewed.
   ts_csat_first_response:
     lineage:

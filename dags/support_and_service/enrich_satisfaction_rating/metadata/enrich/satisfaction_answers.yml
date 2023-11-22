@@ -157,10 +157,6 @@ columns:
       - datalake_satisfaction_rating.gsheets_surveys.custom_attributes
       - datalake_satisfaction_rating.survicate_surveys.custom_attributes
       - datalake_satisfaction_rating.chat_fup_surveys.custom_attributes
-  ts_first_seen:
-    description: Date when the form was first viewed by the respondent.
-    lineage:
-      - datalake_satisfaction_rating.survicate_surveys.ts_first_seen
   ts_submitted:
     description: Date the satisfaction response was submitted.
     lineage:

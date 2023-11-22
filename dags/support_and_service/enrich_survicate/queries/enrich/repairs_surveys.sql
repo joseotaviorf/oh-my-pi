@@ -1,31 +1,35 @@
 SELECT
-    s.response_uuid AS id_answer,
-    s.id AS id_survey,
-    PARSE_URL(s.page_url, 'QUERY', 't_id') AS id_ticket,
-    PARSE_URL(s.page_url, 'QUERY', 'email') AS respondent_email,
+    rc.id_response AS id_answer,
+    sr.id_survey,
+    sr.id_respondent,
+    PARSE_URL(sr.response_url, 'QUERY', 't_id') AS id_ticket,
+    PARSE_URL(sr.response_url, 'QUERY', 'email') AS respondent_email,
     CASE
-        WHEN s.id = '01176589bb5ad239' THEN "owner"
-        WHEN s.id = 'a514a5d6fe646931' THEN "tenant"
+        WHEN sr.id_survey = '01176589bb5ad239' THEN "owner"
+        WHEN sr.id_survey = 'a514a5d6fe646931' THEN "tenant"
     END AS respondent_type,
     'repairs' AS service_type,
     'offboarding' AS service_context,
     'survicate' AS source_name,
-    s.answers[2]['content'] AS improvement_tags,
-    s.answers[3]['content'] AS respondent_comments,
-    s.answers[1]['content'] AS satisfaction_score,
+    CAST(COLLECT_LIST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852448, 1852462)) AS STRING) AS improvement_tags,
+    LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852449, 1852463)) AS respondent_comments,
+    CAST(LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852451, 1852461)) AS INT) AS satisfaction_score,
     "satisfaction evaluation" AS score_description,
-    s.answers[0]['content'] AS secondary_satisfaction_score,
+    CAST(LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852447, 1852460)) AS INT) AS secondary_satisfaction_score,
     "satisfaction between parties involved" AS secondary_score_description,
-    s.custom_attributes,
-    s.ts_first_seen,
-    s.ts_first_response AS ts_submitted,
-    s.year,
-    s.month,
-    s.day
+    rc.ts_collected AS ts_submitted,
+    rc.dt_load,
+    rc.year,
+    rc.month,
+    rc.day
 FROM
-    datalake_survicate_clean.surveys AS s
+    datalake_survicate.response_content AS rc
+JOIN
+    datalake_survicate.survey_responses AS sr
+        ON sr.id_response = rc.id_response
 WHERE
-    id IN ('a514a5d6fe646931', '01176589bb5ad239')
-    AND s.year = {year}
-    AND s.month = {month}
-    AND s.day = {day}
+    sr.id_survey IN ('a514a5d6fe646931', '01176589bb5ad239')
+    AND rc.year = {year}
+    AND rc.month = {month}
+    AND rc.day = {day}
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 15, 16, 17, 18, 19, 20

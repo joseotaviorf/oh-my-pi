@@ -7,3 +7,28 @@ custom_cluster:
   autoscale:
     max_workers: 3
     min_workers: 1
+
+partitions: ["year", "month", "day"]
+
+inner_dependencies:
+  inspections_surveys:
+    - response_content
+    - survey_responses
+  keys_surveys:
+    - response_content
+    - survey_responses
+  lockbox_surveys:
+    - response_content
+    - survey_responses
+  photo_surveys:
+    - response_content
+    - survey_responses
+  repairs_surveys:
+    - response_content
+    - survey_responses
+  scheduling_surveys:
+    - response_content
+    - survey_responses
+  zendesk_email_surveys:
+    - response_content
+    - survey_responses

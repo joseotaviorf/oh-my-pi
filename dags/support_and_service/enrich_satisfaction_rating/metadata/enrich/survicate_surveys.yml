@@ -146,24 +146,6 @@ columns:
     lineage:
       - datalake_survicate.inspections_surveys.secondary_score_description
       - datalake_survicate.repairs_surveys.secondary_score_description
-  custom_attributes:
-    description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
-    lineage:
-      - datalake_survicate.inspections_surveys.custom_attributes
-      - datalake_survicate.repairs_surveys.custom_attributes
-      - datalake_survicate.lockbox_surveys.custom_attributes
-      - datalake_survicate.scheduling_surveys.custom_attributes
-      - datalake_survicate.keys_surveys.custom_attributes
-      - datalake_survicate.photo_surveys.custom_attributes
-  ts_first_seen:
-    description: Date when the form was first viewed by the respondent.
-    lineage:
-      - datalake_survicate.inspections_surveys.ts_first_seen
-      - datalake_survicate.repairs_surveys.ts_first_seen
-      - datalake_survicate.lockbox_surveys.ts_first_seen
-      - datalake_survicate.scheduling_surveys.ts_first_seen
-      - datalake_survicate.keys_surveys.ts_first_seen
-      - datalake_survicate.photo_surveys.ts_first_seen
   ts_submitted:
     description: Date the satisfaction response was submitted.
     lineage:

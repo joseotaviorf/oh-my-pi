@@ -28,25 +28,21 @@ columns:
     description: Name of the satisfaction form, used to identify different forms from the same source, if they have a description.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.survey_name
-  ts_first_seen:
-    description: Date when the survey was first viewed by the respondent.
+  ts_first_submitted:
+    description: Date when the survey was first submitted by the respondent.
     lineage:
-      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
       - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_satisfaction_rating.
   year:
     description: Year referring to the data loading day.
     lineage:
-      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
       - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
   month:
     description: Month referring to the data loading day.
     lineage:
-      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
       - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
   day:
     description: Day referring to the data loading day.
     lineage:
-      - datalake_satisfaction_rating.satisfaction_answers.ts_first_seen
       - datalake_satisfaction_rating.satisfaction_answers.ts_submitted

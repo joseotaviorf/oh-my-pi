@@ -48,7 +48,6 @@ email_total AS (
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good') THEN TRUE
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
       END AS is_solved,
-      NULL AS ts_first_seen,
       MIN(sr.ts_updated) OVER(PARTITION BY t.id_ticket) AS ts_first_response
     FROM
       datalake_zendesk_tickets_clean.tickets t
@@ -73,13 +72,12 @@ email_total AS (
         CAST(is_solved AS STRING)
       ) IS NOT NULL AS is_answered,
       is_solved,
-      ts_first_seen,
       ts_first_response
     FROM
       datalake_survicate.zendesk_email_surveys
     WHERE
       id_ticket IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9
   )
   SELECT
     csat.id_ticket,
