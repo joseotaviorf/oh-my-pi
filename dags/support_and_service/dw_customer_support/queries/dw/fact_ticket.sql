@@ -41,13 +41,14 @@ WITH call_tickets AS (
       AND journey_step NOT IN ('Compra e Venda', 'Cross')
       AND team <> 'Ong Back'
       AND area = 'CX'
-      AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+      AND last_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
         'Offboarding Reparos [OFF] [POS] [BACK]',
         'Offboarding pré saída [OFF] [POS] [BACK]',
         'Proteção QuintoAndar [OFF] [POS] [BACK]',
         'Rescisão - Despejo [OFF][POS][BACK]',
         'Rescisão 1 [OFF] [POS] [BACK]'
-      ),
+      )
+      AND direction IN ('inbound', 'outbound-api'),
       TRUE,
       FALSE
     ) AS is_ticket_rate,
@@ -147,7 +148,7 @@ chat_tickets AS (
       AND journey_step NOT IN ('Compra e Venda', 'Cross')
       AND team <> 'Ong Back'
       AND area = 'CX'
-      AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+      AND last_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
         'Offboarding Reparos [OFF] [POS] [BACK]',
         'Offboarding pré saída [OFF] [POS] [BACK]',
         'Proteção QuintoAndar [OFF] [POS] [BACK]',
@@ -249,7 +250,7 @@ email_tickets AS (
     is_solved AS resolution_survey,
     IF(
       front_or_back IN ('back', 'front')
-      AND DATE(ts_ticket_ended) >= DATE('2022-01-01')
+      AND DATE(ts_ticket_solved) >= DATE('2022-01-01')
       AND journey_step NOT IN ('Compra e Venda', 'Cross')
       AND team <> 'Ong Back'
       AND area = 'CX'

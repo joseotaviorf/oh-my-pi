@@ -245,7 +245,10 @@ columns:
         - The ticket must not belong to a few departments (Rescisão por Inadimplência [OFF][POS][BACK], Offboarding Reparos [OFF] [POS] [BACK],
           Offboarding pré saída [OFF] [POS] [BACK], Proteção QuintoAndar [OFF] [POS] [BACK], Rescisão - Despejo [OFF][POS][BACK]
           or Rescisão 1 [OFF] [POS] [BACK]);
-        - The date in which the ticket was solved must be later than 1st January/2022."
+        - The date in which the ticket was solved must be later than 1st January/2022.
+        - If the ticket has channel email, then we accept all directions;
+        - If the ticket has channel chat, then we accept only direction inbound;
+        - If the ticket has channel call, we accept only directions inbound and outbound-api."
   has_answered_csat:
     lineage:
       - datalake_customer_support.call.is_csat_answered
