@@ -22,7 +22,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 7, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 6 * * 2,3,5"
+MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
 CONTEXT = "crawlers_listings"
 DAG_NAME = f"enrich_rental_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -38,6 +38,7 @@ SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 crawlers = config_service.get_config("tables")
 cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+weekday_run = config_service.get_config("weekday_run")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -86,7 +87,18 @@ enrich_task_groups = {}
 
 # The execution date will always be the previous day, because this DAG runs daily.
 # However, it should be the previous week, because the source runs weekly. That is why we are subtracting 6 days.
-actual_execution_date = "{{macros.ds_add(ds, -6)}}"
+actual_execution_date = "{{macros.ds_add(ds, -7)}}"
+
+skip_run = ShortCircuitOperator(
+        task_id=f"check-day-to-skip-execution",
+        python_callable=DAGRunDateValidators.check_is_in_range_of_weekdays,
+        op_args=[actual_execution_date, weekday_run],
+)
+
+chain(
+    skip_run,
+    create_cluster_task,
+)
 
 for crawler in crawlers:
     crawler_name = crawler["table_name"]

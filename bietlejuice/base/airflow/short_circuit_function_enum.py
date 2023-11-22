@@ -5,6 +5,7 @@ class ShortCircuitFunctionEnum(Enum):
 
     CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH = "CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH"
     CHECK_IS_IN_RANGE_OF_DAYS = "CHECK_IS_IN_RANGE_OF_DAYS"
+    CHECK_IS_IN_RANGE_OF_WEEKDAYS = "CHECK_IS_IN_RANGE_OF_WEEKDAYS"
     CHECK_IS_LAST_BUSINESS_DAY_OF_MONTH = "CHECK_IS_LAST_BUSINESS_DAY_OF_MONTH"
     CHECK_IS_SPECIFIC_DAY_OF_MONTH = "CHECK_IS_SPECIFIC_DAY_OF_MONTH"
     CHECK_IS_SPECIFIC_WEEKDAY = "CHECK_IS_SPECIFIC_WEEKDAY"
@@ -25,6 +26,7 @@ class ShortCircuitFunctionEnum(Enum):
         return {
             cls.CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH: DAGRunDateValidators.check_is_first_business_day_of_month,
             cls.CHECK_IS_IN_RANGE_OF_DAYS: DAGRunDateValidators.check_is_in_range_of_days,
+            cls.CHECK_IS_IN_RANGE_OF_WEEKDAYS: DAGRunDateValidators.check_is_in_range_of_weekdays,
             cls.CHECK_IS_LAST_BUSINESS_DAY_OF_MONTH: DAGRunDateValidators.check_is_last_business_day_of_month,
             cls.CHECK_IS_SPECIFIC_DAY_OF_MONTH: DAGRunDateValidators.check_is_specific_day_of_month,
             cls.CHECK_IS_SPECIFIC_WEEKDAY: DAGRunDateValidators.check_is_specific_weekday,

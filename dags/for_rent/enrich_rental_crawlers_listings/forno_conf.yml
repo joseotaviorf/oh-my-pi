@@ -13,3 +13,4 @@ tables:
     weekday_run: 1
     is_incremental: true
     partition_cols: ["address_city", "year", "month", "day"]
+weekday_run: [1, 2, 4]

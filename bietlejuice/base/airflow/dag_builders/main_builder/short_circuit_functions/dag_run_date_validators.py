@@ -79,6 +79,20 @@ class DAGRunDateValidators:
         return datetime.strptime(reference_date, "%Y-%m-%d").weekday() == weekday
 
     @staticmethod
+    def check_is_in_range_of_weekdays(reference_date, weekday_list: list):
+        """
+        Checks if the provided date is in the provided week day list.
+
+        :param reference_date: date used as reference for the evaluation
+        :type reference_date: str
+        :param weekday: list of integers representing the week day to be evaluated,
+            starting on Monday as 0 and ending on Sunday as 6.
+        :type weekday: list[int]
+        :rtype: bool
+        """
+        return datetime.strptime(reference_date, "%Y-%m-%d").weekday() in weekday_list
+
+    @staticmethod
     def check_is_in_range_of_days(reference_date, range_of_days: list):
         """
         Checks if the provided date is in the provided range of days.
