@@ -10,11 +10,10 @@ WITH deduplicate_creditor_pending AS (
       WHEN id_creditor IN (2,6) THEN 2
       ELSE id_creditor
     END AS id_creditor,
-    id_contract,
-    id_installment,
-    installment_code,
-    DATE(dt_table_insertion) AS dt_created
+    id_customer,
+    id_installment
   FROM datalake_recupera_clean.creditor_pending
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
 ),
 deduplicate_complementary_records AS (
   SELECT DISTINCT
@@ -28,51 +27,67 @@ deduplicate_complementary_records AS (
       WHEN id_creditor IN (2,6) THEN 2
       ELSE id_creditor
     END AS id_creditor,
-    id_contract,
-    id_installment,
-    installment_code
+    id_customer,
+    id_installment
   FROM datalake_recupera_clean.complementary_records
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
 ),
 debts AS (
   SELECT
     COALESCE(cp.creditor, cr.creditor) AS creditor,
-    COALESCE(cp.id_contract, cr.id_contract) AS id_contract,
-    COALESCE(cp.id_installment, cr.id_installment) AS id_invoice,
     COALESCE(cp.id_creditor, cr.id_creditor) AS id_creditor,
-    cp.installment_code AS id_negotiation_recupera,
-    cp.dt_created
+    COALESCE(cp.id_customer, cr.id_customer) AS id_customer,
+    COALESCE(cp.id_installment, cr.id_installment) AS id_invoice
   FROM deduplicate_creditor_pending AS cp
   FULL OUTER JOIN deduplicate_complementary_records AS cr
-    ON cp.id_contract = cr.id_contract
-      AND cp.id_installment  = cr.id_installment
+    ON cp.id_installment  = cr.id_installment
 ),
-quintocred AS (
-    SELECT
-        o.id_occurrence,
-        o.due_amount,
-        o.paid_amount,
-        o.ts_paid,
-        COALESCE(o.dt_due, o.dt_due_legacy) AS dt_due_final,
-        j.desc_lvl_1 AS status
-    FROM datalake_velo.occurrence AS o
-    LEFT JOIN datalake_velo.junk AS j
-        ON o.id_occurrence_status = j.id_junk
+union_quintoandar_quintocred AS (
+  SELECT
+    i.id_contract_external AS id_contract,
+    i.id_external AS id_invoice,
+    IF(ii.invoice_user = "landlord", 2, 1) AS id_creditor,
+    i.status AS invoice_payment_status,
+    i.substatus AS invoice_status,
+    ABS(i.due_amount) AS invoice_due_amount,
+    i.paid_amount AS invoice_paid_amount,
+    DATE(i.ts_due) AS invoice_dt_due,
+    DATE(i.ts_paid) AS invoice_dt_paid
+  FROM datalake_retsuko.invoice AS i
+  LEFT JOIN datalake_retsuko.invoice_info AS ii
+    ON i.id_external = ii.id_invoice
+
+  UNION ALL
+
+  SELECT
+    o.id_propose AS id_contract,
+    o.id_occurrence AS id_invoice,
+    IF(INT(o.id_propose) < 5000000, 3 , 5) AS id_creditor,
+    j.desc_lvl_1 AS invoice_payment_status,
+    NULL AS invoice_status,
+    o.due_amount AS invoice_due_amount,
+    o.paid_amount AS invoice_paid_amount,
+    DATE(COALESCE(o.dt_due, o.dt_due_legacy)) AS invoice_dt_due,
+    DATE(o.ts_paid) AS invoice_dt_paid
+  FROM datalake_velo.occurrence AS o
+  LEFT JOIN datalake_velo.junk AS j
+    ON o.id_occurrence_status = j.id_junk
 )
 
 SELECT DISTINCT
-  CONCAT(id_creditor, '-', id_invoice) AS sk_debt,
-  BIGINT(d.id_contract) AS id_contract,
-  BIGINT(d.id_invoice) AS id_invoice,
+  CONCAT(d.id_creditor, "-", u.id_contract, "-", u.id_invoice) AS sk_debt,
+  d.id_customer AS sk_debtor,
+  u.id_contract,
+  u.id_invoice,
   d.creditor AS creditor,
-  COALESCE(i.status, LOWER(q.status)) AS invoice_payment_status,
-  i.substatus AS invoice_status,
-  COALESCE(ABS(i.due_amount), q.due_amount) AS invoice_due_amount,
-  COALESCE(i.paid_amount, q.paid_amount) AS invoice_paid_amount,
-  DATE(COALESCE(i.ts_due, q.dt_due_final)) AS invoice_dt_due,
-  DATE(COALESCE(i.ts_paid, q.ts_paid)) AS invoice_dt_paid,
+  u.invoice_payment_status,
+  u.invoice_status,
+  u.invoice_due_amount,
+  u.invoice_paid_amount,
+  u.invoice_dt_due,
+  u.invoice_dt_paid,
   NOW() AS ts_load
 FROM debts AS d
-LEFT JOIN datalake_retsuko.invoice AS i
-  ON d.id_invoice = i.id_external
-LEFT JOIN quintocred AS q
-  ON d.id_invoice = q.id_occurrence
+INNER JOIN union_quintoandar_quintocred AS u
+  ON d.id_invoice = u.id_invoice
+   AND d.id_creditor = u.id_creditor

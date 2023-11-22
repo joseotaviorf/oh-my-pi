@@ -15,6 +15,11 @@ columns:
       - datalake_recupera_clean.creditor_pending.id_installment
       - datalake_recupera_clean.complementary_records.id_installment
     description: Surrogate key of table. It is a sequencial number based on the id_creditor and id_installment.
+  sk_debtor:
+    lineage:
+      - datalake_recupera_clean.complementary_records.id_customer
+      - datalake_recupera_clean.creditor_pending.id_customer
+    description: Customer ID (CPF). It's the FK of table dim_debtor
   id_contract:
     lineage:
       - datalake_recupera_clean.creditor_pending.id_contract
