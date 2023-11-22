@@ -134,15 +134,15 @@ chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
     dag_inner_dependencies=inner_dependencies,
 )
 
-chain(
-    create_cluster_task,
+create_cluster_task.set_downstream(
     DatalakeTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
-    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+    + DatalakeTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
 )
 
-chain(
-    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
-    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
-    terminate_cluster_task,
-)
 TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
+
+terminate_cluster_task.set_upstream(
+    DatalakeTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DatalakeTaskGroup.all_last_tasks(clean_task_groups)
+    + DatalakeTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries)
+)
