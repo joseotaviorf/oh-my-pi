@@ -1,5 +1,4 @@
-WITH
-base_tickets AS (
+WITH base_tickets AS (
   SELECT
     DATE(ft.ts_solved) AS dt_started,
     dt.theme AS contact_theme_tag,
@@ -9,13 +8,8 @@ base_tickets AS (
     dt.sub_journey,
     dt.line_owner,
     dd.team,
-    COUNT(DISTINCT
-        CASE
-          WHEN ft.channel = 'email' THEN ft.sk_ticket
-          WHEN dd.front_or_back = 'front' AND ft.channel = 'chat' AND dc.direction = 'inbound' THEN ft.sk_ticket
-          WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'inbound' THEN ft.sk_ticket
-          WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'outbound-api' THEN ft.sk_ticket
-    END) AS tickets
+    dd.department,
+    COUNT(DISTINCT ft.sk_ticket) AS tickets
   FROM
     dw_customer_support.fact_ticket AS ft
   JOIN
@@ -29,26 +23,15 @@ base_tickets AS (
     dw_customer_support.dim_channel AS dc
       ON ft.sk_channel = dc.sk_channel
   WHERE
-    ft.main_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]', 'Offboarding Reparos [OFF] [POS] [BACK]', 'Offboarding pré saída [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão 1 [OFF] [POS] [BACK]')
-    AND ft.ts_solved >= CAST('2022-01-01' AS DATE)
-    AND dd.front_or_back IN ('back', 'front')
-    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
-    AND dd.team <> 'Ong Back'
-    AND dd.area = 'CX'
+    ft.is_ticket_rate = TRUE
   GROUP BY
-    1,2,3,4,5,6,7,8
+    1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 missing_tickets AS (
   SELECT
     DATE(ft.ts_solved) AS dt_started,
     dd.front_or_back AS ticket_type,
-    COUNT(DISTINCT
-        CASE
-          WHEN ft.channel = 'email' THEN ft.sk_ticket
-          WHEN dd.front_or_back = 'front' AND ft.channel = 'chat' AND dc.direction = 'inbound' THEN ft.sk_ticket
-          WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'inbound' THEN ft.sk_ticket
-          WHEN dd.front_or_back = 'front' AND ft.channel = 'call' AND dc.direction = 'outbound-api' THEN ft.sk_ticket
-    END) AS missing_theme_tickets
+    COUNT(DISTINCT sk_ticket) AS missing_theme_tickets
   FROM
     dw_customer_support.fact_ticket AS ft
   LEFT JOIN
@@ -61,15 +44,10 @@ missing_tickets AS (
     dw_customer_support.dim_channel AS dc
       ON ft.sk_channel = dc.sk_channel
   WHERE
-    ft.main_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]', 'Offboarding Reparos [OFF] [POS] [BACK]', 'Offboarding pré saída [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão 1 [OFF] [POS] [BACK]')
-    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
-    AND ft.ts_solved >= CAST('2022-01-01' AS DATE)
-    AND dd.front_or_back IN ('back', 'front')
+    ft.is_ticket_rate = TRUE
     AND dt.theme_detail IS NULL
-    AND dd.team <> 'Ong Back'
-    AND dd.area = 'CX'
   GROUP BY
-    1,2
+    1, 2
 ),
 abandoned_calls AS (
   SELECT
@@ -89,9 +67,9 @@ abandoned_calls AS (
     AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
     AND dd.area = 'CX'
     AND frc.is_answered = false
-    AND frc.channel = 'call' 
+    AND frc.channel = 'call'
   GROUP BY
-    1,2
+    1, 2
 ),
 base_themes AS (
   SELECT
@@ -112,6 +90,7 @@ SELECT
   btkt.sub_journey,
   btkt.line_owner,
   btkt.team,
+  btkt.department,
   SUM(btkt.tickets) AS total_tickets_identified,
   CAST(COALESCE((SUM(btkt.tickets)/bt.qt_tickets) * ac.contacts, 0) AS NUMERIC(12,2)) AS total_abandoned_calls_distributed,
   CAST(COALESCE((SUM(btkt.tickets)/bt.qt_tickets) * mt.missing_theme_tickets, 0) AS NUMERIC(12,2)) AS total_tickets_distributed,
@@ -129,7 +108,7 @@ LEFT JOIN
 LEFT JOIN
   abandoned_calls AS ac
     ON ac.dt_started = btkt.dt_started
-      AND ac.ticket_type = btkt.ticket_type      
+      AND ac.ticket_type = btkt.ticket_type
 GROUP BY
   btkt.dt_started,
   btkt.contact_theme_tag,
@@ -139,6 +118,7 @@ GROUP BY
   btkt.sub_journey,
   btkt.line_owner,
   btkt.team,
+  btkt.department,
   bt.qt_tickets,
   mt.missing_theme_tickets,
   ac.contacts

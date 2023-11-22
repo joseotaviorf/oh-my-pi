@@ -1,7 +1,7 @@
 ---
 database_name: metric_rent
 table_name: total_tickets
-description: Daily total tickets. 
+description: Daily total tickets.
   This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate. The granularity is by contact_theme_detail and day.
 domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
@@ -50,6 +50,11 @@ columns:
       - dw_customer_support.dim_department.team
     description: Team responsible for the ticket.
     dimension: True
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department responsible for the ticket.
+    dimension: True
   total_abandoned_calls_distributed:
     description: Volume of tickets resulted from abandoned calls daily being proportionally distributed to this taxonomy.
     metric:
@@ -62,7 +67,7 @@ columns:
       approved_by: marcus.pinto@quintoandar.com.br
       link_to_metric: ""
   total_tickets_identified:
-    description: Count of unique CX's tickets by contact_theme_detail. 
+    description: Count of unique CX's tickets by contact_theme_detail.
       Only considers tickets that had the taxonomy filled in after attendance.
     metric:
       name: Total Tickets Daily
@@ -74,7 +79,7 @@ columns:
       approved_by: marcus.pinto@quintoandar.com.br
       link_to_metric: ""
   total_tickets_distributed:
-    description: Count of unique CX's tickets without contact_theme_detail, 
+    description: Count of unique CX's tickets without contact_theme_detail,
       considering idle cases or in which the attendance was not classified (null taxonomy), and, proportionally distributed to this taxonomy.
     metric:
       name: Total Tickets Distributed Daily
