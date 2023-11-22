@@ -76,3 +76,5 @@ columns:
     lineage:
       - dw_agents_availability.fact_inspector_hourly_allocations.day
     description: Day of the slot. This column is a table partition.
+  ts_load:
+    description: Timestamp of when the table was loaded.
