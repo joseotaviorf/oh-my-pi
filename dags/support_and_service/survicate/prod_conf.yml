@@ -25,13 +25,13 @@ tables:
 
   survey_questions:
     endpoint_enum: SURVEY_QUESTIONS
-    feedback_parameters_query: SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys WHERE DATE(dt_load) = DATE('{execution_date}')
+    feedback_parameters_query: SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys)
     optional_parameters:
       <<: *optional_parameters_anchor
 
   survey_responses:
     endpoint_enum: SURVEY_RESPONSES
-    feedback_parameters_query: SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys WHERE DATE(dt_load) = DATE('{execution_date}')
+    feedback_parameters_query: SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys)
     optional_parameters:
       <<: *optional_parameters_anchor
       end: "{execution_date}T00:00:00.000000Z"
