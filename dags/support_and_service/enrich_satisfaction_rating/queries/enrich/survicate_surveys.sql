@@ -152,7 +152,7 @@ WITH survicate_surveys AS (
         pss.service_context,
         pss.survey_source AS source_name,
         pss.improvement_tags,
-        pss.user_comment AS respondent_comments,
+        pss.respondent_comments,
         pss.satisfaction_rating AS satisfaction_score,
         pss.score_description,
         NULL AS secondary_satisfaction_score,
