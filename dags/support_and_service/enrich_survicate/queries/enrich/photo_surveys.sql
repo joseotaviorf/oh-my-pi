@@ -9,7 +9,7 @@ SELECT
     'survicate' AS survey_source,
     CAST(COLLECT_LIST(rc.answer_content) FILTER (WHERE rc.id_question = 1269662) AS STRING) AS improvement_tags,
     LAST(rc.answer_content) FILTER (WHERE rc.id_question = 1269663) AS respondent_comments,
-    CAST(LAST(rc.answer_content) FILTER (WHERE rc.id_question = 1269661) AS INT) AS satisfaction_rating,
+    LAST(rc.answer_content) FILTER (WHERE rc.id_question = 1269661) AS satisfaction_rating,
     "satisfaction evaluation" AS score_description,
     rc.ts_collected AS ts_first_response,
     rc.dt_load,
