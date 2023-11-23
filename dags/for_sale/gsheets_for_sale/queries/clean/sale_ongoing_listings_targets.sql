@@ -1,6 +1,7 @@
 SELECT
     cidade,
     ongoing_listing,
+    FB AS sale_model,
     halfyear,
     quarter,
     week,

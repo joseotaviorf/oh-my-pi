@@ -7,6 +7,9 @@ columns:
   ongoing_listing:
     lineage:
       - datalake_gsheets_raw.sale_ongoing_listings_targets.ongoing_listing
+  sale_model:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.FB
   halfyear:
     lineage:
       - datalake_gsheets_raw.sale_ongoing_listings_targets.halfyear
