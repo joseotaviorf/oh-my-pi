@@ -29,7 +29,7 @@ SELECT
   sr.id_respondent AS id_visitor,
   rc.id_response AS response_uuid,
   sr.id_respondent AS visitor_uuid,
-  LAST(rc.answer_content) FILTER (WHERE rc.question_type IN ("text", "single")) AS user_comment,
+  LAST(rc.answer_content) FILTER (WHERE rc.question_type IN ("text")) AS user_comment,
   CAST(LAST(
     CASE
       WHEN answer_content = 'Extremely happy' THEN 5
@@ -40,7 +40,7 @@ SELECT
       ELSE answer_content
     END
   ) FILTER (WHERE rc.question_type IN ('rating', 'smiley_scale')) AS INT) AS csat_score,
-  LAST(rc.answer_content) FILTER (WHERE rc.question_type IN ("text", "single")) IN ('sim', "si", "sí") AS is_solved,
+  LOWER(LAST(rc.answer_content) FILTER (WHERE rc.question_type IN ("single"))) IN ('sim', "si", "sí") AS is_solved,
   rc.ts_collected AS ts_first_response,
   rc.dt_load,
   rc.year,
