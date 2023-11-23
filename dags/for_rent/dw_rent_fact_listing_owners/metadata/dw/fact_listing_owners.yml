@@ -1,136 +1,98 @@
 database_name: dw_quintoandar
 table_name: fact_listing_owners
-description: ''
+description: Table with calculated rent flow metrics, each row is an owner of a property.
 domain: For Rent
-owner: ''
+owner: mariana.kralco@quintoandar.com.br
 columns:
   sk_listing_owner:
     lineage:
-    - datalake_listing_owners.rental_metrics.id_listing_owner
-    description: ''
-  sk_first_listing_registered_date:
-    lineage:
-    - datalake_listing_owners.rental_metrics.ts_first_listing_registered
-    description: ''
+      - datalake_listing_owners.rental_metrics.id_listing_owner
+    description: User ID of the property owner
   sk_first_booking_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.ts_first_booking
-    description: ''
-  sk_first_visit_date:
-    lineage:
-    - datalake_listing_owners.rental_metrics.dt_first_visited
-    description: ''
-  sk_first_offer_received_date:
-    lineage:
-    - datalake_listing_owners.rental_metrics.ts_first_offer_received
-    description: ''
-  sk_first_offer_accepted_date:
-    lineage:
-    - datalake_listing_owners.rental_metrics.ts_first_offer_accepted
-    description: ''
+      - datalake_listing_owners.rental_metrics.ts_first_booking
+    description: Date ID (%Y%m%d format) of first booking creation
   sk_first_contract_signed_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.ts_first_contract_signed
-    description: ''
-  sk_last_listing_registered_date:
+      - datalake_listing_owners.rental_metrics.ts_first_contract_signed
+    description: Date ID (%Y%m%d format) of first contract signed
+  sk_first_listing_registered_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.ts_last_listing_registered
-    description: ''
+      - datalake_listing_owners.rental_metrics.ts_first_listing_registered
+    description: Date ID (%Y%m%d format) of first listing registered
+  sk_first_offer_accepted_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_first_offer_accepted
+    description: Date ID (%Y%m%d format) of first offer accepted
+  sk_first_offer_received_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_first_offer_received
+    description: Date ID (%Y%m%d format) of first offer received
+  sk_first_visit_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.dt_first_visited
+    description: Date ID (%Y%m%d format) of first completed visit
   sk_last_booking_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.ts_last_booking
-    description: ''
-  sk_last_visit_date:
-    lineage:
-    - datalake_listing_owners.rental_metrics.dt_last_visited
-    description: ''
-  sk_last_offer_received_date:
-    lineage:
-    - datalake_listing_owners.rental_metrics.ts_last_offer_received
-    description: ''
-  sk_last_offer_accepted_date:
-    lineage:
-    - datalake_listing_owners.rental_metrics.ts_last_offer_accepted
-    description: ''
+      - datalake_listing_owners.rental_metrics.ts_last_booking
+    description: Date ID (%Y%m%d format) of last booking
   sk_last_contract_signed_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.ts_last_contract_signed
-    description: ''
-  properties_registered:
+      - datalake_listing_owners.rental_metrics.ts_last_contract_signed
+    description: Date ID (%Y%m%d format) of last contract signed
+  sk_last_listing_registered_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.properties_registered
-    description: ''
-  listings_published:
+      - datalake_listing_owners.rental_metrics.ts_last_listing_registered
+    description: Date ID (%Y%m%d format) of last listing registered
+  sk_last_offer_accepted_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.listings_published
-    description: ''
-  visits_booked:
+      - datalake_listing_owners.rental_metrics.ts_last_offer_accepted
+    description: Date ID (%Y%m%d format) of last offer accepted
+  sk_last_offer_received_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.visits_booked
-    description: ''
-  visits_received:
+      - datalake_listing_owners.rental_metrics.ts_last_offer_received
+    description: Date ID (%Y%m%d format) of last offer received
+  sk_last_visit_date:
     lineage:
-    - datalake_listing_owners.rental_metrics.visits_received
-    description: ''
-  visits_expected_to_happen:
-    lineage:
-    - datalake_listing_owners.rental_metrics.visits_expected_to_happen
-    description: ''
-  visits_cancelled:
-    lineage:
-    - datalake_listing_owners.rental_metrics.visits_cancelled
-    description: ''
-  offers_received:
-    lineage:
-    - datalake_listing_owners.rental_metrics.offers_received
-    description: ''
-  offers_rejected:
-    lineage:
-    - datalake_listing_owners.rental_metrics.offers_rejected
-    description: ''
-  offers_negotiating:
-    lineage:
-    - datalake_listing_owners.rental_metrics.offers_negotiating
-    description: ''
-  offers_accepted:
-    lineage:
-    - datalake_listing_owners.rental_metrics.offers_accepted
-    description: ''
-  proposals_rejected:
-    lineage:
-    - datalake_listing_owners.rental_metrics.proposals_rejected
-    description: ''
-  proposals_approved:
-    lineage:
-    - datalake_listing_owners.rental_metrics.proposals_approved
-    description: ''
-  reservations_received:
-    lineage:
-    - datalake_listing_owners.rental_metrics.reservations_received
-    description: ''
-  contracts_cancelled:
-    lineage:
-    - datalake_listing_owners.rental_metrics.contracts_cancelled
-    description: ''
-  contracts_to_be_signed:
-    lineage:
-    - datalake_listing_owners.rental_metrics.contracts_to_be_signed
-    description: ''
-  contracts_signed:
-    lineage:
-    - datalake_listing_owners.rental_metrics.contracts_signed
-    description: ''
+      - datalake_listing_owners.rental_metrics.dt_last_visited
+    description: Date ID (%Y%m%d format) of last completed visit
   contracts_annuled:
-    lineage:
-    - datalake_listing_owners.rental_metrics.contracts_annuled
-    description: ''
-  ongoing_listings:
-    lineage:
-    - datalake_listing_owners.rental_metrics.ongoing_listings
-    description: ''
+    description: Number of contracts with status = 'Finalizado'
+  contracts_cancelled:
+    description: Number of contracts with status = 'Cancelado'
+  contracts_signed:
+    description: Number of contracts with status in ('Ativo', 'Finalizado')
+  contracts_to_be_signed:
+    description: Number of contracts with status in ('Minuta', 'PreAssinaturas')
+  listings_published:
+    description: Number of versions of listings published
   ongoing_contracts:
-    lineage:
-    - datalake_listing_owners.rental_metrics.ongoing_contracts
-    description: ''
+    description: Number of contracts that were signed and were active
+  ongoing_listings:
+    description: Number of listings with status = 'PUBLISHED'
+  offers_accepted:
+    description: Number of offers that were accepted, that is, the number of proposals.
+  offers_negotiating:
+    description: Sum of all offers with status = 'EmNegociacao'
+  offers_received:
+    description: Number of offers received.
+  offers_rejected:
+    description: Sum of all offers with status = 'Rejeitada'
+  properties_registered:
+    description: Number of properties owned by the owner
+  proposals_approved:
+    description: Sum of all proposals with status = 'Aprovada'
+  proposals_rejected:
+    description: Sum of all proposals with status = 'Rejeitada'
+  reservations_received:
+    description: Sum of all reservations with status in ('CANCELED', 'FINISHED', 'RETURNED')
   ts_load:
-    description: ''
+    description: Timestamp in which the register was loaded into database
+  visits_booked:
+    description: Count of unique booking visits
+  visits_cancelled:
+    description: Sum of canceled visits
+  visits_expected_to_happen:
+    description: Sum of visits that were not completed and not canceled
+  visits_received:
+    description: Sum of completed visits

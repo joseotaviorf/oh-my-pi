@@ -1,223 +1,176 @@
 database_name: dw_quintoandar
 table_name: dim_house
-description: ''
+description: Table that contains the information about the house. Each row in this table is a house in QuintoAndar
 domain: For Rent
-owner: ''
+owner: mariana.kralco@quintoandar.com.br
 columns:
-  sk_house:
-    lineage:
-    - datalake_ebdb_listing.house.id
-    description: ''
-  id_short_house:
-    lineage:
-    - datalake_ebdb_listing.house.id
-    description: ''
-  condo:
-    lineage:
-    - datalake_ebdb_listing.house.condo
-    description: ''
-  land_area:
-    lineage:
-    - datalake_ebdb_listing.house.land_area
-    description: ''
-  total_area:
-    lineage:
-    - datalake_ebdb_listing.house.total_area
-    description: ''
-  iptu:
-    lineage:
-    - datalake_ebdb_listing.house.iptu
-    description: ''
-  bathrooms:
-    lineage:
-    - datalake_ebdb_listing.house.bathrooms
-    description: ''
-  bedrooms:
-    lineage:
-    - datalake_ebdb_listing.house.bedrooms
-    description: ''
-  parking_slots:
-    lineage:
-    - datalake_ebdb_listing.house.parking_slots
-    description: ''
-  suites:
-    lineage:
-    - datalake_ebdb_listing.house.suites
-    description: ''
-  lat:
-    lineage:
-    - datalake_ebdb_listing.house.lat
-    description: ''
-  lng:
-    lineage:
-    - datalake_ebdb_listing.house.lng
-    description: ''
-  number:
-    lineage:
-    - datalake_ebdb_listing.house.number
-    description: ''
   address:
     lineage:
-    - datalake_ebdb_listing.house.address
-    description: ''
-  city:
+      - datalake_ebdb_listing.house.address
+    description: Address of the house
+  bathrooms:
     lineage:
-    - datalake_ebdb_listing.house.city
-    description: ''
-  complement:
+      - datalake_ebdb_listing.house.bathrooms
+    description: Number of bathrooms of the house
+  bedrooms:
     lineage:
-    - datalake_ebdb_listing.house.complement
-    description: ''
-  neighborhood:
-    lineage:
-    - datalake_ebdb_listing.house.neighborhood
-    description: ''
-  zipcode:
-    lineage:
-    - datalake_ebdb_listing.house.zipcode
-    description: ''
-  geo_hash:
-    lineage:
-    - datalake_ebdb_listing.house.geo_hash
-    description: ''
-  registry:
-    lineage:
-    - datalake_ebdb_listing.house.registry
-    description: ''
+      - datalake_ebdb_listing.house.bedrooms
+    description: Number of bedrooms of the house
   built_period:
     lineage:
-    - datalake_ebdb_listing.house.dt_built
-    description: ''
+      - datalake_ebdb_listing.house.dt_built
+    description: The date the house was built
+  city:
+    lineage:
+      - datalake_ebdb_listing.house.city
+    description: City of the house
+  complement:
+    lineage:
+      - datalake_ebdb_listing.house.complement
+    description: Complement of the house
+  condo:
+    lineage:
+      - datalake_ebdb_listing.house.condo
+    description: Condo price of the house
   condo_type:
     lineage:
-    - datalake_ebdb_listing.house.condo_type
-    description: ''
-    categories:
-      IncluidoNoAluguel: ''
-      NaoExiste: ''
-      NaoInformado: ''
-      Normal: ''
+      - datalake_ebdb_listing.house.condo_type
+    description: Condo type of the house
   conservation_status:
     lineage:
-    - datalake_ebdb_listing.house.conservation_status
-    description: ''
-    categories:
-      BomEstado: ''
-      Novo: ''
-      PrecisaPequenosReparos: ''
-      PrecisaReforma: ''
-      RecentementeReformado: ''
-  doorman_type:
+      - datalake_ebdb_listing.house.conservation_status
+    description: Conservation status of the house (deprecated)
+  description:
     lineage:
-    - datalake_ebdb_listing.house.doorman_type
-    description: ''
-    categories:
-      Diurno: ''
-      NaoHaPorteiro: ''
-      Noturno: ''
-      horas24: ''
-  iptu_type:
-    lineage:
-    - datalake_ebdb_listing.house.iptu_type
-    description: ''
-    categories:
-      IncluidoNoAluguel: ''
-      NaoExiste: ''
-      NaoInformado: ''
-      Normal: ''
-  key_location:
-    lineage:
-    - datalake_ebdb_listing.house.key_location
-    description: ''
-    categories:
-      FrontDoor: ''
-      KeysLocker: ''
-      LockBox: ''
-      None: ''
-      OwnerPresent: ''
-      Password: ''
-  key_type:
-    lineage:
-    - datalake_ebdb_listing.house.key_type
-    description: ''
-    categories:
-      Biometry: ''
-      Common: ''
-      None: ''
-      Password: ''
-  occupant_type:
-    lineage:
-    - datalake_ebdb_listing.house.occupant_type
-    description: ''
-    categories:
-      Empty: ''
-      None: ''
-      Owner: ''
-      Tenant: ''
-  parking_slot_type:
-    lineage:
-    - datalake_ebdb_listing.house.parking_slot_type
-    description: ''
-    categories:
-      Ambos: ''
-      Cobertas: ''
-      NaoCobertas: ''
-  type:
-    lineage:
-    - datalake_ebdb_listing.house.type
-    description: ''
-    categories:
-      Apartamento: ''
-      Casa: ''
-      CasaCondominio: ''
-      StudioOuKitchenette: ''
+      - datalake_ebdb_listing.house.description
+    description: Description of the house
   does_photographer_fill_information:
     lineage:
-    - datalake_ebdb_listing.house.does_photographer_fill_information
-    description: ''
+      - datalake_ebdb_listing.house.does_photographer_fill_information
+    description: If the photographer fills the information
+  doorman_type:
+    lineage:
+      - datalake_ebdb_listing.house.doorman_type
+    description: Type of doorman of the house
+  geo_hash:
+    lineage:
+      - datalake_ebdb_listing.house.geo_hash
+    description: Geo hash of the house (deprecated)
   has_elevator:
     lineage:
-    - datalake_ebdb_listing.house.has_elevator
-    description: ''
+      - datalake_ebdb_listing.house.has_elevator
+    description: If the house has an elevator
   has_service_bathroom:
     lineage:
-    - datalake_ebdb_listing.house.has_service_bathroom
-    description: ''
+      - datalake_ebdb_listing.house.has_service_bathroom
+    description: If the house has a service bathroom (deprecated)
   has_service_bedroom:
     lineage:
-    - datalake_ebdb_listing.house.has_service_bedroom
-    description: ''
+      - datalake_ebdb_listing.house.has_service_bedroom
+    description: If the house has a service bedroom (deprecated)
   has_visit_restriction:
     lineage:
-    - datalake_ebdb_listing.house.has_visit_restriction
-    description: ''
+      - datalake_ebdb_listing.house.has_visit_restriction
+    description: Boolean value to check if the house has a visit restriction
+  id_short_house:
+    lineage:
+      - datalake_ebdb_listing.house.id
+    description: Shortened version of the Id of the house
+  iptu:
+    lineage:
+      - datalake_ebdb_listing.house.iptu
+    description: IPTU price of the house
+  iptu_type:
+    lineage:
+      - datalake_ebdb_listing.house.iptu_type
+    description: IPTU type of the house
   is_furnished:
     lineage:
-    - datalake_ebdb_listing.house.is_furnished
-    description: ''
+      - datalake_ebdb_listing.house.is_furnished
+    description: If the house is furnished
   is_iptu_included:
     lineage:
-    - datalake_ebdb_listing.house.is_iptu_included
-    description: ''
+      - datalake_ebdb_listing.house.is_iptu_included
+    description: If the IPTU is included (deprecated, check iptu_type)
   is_verified:
     lineage:
-    - datalake_ebdb_listing.house.is_verified
-    description: ''
+      - datalake_ebdb_listing.house.is_verified
+    description: If the house is verified
   is_warn_owner_of_visits_needed:
     lineage:
-    - datalake_ebdb_listing.house.is_warn_owner_of_visits_needed
-    description: ''
-  ts_first_verified:
+      - datalake_ebdb_listing.house.is_warn_owner_of_visits_needed
+    description: If the owner needs to be warned of visits (deprecated)
+  key_location:
     lineage:
-    - datalake_ebdb_listing.house.ts_first_verified
-    description: ''
+      - datalake_ebdb_listing.house.key_location
+    description: Key location
+  key_type:
+    lineage:
+      - datalake_ebdb_listing.house.key_type
+    description: Key type of the house
+  land_area:
+    lineage:
+      - datalake_ebdb_listing.house.land_area
+    description: Land area of the house (in m2)
+  lat:
+    lineage:
+      - datalake_ebdb_listing.house.lat
+    description: Latitude of the house
+  lng:
+    lineage:
+      - datalake_ebdb_listing.house.lng
+    description: Longitude of the house
+  neighborhood:
+    lineage:
+      - datalake_ebdb_listing.house.neighborhood
+    description: Neighborhood of the house
+  number:
+    lineage:
+      - datalake_ebdb_listing.house.number
+    description: Number of the address of the house
+  occupant_type:
+    lineage:
+      - datalake_ebdb_listing.house.occupant_type
+    description: Occupant type of the house
+  parking_slot_type:
+    lineage:
+      - datalake_ebdb_listing.house.parking_slot_type
+    description: Type of parking slot of the house
+  parking_slots:
+    lineage:
+      - datalake_ebdb_listing.house.parking_slots
+    description: Number of parking slots of the house
+  registry:
+    lineage:
+      - datalake_ebdb_listing.house.registry
+    description: Registry of the house
+  suites:
+    lineage:
+      - datalake_ebdb_listing.house.suites
+    description: Number of suites of the house
+  total_area:
+    lineage:
+      - datalake_ebdb_listing.house.total_area
+    description: Total area of the house (in m2)
   ts_created:
     lineage:
-    - datalake_ebdb_listing.house.dt_creation
-    description: ''
+      - datalake_ebdb_listing.house.dt_creation
+    description: The date the house was created in QuintoAndar
+  ts_first_verified:
+    lineage:
+      - datalake_ebdb_listing.house.ts_first_verified
+    description: The timestamp the house was first verified
   ts_updated:
     lineage:
-    - datalake_ebdb_listing.house.ts_updated
-    description: ''
+      - datalake_ebdb_listing.house.ts_updated
+    description: The timestamp of when the house was updated for the last time.
   ts_load:
-    description: ''
+    description: Timestamp in which the register was loaded into database
+  type:
+    lineage:
+      - datalake_ebdb_listing.house.type
+    description: Type of the house
+  zipcode:
+    lineage:
+      - datalake_ebdb_listing.house.zipcode
+    description: Zipcode (CEP) of the house
