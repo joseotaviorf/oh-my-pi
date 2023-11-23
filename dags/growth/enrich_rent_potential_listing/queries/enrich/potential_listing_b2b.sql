@@ -25,9 +25,9 @@ SELECT
             CONCAT(
                 CAST(listing_flow.id_house AS STRING),
                 '00',
-                 CAST(COALESCE(hl_version_zero.version, 1) AS STRING)
-             )
-             , '-1'
+                CAST(COALESCE(hl_version_zero.version, 1) AS STRING)
+            ),
+            '-1'
         )
         AS BIGINT) AS id_house_listing,
     COALESCE(pa_b2b_prime.id_partner,

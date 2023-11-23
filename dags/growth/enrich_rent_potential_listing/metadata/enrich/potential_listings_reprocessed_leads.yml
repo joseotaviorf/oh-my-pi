@@ -1,18 +1,30 @@
 database_name: datalake_rent_potential_listing
 table_name: potential_listings_reprocessed_leads
+domain: For Rent
+description: Enrich table that contains origin information about reprocessed leads tied to a listing flow.
+owner: matheus.baroni@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.id
+    description: Listing flow ID
   lead_type:
     lineage:
       - datalake_lead.lead.type
+    description: Type of the lead
   lead_origin:
     lineage:
       - datalake_lead.lead.source
+    description: Origin of the lead
   utm_source:
     lineage:
       - datalake_lead.lead.utm_source
+    description: The origin of the traffic
   utm_medium:
     lineage:
       - datalake_lead.lead.utm_medium
+    description: The medium or location where the link was shared
+  is_lead_branded:
+    description: Boolean indication whether the lead campaign is branded or institutional
+  is_reprocessed:
+    description: Boolean indication whether the lead was reprocessed
