@@ -20,7 +20,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 SOURCE = "heimdall"
 CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
-DAG_OWNER = DAGOwnerEnum.DATA_SS
+DAG_OWNER = DAGOwnerEnum.DATA_FOR_RENT
 ENV = os.environ.get("ENVIRONMENT")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
