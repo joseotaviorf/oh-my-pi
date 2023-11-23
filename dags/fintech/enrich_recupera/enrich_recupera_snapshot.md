@@ -26,6 +26,7 @@ and the following output tables, in Enrich layer, full load:​​
 
 
 - `datalake_recupera.installment`
+- `datalake_recupera.changes_debts_distribution`
 ​
 ​
 </details>
