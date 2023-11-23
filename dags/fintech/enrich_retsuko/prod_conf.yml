@@ -10,3 +10,9 @@ inner_dependencies:
     - invoice
   invoice:
     - entry
+custom_cluster:
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.2xlarge
+  num_workers: 4
+  aws_attributes:
+    availability: ON_DEMAND

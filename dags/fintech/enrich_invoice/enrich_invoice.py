@@ -35,8 +35,7 @@ SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 inner_dependencies = config_service.get_config("inner_dependencies")
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
-
+CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
