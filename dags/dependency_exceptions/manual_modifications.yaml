@@ -560,6 +560,8 @@ bietlejuice.enrich_webhelp_reports:
     - bietlejuice.reverse_webhelp:load-reverse-demand-metric
     - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
     - bietlejuice.reverse_webhelp:load-reverse-general-metric
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
     - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
     - bietlejuice.reverse_webhelp:load-reverse-speech-call
     - bietlejuice.reverse_webhelp:load-reverse-speech-chat

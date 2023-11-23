@@ -12,6 +12,10 @@ tables:
     context: cx
   general_metric:
     context: cx
+  listing_quality_tasks:
+    context: services
+  listing_quality_sla:
+    context: services
   repair_tickets:
     context: services
   speech_call:

@@ -20,6 +20,9 @@ This pipeline processes the following dags for datalake:
 - `demand_metric`
 - `fcr_metric`
 - `general_metric`
+- `listing_quality_tasks`
+- `listing_quality_sla`
+- `repair_tickets`
 - `taxonomia_call`
 - `taxonomia_chat`
 - `taxonomia_email`

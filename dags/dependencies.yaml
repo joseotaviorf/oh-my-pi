@@ -2537,6 +2537,8 @@ bietlejuice.enrich_webhelp_reports:
   - bietlejuice.reverse_webhelp:load-reverse-demand-metric
   - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
   - bietlejuice.reverse_webhelp:load-reverse-general-metric
+  - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
+  - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
   - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
   - bietlejuice.reverse_webhelp:load-reverse-speech-call
   - bietlejuice.reverse_webhelp:load-reverse-speech-chat
@@ -2799,6 +2801,8 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla
+  - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
   - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event

@@ -21,6 +21,9 @@ This pipeline exports the following tables from the reverse_webhelp schema to an
 - `demand_metric`
 - `fcr_metric`
 - `general_metric`
+- `listing_quality_tasks`
+- `listing_quality_sla`
+- `repair_tickets`
 - `taxonomia_call`
 - `taxonomia_chat`
 - `taxonomia_email`
