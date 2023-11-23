@@ -15,8 +15,13 @@ SELECT
     ts_created,
     ts_created_local,
     dt_analyzed_utc,
-    dt_analyzed
+    dt_analyzed,
+    YEAR(CURRENT_DATE - 1) AS year,
+    MONTH(CURRENT_DATE - 1) AS month,
+    DAY(CURRENT_DATE - 1) AS day,
+    NOW() AS ts_load
 FROM
     datalake_listing_jobs.listing_quality_tasks
 WHERE
     responsible_analyst_organization = "webhelp"
+    AND DATE(dt_analyzed_utc) = CURRENT_DATE - 1
