@@ -2,9 +2,11 @@ WITH credit_analysis AS (
   SELECT
     id_credit_analysis,
     id_proposal,
+    guarantee_offered,
     guarantee_accepted,
     category,
-    max_ca_category
+    max_ca_category,
+    ts_guarantee_accepted
   FROM
     datalake_credit_analysis.credit_analysis
 ),
@@ -106,8 +108,10 @@ rent_flows AS (
     flrf.sk_region,
     flrf.sk_tenant_doc_complete_date,
     flrf.sk_tenant_first_doc_sent_date,
+    COALESCE(CAST(DATE_FORMAT(ca.ts_guarantee_accepted, "yyyyMMdd") AS BIGINT), -1) AS sk_guarantee_accepted_date,
     COALESCE(dp.id, -1) AS sk_drop_reason,
     flrf.funnel_step,
+    COALESCE(ca.guarantee_offered, -1) AS guarantee_offered,
     COALESCE(ca.guarantee_accepted, -1) AS guarantee_accepted,
     IF(
       cap.id_first_credit_analysis = ca.id_credit_analysis,
@@ -171,8 +175,10 @@ proposal_credit_flows AS (
     rf.sk_region,
     rf.sk_tenant_doc_complete_date,
     rf.sk_tenant_first_doc_sent_date,
+    rf.sk_guarantee_accepted_date,
     rf.sk_drop_reason,
     rf.funnel_step,
+    rf.guarantee_offered,
     rf.guarantee_accepted,
     CAST(
       COALESCE(
@@ -229,6 +235,7 @@ SELECT
   sk_last_variant_not_null,
   sk_guarantee_category,
   sk_guarantee_paid_date,
+  sk_guarantee_accepted_date,
   sk_last_credit_analysis,
   sk_last_credit_evaluation_init,
   sk_last_credit_evaluation_negative,
@@ -244,6 +251,7 @@ SELECT
   sk_ec_created_date,
   sk_ec_expired_date,
   funnel_step,
+  guarantee_offered,
   guarantee_accepted,
   is_first_credit_evaluation,
   is_last_credit_evaluation,

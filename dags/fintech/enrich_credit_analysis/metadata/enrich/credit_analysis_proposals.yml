@@ -144,6 +144,10 @@ columns:
     lineage:
       - datalake_docx.credit_evaluation.ts_last_credit_evaluation_positive
     description: "First timestamp in which a proposal was given a status of evaluated positively by the model, meaning if the proposal is fit for a Free guarantee."
+  ts_guarantee_accepted:
+    lineage:
+      - datalake_rental_guarantee.guarantee.ts_created
+    description: "Timestamp of the date in which the guarantee was accepted by the tenant prospect."
   ts_processed:
     lineage:
       - datalake_sorting_hat_clean.proposal.ts_processed

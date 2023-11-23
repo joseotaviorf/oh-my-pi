@@ -60,6 +60,10 @@ columns:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
     description: "Key of date of guarantee paid."
+  sk_guarantee_accepted_date:
+    lineage:
+      -  datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
+    description: "Guarantee acceptance key date."
   sk_last_credit_analysis:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.id_last_credit_analysis
@@ -124,6 +128,20 @@ columns:
     lineage:
       - dw_public.fact_listing_rent_flows.funnel_step
     description: "The funnel step where this flow is in/has stoppped."
+  guarantee_offered:
+    description: "If the tenant prospect is not a clear no by income reasons, 5A offers one or more type of guarantee.  The offered guarantee can be paid or free. This column indicates which guarantee was offered to the TP after the evaluation process. The guarantee offered might be null if the credit analysis was transfered or had a later approval to free."
+    categories:
+      FREE: "The offered guarantee is free"
+      PRO_GUARANTOR: "The offered guarantee is the paid guarantee PRO_GUARANTOR"
+      DEPOSIT: "The offered guarantee is the paid guarantee DEPOSIT"
+      INSURANCE: "The offered guarantee is the paid guarantee INSURANCE"
+      STANDALONE: "The offered guarantee is the paid guarantee STANDALONE"
+      THIRD_PARTY_GUARANTEE: "The offered guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
+      BROKERAGE_ONLY: "The offered guarantee is the paid guarantee BROKERAGE_ONLY"
+      INSURANCE, DEPOSIT: "The offered guarantee is the paid guarantee INSURANCE or DEPOSIT"
+      PRO_GUARANTOR, DEPOSIT: "The offered guarantee is the paid guarantee PRO_GUARANTOR or DEPOSIT"
+      CLEAR_NO: "The guarantee was denied to the TP and it could not be offered. It may happen for income reasons, fraud risk or other reasons evaluated by the credit model."
+      UNDEFINED: "The offered guarantee could not be calculated. In this case the guarantee category is -1"
   guarantee_accepted:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type

@@ -164,6 +164,20 @@ columns:
       bypass: "Proposals that end up with Free guarantee due to a special reason that leads to a special analysis."
       bypass max: "Proposals that end up with Free guarantee due to a special reason that leads to a special analysis, but reason is not on last credit analysis,"
       ea_approved: "Proposals with Evaluation positive date even though there isn't any category that indicates such situation."
+  guarantee_offered:
+    description: "If the tenant prospect is not a clear no by income reasons, 5A offers one or more type of guarantee.  The offered guarantee can be paid or free. This column indicates which guarantee was offered to the TP after the evaluation process. The guarantee offered might be null if the credit analysis was transfered or had a later approval to free."
+    categories:
+      FREE: "The offered guarantee is free"
+      PRO_GUARANTOR: "The offered guarantee is the paid guarantee PRO_GUARANTOR"
+      DEPOSIT: "The offered guarantee is the paid guarantee DEPOSIT"
+      INSURANCE: "The offered guarantee is the paid guarantee INSURANCE"
+      STANDALONE: "The offered guarantee is the paid guarantee STANDALONE"
+      THIRD_PARTY_GUARANTEE: "The offered guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
+      BROKERAGE_ONLY: "The offered guarantee is the paid guarantee BROKERAGE_ONLY"
+      INSURANCE, DEPOSIT: "The offered guarantee is the paid guarantee INSURANCE or DEPOSIT"
+      PRO_GUARANTOR, DEPOSIT: "The offered guarantee is the paid guarantee PRO_GUARANTOR or DEPOSIT"
+      CLEAR_NO: "The guarantee was denied to the TP and it could not be offered. It may happen for income reasons, fraud risk or other reasons evaluated by the credit model."
+      UNDEFINED: "The offered guarantee could not be calculated. In this case the guarantee category is -1"
   guarantee_accepted:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
@@ -187,5 +201,9 @@ columns:
     lineage:
       - datalake_credit_analysis.credit_analysis.ts_credit_analysis_created
     description: "Timestamp of a credit analysis creation."
+  ts_guarantee_accepted:
+    lineage:
+      -  datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
+    description: "Timestamp of the date in which the guarantee was accepted by the tenant prospect."
   ts_load:
     description: "Timestamp of data recorded in the table."

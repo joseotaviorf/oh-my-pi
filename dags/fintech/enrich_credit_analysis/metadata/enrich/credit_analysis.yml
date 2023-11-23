@@ -82,6 +82,20 @@ columns:
     description: "Result of the analysis"
   credit_decision_cluster:
     description: "Credit decision cluster of the analysis"
+  guarantee_offered:
+    description: "If the tenant prospect is not a clear no by income reasons, 5A offers one or more type of guarantee.  The offered guarantee can be paid or free. This column indicates which guarantee was offered to the TP after the evaluation process. The guarantee offered might be null if the credit analysis was transfered or had a later approval to free."
+    categories:
+      FREE: "The offered guarantee is free"
+      PRO_GUARANTOR: "The offered guarantee is the paid guarantee PRO_GUARANTOR"
+      DEPOSIT: "The offered guarantee is the paid guarantee DEPOSIT"
+      INSURANCE: "The offered guarantee is the paid guarantee INSURANCE"
+      STANDALONE: "The offered guarantee is the paid guarantee STANDALONE"
+      THIRD_PARTY_GUARANTEE: "The offered guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
+      BROKERAGE_ONLY: "The offered guarantee is the paid guarantee BROKERAGE_ONLY"
+      INSURANCE, DEPOSIT: "The offered guarantee is the paid guarantee INSURANCE or DEPOSIT"
+      PRO_GUARANTOR, DEPOSIT: "The offered guarantee is the paid guarantee PRO_GUARANTOR or DEPOSIT"
+      CLEAR_NO: "The guarantee was denied to the TP and it could not be offered. It may happen for income reasons, fraud risk or other reasons evaluated by the credit model"
+      UNDEFINED: "The offered guarantee could not be calculated. In this case the guarantee category is -1"
   guarantee_accepted:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
@@ -97,6 +111,10 @@ columns:
     description: "True if the analysis is manual"
   is_reprocessed:
     description: "True if the analysis is reprocessed"
+  ts_guarantee_accepted:
+    lineage:
+      -  datalake_credit_analysis.credit_analysis_proposals.ts_guarantee_accepted
+    description: "Timestamp of the date in which the guarantee was accepted by the tenant prospect."
   ts_credit_analysis_created:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.ts_created

@@ -18,9 +18,11 @@ SELECT
   max_bypass,
   result,
   credit_decision_cluster,
+  guarantee_offered,
   guarantee_accepted,
   is_manual_analysis,
   is_reprocessed,
+  ts_guarantee_accepted,
   ts_credit_analysis_created,
   NOW() AS ts_load
 FROM

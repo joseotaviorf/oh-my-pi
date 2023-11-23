@@ -128,6 +128,7 @@ SELECT
   shp.ts_first_analyzed,
   ceval.ts_proposal_first_credit_evaluation_positive AS ts_first_credit_evaluation_positive,
   rg.ts_paid AS ts_guarantee_paid,
+  rg.ts_created AS ts_guarantee_accepted,
   ceval.ts_proposal_last_credit_evaluation_positive AS ts_last_credit_evaluation_positive,
   shp.ts_processed
 FROM

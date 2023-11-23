@@ -53,6 +53,47 @@ SELECT
     ELSE 'Error'
   END AS credit_decision_cluster,
   CASE
+    WHEN rsc.is_standalone_allowed = TRUE THEN 'BROKERAGE_ONLY'
+    WHEN rsc.is_third_party_guarantee_allowed = TRUE THEN 'THIRD_PARTY_GUARANTEE'
+    WHEN (
+      rsc.is_guarantee_allowed = TRUE
+      AND rsc.is_deposit_allowed = FALSE
+      AND rsc.is_pro_guarantor_allowed = FALSE
+    ) THEN 'INSURANCE'
+    WHEN (
+      rsc.is_guarantee_allowed = FALSE
+      AND rsc.is_deposit_allowed = FALSE
+      AND rsc.is_pro_guarantor_allowed = TRUE
+    ) THEN 'PRO_GUARANTOR'
+    WHEN (
+      rsc.is_guarantee_allowed = TRUE
+      AND rsc.is_deposit_allowed = TRUE
+      AND rsc.is_pro_guarantor_allowed = FALSE
+    ) THEN 'INSURANCE, DEPOSIT'
+    WHEN (
+      rsc.is_guarantee_allowed = FALSE
+      AND rsc.is_deposit_allowed = TRUE
+      AND rsc.is_pro_guarantor_allowed = TRUE
+    ) THEN 'PRO_GUARANTOR, DEPOSIT'
+    WHEN (
+      rsc.is_guarantee_allowed = FALSE
+      AND rsc.is_deposit_allowed = TRUE
+      AND rsc.is_pro_guarantor_allowed = FALSE
+    ) THEN 'DEPOSIT'
+    WHEN rsc.category_level = 0
+    OR (
+      ca.category IS NULL
+      AND ca.bypass IS NOT NULL
+    ) THEN 'FREE'
+    WHEN (
+      ca.category IS NULL
+      AND ca.bypass IS NULL
+      AND ca.reason IN ('CLEAR_NO')
+    ) THEN 'CLEAR_NO'
+    WHEN ca.category = -1 THEN 'UNDEFINED'
+    ELSE NULL
+  END AS guarantee_offered,
+  CASE
     WHEN (
       cap.guarantee_type = 'SeguroFairfax'
       OR cap.id_proposal_from_rg IS NULL
@@ -64,6 +105,7 @@ SELECT
     WHEN cap.guarantee_source = 'CRM_DOCUMENTATION_ANALYSIS' THEN TRUE
     ELSE FALSE
   END AS is_reprocessed,
+  cap.ts_guarantee_accepted,
   ca.ts_created AS ts_credit_analysis_created
 FROM
   datalake_sorting_hat_clean.credit_analysis AS ca 
