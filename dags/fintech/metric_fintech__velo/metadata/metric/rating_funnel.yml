@@ -1,0 +1,33 @@
+---
+database_name: metric_fintech__velo
+table_name: rating_funnel
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: Metric with relation between week, neurotech rating analysis and the acquisition funnel for QuintoCred.
+columns:
+  week:
+    description: Week base for each metric
+    dimension: True
+  rating:
+    description: Level of risk assessed in credit approval
+    lineage:
+    - datalake_velo.neurotech_rating.rating
+    metric:
+      name: Rating Funnel
+      description:
+        Level of risk assessed in credit approval
+      acronym: RF
+      is_additive: True
+      business_stage: Other
+      hierarchy: Operation
+      approved_by: jessica.aguiar@quintoandar.com.br
+      link_to_metric: "https://metabase.quintoandar.com.br/question/82676-base-cascata-modelada"
+  total_es:
+    description: Quantity of proposal arrived at the credit analysis.
+    dimension: True
+  total_ca:
+    description: Quantity of proposals on the moment when it had the credit approved
+    dimension: True
+  total_cs:
+    description: Contracts that have had guarantee deposit activated in the reference period.
+    dimension: True

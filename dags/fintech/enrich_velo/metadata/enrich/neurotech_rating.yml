@@ -1,0 +1,19 @@
+---
+database_name: datalake_velo
+table_name: neurotech_rating
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: Base table to process neurotech rating analysis for proposes
+columns:
+  id_propose:
+    description: 'Id of the propose'
+    lineage:
+    - datalake_velo_neurotech_clean.logs_credit_granting.proposal_number
+  rating:
+    description: 'Level of risk assessed in credit approval'
+    lineage:
+    - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
+  ts_operation:
+    description: 'Timestamp of the operation'
+    lineage:
+    - datalake_velo_neurotech_clean.logs_credit_granting.ts_operation
