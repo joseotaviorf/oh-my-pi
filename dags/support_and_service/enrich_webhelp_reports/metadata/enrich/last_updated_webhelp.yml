@@ -17,6 +17,8 @@ columns:
       - reverse_webhelp.demand_metric.ts_load
       - reverse_webhelp.fcr_metric.ts_load
       - reverse_webhelp.general_metric.ts_load
+      - reverse_webhelp.listing_quality_sla
+      - reverse_webhelp.listing_quality_tasks
       - reverse_webhelp.repair_tickets.ts_load
       - reverse_webhelp.speech_call.ts_load
       - reverse_webhelp.speech_chat.ts_load

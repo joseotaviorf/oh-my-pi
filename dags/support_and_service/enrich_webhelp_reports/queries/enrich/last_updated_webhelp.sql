@@ -30,6 +30,18 @@ WITH webhelp_tables AS (
         reverse_webhelp.general_metric
     UNION ALL
     SELECT
+        'listing_quality_sla' AS table_name,
+        ts_load
+    FROM
+        reverse_webhelp.listing_quality_sla
+    UNION ALL
+    SELECT
+        'listing_quality_tasks' AS table_name,
+        ts_load
+    FROM
+        reverse_webhelp.listing_quality_tasks
+    UNION ALL
+    SELECT
         'repair_tickets' AS table_name,
         ts_load
     FROM
