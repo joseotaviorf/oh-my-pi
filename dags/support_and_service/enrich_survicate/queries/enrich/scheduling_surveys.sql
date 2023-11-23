@@ -15,7 +15,7 @@ SELECT
     'survicate' AS source_name,
     CAST(COLLECT_LIST(rc.answer_content) FILTER (WHERE rc.id_question IN (1259234, 1602020)) AS STRING) AS improvement_tags,
     LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1259256, 1602021)) AS respondent_comments,
-    LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1259203, 1602019)) AS satisfaction_score,
+    CAST(LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1259203, 1602019)) AS INT) AS satisfaction_score,
     "satisfaction evaluation" AS score_description,
     rc.ts_collected AS ts_submitted,
     rc.dt_load,

@@ -13,7 +13,7 @@ SELECT
     'survicate' AS source_name,
     CAST(COLLECT_LIST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852448, 1852462)) AS STRING) AS improvement_tags,
     LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852449, 1852463)) AS respondent_comments,
-    LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852451, 1852461)) AS satisfaction_score,
+    CAST(LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852451, 1852461)) AS INT) AS satisfaction_score,
     "satisfaction evaluation" AS score_description,
     CAST(LAST(rc.answer_content) FILTER (WHERE rc.id_question IN (1852447, 1852460)) AS INT) AS secondary_satisfaction_score,
     "satisfaction between parties involved" AS secondary_score_description,
