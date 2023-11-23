@@ -30,6 +30,14 @@ columns:
     lineage:
       - datalake_credit_analysis.credit_analysis.id_credit_analysis
     description: "Key of the credit analysis."
+  sk_analysis_request:
+    lineage:
+      - datalake_credit_analysis.credit_engine_analysis_request.id_analysis_request
+    description: "Key of the analysis request processed by the credit engine. This column may be -1 when the credit analysis was processed by the old credit engine."
+  sk_checklist:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.id_checklist
+    description: "Key of the current checklist. The checklist is an entity with all checks (manual or automatic) associated to an analysis request. This column may be -1 when the credit analysis was processed by the old credit engine."
   sk_credit_analysis_approved_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date

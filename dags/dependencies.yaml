@@ -151,6 +151,8 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
+  - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-analysis-request
+  - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-checklist
   - bietlejuice.enrich_credit_analysis:load-enrich-early-credit-analysis
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_offer:load-enrich-offer

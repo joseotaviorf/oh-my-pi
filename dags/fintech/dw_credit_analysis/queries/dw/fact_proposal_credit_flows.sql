@@ -68,6 +68,17 @@ guarantees AS (
   GROUP BY
     flrf.sk_proposal
 ),
+credit_engine AS (
+  SELECT DISTINCT
+    ar.id_analysis_request,
+    ar.id_proposal,
+    ch.id_checklist
+  FROM
+    datalake_credit_analysis.credit_engine_analysis_request AS ar
+  LEFT JOIN datalake_credit_analysis.credit_engine_checklist AS ch
+    ON ch.id_analysis_request = ar.id_analysis_request
+  WHERE ch.is_current_checklist = TRUE
+),
 rent_flows AS (
   SELECT
     flrf.sk_client,
@@ -76,6 +87,8 @@ rent_flows AS (
     CAST(flrf.sk_house_listing / 1000 AS INTEGER) AS sk_house,
     flrf.sk_contract_signed_date,
     CAST(COALESCE(ca.id_credit_analysis, -1) AS INTEGER) AS sk_credit_analysis,
+    CAST(COALESCE(ce.id_analysis_request, -1) AS INTEGER) AS sk_analysis_request,
+    CAST(COALESCE(ce.id_checklist, -1) AS INTEGER) AS sk_checklist,
     flrf.sk_credit_analysis_approved_date,
     COALESCE(
       NULLIF(flrf.sk_last_credit_evaluation_positive, -1),
@@ -148,6 +161,9 @@ rent_flows AS (
   LEFT JOIN
     dw_public.dim_drop_reason AS dp
       ON dp.desc_original_drop_reason = flrf.funnel_step_drop_reason
+  LEFT JOIN
+    credit_engine AS ce
+      ON ce.id_proposal = flrf.sk_proposal
 ),
 proposal_credit_flows AS (
   SELECT
@@ -157,6 +173,8 @@ proposal_credit_flows AS (
     rf.sk_contract,
     rf.sk_contract_signed_date,
     rf.sk_credit_analysis,
+    rf.sk_analysis_request,
+    rf.sk_checklist,
     rf.sk_credit_analysis_approved_date,
     rf.sk_credit_evaluation_approved_date,
     rf.sk_first_credit_analysis,
@@ -228,6 +246,8 @@ SELECT
   sk_contract,
   sk_contract_signed_date,
   sk_credit_analysis,
+  sk_analysis_request,
+  sk_checklist,
   sk_credit_analysis_approved_date,
   sk_credit_evaluation_approved_date,
   sk_first_credit_analysis,
