@@ -263,21 +263,41 @@ columns:
        We used the entire history of listings that have been published and signed CCVs, with some cuts such as the number of bathrooms, region cluster, price bins, total area bins and m2 price bins. We then defined a `factor' value for each listing in relation to its characteristics. 
        In other words, we compare it with QuintoAndar's history and classify whether that listing is similar to listings that have already been sold'
     categories:
-      S5: > 
+      'S5: Very Similar': > 
         It represents listings with a very high degree of sellability, i.e. it is a listing that is very similar to most of the listings that have already been sold. 
         To be considered S5, the listing must have a sellability factor greater than 3.
-      S4: > 
+      'S4: Quite Similar': > 
         It represents listings with a high degree of sellability, i.e. it is a listing that is quite similar to most of the listings that have already been sold.
         To be considered S4, the listing must have a sellability factor greater than 2 and less than or equal to 3.
-      S3: > 
+      'S3: Moderately Similar': > 
         It represents listings with a moderate degree of sellability, i.e. it is a listing that is moderately similar to most of the listings that have already been sold.
         To be considered S3, the listing must have a sellability factor greater than 1 and less than or equal to 2.
-      S2: > 
+      'S2: Somewhat Similar': > 
         It represents listings with a low degree of sellability, i.e. it is a listing that is slightly similar to most of the listings that have already been sold.
         To be considered S2, the listing must have a sellability factor greater than 0.3 and less than or equal to 1.
-      S1: > 
+      'S1: Not Very Similar': > 
         It represents listings with a very low degree of sellability, i.e. is a listing typology that is totally different from the listings sold on QuintoAndar.
         To be considered S1, the listing must have a sellability factor less than or equal to 0.3.
+  listing_quality_tier: 
+    lineage: 
+      - datalake_sale_listings_lenses.listing_lenses.listing_quality_full_name
+    description: > 
+      We use the entire history of changes to a property's features and condominiums to create a tier that tracks the level of completeness of a house's information.
+      We believe that a house with complete information performs much better on the platform. With this in mind, we used several variables and created a completeness score.
+    categories: 
+      'Q5: Great Accuracy': >
+        Represents listings with full information on amenities and features. There is no penalty, i.e. all the information we considered was filled in.
+      'Q4: Good Accuracy': >
+        Represents listings with almost complete information on amenities and features. There is a small penalty, i.e. some of the amenities or features that are not so critical have not been filled.
+        To be placed into this tier you must have a score between -1 and -500.
+      'Q3: Moderate Accuracy': >
+        Represents listings with incomplete information on amenities and features. There is a medium penalty, i.e. some of the amenities or features have not been filled.
+        To be placed into this tier you must have a score between -501 and -1500.
+      'Q2: Low Accuracy': >
+        Represents listings with very incomplete information on amenities and features. There is a large penalty, i.e. most of the amenities or features have not been filled.
+        To be placed into this tier you must have a score less than -1500.
+      'Q1: Critical Accuracy': >
+        Represents listings with no information on amenities and features. Represents listings that are missing one or more critical information. To be considered in this tier, we have a problem identifying its sale price and/or its condo value and/or its number of bedrooms and/or its total area.
   pricing_lens_disclaimer:
     lineage:
       - datalake_sale_listings_lenses.listing_lenses.pricing_disclaimer
@@ -298,6 +318,16 @@ columns:
       - datalake_sale_listings_lenses.listing_lenses.availability_drill_down
     description: >
       Drill down of the tier_disclaimer column, where we can see the factors/bins that make up the listing's tier.
+  listing_quality_lens_disclaimer:
+    lineage:
+      - datalake_sale_listings_lenses.listing_lenses.listing_quality_disclaimer
+    description: >
+      Column that shows us, in full, the combination of factors/scores concerning the listing, where with this, we classify it within a listing quality tier.
+  listing_quality_lens_drill_down:
+    lineage:
+      - datalake_sale_listings_lenses.listing_lenses.listing_quality_drill_down
+    description: >
+      Drill down of the tier_disclaimer column, where we can see the factors/scores that make up the listing's tier.  
   partner_3p_supply:
     lineage:
     - datalake_ebdb_listing.house.partner_3p_supply

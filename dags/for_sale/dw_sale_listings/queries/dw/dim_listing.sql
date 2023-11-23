@@ -19,10 +19,13 @@ SELECT
   ll.demand_full_name AS demand_lens_tier,
   ll.availability_full_name AS availability_lens_tier,
   ll.sellability_full_name AS sellability_lens_tier,
+  ll.listing_quality_full_name AS listing_quality_lens_tier,
   ll.pricing_disclaimer AS pricing_lens_disclaimer,
   ll.demand_disclaimer AS demand_lens_disclaimer,
   ll.availability_disclaimer AS availability_lens_disclaimer,
   ll.availability_drill_down AS availability_lens_drill_down,
+  ll.listing_quality_disclaimer AS listing_quality_lens_disclaimer,
+  ll.listing_quality_drill_down AS listing_quality_lens_drill_down,
   CASE
     WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
   END AS partner_3p_supply,

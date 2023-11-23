@@ -169,8 +169,8 @@ full_name AS (
 SELECT 
   id_house,
   id_region,
-  price_bin ||'  &  '|| total_area_bin || '  |  ' || pricing_tier || '  |  ' || availability_tier || '  |  ' || demand_tier AS listing_lenses,
-  price_bin ||'  &  '|| total_area_bin || '  |  ' || pricing_full_name || '  |  ' || availability_full_name || '  |  ' || demand_full_name AS full_listing_lenses,
+  price_bin ||'  &  '|| total_area_bin || '  |  ' || pricing_tier || '  |  ' || availability_tier || '  |  ' || demand_tier || '  |  ' || sellability_tier || '  |  ' || listing_quality_name AS listing_lenses,
+  price_bin ||'  &  '|| total_area_bin || '  |  ' || pricing_full_name || '  |  ' || availability_full_name || '  |  ' || demand_full_name || '  |  ' || sellability_full_name || '  |  ' || listing_quality_full_name AS full_listing_lenses,
   price_bin,
   price_m2_bin,
   total_area_bin,
