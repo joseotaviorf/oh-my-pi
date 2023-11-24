@@ -7,7 +7,7 @@ WITH ES AS (
         dw_velo.fact_velo_propose AS ph
     LEFT JOIN
         datalake_velo.neurotech_rating AS r
-            ON r.proposal_id = ph.sk_propose
+            ON r.id_propose = ph.sk_propose
     GROUP BY
         1,2
 
@@ -20,7 +20,7 @@ WITH ES AS (
         dw_velo.fact_velo_propose AS ph
     LEFT JOIN
         datalake_velo.neurotech_rating AS r
-            ON r.proposal_id = ph.sk_propose
+            ON r.id_propose = ph.sk_propose
     GROUP BY
         1, 2
 ), CS AS (
@@ -32,7 +32,7 @@ WITH ES AS (
         dw_velo.fact_velo_propose AS ph
     LEFT JOIN
         datalake_velo.neurotech_rating AS r
-            ON r.proposal_id = ph.sk_propose
+            ON r.id_propose = ph.sk_propose
     GROUP BY
         1, 2
 
