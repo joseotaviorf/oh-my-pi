@@ -59,10 +59,11 @@ columns:
   creci_situation:
     lineage:
     - datalake_airtable_clean.leads.creci_situation
-    description: Creci situation.
+    description: CRECI situation.
   creci_status:
     lineage:
     - datalake_airtable_clean.leads.creci_status
+    description: CRECI status.
   grade:
     lineage:
     - datalake_airtable_clean.leads.grade
@@ -119,6 +120,7 @@ columns:
   training_giving_up:
     lineage:
     - datalake_airtable_clean.leads.training_giving_up
+    description: Reason for the agent give up of the training.
   is_duplicated:
     lineage:
     - datalake_airtable_clean.leads.is_duplicated

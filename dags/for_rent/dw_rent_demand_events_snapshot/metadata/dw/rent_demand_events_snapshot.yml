@@ -17,6 +17,10 @@ columns:
     lineage:
     - dw_public.dim_region.city_group
     description: "Group which the city of the event belongs."
+  guarantee:
+    lineage:
+    - dw_public.dim_proposal.guarantee
+    description: "Guarantee of the proposal."
   tier:
     lineage:
     - dw_public.dim_region.city_group

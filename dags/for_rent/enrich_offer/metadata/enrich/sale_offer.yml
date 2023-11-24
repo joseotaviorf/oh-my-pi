@@ -573,3 +573,17 @@ columns:
       - datalake_firestore.sale_offer.ts_updated
       - datalake_sale_offer_flows.sale_offer_flows.ts_offer_updated
     description: Timestamp when the offer was updated
+  id_user_team_lead:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.sk_user_team_lead
+    description: Team lead ID user on main (EBDB) tables.
+  ts_load:
+    description: Timestamp of when this data was loaded.
+  is_house_first_offer:
+    description: Boolean indicating whether this offer is the first one in this house.
+  is_buyer_first_offer:
+    description: Boolean indicating whether this offer is the first one of the buyer.
+  flg_visit_completed_before_offer:
+    description: Boolean indicating whether a visit was completed (VC) before this offer.
+  flg_booking_before_offer:
+    description: Boolean indicating whether a visit was booked (VB) before this offer.

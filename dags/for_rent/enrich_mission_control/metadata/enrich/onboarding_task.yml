@@ -38,7 +38,7 @@ columns:
     description: It's related to the end deadline of the task.
     lineage:
     - datalake_mission_control_clean.onboarding_task.end_offset
-  is_deleted:
+  id_deleted:
     description: Boolean flag to check if the task was deleted.
     lineage:
     - datalake_mission_control_clean.onboarding_task.is_deleted
