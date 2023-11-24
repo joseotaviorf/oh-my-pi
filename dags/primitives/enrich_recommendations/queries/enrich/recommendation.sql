@@ -91,7 +91,6 @@ carousel_recommendations AS (
     WITH carousel_recommendation_delivered AS (
         SELECT DISTINCT
             "house" AS type_subject,
-            "similar-carousel" AS display_type,
             "house-similarity-embeddings" AS ml_model,
             "house" AS type_item,
             country,
@@ -149,6 +148,7 @@ carousel_recommendations AS (
     carousel_recommendation_enriched AS (
         SELECT
             carousel_recommendation_delivered.*,
+            yp_recs_logs.display_type,
             yp_recs_logs.experiments,
             yp_recs_logs.experiments_variants,
             DENSE_RANK() OVER (
@@ -169,7 +169,6 @@ carousel_recommendations AS (
           ON
             carousel_recommendation_delivered.id_user = yp_recs_logs.id_user
             AND carousel_recommendation_delivered.business_context = yp_recs_logs.business_context
-            AND carousel_recommendation_delivered.display_type = yp_recs_logs.display_type
             AND carousel_recommendation_delivered.ts_rec_created >= yp_recs_logs.ts_log
     )
 
