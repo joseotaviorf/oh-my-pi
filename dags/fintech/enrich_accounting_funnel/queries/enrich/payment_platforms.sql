@@ -114,6 +114,8 @@ inner join
     datalake_vans_clean.file f on f.id = fp.id_file 
 where 
     f.type=':file.type/payment.csv'
+and
+    p2.dt_paid is not null
 ),
 
 CAP AS (
