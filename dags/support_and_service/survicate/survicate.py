@@ -1,4 +1,3 @@
-import json
 import os
 from datetime import datetime
 from pendulum import timezone
@@ -8,7 +7,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import chain, cross_downstream
+from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
@@ -98,20 +97,15 @@ task_group = DatalakeTaskGroup(
 
 raw_task_groups = {}
 clean_task_groups = {}
-for table_name, tables_config in tables.items():
+
+for table_name in tables:
 
     raw_task_groups[table_name] = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
         extraction_spark_job_file=raw_spark_job_path,
-        raw_spark_job_extra_args=[
-            SOURCE,
-            json.dumps(tables_config),
-            table_name,
-            json.dumps(partition_cols),
-            "{{ ds }}",
-        ],
+        raw_spark_job_extra_args=[SOURCE, table_name, "{{ ds }}",],
     )
 
     clean_task_groups[table_name] = task_group.build_clean_task_group(

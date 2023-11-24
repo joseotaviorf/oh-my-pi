@@ -14,8 +14,7 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 
@@ -31,22 +30,6 @@ SCOPE = "quintoandar"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-
-
-def _parse_arguments():
-    """
-    This method aims to get the arguments passed from the dag.
-    """
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("environment")
-    parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
-    parser.add_argument("tables_config")
-    parser.add_argument("raw_table_name")
-    parser.add_argument("partition_cols")
-    parser.add_argument("execution_date")
-
-    return parser.parse_args()
 
 
 def get_api_token():
@@ -72,28 +55,44 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
     @param args: Detailing parameters of the tables..
     @param force_recreate: bool. Indicates if it must force table recreation in metastore.
     """
-    raw_table_name = args.raw_table_name
-    partition_cols = json.loads(args.partition_cols)
 
+    environment = args.environment
+    datalake_bucket = args.datalake_bucket
+    source = args.source
+    raw_table_name = args.raw_table_name
     execution_date = args.execution_date
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
 
-    tables_config = json.loads(args.tables_config)
-    endpoint_enum = tables_config.get("endpoint_enum")
-    optional_parameters = tables_config.get("optional_parameters")
-    feedback_parameters = tables_config.get("feedback_parameters_query")
+    config_service = ConfigurationService(source)
+    partition_cols = config_service.get_config("partition_cols")
+    tables = config_service.get_config("tables")
 
-    if optional_parameters.get("start"):
-        optional_parameters["start"] = optional_parameters.get("start").format(
-            execution_date=execution_date
-        )
+    table_config = tables.get(raw_table_name)
+
+    endpoint_enum = table_config.get("endpoint_enum")
+    optional_parameters = table_config.get("optional_parameters")
+    feedback_parameters_query = table_config.get("feedback_parameters_query")
+
+    logger.info("m=__main__, msg=Format start date...")
+    optional_parameters["start"] = optional_parameters.get("start").format(
+        execution_date=execution_date
+    )
+
     if optional_parameters.get("end"):
+        logger.info("m=__main__, msg=Format end date...")
         optional_parameters["end"] = optional_parameters.get("end").format(
             execution_date=execution_date
         )
-    if feedback_parameters:
-        feedback_parameters = feedback_parameters.format(execution_date=execution_date)
-        df = spark.sql(feedback_parameters)
+
+    feedback_parameters = None
+    if feedback_parameters_query:
+        logger.info("m=__main__, msg=This table has feedback parameters...")
+        logger.info("m=__main__, msg=Format feedback parameters...")
+        feedback_parameters_query = feedback_parameters_query.format(
+            execution_date=execution_date
+        )
+
+        df = spark.sql(feedback_parameters_query)
 
         feedback_parameters = list(map(lambda row: row.asDict(), df.collect()))
 
@@ -102,9 +101,7 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
 
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    db_info = DatalakeMetastoreService.get_db_info(
-        args.environment, args.source, args.datalake_bucket
-    )
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
 
@@ -116,7 +113,7 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
     survicate_client = SurvicateClient(api_token=api_token)
     survicate_consumer = SurvicateConsumer(survicate_client)
 
-    if feedback_parameters != []:
+    if not feedback_parameters_query or feedback_parameters != []:
         response = survicate_consumer.sync(
             endpoint_enum=endpoint_enum,
             feedback_parameters=feedback_parameters,
@@ -155,7 +152,7 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             logger.warning(
                 f"""
                 m={JOB_NAME},
-                environment=dag_execution_date={args.execution_date}, raw_table_name={args.raw_table_name}
+                environment=dag_execution_date={args.execution_date}, raw_table_name={raw_table_name}
                 msg=The API request returned no data, so no data was loaded for the current execution date.
                 """
             )
@@ -163,13 +160,20 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
         logger.warning(
             f"""
             m={JOB_NAME},
-            environment=dag_execution_date={args.execution_date}, raw_table_name={args.raw_table_name}
+            environment={environment}, dag_execution_date={args.execution_date}, raw_table_name={raw_table_name}
             msg=No data to feed back to the API, so no data was loaded for the current execution date.
             """
         )
 
     if __name__ == "__main__":
-        args = _parse_arguments()
+        parser = ArgumentParser(description=JOB_NAME)
+        parser.add_argument("environment")
+        parser.add_argument("datalake_bucket")
+        parser.add_argument("source")
+        parser.add_argument("raw_table_name")
+        parser.add_argument("execution_date")
+
+        args = parser.parse_args()
 
         logger.info(
             f"""
