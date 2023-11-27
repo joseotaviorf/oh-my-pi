@@ -34,14 +34,14 @@ DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-CLUSTER_DESCRIPTION = config_service.get_config("cluster_description")
+CUSTOM_CLUSTER = "custom_cluster"
 CUSTOM_LIBRARIES = config_service.get_config("custom_libraries")
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
 dag_custom_init_script = config_service.get_config("init_script")
 dag_spark_conf = config_service.get_config("spark_conf")
-cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_configuration = config_service.get_config(CUSTOM_CLUSTER)
 default_libraries = config_service.get_config("default_libraries")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 
