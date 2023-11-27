@@ -23,7 +23,6 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2023, 9, 27, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_photon_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 
@@ -33,7 +32,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_configuration = config_service.get_config("custom_cluster")
 default_libraries = config_service.get_config("default_libraries")
 table_task_group_parameters = config_service.get_config("table_task_group_parameters")
 
