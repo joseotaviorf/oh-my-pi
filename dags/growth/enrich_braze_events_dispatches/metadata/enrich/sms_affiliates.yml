@@ -1,7 +1,55 @@
----
 database_name: datalake_braze_dispatches
 table_name: sms_affiliates
 owner: data-growth@quintoandar.com
 domain: growth
-description: Table with details about communications sent through SMS to affiliates.
-columns: {}
+description: Table containing details about SMS communications sent to affiliates.
+columns:
+  id_user_dispatch:
+    description: Combination of id_dispatch and id_user.
+    lineage:
+      - datalake_braze.events_affiliates.id_user_dispatch
+  id_user_braze:
+    description: Unique code to identify an user created by Braze.
+    lineage:
+      - datalake_braze.events_affiliates.id_user_braze
+  id_user:
+    description: Unique code to identify an user.
+    lineage:
+      - datalake_braze.events_affiliates.id_user
+  event_channel:
+    description: Channel related to the event. In this case, only SMS channel events.
+    lineage:
+      - datalake_braze.events_affiliates.event_channel
+  ts_sms_sent:
+    description: Timestamp when the SMS was sent to the owner.
+    lineage:
+      - datalake_braze.events_affiliates.ts_event
+  ts_sms_send_to_carried:
+    description: Timestamp when the SMS was delivered to the owner.
+    lineage:
+      - datalake_braze.events_affiliates.ts_event
+  ts_sms_delivered:
+    description: Timestamp when the SMS was successfully delivered to the owner.
+    lineage:
+      - datalake_braze.events_affiliates.ts_event
+  ts_sms_rejected:
+    description: Timestamp when the SMS was rejected.
+    lineage:
+      - datalake_braze.events_affiliates.ts_event
+  ts_sms_delivery_failed:
+    description: Timestamp when the SMS delivery failed.
+    lineage:
+      - datalake_braze.events_affiliates.ts_event
+  year:
+    description: Year when the event occurred.
+    lineage:
+      - datalake_braze.events_affiliates.year
+  month:
+    description: Month when the event occurred.
+    lineage:
+      - datalake_braze.events_affiliates.month
+  day:
+    description: Day when the event occurred.
+    lineage:
+      - datalake_braze.events_affiliates.day
+  

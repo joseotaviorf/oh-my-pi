@@ -6,7 +6,6 @@ description: Table with metrics regarding all the communications sent to a user 
 domain: Growth
 owner: conrado.fabri@quintoandar.com.br
 columns:
-columns:
   id_user_braze:
     lineage:
       - datalake_braze_user_centric.user_events_daily.id_user_braze
@@ -42,6 +41,12 @@ columns:
       - datalake_braze_user_centric.user_events_daily.event_count
     description: Total of send events (either campaigns or canvases) sent to the user
       on the Owners App Group on the week before the week start of data last update.
+  total_affiliate_communications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.user_type
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total number of communications (send or impression) sent to affiliates.
   total_emails_sent_to:
     lineage:
       - datalake_braze_user_centric.user_events_daily.event_channel

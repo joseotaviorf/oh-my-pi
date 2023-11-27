@@ -12,6 +12,10 @@ columns:
     description: Unique code to identify an user created by Braze.
     lineage:
       - datalake_braze.events_owners.id_user_braze
+  id_user:
+    description: Unique code to identify an user.
+    lineage:
+      - datalake_braze.events_owners.id_user
   event_channel:
     description: Channel related to the event. In this case, only email's channel events. 
     lineage:

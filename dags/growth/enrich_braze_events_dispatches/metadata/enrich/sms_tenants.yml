@@ -1,36 +1,50 @@
 database_name: datalake_braze_dispatches
 table_name: sms_tenants
+owner: data-growth@quintoandar.com
+domain: growth
+description: Table containing details about SMS communications sent to tenants.
 columns:
   id_user_dispatch:
+    description: Combination of id_dispatch and id_user for the tenant.
     lineage:
       - datalake_braze.events_tenants.id_user_dispatch
   id_user_braze:
+    description: Unique code to identify a tenant created by Braze.
     lineage:
       - datalake_braze.events_tenants.id_user_braze
   event_channel:
+    description: Channel related to the event. In this case, only SMS channel events for tenants.
     lineage:
       - datalake_braze.events_tenants.event_channel
   ts_sms_sent:
+    description: Timestamp when the SMS was sent to the tenant.
     lineage:
       - datalake_braze.events_tenants.ts_event
   ts_sms_send_to_carried:
+    description: Timestamp when the SMS was delivered to the tenant.
     lineage:
       - datalake_braze.events_tenants.ts_event
   ts_sms_delivered:
+    description: Timestamp when the SMS was successfully delivered to the tenant.
     lineage:
       - datalake_braze.events_tenants.ts_event
   ts_sms_rejected:
+    description: Timestamp when the SMS was rejected for the tenant.
     lineage:
       - datalake_braze.events_tenants.ts_event
   ts_sms_delivery_failed:
+    description: Timestamp when the SMS delivery failed for the tenant.
     lineage:
       - datalake_braze.events_tenants.ts_event
   year:
+    description: Year of when the event occurred for the tenant.
     lineage:
       - datalake_braze.events_tenants.year
   month:
+    description: Month of when the event occurred for the tenant.
     lineage:
       - datalake_braze.events_tenants.month
   day:
+    description: Day of when the event occurred for the tenant.
     lineage:
       - datalake_braze.events_tenants.day

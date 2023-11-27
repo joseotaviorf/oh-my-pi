@@ -1,36 +1,50 @@
 database_name: datalake_braze_dispatches
 table_name: sms_owners
+owner: data-growth@quintoandar.com
+domain: growth
+description: Table containing details about SMS communications sent to owners.
 columns:
   id_user_dispatch:
+    description: Combination of id_dispatch and id_user for the owner.
     lineage:
       - datalake_braze.events_owners.id_user_dispatch
   id_user_braze:
+    description: Unique code to identify an owner created by Braze.
     lineage:
       - datalake_braze.events_owners.id_user_braze
   event_channel:
+    description: Channel related to the event. In this case, only SMS channel events for owners.
     lineage:
       - datalake_braze.events_owners.event_channel
   ts_sms_sent:
+    description: Timestamp when the SMS was sent to the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_sms_send_to_carried:
+    description: Timestamp when the SMS was delivered to the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_sms_delivered:
+    description: Timestamp when the SMS was successfully delivered to the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_sms_rejected:
+    description: Timestamp when the SMS was rejected for the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   ts_sms_delivery_failed:
+    description: Timestamp when the SMS delivery failed for the owner.
     lineage:
       - datalake_braze.events_owners.ts_event
   year:
+    description: Year of when the event occurred for the owner.
     lineage:
       - datalake_braze.events_owners.year
   month:
+    description: Month of when the event occurred for the owner.
     lineage:
       - datalake_braze.events_owners.month
   day:
+    description: Day of when the event occurred for the owner.
     lineage:
       - datalake_braze.events_owners.day
