@@ -33,6 +33,10 @@ columns:
     description: Code sent to the invited user.
     lineage:
     - datalake_ebdb_raw.agentleadreferral.code
+  origin:
+    description: Channel through which a lead is captured.
+    lineage:
+    - datalake_ebdb_raw.agentleadreferral.origin
   ts_created:
     description: Register creation timestamp
     lineage:

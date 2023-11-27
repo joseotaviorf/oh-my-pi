@@ -6,6 +6,7 @@ SELECT
     status,
     phone,
     code,
+    origin,
     createdAt AS ts_created,
     updatedAt AS ts_updated
 FROM

@@ -32,6 +32,9 @@ columns:
   code:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.code
+  origin:
+    lineage:
+    - datalake_ebdb_raw.agentleadreferral_aud.origin
   mod_name:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.name_mod
@@ -44,6 +47,9 @@ columns:
   mod_phone:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.phone_mod
+  mod_origin:
+    lineage:
+    - datalake_ebdb_raw.agentleadreferral_aud.origin_mod
   mod_id_agent:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.agent_id_mod
