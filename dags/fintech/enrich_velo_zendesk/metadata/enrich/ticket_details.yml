@@ -1,0 +1,108 @@
+database_name: datalake_velo_zendesk
+table_name: ticket_details
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing zendesk tickets information"
+columns:
+  id_ticket:
+    description: "Ticket identification number (ID)"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.id_ticket
+  id_main_ticket:
+    description: "Main ticket id related to the current ticket"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.description
+  request_error:
+    description: "Request error description"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.request_error
+  request_type:
+    description: "Request type description"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.request_type
+  cancellation_reason:
+    description: "Description of the reason of cancellation"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.cancellation_reason
+  broker_name:
+    description: "Broker name"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.broker_name
+  contact_reason:
+    description: "Main reason of contact"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.contact_reason
+  tenant_name:
+    description: "Tenant name related to the ticket"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.tenant_name
+  client_request:
+    description: "Description of client request"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.client_request
+  name:
+    description: "Ticket group name"
+    lineage:
+      - datalake_velo_zendesk_clean.groups.name
+  id_group:
+    description: "Ticket group id"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.id_group
+  priority:
+    description: "Priority description of the ticket"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.priority
+  recipient:
+    description: "Recipient description"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.recipient
+  ticket_via:
+    description: "Via in which the ticket was opened"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.ticket_via
+  short_request_type:
+    description: "Short description of the request type"
+  description:
+    description: "Ticket description"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.description
+  ticket_url:
+    description: "Ticket URL"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.url_ticket
+  tags:
+    description: "Tags linked to the ticket"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.tags
+  ticket_status:
+    description: "Ticket status"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.status
+  subject:
+    description: "Ticket subject"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.subject
+  has_incidents:
+    description: "Flag indicating if the ticket has incidents related"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.has_incidents
+  is_public:
+    description: "Flag indicating if the ticket is public"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.is_public
+  ts_created:
+    description: "Timestamp when the ticket was created"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.ts_created
+  ts_created_local:
+    description: "Timestamp when the ticket was created in Brasilia timezone"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.ts_created_local
+  ts_updated:
+    description: "Timestamp when the ticket was updated"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.ts_updated
+  ts_load:
+    description: "Timestamp when the ticket was loaded"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.ts_load

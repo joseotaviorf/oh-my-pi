@@ -1,0 +1,70 @@
+database_name: datalake_velo_zendesk
+table_name: ticket_history
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing zendesk tickets historical data"
+columns:
+  id_ticket:
+    description: "Ticket identification number (ID)"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.id_ticket
+  id_assignee:
+    description: "Identification number of the agent assigned to the ticket"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.id_assignee
+  id_group:
+    description: "Ticket group id"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.id_group
+  id_requester:
+    description: "Identification number of the requester"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.id_requester
+  id_submitter:
+    description: "Identification number of the submitter"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.id_submitter
+  name:
+    description: "Ticket group name"
+    lineage:
+      - datalake_velo_zendesk_clean.groups.name
+  priority:
+    description: "Ticket priority"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.priority
+  satisfaction_rating:
+    description: "Description of satisfaction rating"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.satisfaction_rating
+  ticket_order:
+    description: "Order of the register in ticket timeline"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.ticket_order
+  subject:
+    description: "Ticket subject description"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.subject
+  status:
+    description: "Ticket status description"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.status
+  dt_extracted:
+    description: "Extraction date of the register"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.dt_extracted
+  ts_created:
+    description: "Timestamp when the ticket was created"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.ts_created
+  ts_created_local:
+    description: "Timestamp when the ticket was created in Brasilia timezone"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.ts_created_local
+  ts_updated:
+    description: "Timestamp when the ticket was updated"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.ts_updated
+  ts_load:
+    description: "Timestamp when the ticket was loaded"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets_history.ts_load

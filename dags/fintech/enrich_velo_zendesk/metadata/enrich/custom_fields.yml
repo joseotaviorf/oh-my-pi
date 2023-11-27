@@ -1,0 +1,70 @@
+database_name: datalake_velo_zendesk
+table_name: custom_fields
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing the most important custom fields from zendesk tickets"
+columns:
+    id_ticket:
+        description: "Ticket identification number (ID)"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.id_ticket
+    id_propose:
+        description: "Identification number of the propose related to the ticket"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    request_error:
+        description: "Description of the request error"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    request_type:
+        description: "Description of the request type"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    cancellation_reason:
+        description: "Description of the cancellation reason"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    broker_name:
+        description: "Name of the broker related to the ticket"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    contact_reason:
+        description: "Description of the contact reason"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    tenant_name:
+        description: "Name of the tenant related to the ticket"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    client_request:
+        description: "Description of the client request"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    overdue_amount:
+        description: "Overdue amount (paid to the broker)"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_request_return:
+        description: "Date when the request had a return"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_submission:
+        description: "Submission date"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_due_original:
+        description: "Original due date"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_started:
+        description: "Date when the ticket started to be analysed"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_payment_scheduled:
+        description: "Date when the payment will be made"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_payment_forwarded:
+        description: "Date when the payment was forwarded"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields

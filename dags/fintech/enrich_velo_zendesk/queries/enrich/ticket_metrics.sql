@@ -1,0 +1,85 @@
+WITH last_extracted AS (
+        SELECT
+            tm.id_ticket,
+            tm.group_stations,
+            tm.assignee_stations,
+            tm.minutes_reply_calendar,
+            tm.minutes_reply_business,
+            tm.minutes_first_resolution_business,
+            tm.minutes_first_resolution_calendar,
+            tm.minutes_requester_wait_business,
+            tm.minutes_requester_wait_calendar,
+            tm.minutes_agent_wait_business,
+            tm.minutes_agent_wait_calendar,
+            tm.minutes_on_hold_business,
+            tm.minutes_on_hold_calendar,
+            tm.minutes_full_resolution_business,
+            tm.minutes_full_resolution_calendar,
+            tm.reopens,
+            tm.replies,
+            tm.dt_extracted,
+            tm.ts_initially_assigned,
+            tm.ts_assigned,
+            tm.ts_solved,
+            tm.ts_created
+        FROM
+            datalake_velo_zendesk_clean.ticket_metrics tm
+        QUALIFY
+            ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY dt_extracted DESC) = 1
+      )
+
+    SELECT
+        le.id_ticket,
+        t.id_assignee,
+        t.id_group,
+        t.id_requester,
+        t.id_submitter,
+        cf.id_propose,
+        le.group_stations,
+        le.assignee_stations,
+        le.minutes_reply_calendar,
+        le.minutes_reply_business,
+        le.minutes_first_resolution_business,
+        le.minutes_first_resolution_calendar,
+        le.minutes_requester_wait_business,
+        le.minutes_requester_wait_calendar,
+        le.minutes_agent_wait_business,
+        le.minutes_agent_wait_calendar,
+        le.minutes_on_hold_business,
+        le.minutes_on_hold_calendar,
+        le.minutes_full_resolution_business,
+        le.minutes_full_resolution_calendar,
+        le.reopens,
+        le.replies,
+        cf.overdue_amount,
+        (le.minutes_full_resolution_calendar/60.000)/24.000 AS leadtime_calendar_days,
+        (le.minutes_full_resolution_business/60.000)/10.000 AS leadtime_business_days,
+        (le.minutes_reply_calendar/60.000)/24.000 as interval_first_response,
+        DATE_TRUNC('month',FROM_UTC_TIMESTAMP(le.ts_solved, 'Brazil/East')) as first_day_of_month,
+        le.minutes_requester_wait_calendar/60.000/24.000 AS broker_waiting_analyst,
+        le.minutes_agent_wait_calendar/60.000/24.000 AS analyst_waiting_broker,
+        le.dt_extracted,
+        cf.dt_request_return,
+        cf.dt_submission,
+        cf.dt_due_original,
+        cf.dt_started,
+        cf.dt_payment_scheduled,
+        cf.dt_payment_forwarded,
+        le.ts_created,
+        t.ts_created_local,
+        t.ts_updated,
+        FROM_UTC_TIMESTAMP(t.ts_updated, 'Brazil/East') AS ts_updated_local,
+        le.ts_initially_assigned,
+        FROM_UTC_TIMESTAMP(le.ts_initially_assigned, 'Brazil/East') AS ts_initially_assigned_local,
+        le.ts_assigned,
+        le.ts_solved,
+        FROM_UTC_TIMESTAMP(le.ts_solved, 'Brazil/East') AS ts_solved_local,
+        t.ts_load
+     FROM
+        last_extracted le
+     LEFT JOIN
+        datalake_velo_zendesk.custom_fields cf
+        ON le.id_ticket = cf.id_ticket
+    LEFT JOIN
+        datalake_velo_zendesk_clean.tickets t
+        ON le.id_ticket = t.id_ticket

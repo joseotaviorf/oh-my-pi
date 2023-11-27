@@ -1,0 +1,172 @@
+database_name: datalake_velo_zendesk
+table_name: ticket_metrics
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing zendesk tickets metrics"
+columns:
+  id_ticket:
+    description: "Ticket identification number (ID)"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.id_ticket
+  id_assignee:
+    description: "Identification number of the agent assigned to the ticket"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.id_assignee
+  id_group:
+    description: "Ticket group id"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.id_group
+  id_requester:
+    description: "Identification number of the requester"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.id_requester
+  id_submitter:
+    description: "Identification number of the submitter"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.id_submitter
+  id_propose:
+    description: "ID of the propose related to the ticket"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.id_propose
+  group_stations:
+    description: "Number of group stations"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.group_stations
+  assignee_stations:
+    description: "Number of assignee stations"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.assignee_stations
+  minutes_reply_calendar:
+    description: "Amount of calendar minutes the ticket took to be replied"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_reply_calendar
+  minutes_reply_business:
+    description: "Amount of business minutes the ticket took to be replied"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_reply_business
+  minutes_first_resolution_business:
+    description: "Amount of business minutes the ticket took to receive the first resolution"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_first_resolution_business
+  minutes_first_resolution_calendar:
+    description: "Amount of calendar minutes the ticket took to receive the first resolution"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_first_resolution_calendar
+  minutes_requester_wait_business:
+    description: "Amount of business minutes the requester had to wait for a reply"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_requester_wait_business
+  minutes_requester_wait_calendar:
+    description: "Amount of calendar minutes the requester had to wait for a reply"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_requester_wait_calendar
+  minutes_agent_wait_business:
+    description: "Amount of business minutes the agent had to wait for a reply"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_agent_wait_business
+  minutes_agent_wait_calendar:
+    description: "Amount of calendar minutes the agent had to wait for a reply"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_agent_wait_calendar
+  minutes_on_hold_business:
+    description: "Amount of business minutes the ticket was on hold"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_on_hold_business
+  minutes_on_hold_calendar:
+    description: "Amount of calendar minutes the ticket was on hold"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_on_hold_calendar
+  minutes_full_resolution_business:
+    description: "Amount of business minutes the ticket took to receive a full resolution"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_full_resolution_business
+  minutes_full_resolution_calendar:
+    description: "Amount of calendar minutes the ticket took to receive a full resolution"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.minutes_full_resolution_calendar
+  reopens:
+    description: "Number of times the ticket was reopened"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.reopens
+  replies:
+    description: "Number of times the ticket was replied"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.replies
+  overdue_amount:
+    description: "Overdue amount (paid to the broker)"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.overdue_amount
+  leadtime_calendar_days:
+    description: "Ticket lead time in calendar days"
+  leadtime_business_days:
+    description: "Ticket lead time in business days"
+  interval_first_response:
+    description: "Ticket interval to receive the first response in calendar days"
+  first_day_of_month:
+    description: "First day of the month that the ticket was solved"
+  broker_waiting_analyst:
+    description: "Amount of calendar days the requester had to wait for a reply"
+  analyst_waiting_broker:
+    description: "Amount of calendar days the agent had to wait for a reply"
+  dt_extracted:
+    description: "Extraction date of the register"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.dt_extracted
+  dt_request_return:
+    description: "Date when the ticket was returned"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.dt_request_return
+  dt_submission:
+    description: "Date of ticket submission"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.dt_submission
+  dt_due_original:
+    description: "Original due date of the invoice"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.dt_due_original
+  dt_started:
+    description: "Date when the ticket started"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.dt_started
+  dt_payment_scheduled:
+    description: "Date scheduled for the payment of the invoice"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.dt_payment_scheduled
+  dt_payment_forwarded:
+    description: "Date forwarded for the payment of the invoice"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.dt_payment_forwarded
+  ts_created:
+    description: "Timestamp when the ticket was created"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.ts_created
+  ts_created_local:
+    description: "Timestamp when the ticket was created in Brasilia timezone"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.ts_created_local
+  ts_updated:
+    description: "Timestamp when the ticket was updated"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.ts_updated
+  ts_updated_local:
+    description: "Timestamp when the ticket was updated in Brasilia timezone"
+  ts_initially_assigned:
+    description: "Timestamp when the ticket was initially assigned"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.ts_initially_assigned
+  ts_initially_assigned_local:
+    description: "Timestamp when the ticket was initially assigned in Brasilia timezone"
+  ts_assigned:
+    description: "Timestamp when the ticket was last assigned"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.ts_assigned
+  ts_solved:
+    description: "Timestamp when the ticket was solved"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_metrics.ts_solved
+  ts_solved_local:
+    description: "Timestamp when the ticket was solved in Brasilia timezone"
+  ts_load:
+    description: "Timestamp when the ticket was loaded"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.ts_load
