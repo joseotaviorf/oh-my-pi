@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.month_start
     description: Date of the month start
-  dt_weekly_started:
+  dt_week_started:
     lineage:
       - datalake_quintoandar.aux_date.week_start
     description: Date of the week start
