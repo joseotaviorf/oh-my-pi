@@ -10,6 +10,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.raw_factory im
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.metric_factory import (
     MetricFactory,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.factories.enrich_factory import (
+    EnrichFactory,
+)
 from bietlejuice.base.pipeline import LayerEnum
 
 
@@ -23,6 +26,7 @@ class FactoryDispatcher:
         LayerEnum.DW: DWFactory,
         LayerEnum.METRIC: MetricFactory,
         LayerEnum.RAW: RawFactory,
+        LayerEnum.ENRICH: EnrichFactory,
     }
 
     def __init__(self, layer: LayerEnum) -> None:
