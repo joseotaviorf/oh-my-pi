@@ -1489,9 +1489,14 @@ bietlejuice.enrich_house_feature_inference:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_hub_services:
+  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb:load-clean-user-aud
+  - bietlejuice.ebdb:load-clean-user-merge
   - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets_for_sale:done-clean-business-unit-region
   - bietlejuice.hub_services:load-clean-business-unit
+  - bietlejuice.hub_services:load-clean-business-unit-region
   - bietlejuice.hub_services:load-clean-business-unit-region-aud
   - bietlejuice.hub_services:load-clean-lead
   - bietlejuice.hub_services:load-clean-member-profile
