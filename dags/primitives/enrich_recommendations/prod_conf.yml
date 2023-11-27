@@ -77,3 +77,7 @@ tables:
     is_incremental: true
     partition_cols:
       - dt_rec_received
+  email_funnel:
+    is_incremental: true
+    partition_cols:
+      - dt_email_sent
