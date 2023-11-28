@@ -5,12 +5,22 @@ owner: '@data-growth'
 domain: growth
 description: Contains ebdb and sindiconet enrich data about condominiums.
 columns:
+  uuid:
+    description: "Unique ID in uuid format"
+    lineage:
+      - datalake_ebdb_clean.condo.id
+      - datalake_sindico_net_clean.condominium.id
   id_source:
     description: "The unique identifier of the condo from the source origin."
     lineage:
       - datalake_ebdb_clean.condo.id
   id_address:
     description: "A hashed ID that is created by concatenating the address, number, neighborhood, zip code and city. It is used for geocoding (deduplicating condo)."
+  source:
+    description: "The source of data"
+    lineage:
+      - datalake_ebdb_clean
+      - datalake_sindico_net_clean
   condo:
     description: "The name of the condo."
     lineage:
@@ -67,7 +77,15 @@ columns:
     description: "The phone number of the condo."
     lineage:
       - datalake_ebdb_clean.condo_contact.phone_number
-  type_sindic:
+  dsr:
+    description: "Data Source Rating"
+    categories:
+      "0.4": "Sindiconet Condo Data Source Rating"
+      "0.5": "EBDB Condo Data Source Rating"
+    lineage:
+      - datalake_ebdb_clean
+      - datalake_sindico_net_clean
+  type_syndic:
     description: "The type of condominium manager (resident or professional)."
     lineage:
       - datalake_sindico_net_clean.condominium.type_sindic
@@ -152,6 +170,10 @@ columns:
     description: "Boolean value to indicate if the condominium has a sports court."
     lineage:
       - datalake_sindico_net_clean.condominium.has_sports_court
+  has_gym:
+    description: "Boolean value to indicate if the condominium has a gym."
+    lineage:
+      - datalake_sindico_net_clean.condominium.has_gym
   has_party_hall:
     description: "Boolean value to indicate if the condominium has a party hall."
     lineage:
@@ -168,6 +190,18 @@ columns:
     description: "Boolean value to indicate if the condo has piped gas."
     lineage:
       - datalake_sindico_net_clean.condominium.has_piped_gas
+  has_gourmet_area:
+    description: "Boolean value to indicate if the condo has gourmet area."
+    lineage:
+      - datalake_sindico_net_clean.condominium.has_gourmet_area
+  has_metro_or_train_close:
+    description: "Boolean value to indicate if the condo has metro or train close."
+    lineage:
+      - datalake_sindico_net_clean.condominium.has_metro_or_train_close
+  has_toy_library:
+    description: "Boolean value to indicate if the condo has toy library."
+    lineage:
+      - datalake_sindico_net_clean.condominium.has_toy_library
   has_water_reuse:
     description: "Boolean value to indicate if the condominium has a water reuse system."
     lineage:
@@ -184,6 +218,21 @@ columns:
       - datalake_sindico_net_clean.condominium.ts_updated
   ts_updated:
     description: "Timestamp of condominium data last update"
+    lineage:
+      - datalake_ebdb_clean.condo.ts_updated
+      - datalake_sindico_net_clean.condominium.ts_updated
+  year:
+    description: "Year of condominium data last update"
+    lineage:
+      - datalake_ebdb_clean.condo.ts_updated
+      - datalake_sindico_net_clean.condominium.ts_updated
+  month:
+    description: "Month of condominium data last update"
+    lineage:
+      - datalake_ebdb_clean.condo.ts_updated
+      - datalake_sindico_net_clean.condominium.ts_updated
+  day:
+    description: "Day of condominium data last update"
     lineage:
       - datalake_ebdb_clean.condo.ts_updated
       - datalake_sindico_net_clean.condominium.ts_updated

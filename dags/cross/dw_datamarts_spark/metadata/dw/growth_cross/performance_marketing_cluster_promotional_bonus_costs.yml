@@ -1,25 +1,45 @@
 ---
 database_name: dw_datamarts
 table_name: performance_marketing_cluster_promotional_bonus_costs
+domain: Growth
+owner: isabela.matsumoto@quintoandar.com.br
+description: This table contains information about promotional bonus costs attributed to affiliates.
 columns:
   sk_user:
+    description: "Unique identifier for the user."
     lineage:
       - dw_datamarts.performance_marketing_cluster_promotional_bonus.sk_user
   city_group:
+    description: "The related city group of the bonus cost."
     lineage:
       - dw_public.dim_region.city_group
   sk_date:
+    description: "SK of the date of the bonus calculation."
     lineage:
       - dw_public.dim_date.sk_date
   listing_date:
+    description: "Date of the house was listing"
     lineage:
       - dw_public.dim_date.date
   listing_week_start:
+    description: "Start date of the week in which of the house was listing"
     lineage:
       - dw_public.dim_date.week_start
   year_month:
+    description: "Year and month of the week in which of the house was listing"
     lineage:
       - dw_public.dim_date.year_month
   affiliate_type:
+    description: "The type of affiliate associated with the listing."
     lineage:
       - dw_datamarts.performance_marketing_cluster_promotional_bonus.affiliate_type
+  final_bonus_rent:
+    description: "Calculated final bonus amount for rental-related activities within the promotional campaign."
+    lineage:
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus.cnt_first_conversion_rent_only
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus.total_listings
+  final_bonus_sale:
+    description:  "Calculated final bonus amount for sales-related activities within the promotional campaign."
+    lineage:
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus.cnt_first_conversion_sale_only
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus.total_listings

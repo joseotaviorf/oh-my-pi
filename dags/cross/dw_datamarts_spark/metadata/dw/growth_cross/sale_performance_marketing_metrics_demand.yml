@@ -31,6 +31,10 @@ columns:
     description: Detail of the prospects status at that dt_event
     lineage:
       - dw_datamarts.buyer_prospect_status.status_detail
+  next_status:
+    description: The subsequent status in the buyer prospect's journey.
+    lineage:
+      - dw_datamarts.buyer_prospect_status.status
   ts_status_start:
     description: Timestamp that started prospect status
     lineage:
@@ -64,6 +68,10 @@ columns:
       Salvador: ""
       Santos: ""
       São José dos Campos: ""
+  flow_event:
+    description: The specific event within the sales and marketing flow.
+    lineage:
+      -  dw_public.dim_booking
   mkt_origin:
     description: Level of the Growth Marketing Taxonomy
     lineage:
@@ -122,6 +130,13 @@ columns:
       - dw_sale.dim_offer.utm_campaign
       - datalake_talk_to_agent.talk_to_agent.utm_campaign
       - datalake_marketing_costs.daily_costs.utm_campaign
+  campaign_context:
+    description: Returns the context of the campaign setted at the marketing plataform
+    lineage:
+      - dw_public.dim_booking.utm_campaign
+      - dw_sale.dim_offer.utm_campaign
+      - datalake_talk_to_agent.talk_to_agent.utm_campaign
+      - datalake_marketing_costs.daily_costs.utm_campaign
   utm_term:
     description: Returns the utm_term parameter defined at campaing configuration at marketing platforms
     lineage:
@@ -151,6 +166,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.id
       - dw_sale.fact_sale_flows.sk_house
+  is_3p:
+    description: Indicator of whether the source is a third-party entity.
+    lineage:
+      - datalake_ebdb_listing.house.is_3p_supply
+  is_3p_bh:
+    description: Specific indicator for third-party involvement in the Belo Horizonte region.
+    lineage:
+     - datalake_ebdb_listing.house.is_3p_supply_bh
   sk_offer:
     description: Offer id
     lineage:
@@ -197,3 +220,23 @@ columns:
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
+  budget:
+    description: Allocated budget for the marketing campaign.
+    lineage:
+      - datalake_gsheets_clean.mkt_cost_per_source.daily_value
+  new_buyer_prospects_target:
+    description: Target metrics for acquiring new buyer prospects.
+    lineage:
+      - datalake_gsheets_clean.sale_nbp_source_targets.nbp_target
+  recovered_buyer_prospects_target:
+    description: Target metrics for recovering previous buyer prospects.
+    lineage:
+      - datalake_gsheets_clean.sale_nbp_source_targets.rbp_target
+  sale_flows_target:
+    description: Target goals for the sales flow processes.
+    lineage:
+      - datalake_gsheets_clean.sale_flows_targets.sf_target
+  marketing_cost:
+    description: Total cost associated with the marketing activities.
+    lineage:
+      - datalake_marketing_costs.daily_costs.cost

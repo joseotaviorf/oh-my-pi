@@ -5,10 +5,20 @@ owner: '@data-growth'
 domain: growth
 description: Deduplicated condos with calculated score for each condo information and id_dejavu (that represents unique address).
 columns:
+  id_dedup:
+    description: "Unique identifier for the deduplicated condo record."
+    lineage:
+      - datalake_vespucio.condo_full.uuid
+      - datalake_vespucio.dejavu.id_dejavu
   id_dejavu:
     description: "Dejavu Id - unique id for the address"
     lineage:
       - datalake_vespucio.dejavu.id_dejavu
+  id_source_list:
+    description: "List of source and id_source"
+    lineage:
+      - datalake_vespucio.condo_full.source
+      - datalake_vespucio.condo_full.id_source
   source:
     description: "The source of data: EBDB or SindicoNet"
     lineage:
@@ -57,8 +67,11 @@ columns:
     description: "The phone number of the condo."
     lineage:
       - datalake_vespucio.condo_full.phone_number
-  type_sindic:
-    description: "The type of condominium manager (resident or professional)."
+  type_syndic:
+    description: "The type of condominium manager."
+    categories:
+        resident: When syndic is also a resident
+        professional: When syndic is a manager from company
     lineage:
       - datalake_vespucio.condo_full.type_sindic
   account_type:
@@ -137,6 +150,10 @@ columns:
     description: "Boolean value to indicate if the condominium has a sports court."
     lineage:
       - datalake_vespucio.condo_full.has_sports_court
+  has_gym:
+    description: "Boolean value to indicate if the condominium has a gym."
+    lineage:
+      - datalake_vespucio.condo_full.has_gym
   has_party_hall:
     description: "Boolean value to indicate if the condominium has a party hall."
     lineage:
@@ -161,10 +178,10 @@ columns:
     description: "Boolean value to indicate if the condominium has a water reuse system."
     lineage:
       - datalake_vespucio.condo_full.has_metro_or_train_close
-  hast_toy_library:
+  has_toy_library:
     description: "Boolean value to indicate if the condominium has a water reuse system."
     lineage:
-      - datalake_vespucio.condo_full.hast_toy_library
+      - datalake_vespucio.condo_full.has_toy_library
   has_water_reuse:
     description: "Boolean value to indicate if the condominium has a water reuse system."
     lineage:
