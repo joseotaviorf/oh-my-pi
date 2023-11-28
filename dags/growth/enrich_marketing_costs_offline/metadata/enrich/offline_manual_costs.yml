@@ -1,73 +1,107 @@
 database_name: datalake_marketing_costs
 table_name: offline_manual_costs
+domain: Growth
+owner: "@data-growth"
+description: This table aggregates manually entered offline marketing costs, detailing expenditures across various campaigns and operational aspects. All information comes from a gsheet.
 columns:
   id_rule_city_group_rent:
+    description: Identifier for the city group rent rule.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.id_rule_city_group_rent
   id_rule_city_group_sale:
+    description: Identifier for the city group sale rule.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.id_rule_city_group_sale
   id_rule_cost_center:
+    description: Identifier for the cost center rule.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.id_rule_cost_center
   email:
+    description: Email address of the employee responsible for the cost entry.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.email
   team:
+    description: Team responsible for or associated with the cost entry.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.team
   entry_type:
+    description: Type of the entry, indicating the nature of the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.entry_type
   invoice_number:
+    description: Unique invoice number associated with the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.invoice_number
   cnpj:
+    description: CNPJ number of the service provider or vendor.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.cnpj
   vendor_name:
+    description: Name of the vendor or service provider linked to the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.vendor_name
   description:
+    description: Brief description of the service or cost incurred.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.description
   campaign_name:
+    description: Name of the marketing campaign associated with the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.campaign_name
   cost_category:
+    description: Broad category of the cost, like 'Branding' or 'Campaign' or 'Content'.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.cost_category
   cost_subcategory:
+    description: More specific subcategory of the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.cost_subcategory
   action:
+    description: Type of action related to the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.action
   business_context:
+    description: Context of the business operation related to the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.business_context
   cost_center:
+    description: Specific cost center associated with the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.cost_center
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_share_cost_center.cost_center
   city_group:
+    description: The related city group of the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.city_group
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_share_city_group.city_group
   cost:
+    description: Total cost amount for the specific entry.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.cost
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_share_cost_center.share
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_share_city_group.share
+  has_city_group_share:
+    description: Indicator if the cost is shared among city groups.
+    lineage:
+      - datalake_gsheets_clean.marketing_offline_manual_costs.has_city_group_share_1
+      - datalake_gsheets_clean.marketing_offline_manual_costs.has_city_group_share_2
+  has_cost_center_share:
+    description: Indicator if the cost is shared among different cost centers.
+    lineage:
+      - datalake_gsheets_clean.marketing_offline_manual_costs.has_cost_center_share
   ts_entry:
+    description: Timestamp when the cost entry was recorded.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.ts_entry
   dt_invoice:
+    description: Date of the invoice associated with the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.dt_invoice
   dt_service_started:
+    description: Start date of the service or operation leading to the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.dt_service_started
   dt_service_ended:
+    description: End date of the service or operation leading to the cost.
     lineage:
       - datalake_marketing_offline_costs_clean.marketing_offline_manual_costs.dt_service_ended
