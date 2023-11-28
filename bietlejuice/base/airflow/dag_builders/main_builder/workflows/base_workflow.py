@@ -1,12 +1,14 @@
 from datetime import datetime
 
 from airflow import DAG
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.builder_interface import (
     BuilderInterface,
 )
+from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
@@ -79,3 +81,14 @@ class BaseWorkflow(BuilderInterface):
             )
 
         return doc_md
+
+    def _has_data_quality_tests(self, table_attributes: TableAttributes) -> bool:
+        """
+        Checks if a data quality tests file exists for the provided table.
+        """
+        return DAGPackagesPathService.artifact_file_exists(
+            artifact_type="data_quality",
+            dag_name=self.dag_name,
+            layer=table_attributes.layer.value,
+            table_name=table_attributes.table_name,
+        )

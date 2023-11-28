@@ -4,6 +4,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.base_factory i
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.enrich_query_workflow import (
+    EnrichQueryWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
 )
@@ -15,7 +18,7 @@ class EnrichFactory(BaseFactory):
     an object of a DW Workflow (DAG), based on parameters.
     """
 
-    _WORKFLOW_ENUM_TO_CLASS_MAPPING = {}
+    _WORKFLOW_ENUM_TO_CLASS_MAPPING = {WorkflowEnum.QUERY_WORKFLOW: EnrichQueryWorkflow}
 
     def __init__(self, dag_conf: dict, workflow_conf: dict, cluster_conf: dict):
         super().__init__()
