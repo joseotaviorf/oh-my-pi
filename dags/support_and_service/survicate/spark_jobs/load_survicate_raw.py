@@ -165,23 +165,24 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             """
         )
 
-    if __name__ == "__main__":
-        parser = ArgumentParser(description=JOB_NAME)
-        parser.add_argument("environment")
-        parser.add_argument("datalake_bucket")
-        parser.add_argument("source")
-        parser.add_argument("raw_table_name")
-        parser.add_argument("execution_date")
 
-        args = parser.parse_args()
+if __name__ == "__main__":
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("environment")
+    parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+    parser.add_argument("raw_table_name")
+    parser.add_argument("execution_date")
 
-        logger.info(
-            f"""
-            m={JOB_NAME},
-            environment={args.environment}, source={args.source}, execution_date={args.execution_date}, table_name={args.raw_table_name},
-            datalake_bucket={args.datalake_bucket}, tables_config={args.tables_config}, partition_cols={args.partition_cols}
-            msg=Spark job arguments
-            """
-        )
+    args = parser.parse_args()
 
-        _load_dataframe_into_datalake(args)
+    logger.info(
+        f"""
+        m={JOB_NAME},
+        environment={args.environment}, source={args.source}, execution_date={args.execution_date},
+        datalake_bucket={args.datalake_bucket}, table_name={args.raw_table_name}
+        msg=Spark job arguments
+        """
+    )
+
+    _load_dataframe_into_datalake(args)
