@@ -4,4 +4,36 @@ table_name: inapp_affiliates
 owner: data-growth@quintoandar.com
 domain: growth
 description: Table with details about communications sent in-app to affiliates.
-columns: {}
+columns:
+  id_user_braze:
+    description: Unique code to identify an user created by Braze.
+    lineage:
+      - datalake_braze.events_affiliates.id_user_braze
+  id_user_dispatch:
+    description: The combination of id_dispatch and id_user.
+    lineage:
+      - datalake_braze.events_affiliates.id_user_dispatch
+  id_user:
+    description: Unique code to identify an user created here at QuintoAndar.
+    lineage:
+      - datalake_braze.events_affiliates.id_user
+  event_channel:
+    description: Through where the event occurred. In this table it's going to be only inappmessage.
+    lineage:
+      - datalake_braze.events_affiliates.event_channel
+  ts_inapp_impressioned:
+    description: Timestamp of when the in-app communication was visualized.
+    lineage:
+      - datalake_braze.events_affiliates.ts_event
+  year:
+    description: Year of when the information was updated.
+    lineage:
+      - datalake_braze.events_affiliates.year
+  month:
+    description: Month of when the information was updated.
+    lineage:
+      - datalake_braze.events_affiliates.month
+  day:
+    description: Day of when the information was updated.
+    lineage:
+      - datalake_braze.events_affiliates.day
