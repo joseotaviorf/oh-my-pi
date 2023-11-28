@@ -14,9 +14,10 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 This pipeline produces the following output table in DW, via full load: 
 
-- `credit.dim_credit_analysis`
-- `credit.dim_experiment`
-- `credit.dim_guarantee_policy`
-- `credit.dim_variant`
-- `credit.fact_proposal_credit_flows`
-- `credit.fact_fintechops_tasks`
+- `dw_credit.dim_credit_analysis`
+- `dw_credit.dim_experiment`
+- `dw_credit.dim_guarantee_policy`
+- `dw_credit.dim_variant`
+- `dw_credit.fact_proposal_credit_flows`
+- `dw_credit.fact_fintechops_tasks`
+- `dw_credit.fact_credit_engine_analysis_request`

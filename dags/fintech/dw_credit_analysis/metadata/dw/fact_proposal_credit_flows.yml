@@ -187,4 +187,4 @@ columns:
       QUINTOANDAR: Default rental administrator, which is QuintoAndar.
       THIRD_PARTY: The rental administrator is a third party real estate agency.
   ts_load:
-    description: "Timestamp of data recorded in the table"
+    description: "Timestamp of data recorded in the table."

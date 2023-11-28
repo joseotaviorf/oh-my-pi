@@ -1,0 +1,90 @@
+database_name: dw_credit
+table_name: fact_credit_engine_analysis_request
+description: "This table stores data about any credit analysis request processed by the credit engine. Each line is a unique checklist item from a checklist, which presents all checks (manual or automatic) performed in an analysis request."
+domain: Fintech
+owner: isabella.santos@quintoandar.com.br
+columns:
+  sk_checklist_item:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.id_checklist_item
+    description: "Key of the checklist item."
+  sk_checklist:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.id_checklist
+    description: "Key of the checklist."
+  sk_checklist_group:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.id_checklist_group
+    description: "Key of the checklist group."
+  sk_input_source:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.id_input_source
+    description: "Key of the input source. This ID is the analyst ID for manual analysis (manual input type) or the machine ID for automatic analysis (automatic input type)."
+  sk_analysis_request:
+    lineage:
+      - datalake_credit_analysis.credit_engine_analysis_request.id_analysis_request
+    description: "Key of the analysis request."
+  sk_proposal:
+    lineage:
+      - datalake_credit_analysis.credit_engine_analysis_request.id_proposal
+    description: "Key of the proposal related to the analysis request. This column can be used with other dimensions, such as dim_proposal, to retrive detailed information of a proposal"
+  input_type:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.input_type
+    description: "Type of the input"
+    categories:
+      MANUAL: Manual inputs that require interventions from the credit desk.
+      AUTOMATIC: Automatic inputs processed by the credit engine.
+  checklist_item_type:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.checklist_item_type
+    description: "Type of the checklist item"
+  checklist_group_subject_type:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.checklist_group_subject_type
+    description: "Type of the checklist group."
+    categories:
+      PROPOSAL: When the checklist items to be verified belongs to a proposal analysis request
+      PROPOSAL_DECISION: When the checklist items to be verified refers to a proposal decision
+      TENANT: When the checklist items to be verified refers to a tenant
+  input_value:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.input_value
+    description: "Value of the input"
+  input_description:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.input_description
+    description: "Description of the input"
+  checklist_decision:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.checklist_decision
+    description: "Final checklist decision. This column is null when a decision is still pending"
+    categories:
+      APPROVED: When the analysis request is approved
+      REJECTED: When the analysis is rejected
+  business_context:
+    lineage:
+      - datalake_credit_analysis.credit_engine_analysis_request.business_context
+    description: "Description of the input"
+  is_checklist_group_compliant:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.is_checklist_group_compliant
+    description: "This column is a boolean indicating if the checklist group is compliant. If there is any item from the group that is nor compliant, it will be false. If there is any checklist item missing verification, it will be null. Otherwise, if all the items from the checklist group are compliant this column will be true."
+  is_checklist_item_compliant:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.is_checklist_item_compliant
+    description: "This column is boolean field that indicates if given the input the item is compliant or not."
+  is_current_checklist:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.is_current_checklist
+    description: "This column is boolean field that indicates if the checklist is the current checklist or not."
+  ts_analysis_request_created:
+    lineage:
+      - datalake_credit_analysis.credit_engine_analysis_request.ts_analysis_request_created
+    description: "Timestamp of the date in which the analysis request was opened."
+  ts_analysis_request_last_update:
+    lineage:
+      - datalake_credit_analysis.credit_engine_analysis_request.ts_analysis_request_updated
+    description: "Timestamp of the last update of the analysis."
+  ts_load:
+    description: "Timestamp of data recorded in the table"

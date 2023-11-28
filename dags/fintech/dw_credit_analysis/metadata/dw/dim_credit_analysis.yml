@@ -13,6 +13,14 @@ columns:
     lineage:
       - datalake_credit_analysis.credit_analysis.id_proposal
     description: "Proposal ID."
+  id_analysis_request:
+    lineage:
+      - datalake_credit_analysis.credit_engine_analysis_request.id_analysis_request
+    description: "ID of the analysis request processed by the credit engine. This column may be null when the credit analysis was processed by the old credit engine."
+  id_checklist:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.id_checklist
+    description: "ID of the current checklist. The checklist is an entity with all checks (manual or automatic) associated to an analysis request. This column may be null when the credit analysis was processed by the old credit engine."
   id_analyst:
     lineage:
       - datalake_credit_analysis.credit_analysis.id_analyst
