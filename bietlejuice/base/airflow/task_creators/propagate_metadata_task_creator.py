@@ -58,14 +58,14 @@ class PropagateMetadataTaskCreator(BaseTaskCreator):
 
     def _get_raw_params(self, product_database_name: str) -> list:
         return [
-            self.environment_attributes.dag_args["name"],
+            self.dag_execution_context.dag_args["name"],
             "--product-database-name",
             product_database_name,
             "--table-name",
         ]
 
     def _get_product_database_name(self) -> str:
-        return self.environment_attributes.workflow_args.get(
+        return self.dag_execution_context.workflow_args.get(
             "lineage_product_database_name", ""
         )
 

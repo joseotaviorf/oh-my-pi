@@ -18,7 +18,7 @@ class SyncHivePartitionsTaskCreator(BaseTaskCreator):
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         task_id = self.generate_task_id(table_attributes)
         parameters = [
-            self.environment_attributes.bucket,
+            self.dag_execution_context.bucket,
             table_attributes.layer.value,
             table_attributes.schema,
             "--table-name",

@@ -11,4 +11,4 @@ class DummyJobClusterFinishedTaskCreator(BaseTaskCreator):
         """
         Creates the job-cluster-finished DummyOperator task to indicate the end of a DAG that uses Job Cluster
         """
-        return DummyOperator(dag=self.environment_attributes.dag, task_id=self._TASK_ID)
+        return DummyOperator(dag=self.dag_execution_context.dag, task_id=self._TASK_ID)

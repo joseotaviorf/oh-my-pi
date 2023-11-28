@@ -4,8 +4,8 @@ from os import path
 
 from airflow.models.baseoperator import BaseOperator
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
-from bietlejuice.base.airflow.task_creators.environment_attributes import (
-    EnvironmentAttributes,
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.formatters.string_formatter import StringFormatter
@@ -23,8 +23,8 @@ class BaseTaskCreator(ABC):
     _TASK_ID_TEMPLATE = "prefix-{layer}-{table_name}"
     """Used to generate the task name. Supports {layer}, {table_name} and {schema} as placeholders. Override in subclasses."""
 
-    def __init__(self, environment_attributes: EnvironmentAttributes) -> None:
-        self.environment_attributes = environment_attributes
+    def __init__(self, dag_execution_context: DagExecutionContext) -> None:
+        self.dag_execution_context = dag_execution_context
 
     @abstractmethod
     def create_task(self, table_attributes: TableAttributes = None) -> BaseOperator:
@@ -40,12 +40,12 @@ class BaseTaskCreator(ABC):
 
         return QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id="databricks_job_cluster",
-            dag=self.environment_attributes.dag,
+            dag=self.dag_execution_context.dag,
             task_id=task_id,
             json={
                 "spark_python_task": {
                     "python_file": path.join(
-                        self.environment_attributes.base_spark_jobs_path,
+                        self.dag_execution_context.base_spark_jobs_path,
                         f"{spark_job_name}.py",
                     ),
                     "parameters": job_parameters,

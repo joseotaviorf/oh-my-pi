@@ -52,7 +52,7 @@ class TableAttributes:
         return table_extraction_type
 
     def _get_partitions(self):
-        default_partitions = self._workflow_args.get("default_partitions")
+        default_partitions = self._workflow_args.get("default_partitions", [])
         table_partitions = self._table_customization.get(
             "partitions", default_partitions
         )

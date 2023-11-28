@@ -7,9 +7,9 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
 
     _TASK_ID = "execute-job-cluster"
 
-    def __init__(self, environment_attributes, config_service):
-        super().__init__(environment_attributes)
-        self.cluster_args = environment_attributes.cluster_args
+    def __init__(self, dag_execution_context, config_service):
+        super().__init__(dag_execution_context)
+        self.cluster_args = dag_execution_context.cluster_args
         self.config_service = config_service
 
     def _get_cluster_params(self) -> dict:
@@ -38,7 +38,7 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
 
         return QuintoAndarDatabricksExecuteJobClusterOperator(
             databricks_conn_id="databricks_job_cluster",
-            dag=self.environment_attributes.dag,
+            dag=self.dag_execution_context.dag,
             task_id=self._TASK_ID,
             cluster_configuration=cluster_params["cluster_configuration"],
             libraries=cluster_params["libraries"],

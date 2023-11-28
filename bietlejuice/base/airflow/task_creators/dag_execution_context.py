@@ -4,7 +4,7 @@ from bietlejuice.base.pipeline import EnvironmentEnum
 
 
 @dataclass
-class EnvironmentAttributes:
+class DagExecutionContext:
     dag: DAG
     environment: str
     bucket: str
@@ -12,6 +12,7 @@ class EnvironmentAttributes:
     dag_args: dict
     workflow_args: dict
     cluster_args: dict
+    execution_date: str = "{{ ds }}"
 
     def __post_init__(self):
         assert self.dag is not None, "DAG is required"
