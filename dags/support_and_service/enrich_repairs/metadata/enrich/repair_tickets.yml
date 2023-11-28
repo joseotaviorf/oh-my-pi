@@ -1,0 +1,181 @@
+database_name: datalake_repairs
+table_name: repair_tickets
+description: Enrichment table that aims to consolidate information from the repair
+  service flow. Each line in this table represents a service ticket for this flow.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_ticket:
+    description: Unique identification key for the service ticket.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  id_request:
+    description: Repair request identification key.
+    lineage:
+      - datalake_repairs_clean.repair_request.id
+  id_contract:
+    description: Identification key of the contract related to the service.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  group_name:
+    description: Discursive data that indicates the department to which the service ticket is linked.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+  client_type:
+    description: Type of customer who requested service.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+  status:
+    description: Descriptive data that indicates the stage in which the service is at.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+  custom_fields:
+    description: Given in json format that brings together additional information for the service.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  tags:
+    description: Descriptive data that indicates the process tags used during the service.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  ticket_via:
+    description: Descriptive data that indicates which platform the ticket was brought through.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ticket_via
+  channel:
+    description: Descriptive data that indicates which service channel was used.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.channel
+  agent_email:
+    description: Descriptive data that indicates the analyst's email linked to the ticket.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.agent_email
+  agent_organization:
+    description: Descriptive data that indicates the company in which the analyst linked to the ticket works.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.agent_organization
+  service_provider:
+    description: Data in json format that indicates which company was the provider and the date on which the information was made available.
+    lineage:
+      - datalake_repairs_clean.repair_request.service_provider
+  theme:
+    description: Descriptive data that indicates a tag related to taxonomies.
+    lineage:
+      - datalake_customer_support.chat.contact_theme_tag
+      - datalake_customer_support.call.contact_theme_tag
+      - datalake_customer_support.email.contact_theme_tag
+  theme_detail:
+    description: Descriptive data that indicates the detail of a tag related to taxonomies.
+    lineage:
+      - datalake_customer_support.chat.contact_theme_detail_tag
+      - datalake_customer_support.call.contact_theme_detail_tag
+      - datalake_customer_support.email.contact_theme_detail_tag
+  request_type:
+    description: Descriptive information indicating the repair responsibility tag.
+    lineage:
+      - datalake_customer_support.chat.request_type
+      - datalake_customer_support.call.request_type
+      - datalake_customer_support.email.request_type
+  customer_type_tag:
+    description: Type of user identified in the tags.
+    lineage:
+      - datalake_customer_support.chat.customer_type_tag
+      - datalake_customer_support.call.customer_type_tag
+      - datalake_customer_support.email.customer_type_tag
+  motivation:
+    description: More taxonomy information to identify motivation.
+    lineage:
+      - datalake_customer_support.chat.contact_motivation_tag
+      - datalake_customer_support.call.contact_motivation_tag
+      - datalake_customer_support.email.contact_motivation_tag
+  front_or_back:
+    description: Descriptive information that indicates whether the ticket is a back or front ticket.
+    lineage:
+      - datalake_customer_support.chat.front_or_back
+      - datalake_customer_support.call.front_or_back
+      - datalake_customer_support.email.front_or_back
+  comment_csat:
+    description: Descriptive information that contains the customer's comment on the satisfaction survey.
+    lineage:
+      - datalake_survicate.repairs_surveys.respondent_comments
+  csat_tags:
+    description: Descriptive information that indicates which tags were added to the service.
+    lineage:
+      - datalake_survicate.repairs_surveys.improvement_tags
+  csat_score:
+    description: Notation that the customer gave to the customer service.
+    lineage:
+      - datalake_survicate.repairs_surveys.satisfaction_score
+  csat_partes:
+    description: Secondary Notation that the customer gave to the service.
+    lineage:
+      - datalake_survicate.repairs_surveys.secondary_satisfaction_score
+  has_chat_negociation:
+    description: Boolean data that indicates whether the repair was negotiated via chat.
+  reopens:
+    description: Integer type data that indicates the number of times the ticket was reopened.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.reopens
+  replies:
+    description: Integer type data that indicates the number of times the ticket was replied.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.replies
+  relisting:
+    description: Integer type data that indicates the number of times the listing was updated.
+  minutes_first_reply_time_calendar:
+    description: Integer type data that indicates the time in minutes until the first service response.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_reply_calendar
+  entrance_date:
+    description: Date on which the contract came into effect.
+    lineage:
+      - datalake_ebdb_contract.contract.dt_entered
+  definition_date:
+    description: Date of the of the repair request.
+    lineage:
+      - datalake_repairs_clean.repair_request.ts_updated
+  ts_first_interaction:
+    description: Date in timestamp format of the first iteration of the repair request.
+  ts_created_local:
+    description: Date in timestamp format that indicates when the ticket was created.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created_local
+  ts_updated_local:
+    description: Date in timestamp format that indicates when the ticket was updated.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
+  ts_closed_local:
+    description: Date in timestamp format that indicates when the ticket was closed.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_closed_local
+  ts_solved_local:
+    description: Date in timestamp format that indicates when the ticket was solved.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_solved_local
+  ts_request_created:
+    description: Date in timestamp format that indicates when the repair request was created.
+    lineage:
+      - datalake_repairs_clean.repair_request.ts_created
+  ts_csat_response_submitted:
+    description: Date in timestamp format that indicates when the satisfaction survey was completed.
+    lineage:
+      - datalake_survicate.repairs_surveys.ts_submitted
+  ts_initially_assigned_local:
+    description: Date in timestamp format that indicates when the first analyst to answer the ticket signed it.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned_local
+  ts_last_assigned_local:
+    description: Date in timestamp format that indicates when the last analyst to answer the ticket signed it.
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_last_assigned_local
+  year:
+    description: Partition data, referring to the year of the ticket update date.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
+  month:
+    description: Partition data, referring to the month of the ticket update date.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
+  day:
+    description: Partition data, referring to the day of the ticket update date.
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
