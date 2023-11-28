@@ -6,6 +6,12 @@ workflow:
   type: query
   layer: dw
   custom_schema: collection_recovery
+  inner_dependencies:
+    fact_invoice_collections_cycle:
+      - fact_debt
+      - bridge_map_debt_negotiation
+      - fact_negotiation
+      - fact_negotiation_installment
 cluster:
   type: databricks_10_4_min_general_cluster
   access_control_list:

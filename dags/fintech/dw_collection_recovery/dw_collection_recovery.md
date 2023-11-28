@@ -23,4 +23,5 @@ This pipeline produces the following output tables:
 - `dw_collection_recovery.fact_negotiation`
 - `dw_collection_recovery.fact_overdue_portfolio_timeline`
 - `dw_collection_recovery.bridge_map_debt_negotiation`
+- `dw_collection_recovery.fact_invoice_collections_cycle`
 </details>
