@@ -2213,6 +2213,7 @@ bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.ebdb:load-clean-booking
   - bietlejuice.ebdb:load-clean-condo-amenities
   - bietlejuice.ebdb:load-clean-house-aud
+  - bietlejuice.ebdb:load-clean-house-predicted-price
   - bietlejuice.ebdb:load-clean-info-amenities-aud
   - bietlejuice.ebdb:load-clean-info-condo-amenities-aud
   - bietlejuice.ebdb:load-clean-listing-business-context

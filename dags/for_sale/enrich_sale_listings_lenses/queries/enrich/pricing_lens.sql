@@ -10,6 +10,50 @@ WITH historical_prices AS (
   FROM 
     datalake_sale_listings.sale_listing_price_changes
 ),
+actual_prices AS (
+  SELECT
+    h.id AS id_house,
+    h.id_region, 
+    h.sale_price,
+    p.p_50 AS calculator_sale_price,
+    p.certainty AS calculator_certainty,
+    (h.sale_price / p.p_50) - 1. AS diff_calculator_price,
+    CURRENT_TIMESTAMP() AS ts_price_started
+  FROM
+    datalake_ebdb_listing.house AS h
+  LEFT JOIN 
+    datalake_ebdb_clean.house_predicted_price AS p
+      ON h.id = p.id_house
+      AND p.business_context = 'SALE'
+  WHERE 
+    h.sale_price IS NOT NULL 
+    AND h.sale_price > 0 
+),
+prices_dataset AS (
+  SELECT 
+    id_house,
+    id_region,
+    sale_price,
+    calculator_sale_price,
+    calculator_certainty,
+    diff_calculator_price,
+    FALSE AS is_actual,
+    ts_price_started
+  FROM 
+    historical_prices
+  UNION ALL 
+  SELECT 
+    id_house,
+    id_region,
+    sale_price,
+    calculator_sale_price,
+    calculator_certainty,
+    diff_calculator_price,
+    TRUE AS is_actual,
+    ts_price_started
+  FROM 
+    actual_prices
+),
 great_price_tag_status_by_day AS ( 
   SELECT 
     lbc.id_house,
@@ -50,31 +94,32 @@ great_price_tag_status AS (
 ),
 create_business_bins AS (
   SELECT 
-    hp.id_house, 
-    hp.id_region, 
+    d.id_house, 
+    d.id_region, 
     CASE 
-      WHEN hp.calculator_certainty IS NULL THEN 'NONE'
-      ELSE hp.calculator_certainty 
+      WHEN d.calculator_certainty IS NULL THEN 'NONE'
+      ELSE d.calculator_certainty 
     END AS certainty_calculator_bins, 
     CASE 
-      WHEN hp.calculator_sale_price IS NULL OR hp.calculator_sale_price = 0 THEN 'T- Undefined'
-      WHEN hp.diff_calculator_price < -0.25 THEN 'T6 < -25%'
-      WHEN hp.diff_calculator_price BETWEEN -0.25 AND 0.00 THEN 'T5 (-25% | 0%]'
-      WHEN hp.diff_calculator_price BETWEEN 0.00 AND 0.15 THEN 'T4 (0% | 15%]'
-      WHEN hp.diff_calculator_price BETWEEN 0.15 AND 0.25 THEN 'T3 (15% | 25%]'
-      WHEN hp.diff_calculator_price BETWEEN 0.25 AND 0.50 THEN 'T2 (25% | 50%]'
-      WHEN hp.diff_calculator_price > 0.50 THEN 'T1 > 50%'
+      WHEN d.calculator_sale_price IS NULL OR d.calculator_sale_price = 0 THEN 'T- Undefined'
+      WHEN d.diff_calculator_price < -0.25 THEN 'T6 < -25%'
+      WHEN d.diff_calculator_price BETWEEN -0.25 AND 0.00 THEN 'T5 (-25% | 0%]'
+      WHEN d.diff_calculator_price BETWEEN 0.00 AND 0.15 THEN 'T4 (0% | 15%]'
+      WHEN d.diff_calculator_price BETWEEN 0.15 AND 0.25 THEN 'T3 (15% | 25%]'
+      WHEN d.diff_calculator_price BETWEEN 0.25 AND 0.50 THEN 'T2 (25% | 50%]'
+      WHEN d.diff_calculator_price > 0.50 THEN 'T1 > 50%'
     END AS pricing_bins,
-    COALESCE(has_great_sale_price_tag, FALSE) AS has_great_price_tag,
-    hp.ts_price_started
+    COALESCE(t.has_great_sale_price_tag, FALSE) AS has_great_price_tag,
+    d.is_actual,
+    d.ts_price_started
   FROM
-    historical_prices AS hp 
+    prices_dataset AS d 
   LEFT JOIN 
-    great_price_tag_status AS pt 
-      ON hp.id_house = pt.id_house
-      AND DATE_TRUNC('DAY', hp.ts_price_started) BETWEEN pt.dt_change AND COALESCE(pt.dt_next_change, CURRENT_TIMESTAMP)
+    great_price_tag_status AS t
+      ON d.id_house = t.id_house
+      AND DATE_TRUNC('DAY', d.ts_price_started) BETWEEN t.dt_change AND COALESCE(t.dt_next_change, CURRENT_TIMESTAMP)
   QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY hp.id_house, hp.ts_price_started ORDER BY pt.ts_change ASC) = 1 
+    ROW_NUMBER() OVER (PARTITION BY d.id_house, d.ts_price_started ORDER BY t.ts_change ASC) = 1 
 ),
 score_business_logic AS (
   SELECT
@@ -116,6 +161,7 @@ score_business_logic AS (
       ELSE 'The listings price is 50% or more over the calculators p50 predicted price.'
     END AS tier_disclaimer,
     has_great_price_tag,
+    is_actual,
     ts_price_started
   FROM 
     create_business_bins
@@ -129,12 +175,73 @@ grouping_tiers AS (
     tier,
     tier_disclaimer,
     has_great_price_tag,
+    is_actual,
     ts_price_started AS ts_tier_started
   FROM
     score_business_logic
   QUALIFY 
-    ts_price_started = MIN(ts_price_started) OVER (PARTITION BY id_house) 
-    OR tier != LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_price_started) 
+    tier IS DISTINCT FROM LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_price_started)
+    OR is_actual = TRUE
+),
+check_to_filter_the_current_photo_as_the_last_tier AS (
+  SELECT 
+    id_house, 
+    id_region,
+    pricing_bins,
+    certainty_calculator_bins,
+    tier,
+    tier_disclaimer,
+    has_great_price_tag,
+    is_actual,
+    ROW_NUMBER() OVER (PARTITION BY id_house, is_actual ORDER BY ts_tier_started DESC) = 1 AS is_check,
+    ts_tier_started
+  FROM 
+    grouping_tiers
+),
+filtering_the_current_photo_as_the_last_tier AS (
+  SELECT 
+    id_house, 
+    id_region,
+    pricing_bins,
+    certainty_calculator_bins,
+    tier,
+    tier_disclaimer,
+    has_great_price_tag,
+    is_actual,
+    LAG(ts_tier_started) OVER (PARTITION BY id_house ORDER BY ts_tier_started ASC) AS ts_tier_started
+  FROM 
+    check_to_filter_the_current_photo_as_the_last_tier
+  WHERE 
+    is_check IS TRUE 
+), 
+corrected_history AS (
+  SELECT
+    id_house, 
+    id_region,
+    pricing_bins,
+    certainty_calculator_bins,
+    tier,
+    tier_disclaimer,
+    has_great_price_tag,
+    ts_tier_started
+  FROM
+    check_to_filter_the_current_photo_as_the_last_tier 
+  WHERE 
+    is_check IS FALSE
+  UNION ALL 
+  SELECT 
+    id_house, 
+    id_region,
+    pricing_bins,
+    certainty_calculator_bins,
+    tier,
+    tier_disclaimer,
+    has_great_price_tag,
+    ts_tier_started
+  FROM
+    filtering_the_current_photo_as_the_last_tier
+  WHERE 
+    is_actual IS TRUE
 ),
 aux AS (
   SELECT 
@@ -156,7 +263,9 @@ aux AS (
     TO_DATE(ts_tier_started) AS ts_tier_started,
     TO_DATE(LEAD(ts_tier_started) OVER (PARTITION BY id_house ORDER BY ts_tier_started)) AS ts_tier_ended
   FROM
-    grouping_tiers
+    corrected_history
+  WHERE 
+    ts_tier_started IS NOT NULL 
 )
 SELECT 
   id_house, 
