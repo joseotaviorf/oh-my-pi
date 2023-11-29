@@ -14,6 +14,10 @@ columns:
     - datalake_braze_user_centric_periodicity.user_events_all_time_before.id_user_braze
     description: Key of the user on the Braze Platform. It is NOT the same sk as our
       sk_user.
+  sk_user:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.id_user
+    description: Key of the user on QuintoAndar Platform.
   total_campaigns_sent_to_same_week:
     lineage:
     - datalake_braze_user_centric_periodicity.user_events_same_week.total_campaigns_sent_to
@@ -130,6 +134,26 @@ columns:
     description: Total of send events (either campaigns or canvases) sent to the user
       on the Owners App Group since the start of our currents implementation until
       D-1 of the dt_snapshot.
+  total_affiliate_communications_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_affiliate_communications_sent_to
+    description: Total number of communications (either campaigns or canvases) sent to the user in the Affiliate App Group during the same week as the dt_snapshot.
+  total_affiliate_communications_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_affiliate_communications_sent_to
+    description: Total number of communications (either campaigns or canvases) sent to the user in the Affiliate App Group during the week preceding the dt_snapshot week.
+  total_affiliate_communications_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_affiliate_communications_sent_to
+    description: Total number of communications (either campaigns or canvases) sent to the user in the Affiliate App Group during the second week before the dt_snapshot week.
+  total_affiliate_communications_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_affiliate_communications_sent_to
+    description: Total number of communications (either campaigns or canvases) sent to the user in the Affiliate App Group during the third week before the dt_snapshot week.
+  total_affiliate_communications_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_affiliate_communications_sent_to
+    description: Cumulative total of communications (either campaigns or canvases) sent to the user in the Affiliate App Group up until the day before the dt_snapshot.
   total_emails_sent_to_same_week:
     lineage:
     - datalake_braze_user_centric_periodicity.user_events_same_week.total_emails_sent_to
@@ -546,14 +570,19 @@ columns:
     - datalake_braze_user_centric_periodicity.user_events_all_time_before.day
     description: Date in which the snapshot to calculate all the events was taken.
       All the other columns reference this column in particular.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp in which the register was loaded in the database.
   year:
     lineage:
-    - datalake_braze_user_centric_periodicity.user_events_all_time_before.year
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.year  
+    description: Year of the date when the snapshot was taken. This field is used to contextualize all other data in the snapshot to a specific year.
   month:
     lineage:
-    - datalake_braze_user_centric_periodicity.user_events_all_time_before.month
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.month
+    description: Month of the date when the snapshot was taken. This field is used to contextualize all other data in the snapshot to a specific month.
   day:
     lineage:
-    - datalake_braze_user_centric_periodicity.user_events_all_time_before.day
-  ts_load:
-    description: Timestamp in which the register was loaded in the database.
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.day
+    description: Day of the date when the snapshot was taken. This field is used to contextualize all other data in the snapshot to a specific Day.

@@ -5,26 +5,30 @@ description: Enrich table that contains origin information about reprocessed lea
 owner: matheus.baroni@quintoandar.com.br
 columns:
   id:
+    description: Listing flow ID.
     lineage:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.id
-    description: Listing flow ID
   lead_type:
+    description: Type of the lead.
     lineage:
       - datalake_lead.lead.type
-    description: Type of the lead
   lead_origin:
+    description: Origin of the lead.
     lineage:
       - datalake_lead.lead.source
-    description: Origin of the lead
   utm_source:
+    description: The origin of the traffic.
     lineage:
       - datalake_lead.lead.utm_source
-    description: The origin of the traffic
   utm_medium:
+    description: The medium or location where the link was shared.
     lineage:
       - datalake_lead.lead.utm_medium
-    description: The medium or location where the link was shared
   is_lead_branded:
-    description: Boolean indication whether the lead campaign is branded or institutional
+    description: Boolean indication whether the lead campaign is branded or institutional.
+    lineage:
+      - datalake_lead.lead.utm_campaign
   is_reprocessed:
-    description: Boolean indication whether the lead was reprocessed
+    description: Boolean indication whether the lead was reprocessed.
+    lineage:
+      - datalake_lead.lead.source

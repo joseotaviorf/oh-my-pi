@@ -68,6 +68,11 @@ columns:
     description: The campaigns are divided in organizations. This table only contains data for the organization Inside Sales.
     lineage:
       - datalake_olos_dialer_clean.customer.name
+  duration_in_seconds:
+    description: Contact duration in seconds.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.ts_started
+      - datalake_olos_dialer_clean.attempts_raw_data.ts_call_ended
   ts_call_started:
     description: Date and time when the contact attempt started.
     lineage:
@@ -76,3 +81,15 @@ columns:
     description: Date and time when the contact attempt ended.
     lineage:
       - datalake_olos_dialer_clean.attempts_raw_data.ts_call_ended
+  year:
+    description: Year of the contact.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.year
+  month:
+    description: Month of the contact.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.month
+  day:
+    description: Day of the contact.
+    lineage:
+      - datalake_olos_dialer_clean.attempts_raw_data.day  
