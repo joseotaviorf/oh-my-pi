@@ -28,7 +28,7 @@ WITH hub_member_profile AS (
   FROM
     datalake_hub_services_clean.member_profile_aud
   WHERE
-    profile = 'AGENT'
+    profile in ('AGENT','NEGOTIATION_EXECUTIVE')
     AND (mod_id_business_unit = TRUE OR mod_active = TRUE)
 
 ),
