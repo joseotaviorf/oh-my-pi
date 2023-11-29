@@ -43,6 +43,9 @@ columns:
   id_last_update_origin:
     lineage:
       - datalake_ebdb_raw.agendamento.origemultimaatualizacao_id
+  structured:
+    lineage:
+      - datalake_ebdb_raw.agendamento.structured
   code:
     lineage:
       - datalake_ebdb_raw.agendamento.codigo

@@ -25,6 +25,15 @@ columns:
   status:
     lineage:
       - datalake_ebdb_raw.visita_aud.status
+  structured:
+    lineage:
+      - datalake_ebdb_raw.visita.structured
+  computed_status:
+    lineage:
+      - datalake_ebdb_raw.visita.computed_status
+  mod_structured:
+    lineage:
+      - datalake_ebdb_raw.visita.structured_MOD
   mod_status:
     lineage:
       - datalake_ebdb_raw.visita_aud.status_mod

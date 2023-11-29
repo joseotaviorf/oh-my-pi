@@ -97,3 +97,9 @@ columns:
   type:
     lineage:
       - datalake_ebdb_raw.agendamento_aud.tipo
+  structured:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.structured
+  mod_structured:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.structured_MOD

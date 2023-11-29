@@ -30,5 +30,7 @@ select
   checkinstatus_mod as mod_checkin_status,
   atendente_id as id_attendant,
   origemultimaatualizacao_id as id_last_update_origin,
-  tipo as type
+  tipo as type,
+  structured as structured,
+  structured_MOD AS mod_structured
 from datalake_ebdb_raw.Agendamento_AUD

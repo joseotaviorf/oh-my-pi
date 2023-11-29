@@ -10,6 +10,8 @@ SELECT
     agenteFixo AS is_fixed_agent,
     realEstateAgentRating_id AS id_real_estate_agent_rating,
     status,
+    structured,
+    computed_status,
     bookingType AS booking_type,
     visitante_id AS id_visitor,
     agente_id AS id_agent,

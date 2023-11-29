@@ -34,6 +34,12 @@ columns:
   status:
     lineage:
       - datalake_ebdb_raw.visita.status
+  structured:
+    lineage:
+      - datalake_ebdb_raw.visita.structured
+  computed_status:
+    lineage:
+      - datalake_ebdb_raw.visita.computed_status
   booking_type:
     lineage:
       - datalake_ebdb_raw.visita.bookingtype
