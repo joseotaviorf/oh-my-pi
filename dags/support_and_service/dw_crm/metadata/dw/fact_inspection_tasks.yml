@@ -38,18 +38,19 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract.id
       - datalake_inspections.inspection_booking.id_contract
+      - datalake_listing_contracts.listing_contracts.id_contract
     description: Contract ID of related to inspection task
   sk_house_listing:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_house_listing
+      - datalake_listing_contracts.listing_contracts.id_house_listing
     description: House Listing ID related to inspection task
   sk_house_owner:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_owner
+      - datalake_ebdb_rent_flow.rent_flow.id_owner
     description: House Owner user's ID related to inspection task
   sk_tenant:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_client
+      - datalake_ebdb_rent_flow.rent_flow.id_client
     description: User's ID who is tenant related to inspection task
   sk_start_date:
     lineage:

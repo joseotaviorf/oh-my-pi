@@ -1,9 +1,9 @@
-    WITH contracts AS (
+WITH contracts AS (
     SELECT
         turf.id_action_date AS sk_action_date,
         turf.id_assignee AS sk_assignee,
         turf.id_completed_date AS sk_completed_date,
-        COALESCE(dc.sk_contract, '-1') AS sk_contract,
+        COALESCE(dc.id, '-1') AS sk_contract,
         turf.id_origin AS sk_origin,
         turf.id_receiver AS sk_receiver,
         turf.id_start_date AS sk_start_date,
@@ -21,12 +21,12 @@
         turf.year,
         turf.month,
         turf.day
-    FROM 
+    FROM
         datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
-    LEFT JOIN 
-        dw_public.dim_contract dc
+    LEFT JOIN
+        datalake_ebdb_clean.contract dc
             ON turf.origin = 'Contrato'
-            AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(dc.sk_contract AS BIGINT)
+            AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(dc.id AS BIGINT)
     WHERE
         turf.year = {year}
         AND turf.month = {month}
@@ -37,17 +37,30 @@
                             'PROTECTION_PARTNERS'
                             )
 ),
-contract_house_listing AS (
+house_listing AS (
     SELECT
-        CAST(sk_contract AS BIGINT) AS sk_contract,
-        CAST(sk_house_listing AS BIGINT) AS sk_house_listing,
-        CAST(sk_owner AS BIGINT) AS sk_house_owner,
-        CAST(sk_client AS BIGINT) AS sk_tenant
-    FROM 
-        dw_public.fact_listing_rent_flows
-    WHERE 
-        sk_contract != '-1'
-    GROUP BY 1, 2, 3, 4
+        hl.id_house_listing,
+        hl.id_contract
+    FROM
+        datalake_ebdb_listing.house_listing AS hl
+    UNION ALL
+    SELECT
+        lc.id_house_listing,
+        lc.id_contract
+    FROM
+        datalake_listing_contracts.listing_contracts AS lc
+),
+contract_house_listing AS (
+    SELECT DISTINCT
+        COALESCE(hl.id_contract, -1) AS sk_contract,
+        COALESCE(hl.id_house_listing, -1) AS sk_house_listing,
+        COALESCE(rf.id_owner, -1) AS sk_house_owner,
+        COALESCE(rf.id_client, -1) AS sk_tenant
+    FROM
+        house_listing AS hl
+    LEFT JOIN
+        datalake_ebdb_rent_flow.rent_flow AS rf
+          ON rf.id_contract = hl.id_contract
 )
 SELECT DISTINCT
     c.sk_task,
@@ -75,9 +88,9 @@ SELECT DISTINCT
     c.year,
     c.month,
     c.day
-FROM 
+FROM
     contracts c
-LEFT JOIN 
+LEFT JOIN
     contract_house_listing chl
         ON c.sk_contract = chl.sk_contract
         AND c.sk_contract != -1

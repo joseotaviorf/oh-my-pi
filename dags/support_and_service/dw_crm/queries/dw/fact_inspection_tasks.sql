@@ -78,16 +78,16 @@ WITH contracts AS (
     AND turf.day = {day}
 ),
 contract_house_listing AS (
-    SELECT
-        CAST(sk_house_listing AS BIGINT) AS sk_house_listing,
-        CAST(sk_contract AS BIGINT) AS sk_contract,
-        CAST(sk_owner AS BIGINT) AS sk_house_owner,
-        CAST(sk_client AS BIGINT) AS sk_tenant
+    SELECT DISTINCT
+        COALESCE(lc.id_house_listing, -1) AS sk_house_listing,
+        COALESCE(lc.id_contract, -1) AS sk_contract,
+        COALESCE(rf.id_owner, -1) AS sk_house_owner,
+        COALESCE(rf.id_client, -1) AS sk_tenant
     FROM
-        dw_public.fact_listing_rent_flows
-    WHERE
-        sk_contract != '-1'
-    GROUP BY 1, 2, 3, 4
+        datalake_listing_contracts.listing_contracts AS lc
+    LEFT JOIN
+        datalake_ebdb_rent_flow.rent_flow AS rf
+        ON rf.id_contract = lc.id_contract
 )
 SELECT DISTINCT
     c.sk_task,

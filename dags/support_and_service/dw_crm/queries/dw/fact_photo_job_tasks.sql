@@ -1,37 +1,39 @@
-WITH photo_jobs AS (
+WITH house_listing AS (
+  SELECT
+    hl.id_house,
+    hl.id_house_listing,
+    h.id_user,
+    hl.ts_listing_version_start,
+    COALESCE(hl.ts_listing_version_end, NOW()) AS ts_listing_version_end
+  FROM
+    datalake_ebdb_listing.house_listing AS hl
+  LEFT JOIN
+    datalake_ebdb_listing.house AS h
+      ON h.id = hl.id_house
+),
+photo_jobs AS (
   SELECT
     turf.*,
-    CAST(COALESCE(dhl.sk_house_listing, dhl_no_version.sk_house_listing, fhl_photo.sk_house_listing, '-1') AS BIGINT) AS sk_house_listing,
-    CAST(COALESCE(fhl_photo.sk_owner, fhl.sk_owner, fhl_no_version.sk_owner, '-1') AS BIGINT) AS sk_house_owner,
-    CAST(COALESCE(fpj.id_photo_job, '-1') AS BIGINT) AS sk_photo_job,
-    CAST(COALESCE(fpj.sk_user_rep, '-1') AS BIGINT) AS sk_user_sales_rep
+    CAST(COALESCE(dhl.id_house_listing, hl_photo.id_house_listing, '-1') AS BIGINT) AS sk_house_listing,
+    CAST(COALESCE(hl_photo.id_user, dhl.id_user, '-1') AS BIGINT) AS sk_house_owner,
+    CAST(COALESCE(fpj.id, '-1') AS BIGINT) AS sk_photo_job,
+    CAST(COALESCE(fpj.id_rep, '-1') AS BIGINT) AS sk_user_sales_rep
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
-  LEFT JOIN 
-    dw_public.fact_photo_job fpj
+  LEFT JOIN
+    datalake_ebdb_listing_jobs.photo_job fpj
       ON turf.origin = 'JobFotografo'
-      AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(fpj.id_photo_job AS BIGINT)
-  LEFT JOIN 
-    dw_public.fact_house_listings fhl_photo
-      ON fhl_photo.sk_house_listing = fpj.sk_house_listing
-      AND fhl_photo.sk_house_listing != '-1'
-  LEFT JOIN 
-    dw_public.dim_house_listing dhl
+      AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(fpj.id AS BIGINT)
+  LEFT JOIN
+    house_listing AS hl_photo
+      ON hl_photo.id_house = fpj.id_house
+      AND fpj.ts_created BETWEEN hl_photo.ts_listing_version_start AND hl_photo.ts_listing_version_end
+      AND hl_photo.id_house_listing IS NOT NULL
+  LEFT JOIN
+    house_listing AS dhl
       ON turf.origin = 'Imovel'
       AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(dhl.id_house AS BIGINT)
-      AND turf.ts_start BETWEEN COALESCE(NULLIF(dhl.ts_listing_version_start,''), turf.ts_start, NOW()) AND COALESCE(NULLIF(dhl.ts_listing_version_end, ''), NOW())
-  LEFT JOIN 
-    dw_public.fact_house_listings fhl
-      ON fhl.sk_house_listing = dhl.sk_house_listing
-      AND fhl.sk_house_listing != '-1'
-  LEFT JOIN 
-    dw_public.dim_house_listing dhl_no_version
-      ON (turf.origin) = 'Imovel'
-      AND turf.id_origin = dhl_no_version.id_house
-      AND dhl_no_version.ts_listing_version_start = ''
-  LEFT JOIN 
-    dw_public.fact_house_listings fhl_no_version
-      ON fhl_no_version.sk_house_listing = dhl_no_version.sk_house_listing
+      AND turf.ts_start BETWEEN COALESCE(NULLIF(dhl.ts_listing_version_start,''), turf.ts_start, NOW()) AND dhl.ts_listing_version_end
   WHERE
     turf.year = {year}
     AND turf.month = {month}
@@ -43,12 +45,12 @@ WITH photo_jobs AS (
 ),
 photo_job_house_listing AS (
   SELECT
-    CAST(sk_house_listing AS BIGINT) AS sk_house_listing,
-    CAST(sk_owner AS BIGINT) AS sk_house_owner
-  FROM 
-    dw_public.fact_house_listings
-  WHERE 
-    sk_house_listing != '-1'
+    CAST(id_house_listing AS BIGINT) AS sk_house_listing,
+    CAST(id_user AS BIGINT) AS sk_house_owner
+  FROM
+    house_listing
+  WHERE
+    id_house_listing IS NOT NULL
   GROUP BY 1, 2
 )
 SELECT DISTINCT
@@ -77,9 +79,9 @@ SELECT DISTINCT
   pj.year,
   pj.month,
   pj.day
-FROM 
+FROM
   photo_jobs pj
-LEFT JOIN 
+LEFT JOIN
   photo_job_house_listing pjhl
     ON pj.sk_house_listing = pjhl.sk_house_listing
     AND pj.sk_photo_job = -1

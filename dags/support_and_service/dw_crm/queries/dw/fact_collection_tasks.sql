@@ -1,15 +1,15 @@
 WITH contracts AS (
   SELECT
     turf.*,
-    CAST(COALESCE(dc.sk_contract, '-1') AS BIGINT) AS sk_contract,
+    CAST(COALESCE(dc.id, '-1') AS BIGINT) AS sk_contract,
     COALESCE(eo.id, -1) AS sk_rent_flow
-  FROM 
+  FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
-  LEFT JOIN 
-    dw_public.dim_contract dc
+  LEFT JOIN
+    datalake_ebdb_clean.contract dc
       ON turf.origin = 'Contrato'
-      AND CAST(CAST(turf.id_origin AS decimal) AS BIGINT) = CAST(dc.sk_contract AS BIGINT)
-  LEFT JOIN  
+      AND CAST(CAST(turf.id_origin AS decimal) AS BIGINT) = CAST(dc.id AS BIGINT)
+  LEFT JOIN
     datalake_ebdb_clean.rent_flow eo
       ON turf.origin = 'FluxoLocacao'
       AND CAST(CAST(turf.id_origin AS decimal) AS BIGINT) = eo.id
@@ -20,17 +20,17 @@ WITH contracts AS (
     AND turf.id_workgroup = 'DEP_COLLECTIONS_ID'
 ),
 contract_house_listing AS (
-  SELECT
-    CAST(sk_contract AS BIGINT) AS sk_contract,
-    CAST(sk_house_listing AS BIGINT) AS sk_house_listing,
-    CAST(sk_owner AS BIGINT) AS sk_house_owner,
-    CAST(sk_rent_flow AS BIGINT) AS sk_rent_flow,
-    CAST(sk_client AS BIGINT) AS sk_tenant
-  FROM 
-    dw_public.fact_listing_rent_flows
-  WHERE 
-    sk_contract != '-1'
-  GROUP BY 1, 2, 3, 4, 5
+  SELECT DISTINCT
+    lc.id_contract AS sk_contract,
+    COALESCE(lc.id_house_listing, -1) AS sk_house_listing,
+    COALESCE(rf.id_owner, -1) AS sk_house_owner,
+    COALESCE(rf.id_rent_flow, -1) AS sk_rent_flow,
+    COALESCE(rf.id_client, -1) AS sk_tenant
+  FROM
+    datalake_listing_contracts.listing_contracts AS lc
+  LEFT JOIN
+    datalake_ebdb_rent_flow.rent_flow AS rf
+      ON rf.id_contract = lc.id_contract
 )
 SELECT DISTINCT
   c.id_task AS sk_task,
@@ -57,14 +57,14 @@ SELECT DISTINCT
   NOW() AS ts_load,
   c.year,
   c.month,
-  c.day 
-FROM 
+  c.day
+FROM
   contracts c
-LEFT JOIN 
+LEFT JOIN
   contract_house_listing chl_contract
     ON c.sk_contract = chl_contract.sk_contract
     AND c.sk_contract != -1
-LEFT JOIN 
+LEFT JOIN
   contract_house_listing chl_rent_flow
     ON c.sk_rent_flow = chl_rent_flow.sk_rent_flow
     AND c.sk_rent_flow != -1

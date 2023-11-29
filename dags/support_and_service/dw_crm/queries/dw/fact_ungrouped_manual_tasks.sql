@@ -4,9 +4,9 @@ WITH contracts_offers AS (
         turf.id_receiver AS sk_receiver,
         turf.id_origin AS sk_origin,
         turf.id_assignee AS sk_assignee,
-        CAST(COALESCE(dc.sk_contract, CAST(ec.id AS STRING)) AS BIGINT) AS sk_contract,
+        CAST(COALESCE(dc.id, CAST(ec.id AS STRING)) AS BIGINT) AS sk_contract,
         ep.id AS sk_proposal,
-        CAST(COALESCE(eo.sk_offer, feo.sk_offer) AS BIGINT) AS sk_offer,
+        CAST(COALESCE(eo.id_offer_context, offer.id_offer_context, feo.id_offer_context) AS BIGINT) AS sk_offer,
         erf.id AS sk_rent_flow,
         turf.id_start_date AS sk_start_date,
         turf.id_completed_date AS sk_completed_date,
@@ -27,9 +27,9 @@ WITH contracts_offers AS (
     FROM
         datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        datalake_ebdb_clean.contract AS dc
             ON turf.origin = 'Contrato'
-                AND turf.id_origin = dc.sk_contract
+                AND turf.id_origin = dc.id
     LEFT JOIN
         datalake_ebdb_clean.pre_proposal AS epp
             ON turf.origin = 'PreProposta'
@@ -41,11 +41,15 @@ WITH contracts_offers AS (
         datalake_ebdb_clean.contract AS ec
             ON ep.id = ec.id_proposal
     LEFT JOIN
-        dw_public.dim_offer AS eo
+        datalake_ebdb_proposal.pre_proposal AS eo
             ON turf.origin = 'Offer'
-                AND turf.id_origin = eo.id_offer
+                AND turf.id_origin = eo.id
     LEFT JOIN
-        dw_public.dim_offer AS feo
+        datalake_offer.offer AS offer
+            ON turf.origin = 'Offer'
+                AND turf.id_origin = offer.id
+    LEFT JOIN
+        datalake_offer.offer AS feo
             ON turf.origin = 'Offer'
                 AND RLIKE(turf.id_origin, '\\D') = TRUE
                 AND turf.id_origin = feo.id_firestore
@@ -60,22 +64,53 @@ WITH contracts_offers AS (
         AND turf.month = {month}
         AND turf.day = {day}
 ),
-contract_offer_house_listing AS (
+house_listing AS (
     SELECT
-        CAST(sk_house_listing AS BIGINT) AS sk_house_listing,
-        CAST(sk_rent_flow AS BIGINT) AS sk_rent_flow,
-        CAST(sk_offer AS BIGINT) AS sk_offer,
-        CAST(sk_proposal AS BIGINT) AS sk_proposal,
-        CAST(sk_owner AS BIGINT) AS sk_house_owner,
-        CAST(COALESCE(IF(sk_contract != '-1', sk_client, sk_contract), '-1') AS BIGINT) AS sk_tenant,
-        CAST(COALESCE(IF(sk_proposal != '-1', sk_client, sk_proposal), '-1') AS BIGINT) AS sk_proponent,
-        MAX(CAST(sk_contract AS BIGINT)) AS sk_contract
+        hl.id_house_listing,
+        hl.id_contract,
+        hl.id_house,
+        hl.ts_listing_version_start,
+        COALESCE(hl.ts_listing_version_end, NOW()) AS ts_listing_version_end
     FROM
-        dw_public.fact_listing_rent_flows
+        datalake_ebdb_listing.house_listing AS hl
+    UNION
+    SELECT
+        lc.id_house_listing,
+        lc.id_contract,
+        lc.id_house,
+        lc.ts_listing_version_started AS ts_listing_version_start,
+        lc.ts_listing_version_ended AS ts_listing_version_end
+    FROM
+        datalake_listing_contracts.listing_contracts AS lc
+),
+contract_offer_house_listing AS (
+    SELECT DISTINCT
+        COALESCE(hl.id_house_listing, -1) AS sk_house_listing,
+        COALESCE(rf.id_rent_flow, -1) AS sk_rent_flow,
+        COALESCE(rf.id_offer_context, -1) AS sk_offer,
+        COALESCE(rf.id_proposal, -1) AS sk_proposal,
+        COALESCE(rf.id_owner, -1) AS sk_house_owner,
+        CASE
+            WHEN rf.id_contract IS NOT NULL THEN rf.id_client
+            ELSE -1
+        END AS sk_tenant,
+        CASE
+            WHEN rf.id_proposal IS NOT NULL THEN rf.id_client
+            ELSE -1
+        END AS sk_proponent,
+        COALESCE(rf.id_contract, -1) AS sk_contract
+    FROM
+        house_listing AS hl
+    LEFT JOIN
+        datalake_ebdb_rent_flow.rent_flow AS rf
+            ON rf.id_contract = hl.id_contract
+            OR (
+                rf.id_house = hl.id_house
+                AND rf.dt_rent_flow_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
+            )
     WHERE
-        sk_contract != '-1'
-        OR sk_offer != '-1'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7
+        rf.id_contract IS NOT NULL
+        OR rf.id_offer_context IS NOT NULL
 )
 SELECT DISTINCT
     co.sk_task,

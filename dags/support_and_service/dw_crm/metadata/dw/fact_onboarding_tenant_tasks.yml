@@ -44,22 +44,24 @@ columns:
     description: Key of task action event
   sk_contract:
     lineage:
-      - dw_public.dim_contract.sk_contract
+      - datalake_ebdb_listing.house_listing.id_contrato
+      - datalake_listing_contracts.listing_contracts.id_contrato
       - datalake_ebdb_clean.onboarding.id_contrato
       - datalake_inspections.inspection_booking.id_contract
       - datalake_ebdb_clean.contract.id
     description: Contract ID  related to onboarding task
   sk_house_listing:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_house_listing
+      - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_listing_contracts.listing_contracts.id_house_listing
     description: House Listing ID related to onboarding task
   sk_house_owner:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_owner
+      - datalake_ebdb_rent_flow.rent_flow.id_owner
     description: House Owner user's ID related to onboarding task
   sk_tenant:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_client
+      - datalake_ebdb_rent_flow.rent_flow.id_client
     description: User's ID who is tenant related to onboarding task
   sk_task_action_start_date:
     lineage:

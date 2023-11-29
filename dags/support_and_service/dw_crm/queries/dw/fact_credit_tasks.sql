@@ -40,16 +40,39 @@ WITH proposals AS (
         AND turf.month = {month}
         AND turf.day = {day}
 ),
-proposal_house_listing AS (
+house_listing AS (
     SELECT
-        CAST(sk_house_listing AS BIGINT) AS sk_house_listing,
-        CAST(sk_proposal AS BIGINT) AS sk_proposal,
-        CAST(sk_client AS BIGINT) AS sk_proponent
+        hl.id_house_listing,
+        hl.id_contract,
+        hl.id_house,
+        hl.ts_listing_version_start,
+        COALESCE(hl.ts_listing_version_end, NOW()) AS ts_listing_version_end
     FROM
-        dw_public.fact_listing_rent_flows
-    WHERE
-        sk_proposal != '-1'
-    GROUP BY 1, 2, 3
+        datalake_ebdb_listing.house_listing AS hl
+    UNION
+    SELECT
+        lc.id_house_listing,
+        lc.id_contract,
+        lc.id_house,
+        lc.ts_listing_version_started AS ts_listing_version_start,
+        lc.ts_listing_version_ended AS ts_listing_version_end
+    FROM
+        datalake_listing_contracts.listing_contracts AS lc
+),
+proposal_house_listing AS (
+    SELECT DISTINCT
+        COALESCE(hl.id_house_listing, -1) AS sk_house_listing,
+        COALESCE(rf.id_proposal, -1) AS sk_proposal,
+        COALESCE(rf.id_client, -1) AS sk_proponent
+    FROM
+        house_listing AS hl
+    LEFT JOIN
+        datalake_ebdb_rent_flow.rent_flow AS rf
+            ON rf.id_contract = hl.id_contract
+            OR (
+                rf.id_house = hl.id_house
+                AND rf.dt_rent_flow_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
+            )
 )
 SELECT DISTINCT
     p.sk_task,

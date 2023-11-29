@@ -1,4 +1,19 @@
-WITH proposals_contracts AS (
+WITH offers AS (
+  SELECT
+    id,
+    id_offer_context,
+    NULL AS id_firestore
+  FROM
+    datalake_ebdb_proposal.pre_proposal
+  UNION
+  SELECT
+    id,
+    id_offer_context,
+    id_firestore
+  FROM
+    datalake_offer.offer
+),
+proposals_contracts AS (
   SELECT
     t.id_task,
     t.id_receiver,
@@ -13,7 +28,7 @@ WITH proposals_contracts AS (
     COALESCE(ec.id, epc.id) AS id_contract,
     COALESCE(epi.id_user, eci.id_user) AS id_house_owner,
     COALESCE(ep.id_proponent, ec.id_user) AS id_tenant,
-    CAST(COALESCE(eo.sk_offer, feo.sk_offer) AS BIGINT) AS id_offer,
+    CAST(COALESCE(eo.id_offer_context, feo.id_offer_context) AS BIGINT) AS id_offer,
     t.id_workgroup,
     t.type,
     t.action_user_name,
@@ -51,30 +66,61 @@ WITH proposals_contracts AS (
     datalake_ebdb_clean.house epi
       ON epi.id = epc.id_house
   LEFT JOIN
-    dw_public.dim_offer eo
+    offers eo
       ON ct.origin = 'Offer'
-      AND CAST(CAST(ct.id_origin AS DECIMAL) AS BIGINT) = CAST(eo.id_offer AS BIGINT)
+      AND CAST(CAST(ct.id_origin AS DECIMAL) AS BIGINT) = CAST(eo.id AS BIGINT)
   LEFT JOIN
-    dw_public.dim_offer feo
+    offers feo
       ON ct.origin = 'Offer'
       AND ct.id_origin = feo.id_firestore
 ),
-contract_proposal_house_listing AS (
+house_listing AS (
   SELECT
-    CAST(sk_house_listing AS BIGINT) AS sk_house_listing,
-    CAST(sk_offer AS BIGINT) as sk_offer,
-    CAST(sk_proposal AS BIGINT) AS sk_proposal,
-    CAST(sk_owner AS BIGINT) AS sk_house_owner,
-    CAST(COALESCE(if(sk_contract != '-1',sk_client, NULL),'-1') AS BIGINT) AS sk_tenant,
-    CAST(COALESCE(if(sk_proposal != '-1',sk_client, NULL),'-1') AS BIGINT) AS sk_proponent,
-    MAX(CAST(sk_contract AS BIGINT)) AS sk_contract
-  FROM 
-    dw_public.fact_listing_rent_flows
-  WHERE 
-    sk_contract != '-1'
-    OR sk_proposal != '-1'
-    OR sk_offer != '-1'
-  GROUP BY 1, 2, 3, 4, 5, 6
+    hl.id_house_listing,
+    hl.id_contract,
+    hl.id_house,
+    hl.ts_listing_version_start,
+    COALESCE(hl.ts_listing_version_end, NOW()) AS ts_listing_version_end
+  FROM
+    datalake_ebdb_listing.house_listing AS hl
+  UNION
+  SELECT
+    lc.id_house_listing,
+    lc.id_contract,
+    lc.id_house,
+    lc.ts_listing_version_started AS ts_listing_version_start,
+    lc.ts_listing_version_ended AS ts_listing_version_end
+  FROM
+    datalake_listing_contracts.listing_contracts AS lc
+),
+contract_proposal_house_listing AS (
+  SELECT DISTINCT
+    COALESCE(hl.id_house_listing, -1) AS sk_house_listing,
+    COALESCE(rf.id_offer_context, -1) AS sk_offer,
+    COALESCE(rf.id_proposal, -1) AS sk_proposal,
+    COALESCE(rf.id_owner, -1) AS sk_house_owner,
+    CASE
+      WHEN rf.id_contract IS NOT NULL THEN rf.id_client
+      ELSE -1
+    END AS sk_tenant,
+    CASE
+      WHEN rf.id_proposal IS NOT NULL THEN rf.id_client
+      ELSE -1
+    END AS sk_proponent,
+    COALESCE(rf.id_contract, -1) AS sk_contract
+  FROM
+    house_listing AS hl
+  LEFT JOIN
+    datalake_ebdb_rent_flow.rent_flow AS rf
+      ON rf.id_contract = hl.id_contract
+      OR (
+        rf.id_house = hl.id_house
+        AND rf.dt_rent_flow_created BETWEEN hl.ts_listing_version_start AND hl.ts_listing_version_end
+      )
+  WHERE
+    rf.id_contract IS NOT NULL
+    OR rf.id_offer_context IS NOT NULL
+    OR rf.id_proposal IS NOT NULL
 )
 SELECT DISTINCT
   pc.id_task AS sk_task,
@@ -108,7 +154,7 @@ SELECT DISTINCT
   pc.year,
   pc.month,
   pc.day
-FROM 
+FROM
   proposals_contracts pc
 LEFT JOIN
   contract_proposal_house_listing proposal
@@ -126,7 +172,7 @@ LEFT JOIN
 WHERE
   (
       type IN (
-        'FrontEnd', 
+        'FrontEnd',
         'CriarMinuta',
         'AprovarMinuta',
         'FollowUpAssinaturas',
@@ -134,9 +180,9 @@ WHERE
         'AnalisarDocumentacaoProprietario',
         'AlinhamentoComPP',
         'VerificacaoComIQ'
-    ) 
+    )
     OR (
-        type = 'Manual' 
+        type = 'Manual'
         AND id_workgroup IN ('DEP_CLOSING_ID','DEP_AGREEMENT_MANUAL_TASK_ID')
     )
   )
