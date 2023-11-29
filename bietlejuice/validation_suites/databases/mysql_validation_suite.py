@@ -33,6 +33,12 @@ class MySQLValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
+    def validate_mission_control(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.MISSION_CONTROL], SparkClient()
+        )
+        self._validate_connection(db_consumer)
+
     def validate_vans(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.VANS], SparkClient()
