@@ -3,13 +3,20 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 class TableAttributes:
     def __init__(
-        self, dag_args: dict, workflow_args: dict, layer: LayerEnum, table_name: str
+        self,
+        dag_args: dict,
+        workflow_args: dict,
+        layer: LayerEnum,
+        table_name: str,
+        table_customization: dict = None,
     ) -> None:
         self._dag_args = dag_args
         self._workflow_args = workflow_args
         self.layer = layer
         self.table_name = table_name
-        self._table_customization = self._get_table_customization()
+        self._table_customization = (
+            table_customization or self._get_table_customization()
+        )
         self.schema = self._get_schema()
         self.extraction_type = self._get_extraction_type()
         self.partitions = self._get_partitions()

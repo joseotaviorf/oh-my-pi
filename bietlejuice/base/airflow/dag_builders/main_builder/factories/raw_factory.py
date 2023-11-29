@@ -7,6 +7,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_gsheets_workflow import (
     RawGsheetsWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_cdc_workflow import (
+    RawCDCWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
 )
@@ -19,7 +22,8 @@ class RawFactory(BaseFactory):
     """
 
     _WORKFLOW_ENUM_TO_CLASS_MAPPING = {
-        WorkflowEnum.GSHEETS_WORKFLOW: RawGsheetsWorkflow
+        WorkflowEnum.GSHEETS_WORKFLOW: RawGsheetsWorkflow,
+        WorkflowEnum.CDC_WORKFLOW: RawCDCWorkflow,
     }
 
     def __init__(self, dag_conf: dict, workflow_conf: dict, cluster_conf: dict):

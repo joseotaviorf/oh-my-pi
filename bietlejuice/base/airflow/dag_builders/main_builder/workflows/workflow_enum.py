@@ -8,6 +8,7 @@ class WorkflowEnum(Enum):
 
     QUERY_WORKFLOW = "query"
     GSHEETS_WORKFLOW = "gsheets"
+    CDC_WORKFLOW = "cdc"
 
     @classmethod
     def get_available_enum_values(cls):

@@ -1,13 +1,13 @@
 from datetime import datetime
 
 from airflow import DAG
-from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.builder_interface import (
     BuilderInterface,
 )
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.services.configuration_service import ConfigurationService
 

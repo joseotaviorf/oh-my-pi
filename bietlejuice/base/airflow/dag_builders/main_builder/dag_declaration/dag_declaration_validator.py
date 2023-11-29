@@ -55,6 +55,7 @@ class DAGDeclarationValidator(Validator):
                 "default_partitions": {"type": "list", "empty": False},
                 "extra_query_template_params": {"type": "dict", "empty": False},
                 "tables_customization": {"type": "dict", "empty": False},
+                "lineage_product_database_name": {"type": "string", "empty": False},
                 "short_circuit_customization": {
                     "type": "dict",
                     "empty": False,
