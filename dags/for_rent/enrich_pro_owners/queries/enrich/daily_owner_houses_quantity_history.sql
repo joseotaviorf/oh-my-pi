@@ -3,7 +3,7 @@ WITH b2b_user AS (
     u.id AS id_user,
     pa.status AS partner_agent_status,
     p.type AS partner_type
-  FROM 
+  FROM
     datalake_ebdb_clean.user AS u
   LEFT JOIN
     datalake_ebdb_clean.partner_agent AS pa
@@ -18,13 +18,13 @@ house_portability AS (
     hl.id_house,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end
-  FROM 
+  FROM
     datalake_ebdb_listing.house_listing hl
-  JOIN 
+  JOIN
     datalake_ebdb_clean.portability por
-      ON por.id_house = hl.id_house 
+      ON por.id_house = hl.id_house
       AND por.owner_type = 'B2B'
-      AND por.ts_created >= COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') 
+      AND por.ts_created >= COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00')
       AND por.ts_created < COALESCE(hl.ts_listing_version_end, NOW())
 ),
 
@@ -55,7 +55,7 @@ owner_houses_history AS (
     datalake_quintoandar.aux_date AS dd
   LEFT JOIN
     datalake_ebdb_listing.rent_listing AS rl
-      ON h.id = rl.id_house 
+      ON h.id = rl.id_house
   LEFT JOIN
     datalake_pro_owners.house_b2b_history  AS hbh
       ON h.id = hbh.id_house
@@ -78,15 +78,15 @@ owner_houses_history AS (
   LEFT JOIN
     datalake_ebdb_clean.partner AS p
       ON pa.id_partner = p.id
-  LEFT JOIN 
+  LEFT JOIN
     house_portability AS por
       ON h.id = por.id_house
       AND dd.date >= DATE(COALESCE(por.ts_listing_version_start, '1900-01-01 00:00:00'))
       AND dd.date < DATE(COALESCE(por.ts_listing_version_end, CURRENT_TIMESTAMP()))
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_country.user AS ur
       ON hbh.id_user = ur.id_user
-  WHERE 
+  WHERE
     dd.date = MAKE_DATE({year}, {month}, {day})
     AND ur.country_code = 'BR'
 ),
@@ -110,9 +110,9 @@ owner_qtd_houses_rental_administrator AS (
     IF(rental_administrator = 'THIRD_PARTY', COUNT(DISTINCT id_house), 0) AS third_party_houses,
     is_merged_user,
     date AS dt_houses_owned
-  FROM 
+  FROM
     owner_houses_history
-  WHERE 
+  WHERE
     is_for_rent = True
     AND is_b2b = False
   GROUP BY 1,2,14,15,rental_administrator
@@ -135,7 +135,7 @@ owner_qtd_houses AS (
     SUM(third_party_houses) AS third_party_houses,
     is_merged_user,
     dt_houses_owned
-  FROM 
+  FROM
     owner_qtd_houses_rental_administrator
   GROUP BY 1,2,14,15
 ),
@@ -147,16 +147,16 @@ pp_multi_history AS (
     aud.is_active,
     DATE(FROM_UNIXTIME(ure.ts_revision/1000)) AS dt_event,
     LEAD(DATE(FROM_UNIXTIME(ure.ts_revision/1000))) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev) AS dt_next_event
-  FROM 
+  FROM
     datalake_ebdb_clean.user_pro_owner_aud AS aud
-  LEFT JOIN 
-    datalake_ebdb_clean.user_revision_entity AS ure 
+  LEFT JOIN
+    datalake_ebdb_clean.user_revision_entity AS ure
       ON aud.rev = ure.id
   LEFT JOIN
     user_merge AS um
       ON aud.id_user = um.id_predecessor_user
 )
-  
+
 SELECT /*+ RANGE_JOIN(oqh, 800) */
   oqh.id_owner,
   IF(ppm.is_active, ppm.id_account_manager, NULL) AS id_account_manager,
@@ -178,7 +178,7 @@ SELECT /*+ RANGE_JOIN(oqh, 800) */
   {year} AS year,
   {month} AS month,
   {day} AS day
-FROM 
+FROM
   owner_qtd_houses AS oqh
 LEFT JOIN
   pp_multi_history AS ppm

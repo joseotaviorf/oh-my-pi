@@ -1,123 +1,169 @@
 database_name: datalake_ebdb_proposal
 table_name: pre_proposal_aud
+description: '[DEPRECATED] Table with pre-proposal auditory data. Not updated since January 2018.'
+domain: For Rent
+owner: conrado.fabri@quintoandar.com.br
 columns:
   id_pre_proposal:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.id_pre_proposal
+    description: id of the pre proposal
   rev:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.rev
+    description: deprecated
   rev_type:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.rev_type
+    description: deprecated
   id_house:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.id_house
+    description: Id of the house in which the pre proposal was made..
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
+    description: Country code related to the offer's country of origin
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   mod_house:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_house
+    description: deprecated
   id_when_will_schedule:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.id_when_will_schedule
+    description: deprecated
   mod_when_will_schedule:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_when_will_schedule
+    description: deprecated
   id_who_will_live:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.id_who_will_live
+    description: deprecated
   mod_who_will_live:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_who_will_live
+    description: deprecated
   id_user:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.id_user
+    description: Id of the the user who made the pre proposal
   mod_user:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_user
+    description: deprecated
   id_animals:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.id_animals
+    description: deprecated
   mod_animals:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_animals
+    description: deprecated
   rent:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.rent
+    description: deprecated
   mod_rent:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_rent
+    description: deprecated
   edition:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.edition
+    description: deprecated
   mod_edition:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_edition
+    description: deprecated
   status:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.status
+    description: deprecated
   mod_status:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_status
+    description: deprecated
   original_rent:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.original_rent
+    description: deprecated
   original_condo:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.original_condo
+    description: deprecated
   original_iptu:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.original_iptu
+    description: deprecated
   original_home_insurance:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.original_home_insurance
+    description: deprecated
   rejection_reason:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.rejection_reason
+    description: deprecated
   code:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.code
+    description: deprecated
   ts_approved:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.ts_approved
+    description: deprecated
   ts_expired:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.ts_expired
+    description: deprecated
   ts_visualized:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.ts_visualized
+    description: deprecated
   mod_ts_visualized:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_ts_visualized
+    description: deprecated
   has_rental_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.has_rental_accepted
+    description: deprecated
   mod_has_rental_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_has_rental_accepted
+    description: deprecated
   has_income_proof_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.has_income_proof_accepted
+    description: deprecated
   mod_has_income_proof_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_has_income_proof_accepted
+    description: deprecated
   has_charge_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.has_charge_accepted
+    description: deprecated
   mod_has_charge_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_has_charge_accepted
+    description: deprecated
   is_owner_accept_condition:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.is_owner_accept_condition
+    description: deprecated
   mod_conditions:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.mod_conditions
+    description: deprecated
   is_tenant_edition:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.edition
+    description: deprecated
   is_landlord_edition:
     lineage:
       - datalake_ebdb_clean.pre_proposal_aud.edition
+    description: deprecated

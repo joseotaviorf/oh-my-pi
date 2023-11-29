@@ -1,81 +1,116 @@
 database_name: datalake_ebdb_proposal
 table_name: pre_proposal
+description: '[DEPRECATED] Table with pre-proposal data. Not updated since January 2018.'
+domain: For Rent
+owner: conrado.fabri@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_clean.pre_proposal.id
+    description: ID of the pre-proposal.
   id_country:
     lineage:
       - datalake_ebdb_country.house.id_country
+    description: Id of the country of the property of the offer
+    categories:
+        '1': Brazil
+        '2': Mexico
   id_offer_context:
     lineage:
       - datalake_ebdb_clean.pre_proposal.id
+    description: deprecated
   id_user:
     lineage:
       - datalake_ebdb_clean.pre_proposal.id_user
+    description: Id of the the user who made the pre proposal
   id_house:
     lineage:
       - datalake_ebdb_clean.pre_proposal.id_house
+    description: Id of the house in which the pre proposal was made
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
+    description: Country code related to the offer's country of origin
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
   code:
     lineage:
       - datalake_ebdb_clean.pre_proposal.code
+    description: deprecated
   rejection_reason:
     lineage:
       - datalake_ebdb_clean.pre_proposal.rejection_reason
+    description: deprecated
   rent:
     lineage:
       - datalake_ebdb_clean.pre_proposal.rent
+    description: deprecated
   original_rent:
     lineage:
       - datalake_ebdb_clean.pre_proposal.original_rent
+    description: deprecated
   original_condo:
     lineage:
       - datalake_ebdb_clean.pre_proposal.original_condo
+    description: deprecated
   edition:
     lineage:
       - datalake_ebdb_clean.pre_proposal.edition
+    description: deprecated
   status:
     lineage:
       - datalake_ebdb_clean.pre_proposal.status
+    description: deprecated
   last_edition_updated:
     lineage:
       - datalake_ebdb_clean.pre_proposal.last_edition_updated
+    description: deprecated
   ts_created:
     lineage:
       - datalake_ebdb_clean.pre_proposal.ts_created
+    description: timestamp of when the pre proposal was created
   ts_updated:
     lineage:
       - datalake_ebdb_clean.pre_proposal.ts_updated
+    description: timestamp of when the pre proposal was updated
   ts_first_sent:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: timestamp of when the pre proposal was first sent
   ts_last_analysis:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: deprecated
   has_rental_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal.has_rental_accepted
+    description: deprecated
   has_income_proof_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal.has_income_proof_accepted
+    description: deprecated
   has_charge_accepted:
     lineage:
       - datalake_ebdb_clean.pre_proposal.has_charge_accepted
+    description: deprecated
   is_owner_accept_condition:
     lineage:
       - datalake_ebdb_clean.pre_proposal.is_owner_accept_condition
+    description: deprecated
   has_animals_condition:
     lineage:
       - datalake_ebdb_clean.proposal_condition.description
+    description: deprecated
   has_when_will_live_condition:
     lineage:
       - datalake_ebdb_clean.proposal_condition.description
+    description: deprecated
   has_who_will_live_condition:
     lineage:
       - datalake_ebdb_clean.proposal_condition.description
+    description: deprecated
   has_edition_update:
     lineage:
       - datalake_ebdb_clean.pre_proposal.last_edition_updated
+    description: deprecated
