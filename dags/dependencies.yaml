@@ -834,6 +834,9 @@ bietlejuice.dw_velo:
   - bietlejuice.enrich_velo:load-enrich-transaction-category
   - bietlejuice.enrich_velo:load-enrich-transaction-entries
   - bietlejuice.enrich_velo:load-enrich-user
+  - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-details
+  - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics
+  - bietlejuice.velo_zendesk:load-clean-users
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs

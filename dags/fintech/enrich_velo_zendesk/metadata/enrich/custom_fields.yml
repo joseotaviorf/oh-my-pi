@@ -32,6 +32,10 @@ columns:
         description: "Description of the contact reason"
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
+    guarantee_activation:
+        description: "Description of the guarantee activation"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
     tenant_name:
         description: "Name of the tenant related to the ticket"
         lineage:

@@ -1,0 +1,25 @@
+SELECT
+    id_user AS sk_ticket_user,
+    id_organization AS sk_organization,
+    id_default_group AS sk_default_group,
+    url_user,
+    name AS user_name,
+    email AS user_email,
+    phone AS user_phone,
+    time_zone,
+    tags,
+    role,
+    role_type,
+    signature,
+    locale,
+    is_verified,
+    is_active,
+    is_shared_phone_number,
+    is_permanently_deleted,
+    ts_last_login,
+    ts_created,
+    ts_created_local,
+    ts_updated,
+    ts_load
+FROM
+    datalake_velo_zendesk_clean.users

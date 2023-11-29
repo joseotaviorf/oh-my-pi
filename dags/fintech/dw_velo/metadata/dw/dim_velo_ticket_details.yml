@@ -1,136 +1,144 @@
-database_name: datalake_velo_zendesk
-table_name: ticket_details
+database_name: dw_velo
+table_name: dim_velo_ticket_details
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: "Table containing zendesk tickets information"
+description: "Table containing zendesk tickets historical information"
 columns:
-  id_ticket:
+  sk_ticket:
     description: "Ticket identification number (ID)"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.id_ticket
-  id_main_ticket:
+      - datalake_velo_zendesk.ticket_details.id_ticket
+  sk_main_ticket:
     description: "Main ticket id related to the current ticket"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.description
-  id_assignee:
+      - datalake_velo_zendesk.ticket_details.description
+  sk_assignee:
     description: "Identification number of the agent assigned to the ticket"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.id_assignee
-  id_requester:
+      - datalake_velo_zendesk.ticket_details.id_assignee
+  sk_requester:
     description: "Identification number of the requester"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.id_requester
-  id_submitter:
+      - datalake_velo_zendesk.ticket_details.id_requester
+  sk_submitter:
     description: "Identification number of the submitter"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.id_submitter
+      - datalake_velo_zendesk.ticket_details.id_submitter
   request_error:
     description: "Request error description"
     lineage:
-      - datalake_velo_zendesk.custom_fields.request_error
+      - datalake_velo_zendesk.ticket_details.request_error
   request_type:
     description: "Request type description"
     lineage:
-      - datalake_velo_zendesk.custom_fields.request_type
+      - datalake_velo_zendesk.ticket_details.request_type
   cancellation_reason:
     description: "Description of the reason of cancellation"
     lineage:
-      - datalake_velo_zendesk.custom_fields.cancellation_reason
+      - datalake_velo_zendesk.ticket_details.cancellation_reason
   broker_name:
     description: "Broker name"
     lineage:
-      - datalake_velo_zendesk.custom_fields.broker_name
+      - datalake_velo_zendesk.ticket_details.broker_name
   contact_reason:
     description: "Main reason of contact"
     lineage:
-      - datalake_velo_zendesk.custom_fields.contact_reason
+      - datalake_velo_zendesk.ticket_details.contact_reason
   tenant_name:
     description: "Tenant name related to the ticket"
     lineage:
-      - datalake_velo_zendesk.custom_fields.tenant_name
+      - datalake_velo_zendesk.ticket_details.tenant_name
   client_request:
     description: "Description of client request"
     lineage:
-      - datalake_velo_zendesk.custom_fields.client_request
+      - datalake_velo_zendesk.ticket_details.client_request
   name:
     description: "Ticket group name"
     lineage:
-      - datalake_velo_zendesk_clean.groups.name
+      - datalake_velo_zendesk.ticket_details.name
   ticket_type:
     description: "Ticket type name"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.type
+      - datalake_velo_zendesk.ticket_details.type
   id_group:
     description: "Ticket group id"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.id_group
+      - datalake_velo_zendesk.ticket_details.id_group
   satisfaction_rating:
     description: "Ticket satisfaction rating evaluation"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.satisfaction_rating
   ticket_order:
     description: "Order of the current register according to ticket timeline"
   priority:
     description: "Priority description of the ticket"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.priority
+      - datalake_velo_zendesk.ticket_details.priority
   recipient:
     description: "Recipient description"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.recipient
   is_last_register:
     description: "Flag indicating if the current register is the most updated from ticket timeline"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.recipient
+      - datalake_velo_zendesk.ticket_details.recipient
   ticket_via:
     description: "Via in which the ticket was opened"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.ticket_via
+      - datalake_velo_zendesk.ticket_details.ticket_via
   short_request_type:
     description: "Short description of the request type"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.short_request_type
   description:
     description: "Ticket description"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.description
+      - datalake_velo_zendesk.ticket_details.description
   ticket_url:
     description: "Ticket URL"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.url_ticket
+      - datalake_velo_zendesk.ticket_details.url_ticket
   tags:
     description: "Tags linked to the ticket"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.tags
+      - datalake_velo_zendesk.ticket_details.tags
   ticket_status:
     description: "Ticket status"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.status
+      - datalake_velo_zendesk.ticket_details.status
   subject:
     description: "Ticket subject"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.subject
+      - datalake_velo_zendesk.ticket_details.subject
   has_incidents:
     description: "Flag indicating if the ticket has incidents related"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.has_incidents
+      - datalake_velo_zendesk.ticket_details.has_incidents
   is_public:
     description: "Flag indicating if the ticket is public"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.is_public
+      - datalake_velo_zendesk.ticket_details.is_public
   ts_created:
     description: "Timestamp when the ticket was created"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.ts_created
+      - datalake_velo_zendesk.ticket_details.ts_created
   ts_created_local:
     description: "Timestamp when the ticket was created in Brasilia timezone"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.ts_created_local
+      - datalake_velo_zendesk.ticket_details.ts_created_local
   ts_updated:
     description: "Timestamp when the ticket was updated"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.ts_updated
+      - datalake_velo_zendesk.ticket_details.ts_updated
   ts_updated_local:
     description: "Timestamp when the ticket was updated in Brasilia timezone"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.ts_updated_local
   dt_extracted:
     description: "Date when the ticket was extracted"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.dt_extracted
+      - datalake_velo_zendesk.ticket_details.dt_extracted
   ts_load:
     description: "Timestamp when the ticket was loaded"
     lineage:
-      - datalake_velo_zendesk_clean.tickets_history.ts_load
+      - datalake_velo_zendesk.ticket_details.ts_load

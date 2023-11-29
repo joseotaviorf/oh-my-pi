@@ -4,5 +4,3 @@ inner_dependencies:
     - custom_fields
   ticket_metrics:
     - custom_fields
-  ticket_history:
-    - custom_fields
