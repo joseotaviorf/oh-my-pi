@@ -88,10 +88,10 @@ WITH claims_omie AS (
             WHEN j.desc_lvl_1 = 'TERMINATION' THEN 'Rescisao'
             ELSE NULL
         END AS invoice_type,
-        IF(dt_due < CURRENT_DATE AND EXTRACT (DAY FROM (COALESCE(dt_paid,CURRENT_DATE) - dt_due))>0, 1, 0) AS is_over,
-        IF(dt_due < CURRENT_DATE AND EXTRACT (DAY FROM (COALESCE(dt_paid,CURRENT_DATE) - dt_due))>30, 1, 0) AS is_over_30,
-        IF(dt_due < CURRENT_DATE AND EXTRACT (DAY FROM (COALESCE(dt_paid,CURRENT_DATE) - dt_due))>60, 1, 0) AS is_over_60,
-        IF(dt_due < CURRENT_DATE AND EXTRACT (DAY FROM (COALESCE(dt_paid,CURRENT_DATE) - dt_due))>90, 1, 0) AS is_over_90
+        IF(dt_due < CURRENT_DATE AND EXTRACT (DAY FROM (COALESCE(d.ts_paid,CURRENT_DATE) - dt_due))>0, 1, 0) AS is_over,
+        IF(dt_due < CURRENT_DATE AND EXTRACT (DAY FROM (COALESCE(d.ts_paid,CURRENT_DATE) - dt_due))>30, 1, 0) AS is_over_30,
+        IF(dt_due < CURRENT_DATE AND EXTRACT (DAY FROM (COALESCE(d.ts_paid,CURRENT_DATE) - dt_due))>60, 1, 0) AS is_over_60,
+        IF(dt_due < CURRENT_DATE AND EXTRACT (DAY FROM (COALESCE(d.ts_paid,CURRENT_DATE) - dt_due))>90, 1, 0) AS is_over_90
 
     FROM
         dw_velo.fact_velo_occurrence AS d
