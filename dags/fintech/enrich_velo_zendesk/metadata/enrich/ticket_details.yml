@@ -66,6 +66,10 @@ columns:
       - datalake_velo_zendesk_clean.tickets_history.id_group
   satisfaction_rating:
     description: "Ticket satisfaction rating evaluation"
+  satisfaction_reason:
+    description: "Reason of satisfaction rating evaluation"
+  satisfaction_comments:
+    description: "Comments of satisfaction rating evaluation"
   ticket_order:
     description: "Order of the current register according to ticket timeline"
   priority:

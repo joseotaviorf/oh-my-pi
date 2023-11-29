@@ -15,6 +15,8 @@ SELECT
     client_request,
     name AS group_name,
     satisfaction_rating,
+    satisfaction_reason,
+    satisfaction_comments,
     priority,
     recipient,
     ticket_via,

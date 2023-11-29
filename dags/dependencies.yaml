@@ -835,9 +835,10 @@ bietlejuice.dw_velo:
   - bietlejuice.enrich_velo:load-enrich-transaction-category
   - bietlejuice.enrich_velo:load-enrich-transaction-entries
   - bietlejuice.enrich_velo:load-enrich-user
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-entry
+bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-details
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics
-  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-entry
   - bietlejuice.velo_zendesk:load-clean-users
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-clean-visit
