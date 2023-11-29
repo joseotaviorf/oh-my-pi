@@ -386,6 +386,9 @@ bietlejuice.enrich_house_feature_inference:
     - bietlejuice.ebdb:load-clean-house
     - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
     - bietlejuice.enrich_ebdb_country:load-enrich-house
+bietlejuice.enrich_label_studio:
+  remove:
+    - bietlejuice.label_studio:load-clean-annotations
 bietlejuice.enrich_lead:
   remove:
     - bietlejuice.ebdb:load-clean-ownerlead
@@ -839,7 +842,6 @@ bietlejuice.reverse_tracksale:
     - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
     - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
     - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
-
 bietlejuice.reverse_webhelp_access:
   add:
     - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
