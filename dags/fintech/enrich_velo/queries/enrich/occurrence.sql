@@ -1,9 +1,9 @@
 
 WITH robin_hood AS (
     SELECT DISTINCT
-        SPLIT(ae.id_external, ':')[2] AS id_occurrence,
+        SPLIT(ae.id_external, ':')[1] AS id_occurrence,
         ARRAY_AGG(ae.id) AS ids_accounting_entry
-        -- SPLIT(ae.id_external, ':')[1] AS id_propose
+        -- SPLIT(ae.id_external, ':')[0] AS id_propose
     FROM
         datalake_robin_hood.accounting_entry AS ae
     INNER JOIN
