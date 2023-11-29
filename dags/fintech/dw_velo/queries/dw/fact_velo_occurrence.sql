@@ -5,6 +5,7 @@ SELECT
     COALESCE(id_occurrence_type, -1) AS sk_occurrence_type,
     COALESCE(id_occurrence_status, -1) AS sk_occurrence_status,
     id_unicid,
+    ids_accounting_entry,
     description,
     invoice_url,
     due_amount,

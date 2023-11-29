@@ -27,12 +27,19 @@ columns:
   id_unicid:
     description: Business ID for UNICID.
     lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.id_unicid
+  ids_accounting_entry:
+    description: Array of Business IDs associated for this occurrence in Robin-Hood.
+    lineage:
+      - datalake_robin_hood.accounting_entry.id
   description:
     description: Description comments for this occurrence.
     lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.description
   invoice_url:
     description: URL of charged invoice.
     lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.invoice_url
   due_amount:
     description: Amount that is due.
     lineage:

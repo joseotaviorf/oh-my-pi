@@ -1,0 +1,225 @@
+---
+database_name: dw_velo
+table_name: fact_derived_velo_propose_claim_mob
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "This is a derived fact table that materializes the temporal monthly evolution (based on MOB) of a given status of an propose and the claim values related to it. \n MOB (Months on books) definition: which is the number of months that have completed since the reference date (creation date or due date) of an claim"
+columns:
+  sk_propose:
+    description: Propose's identification number (ID)
+  dt_created:
+    description:  Timestamp of when the propose has started (based on ts_propose_started)
+  dt_es:
+    description: Timestamp of when the propose's evaluation has started (based on ts_evaluation_started)
+  dt_ca:
+    description: Timestamp of when the propose has been signed (based on ts_sign_started)
+  dt_cs:
+    description: Date of when status of the contract started (based on dt_contract_started)
+  dt_first_claim:
+    description: Date when the first claim of this propose was registered
+  dt_last_claim:
+    description: Date when the last claim of this propose was registered
+  total_mob_count:
+    description: Quantity of months this propose had claims
+  total_mob_value:
+    description: Total sum value of claims made by this propose
+  cohort_age_mob_actual:
+    description: Actual contract age of the contract in months (bases on the current date - dt_contract_started)
+  first_claim_mob:
+    description: First mob that this propose had a claim
+  is_claim:
+    description: If the propose has any claim
+  claim_mob0:
+    description: EVER MOB of given month
+  claim_mob1:
+    description: EVER MOB of given month
+  claim_mob2:
+    description: EVER MOB of given month
+  claim_mob3:
+    description: EVER MOB of given month
+  claim_mob4:
+    description: EVER MOB of given month
+  claim_mob5:
+    description: EVER MOB of given month
+  claim_mob6:
+    description: EVER MOB of given month
+  claim_mob7:
+    description: EVER MOB of given month
+  claim_mob8:
+    description: EVER MOB of given month
+  claim_mob9:
+    description: EVER MOB of given month
+  claim_mob10:
+    description: EVER MOB of given month
+  claim_mob11:
+    description: EVER MOB of given month
+  claim_mob12:
+    description: EVER MOB of given month
+  claim_mob13:
+    description: EVER MOB of given month
+  claim_mob14:
+    description: EVER MOB of given month
+  claim_mob15:
+    description: EVER MOB of given month
+  claim_mob16:
+    description: EVER MOB of given month
+  claim_mob17:
+    description: EVER MOB of given month
+  claim_mob18:
+    description: EVER MOB of given month
+  claim_mob19:
+    description: EVER MOB of given month
+  claim_mob20:
+    description: EVER MOB of given month
+  claim_mob21:
+    description: EVER MOB of given month
+  claim_mob22:
+    description: EVER MOB of given month
+  claim_mob23:
+    description: EVER MOB of given month
+  claim_mob24:
+    description: EVER MOB of given month
+  claim_mob25:
+    description: EVER MOB of given month
+  claim_mob26:
+    description: EVER MOB of given month
+  claim_mob27:
+    description: EVER MOB of given month
+  claim_mob28:
+    description: EVER MOB of given month
+  claim_mob29:
+    description: EVER MOB of given month
+  claim_mob30:
+    description: EVER MOB of given month
+  claim_mob31_more:
+    description: EVER MOB of given month
+  mob_has_claim0:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim1:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim2:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim3:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim4:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim5:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim6:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim7:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim8:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim9:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim10:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim11:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim12:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim13:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim14:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim15:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim16:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim17:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim18:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim19:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim20:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim21:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim22:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim23:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim24:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim25:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim26:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim27:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim28:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim29:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim30:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  mob_has_claim31_more:
+    description: MOB of given month  (0 or 1 if this MOB had a claim)
+  claim_value_mob0:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob1:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob2:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob3:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob4:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob5:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob6:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob7:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob8:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob9:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob10:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob11:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob12:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob13:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob14:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob15:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob16:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob17:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob18:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob19:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob20:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob21:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob22:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob23:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob24:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob25:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob26:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob27:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob28:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob29:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob30:
+    description: MOB Claim value of given month (if existant)
+  claim_value_mob31_more:
+    description: MOB Claim value of given month (if existant)
+  ts_load:
+    description: Moment (timestamp) when the table was last loaded

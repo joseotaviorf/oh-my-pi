@@ -1,4 +1,19 @@
 
+WITH robin_hood AS (
+    SELECT DISTINCT
+        SPLIT(ae.id_external, ':')[2] AS id_occurrence,
+        ARRAY_AGG(ae.id) AS ids_accounting_entry
+        -- SPLIT(ae.id_external, ':')[1] AS id_propose
+    FROM
+        datalake_robin_hood.accounting_entry AS ae
+    INNER JOIN
+        datalake_robin_hood_raw.accounting_entry_source AS aes
+            ON aes.id = ae.id_source
+    WHERE
+        aes.name LIKE 'Fiador profissional:%'
+    GROUP BY 1
+)
+
 SELECT DISTINCT
     o.id AS id_occurrence,
     o.id_propose,
@@ -6,6 +21,7 @@ SELECT DISTINCT
     jk1.id_junk AS id_occurrence_type,
     jk2.id_junk AS id_occurrence_status,
     CAST(NULL AS STRING) AS id_unicid,
+    rh.ids_accounting_entry,
     CAST(NULL AS STRING) AS description,
     CAST(NULL AS STRING) AS invoice_url,
     o.value AS due_amount,
@@ -22,6 +38,9 @@ FROM
 LEFT JOIN
     datalake_rental_guarantee_platform_clean.delinquency_has_agreement AS dha
     ON dha.id_delinquency = o.id
+LEFT JOIN
+    robin_hood AS rh
+    ON o.id = rh.id_occurrence
 LEFT JOIN
     datalake_velo.junk AS jk1
         ON jk1.desc_lvl_1 = CASE
@@ -57,6 +76,7 @@ SELECT DISTINCT
     jk1.id_junk AS id_occurrence_type,
     CAST(NULL AS INTEGER) AS id_occurrence_status,
     CAST(NULL AS STRING) AS id_unicid,
+    CAST(NULL AS ARRAY<INT>) AS ids_accounting_entry,
     CAST(NULL AS STRING) AS description,
     CAST(NULL AS STRING) AS invoice_url,
     ol.value AS due_amount,
