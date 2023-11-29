@@ -21,7 +21,7 @@ photo_jobs AS (
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
   LEFT JOIN
-    datalake_ebdb_listing_jobs.photo_job fpj
+    datalake_ebdb_photo_jobs.photo_job fpj
       ON turf.origin = 'JobFotografo'
       AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(fpj.id AS BIGINT)
   LEFT JOIN

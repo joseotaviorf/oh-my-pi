@@ -174,6 +174,7 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_crm_tasks_transitions:load-enrich-tasks-transitions
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_photo_jobs:load-enrich-photo-job
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
@@ -1756,6 +1757,11 @@ bietlejuice.enrich_mexico_braze_details:
   - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
   - bietlejuice.braze_details:load-clean-canvas-details-owners
   - bietlejuice.braze_details:load-clean-canvas-details-tenants
+bietlejuice.enrich_mexico_cib_events:
+  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
+  - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
 bietlejuice.enrich_mexico_cib_segmentation:
   - bietlejuice.enrich_big_agent:load-enrich-agent
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
@@ -1766,11 +1772,6 @@ bietlejuice.enrich_mexico_cib_segmentation:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
   - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
-  - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
-bietlejuice.enrich_mexico_cib_events:
-  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
-  - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
 bietlejuice.enrich_mexico_consolidated_marketing_metrics:
   - bietlejuice.enrich_mexico_google_ads:load-enrich-ads-performance
@@ -2546,8 +2547,8 @@ bietlejuice.enrich_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-groups
   - bietlejuice.velo_zendesk:load-clean-ticket-fields
   - bietlejuice.velo_zendesk:load-clean-ticket-metrics
-  - bietlejuice.velo_zendesk:load-clean-tickets-history
   - bietlejuice.velo_zendesk:load-clean-tickets
+  - bietlejuice.velo_zendesk:load-clean-tickets-history
 bietlejuice.enrich_vespucio:
   - bietlejuice.ebdb:load-clean-condo
   - bietlejuice.ebdb:load-clean-condo-contact
