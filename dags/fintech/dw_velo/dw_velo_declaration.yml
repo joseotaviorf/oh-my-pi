@@ -7,6 +7,15 @@ workflow:
   layer: dw
   custom_schema: velo
   has_load_to_redshift_task: false
+  inner_dependencies:
+    fact_derived_velo_propose_claim_mob:
+      - fact_velo_propose
+      - fact_velo_occurrence
+      - dim_velo_junk
+      - fact_velo_transaction_entries
+      - dim_velo_transaction
+      - dim_velo_transaction_category
+      - dim_velo_omie_client
 cluster:
   type: databricks_10_4_med_general_cluster
   access_control_list:
