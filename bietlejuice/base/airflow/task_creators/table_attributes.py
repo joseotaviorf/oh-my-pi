@@ -36,8 +36,9 @@ class TableAttributes:
         )
 
     def _get_schema(self):
+        schema_inferred_from_dag_name = self._dag_args["name"].replace("enrich_", "")
         default_schema = self._workflow_args.get(
-            "custom_schema", self._dag_args["name"]
+            "custom_schema", schema_inferred_from_dag_name
         )
         table_schema = self._table_customization.get("custom_schema", default_schema)
         return table_schema
