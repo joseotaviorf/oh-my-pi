@@ -81,10 +81,16 @@ columns:
     lineage:
       - dw_public.dim_booking.dt_scheduling
     description: Timestamp of first visit completed after the attribution of agent with keys.
+  ts_load:
+    description: Timestamp of when this data was loaded.
   ts_optin:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.ts_optin
     description: Timestamp of when the owner has opted for keys with agent.
+  ts_publicated:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.ts_publicated
+    description: Timestamp of when this listing was publicated.
   ts_returned:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.ts_returned

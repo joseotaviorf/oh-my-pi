@@ -38,7 +38,7 @@ columns:
   status_short:
     description: Listing status on the indicated week. This is a short and treated version of the original status
       based on the status itself and the change reason.
-  is_tp_active:
+  is_active_tp:
     description: Flag to indicate if the tenant prospect is active or not.
   had_demand:
     description: Flag to indicate if the listing had demand funnel events.

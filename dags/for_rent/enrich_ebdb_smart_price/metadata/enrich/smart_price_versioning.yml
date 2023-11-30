@@ -38,3 +38,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: Timestamp of when the dynamic pricing started.
+  ts_end_status:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when the dynamic pricing ended.

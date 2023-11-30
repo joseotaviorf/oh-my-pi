@@ -4,6 +4,8 @@ description: Table that contains events (visit(s), offer(s), etc.) of a rent flo
 domain: For Rent
 owner: gustavo.geiger@quintoandar.com.br
 columns:
+  id_house_rent_flow:
+    description: Serial rent flow id.
   id_house:
     lineage:
       - datalake_ebdb_clean.contract.id_house
@@ -71,6 +73,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_origin.is_app
     description: If the visit was updated from the mobile app.
+  is_visit_completed:
+    lineage:
+      - datalake_ebdb_clean.booking.visit_fup
+    description: "Boolean indicating if the visit was completed (visit_fup in ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez'))."
+  is_visit_performed:
+    lineage:
+      - datalake_ebdb_clean.booking.visit_fup
+    description: Boolean indicating if the visit was performed (has visit_fup and agent was present).
   dt_proposal_approved:
     lineage:
       - datalake_ebdb_clean.proposal.ts_approved

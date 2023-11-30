@@ -42,6 +42,11 @@ columns:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.cpf
     description: Id of the personal document.
+  personal_document_type:
+    description: Indicates the document type.
+    categories:
+      CPF: Natural Persons Register.
+      CNPJ: National Register of Legal Entities.
   phone_number:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.phone_number

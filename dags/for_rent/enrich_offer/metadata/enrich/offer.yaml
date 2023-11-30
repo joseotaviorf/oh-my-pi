@@ -8,6 +8,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.offer.id
     description: Id of offer on ebdb
+  id_offer_context:
+    lineage:
+      - datalake_ebdb_clean.offer.id
+    description: "Id calculated using the offer id [(offer.id * 100) + 2]"
   id_firestore:
     lineage:
       - datalake_ebdb_clean.offer.id_firestore
@@ -186,6 +190,12 @@ columns:
     lineage:
       - datalake_firestore.rent_offer.is_instant_offer
     description: Instant Offers are offers that are automatically accepted, demanding no action by the owner (according to some specific the criteria)
+  is_offer_submitted:
+    lineage:
+      - datalake_godfather_clean.offer.ts_last_sent
+      - datalake_godfather_clean.offer.ts_last_sent
+      - datalake_firestore.rent_offer.ts_last_sent
+    description: Boolean indicating if this offer was submitted.
   ts_email_sent_to_owner:
     lineage:
       - datalake_firestore.rent_offer.ts_email_sent_to_owner
