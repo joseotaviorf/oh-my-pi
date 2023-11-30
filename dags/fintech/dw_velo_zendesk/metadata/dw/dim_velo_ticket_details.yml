@@ -52,7 +52,7 @@ columns:
     description: "Description of client request"
     lineage:
       - datalake_velo_zendesk.ticket_details.client_request
-  name:
+  group_name:
     description: "Ticket group name"
     lineage:
       - datalake_velo_zendesk.ticket_details.name
@@ -60,7 +60,7 @@ columns:
     description: "Ticket type name"
     lineage:
       - datalake_velo_zendesk.ticket_details.type
-  id_group:
+  sk_group:
     description: "Ticket group id"
     lineage:
       - datalake_velo_zendesk.ticket_details.id_group
