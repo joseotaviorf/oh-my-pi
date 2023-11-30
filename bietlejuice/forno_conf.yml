@@ -433,6 +433,7 @@ databricks_10_4_med_fixed_workers_4xlarge_general_photon_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+        availability: ON_DEMAND
 
 databricks_10_4_high_fixed_workers_4xlarge_general_photon_cluster:
     <<: *cluster_anchor
