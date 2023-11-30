@@ -1,7 +1,7 @@
 ---
 database_name: datalake_consolidated_marketing_metrics
 table_name: consolidated_media_metrics
-owner: '@data-growth'
+owner: cristina.cardoso@quintoandar.com.br
 domain: Growth
 description: Table that union costs extract from growth marketing platforms
 columns:
@@ -143,3 +143,12 @@ columns:
       - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.clicks
       - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.clicks
       - datalake_marketing_costs_sharing_rules.sharing_rules.share
+  business_context:
+    description: To which business context (Rent or Sale) the metrics belongs to.
+    lineage:
+      - datalake_consolidated_marketing_metrics.criteo_consolidated_metrics.business_context
+      - datalake_consolidated_marketing_metrics.facebook_consolidated_metrics.business_context
+      - datalake_consolidated_marketing_metrics.google_consolidated_metrics.business_context
+      - datalake_consolidated_marketing_metrics.mitula_consolidated_metrics.business_context
+      - datalake_consolidated_marketing_metrics.rtb_consolidated_metrics.business_context
+      - datalake_consolidated_marketing_metrics.trovit_consolidated_metrics.business_context

@@ -1,8 +1,9 @@
+---
 database_name: datalake_crm_lead
 table_name: lead_tasks
 description: CRM task information about leads
 domain: Growth
-owner: '@data-growth'
+owner: cristina.cardoso@quintoandar.com.br
 columns:
   id_lead:
     lineage:
@@ -20,3 +21,7 @@ columns:
     lineage:
       - datalake_crm_tasks.task_status.ts_closed
     description: Task closing date
+  lead_task_order:
+    description: Task order, acording to id_lead and ts_created.
+  lead_task_inverse_order:
+    description: Inversed task order, acording to id_lead and ts_created.
