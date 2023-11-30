@@ -55,7 +55,7 @@ if __name__ == "__main__":
     
     config_service = ConfigurationService(source)
     custom_records_per_file = config_service.get_config("custom_records_per_file")
-    partition_cols = config_service.get_config("partition_cols")
+    partition_cols = config_service.get_config("raw_partition_cols")
     table_name = config_service.get_config("table_name")
     transient_location = config_service.get_config("transient_location")
 
