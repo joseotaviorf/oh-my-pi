@@ -2741,6 +2741,10 @@ bietlejuice.reverse_customer_journey:
   - bietlejuice.enrich_customer_journey:load-enrich-users
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
+bietlejuice.reverse_inside_sales_whitelist:
+  - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
+  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts
+  - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
 bietlejuice.reverse_inspections:
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspector-performance
 bietlejuice.reverse_listings_report_access:

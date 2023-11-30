@@ -1,0 +1,24 @@
+---
+dag_documentation:
+  dag_purpose:
+    This DAG is responsible for compiling a list of phone numbers from customers that contacted the Inside Sales
+    channel and sending these phone numbers to Minority Report
+
+minority_request_header:
+  Content-Type: application/json
+
+batch_size: 100
+
+tables_to_send:
+  bic_ss:
+    key_name: phoneNumber
+    type: CUSTOMER_PHONE_NUMBER_WHITELIST
+
+custom_cluster:
+  driver_node_type_id: r5dn.4xlarge
+  node_type_id: r5dn.4xlarge
+  num_workers: 3
+  aws_attributes:
+    ebs_volume_size: 200
+  spark_conf:
+    spark.driver.maxResultSize: "0"
