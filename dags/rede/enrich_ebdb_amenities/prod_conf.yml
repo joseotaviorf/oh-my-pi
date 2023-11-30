@@ -1,0 +1,5 @@
+---
+inner_dependencies: {}
+tables:
+  amenity_change_history:
+    is_incremental: false

@@ -1319,6 +1319,16 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region
+bietlejuice.enrich_ebdb_amenities:
+  - bietlejuice.ebdb:load-clean-amenities
+  - bietlejuice.ebdb:load-clean-condo-amenities
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.ebdb:load-clean-house-aud
+  - bietlejuice.ebdb:load-clean-info-amenities
+  - bietlejuice.ebdb:load-clean-info-amenities-aud
+  - bietlejuice.ebdb:load-clean-info-condo-amenities
+  - bietlejuice.ebdb:load-clean-info-condo-amenities-aud
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_condo:
   - bietlejuice.ebdb:load-clean-condo-amenities
   - bietlejuice.ebdb:load-clean-house

@@ -1,0 +1,66 @@
+---
+database_name: datalake_ebdb_amenities
+table_name: amenity_change_history
+description: This table has one row per amenity change, be it a house or a condo amenity.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.info_amenities.id_house
+      - datalake_ebdb_clean.info_amenities_aud.id_house
+      - datalake_ebdb_clean.info_condo_amenities.id_house
+      - datalake_ebdb_clean.info_condo_amenities_aud.id_house
+    description: Id of the house that had an amenity change.
+  id_user:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.id_user
+    description: Id of the user that made the change.
+  id_amenity:
+    lineage:
+      - datalake_ebdb_clean.amenities.id
+      - datalake_ebdb_clean.condo_amenities.id_condo_amenity
+    description: Id of the amenity that was changed.
+  rev:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rev
+      - datalake_ebdb_clean.info_amenities_aud.rev
+      - datalake_ebdb_clean.info_condo_amenities_aud.rev
+    description: Revision number.
+  rev_type:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rev_type
+      - datalake_ebdb_clean.info_amenities_aud.rev_type
+      - datalake_ebdb_clean.info_condo_amenities_aud.rev_type
+    description: Type of revision.
+    categories:
+      '0': Insert
+      '1': Update
+      '2': Delete
+  has_feature:
+    lineage:
+      - datalake_ebdb_clean.house.has_elevator
+      - datalake_ebdb_clean.house_aud.has_elevator
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+      - datalake_ebdb_clean.info_condo_amenities_aud.has_feature
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+      - datalake_ebdb_clean.info_amenities_aud.has_feature
+    description: Whether the house has the amenity or not.
+  is_condo_amenity:
+    description: Whether the amenity is a condo amenity or not.
+  ts_change:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.info_amenities.ts_updated
+      - datalake_ebdb_clean.info_condo_amenities.ts_updated
+      - datalake_ebdb_clean.house.ts_updated
+    description: Timestamp of the change.
+  ts_next_change:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.info_amenities.ts_updated
+      - datalake_ebdb_clean.info_condo_amenities.ts_updated
+      - datalake_ebdb_clean.house.ts_updated
+    description: Timestamp of the next change for the same amenity and house (if any).
