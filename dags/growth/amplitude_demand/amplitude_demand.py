@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -13,11 +12,7 @@ from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
-from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
 
 # Pipeline inputs
@@ -30,8 +25,6 @@ CLUSTER_DESCRIPTION = "custom_cluster"
 EXECUTION_TIMEOUT_HOURS = 3
 
 config_service = ConfigurationService(SOURCE)
-PARTITION_COLS = config_service.get_config("partition_cols_dag")
-INCREMENTAL_PARTITIONS = config_service.get_config("incremental_partitions")
 EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
 
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -44,7 +37,6 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
-source_path = SOURCE.split('_')[0]
 
 default_libraries = config_service.get_config("default_libraries")
 
@@ -82,13 +74,25 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+load_amplitude_demand_transient_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"load-transient-{SOURCE}",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": raw_spark_jobs_path + "load_amplitude_demand_transient.py",
+            "parameters": [ENV, datalake_bucket, SOURCE, "{{ ds }}"],
+        }
+    },
+    execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
+)
+
 events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="events-demand-to-datalake-raw",
     dag=dag,
     json={
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_amplitude_demand_raw.py",
-            "parameters": [ENV, datalake_bucket, source_path, "{{ ds }}"],
+            "parameters": [ENV, datalake_bucket, SOURCE, "{{ ds }}"],
         }
     },
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
@@ -97,6 +101,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
 # raw tasks dependencies
 airflow_helpers.chain(
     create_cluster_task,
+    load_amplitude_demand_transient_task,
     events_to_datalake_raw_task,
     terminate_cluster_task,
 )

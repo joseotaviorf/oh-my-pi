@@ -1,8 +1,6 @@
 import json
 from argparse import ArgumentParser
-from datetime import datetime, timedelta
-from zipfile import ZipFile
-from time import sleep
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -13,17 +11,14 @@ from bietlejuice.base.spark import (
     SparkTableStorageFormat,
     SparkDataFrameService,
 )
-from bietlejuice.clients.api_clients.amplitude_client import AmplitudeClient
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.file_service import FileService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
-JOB_NAME = "load_amplitude_raw"
-AMPLITUDE_API_DATE_FORMAT = "%Y%m%dT%H"
+JOB_NAME = "load_amplitude_demand_raw"
 
 # Timeout between retries in seconds.
 BACKOFF_FACTOR = 5
@@ -46,15 +41,9 @@ if __name__ == "__main__":
     source = args.source
     execution_date = args.execution_date
 
-    start_date = datetime.strptime(execution_date, "%Y-%m-%d")
-    end_date = start_date + timedelta(hours=23)
+    source = source.split('_')[0]
 
-    date_times = []
-    date_time = start_date
-    while date_time <= end_date:
-        date_times.append(date_time.strftime(AMPLITUDE_API_DATE_FORMAT))
-        date_time += timedelta(hours=1)
-    time_ranges_list = list(zip(*(iter(date_times),) * 2))
+    dt = datetime.strptime(execution_date, "%Y-%m-%d")
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -68,6 +57,7 @@ if __name__ == "__main__":
     custom_records_per_file = config_service.get_config("custom_records_per_file")
     partition_cols = config_service.get_config("partition_cols")
     table_name = config_service.get_config("table_name")
+    transient_location = config_service.get_config("transient_location")
 
     spark_client = SparkClient()
     spark_context = spark_client.conn.sparkContext
@@ -85,77 +75,30 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
 
     for key in keys:
+
+        transient_path = transient_location + f'/events/year={dt.year}/month={dt.month}/day={dt.day}/app={key["app_id"]}/'
         logger.info(
-            "msg=starting events requests, app_id={}, app_name={}".format(
-                key["app_id"], key["app_name"]
-            )
+            f'msg=starting events processing, app_id={key["app_id"]}, app_name={key["app_name"]}, path={transient_path}'
         )
 
-        retry_count = 0
-        exceptions = []
-        while retry_count < MAX_RETRIES:
-
-            try:
-                amplitude_client = AmplitudeClient(key["app_key"], key["secret_key"])
-
-                time_ranges_rdd = spark_client.conn.sparkContext.parallelize(
-                    time_ranges_list
-                )
-                file_streams_responses = time_ranges_rdd.map(
-                    lambda time_range: amplitude_client.get_event_data_files(
-                        *time_range
-                    )
-                ).collect()
-
-                filtered_responses = list(filter(None, file_streams_responses))
-
-                events_json = []
-                if filtered_responses:
-
-                    for file_stream in filtered_responses:
-                        with ZipFile(file_stream, "r") as zip_file:
-                            events_json.extend(
-                                FileService.get_data_from_zip_file(zip_file)
-                            )
-
-                    logger.info(
-                        f"m=get_event_data_files, msg=received {len(events_json)} events."
-                    )
-
-                break
-
-            except Exception as error:
-                sleep(retry_count * BACKOFF_FACTOR)
-
-                logger.info(
-                    "msg=fail fetch events requests, retry={}, cause={}".format(
-                        retry_count, error
-                    )
-                )
-
-                exceptions.append(error)
-
-            retry_count += 1
-
-        if retry_count == 5:
-            logger.info("msg=fail fetch events requests, max retries exception")
-
-            exceptions_message = "\n" + "\n".join(exceptions)
-            raise Exception(
-                f"Max retries achieved. Fetch events failed {MAX_RETRIES} times. Exceptions:{exceptions_message}"
-            )
-
-        elif events_json:
-            df = spark_client.conn.read.json(spark_context.parallelize(events_json))
+        try:
+          
+          df = spark_client.conn.read.json(transient_path)
+          
+          if not(df.isEmpty()):
+            logger.info(f'msg= events received from App ID {key["app_id"]} for this day.')
+            
             df = (
                 dataframe_service.input(df)
                 .format_column_names()
                 .convert_struct_type_to_json()
+                .create_columns_from_dict({'app': key["app_id"]})
                 .create_year_month_day_columns_from_dataframe_column(
                     "server_upload_time"
                 )
                 .output()
             )
+
             df = df.na.drop(subset=partition_cols)
 
             s3_loader.load_df(
@@ -179,9 +122,11 @@ if __name__ == "__main__":
             spark_metastore_service.create_new_partitions_from_df(
                 database_name, table_name, df, partition_cols, parallelism=8
             )
-        else:
-            logger.info(
-                "msg=no events received from App ID {} for this day.".format(
-                    key["app_id"]
-                )
-            )
+
+          else:
+            logger.info(f'msg=no events received from App ID {key["app_id"]} for this day.')
+
+        except Exception as error:
+          logger.info(f"msg=fail to get events from {dt}, cause={error}")
+          continue
+           

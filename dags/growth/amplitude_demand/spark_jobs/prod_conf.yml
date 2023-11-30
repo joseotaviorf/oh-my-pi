@@ -1,4 +1,6 @@
 ---
 custom_records_per_file: 2500000
-partition_cols: [year, month, day, app]
+transient_partition_cols: [year, month, day, app, hour]
+raw_partition_cols: [year, month, day, app]
 table_name: events
+transient_location: s3://5a-datalake-prod/raw/amplitude_transient/

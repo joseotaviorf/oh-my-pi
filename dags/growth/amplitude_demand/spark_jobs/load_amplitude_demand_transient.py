@@ -16,16 +16,14 @@ from bietlejuice.base.spark import (
 )
 from bietlejuice.clients.api_clients.amplitude_client import AmplitudeClient
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.file_service import FileService
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
 from pyspark.sql.functions import col, year, month, dayofmonth, hour
 from pyspark.sql import DataFrame
 
-JOB_NAME = "load_amplitude_demand_test_raw"
+JOB_NAME = "load_amplitude_demand_transient"
 AMPLITUDE_API_DATE_FORMAT = "%Y%m%dT%H"
 
 # Timeout between retries in seconds.
@@ -47,6 +45,7 @@ def release_memory(dataframe: DataFrame) -> None:
     dataframe.unpersist(blocking=True)
     del dataframe
     gc.collect()
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -82,23 +81,18 @@ if __name__ == "__main__":
     
     config_service = ConfigurationService(source)
     custom_records_per_file = config_service.get_config("custom_records_per_file")
-    partition_cols = config_service.get_config("partition_cols")
+    partition_cols = config_service.get_config("transient_partition_cols")
     table_name = config_service.get_config("table_name")
+    database_location = config_service.get_config("transient_location")
 
     spark_client = SparkClient()
     spark_context = spark_client.conn.sparkContext
     dataframe_service = SparkDataFrameService()
+    s3_loader = S3Loader()
+
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    database_name = db_info["db_raw_databricks"]
-    database_location = db_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
-
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_service.create_database(database_name)
-
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    s3_loader = S3Loader()
 
     stages = [all_time_ranges_list[i * 4:(i + 1) * 4] for i in range((len(all_time_ranges_list) + 3) // 4 )]  
 
@@ -198,24 +192,4 @@ if __name__ == "__main__":
                     optimize_dataframe=False,
                 )
 
-                spark_metastore_loader.update_metastore(
-                    df,
-                    database_name,
-                    table_name,
-                    format_options,
-                    database_location,
-                    partition_cols,
-                    force_recreate=False,
-                )
-                spark_metastore_service.create_new_partitions_from_df(
-                    database_name, table_name, df, partition_cols, parallelism=8
-                )
-
                 release_memory(df)
-
-            else:
-                logger.info(
-                    "msg=no events received from App ID {} for this day.".format(
-                        key["app_id"]
-                    )
-                )
