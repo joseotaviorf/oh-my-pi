@@ -38,3 +38,11 @@ columns:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.is_active
     description: "Boolean indicating if this taxonomy is active"
+  ts_snapshot:
+    description: Timestamp of when the snapshot was made.
+  year:
+    description: Year of the snapshot. It is also a table partition.
+  month:
+    description: Month of the snapshot. It is also a table partition.
+  day:
+    description: Day of the snapshot. It is also a table partition.

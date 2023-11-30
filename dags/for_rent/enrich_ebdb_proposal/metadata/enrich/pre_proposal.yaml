@@ -114,3 +114,15 @@ columns:
     lineage:
       - datalake_ebdb_clean.pre_proposal.last_edition_updated
     description: deprecated
+  special_conditions_count:
+    description: Number of special conditions of the proposal.
+  remove_conditions_count:
+    description: Number of conditions to remove.
+  include_conditions_count:
+    description: Number of conditions to include.
+  maintenance_or_repair_conditions_count:
+    description: Number of conditions of maintenance or repair.
+  replace_or_modify_conditions_count:
+    description: Number of conditions of replacement or modification.
+  other_conditions_count:
+    description: Number of other conditions of the proposal.

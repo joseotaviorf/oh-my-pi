@@ -3,7 +3,7 @@ table_name: contract_b2b
 description: Information related to ForRent contracts B2B. Each line is an unique
   contract
 domain: For Rent
-owner: E ForRent@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_contract:
     lineage:
@@ -16,19 +16,11 @@ columns:
   contract_plan:
     lineage:
     - datalake_ebdb_clean.contract_partnership_data.contract_plan
-    description: ''
-    categories:
-      REFERRAL: ''
-      REGULAR: ''
-      PRIME: ''
+    description: Type of contract plan.
   contract_partner_type:
     lineage:
     - datalake_ebdb_clean.contract_partnership_data.partner_type
-    description: ''
-    categories:
-      AUTONOMOUS_AGENT: ''
-      EXECUTIVE_FOR_RENT: ''
-      PRIME: ''
+    description: Type of partner related to the contract.
   administration_split_percentage:
     lineage:
     - datalake_ebdb_clean.contract_partnership_data.administration_split_percentage
@@ -38,16 +30,17 @@ columns:
     - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
     description: The brokerage percentage of the contract.
   b2b_type:
-    description: ''
+    description: Type of the B2B client origin related to the contract.
     categories:
-      online: ''
-      prime: ''
+      online: The B2B client makes a recommendation of a property to be listed at QuintoAndar (referral).
+      prime: The B2B client registers the property at QuintoAndar.
   b2b_prime_type:
-    description: ''
+    description: Type of B2B client prime from which comes the contract.
     categories:
-      advanced_negotiation: ''
-      batch: ''
-      standard: ''
+      advanced_negotiation: The B2B client sends QuintoAndar the properties and tenants (advanced negotiation), the properties are listed and the contract process continues.
+      batch: The B2B client sends QuintoAndar properties in batches, they are listed and the contract process continues.
+      portability: The B2B client transfers active contracts to be renewed with QuintoAndar.
+      standard: The B2B client registers property by property at QuintoAndar.
   partner_quantity:
     description: Quantity of partners responsible for this contract. It can be one
       or zero operational partner and zero or many executive partners.
