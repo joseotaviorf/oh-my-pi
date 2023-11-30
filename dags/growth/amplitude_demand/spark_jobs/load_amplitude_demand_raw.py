@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     for key in keys:
 
-        transient_path = transient_location + f'/events/year={dt.year}/month={dt.month}/day={dt.day}/app={key["app_id"]}/'
+        transient_path = transient_location + f'events/year={dt.year}/month={dt.month}/day={dt.day}/app={key["app_id"]}/'
         logger.info(
             f'msg=starting events processing, app_id={key["app_id"]}, app_name={key["app_name"]}, path={transient_path}'
         )
@@ -96,6 +96,8 @@ if __name__ == "__main__":
           if not(df.isEmpty()):
             logger.info(f'msg= events received from App ID {key["app_id"]} for this day.')
             
+            df = df.drop("year", "month", "day", "hour", "app")
+
             df = (
                 dataframe_service.input(df)
                 .format_column_names()
