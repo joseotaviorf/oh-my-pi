@@ -10,7 +10,7 @@ minority_request_header:
 batch_size: 100
 
 tables_to_send:
-  bic_ss:
+  phone_numbers:
     key_name: phoneNumber
     type: CUSTOMER_PHONE_NUMBER_WHITELIST
 
