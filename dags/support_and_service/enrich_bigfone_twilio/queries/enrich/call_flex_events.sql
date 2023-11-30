@@ -7,15 +7,16 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.TransferTo') AS id_task_queue_transferred,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.conversations.conversation_id') AS id_conversation,
+	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.channelType') AS channel_type,
 	COALESCE(GET_JSON_OBJECT(metadata,'$.event_data.WorkerSid'),
 		GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.worker_sid')) AS id_agent,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.TransInitiatingWorkerSid') AS id_agent_transferred,
 	NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.from'),'(sip:)?([0-9+]+)@?',2),'') AS from_number,
 	NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.outbound_to'),'(sip:)?([0-9+]+)@?',2),'') AS to_number,
 	CASE
-		WHEN GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.direction') = 'inbound' 
+		WHEN GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.direction') = 'inbound'
 			THEN REGEXP_REPLACE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.from'),'(sip:)?([0-9+]+)@?',2),''),'(^\\+?55)|(\\D*)','')
-		WHEN GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.direction') = 'outbound' 
+		WHEN GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.direction') = 'outbound'
 			THEN REGEXP_REPLACE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.outbound_to'),'(sip:)?([0-9+]+)@?',2),''),'(^\\+?55)|(\\D*)','')
 	END AS customer_phone,
 	GET_JSON_OBJECT(metadata,'$.event_data.WorkerName') AS agent_email,

@@ -36,6 +36,10 @@ columns:
     lineage:
       - datalake_bigfone_events.events.metadata
     description: Unique identifier for each conversation.
+  channel_type:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+    description: Type of the channel related to the Twilio task
   id_agent:
     lineage:
       - datalake_bigfone_events.events.metadata
