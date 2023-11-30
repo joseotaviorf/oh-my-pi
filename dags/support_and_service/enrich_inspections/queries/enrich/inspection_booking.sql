@@ -120,7 +120,7 @@ inspection_contract AS (
             ON r.id = h.id_region
     GROUP BY 1, 2, 3, 4, 9
 )
-SELECT
+SELECT DISTINCT
     i.id_inspection,
     i.id_previous_inspection,
     i.id_external,

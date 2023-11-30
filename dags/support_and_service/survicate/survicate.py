@@ -20,7 +20,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 SOURCE = "survicate"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "30 2 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
