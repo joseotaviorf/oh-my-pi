@@ -41,7 +41,7 @@ if __name__ == "__main__":
     source = args.source
     execution_date = args.execution_date
 
-    source = source.split('_')[0]
+    source_path = source.split('_')[0]
 
     dt = datetime.strptime(execution_date, "%Y-%m-%d")
 
@@ -63,13 +63,21 @@ if __name__ == "__main__":
     spark_context = spark_client.conn.sparkContext
     dataframe_service = SparkDataFrameService()
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source_path, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_service.create_database(database_name)
+
+    logger.info(
+        f'''msg=initiating data processing, parameters
+            environment = {environment}, datalake_bucket = {datalake_bucket},
+            source = {source}, execution_date = {execution_date}, source_path = {source_path}
+            database_name = {database_name}, database_location = {database_location}
+        '''
+    )
 
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     s3_loader = S3Loader()
