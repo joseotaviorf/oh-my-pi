@@ -85,6 +85,7 @@ if __name__ == "__main__":
 
     for raw_table_name, sheet_info in sheet_details.items():
         sheet_details_dict[raw_table_name] = sheet_info
+        sheet_details_dict[raw_table_name]['dag_name'] = dag_name
 
     success_run = True
 
