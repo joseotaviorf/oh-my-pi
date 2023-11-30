@@ -1,11 +1,10 @@
 ---
 custom_cluster:
     driver_node_type_id: r5d.4xlarge
-    node_type_id: r5d.4xlarge
+    node_type_id: r5d.8xlarge
     runtime_engine: PHOTON
-    num_workers: 3
+    num_workers: 4
     spark_version: 10.4.x-scala2.12
-
 custom_libraries:
      - pypi:
           package: "s2cell==1.6.0" 
