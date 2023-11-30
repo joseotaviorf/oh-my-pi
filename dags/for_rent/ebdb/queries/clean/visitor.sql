@@ -1,5 +1,5 @@
 SELECT
-    id AS id_visitor,
+    id,
     agendamento_id AS id_booking,
     usuario_id AS id_user,
     visit_id AS id_visit,
