@@ -426,7 +426,7 @@ SELECT DISTINCT
   FIRST(c.agent_email) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local) AS first_agent_email,
   FIRST(c.agent_email) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local DESC) AS last_agent_email,
   CASE
-    WHEN c.channel_type = "call-in-app" THEN "call inapp"
+    WHEN c.channel_type = "call-in-app" OR c.direction = "outbound-api" THEN "call inapp"
     ELSE CONCAT("call ", direction)
   END AS ticket_origin,
   c.agent_email,

@@ -49,6 +49,7 @@ call AS (
       datalake_bigfone_twilio.call_flex_events
     WHERE
       direction IN ('inbound', 'outbound-api')
+      OR channel_type = 'call-in-app'
   ),
   reservations_ts AS (
     SELECT
