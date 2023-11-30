@@ -99,13 +99,17 @@ raw_task_groups = {}
 clean_task_groups = {}
 
 for table_name in tables:
-
     raw_task_groups[table_name] = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
         extraction_spark_job_file=raw_spark_job_path,
-        raw_spark_job_extra_args=[SOURCE, table_name, "{{ ds }}",],
+        raw_spark_job_extra_args=[
+            SOURCE,
+            table_name,
+            "{{ ds }}",
+        ],
+        has_hive_sync=False,
     )
 
     clean_task_groups[table_name] = task_group.build_clean_task_group(
