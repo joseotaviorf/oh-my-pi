@@ -19,4 +19,5 @@ SELECT
 FROM
     datalake_listing_jobs.listing_quality_sla
 WHERE
-    agent_organization = "webhelp"
+    agent_organization IN ('webhelp', 'webhelpbr')
+

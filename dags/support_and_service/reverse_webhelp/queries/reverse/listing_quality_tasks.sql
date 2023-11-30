@@ -23,5 +23,5 @@ SELECT
 FROM
     datalake_listing_jobs.listing_quality_tasks
 WHERE
-    responsible_analyst_organization = "webhelp"
+    responsible_analyst_organization IN ('webhelp', 'webhelpbr')
     AND DATE(dt_analyzed_utc) = CURRENT_DATE - 1

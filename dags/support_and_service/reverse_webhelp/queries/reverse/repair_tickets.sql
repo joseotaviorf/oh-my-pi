@@ -1,164 +1,51 @@
-WITH ticket_iq  as (
-    SELECT DISTINCT
-        ft.sk_ticket,
-        client_type,
-        sr.id_repair_request AS id_request
-    FROM 
-        dw_tickets.fact_tickets AS ft
-    LEFT JOIN 
-        dw_tickets.dim_ticket AS dt 
-            ON dt.sk_ticket = ft.sk_ticket
-    LEFT JOIN 
-        datalake_repairs_clean.service_request AS sr 
-            ON sr.id_third_party_crm_ticket_external = ft.sk_ticket
-    WHERE 
-        dt.tags LIKE '%teste_ps_pp_grupo_b_intermediacao_autosservico%'
-),
-pp_tickets_test AS (
-    SELECT 
-        tkt.sk_ticket
-    FROM 
-        ticket_iq
-    INNER JOIN 
-        datalake_repairs_clean.service_request AS req 
-            ON req.id_repair_request = ticket_iq.id_request 
-    INNER JOIN 
-        dw_tickets.dim_ticket AS tkt 
-            ON tkt.sk_ticket = req.id_third_party_crm_ticket_external
-),
-relisting_db AS (
-    SELECT DISTINCT
-        dc.sk_contract,
-        CASE 
-            WHEN (dhl.ts_publication  IS NOT NULL) THEN dhl.sk_house_listing 
-            ELSE NULL 
-        END AS listing
-    FROM 
-        dw_public.fact_listing_rent_flows AS fact_listing_rent_flows
-    FULL JOIN 
-        dw_public.dim_house_listing AS dhl 
-            ON fact_listing_rent_flows.sk_house_listing = dhl.sk_house_listing 
-    LEFT JOIN 
-        dw_public.dim_contract AS dc 
-            ON fact_listing_rent_flows.sk_contract = dc.sk_contract
-    WHERE 
-        DATE_TRUNC('month',dhl.ts_listing_version_start) >= ADD_MONTHS(DATE_TRUNC('month',CURRENT_DATE),-47)
-        AND DATE_TRUNC('month',dhl.ts_listing_version_start) <= DATE_ADD(CURRENT_DATE, -1)
-        AND (dhl.listing_category_start = 'Re-Listing') 
-        AND ((dhl.country_code <> 'MX') OR (dhl.country_code IS NULL))
-),
-relisting_distinct AS (
-    SELECT
-        sk_contract,
-        COUNT(DISTINCT listing) AS relisting
-    FROM
-        relisting_db
-    WHERE
-        sk_contract <> -1
-    GROUP BY 1
-),
-repairs_interaction AS (
-    SELECT
-        rr.id AS id_request,
-        IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation,
-        CASE 
-            WHEN MIN(rr.ts_updated) <= rc.ts_started THEN MIN(rr.ts_updated) - INTERVAL 3 HOUR
-            WHEN MIN(rr.ts_updated) > rc.ts_started THEN rc.ts_started - INTERVAL 3 HOUR
-            ELSE COALESCE(MIN(rr.ts_updated) - INTERVAL 3 HOUR, rc.ts_started - INTERVAL 3 HOUR) 
-        END AS first_interaction,
-        MIN(DATE(rr.ts_updated)) AS definition_date
-    FROM
-        datalake_repairs_clean.repair_request AS rr
-    LEFT JOIN
-        datalake_repairs_clean.repair_request_chat AS rc
-            ON rr.id = rc.id_repair_request
-    WHERE
-        (STRING(GET_JSON_OBJECT(rr.owner_approval, '$.approved')) IS NOT NULL)
-        AND CAST(rr.ts_created AS DATE) >= DATE('2023-01-01')
-        AND rr.id_third_party_crm_ticket_external IS NOT NULL
-    GROUP BY 
-        rr.id, rc.ts_started 
-)
-SELECT 
-    ft.sk_ticket,
-    ft.sk_contract,
-    rr.id AS sk_request,
-    dt.group_name,
-    dt.client_type,
-    dt.status,
-    dt.custom_fields,
-    ft.reopens,
-    dt.tags,
-    dt.ticket_via,
-    dt.channel,
-    ft.minutes_first_reply_time_calendar,
-    rd.relisting,
-    da.email,
-    da.agent_organization,
-    ft.replies,
-    rr.service_provider,
-    ri.has_chat_negociation,
-    ri.first_interaction,
-    tax.theme,
-    tax.theme_detail,
-    tax.request_type,
-    tax.customer_type_tag,
-    tax.motivation,
-    cs.front_or_back,
-    csat.satisfaction_score AS csat_score,
-    csat.respondent_comments AS comment_csat,
-    csat.improvement_tags AS csat_tags,
-    csat.secondary_satisfaction_score AS csat_partes,
-    CAST(dc.dt_entrance AS DATE) AS entrance_date,
-    CAST(dt.ts_created_local AS DATE) AS created_date,
-    CAST(ft.ts_solved_local AS DATE) AS solved_date,
-    CAST(rr.ts_created AS DATE) request_date,
-    CAST(csat.ts_submitted AS DATE) AS csat_response_date,
-    ri.definition_date,
-    ft.ts_updated_local,
-    ft.ts_last_assigned_local,
-    ft.ts_initially_assigned_local,
-    ft.ts_closed_local,
-    YEAR(CURRENT_DATE - 1) AS year,
-    MONTH(CURRENT_DATE - 1) AS month,
-    DAY(CURRENT_DATE - 1) AS day,
+SELECT
+    id_ticket,
+    id_request,
+    id_contract,
+    group_name,
+    client_type,
+    status,
+    custom_fields,
+    tags,
+    ticket_via,
+    channel,
+    agent_email,
+    agent_organization,
+    service_provider,
+    theme,
+    theme_detail,
+    request_type,
+    customer_type_tag,
+    motivation,
+    front_or_back,
+    comment_csat,
+    csat_tags,
+    csat_score,
+    csat_partes,
+    has_chat_negociation,
+    reopens,
+    replies,
+    relisting,
+    minutes_first_reply_time_calendar,
+    entrance_date,
+    definition_date,
+    ts_first_interaction,
+    ts_created_local,
+    ts_updated_local,
+    ts_closed_local,
+    ts_solved_local,
+    ts_request_created,
+    ts_csat_response_submitted,
+    ts_initially_assigned_local,
+    ts_last_assigned_local,
+    year,
+    month,
+    day,
     NOW() AS ts_load
-FROM 
-    dw_tickets.fact_tickets AS ft
-LEFT JOIN 
-    dw_tickets.dim_ticket AS dt 
-        ON dt.sk_ticket = ft.sk_ticket
-LEFT JOIN 
-    dw_public.dim_contract AS dc 
-        ON ft.sk_contract = dc.sk_contract
-LEFT JOIN 
-    dw_customer_support.fact_ticket AS cs
-        ON cs.sk_ticket = ft.sk_ticket
-LEFT JOIN
-    dw_customer_support.dim_agent AS da
-        ON ft.sk_agent = da.sk_agent
-LEFT JOIN 
-    dw_customer_support.dim_taxonomy AS tax
-        ON tax.sk_taxonomy = cs.sk_taxonomy
-LEFT JOIN 
-    datalake_repairs_clean.repair_request AS rr 
-        ON rr.id_third_party_crm_ticket_external = ft.sk_ticket
-LEFT JOIN 
-    repairs_interaction AS ri
-        ON ri.id_request = rr.id
-LEFT JOIN
-    relisting_distinct AS rd
-        ON rd.sk_contract = ft.sk_contract
-LEFT JOIN
-    datalake_survicate.repairs_surveys AS csat
-        ON csat.id_ticket = ft.sk_ticket
-WHERE 
-    dt.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
-    AND (dt.ts_created >= DATE_ADD(CURRENT_DATE,-20*7) OR ft.ts_solved >= date('2023-01-01') OR ft.ts_solved IS NULL)
-    AND dt.channel NOT IN ('call')
-    AND dt.status NOT IN ('deleted')
-    AND dt.tags NOT LIKE '%caso_ticket_agregador%'
-    AND ft.sk_ticket NOT IN (SELECT sk_ticket FROM pp_tickets_test)
-    AND da.agent_organization IN ('webhelp', 'webhelpbr')
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ft.sk_ticket ORDER BY dt.ts_created_local DESC) = 1
+FROM
+    datalake_repairs.repair_tickets
+WHERE
+    agent_organization IN ('webhelp', 'webhelpbr')
+    AND {year} = year
+    AND {month} = month
+    AND {day} = day
