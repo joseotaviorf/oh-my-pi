@@ -1774,14 +1774,12 @@ bietlejuice.enrich_mexico_cib_events:
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
 bietlejuice.enrich_mexico_cib_segmentation:
   - bietlejuice.enrich_big_agent:load-enrich-agent
-  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
+  - bietlejuice.enrich_mexico_cib_events:load-enrich-cib-events
+bietlejuice.enrich_mexico_cib_events:
+  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
   - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
 bietlejuice.enrich_mexico_consolidated_marketing_metrics:
   - bietlejuice.enrich_mexico_google_ads:load-enrich-ads-performance

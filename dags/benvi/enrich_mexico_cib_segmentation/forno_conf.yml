@@ -1,6 +1,2 @@
 ---
-custom_cluster:
-  driver_node_type_id: m5d.xlarge
-  node_type_id: m5d.large
-  num_workers: 1
 partitions: [year, month]

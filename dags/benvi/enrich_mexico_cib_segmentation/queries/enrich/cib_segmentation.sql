@@ -1,148 +1,96 @@
-WITH listing_business_context AS (
+WITH dim_cib AS (
     SELECT
-        id_house,
-        CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
-        CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent,
-        MAX(IF(business_context = 'SALE', status, NULL)) AS house_sale_status,
-        MAX(IF(business_context = 'SALE', status_reason, NULL)) AS house_sale_status_reason,
-        MAX(IF(business_context = 'RENT', status, NULL)) AS house_rent_status,
-        MAX(IF(business_context = 'RENT', status_reason, NULL)) AS house_rent_status_reason
+        GET_JSON_OBJECT(a.details, '$.userExternalId') AS id_user,
+        DATE(GET_JSON_OBJECT(a.details, '$.registeredAt')) AS dt_registered
     FROM
-        datalake_ebdb_listing.listing_business_context
-    GROUP BY 1
-),
-house_listing AS (
-    SELECT
-        hl.id_house,
-        hl.id_house_listing AS sk_house_listing,
-        hlco.first_consultant_type,
-        CAST(hl.version AS SMALLINT) AS version,
-        IF(hl.version > 0, hl.ts_listing_version_start, NULL) AS ts_listing_version_start,
-        hl.ts_listing_version_end,
-        CAST(COALESCE(hlco.id_user, -1) AS BIGINT) AS sk_user_consultant,
-        CASE
-            WHEN lbc.id_house IS NULL THEN TRUE -- When house is not in listing_business_context, it is for rent
-            ELSE COALESCE(lbc.is_for_rent, FALSE)
-        END AS is_for_rent,
-        h.country_code
-    FROM
-        datalake_ebdb_listing.house AS h
-    JOIN
-        datalake_ebdb_listing.house_listing AS hl
-            ON hl.id_house = h.id
-    LEFT JOIN
-        listing_business_context AS lbc
-            ON lbc.id_house = h.id
-    LEFT JOIN
-        datalake_big_agent.house_rent_listing_consultant AS hlco
-            ON hlco.id_house_listing = hl.id_house_listing
-            AND hlco.is_last_ciq_on_listing IS TRUE
-),
-first_listing AS (
-    SELECT
-        hl.sk_user_consultant,
-        COUNT(DISTINCT COALESCE(plb2b.id_house_listing, -1)) AS first_listings,
-        DATE(DATE_TRUNC('month' , dd.date)) AS dt_month_start
-    FROM
-        datalake_listing_flow.listing_flows_with_reprocessed_leads AS lfrl
-    LEFT JOIN
-        datalake_rent_potential_listing.potential_listing_b2b AS plb2b
-            ON plb2b.id = lfrl.id
-    JOIN
-        house_listing AS hl
-            ON COALESCE(plb2b.id_house_listing, -1) = hl.sk_house_listing
-    JOIN
-        datalake_quintoandar.aux_date AS dd
-            ON dd.date = DATE(lfrl.ts_first_listing)
-    WHERE
-        hl.country_code = 'MX'
-        AND lfrl.ts_first_listing IS NOT NULL
-        AND hl.first_consultant_type <> 'Core'
-    GROUP BY
-        1, 3
-),
-contract_signed AS (
-    SELECT
-        hl.sk_user_consultant,
-        COUNT(DISTINCT lc.id_contract) AS contracts_signed,
-        DATE(DATE_TRUNC('month' , dd.date)) AS dt_month_start
-    FROM
-        datalake_listing_contracts.listing_contracts AS lc
-    JOIN
-        datalake_ebdb_contract.contract AS c
-            ON lc.id_contract = c.id
-            AND c.status IN ('Ativo', 'Finalizado')
-    JOIN
-        house_listing AS hl
-            ON lc.id_house_listing = hl.sk_house_listing
-    JOIN
-        datalake_quintoandar.aux_date AS dd
-            ON dd.date = DATE(c.ts_signed)
-            AND c.ts_signed IS NOT NULL
-    WHERE
-        lc.country_code = 'MX'
-        AND hl.first_consultant_type <> 'Core'
-    GROUP BY
-        1, 3
-),
-cibs_information AS (
-    SELECT
-        GET_JSON_OBJECT(a.details, '$.userExternalId') AS id_cib,
-        NULLIF(CAST(LEFT(u.name, 200) AS VARCHAR(255)), '') AS cib_name,
-        NULLIF(u.email, '') AS cib_email,
-        DATE(GET_JSON_OBJECT(a.details, '$.registeredAt')) AS dt_registered,
-        dd.month_start AS dt_month_start
-    FROM
-        datalake_quintoandar.aux_date AS dd
-    LEFT JOIN
         datalake_big_agent.agent AS a
-            ON dd.month_start >= DATE_TRUNC('month' , DATE(GET_JSON_OBJECT(a.details, '$.registeredAt')))
-            AND dd.month_start < DATE_TRUNC('month', NOW())
-    LEFT JOIN
+    INNER JOIN
         datalake_ebdb_user.user AS u
             ON u.id = GET_JSON_OBJECT(a.details, '$.userExternalId')
     WHERE
         u.country_code = 'MX'
-    GROUP BY
-        1, 2, 3, 4, 5
 ),
-cibs_info_for_segmentation AS (
-    SELECT
-        ci.id_cib,
-        ci.cib_name,
-        ci.cib_email,
-        COALESCE(fl.first_listings, 0) AS first_listings,
-        COALESCE(cs.contracts_signed, 0) AS contracts_signed,
-        ROUND(MONTHS_BETWEEN(DATE(NOW()), ci.dt_registered), 1) AS months_registered,
-        ci.dt_registered,
-        ci.dt_month_start
+base_months_since_registration AS (
+    SELECT DISTINCT
+        dc.id_user,
+        ROUND(MONTHS_BETWEEN(ad.month_end, dc.dt_registered), 1) AS months_registered,
+        ADD_MONTHS(ad.month_start, 1) AS dt_month_started_segmentation,
+        GREATEST(ad.month_start, dc.dt_registered) AS dt_started,
+        ad.month_end AS dt_ended,
+        ad.year,
+        ad.month
     FROM
-        cibs_information AS ci
+        datalake_quintoandar.aux_date AS ad
+    INNER JOIN
+        dim_cib AS dc
+            ON ad.month_start >= DATE_TRUNC('month' , dt_registered)
+            AND ad.month_start <= MAKE_DATE({year}, {month}, '01')
+    WHERE
+        dc.id_user IS NOT NULL
+        AND ad.month_start >= GREATEST(ADD_MONTHS(MAKE_DATE({year}, {month}, '01'), -1), DATE_TRUNC('month', dt_registered))
+),
+events_by_month AS (
+    SELECT
+        bmsr.id_user,
+        SUM(IF(ce.event_type = 'FL', 1, 0)) AS first_listings,
+        SUM(IF(ce.event_type = 'CS', 1, 0)) AS contracts_signed,
+        bmsr.year,
+        bmsr.month
+    FROM
+        base_months_since_registration AS bmsr
     LEFT JOIN
-        first_listing AS fl
-            ON fl.sk_user_consultant = ci.id_cib
-            AND ci.dt_month_start = fl.dt_month_start
-    LEFT JOIN
-        contract_signed AS cs
-            ON cs.sk_user_consultant = ci.id_cib
-            AND ci.dt_month_start = cs.dt_month_start
+        datalake_mexico_cib_events.cib_events AS ce
+            ON ce.year = bmsr.year
+            AND ce.month = bmsr.month
+            AND ce.id_cib = bmsr.id_user
     GROUP BY
-        1, 2, 3, 4, 5, 6, 7, 8
+        1, 4, 5
+),
+segmentation_rule_calculation AS (
+    SELECT
+        bmsr.id_user AS id_cib,
+        'AVG' AS type_calculation,
+        CASE
+            WHEN bmsr.months_registered < 2 THEN AVG(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY bmsr.id_user ORDER BY bmsr.dt_started ASC ROWS BETWEEN 0 PRECEDING AND CURRENT ROW)
+            ELSE AVG(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY bmsr.id_user ORDER BY bmsr.dt_started ASC ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)
+        END AS avg_fl,
+        CASE
+            WHEN bmsr.months_registered < 2 THEN AVG(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY bmsr.id_user ORDER BY bmsr.dt_started ASC ROWS BETWEEN 0 PRECEDING AND CURRENT ROW)
+            ELSE AVG(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY bmsr.id_user ORDER BY bmsr.dt_started ASC ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)
+        END AS avg_cs,
+        bmsr.months_registered,
+        bmsr.dt_month_started_segmentation,
+        bmsr.dt_started,
+        bmsr.dt_ended,
+        bmsr.year,
+        bmsr.month
+    FROM
+        base_months_since_registration AS bmsr
+    INNER JOIN
+        events_by_month AS ebm
+            ON ebm.year = bmsr.year
+            AND ebm.month = bmsr.month
+            AND ebm.id_user = bmsr.id_user
 )
 SELECT
     id_cib,
-    cib_name,
-    cib_email,
+    type_calculation,
     CASE
-        WHEN months_registered >= 3 AND contracts_signed >= 2 AND first_listings >= 8 THEN 'MASTER'
-        WHEN months_registered >= 1 AND contracts_signed >= 1 AND first_listings >= 2 THEN 'LOYAL'
-        ELSE 'INTER'
-    END AS level,
-    first_listings,
-    contracts_signed,
+        WHEN avg_fl >= 5 AND avg_cs >= 1 THEN 'Elite'
+        WHEN avg_fl > 1 THEN 'Plus'
+        ELSE 'Inter'
+    END AS segmentation,
+    avg_fl AS first_listings,
+    avg_cs AS contracts_signed,
     months_registered,
-    dt_registered,
-    YEAR(dt_month_start) AS year,
-    MONTH(dt_month_start) AS month
+    IF(months_registered < 2, 1, 2) AS months_calculation,
+    dt_month_started_segmentation,
+    dt_started,
+    dt_ended,
+    year,
+    month
 FROM
-    cibs_info_for_segmentation
+    segmentation_rule_calculation
+WHERE
+    year = {year}
+    AND month = {month}

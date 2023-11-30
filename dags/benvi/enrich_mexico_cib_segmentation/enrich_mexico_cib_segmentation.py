@@ -39,7 +39,7 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
 default_libraries = config_service.get_config("default_libraries")
-cluster_description = config_service.get_config("custom_cluster")
+cluster_description = config_service.get_config("databricks_10_4_min_fixed_workers_general_photon_cluster")
 
 partitions = config_service.get_config("partitions")
 
@@ -95,6 +95,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
+    is_incremental=True,
     partitions=partitions,
 )
 

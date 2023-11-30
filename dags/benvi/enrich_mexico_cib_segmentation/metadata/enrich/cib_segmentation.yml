@@ -10,36 +10,50 @@ columns:
   id_cib:
     lineage:
       - datalake_big_agent.agent.details
-    description: ID of the CIB, from EBDB. It's the user external ID from Big Agent
-  cib_name:
-    lineage:
-      - datalake_ebdb_user.user.name
-    description: Name of the CIB.
-  cib_email:
-    lineage:
-      - datalake_ebdb_user.user.email
-    description: Email of the CIB.
-  level:
-    description: Level of the CIB in the corresponding month.
+    description: ID of the CIB, from EBDB. It's the user external ID from Big Agent.
+  type_calculation:
+    description: The type of calculation used in the segmentation rule to obtain CIB segmentation.
     categories:
-      MASTER: 'CIB registered at least 3 months ago, that closed 2 or more contracts and brought 8 or more first listings'
-      LOYAL: 'CIB registered at least a month ago, that closed at least 1 contract and brought 2 or more first listings'
-      INTER: 'CIB that is neither MASTER nor LOYAL'
+      AVG: 'The calculation is the average occurrence of the event.'
+  segmentation:
+    description: The segmentation that CIB fits into, in the corresponding month (dt_month_started_segmentation), according to the stipulated rules.
+    categories:
+      Elite: 'CIB that had an average of 5 or more FL and an average of 1 or more CS in the period analyzed for calculation.'
+      Plus: 'CIB that had an average FL greater than 1 in the period analyzed for calculation.'
+      Inter: 'CIB that had an average FL less than or equal to 1 in the period analyzed for calculation.'
   first_listings:
-    description: Number of CIB's first listings in the corresponding month.
-  contracts_signed:
-    description: Number of CIB's contracts signed in the corresponding month.
-  months_registered:
-    description: Number of months that the CIB has been registered.
-  dt_registered:
     lineage:
+      - datalake_mexico_cib_events.cib_events.id_house
+    description: Number of CIB's first listings calculated according to the stipulated segmentation rules.
+  contracts_signed:
+    lineage:
+      - datalake_mexico_cib_events.cib_events.id_house
+    description: Number of CIB's contracts signed calculated according to the stipulated segmentation rules.
+  months_registered:
+    lineage:
+      - datalake_quintoandar.aux_date.month_end
       - datalake_big_agent.agent.details
-    description: Date when the CIB was registered.
+    description: Number of months that the CIB has been registered.
+  dt_month_started_segmentation:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+    description: Start date of the month in which the CIB will be classified with the calculated segmentation.
+  months_calculation:
+    description: Number of months used in segmentation calculation.
+  dt_started:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+      - datalake_big_agent.agent.details
+    description: Start date of the period in which the events made by the CIB will be analyzed.
+  dt_ended:
+    lineage:
+      - datalake_quintoandar.aux_date.month_end
+    description: End date of the period in which the events made by the CIB will be analyzed
   year:
     lineage:
       - datalake_quintoandar.aux_date.month_start
-    description: Year in which the behavior of the CIB will be analyzed. Also, it's a partition of this table.
+    description: Year in which the events made by the CIB will be analyzed. Also, it's a partition of this table.
   month:
     lineage:
       - datalake_quintoandar.aux_date.month_start
-    description: Month in which the behavior of the CIB will be analyzed. Also, it's a partition of this table.
+    description: Month in the events made by the CIB will be analyzed. Also, it's a partition of this table.
