@@ -8,6 +8,7 @@ SELECT
     taskmaster_task_id AS id_taskmaster_task,
     allow_personal_info_sharing,
     status,
+    journey,
     third_party_crm,
     origin_channel,
     assumed_urgency,

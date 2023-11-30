@@ -28,6 +28,9 @@ columns:
   status:
     lineage:
       - datalake_repairs_raw.repair_request.status
+  journey:
+    lineage:
+      - datalake_repairs_raw.repair_request.journey
   third_party_crm:
     lineage:
       - datalake_repairs_raw.repair_request.third_party_crm
