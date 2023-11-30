@@ -210,6 +210,7 @@ conversation AS (
     COALESCE(ie.from_number,fe.from_number) AS from_phone_number,
     COALESCE(ie.to_number,fe.to_number) AS to_phone_number,
     fe.direction,
+    cfe.channel_type,
     fe.scheduling_source,
     COALESCE(cm.number_of_tasks,0) AS number_of_tasks,
     COALESCE(cm.number_of_departments,0) AS number_of_departments,
@@ -377,6 +378,7 @@ conversation_and_segment AS (
     CAST(c.number_of_departments AS INT) AS number_of_departments,
     CAST(c.number_of_tasks AS INT) AS number_of_segments,
     c.direction,
+    c.channel_type,
     t.is_answered,
     c.has_ended_in_ura,
     CASE
@@ -424,7 +426,7 @@ SELECT DISTINCT
   FIRST(c.agent_email) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local) AS first_agent_email,
   FIRST(c.agent_email) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local DESC) AS last_agent_email,
   CASE
-    WHEN c.direction = "outbound-api" THEN "call inapp"
+    WHEN c.channel_type = "call-in-app" THEN "call inapp"
     ELSE CONCAT("call ", direction)
   END AS ticket_origin,
   c.agent_email,
