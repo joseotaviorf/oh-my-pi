@@ -165,6 +165,18 @@ columns:
     description: ''
     lineage:
     - datalake_gsheets_raw.navent_convenia_like.email_gestor
+  employee_salary_local_currency:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.navent_convenia_like.salario_moeda_local
+  employee_age_group:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.navent_convenia_like.faixa_etaria
+  employee_salary:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.navent_convenia_like.salario
   is_leader:
     description: ''
     lineage:

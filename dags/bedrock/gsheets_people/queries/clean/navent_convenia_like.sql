@@ -39,6 +39,9 @@ SELECT
     criticidade AS criticality,
     status_gestor AS manager_status,
     email_gestor AS manager_email,
+    salario_moeda_local AS employee_salary_local_currency,
+    faixa_etaria AS employee_age_group,
+    FLOAT(salario) AS employee_salary,
     CASE
         WHEN fl_lider = 1
             THEN TRUE
