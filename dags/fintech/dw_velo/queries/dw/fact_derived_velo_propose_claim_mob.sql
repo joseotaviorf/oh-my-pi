@@ -81,7 +81,7 @@ WITH claims_omie AS (
         NULL AS key,
         NULL AS project,
         NULL AS transaction_type,
-        entry.bill_item AS description,
+        NULL AS description,
         'Garantia' AS provisional_group,
         CASE
             WHEN j.desc_lvl_1 = 'GUARANTEE' THEN 'Garantia'
@@ -99,13 +99,10 @@ WITH claims_omie AS (
         dw_velo.dim_velo_junk AS j
             ON d.sk_occurrence_type = j.sk_junk
     LEFT JOIN
-        datalake_rental_guarantee_platform_clean.delinquency_entry AS entry
-            ON d.sk_occurrence = entry.id_delinquency
-    LEFT JOIN
         qtd_bill AS qtd
             ON d.sk_occurrence = qtd.id
     WHERE
-        d.is_legacy IS TRUE
+        d.is_legacy IS FALSE
         AND j.desc_lvl_1 IN ('GUARANTEE', 'TERMINATION')
 ),
 claims_final AS (
