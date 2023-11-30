@@ -1,0 +1,115 @@
+---
+database_name: datalake_hr_system_raw
+table_name: workers
+owner: leonardo.soares@quintoandar.com.br
+domain: bedrock
+description: Table with data of workers from Oracle HR System
+columns:
+  blood_type:
+    tags:
+      - Confidential
+      - PII
+  blood_type_meaning:
+    tags:
+      - Confidential
+      - PII
+  birth_country:
+    tags:
+      - Confidential
+      - PII
+  birth_country_name:
+    tags:
+      - Confidential
+      - PII
+  birth_region:
+    tags:
+      - Confidential
+      - PII
+  birth_town:
+    tags:
+      - Confidential
+      - PII
+  fullname:
+    tags:
+      - Confidential
+      - PII
+  list_name:
+    tags:
+      - Confidential
+      - PII
+  addresses:
+    tags:
+      - Confidential
+      - PII
+  citizenships:
+    tags:
+      - Confidential
+      - PII
+  disabilities:
+    tags:
+      - Confidential
+      - PII
+  driver_licenses:
+    tags:
+      - Confidential
+      - PII
+  emails:
+    tags:
+      - Confidential
+      - PII
+  ethnicities:
+    tags:
+      - Confidential
+      - PII
+  legislative_info:
+    tags:
+      - Confidential
+      - PII
+  names:
+    tags:
+      - Confidential
+      - PII
+  national_identifiers:
+    tags:
+      - Confidential
+      - PII
+  other_communication_accounts:
+    tags:
+      - Confidential
+      - PII
+  passports:
+    tags:
+      - Confidential
+      - PII
+  phones:
+    tags:
+      - Confidential
+      - PII
+  religions:
+    tags:
+      - Confidential
+      - PII
+  visas_permits:
+    tags:
+      - Confidential
+      - PII
+  work_relationships:
+    tags:
+      - Confidential
+      - PII
+  workers_dff:
+    tags:
+      - Confidential
+      - PII
+  workers_eff:
+    tags:
+      - Confidential
+      - PII
+  dt_birth:
+    tags:
+      - Confidential
+      - PII
+  dt_death:
+    tags:
+      - Confidential
+      - PII
