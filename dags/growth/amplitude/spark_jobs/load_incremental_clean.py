@@ -55,6 +55,9 @@ if __name__ == "__main__":
 
     df = spark_client.get_records(query)
     df = df.withColumn("id_app",df.id_app.cast('bigint'))
+    df = df.withColumn("id_schema",df.id_schema.cast('bigint'))
+    df = df.withColumn("location_lat",df.location_lat.cast('string'))
+    df = df.withColumn("location_lng",df.location_lng.cast('string'))
 
     s3_loader.load_df(
         df=df,
