@@ -79,6 +79,19 @@ class AmplitudeCleanLoader():
 
         df = self.spark_client.get_records(query)
 
+        df_cols = df.columns
+
+        if('id_schema' in df.columns):
+            df = df.withColumn("id_schema",df.id_schema.cast('bigint'))
+
+        if('location_lat' in df.columns):
+            df = df.withColumn("location_lat",df.id_schema.cast('string'))
+
+        if('location_lng' in df.columns):
+            df = df.withColumn("location_lng",df.id_schema.cast('string'))
+
+        df = df.select(df_cols)
+
         return df 
 
     def load_data_into_datalake(
