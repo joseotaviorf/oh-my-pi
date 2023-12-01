@@ -11,7 +11,9 @@ WITH call_inapp_csat AS (
     FROM
         datalake_bigfone_clean.event AS ev
     WHERE
-        GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.direction") = "outbound-api"
+        (
+          GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.direction") = "outbound-api"
+          OR GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.channelType") = "call-in-app"
         AND ev.year = {year}
         AND ev.month = {month}
         AND ev.day = {day}
@@ -73,7 +75,7 @@ call_csat AS (
     ce.csat_2,
     ce.csat_3,
     CASE
-      WHEN cs.direction = "outbound-api" THEN "call inapp"
+      WHEN cs.direction = "outbound-api" OR cs.channel_type = "call-in-app" THEN "call inapp"
       ELSE "call"
     END AS service_context,
     ce.ts_created_local,

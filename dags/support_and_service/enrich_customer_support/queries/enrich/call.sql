@@ -457,6 +457,7 @@ SELECT DISTINCT
   c.number_of_departments,
   c.number_of_segments,
   c.direction,
+  c.channel_type,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
   zd.replies,

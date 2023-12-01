@@ -244,6 +244,10 @@ columns:
       outbound:
         An outbound call is a call that is initiated by the Twilio application to an
         external party, such as a customer or a client.
+  channel_type:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.channel_type
+    description: Column used to identify Call InApp records
   minutes_first_resolution_time_calendar:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_calendar
