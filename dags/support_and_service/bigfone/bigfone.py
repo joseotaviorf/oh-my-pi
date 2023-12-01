@@ -129,4 +129,5 @@ cross_downstream(
     DatalakeTaskGroup.all_first_tasks(clean_task_groups),
 )
 
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(raw_task_groups))
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
