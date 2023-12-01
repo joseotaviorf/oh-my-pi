@@ -54,10 +54,19 @@ if __name__ == "__main__":
     ).format(execution_date.year, execution_date.month, execution_date.day)
 
     df = spark_client.get_records(query)
-    df = df.withColumn("id_app",df.id_app.cast('bigint'))
-    df = df.withColumn("id_schema",df.id_schema.cast('bigint'))
-    df = df.withColumn("location_lat",df.location_lat.cast('string'))
-    df = df.withColumn("location_lng",df.location_lng.cast('string'))
+
+    df_cols = df.columns
+
+    if('id_app' in df_cols):
+        df = df.withColumn("id_app",df.id_app.cast('bigint'))
+    if('id_schema' in df_cols):
+        df = df.withColumn("id_schema",df.id_schema.cast('bigint'))
+    if('location_lat' in df_cols):
+        df = df.withColumn("location_lat",df.location_lat.cast('string'))
+    if('location_lng' in df_cols):
+        df = df.withColumn("location_lng",df.location_lng.cast('string'))
+
+    df = df.select(df_cols)
 
     s3_loader.load_df(
         df=df,
