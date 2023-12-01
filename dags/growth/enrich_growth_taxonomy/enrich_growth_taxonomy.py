@@ -33,6 +33,8 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config("custom_cluster")
+extra_spark_conf = config_service.get_config("spark_conf")
+cluster_configuration["spark_conf"].update(extra_spark_conf)
 default_libraries = config_service.get_config("default_libraries")
 table_task_group_parameters = config_service.get_config("table_task_group_parameters")
 

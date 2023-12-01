@@ -2,12 +2,12 @@ custom_cluster:
   driver_node_type_id: r5d.4xlarge
   node_type_id: m5d.4xlarge
   runtime_engine: PHOTON
-  autoscale:
-    max_workers: 3
-    min_workers: 2
-  spark_version: 10.4.x-scala2.12
+  num_workers: 3
+  spark_version: 12.2.x-scala2.12
   aws_attributes:
     ebs_volume_size: 200
+spark_conf:
+  spark.driver.maxResultSize: "0"      
 
 table_task_group_parameters:
   media_setup:
