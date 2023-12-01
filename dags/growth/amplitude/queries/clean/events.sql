@@ -3,7 +3,7 @@ SELECT
     amplitude_attribution_ids AS ids_amplitude_attributed,
     adid,
     amplitude_event_type,
-    app AS id_app,
+    CAST(app AS BIGINT) AS id_app,
     city,
     timestamp(client_event_time) AS ts_client_event,
     timestamp(client_upload_time) AS ts_client_uploaded,

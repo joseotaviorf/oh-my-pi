@@ -54,6 +54,7 @@ if __name__ == "__main__":
     ).format(execution_date.year, execution_date.month, execution_date.day)
 
     df = spark_client.get_records(query)
+    df = df.withColumn("id_app",df.id_app.cast('bigint'))
 
     s3_loader.load_df(
         df=df,
