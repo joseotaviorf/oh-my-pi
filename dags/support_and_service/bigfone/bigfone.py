@@ -125,7 +125,7 @@ clean_task_groups = {**full_clean_task_groups, **incremental_clean_task_groups}
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
 
 cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_groups),
+    DatalakeTaskGroup.first_tasks(raw_task_groups),
     DatalakeTaskGroup.all_first_tasks(clean_task_groups),
 )
 
