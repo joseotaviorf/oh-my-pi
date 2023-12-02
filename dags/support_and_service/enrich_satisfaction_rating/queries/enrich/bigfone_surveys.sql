@@ -13,7 +13,7 @@ WITH call_inapp_csat AS (
     WHERE
         (
           GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.direction") = "outbound-api"
-          OR GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.channelType") = "call-in-app"
+          OR GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.channelType") = "call-in-app")
         AND ev.year = {year}
         AND ev.month = {month}
         AND ev.day = {day}
