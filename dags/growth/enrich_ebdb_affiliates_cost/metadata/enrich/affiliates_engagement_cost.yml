@@ -1,29 +1,52 @@
 ---
 database_name: datalake_ebdb_affiliates_cost
 table_name: affiliates_engagement_cost
+domain: Growth
+owner: '@data-growth'
+description: This table contains detailed data regarding transactions and engagements related to affiliates.
 columns:
   id_user:
+    description: Unique identifier of the user.
     lineage:
       - datalake_ebdb_clean.user.id
   id_region:
+    description: Identifier for the region.
     lineage:
       - datalake_ebdb_clean.house.id_region
   id_affiliates:
+    description: Unique identifier for the affiliate.
     lineage:
       - datalake_ebdb_clean.user.id_affiliates
   id_agent:
+    description:  Identifier of the agent involved in the affiliate engagement, if applicable.
     lineage:
       - datalake_ebdb_clean.lead.id_agent
       - datalake_ebdb_clean.user.id_agent
   affiliate_type:
+    description:  Type of affiliate.
     lineage:
       - datalake_ebdb_clean.lead.affiliate_type
   commission_type:
+    description: Type of commission associated with the engagement.
     lineage:
       - datalake_ebdb_clean.account_transaction.type
   commission_cost:
+    description: The cost of the commission associated with the affiliate engagement.
     lineage:
       - datalake_ebdb_clean.account_transaction.value
   ts_commission_cost:
+    description: Timestamp when the commission cost was incurred.
     lineage:
       - datalake_ebdb_clean.account_transaction.ts_transaction
+  year:
+    description: Year of the date when the commission cost was incurred.
+    lineage:
+      - datalake_ebdb_clean.account_transaction.ts_transaction
+  month:
+    description: Month of the date when the commission cost was incurred.
+    lineage:
+      - datalake_ebdb_clean.account_transaction.ts_transaction
+  day:
+    description: Day of the date when the commission cost was incurred.
+    lineage:
+      - datalake_ebdb_clean.account_transaction.ts_transaction   

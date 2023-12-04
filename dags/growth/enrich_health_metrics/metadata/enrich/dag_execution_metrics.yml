@@ -2,45 +2,45 @@ database_name: datalake_health_metrics
 table_name: dag_execution_metrics
 owner: marcio.gomes@quintoandar.com.br
 domain: Data Growth
-description: WIP
+description: This table contains metrics of each DAG execution.
 columns:
   dag_name:
-    description: WIP
+    description: Unique name identifier of the executed DAG.
     lineage:
       - datalake_health_metrics.dag_historical_executions.dag_name
   dag_owner:
-    description: WIP
+    description: Name of the owner or team responsible for the DAG.
     lineage:
       - datalake_health_metrics.dag.dag_owner
   dag_layer:
-    description: WIP
+    description: Processing layer of the DAG.
     lineage:
       - datalake_health_metrics.table.dag_layer
   dt_executed:
-    description: WIP
+    description: Date on which the DAG was executed.
     lineage:
       - datalake_health_metrics.dag_historical_executions.dt_executed
   ts_dag_started:
-    description: WIP
+    description: Timestamp marking the start of the DAG execution.
     lineage:
       - datalake_health_metrics.dag_historical_executions.ts_dag_started
   ts_dag_ended:
-    description: WIP
+    description: Timestamp marking the end of the DAG execution.
     lineage:
       - datalake_health_metrics.dag_historical_executions.ts_dag_ended
   duration_in_minutes:
-    description: WIP
+    description: DAG execution time in minutes.
     lineage:
       - datalake_health_metrics.dag_historical_executions.duration_in_minutes
   ts_median_started:
-    description: WIP
+    description: The median timestamp representing when the DAG execution starts.
     lineage:
       - datalake_health_metrics.dag_historical_executions.ts_median_started
   ts_median_ended:
-    description: WIP
+    description: The median timestamp representing when the DAG execution ends.
     lineage:
       - datalake_health_metrics.dag_historical_executions.ts_median_ended
   duration_median_in_minutes:
-    description: WIP
+    description: Median DAG execution time in minutes.
     lineage:
       - datalake_health_metrics.dag_historical_executions.duration_median_in_minutes

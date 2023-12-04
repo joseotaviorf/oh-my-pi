@@ -34,11 +34,15 @@ columns:
       - dw_tickets.dim_ticket.custom_fields
       - datalake_gsheets_clean.plaquinhas_installation_pp_organic.dt_install
       - datalake_gsheets_clean.plaquinhas_installation_targets.dt_target
+  timeframe:
+    description: Represents the time duration or specific period related to plaquinhas installation activities.
+    lineage:
+      - datalake_gsheets_clean.plaquinhas_cover_targets.timeframe
   weekday_name:
     description: Cover Session - Represents a weekday of installation
     lineage:
       - dw_public.dim_date.weekday_name
-  dt_month_end:
+  month_end:
     description: Cover Session - The end of the month
     lineage:
       - dw_public.dim_date.month_end
@@ -83,7 +87,7 @@ columns:
     description: New Installs Session - States the reason that was not possible to install that Placa.
     lineage: 
       - dw_tickets.dim_ticket.custom_fields
-  has_plaquinha_house:
+  has_plaquinha:
     description: Cover & New Installs Session - This column specifies whether a house or property specifically has a plaquinha
     lineage:
       - datalake_listing_jobs.listing_quality_tasks.id_house
