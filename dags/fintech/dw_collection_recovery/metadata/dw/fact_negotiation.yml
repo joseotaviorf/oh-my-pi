@@ -126,7 +126,7 @@ columns:
     description: "Due Amount"
   overdue_amount:
     lineage:
-      - datalake_recupera.negotiation.outstanding_amount
+      - datalake_recupera.negotiation.overdue_amount
     description: "Overdue amount"
   paid_amount:
     lineage:
