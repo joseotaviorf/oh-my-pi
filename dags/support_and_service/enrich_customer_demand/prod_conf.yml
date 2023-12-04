@@ -29,3 +29,11 @@ tables:
     is_incremental: false
   ra_metrics:
     is_incremental: false
+
+custom_cluster:
+  driver_node_type_id: r5d.8xlarge
+  node_type_id: r5d.8xlarge
+  runtime_engine: PHOTON
+  num_workers: 3
+  aws_attributes:
+    ebs_volume_size: 300

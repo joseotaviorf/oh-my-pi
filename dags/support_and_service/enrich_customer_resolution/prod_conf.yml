@@ -9,3 +9,11 @@ tables:
   customer_resolution_static:
     is_incremental: true
     partition_cols: ["year", "month", "day"]
+
+custom_cluster:
+  driver_node_type_id: m5d.2xlarge
+  node_type_id: m5d.2xlarge
+  runtime_engine: PHOTON
+  num_workers: 3
+  aws_attributes:
+    ebs_volume_size: 300

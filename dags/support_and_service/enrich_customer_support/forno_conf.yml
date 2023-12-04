@@ -20,8 +20,6 @@ custom_cluster:
   driver_node_type_id: m5d.16xlarge
   node_type_id: m5d.16xlarge
   runtime_engine: PHOTON
-  num_workers: 5
+  num_workers: 6
   aws_attributes:
     ebs_volume_size: 300
-  spark_conf:
-    spark.sql.shuffle.partitions: 1280
