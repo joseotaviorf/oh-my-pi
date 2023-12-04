@@ -25,7 +25,7 @@ ENV = os.environ.get("ENVIRONMENT")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2022, 1, 19, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_med_memory_photon_cluster"
+CLUSTER_DESCRIPTION = "custom_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 

@@ -21,3 +21,11 @@ incremental_tables:
   - satisfaction_answers
   - survicate_surveys
   - zendesk_surveys
+
+custom_cluster:
+  driver_node_type_id: r5d.4xlarge
+  node_type_id: r5d.4xlarge
+  runtime_engine: PHOTON
+  num_workers: 3
+  aws_attributes:
+    availability: ON_DEMAND
