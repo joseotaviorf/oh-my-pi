@@ -23,7 +23,7 @@ def create_data_payload(item):
         "keyName": key_name,
         "type": api_type,
     }
-    data["keyValue"] = item["id_user"]
+    data["keyValue"] = item["phone_number"]
 
     # Create the contextFields dictionary with the desired structure
     context_fields = {
