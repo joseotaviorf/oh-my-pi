@@ -197,10 +197,6 @@ ticket_tasks AS (
     t.ts_started >= '2021-01-01'
     AND t.tags NOT LIKE '%robotserviceaccount02%'
     AND (
-      (t.department = 'Midias Ops [POS] [BACK]' AND (t.tags LIKE '%escalar_back_midias%' OR t.tags LIKE '%escalar_ouvidoria_hard_cases%'))
-      OR t.department <> 'Midias Ops [POS] [BACK]'
-    )
-    AND (
       (t.department = 'Offboarding Reparos [OFF] [POS] [BACK]' AND (t.tags LIKE '%orçamentação_realizada%'))
       OR t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
     )
