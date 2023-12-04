@@ -1,0 +1,47 @@
+partition_cols: ["year", "month", "day"]
+dag_documentation:
+  dag_purpose: |
+    Retrieve data from Oracle HR System API, a sub product of Oracle Human Capital Resources (Oracle HCM).
+    HCM is a cloud-based software application suite for human resources, talent management, and customer experience. 
+  additional_information: |
+    We get data from the folowing endpoints:
+    - /workers: returns all data from workers from Oracle HR System
+
+endpoints:
+  workers:
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "addresses.addressesDFF"
+        - "citizenships"
+        - "disabilities"
+        - "driverLicenses.driverLicensesDDF"
+        - "driverLicenses.driverLicensesDFF"
+        - "emails.emailsDFF"
+        - "ethnicities.ethnicitiesDFF"
+        - "externalIdentifiers"
+        - "legislativeInfo.legislativeInfoDDF"
+        - "legislativeInfo.legislativeInfoDFF"
+        - "messages"
+        - "names"
+        - "nationalIdentifiers.nationalIdentifiersDFF"
+        - "otherCommunicationAccounts"
+        - "passports"
+        - "phones.phonesDFF"
+        - "photos"
+        - "religions"
+        - "visasPermits"
+        - "workRelationships.assignments.allReports"
+        - "workRelationships.assignments.assignmentsDDF"
+        - "workRelationships.assignments.assignmentsDFF"
+        - "workRelationships.assignments.assignmentsEFF"
+        - "workRelationships.assignments.gradeSteps"
+        - "workRelationships.assignments.managers"
+        - "workRelationships.assignments.representatives"
+        - "workRelationships.assignments.workMeasures"
+        - "workRelationships.contracts"
+        - "workRelationships.workRelationshipsDDF"
+        - "workRelationships.workRelationshipsDFF"
+        - "workersDFF"
+        - "workersEFF"
