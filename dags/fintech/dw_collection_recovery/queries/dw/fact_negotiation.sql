@@ -74,7 +74,7 @@ recupera_negotiation AS (
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_negotiation ORDER BY MAKE_DATE(year,month,day) DESC) = 1
 )
 SELECT
-    rn.id_negotiation AS sk_negotiation,
+    STRING(rn.id_negotiation) AS sk_negotiation,
     rn.customer_document AS sk_debtor,
     tfn.id_negotiation AS id_negotiation_trato_feito,
     rn.id_operator,
@@ -95,7 +95,7 @@ SELECT
     rn.agreement_in_delay,
     rn.down_payment AS is_down_payment_paid,
     rn.number_of_installments,
-    IFNULL(tfn.qt_installments_paid,0) AS paid_installments,
+    INT(IFNULL(tfn.qt_installments_paid,0)) AS paid_installments,
     IFNULL(tfn.breached_installment,0) AS breached_installment,
     ri.expense_amount AS debt_amount,
     rn.total_negotiated_amount AS negotiated_amount,

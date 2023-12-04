@@ -43,7 +43,7 @@ recupera_installment AS (
 )
 SELECT DISTINCT
   CONCAT(i.id_negotiation,"-",INT(i.installment_number)) AS sk_negotiation_installment,
-  i.id_negotiation AS sk_negotiation,
+  STRING(i.id_negotiation) AS sk_negotiation,
   i.customer_document AS sk_debtor,
   tfi.id_installment,
   tfi.id_invoice_extra,

@@ -38,12 +38,12 @@ SELECT
     id_operator_registration,
     id_occurrence,
     occurrence,
-    SUM(esforco) AS total_esforco,
-    SUM(alo) AS total_alo,
-    SUM(cpc) AS total_cpc,
-    SUM(promisse) AS total_promisse,
-    SUM(agreement) AS total_agreement,
-    SUM(failure) AS total_failure,
+    INT(SUM(esforco)) AS total_esforco,
+    INT(SUM(alo)) AS total_alo,
+    INT(SUM(cpc)) AS total_cpc,
+    INT(SUM(promisse)) AS total_promisse,
+    INT(SUM(agreement)) AS total_agreement,
+    INT(SUM(failure)) AS total_failure,
     dt_occurrence,
     NOW() AS ts_load
 FROM collection_calculation

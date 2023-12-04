@@ -3,7 +3,7 @@ database_name: datalake_recupera
 table_name: negotiation
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "This table represents the Recupera report called NEGOCIAC and contains information about the negotiation. It stores daily snapshots to capture changes in the negotiation (example: number of installment, advisory..). The first snapshot started on 2023-10-30."
+description: "This table represents the Recupera report called NEGOCIAC and contains information about the negotiation. It stores daily snapshots to capture changes in the negotiation (example: number of installment, advisory..). The first snapshot started on 2023-12-05."
 columns:
   customer_document:
     description: Customer Document. Original field name = CPF
@@ -16,7 +16,11 @@ columns:
       "3": QuintoCred, faturas da plataforma 2.0
       "5": QuintoCred, faturas da plataforma 3.0
     lineage:
-      - datalake_recupera_clean.records.customer_document
+      - datalake_recupera_clean.installment.id_creditor
+  creditor:
+    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
+    lineage:
+      - datalake_recupera_clean.installment.id_creditor
   id_contract:
     description: Contract ID. Original field name = CONTRATO
     lineage:
@@ -94,8 +98,8 @@ columns:
     lineage:
       - datalake_recupera_clean.installment.amount_to_pay
       - datalake_recupera_clean.installment.installment_situation
-  outstanding_amount:
-    description: Outstanding amount. Original field name = VALOR_EM_ATRASO
+  overdue_amount:
+    description: Overdue amount. Original field name = VALOR_EM_ATRASO
     lineage:
       - datalake_recupera_clean.installment.amount_to_pay
       - datalake_recupera_clean.installment.installment_situation
