@@ -41,7 +41,7 @@ class RawCDCWorkflow(BaseWorkflow):
                 dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
             )
             clean_initial_task, clean_final_task = self._create_clean_tasks(
-                table_name=table_parameters["clean_table_name"],
+                table_name=table_parameters.get("clean_table_name", raw_table_name),
                 table_customization=table_parameters,
                 dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
             )
