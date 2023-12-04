@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from airflow import DAG
@@ -8,7 +9,11 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.builder_interf
     BuilderInterface,
 )
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
+)
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
@@ -21,6 +26,7 @@ class BaseWorkflow(BuilderInterface):
         :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
         """
         super().__init__()
+        self.env = os.environ.get("ENVIRONMENT")
 
         self.dag_args = dag_args
         self.dag_name = self.dag_args["name"]
@@ -64,7 +70,6 @@ class BaseWorkflow(BuilderInterface):
         return schedule_start_date
 
     def _get_dag_documentation(self):
-
         dag_documentation = self.dag_args.get("documentation")
         doc_md_chart_url = self.config_service.get_config("doc_md_chart_url")
 
@@ -82,12 +87,50 @@ class BaseWorkflow(BuilderInterface):
 
         return doc_md
 
-    def _has_data_quality_tests(self, table_attributes: TableAttributes) -> bool:
+    def _get_dag_execution_context(self, dag: DAG, bucket: str) -> DagExecutionContext:
+        databricks_bietlejuice_repo_path = self.config_service.get_config(
+            "databricks_bietlejuice_repo_path"
+        )
+        base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+        return DagExecutionContext(
+            dag,
+            self.env,
+            bucket,
+            base_spark_jobs_path,
+            self.dag_args,
+            self.workflow_args,
+            self.cluster_args,
+        )
+
+    def _check_include_data_quality_task(
+        self, table_attributes: TableAttributes
+    ) -> bool:
         """
-        Checks if a data quality tests file exists for the provided table.
+        Checks if data quality tests task should be added into the workflow
+        by verifying if its file exists for the provided table.
         """
         return DAGPackagesPathService.artifact_file_exists(
             artifact_type="data_quality",
+            dag_name=self.dag_name,
+            layer=table_attributes.layer.value,
+            table_name=table_attributes.table_name,
+        )
+
+    def _check_include_propagate_metadata_task(
+        self, table_attributes: TableAttributes
+    ) -> bool:
+        """
+        Checks if propagate metadata task should be added into the workflow.
+        """
+
+        has_product_database_name = (
+            "lineage_product_database_name" in self.workflow_args
+        )
+        if table_attributes.layer == LayerEnum.RAW and has_product_database_name:
+            return True
+
+        return DAGPackagesPathService.artifact_file_exists(
+            artifact_type="metadata",
             dag_name=self.dag_name,
             layer=table_attributes.layer.value,
             table_name=table_attributes.table_name,

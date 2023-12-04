@@ -1,5 +1,3 @@
-import os
-
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -24,9 +22,7 @@ class MetricQueryWorkflow(BaseWorkflow):
     BUSINESS_DOMAIN_DELIMITER = "__"
 
     def __init__(self, dag_args, workflow_args, cluster_args):
-
         super().__init__(dag_args, workflow_args, cluster_args)
-        self.env = os.environ.get("ENVIRONMENT")
 
     def build_dag(self):
         tables_customization = self.workflow_args.get("tables_customization", {})
@@ -112,7 +108,6 @@ class MetricQueryWorkflow(BaseWorkflow):
         terminate_cluster_task,
         metric_task_group,
     ):
-
         if inner_dependencies:
             (
                 task_groups_boundaries_without_inner_dependencies,

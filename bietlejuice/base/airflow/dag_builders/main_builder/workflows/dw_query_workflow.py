@@ -1,5 +1,3 @@
-import os
-
 from databricks_plugin import QuintoAndarDatabricksExecuteJobClusterOperator
 from airflow.operators.python_operator import ShortCircuitOperator
 from airflow.operators.dummy_operator import DummyOperator
@@ -25,9 +23,7 @@ class DWQueryWorkflow(BaseWorkflow):
     """
 
     def __init__(self, dag_args, workflow_args, cluster_args):
-
         super().__init__(dag_args, workflow_args, cluster_args)
-        self.env = os.environ.get("ENVIRONMENT")
 
     def build_dag(self):
         dw_schema = self.workflow_args.get("custom_schema", self.dag_args["name"])
@@ -167,7 +163,6 @@ class DWQueryWorkflow(BaseWorkflow):
         dw_task_groups_boundaries,
         job_cluster_finished_task,
     ):
-
         if skip_run_task:
             chain(skip_run_task, execute_job_cluster_task)
 

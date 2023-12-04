@@ -1,6 +1,4 @@
-import os
 from typing import List, Tuple
-from airflow.models import DAG
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
@@ -26,14 +24,13 @@ class EnrichQueryWorkflow(BaseWorkflow):
 
     def __init__(self, dag_args, workflow_args, cluster_args):
         super().__init__(dag_args, workflow_args, cluster_args)
-        self.env = os.environ.get("ENVIRONMENT")
 
     def build_dag(self):
         dag = self.dag_instance()
 
-        self.dag_execution_context = self._get_execution_context(dag)
-        tables = self._get_tables()
-        self._initialize_task_creators()
+        bucket = self.config_service.get_config("datalake_bucket")
+        dag_execution_context = self._get_dag_execution_context(dag, bucket)
+        self._initialize_task_creators(dag_execution_context)
 
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
         dummy_terminate_job_cluster_task = (
@@ -42,6 +39,7 @@ class EnrichQueryWorkflow(BaseWorkflow):
 
         table_first_tasks = {}
         table_last_tasks = {}
+        tables = self._get_tables()
         for table in tables:
             (
                 table_first_tasks[table.table_name],
@@ -56,22 +54,6 @@ class EnrichQueryWorkflow(BaseWorkflow):
         )
 
         return dag
-
-    def _get_execution_context(self, dag: DAG) -> DagExecutionContext:
-        bucket = self.config_service.get_config("datalake_bucket")
-        databricks_bietlejuice_repo_path = self.config_service.get_config(
-            "databricks_bietlejuice_repo_path"
-        )
-        base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-        return DagExecutionContext(
-            dag,
-            self.env,
-            bucket,
-            base_spark_jobs_path,
-            self.dag_args,
-            self.workflow_args,
-            self.cluster_args,
-        )
 
     def _get_tables(self) -> List[TableAttributes]:
         """Returns the table attributes for all the tables in the enrich layer."""
@@ -97,9 +79,14 @@ class EnrichQueryWorkflow(BaseWorkflow):
             table
         )
         propagate_metadata = self.propagate_metadata_task_creator.create_task(table)
-        load >> sync_metastore_structure >> sync_metastore_partitions >> propagate_metadata
+        (
+            load
+            >> sync_metastore_structure
+            >> sync_metastore_partitions
+            >> propagate_metadata
+        )
 
-        if self._has_data_quality_tests(table):
+        if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
             load >> data_quality
 
@@ -124,8 +111,8 @@ class EnrichQueryWorkflow(BaseWorkflow):
 
         job_cluster_finished_task << table_last_tasks.values()
 
-    def _initialize_task_creators(self):
-        task_creator_factory = TaskCreatorFactory(self.dag_execution_context)
+    def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
+        task_creator_factory = TaskCreatorFactory(dag_execution_context)
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER, self.config_service
         )
