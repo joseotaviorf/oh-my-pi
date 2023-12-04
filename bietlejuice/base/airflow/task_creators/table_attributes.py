@@ -14,7 +14,7 @@ class TableAttributes:
         self._workflow_args = workflow_args
         self.layer = layer
         self.table_name = table_name
-        self._table_customization = (
+        self.table_customization = (
             table_customization or self._get_table_customization()
         )
         self.schema = self._get_schema()
@@ -47,21 +47,21 @@ class TableAttributes:
         default_schema = self._workflow_args.get(
             "custom_schema", schema_inferred_from_dag_name
         )
-        table_schema = self._table_customization.get("custom_schema", default_schema)
+        table_schema = self.table_customization.get("custom_schema", default_schema)
         return table_schema
 
     def _get_extraction_type(self):
         default_extraction_type = self._workflow_args.get(
             "default_extraction_type", "full"
         )
-        table_extraction_type = self._table_customization.get(
+        table_extraction_type = self.table_customization.get(
             "extraction_type", default_extraction_type
         )
         return table_extraction_type
 
     def _get_partitions(self):
         default_partitions = self._workflow_args.get("default_partitions", [])
-        table_partitions = self._table_customization.get(
+        table_partitions = self.table_customization.get(
             "partitions", default_partitions
         )
         return table_partitions

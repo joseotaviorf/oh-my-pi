@@ -86,6 +86,11 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "dbutils_secret_key": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
             },
         },
         "cluster": {

@@ -1,0 +1,42 @@
+from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
+
+
+class LoadPostgresRawTaskCreator(BaseTaskCreator):
+    """Creates the task that extracts data from a Postgres Database and into our raw layer."""
+
+    _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
+    SPARK_JOB_NAME = "load_postgres_raw"
+
+    def create_task(
+        self, table_attributes: TableAttributes
+    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+        task_id = self.generate_task_id(table_attributes)
+        parameters = self._get_parameters(table_attributes)
+
+        return self._create_spark_job_task(self.SPARK_JOB_NAME, task_id, parameters)
+
+    def _get_parameters(self, table_attributes: TableAttributes) -> list:
+        dbutils_secret_key = self.dag_execution_context.workflow_args.get(
+            "dbutils_secret_key", f"{table_attributes.schema.upper()}_DB"
+        )
+        unixtime_measure = table_attributes.table_customization.get(
+            "unixtime_measure", ""
+        )
+        date_filter_column = table_attributes.table_customization.get(
+            "date_filter_column", ""
+        )
+
+        return [
+            self.dag_execution_context.environment,
+            self.dag_execution_context.bucket,
+            dbutils_secret_key,
+            table_attributes.schema,
+            table_attributes.table_name,
+            unixtime_measure,
+            table_attributes.extraction_type,
+            str(table_attributes.partitions),
+            date_filter_column,
+            self.dag_execution_context.execution_date,
+        ]
