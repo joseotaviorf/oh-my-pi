@@ -38,6 +38,27 @@ RAW_SPARK_JOB_PATH = (
 
 CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 
+ARTIFACTS_BUCKET = config_service.get_config("artifacts_bucket")
+# Testing Granulate script for Spark job auto optimization
+# TODO Remove after PoV complete (reach out to either Ribs, Mario, Edu, Gus Miller for any clarification and cleansing)
+CLUSTER_DESCRIPTION["init_scripts"].append(
+    {
+        "s3": {
+            "destination": f"{ARTIFACTS_BUCKET}/granulate/sagent_installer_Databricks.sh",
+            "region": "",
+        }
+    }
+)
+CLUSTER_DESCRIPTION["custom_tags"].append(
+    {"key": "granulate-cluster-name", "value": "{{ dag.dag_id }}"}
+)
+CLUSTER_DESCRIPTION["spark_env_vars"][
+    "GRANULATE_DBX_WORKSPACE_URL"
+] = "{{ var.value.GRANULATE_DBX_WORKSPACE_URL_PATH }}"
+CLUSTER_DESCRIPTION["spark_env_vars"][
+    "GRANULATE_DBX_TOKEN"
+] = "{{ var.value.GRANULATE_DBX_TOKEN_PATH }}"
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -92,12 +113,7 @@ for table in tables:
     table_name = table["table_name"]
     user_pool_id = table["user_pool_id"]
 
-    parameters = [
-        SOURCE,
-        table_name,
-        "{{ ds }}",
-        user_pool_id
-    ]
+    parameters = [SOURCE, table_name, "{{ ds }}", user_pool_id]
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
