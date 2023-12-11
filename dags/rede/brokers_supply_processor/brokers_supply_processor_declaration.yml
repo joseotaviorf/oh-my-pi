@@ -1,0 +1,36 @@
+dag:
+  name: brokers_supply_processor
+  schedule_start_date: 2021, 8, 10
+  schedule_interval: 0 0 * * *
+  owner: Data Rede
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  dbutils_secret_key: BROKERS_SUPPLY_PROCESSOR_DB
+  tables_customization:
+    business_context_detail:
+      date_filter_column: updated_at
+    business_context_detail_aud:
+      date_filter_column: created_at
+    file:
+      date_filter_column: updated_at
+    file_aud:
+      date_filter_column: created_at
+    lead3p:
+      clean_table_name: lead_3p
+      date_filter_column: updated_at
+    lead3p_aud:
+      clean_table_name: lead_3p_aud
+      date_filter_column: created_at
+    revinfo:
+      clean_table_name: rev_info
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+cluster:
+  type: databricks_10_4_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
