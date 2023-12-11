@@ -1,24 +1,28 @@
 WITH call_inapp_csat AS (
-    SELECT
-        GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.callSid") AS id_call,
-        CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-1") AS INT) AS csat_1,
-        CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-2") AS INT) AS csat_2,
-        CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-3") AS INT) AS csat_3,
-        TO_TIMESTAMP(FROM_UTC_TIMESTAMP(ev.event_timestamp, "Brazil/East"), "yyyy-MM-dd HH:mm:ss") AS ts_created_local,
-        year,
-        month,
-        day
-    FROM
-        datalake_bigfone_clean.event AS ev
-    WHERE
-        (
-          GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.direction") = "outbound-api"
-          OR GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.channelType") = "call-in-app")
-        AND ev.year = {year}
-        AND ev.month = {month}
-        AND ev.day = {day}
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY event_timestamp DESC) = 1
+  SELECT
+    COALESCE(
+      GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.call_sid"),
+      GET_JSON_OBJECT(ev.metadata,'$.event_data.TaskAttributes.callSid')
+    ) AS id_call,
+    CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-1") AS INT) AS csat_1,
+    CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-2") AS INT) AS csat_2,
+    CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-3") AS INT) AS csat_3,
+    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(ev.event_timestamp, "Brazil/East"), "yyyy-MM-dd HH:mm:ss") AS ts_created_local,
+    year,
+    month,
+    day
+  FROM
+    datalake_bigfone_clean.event AS ev
+  WHERE
+    (
+      GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.direction") = "outbound-api"
+      OR GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.channelType") = "call-in-app"
+    )
+    AND ev.year = {year}
+    AND ev.month = {month}
+    AND ev.day = {day}
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY event_timestamp DESC) = 1
 ),
 ivr_csat AS (
   SELECT

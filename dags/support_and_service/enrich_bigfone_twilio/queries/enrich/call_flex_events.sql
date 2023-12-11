@@ -5,7 +5,10 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') AS id_reservation,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueSid') AS id_task_queue,
 	GET_JSON_OBJECT(metadata,'$.event_data.TransferTo') AS id_task_queue_transferred,
-	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
+	COALESCE(
+		GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.call_sid"),
+		GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.callSid')
+	) AS id_call,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.conversations.conversation_id') AS id_conversation,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.channelType') AS channel_type,
 	COALESCE(GET_JSON_OBJECT(metadata,'$.event_data.WorkerSid'),

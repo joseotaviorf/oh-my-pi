@@ -1,6 +1,9 @@
 WITH reservations_events AS (
     SELECT
-        GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
+        COALESCE(
+            GET_JSON_OBJECT(metadata,"$.event_data.TaskAttributes.call_sid"),
+            GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.callSid')
+        ) AS id_call,
         GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
         GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') AS id_reservation,
         COALESCE(
@@ -100,9 +103,9 @@ call_flex_reservations AS (
     GROUP BY 1,2,3,4,5,6,12,13,14
 ),
 full_events AS (
-    SELECT 
-        re.* 
-    FROM 
+    SELECT
+        re.*
+    FROM
         reservations_events re
     JOIN --filtering only answered reservations
         call_flex_reservations cr
@@ -120,15 +123,15 @@ answered_time_calculations AS (
         fe.id_task,
         fe.id_reservation,
         CASE
-            WHEN 
-                event = 'reservation.created' 
-                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) = 'reservation.accepted' 
-            THEN 
+            WHEN
+                event = 'reservation.created'
+                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) = 'reservation.accepted'
+            THEN
                 LEAD(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) - COALESCE(LAG(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC),ts_event_unix)
-            WHEN 
-                event = 'reservation.created' 
-                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) = 'reservation.completed' 
-            THEN 
+            WHEN
+                event = 'reservation.created'
+                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) = 'reservation.completed'
+            THEN
                 LEAD(ts_event_unix,2) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) - ts_event_unix
         END AS seconds_queue_time,
         CASE
