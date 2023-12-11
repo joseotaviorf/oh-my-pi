@@ -32,6 +32,10 @@ columns:
     lineage:
       - datalake_atta_clean.pre_analysis.archive_complement
     description: "Complementar observations about archivement"
+  created_source_description:
+    lineage:
+      - datalake_atta_clean.pre_analysis.created_source
+    description: "Description of the origin of the created source"
   down_payment_amount:
     lineage:
       - datalake_atta_clean.pre_analysis.down_payment_amount

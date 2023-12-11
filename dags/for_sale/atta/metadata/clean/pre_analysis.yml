@@ -29,6 +29,9 @@ columns:
   status:
     lineage:
       - datalake_atta_raw.consulta_score.status
+  created_source:
+    lineage:
+      - datalake_atta_raw.consulta_score.created_source
   priority_status:
     lineage:
       - datalake_atta_raw.consulta_score.priority
