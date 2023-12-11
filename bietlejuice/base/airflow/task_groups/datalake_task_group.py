@@ -65,7 +65,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         pool: str = AIRFLOW_DEFAULT_POOL,
         spark_job_extra_args: list = [],
     ) -> QuintoAndarDatabricksSubmitRunOperator:
-
         load_table_task = QuintoAndarDatabricksSubmitRunOperator(
             task_id=task_id,
             pool=pool,
@@ -91,7 +90,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         database_name: str,
         table_name: str,
     ) -> list:
-
         sync_metastore_structure_task = QuintoAndarDatabricksSubmitRunOperator(
             task_id=self.generate_default_task_id(
                 task_prefix=self.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
@@ -114,7 +112,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                     + ([table_name] if table_name else []),
                 }
             },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            execution_timeout=timedelta(minutes=30),
             polling_period_seconds=10,
         )
 
@@ -140,7 +138,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                     + ([table_name] if table_name else []),
                 }
             },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            execution_timeout=timedelta(minutes=30),
             polling_period_seconds=10,
         )
 
@@ -156,7 +154,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         source: str = None,
         metadata_type: str = None,
     ) -> list:
-
         config_service = ConfigurationService(source)
 
         metadata_propagator_tasks = []
@@ -237,7 +234,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         tree_path: str = "",
         execution_date="{{ ds }}",
     ) -> list:
-
         data_quality_tasks = []
 
         if (
