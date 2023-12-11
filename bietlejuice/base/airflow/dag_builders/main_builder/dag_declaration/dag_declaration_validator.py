@@ -101,6 +101,11 @@ class DAGDeclarationValidator(Validator):
             "empty": False,
             "schema": {
                 "type": {"type": "string", "required": True, "empty": False},
+                "custom_configurations": {
+                    "type": "dict",
+                    "required": False,
+                    "empty": False,
+                },
                 "custom_libraries": {"type": "list", "required": False, "empty": False},
                 "access_control_list": {
                     "type": "dict",
