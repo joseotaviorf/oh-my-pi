@@ -1,0 +1,52 @@
+---
+database_name: datalake_gsheets_clean
+table_name: experiments_catalog
+columns:
+  experiment_owner_email:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.email_address
+    description: Email address of the person responsible for the experiment registration.
+  experiment_name:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.experiment_name
+    description: Experiment name.
+  line_owner:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.line
+    description: Line responsible for the experiment.
+  squad_owner:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.squad
+    description: Squad responsible for the experiment.
+  experiment_type:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.experiment_type
+    description: Experiment type.
+  amplitude_tag:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.user_property_on_amplitude
+    description: Experiment tag on Amplitude's events table (user_properties column).
+  hypothesis:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.hypothesis
+    description: Experiment Hypothesis.
+  success_metric:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.success_metric
+    description: Experiment success metric.
+  experiment_link:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.experiment_link
+    description: Experiment documentation link.
+  dt_expected_start:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.expected_start_date
+    description: Date of when the experiment is expected to start.
+  dt_expected_end:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.expected_end_date
+    description: Date of when the experiment is expected to end.
+  ts_created:
+    lineage:
+      - datalake_gsheets_raw.experiments_catalog.timestamp
+    description: Timestamp of when the experiment was registered on the experiment forms.

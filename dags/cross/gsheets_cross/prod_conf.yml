@@ -143,6 +143,12 @@ sheets_info:
     clean_table_name: domain_management_metrics
     sheet_context: cross
 
+  experiments_catalog:
+    sheet_id: 18gsH01PjNUgxH76XduC7Cxab2QeLSe0c8oDzRFJa5WQ
+    sheet_name: form_responses
+    clean_table_name: experiments_catalog
+    sheet_context: cross
+
   test_data_analytics_training_quiz_1:
     sheet_id: 1juXa5RunGJW8Pwrv9NBihL6ZgAeZHQtQePPZvDDKnPI
     sheet_name: quiz_1
