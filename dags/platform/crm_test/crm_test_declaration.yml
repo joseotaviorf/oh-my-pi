@@ -1,0 +1,40 @@
+dag:
+  name: crm_test
+  schedule_start_date: 2021, 2, 18
+  schedule_interval: 0 0 * * *
+  owner: Data Engineering
+workflow:
+  type: database_pull
+  layer: raw
+  custom_schema: crm_test
+  database_type: mongo
+  dbutils_secret_key: CRM_DB
+  tables_customization:
+    tasks:
+      clean_table_name: tasks
+      date_filter_column: actions.date
+      partitions: [year, month, day]
+      extraction_type: incremental
+    taskstatushistories:
+      clean_table_name: task_status_histories
+      date_filter_column: history.date
+      partitions: [year, month, day]
+      extraction_type: incremental
+    tasktitles:
+      clean_table_name: task_titles
+    workflows:
+      clean_table_name: workflows
+      date_filter_column: updated
+      partitions: [year, month, day]
+      extraction_type: incremental
+    workgroups: {}
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: c5.4xlarge
+    node_type_id: c5.2xlarge
+    autoscale:
+      max_workers: 4
+      min_workers: 1
+    aws_attributes:
+      ebs_volume_size: 200

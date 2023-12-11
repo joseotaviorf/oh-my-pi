@@ -1,0 +1,21 @@
+---
+database_name: datalake_crm_test_clean
+table_name: task_titles
+domain: platform
+owner: julia.vicente@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_crm_test_raw.tasktitles._id
+  workgroup_ids:
+    lineage:
+      - datalake_crm_test_raw.tasktitles.workgroupids
+  description:
+    lineage:
+      - datalake_crm_test_raw.tasktitles.description
+  title:
+    lineage:
+      - datalake_crm_test_raw.tasktitles.title
+  slug:
+    lineage:
+      - datalake_crm_test_raw.tasktitles.slug
