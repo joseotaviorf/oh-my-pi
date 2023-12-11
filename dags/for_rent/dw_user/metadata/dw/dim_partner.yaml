@@ -60,6 +60,16 @@ columns:
     lineage:
     - datalake_ebdb_clean.partner.city
     description: 'City of the partner.'
+  state_abbreviation:
+    lineage:
+    - datalake_ebdb_clean.state.abbreviation
+    description: 'State abbreviation of the partner.'
+  state_name:
+    lineage:
+    - datalake_ebdb_clean.state.name
+    description: 'State Name of the partner.'
+  internal_locality_code:
+    description: 'Internal locality code, calculated based on the partner city and state. Ex: (L001, L002, L003).'
   utm_campaign:
     lineage:
     - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_campaign
