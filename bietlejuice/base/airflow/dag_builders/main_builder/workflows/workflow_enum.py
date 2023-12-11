@@ -6,9 +6,10 @@ class WorkflowEnum(Enum):
     Mapping of bi-etl-ejuice workflow types to an Enum object.
     """
 
-    QUERY_WORKFLOW = "query"
-    GSHEETS_WORKFLOW = "gsheets"
     CDC_WORKFLOW = "cdc"
+    DATABASE_PULL_WORKFLOW = "database_pull"
+    GSHEETS_WORKFLOW = "gsheets"
+    QUERY_WORKFLOW = "query"
 
     @classmethod
     def get_available_enum_values(cls):

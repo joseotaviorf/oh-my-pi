@@ -42,6 +42,8 @@ from bietlejuice.base.airflow.enums.task_enum import TaskEnum
 
 
 class TaskCreatorFactory:
+    DATABASE_TYPES = ["postgres", "mongo"]
+
     TASK_MAPPING = {
         TaskEnum.DATA_QUALITY_TESTS: DataQualityTestsTaskCreator,
         TaskEnum.DUMMY_JOB_CLUSTER_FINISHED: DummyJobClusterFinishedTaskCreator,
@@ -60,11 +62,27 @@ class TaskCreatorFactory:
     def __init__(self, dag_execution_context: DagExecutionContext) -> None:
         self.dag_execution_context = dag_execution_context
 
+    def __dispatch_task_creator_class(self, task: TaskEnum):
+        return self.TASK_MAPPING[task]
+
     def get_task_creator(self, task: TaskEnum, *args, **kwargs):
         """Returns a task creator instance for the given task, configured with the DAG execution context and optional arguments."""
 
         task_creator_class = self.__dispatch_task_creator_class(task)
         return task_creator_class(self.dag_execution_context, *args, **kwargs)
 
-    def __dispatch_task_creator_class(self, task: TaskEnum):
-        return self.TASK_MAPPING[task]
+    def get_database_task_creator(self, database_type: str, *args, **kwargs):
+        """
+        Returns a task creator instance of one of the currently supported database
+        tasks, according to the provided database type.
+        """
+        if database_type not in self.DATABASE_TYPES:
+            raise ValueError(
+                "Database type '{}' not supported. Supported databases are: {}".format(
+                    database_type, str(self.DATABASE_TYPES)
+                )
+            )
+
+        database_task_enum = TaskEnum["LOAD_{}_RAW".format(database_type.upper())]
+
+        return self.get_task_creator(database_task_enum, *args, **kwargs)
