@@ -8,8 +8,8 @@ SELECT
     hypothesis,
     success_metric,
     experiment_link,
-    expected_start_date AS dt_expected_start,
-    expected_end_date AS dt_expected_end,
-    timestamp AS ts_created
+    TO_DATE(expected_start_date, 'MM/dd/yyyy') AS dt_expected_start,
+    TO_DATE(expected_end_date, 'MM/dd/yyyy') AS dt_expected_end,
+    TO_TIMESTAMP(timestamp, 'MM/dd/yyyy HH:mm:ss') AS ts_created
 FROM
     datalake_gsheets_raw.experiments_catalog
