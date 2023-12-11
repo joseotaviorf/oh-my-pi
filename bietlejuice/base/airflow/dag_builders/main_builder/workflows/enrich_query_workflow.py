@@ -44,7 +44,7 @@ class EnrichQueryWorkflow(BaseWorkflow):
             (
                 table_first_tasks[table.table_name],
                 table_last_tasks[table.table_name],
-            ) = self._create_enrich_tasks(table)
+            ) = self._create_enrich_tasks(table, dummy_terminate_job_cluster_task)
 
         self._set_dependencies(
             execute_job_cluster_task,
@@ -68,8 +68,10 @@ class EnrichQueryWorkflow(BaseWorkflow):
             for table_name in table_names
         ]
 
-    def _create_enrich_tasks(self, table: TableAttributes) -> Tuple:
-        """Returns a tuple with the first (Load) and last (Propagate Metadata) tasks of the table."""
+    def _create_enrich_tasks(
+        self, table: TableAttributes, job_cluster_finished_task
+    ) -> Tuple:
+        """Returns a tuple with the first (Load) and last (Load) tasks of the table."""
 
         load = self.load_enrich_task_creator.create_task(table)
         sync_metastore_structure = self.sync_hive_structure_task_creator.create_task(
@@ -84,13 +86,14 @@ class EnrichQueryWorkflow(BaseWorkflow):
             >> sync_metastore_structure
             >> sync_metastore_partitions
             >> propagate_metadata
+            >> job_cluster_finished_task
         )
 
         if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
-            load >> data_quality
+            load >> data_quality >> job_cluster_finished_task
 
-        return load, propagate_metadata
+        return load, load
 
     def _set_dependencies(
         self,
@@ -99,17 +102,31 @@ class EnrichQueryWorkflow(BaseWorkflow):
         table_last_tasks: dict,
         job_cluster_finished_task,
     ) -> None:
-        inner_dependencies = self.workflow_args.get("inner_dependencies")
+        inner_dependencies = self.workflow_args.get("inner_dependencies", {})
 
-        if inner_dependencies:
-            # TODO: Implement inner dependencies here
-            raise NotImplementedError(
-                "Inner dependencies are not implemented yet for enrich layer"
+        dependency_table_names = set()
+
+        try:
+            for table_name, table_first_task in table_first_tasks.items():
+                if table_name in inner_dependencies:
+                    for inner_dependency in inner_dependencies[table_name]:
+                        table_last_tasks[inner_dependency] >> table_first_task
+                        dependency_table_names.add(inner_dependency)
+                else:
+                    execute_job_cluster_task >> table_first_task
+        except KeyError as e:
+            raise ValueError(
+                f"Error finding table '{e.args[0]}' during inner dependencies settings. "
+                "Make sure this table is named correctly and its query exists."
             )
-        else:
-            execute_job_cluster_task >> table_first_tasks.values()
 
-        job_cluster_finished_task << table_last_tasks.values()
+        job_cluster_finished_task.set_upstream(
+            [
+                table_task
+                for table_name, table_task in table_last_tasks.items()
+                if table_name not in dependency_table_names
+            ]
+        )
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         task_creator_factory = TaskCreatorFactory(dag_execution_context)
