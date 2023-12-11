@@ -71,13 +71,29 @@ b2b AS (
         datalake_b2b.house_listing
     GROUP BY 1
 ),
+previous_listing_early_demand AS (
+  SELECT
+    hl.id_house_listing,
+    hl.id_house,
+    hl.id_contract
+  FROM
+    datalake_ebdb_listing.house_listing AS hl
+  JOIN
+    datalake_ebdb_contract.contract AS c
+      ON hl.id_contract = c.id
+      AND c.status = 'Ativo'
+  JOIN
+    datalake_ebdb_listing.house_listing AS ed
+      ON hl.id_house = ed.id_house
+      AND hl.version = ed.version - 1
+),
 listings_states_per_day AS (
     SELECT /*+ RANGE_JOIN(heh, 1180) */
-        CONCAT(hl.id_house_listing, DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
-        hl.id_house_listing,
-        hl.id_house,
+        CONCAT(COALESCE(pled.id_house_listing, hl.id_house_listing), DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
+        COALESCE(pled.id_house_listing, hl.id_house_listing) AS id_house_listing,
+        COALESCE(pled.id_house, hl.id_house) AS id_house,
         h.id_country,
-        hl.id_contract,
+        COALESCE(pled.id_contract, hl.id_contract) AS id_contract,
         h.id_user AS id_owner,
         heh.id_occupant,
         hbh.id_partner,
@@ -125,47 +141,56 @@ listings_states_per_day AS (
         datalake_ebdb_listing.house_listing_status AS hls -- 1:M => 1 listing has M statuses 
             ON hl.id_house_listing = hls.id_house_listing
             AND hls.is_last_status_of_day = True
+    LEFT JOIN
+        previous_listing_early_demand AS pled
+            ON hl.id_house_listing = pled.id_house_listing
+    LEFT JOIN
+        datalake_ebdb_contract.contract AS c
+            ON pled.id_contract = c.id
     JOIN
         daily_base AS dbase
-            ON dbase.dt_day BETWEEN DATE(hls.ts_status_started) AND COALESCE(DATE(hls.ts_status_ended), '2100-01-01')
+            ON (dbase.dt_day >= DATE(hls.ts_status_started) 
+                AND dbase.dt_day < COALESCE(DATE(hls.ts_status_ended), '2100-01-01'))
+            OR (dbase.dt_day >= c.ts_created 
+                AND dbase.dt_day < COALESCE(c.dt_termination, CURRENT_DATE()))
     LEFT JOIN
         lbc
             ON lbc.id_house = hl.id_house
     LEFT JOIN
         datalake_ebdb_listing.house AS h
-            ON hl.id_house = h.id
+            ON COALESCE(pled.id_house, hl.id_house) = h.id
     LEFT JOIN
         last_ciq_of_day AS lcod
-            ON hl.id_house = lcod.id_house
+            ON COALESCE(pled.id_house, hl.id_house) = lcod.id_house
             AND dbase.dt_day = lcod.dt_day
             AND lcod.is_last_status_house_of_day = True
     LEFT JOIN
         datalake_ebdb_listing.house_entrance_history AS heh
-            ON hl.id_house = heh.id_house
+            ON COALESCE(pled.id_house, hl.id_house) = heh.id_house
             AND dbase.dt_day >= DATE(heh.ts_entrance_started)
             AND dbase.dt_day < COALESCE(DATE(heh.ts_entrance_ended), '2100-01-01')
             AND heh.is_last_status_of_day = True
     LEFT JOIN
         datalake_ebdb_smart_price.rental_price_history AS rph
-            ON hl.id_house = rph.id_house
+            ON COALESCE(pled.id_house, hl.id_house) = rph.id_house
             AND dbase.dt_day >= DATE(rph.ts_price_started)
             AND dbase.dt_day < COALESCE(DATE(rph.ts_price_ended), '2100-01-01')
             AND rph.is_last_status_of_day = True
     LEFT JOIN
         datalake_pro_owners.house_b2b_history AS hbh
-            ON hl.id_house = hbh.id_house
+            ON COALESCE(pled.id_house, hl.id_house) = hbh.id_house
             AND dbase.dt_day >= DATE(hbh.ts_started)
             AND dbase.dt_day < COALESCE(DATE(hbh.ts_ended), '2100-01-01')
             AND hbh.is_last_status_of_day = True
     LEFT JOIN
         datalake_ebdb_listing.agents_with_keys AS awk
-            ON hl.id_house_listing = awk.id_house_listing
+            ON COALESCE(pled.id_house_listing, hl.id_house_listing) = awk.id_house_listing
     LEFT JOIN
         rent_listing AS rl
-            ON hl.id_house = rl.id_house
+            ON COALESCE(pled.id_house, hl.id_house) = rl.id_house
     JOIN
         b2b
-            ON hl.id_house = b2b.id_house
+            ON COALESCE(pled.id_house, hl.id_house) = b2b.id_house
     /* 
     This table is used for For_Rent and
     should be similar to fact_house_listing_status, so

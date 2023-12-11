@@ -2098,6 +2098,7 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history

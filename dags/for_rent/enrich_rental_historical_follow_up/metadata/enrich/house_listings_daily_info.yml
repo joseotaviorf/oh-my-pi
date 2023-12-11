@@ -1,7 +1,8 @@
 database_name: datalake_rental_historical_follow_up
 table_name: house_listings_daily_info
-description: Enriched table for store the last status of the day of listings and other
+description: Enriched table for store the last status of the day of the last house's listing and other
   historical informations like CIQ, entrance, and who is living.
+  Due to Early Demand and corner cases, duplicated houses, but with different listings are expect in this table for the same reference date (dt_day column).
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
@@ -20,8 +21,9 @@ columns:
   id_contract:
     lineage:
     - datalake_ebdb_listing.house_listing.id_contract
-    description: The Id of the last contract associated to the listing in a specific
-      day.
+    description: The Id of the contract associated to the listing in a specific
+      day. Due to early demand, we can have more than one contract associated to the same house.
+      This will happen when the contract was active during the reference date (dt_day column).
   id_owner:
     lineage:
     - datalake_ebdb_listing.house.id_user
@@ -73,9 +75,9 @@ columns:
     - datalake_big_agent.house_consultant_history.consultant_type
     description: Type of consultant, from Big Agent service.
     categories:
-      ASP: ''
-      CIQ_FULL: ''
-      CIQ_MANAGER: ''
+      ASP: House has an ASP manager assigned(similar to CIQ Manager).
+      CIQ_FULL: House is fully managed by the CIQ.
+      CIQ_MANAGER: House has a CIQ manager assigned.
   doorman_type:
     lineage:
     - datalake_ebdb_listing.house_entrance_history.doorman_type
@@ -146,8 +148,8 @@ columns:
   dt_day:
     description: The day (date) when the status was observed.
   year:
-    description: The year when this status was observed.
+    description: The year when this status was observed. Also, it's a partition of this table.
   month:
-    description: The month when this status was observed.
+    description: The month when this status was observed. Also, it's a partition of this table.
   day:
-    description: The day when this status was observed.
+    description: The day when this status was observed. Also, it's a partition of this table.
