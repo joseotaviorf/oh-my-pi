@@ -1,0 +1,345 @@
+---
+database_name: datalake_ebdb_amenities
+table_name: pivotted_amenities
+description: This table has one row per house version, with all the amenities pivotted.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_house:
+    description: Id of the house
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history
+  has_bathtub:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a bathtub. Code: BANHEIRA_DE_HIDROMASSAGEM"
+  has_shower_enclosure:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a shower enclosure. Code: BOX"
+  has_balcony:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a balcony. Code: VARANDA"
+  has_stove_and_refrigerator:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a stove and refrigerator included. Code: FOGAO_E_GELADEIRA_INCLUSOS. This has been deprecated."
+  has_private_pool:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a private pool. Code: PISCINA_PRIVATIVA"
+  has_bedroom_closets:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has bedroom closets. Code: ARMARIOS_EMBUTIDOS_NO_QUARTO"
+  has_bathroom_cabinets:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has bathroom cabinets. Code: ARMARIOS_NOS_BANHEIROS"
+  has_kitchen_cabinets:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has kitchen cabinets. Code: ARMARIOS_NA_COZINHA"
+  has_air_conditioning:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has air conditioning. Code: AR_CONDICIONADO"
+  has_gas_shower:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a gas shower. Code: CHUVEIRO_A_GAS"
+  has_pets_allowed:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house allows pets. Code: PODE_TER_ANIMAIS_DE_ESTIMACAO"
+  has_maid_room:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a maid room. Code: QUARTO_DE_SERVICO"
+  has_maid_bathroom:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a maid bathroom. Code: BANHEIRO_DE_SERVICO"
+  has_assigned_parking_space:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has an assigned parking space. Code: GARAGEM_FIXA. This has been deprecated."
+  has_gourmet_balcony:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a gourmet balcony. Code: VARANDA_GOURMET"
+  is_penthouse_apartment:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house is a penthouse apartment. Code: APARTAMENTO_COBERTURA"
+  reversible_extra_room:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a reversible extra room. Code: QUARTO_EXTRA_REVERSIVEL"
+  has_stove:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a stove included. Code: FOGAO_INCLUSO"
+  has_refrigerator:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a refrigerator included. Code: GELADEIRA_INCLUSO"
+  morning_sun:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has morning sun. Code: SOL_DA_MANHA"
+  afternoon_sun:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has afternoon sun. Code: SOL_DA_TARDE"
+  blackout_curtains:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has blackout curtains. Code: CORTINAS_BLACK_OUT"
+  sheer_curtain:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has sheer curtains. Code: CORTINAS_DECORATIVAS"
+  soundproof_window:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has soundproof windows. Code: JANELA_ANTI_RUIDO"
+  ceiling_fan:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a ceiling fan. Code: VENTILADOR_DE_TETO"
+  has_large_windows:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has large windows. Code: LUMINOSIDADE_NATURAL"
+  has_unobstructed_view:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has an unobstructed view. Code: VISTA_LIVRE"
+  has_quiet_street:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house is located in a quiet street. Code: RUA_SILENCIOSA"
+  has_electric_shower:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has an electric shower. Code: CHUVEIRO_ELETRICO"
+  has_microwave:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a microwave. Code: MICROONDAS"
+  has_sofa:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a sofa. Code: SOFA"
+  has_washing_machine:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a washing machine. Code: MAQUINA_DE_LAVAR"
+  has_dryer:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a dryer. Code: SECADORA. This has been deprecated."
+  has_washer_dryer_combo:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a washer dryer combo. Code: LAVA_E_SECA. This has been deprecated."
+  has_laundry_sink:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a laundry sink. Code: TANQUE"
+  has_window_screens:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has window screens. Code: REDE_DE_PROTECAO"
+  has_clothesline:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a clothesline. Code: VARAL"
+  has_three_pin_outlets:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has three pin outlets. Code: TOMADAS_NOVAS"
+  has_television:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a television. Code: TELEVISAO"
+  has_dining_tables_and_chairs:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has dining tables and chairs. Code: MESAS_E_CADEIRAS_DE_JANTAR"
+  has_coffee_maker:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a coffee maker. Code: CAFETEIRA. This has been deprecated."
+  has_barbecue:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a barbecue. Code: CHURRASQUEIRA"
+  has_step_free_access:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has step free access. Code: ACESSO_SEM_DEGRAUS"
+  has_cooktop:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a cooktop. Code: COOKTOP"
+  has_kitchen_utensils:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has kitchen utensils. Code: UTENSILIOS_DE_COZINHA"
+  has_double_bed:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a double bed. Code: CAMA_DE_CASAL"
+  has_single_bed:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a single bed. Code: CAMA_DE_SOLTEIRO"
+  has_bathroom_mirror:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a bathroom mirror. Code: ESPELHO_NO_BANHEIRO"
+  has_electronic_lock:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has an electronic lock. Code: FECHADURA_ELETRONICA"
+  has_electricity_included:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has electricity included. Code: ENERGIA"
+  has_adapted_bathroom:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has an adapted bathroom. Code: BANHEIRO_ADAPTADO"
+  has_walk_in_closed:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a walk in closed. Code: CLOSET"
+  has_open_kitchen:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has an open kitchen. Code: COZINHA_AMERICANA"
+  has_office_tables_and_chairs:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has office tables and chairs. Code: MESAS_E_CADEIRAS_DE_ESCRITORIO"
+  has_garden:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a garden. Code: JARDIM"
+  has_spacious_rooms_and_corridors_doors:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has spacious rooms and corridors doors. Code: QUARTOS_E_CORREDORES_COM_PORTAS_AMPLAS"
+  has_backyard:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a backyard. Code: QUINTAL"
+  has_single_house_on_the_property:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a single house on the property. Code: SOMENTE_UMA_CASA_NO_TERRENO"
+  has_laundry_area:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a laundry area. Code: AREA_DE_SERVICO"
+  has_private_garden_area:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house has a private/garden area. Code: GARDEN"
+  has_elevator:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has an elevator. Code: ELEVADOR"
+  has_playground:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a playground. Code: PLAYGROUND"
+  has_condo_pool:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a pool. Code: PISCINA"
+  has_condo_grill_area:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a grill area. Code: CHURRASQUEIRA"
+  has_sports_court:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a sports court. Code: QUADRA_ESPORTIVA"
+  has_gym:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a gym. Code: ACADEMIA"
+  has_party_hall:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a party hall. Code: SALAO_DE_FESTAS"
+  has_sauna:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a sauna. Code: SAUNA"
+  has_condo_laundry:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a laundry. Code: LAVANDERIA_NO_PREDIO"
+  has_piped_gas:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has piped gas. Code: GAS_ENCANADO"
+  has_automatic_gate:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has an automatic gate. Code: PORTAO_AUTOMATICO. This has been deprecated."
+  has_gourmet_area:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a gourmet area. Code: ESPACO_GOURMET_NA_AREA_COMUM"
+  is_near_metro_or_train:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the house is near a metro or train station. Code: PERTO_DE_METRO_OU_TREM"
+  has_playroom:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a playroom. Code: BRINQUEDOTECA"
+  has_handrail:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a handrail. Code: CORRIMAO"
+  has_tactile_floor:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a tactile floor. Code: PISO_TATIL"
+  has_access_ramps:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has access ramps. Code: RAMPAS_DE_ACESSO"
+  has_game_room:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a game room. Code: SALAO_DE_JOGOS"
+  has_accessible_parking_space:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has an accessible parking space. Code: VAGA_DE_GARAGEM_ACESSIVEL"
+  has_green_area:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
+    description: "Whether the condo has a green area. Code: AREA_VERDE"
+  is_last_status_of_day:
+    description: "Whether this row represents the last status of the day."
+  is_current_version:
+    description: "Whether this row represents the current version of the house."
+  version:
+    description: "Version of the house."
+  ts_version_started:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.ts_change
+    description: "Timestamp of when the version started."
+  ts_version_ended:
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.ts_change
+    description: "Timestamp of when the version ended."

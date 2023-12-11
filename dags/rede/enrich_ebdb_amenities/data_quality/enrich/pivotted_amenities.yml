@@ -1,0 +1,17 @@
+---
+table_name: datalake_ebdb_amenities.amenity_change_history
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 5000000
+    severity_level: Error
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  ts_version_started:
+    is_complete:
+      severity_level: Error

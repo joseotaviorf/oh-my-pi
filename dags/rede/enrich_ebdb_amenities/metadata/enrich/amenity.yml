@@ -1,0 +1,58 @@
+---
+database_name: datalake_ebdb_amenities
+table_name: amenity
+description: This table has one row per amenity, be it from house or condo.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_amenity:
+    lineage:
+      - datalake_ebdb_clean.amenities.id
+      - datalake_ebdb_clean.condo_amenities.id_condo_amenity
+    description: Id of the amenity. Not necessarily unique, since it might be the same ID for a condo or a house amenity.
+  code:
+    lineage:
+      - datalake_ebdb_clean.amenities.code
+      - datalake_ebdb_clean.condo_amenities.code
+    description: Code of the amenity. Formatted in UPPER_SNAKE_CASE, in Portuguese.
+  name:
+    lineage:
+      - datalake_ebdb_clean.amenities.name
+      - datalake_ebdb_clean.condo_amenities.name
+    description: Name of the amenity, in Portuguese.
+  slug:
+    lineage:
+      - datalake_ebdb_clean.amenities.slug
+      - datalake_ebdb_clean.condo_amenities.slug
+    description: Slug of the amenity, in Portuguese.
+  is_condo_amenity:
+    description: True if it is a condo amenity
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.amenities.is_active
+      - datalake_ebdb_clean.condo_amenities.is_active
+    description: True if the amenity is marked as active
+  ratio_houses_filled:
+    description: Ratio (0-1) of houses in which this amenity is not null.
+  ratio_sale_houses_filled:
+    description: Ratio (0-1) of houses in the sale context in which this amenity is not null.
+  ratio_rent_houses_filled:
+    description: Ratio (0-1) of houses in the rent context in which this amenity is not null.
+  ratio_houses_true:
+    description: Ratio (0-1) of houses in which this amenity is true.
+  ratio_sale_houses_true:
+    description: Ratio (0-1) of houses in the sale context in which this amenity is true.
+  ratio_rent_houses_true:
+    description: Ratio (0-1) of houses in the rent context in which this amenity is true.
+  ts_first_usage:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.ts_created
+      - datalake_ebdb_clean.info_condo_amenities.ts_created
+      - datalake_ebdb_clean.house.dt_creation
+    description: Timestamp of when this amenity was used for the first time.
+  ts_last_usage:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.ts_created
+      - datalake_ebdb_clean.info_condo_amenities.ts_created
+      - datalake_ebdb_clean.house.dt_creation
+    description: Timestamp of when this amenity was used for the last time.

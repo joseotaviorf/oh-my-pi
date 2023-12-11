@@ -1,0 +1,14 @@
+---
+table_name: datalake_ebdb_amenities.amenity
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    equal_to: 82
+    severity_level: Error
+column_level_validations:
+  id_amenity:
+    is_complete:
+      severity_level: Error
+  is_condo_amenity:
+    is_complete:
+      severity_level: Error
