@@ -45,4 +45,11 @@ endpoints:
         - "workRelationships.workRelationshipsDFF"
         - "workersDFF"
         - "workersEFF"
+  jobs:
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "JobCustomerFlex"
+        - "validGrades"
 
