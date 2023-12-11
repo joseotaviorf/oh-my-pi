@@ -447,6 +447,8 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
+bietlejuice.dw_house_amenities:
+  - bietlejuice.enrich_ebdb_amenities:load-enrich-pivotted-amenities
 bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections:load-enrich-item
@@ -1775,11 +1777,6 @@ bietlejuice.enrich_mexico_cib_segmentation:
   - bietlejuice.enrich_big_agent:load-enrich-agent
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_mexico_cib_events:load-enrich-cib-events
-bietlejuice.enrich_mexico_cib_events:
-  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
-  - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
 bietlejuice.enrich_mexico_consolidated_marketing_metrics:
   - bietlejuice.enrich_mexico_google_ads:load-enrich-ads-performance
   - bietlejuice.enrich_mexico_google_ads:load-enrich-campaigns-performance
