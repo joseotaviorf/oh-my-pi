@@ -1,0 +1,13 @@
+dag:
+  name: enrich_brokers_supply_processor
+  schedule_start_date: 2020, 7, 1
+  owner: Data Rede
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    lead_3p:
+      - file
+      - business_context_detail
+cluster:
+  type: databricks_10_4_med_general_cluster
