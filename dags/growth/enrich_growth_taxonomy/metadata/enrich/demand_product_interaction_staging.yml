@@ -2,38 +2,38 @@
 database_name: datalake_growth_taxonomy
 table_name: demand_product_interaction
 owner: thiago.jesus@quintoandar.com.br
-domain: growth
+domain: Growth
 description: Each row of this table is a combination of growth parameters to describe the user interaction with QuintoAndar products.
   More info about Growth Taxonomy and media setup params in this doc https://docs.google.com/presentation/d/1BylJwYp9-yoqEqNvzcIvzHLVhZbOOomAjDH5XmIaXtY/edit?usp=sharing
 columns:
   id_product_interaction:
-    description: 'Unique id for the combination of platform & content page & origin.'
+    description: Unique id for the combination of platform & content page & origin.
     lineage:
       - datalake_growth_taxonomy.demand_product_interaction.id_product_interaction
   bk_product_interaction:
-    description: 'Combination of product/Amplitude parameters that are key to a taxonomy combination'
+    description: Combination of product/Amplitude parameters that are key to a taxonomy combination
     lineage:
       - datalake_ebdb_clean.visit_origin.name
       - datalake_amplitude_visit.amplitude_visit.app_type
       - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
       - datalake_gshets_clean.taxonomy_levels_values.value
   platform:
-    description: 'Platform of the prospect device where the evaluated event took place.'
+    description: Platform of the prospect device where the evaluated event took place.
     lineage:
       - datalake_amplitude_visit.amplitude_visit.app_type
   origin:
-    description: 'QuintoAndar application where the conversion was carried out in the funnel stage under analysis.'
+    description: QuintoAndar application where the conversion was carried out in the funnel stage under analysis.
     lineage:
       - datalake_ebdb_clean.visit_origin.name
   content_page:
-    description: 'Classification of content pages depending on the strategy adopted.'
+    description: Classification of content pages depending on the strategy adopted.
     lineage:
       - datalake_gshets_clean.taxonomy_levels_values.taxonomy_level
       - datalake_gshets_clean.taxonomy_levels_values.value
   ts_combination_created:
-    description: 'Timestamp of when that taxonomy combination was created.'
+    description: Timestamp of when that taxonomy combination was created.
     lineage:
       - datalake_growth_taxonomy.demand_product_interaction.ts_combination_created
   ts_load:
-    description: 'Timestamp of when the table was last loaded.'
+    description: Timestamp of when the table was last loaded.
  
