@@ -75,7 +75,7 @@ call_flex_reservations AS (
         re2.queue_name,
         COUNT(
             CASE
-                WHEN re1.event = 'reservation.accepted' THEN re1.id_reservation
+                WHEN re1.event = 'reservation.accepted' OR re1.event = 'reservation.completed' THEN re1.id_reservation
             END
         ) > 0 AS is_answered,
         COUNT(
