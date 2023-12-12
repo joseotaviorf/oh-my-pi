@@ -1,0 +1,60 @@
+---
+database_name: datalake_gsheets_clean
+table_name: demand_targets_retro
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.city_group
+  dt_target:
+    description: Date of the target.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.date
+  business_type:
+    description: Business type of the listing related to the event (ASP, CIQ, B2B or Core).
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.business_type
+  rent_flow_origin:
+    description: Origin (first touchpoint) of the rent flow related to the event.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.rent_flow_origin
+  rental_administrator:
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.rental_administrator
+  visits_booked:
+    description: Target volume of visits booked.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.visits_booked  
+  visits_completed:
+    description: Target volume of visits completed.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.visits_completed
+  offers_submitted:
+    description: Target volume of offers submitted.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.offers_submitted
+  offers_accepted:
+    description: Target volume of offers accepted.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.offers_accepted
+  evaluation_started:
+    description: Target volume of evaluations started.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.evaluation_started
+  evaluation_positive:
+    description: Target volume of evaluations positive.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.evaluation_positive
+  documentation_sent:
+    description: Target volume of documentations sent.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.documentation_sent
+  credit_approved:
+    description: Target volume of credit analysis approved.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.credit_approved
+  contracts_signed:
+    description: Target volume of contracts signed.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_retro.contracts_signed

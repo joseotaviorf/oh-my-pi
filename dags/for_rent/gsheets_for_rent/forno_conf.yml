@@ -35,6 +35,18 @@ sheets_info:
     clean_table_name: demand_targets_2022
     sheet_context: for_rent
 
+  demand_targets_2024:
+    sheet_id: 1jjdLup3rMkMvNI6tAPOqAwC07QwzGU8PLm4rir0dGrk
+    sheet_name: demand_targets_2024
+    clean_table_name: demand_targets_2024
+    sheet_context: for_rent
+
+  demand_targets_2024_cohort:
+    sheet_id: 1Sy3hH9ZUXkKxxiHRONekKU3-x3m3lr7InsgYHYYW7j0
+    sheet_name: demand_targets_2024_cohort
+    clean_table_name: demand_targets_2024_cohort
+    sheet_context: for_rent
+
   estrutura_gerente_corretor:
     sheet_id: 1ytcDCgwYO0hs2vEexqx8XlJe8etbg7yhLi44z2ja1zw
     sheet_name: Base

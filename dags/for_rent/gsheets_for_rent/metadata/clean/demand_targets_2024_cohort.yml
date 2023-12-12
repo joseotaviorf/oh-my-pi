@@ -1,0 +1,56 @@
+---
+database_name: datalake_gsheets_clean
+table_name: demand_targets_2024_cohort
+columns:
+  dt_week_started:
+    description: Week of the target.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.week_start
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.city_group
+  rental_administrator:
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.rental_administrator
+  business_type:
+    description: Business type of the listing related to the event (ASP, CIQ, B2B or Core).
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.business_type
+  rent_flow_origin:
+    description: Origin (first touchpoint) of the rent flow related to the event.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.rent_flow_origin
+  weeks_conversion:
+    description: Indicator of the cohort. Represents by the number of weeks between the events. 'W0' stands for Week 0, 'W1' stands for Week 1 and so on.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.weeks_conversion
+  vb2vc:
+    description: Target volume of visits booked that converted into visits completed.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.vb2vc
+  vc2os:
+    description: Target volume of visits completed that converted into offers submitted.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.vc2os
+  os2oa:
+    description: Target volume of offers submitted that converted into offers approved.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.os2oa
+  oa2ca:
+    description: Target volume of offers approved that converted into credit analysis approved.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.oa2ca
+  ca2cs:
+    description: Target volume of credit analysis approved that converted into contracts signed.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.ca2cs
+  cs:
+    description: Target volume of contratcs signed.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.cs
+  vb2os: 
+    description: Target volume of visits booked that converted into offers submitted.
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2024_cohort.vb2os
