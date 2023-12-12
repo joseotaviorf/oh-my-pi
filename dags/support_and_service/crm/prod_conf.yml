@@ -7,9 +7,7 @@ lineage_product_database_name: crm
 custom_cluster:
   driver_node_type_id: c5.4xlarge
   node_type_id: c5.2xlarge
-  autoscale:
-    max_workers: 4
-    min_workers: 1
+  num_workers: 3
   aws_attributes:
     ebs_volume_size: 200
 

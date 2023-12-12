@@ -11,9 +11,7 @@ dag_documentation:
 custom_cluster:
   driver_node_type_id: m5a.xlarge
   node_type_id: c5a.4xlarge
-  autoscale:
-    max_workers: 3
-    min_workers: 1
+  num_workers: 3
 
 tables:
   # <raw_table_name>:
