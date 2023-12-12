@@ -5,14 +5,6 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "This table brings all ERP Gateway stages and their respetive statuses"
 columns:
-  id_feature:
-    lineage:
-      - datalake_sap_gateway.feature.id_feature
-    description: "This ID is the key to join with accounting_entries_retsuko."
-  hash:
-    lineage:
-      - datalake_sap_gateway.sync_sap_job.hash
-    description: "This hash is the key to join with SAP. ERP Gateway create this hash when a job is created."
   id_source:
     lineage:
       - datalake_sap_gateway.feature.id_source
@@ -21,14 +13,38 @@ columns:
     lineage:
       - datalake_sap_gateway.feature.id_finance_entity
     description: "This field is the other input that products send to ERP Gateway to identification"
+  id_feature:
+    lineage:
+      - datalake_sap_gateway.feature.id_feature
+    description: "This ID is the key to join with accounting_entries_retsuko."
   id_sync_sap_job:
     lineage:
       - datalake_sap_gateway.sync_sap_job.id_sync_sap_job
-    description: "ID that "
-  feature_source:
+    description: "ID that refers to sync sap job creation"
+  hash:
+    lineage:
+      - datalake_sap_gateway.sync_sap_job.hash
+    description: "This hash is the key to join with SAP. ERP Gateway create this hash when a job is created."
+  source_client:
+    lineage:
+      - datalake_sap_gateway.feature.source_client
+    description: "Indicates the product that called ERP Gateway"
+  source_type:
     lineage:
       - datalake_sap_gateway.feature.source
     description: "Indicates the product and trigger that called ERP Gateway"
+  user_type:
+    lineage:
+      - datalake_sap_gateway.feature.user_type
+    description: "Indicates the product user type this feature refers to"
+  finance_entity_type:
+    lineage:
+      - datalake_sap_gateway.feature.finance_entity_type
+    description: "Indicates what kind of product entity this feature refers to"
+  transaction_type:
+    lineage:
+      - datalake_sap_gateway.feature.transaction_type
+    description: "Indicates what kind of product transaction called ERP Gateway"
   sync_sap_job_type:
     lineage:
       - datalake_sap_gateway.sync_sap_job.type
@@ -41,6 +57,12 @@ columns:
     lineage:
       - datalake_sap_gateway.sync_sap_job.status
     description: "This fields indicates the second - and last - stage. The sync status between ERP Gatway and SAP"
+  stage_status:
+    lineage:
+      - datalake_sap_gateway.feature.ts_created
+      - datalake_sap_gateway.sync_sap_job.ts_created
+      - datalake_sap_gateway.sync_sap_job.ts_synced
+    description: "Indicates at what stage the launch is in ERP Gateway"
   dt_feature_created:
     lineage:
       - datalake_sap_gateway.feature.ts_created
@@ -53,3 +75,8 @@ columns:
     lineage:
       - datalake_sap_gateway.sync_sap_job.ts_synced
     description: "When the sync between ERP Gateway and SAP succeeds"
+  dt_updated:
+    lineage:
+      - datalake_sap_gateway.feature.ts_updated
+      - datalake_sap_gateway.sync_sap_job.ts_updated
+    description: "Indicates the last stage update"
