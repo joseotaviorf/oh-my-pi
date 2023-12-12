@@ -55,3 +55,15 @@ sheets_info:
     sheet_context: bedrock
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: quinto_andar_companies
+
+  pre_full_merge_dismissals:
+    clean_table_name: pre_full_merge_dismissals
+    sheet_context: bedrock
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: pre_fm_dismissals
+
+  pre_full_merge_dismissals_salaries:
+    clean_table_name: pre_full_merge_dismissals_salaries
+    sheet_context: bedrock
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: pre_fm_dismissals_salaries
