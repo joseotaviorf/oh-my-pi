@@ -15,3 +15,4 @@ Currently, this DAG creates the following output tables in the metric layer:
 - `metric_rent.cohort_conversions`
 - `metric_rent.coincident_events_time_variations`
 - `metric_rent.demand_events`
+- `metric_rent.ppmulti_demand_events`

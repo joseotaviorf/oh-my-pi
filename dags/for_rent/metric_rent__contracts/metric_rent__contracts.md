@@ -42,6 +42,15 @@ Currently, there is the following output tables in the metric layer
 - `ongoing_rentals_monthly_by_sk_region`
 - `ongoing_rentals_weekly`
 - `ongoing_rentals_weekly_by_sk_region`
+- `ppmulti_ended_rentals_daily`
+- `ppmulti_ended_rentals_monthly`
+- `ppmulti_ended_rentals_weekly`
+- `ppmulti_new_rentals_daily`
+- `ppmulti_new_rentals_monthly`
+- `ppmulti_new_rentals_weekly`
+- `ppmulti_ongoing_rentals_daily`
+- `ppmulti_ongoing_rentals_monthly`
+- `ppmulti_ongoing_rentals_weekly`
 - `re_rentals_daily`
 - `re_rentals_daily_by_sk_region`
 - `re_rentals_monthly`

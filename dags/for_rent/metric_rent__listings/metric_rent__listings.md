@@ -24,6 +24,12 @@ Currently, there is the following output tables in the metric layer:
 - `ongoing_listings_monthly_by_sk_region`
 - `ongoing_listings_weekly`
 - `ongoing_listings_weekly_by_sk_region`
+- `ppmulti_new_first_listings_daily`
+- `ppmulti_new_first_listings_monthly`
+- `ppmulti_new_first_listings_weekly`
+- `ppmulti_ongoing_listings_daily`
+- `ppmulti_ongoing_listings_monthly`
+- `ppmulti_ongoing_listings_weekly`
 - `total_listings_daily`
 - `total_listings_daily_by_sk_region`
 - `total_listings_monthly`
