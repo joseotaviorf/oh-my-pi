@@ -11,6 +11,17 @@ columns:
     lineage:
       - datalake_crawlers_listings_clean.em_casa.id
     description: ID house from platform.
+  id_house:
+    lineage: 
+      - datalake_crawlers_listings_clean.em_casa.id
+    description: ID with the competitor's platform name together. In this case, <id>EmCasa.
+  platform:
+    description: Competitor's platform name. In this case, EmCasa.
+  status:
+    description: House listing status.
+    categories:
+      Publicado: The listing is currently published.
+      Despublicado: The listing is currently unpublished.
   id_neighborhood:
     lineage:
       - datalake_crawlers_listings.em_casa_region_mapping.id_neighborhood
@@ -44,6 +55,8 @@ columns:
     lineage:
       - datalake_crawlers_listings_clean.em_casa.address
     description: Name of the street where the listing is located.
+  st_number:
+    description: Street number.
   zip_code:
     lineage:
       - datalake_crawlers_listings_clean.em_casa.address
@@ -80,10 +93,22 @@ columns:
     lineage:
       - datalake_crawlers_listings_clean.em_casa.house_info
     description: Number of bathrooms in the listing.
+  year_built:
+    description: House's year of construction.
+  unit_type:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: House's unit type.
+  usage_type:
+    description: House's usage type.
   price:
     lineage:
       - datalake_crawlers_listings_clean.em_casa.price
     description: Published sales price on competitor site.
+  price_m2:
+    lineage:
+      - datalake_crawlers_listings_clean.em_casa.house_info
+    description: Price per square meter.
   condo_fee:
     lineage:
       - datalake_crawlers_listings_clean.em_casa.price

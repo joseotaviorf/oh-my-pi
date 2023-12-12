@@ -13,6 +13,10 @@ columns:
         lineage:
             - datalake_crawlers_listings_clean.em_casa.id
         description: ID from platform.
+    id_status:
+        lineage:
+            - datalake_crawlers_listings_clean.em_casa.id
+        description:  ID with the competitor's platform name together and status row number. In this case, <id>EmCasa<status row number>.
     id_neighborhood:
         lineage:
             - datalake_ebdb_clean.map_region.id_neighborhood
@@ -27,3 +31,27 @@ columns:
             - datalake_crawlers_listings_clean.em_casa.neighborhood
             - datalake_ebdb_clean.polygon_region.neighborhood
         description: House listing neighborhood name.
+    is_last_status:
+        description: Boolean indicating if this represent the last house status.
+    is_first_status:
+        description: Boolean indicating if this represent the first house status.
+    ts_first_publication:
+        lineage:
+            - datalake_crawlers_listings_clean.em_casa.year
+            - datalake_crawlers_listings_clean.em_casa.month
+            - datalake_crawlers_listings_clean.em_casa.day
+        description: Timestamp of this house first publication.
+    ts_updated:
+        lineage:
+            - datalake_crawlers_listings_clean.em_casa.year
+            - datalake_crawlers_listings_clean.em_casa.month
+            - datalake_crawlers_listings_clean.em_casa.day
+        description: Timestamp when this was updated.
+    ts_last_extraction:
+        lineage:
+            - datalake_crawlers_listings_clean.em_casa.year
+            - datalake_crawlers_listings_clean.em_casa.month
+            - datalake_crawlers_listings_clean.em_casa.day
+        description: Timestamp of this data last extraction.
+    ts_load:
+        description: Timestamp of when this data was loaded.
