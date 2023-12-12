@@ -189,6 +189,14 @@ columns:
     lineage:
       - datalake_losses.delay.is_invoice_deal
     description: Flag to identify if the invoice has deal.
+  is_international:
+    lineage:
+      - datalake_losses.delay.is_international
+    description: Flag to show if the invoice is international.
+  is_writtendown_in_dead_time:
+    lineage:
+      - datalake_losses.delay.is_writtendown_in_dead_time
+    description: Flag to show if the invoice is writtendown in dead time.
   dt_closing:
     lineage:
       - datalake_losses.delay.dt_closing

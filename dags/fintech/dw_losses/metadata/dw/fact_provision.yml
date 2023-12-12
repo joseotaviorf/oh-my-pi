@@ -7,123 +7,135 @@ domain: fintech
 columns:
   sk_invoice:
     lineage:
-    - datalake_losses.provision.id_invoice
-    description: 'Id of the invoice.'
+      - datalake_losses.provision.id_invoice
+    description: "Id of the invoice."
   sk_contract:
-    lineage:   
-    - datalake_losses.provision.id_contract
-    description: 'Id of the contract.' 
+    lineage:
+      - datalake_losses.provision.id_contract
+    description: "Id of the contract."
   due_amount:
-    lineage:   
-    - datalake_losses.provision.due_amount
-    description: 'Total value of the invoice.'
+    lineage:
+      - datalake_losses.provision.due_amount
+    description: "Total value of the invoice."
   invoice_account_type:
-    lineage:   
-    - datalake_losses.provision.invoice_account_type
+    lineage:
+      - datalake_losses.provision.invoice_account_type
     description: Account type information associated with the user information.
   payment_status:
-    lineage:   
-    - datalake_losses.provision.payment_status
+    lineage:
+      - datalake_losses.provision.payment_status
     description: Invoice status of payment i.e if it is open, paid, canceled or was written down
   invoice_status:
-    lineage:   
-    - datalake_losses.provision.invoice_status
+    lineage:
+      - datalake_losses.provision.invoice_status
     description: Invoice status information related to the payment status.
   provision_balance_p1_delay_a:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p1_delay_a
-    description: 'Provision balance considering the delay contamination rule A and the provision factors from rule 1.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p1_delay_a
+    description: "Provision balance considering the delay contamination rule A and the provision factors from rule 1."
   provision_balance_p2_delay_a:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p2_delay_a
-    description: 'Provision balance considering the delay contamination rule A and the provision factors from rule 2.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p2_delay_a
+    description: "Provision balance considering the delay contamination rule A and the provision factors from rule 2."
   provision_balance_p3_delay_a:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p3_delay_a
-    description: 'Provision balance considering the delay contamination rule A and the provision factors from rule 3.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p3_delay_a
+    description: "Provision balance considering the delay contamination rule A and the provision factors from rule 3."
   provision_balance_p4_delay_a:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p4_delay_a
-    description: 'Provision balance considering the delay contamination rule A and the provision factors from rule 4.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p4_delay_a
+    description: "Provision balance considering the delay contamination rule A and the provision factors from rule 4."
   provision_balance_p1_delay_b:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p1_delay_b
-    description: 'Provision balance considering the delay contamination rule B and the provision factors from rule 1.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p1_delay_b
+    description: "Provision balance considering the delay contamination rule B and the provision factors from rule 1."
   provision_balance_p2_delay_b:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p2_delay_b
-    description: 'Provision balance considering the delay contamination rule B and the provision factors from rule 2.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p2_delay_b
+    description: "Provision balance considering the delay contamination rule B and the provision factors from rule 2."
   provision_balance_p3_delay_b:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p3_delay_b
-    description: 'Provision balance considering the delay contamination rule B and the provision factors from rule 3.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p3_delay_b
+    description: "Provision balance considering the delay contamination rule B and the provision factors from rule 3."
   provision_balance_p4_delay_b:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p4_delay_b
-    description: 'Provision balance considering the delay contamination rule B and the provision factors from rule 4.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p4_delay_b
+    description: "Provision balance considering the delay contamination rule B and the provision factors from rule 4."
   provision_balance_p1_delay_c:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p1_delay_c
-    description: 'Provision balance considering the delay contamination rule C and the provision factors from rule 1.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p1_delay_c
+    description: "Provision balance considering the delay contamination rule C and the provision factors from rule 1."
   provision_balance_p2_delay_c:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p2_delay_c
-    description: 'Provision balance considering the delay contamination rule C and the provision factors from rule 2.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p2_delay_c
+    description: "Provision balance considering the delay contamination rule C and the provision factors from rule 2."
   provision_balance_p3_delay_c:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p3_delay_c
-    description: 'Provision balance considering the delay contamination rule C and the provision factors from rule 3.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p3_delay_c
+    description: "Provision balance considering the delay contamination rule C and the provision factors from rule 3."
   provision_balance_p4_delay_c:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p4_delay_c
-    description: 'Provision balance considering the delay contamination rule C and the provision factors from rule 4.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p4_delay_c
+    description: "Provision balance considering the delay contamination rule C and the provision factors from rule 4."
   provision_balance_p1_delay_d:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p1_delay_d
-    description: 'Provision balance considering the delay contamination rule D and the provision factors from rule 1.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p1_delay_d
+    description: "Provision balance considering the delay contamination rule D and the provision factors from rule 1."
   provision_balance_p2_delay_d:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p2_delay_d
-    description: 'Provision balance considering the delay contamination rule D and the provision factors from rule 2.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p2_delay_d
+    description: "Provision balance considering the delay contamination rule D and the provision factors from rule 2."
   provision_balance_p3_delay_d:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p3_delay_d
-    description: 'Provision balance considering the delay contamination rule D and the provision factors from rule 3.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p3_delay_d
+    description: "Provision balance considering the delay contamination rule D and the provision factors from rule 3."
   provision_balance_p4_delay_d:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p4_delay_d
-    description: 'Provision balance considering the delay contamination rule D and the provision factors from rule 4.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p4_delay_d
+    description: "Provision balance considering the delay contamination rule D and the provision factors from rule 4."
   provision_balance_p1_delay_e:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p1_delay_e
-    description: 'Provision balance considering the delay contamination rule E and the provision factors from rule 1.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p1_delay_e
+    description: "Provision balance considering the delay contamination rule E and the provision factors from rule 1."
   provision_balance_p2_delay_e:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p2_delay_e
-    description: 'Provision balance considering the delay contamination rule E and the provision factors from rule 2.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p2_delay_e
+    description: "Provision balance considering the delay contamination rule E and the provision factors from rule 2."
   provision_balance_p3_delay_e:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p3_delay_e
-    description: 'Provision balance considering the delay contamination rule E and the provision factors from rule 3.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p3_delay_e
+    description: "Provision balance considering the delay contamination rule E and the provision factors from rule 3."
   provision_balance_p4_delay_e:
-    lineage:   
-    - datalake_losses.provision.provision_balance_p4_delay_e
-    description: 'Provision balance considering the delay contamination rule E and the provision factors from rule 4.'
+    lineage:
+      - datalake_losses.provision.provision_balance_p4_delay_e
+    description: "Provision balance considering the delay contamination rule E and the provision factors from rule 4."
   provision_balance:
-    lineage:   
-    - datalake_losses.provision.provision_balance
+    lineage:
+      - datalake_losses.provision.provision_balance
     description: Provision balance being applied to the invoice.
   provision_factor:
-    lineage:   
-    - datalake_losses.provision.provision_factor
+    lineage:
+      - datalake_losses.provision.provision_factor
     description: Provision factor being applied to the invoice.
   user:
     lineage:
-    - datalake_losses.provision.user
-    description: 'User information related to the invoice.'
+      - datalake_losses.provision.user
+    description: "User information related to the invoice."
+  is_before_started:
+    lineage:
+      - datalake_losses.provision.is_before_started
+    description: Flag to show if the invoice is before started.
+  is_international:
+    lineage:
+      - datalake_losses.provision.is_international
+    description: Flag to show if the invoice is international.
+  is_writtendown_in_dead_time:
+    lineage:
+      - datalake_losses.provision.is_writtendown_in_dead_time
+    description: Flag to show if the invoice is writtendown in dead time.
   dt_closing:
     lineage:
-    - datalake_losses.provision.dt_closing
-    description: 'Last day of the month.'
+      - datalake_losses.provision.dt_closing
+    description: "Last day of the month."
   ts_load:
-    description: 'Load date.'
+    description: "Load date."

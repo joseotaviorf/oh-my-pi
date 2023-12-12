@@ -7,18 +7,18 @@ domain: fintech
 columns:
   id_invoice:
     lineage:
-    - datalake_losses.closing.id_invoice
-    - datalake_losses.historical_closing.id_invoice
-    description: Id of the invoice. 
+      - datalake_losses.closing.id_invoice
+      - datalake_losses.historical_closing.id_invoice
+    description: Id of the invoice.
   id_contract:
-    lineage:   
-    - datalake_losses.closing.id_contract
-    - datalake_losses.historical_closing.id_contract
-    description: Id of the contract. 
+    lineage:
+      - datalake_losses.closing.id_contract
+      - datalake_losses.historical_closing.id_contract
+    description: Id of the contract.
   accrual_year_month:
-    lineage:   
-    - datalake_losses.closing.accrual_year_month
-    - datalake_losses.historical_closing.accrual_year_month
+    lineage:
+      - datalake_losses.closing.accrual_year_month
+      - datalake_losses.historical_closing.accrual_year_month
     description: String with Year number and Month number 'yyyymm' related to the sent date.
   deal_delay_rule_a:
     description: Rule A related to the delay of the payment. In this rule we contaminate all deals invoices by the anchor in the negoation and keep the natural debt rolling despite the deal being paid
@@ -71,26 +71,26 @@ columns:
   delta_days:
     description: Date difference between dt_due_adjs and dt_closing.
   due_amount:
-    lineage:   
-    - datalake_losses.closing.due_amount
-    - datalake_losses.historical_closing.due_amount
-    description: Total value of the invoice. 
-  frequency: 
-    lineage:   
-    - datalake_losses.closing.frequency
-    - datalake_losses.historical_closing.frequency
+    lineage:
+      - datalake_losses.closing.due_amount
+      - datalake_losses.historical_closing.due_amount
+    description: Total value of the invoice.
+  frequency:
+    lineage:
+      - datalake_losses.closing.frequency
+      - datalake_losses.historical_closing.frequency
     description: Frequency of the payment.
-  payment_status: 
-    lineage:   
-    - datalake_losses.closing.payment_status
-    - datalake_losses.historical_closing.payment_status
+  payment_status:
+    lineage:
+      - datalake_losses.closing.payment_status
+      - datalake_losses.historical_closing.payment_status
     description: Invoice status of payment i.e if it is open, paid, canceled or was written down
   invoice_competence_renegotiated:
-    description:  Competence information of the renegotiation of the invoice.
+    description: Competence information of the renegotiation of the invoice.
   full_delay_at_deal:
-    description:  Date difference between deal_anchor_due_date and dt_closing.
+    description: Date difference between deal_anchor_due_date and dt_closing.
   guarantee_type:
-    description: Guarantee information related to the invoice. 
+    description: Guarantee information related to the invoice.
   pd_range_rule_a:
     description: Range of the delay in days related to Rule A.
   pd_range_rule_b:
@@ -104,25 +104,35 @@ columns:
   risk_type:
     description: Risk type of the deal.
   user:
-    lineage:   
-    - datalake_losses.closing.user
-    - datalake_losses.historical_closing.user
-    description: User information related to the invoice. 
+    lineage:
+      - datalake_losses.closing.user
+      - datalake_losses.historical_closing.user
+    description: User information related to the invoice.
   is_before_started:
-    lineage:   
-    - datalake_losses.closing.is_before_started
-    - datalake_losses.historical_closing.is_before_started
-    description: Flag to show if the date is before started. 
+    lineage:
+      - datalake_losses.closing.is_before_started
+      - datalake_losses.historical_closing.is_before_started
+    description: Flag to show if the date is before started.
   is_contract_with_deal:
-    description: Flag to show if the contract had deal. 
+    description: Flag to show if the contract had deal.
   is_hr:
     description: Flag to identify if the deal is high risk.
   is_invoice_deal:
     description: Flag to identify if the invoice has deal.
+  is_international:
+    lineage:
+      - datalake_losses.closing.is_international
+      - datalake_losses.historical_closing.is_international
+    description: Flag to show if the invoice is international.
+  is_writtendown_in_dead_time:
+    lineage:
+      - datalake_losses.closing.is_writtendown_in_dead_time
+      - datalake_losses.historical_closing.is_writtendown_in_dead_time
+    description: Flag to show if the invoice is writtendown in dead time.
   dt_closing:
     lineage:
-    - datalake_losses.closing.dt_closing
-    - datalake_losses.historical_closing.dt_closing
+      - datalake_losses.closing.dt_closing
+      - datalake_losses.historical_closing.dt_closing
     description: Last day of the month.
   dt_created_deal:
     description: Date of the deal creation.
@@ -136,6 +146,6 @@ columns:
     description: Payment date of the deal.
   dt_snapshot:
     lineage:
-    - datalake_losses.closing.dt_snapshot
-    - datalake_losses.historical_closing.dt_snapshot
+      - datalake_losses.closing.dt_snapshot
+      - datalake_losses.historical_closing.dt_snapshot
     description: Date of the snapshot.

@@ -1,68 +1,68 @@
 WITH BASE_VENCIMENTOS_PADRONIZADOS AS(
   WITH base_1 AS(
-    SELECT 
+    SELECT
       accrual_year_month,
       cast(ts_due AS date) AS dt_due,
-      count(id_external) AS qtd_faturas 
-    FROM 
+      count(id_external) AS qtd_faturas
+    FROM
       datalake_retsuko.invoice
-    WHERE 
-      purpose = 'monthly' 
+    WHERE
+      purpose = 'monthly'
       AND due_amount <= 0
     GROUP BY 1,2
   ),
   base_2 AS(
-    SELECT 
-      *, 
-      row_number() OVER(PARTITION BY accrual_year_month ORDER BY qtd_faturas DESC, dt_due DESC) AS rowNumber 
-    FROM 
+    SELECT
+      *,
+      row_number() OVER(PARTITION BY accrual_year_month ORDER BY qtd_faturas DESC, dt_due DESC) AS rowNumber
+    FROM
       base_1
   )
-  SELECT 
-    accrual_year_month, 
+  SELECT
+    accrual_year_month,
     dt_due
-  FROM 
+  FROM
     base_2
-  WHERE 
+  WHERE
     rowNumber = 1
 ),
 BASE_ACORDOS_METODOLOGIA_ANTIGA AS(
   WITH base_acordo_antigo AS(
-    SELECT 
+    SELECT
       id_invoice_external AS sk_invoice,
       dt_created,
       id_contract_external AS sk_contract,
       accrual_year_month AS accrual_year_month_renegociada,
       description
-    FROM 
+    FROM
       (
-        SELECT 
-          e.*, 
-          c.id_external AS id_contract_external, 
-          i.id_external AS id_invoice_external, 
-          cast(i.ts_created AS date) AS dt_created 
-        FROM 
+        SELECT
+          e.*,
+          c.id_external AS id_contract_external,
+          i.id_external AS id_invoice_external,
+          cast(i.ts_created AS date) AS dt_created
+        FROM
           datalake_retsuko.entry e
-        LEFT JOIN 
-          datalake_retsuko_clean.contract c 
+        LEFT JOIN
+          datalake_retsuko_clean.contract c
             ON c.id = e.id_contract
-        LEFT JOIN 
-          datalake_retsuko.invoice i 
+        LEFT JOIN
+          datalake_retsuko.invoice i
             ON i.id = e.id_invoice
         WHERE
         (trim(upper(e.description)) LIKE '%ACORDO COBRAN%' AND (trim(upper(e.bill_item)) LIKE '%ENTRY.BILL-ITEM/INSURANCE-GUARANTEE%'))
       )
-    WHERE 
+    WHERE
       id_invoice_external IS NOT NULL
   )
-  SELECT 
-    baa.sk_contract, 
-    baa.sk_invoice AS sk_deal_invoice, 
-    baa.dt_created AS dt_created_deal, 
+  SELECT
+    baa.sk_contract,
+    baa.sk_invoice AS sk_deal_invoice,
+    baa.dt_created AS dt_created_deal,
     bvp.dt_due AS dt_min_due_date_at_deal
-  FROM 
+  FROM
     base_acordo_antigo AS baa
-  LEFT JOIN 
+  LEFT JOIN
     BASE_VENCIMENTOS_PADRONIZADOS bvp
       ON bvp.accrual_year_month = baa.accrual_year_month_renegociada
 ),
@@ -79,17 +79,17 @@ BASE_ACORDOS_METODOLOGIA_NOVA AS(
       cast(i.ts_paid AS date) AS tspaid_Origem,
       i.paid_amount
     FROM
-      datalake_trato_feito_clean.negotiation n 
-    INNER JOIN 
-      datalake_trato_feito_clean.debt d                                                     
+      datalake_trato_feito_clean.negotiation n
+    INNER JOIN
+      datalake_trato_feito_clean.debt d
         ON n.id = d.id_negotiation
-    INNER JOIN 
-      datalake_retsuko.invoice i                                                      
+    INNER JOIN
+      datalake_retsuko.invoice i
         ON i.id_external = cast(d.id_external AS bigint)
-    INNER JOIN 
-      datalake_retsuko_clean.contract c                                                    	
-        ON i.id_contract = c.id 
-  ), 
+    INNER JOIN
+      datalake_retsuko_clean.contract c
+        ON i.id_contract = c.id
+  ),
   total_parcelas AS(
     SELECT
       a.NuContrato AS sk_contract,
@@ -100,17 +100,17 @@ BASE_ACORDOS_METODOLOGIA_NOVA AS(
       cast(i.ts_due AS date) AS tsdue_Acordo,
       i.due_amount AS dueAmount_Acordo,
       cast(i.ts_paid AS date) AS tspaid_Acordo,
-      i.paid_amount AS paidamount_Acordo  
-    FROM  
+      i.paid_amount AS paidamount_Acordo
+    FROM
       base_de_acordos a
-    INNER JOIN 
-      datalake_trato_feito_clean.installment p  
+    INNER JOIN
+      datalake_trato_feito_clean.installment p
         ON a.Id_Acordo = p.id_negotiation
-    INNER JOIN 
-      datalake_trato_feito_clean.accounting_installment ai  
+    INNER JOIN
+      datalake_trato_feito_clean.accounting_installment ai
         ON ai.id_installment = p.id
-    INNER JOIN 
-      datalake_retsuko.invoice i  
+    INNER JOIN
+      datalake_retsuko.invoice i
         ON i.id_external = cast(ai.id_external AS bigint)
   )
   SELECT
@@ -118,59 +118,61 @@ BASE_ACORDOS_METODOLOGIA_NOVA AS(
     sk_deal_invoice,
     dt_created_deal,
     min(tsdue_origem) as dt_min_due_date_at_deal
-  FROM 
+  FROM
     total_parcelas
   GROUP BY 1,2,3
 ),
 BASE_ACORDOS_GLOBAL AS(
-  SELECT 
+  SELECT
     bama.*,
-    'bill-item' as deal_detection_method 
-  FROM 
+    'bill-item' as deal_detection_method
+  FROM
     BASE_ACORDOS_METODOLOGIA_ANTIGA as bama
   UNION ALL
-  SELECT 
+  SELECT
     bamn.*,
-    'trato-feito' as deal_detection_method 
-  FROM 
+    'trato-feito' as deal_detection_method
+  FROM
     BASE_ACORDOS_METODOLOGIA_NOVA as bamn
 ),
 closing_union AS(
-  SELECT 
-    * 
-  FROM 
-    datalake_losses.closing 
-  UNION 
-  SELECT 
-    * 
-  FROM 
-    datalake_losses.historical_closing 
+  SELECT
+    *
+  FROM
+    datalake_losses.closing
+  UNION
+  SELECT
+    *
+  FROM
+    datalake_losses.historical_closing
 ),
 base_step0_delay AS(
-  SELECT 
+  SELECT
     fc.*,
-    CASE WHEN payment_status = 'paid' AND dt_paid > dt_closing THEN NULL ELSE dt_paid END AS dt_paid_adjs, 
+    CASE WHEN payment_status = 'paid' AND dt_paid > dt_closing THEN NULL ELSE dt_paid END AS dt_paid_adjs,
     CASE WHEN fc.frequency = 'monthly' THEN v.dt_due ELSE fc.dt_due END AS dt_due_adjs,
     d.dt_created_deal,
     d.deal_detection_method,
     d.dt_min_due_date_at_deal AS deal_anchor_due_date,
-    v.dt_due as dt_due_general_accrual
-  FROM 
+    v.dt_due as dt_due_general_accrual,
+    is_international,
+    is_before_started
+  FROM
     closing_union fc
-  LEFT JOIN 
-    BASE_ACORDOS_GLOBAL d 
+  LEFT JOIN
+    BASE_ACORDOS_GLOBAL d
       ON d.sk_deal_invoice = fc.id_invoice
   LEFT JOIN
-    BASE_VENCIMENTOS_PADRONIZADOS v 
+    BASE_VENCIMENTOS_PADRONIZADOS v
       ON v.accrual_year_month = fc.accrual_year_month
-  WHERE 
+  WHERE
     TRUE
-    AND is_international is FALSE
-    AND is_before_started is FALSE
+    --AND is_international is FALSE
+    --AND is_before_started is FALSE
   -- There`s an exception of deals on january balance due to the accounting window on the moment of the emission of this closing, there`s an alignment between MIS and controlling regarding this.
     AND (is_paid_in_closing_day is FALSE or dt_closing = '2023-01-31')
     AND (payment_status <> 'canceled' and (is_canceled_in_dead_time is FALSE or is_canceled_in_dead_time IS TRUE))
-  
+
 ),
 base_step1_delay AS(
   SELECT
@@ -179,61 +181,67 @@ base_step1_delay AS(
     CASE WHEN (deal_anchor_due_date IS NOT NULL AND ((deal_detection_method='bill-item') AND (dt_closing=date('2023-1-31')))) OR (deal_anchor_due_date IS NOT NULL AND NOT(dt_closing=date('2023-1-31'))) THEN 1 ELSE 0 END AS flag_is_invoice_deal,
     datediff(dt_due_adjs, dt_closing) AS delta_days,
     datediff(deal_anchor_due_date, dt_created_deal) AS delay_at_deal_creation,
-    datediff(deal_anchor_due_date, dt_closing) AS full_delay_at_deal
-  FROM 
+    datediff(deal_anchor_due_date, dt_closing) AS full_delay_at_deal,
+    is_international,
+    is_before_started,
+    is_writtendown_in_dead_time
+  FROM
     base_step0_delay
 ),
 base_aux_ref_contract_deals AS(
-  SELECT 
+  SELECT
     DISTINCT id_contract,
     user,
-    dt_closing 
-  FROM 
-    base_step1_delay 
-  WHERE 
+    dt_closing,
+    is_international,
+    is_before_started,
+    is_writtendown_in_dead_time
+  FROM
+    base_step1_delay
+  WHERE
     flag_is_invoice_deal = 1
 ),
 base_aux_ref_contract_deals_ AS(
-  SELECT 
-    *, 
-    TRUE as flas_contract_has_deal 
-  FROM 
+  SELECT
+    *,
+    TRUE as flas_contract_has_deal
+  FROM
     base_aux_ref_contract_deals
 ),
 base_flag_oldest_deal AS(
-  SELECT 
+  SELECT
     DISTINCT id_contract,
     user,
-    dt_closing, 
-    id_invoice, 
-    row_number() OVER(PARTITION BY id_contract, user, dt_closing ORDER BY deal_anchor_due_date ASC, dt_created_deal ASC) AS deal_order 
-  FROM  
-    base_step1_delay 
-  WHERE 
+    dt_closing,
+    id_invoice,
+    row_number() OVER(PARTITION BY id_contract, user, dt_closing ORDER BY deal_anchor_due_date ASC, dt_created_deal ASC) AS deal_order
+  FROM
+    base_step1_delay
+  WHERE
     flag_is_invoice_deal = 1
 ),
 base_step2_delay AS(
-  SELECT 
+  SELECT
     m.*,
     CASE WHEN flag_is_invoice_deal = 1 AND delta_days < 0 THEN 'DEAL IN DELAY'
          WHEN flag_is_invoice_deal = 1 AND delta_days >= 0 THEN 'DEAL ON TIME. DELAY AT ANCHOR'
-         WHEN flag_is_invoice_deal = 0 THEN 'NOT-DEAL' 
+         WHEN flag_is_invoice_deal = 0 THEN 'NOT-DEAL'
     END AS flag_deal_status_on_delay,
     coalesce(aux.flas_contract_has_deal, FALSE) AS flas_contract_has_deal,
     deal_age.deal_order AS deal_order
-  FROM 
+  FROM
     base_step1_delay m
-  LEFT JOIN 
-    base_aux_ref_contract_deals_ aux 
+  LEFT JOIN
+    base_aux_ref_contract_deals_ aux
       ON (aux.id_contract = m.id_contract) AND (aux.dt_closing = m.dt_closing)
-  LEFT JOIN 
-    base_flag_oldest_deal deal_age 
+  LEFT JOIN
+    base_flag_oldest_deal deal_age
       ON (deal_age.id_contract = m.id_contract) AND (deal_age.dt_closing = m.dt_closing) AND (deal_age.user = m.user) AND (m.id_invoice = deal_age.id_invoice)
 ),
 
 base_step2_delay_append AS (
 
-  SELECT  
+  SELECT
     DISTINCT id_contract,
     user,
     dt_closing,
@@ -248,10 +256,10 @@ base_step2_delay_append AS (
 
 
 base_step2_delay_mid AS(
-  SELECT 
+  SELECT
     m.*,
     f.bigger_anchor_deal_at_contract,
-  -- RULE A: Current on 2022 
+  -- RULE A: Current on 2022
   -- Set de delay on the time of the anchor of the deal, doesn`t look if the payment is up to date
     CASE WHEN flag_is_invoice_deal = 1 THEN least(full_delay_at_deal, delta_days) ELSE delta_days END AS deal_delay_rule_a,
   -- RULE B: Verifies if the de delay of the deal invoice is greater than the delay of the deal date, if not it keeps the delay of the deal date
@@ -271,8 +279,11 @@ base_step2_delay_mid AS(
          WHEN flag_is_invoice_deal = 0 AND flas_contract_has_deal = 1 AND delta_days < 0 THEN delta_days + coalesce(f.bigger_anchor_deal_at_contract,0)
          WHEN flag_is_invoice_deal = 0 AND  flas_contract_has_deal = 1 AND delta_days >=0 THEN delta_days
          WHEN flag_is_invoice_deal = 0 AND  flas_contract_has_deal = 0 THEN delta_days
-        END AS deal_delay_rule_e
-  FROM 
+        END AS deal_delay_rule_e,
+    is_international,
+    is_before_started,
+    is_writtendown_in_dead_time
+  FROM
     base_step2_delay m
   LEFT JOIN
      base_step2_delay_append as f
@@ -290,49 +301,52 @@ base_aux_ref_contract_delays AS(
     min(deal_delay_rule_c) AS delay_contaminated_range_rule_c,
     min(deal_delay_rule_d) AS delay_contaminated_range_rule_d,
     min(deal_delay_rule_e) AS delay_contaminated_range_rule_e
-  FROM 
+  FROM
     base_step2_delay_mid
   GROUP BY 1,2,3
 ),
 base_aux_ref_contract_risk AS(
-  SELECT 
+  SELECT
     DISTINCT dt_closing,
     id_contract
-  FROM 
+  FROM
     base_step2_delay_mid
-  WHERE 
-    frequency = 'extra' 
+  WHERE
+    frequency = 'extra'
     OR frequency = 'early termination'
-    OR frequency = 'early-termination'  
+    OR frequency = 'early-termination'
     OR frequency = 'pos rental'
     OR frequency = 'pos-rental'
 ),
 base_aux_ref_contract_risk_ AS(
-  SELECT 
+  SELECT
     *,
     TRUE as flag_is_HR
-  FROM 
+  FROM
     base_aux_ref_contract_risk
 ),
 base_step3_delay AS(
-  SELECT 
-    m.*, 
-    aux.delay_contaminated_range_rule_b, 
-    aux.delay_contaminated_range_rule_a,  
-    aux.delay_contaminated_range_rule_c,  
+  SELECT
+    m.*,
+    aux.delay_contaminated_range_rule_b,
+    aux.delay_contaminated_range_rule_a,
+    aux.delay_contaminated_range_rule_c,
     aux.delay_contaminated_range_rule_d,
     aux.delay_contaminated_range_rule_e,
-    aux_hr.flag_is_HR
+    aux_hr.flag_is_HR,
+    is_international,
+    is_before_started,
+    is_writtendown_in_dead_time
   FROM base_step2_delay_mid m
-  LEFT JOIN 
-    base_aux_ref_contract_delays AS aux 
+  LEFT JOIN
+    base_aux_ref_contract_delays AS aux
       ON (aux.id_contract = m.id_contract) AND (aux.dt_closing = m.dt_closing) AND (aux.user = m.user)
-  LEFT JOIN 
-    base_aux_ref_contract_risk_ AS aux_hr 
+  LEFT JOIN
+    base_aux_ref_contract_risk_ AS aux_hr
       ON (aux_hr.id_contract = m.id_contract) AND (aux_hr.dt_closing = m.dt_closing)
 ),
 base_step4_delay AS(
-  SELECT 
+  SELECT
     *,
     CASE WHEN delay_contaminated_range_rule_a <= -181 THEN 'TotalM +6 (>181 days)'
          WHEN delay_contaminated_range_rule_a <= -151 THEN 'TotalM +5 (151-180 days)'
@@ -341,7 +355,7 @@ base_step4_delay AS(
          WHEN delay_contaminated_range_rule_a <= -61 THEN 'TotalM +2 (61-90 days)'
          WHEN delay_contaminated_range_rule_a <= -31 THEN 'TotalM +1 (31-60 days)'
          WHEN delay_contaminated_range_rule_a <= -1 THEN 'TotalM +0 (1-30 days)'
-         ELSE 'TotalCurrent' 
+         ELSE 'TotalCurrent'
     END AS pd_range_rule_a,
     CASE WHEN delay_contaminated_range_rule_b <= -181 THEN 'TotalM +6 (>181 days)'
          WHEN delay_contaminated_range_rule_b <= -151 THEN 'TotalM +5 (151-180 days)'
@@ -350,7 +364,7 @@ base_step4_delay AS(
          WHEN delay_contaminated_range_rule_b <= -61 THEN 'TotalM +2 (61-90 days)'
          WHEN delay_contaminated_range_rule_b <= -31 THEN 'TotalM +1 (31-60 days)'
          WHEN delay_contaminated_range_rule_b <= -1 THEN 'TotalM +0 (1-30 days)'
-         ELSE 'TotalCurrent' 
+         ELSE 'TotalCurrent'
     END AS pd_range_rule_b,
     CASE WHEN delay_contaminated_range_rule_c <= -181 THEN 'TotalM +6 (>181 days)'
          WHEN delay_contaminated_range_rule_c <= -151 THEN 'TotalM +5 (151-180 days)'
@@ -359,7 +373,7 @@ base_step4_delay AS(
          WHEN delay_contaminated_range_rule_c <= -61 THEN 'TotalM +2 (61-90 days)'
          WHEN delay_contaminated_range_rule_c <= -31 THEN 'TotalM +1 (31-60 days)'
          WHEN delay_contaminated_range_rule_c <= -1 THEN 'TotalM +0 (1-30 days)'
-         ELSE 'TotalCurrent' 
+         ELSE 'TotalCurrent'
     END AS pd_range_rule_c,
     CASE WHEN delay_contaminated_range_rule_d <= -181 THEN 'TotalM +6 (>181 days)'
          WHEN delay_contaminated_range_rule_d <= -151 THEN 'TotalM +5 (151-180 days)'
@@ -368,7 +382,7 @@ base_step4_delay AS(
          WHEN delay_contaminated_range_rule_d <= -61 THEN 'TotalM +2 (61-90 days)'
          WHEN delay_contaminated_range_rule_d <= -31 THEN 'TotalM +1 (31-60 days)'
          WHEN delay_contaminated_range_rule_d <= -1 THEN 'TotalM +0 (1-30 days)'
-         ELSE 'TotalCurrent' 
+         ELSE 'TotalCurrent'
     END AS pd_range_rule_d,
     CASE WHEN delay_contaminated_range_rule_E <= -181 THEN 'TotalM +6 (>181 days)'
          WHEN delay_contaminated_range_rule_E <= -151 THEN 'TotalM +5 (151-180 days)'
@@ -377,16 +391,19 @@ base_step4_delay AS(
          WHEN delay_contaminated_range_rule_E <= -61 THEN 'TotalM +2 (61-90 days)'
          WHEN delay_contaminated_range_rule_E <= -31 THEN 'TotalM +1 (31-60 days)'
          WHEN delay_contaminated_range_rule_E <= -1 THEN 'TotalM +0 (1-30 days)'
-         ELSE 'TotalCurrent' 
+         ELSE 'TotalCurrent'
     END AS pd_range_rule_e,
-    CASE WHEN flag_is_HR IS TRUE THEN 'HR' 
-         ELSE 'LR' 
-    END AS flag_risk
-  FROM 
+    CASE WHEN flag_is_HR IS TRUE THEN 'HR'
+         ELSE 'LR'
+    END AS flag_risk,
+    is_international,
+    is_before_started,
+    is_writtendown_in_dead_time
+  FROM
     base_step3_delay
 ),
 base_step5_delay AS(
-SELECT 
+SELECT
   id_invoice,
   id_contract,
   accrual_year_month,
@@ -508,11 +525,14 @@ SELECT
   deal_anchor_due_date as dt_due_deal_anchor,
   dt_due_general_accrual,
   dt_paid_adjs,
-  dt_snapshot
-FROM 
+  dt_snapshot,
+  is_international,
+  is_before_started,
+  is_writtendown_in_dead_time
+FROM
   base_step4_delay
 )
-SELECT 
+SELECT
   id_invoice,
   id_contract,
   accrual_year_month,
@@ -534,7 +554,7 @@ SELECT
   delay_invoice_range_b,
   delay_invoice_range_d,
   delay_invoice_range_e,
-  CASE 
+  CASE
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH <= DATE('2022-12-01') THEN delay_invoice_range_b
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH = DATE('2023-01-01') THEN delay_invoice_range_a
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH BETWEEN DATE('2023-02-01') AND DATE('2023-05-01') THEN delay_invoice_range_b
@@ -544,7 +564,7 @@ SELECT
   delay_contamined_range_b,
   delay_contamined_range_d,
   delay_contamined_range_e,
-  CASE 
+  CASE
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH <= DATE('2022-12-01') THEN delay_contamined_range_b
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH = DATE('2023-01-01') THEN delay_contamined_range_a
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH BETWEEN DATE('2023-02-01') AND DATE('2023-05-01') THEN delay_contamined_range_b
@@ -568,6 +588,8 @@ SELECT
   is_contract_with_deal,
   is_hr,
   is_invoice_deal,
+  is_international,
+  is_writtendown_in_dead_time,
   dt_closing,
   dt_created_deal,
   dt_due_adjs,
@@ -575,5 +597,5 @@ SELECT
   dt_due_general_accrual,
   dt_paid_adjs,
   dt_snapshot
-FROM 
+FROM
   base_step5_delay

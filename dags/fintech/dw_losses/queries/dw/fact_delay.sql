@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     COALESCE(id_invoice, -1) AS sk_invoice,
     COALESCE(id_contract, -1) AS sk_contract,
     deal_delay_rule_a,
@@ -31,9 +31,12 @@ SELECT
     pd_range_rule_e,
     risk_type,
     user,
+    is_before_started,
+    is_international,
+    is_writtendown_in_dead_time,
     dt_closing,
     NOW() AS ts_load
-FROM 
+FROM
     datalake_losses.delay
-WHERE 
+WHERE
   payment_status <> 'written down'

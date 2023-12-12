@@ -7,113 +7,123 @@ domain: fintech
 columns:
   sk_invoice:
     lineage:
-    - datalake_losses.closing.id_invoice
-    - datalake_losses.historical_closing.id_invoice
-    description: Id of the invoice. 
+      - datalake_losses.closing.id_invoice
+      - datalake_losses.historical_closing.id_invoice
+    description: Id of the invoice.
   sk_contract:
-    lineage:   
-    - datalake_losses.closing.id_contract
-    - datalake_losses.historical_closing.id_contract
-    description: Id of the contract. 
+    lineage:
+      - datalake_losses.closing.id_contract
+      - datalake_losses.historical_closing.id_contract
+    description: Id of the contract.
   accrual_year_month:
-    lineage:   
-    - datalake_losses.closing.accrual_year_month
-    - datalake_losses.historical_closing.accrual_year_month
+    lineage:
+      - datalake_losses.closing.accrual_year_month
+      - datalake_losses.historical_closing.accrual_year_month
     description: String with Year number and Month number 'yyyymm' related to the sent date.
   closing_month_status:
-    lineage:   
-    - datalake_losses.closing.closing_month_status
-    - datalake_losses.historical_closing.closing_month_status
-    description: Status of the closing month. 
+    lineage:
+      - datalake_losses.closing.closing_month_status
+      - datalake_losses.historical_closing.closing_month_status
+    description: Status of the closing month.
+  contract_guarantee:
+    lineage:
+      - datalake_losses.closing.contract_guarantee
+      - datalake_losses.historical_closing.contract_guarantee
+    description: guarantee information related to the contract.
   due_amount:
-    lineage:   
-    - datalake_losses.closing.due_amount
-    - datalake_losses.historical_closing.due_amount
-    description: Total value of the invoice. 
+    lineage:
+      - datalake_losses.closing.due_amount
+      - datalake_losses.historical_closing.due_amount
+    description: Total value of the invoice.
   invoice_type:
-    lineage:   
-    - datalake_losses.closing.invoice_type
-    - datalake_losses.historical_closing.invoice_type
-    description: Type of the invoice according to the frequency information. 
+    lineage:
+      - datalake_losses.closing.invoice_type
+      - datalake_losses.historical_closing.invoice_type
+    description: Type of the invoice according to the frequency information.
   invoice_paid_amount:
-    lineage:   
-    - datalake_losses.closing.paid_amount
-    - datalake_losses.historical_closing.paid_amount
-    description: Total paid amount fo the invoice. 
+    lineage:
+      - datalake_losses.closing.paid_amount
+      - datalake_losses.historical_closing.paid_amount
+    description: Total paid amount fo the invoice.
   is_before_started:
-    lineage:   
-    - datalake_losses.closing.is_before_started
-    - datalake_losses.historical_closing.is_before_started
-    description: Flag to show if the date is before started. 
+    lineage:
+      - datalake_losses.closing.is_before_started
+      - datalake_losses.historical_closing.is_before_started
+    description: Flag to show if the date is before started.
   is_before_started_raw:
-    lineage:   
-    - datalake_losses.closing.is_before_started_raw
-    - datalake_losses.historical_closing.is_before_started_raw
-    description: Flag to show if the date is before started. 
+    lineage:
+      - datalake_losses.closing.is_before_started_raw
+      - datalake_losses.historical_closing.is_before_started_raw
+    description: Flag to show if the date is before started.
   is_canceled_in_dead_time:
-    lineage:   
-    - datalake_losses.closing.is_canceled_in_dead_time
-    - datalake_losses.historical_closing.is_canceled_in_dead_time
-    description: Flag to show if the invoice is canceled in dead time. 
+    lineage:
+      - datalake_losses.closing.is_canceled_in_dead_time
+      - datalake_losses.historical_closing.is_canceled_in_dead_time
+    description: Flag to show if the invoice is canceled in dead time.
   is_guarantee_paid:
-    lineage:  
-    - datalake_losses.closing.is_guarantee_paid
-    - datalake_losses.historical_closing.is_guarantee_paid
+    lineage:
+      - datalake_losses.closing.is_guarantee_paid
+      - datalake_losses.historical_closing.is_guarantee_paid
     description: Flag to show if the guarantee is paid.
   is_international:
-    lineage:   
-    - datalake_losses.closing.is_international
-    - datalake_losses.historical_closing.is_international
+    lineage:
+      - datalake_losses.closing.is_international
+      - datalake_losses.historical_closing.is_international
     description: Flag to show if the invoice is international.
   is_paid_in_closing_day:
-    lineage:   
-    - datalake_losses.closing.is_paid_in_closing_day
-    - datalake_losses.historical_closing.is_paid_in_closing_day
+    lineage:
+      - datalake_losses.closing.is_paid_in_closing_day
+      - datalake_losses.historical_closing.is_paid_in_closing_day
     description: Flag to show if the invoice is paid within the closing day.
   is_writtendown_in_dead_time:
-    lineage:   
-    - datalake_losses.closing.is_writtendown_in_dead_time
-    - datalake_losses.historical_closing.is_writtendown_in_dead_time
+    lineage:
+      - datalake_losses.closing.is_writtendown_in_dead_time
+      - datalake_losses.historical_closing.is_writtendown_in_dead_time
     description: Flag to show if the invoice is writtendown in the deadtime.
   payment_status:
-    lineage:   
-    - datalake_losses.closing.payment_status
-    - datalake_losses.historical_closing.payment_status
+    lineage:
+      - datalake_losses.closing.payment_status
+      - datalake_losses.historical_closing.payment_status
     description: Status of the invoice payment.
   origin_factor:
-    lineage:   
-    - datalake_losses.closing.origin_factor
-    - datalake_losses.historical_closing.origin_factor
-    description: Origin of the data, currently can come from the historical table or the snapshot. 
+    lineage:
+      - datalake_losses.closing.origin_factor
+      - datalake_losses.historical_closing.origin_factor
+    description: Origin of the data, currently can come from the historical table or the snapshot.
+  dt_annulment:
+    lineage:
+      - datalake_losses.closing.dt_annulment
+      - datalake_losses.historical_closing.dt_annulment
+    description: Contract annulment date.
   dt_closing:
     lineage:
-    - datalake_losses.closing.dt_closing
-    - datalake_losses.historical_closing.dt_closing
+      - datalake_losses.closing.dt_closing
+      - datalake_losses.historical_closing.dt_closing
     description: Last day of the month.
   dt_contract_signature:
     lineage:
-    - datalake_losses.closing.dt_contract_signature
-    - datalake_losses.historical_closing.dt_contract_signature
+      - datalake_losses.closing.dt_contract_signature
+      - datalake_losses.historical_closing.dt_contract_signature
     description: Date of the contract signature.
-  dt_due: 
+  dt_due:
     lineage:
-    - datalake_losses.closing.dt_due
-    - datalake_losses.historical_closing.dt_due
-    description: Due date of the invoice. 
-  dt_paid: 
+      - datalake_losses.closing.dt_due
+      - datalake_losses.historical_closing.dt_due
+    description: Due date of the invoice.
+  dt_paid:
     lineage:
-    - datalake_losses.closing.dt_paid
-    - datalake_losses.historical_closing.dt_paid
-    description: Payment completed date of the invoice. 
-  dt_sent: 
+      - datalake_losses.closing.dt_paid
+      - datalake_losses.historical_closing.dt_paid
+    description: Payment completed date of the invoice.
+  dt_sent:
     lineage:
-    - datalake_losses.closing.dt_sent
-    - datalake_losses.historical_closing.dt_sent
-    description: Sent date of the invoice. 
+      - datalake_losses.closing.dt_sent
+      - datalake_losses.historical_closing.dt_sent
+    description: Sent date of the invoice.
   dt_snapshot:
     lineage:
-    - datalake_losses.closing.dt_snapshot
-    - datalake_losses.historical_closing.dt_snapshot
+      - datalake_losses.closing.dt_snapshot
+      - datalake_losses.historical_closing.dt_snapshot
     description: Date of the snapshot.
   ts_load:
     description: Load date.
