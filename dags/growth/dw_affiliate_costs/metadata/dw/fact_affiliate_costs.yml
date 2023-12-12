@@ -1,28 +1,28 @@
 database_name: dw_quintoandar
 table_name: fact_affiliate_costs
-description: ''
+description: 'Table created to control affiliate costs based on robin hood'
 domain: Growth
-owner: ''
+owner: '@data-growth'
 columns:
   sk_rh_accounting_entry:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
-    description: ''
+    description: 'This is a registration number of information in the database of accounting entry.'
   sk_payee:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_payee
-    description: ''
+    description: 'This is a registration number of information in the database of payee.'
   sk_date:
     lineage:
     - datalake_robin_hood.affiliate_costs.dt_transaction
-    description: ''
+    description: 'Date that transaction was executed.'
   sk_user:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_external
-    description: ''
+    description: 'Unique key that identifies a User.'
   cost:
     lineage:
     - datalake_robin_hood.affiliate_costs.cost
-    description: ''
+    description: 'Cost spent on campaign.'
   ts_load:
-    description: ''
+    description: 'Timestamp indicating when data was loaded.'

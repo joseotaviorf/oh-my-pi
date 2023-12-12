@@ -1,76 +1,40 @@
 database_name: dw_quintoandar
 table_name: dim_affiliate_cost
-description: ''
+description: 'Table created to control affiliate costs based on robin hood'
 domain: Growth
-owner: ''
+owner: '@data-growth'
 columns:
   sk_rh_accounting_entry:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
-    description: ''
+    description: 'A registration number of information in the database of accounting entry.'
   sk_payee:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_payee
-    description: ''
+    description: 'A registration number of information in the database of payee.'
   city_group:
     lineage:
     - datalake_robin_hood.affiliate_costs.city_group
-    description: ''
-    categories:
-      Belo Horizonte: ''
-      Brasília: ''
-      Campinas: ''
-      Cotia: ''
-      Curitiba: ''
-      Curtitiba: ''
-      Florianópolis: ''
-      Goiânia: ''
-      Mogi das Cruzes: ''
-      Porto Alegre: ''
-      RMSP: ''
-      Recife: ''
-      Rio de Janeiro: ''
-      Salvador: ''
-      Santos: ''
-      São José dos Campos: ''
-      Vitória: ''
+    description: 'A grouping of city or clusters of cities and neighborhoods (RMSP - Região Metropolitana de São Paulo).'
   description:
     lineage:
     - datalake_robin_hood.affiliate_costs.description
-    description: ''
+    description: 'A description of house indication.'
   source_bill_item:
     lineage:
     - datalake_robin_hood.affiliate_costs.source_bill_item
-    description: ''
+    description: 'A source bill item.'
   commission_type:
     lineage:
     - datalake_robin_hood.affiliate_costs.commission_type
-    description: ''
-    categories:
-      Commission Listing: ''
-      Commission MGM: ''
-      Commission Rent: ''
-      Commission Sale: ''
+    description: 'A type of comission.'
   cost_center_code:
     lineage:
     - datalake_robin_hood.affiliate_costs.cost_center_code
-    description: ''
-    categories:
-      C023: ''
-      C038: ''
-      C039: ''
-      C040: ''
-      C046: ''
-      C066: ''
-      C081: ''
-      C40: ''
+    description: 'A cost center code.'
   mkt_origin:
     lineage:
     - datalake_robin_hood.affiliate_costs.mkt_origin
-    description: ''
-    categories:
-      Doorman: ''
-      Indica Aí - Agents: ''
-      Indica Aí - General: ''
+    description: 'Inputed origin of the marketing campaign that acquired the lead, such as a specific product.'
   ts_load:
-    description: ''
+    description: 'Timestamp indicating the data load into our system. It has nothing related to the rent flow taxonomy itself.'
