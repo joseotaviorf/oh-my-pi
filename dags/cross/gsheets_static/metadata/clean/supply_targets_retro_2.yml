@@ -1,0 +1,47 @@
+database_name: datalake_gsheets_clean
+table_name: supply_targets_retro_2
+columns:
+  dt_target:
+    description: Date of the target.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.date
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.city_group
+  lead_processing_operation:
+    description: Operation that processed the listing lead.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.lead_processing_operation
+  supply_mkt_origin_detailed:
+    description: Market origin of the lead.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.supply_mkt_origin_detailed
+  planning_taxonomy:
+    description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.planning_taxonomy
+  rental_administrator:
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.rental_administrator
+  prospects:
+    description: Target volume of prospects.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.prospects
+  qualifieds:
+    description: Target volume of qualifieds.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.qualifieds
+  opportunities:
+    description: Target volume of opportunities.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.opportunities
+  available_qualifieds:
+    description: Target volume of available qualifieds.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.available_qualifieds
+  first_listings:
+    description: Target volume of first listings.
+    lineage:
+      - datalake_gsheets_raw.supply_targets_retro_2.first_listings

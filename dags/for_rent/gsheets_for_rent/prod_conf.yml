@@ -137,6 +137,18 @@ sheets_info:
     clean_table_name: supply_targets_2022
     sheet_context: for_rent
 
+  supply_targets_2024:
+    sheet_id: 1xv5xsrzWfTHZbgjC5McbIyagJ_GYrTPm3ykfMGQHFTc
+    sheet_name: supply_targets_2024
+    clean_table_name: supply_targets_2024
+    sheet_context: for_rent
+
+  supply_targets_2024_cohort:
+    sheet_id: 1xv5xsrzWfTHZbgjC5McbIyagJ_GYrTPm3ykfMGQHFTc
+    sheet_name: supply_targets_2024_cohort
+    clean_table_name: supply_targets_2024_cohort
+    sheet_context: for_rent
+
   tratativas_actionline_ciq_full_responses:
     sheet_id: 1PNFjoLH0RvuQv5u8n4nYzDKF9RrRE2d1jTDPFJeBxA8
     sheet_name: Form Responses 1

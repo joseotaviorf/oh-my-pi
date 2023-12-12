@@ -251,6 +251,24 @@ sheets_info:
     clean_table_name: supply_targets_2021
     sheet_context: static
 
+  supply_targets_retro_1:
+    sheet_id: 1Y2qZOqOZLFgxwh4Hb7uuK_mPnp-h8gPdIWgBLZ_tAqI
+    sheet_name: supply_targets_retro_1
+    clean_table_name: supply_targets_retro_1
+    sheet_context: static
+
+  supply_targets_retro_2:
+    sheet_id: 1W7wLAYQoHtGgHcLaKUSYXbEOv144jP8dIbGH3NmUfkk
+    sheet_name: supply_targets_retro_2
+    clean_table_name: supply_targets_retro_2
+    sheet_context: static
+
+  supply_targets_retro_cohort:
+    sheet_id: 1fZaDo2wZ0AoiFpwbaiwSgm7X5bJWL05wBe7h0FfaCpQ
+    sheet_name: supply_targets_retro_cohort
+    clean_table_name: supply_targets_retro_cohort
+    sheet_context: static
+
   survival_estimation:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation
