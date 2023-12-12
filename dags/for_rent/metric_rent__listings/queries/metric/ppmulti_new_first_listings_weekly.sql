@@ -5,7 +5,7 @@ SELECT
 FROM 
     dw_public.fact_house_listing_flows AS lf
 JOIN 
-    dw_public.dim_date dd
+    dw_public.dim_date AS dd
         ON lf.sk_first_listing_date = dd.sk_date
         AND DATE_TRUNC('week', dd.date) < DATE_TRUNC('week', CURRENT_DATE)
 JOIN
@@ -14,12 +14,10 @@ JOIN
 JOIN
     datalake_pro_owners.daily_owner_houses_quantity_history AS doh
         ON doh.id_owner = fhl.sk_owner
-        AND d.year = doh.year
-        AND d.month = doh.month
-        AND d.day = doh.day
+        AND dd.year = doh.year
+        AND dd.month = doh.month
+        AND dd.day = doh.day
 WHERE 
     lf.sk_first_listing_date > 0
         AND doh.ongoing_houses >= 5
 GROUP BY 1, 2
-
-

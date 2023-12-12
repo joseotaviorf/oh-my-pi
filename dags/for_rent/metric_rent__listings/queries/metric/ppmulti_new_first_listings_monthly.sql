@@ -1,11 +1,11 @@
 SELECT
-    DATE_TRUNC('month', dd.date) AS week,
+    DATE_TRUNC('month', dd.date) AS month,
     lf.country_code,
     COUNT(DISTINCT lf.sk_house_listing) AS new_first_listings
 FROM 
     dw_public.fact_house_listing_flows AS lf
 JOIN 
-    dw_public.dim_date dd
+    dw_public.dim_date AS dd
         ON lf.sk_first_listing_date = dd.sk_date
         AND DATE_TRUNC('month', dd.date) < DATE_TRUNC('month', CURRENT_DATE)
 JOIN
@@ -14,7 +14,7 @@ JOIN
 JOIN
     datalake_pro_owners.daily_owner_houses_quantity_history AS doh
         ON doh.id_owner = fhl.sk_owner
-        AND ddyear = doh.year
+        AND dd.year = doh.year
         AND dd.month = doh.month
         AND dd.day = doh.day
 WHERE 
