@@ -18,6 +18,7 @@ class HiveMetastoreLoader:
         """
         self.hive_metastore_service = metastore_service
 
+    @logger
     def sync_metastore(
         self,
         database_name,
@@ -99,6 +100,7 @@ class HiveMetastoreLoader:
                 format_info,
             )
 
+    @logger
     def create_table(
         self,
         database_name,
@@ -147,6 +149,7 @@ class HiveMetastoreLoader:
             format_info,
         )
 
+    @logger
     def update_table(
         self,
         database_name,
@@ -216,6 +219,7 @@ class HiveMetastoreLoader:
             )
             self._update_table_in_metastore(database_name, table_name, schema_changes)
 
+    @logger(exclude="partition_values")
     def update_table_partitions(self, database_name, table_name, partition_values):
         """
         Updates partitions values of Hive table.
@@ -270,6 +274,7 @@ class HiveMetastoreLoader:
             )
 
     @staticmethod
+    @logger
     def _get_tables_difference(spark_table_columns, metastore_table_columns):
         """
         Identifies the columns that were added and removed from the table in Spark Metastore.
@@ -295,6 +300,7 @@ class HiveMetastoreLoader:
 
         return added_columns, removed_columns
 
+    @logger
     def _get_table_schema_changes(self, database_name, table_name, source_schema):
         """
         Returns the table new columns and the removed columns in Spark Metastore.
@@ -322,6 +328,7 @@ class HiveMetastoreLoader:
 
         return changes
 
+    @logger
     def _is_table_in_metastore(self, database_name, table_name):
         """
         Checks whether table exists in Hive Metastore.
@@ -334,6 +341,7 @@ class HiveMetastoreLoader:
         """
         return table_name in self.hive_metastore_service.get_table_names(database_name)
 
+    @logger
     def _is_table_partitioned(self, database_name, table_name):
         """
         Checks if table is partitioned in Hive Metastore.
@@ -345,6 +353,7 @@ class HiveMetastoreLoader:
         """
         return self.hive_metastore_service.get_partition_keys(database_name, table_name)
 
+    @logger
     def _update_table_in_metastore(self, database_name, table_name, schema_changes):
         """
         Perform an alterantive alter table in the Hive Metastore's table via add and drop commands.
@@ -380,6 +389,7 @@ class HiveMetastoreLoader:
             )
 
     @staticmethod
+    @logger
     def _map_partition_values_difference(
         database_name, table_name, spark_partition_values, metastore_partition_values
     ):
@@ -409,6 +419,7 @@ class HiveMetastoreLoader:
 
         return added_partitions, removed_partitions
 
+    @logger
     def _partition_keys_match(
         self, database_name, table_name, source_table_partition_keys
     ):

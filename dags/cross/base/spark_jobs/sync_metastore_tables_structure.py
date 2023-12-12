@@ -19,10 +19,10 @@ from bietlejuice.services.metastore_services.hive_metastore_service import (
 JOB_NAME = "sync_metastore_tables_structure"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
+driver_logger = QuintoAndarLogger(JOB_NAME)
 
 
 def update_table_structure(
-    logger: QuintoAndarLogger,
     hive_ms_loader: HiveMetastoreLoader,
     database_name: str,
     database_location: str,
@@ -36,7 +36,6 @@ def update_table_structure(
     or creating them according to the values provided. Used for multiple concurrent
     requests that share the same Hive Metastore Loader object.
     Args:
-        logger (QuintoAndarLogger): logger instance
         hive_ms_loader (HiveMetastoreLoader): Hive Metastore Loader object
         database_name (str): Name of the database from Databricks Metastore that
             contains the table(s) which partitions will be updated in Hive Metastore.
@@ -47,8 +46,8 @@ def update_table_structure(
         columns (str): List of columns that will be updated in Hive Metastore.
         partition_keys (List[str]): List of partition keys as strings.
     """
-
-    logger.info(
+    # logs were not being register in parallel with logger, thus using print
+    print(
         f"m={JOB_NAME}, database_name={database_name}, table_name={table_name}, "
         f"columns={columns}, partition_keys={partition_keys}, "
         f"msg=Starting table schema and partition keys update"
@@ -65,7 +64,8 @@ def update_table_structure(
         source_schema=columns,
     )
 
-    logger.info(
+    # logs were not being register in parallel with logger, thus using print
+    print(
         f"m={JOB_NAME}, database_name={database_name}, table_name={table_name}, "
         f"columns={columns}, partition_keys={partition_keys}, "
         f"msg=Completed table schema and partition keys update"
@@ -114,9 +114,7 @@ if __name__ == "__main__":
     table_name = args.table_name
     all_tables_flag = args.all_tables_flag
 
-    logger = logging.getLogger(JOB_NAME)
-
-    logger.info(
+    driver_logger.info(
         f"m={JOB_NAME}, bucket={bucket}, layer={layer}, schema={schema}, "
         f"table_name={table_name}, all_tables_flag={all_tables_flag}, "
         "msg=Job execution started."
@@ -135,7 +133,6 @@ if __name__ == "__main__":
 
     func = partial(
         update_table_structure,
-        logger,
         hive_ms_loader,
         spark_ms.spark_database_name,
         spark_ms.database_location,
@@ -151,4 +148,4 @@ if __name__ == "__main__":
         )
     )
 
-    logger.info(f"m={JOB_NAME}, msg=Finished synchronization.")
+    driver_logger.info(f"m={JOB_NAME}, msg=Finished synchronization.")
