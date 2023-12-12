@@ -4,6 +4,4 @@ partition_cols:
 custom_cluster:
   driver_node_type_id: m5a.2xlarge
   node_type_id: m5a.4xlarge
-  autoscale:
-    min_workers: 1
-    max_workers: 3
+  num_workers: 2

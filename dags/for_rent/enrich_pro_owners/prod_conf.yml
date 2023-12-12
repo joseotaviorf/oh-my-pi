@@ -3,9 +3,7 @@ custom_cluster:
   driver_node_type_id: m5d.xlarge
   node_type_id: m5d.2xlarge
   runtime_engine: PHOTON
-  autoscale:
-    min_workers: 1
-    max_workers: 4
+  num_workers: 4
 inner_dependencies:
   daily_owner_houses_quantity_history:
     - house_b2b_history
