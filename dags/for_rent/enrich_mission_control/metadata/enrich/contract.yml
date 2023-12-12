@@ -46,7 +46,7 @@ columns:
     description: ID of the condo manager.
     lineage:
     - datalake_mission_control_clean.contract.id_condo_manager
-  id_info_payment:
+  id_payment_info:
     description: ID of the info payment.
     lineage:
     - datalake_mission_control_clean.contract.id_info_payment
