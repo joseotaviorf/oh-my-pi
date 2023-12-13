@@ -4,6 +4,7 @@ WITH house_owner AS (
     id_owner,
     houses_published,
     total_houses,
+    ongoing_houses,
     is_pp_multi_active
   FROM
     datalake_pro_owners.daily_owner_houses_quantity_history
@@ -362,6 +363,7 @@ landlord_journey_agg AS (
         END
     ) AS total_active_termination_contracts,
     MAX(ho.total_houses) AS total_houses,
+    MAX(ho.ongoing_houses) AS ongoing_houses,
     MAX(
       CASE
         WHEN ho.houses_published > 0 THEN TRUE
@@ -623,6 +625,7 @@ SELECT
   IF(sj.total_days_since_last_termination_creation < 0, 0, sj.total_days_since_last_termination_creation) AS total_days_since_last_termination_creation,
   IF(sj.total_days_since_last_termination_finished < 0, 0, sj.total_days_since_last_termination_finished) AS total_days_since_last_termination_finished,
   sj.total_houses,
+  sj.ongoing_houses,
   sj.total_bookings,
   sj.total_reservations,
   sj.total_canceled_bookings,

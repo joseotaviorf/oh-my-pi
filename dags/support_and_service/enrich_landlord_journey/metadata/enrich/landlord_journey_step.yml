@@ -166,6 +166,8 @@ columns:
       the reference point for this calculation
   total_houses:
     description: Number of houses the owner currently has
+  ongoing_houses:
+    description: Number of houses the owner currently has that are in published, rented or suspended status
   total_bookings:
     description:
       The volume of bookings per user. It considers only events of type equal to 1,

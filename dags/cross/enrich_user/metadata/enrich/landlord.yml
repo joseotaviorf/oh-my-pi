@@ -79,6 +79,17 @@ columns:
         If the user has taken any step in offboarding, ongoing, or onboarding, it
         indicates that the user is in a post-contract step
       Not_Apply: If the user is not in the pre or post contract steps
+  total_houses:
+    lineage:
+      - datalake_landlord_journey.landlord_journey_step.total_houses
+    description:
+      Number of houses the owner had in a reference date (id_snapshot or year, month and day column)
+  ongoing_houses:
+    lineage:
+      - datalake_landlord_journey.landlord_journey_step.ongoing_houses
+    description:
+      Number of houses the owner had in a reference date (id_snapshot or year, month and day column)
+      that were in published, rented or suspended status.
   is_active:
     lineage:
       - datalake_ebdb_clean.user.is_active
@@ -147,6 +158,9 @@ columns:
     description:
       If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
       that the user is in a post-contract step
+  is_pp_multi_5_more_ongoing_houses:
+    description:
+      If the user is a PP Multi or has 5 or more ongoing houses.
   dt_birth:
     lineage:
       - datalake_ebdb_clean.user.dt_birth
