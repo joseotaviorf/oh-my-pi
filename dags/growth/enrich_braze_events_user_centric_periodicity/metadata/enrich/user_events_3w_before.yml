@@ -103,6 +103,12 @@ columns:
       - datalake_braze_user_centric.user_events_daily.event_action
       - datalake_braze_user_centric.user_events_daily.event_count
     description: Total of delivery events for emails (either canvas or campaigns,tenants or owners app).
+  total_affiliate_communications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events (either campaigns or canvases) sent to the affiliate users.
   year:
     lineage:
       - datalake_braze_user_centric.user_events_daily.dt_event

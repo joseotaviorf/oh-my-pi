@@ -6,7 +6,7 @@ domain: growth
 description: Each row of this table is a combination of growth parameters to describe the operational teams that helped the prospect in it's journey to book a visit or send an offer.
   More info about Growth Taxonomy and media setup params in this doc https://docs.google.com/presentation/d/1BylJwYp9-yoqEqNvzcIvzHLVhZbOOomAjDH5XmIaXtY/edit?usp=sharing
 columns:
-  id_operation_flow:
+  id_demand_operation_flow:
     description: 'Unique id for the combination of operation_flow & referral type.'
     lineage:
       - datalake_growth_taxonomy.demand_operation_flow_staging.id_operation_flow

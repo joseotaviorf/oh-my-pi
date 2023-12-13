@@ -1,24 +1,24 @@
 database_name: dw_quintoandar
 table_name: fact_affiliate_taxes
-description: ''
+description: Table that contains data about affiliate taxes.
 domain: Growth
-owner: ''
+owner: '@data-growth'
 columns:
   sk_tax:
     lineage:
     - datalake_robin_hood_clean.tax.id
-    description: ''
+    description: Identificator of the transaction.
   sk_payee:
     lineage:
     - datalake_robin_hood_clean.tax.id_payee
-    description: ''
+    description: Id of the affiliate.
   due_amount:
     lineage:
     - datalake_robin_hood_clean.tax.due_amount
-    description: ''
+    description: The amount of tax.
   dt_accounting_year_month:
     lineage:
     - datalake_robin_hood_clean.tax.accounting_year_month
-    description: ''
+    description: Year/month tax reference.
   ts_load:
-    description: ''
+    description: Timestamp when the data was loaded into the table.

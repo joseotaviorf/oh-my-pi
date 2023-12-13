@@ -183,3 +183,9 @@ columns:
     - datalake_sale_demand_events.sale_demand_events.ts_event
     - datalake_rent_demand_events.rent_demand_events.ts_event
     - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+  id_event_date:
+    description: 'ID of the date in format yyyyMMdd.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.dt_event
+    - datalake_rent_demand_events.rent_demand_events.ts_event
+    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts

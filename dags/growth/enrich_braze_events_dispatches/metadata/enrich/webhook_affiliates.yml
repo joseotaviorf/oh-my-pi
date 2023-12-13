@@ -4,4 +4,36 @@ table_name: webhook_affiliates
 owner: data-growth@quintoandar.com
 domain: growth
 description: Table with details about communications sent through webhook to affiliates.
-columns: {}
+columns:
+  id_user_dispatch:
+    lineage:
+      - datalake_braze.events_affiliates.id_user_dispatch
+    description: The combination of id_dispatch and id_user.
+  id_user_braze:
+    lineage:
+      - datalake_braze.events_affiliates.id_user_braze
+    description: Unique code to identify an user created by Braze.
+  ts_webhook_sent:
+    lineage:
+      - datalake_braze.events_affiliates.ts_event
+    description: Timestamp of when that communication of a webhook was sent to an user.
+  id_user:
+    lineage:
+      - datalake_braze.events_affiliates.id_user
+    description: Unique code to identify an user created here at QuintoAndar.
+  event_channel:
+    lineage:
+      - datalake_braze.events_affiliates.event_channel
+    description: Through where the event occurred.
+  year:
+    lineage:
+      - datalake_braze.events_affiliates.year
+    description: Year of when the event occurred.
+  month:
+    lineage:
+      - datalake_braze.events_affiliates.month
+    description: Month of when the event occurred.
+  day:
+    lineage:
+      - datalake_braze.events_affiliates.day
+    description: Day of when the event occurred.

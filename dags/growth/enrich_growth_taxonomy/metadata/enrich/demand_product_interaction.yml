@@ -6,7 +6,7 @@ domain: growth
 description: Each row of this table is a combination of growth parameters to describe the user interaction with QuintoAndar products.
   More info about Growth Taxonomy and media setup params in this doc https://docs.google.com/presentation/d/1BylJwYp9-yoqEqNvzcIvzHLVhZbOOomAjDH5XmIaXtY/edit?usp=sharing
 columns:
-  id_product_interaction:
+  id_demand_product_interaction:
     description: 'Unique id for the combination of platform & content page & origin.'
     lineage:
       - datalake_growth_taxonomy.demand_product_interaction_staging.id_product_interaction

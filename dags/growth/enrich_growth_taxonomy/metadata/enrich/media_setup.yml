@@ -88,10 +88,10 @@ columns:
     description: 'Acronym generated from the values of source.'
     lineage:
       - datalake_growth_taxonomy.media_setup_staging.prefix_source
-  ts_combnination_created:
+  ts_combination_created:
     description: 'Timestamp used to track new media setup combinations created.'
     lineage:
-      - datalake_growth_taxonomy.media_setup_staging.ts_combnination_created
+      - datalake_growth_taxonomy.media_setup_staging.ts_combination_created
   ts_load:
     description: 'Timestamp of the table load.'
     lineage:
