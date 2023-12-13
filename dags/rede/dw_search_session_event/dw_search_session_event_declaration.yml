@@ -20,6 +20,3 @@ workflow:
         day: "{day}"
 cluster:
   type: databricks_10_4_max_io-memory_photon_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE

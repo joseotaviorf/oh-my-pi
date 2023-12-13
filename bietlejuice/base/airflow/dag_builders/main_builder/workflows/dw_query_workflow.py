@@ -1,12 +1,17 @@
-from databricks_plugin import QuintoAndarDatabricksExecuteJobClusterOperator
 from airflow.operators.python_operator import ShortCircuitOperator
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.utils.helpers import chain
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
+)
+from bietlejuice.base.airflow.task_creators.task_creator_factory import (
+    TaskCreatorFactory,
+    TaskEnum,
+)
 from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
 from bietlejuice.base.airflow.short_circuit_function_enum import (
     ShortCircuitFunctionEnum,
@@ -43,15 +48,17 @@ class DWQueryWorkflow(BaseWorkflow):
         )
         spark_session_configs = self.workflow_args.get("spark_session_configs", {})
         inner_dependencies = self.workflow_args.get("inner_dependencies")
-        cluster_params = self.get_cluster_params()
 
         dw_bucket = self.config_service.get_config("dw_bucket")
+        dag = self.dag_instance()
+        dag_execution_context = self._get_dag_execution_context(dag, dw_bucket)
+        self._initialize_task_creators(dag_execution_context)
+
         databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
         base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
-        dag = self.dag_instance()
         task_group = DWTaskGroup(
             dag=dag,
             env=self.env,
@@ -92,17 +99,9 @@ class DWQueryWorkflow(BaseWorkflow):
             else None
         )
 
-        execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
-            databricks_conn_id="databricks_job_cluster",
-            dag=dag,
-            task_id="execute-job-cluster",
-            cluster_configuration=cluster_params["cluster_config"],
-            libraries=cluster_params["default_libraries"],
-            access_control_list=cluster_params["access_control_list"],
-        )
-
-        job_cluster_finished_task = DummyOperator(
-            dag=dag, task_id="job-cluster-finished"
+        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
+        job_cluster_finished_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
         )
 
         dw_task_groups_boundaries = (
@@ -124,23 +123,14 @@ class DWQueryWorkflow(BaseWorkflow):
 
         return dag
 
-    def get_cluster_params(self):
-        cluster_configuration = self.config_service.get_config(
-            self.cluster_args["type"]
+    def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
+        task_creator_factory = TaskCreatorFactory(dag_execution_context)
+        self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.EXECUTE_JOB_CLUSTER, self.config_service
         )
-        default_libraries = self.config_service.get_config("default_libraries")
-        access_control_list_from_yml = self.cluster_args["access_control_list"]
-        databricks_access_control_list = [
-            {
-                "group_name": access_control_list_from_yml["group_name"],
-                "permission_level": access_control_list_from_yml["permission_level"],
-            }
-        ]
-        return {
-            "cluster_config": cluster_configuration,
-            "default_libraries": default_libraries,
-            "access_control_list": databricks_access_control_list,
-        }
+        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        )
 
     def _get_dw_task_groups_boundaries(self, dw_task_groups, dw_staging_task_groups):
         dw_task_groups_boundaries = {}
