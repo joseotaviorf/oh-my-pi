@@ -36,13 +36,13 @@ sheets_info:
     sheet_context: for_rent
 
   demand_targets_2024:
-    sheet_id: 1jjdLup3rMkMvNI6tAPOqAwC07QwzGU8PLm4rir0dGrk
+    sheet_id: 1KQ41cUj0gB4whSYubYyPPfdelVdCHS7bBzxorvbrD9I
     sheet_name: demand_targets_2024
     clean_table_name: demand_targets_2024
     sheet_context: for_rent
 
   demand_targets_2024_cohort:
-    sheet_id: 1Sy3hH9ZUXkKxxiHRONekKU3-x3m3lr7InsgYHYYW7j0
+    sheet_id: 1yNCA3Y6y4hkqIh-AgFDOdTFB4dsJhgS-VYRgsC8oEe4
     sheet_name: demand_targets_2024_cohort
     clean_table_name: demand_targets_2024_cohort
     sheet_context: for_rent
@@ -156,7 +156,7 @@ sheets_info:
     sheet_context: for_rent
 
   supply_targets_2024_cohort:
-    sheet_id: 1ukspY9YfiJH1S6c8SlPTf_U2Mc2kCI2CX8Sv8uPB1d8
+    sheet_id: 1V5HQxP9pI9pm7P4si59P40TJvGxGS1doVUTX-R3h0iY
     sheet_name: supply_targets_2024_cohort
     clean_table_name: supply_targets_2024_cohort
     sheet_context: for_rent
