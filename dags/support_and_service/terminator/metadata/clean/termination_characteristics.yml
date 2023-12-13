@@ -51,7 +51,19 @@ columns:
   is_inspection_opted_out:
     lineage:
       - datalake_terminator_raw.termination_characteristics.inspection_opted_out
-    description: Termination where PP has exempted IQ from liability for repairs before the inspection is carried out.  
+    description: Termination where PP has exempted IQ from liability for repairs before the inspection is carried out.
+  is_inspection_required:
+    lineage:
+      - datalake_terminator_raw.termination_characteristics.inspection_required
+    description: Indicates whether a property inspection is required as part of the contract termination process.
+  is_intermediation_required:
+    lineage:
+      - datalake_terminator_raw.termination_characteristics.intermediation_required
+    description: Refers to terminations where intermediation is necessary.
+  is_high_value_contract:
+    lineage:
+      - datalake_terminator_raw.termination_characteristics.high_value_contract
+    description: contract with value higher than R$ 2500.  
   ts_created:
     lineage:
       - datalake_terminator_raw.termination_characteristics.created_at
