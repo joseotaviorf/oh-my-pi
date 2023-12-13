@@ -810,9 +810,6 @@ bietlejuice.reverse_dashboard_governance:
 bietlejuice.reverse_inspections:
   add:
     - bietlejuice.enrich_inspections_metrics:load-enrich-inspector-performance
-bietlejuice.reverse_ccv_price_report_access:
-  add:
-    - bietlejuice.reverse_ccv_price_report_load:load-reverse-ccv-price-by-region
 bietlejuice.reverse_ccv_price_report_load:
   # We will remove these dependencies because we will only run this DAG once a month. So we don't want to trigger it every time these tables below are updated.
   override: []

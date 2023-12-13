@@ -27,7 +27,7 @@ regions AS (
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN('Santa Cecília') THEN ARRAY('Santa Cecília', '1 specific neighborhood')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN('Consolação') THEN ARRAY('Consolação', '1 specific neighborhood')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN('Vila Leopoldina') THEN ARRAY('Vila Leopoldina', '1 specific neighborhood')
-    -- SP-5-Centro + 44 bairros
+    -- SP.5 - Centro, Mooca, Tatuapé, Cambuci (+42 bairros)
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Mooca') THEN ARRAY('Mooca', '1 specific neighborhood')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Tatuapé','Parque Novo Mundo','Penha de França') 
       OR r.neighborhood LIKE '%Parque Novo Mundo%' THEN ARRAY('Tatuapé', 'neighborhood cluster')
@@ -46,7 +46,7 @@ regions AS (
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Sacomã', 'Parque Bristol', 'Jardim Santa Emília') THEN ARRAY('Sacomã', 'neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Vila Esperança', 'Vila Ré', 'Vila Guilhermina', 'Vila Nova Curuca', 'Vila Curuca') THEN ARRAY('Vila Esperança', 'neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Centro', 'Canindé', 'Pari', 'Brás', 'Campos Elíseos') THEN ARRAY('Centro', 'neighborhood cluster')
-    -- SP-2-Itaquera + 31 bairros
+    -- SP.2 - Itaquera, Sapopemba, Vila Califórnia, Vila Alpina (+29 bairros)
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Itaquera', 'Conjunto Residencial Jose Bonifacio', 'Jardim Brasília', 'Vila Progresso', 'Parque Casa de Pedra', 'Vila Pedroso', 'Parque Savoy City', 'Cidade Lider') 
       THEN ARRAY('Itaquera', 'neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Sapopemba', 'Parque São Lucas', 'Parque Residencial Oratório', 'Vila Carmosina', 'Vila Industrial', 'Jardim Mimar', 'Jardim Cinco de Julho') 
@@ -55,12 +55,12 @@ regions AS (
       'Jardim dos Lagos', 'Jardim Paquetá', 'Jurubatuba', 'Jardim Santa Helena', 'Jardim Ipanema', 'Vila Gea') 
       OR r.neighborhood LIKE '%Vila da Paz%' THEN ARRAY('Veleiros', 'neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND R.neighborhood IN ('Vila Califórnia', 'Vila Alpina') THEN ARRAY('Vila Califórnia', 'neighborhood cluster')
-    --SP-1-Ponte Rasa + 11 bairros
+    -- SP.1 - Artur Alvim, Ponte Rasa, Ermelino Matarazzo, Vila Jacuí (+10 bairros)
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Ermelino Matarazzo', 'Vila Penteado') THEN ARRAY('Ermelino Matarazzo','neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Artur Alvim', 'Cidade Patriarca', 'Jardim Santa Maria', 'Vila Dalila', 'Vila Nhocuné', 'Vila Nova Savoia', 'Vila Talarico', 'Vila Euthalia', 'Jardim Arize') THEN ARRAY('Artur Alvim','neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Ponte Rasa') THEN ARRAY('Ponte Rasa', '1 specific neighborhood')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Vila Jacuí') THEN ARRAY('Vila Jacuí', '1 specific neighborhood')
-    -- SP-4-Butanta + 39 bairros
+    -- SP.4 - Butantã, Brooklin, Panamby, Campo Belo (+41 bairros)
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Brooklin', 'Planalto Paulista') THEN ARRAY('Brooklin', 'neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Panamby') THEN ARRAY('Panamby', '1 specific neighborhood')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Butantã', 'Jardim Éster Yolanda', 'Jaguaré', 'Cidade São Francisco', 'City América', 'Parque São Domingos', 'Parque dos Príncipes', 'Jardim Santo Elias') 
@@ -77,7 +77,7 @@ regions AS (
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Santo Amaro', 'Jardim São Savério', 'Vila Campestre', 'Socorro', 'Campo Grande', 'Jardim Palmares', 'Vila Campo Grande', 'Vila Romano', 'Jardim Guarapiranga', 
       'Jardim Nosso Lar','Jardim Campo Grande','Vila Isa') 
       OR r.neighborhood LIKE '%Jardim Sao Luis%' OR r.neighborhood LIKE '%Santo Amaro%' OR r.neighborhood LIKE '%Jardim Marajoara%' THEN ARRAY('Santo Amaro', 'neighborhood cluster')
-    -- SP-3-Pinheiros + 33 bairros
+    -- SP.3 - Pinheiros, Vila Mariana, Santa Cecília, Bela Vista (+31 bairros)
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Moema') THEN ARRAY('Moema', '1 specific neighborhood')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Saúde', 'Jardim Vergueiro') THEN ARRAY('Saúde', 'neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Aclimação') THEN ARRAY('Aclimação', '1 specific neighborhood')
@@ -92,7 +92,7 @@ regions AS (
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Paraíso') THEN ARRAY('Paraíso', '1 specific neighborhood')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Sumaré') THEN ARRAY('Sumaré', '1 specific neighborhood')
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Vila Clementino', 'Jardim Avelino') THEN ARRAY('Vila Clementino', 'neighborhood cluster')
-    -- SP-0-Santana+23bairros
+    -- SP.0 - Santana, Água Fria, Freguesia do Ó, Mandaqui (+24 bairros)
     WHEN r.city_name = 'São Paulo' AND r.neighborhood IN ('Santana', 'Vila Ede', 'Vila Maria', 'Vila Sabrina') 
       OR r.neighborhood LIKE '%Vila Sabrina%' OR r.neighborhood LIKE '%Vila Maria%' THEN ARRAY('Santana', 'neighborhood cluster')
     WHEN r.city_name = 'São Paulo' AND (r.neighborhood) IN ('Freguesia do Ó', 'Piqueri', 'Vila Mangalot', 'Vila Jaguara') 
@@ -116,26 +116,27 @@ regions AS (
     --------------------
     -- RIO DE JANEIRO --
     --------------------
-    --RJ-1-Irajá  + 11 bairros
+    -- RJ.1 - Irajá, Penha, Olaria, Ramos (+7 bairros)
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Olaria', 'Penha', 'Ramos', 'Bonsucesso', 'Benfica', 'Penha Circular') THEN ARRAY('Olaria and 5 specific neighborhood', 'neighborhood cluster')
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Irajá', 'Jardim America', 'Brás de Pina', 'Cordovil', 'Parada de Lucas') THEN ARRAY('Irajá and 4 specific neighborhood', 'neighborhood cluster')
-    --RJ-2-Méier  + 13 bairros
+    -- RJ.2 - Méier, Engenho Novo, Cachambi, Piedade (+9 bairros)
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Méier', 'Madureira', 'Quintino Bocaiúva', 'Cascadura', 'Abolição', 'Todos os Santos', 'Engenho de Dentro', 'Engenho Novo', 'Piedade') THEN ARRAY('Méier and 5 specific neighborhood', 'neighborhood cluster')
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Cachambi', 'Del Castilho', 'Inhaúma', 'Engenho da Rainha', 'Pilares') THEN ARRAY('Cachambi and 5 specific neighborhood', 'neighborhood cluster')
-    --RJ-4-Tijuca  +10 bairros
+    -- RJ.4 - Tijuca, Botafogo, Centro, Flamengo (+7 bairros)
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Centro','Cidade Nova','Rio Comprido','Santa Teresa','Estácio') THEN ARRAY('Centro and 4 specific neighborhood', 'neighborhood cluster')
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Botafogo','Flamengo','Glória','Laranjeiras','Catete') THEN ARRAY('Botafogo and 4 specific neighborhood', 'neighborhood cluster')
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Tijuca','Maracanã') THEN ARRAY('Tijuca and 1 specific neighborhood', 'neighborhood cluster')
-    --RJ-8-Freguesia  + 10 bairros
+    -- RJ.8 - Freguesia, Taquara, Jacarepaguá, Pechincha (+3 bairros)
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Freguesia','Jacarepaguá','Anil','Curicica','Itanhangá') 
       OR (r.neighborhood LIKE '%Freguesia%' AND r.city_name = 'Rio de Janeiro') THEN ARRAY('Freguesia and 4 specific neighborhood', 'neighborhood cluster')
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' AND r.neighborhood IN ('Taquara', 'Pechincha') THEN ARRAY('Taquara and 1 specific neighborhood', 'neighborhood cluster')
-    WHEN r.neighborhood IN ('Vargem Pequena', 'Vargem Grande', 'Joá') THEN ARRAY('RJ-9-Recreio  + 5 bairros', 'neighborhood cluster')
-    WHEN cl.cluster_name = 'RJ-9-Recreio + 5 bairros' THEN ARRAY('RJ-9-Recreio + 5 bairros', 'neighborhood cluster')
-    WHEN cl.cluster_name IN ('RJ-0-Copacabana  + 8 bairros','RJ-5-Jardim Guanabara  +5 bairros','RJ-3-Praia da Bandeira  + 4 bairros','RJ-6-Vargem Pequena  + 3 bairros') 
+    WHEN r.neighborhood IN ('Vargem Pequena', 'Vargem Grande', 'Joá') THEN ARRAY('RJ.9 - Recreio, Jardim Oceânico, Barra da Tijuca, São Conrado (+1 bairro)', 'neighborhood cluster')
+    WHEN cl.cluster_name = 'RJ.9 - Recreio, Jardim Oceânico, Barra da Tijuca, São Conrado (+1 bairro)' THEN ARRAY('RJ.9 - Recreio, Jardim Oceânico, Barra da Tijuca, São Conrado (+1 bairro)', 'neighborhood cluster')
+    WHEN cl.cluster_name IN ('RJ.0 - Copacabana, Ipanema, Leblon, Lagoa (+4 bairros)', 'RJ.5 - Jardim Guanabara, Portuguesa, Urca, Jardim Carioca (+1 bairro)', 
+    'RJ.3 - Praia da Bandeira, Ribeira, Pitangueiras, Zumbi', 'RJ.6 - Vargem Pequena, Vargem Grande, Madureira') 
       AND r.neighborhood NOT IN ('Portuguesa', 'Jardim Carioca', 'Moneró', 'Praia da Bandeira', 'Pitangueiras', 'Zumbi', 'Ribeira', 'Jardim Guanabara') 
-      OR r.neighborhood IN ('Copacabana') THEN ARRAY('Zona Sul Rio', 'several neighborhood clusters')
-    WHEN cl.cluster_name LIKE 'RJ%' AND cl.cluster_name NOT IN ('RJ-9-Recreio + 5 bairros') THEN ARRAY(cl.cluster_name, 'neighborhood cluster')
+      OR (r.neighborhood IN ('Copacabana') AND r.city_name = 'Rio de Janeiro') THEN ARRAY('Zona Sul Rio', 'several neighborhood clusters')
+    WHEN cl.cluster_name LIKE 'RJ%' AND cl.cluster_name NOT IN ('RJ.9 - Recreio, Jardim Oceânico, Barra da Tijuca, São Conrado (+1 bairro)') THEN ARRAY(cl.cluster_name, 'neighborhood cluster')
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name = 'Rio de Janeiro' THEN ARRAY('Rio de Janeiro Capital', 'defaulting to capital city name')
     WHEN r.city_group IN ('Rio de Janeiro') AND r.city_name != 'Rio de Janeiro' THEN ARRAY('Grande Rio de Janeiro', 'metropolitan area without core city')
     ------------------

@@ -22,6 +22,7 @@ DAG_NAME = f"reverse_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 MAIN_START_DATE = datetime(2022, 7, 12, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = "0 15 1 * *"
 
 config_service = ConfigurationService(DAG_NAME)
 
@@ -54,7 +55,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID, ENV=ENV
     ),
