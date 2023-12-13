@@ -1,0 +1,101 @@
+---
+database_name: dw_house
+table_name: dim_house_information
+description: Each row corresponds to a combination of a house information category and possible value it might assume. For example,
+  "PISCINA" + "TRUE" is a valid row, same as  "PISCINA" + "FALSE" or ""PISCINA" + "Unknown". For now, it includes house and
+  condo amenities.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  sk_information:
+    description: Primary key of the table.
+    lineage:
+      - datalake_ebdb_amenities.amenity.id_amenity
+      - datalake_ebdb_amenities.amenity.is_condo_amenity
+  id_amenity:
+    description: If the information is an amenity, it will have an ID, which is the natural key. This might have duplicates, since house and
+      condo amenities are separate tables with conflicting IDs.
+    lineage:
+      - datalake_ebdb_amenities.amenity.id_amenity
+  information_type:
+    description: Type of information.
+    categories:
+      CONDO_AMENITY: Condo amenity, such as sauna or condo pool.
+      HOUSE_AMENITY: House amenity, such as private pool or ceiling fans.
+    lineage:
+      - datalake_ebdb_amenities.amenity.is_condo_amenity
+  value:
+    description: Possible value the information can assume.
+    categories:
+      "TRUE": The house has the amenity.
+      "FALSE": The house does not have the amenity.
+      Unknown: The house might or might not have the amenity, it is null in the source.
+  code:
+    description: Code of the amenity. Formatted in UPPER_SNAKE_CASE, in Portuguese.
+    lineage:
+      - datalake_ebdb_amenities.amenity.code
+  name:
+    description: Name of the amenity, in Portuguese.
+    lineage:
+      - datalake_ebdb_amenities.amenity.name
+  slug:
+    description: Slug of the amenity, in Portuguese.
+    lineage:
+      - datalake_ebdb_amenities.amenity.slug
+  usage_frequency:
+    description: Categorical column to describe how often this information is non-null.
+    categories:
+      DEPRECATED: This has not been used for at least a year, or is marked as inactive.
+      UNCOMMON: Less than 50% of the houses have this information known, either TRUE or FALSE.
+      COMMON: More than 50% of the houses have this information known, either TRUE or FALSE.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ratio_houses_filled
+  true_value_frequency:
+    description: Categorical column to describe how often this information is equal TRUE. That is, how often houses have this amenity.
+    categories:
+      UNKNOWN: Less than 10% of the houses have this amenity.
+      COMMON: More than 10% of the houses have this amenity.
+    lineage:
+      - datalake_ebdb_amenities.amenity.true_frequency
+  ratio_houses_with_known_value:
+    description: Ratio (0-1) of houses in which this amenity is not null.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ratio_houses_filled
+  ratio_sale_houses_with_known_value:
+    description: Ratio (0-1) of houses in the sale context in which this amenity is not null.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ratio_sale_houses_filled
+  ratio_rent_houses_with_known_value:
+    description: Ratio (0-1) of houses in the rent context in which this amenity is not null.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ratio_rent_houses_filled
+  ratio_houses_with_true_value:
+    description: Ratio (0-1) of houses in which this amenity is true.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ratio_houses_true
+  ratio_sale_houses_with_true_value:
+    description: Ratio (0-1) of houses in the sale context in which this amenity is true.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ratio_sale_houses_true
+  ratio_rent_houses_with_true_value:
+    description: Ratio (0-1) of houses in the rent context in which this amenity is true.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ratio_rent_houses_true
+  is_deprecated:
+    description: Whether the amenity is deprecated or not. This has not been used for at least a year, or is marked as inactive.
+    lineage:
+      - datalake_ebdb_amenities.amenity.is_deprecated
+  is_condo_amenity:
+    description: True if it is a condo amenity.
+    lineage:
+      - datalake_ebdb_amenities.amenity.is_condo_amenity
+  ts_first_usage:
+    description: Timestamp of when this amenity was used for the first time.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ts_first_usage
+  ts_last_usage:
+    description: Timestamp of when this amenity was used for the last time.
+    lineage:
+      - datalake_ebdb_amenities.amenity.ts_last_usage
+  ts_load:
+    description: Timestamp of when the row was inserted in the table.

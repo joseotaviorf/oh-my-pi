@@ -10,6 +10,10 @@ workflow:
   layer: dw
   custom_schema: house
   default_extraction_type: full
+  inner_dependencies:
+    fact_house_information_filling:
+      - dim_house_amenities_version
+      - dim_house_information
 cluster:
   type: databricks_10_4_med_general_cluster
   access_control_list:

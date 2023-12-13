@@ -1,0 +1,52 @@
+---
+database_name: dw_house
+table_name: fact_house_information_filling
+description: Every time a particular information changes, such as a house or condo amenity, a new row is inserted in this table.
+domain: Rede
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  sk_house_information_change:
+    description: Primary key of the table. Unique for every change in any particular house information.
+  sk_house_amenities_version:
+    description: Foreign key to the dimension table (dim_house_amenities_version) that contains the version of the house at that moment.
+    lineage:
+      - dw_house.dim_house_amenities_version.sk_house_amenities_version
+  sk_house:
+    description: Foreign key to the dimension table (dim_house) that contains the house that had an information change.
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.id_house
+  sk_information:
+    description: Foreign key to the dimension table (dw_house.dim_house_information) that contains the information that changed.
+      It has details such as the name, how often it is used, as well as the value that was set.
+    lineage:
+      - dw_house.dim_house_information.sk_information
+  sk_user_revisor:
+    description: ID of the user that made the change.
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.id_user
+  sk_region:
+    description: ID of the region where the house is located.
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+  sk_company:
+    description: SK of the Rede company that owns the house.
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
+  sk_revision_date:
+    description: Date key of when the change was made.
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.ts_change
+  sk_next_revision_date:
+    description: Date key of when the next change was made to the same information type.
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.ts_next_change
+  ts_revision:
+    description: Timestamp of when the change was made.
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.ts_change
+  ts_next_revision:
+    description: Timestamp of when the next change was made to the same information type.
+    lineage:
+      - datalake_ebdb_amenities.amenity_change_history.ts_next_change
+  ts_load:
+    description: Timestamp of when the row was inserted in the table.
