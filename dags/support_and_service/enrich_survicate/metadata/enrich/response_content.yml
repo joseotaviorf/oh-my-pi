@@ -1,5 +1,5 @@
 ---
-database_name: datalake_survicate_clean
+database_name: datalake_survicate
 table_name: response_content
 description: Content of the response submitted in the survey
 domain: Support and Service

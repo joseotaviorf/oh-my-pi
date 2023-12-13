@@ -1,5 +1,5 @@
 ---
-database_name: datalake_survicate_clean
+database_name: datalake_survicate
 table_name: survey_responses
 description: Responses to a specific survey identified by their unique ID.
 domain: Support and Service
