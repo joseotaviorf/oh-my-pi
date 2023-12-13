@@ -14,8 +14,8 @@ tables:
     partitions: [country_code]
 
 custom_cluster:
-  driver_node_type_id: m4.xlarge
-  node_type_id: m4.2xlarge
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.4xlarge
   num_workers: 3
 
 inner_dependencies:
