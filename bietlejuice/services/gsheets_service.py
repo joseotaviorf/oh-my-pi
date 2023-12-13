@@ -69,6 +69,7 @@ class GsheetsService:
                     supportsAllDrives=True,
                     includeItemsFromAllDrives=True,
                     pageToken=page_token,
+                    corpora="allDrives",
                 )
                 .execute()
             )
