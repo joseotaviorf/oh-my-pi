@@ -17,7 +17,6 @@ metadata_files_out_of_pattern:
   - for_sale/dw_sale_events/metadata/dw/dim_sale_event_type.yml
   - for_sale/enrich_sale_flows/metadata/enrich/sale_flow.yml
   - fintech/velo_omie/metadata/clean/country.yml
-  - support_and_service/enrich_offboarding/metadata/enrich/contract_termination.yml
   - support_and_service/enrich_offboarding/metadata/enrich/ongoing.yml
   - support_and_service/enrich_offboarding/metadata/enrich/tickets.yml
   # The following files are being added only temporarily to skip list, with permission from the Data Governance team

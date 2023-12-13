@@ -8,228 +8,360 @@ domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_termination:
+    description: Termination request identification code
     lineage:
       - datalake_terminator_clean.termination.id
   id_application_user:
+    description: Application user ID
     lineage:
       - datalake_terminator_clean.application_user.id_external
   id_contract:
+    description: Contract identification code
     lineage:
       - datalake_terminator_clean.termination.id_contract
   id_exit_inspection:
+    description: Exit inspection identification code
     lineage:
       - datalake_terminator_clean.termination.id_exit_inspection
       - datalake_inspections.inspection_booking.id_external
   id_house:
+    description: House identification code
     lineage:
       - datalake_ebdb_contract.contract.id_house
   id_house_listing:
+    description: House listing identification code
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
   id_region:
+    description: Code identifying the region where the property is located
     lineage:
       - datalake_ebdb_clean.house.id_region
   id_workflow_assignee:
+    description: Application user ID
     lineage:
       - datalake_terminator_clean.termination_workflow.id_current_assignee
   id_nps_answer:
+    description: NPS Survey response identifier code
     lineage:
       - datalake_tracksale.customer_conversions.id_answer
       - datalake_casa_mineira_tracksale.customer_conversions.id_answer
   id_dispatch_lot:
+    description: Identification key related to the batch of NPS shots
     lineage:
       - datalake_tracksale.customer_conversions.id_dispatch_lot
       - datalake_casa_mineira_tracksale.customer_conversions.id_dispatch_lot
   score_category:
+    description: Identifies the Customer Satisfaction Level
     lineage:
       - datalake_tracksale.answer.score_category
       - datalake_casa_mineira_tracksale.answer.score_category
   customer_email:
+    description: Email of the customer who responded to the satisfaction survey (NPS)
     lineage:
       - datalake_tracksale.customer_conversions.customer_email
       - datalake_casa_mineira_tracksale.customer_conversions.customer_email
   customer_phone:
+    description: Phone of the customer who responded to the satisfaction survey (NPS)
     lineage:
       - datalake_tracksale.customer_conversions.customer_phone
       - datalake_casa_mineira_tracksale.customer_conversions.customer_phone
   nps_comment:
+    description: Comment satisfaction survey (NPS)
     lineage:
       - datalake_tracksale.answer.nps_comment
       - datalake_casa_mineira_tracksale.answer.nps_comment
   dispatch_status:
+    description: Dispatch tracking information
     lineage:
       - datalake_tracksale.dispatch.status
       - datalake_casa_mineira_tracksale.dispatch.status
   contract_status:
+    description: Latest contract status
     lineage:
       - datalake_ebdb_contract.contract.status
   customer_type:
+    description: Customer type (Tenant or Owner)
     lineage:
       - datalake_tracksale.campaign.customer_type
       - datalake_casa_mineira_tracksale.campaign.customer_type
   campaign_name:
+    description: Name of the NPS campaign, such as registered in Tracksale
     lineage:
       - datalake_tracksale.campaign.campaign_name
       - datalake_casa_mineira_tracksale.campaign.campaign_name
   cancellation_info:
+    description: More information about cancellation, such as reason, data, requesting user, user type (PP, IQ)
     lineage:
       - datalake_terminator_clean.termination.cancellation_info
   category:
+    description: Termination category, which will be depreciated in favor of the characteristics.
+    categories:
+      STANDARD: ""
+      TERMINATION_WITH_ADMIN: ""
+      BEFORE_RENTAL: ""
+      EVICTION: ""
+      ABANDONMENT: ""
+      FRAUD: ""
+      SOLD_TO_THIRD_PARTIES: ""
+      SOLD_TO_TENANT: ""
+      JOB_TRANSFER: ""
+      EXECUTION: ""
+      NPS_REVERSION: ""
+      NEGOTIATION_ATTENDANCE: ""
     lineage:
       - datalake_terminator_clean.termination.category
   feedback:
+    description: Information about the termination, such as reason, problems, comments, etc.
     lineage:
       - datalake_terminator_clean.termination.feedback
   churn_reason:
+    description: |
+      Reason for churn, such as: Region not covered, no matches, offer
     lineage:
       - datalake_terminator_clean.termination.feedback
   next_property:
+    description: What will be the next property.
+    categories:
+      OTHER_REAL_ESTATE_AGENCY: ""
+      DIRECTLY_WITH_OWNER: ""
+      FRIENDS_OR_FAMILY: ""
+      NOT_DECIDED: ""
+      QUINTOANDAR: ""
+      OWN_HOUSE: ""
     lineage:
       - datalake_terminator_clean.termination.feedback
   property_issue:
+    description: If there is a problem with the property
+    categories:
+      INFILTRATION: ""
+      NEIGHBORHOOD: ""
+      ELECTRICAL: ""
+      UTILITIES: ""
+      INTERNET: ""
+      OWNER: ""
+      OTHER: ""
     lineage:
       - datalake_terminator_clean.termination.feedback
   reason:
+    description: Reason for leaving the property
     lineage:
       - datalake_terminator_clean.termination.feedback
   requested_by:
+    description: Identifies who requested to leave the property (IQ or PP)
     lineage:
       - datalake_terminator_clean.termination.requested_by
   rescheduling_history:
+    description: Termination rescheduling history information
     lineage:
       - datalake_terminator_clean.termination.rescheduling_history
   status:
+    description: |
+      Current termination state machine, but will evolve to just the states: Requested, Done, Canceled
     lineage:
       - datalake_terminator_clean.termination.status
   source:
+    description: Source of termination
+    categories:
+      PWA: ""
+      CRM: ""
+      MagicLink2: ""
     lineage:
       - datalake_terminator_clean.termination.source
+  type:
+    description: Indicates whether the flow is occurring manually, automatically or semi-automatically
   tenant_key_location:
+    description: Location of key collection by the tenant
     lineage:
       - datalake_terminator_clean.termination.tenant_keys_location
   tenant_key_detail:
+    description: Property key delivery information by the tenant
     lineage:
       - datalake_terminator_clean.termination.tenant_keys_location
   owner_key_detail:
+    description: Property key delivery information by the owner
     lineage:
       - datalake_terminator_clean.termination.owner_keys_location
   utility_bill_info:
+    description: Voucher information
     lineage:
       - datalake_terminator_clean.termination.utility_bill_info
   application_user_name:
+    description: Application client name
     lineage:
       - datalake_terminator_clean.application_user.name
   application_user_email:
+    description: Email client app
     lineage:
       - datalake_terminator_clean.application_user.email
   b2b_type:
+    description: Type of the B2B client origin related to the contract.
     lineage:
       - datalake_ebdb_contract.contract_b2b.b2b_type
   b2b_prime_type:
+    description: Type of B2B client prime from which comes the contract.
     lineage:
       - datalake_ebdb_contract.contract_b2b.b2b_prime_type
   repair_resolution:
+    description: Classifies type of repair when there is one in the Offboarding process
     lineage:
       - datalake_terminator_clean.negotiation.repair_resolution
   fee_payment_option:
+    description: Payment by bank slip or card
     lineage:
       - datalake_terminator_clean.termination_fee.tenant_payment_method
   fee_negotiation_status:
+    description: Created, Confirmed, Declined, Expired
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.fee_negotiation_status
   completed_utility_attachments:
+    description: Indicates which attachments (water, electricity and gas) are completed utilities
     lineage:
       - datalake_terminator_clean.utility_bill.type
   pending_utility_attachments:
+    description: Indicates which attachments (water, electricity and gas) are pending utilities
     lineage:
       - datalake_terminator_clean.utility_bill.type
   utility_bill_in_condominium:
+    description: If utility bills are included in the condominium
     lineage:
       - datalake_terminator_clean.utility_bill.type
   workflow_current_step:
+    description: Step of the current workflow that the termination is in
     lineage:
       - datalake_terminator_clean.termination_workflow.current_step
+  nps:
+    description: NPS score
+  iq_nps:
+    description: IQ NPS score
+  pp_nps:
+    description: PP NPS score
   repair_cost:
+    description: Cost of Repair to be performed in the Offboarding process
     lineage:
       - datalake_terminator_clean.negotiation.repair_cost
   fee_discount_percentage:
+    description: Percentage discount on termination fine
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.fee_discount_percentage
   fee_discount_value:
+    description: Final value of the discount on the termination fine
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.fee_discount_value
   fee_final_amount:
+    description: Final value of the termination fine
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.fee_final_amount
   fee_number_of_installments:
+    description: Number of installments to pay the termination fine
     lineage:
       - datalake_terminator_clean.termination_fee.tenant_payment_method
+  leadtime_request_to_vacancy:
+    description: Difference in days between termination request and tenant leaving the property
+  leadtime_vacancy_to_finish:
+    description: Difference in days between the tenant leaving the property and completion of the termination process
   is_b2b:
+    description: Boolean that indicates if the affiliate responsible is B2B.
     lineage:
       - datalake_ebdb_contract.contract_b2b.is_b2b
   is_contract_b2b:
+    description: Boolean that indicates if is a PRIME partner.
     lineage:
       - datalake_ebdb_contract.contract_b2b.is_contract_b2b
+  is_before_contract_start:
+    description: Indicates that the contract termination request occurred before the contract began
   has_exit_inspection:
+    description: Identifies whether an exit inspection occurred
     lineage:
       - datalake_terminator_clean.termination.has_exit_inspection
   has_repairs:
+    description: Identifies whether repairs have been identified
     lineage:
       - datalake_terminator_clean.negotiation.has_landlord_comment
   is_repair_tenant_duty:
+    description: Identifies whether repairs are due by the Tenant
     lineage:
       - datalake_terminator_clean.negotiation.needs_repair_by_tenant
+  has_prior_notice_fine:
+    description: Identifies if there is a fine for giving less than 30 days notice
+  has_one_year_fine:
+    description: Identifies whether there is a fine for termination before the 12-month period
+  has_been_rescheduled:
+    description: Indicates that the contract termination has been rescheduled
+  is_termination_canceled:
+    description: Identifies whether the termination process has been canceled
+  is_workflow:
+    description: Indicates that there is a termination of the workflow
   is_relisting:
+    description: Identifies whether the property is a relisting
     lineage:
       - datalake_terminator_clean.termination.is_relisting
+  is_answered:
+    description: The NPS survey was answered by the customer
   is_exit_inspection_opted_out:
+    description: Identifies whether the exit inspection was exempted by the owner
     lineage:
       - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
   has_automatically_closed_task:
+    description: Indicates whether the task has automatically closed
     lineage:
       - datalake_terminator_clean.termination_workflow.has_automatically_closed_task
   dt_termination:
+    description: Date of the contract's termination.
     lineage:
       - datalake_terminator_clean.termination.dt_vacancy
-    description: Date of the contract's termination.
   dt_last_rescheduled:
+    description: Last scheduled date
     lineage:
       - datalake_terminator_clean.termination_aud.ts_updated
   dt_last_inspection_synched:
+    description: Sync date of the last exit inspection carried out
     lineage:
       - datalake_inspections.inspection_booking.ts_inspected
   dt_contract_started:
+    description: Contract start date
     lineage:
       - datalake_ebdb_contract.contract.dt_started
   dt_contract_entrance:
+    description: Date of entry into the property
     lineage:
       - datalake_ebdb_contract.contract.dt_entered
   ts_analyst_annulment_input:
+    description: Timestamp of the analyst's annulment input
     lineage:
       - datalake_ebdb_contract.contract.ts_analyst_annulment_input
   ts_nps_answer_sent:
+    description: NPS response submission timestamp
     lineage:
       - datalake_tracksale.answer.ts_answer_sent_local
       - datalake_casa_mineira_tracksale.answer.ts_answer_sent_local
   ts_negotiation_updated:
+    description: Negotiation update timestamp
     lineage:
       - datalake_terminator_clean.negotiation.ts_updated
   ts_fee_negotiation_created:
+    description: Timestamp of creation of the negotiation fine
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.ts_created
   ts_fee_negotiation_updated:
+    description: Negotiation fine update timestamp
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.ts_updated
   ts_created:
+    description: Contract termination creation timestamp
     lineage:
       - datalake_terminator_clean.termination.ts_created
   ts_canceled:
+    description: Timestamp of cancellation of contract termination
     lineage:
       - datalake_terminator_clean.termination.ts_canceled
   ts_termination_finished:
+    description: Offboarding process completion date
     lineage:
       - datalake_terminator_clean.negotiation.ts_updated
       - datalake_terminator_clean.termination_aud.ts_updated
   ts_updated:
+    description: Contract termination last update timestamp
     lineage:
       - datalake_terminator_clean.termination.ts_updated
+  ts_load:
+    description: This timestamp indicates when this data was loaded
