@@ -38,6 +38,9 @@ columns:
   cost_center:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.ccost
+  scope:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.scope
   ts_sent:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.sent_at
