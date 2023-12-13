@@ -1,67 +1,91 @@
 ---
 database_name: datalake_tracked_events
 table_name: attribution_cross_channel
+owner: cristina.cardoso@quintoandar.com.br
+domain: Growth
+description: Table utilized by the Growth team to describe the attribution cross channel of the amplitude events.
 columns:
   id_user:
+    description: sk_user of the user that did the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.id_user
   id_amplitude:
+    description: ID to identify the amplitude user.
     lineage:
       - datalake_tracked_events.cross_channel_full.id_amplitude
   id_session:
+    description: ID of the session.
     lineage:
       - datalake_tracked_events.cross_channel_full.id_session
   id_house:
+    description: ID of the house.
     lineage:
       - datalake_tracked_events.cross_channel_full.id_house
   id_firestore:
+    description: ID of the firestore database.
     lineage:
       - datalake_tracked_events.cross_channel_full.id_firestore
   id_contact:
+    description: ID of the contact.
     lineage:
       - datalake_tracked_events.cross_channel_full.id_contact
   event_name:
+    description: Name of the amplitude event.
     lineage:
       - datalake_tracked_events.cross_channel_full.event_name
   visit_code:
+    description: Code of the visit when the event is related to a visit.
     lineage:
       - datalake_tracked_events.cross_channel_full.visit_code
   app_type:
+    description: Type of the app used by the user when he did the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.platform
   final_attribution_branded:
+    description: If in the final attribution the user came through a branded campaign.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_branded
   final_attribution_origin:
+    description: Final origin attributed to the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_origin
   final_attribution_source:
+    description: Final source attributed to the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_source
   final_attribution_medium:
+    description: Final medium attributed to the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_medium
   final_attribution_campaign:
+    description: Final campaign attributed to the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_campaign
   final_attribution_term:
+    description: Final term attributed to the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_term
   final_attribution_content:
+    description: Final content attributed to the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_content
   final_attribution_media_source:
+    description: Final media source attributed to the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_media_source
   ts_event:
+    description: Date of the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.ts_event
   year:
+    description: Year of the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.year
   month:
+    description: Month of the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.month
   day:
+    description: Day of the event.
     lineage:
       - datalake_tracked_events.cross_channel_full.day
