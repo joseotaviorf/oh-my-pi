@@ -1,5 +1,5 @@
 database_name: datalake_iaf_clean
-table_name: occurrence
+table_name: occurrences
 columns:
   id_company:
     lineage:

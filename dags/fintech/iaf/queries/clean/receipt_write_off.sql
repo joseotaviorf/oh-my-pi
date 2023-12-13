@@ -1,6 +1,6 @@
 SELECT
     id,
-    idbaixa_old AS id_write_off_old
+    idbaixa_old AS id_write_off_old,
     idempresa AS id_company,
     idcredor AS id_creditor,
     iddevedor AS id_debtor,

@@ -88,9 +88,12 @@ columns:
   password:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.ac_senha
-  email:
+  ac_email:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.ac_email
+  p_email:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_email
   consultant:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.consultor
