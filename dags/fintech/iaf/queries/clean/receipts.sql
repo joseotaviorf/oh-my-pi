@@ -1,0 +1,25 @@
+SELECT
+    id,
+    idempresa AS id_company,
+    idcredor AS id_creditor,
+    iddevedor AS id_debtor,
+    idparc_acordo AS id_agreement,
+    idconta AS id_account,
+    idboleto AS id_invoice,
+    idcheque AS id_bank_check,
+    idplanoconta AS id_account_plan,
+    processo AS process,
+    valor AS value,
+    status,
+    formapagto AS payment_type,
+    localpagto AS payment_local,
+    usuario_cad AS user_cad,
+    codigo AS code,
+    codigo_origi AS original_code,
+    bloq AS block,
+    obs_bloq AS obs_block,
+    obs,
+    data_cad AS dt_cad,
+    last_update AS ts_updated
+FROM
+    datalake_iaf_raw.vi_319_tb_recebimentos
