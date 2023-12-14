@@ -198,10 +198,10 @@ sheets_info:
     sheet_context: static
 
   nexxera_holly_days:
-  sheet_id: 1bGLFxjHFVTRXLEHJBbX8mwJyQVaYbCVaxFgzpACQmlQ
-  sheet_name: nexxera_holly_days
-  clean_table_name: nexxera_holly_days
-  sheet_context: static
+    sheet_id: 1bGLFxjHFVTRXLEHJBbX8mwJyQVaYbCVaxFgzpACQmlQ
+    sheet_name: nexxera_holly_days
+    clean_table_name: nexxera_holly_days
+    sheet_context: static
 
   mra_historical:
     sheet_id: 1VS3SgHgFlqPJKxXMHsAgtUk0Xb6x2-Ey66I1iRmKAqI
