@@ -7,7 +7,7 @@ description: Every row of this table corresponds to a condo amenity associated w
 columns:
   id_house:
     lineage:
-      - datalake_ebdb_clean.info_condo_amenities_aud.id_house
+      - datalake_ebdb_amenities.amenity_change_history.id_house
     description: Id of the house associated with the amenity.
   id_condo_parent:
     lineage:
@@ -19,7 +19,7 @@ columns:
     description: Id of the user who set the amenity.
   code:
     lineage:
-      - datalake_ebdb_clean.condo_amenities.code
+      - datalake_ebdb_amenities.amenity.code
     description: Code of the amenity, such as PISCINA, CHURRASQUEIRA, etc.
   revisor:
     description: Role of the user who set the amenity.
@@ -37,7 +37,7 @@ columns:
       Other External: Another category of external user (without @quintoandar email).
   has_feature:
     lineage:
-      - datalake_ebdb_clean.info_condo_amenities_aud.has_feature
+      - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: Whether the amenity is present in the house or not.
   ts_revision:
     lineage:

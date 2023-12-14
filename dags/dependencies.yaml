@@ -1332,11 +1332,11 @@ bietlejuice.enrich_ebdb_amenities:
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_condo:
-  - bietlejuice.ebdb:load-clean-condo-amenities
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-enrichment-aud
-  - bietlejuice.ebdb:load-clean-info-condo-amenities-aud
+  - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity
+  - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:load-clean-contract

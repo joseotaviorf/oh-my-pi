@@ -125,6 +125,10 @@ removed_redundancies AS (
                 ORDER BY ts_change, rev_type DESC -- rev_type = 2 (deletion) will come first, so its row would be removed if the deletion is simultaneous with an insert
             )
         ) - UNIX_TIMESTAMP(ts_change), 61) > 60
+        OR has_feature IS NOT DISTINCT FROM LEAD(has_feature) OVER( -- Unless, the next change has literally the same value. In that, we will consider the first one
+            PARTITION BY id_house, rev IS NOT NULL, id_amenity, is_condo_amenity
+            ORDER BY ts_change, rev_type DESC
+        )
 ),
 deduped_amenities AS (
     SELECT *
