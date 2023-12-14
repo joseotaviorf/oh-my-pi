@@ -214,6 +214,7 @@ bietlejuice.dw_revenue_lines:
     - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-fee
     - bietlejuice.enrich_revenue_lines:load-enrich-management-fee
     - bietlejuice.enrich_revenue_lines:load-enrich-service-fee
+    - bietlejuice.dw_contract:load-dw-public-dim-contract
 bietlejuice.dw_sale_events:
   add:
     - bietlejuice.dw_rede_company:load-dw-rede-dim-company

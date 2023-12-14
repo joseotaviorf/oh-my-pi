@@ -23,5 +23,6 @@ This pipeline produces the following output tables:
 - `dw_revenue_lines.dim_month_rental_anticipation`
 - `dw_revenue_lines.dim_rental_guarantee`
 - `dw_revenue_lines.dim_reservation`
+- `dw_revenue_lines.fact_revenue_lines`
 
 </details>
