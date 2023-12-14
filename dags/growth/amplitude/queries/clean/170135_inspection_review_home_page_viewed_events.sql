@@ -8,7 +8,6 @@ SELECT
     id_inserted,
     id_user,
     id_schema,
-    event_properties,
     idfa,
     adid,
     uuid,
