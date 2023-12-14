@@ -50,5 +50,5 @@ endpoints:
       onlyData: true
       limit: 100
       expand:
-        - "jobCustomerFlex"
+        - "JobCustomerFlex"
         - "validGrades"
