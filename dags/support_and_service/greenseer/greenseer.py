@@ -115,6 +115,7 @@ for db_table_name, table_details in tables.items():
             max_records_per_file,
             "{{ ds }}",
         ],
+        has_hive_sync=False
     )
 
     clean_table_name = table_details.get("clean_table_name", raw_table_name)
@@ -129,8 +130,9 @@ for db_table_name, table_details in tables.items():
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
     cross_downstream(
-        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(raw_task_group),
         DatalakeTaskGroup.first_tasks(clean_task_group),
     )
 
     terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(raw_task_group))

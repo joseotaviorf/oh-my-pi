@@ -98,6 +98,7 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     target_database_base_name=SOURCE,
     extraction_spark_job_file=raw_spark_job_path,
     raw_spark_job_extra_args=[SOURCE, "{{ ds }}"],
+    has_hive_sync=False
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
@@ -111,7 +112,9 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
 cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_groups),
+    DatalakeTaskGroup.first_tasks(raw_task_groups),
     DatalakeTaskGroup.all_first_tasks(clean_task_groups),
 )
+
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(raw_task_groups))
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))

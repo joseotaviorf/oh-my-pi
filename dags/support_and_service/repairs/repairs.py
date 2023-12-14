@@ -120,8 +120,9 @@ for raw_table_name, table_details in tables.items():
     create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
 
     cross_downstream(
-        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(raw_task_group),
         DatalakeTaskGroup.first_tasks(clean_task_group),
     )
 
     terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(raw_task_group))

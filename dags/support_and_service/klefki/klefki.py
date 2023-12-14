@@ -106,6 +106,7 @@ for klefki_table_name, table_info in tables.items():
             json.dumps(table_info),
             json.dumps(partition_cols),
         ],
+        has_hive_sync=False
     )
 
     clean_task_groups = task_group.build_task_group_from_sql_files(
@@ -120,10 +121,11 @@ for klefki_table_name, table_info in tables.items():
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
 
     cross_downstream(
-        DatalakeTaskGroup.last_tasks(raw_task_groups),
+        DatalakeTaskGroup.first_tasks(raw_task_groups),
         DatalakeTaskGroup.all_first_tasks(clean_task_groups),
     )
 
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(raw_task_groups))
     terminate_cluster_task.set_upstream(
         DatalakeTaskGroup.all_last_tasks(clean_task_groups)
     )
