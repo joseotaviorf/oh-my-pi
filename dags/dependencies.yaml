@@ -1502,7 +1502,11 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_fintech:done-clean-fdic-acquisition-2023
   - bietlejuice.gsheets_fintech:done-clean-fdic-liquidation-2023
   - bietlejuice.gsheets_for_rent:done-clean-demand-targets-2022
+  - bietlejuice.gsheets_for_rent:done-clean-demand-targets-2024
+  - bietlejuice.gsheets_for_rent:done-clean-demand-targets-2024-cohort
   - bietlejuice.gsheets_for_rent:done-clean-supply-targets-2022
+  - bietlejuice.gsheets_for_rent:done-clean-supply-targets-2024
+  - bietlejuice.gsheets_for_rent:done-clean-supply-targets-2024-cohort
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity

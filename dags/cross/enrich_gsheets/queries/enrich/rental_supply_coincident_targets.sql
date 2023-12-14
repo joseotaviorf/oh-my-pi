@@ -1,0 +1,44 @@
+SELECT
+    city_group,
+    lead_processing_operation,
+    supply_mkt_origin_detailed,
+    planning_taxonomy,
+    rental_administrator,
+    prospects,
+    qualifieds,
+    opportunities,
+    available_qualifieds,
+    first_listings,
+    dt_target
+FROM
+    datalake_gsheets_clean.supply_targets_retro_1
+UNION ALL
+SELECT
+    city_group,
+    lead_processing_operation,
+    supply_mkt_origin_detailed,
+    planning_taxonomy,
+    rental_administrator,
+    prospects,
+    qualifieds,
+    opportunities,
+    available_qualifieds,
+    first_listings,
+    dt_target
+FROM
+    datalake_gsheets_clean.supply_targets_retro_2
+UNION ALL
+SELECT
+    city_group,
+    lead_processing_operation,
+    supply_mkt_origin_detailed,
+    planning_taxonomy,
+    rental_administrator,
+    prospects,
+    qualifieds,
+    opportunities,
+    available_qualifieds,
+    first_listings,
+    dt_target
+FROM
+    datalake_gsheets_clean.supply_targets_2024

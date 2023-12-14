@@ -1,0 +1,73 @@
+---
+database_name: datalake_gsheets
+table_name: rental_supply_coincident_targets
+description: Table that consolidates the rent supply coincident targets, with historical data and data from the present year.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.city_group
+      - datalake_gsheets_clean.supply_targets_retro_2.city_group
+      - datalake_gsheets_clean.supply_targets_2024.city_group
+    description: City group related to the target.
+  planning_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.planning_taxonomy
+      - datalake_gsheets_clean.supply_targets_retro_2.planning_taxonomy
+      - datalake_gsheets_clean.supply_targets_2024.planning_taxonomy
+    description: Planning taxonomy related to the target.planning_taxonomy
+  supply_mkt_origin_detailed:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.supply_mkt_origin_detailed
+      - datalake_gsheets_clean.supply_targets_retro_2.supply_mkt_origin_detailed
+      - datalake_gsheets_clean.supply_targets_2024.supply_mkt_origin_detailed
+    description: Supply marketing origin detailed related to the target.
+  lead_processing_operation:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.lead_processing_operation
+      - datalake_gsheets_clean.supply_targets_retro_2.lead_processing_operation
+      - datalake_gsheets_clean.supply_targets_2024.lead_processing_operation
+    description: Lead processing operation related to the target.
+  rental_administrator:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.rental_administrator
+      - datalake_gsheets_clean.supply_targets_retro_2.rental_administrator
+      - datalake_gsheets_clean.supply_targets_2024.rental_administrator
+    description: Rental administrator related to the target.
+  prospects:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.prospects
+      - datalake_gsheets_clean.supply_targets_retro_2.prospects
+      - datalake_gsheets_clean.supply_targets_2024.prospects
+    description: Volume of prospects related to the target.
+  qualifieds:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.qualifieds
+      - datalake_gsheets_clean.supply_targets_retro_2.qualifieds
+      - datalake_gsheets_clean.supply_targets_2024.qualifieds
+    description: Volume of qualifieds related to the target.
+  opportunities:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.opportunities
+      - datalake_gsheets_clean.supply_targets_retro_2.opportunities
+      - datalake_gsheets_clean.supply_targets_2024.opportunities
+    description: Volume of opportunities related to the target.
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.available_qualifieds
+      - datalake_gsheets_clean.supply_targets_retro_2.available_qualifieds
+      - datalake_gsheets_clean.supply_targets_2024.available_qualifieds
+    description: Volume of available qualifieds related to the target.
+  first_listings:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.first_listings
+      - datalake_gsheets_clean.supply_targets_retro_2.first_listings
+      - datalake_gsheets_clean.supply_targets_2024.first_listings
+    description: Volume of first listings related to the target.
+  dt_target:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_retro_1.dt_target
+      - datalake_gsheets_clean.supply_targets_retro_2.dt_target
+      - datalake_gsheets_clean.supply_targets_2024.dt_target
+    description: Date related to the target.
