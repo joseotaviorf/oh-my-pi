@@ -114,6 +114,9 @@ bietlejuice.dw_casa_mineira_portal:
   - bietlejuice.enrich_casa_mineira_portal:load-enrich-real-estate-status
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses
+bietlejuice.dw_cib_events:
+  - bietlejuice.enrich_mexico_cib_events:load-enrich-cib-events
+  - bietlejuice.enrich_mexico_cib_segmentation:load-enrich-cib-segmentation
 bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
