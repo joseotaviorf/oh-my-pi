@@ -1,0 +1,10 @@
+---
+database_name: datalake_gsheets_clean
+table_name: nexxera_holly_days
+columns:
+  holly_day:
+    lineage:
+      - datalake_gsheets_raw.nexxera_holly_days.holly_day
+  work_day:
+    lineage:
+      - datalake_gsheets_raw.nexxera_holly_days.work_day

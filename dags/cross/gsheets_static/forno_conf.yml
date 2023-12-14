@@ -130,7 +130,7 @@ sheets_info:
     sheet_name: acquisition
     clean_table_name: fdic_acquisition_2021
     sheet_context: static
-  
+
   fdic_acquisition_2022:
     sheet_id: 1FGeBxPXwU0sBzz9UAsRiFsD7Ev_qtVQEeN4WFFkIXDU
     sheet_name: acquisition
@@ -202,6 +202,12 @@ sheets_info:
     sheet_name: mra_historical
     clean_table_name: mra_historical
     sheet_context: static
+
+  nexxera_holly_days:
+  sheet_id: 1bGLFxjHFVTRXLEHJBbX8mwJyQVaYbCVaxFgzpACQmlQ
+  sheet_name: nexxera_holly_days
+  clean_table_name: nexxera_holly_days
+  sheet_context: static
 
   offline_and_branding_marketing_costs:
     sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
