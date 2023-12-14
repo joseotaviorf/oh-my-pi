@@ -10,6 +10,7 @@ column_level_validations:
         - B2B
         - CIQ_MANAGER
         - CIQ_FULL
+        - ASP
   date:
     is_complete:
       severity_level: Error
