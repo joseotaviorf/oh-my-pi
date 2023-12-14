@@ -1202,10 +1202,6 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
   - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
   - bietlejuice.reclameaqui:load-clean-tickets
-bietlejuice.enrich_customer_journey:
-  - bietlejuice.dw_user:load-dw-public-dim-user
-  - bietlejuice.enrich_user:load-enrich-persona-type
-  - bietlejuice.enrich_user:load-enrich-tenant-user
 bietlejuice.enrich_customer_resolution:
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
@@ -2657,11 +2653,11 @@ bietlejuice.metric_rent__contracts:
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
   - bietlejuice.terminator:load-clean-termination
 bietlejuice.metric_rent__demand_events:
-  - bietlejuice.dw_user:load-dw-rent-dim-owner-category
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-coincident-events-volume-changes-snapshot
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-cohort-conversions-snapshot
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
+  - bietlejuice.dw_user:load-dw-rent-dim-owner-category
 bietlejuice.metric_rent__gross_profit:
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
   - bietlejuice.enrich_sap:load-enrich-ledger
@@ -2695,8 +2691,6 @@ bietlejuice.reports:
   - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-confirmed-into-sns
   - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-scheduled-into-sns
   - bietlejuice.reverse_listings_report_access:load-sale-ongoing-listings-into-sns
-bietlejuice.reverse_app_installed:
-  - bietlejuice.enrich_app_installed:load-enrich-events
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_call:load-dw-call-dim-call
@@ -2738,8 +2732,6 @@ bietlejuice.reverse_bic_ss:
   - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
   - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
-bietlejuice.reverse_customer_journey:
-  - bietlejuice.enrich_customer_journey:load-enrich-users
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
 bietlejuice.reverse_inside_sales_whitelist:

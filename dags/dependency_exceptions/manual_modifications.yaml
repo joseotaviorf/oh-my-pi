@@ -782,11 +782,6 @@ bietlejuice.reports:
     - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-confirmed-into-sns
     - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-scheduled-into-sns
     - bietlejuice.reverse_listings_report_access:load-sale-ongoing-listings-into-sns
-bietlejuice.reverse_app_installed:
-  add:
-    - bietlejuice.enrich_app_installed:load-enrich-events
-  remove:
-    - bietlejuice.enrich_app_installed:load-enrich-user-app-installed-event
 bietlejuice.reverse_atento_access:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric
@@ -830,9 +825,6 @@ bietlejuice.reverse_navent_bigquery:
   override: []
 bietlejuice.reverse_nps_reversion:
   override: []
-bietlejuice.reverse_customer_journey:
-  add:
-    - bietlejuice.enrich_customer_journey:load-enrich-users
 bietlejuice.reverse_tracksale:
   remove:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing

@@ -1,9 +1,0 @@
-minority_report_endpoint: https://minority-report-api.quintoandar.com.br/profile/batch
-
-dag_documentation:
-  dag_purpose: This DAG is responsible for making user journey data available for external use through the Minority Report API.
-
-tables_to_send:
-  users:
-    key_name: user
-    type: CUSTOMER_JOURNEY
