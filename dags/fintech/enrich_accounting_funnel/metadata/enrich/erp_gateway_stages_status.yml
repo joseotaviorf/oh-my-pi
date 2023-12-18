@@ -71,7 +71,7 @@ columns:
     lineage:
       - datalake_sap_gateway.sync_sap_job.ts_created
     description: "This date indicates when ERP Gateway, after receive the feature, succeeds in create a job to sync"
-  dt_sync_sap_job_synced:
+  dt_sap_job_synced:
     lineage:
       - datalake_sap_gateway.sync_sap_job.ts_synced
     description: "When the sync between ERP Gateway and SAP succeeds"
