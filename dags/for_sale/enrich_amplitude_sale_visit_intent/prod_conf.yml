@@ -1,7 +1,8 @@
 custom_cluster:
   driver_node_type_id: r5d.2xlarge
   node_type_id: r5d.xlarge
-  autoscale:
-    max_workers: 6
-    min_workers: 2
+  num_workers: 6
+  # autoscale:
+  #   max_workers: 6
+  #   min_workers: 2
   runtime_engine: PHOTON

@@ -10,9 +10,10 @@ tables:
 custom_cluster:
   driver_node_type_id: m5a.xlarge
   node_type_id: m5a.xlarge
-  autoscale:
-    max_workers: 3
-    min_workers: 1
+  num_workers: 3
+  # autoscale:
+  #   max_workers: 3
+  #   min_workers: 1
   spark_version: 10.4.x-scala2.12
   aws_attributes:
     ebs_volume_size: 200
