@@ -59,6 +59,7 @@ amplitude_last_search_events AS (
   WHERE
     COALESCE(ssle.business_context, 'rent') = 'rent'
     AND ssle.id_user IS NOT NULL
+    AND REGEXP_REPLACE(ssle.id_user, "\\.", "") RLIKE '^[0-9]*$'
   GROUP BY 1
 ),
 -- CTE to retrieve the timestamp for specific events, such as, canceled booking, rejected offers, rejected credits, termination created and finished.
