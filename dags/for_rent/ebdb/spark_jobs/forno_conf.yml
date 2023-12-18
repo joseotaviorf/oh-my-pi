@@ -17,6 +17,7 @@ table_block_list:
   - DocumentoProposta_AUD
   - Visitor_AUD
   - Notificacao
+  - FotoItemVistoria_AUD
   - ItemVistoria_AUD
   - ItemVistoria_Checklist
   - Imovel_Etapas_AUD
