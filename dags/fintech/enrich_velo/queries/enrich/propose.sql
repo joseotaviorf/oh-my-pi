@@ -211,15 +211,27 @@ WITH old_system_dates AS (
             ON spd.id_propose = p.id
 ),
 prop_history AS (
-    WITH propose_history AS (
+    WITH propose_history_ignore_list AS (
+    SELECT
+        id
+    FROM
+        datalake_rental_guarantee_platform_clean.propose_history
+    WHERE
+        value IN ('Contrato Cancelado', 'Proposta Cancelada')
+        QUALIFY LAG(value) OVER (PARTITION BY id_propose ORDER BY ts_updated) = value
+    ),
+    propose_history AS (
         SELECT
             h.id_propose,
             h.value AS history_status,
             h.ts_updated AS ts_history
         FROM datalake_rental_guarantee_platform_clean.propose_history AS h
+        LEFT JOIN propose_history_ignore_list ig
+            ON ig.id = h.id
         WHERE
             h.value IN ('Contrato Cancelado', 'Proposta Cancelada')
             AND h.id_history_type = 5 -- Status update type
+            AND ig.id IS NULL
     ),
     propose_aud AS (
         SELECT
