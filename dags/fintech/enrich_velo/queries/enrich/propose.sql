@@ -312,10 +312,7 @@ ended_date AS (
             old.dt_ended IS NOT NULL
             OR h.id_propose IS NOT NULL
         )
-        AND (
-        ps.name IN ('Contrato Cancelado', 'Contrato cancelado pela analise humana', 'Proposta Cancelada', 'Reprovado na análise humanizada', 'Reprovado pelo analista')
-        OR cs.name IN ('Cancelado', 'Finalizado')
-        ) -- there are proposes that have ts_updated for cancellation history but are reopen
+        AND ps.name IN ('Contrato Cancelado', 'Proposta Cancelada') -- there are proposes that have ts_updated for cancellation history but are reopen
     GROUP BY
         1 -- some proposes can have multiple same status
 ),
