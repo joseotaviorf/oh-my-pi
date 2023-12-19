@@ -90,31 +90,29 @@ credit_card_payment AS (
 
 reservation AS (
   WITH clean_reservation AS (
-    SELECT
-      r.id_reservation,
-      MAX(rf.sk_contract) AS sk_contract,
-      CAST(r.accrual_month AS INT) AS accrual_year_month
-    FROM
-      datalake_revenue_lines.reservation AS r
-    INNER JOIN
-      dw_public.fact_listing_rent_flows AS rf
-        ON r.id_reservation = rf.sk_reservation
-    WHERE
-      rf.sk_contract > 0
-      AND r.id_reservation > 0
-      AND r.is_ongoing IS NULL
-      AND (r.status IN ('FINISHED', 'CHARGED') OR (r.status = 'CANCELED' AND (r.cancellation_reason = 'TENANT_GAVE_UP' OR r.cancellation_reason LIKE '%WITHOUT_CHARGE_BACK')))
-    GROUP BY 1,3
+      SELECT
+        r.id_reservation,
+        MAX(rf.sk_contract) AS sk_contract,
+        CAST(r.accrual_month AS INT) AS accrual_year_month,
+        r.monthly_value
+      FROM
+        datalake_revenue_lines.reservation AS r
+      INNER JOIN
+        dw_public.fact_listing_rent_flows AS rf
+          ON r.id_reservation = rf.sk_reservation
+      WHERE
+        rf.sk_contract > 0
+        AND r.id_reservation > 0
+        AND r.is_ongoing IS NULL
+        AND (r.status IN ('FINISHED', 'CHARGED') OR (r.status = 'CANCELED' AND (r.cancellation_reason = 'TENANT_GAVE_UP' OR r.cancellation_reason LIKE '%WITHOUT_CHARGE_BACK')))
+      GROUP BY 1,3,4
   )
   SELECT
-    rf.sk_contract,
-    CAST(r.accrual_month AS INT) AS accrual_year_month,
-    sum(r.monthly_value) AS revenue_amount
+    sk_contract,
+    accrual_year_month,
+    sum(monthly_value) as revenue_amount
   FROM
-    datalake_revenue_lines.reservation AS r
-  INNER JOIN
-    clean_reservation AS rf
-        ON r.id_reservation = rf.id_reservation
+    clean_reservation
   GROUP BY 1,2
 ),
 
