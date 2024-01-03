@@ -70,11 +70,16 @@ owners AS (
 			AND cp.type in ('Proprietario')
   LEFT JOIN
     datalake_ebdb_clean.user AS u
-      ON cp.email = u.email
+      ON (cp.email = u.email
+        OR cp.email = u.alternative_email)
+  LEFT JOIN
+    datalake_ebdb_customer_contact_identification.customer_contact_identification AS cci
+      ON cp.email = cci.customer_contact
   LEFT JOIN 
     datalake_ebdb_clean.user_pro_owner AS po 
       ON (cp.id_user = po.id_user
-        OR u.id = po.id_user)
+        OR u.id = po.id_user
+        OR cci.id_user = po.id_user)
       AND po.is_active = true 
 	WHERE
 		po.id_user IS NULL
