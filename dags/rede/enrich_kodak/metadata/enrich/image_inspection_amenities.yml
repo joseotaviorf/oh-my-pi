@@ -24,3 +24,9 @@ columns:
     description: True if there is any image with room_type = tennis_court or basketball_court.
   has_toy_library:
     description: True if there is any image with room_type = game_room or playground.
+  has_balcony:
+    description: True if there is any image with room_type = balcony.
+  has_walk_in_closet:
+    description: True if there is any image with room_type = walk_in_closet.
+  has_unobstructed_view:
+    description: True if there is any image with room_type = mountain_view or city_view.

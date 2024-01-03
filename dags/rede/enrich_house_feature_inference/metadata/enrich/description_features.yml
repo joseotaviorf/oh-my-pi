@@ -44,3 +44,49 @@ columns:
     description: "Whether the condo has a gourmet area, according to the description"
   has_entrance_hall:
     description: "Whether the condo has an entrance hall, according to the description"
+  is_furnished:
+    description: "Whether the house is furnished, according to the description"
+  has_balcony:
+    description: "Whether the house has a balcony, according to the description"
+  has_walk_in_closet:
+    description: "Whether the house has a walk-in closet, according to the description"
+  has_unobstructed_view:
+    description: "Whether the house has an unobstructed view, according to the description"
+  has_laundry_area:
+    description: "Whether the house has a laundry area, according to the description"
+  has_maid_room:
+    description: "Whether the house has a maid room, according to the description"
+  is_penthouse_apartment:
+    description: "Whether the house is a penthouse apartment, according to the description"
+  has_morning_sun:
+    description: "Whether the house has morning sun, according to the description"
+  has_open_kitchen:
+    description: "Whether the house has an open kitchen, according to the description"
+  has_gourmet_balcony:
+    description: "Whether the house has a gourmet balcony, according to the description"
+  has_quiet_street:
+    description: "Whether the house is in a quiet street, according to the description"
+  has_adapted_bathroom:
+    description: "Whether the house has an adapted bathroom, according to the description"
+  has_backyard:
+    description: "Whether the house has a backyard, according to the description"
+  has_bathtub:
+    description: "Whether the house has a bathtub, according to the description"
+  has_shower_enclosure:
+    description: "Whether the house has a shower enclosure, according to the description"
+  has_private_pool:
+    description: "Whether the house has a private pool, according to the description"
+  has_bedroom_closets:
+    description: "Whether the house has bedroom closets, according to the description"
+  has_bathroom_cabinets:
+    description: "Whether the house has bathroom cabinets, according to the description"
+  has_kitchen_cabinets:
+    description: "Whether the house has kitchen cabinets, according to the description"
+  has_air_conditioning:
+    description: "Whether the house has air conditioning, according to the description"
+  has_gas_shower:
+    description: "Whether the house has a gas shower, according to the description"
+  has_maid_bathroom:
+    description: "Whether the house has a maid bathroom, according to the description"
+  has_assigned_parking_space:
+    description: "Whether the house has an assigned parking space, according to the description"

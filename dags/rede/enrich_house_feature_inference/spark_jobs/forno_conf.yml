@@ -16,9 +16,32 @@ fields:
   - has_piped_gas
   - has_gourmet_area
   - has_entrance_hall
+  - is_furnished
+  - has_balcony
+  - has_walk_in_closet
+  - has_unobstructed_view
+  - has_laundry_area
+  - has_maid_room
+  - is_penthouse_apartment
+  - has_morning_sun
+  - has_open_kitchen
+  - has_gourmet_balcony
+  - has_quiet_street
+  - has_adapted_bathroom
+  - has_backyard
+  - has_bathtub
+  - has_shower_enclosure
+  - has_private_pool
+  - has_bedroom_closets
+  - has_bathroom_cabinets
+  - has_kitchen_cabinets
+  - has_air_conditioning
+  - has_gas_shower
+  - has_maid_bathroom
+  - has_assigned_parking_space
 patterns_by_country_code:
   BR:
-    - pattern: piscina
+    - pattern: piscina(?! particular| privativa)
       field: has_swim_pool
       output: true
     - pattern: academia
@@ -89,4 +112,115 @@ patterns_by_country_code:
       output: true
     - pattern: portaria 24h
       field: has_entrance_hall
+      output: true
+    - pattern: mobiliado
+      field: is_furnished
+      output: true
+    - pattern: varanda
+      field: has_balcony
+      output: true
+    - pattern: sacada
+      field: has_balcony
+      output: true
+    - pattern: closet
+      field: has_walk_in_closet
+      output: true
+    - pattern: vista livre
+      field: has_unobstructed_view
+      output: true
+    - pattern: vista da
+      field: has_unobstructed_view
+      output: true
+    - pattern: vista para
+      field: has_unobstructed_view
+      output: true
+    - pattern: area de servico
+      field: has_laundry_area
+      output: true
+    - pattern: dependencia
+      field: has_maid_room
+      output: true
+    - pattern: empregada
+      field: has_maid_room
+      output: true
+    - pattern: quarto de servico
+      field: has_maid_room
+      output: true
+    - pattern: cobertura
+      field: is_penthouse_apartment
+      output: true
+    - pattern: sol da manha
+      field: has_morning_sun
+      output: true
+    - pattern: cozinha americana
+      field: has_open_kitchen
+      output: true
+    - pattern: varanda gourmet
+      field: has_gourmet_balcony
+      output: true
+    - pattern: silenciosa
+      field: has_quiet_street
+      output: true
+    - pattern: tranquil
+      field: has_quiet_street
+      output: true
+    - pattern: rua calma
+      field: has_quiet_street
+      output: true
+    - pattern: banheiro adaptado
+      field: has_adapted_bathroom
+      output: true
+    - pattern: quintal
+      field: has_backyard
+      output: true
+    - pattern: hidromassagem
+      field: has_bathtub
+      output: true
+    - pattern: jacuzzi
+      field: has_bathtub
+      output: true
+    - pattern: blindex
+      field: has_shower_enclosure
+      output: true
+    - pattern: box
+      field: has_shower_enclosure
+      output: true
+    - pattern: piscina privativa
+      field: has_private_pool
+      output: true
+    - pattern: piscina particular
+      field: has_private_pool
+      output: true
+    - pattern: armarios? embutido
+      field: has_bedroom_closets
+      output: true
+    - pattern: armarios? nos? banheiro
+      field: has_bathroom_cabinets
+      output: true
+    - pattern: armarios? nas? cozinha
+      field: has_kitchen_cabinets
+      output: true
+    - pattern: cozinhas? com armario
+      field: has_kitchen_cabinets
+      output: true
+    - pattern: ar condicionado
+      field: has_air_conditioning
+      output: true
+    - pattern: split
+      field: has_air_conditioning
+      output: true
+    - pattern: chuveiro a gas
+      field: has_gas_shower
+      output: true
+    - pattern: banheiro de empregada
+      field: has_maid_bathroom
+      output: true
+    - pattern: banheiro de servico
+      field: has_maid_bathroom
+      output: true
+    - pattern: dependencia completa
+      field: has_maid_bathroom
+      output: true
+    - pattern: garagem (?:privada|fixa|particular)
+      field: has_assigned_parking_space
       output: true
