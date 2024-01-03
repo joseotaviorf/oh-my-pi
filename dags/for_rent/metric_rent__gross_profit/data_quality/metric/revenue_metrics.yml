@@ -11,11 +11,11 @@ column_level_validations:
     has_min_value:
       greater_than: 0
   partner_share_management:
-    has_min_value:
-      greater_than: 0
+    has_max_value:
+      less_than_or_equal_to: 0
   partner_share_brokerage:
-    has_min_value:
-      greater_than: 0
+    has_max_value:
+      less_than_or_equal_to: 0
   insurance_commission:
     has_min_value:
       greater_than: 0
@@ -50,14 +50,14 @@ column_level_validations:
     has_min_value:
       greater_than: 0
   agents_commission:
-    has_min_value:
-      greater_than: 0
+    has_max_value:
+      less_than_or_equal_to: 0
   affiliates_commission:
-    has_min_value:
-      greater_than: 0
+    has_max_value:
+      less_than_or_equal_to: 0
   revenue_share_total:
-    has_min_value:
-      greater_than: 0
+    has_max_value:
+      less_than_or_equal_to: 0
   gross_revenue:
     has_min_value:
       greater_than: 0
@@ -65,8 +65,8 @@ column_level_validations:
     has_min_value:
       greater_than: 0
   sales_tax:
-    has_min_value:
-      greater_than: 0
+    has_max_value:
+      less_than_or_equal_to: 0
   net_revenue:
     has_min_value:
       greater_than: 0
