@@ -66,9 +66,9 @@ csat AS (
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good') THEN TRUE
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
     END AS is_solved,
-    NULL AS ts_first_response
+    ts_updated AS ts_first_response
   FROM
-    datalake_zendesk_tickets_clean.tickets
+    datalake_zendesk_tickets_clean.tickets_history
   WHERE
     GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad')
   UNION ALL
