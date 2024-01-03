@@ -73,7 +73,7 @@ columns:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house is a penthouse apartment. Code: APARTAMENTO_COBERTURA"
-  reversible_extra_room:
+  has_reversible_extra_room:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has a reversible extra room. Code: QUARTO_EXTRA_REVERSIVEL"
@@ -85,27 +85,27 @@ columns:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has a refrigerator included. Code: GELADEIRA_INCLUSO"
-  morning_sun:
+  has_morning_sun:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has morning sun. Code: SOL_DA_MANHA"
-  afternoon_sun:
+  has_afternoon_sun:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has afternoon sun. Code: SOL_DA_TARDE"
-  blackout_curtains:
+  has_blackout_curtains:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has blackout curtains. Code: CORTINAS_BLACK_OUT"
-  sheer_curtain:
+  has_sheer_curtain:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has sheer curtains. Code: CORTINAS_DECORATIVAS"
-  soundproof_window:
+  has_soundproof_window:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has soundproof windows. Code: JANELA_ANTI_RUIDO"
-  ceiling_fan:
+  has_ceiling_fan:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has a ceiling fan. Code: VENTILADOR_DE_TETO"
@@ -213,10 +213,10 @@ columns:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
     description: "Whether the house has an adapted bathroom. Code: BANHEIRO_ADAPTADO"
-  has_walk_in_closed:
+  has_walk_in_closet:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
-    description: "Whether the house has a walk in closed. Code: CLOSET"
+    description: "Whether the house has a walk in closet. Code: CLOSET"
   has_open_kitchen:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.has_feature
