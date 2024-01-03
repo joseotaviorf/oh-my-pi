@@ -48,14 +48,76 @@ WHERE
     AND DATE(ts_email_sent) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
 
 GROUP BY id_email, id_user, display_type, business_context, DATE(ts_email_sent)
+),
+
+yellow_pages_recommendation_logs_dedup AS (
+
+WITH yellow_pages_recommendation_logs AS (
+  SELECT
+      id_user,
+      business_context,
+      display_type,
+      experiments,
+      experiments_variants,
+      ts_log,
+      dt_log,
+      min(ts_log) Over (PARTITION BY id_user, business_context, display_type, dt_log) AS min_ts_log
+  FROM (
+      SELECT
+          CAST(
+              GET_JSON_OBJECT(emlio_logs.inputs, "$.user_id") as string
+          ) AS id_user,
+          LOWER(
+              GET_JSON_OBJECT(
+                  emlio_logs.inputs, "$.business_context"
+              )
+          ) AS business_context,
+          LOWER(
+              GET_JSON_OBJECT(emlio_logs.inputs, "$.display_type")
+          ) AS display_type,
+          -- Multiple experiments can be active at the same time
+          MAP_KEYS(
+            FROM_JSON(
+              GET_JSON_OBJECT(inputs, "$.experiment_settings"), "map<string, string>"
+            )
+          ) AS experiments,
+          MAP_VALUES(
+            from_json(
+              GET_JSON_OBJECT(inputs, "$.experiment_settings"), "map<string, string>"
+            )
+          ) AS experiments_variants,
+          DATE(ts_log) AS dt_log,
+          ts_log
+      FROM datalake_emlio_clean.emlio_logs AS emlio_logs
+      WHERE
+          emlio_logs.id_service = "yellow-pages"
+          AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past}) AND DATE('{end_date}')
+  )
+)
+SELECT DISTINCT *
+FROM
+    yellow_pages_recommendation_logs
+WHERE
+    min_ts_log = ts_log
 )
 
-SELECT display_type,
-business_context,
-dt_email_sent,
-SUM(CASE WHEN ts_email_sent IS NOT NULL THEN 1 ELSE 0 END) AS emails_sent,
-SUM(CASE WHEN dt_email_delivered IS NOT NULL THEN 1 ELSE 0 END) AS  emails_delivered,
-SUM(CASE WHEN dt_email_first_opened IS NOT NULL THEN 1 ELSE 0 END) AS  emails_opened,
-SUM(CASE WHEN dt_email_first_clicked IS NOT NULL THEN 1 ELSE 0 END) AS  emails_clicked
-FROM email_recommendation
-GROUP BY display_type, business_context, dt_email_sent
+SELECT
+    r.display_type,
+    r.business_context,
+    yp.experiments,
+    yp.experiments_variants,
+    r.dt_email_sent,
+    SUM(CASE WHEN ts_email_sent IS NOT NULL THEN 1 ELSE 0 END) AS emails_sent,
+    SUM(CASE WHEN dt_email_delivered IS NOT NULL THEN 1 ELSE 0 END) AS  emails_delivered,
+    SUM(CASE WHEN dt_email_first_opened IS NOT NULL THEN 1 ELSE 0 END) AS  emails_opened,
+    SUM(CASE WHEN dt_email_first_clicked IS NOT NULL THEN 1 ELSE 0 END) AS  emails_clicked
+FROM
+    email_recommendation AS r
+LEFT JOIN
+    yellow_pages_recommendation_logs_dedup yp
+    ON r.display_type = yp.display_type
+        AND r.business_context = yp.business_context
+        AND r.dt_email_sent = yp.dt_log
+        AND r.id_user = yp.id_user
+GROUP BY
+    r.display_type, r.business_context, yp.experiments, yp.experiments_variants, r.dt_email_sent

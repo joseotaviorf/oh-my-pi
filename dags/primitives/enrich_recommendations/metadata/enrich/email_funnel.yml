@@ -11,6 +11,14 @@ columns:
     description: Business context for which this recommendation was made
     lineage:
       - datalake_amplitude_clean.events.event_properties
+  experiments:
+    description: A/B experiment associated with this recommendation
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+  experiments_variants:
+    description: A/B experiment variant associated with this recommendation
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
   dt_email_sent:
      description: Date the email was sent
   emails_sent:
