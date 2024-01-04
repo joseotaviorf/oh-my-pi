@@ -2,7 +2,6 @@
 WITH house_owner AS (
   SELECT
     id_owner,
-    houses_published,
     total_houses,
     ongoing_houses,
     is_pp_multi_active
@@ -366,12 +365,6 @@ landlord_journey_agg AS (
     MAX(ho.ongoing_houses) AS ongoing_houses,
     MAX(
       CASE
-        WHEN ho.houses_published > 0 THEN TRUE
-        ELSE FALSE
-      END
-    ) AS has_published_house,
-    MAX(
-      CASE
         WHEN ols.listing_status = "PUBLISHED" THEN TRUE
         ELSE FALSE
       END
@@ -642,7 +635,6 @@ SELECT
   sj.total_active_contracts,
   sj.total_finished_contracts,
   sj.total_active_termination_contracts,
-  sj.has_published_house,
   sj.has_published_listings,
   sj.has_pending_listings_only,
   sj.has_opted_out_listings_only,

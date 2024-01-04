@@ -247,7 +247,7 @@ columns:
       events of type equal to 9, indicating that the contract has been signed by the user,
       and the termination status is not "DONE" or "CANCELED"
   has_published_house:
-    description: If the owner has ever published a house
+    description: DEPRECATED
   has_published_listings:
     description: If the owner currently has a published listing
   has_pending_listings_only:
