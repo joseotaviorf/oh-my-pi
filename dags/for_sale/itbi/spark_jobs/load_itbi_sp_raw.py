@@ -120,23 +120,32 @@ def get_data(
         sheets = pd.read_excel(url, sheet_name=None)
         sheets = {k: sheets[k] for k in sheets if re.match("[a-zA-Z]+-[0-9]+", k)}
 
-        dfs = pd.concat([df.assign(name=n) for n, df in sheets.items()])
-        df = spark_client.conn.createDataFrame(dfs.astype(str))
+        list_of_sheets = [df.assign(name=n) for n, df in sheets.items()]
 
-        df = df.replace("nan", None)
-        df = df.withColumnRenamed("name", "source_tab")
-        df = df.withColumn("source_file", lit(url))
-        df = df.withColumn("year", expr("substring(source_tab, 5, length(source_tab))"))
-        df = df.withColumn("year", df.year.cast(IntegerType()))
-        df = df.withColumn("month", expr("substring(source_tab, 0, 3)"))
-        df = df.withColumn("month", udf_transform_month_to_portuguese_relative("month"))
-        df = df.withColumn("month", df.month.cast(IntegerType()))
-        df = df.withColumn("dt_load", lit(date.today()))
+        treated_sheets = []
 
-        if columns_rename_mapped:
-            df = rename_columns(df, columns_rename_mapped, problematic_columns_rename_mapped)
+        for sheet in list_of_sheets:
+          df = spark_client.conn.createDataFrame(sheet.astype(str))
 
-        dataframes.append(df)
+          df = df.replace("nan", None)
+          df = df.withColumnRenamed("name", "source_tab")
+          df = df.withColumn("source_file", lit(url))
+          df = df.withColumn("year", expr("substring(source_tab, 5, length(source_tab))"))
+          df = df.withColumn("year", df.year.cast(IntegerType()))
+          df = df.withColumn("month", expr("substring(source_tab, 0, 3)"))
+          df = df.withColumn("month", udf_transform_month_to_portuguese_relative("month"))
+          df = df.withColumn("month", df.month.cast(IntegerType()))
+          df = df.withColumn("dt_load", lit(date.today()))
+
+          if columns_rename_mapped:
+              df = rename_columns(df, columns_rename_mapped, problematic_columns_rename_mapped)
+              df = df.drop(*[col for col in df.columns if "Unnamed" in col])
+
+          treated_sheets.append(df)
+
+        full_year_dataframe = reduce(lambda df1, df2: df1.unionByName(df2, allowMissingColumns=True), treated_sheets)
+
+        dataframes.append(full_year_dataframe)
 
     logger.info(
         f"""
@@ -144,7 +153,7 @@ def get_data(
     """
     )
 
-    dataframe = reduce(lambda df1, df2: df1.unionByName(df2), dataframes)
+    dataframe = reduce(lambda df1, df2: df1.unionByName(df2, allowMissingColumns=True), dataframes)
 
     return dataframe
 
