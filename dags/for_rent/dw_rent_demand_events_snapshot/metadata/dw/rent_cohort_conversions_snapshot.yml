@@ -48,6 +48,8 @@ columns:
       - dw_rent.fact_rent_cohort_conversions.weeks_to_conversion
     description: "How many weeks took the event to be converted.
       Events with 'unnatural conversion' (e.g. event was a VC before being a VB) will be assigned as week zero (0)."
+  vb_unconverted:
+    description: "Total volume of visits booked that weren't converted."
   vb_converted_vc:
     description: "Total volume of the conversion visit booked to visit completed."
   vb_converted_os:
@@ -64,6 +66,8 @@ columns:
     description: "Total volume of the conversion visit booked to credit approved."
   vb_converted_cs:
     description: "Total volume of the conversion visit booked to contract signed."
+  vc_unconverted:
+    description: "Total volume of visits completed that weren't converted."
   vc_converted_os:
     description: "Total volume of the conversion visit completed to offer submitted."
   vc_converted_oa:
@@ -78,6 +82,8 @@ columns:
     description: "Total volume of the conversion visit completed to credit approved."
   vc_converted_cs:
     description: "Total volume of the conversion visit completed to contract signed."
+  os_unconverted:
+    description: "Total volume of offers submitted that weren't converted."
   os_converted_oa:
     description: "Total volume of the conversions offer submitted to offer approved."
   os_converted_es:
@@ -90,6 +96,8 @@ columns:
     description: "Total volume of the conversion offer submitted to credit approved."
   os_converted_cs:
     description: "Total volume of the conversion offer submitted to contract signed."
+  oa_unconverted:
+    description: "Total volume of offers approved that weren't converted."
   oa_converted_es:
     description: "Total volume of the conversions offer approved to evaluation started."
   oa_converted_ep:
@@ -100,6 +108,8 @@ columns:
     description: "Total volume of the conversion offer approved to credit approved."
   oa_converted_cs:
     description: "Total volume of the conversion offer approved to contract signed."
+  es_unconverted:
+    description: "Total volume of started evaluations that weren't converted."
   es_converted_ep:
     description: "Total volume of the conversion evaluation started to evaluation positive."
   es_converted_ds:
@@ -108,20 +118,28 @@ columns:
     description: "Total volume of the conversion evaluation started to credit approved."
   es_converted_cs:
     description: "Total volume of the conversion evaluation started to contract signed."
+  ep_unconverted:
+    description: "Total volume of positive evaluations that weren't converted."
   ep_converted_ds:
     description: "Total volume of the conversion evaluation positive to documentation sent."
   ep_converted_ca:
     description: "Total volume of the conversion evaluation positive to credit approved."
   ep_converted_cs:
     description: "Total volume of the conversion evaluation positive to contract signed."
+  ds_unconverted:
+    description: "Total volume of documentation sent that weren't converted."
   ds_converted_ca:
     description: "Total volume of the conversion documentation sent to credit approved."
   ds_converted_cs:
     description: "Total volume of the conversion documentation sent to contract signed."
+  ca_unconverted:
+    description: "Total volume of approved credits that weren't converted."
   ca_converted_cc:
     description: "Total volume of the credit approved to contract created."
   ca_converted_cs:
     description: "Total volume of the conversion credit approved to contract signed."
+  cc_unconverted:
+    description: "Total volume of contracts created that weren't converted."
   cc_converted_cs:
     description: "Total volume of the conversion contract created to contract signed."
   has_guarantee:
