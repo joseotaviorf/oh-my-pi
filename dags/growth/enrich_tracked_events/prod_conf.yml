@@ -10,6 +10,10 @@ partition_cols:
     - year
     - month
     - day
+  secretaria_offline_touchpoints:
+    - year
+    - month
+    - day
   offline_attribution:
     - year
     - month

@@ -2448,6 +2448,8 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.casa_mineira_crm:load-clean-media-contact
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions
+  - bietlejuice.hub_services:load-clean-lead
+  - bietlejuice.hub_services:load-clean-visitor
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events

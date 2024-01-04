@@ -8,77 +8,59 @@ columns:
   id_user:
     description: Unique identifier for the user associated with the event.
     lineage:
-      - datalake_ebdb_clean.user.id
-      - datalake_ebdb_user.user.id
-      - datalake_gsheets_clean.users_cx_plaquinhas.id_user
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.id_user
+      - datalake_tracked_events.secretaria_offline_touchpoints.id_user
       - datalake_demand_contact_submission_clean.contact_submissions.id_user
-      - datalake_customer_support.call.id_user
-      - datalake_customer_support.chat.id_user
   id_contact:
     description: Unique identifier for the contact related to the offline attribution event.
     lineage:
-      - datalake_casa_mineira_crm_clean.contact.id
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.id_contact
+      - datalake_tracked_events.secretaria_offline_touchpoints.id_contact
       - datalake_demand_contact_submission_clean.contact_submissions.id_user
-      - datalake_demand_contact_submission_clean.contact_submissions.email
-      - datalake_demand_contact_submission_clean.contact_submissions.id_contact_submission
+      - datalake_demand_contact_submission_clean.contact_submissions.user_email  
+      - datalake_demand_contact_submission_clean.contact_submissions.id_contact_submission  
   event_name:
     description: Name of the event.
     lineage:
       - datalake_tracked_events.plaquinhas_offline_touchpoints.event_name
+      - datalake_tracked_events.secretaria_offline_touchpoints.event_name
   origin:
     description: Origin source of the event, indicating where the initial interaction occurred.
     lineage:
-      - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.origin
+      - datalake_tracked_events.secretaria_offline_touchpoints.origin
       - datalake_demand_contact_submission_clean.contact_submissions.origin
   channel:
     description: Communication channel through which the event was recorded.
     lineage:
-      - datalake_casa_mineira_crm_clean.media_contact.media_contact_name
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.channel
+      - datalake_tracked_events.secretaria_offline_touchpoints.channel
   agent:
     description: Agent or representative handling the contact or event.
     lineage:
       - datalake_tracked_events.plaquinhas_offline_touchpoints.agent
+      - datalake_tracked_events.secretaria_offline_touchpoints.agent
   ts_event:
     description: Timestamp of when the event occurred.
     lineage:
-      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_ebdb_user.user.ts_created
-      - datalake_quinto_messenger.channel.ts_created
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
-      - datalake_demand_contact_submission_clean.contact_submissions.ts_created_at
-      - datalake_customer_support.call.ts_ticket_started
-      - datalake_customer_support.chat.ts_ticket_started
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.ts_event
+      - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
+      - datalake_demand_contact_submission_clean.contact_submissions.ts_event
   year:
     description: Year when the event was recorded.
     lineage:
-      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_ebdb_user.user.ts_created
-      - datalake_quinto_messenger.channel.ts_created
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
-      - datalake_demand_contact_submission_clean.contact_submissions.year
-      - datalake_customer_support.call.ts_ticket_started
-      - datalake_customer_support.chat.ts_ticket_started
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.ts_event
+      - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
+      - datalake_demand_contact_submission_clean.contact_submissions.ts_event
   month:
     description: Month when the event was recorded.
     lineage:
-      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_ebdb_user.user.ts_created
-      - datalake_quinto_messenger.channel.ts_created
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
-      - datalake_demand_contact_submission_clean.contact_submissions.month
-      - datalake_customer_support.call.ts_ticket_started
-      - datalake_customer_support.chat.ts_ticket_started
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.ts_event
+      - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
+      - datalake_demand_contact_submission_clean.contact_submissions.ts_event
   day:
     description: Day when the event was recorded.
     lineage:
-      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_ebdb_user.user.ts_created
-      - datalake_quinto_messenger.channel.ts_created
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
-      - datalake_demand_contact_submission_clean.contact_submissions.day
-      - datalake_customer_support.call.ts_ticket_started
-      - datalake_customer_support.chat.ts_ticket_started
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.ts_event
+      - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
+      - datalake_demand_contact_submission_clean.contact_submissions.ts_event
