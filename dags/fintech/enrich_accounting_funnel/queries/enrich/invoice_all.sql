@@ -13,18 +13,39 @@ deduplicate_sap_entity AS (
   FROM
     datalake_retsuko_clean.sap_entity
 ),
-remove_reversed AS (
+pre_remove_reversed AS (
+SELECT 
+    e.sk_invoice_reversed_entry
+FROM 
+    dw_payment.dim_invoice_entry e
+GROUP BY 
+    1
+HAVING 
+    count(e.sk_invoice_reversed_entry) > 1
+),
+pre_remove_reversed_2 AS (
   SELECT 
-    die.sk_invoice_reversed_entry AS id_entry,
-    DATE(fie.ts_created) AS dt_reversal
+    die.sk_invoice_entry AS id_entry,
+    DATE(fie1.ts_created) AS dt_reversal
   FROM 
-    dw_payment.fact_invoice_entries fie
+    dw_payment.dim_invoice_entry die
   INNER JOIN 
-    dw_payment.dim_invoice_entry die 
-      ON fie.sk_invoice_entry = die.sk_invoice_entry
+    dw_payment.dim_invoice_entry die1
+      ON die.sk_invoice_entry = die1.sk_invoice_reversed_entry
+  INNER JOIN 
+    dw_payment.fact_invoice_entries fie1
+      ON fie1.sk_invoice_entry = die1.sk_invoice_entry
+  INNER JOIN 
+    dw_payment.fact_invoice_entries fie2
+      ON fie2.sk_invoice_entry = die.sk_invoice_entry
+  LEFT JOIN 
+    pre_remove_reversed prr 
+      ON prr.sk_invoice_reversed_entry = die.sk_invoice_entry
   WHERE 
-    sk_invoice_reversed_entry IS NOT NULL
-
+    fie1.sk_invoice = fie2.sk_invoice
+  AND 
+    prr.sk_invoice_reversed_entry IS NULL
+    
   UNION ALL
 
   SELECT 
@@ -35,16 +56,96 @@ remove_reversed AS (
   INNER JOIN 
     dw_payment.dim_invoice_entry die 
       ON fie.sk_invoice_entry = die.sk_invoice_entry
+  INNER JOIN 
+    dw_payment.fact_invoice_entries fie1
+      ON fie1.sk_invoice_entry = die.sk_invoice_reversed_entry
+  LEFT JOIN 
+    pre_remove_reversed prr 
+      ON prr.sk_invoice_reversed_entry = die.sk_invoice_reversed_entry
   WHERE 
     die.sk_invoice_reversed_entry IS NOT NULL
+  AND 
+    prr.sk_invoice_reversed_entry IS NULL
+  AND 
+    fie1.sk_invoice = fie.sk_invoice
 ),
-remove_first_reversed AS (
-SELECT 
-    id_entry, 
-    dt_reversal
+remove_reversed AS (
+  SELECT 
+    id_entry,
+    MIN(dt_reversal) as dt_reversal
+  FROM 
+    pre_remove_reversed_2
+  GROUP BY 1
+),
+invoiceable AS (
+    select
+        *,
+        SUM(ei.due_amount) OVER (PARTITION BY ei.sk_contract, ei.bill_item, ei.description, ei.accrual_year_month, ei.account_type) as balance
+    from
+        datalake_accounting_funnel.invoice_all ei  
+),
+not_invoiceable AS (
+    select distinct
+        c.id_external as id_contract,
+        eni.id_external as not_invoiceable_entry,
+        eni.bill_item as not_invoiceable_bill_item,
+        eni.amount as not_invoiceable_amount,
+        eni.accrual_year_month as not_invoiceable_accrual
+    from 
+        datalake_retsuko.entry eni -- entry not-invoiceable
+    inner join 
+        datalake_retsuko_clean.contract c 
+            on c.id = eni.id_contract
+    inner join 
+        invoiceable ei 
+            on ei.sk_contract = c.id
+            and eni.bill_item = ei.bill_item 
+            and eni.description = ei.description
+            and ABS(eni.amount) = ABS(ei.due_amount)
+            and eni.accrual_year_month = ei.accrual_year_month -- entry invoiceable
+    left join 
+        datalake_retsuko.invoice i 
+            on i.id = ei.id_invoice
+    left join 
+        datalake_retsuko.invoice_info ii 
+            on i.id_external = ii.id_invoice
+    left join 
+        remove_reversed rr 
+            on rr.id_entry = eni.id_external
+    where
+        (
+            rr.id_entry is null
+        and    
+            eni.accounting_transaction_identifier is not null 
+        and 
+            eni.id_invoice is null
+        and 
+            ei.id_invoice is not null
+        and 
+            (
+                (ei.accounting_transaction_identifier != eni.accounting_transaction_identifier and balance = 0) or
+                (ei.accounting_transaction_identifier is null and balance = 0) or 
+                (ei.accounting_transaction_identifier = eni.accounting_transaction_identifier and ii.payment_status = 'canceled' and ii.invoice_user = 'tenant')
+            )
+        )
+        OR (eni.id_invoice is null AND eni.ts_created <= DATE('2023-11-30'))
+),
+remove_not_invoiceable AS (
+select 
+      fie.sk_invoice_entry
 FROM 
-    remove_reversed
-QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entry ORDER BY dt_reversal) = 1
+    dw_payment.fact_invoice_entries fie
+INNER JOIN 
+    dw_payment.dim_invoice_entry die 
+        ON fie.sk_invoice_entry = die.sk_invoice_entry
+LEFT JOIN 
+    not_invoiceable ni 
+        ON ni.not_invoiceable_entry = fie.sk_invoice_entry
+LEFT JOIN   
+    remove_reversed rr 
+        ON rr.id_entry = fie.sk_invoice_entry
+WHERE 
+    ((rr.id_entry IS NOT NULL) OR (ni.not_invoiceable_entry IS NOT NULL) OR (fie.sk_invoice < 0 AND die.sk_invoice_reversed_entry IS NOT NULL) OR (fie.sk_invoice < 0 AND DATE(fie.ts_created) <= DATE('2023-11-30')))
 ),
 next_business_day AS (
   SELECT
@@ -87,6 +188,7 @@ SELECT DISTINCT
     AS contract_status,
   ie.is_rental_paid_in_advance,
   IF(rr.id_entry IS NULL, False, True) AS is_reversed,
+  IF(rni.sk_invoice_entry IS NOT NULL, TRUE, FALSE) as is_not_invoiceable_inconsiderable,
   ie.entry_type AS bill_item,
   ie.description,
   CASE
@@ -183,8 +285,11 @@ LEFT JOIN
     deduplicate_sap_entity sap 
     ON fie.sk_invoice_entry = sap.id_finance_entity
 LEFT JOIN 
-    remove_first_reversed rr 
+    remove_reversed rr 
     ON rr.id_entry = fie.sk_invoice_entry
+LEFT JOIN 
+    remove_not_invoiceable AS rni 
+        ON rni.sk_invoice_entry = fie.sk_invoice_entry
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')

@@ -71,6 +71,8 @@ columns:
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice_entry
     description: "Flag that indicates if a entry was create to reverse (cancel) another entry or if that entry was reversed by another entry"
+  is_not_invoiceable_inconsiderable:
+    description: "Flag that indicates, if true, that a entry is a not-invoiceable/reversed insconsiderable"
   bill_item:
     lineage:
       - dw_payment.dim_invoice_entry.entry_type
