@@ -1,11 +1,16 @@
 SELECT
+    100 AS sk_cohort_type,
+    'VISIT_BOOKED_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
+UNION ALL
+SELECT
     102 AS sk_cohort_type,
     'VISIT_BOOKED_TO_VISIT_COMPLETED' AS cohort_name,
     'VB2VC' AS abbreviation
 UNION ALL
 SELECT
     103 AS sk_cohort_type,
-    'VISIT_BOOKED_TO_OFFER_SENT' AS cohort_name,
+    'VISIT_BOOKED_TO_OFFER_SUBMITTED' AS cohort_name,
     'VB2OS' AS abbreviation
 UNION ALL
 SELECT
@@ -25,7 +30,7 @@ SELECT
 UNION ALL
 SELECT
     107 AS sk_cohort_type,
-    'VISIT_BOOKED_TO_DOC_SENT' AS cohort_name,
+    'VISIT_BOOKED_TO_DOCUMENTATION_SENT' AS cohort_name,
     'VB2DS' AS abbreviation
 UNION ALL
 SELECT
@@ -39,8 +44,18 @@ SELECT
     'VB2CS' AS abbreviation
 UNION ALL
 SELECT
+    1010 AS sk_cohort_type,
+    'VISIT_BOOKED_TO_CONTRACT_CREATED' AS cohort_name,
+    'VB2CC' AS abbreviation
+UNION ALL
+SELECT
+    200 AS sk_cohort_type,
+    'VISIT_COMPLETED_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
+UNION ALL
+SELECT
     203 AS sk_cohort_type,
-    'VISIT_COMPLETED_TO_OFFER_SENT' AS cohort_name,
+    'VISIT_COMPLETED_TO_OFFER_SUBMITTED' AS cohort_name,
     'VC2OS' AS abbreviation
 UNION ALL
 SELECT
@@ -60,7 +75,7 @@ SELECT
 UNION ALL
 SELECT
     207 AS sk_cohort_type,
-    'VISIT_COMPLETED_TO_DOC_SENT' AS cohort_name,
+    'VISIT_COMPLETED_TO_DOCUMENTATION_SENT' AS cohort_name,
     'VC2DS' AS abbreviation
 UNION ALL
 SELECT
@@ -74,34 +89,54 @@ SELECT
     'VC2CS' AS abbreviation
 UNION ALL
 SELECT
+    2010 AS sk_cohort_type,
+    'VISIT_COMPLETED_TO_CONTRACT_CREATED' AS cohort_name,
+    'VC2CC' AS abbreviation
+UNION ALL
+SELECT
+    300 AS sk_cohort_type,
+    'OFFER_SUBMITTED_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
+UNION ALL
+SELECT
     304 AS sk_cohort_type,
-    'OFFER_SENT_TO_OFFER_APPROVED' AS cohort_name,
+    'OFFER_SUBMITTED_TO_OFFER_APPROVED' AS cohort_name,
     'OS2OA' AS abbreviation
 UNION ALL
 SELECT
     305 AS sk_cohort_type,
-    'OFFER_SENT_TO_EVALUATION_STARTED' AS cohort_name,
+    'OFFER_SUBMITTED_TO_EVALUATION_STARTED' AS cohort_name,
     'OS2ES' AS abbreviation
 UNION ALL
 SELECT
     306 AS sk_cohort_type,
-    'OFFER_SENT_TO_EVALUATION_POSITIVE' AS cohort_name,
+    'OFFER_SUBMITTED_TO_EVALUATION_POSITIVE' AS cohort_name,
     'OS2EP' AS abbreviation
 UNION ALL
 SELECT
     307 AS sk_cohort_type,
-    'OFFER_SENT_TO_DOC_SENT' AS cohort_name,
+    'OFFER_SUBMITTED_TO_DOCUMENTATION_SENT' AS cohort_name,
     'OS2DS' AS abbreviation
 UNION ALL
 SELECT
     308 AS sk_cohort_type,
-    'OFFER_SENT_TO_CREDIT_APPROVED' AS cohort_name,
+    'OFFER_SUBMITTED_TO_CREDIT_APPROVED' AS cohort_name,
     'OS2CA' AS abbreviation
 UNION ALL
 SELECT
     309 AS sk_cohort_type,
-    'OFFER_SENT_TO_CONTRACT_SIGNED' AS cohort_name,
+    'OFFER_SUBMITTED_TO_CONTRACT_SIGNED' AS cohort_name,
     'OS2CS' AS abbreviation
+UNION ALL
+SELECT
+    3010 AS sk_cohort_type,
+    'OFFER_SUBMITTED_TO_CONTRACT_CREATED' AS cohort_name,
+    'OS2CC' AS abbreviation
+UNION ALL
+SELECT
+    400 AS sk_cohort_type,
+    'OFFER_APPROVED_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
 UNION ALL
 SELECT
     405 AS sk_cohort_type,
@@ -115,7 +150,7 @@ SELECT
 UNION ALL
 SELECT
     407 AS sk_cohort_type,
-    'OFFER_APPROVED_TO_DOC_SENT' AS cohort_name,
+    'OFFER_APPROVED_TO_DOCUMENTATION_SENT' AS cohort_name,
     'OA2DS' AS abbreviation
 UNION ALL
 SELECT
@@ -129,13 +164,23 @@ SELECT
     'OA2CS' AS abbreviation
 UNION ALL
 SELECT
+    4010 AS sk_cohort_type,
+    'OFFER_APPROVED_TO_CONTRACT_CREATED' AS cohort_name,
+    'OA2CC' AS abbreviation
+UNION ALL
+SELECT
+    500 AS sk_cohort_type,
+    'EVALUATION_STARTED_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
+UNION ALL
+SELECT
     506 AS sk_cohort_type,
     'EVALUATION_STARTED_TO_EVALUATION_POSITIVE' AS cohort_name,
     'ES2EP' AS abbreviation
 UNION ALL
 SELECT
     507 AS sk_cohort_type,
-    'EVALUATION_STARTED_TO_DOC_SENT' AS cohort_name,
+    'EVALUATION_STARTED_TO_DOCUMENTATION_SENT' AS cohort_name,
     'ES2DS' AS abbreviation
 UNION ALL
 SELECT
@@ -149,8 +194,18 @@ SELECT
     'ES2CS' AS abbreviation
 UNION ALL
 SELECT
+    5010 AS sk_cohort_type,
+    'EVALUATION_STARTED_TO_CONTRACT_CREATED' AS cohort_name,
+    'ES2CC' AS abbreviation
+UNION ALL
+SELECT
+    600 AS sk_cohort_type,
+    'EVALUATION_POSITIVE_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
+UNION ALL
+SELECT
     607 AS sk_cohort_type,
-    'EVALUATION_POSITIVE_TO_DOC_SENT' AS cohort_name,
+    'EVALUATION_POSITIVE_TO_DOCUMENTATION_SENT' AS cohort_name,
     'EP2DS' AS abbreviation
 UNION ALL
 SELECT
@@ -164,14 +219,34 @@ SELECT
     'EP2CS' AS abbreviation
 UNION ALL
 SELECT
+    6010 AS sk_cohort_type,
+    'EVALUATION_POSITIVE_TO_CONTRACT_CREATED' AS cohort_name,
+    'EP2CC' AS abbreviation
+UNION ALL
+SELECT
+    700 AS sk_cohort_type,
+    'DOCUMENTATION_SENT_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
+UNION ALL
+SELECT
     708 AS sk_cohort_type,
-    'DOC_SENT_TO_CREDIT_APPROVED' AS cohort_name,
+    'DOCUMENTATION_SENT_TO_CREDIT_APPROVED' AS cohort_name,
     'DS2CA' AS abbreviation
 UNION ALL
 SELECT
     709 AS sk_cohort_type,
-    'DOC_SENT_TO_CONTRACT_SIGNED' AS cohort_name,
+    'DOCUMENTATION_SENT_TO_CONTRACT_SIGNED' AS cohort_name,
     'DS2CS' AS abbreviation
+UNION ALL
+SELECT
+    7010 AS sk_cohort_type,
+    'DOCUMENTATION_SENT_TO_CONTRACT_CREATED' AS cohort_name,
+    'DS2CC' AS abbreviation
+UNION ALL
+SELECT
+    800 AS sk_cohort_type,
+    'CREDIT_APPROVED_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
 UNION ALL
 SELECT
     809 AS sk_cohort_type,
@@ -179,11 +254,16 @@ SELECT
     'CA2CS' AS abbreviation
 UNION ALL
 SELECT
-    1009 AS sk_cohort_type,
-    'CONTRACT_CREATED_TO_CONTRACT_SIGNED' AS cohort_name,
-    'CC2CS' AS abbreviation
-UNION ALL
-SELECT
     8010 AS sk_cohort_type,
     'CREDIT_APPROVED_TO_CONTRACT_CREATED' AS cohort_name,
     'CA2CC' AS abbreviation
+UNION ALL
+SELECT
+    1000 AS sk_cohort_type,
+    'CONTRACT_CREATED_UNCONVERTED' AS cohort_name,
+    '' AS abbreviation
+UNION ALL
+SELECT
+    1009 AS sk_cohort_type,
+    'CONTRACT_CREATED_TO_CONTRACT_SIGNED' AS cohort_name,
+    'CC2CS' AS abbreviation
