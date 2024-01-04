@@ -21,6 +21,7 @@ columns:
       name: Total Listings Weekly
       description: Count of unique listings (sk_house_listing from dim_house_listing) that where published on the referenced week.
         Attention to listings without city group and/or city name, they must be removed from the result.
+        Also, there is a filter removing the listings that does not contain the ts_publication value.
       acronym: TL
       is_additive: True
       business_stage: Demand

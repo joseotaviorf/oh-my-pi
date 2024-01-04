@@ -1,5 +1,5 @@
 SELECT
-    DATE_TRUNC('week', DATE(ts_publication)) AS week,
+    DATE_TRUNC('week', DATE(hl.ts_publication)) AS week,
     dr.country_code,
     COUNT(DISTINCT hl.sk_house_listing) AS total_listings
 FROM
@@ -13,4 +13,5 @@ LEFT JOIN
 WHERE
     dr.city_group IS NOT NULL
     AND hl.version > 0
+    AND hl.ts_publication IS NOT NULL
 GROUP BY 1, 2
