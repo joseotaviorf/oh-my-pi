@@ -22,6 +22,7 @@ columns:
       description: Amount of users that scheduled a booking on a month.
         This amount is calculated by the count distinct of sk_client from fact_listing_rent_flows,
         segmented by country_code.
+        Also, there is a filter removing the sk_booking_created_date < -1.
       acronym: TP Bookers
       is_additive: False
       business_stage: Demand
