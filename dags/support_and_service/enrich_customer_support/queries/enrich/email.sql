@@ -54,8 +54,8 @@ WITH zendesk_email AS (
 csat AS (
   SELECT
     id_ticket,
-    GET_JSON_OBJECT(satisfaction_rating,'$.comment') AS csat_comment,
-    GET_JSON_OBJECT(satisfaction_rating,'$.reason') AS score_reason,
+    GET_JSON_OBJECT(satisfaction_rating, '$.comment') AS csat_comment,
+    GET_JSON_OBJECT(satisfaction_rating, '$.reason') AS score_reason,
     CASE
       WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'bad' THEN  1
       WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'good' THEN  5
@@ -66,7 +66,7 @@ csat AS (
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good') THEN TRUE
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
     END AS is_solved,
-    ts_updated AS ts_first_response
+    ts_updated AS ts_response
   FROM
     datalake_zendesk_tickets_clean.tickets_history
   WHERE
@@ -77,16 +77,16 @@ csat AS (
     user_comment AS csat_comment,
     NULL AS score_reason,
     csat_score,
-    COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL AS is_answered,
+    COALESCE(CAST(user_comment AS STRING), CAST(csat_score AS STRING), CAST(is_solved AS STRING)) IS NOT NULL AS is_answered,
     is_solved,
-    ts_first_response
+    ts_first_response  AS ts_response
   FROM
     datalake_survicate.zendesk_email_surveys
   WHERE
     id_ticket IS NOT NULL
-    AND COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL
+    AND COALESCE(CAST(user_comment AS STRING), CAST(csat_score AS STRING), CAST(is_solved AS STRING)) IS NOT NULL
 ),
-last_csat_answer AS (
+csat_answers AS (
   SELECT
     id_ticket,
     csat_comment,
@@ -94,10 +94,32 @@ last_csat_answer AS (
     csat_score,
     is_answered,
     is_solved,
-    ts_first_response,
-    ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_first_response DESC) AS rw_number
+    ts_response,
+    ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_response DESC) AS rw_number_desc,
+    ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_response) AS rw_number_asc
   FROM
     csat
+),
+csat_first_and_last_ts AS (
+  SELECT
+    ca.id_ticket,
+    ca.csat_comment AS last_csat_comment,
+    ca2.csat_comment AS first_csat_comment,
+    ca.score_reason,
+    ca.csat_score AS last_csat_score,
+    ca2.csat_score AS first_csat_score,
+    ca.is_answered,
+    ca.is_solved,
+    ca.ts_response AS ts_last_response,
+    ca2.ts_response AS ts_first_response
+  FROM
+    csat_answers AS ca
+  INNER JOIN
+    csat_answers AS ca2
+      ON ca2.id_ticket = ca.id_ticket
+      AND ca2.rw_number_asc = 1
+  WHERE
+    ca.rw_number_desc = 1
 ),
 back_tickets AS (
   SELECT
@@ -167,11 +189,13 @@ SELECT DISTINCT
   ze.minutes_first_response,
   ze.replies,
   ze.reopens,
-  cs.csat_score,
+  cs.first_csat_score,
+  cs.last_csat_score AS csat_score,
   cs.is_answered,
   cs.is_solved,
   cs.score_reason,
-  cs.csat_comment,
+  cs.first_csat_comment,
+  cs.last_csat_comment AS csat_comment,
   ze.channel,
   ze.custom_fields,
   ze.request_type,
@@ -200,22 +224,22 @@ SELECT DISTINCT
   bt.total_backoffice_minutes_time,
   CAST((TO_UNIX_TIMESTAMP(bt.ts_first_created) - TO_UNIX_TIMESTAMP(ze.ts_ticket_solved))/60.0 AS DOUBLE) AS total_minutes_front_to_open_back_ticket_time,
   cs.ts_first_response AS ts_csat_first_response,
+  cs.ts_last_response AS ts_csat_last_response,
   ze.ts_initially_assigned_local,
   ze.ts_last_assigned_local,
   ze.ts_ticket_started,
   ze.ts_ticket_solved,
   ze.ts_ticket_ended
 FROM
-  zendesk_email ze
+  zendesk_email AS ze
 LEFT JOIN
-  datalake_gsheets_clean.department_control dc
+  datalake_gsheets_clean.department_control AS dc
     ON dc.department = ze.department
 LEFT JOIN
-  last_csat_answer cs
+  csat_first_and_last_ts AS cs
     ON ze.id_ticket = cs.id_ticket
-    AND cs.rw_number = 1
 LEFT JOIN
-  last_back_ticket bt
+  last_back_ticket AS bt
     ON bt.front_ticket = ze.id_ticket
 WHERE
   ze.channel IN ('email', 'form_faq', 'web', 'other', 'whatsapp')

@@ -102,6 +102,7 @@ WITH call_tickets AS (
     ts_ticket_ended AS ts_closed,
     ts_ticket_ended AS ts_solved,
     ts_csat_answered AS ts_csat_response,
+    NULL AS ts_csat_first_response,
     ts_csat_answered AS ts_survey,
     NOW() AS ts_load
   FROM
@@ -208,6 +209,7 @@ chat_tickets AS (
     ts_ticket_ended AS ts_closed,
     ts_ticket_ended AS ts_solved,
     ts_csat_response,
+    NULL AS ts_csat_first_response,
     ts_survey,
     NOW() AS ts_load
   FROM
@@ -312,7 +314,8 @@ email_tickets AS (
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     ts_ticket_solved AS ts_solved,
-    ts_csat_first_response AS ts_csat_response,
+    ts_csat_last_response AS ts_csat_response,
+    ts_csat_first_response,
     NULL AS ts_survey,
     NOW() AS ts_load
   FROM
@@ -377,6 +380,7 @@ historical_call_tickets AS (
     ts_ticket_ended AS ts_closed,
     ts_ticket_ended AS ts_solved,
     NULL AS ts_csat_response,
+    NULL AS ts_csat_first_response,
     NULL AS ts_survey,
     NOW() AS ts_load
   FROM
@@ -466,6 +470,7 @@ historical_chat_tickets AS (
     ts_ticket_ended AS ts_closed,
     ts_ticket_ended AS ts_solved,
     NULL AS ts_csat_response,
+    NULL AS ts_csat_first_response,
     NULL AS ts_survey,
     NOW() AS ts_load
   FROM
@@ -585,6 +590,7 @@ SELECT DISTINCT
     bt.ts_closed,
     bt.ts_solved,
     bt.ts_csat_response,
+    bt.ts_csat_first_response,
     bt.ts_survey,
     bt.ts_load
 FROM
