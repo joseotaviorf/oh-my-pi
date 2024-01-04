@@ -631,8 +631,10 @@ bietlejuice.dw_rent_listing_flow:
 bietlejuice.dw_rental_contribution_margin:
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
+  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info

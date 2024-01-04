@@ -279,9 +279,9 @@ revenues_calculation AS (
   SELECT
     MONOTONICALLY_INCREASING_ID() AS sk_house_listing_revenue,
     COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb, nb.id_contract, -1) AS id_contract,
-    COALESCE(r.id_house_listing, revenue.id_house_listing, hl_contract.id_house_listing) AS id_house_listing,
-    COALESCE(r.id_house, revenue.id_house, hl_contract.id_house) AS id_house,
-    COALESCE(hl.country_code, hl_contract.country_code, 'Undefined') AS country_code,
+    COALESCE(r.id_house_listing, revenue.id_house_listing, lc.id_house_listing) AS id_house_listing,
+    COALESCE(r.id_house, revenue.id_house, lc.id_house, c.id_house) AS id_house,
+    COALESCE(ch.country_code, 'Undefined') AS country_code,
     contract_lifetime,
     COALESCE(rent_value_invoice, 0) AS rent_value_invoice,
     COALESCE(rental_management, 0) AS rental_management,
@@ -313,25 +313,26 @@ revenues_calculation AS (
   LEFT JOIN
     dw_public.fact_listing_rent_flows AS rf
     ON r.id_reservation = rf.sk_reservation
-  LEFT JOIN
-    datalake_ebdb_listing.house_listing AS hl
-      ON COALESCE(r.id_house_listing, revenue.id_house_listing) = hl.id_house_listing
   FULL OUTER JOIN
     long_term_rental_anticipation AS ltra
       ON revenue.id_contract = ltra.id_contract_ebdb
       AND revenue.accrual_year_month = ltra.due_accrual_year_month
-  LEFT JOIN
-    datalake_ebdb_listing.house_listing AS hl_contract
-      ON ltra.id_contract_ebdb = hl_contract.id_contract
-      AND ltra.dt_due >= DATE(COALESCE(hl_contract.ts_listing_version_start, '1900-01-01 00:00:00'))
-      AND ltra.dt_due < DATE(COALESCE(hl_contract.ts_listing_version_end, NOW()))
   FULL OUTER JOIN
     new_business AS nb
       ON revenue.id_contract = nb.id_contract
       AND revenue.accrual_year_month = nb.accrual_year_month
-  LEFT JOIN
+  JOIN
     dw_public.dim_date AS dd
-      ON TO_DATE(STRING(COALESCE(r.created_accrual_year_month, ltra.due_accrual_year_month, nb.accrual_year_month)), 'yyyyMM') = dd.date
+      ON TO_DATE(STRING(COALESCE(revenue.accrual_year_month, r.created_accrual_year_month, ltra.due_accrual_year_month, nb.accrual_year_month)), 'yyyyMM') = dd.date
+  LEFT JOIN
+    datalake_listing_contracts.listing_contracts AS lc
+      ON COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb, nb.id_contract) = lc.id_contract
+  LEFT JOIN
+    datalake_ebdb_contract.contract AS c
+      ON COALESCE(revenue.id_contract, rf.sk_contract, ltra.id_contract_ebdb, nb.id_contract) = c.id
+  LEFT JOIN
+    datalake_ebdb_country.house AS ch
+      ON COALESCE(r.id_house, revenue.id_house, lc.id_house, c.id_house) = ch.id_house
   WHERE
     COALESCE(r.created_accrual_year_month, revenue.accrual_year_month, ltra.due_accrual_year_month, nb.accrual_year_month) <= DATE_FORMAT(CURRENT_TIMESTAMP(), 'yyyyMM')
 )
