@@ -17,7 +17,11 @@ workflow:
       extra_query_template_params:
         "MAKE_DATE(year, month, day)": "DATE_ADD(MAKE_DATE({year}, {month}, {day}), 1)"
 cluster:
-  type: databricks_10_4_med_fixed_workers_4xlarge_general_photon_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.4xlarge
+    num_workers: 2
+    aws_attributes:
+        ebs_volume_size: 200
+        availability: ON_DEMAND
