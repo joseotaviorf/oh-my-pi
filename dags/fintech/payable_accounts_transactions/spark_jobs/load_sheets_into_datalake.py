@@ -262,12 +262,7 @@ if __name__ == "__main__":
             ):
                 engine = None if "xlsb" not in i["name"] else "pyxlsb"
                 if "Terceiros" in i["name"]:
-                    if str(datetime.now().year) in i["name"]:
-                        sheetname = str(datetime.now().year)  # 2023
-                    elif str(datetime.now().year - 1) in i["name"]:
-                        sheetname = str(datetime.now().year - 1)  # 2022
-                    else:
-                        sheetname = str(datetime.now().year - 2)  # 2021 (not in sheet name)
+                    sheetname = str(2021)
                     usecols = columns_to_read + ["Itaú"] + ["Description"]
                     df_2021 = pd.read_excel(
                         __drive_file_download(gdrive_client, i["id"]),
@@ -299,12 +294,10 @@ if __name__ == "__main__":
             ):
                 engine = None if "xlsb" not in i["name"] else "pyxlsb"
                 if "Terceiros" in i["name"]:
-                    if str(datetime.now().year) in i["name"]:
-                        sheetname = str(datetime.now().year)  # 2023
-                    elif str(datetime.now().year - 1) in i["name"]:
-                        sheetname = str(datetime.now().year - 1)  # 2022
-                    else:
-                        sheetname = str(datetime.now().year - 2)  # 2021 (not in sheet name)
+                    sheetname = None
+                    for year in range(2021, datetime.now().year + 1):
+                        if str(year) in i["name"]:
+                            sheetname = str(year)
                     usecols = columns_to_read + ["Itaú"]
                     df = pd.read_excel(
                         __drive_file_download(gdrive_client, i["id"]),
@@ -373,7 +366,7 @@ if __name__ == "__main__":
     df_citi_2021 = df_citi_2021.withColumnRenamed("citi", "saldo_total")
 
     df_2021 = reduce(DataFrame.unionAll, [df_itau_2021, df_bradesco_2021, df_citi_2021])
-    
+
     # Remove non-standard 'saldo inicial' rows and remove 'Description' only present in 2021 files and used for removing 'saldo inicial
     filter_all_columns = [
         functions.lower(functions.col(col)).contains("saldo inicial")
