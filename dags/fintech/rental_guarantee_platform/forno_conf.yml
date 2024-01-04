@@ -231,4 +231,7 @@ tables:
   - table_name: clientes_person_legacy
     date_filter_column: dateupdate
     extraction_type: incremental
+  - table_name: sap
+    date_filter_column: created_at
+    extraction_type: incremental
 partition_cols: ["year", "month", "day"]

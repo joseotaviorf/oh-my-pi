@@ -36,6 +36,7 @@ Via **incremental load**:
     - `property`
     - `revinfo`
     - `user_account`
+    - `sap`
 
 Velo 3.0 tables:
 
@@ -102,6 +103,7 @@ Via **incremental load**:
     - `property`
     - `revinfo`
     - `user_account`
+    - `sap`
 
 Velo 3.0 tables:
 

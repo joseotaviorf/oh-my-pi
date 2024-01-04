@@ -1,0 +1,35 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: sap
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.id
+  id_business_entity:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.business_entity_id
+  id_finance_entity:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.finance_entity_id
+  id_feature:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.feature_id
+  request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.request
+  response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.response
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.status
+  trigger:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.trigger
+  transaction_name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.transaction_name
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.sap.created_at
