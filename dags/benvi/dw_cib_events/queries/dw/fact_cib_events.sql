@@ -4,9 +4,11 @@ WITH sum_events AS (
         id_event AS sk_event,
         id_house AS sk_house,
         id_house_listing AS sk_house_listing,
+        id_offer AS sk_offer,
         id_contract AS sk_contract,
         dt_event,
         SUM(IF(event_type = 'FL', 1, 0)) AS first_listings,
+        SUM(IF(event_type = 'OA', 1, 0)) AS offers_accepted,
         SUM(IF(event_type = 'CS', 1, 0)) AS contracts_signed,
         year,
         month,
@@ -18,7 +20,7 @@ WITH sum_events AS (
       AND month = {month}
       AND day = {day}
     GROUP BY
-        1, 2, 3, 4, 5, 6, 9, 10, 11
+        1, 2, 3, 4, 5, 6, 7, 11, 12, 13
 )
 SELECT
     se.sk_cib,
@@ -26,8 +28,10 @@ SELECT
     se.sk_event,
     se.sk_house,
     se.sk_house_listing,
+    se.sk_offer,
     se.sk_contract,
     se.first_listings,
+    se.offers_accepted,
     se.contracts_signed,
     se.dt_event,
     se.year,

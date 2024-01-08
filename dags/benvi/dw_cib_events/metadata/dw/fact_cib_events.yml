@@ -25,18 +25,26 @@ columns:
     lineage:
       - datalake_mexico_cib_events.cib_events.id_house_listing
     description: ID of the house listing related to the CIB.
+  sk_offer:
+    lineage:
+      - datalake_mexico_cib_events.cib_events.id_offer
+    description: ID of the offer accepted.
   sk_contract:
     lineage:
       - datalake_mexico_cib_events.cib_events.id_contract
-    description: ID of the contract.
+    description: ID of the contract signed.
   first_listings:
     lineage:
       - datalake_mexico_cib_events.cib_events.event_type
-    description: Number of CIB's first listings for unique sk_cib, sk_event, sk_house, sk_house_listing, sk_contract and dt_event.
+    description: Number of CIB's first listings for unique sk_cib, sk_event, sk_house, sk_house_listing, sk_offer, sk_contract and dt_event.
+  offers_accepted:
+    lineage:
+      - datalake_mexico_cib_events.cib_events.event_type
+    description: Number of CIB's offers accepted for unique sk_cib, sk_event, sk_house, sk_house_listing, sk_offer, sk_contract and dt_event.
   contracts_signed:
     lineage:
       - datalake_mexico_cib_events.cib_events.event_type
-    description: Number of CIB's contracts signed for unique sk_cib, sk_event, sk_house, sk_house_listing, sk_contract and dt_event.
+    description: Number of CIB's contracts signed for unique sk_cib, sk_event, sk_house, sk_house_listing, sk_offer, sk_contract and dt_event.
   dt_event:
     lineage:
       - datalake_mexico_cib_events.cib_events.dt_event
