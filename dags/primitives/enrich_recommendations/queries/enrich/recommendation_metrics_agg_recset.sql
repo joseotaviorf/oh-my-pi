@@ -91,7 +91,12 @@ metrics_at_3 AS (
         SUM(INT(rec_to_sale_flow_fourteen_days)) / COUNT(item_rank) AS rec_to_sale_flow_fourteen_days_at_3,
         SUM(INT(rec_to_rent_flow_one_day)) / COUNT(item_rank) AS rec_to_rent_flow_one_day_at_3,
         SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_3,
-        MEAN(popularity) AS popularity_at_3
+        MEAN(popularity) AS popularity_at_3,
+        SUM(INT(rec_to_sale_flow_fourteen_days) * INT(true_positive)) AS true_positive_and_sale_flow_fourteen_days_at_3,
+        SUM(INT(rec_to_rent_flow_seven_days) * INT(true_positive)) AS true_positive_and_to_rent_flow_seven_days_at_3,
+        MAX(INT(rec_to_sale_flow_fourteen_days) * INT(true_positive)) AS hit_true_positive_and_sale_flow_fourteen_days_at_3,
+        MAX(INT(rec_to_rent_flow_seven_days) * INT(true_positive)) AS hit_true_positive_and_rent_flow_seven_days_at_3,
+        SUM(INT(true_positive)) AS count_true_positive_at_3
     FROM
         recommendation_feats
     WHERE
@@ -119,7 +124,12 @@ metrics_at_5 AS (
         SUM(INT(rec_to_sale_flow_fourteen_days)) / COUNT(item_rank) AS rec_to_sale_flow_fourteen_days_at_5,
         SUM(INT(rec_to_rent_flow_one_day)) / COUNT(item_rank) AS rec_to_rent_flow_one_day_at_5,
         SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_5,
-        MEAN(popularity) AS popularity_at_5
+        MEAN(popularity) AS popularity_at_5,
+        SUM(INT(rec_to_sale_flow_fourteen_days) * INT(true_positive)) AS true_positive_and_sale_flow_fourteen_days_at_5,
+        SUM(INT(rec_to_rent_flow_seven_days) * INT(true_positive)) AS true_positive_and_to_rent_flow_seven_days_at_5,
+        MAX(INT(rec_to_sale_flow_fourteen_days) * INT(true_positive)) AS hit_true_positive_and_sale_flow_fourteen_days_at_5,
+        MAX(INT(rec_to_rent_flow_seven_days) * INT(true_positive)) AS hit_true_positive_and_rent_flow_seven_days_at_5,
+        SUM(INT(true_positive)) AS count_true_positive_at_5
    FROM
         recommendation_feats
     WHERE
@@ -148,7 +158,12 @@ metrics_at_10 AS
         SUM(INT(rec_to_sale_flow_fourteen_days)) / COUNT(item_rank) AS rec_to_sale_flow_fourteen_days_at_10,
         SUM(INT(rec_to_rent_flow_one_day)) / COUNT(item_rank) AS rec_to_rent_flow_one_day_at_10,
         SUM(INT(rec_to_rent_flow_seven_days)) / COUNT(item_rank) AS rec_to_rent_flow_seven_days_at_10,
-        MEAN(popularity) AS popularity_at_10
+        MEAN(popularity) AS popularity_at_10,
+        SUM(INT(rec_to_sale_flow_fourteen_days) * INT(true_positive)) AS true_positive_and_sale_flow_fourteen_days_at_10,
+        SUM(INT(rec_to_rent_flow_seven_days) * INT(true_positive)) AS true_positive_and_to_rent_flow_seven_days_at_10,
+        MAX(INT(rec_to_sale_flow_fourteen_days) * INT(true_positive)) AS hit_true_positive_and_sale_flow_fourteen_days_at_10,
+        MAX(INT(rec_to_rent_flow_seven_days) * INT(true_positive)) AS hit_true_positive_and_rent_flow_seven_days_at_10,
+        SUM(INT(true_positive)) AS count_true_positive_at_10
     FROM
         recommendation_feats
     WHERE
@@ -178,6 +193,11 @@ hit_rec_to_sale_flow_fourteen_days_at_3,
 hit_rec_to_rent_flow_one_day_at_3,
 hit_rec_to_rent_flow_seven_days_at_3,
 popularity_at_3,
+true_positive_and_sale_flow_fourteen_days_at_3,
+true_positive_and_to_rent_flow_seven_days_at_3,
+hit_true_positive_and_sale_flow_fourteen_days_at_3,
+hit_true_positive_and_rent_flow_seven_days_at_3,
+count_true_positive_at_3,
 
 --k_5
 precision_at_5,
@@ -199,6 +219,11 @@ hit_rec_to_sale_flow_fourteen_days_at_5,
 hit_rec_to_rent_flow_one_day_at_5,
 hit_rec_to_rent_flow_seven_days_at_5,
 popularity_at_5,
+true_positive_and_sale_flow_fourteen_days_at_5,
+true_positive_and_to_rent_flow_seven_days_at_5,
+hit_true_positive_and_sale_flow_fourteen_days_at_5,
+hit_true_positive_and_rent_flow_seven_days_at_5,
+count_true_positive_at_5,
 
 --k_10
 precision_at_10,
@@ -219,7 +244,13 @@ hit_rec_to_sale_flow_one_day_at_10,
 hit_rec_to_sale_flow_fourteen_days_at_10,
 hit_rec_to_rent_flow_one_day_at_10,
 hit_rec_to_rent_flow_seven_days_at_10,
-popularity_at_10
+popularity_at_10,
+true_positive_and_sale_flow_fourteen_days_at_10,
+true_positive_and_to_rent_flow_seven_days_at_10,
+hit_true_positive_and_sale_flow_fourteen_days_at_10,
+hit_true_positive_and_rent_flow_seven_days_at_10,
+count_true_positive_at_10
+
 FROM
     base
 LEFT JOIN

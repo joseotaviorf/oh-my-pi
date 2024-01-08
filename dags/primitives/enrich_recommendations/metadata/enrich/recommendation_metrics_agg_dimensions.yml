@@ -64,6 +64,16 @@ columns:
   sum_popularity_3:
     description: |
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+  sum_true_positive_and_sale_flow_fourteen_days_at_3:
+    description: sum_true_positive_and_sale_flow_fourteen_days_at_3
+  sum_true_positive_and_rent_flow_seven_days_at_3:
+    description: sum_true_positive_and_rent_flow_seven_days_at_3
+  sum_hit_true_positive_and_sale_flow_fourteen_days_at_3:
+    description: sum_hit_true_positive_and_sale_flow_fourteen_days_at_3
+  sum_hit_true_positive_and_rent_flow_seven_days_at_3:
+    description: sum_hit_true_positive_and_rent_flow_seven_days_at_3
+  sum_true_positive_at_3:
+    description: sum_true_positive_at_3
   sum_precision_at_5:
     description: Precision @5
   sum_recall_at_5:
@@ -103,6 +113,16 @@ columns:
   sum_popularity_5:
     description: |
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+  sum_true_positive_and_sale_flow_fourteen_days_at_5:
+    description: sum_true_positive_and_sale_flow_fourteen_days_at_5
+  sum_true_positive_and_rent_flow_seven_days_at_5:
+    description: sum_true_positive_and_rent_flow_seven_days_at_5
+  sum_hit_true_positive_and_sale_flow_fourteen_days_at_5:
+    description: sum_hit_true_positive_and_sale_flow_fourteen_days_at_5
+  sum_hit_true_positive_and_rent_flow_seven_days_at_5:
+    description: sum_hit_true_positive_and_rent_flow_seven_days_at_5
+  sum_true_positive_at_5:
+    description: sum_true_positive_at_5
   sum_precision_at_10:
     description: Precision @10
   sum_recall_at_10:
@@ -142,3 +162,13 @@ columns:
   sum_popularity_10:
     description: |
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
+  sum_true_positive_and_sale_flow_fourteen_days_at_10:
+    description: sum_true_positive_and_sale_flow_fourteen_days_at_10
+  sum_true_positive_and_rent_flow_seven_days_at_10:
+    description: sum_true_positive_and_rent_flow_seven_days_at_10
+  sum_hit_true_positive_and_sale_flow_fourteen_days_at_10:
+    description: sum_hit_true_positive_and_sale_flow_fourteen_days_at_10
+  sum_hit_true_positive_and_rent_flow_seven_days_at_10:
+    description: sum_hit_true_positive_and_rent_flow_seven_days_at_10
+  sum_true_positive_at_10:
+    description: sum_true_positive_at_10

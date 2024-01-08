@@ -164,6 +164,21 @@ columns:
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
     lineage:
       - datalake_recommendations.popularity.popularity
+  true_positive_and_sale_flow_fourteen_days_at_3:
+    description: |
+      true_positive_and_sale_flow_fourteen_days_at_3
+  true_positive_and_to_rent_flow_seven_days_at_3:
+    description: |
+      true_positive_and_to_rent_flow_seven_days_at_3
+  hit_true_positive_and_sale_flow_fourteen_days_at_3:
+    description: |
+      hit_true_positive_and_sale_flow_fourteen_days_at_3
+  hit_true_positive_and_rent_flow_seven_days_at_3:
+    description: |
+      hit_true_positive_and_rent_flow_seven_days_at_3
+  count_true_positive_at_3:
+    description: |
+      count_true_positive_at_3
   precision_at_5:
     description: Precision @5
     lineage:
@@ -255,6 +270,21 @@ columns:
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
     lineage:
       - datalake_recommendations.popularity.popularity
+  true_positive_and_sale_flow_fourteen_days_at_5:
+    description: |
+      true_positive_and_sale_flow_fourteen_days_at_5
+  true_positive_and_to_rent_flow_seven_days_at_5:
+    description: |
+      true_positive_and_to_rent_flow_seven_days_at_5
+  hit_true_positive_and_sale_flow_fourteen_days_at_5:
+    description: |
+      hit_true_positive_and_sale_flow_fourteen_days_at_5
+  hit_true_positive_and_rent_flow_seven_days_at_5:
+    description: |
+      hit_true_positive_and_rent_flow_seven_days_at_5
+  count_true_positive_at_5:
+    description: |
+      count_true_positive_at_5
   precision_at_10:
     description: Precision @10
     lineage:
@@ -346,3 +376,18 @@ columns:
       Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.
     lineage:
       - datalake_recommendations.popularity.popularity
+  true_positive_and_sale_flow_fourteen_days_at_10:
+    description: |
+      true_positive_and_sale_flow_fourteen_days_at_10
+  true_positive_and_to_rent_flow_seven_days_at_10:
+    description: |
+      true_positive_and_to_rent_flow_seven_days_at_10
+  hit_true_positive_and_sale_flow_fourteen_days_at_10:
+    description: |
+      hit_true_positive_and_sale_flow_fourteen_days_at_10
+  hit_true_positive_and_rent_flow_seven_days_at_10:
+    description: |
+      hit_true_positive_and_rent_flow_seven_days_at_10
+  count_true_positive_at_10:
+    description: |
+      count_true_positive_at_10

@@ -27,6 +27,11 @@ SELECT
     SUM(hit_rec_to_rent_flow_one_day_at_3) AS sum_hit_rec_to_rent_flow_one_day_at_3,
     SUM(hit_rec_to_rent_flow_seven_days_at_3) AS sum_hit_rec_to_rent_flow_seven_days_at_3,
     SUM(popularity_at_3) AS sum_popularity_at_3,
+    SUM(true_positive_and_sale_flow_fourteen_days_at_3) AS sum_true_positive_and_sale_flow_fourteen_days_at_3,
+    SUM(true_positive_and_rent_flow_seven_days_at_3) AS 3sum_true_positive_and_rent_flow_seven_days_at_3,
+    SUM(hit_true_positive_and_sale_flow_fourteen_days_at_3) AS sum_hit_true_positive_and_sale_flow_fourteen_days_at_3,
+    SUM(hit_true_positive_and_rent_flow_seven_days_at_3) AS sum_hit_true_positive_and_rent_flow_seven_days_at_3,
+    SUM(count_true_positive_at_3) AS sum_true_positive_at_3,
 
     --k_5
     SUM(precision_at_5) AS sum_precision_at_5,
@@ -48,6 +53,11 @@ SELECT
     SUM(hit_rec_to_rent_flow_one_day_at_5) AS sum_hit_rec_to_rent_flow_one_day_at_5,
     SUM(hit_rec_to_rent_flow_seven_days_at_5) AS sum_hit_rec_to_rent_flow_seven_days_at_5,
     SUM(popularity_at_5) AS sum_popularity_at_5,
+    SUM(true_positive_and_sale_flow_fourteen_days_at_5) AS sum_true_positive_and_sale_flow_fourteen_days_at_5,
+    SUM(true_positive_and_rent_flow_seven_days_at_5) AS 3sum_true_positive_and_rent_flow_seven_days_at_5,
+    SUM(hit_true_positive_and_sale_flow_fourteen_days_at_5) AS sum_hit_true_positive_and_sale_flow_fourteen_days_at_5,
+    SUM(hit_true_positive_and_rent_flow_seven_days_at_5) AS sum_hit_true_positive_and_rent_flow_seven_days_at_5,
+    SUM(count_true_positive_at_5) AS sum_true_positive_at_5,
 
     --k_10
     SUM(precision_at_10) AS sum_precision_at_10,
@@ -68,7 +78,12 @@ SELECT
     SUM(hit_rec_to_sale_flow_fourteen_days_at_10) AS sum_hit_rec_to_sale_flow_fourteen_days_at_10,
     SUM(hit_rec_to_rent_flow_one_day_at_10) AS sum_hit_rec_to_rent_flow_one_day_at_10,
     SUM(hit_rec_to_rent_flow_seven_days_at_10) AS sum_hit_rec_to_rent_flow_seven_days_at_10,
-    SUM(popularity_at_10) AS sum_popularity_at_10
+    SUM(popularity_at_10) AS sum_popularity_at_10,
+    SUM(true_positive_and_sale_flow_fourteen_days_at_10) AS sum_true_positive_and_sale_flow_fourteen_days_at_10,
+    SUM(true_positive_and_rent_flow_seven_days_at_10) AS 3sum_true_positive_and_rent_flow_seven_days_at_10,
+    SUM(hit_true_positive_and_sale_flow_fourteen_days_at_10) AS sum_hit_true_positive_and_sale_flow_fourteen_days_at_10,
+    SUM(hit_true_positive_and_rent_flow_seven_days_at_10) AS sum_hit_true_positive_and_rent_flow_seven_days_at_10,
+    SUM(count_true_positive_at_10) AS sum_true_positive_at_10
 FROM
     datalake_recommendations.recommendation_metrics_agg_recset
 WHERE
