@@ -129,10 +129,6 @@ columns:
     description: Date on which the contract came into effect.
     lineage:
       - datalake_ebdb_contract.contract.dt_entered
-  definition_date:
-    description: Date of the of the repair request.
-    lineage:
-      - datalake_repairs_clean.repair_request.ts_updated
   ts_first_interaction:
     description: Date in timestamp format of the first iteration of the repair request.
   ts_created_local:

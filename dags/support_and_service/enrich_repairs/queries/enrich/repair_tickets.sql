@@ -1,17 +1,4 @@
-WITH pp_tickets_test  as (
-    SELECT DISTINCT
-        tf.id_ticket,
-        tf.client_type,
-        sr.id_repair_request AS id_request
-    FROM 
-        datalake_zendesk_ticket_funnels.ticket_funnel AS tf
-    INNER JOIN 
-        datalake_repairs_clean.service_request AS sr 
-            ON sr.id_third_party_crm_ticket_external = tf.id_ticket
-    WHERE 
-        tf.tags LIKE '%teste_ps_pp_grupo_b_intermediacao_autosservico%'
-),
-relisting_db AS (
+WITH relisting_db AS (
     SELECT
         rf.id_contract,
         IF(hl.version >= 0, hl.id_house_listing, NULL) AS listing
@@ -40,15 +27,11 @@ relisting_distinct AS (
     GROUP BY 1
 ),
 repairs_interaction AS (
-    SELECT
+   SELECT
         rr.id AS id_request,
-        IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation,
-        CASE 
-            WHEN MIN(rr.ts_updated) <= rc.ts_started THEN MIN(rr.ts_updated) - INTERVAL 3 HOUR
-            WHEN MIN(rr.ts_updated) > rc.ts_started THEN rc.ts_started - INTERVAL 3 HOUR
-            ELSE COALESCE(MIN(rr.ts_updated) - INTERVAL 3 HOUR, rc.ts_started - INTERVAL 3 HOUR) 
-        END AS ts_first_interaction,
-        MIN(DATE(rr.ts_updated)) AS definition_date
+        rc.ts_started,
+        COALESCE(MIN(rr.ts_updated) - INTERVAL 3 HOUR, rc.ts_started - INTERVAL 3 HOUR) AS ts_first_interaction,
+        IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation
     FROM
         datalake_repairs_clean.repair_request AS rr
     LEFT JOIN
@@ -60,10 +43,22 @@ repairs_interaction AS (
         AND rr.id_third_party_crm_ticket_external IS NOT NULL
     GROUP BY 
         rr.id, rc.ts_started 
+),
+service_provider AS (
+  SELECT
+    rr.id_third_party_crm_ticket_external AS sk_ticket,
+    rr.id AS id_repair_request,
+    rr.service_provider,
+    rr.ts_created
+  FROM 
+    datalake_repairs_clean.repair_request AS rr
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated DESC) = 1
 )
+
 SELECT 
     tf.id_ticket,
-    rr.id AS id_request,
+    rr.id_repair_request AS id_request,
     tfm.id_contract,
     tf.group_name,
     tf.client_type,
@@ -91,7 +86,6 @@ SELECT
     rd.relisting,
     tfm.minutes_reply_calendar AS minutes_first_reply_time_calendar,
     c.dt_entered AS entrance_date,
-    ri.definition_date,
     ri.ts_first_interaction,
     tf.ts_created_local,
     tf.ts_updated_local,
@@ -122,23 +116,29 @@ LEFT JOIN
     datalake_ebdb_contract.contract AS c
         ON tfm.id_contract = c.id
 LEFT JOIN 
-    datalake_repairs_clean.repair_request AS rr 
-        ON tf.id_ticket = rr.id_third_party_crm_ticket_external
+    service_provider AS rr
+        ON tf.id_ticket = rr.sk_ticket
 LEFT JOIN 
     repairs_interaction AS ri
-        ON ri.id_request = rr.id
+        ON ri.id_request = rr.id_repair_request
 LEFT JOIN
     relisting_distinct AS rd
         ON rd.id_contract = tfm.id_contract
 LEFT JOIN
     datalake_survicate.repairs_surveys AS csat
         ON csat.id_ticket = tf.id_ticket
+LEFT JOIN 
+    datalake_repairs_clean.repair_request AS rr_first_interaction
+        ON tf.id_ticket = rr_first_interaction.id_third_party_crm_ticket_external
+        AND rr_first_interaction.id_third_party_crm_ticket_external IS NOT NULL
+LEFT JOIN
+    datalake_repairs_clean.repair_request_chat rct 
+        ON rr_first_interaction.id = rct.id_repair_request
 WHERE 
-    tf.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
-    AND (tf.ts_created >= DATE_ADD(CURRENT_DATE,-20*7) OR tfm.ts_solved >= date('2023-01-01') OR tfm.ts_solved IS NULL)
-    AND tf.channel NOT IN ('call')
-    AND tf.status NOT IN ('deleted')
-    AND tf.tags NOT LIKE '%caso_ticket_agregador%'
-    AND tf.id_ticket NOT IN (SELECT id_ticket FROM pp_tickets_test)
+  tf.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
+  AND (tf.ts_created >= DATE_ADD(CURRENT_DATE,-20*7) OR tfm.ts_solved >= date('2023-01-01') OR tfm.ts_solved IS NULL)
+  AND tf.channel NOT IN ('call')
+  AND tf.status NOT IN ('deleted')
+  AND tf.tags NOT LIKE '%caso_ticket_agregador%'
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY tf.id_ticket ORDER BY tf.ts_created_local DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY tf.id_ticket ORDER BY tf.ts_updated_local DESC) = 1

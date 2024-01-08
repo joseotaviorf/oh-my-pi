@@ -2128,7 +2128,6 @@ bietlejuice.enrich_repairs:
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.repairs:load-clean-repair-request-chat
-  - bietlejuice.repairs:load-clean-service-request
 bietlejuice.enrich_reports_validation:
   - bietlejuice.reports:load-clean-daily-listings-summary
   - bietlejuice.reports:load-clean-processed-event
