@@ -24,14 +24,19 @@ columns:
       - datalake_rent_potential_listing.potential_listing_b2b.id_house_listing
       - datalake_rent_demand_events.rent_demand_events.id_house_listing
     description: ID of the house listing related to the CIB.
+  id_offer:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_offer
+    description: ID of the offer accepted.
   id_contract:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_contract
-    description: ID of the contract.
+    description: ID of the contract signed.
   event_type:
     description: The type of the event made by the CIB.
     categories:
       FL: CIB brought a First Listing.
+      OA: The listing that CIB manages had an Offer Accepted.
       CS: The listing that CIB manages had a Contract Signed.
   dt_event:
     description: Date of the event made by the CIB.

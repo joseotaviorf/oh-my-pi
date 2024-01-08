@@ -4,6 +4,7 @@ WITH first_listing_event AS (
         COALESCE(plb2b.id_house_listing, -1) AS id_event,
         hrlc.id_house,
         COALESCE(plb2b.id_house_listing, -1) AS id_house_listing,
+        -1 AS id_offer,
         -1 AS id_contract,
         'FL' AS event_type,
         DATE(lfrl.ts_first_listing) AS dt_event,
@@ -22,7 +23,7 @@ WITH first_listing_event AS (
         lfrl.country_code = 'MX'
         AND lfrl.ts_first_listing IS NOT NULL
         AND hrlc.consultant_type <> 'Core'
-        AND hrlc.id_user <> -1
+        AND hrlc.id_user IS NOT NULL
         AND YEAR(DATE(lfrl.ts_first_listing)) = {year}
         AND MONTH(DATE(lfrl.ts_first_listing)) = {month}
         AND DAY(DATE(lfrl.ts_first_listing)) = {day}
@@ -33,6 +34,7 @@ contract_signed_event AS (
         rde.id_contract AS id_event,
         hrlc.id_house,
         rde.id_house_listing,
+        rde.id_offer,
         rde.id_contract,
         'CS' AS event_type,
         DATE(ts_event) AS dt_event,
@@ -48,7 +50,34 @@ contract_signed_event AS (
         rde.country_code = 'MX'
         AND rde.id_event_type = 9
         AND hrlc.consultant_type <> 'Core'
-        AND hrlc.id_user <> -1
+        AND hrlc.id_user IS NOT NULL
+        AND YEAR(DATE(ts_event)) = {year}
+        AND MONTH(DATE(ts_event)) = {month}
+        AND DAY(DATE(ts_event)) = {day}
+),
+offer_accepted_event AS (
+    SELECT DISTINCT
+        hrlc.id_user AS id_cib,
+        rde.id_offer AS id_event,
+        hrlc.id_house,
+        rde.id_house_listing,
+        rde.id_offer,
+        COALESCE(rde.id_contract, -1) AS id_contract,
+        'OA' AS event_type,
+        DATE(ts_event) AS dt_event,
+        YEAR(DATE(ts_event)) AS year,
+        MONTH(DATE(ts_event)) AS month,
+        DAY(DATE(ts_event)) AS day
+    FROM
+        datalake_rent_demand_events.rent_demand_events AS rde
+    JOIN
+        datalake_big_agent.house_rent_listing_consultant AS hrlc
+            ON rde.id_house_listing = hrlc.id_house_listing
+    WHERE
+        rde.country_code = 'MX'
+        AND rde.id_event_type = 4
+        AND hrlc.consultant_type <> 'Core'
+        AND hrlc.id_user IS NOT NULL
         AND YEAR(DATE(ts_event)) = {year}
         AND MONTH(DATE(ts_event)) = {month}
         AND DAY(DATE(ts_event)) = {day}
@@ -56,3 +85,5 @@ contract_signed_event AS (
 SELECT * FROM first_listing_event
 UNION ALL
 SELECT * FROM  contract_signed_event
+UNION ALL
+SELECT * FROM offer_accepted_event
