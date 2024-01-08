@@ -10,4 +10,5 @@ LEFT JOIN
         ON dc.sk_contract = hl.sk_contract
 WHERE 
     dc.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active and ended
+    AND DATE_TRUNC('day', COALESCE(dc.ts_signature, dc.dt_start)) < CURRENT_DATE()
 GROUP BY 1, 2, 3
