@@ -1,0 +1,22 @@
+dag:
+  name: dw_repairs
+  schedule_start_date: 2022,12,31
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This modeling aims to provide operational information related to ongoing repair tickets.
+workflow:
+  type: query
+  layer: dw
+  custom_schema: repairs
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    dim_repair_ongoing:
+      extraction_type: full
+      partitions: []
+cluster:
+  type: databricks_10_4_med_io-memory_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

@@ -655,6 +655,14 @@ bietlejuice.dw_rental_contribution_margin:
 bietlejuice.dw_rental_payments:
   - bietlejuice.enrich_retsuko:load-enrich-bill-items
   - bietlejuice.enrich_retsuko:load-enrich-invoice
+bietlejuice.dw_repairs:
+  - bietlejuice.enrich_repairs:load-enrich-repair-tickets
+  - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+  - bietlejuice.repairs:load-clean-repair-request
+  - bietlejuice.repairs:load-clean-repair-request-budget
+  - bietlejuice.repairs:load-clean-repair-request-chat
+  - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
 bietlejuice.dw_revenue_lines:
@@ -2444,8 +2452,6 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.casa_mineira_crm:load-clean-media-contact
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions
-  - bietlejuice.hub_services:load-clean-lead
-  - bietlejuice.hub_services:load-clean-visitor
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
@@ -2454,6 +2460,8 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
+  - bietlejuice.hub_services:load-clean-lead
+  - bietlejuice.hub_services:load-clean-visitor
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-answer
   - bietlejuice.tracksale:load-clean-dispatch

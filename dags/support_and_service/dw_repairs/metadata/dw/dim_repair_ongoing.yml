@@ -1,0 +1,63 @@
+database_name: dw_repairs
+table_name: fact_repair_ongoing
+description: 
+  Stores data on ongoing repair requests, including information about the customer, the repair, the responsible analyst, and the repair status.
+  This data is used to analyze the performance of the repair process, including response time, resolution time, costs, delay reasons, and success factors.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_ticket:
+    description: Ticket unique identifier.
+    lineage:
+      - datalake_repairs.repair_tickets.id_ticket
+  repair_class:
+    description: Broad category associated with the repair type.
+    lineage:
+      - datalake_repairs.repair_tickets.custom_fields
+  repair_type:
+    description: More specific subgroup within the repair category.
+    lineage:
+      - datalake_repairs.repair_tickets.custom_fields
+  repair_detailed:
+    description: Even more specific details about the repair type, further narrowing down the category and subgroup.
+    lineage:
+      - datalake_repairs.repair_tickets.custom_fields
+  execution_flow:
+    description: Categorization of how the repair execution flow was carried out.
+    lineage:
+      - datalake_repairs.repair_tickets.custom_fields
+  criticality:
+    description: Priority level of the repair request, indicating its urgency.
+    categories:
+      Emergencial: The maxima priority level.
+      Urgente: The high priority level.
+      Comum: The medium priority level.
+      Benfeitoria: When tag criticality is a improvement.
+      Sem Defeito: When tag criticality is null.
+      Outros: The criticality of the tag is other than the above.
+    lineage:
+      - datalake_repairs.repair_tickets.custom_fields
+      - datalake_repairs.repair_tickets.tags
+  contract_journey:
+    description: Indicates whether the repair request is part of a onboarding or ongoing contract.
+    lineage:
+      - datalake_repairs.repair_tickets.entrance_date
+      - datalake_repairs.repair_tickets.ts_created_local
+  service_provider:
+    description: Data in json format that indicates which company was the provider and the date on which the information was made available.
+    lineage:
+      - datalake_repairs.repair_tickets.service_provider
+  created_front_or_back:
+    description: Descriptive information that indicates whether the ticket is a back or front ticket.
+    lineage:
+      - datalake_repairs.repair_tickets.front_or_back
+  status_fup_iq:
+    description: Current status of the tenant negotiation follow-up for the repair request.
+    lineage:
+      - datalake_repairs_clean.repair_request_tenant_negotiation_follow_up.status
+  owner_aproval:
+    description: Approval status from the owner regarding the repair request.
+    lineage:
+      - datalake_repairs_clean.repair_request.owner_aproval
+  ts_load:
+    description: Date and time when the data was loaded.
