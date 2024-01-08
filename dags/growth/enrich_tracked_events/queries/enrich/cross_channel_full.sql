@@ -207,11 +207,15 @@ cross_channel AS (
                 'Quinto Andar Classificados Lite',
                 'Quinto Andar Classificados Hub',
                 'Quinto Andar Inbound',
-                'Quinto Andar Classificados Inbound') 
+                'Quinto Andar Classificados Inbound',
+                'CLASSIFIED', 
+                'TQC_5A', 
+                'INBOUND')  
                 THEN 'Non-Branded'
             WHEN origin IN (
                 'Quinto Andar - Traz quem compra',
-                'Quinto Andar - Placas') 
+                'Quinto Andar - Placas', 
+                'SIGN') 
                 THEN 'Branded' 
             ELSE ''
         END AS attribution_branded,
@@ -244,7 +248,11 @@ cross_channel AS (
             'Quinto Andar Classificados Inbound',
             'Quinto Andar - Traz quem compra',
             'Quinto Andar - Placas',
-            'Placas'
+            'Placas',
+            'CLASSIFIED', 
+            'TQC_5A', 
+            'SIGN', 
+            'INBOUND'
             )
 ),
 apply_attribution_rule AS (
