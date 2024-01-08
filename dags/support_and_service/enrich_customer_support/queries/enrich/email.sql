@@ -191,6 +191,7 @@ SELECT DISTINCT
   ze.reopens,
   cs.first_csat_score,
   cs.last_csat_score AS csat_score,
+  cs.first_csat_score,
   cs.is_answered,
   cs.is_solved,
   cs.score_reason,

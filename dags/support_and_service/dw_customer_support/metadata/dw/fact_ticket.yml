@@ -144,6 +144,13 @@ columns:
       - datalake_customer_support.email.csat_score
       - datalake_customer_support.historical_chat.csat_score
     description: Last CSAT score (value goes from 1 to 5).
+  first_csat_score:
+    lineage:
+      - datalake_customer_support.call.csat_rating
+      - datalake_customer_support.chat.csat_score
+      - datalake_customer_support.email.csat_score
+      - datalake_customer_support.historical_chat.csat_score
+    description: First CSAT score (value goes from 1 to 5).
   status:
     lineage:
       - datalake_customer_support.call.status
@@ -430,7 +437,12 @@ columns:
     lineage:
       - datalake_customer_support.email.csat_comment
       - datalake_customer_support.chat.csat_comment
-    description: Sample of the comment user left on our CSAT survey.
+    description: Sample of the comment the user left on our CSAT survey.
+  first_csat_comment:
+    lineage:
+      - datalake_customer_support.email.csat_comment
+      - datalake_customer_support.chat.csat_comment
+    description: Sample of the first comment the user left on our CSAT survey.
   ts_started:
     lineage:
       - datalake_customer_support.call.ts_ticket_started

@@ -149,18 +149,36 @@ conversation AS (
       )
     GROUP BY 1,2,3,4,5,6,7,8,9
   ),
-  csat_events AS (
-    SELECT
+  csat AS (
+    SELECT DISTINCT
       id_call,
       id_task,
-      MAX(csat_1) AS csat_1,
-      MAX(csat_2) AS csat_2,
-      MIN(ts_created_local) AS ts_csat
+      csat_1,
+      csat_2,
+      ts_created_local,
+      ROW_NUMBER() OVER (PARTITION BY id_call ORDER BY ts_created_local) AS rw_number_asc,
+      ROW_NUMBER() OVER (PARTITION BY id_call ORDER BY ts_created_local DESC) AS rw_number_desc
     FROM
       datalake_bigfone_twilio.call_ivr_events
     WHERE
       COALESCE(csat_1, csat_2) IS NOT NULL
-    GROUP BY 1,2
+  ),
+  csat_events AS (
+    SELECT
+      ca.id_call,
+      ca.csat_2 AS last_csat_score,
+      ca2.csat_2 AS first_csat_score,
+      ca.ts_created_local AS ts_last_response,
+      ca2.ts_created_local AS ts_first_response,
+      ca.csat_1
+    FROM
+      csat AS ca
+    INNER JOIN
+      csat AS ca2
+        ON ca2.id_call = ca.id_call
+        AND ca2.rw_number_asc = 1
+    WHERE
+      ca.rw_number_desc = 1
   ),
   call_metrics AS (
     SELECT
@@ -222,13 +240,15 @@ conversation AS (
     ctm.total_queue_time AS seconds_total_queue_time,
     ctm.total_wrap_up_time AS seconds_total_wrap_up_time,
     ctm.total_handling_time AS seconds_total_handling_time,
-    COALESCE(CAST(ce.csat_2 AS string), CAST(ce.csat_1 AS string)) IS NOT NULL AS is_csat_answered,
+    COALESCE(CAST(ce.first_csat_score AS string), CAST(ce.csat_1 AS string)) IS NOT NULL AS is_csat_answered,
     ce.csat_1 = 1 AS is_solved,
-    ce.csat_2 AS csat_rating,
+    ce.last_csat_score,
+    ce.first_csat_score,
     ie.total_minutes_reception_time,
     GREATEST(ie.ts_last_event_local_unix,fe.ts_last_event_local_unix) - COALESCE(ie.ts_first_event_local_unix,fe.ts_first_event_local_unix) AS seconds_duration,
     COALESCE(ie.ts_first_event,fe.ts_first_event) AS ts_started,
-    ce.ts_csat AS ts_csat_answered,
+    ce.ts_first_response AS ts_csat_first_response,
+    ce.ts_last_response AS ts_csat_last_response,
     GREATEST(ie.ts_last_event,fe.ts_last_event) AS ts_ended,
     cfe.ts_created_local AS ts_created
   FROM
@@ -387,8 +407,10 @@ conversation_and_segment AS (
     END AS has_transfers,
     c.is_csat_answered,
     c.is_solved,
-    c.csat_rating,
-    c.ts_csat_answered,
+    c.first_csat_score,
+    c.last_csat_score,
+    c.ts_csat_first_response,
+    c.ts_csat_last_response,
     t.ts_twilio_created_local,
     t.ts_twilio_closed_local,
     c.ts_started,
@@ -494,8 +516,10 @@ SELECT DISTINCT
   bt.back_ticket_list,
   c.is_csat_answered,
   c.is_solved,
-  c.csat_rating,
-  c.ts_csat_answered,
+  c.first_csat_score,
+  c.last_csat_score,
+  c.ts_csat_first_response,
+  c.ts_csat_last_response,
   c.ts_twilio_created_local AS ts_segment_created,
   c.ts_twilio_closed_local AS ts_segment_closed,
   c.ts_started AS ts_ticket_started,

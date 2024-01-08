@@ -412,18 +412,26 @@ columns:
     description:
       If the call csat ivr event assumes value equal to 1 for the satisfaction survey
       for the respective call.
-  csat_rating:
+  first_csat_score:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.csat_2
+    description:
+      The csat score or csat rating for the respective call. It considers the first csat
+      score (values goes from 1 to 5).
+  last_csat_score:
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.csat_2
     description:
       The csat score or csat rating for the respective call. It considers the last csat
       score (values goes from 1 to 5).
-  ts_csat_answered:
+  ts_csat_first_response:
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-    description:
-      Time when the survey was sent to the user. Null if we don't have this
-      information.
+    description: Timestamp of the first CSAT survey answer
+  ts_csat_last_response:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+    description: Timestamp of the first CSAT survey answer
   ts_segment_created:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.ts_created_local

@@ -24,7 +24,8 @@ WITH call_tickets AS (
     MD5("N/A") AS sk_service_status,
     'call' AS channel,
     ticket_origin,
-    csat_rating AS csat_score,
+    last_csat_score AS csat_score,
+    first_csat_score,
     status,
     first_department,
     last_department AS main_department,
@@ -98,16 +99,17 @@ WITH call_tickets AS (
     replies,
     reopens,
     NULL AS csat_comment,
+    NULL AS first_csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     ts_ticket_ended AS ts_solved,
-    ts_csat_answered AS ts_csat_response,
-    NULL AS ts_csat_first_response,
-    ts_csat_answered AS ts_survey,
+    ts_csat_last_response AS ts_csat_response,
+    ts_csat_first_response,
+    ts_csat_last_response AS ts_survey,
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50
 ),
 chat_tickets AS (
   SELECT
@@ -135,7 +137,8 @@ chat_tickets AS (
     MD5(service_status) AS sk_service_status,
     'chat' AS channel,
     ticket_origin,
-    csat_score,
+    last_csat_score AS csat_score,
+    first_csat_score,
     status,
     first_department,
     last_department AS main_department,
@@ -204,17 +207,18 @@ chat_tickets AS (
     total_minutes_front_to_open_back_ticket_time,
     replies,
     reopens,
-    csat_comment,
+    last_csat_comment AS csat_comment,
+    first_csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     ts_ticket_ended AS ts_solved,
-    ts_csat_response,
-    NULL AS ts_csat_first_response,
-    ts_survey,
+    ts_csat_last_response AS ts_csat_response,
+    ts_csat_first_response,
+    ts_csat_last_response AS ts_survey,
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50
 ),
 email_tickets AS (
   SELECT
@@ -243,6 +247,7 @@ email_tickets AS (
     'email' AS channel,
     'N/A' AS ticket_origin,
     csat_score,
+    first_csat_score,
     status,
     department AS first_department,
     department AS main_department,
@@ -311,6 +316,7 @@ email_tickets AS (
     replies,
     reopens,
     csat_comment,
+    first_csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     ts_ticket_solved AS ts_solved,
@@ -320,7 +326,7 @@ email_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49
 ),
 historical_call_tickets AS (
   SELECT
@@ -349,6 +355,7 @@ historical_call_tickets AS (
     'call' AS channel,
     'N/A' AS ticket_origin,
     NULL AS csat_score,
+    NULL AS first_csat_score,
     status,
     first_department,
     last_department AS main_department,
@@ -376,6 +383,7 @@ historical_call_tickets AS (
     NULL AS replies,
     NULL AS reopens,
     NULL AS csat_comment,
+    NULL AS first_csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     ts_ticket_ended AS ts_solved,
@@ -385,7 +393,7 @@ historical_call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49
 ),
 historical_chat_tickets AS (
   SELECT
@@ -414,6 +422,7 @@ historical_chat_tickets AS (
     'chat' AS channel,
     'N/A' AS ticket_origin,
     csat_score,
+    NULL AS first_csat_score,
     status,
     first_department,
     last_department AS main_department,
@@ -466,6 +475,7 @@ historical_chat_tickets AS (
     NULL AS replies,
     NULL AS reopens,
     NULL AS csat_comment,
+    NULL AS first_csat_comment,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     ts_ticket_ended AS ts_solved,
@@ -475,7 +485,7 @@ historical_chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49
 ),
 base_tickets AS (
   SELECT
@@ -539,6 +549,7 @@ SELECT DISTINCT
     bt.channel,
     bt.ticket_origin,
     bt.csat_score,
+    bt.first_csat_score,
     bt.status,
     bt.first_department,
     bt.main_department,
@@ -586,6 +597,7 @@ SELECT DISTINCT
     bt.replies,
     bt.reopens,
     SUBSTR(bt.csat_comment,1,1000) AS csat_comment,
+    SUBSTR(bt.first_csat_comment,1,1000) AS first_csat_comment,
     bt.ts_started,
     bt.ts_closed,
     bt.ts_solved,

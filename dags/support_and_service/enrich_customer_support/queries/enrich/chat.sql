@@ -303,7 +303,7 @@ quinto_messenger_tasks AS (
     twilio_time_metrics AS ttm
       ON ttm.id_channel = c5a.id_channel
 ),
-chat_csat AS(
+csat AS (
   SELECT
     c.id_ticket,
     sa.rating AS csat_score,
@@ -314,8 +314,9 @@ chat_csat AS(
         WHEN sa.is_solved = FALSE THEN FALSE
         ELSE NULL
     END AS is_solved,
-    ss.ts_created AS ts_survey,
-    sa.ts_created AS ts_csat_response
+    sa.ts_created AS ts_csat_response,
+    ROW_NUMBER() OVER (PARTITION BY c.id_ticket ORDER BY sa.ts_created) AS rw_number_asc,
+    ROW_NUMBER() OVER (PARTITION BY c.id_ticket ORDER BY sa.ts_created DESC) AS rw_number_desc
   FROM
     datalake_chat_fup_clean.chats_chat AS c
   INNER JOIN
@@ -327,8 +328,25 @@ chat_csat AS(
   WHERE
     sa.id IS NOT NULL
     AND DATE(c.ts_attended) >= DATE('2018-01-01')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY c.id_ticket ORDER BY sa.ts_created DESC) = 1
+),
+chat_csat AS (
+  SELECT
+    ca.id_ticket,
+    ca.csat_score AS last_csat_score,
+    ca2.csat_score AS first_csat_score,
+    ca.comment AS last_csat_comment,
+    ca2.comment AS first_csat_comment,
+    ca.ts_csat_response AS ts_last_response,
+    ca2.ts_csat_response AS ts_first_response,
+    ca.is_solved
+  FROM
+    csat AS ca
+  INNER JOIN
+    csat AS ca2
+      ON ca2.id_ticket = ca.id_ticket
+      AND ca2.rw_number_asc = 1
+  WHERE
+    ca.rw_number_desc = 1
 ),
 zendesk_ticket_info AS (
   SELECT DISTINCT
@@ -511,7 +529,6 @@ SELECT DISTINCT
   FIRST(qmt.agent_email) OVER (PARTITION BY zti.id_ticket ORDER BY qmt.ts_task_created DESC) AS last_agent_email,
   qmt.origin AS ticket_origin,
   qmt.agent_email,
-  cc.comment AS csat_comment,
   qmt.department,
   zti.zendesk_ticket_department AS zendesk_department,
   ldep.first_department,
@@ -572,10 +589,12 @@ SELECT DISTINCT
   bt.is_open_back_ticket,
   cc.id_ticket IS NOT NULL AS is_csat_answered,
   cc.is_solved,
-  cc.csat_score,
-  cc.group_name,
-  cc.ts_survey,
-  cc.ts_csat_response,
+  cc.first_csat_score,
+  cc.last_csat_score,
+  cc.last_csat_comment,
+  cc.first_csat_comment,
+  cc.ts_first_response AS ts_csat_first_response,
+  cc.ts_last_response AS ts_csat_last_response,
   qmt.ts_created,
   qmt.ts_updated,
   qmt.ts_first_event AS ts_ticket_started,
