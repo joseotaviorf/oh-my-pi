@@ -21,9 +21,7 @@ FROM
     datalake_retsuko_raw.boleto
 WHERE
     (
-        year = {year}
-        AND month = {month}
-        AND day = {day} - 1
+        MAKE_DATE(year,month,day) = MAKE_DATE({year}, {month}, {day}) - 1
     )
     OR
     (
