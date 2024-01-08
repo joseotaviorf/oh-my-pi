@@ -194,7 +194,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_customer_support:load-enrich-received-demand
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
-  - bietlejuice.gsheets_support_and_service:done-clean-agents-control
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.dw_datamarts_spark.cross:
@@ -917,7 +916,7 @@ bietlejuice.enrich_amplitude_lead:
   - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.gsheets_support_and_service:done-clean-agents-control
+  - bietlejuice.enrich_zendesk_users:load-enrich-agents
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-groups
   - bietlejuice.zendesk_tickets:load-clean-users
@@ -1197,12 +1196,10 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
-  - bietlejuice.gsheets_support_and_service:done-clean-agents-control
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
   - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
   - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
-  - bietlejuice.reclameaqui:load-clean-tickets
 bietlejuice.enrich_customer_resolution:
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat

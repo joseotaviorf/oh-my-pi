@@ -7,29 +7,6 @@ WITH agent_department AS (
     JOIN
         datalake_zendesk_tickets_clean.groups AS g
             ON us.id_default_group = g.id_group
-),
-agents AS (
-    WITH last_agent_info AS (
-        SELECT
-            ac.email,
-            MAX(ac.dt_start) AS dt_start
-        FROM
-            datalake_gsheets_clean.agents_control ac
-        GROUP BY 1
-    )
-    SELECT
-        ac.id_assignee,
-        ac.agent_name,
-        ac.email,
-        ac.agent_company,
-        ac.manager,
-        ac.dt_start
-    FROM
-        datalake_gsheets_clean.agents_control ac
-    JOIN
-        last_agent_info a
-            ON a.email = ac.email
-            AND a.dt_start = ac.dt_start
 )
 SELECT DISTINCT
     e.id_amplitude,
@@ -40,7 +17,7 @@ SELECT DISTINCT
     e.id_schema,
     e.id_inserted,
     e.id_user,
-    ac.id_assignee AS id_agent,
+    ac.id_agent,
     e.uuid,
     e.ids_amplitude_attributed,
     e.adid,
@@ -48,9 +25,8 @@ SELECT DISTINCT
     e.user_properties,
     GET_JSON_OBJECT(e.user_properties, '$.country') AS country_code,
     GET_JSON_OBJECT(e.user_properties, '$.email') AS agent_email,
-    ac.agent_name,
-    ac.agent_company,
-    ac.manager AS agent_manager,
+    ac.name AS agent_name,
+    ac.organization AS agent_company,
     dc.department AS agent_department,
     dc.team AS department_team,
     dc.journey_step AS department_journey_step,
@@ -83,7 +59,6 @@ SELECT DISTINCT
     e.data AS event_data,
     e.is_attribution_event,
     e.is_paying,
-    ac.dt_start AS dt_agent_started,
     e.ts_client_event,
     e.ts_client_uploaded,
     e.ts_server_received,
@@ -97,7 +72,7 @@ SELECT DISTINCT
 FROM
     datalake_amplitude_clean.events e
 LEFT JOIN
-    agents ac
+    datalake_zendesk_users.agents ac
         ON GET_JSON_OBJECT(e.user_properties, '$.email') = ac.email
 LEFT JOIN
     agent_department ad

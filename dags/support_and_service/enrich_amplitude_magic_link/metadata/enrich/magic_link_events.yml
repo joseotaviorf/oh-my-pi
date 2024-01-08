@@ -1,190 +1,248 @@
 ---
 database_name: datalake_amplitude_magic_link
 table_name: magic_link_events
+description: Enrichment table with the aim of unifying information about magic link
+ events and assigned analysts. Each row in this table represents an event.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_amplitude:
+    description: Event identification key within the amplitude.
     lineage:
       - datalake_amplitude_clean.events.id_amplitude
   id_app:
+    description: Identification key of the app where the event was taken.
     lineage:
       - datalake_amplitude_clean.events.id_app
   id_device:
+    description: Device identification key used during the event.
     lineage:
       - datalake_amplitude_clean.events.id_device
   id_event:
+    description: Event identification key in the amplitude.
     lineage:
       - datalake_amplitude_clean.events.id_event
   id_session:
+    description: Key of the amplitude session in which the amplitude event happened.
     lineage:
       - datalake_amplitude_clean.events.id_session
   id_schema:
+    description: Schema identification key that the data has in the amplitude.
     lineage:
       - datalake_amplitude_clean.events.id_schema
   id_inserted:
+    description: Event insert identification key.
     lineage:
       - datalake_amplitude_clean.events.id_inserted
   id_user:
+    description: Identification key of the user who performed the event.
     lineage:
       - datalake_amplitude_clean.events.id_user
   id_agent:
+    description: Analyst identification key linked to the magic link event.
     lineage:
-      - datalake_gsheets_clean.agents_control.id_assignee
+      - datalake_zendesk_users.agents.id_agent
   uuid:
+    description: Unique identifier (UUID) generated in the Product Database.
     lineage:
       - datalake_amplitude_clean.events.uuid
   ids_amplitude_attributed:
+    description: The hashed attribution ids on the event.
     lineage:
       - datalake_amplitude_clean.events.ids_amplitude_attributed
   adid:
+    description: Identification key indicating the advertiser's identifier, mandatory for Android.
     lineage:
       - datalake_amplitude_clean.events.adid
   event_properties:
+    description: Json type information that contains the properties of the events in the amplitude.
     lineage:
       - datalake_amplitude_clean.events.event_properties
   user_properties:
+    description: Json type information that contains the properties of the users in the amplitude.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   country_code:
+    description: Region code.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   agent_email:
+    description: Email of the analyst assigned to the amplitude event.
     lineage:
       - datalake_amplitude_clean.events.user_properties
   agent_name:
+    description: Name of the analyst assigned to the amplitude event.
     lineage:
-      - datalake_gsheets_clean.agents_control.agent_name
+      - datalake_zendesk_users.agents.name
   agent_company:
+    description: Organization in which the analyst assigned to the amplitude event works.
     lineage:
-      - datalake_gsheets_clean.agents_control.agent_company
-  agent_manager:
-    lineage:
-      - datalake_gsheets_clean.agents_control.manager
+      - datalake_zendesk_users.agents.organization
   agent_department:
+    description: Department in which the analyst assigned to the amplitude event works.
     lineage:
       - datalake_gsheets_clean.department_control.department
   department_team:
+    description: Name of the department to which the event is assigned.
     lineage:
       - datalake_gsheets_clean.department_control.team
   department_journey_step:
+    description: Descriptive information that indicates the stage of the journey the department is in.
     lineage:
       - datalake_gsheets_clean.department_control.journey_step
   department_area:
+    description: Descriptive information that indicates the department’s area of activity.
     lineage:
       - datalake_gsheets_clean.department_control.area
   department_front_or_back:
+    description: Descriptive information that indicates whether the department is front or back.
     lineage:
       - datalake_gsheets_clean.department_control.front_or_back
   amplitude_event_type:
+    description: Descriptive information indicating the type of amplitude event.
     lineage:
       - datalake_amplitude_clean.events.amplitude_event_type
   city:
+    description: Descriptive information that indicates the city where the event was generated.
     lineage:
       - datalake_amplitude_clean.events.city
   country:
+    description: Descriptive information that indicates the country where the event was generated.
     lineage:
       - datalake_amplitude_clean.events.country
   device_brand:
+    description: Brand of the device from which the event was generated in amplitude.
     lineage:
       - datalake_amplitude_clean.events.device_brand
   device_carrier:
+    description: Operator of the device on which the event was generated.
     lineage:
       - datalake_amplitude_clean.events.device_carrier
   device_family:
+    description: Device family where the event was generated.
     lineage:
       - datalake_amplitude_clean.events.device_family
   device_manufacturer:
+    description: Manufacturer of the device where the event was generated.
     lineage:
       - datalake_amplitude_clean.events.device_manufacturer
   device_model:
+    description: Model of the device where the event was generated.
     lineage:
       - datalake_amplitude_clean.events.device_model
   device_type:
+    description: Type of device where the event was generated.
     lineage:
       - datalake_amplitude_clean.events.device_type
   dma:
+    description: City where the device was manufactured.
     lineage:
       - datalake_amplitude_clean.events.dma
   event_type:
+    description: Type of event generated in amplitude.
     lineage:
       - datalake_amplitude_clean.events.event_type
   idfa:
+    description: Descriptive information indicating the advertiser's identifier, mandatory for iOS.
     lineage:
       - datalake_amplitude_clean.events.idfa
   ip_address:
+    description: IP address of the device where the event was generated.
     lineage:
       - datalake_amplitude_clean.events.ip_address
   location_lat:
+    description: Latitude information for the region where the device is located.
     lineage:
       - datalake_amplitude_clean.events.location_lat
   location_lng:
+    description: Longitude information for the region where the device is located.
     lineage:
       - datalake_amplitude_clean.events.location_lng
   os_name:
+    description: Device operating system name.
     lineage:
       - datalake_amplitude_clean.events.os_name
   os_version:
+    description: Device operating system version.
     lineage:
       - datalake_amplitude_clean.events.os_version
   platform:
+    description: Platform used by the device to generate the event.
     lineage:
       - datalake_amplitude_clean.events.platform
   library:
+    description: Descriptive data indicating the amplitude version.
     lineage:
       - datalake_amplitude_clean.events.library
   region:
+    description: Descriptive data that indicates the region in which the event was generated.
     lineage:
       - datalake_amplitude_clean.events.region
   start_version:
+    description: App version the user was first tracked on.
     lineage:
       - datalake_amplitude_clean.events.start_version
   language:
+    description: Platform language at the time of the event.
     lineage:
       - datalake_amplitude_clean.events.language
   version_name:
+    description: Descriptive information about the amplitude version.
     lineage:
       - datalake_amplitude_clean.events.version_name
   sample_rate:
+    description: The number of samples taken. This feature is available to customers with Scale add-on.
     lineage:
       - datalake_amplitude_clean.events.sample_rate
   event_data:
+    description: Descriptive information in json format that contains data about the event.
     lineage:
       - datalake_amplitude_clean.events.data
   is_attribution_event:
+    description: Boolean type information that indicates whether it is an event attribute.
     lineage:
       - datalake_amplitude_clean.events.is_attribution_event
   is_paying:
+    description: True if the user has ever logged any revenue, otherwise (none).
     lineage:
       - datalake_amplitude_clean.events.is_paying
-  dt_agent_started:
-    lineage:
-      - datalake_gsheets_clean.agents_control.dt_start
   ts_client_event:
+    description: Timestamp type information that indicates when the event was requested in the Amplitude client.
     lineage:
       - datalake_amplitude_clean.events.ts_client_event
   ts_client_uploaded:
+    description: Timestamp type information that indicates when the event was uploaded to the Amplitude client.
     lineage:
       - datalake_amplitude_clean.events.ts_client_uploaded
   ts_server_received:
+    description: Timestamp type information that indicates when the event was received by the amplitude.
     lineage:
       - datalake_amplitude_clean.events.ts_server_received
   ts_event:
+    description: Timestamp-type information that indicates when the event took place.
     lineage:
       - datalake_amplitude_clean.events.ts_event
   ts_server_uploaded:
+    description: Timestamp type information that indicates when the event was uploaded to the Amplitude server.
     lineage:
       - datalake_amplitude_clean.events.ts_server_uploaded
   ts_user_created:
+    description: Timestamp type information that indicates when the user was created in Amplitude.
     lineage:
       - datalake_amplitude_clean.events.ts_user_created
   ts_processed:
+    description: Timestamp type information that indicates when the event was processed in the amplitude.
     lineage:
       - datalake_amplitude_clean.events.ts_processed
   year:
+    description: Integer type information that indicates the year of the range partition.
     lineage:
       - datalake_amplitude_clean.events.year
   month:
+    description: Integer type information that indicates the month of the range partition.
     lineage:
       - datalake_amplitude_clean.events.month
   day:
+    description: Integer type information that indicates the day of the range partition.
     lineage:
       - datalake_amplitude_clean.events.day
