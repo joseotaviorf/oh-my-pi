@@ -142,4 +142,4 @@ requirements-freeze.txt
 local/airflow/plugins*
 
 # Airflow DAG Builder Python tfiles
-*_dag.py
+dags/**/*_dag.py
