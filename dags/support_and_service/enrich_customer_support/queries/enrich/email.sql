@@ -189,7 +189,6 @@ SELECT DISTINCT
   ze.minutes_first_response,
   ze.replies,
   ze.reopens,
-  cs.first_csat_score,
   cs.last_csat_score AS csat_score,
   cs.first_csat_score,
   cs.is_answered,
