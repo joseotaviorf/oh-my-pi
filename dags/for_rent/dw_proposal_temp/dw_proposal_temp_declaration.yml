@@ -1,10 +1,15 @@
 dag:
-  name: dw_proposal
+  name: dw_proposal_temp
   owner: Data ForRent
 workflow:
   type: query
   layer: dw
-  custom_schema: rent
+  custom_schema: public
+  tables_customization:
+    dim_proposal_person:
+      custom_schema: quintoandar
+    fact_proposal_people:
+      custom_schema: quintoandar
 cluster:
   type: databricks_10_4_min_general_photon_cluster
   access_control_list:

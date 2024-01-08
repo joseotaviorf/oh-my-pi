@@ -154,7 +154,7 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(dim_contract.ts_signature AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_signed,
             COALESCE(CAST(dim_contract.ts_created AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_created,
             CAST(NOW() AS TIMESTAMP) AS ts_load
-        FROM datalake_ebdb_rent_flow.rent_flow 
+        FROM datalake_ebdb_rent_flow.rent_flow
         JOIN dw_public.dim_house_listing -- 1:M (M rent_flow x 1 listing)
             ON dim_house_listing.id_house = rent_flow.id_house
             AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01') BETWEEN
@@ -165,26 +165,26 @@ WITH listing_rent_flows AS (
         LEFT JOIN dw_public.dim_offer
             ON dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
             AND dim_offer.sk_offer != -1
-        LEFT JOIN dw_public.dim_proposal
+        LEFT JOIN dw_rent.dim_proposal
             ON rent_flow.id_proposal = dim_proposal.id_proposal
         LEFT JOIN
             datalake_ebdb_clean.contract AS con
                 ON con.id_house = rent_flow.id_house
                 AND con.id = rent_flow.id_contract
-        LEFT JOIN 
+        LEFT JOIN
             dw_public.dim_contract
                 ON dim_contract.sk_contract = COALESCE(con.id, -1)
         LEFT JOIN
         /*
-        dim_house_listing can be associated with the rent_flow 
+        dim_house_listing can be associated with the rent_flow
         or with the contract period. As we know nowdays, a rent_flow can
-        starts before the listing starts and it is generating 
+        starts before the listing starts and it is generating
         an erronous relationship with listing. To solve this while
         we align with SWE a permanent solution, we are giving priority
         to contract association with listing, instead of rent_flow.
         */
             dw_public.dim_house_listing AS dhl_contract
-                ON con.id_house = dhl_contract.id_house 
+                ON con.id_house = dhl_contract.id_house
                 AND dim_contract.ts_created BETWEEN COALESCE(dhl_contract.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(dhl_contract.ts_listing_version_end, CURRENT_DATE)
         LEFT JOIN datalake_ebdb_agents.agents_review ar
             ON rent_flow.id_booking = ar.id_booking
@@ -203,7 +203,7 @@ WITH listing_rent_flows AS (
             ON dim_booking.sk_booking = rent_flow.id_booking
         LEFT JOIN
             datalake_rede_company.company_sks AS cs
-                ON h.is_rent_3p_supply 
+                ON h.is_rent_3p_supply
                 AND ((
                     h.uuid_company IS NOT NULL
                     AND h.uuid_company = cs.uuid_company
@@ -244,7 +244,7 @@ WITH listing_rent_flows AS (
           COALESCE(rf.ts_contract_signed, TIMESTAMP '1900-01-01') AS ts_contract_signed,
           CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_created, TIMESTAMP '1900-01-01')) AS FLOAT) AS ca2cc_working_minutes,
           CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) ca2cs_working_minutes,
-          CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_contract_created, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) cc2cs_working_minutes 
+          CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_contract_created, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) cc2cs_working_minutes
           -- generic date 1900-01-01 is being used as a workaround for null dates error. Businesstimedelta cant handle null dates.
         FROM
           rent_flows_base rf

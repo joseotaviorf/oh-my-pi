@@ -16,8 +16,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables:
 
-- `dw_rent.dim_proposal`
-- `dw_rent.dim_proposal_person`
-- `dw_rent.fact_proposal_people`
+- `dim_proposal`
+- `quintoandar.dim_proposal_person`
+- `quintoandar.fact_proposal_people`
 
 </details>

@@ -103,6 +103,6 @@ INNER JOIN
   dw_rent.dim_rent_flow_type AS drf
     ON frf.sk_rent_flow_type = drf.sk_rent_flow_type
 INNER JOIN
-    dw_public.dim_proposal AS dp
+    dw_rent.dim_proposal AS dp
         ON fd.sk_proposal = dp.sk_proposal
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 59, 60, 61, 62, 63, 64, 65, 66

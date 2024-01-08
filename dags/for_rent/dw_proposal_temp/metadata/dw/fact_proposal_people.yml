@@ -1,4 +1,4 @@
-database_name: dw_rent
+database_name: dw_quintoandar
 table_name: fact_proposal_people
 description: Table with events and metrics about people involved in an offer accepted,
   also called proposal (users or not). Each line is a register of a person, not necessarily
@@ -8,75 +8,77 @@ owner: matheus.baroni@quintoandar.com.br
 columns:
   sk_proposal_person:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.id_proposal_person
+      - dw_rent.fact_proposal_people.sk_proposal_person
     description: ID of the register of a person involved in a proposal (offer accepted).
       Note that any unique person might appear in multiple lines.
   sk_personal_document:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.id_personal_document
+      - dw_rent.fact_proposal_people.sk_personal_document
     description: Document (such as CPF and CNPJ) of the person involved
       in the proposal (offer accepted).
   sk_proponent:
     lineage:
-      - datalake_ebdb_clean.user.id
+      - dw_rent.fact_proposal_people.sk_proponent
     description: User ID of the proponent responsible for the proposal.
   sk_proposal:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.id_proposal
+      - dw_rent.fact_proposal_people.sk_proposal
     description: ID of the proposal where the people were registered.
   sk_birth_date:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.dt_birth
+      - dw_rent.fact_proposal_people.sk_birth_date
     description: Key for the proposal person's birth date, if specified.
   sk_created_date:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.ts_created
+      - dw_rent.fact_proposal_people.sk_created_date
     description: Key for the date in which a proposal person's register was created
       in database.
   expected_contract_role:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.expected_contract_role
+      - dw_rent.fact_proposal_people.expected_contract_role
     description: Role that person informs to perform in the contract, such as owner,
       tenant, dweller, sponsor ("fiador").
   rental_motive:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.rental_motive
+      - dw_rent.fact_proposal_people.rental_motive
     description: Reason that motivated the person to look for a house to rent, such
       as proximity, family, cost.
   brl_total_income:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.brl_total_income
+      - dw_rent.fact_proposal_people.brl_total_income
     description: Proposal person total income informed, considering both salary and
       additional sources
   is_going_to_live:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.is_going_to_live
+      - dw_rent.fact_proposal_people.is_going_to_live
     description: Flag to indicate if the person will live in the house associated
       to the contract.
   is_first_proposal:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.is_first_proposal
+      - dw_rent.fact_proposal_people.is_first_proposal
     description: Flag to indicate whether the proposal is the first of that person.
       Valid for users only.
   is_last_proposal:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.is_last_proposal
+      - dw_rent.fact_proposal_people.is_last_proposal
     description: Flag to indicate whether the proposal is the last of that person.
       Valid for users only.
   is_valid_cpf:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.is_valid_cpf
+      - dw_rent.fact_proposal_people.is_valid_cpf
     description: Flag to indicate whether the personal document is a valid CPF, according
       to the last 2 verification digits.
   is_valid_cnpj:
     lineage:
-      - datalake_ebdb_proposal.proposal_person.is_valid_cnpj
+      - dw_rent.fact_proposal_people.is_valid_cnpj
     description: Flag to indicate whether the personal document is a valid CNPJ, according
       to the last 2 verification digits.
   is_user:
+    lineage:
+      - dw_rent.fact_proposal_people.is_user
     description: Flag to indicate whether the person is an user in QuintoAndar (uses
       any app).
-    lineage:
-      - datalake_ebdb_clean.user.id
   ts_load:
+    lineage:
+      - dw_rent.fact_proposal_people.ts_load
     description: Timestamp in which the register was load in database.

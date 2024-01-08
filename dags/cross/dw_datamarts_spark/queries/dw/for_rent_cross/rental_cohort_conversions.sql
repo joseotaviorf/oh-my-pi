@@ -488,7 +488,7 @@ rent_flow_adjusted AS (
     FROM
         dw_public.fact_listing_rent_flows rf
     LEFT JOIN
-        dw_public.dim_proposal dp
+        dw_rent.dim_proposal dp
             ON rf.sk_proposal = dp.sk_proposal
     JOIN
         dw_public.dim_house_listing dhl

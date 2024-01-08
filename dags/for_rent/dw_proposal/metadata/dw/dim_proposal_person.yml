@@ -1,49 +1,68 @@
 ---
-database_name: dw_quintoandar
+database_name: dw_rent
 table_name: dim_proposal_person
+description: This table has each person related to a rental proposal.
+  Each line is as unique sk_proposal_person.
+domain: For Rent
+owner: conrado.fabri@quintoandar.com.br
 columns:
   sk_proposal_person:
     lineage:
       - datalake_ebdb_proposal.proposal_person.id_proposal_person
+    description: Key that identifies the person of the proposal. Each line should be an unique sk_proposal_person.
   full_name:
     lineage:
       - datalake_ebdb_proposal.proposal_person.full_name
+    description: Full name of the person.
   email:
     lineage:
       - datalake_ebdb_proposal.proposal_person.email
+    description: Email of the person.
   personal_document:
     lineage:
       - datalake_ebdb_proposal.proposal_person.personal_document
+    description: Personal document number of the person.
   personal_document_type:
     lineage:
       - datalake_ebdb_proposal.proposal_person.personal_document_type
+    description: Type of the personal document.
   employment_bond:
     lineage:
       - datalake_ebdb_proposal.proposal_person.employment_bond
+    description: Type of the person's actual employment bond.
   number_of_dependents:
     lineage:
       - datalake_ebdb_proposal.proposal_person.number_of_dependents
+    description: Number of dependents of the person.
   current_house_situation:
     lineage:
       - datalake_ebdb_proposal.proposal_person.current_house_situation
+    description: Current house situation in which the person is living.
   has_contributed_to_current_house:
     lineage:
       - datalake_ebdb_proposal.proposal_person.has_contributed_to_current_house
+    description: Boolean flag indicating if the person contributes to the current house in which it's living.
   gender:
     lineage:
       - datalake_ebdb_proposal.proposal_person.gender
+    description: The person's gender.
   marital_status:
     lineage:
       - datalake_ebdb_proposal.proposal_person.marital_status
+    description: The person's current marital status.
   state_code:
     lineage:
       - datalake_ebdb_proposal.proposal_person.state_code
+    description: Code of the state from which the person is.
   dt_birth:
     lineage:
       - datalake_ebdb_proposal.proposal_person.dt_birth
+    description: Birth date of the person.
   ts_created:
     lineage:
       - datalake_ebdb_proposal.proposal_person.ts_created
+    description: Timestamp of when the data was created.
   ts_updated:
     lineage:
       - datalake_ebdb_proposal.proposal_person.ts_updated
+    description: Timestamp of when the data was updated.

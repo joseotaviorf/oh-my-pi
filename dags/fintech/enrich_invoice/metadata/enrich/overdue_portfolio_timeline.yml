@@ -15,7 +15,7 @@ columns:
   id_proposal:
     lineage:
       - datalake_proposal.proposal.id
-    description: Proposal ID. Use it as key to dw_public.dim_proposal
+    description: Proposal ID. Use it as key to dw_rent.dim_proposal
   id_invoice:
     lineage:
       - datalake_retsuko.invoice.id_external

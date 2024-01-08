@@ -1,6 +1,7 @@
 database_name: dw_rent
 table_name: fact_rent_flows
-description: Fact table that contains information related to a rent flow (which is the tuple [property, tenant prospect]),
+description:
+  Fact table that contains information related to a rent flow (which is the tuple [property, tenant prospect]),
   mostly related about its metrics. If desired to understand characteristics of the rent flow, it's necessary to join with
   the dw_rent.dim_rent_flow_type using the key sk_rent_flow_type.
   Each line is an unique rent flow (sk_rent_flow).
@@ -12,12 +13,14 @@ columns:
   sk_rent_flow:
     lineage:
       - datalake_rent_flows.rent_flows.id_rent_flow
-    description: Id of the rent flow, also the PK of the table. Each line should be an unique rent flow.
+    description:
+      Id of the rent flow, also the PK of the table. Each line should be an unique rent flow.
       Joins with dw_public.fact_listing_rent_flows.
   sk_rent_flow_type:
     lineage:
       - datalake_rent_flows.rent_flows_types.id_rent_flow_type
-    description: Unique but mutable id that makes possible to identify the type of the rent flow and its combinations.
+    description:
+      Unique but mutable id that makes possible to identify the type of the rent flow and its combinations.
       To reach this information, it's necessary to use this key to join with the dw_rent.dim_rent_flow_type.
       This id should be used only to connect with mentioned dim table in order to identify the rent flow type and its
       characteristics, but never used for analysis (as for example, filtering data by it).
@@ -60,11 +63,11 @@ columns:
   sk_first_proposal:
     lineage:
       - datalake_rent_flows.rent_flows.id_proposal
-    description: Id of the first proposal. Joins with dw_public.dim_proposal.
+    description: Id of the first proposal. Joins with dw_rent.dim_proposal.
   sk_last_proposal:
     lineage:
       - datalake_rent_flows.rent_flows.id_proposal
-    description: Id of the most recent proposal. Joins with dw_public.dim_proposal.
+    description: Id of the most recent proposal. Joins with dw_rent.dim_proposal.
   sk_first_contract:
     lineage:
       - datalake_rent_flows.rent_flows.id_contract
@@ -79,7 +82,7 @@ columns:
     description: Id of the property region. Joins with dw_public.dim_region.
   sk_company_supply:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+      - datalake_rede_company.company_sks.sk_company
     description: Key of the Rede company that owns the house related to the rent flow. Can be joined with dw_rede.dim_company.
   sk_first_event_date:
     lineage:
@@ -148,7 +151,8 @@ columns:
   country_code:
     lineage:
       - datalake_rent_flows.rent_flows.country_code
-    description: Country code of the rent flow, related to the property. Also, a partition of this table --
+    description:
+      Country code of the rent flow, related to the property. Also, a partition of this table --
       if you're using this column as a filter, make sure to be one of the first filters, it will improve the
       query's performance.
   days_first_touchpoint_to_last:
