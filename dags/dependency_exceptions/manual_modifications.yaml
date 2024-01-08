@@ -502,10 +502,6 @@ bietlejuice.enrich_recommendations:
     - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
     - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_condo_amenities
     - wonka.house_main:load-house_main
-    - wonka.user_agg_search_filters:load-user_agg_search_filters
-    - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
-    - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
-    - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
 bietlejuice.enrich_recupera:
   add:
     - bietlejuice.recupera:load-clean-records
