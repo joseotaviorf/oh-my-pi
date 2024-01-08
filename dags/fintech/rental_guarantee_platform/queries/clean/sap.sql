@@ -11,3 +11,5 @@ SELECT
     created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.sap
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY created_at DESC) = 1
