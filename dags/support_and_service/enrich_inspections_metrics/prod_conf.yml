@@ -7,8 +7,8 @@ incremental_tables:
   - inspector_performance
 
 custom_cluster:
-  driver_node_type_id: c5.2xlarge
-  node_type_id: c5.xlarge
+  driver_node_type_id: c5.4xlarge
+  node_type_id: c5.2xlarge
   num_workers: 3
 
 partitions_cols: [year, month, day]
