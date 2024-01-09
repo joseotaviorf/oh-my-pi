@@ -518,6 +518,8 @@ SELECT DISTINCT
   c.is_solved,
   c.first_csat_score,
   c.last_csat_score,
+  c.last_csat_score AS csat_rating,
+  c.ts_csat_last_response AS ts_csat_answered,
   c.ts_csat_first_response,
   c.ts_csat_last_response,
   c.ts_twilio_created_local AS ts_segment_created,

@@ -424,6 +424,16 @@ columns:
     description:
       The csat score or csat rating for the respective call. It considers the last csat
       score (values goes from 1 to 5).
+  csat_rating:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.csat_2
+    description:
+      The csat score or csat rating for the respective call. It considers the last csat
+      score (values goes from 1 to 5).
+  ts_csat_answered:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+    description: Timestamp of the last CSAT survey answer
   ts_csat_first_response:
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
@@ -431,7 +441,7 @@ columns:
   ts_csat_last_response:
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-    description: Timestamp of the first CSAT survey answer
+    description: Timestamp of the last CSAT survey answer
   ts_segment_created:
     lineage:
       - datalake_bigfone_twilio.call_flex_events.ts_created_local

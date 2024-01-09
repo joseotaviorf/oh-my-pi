@@ -82,6 +82,10 @@ columns:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.comment
     description: The last csat survey comment for the Zendesk Chat Ticket, if available.
+  last_csat_comment:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.comment
+    description: The last csat survey comment for the Zendesk Chat Ticket, if available.
   first_csat_comment:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.comment
@@ -373,6 +377,18 @@ columns:
     description:
       The CSAT score or rating for the respective chat. It considers the first CSAT
       score (values range from 1 to 5).
+  last_csat_score:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.rating
+    description:
+      The CSAT score or rating for the respective chat. It considers the last CSAT
+      score (values range from 1 to 5).
+  csat_score:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.rating
+    description:
+      The CSAT score or rating for the respective chat. It considers the last CSAT
+      score (values range from 1 to 5).
   group_name:
     lineage:
       - datalake_chat_fup_clean.chats_chat.group_name
@@ -383,6 +399,18 @@ columns:
     description:
       The timestamp when the survey was created. This field contains a null value if
       we don't have this information.
+  ts_csat_first_response:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.ts_created
+    description:
+      The first timestamp when the survey was answered by the user. This field contains a
+      null value if we don't have this information.
+  ts_csat_last_response:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.ts_created
+    description:
+      The last timestamp when the survey was answered by the user. This field contains a
+      null value if we don't have this information.
   ts_csat_response:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.ts_created

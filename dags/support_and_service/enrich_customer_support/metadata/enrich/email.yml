@@ -116,6 +116,13 @@ columns:
     description:
       The CSAT score or rating for the respective call. It considers the first CSAT
       score (values range from 1 to 5).
+  last_csat_score:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.satisfaction_rating
+      - datalake_survicate.zendesk_email_surveys.csat_score
+    description:
+      The CSAT score or rating for the respective call. It considers the last CSAT
+      score (values range from 1 to 5).
   is_answered:
     lineage:
       - datalake_zendesk_tickets_clean.tickets_history.satisfaction_rating
@@ -144,6 +151,11 @@ columns:
       - datalake_zendesk_tickets_clean.tickets_history.satisfaction_rating
       - datalake_survicate.zendesk_email_surveys.user_comment
     description: The first CSAT survey comment for the Zendesk Email Ticket.
+  last_csat_comment:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets_history.satisfaction_rating
+      - datalake_survicate.zendesk_email_surveys.user_comment
+    description: The last CSAT survey comment for the Zendesk Email Ticket.
   channel:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.channel
