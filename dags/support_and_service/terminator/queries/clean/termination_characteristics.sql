@@ -14,6 +14,7 @@ SELECT
     inspection_required  AS is_inspection_required,
     intermediation_required AS is_intermediation_required,
     high_value_contract AS is_high_value_contract,
+    admin_termination AS is_admin_termination,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
