@@ -158,7 +158,7 @@ WITH listing_rent_flows AS (
                 AND COALESCE(dim_house_listing_house.ts_listing_version_end, NOW())
         LEFT JOIN datalake_ebdb_listing.house h
             ON dim_house_listing_house.id_house = h.id
-        LEFT JOIN dw_public.dim_offer
+        LEFT JOIN dw_rent.dim_offer
             ON dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
             AND dim_offer.sk_offer != -1
         LEFT JOIN dw_rent.dim_proposal

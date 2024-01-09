@@ -44,7 +44,7 @@ offer AS (
         a.utm_campaign,
         a.dt_first_sent AS ts_event
     FROM
-        dw_public.dim_offer AS a
+        dw_rent.dim_offer AS a
         JOIN dw_public.fact_listing_rent_flows AS flrf
             USING(sk_offer)
     WHERE

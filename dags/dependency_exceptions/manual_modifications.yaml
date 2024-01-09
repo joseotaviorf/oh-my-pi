@@ -40,7 +40,7 @@ bietlejuice.dw_crm:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
     - bietlejuice.dw_contract:load-dw-public-dim-contract
     - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-    - bietlejuice.dw_offer:load-dw-public-dim-offer
+    - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.ebdb:load-clean-contract
     - bietlejuice.ebdb:load-clean-house
     - bietlejuice.ebdb:load-clean-offer
@@ -73,7 +73,7 @@ bietlejuice.dw_datamarts_spark.cross:
     - bietlejuice.dw_lead:load-dw-public-dim-lead
     - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
     - bietlejuice.dw_photo_jobs:load-dw-public-fact-photo-job
-    - bietlejuice.dw_offer:load-dw-public-dim-offer
+    - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.dw_region:load-dw-public-dim-region
     - bietlejuice.dw_user:load-dw-quintoandar-dim-user-sales-rep
     - bietlejuice.ebdb:load-clean-booking
@@ -89,7 +89,7 @@ bietlejuice.dw_datamarts_spark.fintech_cross:
     - bietlejuice.dw_region:load-dw-public-dim-region
     - bietlejuice.dw_contract:load-dw-public-dim-contract
     - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-    - bietlejuice.dw_offer:load-dw-public-dim-offer
+    - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
     - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
     - bietlejuice.ebdb:load-clean-proponent-proposal
@@ -410,7 +410,7 @@ bietlejuice.enrich_listing_temp:
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
     - bietlejuice.dw_contract:load-dw-public-dim-contract
-    - bietlejuice.dw_offer:load-dw-public-dim-offer
+    - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
     - bietlejuice.ebdb:load-clean-house-aud
     - bietlejuice.ebdb:load-clean-house-special-condition

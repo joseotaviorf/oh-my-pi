@@ -139,7 +139,7 @@ weekly_short_status AS (
 
 ),
 weekly_listings_status AS (
-    SELECT 
+    SELECT
         week_start,
         sk_house_listing,
         sk_region,
@@ -184,7 +184,7 @@ rent_flow_demand AS (
     rent_flow_interactions AS rf
     JOIN dw_public.dim_date AS dd
       ON dd.date = rf.dt_event
-  GROUP BY 1,2,3,4   
+  GROUP BY 1,2,3,4
 ),
 demand_funnel AS (
   -- RENT FLOWS AGGREGATED--
@@ -205,7 +205,7 @@ demand_funnel AS (
     credits_approved,
     contracts_signed
   FROM
-    rent_flow_demand 
+    rent_flow_demand
   --
   UNION ALL
   -- BOOKINGS --
@@ -248,7 +248,7 @@ demand_funnel AS (
     COUNT(NULL) AS contracts_signed
   FROM
     datalake_listing_temp.fact_listing_rent_flows_house AS flrf
-    JOIN dw_public.dim_offer AS o
+    JOIN dw_rent.dim_offer AS o
         USING(sk_offer)
     JOIN dw_public.dim_date AS dd
         ON dd.sk_date = flrf.sk_offer_submitted_date
@@ -273,7 +273,7 @@ demand_funnel AS (
     COUNT(NULL) AS contracts_signed
   FROM
     datalake_listing_temp.fact_listing_rent_flows_house AS flrf
-    JOIN dw_public.dim_offer AS o
+    JOIN dw_rent.dim_offer AS o
         USING(sk_offer)
     JOIN dw_public.dim_date AS dd
         ON dd.sk_date = flrf.sk_offer_approved_date
@@ -403,7 +403,7 @@ SELECT DISTINCT
   COALESCE(atp.sk_client, lwd.sk_client) AS sk_client,
   MAX(lwd.listing_cummulative_rent_flows) OVER(
     PARTITION BY COALESCE(wls.sk_house_listing, atp.sk_house_listing, lwd.sk_house_listing)
-    ORDER BY COALESCE(wls.week_start, atp.week_start, lwd.week_start) ASC NULLS LAST, COALESCE(lwd.listing_cummulative_rent_flows, 0) DESC NULLS LAST 
+    ORDER BY COALESCE(wls.week_start, atp.week_start, lwd.week_start) ASC NULLS LAST, COALESCE(lwd.listing_cummulative_rent_flows, 0) DESC NULLS LAST
     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) AS listing_cummulative_rent_flows,
   SUM(lwd.rent_flows) OVER(

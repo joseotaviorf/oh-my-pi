@@ -500,7 +500,7 @@ rent_flow_adjusted AS (
         dw_public.dim_region dr
             ON rf.sk_region = dr.sk_region
     LEFT JOIN
-        dw_public.dim_offer dof
+        dw_rent.dim_offer dof
             ON rf.sk_offer = dof.sk_offer
     LEFT JOIN
         dw_rent.fact_rent_flows AS frf

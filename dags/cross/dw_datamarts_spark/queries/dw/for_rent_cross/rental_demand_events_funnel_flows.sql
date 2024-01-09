@@ -294,7 +294,7 @@ offer_submitted AS (
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -342,7 +342,7 @@ offer_approved AS(
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -390,7 +390,7 @@ credit_evaluation_init AS(
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -438,7 +438,7 @@ credit_evaluation_positive AS(
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -486,7 +486,7 @@ doc_sent AS(
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -534,7 +534,7 @@ doc_approved AS(
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -582,7 +582,7 @@ doc_completed AS(
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -630,7 +630,7 @@ credit_processed AS(
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -678,7 +678,7 @@ credit_approved AS(
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -726,7 +726,7 @@ contract_created AS (
     dw_public.dim_house_listing AS dhl
     ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -774,7 +774,7 @@ contract_signed AS (
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -826,7 +826,7 @@ contract_ended AS (
     dw_public.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
-    dw_public.dim_offer AS dof
+    dw_rent.dim_offer AS dof
       ON rf.sk_offer = dof.sk_offer
   LEFT JOIN
     dw_public.dim_region AS dr

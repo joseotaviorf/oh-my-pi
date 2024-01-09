@@ -39,14 +39,14 @@ columns:
   demand_mkt_channel:
     lineage:
       - dw_public.dim_booking.mkt_channel
-      - dw_public.dim_offer.mkt_channel
+      - dw_rent.dim_offer.mkt_channel
     description: The market channel in demand context.
   demand_mkt_channel_detailed:
     lineage:
-      - dw_public.dim_offer.mkt_medium
+      - dw_rent.dim_offer.mkt_medium
       - dw_public.dim_booking.mkt_medium
       - dw_public.dim_booking.mkt_channel
-      - dw_public.dim_offer.mkt_channel
+      - dw_rent.dim_offer.mkt_channel
     description: The detailed market channel in demand context.
   first_touchpoint:
     lineage:

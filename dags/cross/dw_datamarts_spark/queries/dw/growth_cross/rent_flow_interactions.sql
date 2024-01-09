@@ -48,7 +48,7 @@ WITH events AS (
         'Offer' AS flow_event
     FROM
         dw_public.fact_listing_rent_flows AS flrf
-        JOIN dw_public.dim_offer AS o
+        JOIN dw_rent.dim_offer AS o
             ON CAST(flrf.sk_offer AS BIGINT) = CAST(o.sk_offer AS BIGINT)
     WHERE
         CAST(o.sk_offer AS BIGINT) > 0

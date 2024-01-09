@@ -25,7 +25,7 @@ rent_flow_client_info AS (
     ON
         dim_booking.sk_booking = rent_flow.id_booking
     LEFT JOIN
-        dw_public.dim_offer
+        dw_rent.dim_offer
     ON
         dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
         AND dim_offer.sk_offer != -1
@@ -63,7 +63,7 @@ tenant_prospect_events AS (
     o.mkt_source,
     o.dt_first_sent AS ts_event
   FROM
-    dw_public.dim_offer AS o
+    dw_rent.dim_offer AS o
     JOIN rent_flow_client_info AS flrf
       ON o.sk_offer = flrf.sk_offer
   WHERE

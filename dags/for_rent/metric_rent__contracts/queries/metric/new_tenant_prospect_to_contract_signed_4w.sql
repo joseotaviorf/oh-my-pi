@@ -14,7 +14,7 @@ WITH base AS (
             AND db.type = 'Visita'
             AND (db.country_code = 'BR' OR db.country_code IS NULL)
     LEFT JOIN
-        dw_public.dim_offer AS do
+        dw_rent.dim_offer AS do
             ON rf.sk_offer = do.sk_offer
             AND (do.country_code = 'BR' OR do.country_code IS NULL)
     LEFT JOIN
@@ -50,7 +50,7 @@ base_adjust AS (
 SELECT
     DATE(DATE_TRUNC('month', dt_first_interaction)) AS dt_month_started,
     COUNT(
-        DISTINCT 
+        DISTINCT
             CASE
                 WHEN DATEDIFF(dt_first_interaction, dt_first_contract_signed) <= 28 THEN sk_client
             END
@@ -59,7 +59,7 @@ SELECT
                     DISTINCT
                         CASE
                             WHEN dt_first_interaction IS NOT NULL THEN sk_client
-                        END) 
+                        END)
                 AS DOUBLE
             ) AS ntp2cs
 FROM

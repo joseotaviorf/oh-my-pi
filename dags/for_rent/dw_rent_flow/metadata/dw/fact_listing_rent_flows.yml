@@ -54,7 +54,7 @@ columns:
     description: Key of the visit scheduled on the rent flow. A rent flow can have none, one or more visits related.
   sk_offer:
     lineage:
-      - dw_public.dim_offer.sk_offer
+      - dw_rent.dim_offer.sk_offer
     description: Key of the offer related to the rent flow. A rent flow can have none, one or more offers related.
   sk_reservation:
     lineage:
@@ -90,7 +90,7 @@ columns:
     description: Key of the house listing depublication date of the present version related to the rent flow. It's the date of the listing's version depublication transformed into a number.
   sk_house_listing_first_offer_submitted_date:
     lineage:
-      - dw_public.dim_offer.dt_created
+      - dw_rent.dim_offer.dt_created
     description: Key of the property's first offer submitted date. It's important to notice that this date is related to the house's first offer submitted, not the house listing.
   sk_booking_created_date:
     lineage:
@@ -110,11 +110,11 @@ columns:
     description: Key of the date when the tenant prospect signed up in the platform. It's the sign up date transformed into a number.
   sk_offer_submitted_date:
     lineage:
-      - dw_public.dim_offer.dt_first_sent
+      - dw_rent.dim_offer.dt_first_sent
     description: Key of the date when the offer was submitted by the tenant prospect. It's the offer's submitted date transformed into a number. A rent flow can have none, one or more offer's submitted dates.
   sk_min_offer_submitted_date:
     lineage:
-      - dw_public.dim_offer.dt_first_sent
+      - dw_rent.dim_offer.dt_first_sent
     description: Key of the first date when an offer was submitted by the tenant prospect in the rent flow. It's the first offer's submitted date transformed into a number.
   sk_offer_approved_date:
     lineage:
@@ -295,7 +295,7 @@ columns:
   funnel_step_drop_reason:
     lineage:
       - dw_public.dim_contract.cancellation_reason
-      - dw_public.dim_offer.rejection_reason
+      - dw_rent.dim_offer.rejection_reason
       - dw_rent.dim_proposal.rejection_reason
       - dw_public.dim_booking.cancellation_reason
     description: The reason of why the rent flow has stopped in the actual funnel step. A rent flow can have none, one or more values of drop reason.

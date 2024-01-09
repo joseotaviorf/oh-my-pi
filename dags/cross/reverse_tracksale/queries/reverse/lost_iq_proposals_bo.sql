@@ -1,14 +1,11 @@
--- Benvi IQ Lost Proposals:
--- 1) proponents with offers sent on D-10 and rejected not by credit who did neither send another offer not book a visit after that
--- 2) proponents with offers sent on D-10 and approved who did not send documentation after that
--- 3) proponents with documentation sent on D-10 for credit analysis who did not sign a contract after that, by any reason except documentation rejected
-WITH mexico_houses AS (
-    SELECT
-        DISTINCT sk_house_listing
+WITH brazil_houses AS (
+    SELECT DISTINCT
+        sk_house_listing
     FROM
         dw_public.dim_house_listing
     WHERE
-        country_code = 'MX' --- added to filter only MX business (excluding BR)
+        country_code = 'BR'
+        AND rental_administrator = 'OWNER' --Including only brokerage only for these metrics
 ),
 distinct_offers AS (
     SELECT
@@ -20,21 +17,20 @@ distinct_offers AS (
     FROM
         dw_public.fact_listing_rent_flows AS rf
     INNER JOIN
-        mexico_houses AS h
-            ON rf.sk_house_listing=h.sk_house_listing  --- added to filter only BR business (excluding mexico)
-            AND rf.sk_offer > 0
-    GROUP BY 1, 2, 3, 4, 5
+        brazil_houses AS h
+            ON rf.sk_house_listing = h.sk_house_listing
+    WHERE
+        sk_offer > 0
+    GROUP BY 1,2,3,4,5
 ),
--- consider the first offer on D-10 for each proponent
 first_offer AS (
     SELECT
         sk_client,
-        MIN(sk_offer) AS first_sk_offer -- id because there could be n offers in a day
+        MIN(sk_offer) AS first_sk_offer
     FROM
         distinct_offers
     GROUP BY 1
 ),
--- relate next offer for each proponent
 next_offers AS (
     SELECT
         od.sk_client,
@@ -44,29 +40,33 @@ next_offers AS (
         dof.rejection_reason AS offer_rejection_reason,
         dp.rejection_reason AS proposal_rejection_reason,
         dp.result_credit_evaluation AS proposal_result_credit_evaluation,
-        LEAD(od.sk_offer, 1) OVER (PARTITION BY od.sk_client ORDER BY od.sk_offer) AS next_sk_offer -- next offer will have a greater id (incremental)
+        LEAD(od.sk_offer,1) OVER (PARTITION BY od.sk_client ORDER BY od.sk_offer) AS next_sk_offer
     FROM
         distinct_offers AS od
     INNER JOIN
         dw_rent.dim_offer AS dof
             ON dof.sk_offer = od.sk_offer
-            AND dof.country_code = 'MX'
     LEFT JOIN
         dw_rent.dim_proposal AS dp
             ON dp.sk_proposal = od.sk_proposal
 ),
--- consider only the city of the first offer for each proponent
 first_offer_city AS (
     SELECT
-        no.*
+        no.sk_client,
+        no.sk_offer,
+        no.sk_offer_submitted_date,
+        no.sk_offer_approved_date,
+        no.offer_rejection_reason,
+        no.proposal_rejection_reason,
+        no.proposal_result_credit_evaluation,
+        no.next_sk_offer
     FROM
         next_offers AS no
     INNER JOIN
         first_offer AS fo
             ON no.sk_offer = fo.first_sk_offer
 ),
--- get all distinct bookings for each client
-distinct_bookings as (
+distinct_bookings AS (
     SELECT
         rf.sk_client,
         rf.sk_booking,
@@ -76,11 +76,11 @@ distinct_bookings as (
     INNER JOIN
         dw_public.dim_region AS dr
             ON dr.sk_region = rf.sk_region
-            AND dr.country_code = 'MX'
-            AND rf.sk_booking_created_date > 0
-    GROUP BY 1, 2, 3
+    WHERE
+        rf.sk_booking_created_date > 0
+        AND dr.id_country = 1
+    GROUP BY 1,2,3
 ),
--- get all distinct documentations sent by each client
 distinct_documentations AS (
     SELECT
         sk_client,
@@ -89,9 +89,8 @@ distinct_documentations AS (
         dw_public.fact_listing_rent_flows
     WHERE
         sk_tenant_first_doc_sent_date > 0
-    GROUP BY 1, 2
+    GROUP BY 1,2
 ),
--- get all distinct contracts signed FROM each client
 distinct_contracts AS (
     SELECT
         sk_client,
@@ -101,9 +100,9 @@ distinct_contracts AS (
         dw_public.fact_listing_rent_flows
     WHERE
         sk_contract_signed_date > 0
-    GROUP BY 1, 2, 3
+    GROUP BY 1,2,3
 ),
-active_contracts as (
+active_contracts AS (
     SELECT
         rf.sk_client,
         COUNT(rf.sk_contract) > 0 AS has_active_contracts
@@ -112,23 +111,23 @@ active_contracts as (
     INNER JOIN
         dw_public.dim_contract AS dc
             ON rf.sk_contract = dc.sk_contract
-            AND dc.country_code = 'MX'
-            AND rf.sk_contract_signed_date > 0
-            AND dc.status = 'Ativo'
+    WHERE
+        rf.sk_contract_signed_date >0
+        AND dc.status = 'Ativo'
+        AND dc.country_code = 'BR'
     GROUP BY 1
 ),
-positive_credit_evaluations as (
+positive_credit_evaluations AS (
     SELECT
         id_user,
         id_proposal,
-        CAST(REPLACE(SUBSTRING(CAST(ts_updated AS STRING), 1, 10), '-', '') AS INTEGER) AS sk_updated_date
+        CAST(REPLACE(SUBSTRING(CAST(ts_updated AS STRING),1,10),'-','') AS INTEGER) AS sk_updated_date
     FROM
         datalake_docx_clean.credit_evaluation AS ce
     WHERE
         status = 'FINISHED'
         AND result = 'PRE_APPROVED'
 ),
--- relate next funnel steps (offer or booking) for each client
 next_steps AS (
     SELECT
         fo.sk_client,
@@ -142,7 +141,7 @@ next_steps AS (
         db.sk_booking AS next_sk_booking,
         dd.sk_tenant_first_doc_sent_date AS next_doc_sent,
         dc.sk_contract AS next_sk_contract,
-        coalesce(ac.has_active_contracts,false) AS has_active_contracts,
+        COALESCE(ac.has_active_contracts,false) AS has_active_contracts,
         pce.id_proposal AS positive_credit_evaluation
     FROM
         first_offer_city AS fo
@@ -169,7 +168,6 @@ next_steps AS (
             ON pce.id_user = fo.sk_client
             AND pce.sk_updated_date >= fo.sk_offer_submitted_date
 ),
--- filter clients with offer rejected and no further booking/offer
 proponents_rejected AS (
     SELECT
         sk_client,
@@ -178,15 +176,14 @@ proponents_rejected AS (
     FROM
         next_steps
     WHERE
-        dt_offer = DATE_ADD(CURRENT_DATE(), -10) -- SELECT the initial offer on D-10
-        AND NOT sk_offer_approved_date > 0 -- selecting offers that were not approved (all might have a line with -1)
-        AND next_sk_offer IS NULL -- selecting offers without a next offer
-        AND next_sk_booking IS NULL -- selecting offers without a next booking
-        AND has_active_contracts IS FALSE -- excluding clients with active contracts
-        AND positive_credit_evaluation IS NULL -- excluding clients with a later positive credit evaluation
-    GROUP BY 1, 2, 3
+        dt_offer = DATE_SUB(current_date, 10)
+        AND NOT sk_offer_approved_date > 0
+        AND next_sk_offer IS NULL
+        AND next_sk_booking IS NULL
+        AND has_active_contracts = false
+        AND positive_credit_evaluation IS NULL
+    GROUP BY 1,2,3
 ),
--- filter clients with offer approved and no further documentation sent
 proponents_approved_docs AS (
     SELECT
         sk_client,
@@ -197,33 +194,32 @@ proponents_approved_docs AS (
     FROM
         next_steps
     WHERE
-        dt_offer = DATE_ADD(CURRENT_DATE(), -10) -- SELECT the initial offer on D-10
-        AND sk_offer_approved_date > 0 -- selecting offers that were approved
-        AND next_doc_sent IS NULL -- selecting proponents that did not send docs
-        AND has_active_contracts IS FALSE -- excluding clients with active contracts
-        AND positive_credit_evaluation IS NULL -- excluding clients with a later positive credit evaluation
-    GROUP BY 1, 2, 3, 4, 5
+        dt_offer = DATE_SUB(current_date, 10)
+        AND sk_offer_approved_date > 0
+        AND next_doc_sent IS NULL
+        AND has_active_contracts = false
+        AND positive_credit_evaluation IS NULL
+    GROUP BY 1,2,3,4,5
 ),
 proponents_approved_docs_rejected AS (
-    SELECT
-        DISTINCT sk_client
+    SELECT DISTINCT
+        sk_client
     FROM
         proponents_approved_docs
     WHERE
         proposal_result_credit_evaluation = 'PRE_REJECTED'
         OR proposal_rejection_reason IN ('CreditEvaluationRejected','TenantDocumentationRejected')
 ),
-proponents_approved_docs_correct as (
+proponents_approved_docs_correct AS (
     SELECT
-        sk_client,
-        sk_offer,
-        step
+        p.sk_client,
+        p.sk_offer,
+        p.step
     FROM
-        proponents_approved_docs
+        proponents_approved_docs p
     WHERE
-        sk_client NOT IN (SELECT * FROM proponents_approved_docs_rejected)
+        p.sk_client NOT IN (SELECT * FROM proponents_approved_docs_rejected)
 ),
--- filter clients with offer approved and no further contract signed
 proponents_approved_contract AS (
     SELECT
         sk_client,
@@ -234,16 +230,16 @@ proponents_approved_contract AS (
     FROM
         next_steps
     WHERE
-        dt_offer = DATE_ADD(CURRENT_DATE(), -10) -- SELECT the initial offer on D-10
-        AND sk_offer_approved_date > 0 -- selecting offers that were approved
-        AND next_doc_sent > 0  -- selecting offers that did not send docs
-        AND next_sk_contract IS NULL -- selecting proponents that did not sign contracts
-        AND positive_credit_evaluation IS NULL -- excluding clients with a later positive credit evaluation
-    GROUP BY 1, 2, 3, 4, 5
+        dt_offer = DATE_SUB(CURRENT_DATE, 10)
+        AND sk_offer_approved_date > 0
+        AND next_doc_sent > 0
+        AND next_sk_contract IS NULL
+        AND positive_credit_evaluation IS NULL
+    GROUP BY 1,2,3,4,5
 ),
 proponents_approved_contract_rejected AS (
-    SELECT
-        DISTINCT sk_client
+    SELECT DISTINCT
+        sk_client
     FROM
         proponents_approved_contract
     WHERE
@@ -252,32 +248,21 @@ proponents_approved_contract_rejected AS (
 ),
 proponents_approved_contract_correct AS (
     SELECT
-        sk_client,
-        sk_offer,
-        step
+        p.sk_client,
+        p.sk_offer,
+        p.step
     FROM
-        proponents_approved_contract
+        proponents_approved_contract p
     WHERE
-        sk_client NOT IN (SELECT * FROM proponents_approved_contract_rejected)
+        p.sk_client NOT IN (SELECT * FROM proponents_approved_contract_rejected)
 ),
--- filter proponents with NPS conditions
 dispatches AS (
-    SELECT
-        *
-    FROM
-        proponents_rejected
+    SELECT * FROM proponents_rejected
     UNION
-    SELECT
-        *
-    FROM
-        proponents_approved_docs_correct
+    SELECT * FROM proponents_approved_docs_correct
     UNION
-    SELECT
-        *
-    FROM
-        proponents_approved_contract_correct
+    SELECT * FROM proponents_approved_contract_correct
 ),
--- avoid users which experience ongoing crisis, there is crisis tickets not closed yet
 crisis_users AS (
     SELECT
         ft.sk_user
@@ -286,26 +271,26 @@ crisis_users AS (
     INNER JOIN
         dw_tickets.fact_tickets AS ft
             ON dt.sk_ticket  = ft.sk_ticket
-            AND ft.sk_closed_date_local = -1
     INNER JOIN
         dw_customer_support.dim_department AS dc
             ON dt.group_name = dc.department
-			AND dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui') -- exclude contracts from these areas
+    WHERE
+        dc.team IN ('Casos Especiais','Proteção 5A','Ouvidoria','ReclameAqui')
+        AND ft.sk_closed_date_local = -1
     GROUP BY 1
 ),
--- select each client only once if s/he has been in both steps (contract and negotiation)
 proponents AS (
     SELECT
         sk_client,
         sk_offer,
-        MIN(step) AS step -- if both, select contract, that is the last step
+        MIN(step) AS step
     FROM
         dispatches AS d
     LEFT JOIN
         crisis_users AS uc
             ON uc.sk_user = d.sk_client
-            AND uc.sk_user IS NULL -- exclude users with ongoing crisis ticket
-    GROUP BY 1, 2
+            AND uc.sk_user IS NULL
+    GROUP BY 1,2
 )
 SELECT
     u.nome AS customer_name,

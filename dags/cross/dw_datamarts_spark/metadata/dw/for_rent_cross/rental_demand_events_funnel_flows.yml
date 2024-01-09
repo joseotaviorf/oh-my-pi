@@ -35,7 +35,7 @@ columns:
     description: If the event flow was only visit, only direct or mixed.
   demand_channel:
     lineage:
-      - dw_public.dim_offer.mkt_medium
+      - dw_rent.dim_offer.mkt_medium
     description: The market channel in demand context.
   is_b2b_demand:
     lineage:

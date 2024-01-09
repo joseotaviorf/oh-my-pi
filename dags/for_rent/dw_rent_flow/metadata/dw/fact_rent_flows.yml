@@ -55,11 +55,11 @@ columns:
   sk_first_offer:
     lineage:
       - datalake_rent_flows.rent_flows.id_offer
-    description: Id of the first offer. Joins with dw_public.dim_offer.
+    description: Id of the first offer. Joins with dw_rent.dim_offer.
   sk_last_offer:
     lineage:
       - datalake_rent_flows.rent_flows.id_offer
-    description: Id of the most recent offer. Joins with dw_public.dim_offer.
+    description: Id of the most recent offer. Joins with dw_rent.dim_offer.
   sk_first_proposal:
     lineage:
       - datalake_rent_flows.rent_flows.id_proposal

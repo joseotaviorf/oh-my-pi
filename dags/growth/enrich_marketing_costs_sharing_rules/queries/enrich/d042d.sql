@@ -25,7 +25,7 @@ rent_flow_client_info AS (
     ON
         dim_booking.sk_booking = rent_flow.id_booking
     LEFT JOIN
-        dw_public.dim_offer
+        dw_rent.dim_offer
     ON
         dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
         AND dim_offer.sk_offer != -1
@@ -64,7 +64,7 @@ tenant_prospect_events AS (
 		dof.mkt_source,
 		dof.dt_first_sent AS ts_interaction
 	FROM
-		dw_public.dim_offer AS dof
+		dw_rent.dim_offer AS dof
 	INNER JOIN
         rent_flow_client_info AS lrf
 	        USING(sk_offer)
@@ -181,7 +181,7 @@ SELECT DISTINCT
 	CASE
 		WHEN validador > 0 THEN r.share
 		ELSE fb.share
-	END AS share, 
+	END AS share,
 	'demand' AS funnel_side,
 	CAST(NULL AS STRING) AS business_context
 FROM validacao v
