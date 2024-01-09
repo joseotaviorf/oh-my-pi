@@ -167,9 +167,9 @@ columns:
   true_positive_and_sale_flow_fourteen_days_at_3:
     description: |
       true_positive_and_sale_flow_fourteen_days_at_3
-  true_positive_and_to_rent_flow_seven_days_at_3:
+  true_positive_and_rent_flow_seven_days_at_3:
     description: |
-      true_positive_and_to_rent_flow_seven_days_at_3
+      true_positive_and_rent_flow_seven_days_at_3
   hit_true_positive_and_sale_flow_fourteen_days_at_3:
     description: |
       hit_true_positive_and_sale_flow_fourteen_days_at_3
@@ -273,9 +273,9 @@ columns:
   true_positive_and_sale_flow_fourteen_days_at_5:
     description: |
       true_positive_and_sale_flow_fourteen_days_at_5
-  true_positive_and_to_rent_flow_seven_days_at_5:
+  true_positive_and_rent_flow_seven_days_at_5:
     description: |
-      true_positive_and_to_rent_flow_seven_days_at_5
+      true_positive_and_rent_flow_seven_days_at_5
   hit_true_positive_and_sale_flow_fourteen_days_at_5:
     description: |
       hit_true_positive_and_sale_flow_fourteen_days_at_5
@@ -379,9 +379,9 @@ columns:
   true_positive_and_sale_flow_fourteen_days_at_10:
     description: |
       true_positive_and_sale_flow_fourteen_days_at_10
-  true_positive_and_to_rent_flow_seven_days_at_10:
+  true_positive_and_rent_flow_seven_days_at_10:
     description: |
-      true_positive_and_to_rent_flow_seven_days_at_10
+      true_positive_and_rent_flow_seven_days_at_10
   hit_true_positive_and_sale_flow_fourteen_days_at_10:
     description: |
       hit_true_positive_and_sale_flow_fourteen_days_at_10
