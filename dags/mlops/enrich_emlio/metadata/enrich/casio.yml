@@ -1,0 +1,2988 @@
+---
+database_name: datalake_emlio
+table_name: casio
+owner: 'ralph.filho@quintoandar.com.br'
+domain: MLOps
+description: Inputs of the casio model. Casio is a model for house price prediction.
+  The purpose is to track and monitor data drifts.
+columns:
+  year:
+    description: Year of the log.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.year
+  month:
+    description: Month of the log.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.month
+  day:
+    description: Day of the log.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.day
+  id_service:
+    description: ID of the service ('casio').
+    lineage:
+    - datalake_emlio_clean.emlio_logs.id_service
+  service_version:
+    description: Version of the billboard service.
+    lineage:
+    - datalake_emlio_clean.emlio_logs.service_version
+  latitude:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  longitude:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  bedroom_count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  maintenance_condition:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  bathroom_count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  city:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  neighborhood:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  condominium_per_month:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  iptu_per_month:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  parking_slots_count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_fridge:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_sauna:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  suite_count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  total_area:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  is_furnished:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_air_conditioning:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_bedroom_cabinets:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_ceiling_fan:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  floor:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_oven:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_pool:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_bathroom_cabinets:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_gas_heated_shower:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_glass_shower_stall:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_gourmet_balcony:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_gym:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_kitchen_cabinets:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_brazilian_plug:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_gourmet_space:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  type:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  doorman_type:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_microwave:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_common_laundry:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  is_near_subway:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_cooktop:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_eletric_shower:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  has_television:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  id:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__condominium_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__condominium_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__contract_rent_over_area__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__contract_rent_over_area__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__contract_rent_per_month__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__contract_rent_per_month__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__house_published__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__house_published__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__house_rented__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__house_rented__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__iptu_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__iptu_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__ongoing_contracts__count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__ongoing_rent_per_month__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__ongoing_rent_per_month__max:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__ongoing_rent_per_month__min:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__ongoing_rent_per_month__stddev:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_over_area_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__rent_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__suite_count_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_6__suite_count_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__condominium_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__condominium_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__contract_rent_over_area__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__contract_rent_over_area__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__contract_rent_per_month__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__contract_rent_per_month__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__house_published__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__house_published__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__house_rented__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__house_rented__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__iptu_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__iptu_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__ongoing_contracts__count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__ongoing_rent_per_month__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__ongoing_rent_per_month__max:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__ongoing_rent_per_month__min:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__ongoing_rent_per_month__stddev:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_over_area_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__rent_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__suite_count_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_7__suite_count_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__condominium_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__condominium_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__contract_rent_over_area__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__contract_rent_over_area__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__contract_rent_per_month__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__contract_rent_per_month__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__house_published__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__house_published__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__house_rented__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__house_rented__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__iptu_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__iptu_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__ongoing_contracts__count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__ongoing_rent_per_month__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__ongoing_rent_per_month__max:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__ongoing_rent_per_month__min:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__ongoing_rent_per_month__stddev:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_over_area_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__rent_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__suite_count_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_8__suite_count_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__condominium_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__condominium_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__contract_rent_over_area__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__contract_rent_over_area__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__contract_rent_per_month__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__contract_rent_per_month__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__house_published__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__house_published__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__house_rented__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__house_rented__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__iptu_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__iptu_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__ongoing_contracts__count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__ongoing_rent_per_month__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__ongoing_rent_per_month__max:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__ongoing_rent_per_month__min:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__ongoing_rent_per_month__stddev:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_over_area_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__rent_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__suite_count_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_9__suite_count_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__condominium_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__condominium_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__contract_rent_over_area__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__contract_rent_over_area__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__contract_rent_per_month__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__contract_rent_per_month__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__house_published__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__house_published__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__house_rented__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__house_rented__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__iptu_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__iptu_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__ongoing_contracts__count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__ongoing_rent_per_month__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__ongoing_rent_per_month__max:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__ongoing_rent_per_month__min:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__ongoing_rent_per_month__stddev:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_over_area_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__rent_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__suite_count_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_10__suite_count_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__condominium_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__condominium_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__contract_rent_over_area__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__contract_rent_over_area__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__contract_rent_per_month__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__contract_rent_per_month__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__house_published__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__house_published__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__house_rented__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__house_rented__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__iptu_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__iptu_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__ongoing_contracts__count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__ongoing_rent_per_month__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__ongoing_rent_per_month__max:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__ongoing_rent_per_month__min:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__ongoing_rent_per_month__stddev:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_over_area_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__rent_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__suite_count_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_11__suite_count_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__condominium_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__condominium_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__contract_rent_over_area__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__contract_rent_over_area__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__contract_rent_per_month__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__contract_rent_per_month__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__house_published__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__house_published__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__house_rented__count_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__house_rented__count_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__iptu_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__iptu_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__ongoing_contracts__count:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__ongoing_rent_per_month__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__ongoing_rent_per_month__max:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__ongoing_rent_per_month__min:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__ongoing_rent_per_month__stddev:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_over_area_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_apartments_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_0_1_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_0_1_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_0_1_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_0_1_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_0_1_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_0_1_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_2_3_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_2_3_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_2_3_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_2_3_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_2_3_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_2_3_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_4_more_bedrooms__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_4_more_bedrooms__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_4_more_bedrooms__max_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_4_more_bedrooms__max_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_4_more_bedrooms__min_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_house_4_more_bedrooms__min_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_published__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_published__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__rent_per_month_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__suite_count_rented__avg_over_30_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  h3_resolution_12__suite_count_rented__avg_over_365_days_rolling_windows:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  idhm_city_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  idhm_renda_city_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  idhm_educacao_city_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  idhm_longevidade_city_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  renda_per_capita_city_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  idhm_state_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  idhm_renda_state_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  idhm_educacao_state_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  idhm_longevidade_state_level__avg:
+    description: Casio's default field.
+    lineage:
+    - datalake_emlio_clean.inputs

@@ -1492,6 +1492,8 @@ bietlejuice.enrich_ebdb_user:
 bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb:load-clean-work-contract
   - bietlejuice.hubspot:load-clean-company
+bietlejuice.enrich_emlio:
+  - bietlejuice.emlio:load-clean-emlio-logs
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all

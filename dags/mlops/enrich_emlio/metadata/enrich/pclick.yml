@@ -1,0 +1,388 @@
+---
+database_name: datalake_emlio
+table_name: casio
+owner: 'ralph.filho@quintoandar.com.br'
+domain: MLOps
+description: Inputs of the casio model. Casio is a model for house price prediction.
+  The purpose is to track and monitor data drifts.
+columns:
+  service_version:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  id_service:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  year:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  month:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  day:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_value_price_type:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_value_price_min:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_value_price_max:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_value_price_max_changed:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_sale_value_valor_min:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_sale_value_valor_max:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_sale_value_valor_min_changed:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_sale_value_valor_max_changed:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_value_area_min:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__filter_value_area_max:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__map_borders_lat_center:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__map_borders_lng_center:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__map_borders_lat_ne:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__map_borders_lat_sw:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__map_borders_lng_ne:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__map_borders_lng_sw:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__hour_day:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__day_of_week:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__dropdown_address_type:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  address:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__search_location_context:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_iptu_per_month__stddev_pop_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_iptu_per_month__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_iptu_per_month__stddev_pop_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_rent_over_area__avg_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_rent_over_area__stddev_pop_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_rent_over_area__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_suite_count__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_has_elevator__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_has_air_conditioning__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_iptu_per_month__avg_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_has_bedroom_cabinets__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_has_kitchen_cabinets__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_has_oven__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_has_pool__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_rent_per_month__avg_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_rent_per_month__stddev_pop_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__user_platform:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_rent_per_month__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__amplitude_device_model:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_rent_per_month__stddev_pop_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_total_area__avg_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_total_area__stddev_pop_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_total_area__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_total_area__stddev_pop_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_bedroom_count__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_bedroom_count__stddev_pop_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_bathroom_count__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_bathroom_count__stddev_pop_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_rent_over_area__stddev_pop_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_condominium_per_month__avg_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_condominium_per_month__stddev_pop_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_condominium_per_month__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_condominium_per_month__stddev_pop_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_is_furnished__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_floor__avg_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_floor__stddev_pop_over_5_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_floor__avg_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__listing_page_viewed_floor__stddev_pop_over_15_events_row_windows:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user__id:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__street:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__bathroom_count:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__bathrooms_over_area:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__has_elevator:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__is_furnished:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__bedrooms_over_area:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__parking_slots_count:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__city:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__type:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__rent_over_area:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__rent_per_month:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__condominium_per_month:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__bedroom_count:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__total_area:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__latitude:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house__longitude:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  searched_house__haversine_distance:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  searched_house__estimated_difference_price_min:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  searched_house__estimated_difference_price_max:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  searched_house__estimated_difference_area_min:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  searched_house__estimated_difference_area_max:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user_house_diff__rent_per_month__avg:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user_house_diff__condominium__avg:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user_house_diff__total_price__avg:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user_house_diff__total_area__avg:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user_house_diff__bedroom_count__avg:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user_house_diff__bathroom_count__avg:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user_house_diff__furnished__avg:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  user_id:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
+  house_id:
+    description: P-click's default field.
+    lineage:
+    - datalake_emlio_clean.inputs
