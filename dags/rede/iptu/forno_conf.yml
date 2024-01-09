@@ -1,0 +1,7 @@
+---
+custom_libraries:
+    - pypi:
+        package: openpyxl
+tables:
+  iptu_sp:
+    is_incremental: false
