@@ -31,6 +31,7 @@ Currently, there is the following output table for both our raw and clean layers
 - `experiment`
 - `external_score`
 - `offer`
+- `policy_report`
 - `proponent`
 - `proponent_version`
 - `proposal`

@@ -1,0 +1,40 @@
+database_name: datalake_sorting_hat_clean
+table_name: policy_report
+description: Table with information about the credit policy.
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.id
+    description: Policy report ID
+  id_external:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.external_id
+    description: External ID. It can be either the proposal ID when the external source is PROPOSAL or the credit ID when the external source is CREDIT_EVALUATION
+  type:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.type
+    description: Type of the credit policy
+  external_source:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.external_source
+    description: External source of the credit policy
+  result:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.result
+    description: JSON with the result of the credit policy applied
+  raw_data:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.raw_data
+    description: JSON with the raw data input of the credit policy
+  version:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.version
+    description: Version of the credit policy
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.created_at
+    description: Timestamp creation date of the credit policy
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.policyreport.updated_at
+    description: Timestamp updated date of the credit policy
