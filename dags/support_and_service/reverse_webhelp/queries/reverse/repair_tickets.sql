@@ -28,7 +28,6 @@ SELECT
     relisting,
     minutes_first_reply_time_calendar,
     entrance_date,
-    definition_date,
     ts_first_interaction,
     ts_created_local,
     ts_updated_local,
