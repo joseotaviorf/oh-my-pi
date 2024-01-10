@@ -1,0 +1,75 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: client
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: "table to store customers that may or may not be sent to the collector, basically it is a representation of the ContraPessoa table in Main. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
+columns:
+  id:
+    description: "Unique identifier"
+    lineage:
+      - datalake_trato_feito_raw.client.id
+  id_external:
+    description: "Entity ID in its source domain, in the case of a rental contract, user ID in Main"
+    lineage:
+      - datalake_trato_feito_raw.client.external_id
+  id_contract:
+    description: "Trato-Feito contract entity ID"
+    lineage:
+      - datalake_trato_feito_raw.client.contract_id
+  status_syncs:
+    description: "JSON object to represent entity sync status"
+    lineage:
+      - datalake_trato_feito_raw.client.status_syncs
+  creditor:
+    description: "Creditor in the collector to which the entity was synchronized"
+    lineage:
+      - datalake_trato_feito_raw.client.creditor
+  document:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.client.document
+  document_type:
+    description: "Customer document"
+    lineage:
+      - datalake_trato_feito_raw.client.document_type
+  marital_status:
+    description: "marital status"
+    lineage:
+      - datalake_trato_feito_raw.client.marital_status
+  name:
+    description: "Customer's full name"
+    lineage:
+      - datalake_trato_feito_raw.client.name
+  birth_date:
+    description: "Date of birth"
+    lineage:
+      - datalake_trato_feito_raw.client.birth_date
+  phones:
+    description: "Customer phone list"
+    lineage:
+      - datalake_trato_feito_raw.client.phones
+  emails:
+    description: "Customer email list"
+    lineage:
+      - datalake_trato_feito_raw.client.emails
+  client_type:
+    description: "Indicates the type of customer, whether it is the main tenant, tenant or owner"
+    lineage:
+      - datalake_trato_feito_raw.client.client_type
+  debtor_origin:
+    description: "Describes the origin of the debtor (product)"
+    lineage:
+      - datalake_trato_feito_raw.client.debtor_origin
+  will_live_in_place:
+    description: "Indicates whether the person will live in the rented property"
+    lineage:
+      - datalake_trato_feito_raw.client.will_live_in_place
+  dt_created:
+    description: "Created at"
+    lineage:
+      - datalake_trato_feito_raw.client.created_at
+  dt_updated:
+    description: "Updated at"
+    lineage:
+      - datalake_trato_feito_raw.client.updated_at

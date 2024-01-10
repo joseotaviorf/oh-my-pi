@@ -7,6 +7,8 @@ SELECT
     status,
     currency,
     status_reason,
+    payload,
+    manage_type,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

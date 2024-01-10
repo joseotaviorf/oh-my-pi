@@ -15,14 +15,20 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Load the following tables into the datalake clean (via full load):
 
 - `accounting_installment`
+- `bill`
+- `client`
+- `collector_load`
 - `collector`
+- `contract`
 - `debt`
 - `debtor`
-- `eviction`
+- `events_batch`
 - `eviction_data`
+- `eviction`
 - `evictions_report`
 - `installment`
 - `negotiation`
 - `payment`
+- `status_sync`
 
 </details>

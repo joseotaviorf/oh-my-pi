@@ -1,0 +1,21 @@
+SELECT
+    id,
+    external_id AS id_external,
+    imovel_id AS id_imovel,
+    sync_status,
+    guarantee,
+    external_status,
+    version,
+    rental_administrator,
+    rental_amount,
+    iptu_installment,
+    iptu_amount,
+    condominium_amount,
+    guarantee_start_date AS dt_guarantee_start,
+    end_date AS dt_end,
+    expected_end_date AS dt_expected_end,
+    created_at AS dt_created,
+    updated_at AS dt_updated,
+    last_received_at AS dt_last_received,
+    start_date AS dt_start
+FROM datalake_trato_feito_raw.contract

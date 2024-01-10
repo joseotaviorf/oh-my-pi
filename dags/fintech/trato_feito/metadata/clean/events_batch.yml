@@ -1,0 +1,47 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: events_batch
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: "Table for storing batch processing events. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
+columns:
+  id:
+    description: "Unique identifier"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.id
+  id_batch:
+    description: "Unique ID of the generated batch"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.batch_id
+  origin:
+    description: "Identifies the origin of the generated event (product)"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.origin
+  batch_type:
+    description: "Type of batch processed"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.batch_type
+  batch_payload:
+    description: "Batch event payload"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.batch_payload
+  batch_size:
+    description: "Number of events processed in the batch"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.batch_size
+  dt_started:
+    description: "Batch processing start date and time"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.started_at
+  dt_finished:
+    description: "Batch processing end date and time"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.finished_at
+  dt_created:
+    description: "Created at"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.created_at
+  dt_updated:
+    description: "Updated at"
+    lineage:
+      - datalake_trato_feito_raw.tmp_blocklist.updated_at

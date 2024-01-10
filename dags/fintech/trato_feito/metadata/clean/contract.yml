@@ -1,0 +1,83 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: contract
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: "Table to store contracts that may or may not be sent to the collector. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
+columns:
+  id:
+    description: "Unique identifier"
+    lineage:
+      - datalake_trato_feito_raw.contract.id
+  id_external:
+    description: "Entity ID in its source domain, in the case of a rental contract, user ID in Main"
+    lineage:
+      - datalake_trato_feito_raw.contract.external_id
+  id_imovel:
+    description: "ID of the property associated with the contract on main"
+    lineage:
+      - datalake_trato_feito_raw.contract.imovel_id
+  sync_status:
+    description: "Entity synchronization status with the collector"
+    lineage:
+      - datalake_trato_feito_raw.contract.sync_status
+  guarantee:
+    description: "Type of rental guarantee associated with the contract"
+    lineage:
+      - datalake_trato_feito_raw.contract.guarantee
+  external_status:
+    description: "Contract status, in the case of a rental contract, is the status in the main"
+    lineage:
+      - datalake_trato_feito_raw.contract.external_status
+  version:
+    description: "Contract version"
+    lineage:
+      - datalake_trato_feito_raw.contract.version
+  rental_administrator:
+    description: "Contract administration model"
+    lineage:
+      - datalake_trato_feito_raw.contract.rental_administrator
+  rental_amount:
+    description: "Rent amount"
+    lineage:
+      - datalake_trato_feito_raw.contract.rental_amount
+  iptu_installment:
+    description: "IPTU installment amount"
+    lineage:
+      - datalake_trato_feito_raw.contract.iptu_installment
+  iptu_amount:
+    description: "IPTU amount"
+    lineage:
+      - datalake_trato_feito_raw.contract.iptu_amount
+  condominium_amount:
+    description: "Condominium amount"
+    lineage:
+      - datalake_trato_feito_raw.contract.condominium_amount
+  dt_guarantee_start:
+    description: "Guarantee effective date"
+    lineage:
+      - datalake_trato_feito_raw.contract.guarantee_start_date
+  dt_end:
+    description: "End date of the contract term"
+    lineage:
+      - datalake_trato_feito_raw.contract.end_date
+  dt_expected_end:
+    description: "Expected date for the contract to end"
+    lineage:
+      - datalake_trato_feito_raw.contract.expected_end_date
+  dt_created:
+    description: "Created at"
+    lineage:
+      - datalake_trato_feito_raw.contract.created_at
+  dt_updated:
+    description: "Updated at"
+    lineage:
+      - datalake_trato_feito_raw.contract.updated_at
+  dt_last_received:
+    description: "Entity last synchronized at"
+    lineage:
+      - datalake_trato_feito_raw.contract.last_received_at
+  dt_start:
+    description: "When the contract started"
+    lineage:
+      - datalake_trato_feito_raw.contract.start_date
