@@ -6,7 +6,7 @@ WITH ongoing_listings AS (
     COUNT(DISTINCT id_house_listing) AS ongoing_listings
   FROM
     datalake_rental_historical_follow_up.house_listings_daily_info AS h
-  JOIN 
+  JOIN
     dw_public.dim_region AS dr
       ON h.id_region = dr.sk_region
   JOIN
@@ -24,18 +24,18 @@ visits_booked AS (
     dr.sk_region,
     rf.country_code,
     COUNT(DISTINCT CASE WHEN (rf.sk_booking_created_date  > 0) THEN rf.sk_booking ELSE NULL END) AS visits_booked
-  FROM 
-    dw_public.fact_listing_rent_flows AS rf
-  JOIN 
+  FROM
+    dw_rent.fact_listing_rent_flows AS rf
+  JOIN
     dw_public.dim_booking AS db
       ON db.sk_booking = rf.sk_booking
-  JOIN 
+  JOIN
     dw_public.dim_date AS dd
       ON dd.sk_date = rf.sk_booking_created_date
-  JOIN 
+  JOIN
     dw_public.dim_region AS dr
       ON dr.sk_region = rf.sk_region
-  WHERE 
+  WHERE
     dr.city_group IS NOT NULL
     AND dd.date < CURRENT_DATE()
   GROUP BY 1, 2, 3
@@ -46,12 +46,12 @@ SELECT
   vb.sk_region,
   vb.country_code,
   vb.visits_booked/ol.ongoing_listings AS visits_booked_per_ongoing_listings
-FROM 
+FROM
   visits_booked AS vb
-LEFT JOIN 
+LEFT JOIN
   ongoing_listings AS ol
     ON ol.date = vb.date
     AND vb.country_code = ol.country_code
-    AND vb.sk_region = ol.sk_region 
-WHERE 
+    AND vb.sk_region = ol.sk_region
+WHERE
   vb.date IS NOT NULL

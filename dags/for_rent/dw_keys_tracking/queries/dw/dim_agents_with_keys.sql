@@ -5,7 +5,7 @@ WITH listing_scheduling AS (
         MIN(db.dt_scheduling) OVER(PARTITION BY flrf.sk_house_listing) AS ts_first_scheduling,
         MIN(db.dt_scheduling) OVER(PARTITION BY flrf.sk_house_listing, flrf.sk_user_agent) AS ts_agent_scheduled
     FROM
-        dw_public.fact_listing_rent_flows AS flrf
+        dw_rent.fact_listing_rent_flows AS flrf
     JOIN
         dw_public.dim_booking AS db
             ON flrf.sk_booking = db.sk_booking
@@ -29,7 +29,7 @@ SELECT
     awk.id_house_listing AS sk_house_listing,
     COALESCE(awk.id_agent, -1) AS sk_agent,
     awk.id_house AS sk_house,
-    awk.all_id_agents, 
+    awk.all_id_agents,
     IF(awk.has_keys_with_agent_attributed, CAST((TO_UNIX_TIMESTAMP(uls.ts_first_scheduling) -  TO_UNIX_TIMESTAMP(awk.ts_attributed))/86400 AS DECIMAL(7,2)), NULL) AS days_attribution_to_first_vc,
     IF(awk.has_keys_with_agent_attributed, CAST((TO_UNIX_TIMESTAMP(uls.ts_agent_scheduled) - TO_UNIX_TIMESTAMP(awk.ts_attributed))/86400 AS DECIMAL(7,2)), NULL) AS days_attribution_to_first_vc_agent,
     awk.days_cs_to_return,
@@ -38,21 +38,21 @@ SELECT
     awk.has_keys_with_agent_delivered,
     awk.has_keys_with_agent_returned,
     CASE
-        WHEN uls.ts_first_scheduling IS NOT NULL THEN 
+        WHEN uls.ts_first_scheduling IS NOT NULL THEN
             CASE
                 WHEN DATEDIFF(awk.ts_delivered, uls.ts_agent_scheduled) < 0 THEN True
                 ELSE False
             END
     END AS is_delivered_earlier_first_vc_agent,
     CASE
-        WHEN uls.ts_first_scheduling IS NOT NULL THEN 
+        WHEN uls.ts_first_scheduling IS NOT NULL THEN
             CASE
                 WHEN DATEDIFF(awk.ts_delivered, uls.ts_first_scheduling) <= 3 THEN True
                 ELSE False
         END
     END AS is_delivered_first_vc,
     CASE
-        WHEN uls.ts_first_scheduling IS NOT NULL THEN 
+        WHEN uls.ts_first_scheduling IS NOT NULL THEN
             CASE
                 WHEN DATEDIFF(awk.ts_delivered, uls.ts_agent_scheduled) <= 3 THEN True
                 ELSE False

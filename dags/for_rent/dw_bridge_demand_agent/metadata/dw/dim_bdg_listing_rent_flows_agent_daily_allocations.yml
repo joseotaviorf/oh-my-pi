@@ -8,7 +8,7 @@ columns:
   sk_listing_rent_flow:
     lineage:
       - dw_agent.fact_listing_rent_flows.ods_id
-    description: ODS ID (from dw_public.fact_listing_rent_flows)
+    description: ODS ID (from dw_rent.fact_listing_rent_flows)
   sk_date:
     lineage:
       - dw_agent.fact_agent_daily_allocations.sk_slot_date

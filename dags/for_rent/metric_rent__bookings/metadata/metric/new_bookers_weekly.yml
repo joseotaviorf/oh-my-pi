@@ -1,4 +1,3 @@
-
 ---
 database_name: metric_rent
 table_name: new_bookers_weekly
@@ -13,14 +12,15 @@ columns:
     dimension: True
   country_code:
     lineage:
-      - dw_public.fact_listing_rent_flows.country_code
+      - dw_rent.fact_listing_rent_flows.country_code
     description: Country code identifier.
     dimension: True
   new_bookers:
     description: Amount of users that made their first booking.
     metric:
       name: TP New Bookers Weekly
-      description: Amount of users that made their first booking segmented by sk_region.
+      description:
+        Amount of users that made their first booking segmented by sk_region.
         This amount is calculated by the count distinct of sk_client from fact_listing_rent_flows,
         segmented by country_code and we're filtering just the first booking of this sk_client.
       acronym: TP NB RG

@@ -1,7 +1,8 @@
 ---
 database_name: metric_rent
 table_name: visits_booked_per_ongoing_listings_weekly
-description: Weekly table with the amount of Visits Booked divided by the Ongoing Listing.
+description:
+  Weekly table with the amount of Visits Booked divided by the Ongoing Listing.
   Metric used to connect the supply and demand funnels.
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
@@ -13,19 +14,21 @@ columns:
     dimension: True
   country_code:
     lineage:
-      - dw_public.fact_listing_rent_flows.country_code
+      - dw_rent.fact_listing_rent_flows.country_code
     description: Country code of the house
     dimension: True
   visits_booked_per_ongoing_listings:
-    description: Total of Visits Booked divided by the Ongoing Listing on a week.
+    description:
+      Total of Visits Booked divided by the Ongoing Listing on a week.
       Metric used to connect the supply and demand funnels.
     metric:
       name: Visits Booked per Ongoing Listings Weekly
-      description: Total of Visits Booked divided by the Ongoing Listing on a week.
+      description:
+        Total of Visits Booked divided by the Ongoing Listing on a week.
         Metric used to connect the supply and demand funnels.
       acronym: VB2OL
       is_additive: False
       business_stage: Suply/Demand
       hierarchy: User analisys
       approved_by: augusto.torres@quintoandar.com.br
-      link_to_metric: 'https://quintoandar.sa.looker.com/looks/4763'
+      link_to_metric: "https://quintoandar.sa.looker.com/looks/4763"

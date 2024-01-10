@@ -1,14 +1,15 @@
 ---
 database_name: dw_datamarts
 table_name: weekly_demand_metrics
-description: Table with information about some metrics (bookings, offers submited
+description:
+  Table with information about some metrics (bookings, offers submited
   OS2OA, VB2VC, VC2OS and visits completed) segmented by house and reference week date.
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_house_listing
+      - dw_rent.fact_listing_rent_flows.sk_house_listing
     description: ID of the house.
   id_house_week:
     lineage:

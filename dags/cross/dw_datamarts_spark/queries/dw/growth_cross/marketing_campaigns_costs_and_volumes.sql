@@ -22,7 +22,7 @@ booking AS (
     FROM
         dw_public.dim_booking AS a
         JOIN
-            dw_public.fact_listing_rent_flows flrf
+            dw_rent.fact_listing_rent_flows flrf
             USING(sk_booking)
     WHERE
         a.sk_booking > 0
@@ -45,7 +45,8 @@ offer AS (
         a.dt_first_sent AS ts_event
     FROM
         dw_rent.dim_offer AS a
-        JOIN dw_public.fact_listing_rent_flows AS flrf
+    JOIN
+        dw_rent.fact_listing_rent_flows AS flrf
             USING(sk_offer)
     WHERE
         a.sk_offer > 0

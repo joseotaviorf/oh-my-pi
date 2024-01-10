@@ -19,7 +19,7 @@ WITH events AS (
         db.dt_created AS ts_event,
         'Booking' AS flow_event
     FROM
-        dw_public.fact_listing_rent_flows AS flrf
+        dw_rent.fact_listing_rent_flows AS flrf
         JOIN dw_public.dim_booking AS db
             ON CAST(flrf.sk_booking AS BIGINT) = CAST(db.sk_booking AS BIGINT)
     WHERE
@@ -47,8 +47,9 @@ WITH events AS (
         o.dt_first_sent AS ts_event,
         'Offer' AS flow_event
     FROM
-        dw_public.fact_listing_rent_flows AS flrf
-        JOIN dw_rent.dim_offer AS o
+        dw_rent.fact_listing_rent_flows AS flrf
+    JOIN
+        dw_rent.dim_offer AS o
             ON CAST(flrf.sk_offer AS BIGINT) = CAST(o.sk_offer AS BIGINT)
     WHERE
         CAST(o.sk_offer AS BIGINT) > 0

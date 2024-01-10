@@ -24,7 +24,7 @@ WITH all_listings AS (
     FROM
         dw_rent.dim_contract AS dc
     LEFT JOIN
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
             ON dc.sk_contract = rf.sk_contract
             AND (rf.sk_contract_signed_date > 0
                 OR rf.sk_contract_created_date > 0

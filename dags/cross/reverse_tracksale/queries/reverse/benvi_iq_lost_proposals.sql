@@ -18,7 +18,7 @@ distinct_offers AS (
         rf.sk_offer_submitted_date,
         rf.sk_offer_approved_date
     FROM
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
     INNER JOIN
         mexico_houses AS h
             ON rf.sk_house_listing=h.sk_house_listing  --- added to filter only BR business (excluding mexico)
@@ -72,7 +72,7 @@ distinct_bookings as (
         rf.sk_booking,
         rf.sk_booking_created_date
     FROM
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
     INNER JOIN
         dw_public.dim_region AS dr
             ON dr.sk_region = rf.sk_region
@@ -86,7 +86,7 @@ distinct_documentations AS (
         sk_client,
         sk_tenant_first_doc_sent_date
     FROM
-        dw_public.fact_listing_rent_flows
+        dw_rent.fact_listing_rent_flows
     WHERE
         sk_tenant_first_doc_sent_date > 0
     GROUP BY 1, 2
@@ -98,7 +98,7 @@ distinct_contracts AS (
         sk_contract,
         sk_contract_signed_date
     FROM
-        dw_public.fact_listing_rent_flows
+        dw_rent.fact_listing_rent_flows
     WHERE
         sk_contract_signed_date > 0
     GROUP BY 1, 2, 3
@@ -108,7 +108,7 @@ active_contracts as (
         rf.sk_client,
         COUNT(rf.sk_contract) > 0 AS has_active_contracts
     FROM
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
     INNER JOIN
         dw_rent.dim_contract AS dc
             ON rf.sk_contract = dc.sk_contract

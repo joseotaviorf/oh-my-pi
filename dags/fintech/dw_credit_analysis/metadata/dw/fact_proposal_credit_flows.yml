@@ -9,23 +9,23 @@ owner: isabella.santos@quintoandar.com.br
 columns:
   sk_client:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_client
+      - dw_rent.fact_listing_rent_flows.sk_client
     description: "Key of client that sent an offer or booked a visit."
   sk_house_listing:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_house_listing
+      - dw_rent.fact_listing_rent_flows.sk_house_listing
     description: "Listining identification, created by data team. A new version is given to a house after it was rented or unpublished."
   sk_house:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_house_listing
+      - dw_rent.fact_listing_rent_flows.sk_house_listing
     description: "Id of the house."
   sk_contract:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract
+      - dw_rent.fact_listing_rent_flows.sk_contract
     description: "Key of contract. This column can be used to join with the table dw_rent.dim_contract to get the contract details. When the sk_contract value is -1, it means that the contract has not been created yet."
   sk_contract_signed_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
     description: "Key of date when contract was signed."
   sk_credit_analysis:
     lineage:
@@ -41,11 +41,11 @@ columns:
     description: "Key of the current checklist. The checklist is an entity with all checks (manual or automatic) associated to an analysis request. This column may be -1 when the credit analysis was processed by the old credit engine."
   sk_credit_analysis_approved_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
+      - dw_rent.fact_listing_rent_flows.sk_credit_analysis_approved_date
     description: "Key of date when credit analysis was approved."
   sk_credit_evaluation_approved_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
+      - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_negative
     description:
       "Key of the date when credit evaluation was approved. This field should
       be used on Evaluation Positive (EP) on credit funnel as it contains the logic
@@ -68,7 +68,7 @@ columns:
     description: "Key for the guarantee category presented."
   sk_guarantee_paid_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
+      - dw_rent.fact_listing_rent_flows.sk_guarantee_paid_date
     description: "Key of date of guarantee paid."
   sk_guarantee_accepted_date:
     lineage:
@@ -80,27 +80,27 @@ columns:
     description: "Key for the last credit analysis to a given proposal."
   sk_last_credit_evaluation_init:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
     description: "Key of date when credit evaluation last was initiated."
   sk_last_credit_evaluation_negative:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
+      - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_negative
     description: "Key of date when credit evaluation last was negative."
   sk_last_credit_evaluation_positive:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_positive
+      - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_positive
     description: "Key of date when credit evaluation last was positive."
   sk_offer:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer
+      - dw_rent.fact_listing_rent_flows.sk_offer
     description: "Key of offer."
   sk_offer_approved_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer_approved_date
+      - dw_rent.fact_listing_rent_flows.sk_offer_approved_date
     description: "Key of date when offer was approved by owner."
   sk_offer_submitted_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
+      - dw_rent.fact_listing_rent_flows.sk_offer_submitted_date
     description: "Key of date when offer was submitted by client."
   sk_proposal:
     lineage:
@@ -108,15 +108,15 @@ columns:
     description: "Key of proposal (offer that was accepted)."
   sk_region:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_region
+      - dw_rent.fact_listing_rent_flows.sk_region
     description: "Key of house region."
   sk_tenant_doc_complete_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_tenant_doc_complete_date
+      - dw_rent.fact_listing_rent_flows.sk_tenant_doc_complete_date
     description: "Key of date when tenant doc was completed."
   sk_tenant_first_doc_sent_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
+      - dw_rent.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
     description: "Key of date when client sent first documentation."
   sk_drop_reason:
     lineage:
@@ -136,7 +136,7 @@ columns:
     description: "Key of the drop reason. This column can be used to join with the table dw_public.dim_drop_reason to get the drop reason description."
   funnel_step:
     lineage:
-      - dw_public.fact_listing_rent_flows.funnel_step
+      - dw_rent.fact_listing_rent_flows.funnel_step
     description: "The funnel step where this flow is in/has stoppped."
   guarantee_offered:
     description: "If the tenant prospect is not a clear no by income reasons, 5A offers one or more type of guarantee.  The offered guarantee can be paid or free. This column indicates which guarantee was offered to the TP after the evaluation process. The guarantee offered might be null if the credit analysis was transfered or had a later approval to free."

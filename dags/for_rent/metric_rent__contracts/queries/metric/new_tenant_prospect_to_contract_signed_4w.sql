@@ -6,7 +6,7 @@ WITH base AS (
         do.dt_created AS dt_offer_sent,
         dc.ts_signature AS dt_contract_signed
     FROM
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
     LEFT JOIN
         dw_public.dim_booking AS db
             ON rf.sk_booking = db.sk_booking

@@ -61,7 +61,7 @@ WITH rent_flows_adap AS (
     tta_c.first_attendance_date,
     tta_c.sk_house_listing || tta_c.sk_client || tta_c.agent_id as tta_id
   FROM
-    dw_public.fact_listing_rent_flows AS rf
+    dw_rent.fact_listing_rent_flows AS rf
   LEFT JOIN
     dw_rent.fact_rent_flows AS frf
       ON rf.sk_rent_flow = frf.sk_rent_flow

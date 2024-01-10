@@ -51,8 +51,8 @@ brokerage_fees AS (
     datalake_revenue_lines.brokerage_fee
   WHERE
     contract_guarantee IN (
-      'SeguroFairfax', 
-      'PRO_GUARANTOR', 
+      'SeguroFairfax',
+      'PRO_GUARANTOR',
       'RentalDeposit',
       'Standalone'
     )
@@ -311,7 +311,7 @@ revenues_calculation AS (
       ON revenue.id_house_listing = r.id_house_listing
       AND revenue.accrual_year_month = r.created_accrual_year_month
   LEFT JOIN
-    dw_public.fact_listing_rent_flows AS rf
+    dw_rent.fact_listing_rent_flows AS rf
     ON r.id_reservation = rf.sk_reservation
   FULL OUTER JOIN
     long_term_rental_anticipation AS ltra

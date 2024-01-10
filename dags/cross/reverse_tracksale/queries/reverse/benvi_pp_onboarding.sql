@@ -6,7 +6,7 @@ WITH new_contracts AS (
     FROM
         dw_rent.dim_contract AS dc
     INNER JOIN
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
             ON dc.sk_contract = rf.sk_contract
             AND rf.sk_contract_signed_date > 0 -- select only signed contracts
             AND dc.country_code = 'MX'

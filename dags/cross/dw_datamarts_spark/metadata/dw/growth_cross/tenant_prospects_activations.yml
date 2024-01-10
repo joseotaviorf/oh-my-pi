@@ -6,7 +6,7 @@ columns:
     lineage:
       - dw_datamarts.rent_flow_interactions.sk_client
       - dw_rent.fact_contract_people.sk_user
-      - dw_public.fact_listing_rent_flows.sk_client
+      - dw_rent.fact_listing_rent_flows.sk_client
   city_group:
     lineage:
       - dw_public.dim_region.city_group

@@ -3,7 +3,7 @@ WITH b2b_listings AS (--all b2b listings with contracts signed
     rf.sk_contract,
     hl.is_b2b
   FROM
-    dw_public.fact_listing_rent_flows AS rf
+    dw_rent.fact_listing_rent_flows AS rf
   INNER JOIN
     dw_public.dim_house_listing AS hl
       ON rf.sk_house_listing = hl.sk_house_listing

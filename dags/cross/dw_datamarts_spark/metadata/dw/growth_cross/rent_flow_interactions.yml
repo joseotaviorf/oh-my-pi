@@ -7,12 +7,12 @@ owner: cristina.cardoso@quintoandar.com.br
 columns:
   sk_client:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_client
+      - dw_rent.fact_listing_rent_flows.sk_client
       - datalake_talk_to_agent.talk_to_agent.tenant_id
     description: key of the client user.
   sk_house_listing:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_house_listing
+      - dw_rent.fact_listing_rent_flows.sk_house_listing
       - datalake_talk_to_agent.talk_to_agent.sk_house_listing
     description: key of the listing of the house after prospect.
   id_house:
@@ -23,7 +23,7 @@ columns:
     description: key of the house.
   sk_rf:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_client
+      - dw_rent.fact_listing_rent_flows.sk_client
       - datalake_talk_to_agent.talk_to_agent.tenant_id
       - dw_public.dim_booking.id_property
       - dw_rent.dim_offer.id_property
@@ -31,7 +31,7 @@ columns:
     description: key of the rent flow.
   sk_region:
     lineage:
-      - dw_public.fact_listing_rent_flows.sk_region
+      - dw_rent.fact_listing_rent_flows.sk_region
       - dw_public.fact_house_listings.sk_region
     description: key of the region of the QuintoAndar.
   mkt_origin:

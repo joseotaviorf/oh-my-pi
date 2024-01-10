@@ -95,7 +95,7 @@ regions AS (
         sk_house_listing,
         MIN(days_house_listing_to_contract_signed) AS days_house_listing_to_contract_signed
     FROM
-	 dw_public.fact_listing_rent_flows
+	 dw_rent.fact_listing_rent_flows
     GROUP BY 1
 ),
 listings_info AS (
@@ -169,7 +169,7 @@ contract_base AS (
         d.house_type,
         c.rent/d.house_total_area AS price_m2
     FROM
-	 dw_public.fact_listing_rent_flows f
+	 dw_rent.fact_listing_rent_flows f
     INNER JOIN
 	 contracts c
           ON c.sk_contract = f.sk_contract

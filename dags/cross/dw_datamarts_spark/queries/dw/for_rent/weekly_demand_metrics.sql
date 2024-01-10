@@ -6,18 +6,18 @@ WITH visit_booked AS (
         COUNT(DISTINCT CASE WHEN rf.flg_visit_completed = true THEN rf.sk_booking ELSE NULL END) AS vb2vc,
         COUNT(DISTINCT CASE WHEN sk_contract_signed_date > 0 AND DATEDIFF(dd3.date, dd1.date) <= 28 THEN sk_contract ELSE NULL END) AS vb2cs_4w,
         COUNT(DISTINCT CASE WHEN sk_contract_signed_date > 0 AND DATEDIFF(dd3.date, dd1.date) <= 56 THEN sk_contract ELSE NULL END) AS vb2cs_8w
-    FROM 
-        dw_public.fact_listing_rent_flows rf
-    JOIN 
+    FROM
+        dw_rent.fact_listing_rent_flows rf
+    JOIN
         dw_public.dim_date dd1
             ON dd1.sk_date = rf.sk_booking_created_date
-    JOIN 
+    JOIN
         dw_public.dim_date dd2
             ON dd2.sk_date = rf.sk_visit_date
-    JOIN 
+    JOIN
         dw_public.dim_date dd3
             ON dd3.sk_date = rf.sk_contract_signed_date
-    WHERE 
+    WHERE
         dd1.week_start > DATE(CURRENT_DATE - INTERVAL '26 WEEKS')
         AND rf.sk_booking > 0
     GROUP BY 1,2
@@ -28,15 +28,15 @@ visit_completed AS (
         dd1.week_start,
         COUNT(DISTINCT CASE WHEN rf.flg_visit_completed = true AND rf.sk_offer_submitted_date > 0 AND DATEDIFF(dd2.date, dd1.date) <= 28 THEN rf.sk_offer ELSE NULL END) AS vc2os_4w,
         COUNT(DISTINCT CASE WHEN rf.flg_visit_completed = true THEN rf.sk_booking ELSE NULL END) AS visits_completed
-    FROM 
-        dw_public.fact_listing_rent_flows rf
-    JOIN 
+    FROM
+        dw_rent.fact_listing_rent_flows rf
+    JOIN
         dw_public.dim_date dd1
             ON dd1.sk_date = rf.sk_visit_date
-    JOIN 
+    JOIN
         dw_public.dim_date dd2
             ON dd2.sk_date = rf.sk_offer_submitted_date
-    WHERE 
+    WHERE
         dd1.week_start > DATE(CURRENT_DATE - INTERVAL '26 WEEKS')
     GROUP BY 1,2
 ),
@@ -47,15 +47,15 @@ offer_submitted AS (
         COUNT(DISTINCT sk_offer) AS offer_submitted,
         COUNT(DISTINCT CASE WHEN sk_offer_approved_date > 0 THEN sk_offer ELSE NULL END) AS os2oa,
         COUNT(DISTINCT CASE WHEN sk_offer_approved_date > 0 AND DATEDIFF(dd2.date, dd1.date) <= 14 THEN sk_offer ELSE NULL END) AS os2oa_2w
-    FROM 
-        dw_public.fact_listing_rent_flows rf
-    JOIN 
+    FROM
+        dw_rent.fact_listing_rent_flows rf
+    JOIN
         dw_public.dim_date dd1
             ON dd1.sk_date = rf.sk_offer_submitted_date
-    JOIN 
+    JOIN
         dw_public.dim_date dd2
             ON dd2.sk_date = rf.sk_offer_approved_date
-    WHERE 
+    WHERE
         dd1.week_start > DATE(CURRENT_DATE - INTERVAL '26 WEEKS')
     GROUP BY 1,2
   ),
@@ -72,13 +72,13 @@ demand_metrics AS (
         SUM(vb.vb2cs_8w) AS vb2cs_8w,
         SUM(vc.vc2os_4w) AS vc2os_4w,
         SUM(vc.visits_completed) AS visits_completed
-    FROM 
+    FROM
         visit_booked vb
     FULL JOIN
-        visit_completed vc 
-            ON vc.sk_house_listing = vb.sk_house_listing 
+        visit_completed vc
+            ON vc.sk_house_listing = vb.sk_house_listing
             AND vc.week_start = vb.week_start
-    FULL JOIN 
+    FULL JOIN
         offer_submitted os
             ON os.sk_house_listing = vb.sk_house_listing
             AND os.week_start = vb.week_start
@@ -97,6 +97,6 @@ SELECT
     SUM(vb2cs_8w) AS vb2cs_8w,
     SUM(vc2os_4w) AS vc2os_4w,
     SUM(visits_completed) AS visits_completed
-FROM 
+FROM
     demand_metrics
-GROUP BY 1,2,3 
+GROUP BY 1,2,3

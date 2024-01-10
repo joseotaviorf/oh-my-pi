@@ -5,7 +5,7 @@ WITH new_contracts AS (
 	FROM
 		dw_rent.dim_contract dc
 	INNER JOIN
-		dw_public.fact_listing_rent_flows rf
+		dw_rent.fact_listing_rent_flows rf
 			ON dc.sk_contract = rf.sk_contract
 			AND rf.sk_contract_signed_date > 0
 	INNER JOIN

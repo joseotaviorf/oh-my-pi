@@ -486,7 +486,7 @@ rent_flow_adjusted AS (
         COALESCE(dhl.country_code, dr.country_code) AS country_code,
         dhl.rental_administrator
     FROM
-        dw_public.fact_listing_rent_flows rf
+        dw_rent.fact_listing_rent_flows rf
     LEFT JOIN
         dw_rent.dim_proposal dp
             ON rf.sk_proposal = dp.sk_proposal

@@ -28,7 +28,7 @@ booking_review AS (
     ROUND(CAST(AVG(br.cost_benefit) AS FLOAT), 2) AS house_score_cost_benefit,
     ROUND(CAST(AVG(br.conservation) AS FLOAT), 2) AS house_score_conservation
   FROM
-    dw_public.fact_listing_rent_flows AS rf
+    dw_rent.fact_listing_rent_flows AS rf
   LEFT JOIN
     dw_public.dim_tenant_booking_review AS br
       ON br.sk_tenant_booking_review = rf.sk_tenant_booking_review
@@ -63,7 +63,7 @@ house_consideration_infos AS (
       END
     ) AS house_qty_visit
   FROM
-    dw_public.fact_listing_rent_flows
+    dw_rent.fact_listing_rent_flows
   GROUP BY
     1
 ),
@@ -116,7 +116,7 @@ rent_flow AS (
     rf.sk_client sk_tenant,
     rf.sk_region
   FROM
-    dw_public.fact_listing_rent_flows AS rf
+    dw_rent.fact_listing_rent_flows AS rf
   WHERE
     rf.sk_contract != -1
 ),

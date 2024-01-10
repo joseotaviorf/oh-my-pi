@@ -24,7 +24,7 @@ house_listing_fix AS (
         sk_contract,
         MAX(sk_house_listing) AS sk_house_listing
     FROM
-        dw_public.fact_listing_rent_flows
+        dw_rent.fact_listing_rent_flows
     GROUP BY
         1
 ),

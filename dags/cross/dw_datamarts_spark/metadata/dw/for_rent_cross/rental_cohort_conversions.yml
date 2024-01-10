@@ -65,20 +65,20 @@ columns:
       - dw_datamarts.lead_listing_flows.sk_qualified_date
       - dw_datamarts.lead_listing_flows.sk_opportunity_date
       - dw_datamarts.lead_listing_flows.sk_first_listing_date
-      - dw_public.fact_listing_rent_flows.sk_booking_created_date
-      - dw_public.fact_listing_rent_flows.sk_visit_date
-      - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
-      - dw_public.fact_listing_rent_flows.sk_offer_approved_date
-      - dw_public.fact_listing_rent_flows.sk_first_credit_evaluation_init
-      - dw_public.fact_listing_rent_flows.sk_last_doc_analysis_approved
-      - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
-      - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
-      - dw_public.fact_listing_rent_flows.sk_first_credit_evaluation_positive
-      - dw_public.fact_listing_rent_flows.sk_guarantee_date
-      - dw_public.fact_listing_rent_flows.sk_contract_created_date
-      - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
-      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
-      - dw_public.fact_listing_rent_flows.sk_contract_annulment_date
+      - dw_rent.fact_listing_rent_flows.sk_booking_created_date
+      - dw_rent.fact_listing_rent_flows.sk_visit_date
+      - dw_rent.fact_listing_rent_flows.sk_offer_submitted_date
+      - dw_rent.fact_listing_rent_flows.sk_offer_approved_date
+      - dw_rent.fact_listing_rent_flows.sk_first_credit_evaluation_init
+      - dw_rent.fact_listing_rent_flows.sk_last_doc_analysis_approved
+      - dw_rent.fact_listing_rent_flows.sk_credit_analysis_approved_date
+      - dw_rent.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
+      - dw_rent.fact_listing_rent_flows.sk_first_credit_evaluation_positive
+      - dw_rent.fact_listing_rent_flows.sk_guarantee_date
+      - dw_rent.fact_listing_rent_flows.sk_contract_created_date
+      - dw_rent.fact_listing_rent_flows.sk_guarantee_paid_date
+      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
+      - dw_rent.fact_listing_rent_flows.sk_contract_annulment_date
     description: The number of weeks it took for the rental cohort to convert.
   rental_administrator:
     lineage:

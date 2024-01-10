@@ -1,4 +1,4 @@
-database_name: dw_public
+database_name: dw_rent
 table_name: dim_rent_flow_taxonomy
 description: This table has data related to the Rent Flow's demand taxonomy, used to categorize a rent flow related to
   the lead of origin (which can be a TP (Tenant Prospect, if talking about Rent) or BP (Buyer Prospect, if talking about Sale)).
@@ -20,7 +20,7 @@ columns:
     description: The interpretation of how the TP/BP is attributed to the acquisition strategy.
     categories:
       Inbound: Marketing strategy related to reaching clients through relevant content.
-      Not Mapped: A more traditional marketing strategy, focused on reaching clients through physical and digital advertising. 
+      Not Mapped: A more traditional marketing strategy, focused on reaching clients through physical and digital advertising.
   mkt_flow:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.flow

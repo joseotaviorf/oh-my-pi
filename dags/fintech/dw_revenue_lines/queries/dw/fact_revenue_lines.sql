@@ -98,7 +98,7 @@ reservation AS (
       FROM
         datalake_revenue_lines.reservation AS r
       INNER JOIN
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
           ON r.id_reservation = rf.sk_reservation
       WHERE
         rf.sk_contract > 0

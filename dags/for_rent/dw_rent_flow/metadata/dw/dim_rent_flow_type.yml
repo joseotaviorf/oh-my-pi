@@ -51,7 +51,7 @@ columns:
       Rent intent or it could have Sale intent but is related to a rent contract at the end. Then, at least one demand event
       needs to follows several rules -- for example, to count a visit booked, it has to be type = Visit,
       otherwise it won't be counted as a valid visit booked.
-      In this way, the rent flow is considered as valid (is_valid_rent_flow = true), otherwise it won't. 
+      In this way, the rent flow is considered as valid (is_valid_rent_flow = true), otherwise it won't.
   has_visit_flow:
     lineage:
       - datalake_rent_flows.rent_flows_types.has_visit_flow

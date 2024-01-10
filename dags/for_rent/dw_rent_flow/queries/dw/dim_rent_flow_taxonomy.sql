@@ -10,4 +10,5 @@ SELECT
     source AS mkt_source,
     platform AS mkt_platform,
     NOW() AS ts_load
-FROM datalake_gsheets_clean.taxonomy_demand
+FROM
+    datalake_gsheets_clean.taxonomy_demand

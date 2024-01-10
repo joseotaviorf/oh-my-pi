@@ -35,7 +35,7 @@ events_user AS (
         sk_reservation,
         sk_contract,
         sk_visit
-    FROM dw_public.fact_listing_rent_flows rf
+    FROM dw_rent.fact_listing_rent_flows rf
     FULL OUTER JOIN events_agent AS ta
     ON rf.sk_client = ta.sk_client AND rf.sk_region = ta.sk_region
     LEFT JOIN dw_public.dim_region dr

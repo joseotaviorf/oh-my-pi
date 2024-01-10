@@ -10,7 +10,7 @@ tps_contracts AS (
       NULL::INT AS cs_order
   FROM
       dw_rent.dim_contract AS dc
-      JOIN dw_public.fact_listing_rent_flows AS flrf
+      JOIN dw_rent.fact_listing_rent_flows AS flrf
           ON dc.sk_contract = flrf.sk_contract
       JOIN dw_public.dim_region AS dr
           ON flrf.sk_region = dr.sk_region
@@ -39,7 +39,7 @@ contract_person AS (
                           ORDER BY fcp.contract_role DESC) as cs_order
     FROM
         dw_rent.dim_contract AS dc
-        JOIN dw_public.fact_listing_rent_flows AS flrf
+        JOIN dw_rent.fact_listing_rent_flows AS flrf
             ON dc.sk_contract = flrf.sk_contract
         JOIN dw_public.dim_region AS dr
             ON flrf.sk_region = dr.sk_region

@@ -1,6 +1,6 @@
-SELECT 
+SELECT
     r.id_reservation AS sk_reservation,
-    MAX(rf.sk_contract) AS id_contract, 
+    MAX(rf.sk_contract) AS id_contract,
     r.status,
     r.cancellation_reason,
     r.total_installments,
@@ -13,9 +13,9 @@ SELECT
 FROM
     datalake_revenue_lines.reservation r
 INNER JOIN
-    dw_public.fact_listing_rent_flows AS rf
+    dw_rent.fact_listing_rent_flows AS rf
         ON r.id_reservation = rf.sk_reservation
-WHERE 
+WHERE
     rf.sk_contract > 0
     AND r.id_reservation > 0
     AND r.is_ongoing IS NULL

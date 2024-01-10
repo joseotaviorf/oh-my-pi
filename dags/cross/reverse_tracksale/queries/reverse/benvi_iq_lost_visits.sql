@@ -14,7 +14,7 @@ distinct_bookings AS (
 		rf.sk_booking,
 		rf.sk_booking_created_date
 	FROM
-		dw_public.fact_listing_rent_flows AS rf
+		dw_rent.fact_listing_rent_flows AS rf
 	INNER JOIN
 		mex_houses h
 			ON rf.sk_house_listing = h.sk_house_listing  --- added to filter only MX business (excluding BR)
@@ -59,7 +59,7 @@ distinct_offers AS (
 		sk_offer,
 		sk_offer_submitted_date
 	FROM
-		dw_public.fact_listing_rent_flows
+		dw_rent.fact_listing_rent_flows
 	GROUP BY 1, 2, 3
 ),
 -- get all distinct talk to agent for each client

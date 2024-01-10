@@ -6,7 +6,7 @@ SELECT
 FROM
     dw_public.dim_house_listing AS dhl
 LEFT JOIN
-    dw_public.fact_listing_rent_flows AS rf
+    dw_rent.fact_listing_rent_flows AS rf
         ON rf.sk_house_listing = dhl.sk_house_listing
 LEFT JOIN
     dw_public.dim_date AS dd

@@ -12,7 +12,7 @@ columns:
     dimension: True
   country_code:
     lineage:
-      - dw_public.fact_listing_rent_flows.country_code
+      - dw_rent.fact_listing_rent_flows.country_code
     description: Country code
     dimension: True
   new_bookers:

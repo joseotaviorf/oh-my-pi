@@ -59,7 +59,7 @@ guarantees AS (
       END
     ) AS guarantee_not_accepted
   FROM
-    dw_public.fact_listing_rent_flows AS flrf
+    dw_rent.fact_listing_rent_flows AS flrf
     LEFT JOIN
       datalake_rental_guarantee.guarantee AS g
         ON g.id_documentation_ebdb = flrf.sk_proposal
@@ -142,7 +142,7 @@ rent_flows AS (
     hl.version,
     IF(g.guarantee_not_accepted = 1, TRUE, FALSE) AS guarantee_not_accepted
   FROM
-    dw_public.fact_listing_rent_flows AS flrf
+    dw_rent.fact_listing_rent_flows AS flrf
   LEFT JOIN
     datalake_credit_analysis.credit_analysis_proposals AS cap
       ON cap.id_proposal = flrf.sk_proposal
@@ -150,7 +150,7 @@ rent_flows AS (
     credit_analysis AS ca
       ON cap.id_proposal = ca.id_proposal
   LEFT JOIN
-    dw_public.dim_date AS dd 
+    dw_public.dim_date AS dd
       ON flrf.sk_offer_submitted_date = dd.sk_date
   LEFT JOIN
     dw_public.dim_house_listing AS hl

@@ -186,7 +186,7 @@ new_bookers AS (
                 db.dt_created AS first_booking_created_date,
                 ROW_NUMBER() OVER(PARTITION BY rf.sk_client ORDER BY db.dt_created ASC NULLS LAST, rf.sk_region) AS rk
             FROM
-                dw_public.fact_listing_rent_flows AS rf
+                dw_rent.fact_listing_rent_flows AS rf
             JOIN
                 dw_public.dim_booking AS db
                 ON db.sk_booking = rf.sk_booking
@@ -202,7 +202,7 @@ new_bookers AS (
     FROM
         first_booking AS fb
     LEFT JOIN
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
             ON (fb.sk_client = rf.sk_client)
     LEFT JOIN
         dw_public.dim_date AS dd
@@ -361,7 +361,7 @@ visits_booked_per_ongoing_listings AS (
             dr.city_name,
             COUNT(DISTINCT CASE WHEN (rf.sk_booking_created_date  > 0) THEN rf.sk_booking ELSE NULL END) AS visits_booked
         FROM
-            dw_public.fact_listing_rent_flows AS rf
+            dw_rent.fact_listing_rent_flows AS rf
         JOIN
             dw_public.dim_booking AS db
                 ON db.sk_booking = rf.sk_booking
@@ -452,7 +452,7 @@ bookers AS (
         dr.city_name,
         COUNT(DISTINCT rf.sk_client) AS bookers_weekly
     FROM
-        dw_public.fact_listing_rent_flows AS rf
+        dw_rent.fact_listing_rent_flows AS rf
     LEFT JOIN
         dw_public.dim_date AS dd
             ON rf.sk_booking_created_date = dd.sk_date

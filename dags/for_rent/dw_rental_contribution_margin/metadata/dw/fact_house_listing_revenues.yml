@@ -1,20 +1,22 @@
 database_name: dw_rental_contribution_margin
 table_name: fact_house_listing_revenues
-description: This table shows the revenues of each contract and competence month.
+description:
+  This table shows the revenues of each contract and competence month.
   Each row represents the revenues of the contract in a month. So we can have repeated
   ID contracs and ID house_listing
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_house_listing_revenue:
-    description: Primary key for the table. It is generated artificially in the ETL,
+    description:
+      Primary key for the table. It is generated artificially in the ETL,
       so it has no meaning or correspondence in any product.
   id_contract:
     lineage:
     - datalake_invoice.invoice_entries.id_contract
     - datalake_revenue_lines.long_term_rental_anticipation.id_contract_ebdb
     - datalake_revenue_lines.rental_guarantee.id_contract
-    - dw_public.fact_listing_rent_flows.sk_contract
+    - dw_rent.fact_listing_rent_flows.sk_contract
     description: Natural key that represents the contract ID.
   id_house_listing:
     lineage:
@@ -30,17 +32,19 @@ columns:
     description: Natural key that represents the house ID.
   country_code:
     lineage:
-    - datalake_ebdb_country.house.country_code
+      - datalake_ebdb_country.house.country_code
     description: Country code of the house. We're filtering just BR houses.
   contract_lifetime:
-    description: The difference between the month when the contract started and competence
+    description:
+      The difference between the month when the contract started and competence
       month of the revenue.
   rent_value_invoice:
     description: Rent value of the contract charged from tenant.
   rental_management:
     description: Management fee value charged from landlord.
   rental_brokerage:
-    description: First rental commission value. We receive this value just on the
+    description:
+      First rental commission value. We receive this value just on the
       first competence month of the contract.
   insurance_commission:
     description: Home/fire insurance revenue.
@@ -68,7 +72,8 @@ columns:
   affiliates_commission:
     description: Affiliates commission share value that is passed to CIQ. (Negative value).
   partner_share_brokerage:
-    description: Commission paid to affiliates/B2B partners. We receive this value
+    description:
+      Commission paid to affiliates/B2B partners. We receive this value
       just on the first competence month of the contract. (Negative value).
   partner_share_management:
     description: Administration fee paid to partners when the contract is linked
@@ -83,15 +88,15 @@ columns:
     description: Discount revenue calculated by adding the agents_commission, brokerage_partner_share, management_partner_share columns. This column has negative value.
   quarter:
     lineage:
-    - dw_public.dim_date.quarter
+      - dw_public.dim_date.quarter
     description: Quarter of the revenue's competence month.
   accrual_year_month:
     lineage:
-    - datalake_retsuko.invoice.accrual_year_month
+      - datalake_retsuko.invoice.accrual_year_month
     description: Competence month of the revenue.
   dt_month_start:
     lineage:
-    - dw_public.dim_date.month_start
+      - dw_public.dim_date.month_start
     description: Month start date of the revenue's compentece month.
   ts_load:
     description: Time when the table was loaded.

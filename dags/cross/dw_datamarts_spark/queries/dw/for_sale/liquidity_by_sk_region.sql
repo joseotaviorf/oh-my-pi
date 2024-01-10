@@ -1,9 +1,9 @@
 WITH rent_flows_contracts AS (
-    SELECT DISTINCT 
+    SELECT DISTINCT
         sk_house_listing,
         MAX(days_house_listing_to_contract_signed) AS days_house_listing_to_contract_signed
     FROM
-        dw_public.fact_listing_rent_flows
+        dw_rent.fact_listing_rent_flows
     WHERE
         days_house_listing_to_contract_signed IS NOT NULL
     GROUP BY
@@ -27,7 +27,7 @@ listings_metrics AS (
     FROM
         dw_public.dim_house_listing AS hl
     LEFT JOIN
-        dw_public.fact_house_listings AS fhl 
+        dw_public.fact_house_listings AS fhl
             ON hl.sk_house_listing = fhl.sk_house_listing
     LEFT JOIN
         rent_flows_contracts AS rf
@@ -47,9 +47,9 @@ aux_liquidity_metrics AS (
         m.sk_region,
         m.house_bedrooms_category,
         SUM(
-            CASE 
-                WHEN m.days_house_listing_to_contract_signed BETWEEN 0 AND 42 THEN 1 
-                ELSE 0 
+            CASE
+                WHEN m.days_house_listing_to_contract_signed BETWEEN 0 AND 42 THEN 1
+                ELSE 0
             END
         ) AS rented_in_6_weeks,
         COUNT(*) AS sample_size,
@@ -100,7 +100,7 @@ liquidity_metrics AS (
         median_days_house_listing_to_contract_signed
     FROM
         aux_liquidity_metrics_percentages
-    WHERE 
+    WHERE
         sample_size > 0
         AND percent_rented_in_6_weeks < 1
         AND percent_rented_in_6_weeks > 0
@@ -144,20 +144,20 @@ SELECT
     l.rented_in_6_weeks,
     ROUND(percent_rented_in_6_weeks, 2) AS percent_rented_in_6_weeks,
     (
-        CASE 
-            WHEN percent_rented_in_6_weeks >= percent_rented_in_6_weeks_error THEN ' ' 
-            ELSE '' 
-        END 
-        || FORMAT_NUMBER((percent_rented_in_6_weeks - percent_rented_in_6_weeks_error), 2) || '- ' 
+        CASE
+            WHEN percent_rented_in_6_weeks >= percent_rented_in_6_weeks_error THEN ' '
+            ELSE ''
+        END
+        || FORMAT_NUMBER((percent_rented_in_6_weeks - percent_rented_in_6_weeks_error), 2) || '- '
         || FORMAT_NUMBER((percent_rented_in_6_weeks + percent_rented_in_6_weeks_error), 2)
     ) AS percent_rented_in_6_weeks_interval,
     ROUND(percent_rented_in_6_weeks_error, 2) AS percent_rented_in_6_weeks_error,
     percent_rented_in_6_weeks_error_level,
     ROUND(average_days_house_listing_to_contract_signed) AS average_days_house_listing_to_contract_signed,
     (
-        FORMAT_NUMBER(average_days_house_listing_to_contract_signed - average_days_house_listing_to_contract_signed_error, 0) 
-        || '-' 
-        || FORMAT_NUMBER(average_days_house_listing_to_contract_signed + average_days_house_listing_to_contract_signed_error, 0) 
+        FORMAT_NUMBER(average_days_house_listing_to_contract_signed - average_days_house_listing_to_contract_signed_error, 0)
+        || '-'
+        || FORMAT_NUMBER(average_days_house_listing_to_contract_signed + average_days_house_listing_to_contract_signed_error, 0)
     ) AS average_days_house_listing_to_contract_signed_interval,
     ROUND(average_days_house_listing_to_contract_signed_error, 2) AS average_days_house_listing_to_contract_signed_error,
     median_days_house_listing_to_contract_signed AS median_days_house_listing_to_contract_signed,

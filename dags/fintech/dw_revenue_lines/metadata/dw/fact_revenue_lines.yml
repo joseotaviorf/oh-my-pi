@@ -17,7 +17,7 @@ columns:
       - datalake_revenue_lines.management_fee.id_contract_ebdb
       - datalake_revenue_lines.month_rental_anticipation.id_contract_ebdb
       - datalake_revenue_lines.rental_guarantee.id_contract
-      - dw_public.fact_listing_rent_flows.sk_contract
+      - dw_rent.fact_listing_rent_flows.sk_contract
       - datalake_revenue_lines.service_fee.id_contract_ebdb
     description: Id of the contract, used as the foreign key to link with the dimensions.
   accrual_year_month:
