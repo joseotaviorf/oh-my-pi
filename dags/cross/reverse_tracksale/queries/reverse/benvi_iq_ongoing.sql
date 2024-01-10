@@ -1,54 +1,54 @@
 -- Benvi IQ Ongoing: tenants and dwellers every 6 month anniversary from start, excluding people under rescision
 WITH anniversary_contracts AS (
-	SELECT 
+	SELECT
 		dc.sk_contract,
         CONCAT(ROUND(MONTHS_BETWEEN(CURRENT_DATE(), COALESCE(dc.dt_start, DATE(dc.ts_signature))), 0), ' meses') AS step
 	FROM
-        dw_public.dim_contract AS dc	
+        dw_rent.dim_contract AS dc
 	LEFT JOIN
         datalake_terminator_clean.termination AS t
-            ON dc.sk_contract = t.id_contract 
+            ON dc.sk_contract = t.id_contract
 	WHERE
         dc.country_code = 'MX'
         AND dc.status = 'Ativo' -- only ongoing contracts
 		-- select only contracts in each 6th anniversary
-		AND COALESCE(dc.dt_start, DATE(dc.ts_signature)) IN (ADD_MONTHS(CURRENT_DATE(), -6), ADD_MONTHS(CURRENT_DATE(), -12), ADD_MONTHS(CURRENT_DATE(), -18), 
-			ADD_MONTHS(CURRENT_DATE(), -24), ADD_MONTHS(CURRENT_DATE(), -30), ADD_MONTHS(CURRENT_DATE(), -36), ADD_MONTHS(CURRENT_DATE(), -42), 
+		AND COALESCE(dc.dt_start, DATE(dc.ts_signature)) IN (ADD_MONTHS(CURRENT_DATE(), -6), ADD_MONTHS(CURRENT_DATE(), -12), ADD_MONTHS(CURRENT_DATE(), -18),
+			ADD_MONTHS(CURRENT_DATE(), -24), ADD_MONTHS(CURRENT_DATE(), -30), ADD_MONTHS(CURRENT_DATE(), -36), ADD_MONTHS(CURRENT_DATE(), -42),
 			ADD_MONTHS(CURRENT_DATE(), -48), ADD_MONTHS(CURRENT_DATE(), -54), ADD_MONTHS(CURRENT_DATE(), -60))
 		AND t.id_contract IS NULL -- excluding contracts that started termination process
 ),
 recovery_contracts AS (
-	SELECT 
+	SELECT
 		ft.sk_contract,
 		'Repescagem Casos Especiais' AS step
 	FROM
         dw_tickets.dim_ticket AS dt
 	INNER JOIN
-        dw_tickets.fact_tickets AS ft 
+        dw_tickets.fact_tickets AS ft
 		    ON dt.sk_ticket  = ft.sk_ticket
     INNER JOIN
         dw_customer_support.dim_department AS dc
 			ON dt.group_name = dc.department
 			AND dc.team IN ('Casos Especiais','Ouvidoria','ReclameAqui') -- exclude users from these areas (crisis)
 	LEFT JOIN
-        dw_public.dim_contract AS dc_
+        dw_rent.dim_contract AS dc_
 	        ON dc_.sk_contract = ft.sk_contract
 	WHERE
         dc_.country_code = 'MX'
 		AND DATE(ft.ts_closed_local) = DATE_ADD(CURRENT_DATE(), -10) -- select tickets from Proteção 5A closed 3 days ago
 		AND dc_.status = 'Ativo'
-		and COALESCE(dc_.dt_start, DATE(dc_.ts_signature)) IN (ADD_MONTHS(CURRENT_DATE(), -6), ADD_MONTHS(CURRENT_DATE(), -12), ADD_MONTHS(CURRENT_DATE(), -18), 
-			ADD_MONTHS(CURRENT_DATE(), -24), ADD_MONTHS(CURRENT_DATE(), -30), ADD_MONTHS(CURRENT_DATE(), -36), ADD_MONTHS(CURRENT_DATE(), -42), 
+		and COALESCE(dc_.dt_start, DATE(dc_.ts_signature)) IN (ADD_MONTHS(CURRENT_DATE(), -6), ADD_MONTHS(CURRENT_DATE(), -12), ADD_MONTHS(CURRENT_DATE(), -18),
+			ADD_MONTHS(CURRENT_DATE(), -24), ADD_MONTHS(CURRENT_DATE(), -30), ADD_MONTHS(CURRENT_DATE(), -36), ADD_MONTHS(CURRENT_DATE(), -42),
 			ADD_MONTHS(CURRENT_DATE(), -48), ADD_MONTHS(CURRENT_DATE(), -54), ADD_MONTHS(CURRENT_DATE(), -60))
 	GROUP BY 1, 2
 ),
 crisis_users AS (
-	SELECT 
+	SELECT
 		ft.sk_contract
 	FROM
         dw_tickets.dim_ticket AS dt
 	INNER JOIN
-        dw_tickets.fact_tickets AS ft 
+        dw_tickets.fact_tickets AS ft
 		    ON dt.sk_ticket  = ft.sk_ticket
             AND ft.sk_closed_date_local = -1 -- consider only users with crisis tickets not closed yet
 	INNER JOIN
@@ -61,7 +61,7 @@ all_contracts AS (
 	SELECT
         *
     FROM
-        anniversary_contracts 
+        anniversary_contracts
 	UNION
 	SELECT
         *
@@ -80,22 +80,22 @@ tenants_dwellers AS (
 		ac.step,
 		DENSE_RANK() OVER(PARTITION BY cp.sk_contract, dcp.email ORDER BY cp.sk_contract_person) AS order_diff_email
 	FROM
-        all_contracts AS ac 
+        all_contracts AS ac
     INNER JOIN
-		dw_quintoandar.fact_contract_people AS cp 
+		dw_rent.fact_contract_people AS cp
 			ON ac.sk_contract = cp.sk_contract
-			AND cp.contract_role IN ('dweller', 'tenant') 
+			AND cp.contract_role IN ('dweller', 'tenant')
 	LEFT JOIN
-		dw_quintoandar.dim_contract_person AS dcp
+		dw_rent.dim_contract_person AS dcp
 			ON cp.sk_contract_person = dcp.sk_contract_person
 	LEFT JOIN
-        crisis_users AS uc 
+        crisis_users AS uc
 		    ON uc.sk_contract = ac.sk_contract
 	WHERE
         uc.sk_contract IS NULL -- exclude contracts with ongoing crisis ticket
         AND dcp.email IS NOT NULL
 )
-SELECT 
+SELECT
 	name AS customer_name,
 	email AS customer_email,
 	phone_number AS customer_phone,
@@ -112,7 +112,7 @@ FROM
 WHERE
     order_diff_email = 1
 UNION ALL
-SELECT 
+SELECT
 	'Teste Disparo' AS customer_name,
 	'testes.disparos.5a@gmail.com' AS customer_email,
 	'+5511123456789' AS customer_phone,

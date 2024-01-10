@@ -154,7 +154,7 @@ contracts AS (
     ct.status AS termination_status,
     ct.repair_cost
   FROM
-    dw_public.dim_contract AS dc
+    dw_rent.dim_contract AS dc
   LEFT JOIN
     datalake_offboarding.contract_termination AS ct
       ON dc.sk_contract = ct.id_contract
@@ -179,7 +179,7 @@ contract_people_qty AS (
       END
     ) AS contract_qty_dweller
   FROM
-    dw_quintoandar.fact_contract_people
+    dw_rent.fact_contract_people
   GROUP BY
     1
 )

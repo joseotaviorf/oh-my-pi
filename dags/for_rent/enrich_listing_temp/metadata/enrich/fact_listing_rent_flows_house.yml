@@ -66,7 +66,7 @@ columns:
     description: Key of the proposal related to the rent flow, an offer that was accepted. A rent flow can have none, one or more proposals related.
   sk_contract:
     lineage:
-      - dw_public.dim_contract.sk_contract
+      - dw_rent.dim_contract.sk_contract
     description: Key of the contract related to the rent flow. A rent flow can have none, one or more contracts related.
   sk_rent_flow_taxonomy:
     lineage:
@@ -155,19 +155,19 @@ columns:
     description: Key of the date when the tenant prospect documentation was completed. It's the client's documentation completed date transformed into a number. A rent flow can have none, one or more documentation completed dates.
   sk_contract_created_date:
     lineage:
-      - dw_public.dim_contract.ts_created
+      - dw_rent.dim_contract.ts_created
     description: Key of the date when the contract related to the rent flow was created. It's the contract's creation date transformed into a number. A rent flow can have none, one or more contract's created dates.
   sk_contract_signed_date:
     lineage:
-      - dw_public.dim_contract.ts_signature
+      - dw_rent.dim_contract.ts_signature
     description: Key of the date when the contract related to the rent flow was signed. It's the contract's signed date transformed into a number. A rent flow can have none, one or more contract's signed dates.
   sk_contract_annulment_date:
     lineage:
-      - dw_public.dim_contract.dt_annulment
+      - dw_rent.dim_contract.dt_annulment
     description: Key of the date when the contract related to the rent flow was terminated. It's the contract's termination date transformed into a number. A rent flow can have none, one or more contract's termination dates.
   sk_contract_canceled_date:
     lineage:
-      - dw_public.dim_contract.ts_canceled
+      - dw_rent.dim_contract.ts_canceled
     description: Key of the date when the contract related to the rent flow was canceled. It's the contract's cancelation date transformed into a number. A rent flow can have none, one or more contract's canceled dates.
   sk_credit_analysis_first_init_date:
     lineage:
@@ -290,7 +290,7 @@ columns:
       visit_completed: The rent flow is in/stopped with visit completed.
   funnel_step_drop_reason:
     lineage:
-      - dw_public.dim_contract.cancellation_reason
+      - dw_rent.dim_contract.cancellation_reason
       - dw_rent.dim_offer.rejection_reason
       - dw_rent.dim_proposal.rejection_reason
       - dw_public.dim_booking.cancellation_reason

@@ -3,12 +3,12 @@ SELECT
   COALESCE(hl.sk_region, -1) AS sk_region,
   dc.country_code,
   COUNT(DISTINCT dc.sk_contract) AS ended_rentals
-FROM 
-  dw_public.dim_contract AS dc
-LEFT JOIN 
+FROM
+  dw_rent.dim_contract AS dc
+LEFT JOIN
   dw_public.fact_house_listings AS hl
     ON dc.sk_contract = hl.sk_contract
-WHERE 
+WHERE
   dc.status = 'Finalizado'
   AND dc.dt_annulment < CURRENT_DATE()
 GROUP BY 1, 2, 3

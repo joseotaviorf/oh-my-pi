@@ -133,7 +133,7 @@ listings_info AS (
 	    dw_datamarts.performance_marketing_metrics_demand dem
           ON dem.sk_house_listing = hi.sk_house_listing
 	LEFT JOIN
-	    dw_public.dim_contract dc
+	    dw_rent.dim_contract dc
           ON dc.sk_contract = dem.sk_contract
 	LEFT JOIN
 	    listing_to_rented ltr
@@ -149,7 +149,7 @@ contracts AS (
         rent,
         DATE(ts_signature) AS date_signature
     FROM
-	 dw_public.dim_contract
+	 dw_rent.dim_contract
     WHERE ts_signature is not null
 ),
 contract_base AS (

@@ -56,7 +56,7 @@ dim_contract AS (
     FROM
         contract_termination AS ct
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON dc.sk_contract = ct.id_contract
 ),
 dim_house_listing AS (
@@ -141,7 +141,7 @@ tenants AS (
         END AS is_first_contract,
         is_contract_user
     FROM
-        dw_quintoandar.fact_contract_people
+        dw_rent.fact_contract_people
     WHERE
         contract_role = 'tenant'
     UNION ALL

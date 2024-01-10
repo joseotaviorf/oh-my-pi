@@ -22,7 +22,7 @@ WITH all_listings AS (
         COUNT(rf.sk_house_listing) OVER (PARTITION BY dhl.id_house) AS total_listings,
         MIN(dc.dt_start) OVER (PARTITION BY dhl.id_house) AS first_dt_start
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
     LEFT JOIN
         dw_public.fact_listing_rent_flows AS rf
             ON dc.sk_contract = rf.sk_contract
@@ -130,7 +130,7 @@ all_ended_re_rentals AS (
         all_next_contracts AS anc
     WHERE
         anc.contract_end_month IS NOT NULL
-    GROUP BY 1, 2, 3 
+    GROUP BY 1, 2, 3
 ),
 all_first_contract_rent AS (
     SELECT
@@ -138,7 +138,7 @@ all_first_contract_rent AS (
         contract_start_month,
         months_after_first_contract,
         AVG(value_rent) AS avg_value_rent_first_rentals
-    FROM 
+    FROM
         (
         SELECT DISTINCT
             city_group,
@@ -147,9 +147,9 @@ all_first_contract_rent AS (
             id_house,
             value_rent
         FROM
-            all_first_contracts 
+            all_first_contracts
         )
-    GROUP BY 1, 2, 3 
+    GROUP BY 1, 2, 3
 ),
 all_re_rental_rent AS (
     SELECT
@@ -166,9 +166,9 @@ all_re_rental_rent AS (
             id_house,
             value_rent
         FROM
-            all_next_contracts 
+            all_next_contracts
         )
-    GROUP BY 1, 2, 3 
+    GROUP BY 1, 2, 3
 ),
 all_first_contract_adm_fee AS (
     SELECT
@@ -176,7 +176,7 @@ all_first_contract_adm_fee AS (
         contract_start_month,
         months_after_first_contract,
         AVG(admin_fee) AS avg_admin_fee_first_rentals
-    FROM 
+    FROM
         (
         SELECT DISTINCT
             city_group,
@@ -187,7 +187,7 @@ all_first_contract_adm_fee AS (
         FROM
             all_first_contracts
         )
-    GROUP BY 1, 2, 3 
+    GROUP BY 1, 2, 3
 ),
 all_re_rental_adm_fee AS (
     SELECT
@@ -195,7 +195,7 @@ all_re_rental_adm_fee AS (
         contract_start_month,
         months_after_first_contract,
         AVG(admin_fee) AS avg_admin_fee_re_rentals
-    FROM 
+    FROM
         (
         SELECT DISTINCT
             city_group,
@@ -206,7 +206,7 @@ all_re_rental_adm_fee AS (
         FROM
             all_next_contracts
         )
-    GROUP BY 1, 2, 3 
+    GROUP BY 1, 2, 3
 )
 SELECT
     fr.city_group,

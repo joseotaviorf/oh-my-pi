@@ -4,7 +4,7 @@ WITH ongoing_contracts_weekly AS (
         hl.sk_region,
         COUNT(DISTINCT dc.sk_contract) AS ongoing_contracts_weekly
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
     JOIN
         dw_public.dim_date AS dd
             ON dd.date BETWEEN DATE(COALESCE(dc.ts_signature,dc.dt_start,dc.dt_entrance))
@@ -25,10 +25,10 @@ ongoing_rentals_weekly AS (
         hl.sk_region,
         COUNT(DISTINCT dc.sk_contract) AS ongoing_rentals_weekly
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
     JOIN
         dw_public.dim_date AS dd
-            ON dd.date BETWEEN DATE(COALESCE(dc.dt_start, dc.dt_entrance)) 
+            ON dd.date BETWEEN DATE(COALESCE(dc.dt_start, dc.dt_entrance))
             AND (COALESCE(dc.dt_annulment, CURRENT_DATE) - INTERVAL 1 DAY)
     LEFT JOIN
         dw_public.fact_house_listings AS hl
@@ -51,7 +51,7 @@ new_rentals AS (
         SUM(COUNT(DISTINCT dc.sk_contract)) OVER(PARTITION BY DATE_TRUNC('week',COALESCE(dc.dt_start, dc.dt_entrance)), hl.sk_region) AS new_rentals_weekly,
         SUM(COUNT(DISTINCT dc.sk_contract)) OVER(PARTITION BY DATE_TRUNC('month',COALESCE(dc.dt_start, dc.dt_entrance)), hl.sk_region) AS new_rentals_monthly
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
     LEFT JOIN
         dw_public.fact_house_listings AS hl
             ON dc.sk_contract = hl.sk_contract
@@ -70,8 +70,8 @@ new_contracts AS (
         COUNT(DISTINCT dc.sk_contract) AS new_contracts_signed_daily,
         SUM(COUNT(DISTINCT dc.sk_contract)) OVER(PARTITION BY DATE_TRUNC('week',COALESCE(dc.ts_signature, dc.dt_start)), hl.sk_region) AS new_contracts_signed_weekly,
         SUM(COUNT(DISTINCT dc.sk_contract)) OVER(PARTITION BY DATE_TRUNC('month',COALESCE(dc.ts_signature, dc.dt_start)), hl.sk_region) AS new_contracts_signed_monthly
-    FROM 
-        dw_public.dim_contract AS dc
+    FROM
+        dw_rent.dim_contract AS dc
     LEFT JOIN
         dw_public.fact_house_listings AS hl
             ON dc.sk_contract = hl.sk_contract
@@ -111,7 +111,7 @@ re_rentals AS (
             ROW_NUMBER() OVER(PARTITION BY dhl.id_house ORDER BY fhl.sk_house_listing) AS row_number_renting,
             fhl.sk_region
         FROM
-            dw_public.dim_contract AS dc
+            dw_rent.dim_contract AS dc
         JOIN
             dw_public.fact_house_listings AS fhl
                 ON dc.sk_contract = fhl.sk_contract
@@ -133,7 +133,7 @@ re_rentals AS (
     FROM
         ordered_rentals AS ord
     WHERE
-        ord.row_number_renting > 1 
+        ord.row_number_renting > 1
         AND ord.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active at a given period
     GROUP BY 1, 2, 3, 4
 ),
@@ -147,7 +147,7 @@ ended_rentals AS (
         SUM(COUNT(DISTINCT dc.sk_contract)) OVER(PARTITION BY DATE_TRUNC('week',dc.dt_annulment), hl.sk_region) AS ended_rentals_weekly,
         SUM(COUNT(DISTINCT dc.sk_contract)) OVER(PARTITION BY DATE_TRUNC('month',dc.dt_annulment), hl.sk_region) AS ended_rentals_monthly
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
     LEFT JOIN
         dw_public.fact_house_listings AS hl
             USING(sk_contract)
@@ -166,14 +166,14 @@ ended_rentals_confirmed AS (
         SUM(COUNT(DISTINCT dc.sk_contract)) OVER(PARTITION BY DATE_TRUNC('week',COALESCE(dc.ts_analyst_annulment_input,dc.dt_annulment)), hl.sk_region) AS ended_rentals_confirmed_weekly,
         SUM(COUNT(DISTINCT dc.sk_contract)) OVER(PARTITION BY DATE_TRUNC('month',COALESCE(dc.ts_analyst_annulment_input,dc.dt_annulment)), hl.sk_region) AS ended_rentals_confirmed_monthly
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
     LEFT JOIN
         dw_public.fact_house_listings AS hl
             USING(sk_contract)
     WHERE
         dc.status = 'Finalizado'
         AND COALESCE(ts_analyst_annulment_input,dc.dt_annulment) < CURRENT_DATE
-    GROUP BY 1, 2, 3, 4, dc.ts_analyst_annulment_input, dc.dt_annulment 
+    GROUP BY 1, 2, 3, 4, dc.ts_analyst_annulment_input, dc.dt_annulment
 ),
 new_bookers AS (
     WITH first_booking AS (
@@ -187,7 +187,7 @@ new_bookers AS (
                 ROW_NUMBER() OVER(PARTITION BY rf.sk_client ORDER BY db.dt_created ASC NULLS LAST, rf.sk_region) AS rk
             FROM
                 dw_public.fact_listing_rent_flows AS rf
-            JOIN 
+            JOIN
                 dw_public.dim_booking AS db
                 ON db.sk_booking = rf.sk_booking
             WHERE
@@ -225,9 +225,9 @@ ongoing_listings_weekly AS (
             ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC) AS order_status -- daily order status
         FROM
             dw_public.fact_house_listing_status AS f
-        JOIN 
+        JOIN
             dw_public.dim_date AS d
-                ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
+                ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1)
                 AND COALESCE(CAST(DATE_FORMAT(TO_DATE(CAST(NULLIF(sk_status_end_date,-1) AS STRING),'yyyyMMdd') - 1, 'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(CURRENT_DATE -1, 'yyyyMMdd') AS BIGINT))
         WHERE
             f.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
@@ -292,7 +292,7 @@ listing_to_contract_signed AS (
         city_group,
         city_name,
         new_contracts_signed/total_listings::float AS listing_to_contract_signed_weekly
-    FROM 
+    FROM
         sums
 ),
 visits_booked_per_ongoing_listings AS (
@@ -309,9 +309,9 @@ visits_booked_per_ongoing_listings AS (
                 ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start desc) AS order_status -- daily order status
             FROM
                 dw_public.fact_house_listing_status AS f
-            JOIN 
+            JOIN
                 dw_public.dim_date AS d
-                    ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
+                    ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1)
                     AND COALESCE(CAST(DATE_FORMAT(TO_DATE(CAST(NULLIF(sk_status_end_date,-1) AS STRING),'yyyyMMdd') - 1, 'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(CURRENT_DATE -1, 'yyyyMMdd') AS BIGINT))
             WHERE
                 f.status_history IN ('publicado', 'PUBLISHED') -- consider only published status
@@ -365,7 +365,7 @@ visits_booked_per_ongoing_listings AS (
         JOIN
             dw_public.dim_booking AS db
                 ON db.sk_booking = rf.sk_booking
-        JOIN 
+        JOIN
             dw_public.dim_date AS dd
                 ON dd.sk_date = rf.sk_booking_created_date
         LEFT JOIN
@@ -374,7 +374,7 @@ visits_booked_per_ongoing_listings AS (
         WHERE
             dr.city_group IS NOT NULL
         GROUP BY 1, 2, 3, 4
-    )   
+    )
     SELECT
         vb.week_start,
         vb.regional,
@@ -495,6 +495,6 @@ FULL OUTER JOIN
         AND dr.city_name = l2cs.city_name
 FULL OUTER JOIN
     visits_booked_per_ongoing_listings AS vb_ol
-        ON vb_ol.week_start = dm.week_date 
+        ON vb_ol.week_start = dm.week_date
         AND dr.city_name = vb_ol.city_name
 GROUP BY 1, 2, 3, 4, 14, 15, 16

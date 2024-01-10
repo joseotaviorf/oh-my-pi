@@ -3,7 +3,7 @@ WITH new_contracts AS (
 		dc.sk_contract,
 		'Onboarding' AS step
 	FROM
-		dw_public.dim_contract dc
+		dw_rent.dim_contract dc
 	INNER JOIN
 		dw_public.fact_listing_rent_flows rf
 			ON dc.sk_contract = rf.sk_contract
@@ -35,7 +35,7 @@ crisis_users AS (
 		datalake_gsheets_clean.department_control dc
 			ON dt.group_name = dc.department
 	WHERE
-		(dc.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
+		(dc.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
 			OR dc.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
 		AND ft.sk_closed_date_local = -1
 	GROUP BY 1
@@ -75,12 +75,12 @@ owners AS (
   LEFT JOIN
     datalake_ebdb_customer_contact_identification.customer_contact_identification AS cci
       ON cp.email = cci.customer_contact
-  LEFT JOIN 
-    datalake_ebdb_clean.user_pro_owner AS po 
+  LEFT JOIN
+    datalake_ebdb_clean.user_pro_owner AS po
       ON (cp.id_user = po.id_user
         OR u.id = po.id_user
         OR cci.id_user = po.id_user)
-      AND po.is_active = true 
+      AND po.is_active = true
 	WHERE
 		po.id_user IS NULL
 )

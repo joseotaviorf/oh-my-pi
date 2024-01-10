@@ -8,7 +8,7 @@ columns:
   id_contract_ebdb:
     description: "Contract ID on EBDB"
     lineage:
-      - dw_public.dim_contract.sk_contract
+      - dw_rent.dim_contract.sk_contract
   id_invoice_entry:
     description: "Invoice entry ID"
     lineage:
@@ -18,7 +18,7 @@ columns:
   contract_guarantee:
     description: "Type of the contract guarantee."
     lineage:
-      - dw_public.dim_contract.guarantee
+      - dw_rent.dim_contract.guarantee
   invoice_payment_status:
     description: "Description of the invoice payment status"
     lineage:
@@ -26,7 +26,7 @@ columns:
   first_rental_commission:
     description: "Commission value from first rental"
     lineage:
-      - dw_public.dim_contract.first_rental_commission
+      - dw_rent.dim_contract.first_rental_commission
   agent_brokerage_share:
     description: "Share of brokerage agent"
     lineage:
@@ -60,4 +60,4 @@ columns:
   dt_contract_start:
     description: "Contract start date"
     lineage:
-      - dw_public.dim_contract.dt_start
+      - dw_rent.dim_contract.dt_start

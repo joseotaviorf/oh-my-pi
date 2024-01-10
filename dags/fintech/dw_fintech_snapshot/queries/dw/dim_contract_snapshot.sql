@@ -55,6 +55,6 @@ SELECT
     MONTH(ts_load) AS month,
     DAY(ts_load) AS day
 FROM
-    dw_public.dim_contract
+    dw_rent.dim_contract
 WHERE
     ts_load IS NOT NULL

@@ -1,58 +1,58 @@
 ---
 database_name: datalake_mission_control
 table_name: contract_person
-owner: 'kleber.inoue@quintoandar.com.br'
+owner: "kleber.inoue@quintoandar.com.br"
 domain: For Rent
-description: Information about users who have an associated contract. 
-  Each line is a user with their personal information (Name, email, CPF) and their user type, 
+description: Information about users who have an associated contract.
+  Each line is a user with their personal information (Name, email, CPF) and their user type,
   as well as information about the type of contract associated with them.
   This table deduplicates the IDs that comes from raw/clean layer due to incremental load.
 columns:
   id:
-    description: ID of the person participating in the contract. 
+    description: ID of the person participating in the contract.
     lineage:
-    - datalake_mission_control_clean.contract_person.id
+      - datalake_mission_control_clean.contract_person.id
   id_contract:
-    description: ID of the contract. It can be joined with dw_public.dim_contract.
+    description: ID of the contract. It can be joined with dw_rent.dim_contract.
     lineage:
-    - datalake_mission_control_clean.contract_person.id_contract
+      - datalake_mission_control_clean.contract_person.id_contract
   id_address:
     description: ID of the address.
     lineage:
-    - datalake_mission_control_clean.contract_person.id_address
+      - datalake_mission_control_clean.contract_person.id_address
   id_user:
     description: ID of the user.
     lineage:
-    - datalake_mission_control_clean.contract_person.id_user
+      - datalake_mission_control_clean.contract_person.id_user
   contract_type:
     description: ID of the mailing address.
     lineage:
-    - datalake_mission_control_clean.contract_person.contract_type
+      - datalake_mission_control_clean.contract_person.contract_type
   person_type:
     description: Type of person (TENANT or LANDLORD)
     lineage:
-    - datalake_mission_control_clean.contract_person.person_type
+      - datalake_mission_control_clean.contract_person.person_type
   full_name:
     description: Full name of the person.
     lineage:
-    - datalake_mission_control_clean.contract_person.full_name
+      - datalake_mission_control_clean.contract_person.full_name
   phone_number:
     description: Phone number of the person.
     lineage:
-    - datalake_mission_control_clean.contract_person.phone_number
+      - datalake_mission_control_clean.contract_person.phone_number
   document_number:
     description: Document number of the person.
     lineage:
-    - datalake_mission_control_clean.contract_person.document_number
+      - datalake_mission_control_clean.contract_person.document_number
   is_deleted:
     description: Boolean value to check if the record is deleted.
     lineage:
-    - datalake_mission_control_clean.contract_person.is_deleted
+      - datalake_mission_control_clean.contract_person.is_deleted
   ts_created:
     description: Timestamp of the contract_person creation.
     lineage:
-    - datalake_mission_control_clean.contract_person.ts_created
+      - datalake_mission_control_clean.contract_person.ts_created
   ts_updated:
     description: Timestamp when the register was updated.
     lineage:
-    - datalake_mission_control_clean.contract_person.ts_updated
+      - datalake_mission_control_clean.contract_person.ts_updated

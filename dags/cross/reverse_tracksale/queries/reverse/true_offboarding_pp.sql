@@ -25,7 +25,7 @@ contracts AS (
       ELSE NULL
     END AS termination_type
   FROM
-    dw_public.dim_contract AS dc
+    dw_rent.dim_contract AS dc
   INNER JOIN
     datalake_offboarding.contract_termination AS ct
       ON dc.sk_contract = ct.id_contract

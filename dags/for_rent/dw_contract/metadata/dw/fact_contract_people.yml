@@ -1,9 +1,9 @@
-database_name: dw_quintoandar
+database_name: dw_rent
 table_name: fact_contract_people
 description: Table with events and metrics about people involved in a contract created
   (users or not). Each line is a register of a person, not necessarily unique in database
 domain: For Rent
-owner: AE ForRent@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_contract_person:
     lineage:

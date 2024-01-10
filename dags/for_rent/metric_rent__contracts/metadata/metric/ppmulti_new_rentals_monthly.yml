@@ -1,19 +1,20 @@
 database_name: metric_rent
 table_name: ppmulti_new_rentals_monthly
-description: Table to count new rentals of PPs Multi (owners with 5 or more ongoing properties on the date), which are contracts actived or finalized,
+description:
+  Table to count new rentals of PPs Multi (owners with 5 or more ongoing properties on the date), which are contracts actived or finalized,
   on monthly basis. The date reference here is related to contract start or entrance.
 domain: For Rent
 owner: mariana.kralco@quintoandar.com.br
 columns:
   month:
     lineage:
-    - dw_public.dim_contract.dt_start
-    - dw_public.dim_contract.dt_entrance
+      - dw_rent.dim_contract.dt_start
+      - dw_rent.dim_contract.dt_entrance
     description: month when the contract started or the entrance happened
     dimension: True
   country_code:
     lineage:
-      - dw_public.dim_contract.country_code
+      - dw_rent.dim_contract.country_code
     description: Country code of the house.
     dimension: True
   new_rentals:
@@ -26,4 +27,4 @@ columns:
       business_stage: Demand
       hierarchy: User analysis
       approved_by: mariana.kralco@quintoandar.com.br
-      link_to_metric: 'https://metabase.quintoandar.com.br/question/99533'
+      link_to_metric: "https://metabase.quintoandar.com.br/question/99533"

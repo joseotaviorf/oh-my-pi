@@ -1,6 +1,7 @@
 database_name: dw_credit
 table_name: fact_proposal_credit_flows
-description: This table presents each line as a proposal-credit_analysis with dates
+description:
+  This table presents each line as a proposal-credit_analysis with dates
   from the process and partitions by user, personal document and listings, which facilitate
   the aggregation by different grains
 domain: Fintech
@@ -21,7 +22,7 @@ columns:
   sk_contract:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_contract
-    description: "Key of contract. This column can be used to join with the table dw_public.dim_contract to get the contract details. When the sk_contract value is -1, it means that the contract has not been created yet."
+    description: "Key of contract. This column can be used to join with the table dw_rent.dim_contract to get the contract details. When the sk_contract value is -1, it means that the contract has not been created yet."
   sk_contract_signed_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_contract_signed_date
@@ -45,7 +46,8 @@ columns:
   sk_credit_evaluation_approved_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
-    description: "Key of the date when credit evaluation was approved. This field should
+    description:
+      "Key of the date when credit evaluation was approved. This field should
       be used on Evaluation Positive (EP) on credit funnel as it contains the logic
       for paid guarantees as well as for free guarantee."
   sk_first_credit_analysis:
@@ -70,7 +72,7 @@ columns:
     description: "Key of date of guarantee paid."
   sk_guarantee_accepted_date:
     lineage:
-      -  datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
+      - datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
     description: "Guarantee acceptance key date."
   sk_last_credit_analysis:
     lineage:
@@ -169,18 +171,18 @@ columns:
     description: "Indicates if the offer had an early credit analysis."
   guarantee_not_accepted:
     lineage:
-    - datalake_rental_guarantee.guarantee
+      - datalake_rental_guarantee.guarantee
     description: "Indicates if a paid guarantee offered was accepted (FALSE) or not (TRUE) by the tenant."
   country_code:
     lineage:
-    - dw_public.dim_house_listing.country_code
+      - dw_public.dim_house_listing.country_code
     description: Country code related to the listing's country of origin.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   rental_administrator:
     lineage:
-    - dw_public.dim_house_listing.rental_administrator
+      - dw_public.dim_house_listing.rental_administrator
     description: The rental administrator of the house.
     categories:
       OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.

@@ -100,11 +100,11 @@ columns:
   avg_rent_listing_contracts_signed:
     description: "Average rent value for the listing contracts signed."
     lineage:
-      - dw_public.dim_contract.rent
+      - dw_rent.dim_contract.rent
   avg_rent_listing_contracts_signed_m2:
     description: "Average rent per square meter for the listing contracts signed."
     lineage:
-      - dw_public.dim_contract.rent
+      - dw_rent.dim_contract.rent
       - dw_public.dim_house_listing.house_total_area
   days_house_listing_to_contract_signed:
     description: "Number of days from house listing to contract signed."
@@ -113,18 +113,18 @@ columns:
   avg_price_contracts_signed_m2:
     description: "Average price per square meter for the contracts signed."
     lineage:
-      - dw_public.dim_contract.rent
+      - dw_rent.dim_contract.rent
       - dw_public.dim_house_listing.house_total_area
   total_contracts_compared:
     description: "Total number of contracts for comparison."
     lineage:
-      - dw_public.dim_contract.sk_contract
+      - dw_rent.dim_contract.sk_contract
   match_type:
     description: "The similarity used to match the listing and the contract"
   diff_first_listing_contracts:
     description: "Difference between the first listing and the number of contracts."
     lineage:
-      - dw_public.dim_contract.rent
+      - dw_rent.dim_contract.rent
       - datalake_ebdb_clean.house_aud.rent
   first_prediction_p_10:
     description: "First prediction - 10th percentile."
@@ -209,7 +209,7 @@ columns:
   diff_last_listing_contracts:
     description: "Difference between the last listing and the number of contracts."
     lineage:
-      - dw_public.dim_contract.rent
+      - dw_rent.dim_contract.rent
       - dw_public.dim_house_listing.rent
   diff_first_listing_calculator:
     description: "Difference between the first listing and the calculated price."
@@ -229,7 +229,7 @@ columns:
   last_pricing_contract_group:
     description: "Group or category of the last pricing contracts."
     lineage:
-      - dw_public.dim_contract.rent
+      - dw_rent.dim_contract.rent
       - dw_public.dim_house_listing.rent
   first_pricing_calculator_group:
     description: "Group or category of the first pricing based on calculator."

@@ -89,9 +89,9 @@ contract_hist AS (
         fcp.contract_role,
         fcp.is_contract_user
     FROM
-        dw_quintoandar.fact_contract_people AS fcp
+        dw_rent.fact_contract_people AS fcp
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON dc.sk_contract = fcp.sk_contract
 ),
 tbl_first_contract AS (
@@ -178,12 +178,12 @@ people AS (
         dcp.email,
         dc.ts_created
     FROM
-        dw_quintoandar.fact_contract_people AS fcp
+        dw_rent.fact_contract_people AS fcp
     LEFT JOIN
-        dw_quintoandar.dim_contract_person AS dcp
+        dw_rent.dim_contract_person AS dcp
             ON dcp.sk_contract_person = fcp.sk_contract_person
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON dc.sk_contract = fcp.sk_contract
     WHERE
         fcp.contract_role IN ('tenant', 'landlord', 'dweller')
@@ -352,7 +352,7 @@ tbl_final_tickets AS (
         unique_users
             ON unique_users.sk_contract = ct.id_contract
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON dc.sk_contract = ct.id_contract
     LEFT JOIN
         dw_customer_support.fact_ticket AS ft
@@ -427,7 +427,7 @@ tbl_surveys_sent AS (
         dw_public.dim_date AS ddd
             ON ddd.sk_date = fnd.sk_answered_date
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON dc.sk_contract = ct.id_contract
     WHERE
         dnc.metric_group IN ('onboarding', 'ongoing', 'pponboarding', 'ppongoing', 'offboarding', 'ppoffboarding')

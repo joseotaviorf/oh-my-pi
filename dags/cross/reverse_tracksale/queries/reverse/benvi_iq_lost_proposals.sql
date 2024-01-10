@@ -110,7 +110,7 @@ active_contracts as (
     FROM
         dw_public.fact_listing_rent_flows AS rf
     INNER JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON rf.sk_contract = dc.sk_contract
             AND dc.country_code = 'MX'
             AND rf.sk_contract_signed_date > 0

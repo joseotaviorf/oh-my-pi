@@ -18,7 +18,7 @@ WITH base AS (
             ON rf.sk_offer = do.sk_offer
             AND (do.country_code = 'BR' OR do.country_code IS NULL)
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON rf.sk_contract = dc.sk_contract
     INNER JOIN
         dw_public.dim_region AS dr

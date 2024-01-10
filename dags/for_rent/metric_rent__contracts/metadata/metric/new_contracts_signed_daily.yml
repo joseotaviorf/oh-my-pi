@@ -1,19 +1,20 @@
 database_name: metric_rent
 table_name: new_contracts_signed_daily
-description: Table to count new signed contracts, which are contracts actived or finalized,
+description:
+  Table to count new signed contracts, which are contracts actived or finalized,
   on daily basis. The date reference here is related to contract signature or start.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
   day:
     lineage:
-    - dw_public.dim_contract.dt_start
-    - dw_public.dim_contract.ts_signature
+      - dw_rent.dim_contract.dt_start
+      - dw_rent.dim_contract.ts_signature
     description: Day when the contract started or was signed.
     dimension: True
   country_code:
     lineage:
-      - dw_public.dim_contract.country_code
+      - dw_rent.dim_contract.country_code
     description: Country code of the house.
     dimension: True
   new_contracts_signed:

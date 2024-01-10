@@ -5,7 +5,7 @@ columns:
   sk_client:
     lineage:
       - dw_datamarts.rent_flow_interactions.sk_client
-      - dw_quintoandar.fact_contract_people.sk_user
+      - dw_rent.fact_contract_people.sk_user
       - dw_public.fact_listing_rent_flows.sk_client
   city_group:
     lineage:
@@ -13,20 +13,20 @@ columns:
   ts_start:
     lineage:
       - dw_datamarts.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
-      - dw_public.dim_contract.dt_annulment
+      - dw_rent.dim_contract.ts_signature
+      - dw_rent.dim_contract.dt_annulment
   ts_end:
     lineage:
       - dw_datamarts.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
-      - dw_public.dim_contract.dt_annulment
+      - dw_rent.dim_contract.ts_signature
+      - dw_rent.dim_contract.dt_annulment
   sk_start_date:
     lineage:
       - dw_datamarts.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
-      - dw_public.dim_contract.dt_annulment
+      - dw_rent.dim_contract.ts_signature
+      - dw_rent.dim_contract.dt_annulment
   sk_end_date:
     lineage:
       - dw_datamarts.rent_flow_interactions.ts_event
-      - dw_public.dim_contract.ts_signature
-      - dw_public.dim_contract.dt_annulment
+      - dw_rent.dim_contract.ts_signature
+      - dw_rent.dim_contract.dt_annulment

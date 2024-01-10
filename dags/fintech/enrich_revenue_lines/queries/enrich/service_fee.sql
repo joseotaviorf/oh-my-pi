@@ -19,7 +19,7 @@ LEFT JOIN datalake_retsuko.invoice_info di
     ON di.id_invoice = fie.id_invoice
 LEFT JOIN datalake_retsuko.invoice i
     ON di.id_invoice = i.id_external
-LEFT JOIN dw_public.dim_contract c
+LEFT JOIN dw_rent.dim_contract c
     ON c.sk_contract = fie.id_contract
 WHERE
     die.from_account_type NOT IN ('quinto andar', 'contract expenses')

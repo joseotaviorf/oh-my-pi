@@ -780,7 +780,7 @@ contract_signed AS (
     dw_public.dim_region AS dr
       ON rf.sk_region = dr.sk_region
   INNER JOIN
-    dw_public.dim_contract AS dc
+    dw_rent.dim_contract AS dc
       ON rf.sk_contract = dc.sk_contract
       AND dc.status in ('Ativo', 'Finalizado')
   WHERE

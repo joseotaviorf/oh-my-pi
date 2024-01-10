@@ -218,7 +218,7 @@ LEFT JOIN
         SELECT
             distinct *
         FROM
-            dw_public.dim_contract) AS dpdc
+            dw_rent.dim_contract) AS dpdc
     ON dpdc.sk_contract = m.sk_contract
 WHERE
     dpdc.country_code = 'BR'

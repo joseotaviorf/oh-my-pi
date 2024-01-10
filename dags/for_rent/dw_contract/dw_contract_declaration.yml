@@ -5,11 +5,8 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: quintoandar
+  custom_schema: rent
   default_partitions: [country_code]
-  tables_customization:
-    dim_contract:
-      custom_schema: public
 cluster:
   type: databricks_10_4_min_general_cluster
   access_control_list:

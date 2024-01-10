@@ -18,7 +18,7 @@ WITH base AS (
         t.ts_canceled AS ts_termination_canceled,
         t.dt_ended_termination
     FROM
-        dw_public.dim_contract AS c
+        dw_rent.dim_contract AS c
     LEFT JOIN
         dw_public.fact_house_listings AS h
             ON c.sk_contract = h.sk_contract

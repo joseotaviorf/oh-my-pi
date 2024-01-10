@@ -16,7 +16,8 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract.id_user
       - datalake_ebdb_clean.house.id_user
-    description: ID of the user related to the contract, which can be the same as the id_user_contract_person.
+    description:
+      ID of the user related to the contract, which can be the same as the id_user_contract_person.
       This column can have NULL values because it brings the id_user if the tenant or landlord has an ongoing contract.
       It can be joined with dw_public.dim_user.
   id_max_ongoing_contract_user:
@@ -24,13 +25,14 @@ columns:
       - datalake_ebdb_clean.contract.id
     description: ID of the latest contract related to the id_user.
       This column can have NULL values because it brings the id_user if the tenant or landlord has an ongoing contract.
-      It can be joined with dw_public.dim_contract.
+      It can be joined with dw_rent.dim_contract.
   id_max_ongoig_contract_cpf:
     lineage:
       - datalake_ebdb_clean.contract.id
-    description: ID of the latest contract related to the user's CPF (Individual Taxpayer Registration).
+    description:
+      ID of the latest contract related to the user's CPF (Individual Taxpayer Registration).
       This column can have NULL values because it brings the id_user if the tenant or landlord has an ongoing contract.
-      It can be joined with dw_public.dim_contract.
+      It can be joined with dw_rent.dim_contract.
   country_code:
     lineage:
       - datalake_ebdb_country.user.country_code

@@ -38,7 +38,7 @@ bietlejuice.dw_crm:
     - bietlejuice.heimdall:load-clean-activity
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
-    - bietlejuice.dw_contract:load-dw-public-dim-contract
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract
     - bietlejuice.dw_listing:load-dw-public-dim-house-listing
     - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.ebdb:load-clean-contract
@@ -87,7 +87,7 @@ bietlejuice.dw_datamarts_spark.fintech:
 bietlejuice.dw_datamarts_spark.fintech_cross:
   remove:
     - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.dw_contract:load-dw-public-dim-contract
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract
     - bietlejuice.dw_listing:load-dw-public-dim-house-listing
     - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
@@ -218,7 +218,7 @@ bietlejuice.dw_revenue_lines:
     - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-fee
     - bietlejuice.enrich_revenue_lines:load-enrich-management-fee
     - bietlejuice.enrich_revenue_lines:load-enrich-service-fee
-    - bietlejuice.dw_contract:load-dw-public-dim-contract
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract
 bietlejuice.dw_sale_events:
   add:
     - bietlejuice.dw_rede_company:load-dw-rede-dim-company
@@ -409,7 +409,7 @@ bietlejuice.enrich_listing_flow:
 bietlejuice.enrich_listing_temp:
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
-    - bietlejuice.dw_contract:load-dw-public-dim-contract
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract
     - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
     - bietlejuice.ebdb:load-clean-house-aud
@@ -582,7 +582,7 @@ bietlejuice.enrich_revenue_lines:
     - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
     - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   remove:
-    - bietlejuice.dw_contract:load-dw-public-dim-contract
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract
     - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
     - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
     - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries

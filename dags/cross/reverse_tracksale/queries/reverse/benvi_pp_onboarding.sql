@@ -4,14 +4,14 @@ WITH new_contracts AS (
         dc.sk_contract,
         'Onboarding' AS step
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
     INNER JOIN
-        dw_public.fact_listing_rent_flows AS rf 
+        dw_public.fact_listing_rent_flows AS rf
             ON dc.sk_contract = rf.sk_contract
             AND rf.sk_contract_signed_date > 0 -- select only signed contracts
             AND dc.country_code = 'MX'
     INNER JOIN
-        dw_public.dim_house_listing AS dhl 
+        dw_public.dim_house_listing AS dhl
             ON dhl.sk_house_listing = rf.sk_house_listing
             AND dhl.country_code = 'MX'
     LEFT JOIN
@@ -25,12 +25,12 @@ WITH new_contracts AS (
     GROUP BY 1, 2
 ),
 crisis_users AS (
-    SELECT 
+    SELECT
         ft.sk_contract
-    FROM 
+    FROM
         dw_tickets.dim_ticket AS dt
-    INNER JOIN 
-        dw_tickets.fact_tickets AS ft 
+    INNER JOIN
+        dw_tickets.fact_tickets AS ft
             ON dt.sk_ticket  = ft.sk_ticket
             AND ft.sk_closed_date_local = -1 -- consider only users with crisis tickets not closed yet
     INNER JOIN
@@ -40,13 +40,13 @@ crisis_users AS (
     GROUP BY 1
 ),
 onboarding_contracts AS (
-    SELECT 
+    SELECT
         c.sk_contract,
         'Onboarding' AS step
     FROM
         new_contracts AS c
     LEFT JOIN
-        crisis_users AS uc 
+        crisis_users AS uc
         ON uc.sk_contract = c.sk_contract
     WHERE
         uc.sk_contract IS NULL -- exclude contracts with ongoing crisis ticket
@@ -64,18 +64,18 @@ owners AS (
         ac.step,
         DENSE_RANK() OVER(PARTITION BY cp.sk_contract, dcp.email ORDER BY cp.sk_contract_person) AS order_diff_email
     FROM
-        onboarding_contracts AS ac 
+        onboarding_contracts AS ac
     INNER JOIN
-        dw_quintoandar.fact_contract_people AS cp 
+        dw_rent.fact_contract_people AS cp
             ON ac.sk_contract = cp.sk_contract
-            AND cp.contract_role IN ('landlord') 
+            AND cp.contract_role IN ('landlord')
     LEFT JOIN
-        dw_quintoandar.dim_contract_person AS dcp
+        dw_rent.dim_contract_person AS dcp
             ON cp.sk_contract_person = dcp.sk_contract_person
     WHERE
     dcp.email IS NOT NULL
 )
-SELECT 
+SELECT
     name AS customer_name,
     email AS customer_email,
     phone_number AS customer_phone,
@@ -90,7 +90,7 @@ SELECT
 FROM
     owners
 UNION ALL
-SELECT 
+SELECT
     'Teste Disparo' AS customer_name,
     'testes.disparos.5a@gmail.com' AS customer_email,
     '+5511123456789' AS customer_phone,

@@ -8,7 +8,7 @@ WITH tps_contracts AS (
         CAST(dt_annulment AS TIMESTAMP) AS ts_annulment,
         CAST(NULL AS INT) AS cs_order
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
     JOIN dw_public.fact_listing_rent_flows AS flrf
         ON dc.sk_contract = flrf.sk_contract
     JOIN dw_public.dim_region AS dr
@@ -27,12 +27,12 @@ contract_person AS (
             dr.city_group,
             dc.ts_signature
         ORDER BY fcp.contract_role DESC) as cs_order
-    FROM dw_public.dim_contract AS dc
+    FROM dw_rent.dim_contract AS dc
     JOIN dw_public.fact_listing_rent_flows AS flrf
         ON dc.sk_contract = flrf.sk_contract
     JOIN dw_public.dim_region AS dr
         ON flrf.sk_region = dr.sk_region
-    JOIN dw_quintoandar.fact_contract_people AS fcp
+    JOIN dw_rent.fact_contract_people AS fcp
         ON dc.sk_contract = fcp.sk_contract
     FULL OUTER JOIN tps_contracts AS tc -- Anti Join with tps_contracts to get only aditional users
         ON tc.sk_client = fcp.sk_user

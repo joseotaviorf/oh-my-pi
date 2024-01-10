@@ -1,7 +1,8 @@
 ---
 database_name: metric_rent
 table_name: ended_rentals_daily
-description: Daily table with the accumulated sum of the contracts that were annulled (based on annulment
+description:
+  Daily table with the accumulated sum of the contracts that were annulled (based on annulment
   date). Due to the nature of the product,
   this metric can change retroactively. After detailed analysis of the
   behaviour of the variable.
@@ -10,24 +11,26 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   day:
     lineage:
-      - dw_public.dim_contract.dt_anullment
+      - dw_rent.dim_contract.dt_anullment
     description: Day when the rental finalized.
     dimension: True
   country_code:
     lineage:
-      - dw_public.dim_contract.country_code
+      - dw_rent.dim_contract.country_code
     description: Country code of the house.
     dimension: True
   ended_rentals:
-    description: Daily accumulated sum of the contracts that were annulled (based on annulment
+    description:
+      Daily accumulated sum of the contracts that were annulled (based on annulment
       date).
     metric:
       name: Ended Rentals Daily
-      description: Daily accumulated sum of the contracts that were annulled (based on annulment date). 
+      description:
+        Daily accumulated sum of the contracts that were annulled (based on annulment date).
         Due to the nature of the product, this metric can change retroactively.
       acronym: ER
       is_additive: True
       business_stage: Demand
       hierarchy: User analysis
       approved_by: augusto.torres@quintoandar.com.br
-      link_to_metric: 'https://quintoandar.sa.looker.com/looks/4740'
+      link_to_metric: "https://quintoandar.sa.looker.com/looks/4740"

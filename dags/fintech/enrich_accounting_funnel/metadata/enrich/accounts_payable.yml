@@ -17,13 +17,13 @@ columns:
     description: "Contract related to an invoice"
   version:
     lineage:
-      - dw_public.dim_contract.version
+      - dw_rent.dim_contract.version
     description: "Contract version"
   accounting_version:
     description: "Not visible on CAP, it's used to match the number of columns in Invoice_all table"
   is_contract_b2b:
     lineage:
-      - dw_public.dim_contract.version
+      - dw_rent.dim_contract.version
     description: "Flag indicating if the contract is shared with partners"
   locale:
     lineage:
@@ -35,11 +35,11 @@ columns:
     description: "City ID"
   guarantee:
     lineage:
-      - dw_public.dim_contract.guarantee
+      - dw_rent.dim_contract.guarantee
     description: "Type/Insurer hired"
   rental_administrator:
     lineage:
-      - dw_public.dim_contract.rental_administrator
+      - dw_rent.dim_contract.rental_administrator
     description: "Type of administration of the property"
   is_rental_paid_in_advance:
     lineage:
@@ -107,17 +107,17 @@ columns:
     description: "Date when the invoice was canceled"
   contract_start:
     lineage:
-      - dw_public.dim_contract.dt_start
+      - dw_rent.dim_contract.dt_start
     description: "Begining of contract date"
   contract_annulment:
     lineage:
-      - dw_public.dim_contract.dt_annulment
+      - dw_rent.dim_contract.dt_annulment
     description: "Annulment of contract date"
   ended_before_started:
     description: "If the contract annulment happened before the start"
     lineage:
-      - dw_public.dim_contract.dt_start
-      - dw_public.dim_contract.dt_annulment
+      - dw_rent.dim_contract.dt_start
+      - dw_rent.dim_contract.dt_annulment
   pp_pays:
     description: "Flag indicating PP pays. Default value: FALSE"
   entry_sort_ascend:

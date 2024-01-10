@@ -71,11 +71,11 @@ columns:
   sk_first_contract:
     lineage:
       - datalake_rent_flows.rent_flows.id_contract
-    description: Id of the first contract. Joins with dw_public.dim_contract.
+    description: Id of the first contract. Joins with dw_rent.dim_contract.
   sk_last_contract:
     lineage:
       - datalake_rent_flows.rent_flows.id_contract
-    description: Id of the most recent contract. Joins with dw_public.dim_contract.
+    description: Id of the most recent contract. Joins with dw_rent.dim_contract.
   sk_region:
     lineage:
       - datalake_rent_flows.rent_flows.id_region

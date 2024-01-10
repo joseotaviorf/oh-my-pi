@@ -3,42 +3,42 @@ WITH weekly_listings AS (
         hldi.id_house_listing,
         hldi.id_house,
         hldi.id_contract,
-        CASE 
-            WHEN hldi.consultant_type IS NULL THEN 'Core' 
+        CASE
+            WHEN hldi.consultant_type IS NULL THEN 'Core'
             ELSE hldi.consultant_type
         END AS consultant_type,
         CASE
-            WHEN hldi.first_key_location = 'OwnerPresent' 
-                OR hldi.first_key_location = 'None' 
+            WHEN hldi.first_key_location = 'OwnerPresent'
+                OR hldi.first_key_location = 'None'
                 OR hldi.first_key_location IS NULL THEN ('PP Acompanha' ||
-                    CASE 
-                        WHEN ot.name = 'Empty' 
-                            OR ot.name = 'None' THEN ' Vago' 
-                        ELSE 'Ocupado' 
+                    CASE
+                        WHEN ot.name = 'Empty'
+                            OR ot.name = 'None' THEN ' Vago'
+                        ELSE 'Ocupado'
                     END ||
                         CASE
-                            WHEN hldi.doorman_type in ('horas24','Diurno') 
-                                AND (ot.name = 'Empty' OR ot.name = 'None') THEN ' Com Portaria' 
-                            ELSE ' Sem Portaria' 
+                            WHEN hldi.doorman_type in ('horas24','Diurno')
+                                AND (ot.name = 'Empty' OR ot.name = 'None') THEN ' Com Portaria'
+                            ELSE ' Sem Portaria'
                         END)
-            ELSE hldi.first_key_location 
+            ELSE hldi.first_key_location
         END AS entry_condition,
         CASE
-            WHEN hldi.is_exclusive THEN 'Exclusivo' 
-            ELSE 'Não Exclusivo' 
+            WHEN hldi.is_exclusive THEN 'Exclusivo'
+            ELSE 'Não Exclusivo'
         END AS exclusivity,
         CASE
-            WHEN hldi.is_for_rent = TRUE 
+            WHEN hldi.is_for_rent = TRUE
                 AND hldi.is_for_sale = TRUE THEN 'Hibrido'
-            WHEN hldi.is_for_rent = TRUE 
+            WHEN hldi.is_for_rent = TRUE
                 AND hldi.is_for_sale = FALSE THEN 'For Rent'
         END AS hybrid,
         hldi.listing_category AS listing_category_start,
         hldi.status_change_reason,
         CASE
-            WHEN hldi.status_history = 'suspenso' 
+            WHEN hldi.status_history = 'suspenso'
                 AND (LOWER(status_change_reason) RLIKE 'reserv|minuta|negocia|proposta%') THEN 'negociacao avancada' -- casos de suspensão por negociação avançada não são churn
-            WHEN hldi.status_history = 'despublicado' 
+            WHEN hldi.status_history = 'despublicado'
                 AND LOWER(status_change_reason) RLIKE 'disabled|erro ao|despublicação automática após rescisão|\\[auto\\] \\[rescisao\\]' THEN 'opt out / erro' -- casos de despublicação após aluguel sem re-publicação não são churn
             ELSE hldi.status_history
         END AS status_history,
@@ -60,12 +60,12 @@ WITH weekly_listings AS (
     JOIN -- We will get just one day : Sunday
         dw_public.dim_date AS d
             ON d.date = hldi.dt_day
-    JOIN 
+    JOIN
         dw_public.dim_region AS dr
             ON hldi.id_region = dr.sk_region
     LEFT JOIN
         datalake_ebdb_clean.occupant_type AS ot
-            ON hldi.id_occupant = ot.id 
+            ON hldi.id_occupant = ot.id
     WHERE
         dr.sk_region > 0
         AND RIGHT(hldi.id_house_listing, 3) <> '000'
@@ -73,7 +73,7 @@ WITH weekly_listings AS (
         -- Instead of CURRENT_DATE, DATE('{year}-{month}-{day}') try to ensure idempotence
         -- If a listing ends on the middle of a week, we won`t have a problem because
         -- we are considering the final state of the house on that week.
-        AND (hldi.is_week_end = TRUE 
+        AND (hldi.is_week_end = TRUE
             OR DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) = DATE('{year}-{month}-{day}')
             )
         AND dr.country_code = 'BR'
@@ -85,7 +85,7 @@ mkt_house AS (
     SELECT
         LEFT(sk_house_listing, 9) AS id_house,
         MAX(mkt_completion) AS mkt_completion,
-        MAX(mkt_origin) AS mkt_origin 
+        MAX(mkt_origin) AS mkt_origin
     FROM
         dw_public.fact_house_listing_flows AS fhlf
     WHERE
@@ -118,13 +118,13 @@ weekly_listings_mkt AS (
         mkt_house AS mkt
             ON wl.id_house = mkt.id_house
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON wl.id_contract = dc.sk_contract
             AND dc.ts_signature IS NOT NULL
     WHERE
         wl.is_last_listing_on_day = True
 ),
-weekly_listings_base AS ( 
+weekly_listings_base AS (
     SELECT
         wlm.sk_contract,
         MD5(wlm.dt_week || wlm.dt_month || wlm.listing_category_start || wlm.hybrid || wlm.mkt_completion || wlm.mkt_origin || wlm.entry_condition || wlm.consultant_type || wlm.exclusivity || wlm.listing_category_previous) AS id_coincident_listing,
@@ -147,7 +147,7 @@ weekly_listings_base AS (
         weekly_listings_mkt AS wlm
 ),
 weekly_coincident AS (
-    -- Create a PK for these elements to join them and guarantee uniqueness  
+    -- Create a PK for these elements to join them and guarantee uniqueness
     SELECT
         wlb.id_coincident_listing,
         wlb.consultant_type,
@@ -170,12 +170,12 @@ churned AS (
         COUNT(DISTINCT IF(status_history = 'despublicado', id_house_listing, NULL)) AS unpublished,
         COUNT(DISTINCT IF(status_history = 'excluido', id_house_listing, NULL)) AS excluded,
         COUNT(DISTINCT IF(status_history = 'suspenso', id_house_listing, NULL)) AS suspended
-    FROM 
+    FROM
         weekly_listings_base
     WHERE
         status_history IN ('suspenso', 'despublicado', 'excluido')
         AND last_week_status_history NOT IN ('suspenso', 'despublicado', 'excluido')
-        AND is_status_started_on_week = TRUE 
+        AND is_status_started_on_week = TRUE
     GROUP BY 1
 ),
 returned AS (

@@ -15,7 +15,7 @@ columns:
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract_person.id_contract
-    description: ID of the contract. It can be joined with dw_public.dim_contract.
+    description: ID of the contract. It can be joined with dw_rent.dim_contract.
   id_user:
     lineage:
       - datalake_ebdb_clean.user.id

@@ -119,11 +119,11 @@ columns:
     description: "Contract related to an invoice"
   version:
     lineage:
-      - dw_public.dim_contract.version
+      - dw_rent.dim_contract.version
     description: "Contract version"
   is_contract_b2b:
     lineage:
-      - dw_public.dim_contract.version
+      - dw_rent.dim_contract.version
     description: "Flag indicating if the contract is shared with partners"
   locale:
     lineage:
@@ -135,11 +135,11 @@ columns:
     description: "City ID"
   guarantee:
     lineage:
-      - dw_public.dim_contract.guarantee
+      - dw_rent.dim_contract.guarantee
     description: "Type/Insurer hired"
   rental_administrator:
     lineage:
-      - dw_public.dim_contract.rental_administrator
+      - dw_rent.dim_contract.rental_administrator
     description: "Type of administration of the property"
   is_rental_paid_in_advance:
     lineage:
@@ -163,11 +163,11 @@ columns:
     description: "Entry creation date"
   contract_start:
     lineage:
-      - dw_public.dim_contract.dt_start
+      - dw_rent.dim_contract.dt_start
     description: "Begining of contract date"
   contract_annulment:
     lineage:
-      - dw_public.dim_contract.dt_annulment
+      - dw_rent.dim_contract.dt_annulment
     description: "Annulment of contract date"
   ts_snapshot:
     lineage:

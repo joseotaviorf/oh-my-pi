@@ -9,16 +9,16 @@ tps_contracts AS (
       DATEADD(SECOND, 86399, CAST(dt_annulment AS TIMESTAMP))  AS ts_annulment, --bring time to 23:59
       NULL::INT AS cs_order
   FROM
-      dw_public.dim_contract AS dc
+      dw_rent.dim_contract AS dc
       JOIN dw_public.fact_listing_rent_flows AS flrf
           ON dc.sk_contract = flrf.sk_contract
       JOIN dw_public.dim_region AS dr
           ON flrf.sk_region = dr.sk_region
 ),
 aux_tps AS (
-  SELECT 
+  SELECT
       tps.*
-  FROM 
+  FROM
       tps_contracts as tps
   WHERE
     tps.ts_signature < COALESCE(tps.ts_annulment, CURRENT_DATE)
@@ -38,12 +38,12 @@ contract_person AS (
                                        dc.ts_signature
                           ORDER BY fcp.contract_role DESC) as cs_order
     FROM
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
         JOIN dw_public.fact_listing_rent_flows AS flrf
             ON dc.sk_contract = flrf.sk_contract
         JOIN dw_public.dim_region AS dr
             ON flrf.sk_region = dr.sk_region
-        JOIN dw_quintoandar.fact_contract_people AS fcp
+        JOIN dw_rent.fact_contract_people AS fcp
             ON dc.sk_contract = fcp.sk_contract
         FULL OUTER JOIN aux_tps AS tc -- Anti Join with tps_contracts to get only aditional users
             ON tc.sk_client = fcp.sk_user
@@ -140,7 +140,7 @@ churn_dates AS (
         events_base AS b
 ),
 aux_churn AS (
-  SELECT 
+  SELECT
       ch.*
   FROM
       churn_dates AS ch
@@ -227,7 +227,7 @@ base AS (
         aux_ap
 )
 
-SELECT 
+SELECT
     sk_client,
     city_group,
     ts_start,
@@ -250,4 +250,4 @@ SELECT
   FIRST(CASE WHEN ts_start = ts_ntp THEN city_group END, true) OVER(PARTITION BY sk_client ORDER BY ts_start ROWS UNBOUNDED PRECEDING) AS city_group_first_activation
 
 FROM
-    base 
+    base

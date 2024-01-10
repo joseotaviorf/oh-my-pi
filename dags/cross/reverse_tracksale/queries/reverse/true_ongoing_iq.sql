@@ -13,7 +13,7 @@ WITH contracts AS (--all considered contracts, but without birthday criteria app
       ELSE NULL
     END AS birth_type
   FROM
-    dw_public.dim_contract AS dc
+    dw_rent.dim_contract AS dc
   LEFT JOIN
     datalake_offboarding.contract_termination AS ct
       ON dc.sk_contract = ct.id_contract

@@ -3,8 +3,8 @@ SELECT
     dc.country_code,
     COUNT(DISTINCT dc.sk_contract) AS new_contracts_signed
 FROM
-    dw_public.dim_contract AS dc
-LEFT JOIN 
+    dw_rent.dim_contract AS dc
+LEFT JOIN
     dw_public.fact_house_listings AS hl
         ON dc.sk_contract = hl.sk_contract
 WHERE

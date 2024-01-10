@@ -168,7 +168,7 @@ WITH listing_rent_flows AS (
                 ON con.id_house = rent_flow.id_house
                 AND con.id = rent_flow.id_contract
         LEFT JOIN
-            dw_public.dim_contract
+            dw_rent.dim_contract
                 ON dim_contract.sk_contract = COALESCE(con.id, -1)
         LEFT JOIN
         /*

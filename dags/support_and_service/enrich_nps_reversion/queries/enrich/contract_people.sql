@@ -3,7 +3,7 @@ WITH tenants AS (
         sk_contract,
         sk_user
     FROM
-        dw_quintoandar.fact_contract_people
+        dw_rent.fact_contract_people
     WHERE
         contract_role = 'tenant'
     UNION
@@ -31,7 +31,7 @@ tenants_adjusted AS (
     FROM
         datalake_offboarding.contract_termination AS ct
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON dc.sk_contract = ct.id_contract
     LEFT JOIN
         tenants
@@ -56,12 +56,12 @@ people AS (
         dcp.email,
         dc.ts_created
     FROM
-        dw_quintoandar.fact_contract_people AS fcp
+        dw_rent.fact_contract_people AS fcp
     LEFT JOIN
-        dw_quintoandar.dim_contract_person AS dcp
+        dw_rent.dim_contract_person AS dcp
             ON dcp.sk_contract_person = fcp.sk_contract_person
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON dc.sk_contract = fcp.sk_contract
     WHERE
         fcp.contract_role IN ('tenant', 'landlord', 'dweller')
@@ -134,7 +134,7 @@ landlords AS (
         contract_people_togather AS clientes
             ON clientes.sk_contract = ct.id_contract
     LEFT JOIN
-        dw_public.dim_contract AS dc
+        dw_rent.dim_contract AS dc
             ON dc.sk_contract = clientes.sk_contract
     WHERE
         clientes.contract_role = 'landlord'

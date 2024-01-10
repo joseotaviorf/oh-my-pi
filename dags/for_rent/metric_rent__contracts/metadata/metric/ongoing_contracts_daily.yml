@@ -12,15 +12,16 @@ columns:
     dimension: True
   country_code:
     lineage:
-      - dw_public.dim_contract.country_code
+      - dw_rent.dim_contract.country_code
     description: Country code identifier.
     dimension: True
   ongoing_contracts:
     description: Count of unique contracts that were signed and were active on each day.
     metric:
       name: Ongoing Contracts Daily
-      description: Count of unique contracts that were signed and were active on each day. 
-        Attention to the contracts of type DealOnly (we only had contracts with this type until 2016). 
+      description:
+        Count of unique contracts that were signed and were active on each day.
+        Attention to the contracts of type DealOnly (we only had contracts with this type until 2016).
         It was a service only for contracts, without the administration of the rent, therefore only generated brokerage but no
         administration fees and will be accounted once on the day/week/month of contract signed.
       acronym: OC
@@ -28,4 +29,4 @@ columns:
       business_stage: Demand
       hierarchy: User analysis
       approved_by: augusto.torres@quintoandar.com.br
-      link_to_metric: 'https://quintoandar.sa.looker.com/looks/4895'
+      link_to_metric: "https://quintoandar.sa.looker.com/looks/4895"

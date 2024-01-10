@@ -1,16 +1,16 @@
--- PP Offboarding: 
--- 2 days after termination finished and status DONE 
+-- PP Offboarding:
+-- 2 days after termination finished and status DONE
 -- Get all contracts that were involved in Crisis, RA or Proteção 5A
 WITH crisis_contracts AS (
-	SELECT 
+	SELECT
 		ft.sk_contract
 	FROM
 		dw_tickets.dim_ticket AS dt
 	INNER JOIN
-		dw_tickets.fact_tickets AS ft 
+		dw_tickets.fact_tickets AS ft
 			ON dt.sk_ticket  = ft.sk_ticket
 	INNER JOIN
-		dw_customer_support.dim_department AS dc 
+		dw_customer_support.dim_department AS dc
 			ON dt.group_name = dc.department -- novo dc.aux_canal
 	WHERE
 		dc.team IN ('Casos Especiais','Ouvidoria','Proteção 5A','ReclameAqui','Evictions') -- exclude contracts from these areas
@@ -32,7 +32,7 @@ offboarding_contracts_wo_ticket AS (
 			dw_public.fact_house_listings AS fhl
 				ON ct.id_contract = fhl.sk_contract
 		LEFT JOIN
-			dw_public.dim_contract AS dc
+			dw_rent.dim_contract AS dc
 				ON ct.id_contract = dc.sk_contract
 		WHERE
 			dc.country_code = 'MX'
@@ -51,7 +51,7 @@ offboarding_contracts_wo_ticket AS (
 ),
 -- Considering all tenants and dwellers involved in contracts
 tenants_dwellers AS (
-	SELECT 
+	SELECT
 		cp.sk_user AS id_user,
 		oc.id_contract,
 		dcp.personal_document AS customer_cpf,
@@ -62,14 +62,14 @@ tenants_dwellers AS (
 	FROM
 		offboarding_contracts_wo_ticket AS oc
 	INNER JOIN
-		dw_quintoandar.fact_contract_people AS cp 
+		dw_rent.fact_contract_people AS cp
 			ON oc.id_contract = cp.sk_contract
 			AND cp.contract_role IN ('Proprietario')
 	LEFT JOIN
-		dw_quintoandar.dim_contract_person AS dcp
+		dw_rent.dim_contract_person AS dcp
 			ON cp.sk_contract_person = dcp.sk_contract_person
 )
-SELECT 
+SELECT
 	customer_name,
 	customer_email,
 	customer_phone,
@@ -84,7 +84,7 @@ SELECT
 FROM
 	tenants_dwellers
 UNION ALL
-SELECT 
+SELECT
 	'Teste Disparo' AS customer_name,
 	'testes.disparos.5a@gmail.com' AS customer_email,
 	'+5511123456789' AS customer_phone,

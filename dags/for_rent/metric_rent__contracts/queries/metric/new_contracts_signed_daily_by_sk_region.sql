@@ -3,12 +3,12 @@ SELECT
     COALESCE(hl.sk_region, -1) AS sk_region,
     dc.country_code,
     COUNT(DISTINCT dc.sk_contract) AS new_contracts_signed
-FROM 
-    dw_public.dim_contract AS dc
-LEFT JOIN 
+FROM
+    dw_rent.dim_contract AS dc
+LEFT JOIN
     dw_public.fact_house_listings AS hl
         ON dc.sk_contract = hl.sk_contract
-WHERE 
+WHERE
     dc.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active and ended
     AND DATE_TRUNC('day', COALESCE(dc.ts_signature, dc.dt_start)) < CURRENT_DATE()
 GROUP BY 1, 2, 3

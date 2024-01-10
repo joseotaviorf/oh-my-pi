@@ -13,7 +13,7 @@ cap_contract_info AS (
         c.sk_contract,
         ie.is_rental_paid_in_advance
     FROM
-        dw_public.dim_contract AS c
+        dw_rent.dim_contract AS c
     LEFT JOIN
         dw_payment.fact_invoice_entries AS fie
             ON fie.sk_contract = c.sk_contract
@@ -203,7 +203,7 @@ SELECT DISTINCT
 FROM
     cap_formated as cap
 LEFT JOIN
-    dw_public.dim_contract AS c
+    dw_rent.dim_contract AS c
         ON c.sk_contract = CAST(try_cast(cap.supplier_description AS REAL) AS INT)
 LEFT JOIN
     cap_contract_info AS cci
@@ -266,7 +266,7 @@ vans_final AS (
   FROM
       vans_formated as vans
   LEFT JOIN
-      dw_public.dim_contract AS c
+      dw_rent.dim_contract AS c
           ON c.sk_contract = CAST(try_cast(vans.supplier_description AS REAL) AS INT)
   LEFT JOIN
       cap_contract_info AS cci

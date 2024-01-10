@@ -14,5 +14,5 @@ columns:
     lineage:
       - dw_public.dim_booking.dt_booking_created
       - dw_rent.dim_offer.dt_created
-      - dw_public.dim_contract.ts_signature
+      - dw_rent.dim_contract.ts_signature
     description: Rate of new tenant prospects with signed contract within 4 weeks.

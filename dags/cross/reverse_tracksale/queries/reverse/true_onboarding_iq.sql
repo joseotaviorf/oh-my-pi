@@ -3,7 +3,7 @@ WITH new_contracts AS (
 		dc.sk_contract,
 		'Onboarding' AS step
 	FROM
-		dw_public.dim_contract dc
+		dw_rent.dim_contract dc
 	INNER JOIN
 		dw_public.fact_listing_rent_flows rf
 			ON dc.sk_contract = rf.sk_contract
@@ -34,7 +34,7 @@ crisis_users AS (
 		dw_customer_support.dim_department dc
 			ON dt.group_name = dc.department
 	WHERE
-		(dc.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]') 
+		(dc.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
 			OR dc.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
 		AND ft.sk_closed_date_local = -1
 	GROUP BY 1

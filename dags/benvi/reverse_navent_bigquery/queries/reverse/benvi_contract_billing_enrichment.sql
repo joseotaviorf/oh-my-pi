@@ -24,7 +24,7 @@ WITH mexico_contracts AS (
       c.dt_intended_end,
       c.dt_annulment
   FROM
-    dw_public.dim_contract AS c
+    dw_rent.dim_contract AS c
   WHERE
     country_code = 'MX'
 )
@@ -36,7 +36,7 @@ SELECT
     c.status,
     c.condo_payer,
     c.condo_responsible,
-    c.rental_administrator, 
+    c.rental_administrator,
     /* Owner information */
     f.sk_owner,
     '' AS owner_name,
@@ -121,29 +121,29 @@ SELECT
 FROM
     mexico_contracts AS c
 JOIN
-    dw_public.fact_listing_rent_flows AS f 
+    dw_public.fact_listing_rent_flows AS f
         ON c.id_contract = f.sk_contract
 JOIN
     dw_public.dim_house_listing AS l
         ON l.sk_house_listing = f.sk_house_listing
 LEFT JOIN
-    dw_quintoandar.fact_contract_people AS cpo 
+    dw_rent.fact_contract_people AS cpo
         ON c.id_contract = cpo.sk_contract
         AND cpo.is_contract_user = TRUE
         AND cpo.contract_role = 'landlord'
 LEFT JOIN
-    dw_quintoandar.dim_contract_person AS dpo
+    dw_rent.dim_contract_person AS dpo
         ON cpo.sk_contract_person = dpo.sk_contract_person
 LEFT JOIN
-    dw_quintoandar.fact_contract_people AS cpt 
+    dw_rent.fact_contract_people AS cpt
         ON c.id_contract = cpt.sk_contract
         AND cpt.is_contract_user = True
         AND cpt.contract_role = 'tenant'
 LEFT JOIN
-    dw_quintoandar.dim_contract_person AS dpt
+    dw_rent.dim_contract_person AS dpt
         ON cpt.sk_contract_person = dpt.sk_contract_person
 JOIN
-    dw_public.dim_user AS uo 
+    dw_public.dim_user AS uo
         ON uo.sk_user = f.sk_owner
 JOIN
     dw_public.dim_user AS ut

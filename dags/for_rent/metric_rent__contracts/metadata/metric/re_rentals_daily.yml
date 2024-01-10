@@ -7,25 +7,25 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   day:
     lineage:
-      - dw_public.dim_contract.dt_start
-      - dw_public.dim_contract.dt_entrance
+      - dw_rent.dim_contract.dt_start
+      - dw_rent.dim_contract.dt_entrance
     description: Date when a contract started or the entrance happened.
     dimension: True
   country_code:
     lineage:
-      - dw_public.dim_contract.country_code
+      - dw_rent.dim_contract.country_code
     description: Country code of the house
     dimension: True
   re_rentals:
     description: New Rentals in houses which already had a previous contract signed.
     metric:
       name: Re Rentals Daily
-      description: New Rentals in houses which already had a previous contract signed.
+      description:
+        New Rentals in houses which already had a previous contract signed.
         It's the count distinct of sk_contracts that were in status Ativo or Finalizado and the house already was rented before.
       acronym: RR
       is_additive: True
       business_stage: Demand
       hierarchy: User analysis
       approved_by: augusto.torres@quintoandar.com.br
-      link_to_metric: 'https://quintoandar.sa.looker.com/looks/4738'
-
+      link_to_metric: "https://quintoandar.sa.looker.com/looks/4738"
