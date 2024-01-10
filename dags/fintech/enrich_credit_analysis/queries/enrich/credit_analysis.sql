@@ -69,12 +69,12 @@ SELECT
       rsc.is_guarantee_allowed = TRUE
       AND rsc.is_deposit_allowed = TRUE
       AND rsc.is_pro_guarantor_allowed = FALSE
-    ) THEN 'INSURANCE, DEPOSIT'
+    ) THEN 'INSURANCE_OR_DEPOSIT'
     WHEN (
       rsc.is_guarantee_allowed = FALSE
       AND rsc.is_deposit_allowed = TRUE
       AND rsc.is_pro_guarantor_allowed = TRUE
-    ) THEN 'PRO_GUARANTOR, DEPOSIT'
+    ) THEN 'PRO_GUARANTOR_OR_DEPOSIT'
     WHEN (
       rsc.is_guarantee_allowed = FALSE
       AND rsc.is_deposit_allowed = TRUE

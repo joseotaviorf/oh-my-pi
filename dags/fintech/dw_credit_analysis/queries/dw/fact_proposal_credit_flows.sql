@@ -124,8 +124,8 @@ rent_flows AS (
     COALESCE(CAST(DATE_FORMAT(ca.ts_guarantee_accepted, "yyyyMMdd") AS BIGINT), -1) AS sk_guarantee_accepted_date,
     COALESCE(dp.id, -1) AS sk_drop_reason,
     flrf.funnel_step,
-    COALESCE(ca.guarantee_offered, -1) AS guarantee_offered,
-    COALESCE(ca.guarantee_accepted, -1) AS guarantee_accepted,
+    ca.guarantee_offered AS guarantee_offered,
+    ca.guarantee_accepted AS guarantee_accepted,
     IF(
       cap.id_first_credit_analysis = ca.id_credit_analysis,
       TRUE,
