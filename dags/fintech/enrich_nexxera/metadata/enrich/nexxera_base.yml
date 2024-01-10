@@ -1,0 +1,138 @@
+---
+database_name: datalake_nexxera
+table_name: nexxera_base
+description: "Table containing inadvance data from nexxera files (id_registration = 10). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  rn_end:
+    description: "Line number"
+  id_bank_grouper:
+    description: "Banking group in which the sale was settled"
+    lineage:
+      - datalake_nexxera_clean.financial.id_bank_grouper
+      - datalake_nexxera_clean.adjustments.id_bank_grouper
+  id_flag:
+    description: "Flag ID adopted by Nexxera"
+    lineage:
+      - datalake_nexxera_clean.financial.id_flag
+      - datalake_nexxera_clean.financial_extracts_050e.id_flag
+  id_external_payment:
+    description: "External payment ID"
+  reconciliation_status:
+    description: "Reason for manual bank reconciliation (when reconciled)"
+    lineage:
+      - datalake_nexxera_clean.financial.manual_bank_reconciliation
+      - datalake_nexxera_clean.adjustments.manual_bank_reconciliation
+  description_memo:
+    description: "Description"
+  rn_credit:
+    description: "Credit row number"
+    lineage:
+      - datalake_nexxera.financial.rn_credit
+  rn_adjustments:
+    description: "Adjustments row number"
+    lineage:
+      - datalake_nexxera.adjustments.rn_adjustments
+  rn_bank:
+    description: "Bank row number"
+    lineage:
+      - datalake_nexxera.financial.rn_bank
+  payment_status:
+    description: "Payment status informed by the acquirer"
+    lineage:
+      - datalake_nexxera.financial.payment_status
+  ec:
+    description: "EC - Commercial establishment"
+    lineage:
+      - datalake_nexxera_clean.financial.id_ec
+      - datalake_nexxera_clean.adjustments.id_ec
+  flag:
+    description: "Name of the flag for which the sale was made."
+    lineage:
+      - datalake_nexxera_clean.financial.id_ec
+      - datalake_nexxera_clean.adjustments.id_ec
+      - datalake_nexxera.financial_extracts_050e.id_ec
+  summary_number:
+    description: "Summary number provided by the acquirer for this sale"
+    lineage:
+      - datalake_nexxera.financial.rv_summary_number
+      - datalake_nexxera.adjustments.current_summary_number
+  authorization_number:
+    description: "Authorization number provided by the acquirer"
+    lineage:
+      - datalake_nexxera.financial.id_authorization
+      - datalake_nexxera.adjustments.id_authorization
+  receipt:
+    description: "Proof of sale number provided by the purchaser"
+    lineage:
+      - datalake_nexxera.financial.nsu_cv
+      - datalake_nexxera.adjustments.nsu_cv
+  installment_number:
+    description: "Number of the installment"
+    lineage:
+      - datalake_nexxera.financial.installment_number
+      - datalake_nexxera.adjustments.installment_number
+  total_installments:
+    description: "Total number of installments"
+    lineage:
+      - datalake_nexxera.financial.total_installments
+      - datalake_nexxera.adjustments.total_installments
+  gross_amount:
+    description: "Gross value of the sales installment"
+    lineage:
+      - datalake_nexxera.financial.installment_gross_amount
+  tax_amount:
+    description: "Amount charged by the acquirer as an administration fee for the sales portion"
+    lineage:
+      - datalake_nexxera.financial.installment_discount_value
+  net_amount:
+    description: "Net value of the sales installment"
+    lineage:
+      - datalake_nexxera.financial.installment_net_amount
+  total_gross_amount:
+    description: "Total gross value of the sales receipt"
+    lineage:
+      - datalake_nexxera.financial.total_sale_gross_amount
+  total_tax_amount:
+    description: "Total amount charged by the acquirer as a sales receipt administration fee"
+    lineage:
+      - datalake_nexxera.financial.total_sale_discount_amount
+  total_net_amount:
+    description: "Total net value of the sales receipt"
+    lineage:
+      - datalake_nexxera.financial.total_sale_net_amount
+  tax:
+    description: "Fee charged by the acquirer for managing the transaction"
+    lineage:
+      - datalake_nexxera.financial.discount_charge
+  adjustment_type:
+    description: "Original description of the reason for the adjustment sent by the acquirer"
+    lineage:
+      - datalake_nexxera.adjustments.adjustment_original_reason
+  adjustment_gross_value:
+    description: "Gross value of the adjustment"
+    lineage:
+      - datalake_nexxera.adjustments.adjustment_value
+  adjustment_sale_value:
+    description: "Net value of the adjustment"
+    lineage:
+      - datalake_nexxera.adjustments.net_adjustment_value
+  adjustment_tax_value:
+    description: "Tax value of the adjustment"
+    lineage:
+      - datalake_nexxera.adjustments.adjustment_value_tax
+  dt_credit_adjustment:
+    description: "Original date of sale or adjustment date"
+    lineage:
+      - datalake_nexxera.adjustments.dt_adjustment_launch
+  dt_credit:
+    description: "Date on which the deposit will be made"
+    lineage:
+      - datalake_nexxera.financial.dt_installment_credit
+      - datalake_nexxera.adjustments.dt_installment_credit
+  dt_sale:
+    description: "Original date of sale"
+    lineage:
+      - datalake_nexxera.financial.dt_sale
+      - datalake_nexxera.adjustments.dt_sale_adjustment

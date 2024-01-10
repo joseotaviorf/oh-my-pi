@@ -1,0 +1,129 @@
+---
+database_name: datalake_nexxera
+table_name: dtw_filter
+description: "Table containing structured data to be ingested by SAP"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  OK:
+    description: "Checks if the receipt matches the data from the bank"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.OK
+  BANK_OK:
+    description: "Checks if the data from the bank is ok"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.BANK_OK
+  BANK_DIFF:
+    description: "Differente from receipt X bank"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.BANK_DIFF
+  BALANCE_OK:
+    description: "Validation"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.BALANCE_OK
+  BALANCE_DIFF:
+    description: "Difference in validation"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.BALANCE_DIFF
+  EC:
+    description: "EC - Commercial establishment"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.EC
+  STORE_ID:
+    description: "Store ID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.STORE_ID
+  JdtNum:
+    description: "Header ID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.JdtNum
+  ReferenceDate:
+    description: "Lauch date"
+  DueDate:
+    description: "Due date"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.DueDate
+  TaxDate:
+    description: "Document date"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.TaxDate
+  Reference:
+    description: "Card flag"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.Reference
+  Reference2:
+    description: "Commercial establishment (EC)"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.Reference2
+  Reference3:
+    description: "Accrual date"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.Reference3
+  Memo:
+    description: "Description"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.Memo
+  U_ExternalPaymentId:
+    description: "External payment ID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.U_ExternalPaymentId
+  U_SourceClient:
+    description: "Source system"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.U_SourceClient
+  U_RSD_UUIDSB:
+    description: "Source system UUID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.U_RSD_UUIDSB
+  ParentKey:
+    description: "Header ID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.ParentKey
+  LineNum:
+    description: "Line number"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.LineNum
+  ShortName:
+    description: "Accounting account"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.ShortName
+  Debit:
+    description: "Debit amount"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.Debit
+  Credit:
+    description: "Credit amount"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.Credit
+  BPLID:
+    description: "Branch ID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.BPLID
+  Reference1:
+    description: "Business entity ID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.Reference1
+  Reference2_:
+    description: "Financial/accounting event ID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.Reference2_
+  AdditionalReference:
+    description: "Accrual date"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.AdditionalReference
+  U_FinanceEntityEntryId:
+    description: "Financial/accounting event entry ID"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.U_FinanceEntityEntryId
+  CostingCode:
+    description: "Location"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.CostingCode
+  CostingCode2:
+    description: "Cost center"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.CostingCode2
+  DueDate_:
+    description: "Due date"
+    lineage:
+      - datalake_nexxera_raw.nexxera_final.DueDate_

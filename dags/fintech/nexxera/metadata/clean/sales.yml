@@ -174,3 +174,6 @@ columns:
   day:
     lineage:
       - datalake_nexxera_raw.sales.day
+  ts_ingested:
+    lineage:
+      - datalake_nexxera_raw.sales.ts_ingested

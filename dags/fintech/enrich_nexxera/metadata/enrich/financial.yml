@@ -1,0 +1,89 @@
+---
+database_name: datalake_nexxera
+table_name: financial
+description: "Table containing financial data from nexxera files (id_registration = 11). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  rn_credit:
+    description: Row number to order registers
+  manual_bank_reconciliation:
+    description: Reason for manual bank reconciliation (when reconciled)
+    lineage:
+      - datalake_nexxera_clean.financial.manual_bank_reconciliation
+  payment_status:
+    description: Payment status informed by the acquirer
+    lineage:
+      - datalake_nexxera_clean.financial.payment_status
+  dt_installment_credit:
+    description: Date on which the deposit will be made
+    lineage:
+      - datalake_nexxera_clean.financial.dt_installment_credit
+  dt_sale:
+    description: Original date of sale
+    lineage:
+      - datalake_nexxera_clean.financial.dt_sale
+  id_ec:
+    description: Point of sale number registered with the acquirer
+    lineage:
+      - datalake_nexxera_clean.financial.acquirer_pos
+  flag:
+    description: Flag name
+    lineage:
+      - datalake_nexxera_clean.financial.flag
+  id_flag:
+    description: Flag ID defined by Nexxera
+    lineage:
+      - datalake_nexxera_clean.financial.id_flag
+  nsu_cv:
+    description: Original sales receipt number linked to this adjustment. Will not be filled in for adjustments not linked to the sale
+    lineage:
+      - datalake_nexxera_clean.financial.nsu_cv
+  rv_summary_number:
+    description: Summary number provided by the acquirer for this sale
+    lineage:
+      - datalake_nexxera_clean.financial.rv_summary_number
+  id_authorization:
+    description: Authorization number provided by the acquirer
+    lineage:
+      - datalake_nexxera_clean.financial.id_authorization
+  installment_number:
+    description: Number of the installment
+    lineage:
+      - datalake_nexxera_clean.financial.installment_number
+  total_installments:
+    description: Total number of installments
+    lineage:
+      - datalake_nexxera_clean.financial.total_installments
+  installment_gross_amount:
+    description: Gross amount of the sale installment
+    lineage:
+      - datalake_nexxera_clean.financial.installment_gross_amount
+  installment_discount_value:
+    description: Discount value of the sale installment
+    lineage:
+      - datalake_nexxera_clean.financial.installment_discount_value
+  installment_net_amount:
+    description: Net amount of the sale installment
+    lineage:
+      - datalake_nexxera_clean.financial.installment_net_amount
+  total_sale_gross_amount:
+    description: Total gross amount of the sale
+    lineage:
+      - datalake_nexxera_clean.financial.total_sale_gross_amount
+  total_sale_discount_amount:
+    description: Total discount amount of the sale
+    lineage:
+      - datalake_nexxera_clean.financial.total_sale_discount_amount
+  total_sale_net_amount:
+    description: Total net amount of the sale
+    lineage:
+      - datalake_nexxera_clean.financial.total_sale_net_amount
+  discount_charge:
+    description: Fee charged by the acquirer for managing the transaction
+    lineage:
+      - datalake_nexxera_clean.financial.discount_charge
+  id_bank_grouper:
+    description: Banking grouping in which the sale was settled
+    lineage:
+      - datalake_nexxera_clean.financial.id_bank_grouper

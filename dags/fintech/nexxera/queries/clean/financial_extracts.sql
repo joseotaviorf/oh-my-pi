@@ -7,6 +7,7 @@ SELECT
     SUBSTRING(metadata, 7, 3) AS instruction_code,
     SUBSTRING(metadata, 10, 3) AS compensation_code,
     metadata AS description,
+    NOW() AS ts_ingested,
     year,
     month,
     day

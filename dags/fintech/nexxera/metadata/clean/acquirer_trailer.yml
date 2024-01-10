@@ -115,3 +115,10 @@ columns:
       - datalake_nexxera_raw.inadvance.day
       - datalake_nexxera_raw.sales.day
       - datalake_nexxera_raw.transaction.day
+  ts_ingested:
+    lineage:
+      - datalake_nexxera_raw.adjustments.ts_ingested
+      - datalake_nexxera_raw.financial.ts_ingested
+      - datalake_nexxera_raw.inadvance.ts_ingested
+      - datalake_nexxera_raw.sales.ts_ingested
+      - datalake_nexxera_raw.transaction.ts_ingested

@@ -1,0 +1,127 @@
+---
+database_name: datalake_nexxera
+table_name: nexxera_final
+description: "Table containing sales data from nexxera files (id_registration = 11). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  OK:
+    description: "Checks if the receipt matches the data from the bank"
+    lineage:
+      - datalake_nexxera_raw.sales.col_1
+  BANK_OK:
+    description: "Checks if the data from the bank is ok"
+    lineage:
+      - datalake_nexxera_raw.sales.col_2
+  BANK_DIFF:
+    description: "Differente from receipt X bank"
+    lineage:
+      - datalake_nexxera_raw.sales.col_3
+  BALANCE_OK:
+    description: "Validation"
+    lineage:
+      - datalake_nexxera_raw.sales.col_4
+  BALANCE_DIFF:
+    description: "Difference in validation"
+    lineage:
+      - datalake_nexxera_raw.sales.col_5
+  EC:
+    description: "EC - Commercial establishment"
+    lineage:
+      - datalake_nexxera_raw.sales.col_6
+  STORE_ID:
+    description: "Store ID"
+    lineage:
+      - datalake_nexxera_raw.sales.col_7
+  JdtNum:
+    description: "Header ID"
+    lineage:
+      - datalake_nexxera_raw.sales.col_8
+  dt_due:
+    description: "Due date"
+    lineage:
+      - datalake_nexxera_raw.sales.col_9
+  dt_tax:
+    description: "Document date"
+    lineage:
+      - datalake_nexxera_raw.sales.col_10
+  reference:
+    description: "Card flag"
+    lineage:
+      - datalake_nexxera_raw.sales.col_11
+  reference_2:
+    description: "EC - Commercial establishment"
+    lineage:
+      - datalake_nexxera_raw.sales.col_12
+  reference_3:
+    description: "Accrual date"
+    lineage:
+      - datalake_nexxera_raw.sales.col_13
+  memo:
+    description: "Description"
+    lineage:
+      - datalake_nexxera_raw.sales.col_14
+  id_u_external_payment:
+    description: "External payment ID"
+    lineage:
+      - datalake_nexxera_raw.sales.col_15
+  u_source_client:
+    description: "Origin system"
+    lineage:
+      - datalake_nexxera_raw.sales.col_16
+  uuid_u_rsd_sb:
+    description: "UUID from origin system"
+    lineage:
+      - datalake_nexxera_raw.sales.col_17
+  parent_key:
+    description: "Header ID"
+    lineage:
+      - datalake_nexxera_raw.sales.col_18
+  line_num:
+    description: "Line number"
+    lineage:
+      - datalake_nexxera_raw.sales.col_19
+  short_name:
+    description: "Accounting account"
+    lineage:
+      - datalake_nexxera_raw.sales.col_20
+  debit:
+    description: "Debit amount"
+    lineage:
+      - datalake_nexxera_raw.sales.col_21
+  credit:
+    description: "Credit amount"
+    lineage:
+      - datalake_nexxera_raw.sales.col_22
+  id_pbl:
+    description: "Branch ID"
+    lineage:
+      - datalake_nexxera_raw.sales.col_23
+  additional_reference_1:
+    description: "Business entity ID"
+    lineage:
+      - datalake_nexxera_raw.sales.col_24
+  additional_reference_2:
+    description: "Financial/accounting event ID"
+    lineage:
+      - datalake_nexxera_raw.sales.col_25
+  additional_reference:
+    description: "Accrual date"
+    lineage:
+      - datalake_nexxera_raw.sales.col_26
+  id_u_finance_entity_entry:
+    description: "Financial/accounting event entry ID"
+    lineage:
+      - datalake_nexxera_raw.sales.col_27
+  costing_code:
+    description: "Location"
+    lineage:
+      - datalake_nexxera_raw.sales.col_28
+  costing_code_2:
+    description: "Cost center"
+    lineage:
+      - datalake_nexxera_raw.sales.col_29
+  dt_due_2:
+    description: "Due date"
+    lineage:
+      - datalake_nexxera_raw.sales.col_30

@@ -1846,6 +1846,14 @@ bietlejuice.enrich_monopoly:
   - bietlejuice.monopoly:load-clean-outcome-reference
   - bietlejuice.monopoly:load-clean-sale
   - bietlejuice.monopoly:load-clean-sale-transaction
+bietlejuice.enrich_nexxera:
+  - bietlejuice.nexxera:load-clean-adjustments
+  - bietlejuice.nexxera:load-clean-financial
+  - bietlejuice.nexxera:load-clean-financial-extracts-050e
+  - bietlejuice.rental_guarantee_platform:load-clean-address
+  - bietlejuice.rental_guarantee_platform:load-clean-property-propose
+  - bietlejuice.rental_guarantee_platform:load-clean-propose
+  - bietlejuice.wall_street:load-clean-charge
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb:load-clean-booking
   - bietlejuice.ebdb:load-clean-contract

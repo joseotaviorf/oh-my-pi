@@ -11,6 +11,7 @@ SELECT
     CAST(col_9 / 100 AS DECIMAL(15,2)) AS debit_adjustments_value,
     CAST(col_10 / 100 AS DECIMAL(15,2)) AS compensated_adjustments_value,
     CAST(col_11 / 100 AS DECIMAL(15,2)) AS legacy_summary_installments_value,
+    NOW() AS ts_ingested,
     year,
     month,
     day
@@ -37,6 +38,7 @@ SELECT
     CAST(col_9 / 100 AS DECIMAL(15,2)) AS debit_adjustments_value,
     CAST(col_10 / 100 AS DECIMAL(15,2)) AS compensated_adjustments_value,
     CAST(col_11 / 100 AS DECIMAL(15,2)) AS legacy_summary_installments_value,
+    NOW() AS ts_ingested,
     year,
     month,
     day
@@ -63,6 +65,7 @@ SELECT
     CAST(col_9 / 100 AS DECIMAL(15,2)) AS debit_adjustments_value,
     CAST(col_10 / 100 AS DECIMAL(15,2)) AS compensated_adjustments_value,
     CAST(col_11 / 100 AS DECIMAL(15,2)) AS legacy_summary_installments_value,
+    NOW() AS ts_ingested,
     year,
     month,
     day
@@ -89,6 +92,7 @@ SELECT
     CAST(col_9 / 100 AS DECIMAL(15,2)) AS debit_adjustments_value,
     CAST(col_10 / 100 AS DECIMAL(15,2)) AS compensated_adjustments_value,
     CAST(col_11 / 100 AS DECIMAL(15,2)) AS legacy_summary_installments_value,
+    NOW() AS ts_ingested,
     year,
     month,
     day
@@ -115,6 +119,7 @@ SELECT
     CAST(col_9 / 100 AS DECIMAL(15,2)) AS debit_adjustments_value,
     CAST(col_10 / 100 AS DECIMAL(15,2)) AS compensated_adjustments_value,
     CAST(col_11 / 100 AS DECIMAL(15,2)) AS legacy_summary_installments_value,
+    NOW() AS ts_ingested,
     year,
     month,
     day

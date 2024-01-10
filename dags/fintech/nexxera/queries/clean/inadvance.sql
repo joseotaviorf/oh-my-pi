@@ -22,6 +22,7 @@ SELECT
   TO_DATE(col_8, 'ddMMyy') AS dt_credit_installment,
   TO_DATE(col_16, 'ddMMyy') AS dt_summary_sale,
   TO_DATE(col_6, 'ddMMyy') AS dt_due,
+    NOW() AS ts_ingested,
     year,
     month,
     day

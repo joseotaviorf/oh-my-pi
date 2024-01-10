@@ -1,0 +1,73 @@
+---
+database_name: datalake_nexxera
+table_name: adjustments
+description: "Table containing adjustments data from nexxera files (id_registration = 12). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  rn_adjustments:
+    description: Adjustment row number
+  dt_adjustment_launch:
+    description: Date on which the credit or debit relating to the adjustment will be made
+    lineage:
+      - datalake_nexxera_clean.adjustments.dt_adjustment_launch
+  dt_sale_adjustment:
+    description: Original date of sale or adjustment date
+    lineage:
+      - datalake_nexxera_clean.adjustments.dt_sale_adjustment
+  id_flag:
+    description: Flag ID defined by Nexxera
+    lineage:
+      - datalake_nexxera_clean.adjustments.id_flag
+  flag:
+    description: Flag description
+    lineage:
+      - datalake_nexxera_clean.adjustments.id_flag
+  installment_number:
+    description: Number of the installment that suffered the adjustment
+    lineage:
+      - datalake_nexxera_clean.adjustments.installment_number
+  total_installments:
+    description: Total number of installments
+    lineage:
+      - datalake_nexxera_clean.adjustments.total_installments
+  id_bank_grouper:
+    description: Banking grouping in which the sale was settled. Generated only when reconciled with the deposit (Bank Conciliation).
+    lineage:
+      - datalake_nexxera_clean.adjustments.id_bank_grouper
+  current_summary_number:
+    description: Number of the sales summary receiving the adjustment
+    lineage:
+      - datalake_nexxera_clean.adjustments.current_summary_number
+  id_authorization:
+    description: Sales authorization number. Will not be filled in for adjustments not linked to the sale
+    lineage:
+      - datalake_nexxera_clean.adjustments.id_authorization
+  nsu_cv:
+    description: Original sales receipt number linked to this adjustment. Will not be filled in for adjustments not linked to the sale
+    lineage:
+      - datalake_nexxera_clean.adjustments.nsu_cv
+  adjustment_original_reason:
+    description: Original description of the reason for the adjustment sent by the acquirer
+    lineage:
+      - datalake_nexxera_clean.adjustments.adjustment_original_reason
+  id_ec:
+    description: Original point of sale number of the sale
+    lineage:
+      - datalake_nexxera_clean.adjustments.original_pos
+  adjustment_value:
+    description: Informed value of the adjustment
+    lineage:
+      - datalake_nexxera_clean.adjustments.adjustment_value
+  net_adjustment_value:
+    description: Informed net value of the adjustment
+    lineage:
+      - datalake_nexxera_clean.adjustments.adjustment_value
+  adjustment_value_tax:
+    description: Informed tax value of the adjustment
+    lineage:
+      - datalake_nexxera_clean.adjustments.adjustment_value
+  counter_adjustments:
+    description: Counter of adjustments
+    lineage:
+      - datalake_nexxera_clean.adjustments.adjustment_value

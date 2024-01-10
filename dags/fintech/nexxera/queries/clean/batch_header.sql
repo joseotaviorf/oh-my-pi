@@ -25,6 +25,7 @@ SELECT
     CAST(SUBSTRING(metadata, 166, 5) AS INTEGER) AS extract_sequence_number,
     SUBSTRING(metadata, 171, 62) AS cnab_reserved_field,
     TO_DATE(SUBSTRING(metadata, 135, 8), 'ddMMyyyy') AS dt_inicial_balance,
+    NOW() AS ts_ingested,
     year,
     month,
     day

@@ -1,0 +1,25 @@
+---
+database_name: datalake_nexxera
+table_name: financial_extracts_050e
+description: "Table containing all financial extract files from itaú and bradesco with layout 050 and segment 'e'. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  rn_bank:
+    description: Row number to order registers
+  dt_launch:
+    description: Launch date
+    lineage:
+      - datalake_nexxera_clean.financial_extracts_050e.dt_launch
+  id_flag:
+    description: Flag ID defined by Nexxera
+    lineage:
+      - datalake_nexxera_clean.financial_extracts_050e.history_description
+  id_ec:
+    description: Description of the Launch History at the Bank
+    lineage:
+      - datalake_nexxera_clean.financial_extracts_050e.history_description
+  launch_value:
+    description: Launch value
+    lineage:
+      - datalake_nexxera_clean.financial_extracts_050e.launch_value

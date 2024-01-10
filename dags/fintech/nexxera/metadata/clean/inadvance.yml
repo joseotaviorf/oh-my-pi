@@ -81,3 +81,6 @@ columns:
   day:
     lineage:
       - datalake_nexxera_raw.inadvance.day
+  ts_ingested:
+    lineage:
+      - datalake_nexxera_raw.inadvance.ts_ingested

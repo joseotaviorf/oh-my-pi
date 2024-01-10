@@ -23,6 +23,7 @@ SELECT
     SUBSTRING(metadata, 194, 20) AS document_number,
     file_name,
     TO_DATE(SUBSTRING(metadata, 135, 8), 'ddMMyyyy') AS dt_launch,
+    NOW() AS ts_ingested,
     year,
     month,
     day

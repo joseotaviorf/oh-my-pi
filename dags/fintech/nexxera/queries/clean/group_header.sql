@@ -9,6 +9,7 @@ SELECT
     col_6 AS hr_file_generated,
     TO_DATE(col_5, 'ddMMyy') AS dt_file_generated,
     TO_DATE(col_4, 'ddMMyy') AS dt_file_reference,
+    NOW() AS ts_ingested,
     year,
     month,
     day
@@ -33,6 +34,7 @@ SELECT
     col_6 AS hr_file_generated,
     TO_DATE(col_5, 'ddMMyy') AS dt_file_generated,
     TO_DATE(col_4, 'ddMMyy') AS dt_file_reference,
+    NOW() AS ts_ingested,
     year,
     month,
     day
@@ -57,6 +59,7 @@ SELECT
     col_6 AS hr_file_generated,
     TO_DATE(col_5, 'ddMMyy') AS dt_file_generated,
     TO_DATE(col_4, 'ddMMyy') AS dt_file_reference,
+    NOW() AS ts_ingested,
     year,
     month,
     day
@@ -81,6 +84,7 @@ SELECT
     col_6 AS hr_file_generated,
     TO_DATE(col_5, 'ddMMyy') AS dt_file_generated,
     TO_DATE(col_4, 'ddMMyy') AS dt_file_reference,
+    NOW() AS ts_ingested,
     year,
     month,
     day
@@ -105,6 +109,7 @@ SELECT
     col_6 AS hr_file_generated,
     TO_DATE(col_5, 'ddMMyy') AS dt_file_generated,
     TO_DATE(col_4, 'ddMMyy') AS dt_file_reference,
+    NOW() AS ts_ingested,
     year,
     month,
     day

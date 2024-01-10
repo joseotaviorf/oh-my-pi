@@ -75,3 +75,6 @@ columns:
   day:
     lineage:
       - datalake_nexxera_raw.financial_legacy.day
+  ts_ingested:
+    lineage:
+      - datalake_nexxera_raw.financial_legacy.ts_ingested

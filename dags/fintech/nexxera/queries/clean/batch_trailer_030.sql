@@ -3,6 +3,7 @@ SELECT
     id_bank,
     id_service_batch,
     record_type,
+    file_name,
     SUBSTRING(metadata, 10, 1) AS company_register_type,
     SUBSTRING(metadata, 11, 14) AS company_register_number,
     CAST(SUBSTRING(metadata, 25, 20) AS INTEGER) AS bank_insurance_code,
@@ -22,7 +23,7 @@ SELECT
     CAST(SUBSTRING(metadata, 187, 18)/ 100 AS DECIMAL(16,2)) AS credit_value,
     SUBSTRING(metadata, 205, 28) AS cnab_reserved_field,
     TO_DATE(SUBSTRING(metadata, 135, 8), 'ddMMyyyy') AS dt_final_balance,
-    file_name,
+    NOW() AS ts_ingested,
     year,
     month,
     day
