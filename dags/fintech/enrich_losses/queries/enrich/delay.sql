@@ -192,10 +192,7 @@ base_aux_ref_contract_deals AS(
   SELECT
     DISTINCT id_contract,
     user,
-    dt_closing,
-    is_international,
-    is_before_started,
-    is_writtendown_in_dead_time
+    dt_closing
   FROM
     base_step1_delay
   WHERE
