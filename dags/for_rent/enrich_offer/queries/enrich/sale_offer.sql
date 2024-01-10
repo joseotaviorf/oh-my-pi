@@ -26,7 +26,7 @@ WITH visit_before_offer AS (
                     ON vo.id_offer = g.id
         JOIN
             datalake_booking.booking AS bs
-                ON bs.id_house = COALESCE(g.id, vo.id_offer)
+                ON bs.id_house = COALESCE(g.id_house, vo.id_house)
                 AND bs.id_visitor = COALESCE(g.id_buyer, vo.id_buyer)
         LEFT JOIN
             datalake_ebdb_user.user AS du
