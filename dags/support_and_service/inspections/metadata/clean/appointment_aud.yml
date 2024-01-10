@@ -72,7 +72,7 @@ columns:
   mod_observation:
     description: Indicates if the observation field has been changed
     lineage:
-      - datalake_inspections_raw.appointment_aud.observation
+      - datalake_inspections_raw.appointment_aud.observation_mod
   cancellation_reason:
     description: Description of the reason for canceling the inspection appointment
     lineage:
