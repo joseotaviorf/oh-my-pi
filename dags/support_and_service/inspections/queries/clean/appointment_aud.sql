@@ -1,33 +1,35 @@
 SELECT
 	id AS id_appointment,
-    external_appointment_id as id_external_appointment,
-	external_appointment_id_mod as id_external_appointment_mod,
-	inspection_id as id_inspection,
-	inspection_id_mod as id_inspection_mod,
-	inspector_id as id_inspector,
-	inspector_id_mod as id_inspector_mod,
-    rev,
+	external_appointment_id AS id_external_appointment,
+	external_appointment_id_mod AS mod_id_external_appointment,
+	inspection_id AS id_inspection,
+	inspection_id_mod AS mod_id_inspection,
+	inspector_id AS id_inspector,
+	inspector_id_mod AS mod_id_inspector,
+	rev,
 	revtype AS rev_type,
 	revend AS rev_end,
 	status,
-	status_mod,
-	inspection_mod,
+	mod_status,
+	mod_inspection,
 	observation,
-	observation_mod,
-    fixed_agent as is_fixed_agent,
-	fixed_agent_mod as is_fixed_agent_mod,
-    scheduled_date as dt_scheduled,
-	scheduled_date_mod as dt_scheduled_mod,
-    updated_at as ts_updated,
-	updated_at_mod as ts_updated_mod,
-    created_at as ts_created,
-	created_at_mod as ts_created_mod,
-    year,
-    month,
-    day
+	mod_observation,
+	cancellation_reason,
+	mod_cancellation_reason,
+	fixed_agent AS is_fixed_agent,
+	fixed_agent_mod AS mod_is_fixed_agent,
+	scheduled_date AS dt_scheduled,
+	scheduled_date_mod AS mod_dt_scheduled,
+	updated_at AS ts_updated,
+	updated_at_mod AS mod_ts_updated,
+	created_at AS ts_created,
+	created_at_mod AS mod_ts_created,
+	year,
+	month,
+	day
 FROM
-    datalake_inspections_raw.appointment_aud
+	datalake_inspections_raw.appointment_aud
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+	year = {year}
+	AND month = {month}
+	AND day = {day}
