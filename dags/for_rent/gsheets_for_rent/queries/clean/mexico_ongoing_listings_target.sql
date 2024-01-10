@@ -4,6 +4,7 @@ SELECT
     rental_administrator,
     CAST(REPLACE(tier, ',', '') AS INT) AS tier,
     CAST(REPLACE(depublications, ',', '') AS DECIMAL(14,6)) AS depublications,  
+    CAST(REPLACE(ended_rentals, ',', '') AS DECIMAL(14,6)) AS ended_rentals, 
     CAST(REPLACE(ongoing_listings, ',', '') AS DECIMAL(14,6)) AS ongoing_listings,  
     CAST(REPLACE(recovered, ',', '') AS DECIMAL(14,6)) AS recovered,  
     CAST(REPLACE(relisting, ',', '') AS DECIMAL(14,6)) AS relisting,  

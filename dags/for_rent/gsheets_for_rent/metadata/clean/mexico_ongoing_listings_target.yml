@@ -24,6 +24,10 @@ columns:
     lineage:
       - datalake_gsheets_raw.mexico_ongoing_listings_targets.depublications
     description: Depublications target.
+  ended_rentals:
+    lineage:
+      - datalake_gsheets_raw.mexico_ongoing_listings_targets.ended_rentals
+    description: Ended rentals target.
   ongoing_listings:
     lineage:
       - datalake_gsheets_raw.mexico_ongoing_listings_targets.ongoing_listings
