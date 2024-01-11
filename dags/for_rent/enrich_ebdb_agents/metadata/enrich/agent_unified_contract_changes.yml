@@ -1,0 +1,78 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agent_unified_contract_changes
+description: Each row of this table is a change associated with the agent's contract, including business context,
+  activations, and suspensions.
+domain: Cross
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_agent:
+    description: Foreign key of the agent. Can be joined with dw_public.dim_user.dados_agente_id and dw_public.dim_agent.sk_agent.
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.id_agent
+      - datalake_ebdb_agents.agent_coincident_business_contexts.id_agent_data
+  id_work_contract:
+    description: Foreign key of the work contract.
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.id
+  id_company_hubspot:
+    description: ID of the Rede company in Hubspot.
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
+  3p_partner:
+    description: Short name of the Rede company.
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.3p_partner
+  action:
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.action
+    description: 'Description of what changed between the previous line and the current one. Can be one of these:
+      - REACTIVATED
+      - ACTIVATED
+      - DEACTIVATED
+      - SUSPENDED
+      - UNSUSPENDED
+      - ALTERED_CONTRACT
+      - BUSINESS_CONTEXT_CHANGED'
+  days_in_status:
+    description: Number of days between the start and end of the validity period.
+  is_agent_active:
+    description: Whether the agent is active, as specified by Main's agent data.
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.is_agent_active
+  is_agent_suspended:
+    description: Whether the agent is suspended, which is the same as being marked with "Agenda Bloqueada".
+  is_agent_for_sale:
+    description: Whether the agent works in the For Sale context.
+    lineage:
+      - datalake_ebdb_agents.agent_coincident_business_contexts.is_agent_for_sale
+  is_agent_for_rent:
+    description: Whether the agent works in the For Rent context.
+    lineage:
+      - datalake_ebdb_agents.agent_coincident_business_contexts.is_agent_for_rent
+  ts_last_contract_changed:
+    description: Timestamp of when the agent''s contract was last changed.
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+  ts_last_suspension_changed:
+    description: Timestamp of when the agent''s suspension was last changed.
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+  ts_last_activation_changed:
+    description: Timestamp of when the agent''s activation was last changed.
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+  ts_last_business_context_changed:
+    description: Timestamp of when the agent''s business context was last changed.
+    lineage:
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started
+  ts_status_started:
+    description: Timestamp of when the validity period started.
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started
+  ts_status_ended:
+    description: Timestamp of when the validity period ended.
+    lineage:
+      - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision
+      - datalake_ebdb_agents.agent_coincident_business_contexts.ts_agent_business_context_started

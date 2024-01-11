@@ -1342,6 +1342,7 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region
 bietlejuice.enrich_ebdb_amenities:
   - bietlejuice.ebdb:load-clean-amenities
