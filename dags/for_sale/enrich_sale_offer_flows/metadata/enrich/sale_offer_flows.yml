@@ -128,7 +128,9 @@ columns:
       - datalake_sales_flow.offer_specialists.id_user_agent
     description: Broker identification key linked to the offer on main tables (EBDB)
   id_agent:
-    description: Broker identification key linked to the offer on SalesFlow specialist table.
+    description: Broker identification key linked to the offer on SalesFlow specialist table. Although it has the same name, it is NOT
+      the same as the id_agent or sk_agent anywhere else other than SalesFlow. Only use it to join with datalake_sale_offer_flows.offer_specialists or
+      tables in datalake_sales_flow_clean.
     lineage:
       - datalake_sales_flow.offer_specialists.id_agent
   id_user_post_dd_specialist:
