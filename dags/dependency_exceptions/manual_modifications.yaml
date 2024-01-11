@@ -119,6 +119,8 @@ bietlejuice.dw_datamarts_spark.for_sale:
     - bietlejuice.ebdb:load-clean-work-contract
     - bietlejuice.kodak:load-clean-photo-sphere-aud
     - bietlejuice.kodak:load-clean-video-aud
+    - bietlejuice.enrich_sale_firestore:load-enrich-monday
+    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
 bietlejuice.dw_datamarts_spark.for_sale_cross:
   add:
     - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
@@ -127,8 +129,13 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
     - bietlejuice.enrich_3p:load-enrich-houses-3p
     - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
     - bietlejuice.enrich_offer:load-enrich-sale-offer
+    - bietlejuice.enrich_sale_firestore:load-enrich-monday
     - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
     - bietlejuice.sales_flow:load-clean-sales-flow-aud
+bietlejuice.enrich_offer:
+  remove:
+    - bietlejuice.enrich_sale_firestore:load-enrich-monday
+    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
 bietlejuice.dw_datamarts_spark.growth:
   add:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -471,7 +478,7 @@ bietlejuice.enrich_nps_answer_drivers:
   add:
     - bietlejuice.enrich_tracksale:load-enrich-answer
   remove:
-    - bietlejuice.enrich_firestore:load-enrich-sale-offer
+    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
 bietlejuice.enrich_nps_reversion:
   override: []
 bietlejuice.enrich_offboarding:
@@ -606,6 +613,7 @@ bietlejuice.enrich_sale_closing_flows:
     - bietlejuice.monopoly:load-clean-sale
   remove:
     - bietlejuice.firestore:load-clean-sale-offer
+    - bietlejuice.enrich_sale_firestore:load-enrich-monday
 bietlejuice.enrich_sale_crawlers_listings:
   remove:
     - bietlejuice.ebdb:load-clean-map-region
@@ -613,6 +621,10 @@ bietlejuice.enrich_sale_crawlers_listings:
     - bietlejuice.enrich_region:load-enrich-region
     - bietlejuice.listings.em_casa:load-clean-em-casa
     - bietlejuice.listings.loft:load-clean-loft
+bietlejuice.enrich_sale_firestore:
+  remove:
+    - bietlejuice.firestore:load-clean-monday
+    - bietlejuice.firestore:load-clean-sale-offer
 bietlejuice.enrich_sale_lead_flows:
   add:
     - bietlejuice.ebdb:load-clean-contract
@@ -705,8 +717,8 @@ bietlejuice.enrich_tracksale:
     - bietlejuice.ebdb:load-clean-house
     - bietlejuice.ebdb:load-clean-offer
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-    - bietlejuice.enrich_firestore:load-enrich-sale-offer
     - bietlejuice.tracksale:load-clean-campaign
+    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
 bietlejuice.enrich_unified_listing_flow:
   remove:
     - bietlejuice.ebdb:load-clean-affiliate-data

@@ -1,0 +1,13 @@
+dag:
+    name: enrich_sale_firestore
+    owner: Data ForSale
+    schedule_start_date: 2023, 1, 1
+workflow:
+    type: query
+    layer: enrich
+    custom_schema: datalake_firestore
+cluster:
+    type: databricks_10_4_med_general_photon_cluster
+    access_control_list:
+        group_name: analytics-engineers
+        permission_level: CAN_MANAGE

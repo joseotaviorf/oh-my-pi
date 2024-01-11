@@ -1,7 +1,7 @@
-## Enrich Firestore
+## Enrich Sale Firestore
 
 ### Purpose
-This DAG creates the enriched tables from Firestore data, for ForSale.
+This DAG created enriched tables from Firestore data, for ForSale. Today it is only used for historical data.
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
@@ -12,7 +12,7 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 This pipeline produces the following tables in enrich layer, via full load:
-
-- `rent_offer`
+- `monday`
+- `sale_offer`
 
 ​</details>

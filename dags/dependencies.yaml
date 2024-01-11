@@ -298,8 +298,6 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
-  - bietlejuice.enrich_firestore:load-enrich-monday
-  - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
   - bietlejuice.kodak:load-clean-photo-sphere
   - bietlejuice.kodak:load-clean-user-revision-entity
@@ -316,7 +314,6 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.rene_descartes:load-clean-lead-rejection
   - bietlejuice.wololo:load-clean-context-discard
@@ -1505,9 +1502,7 @@ bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all
 bietlejuice.enrich_firestore:
-  - bietlejuice.firestore:load-clean-monday
   - bietlejuice.firestore:load-clean-rent-offer
-  - bietlejuice.firestore:load-clean-sale-offer
 bietlejuice.enrich_golden_set:
   - bietlejuice.enrich_vespucio:load-enrich-dejavu
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
@@ -1925,9 +1920,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-  - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
-  - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.enrich_gsheets:load-enrich-sale-hub-offer
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_region:load-enrich-region
@@ -2200,7 +2193,6 @@ bietlejuice.enrich_sale_available_booking_hours:
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.enrich_booking:load-enrich-house-available-hours
 bietlejuice.enrich_sale_closing_flows:
-  - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_monopoly:load-enrich-sale
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
