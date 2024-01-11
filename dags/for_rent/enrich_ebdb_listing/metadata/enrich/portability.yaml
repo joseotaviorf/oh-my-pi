@@ -1,108 +1,145 @@
 database_name: datalake_ebdb_listing
 table_name: portability
+description: This table contains portability records by property
+domain: For Rent
+owner: camila.simoes@quintoandar.com.br
+
 columns:
   id:
+    description: Identification of the portability record
     lineage:
       - datalake_ebdb_clean.portability.id
   id_house:
+    description: House identification
     lineage:
       - datalake_ebdb_clean.portability.id_house
   id_flow:
+    description: Rent Flow identification. Each line should be an unique rent flow. Joins with dw_public.fact_listing_rent_flows.
     lineage:
       - datalake_ebdb_clean.portability.id_flow
   id_tenant:
+    description: Tenant identification. Equivalent to sk_client from dw_public.fact_listing_rent_flows or sk_user from dw_public.dim_user.
     lineage:
       - datalake_ebdb_clean.portability.id_tenant
   id_house_state:
+    description: Identification of the state of the property. Join with datalake_ebdb_clean.state
     lineage:
       - datalake_ebdb_clean.portability.id_state
   id_house_region:
+    description: Identification of the region of the property. Join with dw_public.dim_region
     lineage:
       - datalake_ebdb_clean.portability.id_region
   country_code:
+    description: Identification of the country abbreviation
     lineage:
       - datalake_ebdb_country.house.country_code
   owner_type:
+    description: Record on the relationship between property and end customer. If there is a real estate partnership (B2B) or if the business is done directly between 5A and the Client (B2C)
     lineage:
       - datalake_ebdb_clean.portability.owner_type
   dt_contract_started:
+    description: Contract start date
     lineage:
       - datalake_ebdb_clean.portability.dt_contract_started
   dt_contract_ended:
+    description: Contract finish date
     lineage:
       - datalake_ebdb_clean.portability.dt_contract_ended
   current_condo_fee:
+    description: Registration of the condominium value
     lineage:
       - datalake_ebdb_clean.portability.current_condo_fee
   current_iptu_twelth:
+    description: IPTU (property tax) value
     lineage:
       - datalake_ebdb_clean.portability.current_iptu_twelth
   current_rent:
+    description: Registration of rent value
     lineage:
       - datalake_ebdb_clean.portability.current_rent
   house_address_neighborhood:
+    description: Registration of the neighborhood in which the property is located
     lineage:
       - datalake_ebdb_clean.portability.house_address_neighborhood
   house_address_zipcode:
+    description: Registration of the zipcode in which the property is located
     lineage:
       - datalake_ebdb_clean.portability.house_address_zipcode
   house_address_city:
+    description: Registration of the city in which the property is located
     lineage:
       - datalake_ebdb_clean.portability.house_address_city
   house_address_complement:
+    description: Information such as block number, apartment number, details that complement the address
     lineage:
       - datalake_ebdb_clean.portability.house_address_complement
   house_address_street:
+    description: Street name registration in which the property is located
     lineage:
       - datalake_ebdb_clean.portability.house_address_street
   house_address_number:
+    description: Number that makes up the address to identify the location of the property on the street
     lineage:
       - datalake_ebdb_clean.portability.house_address_number
   house_type:
+    description: Property Category. If it is an apartment, studio, house or house in condominium.
     lineage:
       - datalake_ebdb_clean.portability.house_type
   lat:
+    description: Identification of the geographic coordinate referring to the latitude
     lineage:
       - datalake_ebdb_clean.portability.lat
   lng:
+    description: Identification of the geographic coordinate referring to the longitude
     lineage:
       - datalake_ebdb_clean.portability.lng
   owner_data_email:
+    description: Property owner email registration
     lineage:
       - datalake_ebdb_clean.portability.owner_data_email
   owner_data_gender:
+    description: Property owner gender registration (0=Masculine & 1=Feminine)
     lineage:
       - datalake_ebdb_clean.portability.owner_data_gender
   owner_data_name:
+    description: Property owner name registration
     lineage:
       - datalake_ebdb_clean.portability.owner_data_name
   owner_data_phone_number:
+    description: Property owner phone number
     lineage:
       - datalake_ebdb_clean.portability.owner_data_phone_number
   status:
+    description: Identifies if the porting was successful (success=converted)
     lineage:
       - datalake_ebdb_clean.portability.status
   tenant_data_email:
+    description:  Tenant email registration
     lineage:
       - datalake_ebdb_clean.portability.tenant_data_email
   tenant_data_gender:
+    description: Tenant gender registration (0=Masculine & 1=Feminine)
     lineage:
       - datalake_ebdb_clean.portability.tenant_data_gender
   tenant_data_name:
+    description: Tenant name registration
     lineage:
       - datalake_ebdb_clean.portability.tenant_data_name
   tenant_data_phone_number:
+    description: Tenant phone number
     lineage:
       - datalake_ebdb_clean.portability.tenant_data_phone_number
   contract_observations:
+    description: Detailed Portability Comments
     lineage:
       - datalake_ebdb_clean.portability.contract_observations
   is_owner_b2b:
-    lineage:
-      - datalake_ebdb_clean.portability.owner_type
+    description: Boolean field that identifies whether the owner is B2B. If the record is true, it means that the owner of the property has this characteristic.
   ts_created:
+    description: Timestamp when the port was created/requested
     lineage:
       - datalake_ebdb_clean.portability.ts_created
   ts_updated:
+    description: Timestamp when there was an update on that portability
     lineage:
       - datalake_ebdb_clean.portability.ts_updated
