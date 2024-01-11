@@ -21,7 +21,7 @@ cluster:
   custom_configurations:
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.4xlarge
-    num_workers: 2
+    num_workers: 3
     aws_attributes:
         ebs_volume_size: 200
         availability: ON_DEMAND
