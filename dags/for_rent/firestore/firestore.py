@@ -25,7 +25,7 @@ ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "firestore"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 9, 20, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
