@@ -1,4 +1,4 @@
-database_name: dw_rent
+database_name: dw_public
 table_name: dim_reservation
 description: QuintoAndar allows tenants to reserve properties by making a payment.
   Each line is a reservation attempt. This table contains just rent context.
@@ -8,23 +8,23 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_reservation:
     lineage:
-    - datalake_kill_queue.reservation.id_reservation
+    - dw_rent.dim_reservation.sk_reservation
     description: Unique ID of reservation from kill queue, it's the primary key of this table.
   id_reservation:
     lineage:
-    - datalake_kill_queue.reservation.id_reservation
+    - dw_rent.dim_reservation.id_reservation
     description: Unique ID of reservation from kill queue, it's the same as the primary key of this table.
   version:
     lineage:
-    - datalake_kill_queue.reservation.version
+    - dw_rent.dim_reservation.version
     description: Attempt number of payment.
   attempt:
     lineage:
-    - datalake_kill_queue.reservation.attempt
+    - dw_rent.dim_reservation.attempt
     description: Number of tries of user.
   status:
     lineage:
-    - datalake_kill_queue.reservation.status
+    - dw_rent.dim_reservation.status
     description: Status of the reservation.
     categories:
       CANCELED: Rent flow was interrupted at some point.
@@ -36,27 +36,27 @@ columns:
       TOKEN_RECEIVED: Credit card info sent to MundiPagg and authorization token was saved.
   cancellation_reason:
     lineage:
-    - datalake_kill_queue.reservation.cancellation_reason
+    - dw_rent.dim_reservation.cancellation_reason
     description: Reason why reservation was cancelled if status is equal to 'CANCELED'
       or 'RETURNED'.
   value:
     lineage:
-    - datalake_kill_queue.reservation.value
+    - dw_rent.dim_reservation.value
     description: Value paid by tentant for the reservation fee.
   installments:
     lineage:
-    - datalake_kill_queue.reservation.installments
+    - dw_rent.dim_reservation.installments
     description: Number of installments in which the reservation value was divided.
   is_ongoing:
     lineage:
-    - datalake_kill_queue.reservation.is_ongoing
+    - dw_rent.dim_reservation.is_ongoing
     description: Flag which indicates if reservation is still open (when status is
       either equal to 'CHARGED' or 'TOKEN_RECEIVED').
   ts_created:
     lineage:
-    - datalake_kill_queue.reservation.ts_created
+    - dw_rent.dim_reservation.ts_created
     description: Timestamp of when reservation was created.
   ts_updated:
     lineage:
-    - datalake_kill_queue.reservation.ts_updated
+    - dw_rent.dim_reservation.ts_updated
     description: Timestamp of when the reservation was updated.

@@ -671,6 +671,8 @@ bietlejuice.dw_repairs:
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
+bietlejuice.dw_reservation_temp:
+  - bietlejuice.dw_reservation:load-dw-rent-dim-reservation
 bietlejuice.dw_revenue_lines:
   - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
   - bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment

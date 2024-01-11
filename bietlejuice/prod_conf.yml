@@ -37,6 +37,7 @@ dags_out_of_pattern:
         "dw_rent_demand_events_snapshot",
         "dw_rent_flow",
         "dw_rent_listing_flow",
+        "dw_reservation",
         "dw_sale_available_booking_hours",
         "dw_sale_closing_flows",
         "dw_sale_events",

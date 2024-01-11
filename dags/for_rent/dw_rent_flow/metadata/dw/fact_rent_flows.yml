@@ -47,11 +47,11 @@ columns:
   sk_first_reservation:
     lineage:
       - datalake_rent_flows.rent_flows.id_reservation
-    description: Id of the first reservation. Joins with dw_public.dim_reservation.
+    description: Id of the first reservation. Joins with dw_rent.dim_reservation.
   sk_last_reservation:
     lineage:
       - datalake_rent_flows.rent_flows.id_reservation
-    description: Id of the most recent reservation. Joins with dw_public.dim_reservation.
+    description: Id of the most recent reservation. Joins with dw_rent.dim_reservation.
   sk_first_offer:
     lineage:
       - datalake_rent_flows.rent_flows.id_offer

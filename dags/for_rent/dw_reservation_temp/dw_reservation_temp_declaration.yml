@@ -1,13 +1,13 @@
 dag:
-  name: dw_reservation
+  name: dw_reservation_temp
   schedule_start_date: 2020,02,20
   owner: Data ForRent
 workflow:
   type: query
   layer: dw
-  custom_schema: rent
+  custom_schema: public
 cluster:
-  type: databricks_10_4_min_general_photon_cluster
+  type: databricks_10_4_min_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
