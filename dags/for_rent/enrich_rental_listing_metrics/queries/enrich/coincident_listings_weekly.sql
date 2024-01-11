@@ -55,7 +55,7 @@ WITH weekly_listings AS (
     FROM
         datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
     JOIN
-        dw_public.dim_house_listing AS dhl
+        dw_rent.dim_house_listing AS dhl
             ON hldi.id_house_listing = dhl.sk_house_listing
     JOIN -- We will get just one day : Sunday
         dw_public.dim_date AS d

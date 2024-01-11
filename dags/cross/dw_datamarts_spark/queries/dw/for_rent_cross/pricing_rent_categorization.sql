@@ -17,7 +17,7 @@ WITH rent_modifications AS (
 	    datalake_ebdb_clean.user_revision_entity ure
           ON ure.id = ha.rev
 	LEFT JOIN
-	    dw_public.dim_house_listing dhl
+	    dw_rent.dim_house_listing dhl
           ON dhl.id_house = ha.id_house
           AND dhl.version > 0
           AND DATE(TIMESTAMP(ure.ts_revision/1000)) BETWEEN DATE(dhl.ts_listing_version_start) AND COALESCE(DATE(dhl.ts_listing_version_end), current_date)
@@ -69,7 +69,7 @@ pricing_changes AS (
 	    dhl.house_type,
 	    dhl.is_house_furnished
 	FROM
-	    dw_public.dim_house_listing dhl
+	    dw_rent.dim_house_listing dhl
 	INNER JOIN
 	    pricing_changes pc
           ON pc.sk_house_listing = dhl.sk_house_listing
@@ -85,7 +85,7 @@ regions AS (
         dr.macro_name,
         dr.city_name
     FROM
-	    dw_public.fact_house_listings fl
+	    dw_rent.fact_house_listings fl
     JOIN
 	    dw_public.dim_region  dr
           ON dr.sk_region  = fl.sk_region
@@ -174,7 +174,7 @@ contract_base AS (
 	 contracts c
           ON c.sk_contract = f.sk_contract
     JOIN
-	 dw_public.dim_house_listing d
+	 dw_rent.dim_house_listing d
           ON d.sk_house_listing = f.sk_house_listing
     JOIN
 	 dw_public.dim_region  dr

@@ -1,7 +1,8 @@
 ---
 database_name: dw_rent_snapshot
 table_name: rent_cohort_conversions_snapshot
-description: "This table has the dailies snapshots data based on the fact_rent_cohort_conversions, creating a full historical
+description:
+  "This table has the dailies snapshots data based on the fact_rent_cohort_conversions, creating a full historical
   of the changes, allowing to understand data updates through time.
   The table has aggregated sums of cohort conversions of the rental funnel, which is also the base used to build the rent
   cohort conversions event metric.
@@ -25,11 +26,11 @@ columns:
     description: "Tier information based on the city group of the event."
   business_type:
     lineage:
-      - dw_public.dim_house_listing.first_consultant_type
+      - dw_rent.dim_house_listing.first_consultant_type
     description: "Business type related to the listing of the event."
   listing_category_start:
     lineage:
-      - dw_public.dim_house_listing.listing_category_start
+      - dw_rent.dim_house_listing.listing_category_start
     description: "Listing category start information coming from the house listing."
   rent_flow_origin:
     lineage:
@@ -37,7 +38,7 @@ columns:
     description: "Funnel first touchpoint information based on the information available on the column with the same name from funnel_demand_flows."
   rental_administrator:
     lineage:
-      - dw_public.dim_house_listing.rental_administrator
+      - dw_rent.dim_house_listing.rental_administrator
     description: "Rental administrator related to the event."
   days_to_conversion:
     lineage:
@@ -148,17 +149,17 @@ columns:
       If the event type is equal or bigger than 5 (EA til CS), the flag is related to the proposal's guarantee type if it's RentalGuarantee."
   dt_event:
     lineage:
-    - dw_public.dim_date.date
+      - dw_public.dim_date.date
     description: "Date of the base event."
   dt_week_started:
     lineage:
-    - dw_public.dim_date.date
+      - dw_public.dim_date.date
     description: "Week date of the event."
   ts_snapshot:
     description: "Load timestamp, which is the snapshot timestamp."
   country_code:
     lineage:
-    - dw_rent.fact_rent_cohort_conversions.country_code
+      - dw_rent.fact_rent_cohort_conversions.country_code
     description: "Country code information, also a partition."
   year:
     lineage:

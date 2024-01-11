@@ -7,10 +7,10 @@ WITH ordered_rentals AS (
   FROM
     dw_rent.dim_contract AS dc
   JOIN
-    dw_public.fact_house_listings AS fhl
+    dw_rent.fact_house_listings AS fhl
       on dc.sk_contract = fhl.sk_contract
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       on dhl.sk_house_listing = fhl.sk_house_listing
   WHERE
     DATE(COALESCE(dc.dt_start, dc.dt_entrance)) < CURRENT_DATE() -- we know we may have future dates for dt_start

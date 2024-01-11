@@ -7,8 +7,8 @@ owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_cohort_listing_week:
     lineage:
-      - dw_public.dim_house_listing.ts_listing_version_start
-      - dw_public.dim_house_listing.listing_category_start
+      - dw_rent.dim_house_listing.ts_listing_version_start
+      - dw_rent.dim_house_listing.listing_category_start
       - datalake_region.region.city_group
       - datalake_rental_historical_follow_up.house_listings_daily_info.is_for_rent
       - datalake_rental_historical_follow_up.house_listings_daily_info.is_for_sale
@@ -22,8 +22,8 @@ columns:
     description: Composed ID of the cohort listing and week.
   id_cohort_listing:
     lineage:
-      - dw_public.dim_house_listing.ts_listing_version_start
-      - dw_public.dim_house_listing.listing_category_start
+      - dw_rent.dim_house_listing.ts_listing_version_start
+      - dw_rent.dim_house_listing.listing_category_start
       - datalake_region.region.city_group
       - datalake_rental_historical_follow_up.house_listings_daily_info.is_for_rent
       - datalake_rental_historical_follow_up.house_listings_daily_info.is_for_sale
@@ -70,7 +70,7 @@ columns:
       Hybrid: Listing is for rent and sale.
   listing_category_start:
     lineage:
-      - dw_public.dim_house_listing.listing_category_start
+      - dw_rent.dim_house_listing.listing_category_start
     description: Category that house listing started as.
     categories:
       First Listing: Is the first time this house is being published.
@@ -121,9 +121,9 @@ columns:
     description: Number of weeks since the listing started.
   dt_listing_month_started:
     lineage:
-      - dw_public.dim_house_listing.ts_listing_version_start
+      - dw_rent.dim_house_listing.ts_listing_version_start
     description: Month when the listing started.
   dt_listing_week_started:
     lineage:
-      - dw_public.dim_house_listing.ts_listing_version_start
+      - dw_rent.dim_house_listing.ts_listing_version_start
     description: Week when the listing started.

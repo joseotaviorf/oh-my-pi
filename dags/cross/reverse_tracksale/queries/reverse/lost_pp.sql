@@ -11,7 +11,7 @@ WITH unpublished_listings AS (
 		ts_status_start,
 		ts_status_end
 	FROM
-		dw_public.fact_house_listing_status
+		dw_rent.fact_house_listing_status
 	WHERE
 		country_code = 'BR'
 		AND is_last_status_of_day = true
@@ -38,7 +38,7 @@ listing_aux AS (
 		unpublished AS unp
 			ON unp.sk_house_listing = u.sk_house_listing
 	INNER JOIN
-		dw_public.dim_house_listing AS dhl
+		dw_rent.dim_house_listing AS dhl
 			ON dhl.sk_house_listing = u.sk_house_listing
 	WHERE
 		DATE(u.ts_status_start) >= unp.dt_min_unpublished
@@ -102,7 +102,7 @@ SELECT
 FROM
 	base AS b
 JOIN
-	dw_public.dim_house_listing AS dhl
+	dw_rent.dim_house_listing AS dhl
 		ON dhl.sk_house_listing = b.sk_house_listing
 JOIN
 	datalake_ebdb_clean.house AS h

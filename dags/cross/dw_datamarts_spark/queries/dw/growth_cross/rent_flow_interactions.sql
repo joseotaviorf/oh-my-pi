@@ -75,7 +75,7 @@ WITH events AS (
         'Talk to Agent' AS flow_event
     FROM
         datalake_talk_to_agent.talk_to_agent AS tta
-        JOIN dw_public.fact_house_listings AS fhl
+        JOIN dw_rent.fact_house_listings AS fhl
             ON CAST(tta.sk_house_listing AS BIGINT) = CAST(fhl.sk_house_listing AS BIGINT)
     WHERE
         tta.business_context = 'RENT'

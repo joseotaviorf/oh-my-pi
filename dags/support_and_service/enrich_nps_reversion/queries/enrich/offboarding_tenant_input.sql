@@ -70,7 +70,7 @@ dim_house_listing AS (
     FROM
         contract_termination AS ct
     LEFT JOIN
-        dw_public.dim_house_listing AS dhl
+        dw_rent.dim_house_listing AS dhl
             ON ct.id_house_listing = dhl.sk_house_listing
 ),
 iq_nps AS (

@@ -9,7 +9,7 @@ JOIN
   dw_public.dim_date AS dd
     ON dd.date BETWEEN DATE(COALESCE(dc.dt_start, dc.dt_entrance)) AND (DATE_ADD(COALESCE(dc.dt_annulment, CURRENT_DATE()), -1))
 LEFT JOIN
-  dw_public.fact_house_listings AS hl
+  dw_rent.fact_house_listings AS hl
     ON dc.sk_contract = hl.sk_contract
 WHERE
   dc.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active at a given period

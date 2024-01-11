@@ -18,15 +18,15 @@ WITH sale_listing_flows_adjust AS (
         CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
         dhl.partner_3p_supply AS supply_3p_partner,
         CASE
-            WHEN lf.mkt_origin = 'B2B' 
-            OR lf.mkt_origin = 'CIQ' 
+            WHEN lf.mkt_origin = 'B2B'
+            OR lf.mkt_origin = 'CIQ'
                 THEN lf.mkt_origin
             WHEN lf.mkt_completion = 'Full Self-Service'
                 THEN 'FSS'
             ELSE 'IS'
         END AS lead_context,
         CASE
-            WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') 
+            WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other')
             AND lf.mkt_origin NOT IN ('B2B', 'CIQ') THEN 'IS'
             ELSE sourcing_ops
         END AS lead_processing_operation,
@@ -54,8 +54,8 @@ WITH sale_listing_flows_adjust AS (
         dw_public.dim_region AS dr
             ON dr.sk_region = lf.sk_region
     LEFT JOIN
-        dw_public.dim_house_listing AS dhl
-            ON dhl.sk_house_listing = lf.sk_house_listing 
+        dw_rent.dim_house_listing AS dhl
+            ON dhl.sk_house_listing = lf.sk_house_listing
     LEFT JOIN
         datalake_3p.houses_3p_bh AS rbh
             ON rbh.id_house = lf.sk_house_listing / 1000
@@ -129,12 +129,12 @@ sale_bookings_base AS (
     JOIN
         dw_public.dim_booking AS db
             ON db.sk_booking = fv.sk_booking
-    LEFT JOIN 
+    LEFT JOIN
         datalake_hub_services_clean.business_unit AS hs
             ON hs.id = fv.sk_business_unit
 ),
 sale_bookings AS (
-    SELECT 
+    SELECT
         id_property,
         id_visitor,
         id_agent,
@@ -150,9 +150,9 @@ sale_bookings AS (
         dt_created,
         dt_completed,
         order_booking
-    FROM 
+    FROM
         sale_bookings_base
-    WHERE 
+    WHERE
         order_booking = 1
 ),
 sale_closing AS (
@@ -173,7 +173,7 @@ sale_closing AS (
         LEFT JOIN
             dw_public.dim_date AS dd
                 ON dd.sk_date = fo.sk_offer_submitted_date
-        INNER JOIN 
+        INNER JOIN
             dw_sale.dim_offer AS sdo
                 ON sdo.sk_offer = fo.sk_offer
         WHERE
@@ -196,7 +196,7 @@ sale_closing AS (
         LEFT JOIN
             dw_public.dim_date AS dd
                 ON dd.sk_date = fo.sk_offer_accepted_date
-        INNER JOIN 
+        INNER JOIN
             dw_sale.dim_offer AS sdo
                 ON sdo.sk_offer = fo.sk_offer
         WHERE
@@ -219,7 +219,7 @@ sale_closing AS (
         LEFT JOIN
             dw_public.dim_date AS dd
                 ON dd.sk_date = fo.sk_sale_agreement_signed_date
-        INNER JOIN 
+        INNER JOIN
             dw_sale.dim_offer AS sdo
                 ON sdo.sk_offer = fo.sk_offer
         WHERE
@@ -341,8 +341,8 @@ sale_demand_events_complete AS (
         sale_demand_events AS sde
     FULL OUTER JOIN
         sale_bookings AS db
-            ON sde.id_house = db.id_property 
-            AND sde.id_buyer = db.id_visitor 
+            ON sde.id_house = db.id_property
+            AND sde.id_buyer = db.id_visitor
             AND sde.id_offer = db.sk_offer
 ),
 sale_demand_classification AS (
@@ -1939,7 +1939,7 @@ ccv2lts AS (
         sale_demand_classification
     WHERE
         dt_ccv_signed IS NOT NULL
-    GROUP BY 
+    GROUP BY
         1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 ),
 lts2lte AS (

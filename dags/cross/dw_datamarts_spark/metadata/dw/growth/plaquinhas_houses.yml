@@ -1,7 +1,7 @@
 ---
 database_name: dw_datamarts
 table_name: plaquinhas_houses
-owner: '@data-growth'
+owner: "@data-growth"
 domain: Data Growth
 description: Measures plaquinhas installs performance. It is divided in two information segments. New Installs and Cover.
 columns:
@@ -10,23 +10,23 @@ columns:
     lineage:
       - datalake_listing_temp.fact_house_listing_status_house.sk_house_listing
       - dw_sale.fact_listing_status.sk_sale_listing
-  id_install: 
+  id_install:
     description: New Installs Session - This column represents the identifier of installs in each source used to compute installs. Therefore could be same numbers referening to different installs.
-    lineage: 
+    lineage:
       - datalake_gsheets_clean.branding_where_is_plaquinha.id_house
       - dw_public.dim_photo_job.sk_photo_job
       - dw_tickets.dim_ticket.custom_fields
       - datalake_gsheets_clean.plaquinhas_installation_pp_organic.id_ticket
   photographer_id:
     description: New Installs Session - This columns represents Photographer ID responsible for installs
-    lineage: 
+    lineage:
       - dw_public.dim_photo_job.photographer_id
-  dt_ongoing_listing: 
+  dt_ongoing_listing:
     description: Cover Session - Indicates the date of ongoing listing frame
-    lineage: 
+    lineage:
       - dw_public.dim_date.date
       - datalake_gsheets_clean.plaquinhas_cover_targets.dt_target
-  dt_install: 
+  dt_install:
     description: New Installs Session - This column indicates the proxy date or timestamp when a plaquinha was installed specifically in a house.
     lineage:
       - datalake_gsheets_clean.branding_where_is_plaquinha.dt_plaquinha
@@ -49,8 +49,8 @@ columns:
   business_context:
     description: Cover & New Installs Session - This column provides information about the specific business context.
     lineage:
-      - dw_public.dim_house_listing.is_for_rent
-      - dw_public.dim_house_listing.is_for_sale
+      - dw_rent.dim_house_listing.is_for_rent
+      - dw_rent.dim_house_listing.is_for_sale
       - dw_tickets.dim_ticket.custom_fields
       - datalake_gsheets_clean.plaquinhas_installation_pp_organic.business_context
       - datalake_gsheets_clean.plaquinhas_installation_targets.business_context
@@ -73,19 +73,19 @@ columns:
     description: Cover & New Installs Session - This column represents the name of a neighborhood
     lineage:
       - dw_public.dim_region.name
-  agent_install: 
+  agent_install:
     description: New Installs Session - States who was the responsible for placas install
-    lineage: 
+    lineage:
       - datalake_gsheets_clean.branding_where_is_plaquinha.installation_type
       - dw_tickets.dim_ticket.custom_fields
-  listing_type: 
+  listing_type:
     description: New Installs Session - States the type of listing that placas was used for.
-    lineage: 
+    lineage:
       - datalake_gsheets_clean.branding_where_is_plaquinha.listing_type
       - datalake_gsheets_clean.plaquinhas_installation_targets.listing_type
-  not_install_reason: 
+  not_install_reason:
     description: New Installs Session - States the reason that was not possible to install that Placa.
-    lineage: 
+    lineage:
       - dw_tickets.dim_ticket.custom_fields
   has_plaquinha:
     description: Cover & New Installs Session - This column specifies whether a house or property specifically has a plaquinha

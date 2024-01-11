@@ -19,7 +19,7 @@ columns:
     description: If of the property related to the TTA event.
   sk_house_listing:
     lineage:
-      - dw_public.dim_house_listing.sk_house_listing
+      - dw_rent.dim_house_listing.sk_house_listing
     description: Id of the property listing.
   attended:
     description: Boolean flag indicating if the tenant/buyer prospect was attended by the TTA.

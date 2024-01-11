@@ -9,7 +9,7 @@ WITH new_contracts AS (
 			ON dc.sk_contract = rf.sk_contract
 			AND rf.sk_contract_signed_date > 0
 	INNER JOIN
-		dw_public.dim_house_listing dhl
+		dw_rent.dim_house_listing dhl
 			ON dhl.sk_house_listing = rf.sk_house_listing
 	LEFT JOIN
 		datalake_offboarding.contract_termination ct

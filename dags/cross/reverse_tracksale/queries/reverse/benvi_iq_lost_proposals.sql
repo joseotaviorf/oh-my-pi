@@ -6,7 +6,7 @@ WITH mexico_houses AS (
     SELECT
         DISTINCT sk_house_listing
     FROM
-        dw_public.dim_house_listing
+        dw_rent.dim_house_listing
     WHERE
         country_code = 'MX' --- added to filter only MX business (excluding BR)
 ),

@@ -127,7 +127,7 @@ listing AS (
         CAST(id_house AS BIGINT) AS id_house,
         CAST(MAX(sk_house_listing) AS BIGINT) AS sk_house_listing
     FROM
-        dw_public.dim_house_listing
+        dw_rent.dim_house_listing
     WHERE
         CAST(sk_house_listing AS STRING) > ''
         AND CAST(id_house AS STRING) > ''
@@ -149,7 +149,7 @@ registered_tta AS (
         datalake_ebdb_clean.listing_business_context AS bc
             ON bc.id = a.id_listing
     JOIN
-        dw_public.dim_house_listing AS h
+        dw_rent.dim_house_listing AS h
             ON bc.id_house = CAST(h.id_house AS BIGINT)
     JOIN
         dw_public.dim_user AS u
@@ -289,7 +289,7 @@ final AS(
             AND sa.is_sale_agent
     -- version of the moment the tenant has sent the message
     JOIN
-        dw_public.dim_house_listing AS m
+        dw_rent.dim_house_listing AS m
             ON e.house_id = CAST(NULLIF(CAST(m.id_house AS STRING),'') AS BIGINT)
             AND CAST(ts_listing_version_start AS STRING) <  e.first_message_ts
             AND (CAST(ts_listing_version_end AS STRING)='' OR CAST(ts_listing_version_end AS STRING) > e.first_message_ts)

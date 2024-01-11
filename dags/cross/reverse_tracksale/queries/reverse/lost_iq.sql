@@ -73,7 +73,7 @@ brokerage_only AS ( -- Tenant prospects with interactions in Brokerage-Only list
     FROM
         dw_rent.fact_rent_demand_events AS fde
     INNER JOIN
-        dw_public.dim_house_listing AS dhl
+        dw_rent.dim_house_listing AS dhl
             ON dhl.sk_house_listing = fde.sk_house_listing
     WHERE
         dhl.rental_administrator IN ('OWNER', 'THIRD_PARTY')

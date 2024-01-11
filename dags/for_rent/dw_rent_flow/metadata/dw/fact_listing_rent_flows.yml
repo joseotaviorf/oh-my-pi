@@ -14,7 +14,7 @@ columns:
   sk_house_listing:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_house
-      - dw_public.dim_house_listing.version
+      - dw_rent.dim_house_listing.version
     description: Key of the house listing related to the rent flow.
   sk_region:
     lineage:
@@ -54,7 +54,7 @@ columns:
     description: Key of the visit scheduled on the rent flow. A rent flow can have none, one or more visits related.
   sk_offer:
     lineage:
-      - dw_rent.dim_offer.sk_offer
+      - dW_rent.dim_offer.sk_offer
     description: Key of the offer related to the rent flow. A rent flow can have none, one or more offers related.
   sk_reservation:
     lineage:
@@ -82,11 +82,11 @@ columns:
     description: Key of the the first listing date of the property related to the rent flow. It's the date of the first listing of the property transformed into a number.
   sk_house_listing_date:
     lineage:
-      - dw_public.dim_house_listing.ts_listing_version_start
+      - dw_rent.dim_house_listing.ts_listing_version_start
     description: Key of the house listing date of the present version related to the rent flow. It's the date of the listing's version start transformed into a number.
   sk_house_listing_de_publication_date:
     lineage:
-      - dw_public.dim_house_listing.ts_last_de_publication
+      - dw_rent.dim_house_listing.ts_last_de_publication
     description: Key of the house listing depublication date of the present version related to the rent flow. It's the date of the listing's version depublication transformed into a number.
   sk_house_listing_first_offer_submitted_date:
     lineage:

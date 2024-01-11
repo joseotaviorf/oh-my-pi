@@ -175,14 +175,14 @@ columns:
     description: "Indicates if a paid guarantee offered was accepted (FALSE) or not (TRUE) by the tenant."
   country_code:
     lineage:
-      - dw_public.dim_house_listing.country_code
+      - dw_rent.dim_house_listing.country_code
     description: Country code related to the listing's country of origin.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   rental_administrator:
     lineage:
-      - dw_public.dim_house_listing.rental_administrator
+      - dw_rent.dim_house_listing.rental_administrator
     description: The rental administrator of the house.
     categories:
       OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.

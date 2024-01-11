@@ -8,7 +8,7 @@ columns:
   id_item:
     description: Identifier of recommendation item
     lineage:
-      - dw_public.fact_house_listing_status.sk_house_listing
+      - dw_rent.fact_house_listing_status.sk_house_listing
       - dw_sale.fact_listing_status.sk_sale_listing
   type_item:
     description: Type of item that can be recommended
@@ -17,10 +17,10 @@ columns:
   ts_status_started:
     description: Timestamp of publication
     lineage:
-      - dw_public.fact_house_listing_status.sk_house_listing
+      - dw_rent.fact_house_listing_status.sk_house_listing
       - dw_sale.fact_listing_status.sk_sale_listing
   ts_status_ended:
     description: Timestamp of depublication
     lineage:
-      - dw_public.fact_house_listing_status.sk_house_listing
+      - dw_rent.fact_house_listing_status.sk_house_listing
       - dw_sale.fact_listing_status.sk_sale_listing

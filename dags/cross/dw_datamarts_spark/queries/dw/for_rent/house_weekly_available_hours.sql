@@ -7,7 +7,7 @@ WITH daily_published_listings AS (
         d.week_start,
         ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC) AS order_status -- daily order status
     FROM
-        dw_public.fact_house_listing_status AS f
+        dw_rent.fact_house_listing_status AS f
     JOIN
         dw_public.dim_date AS d
             ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1)

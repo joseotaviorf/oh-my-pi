@@ -153,7 +153,7 @@ rent_flows AS (
     dw_public.dim_date AS dd
       ON flrf.sk_offer_submitted_date = dd.sk_date
   LEFT JOIN
-    dw_public.dim_house_listing AS hl
+    dw_rent.dim_house_listing AS hl
       ON hl.sk_house_listing = flrf.sk_house_listing
   LEFT JOIN
     guarantees AS g

@@ -28,11 +28,11 @@ columns:
     description: "Tier information based on the city group of the event."
   business_type:
     lineage:
-      - dw_public.dim_house_listing.first_consultant_type
+      - dw_rent.dim_house_listing.first_consultant_type
     description: "Business type related to the listing of the event."
   listing_category_start:
     lineage:
-      - dw_public.dim_house_listing.listing_category_start
+      - dw_rent.dim_house_listing.listing_category_start
     description: "Listing category start information coming from the house listing."
   rent_flow_origin:
     lineage:
@@ -40,7 +40,7 @@ columns:
     description: "Funnel first touchpoint information based on the information available on the column with the same name from funnel_demand_flows."
   rental_administrator:
     lineage:
-      - dw_public.dim_house_listing.rental_administrator
+      - dw_rent.dim_house_listing.rental_administrator
     description: "Rental administrator related to the event."
   visits_booked:
     description: "Total volume of visits booked within the aggregation."

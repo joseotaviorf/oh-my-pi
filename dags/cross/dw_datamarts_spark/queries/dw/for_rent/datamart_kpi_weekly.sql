@@ -10,7 +10,7 @@ WITH ongoing_contracts_weekly AS (
             ON dd.date BETWEEN DATE(COALESCE(dc.ts_signature,dc.dt_start,dc.dt_entrance))
             AND (COALESCE(dc.dt_annulment, CURRENT_DATE) - INTERVAL 1 DAY)
     LEFT JOIN
-        dw_public.fact_house_listings AS hl
+        dw_rent.fact_house_listings AS hl
             ON dc.sk_contract = hl.sk_contract
     WHERE
         dd.date < CURRENT_DATE -- we know we may have future dates for dt_annulment AND we need to filter future dates
@@ -31,7 +31,7 @@ ongoing_rentals_weekly AS (
             ON dd.date BETWEEN DATE(COALESCE(dc.dt_start, dc.dt_entrance))
             AND (COALESCE(dc.dt_annulment, CURRENT_DATE) - INTERVAL 1 DAY)
     LEFT JOIN
-        dw_public.fact_house_listings AS hl
+        dw_rent.fact_house_listings AS hl
         ON dc.sk_contract = hl.sk_contract
     WHERE
         dc.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active at a given period
@@ -53,7 +53,7 @@ new_rentals AS (
     FROM
         dw_rent.dim_contract AS dc
     LEFT JOIN
-        dw_public.fact_house_listings AS hl
+        dw_rent.fact_house_listings AS hl
             ON dc.sk_contract = hl.sk_contract
     WHERE
         dc.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active at a given period
@@ -73,7 +73,7 @@ new_contracts AS (
     FROM
         dw_rent.dim_contract AS dc
     LEFT JOIN
-        dw_public.fact_house_listings AS hl
+        dw_rent.fact_house_listings AS hl
             ON dc.sk_contract = hl.sk_contract
     WHERE
         dc.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active AND ended
@@ -113,10 +113,10 @@ re_rentals AS (
         FROM
             dw_rent.dim_contract AS dc
         JOIN
-            dw_public.fact_house_listings AS fhl
+            dw_rent.fact_house_listings AS fhl
                 ON dc.sk_contract = fhl.sk_contract
         JOIN
-            dw_public.dim_house_listing AS dhl
+            dw_rent.dim_house_listing AS dhl
                 ON dhl.sk_house_listing = fhl.sk_house_listing
         WHERE
             DATE(COALESCE(dc.dt_start, dc.dt_entrance)) < CURRENT_DATE -- we know we may have future dates for dt_start
@@ -149,7 +149,7 @@ ended_rentals AS (
     FROM
         dw_rent.dim_contract AS dc
     LEFT JOIN
-        dw_public.fact_house_listings AS hl
+        dw_rent.fact_house_listings AS hl
             USING(sk_contract)
     WHERE
         dc.status = 'Finalizado'
@@ -168,7 +168,7 @@ ended_rentals_confirmed AS (
     FROM
         dw_rent.dim_contract AS dc
     LEFT JOIN
-        dw_public.fact_house_listings AS hl
+        dw_rent.fact_house_listings AS hl
             USING(sk_contract)
     WHERE
         dc.status = 'Finalizado'
@@ -224,7 +224,7 @@ ongoing_listings_weekly AS (
             d.month_end,
             ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC) AS order_status -- daily order status
         FROM
-            dw_public.fact_house_listing_status AS f
+            dw_rent.fact_house_listing_status AS f
         JOIN
             dw_public.dim_date AS d
                 ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1)
@@ -247,7 +247,7 @@ ongoing_listings_weekly AS (
         FROM
             daily_published_listings AS fhs
         LEFT JOIN
-            dw_public.fact_house_listings AS fhl
+            dw_rent.fact_house_listings AS fhl
                 ON fhs.sk_house_listing = fhl.sk_house_listing
         LEFT JOIN
             dw_public.dim_region AS dr
@@ -275,9 +275,9 @@ listing_to_contract_signed AS (
             COUNT(DISTINCT dhl.sk_house_listing) AS total_listings,
             COUNT(DISTINCT fhl.sk_contract) AS new_contracts_signed
         FROM
-            dw_public.dim_house_listing AS dhl
+            dw_rent.dim_house_listing AS dhl
         LEFT JOIN
-            dw_public.fact_house_listings AS fhl
+            dw_rent.fact_house_listings AS fhl
                 ON fhl.sk_house_listing = dhl.sk_house_listing
         LEFT JOIN
             dw_public.dim_region AS dr
@@ -308,7 +308,7 @@ visits_booked_per_ongoing_listings AS (
                 d.month_end,
                 ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start desc) AS order_status -- daily order status
             FROM
-                dw_public.fact_house_listing_status AS f
+                dw_rent.fact_house_listing_status AS f
             JOIN
                 dw_public.dim_date AS d
                     ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1)
@@ -333,7 +333,7 @@ visits_booked_per_ongoing_listings AS (
             FROM
                 daily_published_listings AS fhs
             LEFT JOIN
-                dw_public.fact_house_listings AS fhl
+                dw_rent.fact_house_listings AS fhl
                     ON fhs.sk_house_listing = fhl.sk_house_listing
             LEFT JOIN
                 dw_public.dim_region AS dr

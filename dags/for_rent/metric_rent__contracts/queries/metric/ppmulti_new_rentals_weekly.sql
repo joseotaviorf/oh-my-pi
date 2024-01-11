@@ -5,7 +5,7 @@ SELECT
 FROM
     dw_rent.dim_contract AS dc
 JOIN
-    dw_public.fact_house_listings AS fhl
+    dw_rent.fact_house_listings AS fhl
       ON dc.sk_contract = fhl.sk_contract
 JOIN
     datalake_pro_owners.daily_owner_houses_quantity_history AS doh

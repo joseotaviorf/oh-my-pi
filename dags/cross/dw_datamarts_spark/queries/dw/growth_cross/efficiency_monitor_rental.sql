@@ -13,7 +13,7 @@ WITH rentals_and_tickets AS (
         dc.rent
     FROM
         dw_rent.dim_contract AS dc
-        LEFT JOIN dw_public.fact_house_listings AS hl ON dc.sk_contract = hl.sk_contract
+        LEFT JOIN dW_rent.fact_house_listings AS hl ON dc.sk_contract = hl.sk_contract
         LEFT JOIN dw_public.dim_region AS dr ON hl.sk_region = dr.sk_region
     WHERE
         TRIM(dc.status) IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active and ended

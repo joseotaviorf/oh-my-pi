@@ -2,7 +2,7 @@
 database_name: dw_datamarts
 table_name: attribution_conversion_paths_demand
 domain: Growth
-owner: '@data-growth'
+owner: "@data-growth"
 description: This table aggregates data related to conversion paths and attribution. It compiles information on how users interact with different marketing channels and touchpoints before a conversion event.
 columns:
   sk_conversion_date:
@@ -10,9 +10,9 @@ columns:
     lineage:
       - datalake_amplitude_page_viewed_events.contract_docusign_signed_events.ts_event
   sk_region:
-    description:  Identifier for the region.
+    description: Identifier for the region.
     lineage:
-      - dw_public.fact_house_listings.sk_region
+      - dw_rent.fact_house_listings.sk_region
   unique_conversion_id:
     description: Unique identifier for each conversion event.
     lineage:

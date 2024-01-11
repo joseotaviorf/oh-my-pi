@@ -209,7 +209,7 @@ LEFT JOIN
     cap_contract_info AS cci
         ON cci.sk_contract = c.sk_contract
 LEFT JOIN
-    dw_public.fact_house_listings AS rf
+    dw_rent.fact_house_listings AS rf
         ON rf.sk_contract = c.sk_contract
 LEFT JOIN
     dw_public.dim_region AS r
@@ -272,7 +272,7 @@ vans_final AS (
       cap_contract_info AS cci
           ON cci.sk_contract = c.sk_contract
   LEFT JOIN
-      dw_public.fact_house_listings AS rf
+      dw_rent.fact_house_listings AS rf
           ON rf.sk_contract = c.sk_contract
   LEFT JOIN
       dw_public.dim_region AS r

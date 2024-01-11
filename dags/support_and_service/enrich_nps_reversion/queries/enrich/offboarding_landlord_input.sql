@@ -51,7 +51,7 @@ house_listing AS (
         house_listing_fix AS fix
             ON fix.sk_contract = ct.id_contract
     LEFT JOIN
-        dw_public.dim_house_listing AS dhl
+        dw_rent.dim_house_listing AS dhl
             ON COALESCE(ct.id_house_listing, fix.sk_house_listing) = dhl.sk_house_listing
     LEFT JOIN
         datalake_ebdb_clean.house_maintenance_condition AS dam

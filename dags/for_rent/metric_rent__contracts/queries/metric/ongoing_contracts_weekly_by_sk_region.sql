@@ -9,7 +9,7 @@ JOIN
   dw_public.dim_date AS dd
     ON dd.date BETWEEN DATE(COALESCE(COALESCE(dc.ts_signature, dc.dt_start), dc.dt_entrance)) AND (COALESCE(dc.dt_annulment, CURRENT_DATE()) - 1)
 LEFT JOIN
-  dw_public.fact_house_listings AS hl
+  dw_rent.fact_house_listings AS hl
     ON dc.sk_contract = hl.sk_contract
 WHERE
   dd.date < CURRENT_DATE() -- we know we may have future dates for dt_annulment and we need to filter future dates

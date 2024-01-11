@@ -12,7 +12,7 @@ WITH anniversary_contracts AS (
 			AND dc.country_code = 'MX'
 			AND dc.status = 'Ativo' -- select only ongoing contracts
 	INNER JOIN
-		dw_public.dim_house_listing AS dhl
+		dw_rent.dim_house_listing AS dhl
 			ON dhl.sk_house_listing = rf.sk_house_listing
 			AND dhl.is_b2b = FALSE -- excluding B2B listings
 	LEFT JOIN

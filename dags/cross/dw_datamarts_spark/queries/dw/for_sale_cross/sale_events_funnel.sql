@@ -51,7 +51,7 @@ LEFT JOIN
     dw_public.dim_region dr
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
     	ON dhl.sk_house_listing = lf.sk_house_listing
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh

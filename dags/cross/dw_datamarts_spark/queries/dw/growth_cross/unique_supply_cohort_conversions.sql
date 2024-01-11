@@ -43,11 +43,11 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
-LEFT JOIN 
-	dw_public.dim_house_listing dhl
+LEFT JOIN
+	dw_rent.dim_house_listing dhl
 		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
-    dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE  
+    dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE
 ),
 l2p AS (
 SELECT
@@ -73,7 +73,7 @@ SELECT
 	CASE
 	    WHEN quantity_weeks_conversion < 0
 	        THEN 'W5+'
-        WHEN quantity_weeks_conversion BETWEEN 0 AND 4 
+        WHEN quantity_weeks_conversion BETWEEN 0 AND 4
             THEN 'W'||quantity_weeks_conversion
         WHEN quantity_weeks_conversion >=5
 	        THEN 'W5+'
@@ -134,8 +134,8 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
-LEFT JOIN 
-	dw_public.dim_house_listing dhl
+LEFT JOIN
+	dw_rent.dim_house_listing dhl
 		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE
@@ -164,7 +164,7 @@ SELECT
 	CASE
 	    WHEN quantity_weeks_conversion < 0
 	        THEN 'W5+'
-        WHEN quantity_weeks_conversion BETWEEN 0 AND 4 
+        WHEN quantity_weeks_conversion BETWEEN 0 AND 4
             THEN 'W'||quantity_weeks_conversion
         WHEN quantity_weeks_conversion >=5
 	        THEN 'W5+'
@@ -225,8 +225,8 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
-LEFT JOIN 
-	dw_public.dim_house_listing dhl
+LEFT JOIN
+	dw_rent.dim_house_listing dhl
 		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE
@@ -255,7 +255,7 @@ SELECT
 	CASE
 	    WHEN quantity_weeks_conversion < 0
 	        THEN 'W5+'
-        WHEN quantity_weeks_conversion BETWEEN 0 AND 4 
+        WHEN quantity_weeks_conversion BETWEEN 0 AND 4
             THEN 'W'||quantity_weeks_conversion
         WHEN quantity_weeks_conversion >=5
 	        THEN 'W5+'
@@ -316,8 +316,8 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
-LEFT JOIN 
-	dw_public.dim_house_listing dhl
+LEFT JOIN
+	dw_rent.dim_house_listing dhl
 		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE
@@ -346,7 +346,7 @@ SELECT
 	CASE
 	    WHEN quantity_weeks_conversion < 0
 	        THEN 'W5+'
-        WHEN quantity_weeks_conversion BETWEEN 0 AND 4 
+        WHEN quantity_weeks_conversion BETWEEN 0 AND 4
             THEN 'W'||quantity_weeks_conversion
         WHEN quantity_weeks_conversion >=5
 	        THEN 'W5+'
@@ -407,8 +407,8 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
-LEFT JOIN 
-	dw_public.dim_house_listing dhl
+LEFT JOIN
+	dw_rent.dim_house_listing dhl
 		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE -- filter data from 4 years ago
@@ -438,7 +438,7 @@ SELECT
 	CASE
 	    WHEN quantity_weeks_conversion < 0
 	        THEN 'W5+'
-        WHEN quantity_weeks_conversion BETWEEN 0 AND 4 
+        WHEN quantity_weeks_conversion BETWEEN 0 AND 4
             THEN 'W'||quantity_weeks_conversion
         WHEN quantity_weeks_conversion >=5
 	        THEN 'W5+'
@@ -499,8 +499,8 @@ LEFT JOIN
 LEFT JOIN
     datalake_3p.houses_3p_bh AS rbh
         ON rbh.id_house = lf.sk_house_listing / 1000
-LEFT JOIN 
-	dw_public.dim_house_listing dhl
+LEFT JOIN
+	dw_rent.dim_house_listing dhl
 		ON lf.sk_house_listing = dhl.sk_house_listing
 WHERE
     dd.date BETWEEN DATE_TRUNC('YEAR',CURRENT_DATE) - INTERVAL 4 year AND CURRENT_DATE -- filter data from 4 years ago
@@ -529,7 +529,7 @@ SELECT
 	CASE
 	    WHEN quantity_weeks_conversion < 0
 	        THEN 'W5+'
-        WHEN quantity_weeks_conversion BETWEEN 0 AND 4 
+        WHEN quantity_weeks_conversion BETWEEN 0 AND 4
             THEN 'W'||quantity_weeks_conversion
         WHEN quantity_weeks_conversion >=5
 	        THEN 'W5+'
@@ -620,9 +620,9 @@ SELECT
   sales_company,
   sourcing_ops,
   CASE
-      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') 
-          AND (supply_mkt_completion = 'Full Self-Service' 
-                  OR (supply_mkt_origin <> 'B2B' AND supply_mkt_origin <> 'CIQ' )) 
+      WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other')
+          AND (supply_mkt_completion = 'Full Self-Service'
+                  OR (supply_mkt_origin <> 'B2B' AND supply_mkt_origin <> 'CIQ' ))
           THEN 'IS'
       ELSE sourcing_ops
   END AS lead_processing_operation,

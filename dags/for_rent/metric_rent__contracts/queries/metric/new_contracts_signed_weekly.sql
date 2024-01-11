@@ -5,7 +5,7 @@ SELECT
 FROM
     dw_rent.dim_contract AS dc
 LEFT JOIN
-    dw_public.fact_house_listings AS hl
+    dw_rent.fact_house_listings AS hl
         ON dc.sk_contract = hl.sk_contract
 WHERE
     dc.status IN ('Ativo', 'Finalizado') -- consider only contracts that are active or were active AND ended

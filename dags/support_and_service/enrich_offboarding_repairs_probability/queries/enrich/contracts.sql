@@ -244,7 +244,7 @@ LEFT JOIN
   dw_datamarts.dim_house_listing_amenities AS la
     ON CAST(rf.sk_house_listing / 1000 AS BIGINT) = CAST(la.id_house AS BIGINT)
 LEFT JOIN
-  dw_public.dim_house_listing AS hl
+  dw_rent.dim_house_listing AS hl
     ON rf.sk_house_listing = hl.sk_house_listing
 LEFT JOIN
   proponent_infos AS pi

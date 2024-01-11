@@ -11,7 +11,7 @@ WITH rent_houses_catalog AS (
         ) AS id_item,
         COALESCE(ts_status_end, CURRENT_TIMESTAMP()) AS ts_status_ended
     FROM
-        dw_public.fact_house_listing_status
+        dw_rent.fact_house_listing_status
     WHERE
         status_history IN ('publicado', 'PUBLISHED')
         AND ts_status_start <= CURRENT_TIMESTAMP()

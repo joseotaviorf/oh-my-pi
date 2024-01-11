@@ -44,8 +44,8 @@ WITH fact_house_listing_flows_adjust AS (
         dhl.ts_house_first_publication,
         FROM_UTC_TIMESTAMP(dhl.ts_house_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
         CASE
-            WHEN LOWER(om.sales_company) = 'mensageria' 
-                OR LOWER(olc.sales_company) = 'mensageria' 
+            WHEN LOWER(om.sales_company) = 'mensageria'
+                OR LOWER(olc.sales_company) = 'mensageria'
                 OR LOWER(dl.sales_company) = 'mensageria'
                 OR LOWER(du.sales_company) = 'mensageria'
                 THEN 'MENSAGERIA'
@@ -66,7 +66,7 @@ WITH fact_house_listing_flows_adjust AS (
     FROM
         dw_public.fact_house_listing_flows AS hl
     INNER JOIN
-        dw_public.dim_house_listing AS dhl
+        dw_rent.dim_house_listing AS dhl
             ON hl.sk_house_listing = dhl.sk_house_listing
     JOIN
         dw_public.dim_lead AS dl
@@ -213,8 +213,8 @@ sale_fact_listing_flows_adjust AS (
         FROM_UTC_TIMESTAMP(dl.ts_first_publication,'Brazil/East') AS ts_house_first_publication_br_tz,
         COALESCE(dl.is_casa_mineira_migration, false) as is_casa_mineira_migration,
         CASE
-            WHEN LOWER(om.sales_company) = 'mensageria' 
-                OR LOWER(olc.sales_company) = 'mensageria' 
+            WHEN LOWER(om.sales_company) = 'mensageria'
+                OR LOWER(olc.sales_company) = 'mensageria'
                 OR LOWER(dl.sales_company) = 'mensageria'
                 OR LOWER(du.sales_company) = 'mensageria'
                 THEN 'MENSAGERIA'
@@ -341,7 +341,7 @@ source_ops_sale AS (
             dw_public.fact_house_listing_flows AS hlf
                 ON hlf.sk_house_listing_flow = ssf.sk_house_listing_flow
         LEFT JOIN
-            dw_public.dim_house_listing AS dhl
+            dw_rent.dim_house_listing AS dhl
             ON dhl.sk_house_listing = hlf.sk_house_listing
         where ssf.is_casa_mineira_migration = false
 ),

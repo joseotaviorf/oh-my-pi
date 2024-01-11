@@ -32,7 +32,7 @@ columns:
   sk_region:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_region
-      - dw_public.fact_house_listings.sk_region
+      - dw_rent.fact_house_listings.sk_region
     description: key of the region of the QuintoAndar.
   mkt_origin:
     lineage:

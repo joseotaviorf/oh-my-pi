@@ -117,10 +117,10 @@ lost_listings_query: |
     MONTH(dhl.ts_listing_version_start) AS month,
     DAY(dhl.ts_listing_version_start) AS day
   FROM
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
     LEFT JOIN dim_house_listing_amenities AS dhla
       ON CAST(SUBSTR(dhl.sk_house_listing, 1, 9) AS INT)  = CAST(dhla.id_house AS INT)
-    JOIN dw_public.fact_house_listings AS fhl
+    JOIN dw_rent.fact_house_listings AS fhl
       ON dhl.sk_house_listing = fhl.sk_house_listing
     JOIN datalake_region.region dr
       ON fhl.sk_region = dr.id

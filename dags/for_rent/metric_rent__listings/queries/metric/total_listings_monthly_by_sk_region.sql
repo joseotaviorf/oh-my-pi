@@ -4,9 +4,9 @@ SELECT
     dr.country_code,
     COUNT(DISTINCT hl.sk_house_listing) AS total_listings
 FROM
-    dw_public.dim_house_listing AS hl
+    dw_rent.dim_house_listing AS hl
 LEFT JOIN
-    dw_public.fact_house_listings AS fhl
+    dw_rent.fact_house_listings AS fhl
         ON fhl.sk_house_listing = hl.sk_house_listing
 LEFT JOIN
     dw_public.dim_region AS dr

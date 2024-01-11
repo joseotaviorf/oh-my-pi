@@ -1,0 +1,84 @@
+database_name: dw_public
+table_name: fact_house_listing_status
+description: Fact table that contains each status that the listing had. Each line
+  is a listing and its status in a certain time period
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  country_code:
+    lineage:
+    - dw_rent.fact_house_listing_status.country_code
+    description: Country code of the listing.
+    categories:
+      BR: Brazil's country code.
+      MX: Mexico's country code.
+  is_last_status_of_day:
+    lineage:
+      - dw_rent.fact_house_listing_status.is_last_status_of_day
+    description: Boolean indicating if the status is the last one of the day for this listing.
+  revision_reason:
+    lineage:
+    - dw_rent.fact_house_listing_status.revision_reason
+    description: Reason why the status has changed.
+  sk_first_publication_date:
+    lineage:
+    - dw_rent.fact_house_listing_status.sk_first_publication_date
+    description: Date when house listing was first published.
+  sk_house_listing:
+    lineage:
+    - dw_rent.fact_house_listing_status.sk_house_listing
+    description: Key of house listing. For house listing version rules, click here
+      https://docs.google.com/presentation/d/1u4-p1tdzN5TRVfgtreH9thOfNr9O9pDrglah-XMUloQ/edit#slide=id.g41939e4bd1_0_115.
+  sk_region:
+    lineage:
+    - dw_rent.fact_house_listing_status.sk_region
+    description: Key of region where house listing is located in.
+  sk_company_supply:
+    lineage:
+    - dw_rent.fact_house_listing_status.sk_company_supply
+    description: Key of the Rede company that owns the house. Can be joined with dw_rede.dim_company.
+  sk_status_end_date:
+    lineage:
+    - dw_rent.fact_house_listing_status.sk_status_end_date
+    description: Date when status ended. If it is equal to -1, it means the status
+      is still current.
+  sk_status_start_date:
+    lineage:
+    - dw_rent.fact_house_listing_status.sk_status_start_date
+    description: Date when status started.
+  status_change_reason:
+    lineage:
+    - dw_rent.fact_house_listing_status.status_change_reason
+    description: Status reason of house listing.
+  status_history:
+    lineage:
+    - dw_rent.fact_house_listing_status.status_history
+    description: Status of house listing.
+    categories:
+      aguardando_publicacao: Waiting publication.
+      alugado: Rented.
+      despublicado: Unpublished.
+      edicao: Editing.
+      edicaoSemUsuario: No user editing.
+      edicaoUsuarioNaoConfirmado: Unconfirmed user editing.
+      excluido: Deleted.
+      publicado: Published.
+      suspenso: Suspended.
+      EDITING: Editing.
+      OPTED_OUT: Owner opted out.
+      PUBLISHED: Published.
+      SUSPENDED: Suspended.
+      UNPUBLISHED: Unpublished.
+  ts_load:
+    lineage:
+      - dw_rent.fact_house_listing_status.ts_load
+    description: Timestamp when the data was loaded.
+  ts_status_end:
+    lineage:
+    - dw_rent.fact_house_listing_status.ts_status_end
+    description: Timestamp of when status ended. If it is equal NULL, it means the
+      status is still current.
+  ts_status_start:
+    lineage:
+    - dw_rent.fact_house_listing_status.ts_status_start
+    description: Timestamp of when status started.

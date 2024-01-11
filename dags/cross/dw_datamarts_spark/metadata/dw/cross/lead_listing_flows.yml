@@ -2,7 +2,7 @@
 database_name: dw_datamarts
 table_name: lead_listing_flows
 domain: Cross
-owner: '@data-growth'
+owner: "@data-growth"
 description: This dataset contains information about the lead flow.
 columns:
   sk_house_listing_flow:
@@ -149,7 +149,7 @@ columns:
   rental_administrator:
     description: Rental administrator after the change
     lineage:
-      - dw_public.dim_house_listing.rental_administrator
+      - dw_rent.dim_house_listing.rental_administrator
   first_prospect_date:
     description: First Prospect Date
     lineage:
@@ -192,9 +192,9 @@ columns:
     description: Timestamp of the first publication
     lineage:
       - dw_sale.dim_listing.ts_first_publication
-      - dw_public.dim_house_listing.ts_house_first_publication
+      - dw_rent.dim_house_listing.ts_house_first_publication
   ts_house_first_publication_br_tz:
     description: Timestamp of the first publication in br timezone
     lineage:
       - dw_sale.dim_listing.ts_first_publication
-      - dw_public.dim_house_listing.ts_house_first_publication
+      - dw_rent.dim_house_listing.ts_house_first_publication

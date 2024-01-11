@@ -5,7 +5,7 @@ events_agent AS (
         fhl.sk_region,
         CAST(DATE_FORMAT(CAST(first_message_ts AS TIMESTAMP), 'yyyyMMdd') AS INT) AS sk_talk_to_agent_date
     FROM datalake_talk_to_agent.talk_to_agent AS tta
-        JOIN dw_public.fact_house_listings AS fhl
+        JOIN dw_rent.fact_house_listings AS fhl
           ON tta.sk_house_listing = fhl.sk_house_listing
     WHERE
         tta.business_context = 'RENT'

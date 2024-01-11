@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_big_agent_clean.agency.id
   id_house:
-    description: ID of the house (not the same as id_house from dw_public.dim_house_listing).
+    description: ID of the house (not the same as id_house from dw_rent.dim_house_listing).
     lineage:
       - datalake_big_agent_clean.agency.id_house
   id_enrollment:

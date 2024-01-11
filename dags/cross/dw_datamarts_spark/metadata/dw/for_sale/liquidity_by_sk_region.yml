@@ -13,7 +13,7 @@ columns:
       - dw_public.dim_region.sk_region
   min_bedrooms:
     lineage:
-      - dw_public.dim_house_listing.house_bedrooms
+      - dw_rent.dim_house_listing.house_bedrooms
   max_bedrooms:
     lineage:
-      - dw_public.dim_house_listing.house_bedrooms
+      - dw_rent.dim_house_listing.house_bedrooms

@@ -1,4 +1,4 @@
-database_name: dw_public
+database_name: dw_rent
 table_name: fact_house_listing_status
 description: Fact table that contains each status that the listing had. Each line
   is a listing and its status in a certain time period
@@ -78,4 +78,3 @@ columns:
     lineage:
     - datalake_ebdb_listing.house_listing_status.ts_status_started
     description: Timestamp of when status started.
-  

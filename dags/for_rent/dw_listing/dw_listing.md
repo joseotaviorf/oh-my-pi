@@ -14,8 +14,10 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 This pipeline produces the following output table in DW, via full load:
 
-- `dim_condo`
-- `dim_house_listing`
-- `fact_house_listing_status`
-
+- `dw_public.dim_condo`
+- `dw_rent.dim_house_listing`
+- `dw_rent.fact_house_listing_daily_infos`
+- `dw_rent.fact_house_listing_status`
+- `dw_rent.fact_house_listings`
+-
 </details>

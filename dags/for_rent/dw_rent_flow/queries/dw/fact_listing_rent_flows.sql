@@ -155,7 +155,7 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(dim_contract.ts_created AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_created,
             CAST(NOW() AS TIMESTAMP) AS ts_load
         FROM datalake_ebdb_rent_flow.rent_flow
-        JOIN dw_public.dim_house_listing -- 1:M (M rent_flow x 1 listing)
+        JOIN dw_rent.dim_house_listing -- 1:M (M rent_flow x 1 listing)
             ON dim_house_listing.id_house = rent_flow.id_house
             AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01') BETWEEN
                 COALESCE(dim_house_listing.ts_listing_version_start, '1900-01-01')
@@ -183,7 +183,7 @@ WITH listing_rent_flows AS (
         we align with SWE a permanent solution, we are giving priority
         to contract association with listing, instead of rent_flow.
         */
-            dw_public.dim_house_listing AS dhl_contract
+            dw_rent.dim_house_listing AS dhl_contract
                 ON con.id_house = dhl_contract.id_house
                 AND dim_contract.ts_created BETWEEN COALESCE(dhl_contract.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(dhl_contract.ts_listing_version_end, CURRENT_DATE)
         LEFT JOIN datalake_ebdb_agents.agents_review ar

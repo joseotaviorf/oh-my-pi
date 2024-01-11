@@ -39,5 +39,5 @@ columns:
     description: The market channel in demand context.
   is_b2b_demand:
     lineage:
-      - dw_public.dim_house_listing.is_b2b
+      - dw_rent.dim_house_listing.is_b2b
     description: If house comes from a b2b partner.

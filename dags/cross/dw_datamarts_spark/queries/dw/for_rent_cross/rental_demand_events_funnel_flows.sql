@@ -108,7 +108,7 @@ messages_sent AS (
     rent_flows_adap AS rf
       ON DATE(rf.first_message_date) = dd.date
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     (SELECT DISTINCT city_group, region_code FROM dw_public.dim_region) AS dr
@@ -152,7 +152,7 @@ agent_supports AS (
     rent_flows_adap AS rf
       ON DATE(rf.first_attendance_date) = dd.date
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_public.dim_region AS dr
@@ -197,7 +197,7 @@ visits_booked AS (
       ON dd.sk_date = rf.sk_booking_created_date
       AND rf.sk_booking_created_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN dw_public.dim_booking db
       ON rf.sk_booking = db.sk_booking
@@ -244,7 +244,7 @@ visits_completed AS (
       ON dd.sk_date = rf.sk_visit_date
       AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN dw_public.dim_booking db
       ON rf.sk_booking = db.sk_booking
@@ -291,7 +291,7 @@ offer_submitted AS (
       ON dd.sk_date = rf.sk_offer_submitted_date
       AND rf.sk_offer_submitted_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -339,7 +339,7 @@ offer_approved AS(
       ON dd.sk_date = rf.sk_offer_approved_date
       AND rf.sk_offer_approved_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -387,7 +387,7 @@ credit_evaluation_init AS(
       ON dd.sk_date = rf.sk_first_credit_evaluation_init
       AND rf.sk_first_credit_evaluation_init > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -435,7 +435,7 @@ credit_evaluation_positive AS(
       ON dd.sk_date = rf.sk_first_credit_evaluation_positive
       AND rf.sk_first_credit_evaluation_positive > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -483,7 +483,7 @@ doc_sent AS(
       ON dd.sk_date = rf.sk_tenant_first_doc_sent_date
       AND rf.sk_tenant_first_doc_sent_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -531,7 +531,7 @@ doc_approved AS(
       ON dd.sk_date = rf.sk_last_doc_analysis_approved
       AND rf.sk_last_doc_analysis_approved > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -579,7 +579,7 @@ doc_completed AS(
       ON dd.sk_date = rf.sk_credit_analysis_init_date
       AND rf.sk_credit_analysis_init_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -627,7 +627,7 @@ credit_processed AS(
       ON dd.sk_date = rf.sk_credit_analysis_end_date
       AND rf.sk_credit_analysis_end_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -675,7 +675,7 @@ credit_approved AS(
       ON dd.sk_date = rf.sk_credit_analysis_approved_date
       AND rf.sk_credit_analysis_approved_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -723,7 +723,7 @@ contract_created AS (
       ON dd.sk_date = rf.sk_contract_created_date
       AND rf.sk_contract_created_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
     ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -771,7 +771,7 @@ contract_signed AS (
       ON dd.sk_date = rf.sk_contract_signed_date
       AND rf.sk_contract_signed_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof
@@ -823,7 +823,7 @@ contract_ended AS (
       ON dd.sk_date = rf.sk_contract_annulment_date
       AND rf.sk_contract_signed_date > 0 and rf.sk_contract_annulment_date > 0
   JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON rf.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN
     dw_rent.dim_offer AS dof

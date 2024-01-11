@@ -1,4 +1,4 @@
-WITH 
+WITH
 contract_docusign_signed_conversions AS (
     SELECT
         csa.ts_event,
@@ -11,9 +11,9 @@ contract_docusign_signed_conversions AS (
         csa.utm_content,
         csa.utm_term,
         clofhl.sk_region
-    FROM 
+    FROM
       datalake_amplitude_page_viewed_events.contract_docusign_signed_events csa
-      LEFT JOIN dw_public.fact_house_listings clofhl
+      LEFT JOIN dw_rent.fact_house_listings clofhl
         ON CAST(csa.id_house AS INTEGER) = CAST(clofhl.sk_house_listing AS BIGINT) / 1000
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
@@ -43,7 +43,7 @@ pre_events AS (
       utm_content,
       utm_term,
       ts_event
-    FROM 
+    FROM
       datalake_amplitude_page_viewed_events.listing_page_viewed
     UNION ALL
     SELECT
@@ -56,7 +56,7 @@ pre_events AS (
       utm_content,
       utm_term,
       ts_event
-    FROM 
+    FROM
       datalake_amplitude_page_viewed_events.home_page_viewed
     UNION ALL
     SELECT
@@ -69,7 +69,7 @@ pre_events AS (
       utm_content,
       utm_term,
       ts_event
-    FROM 
+    FROM
       datalake_amplitude_page_viewed_events.search_results_page_viewed
     UNION ALL
     SELECT
@@ -103,14 +103,14 @@ first_event_on_session AS (
     min(ts_event) AS ts_event,
     id_amplitude,
     id_session
-  FROM 
+  FROM
     pre_events
   GROUP BY 2,3
 ),
 events AS (
   SELECT
     p.*
-  FROM 
+  FROM
     pre_events p
     JOIN first_event_on_session r
       ON p.ts_event = r.ts_event
@@ -124,7 +124,7 @@ conversion_sessions_unique AS (
     css.id_amplitude,
     er.ts_event AS ts_session,
     nullif(lag(er.ts_event) over (partition BY css.id_amplitude ORDER BY er.ts_event), er.ts_event) AS ts_last_session
-  FROM 
+  FROM
     contract_docusign_signed_sessions css
     JOIN first_event_on_session er
       ON er.id_amplitude = css.id_amplitude
@@ -141,11 +141,11 @@ conversion_events AS (
     csu.ts_session,
     csu.ts_last_session,
     RANK() OVER (PARTITION BY csc.id_amplitude ORDER BY csc.ts_event) AS rnk_conversion
-  FROM 
+  FROM
     contract_docusign_signed_conversions csc
-  JOIN 
-    conversion_sessions_unique csu 
-    ON csu.id_amplitude = csc.id_amplitude 
+  JOIN
+    conversion_sessions_unique csu
+    ON csu.id_amplitude = csc.id_amplitude
     AND csu.id_session = csc.id_session
 ),
 touchpoints AS (
@@ -157,16 +157,16 @@ touchpoints AS (
     evt.id_amplitude,
     evt.id_session,
     evt.utm_source || '/' || evt.utm_medium || '/' ||
-    (CASE 
+    (CASE
       WHEN evt.utm_campaign LIKE '%branded%' AND LOWER(evt.utm_campaign) NOT LIKE '%non-branded%' THEN 'true'
       WHEN evt.utm_campaign LIKE '%institucional%' THEN 'true'
-      ELSE 'false' 
+      ELSE 'false'
     END) AS utm_source_medium_branded,
     evt.ts_event AS session_start_time,
     conv.sk_region,
     conv.ts_event AS conversion_time,
     conv.rnk_conversion AS nst_conversion
-  FROM 
+  FROM
     conversion_events conv
   LEFT JOIN events evt
   	ON evt.id_amplitude = conv.id_amplitude
@@ -182,7 +182,7 @@ SELECT
   CAST(CAST(id_amplitude * 1000 + nst_conversion AS BIGINT) AS STRING) AS unique_conversion_id,
   CAST(ARRAY_JOIN(collect_list(utm_source_medium_branded), '; ') AS VARCHAR(20000)) AS path_utm_source_medium_branded,
   NOW()::STRING AS ts_load
-FROM 
+FROM
   touchpoints
 WHERE
   conversion_time >= CURRENT_DATE - INTERVAL '3' MONTH

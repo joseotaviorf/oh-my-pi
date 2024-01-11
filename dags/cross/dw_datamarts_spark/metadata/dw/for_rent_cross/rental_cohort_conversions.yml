@@ -17,7 +17,7 @@ columns:
     lineage:
       - dw_datamarts.lead_listing_flows.country_code
       - dw_public.dim_region.country_code
-      - dw_public.dim_house_listing.country_code
+      - dw_rent.dim_house_listing.country_code
     description: The country code.
   supply_mkt_origin:
     lineage:
@@ -82,7 +82,7 @@ columns:
     description: The number of weeks it took for the rental cohort to convert.
   rental_administrator:
     lineage:
-      - dw_public.dim_house_listing.rental_administrator
+      - dw_rent.dim_house_listing.rental_administrator
     description: The rental administrator of the house listing in the rental cohort.
   l2p:
     description: Sum of lead that became a prospect.

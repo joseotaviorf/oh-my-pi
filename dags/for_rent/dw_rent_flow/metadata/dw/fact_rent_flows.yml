@@ -27,7 +27,7 @@ columns:
   sk_house:
     lineage:
       - datalake_rent_flows.rent_flows.id_house
-    description: Id of the property. Joins with dw_public.dim_house_listing
+    description: Id of the property. Joins with dw_rent.dim_house_listing
   sk_tenant_prospect:
     lineage:
       - datalake_rent_flows.rent_flows.id_tenant_prospect

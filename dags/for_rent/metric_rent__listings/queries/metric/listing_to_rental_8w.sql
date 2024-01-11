@@ -4,7 +4,7 @@ SELECT
     COUNT(DISTINCT CASE WHEN rf.days_house_listing_to_contract_signed <= 56 THEN rf.sk_house_listing ELSE NULL END) AS listings_rented_8w,
     COUNT(DISTINCT CASE WHEN rf.days_house_listing_to_contract_signed <= 56 THEN rf.sk_house_listing ELSE NULL END)/CAST(COUNT(DISTINCT CASE WHEN dhl.ts_publication IS NOT NULL THEN dhl.sk_house_listing ELSE NULL END) AS DOUBLE) AS l2r_8w
 FROM
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
 LEFT JOIN
     dw_rent.fact_listing_rent_flows AS rf
         ON rf.sk_house_listing = dhl.sk_house_listing

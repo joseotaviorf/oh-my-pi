@@ -93,8 +93,8 @@ INNER JOIN
 LEFT JOIN
     dw_public.dim_region AS dr
         ON dr.sk_region = fd.sk_region
-INNER JOIN
-    dw_public.dim_house_listing AS dhl
+LEFT JOIN
+    dw_rent.dim_house_listing AS dhl
         ON fd.sk_house_listing = dhl.sk_house_listing
 INNER JOIN
   dw_rent.fact_rent_flows AS frf

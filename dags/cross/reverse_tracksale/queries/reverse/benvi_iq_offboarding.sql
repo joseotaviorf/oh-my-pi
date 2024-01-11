@@ -27,7 +27,7 @@ offboarding_contracts_wo_ticket AS (
             crisis_contracts AS cc
                 ON cc.sk_contract = ct.id_contract
         LEFT JOIN
-            dw_public.fact_house_listings AS fhl
+            dw_rent.fact_house_listings AS fhl
                 ON ct.id_contract = fhl.sk_contract
         LEFT JOIN
             dw_rent.dim_contract AS dc

@@ -7,7 +7,7 @@ owner: matheus.baroni@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - dw_public.fact_house_listing_status.sk_house_listing
+      - dw_rent.fact_house_listing_status.sk_house_listing
     description: House ID
   id_house_week:
     lineage:
@@ -17,6 +17,6 @@ columns:
   week_start:
     lineage:
       - dw_public.dim_date.week_start
-    description: Week start date 
+    description: Week start date
   available_hours:
     description: Available hours for the house during that week

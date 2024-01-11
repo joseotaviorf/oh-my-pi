@@ -3,7 +3,7 @@ WITH mex_houses AS (
     SELECT
         DISTINCT sk_house_listing
     FROM
-		dw_public.dim_house_listing
+		dw_rent.dim_house_listing
     WHERE
 		country_code = 'MX' --- added to filter only MX business (excluding BR)
 ),
@@ -167,7 +167,7 @@ visitors AS (
 	FROM
 		next_steps_booking AS ns
 	INNER JOIN
-		dw_public.dim_house_listing AS dhl
+		dw_rent.dim_house_listing AS dhl
 	    	ON dhl.sk_house_listing = ns.sk_house_listing
 			AND dhl.country_code = 'MX'
 	LEFT JOIN
@@ -190,7 +190,7 @@ visitors_tta AS (
 	FROM
 		next_steps_tta AS ns
 	INNER JOIN
-		dw_public.dim_house_listing AS dhl
+		dw_rent.dim_house_listing AS dhl
 	    	ON dhl.sk_house_listing = ns.sk_house_listing
 			AND dhl.country_code = 'MX'
 	LEFT JOIN

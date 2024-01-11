@@ -50,7 +50,7 @@ LEFT JOIN
   dw_public.dim_region AS dr -- city_groups
     ON (dr.sk_region = fde.sk_region)
 LEFT JOIN
-  dw_public.dim_house_listing AS dhl -- listings info
+  dw_rent.dim_house_listing AS dhl -- listings info
     ON fde.sk_house_listing = dhl.sk_house_listing
 LEFT JOIN
   dw_rent.fact_rent_flows AS frf

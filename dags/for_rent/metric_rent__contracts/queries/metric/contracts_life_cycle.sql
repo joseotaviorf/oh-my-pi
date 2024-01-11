@@ -20,7 +20,7 @@ WITH base AS (
     FROM
         dw_rent.dim_contract AS c
     LEFT JOIN
-        dw_public.fact_house_listings AS h
+        dw_rent.fact_house_listings AS h
             ON c.sk_contract = h.sk_contract
     LEFT JOIN
         dw_public.dim_region AS r

@@ -59,4 +59,4 @@ columns:
       - datalake_3p.houses_3p_bh.partner
   rental_administrator:
     lineage:
-      - dw_public.dim_house_listing.rental_administrator
+      - dw_rent.dim_house_listing.rental_administrator

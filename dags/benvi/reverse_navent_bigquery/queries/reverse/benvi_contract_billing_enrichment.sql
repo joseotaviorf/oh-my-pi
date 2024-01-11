@@ -124,7 +124,7 @@ JOIN
     dw_rent.fact_listing_rent_flows AS f
         ON c.id_contract = f.sk_contract
 JOIN
-    dw_public.dim_house_listing AS l
+    dw_rent.dim_house_listing AS l
         ON l.sk_house_listing = f.sk_house_listing
 LEFT JOIN
     dw_rent.fact_contract_people AS cpo

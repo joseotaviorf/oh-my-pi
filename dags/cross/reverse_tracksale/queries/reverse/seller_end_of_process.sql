@@ -55,9 +55,9 @@ rental_listing AS (
         dhl.ts_listing_version_start,
         fhl.sk_owner AS pp_id
     FROM
-        dw_public.dim_house_listing AS dhl
+        dw_rent.dim_house_listing AS dhl
     JOIN
-        dw_public.fact_house_listings AS fhl
+        dw_rent.fact_house_listings AS fhl
             ON fhl.sk_house_listing = dhl.sk_house_listing
     WHERE
         dhl.is_last_version = TRUE

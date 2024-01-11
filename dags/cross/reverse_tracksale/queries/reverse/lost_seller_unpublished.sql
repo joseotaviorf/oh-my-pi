@@ -1,7 +1,7 @@
 WITH brazil_regions AS (
     SELECT
         DISTINCT sk_region
-    FROM 
+    FROM
         dw_public.dim_region
     WHERE
         id_country = 1
@@ -27,7 +27,7 @@ depublished_listings AS (
         brazil_regions br
             ON fl.sk_region = br.sk_region
     LEFT JOIN
-        dw_public.dim_house_listing dhl
+        dw_rent.dim_house_listing dhl
             ON dhl.id_house = dl.sk_house
     WHERE
         DATEDIFF(current_date, DATE(dl.ts_last_depublication)) = 4

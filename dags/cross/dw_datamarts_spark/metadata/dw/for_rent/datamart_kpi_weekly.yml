@@ -13,7 +13,7 @@ columns:
       - dw_rent.dim_contract.ts_signature
       - dw_public.dim_date.date
       - dw_public.dim_date.week_start
-      - dw_public.dim_house_listing.ts_publication
+      - dw_rent.dim_house_listing.ts_publication
   regional:
     lineage:
       - dw_public.dim_region.regional

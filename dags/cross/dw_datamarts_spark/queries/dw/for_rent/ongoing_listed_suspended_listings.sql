@@ -9,12 +9,12 @@ SELECT /*+ RANGE_JOIN(f, 19000) */
     d.month_start,
     d.month_end,
     ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC) AS order_status -- daily order status
-FROM 
-    dw_public.fact_house_listing_status f
-JOIN 
+FROM
+    dw_rent.fact_house_listing_status f
+JOIN
     dw_public.dim_date d
         ON d.sk_date BETWEEN nullif(f.sk_status_start_date,-1) AND COALESCE(CAST(DATE_FORMAT(date_sub(to_date(string(nullif(sk_status_end_date,-1)),'yyyyMMdd'), 1),'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(DATE_SUB(CURRENT_DATE(),1), 'yyyyMMdd') as BIGINT))
-WHERE 
+WHERE
     f.status_history IN ('publicado','suspenso', 'PUBLISHED', 'SUSPENDED') -- consider published and suspended status
     AND COALESCE(f.status_change_reason, '') <> 'RENTED'
     AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
@@ -31,12 +31,12 @@ SELECT
     fhs.status_history,
     fhs.status_change_reason,
     CAST(DATEDIFF(fhs.week_start, DATE_TRUNC('WEEK',dhl.ts_publication))/7 AS BIGINT) AS weeks_since_publication
-FROM 
+FROM
     daily_published_and_suspended_listings fhs
-LEFT JOIN 
-    dw_public.dim_house_listing dhl
+LEFT JOIN
+    dw_rent.dim_house_listing dhl
         ON fhs.sk_house_listing = dhl.sk_house_listing
-WHERE 
+WHERE
     fhs.order_status = 1 -- consider last status on the day
     AND fhs.weekday_name = 'Sunday' -- filter that indicates it will be grouped by week
 )
@@ -47,7 +47,7 @@ SELECT
     status_history,
     CASE
         WHEN status_history IN ('suspenso', 'SUSPENDED') THEN status_change_reason
-        ELSE NULL 
+        ELSE NULL
     END AS status_change_reason
-FROM 
+FROM
     daily_published_suspended_listings_adjusted

@@ -5,13 +5,13 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: public
+  custom_schema: rent
   default_partitions: [country_code]
   tables_customization:
     dim_condo:
       partitions: []
+      custom_schema: public
     fact_house_listing_daily_infos:
-      custom_schema: rent
       partitions: ["country_code", "year", "month", "day"]
       extraction_type: incremental
       extra_query_template_params:

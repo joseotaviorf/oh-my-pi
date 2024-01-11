@@ -30,7 +30,7 @@ WITH all_listings AS (
                 OR rf.sk_contract_created_date > 0
                 )
     LEFT JOIN
-        dw_public.dim_house_listing AS dhl -- bring information about the listing
+        dw_rent.dim_house_listing AS dhl -- bring information about the listing
             ON rf.sk_house_listing = dhl.sk_house_listing
     LEFT JOIN
         dw_public.dim_region AS dr -- bring information from city_group

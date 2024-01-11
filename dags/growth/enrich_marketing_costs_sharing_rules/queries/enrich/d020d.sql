@@ -11,7 +11,7 @@ rent_flow_client_info AS (
     FROM
         datalake_ebdb_rent_flow.rent_flow
     JOIN
-        dw_public.dim_house_listing
+        dw_rent.dim_house_listing
     ON
         dim_house_listing.id_house = rent_flow.id_house
         AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01')
@@ -81,7 +81,7 @@ tenant_prospect_events AS (
 	FROM
 		datalake_talk_to_agent.talk_to_agent AS tta
 	INNER JOIN
-        dw_public.fact_house_listings AS fhl
+        dw_rent.fact_house_listings AS fhl
             USING(sk_house_listing)
 	WHERE
 		tta.business_context = 'RENT'

@@ -5,14 +5,14 @@ WITH depublished_listings AS (
         fhl.sk_house_listing,
         fls.ts_status_start AS ts_depublication
     FROM
-        dw_public.fact_house_listings AS fhl -- considering as owner only users with published listings
+        dw_rent.fact_house_listings AS fhl -- considering as owner only users with published listings
     INNER JOIN
-        dw_public.dim_house_listing AS dhl 
-            ON dhl.sk_house_listing = fhl.sk_house_listing   
+        dw_rent.dim_house_listing AS dhl
+            ON dhl.sk_house_listing = fhl.sk_house_listing
             AND dhl.country_code = 'MX'
             AND dhl.version > 0 -- exclusing listings for edition before publishing
     INNER JOIN
-        dw_public.fact_house_listing_status AS fls 
+        dw_rent.fact_house_listing_status AS fls
             ON fls.sk_house_listing = fhl.sk_house_listing
             AND fls.status_history IN ('despublicado', 'UNPUBLISHED') -- listing status modification is depublishing
     WHERE
@@ -20,11 +20,11 @@ WITH depublished_listings AS (
         AND (dhl.house_unpublished_reason != 'OWNER_CONSEQUENCES_MANAGEMENT' OR dhl.house_unpublished_reason IS NULL) -- excluding consequence management
         AND dhl.is_b2b = FALSE -- excluding B2B listings
         AND dhl.is_for_sale = FALSE -- excluding listings for sale
-    GROUP BY 1, 2, 3 
+    GROUP BY 1, 2, 3
 ),
 -- considering the first depublication on D-4 for each owner
 first_depublication AS (
-    SELECT 
+    SELECT
         sk_owner,
         MIN(ts_depublication) AS ts_first_depublication
     FROM
@@ -33,12 +33,12 @@ first_depublication AS (
 ),
 -- avoid users which experience ongoing crisis, there is crisis tickets not closed yet
 crisis_users AS (
-    SELECT 
+    SELECT
         ft.sk_user
     FROM
         dw_tickets.dim_ticket AS dt
     INNER JOIN
-        dw_tickets.fact_tickets AS ft 
+        dw_tickets.fact_tickets AS ft
             ON dt.sk_ticket  = ft.sk_ticket
             AND ft.sk_closed_date_local = -1
     INNER JOIN
@@ -49,17 +49,17 @@ crisis_users AS (
 ),
 -- get the corresponding city of the first depublicated listing for each owner
 owners AS (
-    SELECT 
+    SELECT
         dl.sk_owner,
         dl.sk_house_listing
     FROM
-        depublished_listings AS dl 
+        depublished_listings AS dl
     INNER JOIN
-        first_depublication AS fd 
+        first_depublication AS fd
             ON dl.sk_owner = fd.sk_owner
             AND dl.ts_depublication = fd.ts_first_depublication
     LEFT JOIN
-        crisis_users AS uc 
+        crisis_users AS uc
             ON uc.sk_user = dl.sk_owner
     WHERE
         uc.sk_user IS NULL -- exclude users with ongoing crisis ticket
@@ -77,9 +77,9 @@ SELECT
     o.sk_house_listing AS id_driver,
     NOW() AS ts_load
 FROM
-    owners AS o 
+    owners AS o
 INNER JOIN
-    dw_public.dim_user AS u 
+    dw_public.dim_user AS u
         ON u.sk_user = o.sk_owner
 UNION ALL
 SELECT

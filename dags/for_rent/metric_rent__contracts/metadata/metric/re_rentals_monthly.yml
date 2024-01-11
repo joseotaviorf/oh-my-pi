@@ -13,7 +13,7 @@ columns:
     dimension: True
   sk_region:
     lineage:
-      - dw_public.fact_house_listings.sk_region
+      - dw_rent.fact_house_listings.sk_region
     description: sk_region identifier.
     dimension: True
   country_code:

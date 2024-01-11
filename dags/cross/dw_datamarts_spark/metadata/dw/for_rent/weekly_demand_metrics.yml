@@ -13,7 +13,7 @@ columns:
     description: ID of the house.
   id_house_week:
     lineage:
-      - dw_public.fact_house_listing_status.sk_house_listing
+      - dw_rent.fact_house_listing_status.sk_house_listing
       - dw_public.dim_date.week_start
     description: Concatenation of id_house and the reference week date.
   week_start:

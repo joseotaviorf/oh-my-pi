@@ -1,5 +1,5 @@
 ---
-database_name: dw_public
+database_name: dw_rent
 table_name: dim_house_listing
 description: Information related to ForRent listings. Each line is an unique listing
   related to a house. The tuple [id_house_listing, id_house] must be unique.

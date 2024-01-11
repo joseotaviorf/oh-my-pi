@@ -1,5 +1,5 @@
 WITH projected_weeks AS (
-    SELECT 
+    SELECT
         weeks.weeks_since_listing_started,
         CAST(7*weeks.weeks_since_listing_started AS INT) AS days_since_listing_started
     FROM
@@ -11,7 +11,7 @@ mkt_house AS (
     SELECT
         LEFT(sk_house_listing, 9) AS id_house,
         MAX(mkt_completion) AS mkt_completion,
-        MAX(mkt_origin) AS mkt_origin 
+        MAX(mkt_origin) AS mkt_origin
     FROM
         dw_public.fact_house_listing_flows AS fhlf
     WHERE
@@ -22,33 +22,33 @@ weekly_status_since_start AS (
     SELECT
         hldi.id_house_listing,
         r.city_group,
-        CASE 
-            WHEN hldi.consultant_type IS NULL THEN 'Core' 
+        CASE
+            WHEN hldi.consultant_type IS NULL THEN 'Core'
             ELSE hldi.consultant_type
         END AS consultant_type,
         CASE
-            WHEN hldi.first_key_location = 'OwnerPresent' 
-                OR hldi.first_key_location = 'None' 
+            WHEN hldi.first_key_location = 'OwnerPresent'
+                OR hldi.first_key_location = 'None'
                 OR hldi.first_key_location IS NULL THEN ('PP Acompanha' ||
-                    CASE 
-                        WHEN ot.name = 'Empty' 
-                            OR ot.name = 'None' THEN ' Vago' 
-                        ELSE 'Ocupado' 
+                    CASE
+                        WHEN ot.name = 'Empty'
+                            OR ot.name = 'None' THEN ' Vago'
+                        ELSE 'Ocupado'
                     END ||
                         CASE
-                            WHEN hldi.doorman_type in ('horas24','Diurno')  THEN ' Com Portaria' 
-                            ELSE ' Sem Portaria' 
+                            WHEN hldi.doorman_type in ('horas24','Diurno')  THEN ' Com Portaria'
+                            ELSE ' Sem Portaria'
                         END)
-            ELSE hldi.first_key_location 
+            ELSE hldi.first_key_location
         END AS entry_condition,
         CASE
-            WHEN hldi.is_exclusive THEN 'Exclusivo' 
-            ELSE 'Não Exclusivo' 
+            WHEN hldi.is_exclusive THEN 'Exclusivo'
+            ELSE 'Não Exclusivo'
         END AS exclusivity,
         CASE
-            WHEN hldi.is_for_rent = TRUE 
+            WHEN hldi.is_for_rent = TRUE
                 AND hldi.is_for_sale = TRUE THEN 'Hibrido'
-            WHEN hldi.is_for_rent = TRUE 
+            WHEN hldi.is_for_rent = TRUE
                 AND hldi.is_for_sale = FALSE THEN 'For Rent'
         END AS hybrid,
         dhl.listing_category_start,
@@ -66,7 +66,7 @@ weekly_status_since_start AS (
         hldi.ts_status_started,
         dhl.ts_listing_version_start
     FROM
-        dw_public.dim_house_listing AS dhl
+        dw_rent.dim_house_listing AS dhl
     JOIN
         datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
             ON dhl.sk_house_listing = hldi.id_house_listing
@@ -87,7 +87,7 @@ weekly_status_since_start AS (
         dhl.ts_listing_version_start >= DATE('{year}-{month}-{day}') - INTERVAL 90 WEEK
         AND DATE(CONCAT(hldi.year, '-', hldi.month, '-', hldi.day)) >= DATE('{year}-{month}-{day}') - INTERVAL 90 WEEK -- PartitionFilters
         AND dhl.country_code = 'BR'
-        AND r.city_group IS NOT NULL 
+        AND r.city_group IS NOT NULL
 ),
 listing_first_group AS (
 /*

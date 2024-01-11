@@ -25,9 +25,9 @@ listings_metrics AS (
         dr.region_code,
         dr.city_group
     FROM
-        dw_public.dim_house_listing AS hl
+        dw_rent.dim_house_listing AS hl
     LEFT JOIN
-        dw_public.fact_house_listings AS fhl
+        dw_rent.fact_house_listings AS fhl
             ON hl.sk_house_listing = fhl.sk_house_listing
     LEFT JOIN
         rent_flows_contracts AS rf

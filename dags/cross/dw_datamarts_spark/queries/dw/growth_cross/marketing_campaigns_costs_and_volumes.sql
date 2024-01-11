@@ -67,7 +67,7 @@ talk_to_agent AS (
         a.first_message_ts::timestamp AS ts_event
     FROM
         datalake_talk_to_agent.talk_to_agent AS a
-        JOIN dw_public.fact_house_listings AS fhl
+        JOIN dw_rent.fact_house_listings AS fhl
             ON a.sk_house_listing = fhl.sk_house_listing
     WHERE
         a.business_context = 'RENT'

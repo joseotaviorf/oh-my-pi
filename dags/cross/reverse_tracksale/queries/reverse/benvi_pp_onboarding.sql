@@ -11,7 +11,7 @@ WITH new_contracts AS (
             AND rf.sk_contract_signed_date > 0 -- select only signed contracts
             AND dc.country_code = 'MX'
     INNER JOIN
-        dw_public.dim_house_listing AS dhl
+        dw_rent.dim_house_listing AS dhl
             ON dhl.sk_house_listing = rf.sk_house_listing
             AND dhl.country_code = 'MX'
     LEFT JOIN

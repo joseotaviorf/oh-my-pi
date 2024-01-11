@@ -1,5 +1,6 @@
 metadata_files_out_of_pattern:
   - cross/gsheets_by_context/metadata/clean/for_rent/proj_agent_manager.yml
+  - growth/enrich_lost_listings/metadata/enrich/lost_listings.yml
   - growth/enrich_rent_potential_listing/metadata/enrich/potential_listing_b2b.yml
   - growth/enrich_rent_potential_listing/metadata/enrich/potential_listings_reprocessed_leads.yml
   - growth/enrich_supply_outbound_flows/metadata/enrich/supply_outbound_contacts.yml
@@ -22,6 +23,7 @@ metadata_files_out_of_pattern:
   - support_and_service/enrich_offboarding/metadata/enrich/tickets.yml
   # The following files are being added only temporarily to skip list, with permission from the Data Governance team
   - cross/dw_datamarts_spark/metadata/dw/for_rent/datamart_kpi_weekly.yml
+  - cross/dw_datamarts_spark/metadata/dw/for_sale/liquidity_by_sk_region.yml
   - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/sale_cohort_conversions.yml
   - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/sale_events_funnel.yml
   - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/temp_supply_flows.yml
