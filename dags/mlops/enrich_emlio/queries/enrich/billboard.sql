@@ -9,7 +9,7 @@ SELECT
 FROM (
     SELECT
        id_service,
-       EXPLODE(FROM(inputs, "Struct<house_maps: Array<Struct<house_id: LONG, weight: DOUBLE>>>").house_maps) AS maps,
+       EXPLODE(FROM_JSON(inputs, "Struct<house_maps: Array<Struct<house_id: LONG, weight: DOUBLE>>>").house_maps) AS maps,
        service_version,
        year,
        month,
