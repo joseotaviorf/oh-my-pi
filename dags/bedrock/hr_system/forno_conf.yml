@@ -9,6 +9,8 @@ dag_documentation:
 
 endpoints:
   workers:
+    has_partitions: true
+    column_to_partition: "LastUpdateDate"
     params:
       onlyData: true
       limit: 100
@@ -46,10 +48,52 @@ endpoints:
         - "workersDFF"
         - "workersEFF"
   jobs:
+    has_partitions: true
+    column_to_partition: "LastUpdateDate"
     params:
       onlyData: true
       limit: 100
       expand:
         - "JobCustomerFlex"
         - "validGrades"
+  talent_person_profiles:
+    has_partitions: true
+    column_to_partition: "LastUpdateDate"
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "accomplishmentSections"
+        - "areaOfStudySections"
+        - "areasOfExpertise"
+        - "areasOfInterest"
+        - "attachments"
+        - "careerPreferenceSections"
+        - "careersOfInterest"
+        - "certificationSections"
+        - "competencySections.competencyItems"
+        - "educationLvlSections"
+        - "educationSections"
+        - "favoriteLinks"
+        - "highestEducationLvlSections"
+        - "honorSections"
+        - "languageSections"
+        - "membershipSections"
+        - "publicSkills"
+        - "skillSections"
+        - "specialProjectSections"
+        - "tags"
+        - "technicalPostDetailsSections"
+        - "workHistorySections"
+        - "workPreferenceSections"
+  talent_ratings:
+    has_partitions: false
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "nBoxCellAssignments"
+        - "performanceRatings.performanceRatingsDFF"
+        - "userDefinedRatingSections"
+
 

@@ -21,10 +21,6 @@ JOB_NAME = "load_hr_system_to_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-
-
-
-
 def create_spark_dataframe(endpoint_id, json_data, spark_client, hr_system_client):
     spark_schema = EndPointService.get_spark_schema(endpoint_id, hr_system_client)
     schema = StructType.fromJson(spark_schema)
@@ -41,16 +37,23 @@ def run_sync(endpoint_id, url, token, endpoint_details):
     return create_spark_dataframe(path, json_data, spark_client, hr_system_client)
 
 
-def insert_columns(df):
+def insert_columns(df, endpoint_details):
+    column_to_partition = endpoint_details["column_to_partition"]
     df = df.withColumn("ts_load", current_timestamp())
-    df = df.withColumn("year", date_format(col("LastUpdateDate"), "yyyy"))
-    df = df.withColumn("month", date_format(col("LastUpdateDate"), "MM"))
-    df = df.withColumn("day", date_format(col("LastUpdateDate"), "dd"))
+    df = df.withColumn("year", date_format(col(column_to_partition), "yyyy"))
+    df = df.withColumn("month", date_format(col(column_to_partition), "MM"))
+    df = df.withColumn("day", date_format(col(column_to_partition), "dd"))
     return df
 
 
 def load_raw(
-    spark_client, df, environment, source, datalake_bucket, endpoint_id, partition_cols
+    spark_client,
+    df,
+    environment,
+    source,
+    datalake_bucket,
+    endpoint_id,
+    partition_cols=None,
 ):
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
@@ -115,13 +118,17 @@ if __name__ == "__main__":
         f"table_name={endpoint_id}, msg=Starting spark job..."
     )
     df = run_sync(endpoint_id, url, token, endpoint_details)
-    df = insert_columns(df)
-    load_raw(
-        spark_client,
-        df,
-        environment,
-        source,
-        datalake_bucket,
-        endpoint_id,
-        partition_cols,
-    )
+    if endpoint_details["has_partitions"]:
+        df = insert_columns(df, endpoint_details)
+        load_raw(
+            spark_client,
+            df,
+            environment,
+            source,
+            datalake_bucket,
+            endpoint_id,
+            partition_cols,
+        )
+    else:
+        df = df.withColumn("ts_load", current_timestamp())
+        load_raw(spark_client, df, environment, source, datalake_bucket, endpoint_id)

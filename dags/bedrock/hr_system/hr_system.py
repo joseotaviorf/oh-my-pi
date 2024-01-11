@@ -125,7 +125,7 @@ for endpoint_id, endpoint_details in endpoints.items():
         target_database_base_name=SOURCE,
         has_create_external_table_task=False,
         table_name=endpoint_id,
-        partitions=partition_cols,
+        partitions=partition_cols if endpoint_details['has_partitions'] else None,
         has_hive_sync=False,
     )
 
