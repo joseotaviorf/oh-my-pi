@@ -109,11 +109,26 @@ client_cnpj AS (
     GROUP BY
         1
 ),
-client_last_propose AS(
+propose_person AS (
     SELECT
-        cf.id_client,
-        pp_doc.id_propose AS id_propose,
-        ROW_NUMBER() OVER (PARTITION BY cf.id_client ORDER BY pp_doc.id_propose DESC) AS rn
+        pp_doc.*,
+        p_doc.dt_contract_started,
+        p_doc.dt_ended
+    FROM
+        datalake_velo.propose_person AS pp_doc
+    LEFT JOIN
+        datalake_velo.propose AS p_doc
+            ON p_doc.id_propose = pp_doc.id_propose
+    WHERE
+        pp_doc.id_propose IS NOT NULL
+        AND p_doc.id_propose IS NOT NULL
+        AND p_doc.is_contract IS TRUE
+),
+cash_flow_propose AS (
+    SELECT DISTINCT
+        cf.id_securities,
+        pp_doc.id_propose,
+        ROW_NUMBER() OVER (PARTITION BY cf.id_securities, cf.id_client ORDER BY pp_doc.id_propose DESC) AS rn
     FROM
         datalake_velo_omie.cash_flows AS cf
     LEFT JOIN
@@ -123,15 +138,11 @@ client_last_propose AS(
         client_cnpj AS ccnpj
             ON ccnpj.id_client = cf.id_client
     LEFT JOIN
-        datalake_velo.propose_person AS pp_doc
+        propose_person AS pp_doc
             ON pp_doc.document = COALESCE(ccpf.document_number, ccnpj.document_number)
-    LEFT JOIN
-        datalake_velo.propose AS p_doc
-            ON p_doc.id_propose = pp_doc.id_propose
+            AND COALESCE(cf.dt_due BETWEEN pp_doc.dt_contract_started AND DATE_ADD(pp_doc.dt_ended, 31), 1=1)
     WHERE
         pp_doc.id_propose IS NOT NULL
-        AND p_doc.id_propose IS NOT NULL
-        AND p_doc.is_contract IS TRUE
 )
 SELECT
     CAST(CONCAT(ct.id_securities, REPLACE(ct.id_category, '.', '')) AS BIGINT) AS id_transaction_entry,
@@ -161,6 +172,6 @@ SELECT
 FROM
     cte_transactions AS ct
 LEFT JOIN
-    client_last_propose AS cfp
-        ON cfp.id_client = ct.id_client
+    cash_flow_propose AS cfp
+        ON cfp.id_securities = ct.id_securities
         AND cfp.rn = 1
