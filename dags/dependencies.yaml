@@ -1825,6 +1825,9 @@ bietlejuice.enrich_mexico_marketing_automatic_daily_costs:
   - bietlejuice.gsheets_growth:done-clean-marketing-cost-taxonomy
 bietlejuice.enrich_mexico_marketing_manual_daily_costs:
   - bietlejuice.gsheets_growth_intraday:done-clean-mexico-marketing-manual-shared-costs
+bietlejuice.enrich_mexico_mox_reports:
+  - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
+  - bietlejuice.arquivo_confidencial:load-clean-rev-info
 bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.ebdb:load-clean-affiliate-data
   - bietlejuice.ebdb:load-clean-user

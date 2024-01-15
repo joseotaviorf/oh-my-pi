@@ -1,0 +1,15 @@
+dag:
+  name: enrich_mexico_mox_reports
+  schedule_start_date: 2023,11,1
+  owner: Data International
+workflow:
+  type: query
+  layer: enrich
+  default_partitions: [ year, month, day ]
+  default_extraction_type: full
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: c5d.2xlarge
+    node_type_id: r5d.large
+    num_workers: 3
