@@ -84,11 +84,6 @@ unified_users AS (
     ul.id_agent AS id_agent_loser_account,
     um.id_winner_account,
     uw.id_agent AS id_agent_winner_account,
-    INITCAP(ul.name) AS loser_account_name,
-    ul.cpf AS loser_account_cpf,
-    ul.main_phone AS loser_account_phone,
-    ul.secondary_phone AS loser_account_secondary_phone,
-    ul.email AS loser_account_email,
     um.ts_updated AS ts_merged_success
   FROM
     datalake_ebdb_clean.user_merge AS um
@@ -105,20 +100,20 @@ unified_users AS (
 ),
 main AS (
 SELECT DISTINCT
-  COALESCE(uu.id_agent_loser_account,mu.id_agent) AS id_agent,
-  u.id_external AS id_user_agent,
+  mu.id_agent,
+  mu.id AS id_user_agent,
   mp.id_business_unit,
   bu.id_region,
   u.email AS hub_service_email,
   u.phone_number AS hub_service_phone,
-  COALESCE(uu.loser_account_phone,mu.main_phone) AS main_phone,
+  mu.main_phone AS main_phone,
   CASE
-    WHEN COALESCE(uu.loser_account_secondary_phone,mu.secondary_phone) != COALESCE(uu.loser_account_phone,mu.main_phone)
-      THEN COALESCE(uu.loser_account_secondary_phone,mu.secondary_phone)
+    WHEN mu.secondary_phone != mu.main_phone
+      THEN mu.secondary_phone
     ELSE NULL
   END AS main_secondary_phone,
-  COALESCE(uu.loser_account_email,mu.email) AS main_email,
-  COALESCE(uu.loser_account_cpf,mu.cpf) AS main_cpf,
+  mu.email AS main_email,
+  mu.cpf AS main_cpf,
   bu.business_context,
   bu.hub_name,
   bu.city_group,
@@ -149,9 +144,9 @@ LEFT JOIN
     ON u.id_external = uu.id_loser_account
 LEFT JOIN
   datalake_ebdb_clean.user AS mu
-    ON u.id_external = mu.id AND COALESCE(mu.id_agent,0) != 0
+    ON COALESCE(uu.id_winner_account,u.id_external) = mu.id AND COALESCE(mu.id_agent,0) != 0
 WHERE
-  COALESCE(uu.id_agent_loser_account,mu.id_agent) IS NOT NULL
+  mu.id_agent IS NOT NULL
   AND bu.business_context = 'SALE'
 QUALIFY
   ROW_NUMBER() OVER(PARTITION BY mp.id_user, mp.id_business_unit, ts_agent_hub_relation_date ORDER BY mp.is_active) = 1
