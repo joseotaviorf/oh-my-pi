@@ -1,0 +1,47 @@
+SELECT
+    rc.country_code,
+    rc.halfyear,
+    rc.quarter,
+    rc.business_type,
+    rc.city_group,
+    rc.tier,
+    rc.listing_category_start,
+    rc.rent_flow_origin,
+    rc.rental_administrator,
+    rc.weeks_to_conversion,
+    rc.vb_unconverted,
+    rc.vc_unconverted,
+    rc.os_unconverted,
+    rc.oa_unconverted,
+    rc.es_unconverted,
+    rc.ep_unconverted,
+    rc.ds_unconverted,
+    rc.ca_unconverted,
+    rc.cc_unconverted,
+    rc.vb_converted_vc,
+    rc.vb_converted_os,
+    rc.vb_converted_oa,
+    rc.vb_converted_cs,
+    rc.vc_converted_os,
+    rc.os_converted_oa,
+    rc.os_converted_cs,
+    rc.oa_converted_es,
+    rc.oa_converted_ds,
+    rc.oa_converted_ca,
+    rc.oa_converted_cs,
+    rc.es_converted_ep,
+    rc.es_converted_ca,
+    rc.ep_converted_ds,
+    rc.ds_converted_ca,
+    rc.ca_converted_cc,
+    rc.ca_converted_cs,
+    rc.cc_converted_cs,
+    rc.has_guarantee,
+    rc.dt_event,
+    rc.dt_week_started
+FROM
+    dw_rent_snapshot.rent_cohort_conversions_snapshot AS rc
+WHERE
+    year = YEAR(NOW())
+    AND month = MONTH(NOW())
+    AND day = DAY(NOW())
