@@ -20,3 +20,5 @@ cluster:
         aws_attributes:
             ebs_volume_size: 500
             availability: ON_DEMAND
+        spark_conf:
+            spark.sql.mapKeyDedupPolicy: "LAST_WIN"
