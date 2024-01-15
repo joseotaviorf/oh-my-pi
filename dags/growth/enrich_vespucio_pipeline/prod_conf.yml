@@ -1,0 +1,4 @@
+dag_documentation:
+  dag_purpose: "Vespúcio is a service that aims to generate a source of truth for condos and houses, joining multiple separate
+    sources of data. This DAG is responsible for orchestrating its execution. For more information, there is the GitHub
+    [Vespucio Repository](https://github.com/quintoandar/vespucio)"

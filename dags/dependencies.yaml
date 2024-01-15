@@ -489,10 +489,6 @@ bietlejuice.dw_lead:
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
   - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
-bietlejuice.dw_listing_temp:
-  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:load-clean-condo
   - bietlejuice.ebdb:load-clean-house
@@ -521,6 +517,10 @@ bietlejuice.dw_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
+bietlejuice.dw_listing_temp:
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
 bietlejuice.dw_losses:
   - bietlejuice.enrich_losses:load-enrich-closing
   - bietlejuice.enrich_losses:load-enrich-delay
@@ -2595,7 +2595,7 @@ bietlejuice.enrich_vespucio:
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
   - bietlejuice.sindico_net:load-clean-condominium
-bietlejuice.enrich_vespucio_sources:
+bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.ebdb:load-clean-amenities
   - bietlejuice.ebdb:load-clean-condo
   - bietlejuice.ebdb:load-clean-condo-contact
