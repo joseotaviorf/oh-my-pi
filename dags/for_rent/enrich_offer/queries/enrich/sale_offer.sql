@@ -26,15 +26,15 @@ WITH visit_before_offer AS (
                     ON vo.id_offer = g.id
         JOIN
             datalake_booking.booking AS bs
-                ON bs.id_house = COALESCE(g.id_house, vo.id_house)
-                AND bs.id_visitor = COALESCE(g.id_buyer, vo.id_buyer)
+                ON bs.id_house = COALESCE(vo.id_house, g.id_house)
+                AND bs.id_visitor = COALESCE(vo.id_buyer, g.id_buyer)
         LEFT JOIN
             datalake_ebdb_user.user AS du
                 ON bs.id_agent = du.id_agent
         WHERE
             bs.visit_intent = 'SALE'
             AND bs.type = 'Visita'
-            AND bs.ts_booking_utc < COALESCE(g.ts_created, vo.ts_offer_created)
+            AND bs.ts_booking_utc < COALESCE(vo.ts_offer_created, g.ts_created)
             AND bs.visit_fup ='VaiNegociar'
     )
     SELECT
@@ -72,15 +72,15 @@ booking_before_offer AS (
                     ON vo.id_offer = g.id
         JOIN
             datalake_booking.booking AS bs
-                ON bs.id_house = COALESCE(g.id_house, vo.id_house)
-                AND bs.id_visitor = COALESCE(g.id_buyer, vo.id_house)
+                ON bs.id_house = COALESCE(vo.id_house, g.id_house)
+                AND bs.id_visitor = COALESCE(vo.id_buyer, g.id_buyer)
         LEFT JOIN
             datalake_ebdb_user.user AS du
                 ON bs.id_agent = du.id_agent
         WHERE
             bs.visit_intent = 'SALE'
             AND bs.type = 'Visita'
-            AND bs.ts_created < COALESCE(g.ts_created,vo.ts_offer_created)
+            AND bs.ts_created < COALESCE(vo.ts_offer_created, g.ts_created)
     )
     SELECT
         bk.*
