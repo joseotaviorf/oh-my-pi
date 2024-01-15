@@ -1,7 +1,0 @@
----
-partition_cols: ["year", "month", "day"]
-dag_documentation:
-  dag_purpose: |
-    Prepares [Bigfone](github.com/quintoandar/big-fone) data for business utilization. [Bigfone](https://github.com/quintoandar/big-fone)
-    is a system responsible for interacting with Twilio (an external service) to manage calls, peers and store data used to generate
-    some reports. Also, it acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.

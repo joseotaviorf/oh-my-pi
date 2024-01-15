@@ -1,5 +1,0 @@
----
-dag_documentation:
-  dag_purpose: |
-    Creates CRM (Customer Relationship Management) tasks transitions
-    tables based in workflows transitions.

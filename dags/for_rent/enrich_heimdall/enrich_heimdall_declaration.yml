@@ -1,0 +1,17 @@
+dag:
+    name: enrich_heimdall
+    schedule_start_date: 2022, 7, 1
+    owner: Data ForRent
+    documentation: 
+        dag_purpose: |
+            Expanding columns from `heimdall` datalake table `activity` to facilitate the analysis.
+workflow:
+    type: query
+    layer: enrich
+    inner_dependencies:
+        ongoing_refund_requests:
+            - activity
+            - auditable_expenses
+            - expenses
+cluster:
+    type: databricks_10_4_med_general_cluster

@@ -1,6 +1,0 @@
----
-partition_cols:
-  - country_code
-dag_documentation:
-  dag_purpose: Creates enriched tables for the context `Photo Jobs` of ebdb, like inspection and photo_job.
-  additional_information: Partitioned by `country_code`.

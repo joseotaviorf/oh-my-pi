@@ -1,0 +1,30 @@
+dag:
+    name: enrich_customer_support
+    schedule_start_date: 2021, 5, 12
+    owner: Data SS
+    documentation: 
+        dag_purpose: |
+            Apply all the business rules needed to build an unified ticket vision on DW (Customer Support model).
+            Each row of Call and Chat tables represent one task from a ticket. Each row in the Email table represents one ticket.
+            About received_demand table, each row is a demand received from the user, it contains all the three channels
+            (Call, Chat and Email).
+        additional_information: |
+            In order to run these queries directly from databricks notebook you must replace double brackets for single ones.
+            This occurs because when running on our data pipeline we read and execute these queries using pyspark and to avoid
+            python syntax errors we must escape the brackets characters.
+workflow:
+    type: query
+    layer: enrich
+    inner_dependencies:
+        received_demand:
+            - call
+            - email
+cluster:
+    type: custom_cluster
+    custom_configurations:
+        driver_node_type_id: m5d.16xlarge
+        node_type_id: m5d.16xlarge
+        runtime_engine: PHOTON
+        num_workers: 6
+        aws_attributes:
+            ebs_volume_size: 300

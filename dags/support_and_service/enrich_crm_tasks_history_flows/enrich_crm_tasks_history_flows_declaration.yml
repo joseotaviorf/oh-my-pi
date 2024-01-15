@@ -1,0 +1,14 @@
+dag:
+    name: enrich_crm_tasks_history_flows
+    schedule_start_date: 2015, 10, 29
+    owner: Data SS
+    documentation: 
+        dag_purpose: |
+            Creates CRM (Customer Relationship Management) base tasks history table. These tables will be used to generate.
+workflow:
+    type: query
+    layer: enrich
+    default_extraction_type: incremental
+    default_partitions: ["year", "month", "day"]
+cluster:
+    type: databricks_10_4_med_general_photon_cluster

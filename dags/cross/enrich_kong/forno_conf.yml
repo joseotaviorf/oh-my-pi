@@ -1,4 +1,0 @@
----
-dag_documentation:
-  dag_purpose: "Extracts the access logs message in to columns"
-partition_cols: ["year", "month", "day", "hour"]

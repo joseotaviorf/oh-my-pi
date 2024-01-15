@@ -1,0 +1,15 @@
+dag:
+    name: enrich_crm_tasks_transitions
+    schedule_start_date: 2020, 8, 29
+    owner: Data SS
+    documentation: 
+        dag_purpose: |
+            Creates CRM (Customer Relationship Management) tasks transitions
+            tables based in workflows transitions.
+workflow:
+    type: query
+    layer: enrich
+    default_extraction_type: incremental
+    default_partitions: ["year", "month", "day"]
+cluster:
+    type: databricks_10_4_min_general_photon_cluster

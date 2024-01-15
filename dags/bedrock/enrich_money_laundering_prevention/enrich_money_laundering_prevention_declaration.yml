@@ -1,0 +1,17 @@
+dag:
+    name: enrich_money_laundering_prevention
+    schedule_start_date: 2022, 7, 3
+    owner: Data Bedrock
+    documentation: 
+        dag_purpose: |
+            This DAG creates the enriched tables from Money Laundering Prevention dimensional model for Compliance/Bedrock.
+workflow:
+    type: query
+    layer: enrich
+cluster:
+    type: custom_cluster
+    custom_configurations:
+        node_type_id: m5a.large
+        driver_node_type_id: m5a.large
+        num_workers: 3
+        spark_version: 10.4.x-scala2.12

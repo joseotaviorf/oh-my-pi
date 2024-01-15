@@ -1,0 +1,17 @@
+dag:
+    name: enrich_ebdb_photo_jobs
+    schedule_start_date: 2020, 7, 1
+    owner: Data SS
+    documentation: 
+        dag_purpose: |
+            Creates enriched tables for the context `Photo Jobs` of ebdb, like inspection and photo_job.
+        additional_information: |
+            Partitioned by `country_code`.
+workflow:
+    type: query
+    layer: enrich
+    tables_customization:
+        photo_job:
+            partitions: [country_code]
+cluster:
+    type: databricks_10_4_med_io-general_photon_cluster
