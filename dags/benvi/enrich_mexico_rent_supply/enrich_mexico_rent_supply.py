@@ -45,7 +45,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 
-partition_cols = config_service.get_config("partition_cols")
+# partition_cols = config_service.get_config("partition_cols")
 inner_dependencies = config_service.get_config("inner_dependencies")
 
 dag = DAG(
@@ -88,7 +88,7 @@ enrich_task_groups = datalake_task_groups.build_task_group_from_sql_files(
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
     is_incremental=True,
-    partitions=partition_cols,
+    # partitions=partition_cols,
     has_create_external_table_task=False,
 )
 

@@ -8,5 +8,3 @@ inner_dependencies:
     - listing_flow
   coincident_funnel:
     - listing_flow
-partition_cols:
-  - country_code
