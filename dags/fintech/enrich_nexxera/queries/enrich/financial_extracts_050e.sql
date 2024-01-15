@@ -3,7 +3,8 @@ WITH datalake_nexxera_clean_financial_extracts_050e_0 AS  (
         dt_launch,
         launch_value,
         UPPER(LEFT(TRIM(REGEXP_EXTRACT(history_description, '^[^ ]+ ([^ ]+) .*$', 1)),4)) AS id_flag,
-        CAST(REGEXP_EXTRACT(TRIM(history_description),'^[^0-9]+([0-9]+)$',1) AS INT) AS id_ec
+        CAST(REGEXP_EXTRACT(TRIM(history_description),'^[^0-9]+([0-9]+)$',1) AS INT) AS id_ec,
+        ts_ingested
     FROM
         datalake_nexxera_clean.financial_extracts_050e
     WHERE
