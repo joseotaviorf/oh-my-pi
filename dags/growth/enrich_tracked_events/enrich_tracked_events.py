@@ -25,8 +25,7 @@ MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
 CLUSTER_DESCRIPTION = "custom_cluster"
 INNER_DEPENDENCIES = {
-    "offline_attribution":["plaquinhas_offline_touchpoints"],
-    "offline_attribution":["secretaria_offline_touchpoints"],
+    "offline_attribution":["plaquinhas_offline_touchpoints", "secretaria_offline_touchpoints"],
     "cross_channel_full": ["offline_attribution"],
     "attribution_cross_channel": ["cross_channel_full"],
 }
