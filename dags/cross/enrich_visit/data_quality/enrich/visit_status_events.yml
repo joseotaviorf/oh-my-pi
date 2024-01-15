@@ -1,0 +1,51 @@
+---
+table_name: datalake_visit.visit_status_events
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_visit_status_events:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_visit_status_log:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_visit:
+    is_complete:
+      severity_level: Error
+  id_schedule:
+    is_complete:
+      severity_level: Error
+  id_visitor:
+    is_complete:
+      severity_level: Error
+  id_owner:
+    is_complete:
+      severity_level: Error
+  id_agent:
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_house_listing:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  ranking:
+    is_complete:
+      severity_level: Error
+  is_visit_last_event:
+    is_complete:
+      severity_level: Error
+  ts_event_created:
+    is_complete:
+      severity_level: Error

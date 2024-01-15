@@ -1,0 +1,113 @@
+database_name: datalake_visit
+table_name: visit_status_events
+description: Information about Rent and Sale visits status log events.
+  Each row is an unique visit status.
+domain: Cross
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  id_visit_status_events:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_visit_status_log
+    description: A concat with visit status log Id + Ranking. Used to be the unique key table.
+  id_visit_status_log:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_visit_status_log
+    description: Id of each visit status log event.
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_visit
+    description: Visit ID for connection to the Visit table
+  id_schedule:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_schedule
+    description: Field that can be used as booking ID
+  id_visitor:
+    lineage:
+      - datalake_ebdb_clean.booking.id_visitor
+    description: User id of the user is visiting the house
+  id_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+    description: User ID of the property owner
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.booking.id_agent
+    description: Agent user who is following the visit
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.booking.id_house
+    description: Id of the house of interest
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+    description: House listing ID
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_clean.booking.id_rent_flow
+    description: Id for Rent Flow connection
+  id_sale_flow:
+    lineage:
+      - datalake_ebdb_clean.booking.id_house
+      - datalake_ebdb_clean.booking.id_visitor
+    description: Id for Sale Flow connection, junction of visitor with house
+  id_fup_details:
+    lineage:
+      - datalake_ebdb_clean.booking.id_fup_details
+    description: Id for visit's follow up
+  id_cancellation_detail:
+    lineage:
+      - datalake_ebdb_clean.visit_cancellation_details.id
+    description: Visit cancellation details id
+  id_company_supply:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_company_hubspot
+    description: Id of the supply partner in HubSpot
+  uuid_company_supply:
+    lineage:
+      - datalake_ebdb_listing.house_listing.uuid_company
+    description: UUID of the supply partner in the company domain
+  id_company_demand:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
+    description: ID of the demand partner from Hubspot.
+  partner_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house_listing.partner_3p_supply
+    description: Supply partner name
+  partner_3p_demand:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
+    description: Demand partner name
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.booking.business_context
+    description: The context of the visit, which can be RENT or SALE
+  ranking:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ranking
+    description: Status numbering of the same visit
+  author_user_type:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.author_user_type
+    description: Person source type in our internal products related to the event
+    categories:
+          PERSON: The user id comes from the Person internal product and can be joined with it.
+          USUARIO: The user id comes from the Main (EBDB) and can be joined with it.
+  author_user_role:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.author_user_role
+    description: Role of the person responsible for that update line
+  on_behalf_of:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.on_behalf_of
+    description: In whose name that status
+  channel:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.channel
+    description: Visit channel
+  is_visit_last_event:
+    description: If it is the last event of that visit in the database
+  ts_event_created:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_created
+    description: When the event was created
