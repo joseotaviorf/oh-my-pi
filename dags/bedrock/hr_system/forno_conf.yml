@@ -95,5 +95,28 @@ endpoints:
         - "nBoxCellAssignments"
         - "performanceRatings.performanceRatingsDFF"
         - "userDefinedRatingSections"
-
+  hcm_contacts:
+    has_partitions: true
+    column_to_partition: "LastUpdateDate"
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "addresses.addressesDFF"
+        - "citizenships"
+        - "contactRelationships.contactRelationshipsDDF"
+        - "contactRelationships.contactRelationshipsDFF"
+        - "contactsDFF"
+        - "driverLicenses"
+        - "emails.emailsDFF"
+        - "ethnicities"
+        - "legislativeInfo.legislativeInfoDDF"
+        - "legislativeInfo.legislativeInfoDFF"
+        - "names"
+        - "nationalIdentifiers.nationalIdentifiersDFF"
+        - "otherCommunicationAccounts"
+        - "passports"
+        - "phones.phonesDFF"
+        - "religions"
+        - "visasPermits"
 
