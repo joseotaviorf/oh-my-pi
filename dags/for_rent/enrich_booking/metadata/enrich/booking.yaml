@@ -57,7 +57,7 @@ columns:
   id_user_sale_attendence_5a:
     lineage:
     - datalake_gsheets_clean.secretariat_hierarchy.id_user_5a
-    description: ''
+    description: User id of the secretary
   id_rent_flow:
     lineage:
     - datalake_ebdb_clean.booking.id_rent_flow
@@ -70,11 +70,11 @@ columns:
   id_real_estate_agent_rating:
     lineage:
     - datalake_ebdb_clean.visit.id_real_estate_agent_rating
-    description: ''
+    description: Id of buyer review of the agent for that booking
   id_sale_fixed_agent:
     lineage:
     - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
-    description: ''
+    description: Id of the fixed agent if the business context = sale
   id_company_supply:
     lineage:
     - datalake_ebdb_listing.house.id_company_hubspot
@@ -119,12 +119,16 @@ columns:
     description: Lists the visitors intention for this visit (if he was looking to
       rent or buy the property)
     categories:
-      RENT: ''
-      SALE: ''
+      RENT: A booking related to the ForRent context, rent intention
+      SALE: A booking related to the ForSale context, buyer intention
   buyer_intention:
     lineage:
     - datalake_ebdb_clean.booking.buyer_intention
-    description: ''
+    description: Lists the buyers intention for the property (if the person was buying to live in the property or as an investment)
+    categories:
+      INVESTMENT_FOR_RENT: If the intention of buying the property is to rent it out later.
+      INVESTMENT_OTHER: If the purchase of the property is for investment.
+      LIVING: If the purchase is for living in the property after the purchase.
   type:
     lineage:
     - datalake_ebdb_clean.booking.type
@@ -195,35 +199,42 @@ columns:
   is_visit_created_from_app:
     lineage:
     - datalake_ebdb_clean.visit_origin.is_app
-    description: ''
+    description: Boolean column that indicates if the visit was created in any of the different applications (Corretores, Inquilinos, Proprietarios,  Vistoriadores, Porfolio, MagicLink). True if it was.
   is_visit_last_updated_from_app:
     lineage:
     - datalake_ebdb_clean.visit_origin.is_app
-    description: ''
+    description: Boolean column that indicates if the last update on that visit came from any of the different applications (Corretores, Inquilinos, Proprietarios, Vistoriadores, Porfolio, MagicLink). True if it was.
   code:
     lineage:
     - datalake_ebdb_clean.visit.code
-    description: ''
+    description: Unique string code with 8 characters generated for each visit
   last_status_change_reason:
     lineage:
     - datalake_ebdb_clean.booking_status_change.reason
-    description: ''
+    description: Gives the last reason why the status changed
   last_status_change_reason_enum:
     lineage:
     - datalake_ebdb_clean.booking_status_change.reason_enum
-    description: ''
+    description: Gives the last reason why the status changed when not automatically as an enum
   last_status_change_reason_category:
     lineage:
     - datalake_ebdb_clean.appointment_change_reason_category.name
-    description: ''
+    description: Shows the type of user responsible for the change in the appointment
+    categories:
+      Tenant: ''
+      Agent: ''
+      Owner: ''
+      Other: ''
+      Inspector: ''
+      Internal: ''
   tenant_absence_reason:
     lineage:
     - datalake_ebdb_clean.visitor.absence_reason
-    description: ''
+    description: '[Deprecated] Describes the reason why visitor did not show up (by agent app follow up).'
   agent_absence_reason:
     lineage:
     - datalake_ebdb_clean.visitor.absence_reason
-    description: ''
+    description: '[Deprecated] Describes the reason why agent did not show up (by agent app follow up).'
   landlord_absence_reason:
     lineage:
     - datalake_ebdb_clean.visitor.absence_reason
@@ -231,7 +242,40 @@ columns:
   troublesome_entrance_problem:
     lineage:
     - datalake_ebdb_clean.entrance.problem
-    description: ''
+    description: If it was not possible to enter the property to visit (succesful_entrance = 0), then this column lists the reason why it was not possible to enter.
+    categories:
+      Allowed: The visit was allowed
+      BrokenLockbox: The lockbox was damaged and the visit could not be completed
+      BuildingAsOkAuthorizationListRequired: It was necessary to align the visit with the condominium/building and it was not possible to complete the visit
+      DamagedKeys: The keys were damaged and it was not possible to enter the listing
+      DidntGetKeys: The keys were not delivered by the person in charge for the visit to be complete
+      KeysKeeperNotPresent: The person responsible for the keys to the listing did not show up for the visit
+      KeysNotAvailable: The keys were not available for the visit
+      LandlordNoShow: The owner did not show up for the visit
+      LockboxProblems: Lockbox related problems and the visit could not be completed
+      MissplacedKeys: The keys were missplaced
+      NameNotInTheList: Some of the parties involved in the visit did not have permission to enter the listing
+      NoCollectiveAuthorization: Some of the parties involved in the visit did not have permission to enter the listing
+      NoEntrancePermission: He was not allowed to enter the listing.'
+      NoIndividualAuthorization: Some of the parties involved in the visit did not have permission to enter the listing
+      NoKeysLockbox: The keys were not in the lockbox and the visit cannot be compelled
+      NoLockbox: Not having lockbox once the visit cannot be completed
+      None: Booking with no troublesome or unknown troublesome
+      NotAllowed: The visit was not allowed for some unspecified reason
+      OwnerQuitAnnouncement: The owner has given up listing
+      PropertyNorForRent: Listing was actually not for rent
+      PropertyNotForSale: Listing was actually not for sale
+      Rented: The listing was already rented
+      RentedByAnotherCompany: The listing has been rented on another platform or real estate agent
+      RentedOrLandlordQuitRenting: Rented or owner has given up putting the listing up for rent
+      ResidentTenantDidntAllowVisit: Current tenant did not allow listing to be visited
+      ResidentTenantDidntKnowVisit: Current tenant did not know that the listing would be visited
+      SoldByAnotherCompany: The listing was sold by another platform or real estate company
+      TemporarilyUnavailable: The listing is temporarily unavailable
+      TenantDelay: The tenant was delaye
+      VisitOffAllowedHours: The visit was outside the available visiting hours
+      WrongAddress: The listing address was incorrect
+      WrongPassword: The password for the electronic lock entered was incorrect
   cancellation_reason:
     lineage:
     - datalake_ebdb_clean.booking_status_change.reason_enum
@@ -365,7 +409,7 @@ columns:
   owner_missing_reason:
     lineage:
     - datalake_ebdb_clean.entrance.problem
-    description: ''
+    description: '[Deprecated] Describes the reason why owner did not show up (by agent app follow up).'
   reason_category:
     lineage:
     - datalake_gsheets_clean.from_to_cancellation.new_reason
@@ -389,11 +433,11 @@ columns:
   partner_3p_demand:
     lineage:
     - datalake_ebdb_work_contract.work_contract.3p_partner
-    description: ''
+    description: Column with the name of partner who brought the visitor, if the listing has the is_3p_demand flag.
   partner_3p_supply:
     lineage:
     - datalake_ebdb_listing.house.partner_3p_supply
-    description: ''
+    description: Column with the name of QuintoAndar real estate partner, if the listing has the is_3p_supply flag.
   ts_visit_fup:
     lineage:
     - datalake_ebdb_clean.booking.ts_visit_fup
@@ -409,116 +453,114 @@ columns:
   ts_first_canceled:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: Date time of the first cancellation.
+    description: Datetime of the first cancellation.
   ts_first_canceled_unevaluated:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: ''
+    description: Date time of the first cancelation even if the date time is greater than the dt_booking
   ts_booking_local_tz:
     lineage:
     - datalake_ebdb_clean.booking.dt_booking
     - datalake_ebdb_clean.booking.slot_day
-    description: ''
+    description: Datetime of the booking date on local timezone, based on the country of the booking.
   ts_created_local_tz:
     lineage:
     - datalake_ebdb_clean.booking.ts_created
-    description: ''
+    description: Datetime of visit creation on local timezone, based on the country of the booking.
   ts_visit_follow_up_local_tz:
     lineage:
     - datalake_ebdb_clean.booking.ts_visit_fup
-    description: ''
+    description: Datetime of the agent fup on local timezone, based on the country of the booking.
   is_confirmed:
     lineage:
     - datalake_ebdb_clean.booking.is_confirmed
-    description: ''
+    description: Boolean column to identify if the visit is confirmed or not. True if it is. On most cases as soon as a Visit is booked it is already confirmed, if it meets these rules 1.The house is not Third Party 2.The date of the scheduling is within the period in which the property is available 3. The house does not have any entry restrictions - the house has entry restrictions if it needs an entry authorization 4. The date of the schedule is after the date of the schedule creation
   is_closed:
     lineage:
     - datalake_ebdb_clean.booking.is_closed
-    description: ''
+    description: '[Deprecated] This column is not used anymore.'
   is_agent_fixed:
     lineage:
     - datalake_ebdb_clean.booking.is_agent_fixed
-    description: ''
+    description: Boolean column to identify if the agent that was assigned for that visit was a PFA (Preferred Fixed Agent) or was a random agent
   is_3p_supply_5a:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: >
-      Boolean column that identifies if the listing is from a real estate partner (Rede Supply) of QuintoAndar.
+    description: Boolean column that identifies if the listing is from a real estate partner (Rede Supply) of QuintoAndar.
   is_3p_supply_bh:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: >
-      Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte.
+    description: Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte.
   is_virtual_visit:
     lineage:
     - datalake_ebdb_clean.follow_up_details.visit_type
-    description: ''
+    description: Boolean column to identify if the visit occurred virtually, i.e. visit_type = 'Video'
   is_entrance_successful:
     lineage:
     - datalake_ebdb_clean.entrance.is_successful
-    description: ''
+    description: Boolean column to identify if the agent and tenant were able to enter the house
   is_canceled:
     lineage:
     - datalake_ebdb_clean.booking.status
-    description: ''
+    description: Boolean column to identify if the visit is Canceled
   is_sale_visit:
     lineage:
     - datalake_ebdb_clean.booking.business_context
-    description: ''
+    description: Boolean column to identify if the business context for that visit is Sale
   is_inspection:
     lineage:
     - datalake_ebdb_clean.booking.type
-    description: ''
+    description: Boolean column to identify if the visit is of "Vistoria" type
   is_visit:
     lineage:
     - datalake_ebdb_clean.booking.type
-    description: ''
+    description: Boolean column to identify if the visit is of "Visita" type
   is_photo_session:
     lineage:
     - datalake_ebdb_clean.booking.type
-    description: ''
+    description: Boolean column to identify if the visit is of "SessaoFotos" type
   is_visit_performed:
     lineage:
     - datalake_ebdb_clean.booking.visit_fup
     - datalake_ebdb_clean.visitor.absence_reason
-    description: ''
+    description: Boolean column to identify if the agent filled the visit_fup but was absent at that visit.
   is_via_reschedule:
     lineage:
     - datalake_ebdb_clean.booking.id_rescheduled_booking
-    description: ''
+    description: Boolean column indicating if the visit has been rescheduled. True when this booking came from another booking as a reschedule.
   has_reschedule:
     lineage:
     - datalake_ebdb_clean.booking.id_rescheduled_booking
-    description: ''
+    description: Boolean column indicating if the visit has been rescheduled. True if it was cancelled to be reschedule.
   has_tenant_attended:
     lineage:
     - datalake_ebdb_clean.visitor.has_attended
-    description: ''
+    description: Boolean column to identify if the visitor appeared at the visit. True if attended.
   has_agent_attended:
     lineage:
     - datalake_ebdb_clean.visitor.has_attended
-    description: ''
+    description: Boolean column to identify if the agent appeared at the visit. True if attended.
   has_landlord_attended:
     lineage:
     - datalake_ebdb_clean.visitor.has_attended
-    description: ''
+    description: Boolean column to identify if the owner appeared at the visit where the rule is visitor_type = 'Landlord' and has attended = true from the table datalake_ebdb_clean.visitor
   has_owner_arrived:
     lineage:
     - datalake_ebdb_clean.entrance.problem
-    description: ''
+    description: Boolean column to identify if the owner appeared at the visit where the rule is if the entrance problem <> 'LandlordNoShow then true
   is_first_booking_auto:
     lineage:
     - datalake_ebdb_clean.booking_status_change.id_user
-    description: ''
+    description: Boolean column to identify if the booking was originally created through planner (program that allocates 5A personnel to inspections and jobs). True if the visit originated via planner flow.
   ts_booking_utc:
     lineage:
     - datalake_ebdb_clean.booking.dt_booking
     - datalake_ebdb_clean.booking.slot_day
-    description: ''
+    description: Date of when visit was scheduled on UTC.
   ts_first_canceled_local_tz:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: ''
+    description: Date of visit cancelation on local timezone, based on the country of the booking.
   ts_first_canceled_unevaluated_local_tz:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
@@ -539,41 +581,47 @@ columns:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
     - datalake_ebdb_clean.booking.ts_created
-    description: ''
+    description: Number of days between the creation of the booking to the cancellation of the booking
   days_visit_cancelled_to_visit:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
     - datalake_ebdb_clean.booking.dt_booking
     - datalake_ebdb_clean.booking.slot_day
-    description: ''
+    description: Number of days between the cancellation of the visit and the date the booking was scheduled for.
   days_visit_booked_to_visit:
     lineage:
     - datalake_ebdb_clean.booking.dt_booking
     - datalake_ebdb_clean.booking.slot_day
     - datalake_ebdb_clean.booking.ts_created
-    description: ''
+    description: Number of days between the creation of the booking and the date it was scheduled for.
   days_visit_booked_to_visit_completed:
     lineage:
     - datalake_ebdb_clean.booking.dt_booking
     - datalake_ebdb_clean.booking.slot_day
     - datalake_ebdb_clean.booking.ts_created
-    description: ''
+    description: Number of days between the creation of the booking and the date it was scheduled for, but only for completed visits
   user_sale_booking_creator:
-    description: ''
+    description: Identifies the type of user who created the sale booking
+    categories:
+      None: ''
+      Admin/CX: ''
+      Agent: ''
+      Buyer: ''
+      Other: ''
+      Secretaria: ''
   hub_agent_region:
-    description: ''
+    description: If the agent is working under the HUB type of contract, it shows the region of the HUB it is allocated
   is_hub_flow:
-    description: ''
+    description: Boolean column indicating if the agent of that visit is working under the HUB flow. True if it is.
   is_3p_demand:
-    description: ''
+    description: Boolean column that identifies if the visitor came from a QuintoAndar demand partner.
   is_3p_supply:
-    description: ''
+    description: Boolean column that identifies if the listing is from a real estate partner (Rede Supply). Regardless if it is from QuintoAndar or CasaMineira.
   is_visit_completed:
-    description: ''
+    description: Boolean column indicating if he visit was completed by the visitor. The confirmation event is not registered yet.
   is_house_rented:
-    description: ''
+    description: Boolean column indicating if the sale visit was scheduled on a house that was rented inside QuintoAndar by the time the visit was scheduled to happen
   ts_checkin:
     lineage:
     - datalake_ebdb_clean.visit_checkin.ts_checkin
     description: Checkin timestamp
-
