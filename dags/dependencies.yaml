@@ -1453,6 +1453,12 @@ bietlejuice.enrich_ebdb_photo_jobs:
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_region:load-enrich-region
+bietlejuice.enrich_ebdb_pricing:
+  - bietlejuice.ebdb:load-clean-house-aud
+  - bietlejuice.ebdb:load-clean-house-predicted-price-aud
+  - bietlejuice.ebdb:load-clean-listing-business-context
+  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
 bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:load-clean-pre-proposal
   - bietlejuice.ebdb:load-clean-pre-proposal-aud

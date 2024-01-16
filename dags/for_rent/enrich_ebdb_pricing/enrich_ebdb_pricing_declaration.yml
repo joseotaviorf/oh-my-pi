@@ -1,0 +1,9 @@
+dag: 
+  name: enrich_ebdb_pricing
+  owner: Data ForRent
+  schedule_start_date: 2020, 8, 29
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_memory_photon_cluster
