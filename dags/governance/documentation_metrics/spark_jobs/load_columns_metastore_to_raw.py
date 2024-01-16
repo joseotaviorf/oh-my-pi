@@ -57,7 +57,7 @@ def get_empty_df(spark_client):
 def list_metastore_databases(spark_client, schemas_skip_list):
     databases_df = (
         spark_client.get_records("SHOW DATABASES")
-        .where("databaseName not like '%_staging%' and databaseName not like 'temp_%'")
+        .where("databaseName not like '%_staging%' and databaseName not like 'temp_%' and databaseName not like 'igorgatis%'")
         .collect()
     )
     databases = [
