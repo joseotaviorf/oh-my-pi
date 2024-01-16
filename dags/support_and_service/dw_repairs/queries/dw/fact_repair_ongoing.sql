@@ -38,7 +38,7 @@ SELECT
   rt.reopens,
   rt.relisting,
   rt.replies,
-  rt.has_chat_negociation,
+  IF(rt.has_chat_negociation IS NULL, FALSE, rt.has_chat_negociation) AS has_chat_negociation,
   IF( rt.ts_created_local IS NOT NULL AND rt.ts_solved_local IS NULL , TRUE, FALSE) AS ongoing,
   DATEDIFF(DAY, DATE(rt.ts_created_local) , DATE(rt.ts_solved_local) ) AS frt,
   IF(rt.tags LIKE '%produto_responsabilidade_terceiros%', TRUE, FALSE) AS is_other_responsability,
@@ -61,3 +61,7 @@ FROM datalake_repairs.repair_tickets AS rt
   LEFT JOIN
     repair_request_chat AS rrc
       ON rrc.sk_repair_request = rt.id_request
+WHERE
+    rt.year = {year}
+    AND rt.month = {month}
+    AND rt.day = {day}
