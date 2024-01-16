@@ -4,7 +4,7 @@ class DAGOwnerEnum:
     """
 
     DEFAULT_OWNER = "Data Engineering"
-
+    DATA_AGENTS = "Data Agents"
     DATA_AVAILABILITY = "Data Availability"
     DATA_BEDROCK = "Data Bedrock"
     DATA_FINTECH = "Data Fintech"

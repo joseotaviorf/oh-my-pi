@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: rent_comission_for_strategic_region
+columns:
+  id_region:
+    lineage:
+      - datalake_gsheets_raw.rent_comission_for_strategic_region.id
+  city_name:
+    lineage:
+      - datalake_gsheets_raw.rent_comission_for_strategic_region.city_name
+  neighborhood_name:
+    lineage:
+      - datalake_gsheets_raw.rent_comission_for_strategic_region.neighborhood_name
+  concat_city_neighborhood:
+    lineage:
+      - datalake_gsheets_raw.rent_comission_for_strategic_region.concat_city_neighborhood
+  is_strategic_region:
+    lineage:
+      - datalake_gsheets_raw.rent_comission_for_strategic_region.strategic_region
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.rent_comission_for_strategic_region.ts_load

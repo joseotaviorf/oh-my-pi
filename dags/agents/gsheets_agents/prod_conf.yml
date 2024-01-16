@@ -1,0 +1,13 @@
+sheets_info:
+  rent_comission_for_strategic_region:
+    sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE
+    sheet_name: for_rent
+    clean_table_name: rent_comission_for_strategic_region
+    sheet_context: agents
+    partitioned: true
+  sale_comission_for_strategic_region:
+    sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE
+    sheet_name: for_sale
+    clean_table_name: sale_comission_for_strategic_region
+    sheet_context: agents
+    partitioned: true
