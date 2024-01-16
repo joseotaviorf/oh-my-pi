@@ -211,7 +211,7 @@ cross_channel AS (
                 'CLASSIFIED', 
                 'TQC_5A', 
                 'INBOUND')  
-                THEN 'Non-Branded'
+                THEN 'Outro'
             WHEN origin IN (
                 'Quinto Andar - Traz quem compra',
                 'Quinto Andar - Placas', 
