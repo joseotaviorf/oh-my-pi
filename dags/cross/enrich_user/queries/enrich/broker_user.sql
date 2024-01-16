@@ -1,11 +1,14 @@
 WITH context_agent AS (
+    /** Not all agents are present on the agent_data_business_contexts_served table.
+        Based on that, agents not present should be considered as Rent context.
+    **/
     SELECT
         ad.id,
-        MAX(adbcs.business_context = 'SALE') AS is_sale_agent,
-        MAX(adbcs.business_context = 'RENT') AS is_rent_agent
+        MAX(COALESCE(adbcs.business_context = 'SALE', FALSE)) AS is_sale_agent,
+        MAX(COALESCE(adbcs.business_context = 'RENT', TRUE)) AS is_rent_agent
     FROM
         datalake_ebdb_clean.agent_data AS ad
-    INNER JOIN
+    LEFT JOIN
         datalake_ebdb_clean.agent_data_business_contexts_served AS adbcs
             ON ad.id = adbcs.id_agent_data
     WHERE
