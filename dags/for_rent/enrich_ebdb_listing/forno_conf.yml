@@ -47,6 +47,8 @@ custom_cluster:
     availability: ON_DEMAND
 
 inner_dependencies:
+  agents_with_keys:
+    - house_listing
   house_listing:
     - house_status_version_order
     - lbc_status_version_order
@@ -59,14 +61,14 @@ inner_dependencies:
     - lbc_status_version_order
   house_listing_early_demand:
     - house_listing_category
+  house_listing_fees:
+    - house_listing
   house_listing_special_conditions:
     - house_listing_category
   house_listing_status:
     - house_status_version_order
     - lbc_status_version_order
-  agents_with_keys:
-    - house_listing
-  house_listing_fees:
+  house_status:
     - house_listing
   lbc_status_version_order:
     - business_context_history

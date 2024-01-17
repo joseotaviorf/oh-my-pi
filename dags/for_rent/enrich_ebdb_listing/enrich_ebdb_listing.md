@@ -22,6 +22,7 @@ Produces the following output tables:
 - `house_listing_fees`
 - `house_listing_special_conditions`
 - `house_listing_status`
+- `house_status`
 - `house_status_version_order`
 - `lbc_status_version_order`
 - `listing_business_context`

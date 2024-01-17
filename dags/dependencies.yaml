@@ -449,6 +449,7 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
 bietlejuice.dw_house_amenities:
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history

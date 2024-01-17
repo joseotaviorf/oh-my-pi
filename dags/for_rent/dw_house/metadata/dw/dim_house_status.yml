@@ -1,0 +1,19 @@
+---
+database_name: dw_rent
+table_name: dim_house_status
+description: Information related to house status. Each line is an unique status
+  related to a house. The SK of this table is created by our pipeline and does not come from product databases.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_house_status:
+    description: Key of the house status.
+      It's created by concatenating the status and status_reason columns and hashing the concatenation.
+  house_status:
+    lineage:
+      - datalake_ebdb_listing.house_status.house_status
+    description: Status of the house.
+  status_reason:
+    lineage:
+      - datalake_ebdb_listing.house_status.status_reason
+    description: House status reason.

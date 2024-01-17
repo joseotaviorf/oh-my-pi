@@ -15,4 +15,6 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 This pipeline produces the following output table in DW: 
 
 - `dim_house` – Contains information about property listings. Each line is a listing version. 
+- `dim_house_status` – Contains information about property status and it's SK. Each line is a house status.
+
 
