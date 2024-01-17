@@ -20,6 +20,7 @@ tables:
     partitions: [country_code]
   - table_name: house_listing_status
     partitions: [country_code]
+  - table_name: house_status
   - table_name: house_status_version_order
     partitions: [country_code]
   - table_name: lbc_status_version_order
