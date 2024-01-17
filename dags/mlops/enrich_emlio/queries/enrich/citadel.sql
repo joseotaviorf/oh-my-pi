@@ -1,5 +1,5 @@
 SELECT 
-    service_version, 
+    regexp_replace(service_version, "[^0-9a-zA-Z_\-]+", "_") as service_version,
     id_service, 
     year, 
     month, 
