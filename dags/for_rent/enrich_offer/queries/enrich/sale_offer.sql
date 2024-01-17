@@ -47,7 +47,7 @@ WITH visit_before_offer AS (
 booking_before_offer AS (
     WITH bk_aux AS (
         SELECT
-            COALESCE(g.id, vo.id_offer) AS id_offer,
+            COALESCE(vo.id_offer, g.id) AS id_offer,
             bs.id AS id_booking,
             bs.id_agent,
             du.id AS id_user_agent,
@@ -56,14 +56,14 @@ booking_before_offer AS (
             bs.partner_3p_demand,
             bs.is_3p_demand,
             TRUE AS flg_booking_before_offer,
-            (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
-            (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
+            (unix_timestamp(COALESCE(vo.ts_offer_created, g.ts_created))-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
+            (unix_timestamp(COALESCE(vo.ts_offer_created, g.ts_created))-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
             ROW_NUMBER() OVER (
                 PARTITION BY
-                    COALESCE(g.id, vo.id_offer)
+                    COALESCE(vo.id_offer ,g.id)
                 ORDER BY
                     is_canceled,
-                    (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_created))
+                    (unix_timestamp(COALESCE( vo.ts_offer_created, g.ts_created))-unix_timestamp(bs.ts_created))
             ) AS rw_booking
         FROM
             datalake_firestore.sale_offer AS g
@@ -136,12 +136,12 @@ work_contract AS (
 regions AS (
     WITH giroffer_regions AS (
         SELECT
-            COALESCE(g.id, vo.id_offer) AS id_offer,
-            COALESCE(g.id_buyer, vo.id_buyer) AS id_buyer,
-            COALESCE(g.id_house, vo.id_house) AS id_house,
-            COALESCE(g.id_owner, vo.id_seller) AS id_owner,
-            COALESCE(g.ts_created, vo.ts_offer_created) AS ts_offer_created,
-            COALESCE(g.last_price_offered_by_buyer, vo.last_price_offered_by_buyer) AS last_price_offered_by_buyer
+            COALESCE(vo.id_offer, g.id) AS id_offer,
+            COALESCE(vo.id_buyer, g.id_buyer) AS id_buyer,
+            COALESCE(vo.id_house, g.id_house) AS id_house,
+            COALESCE(vo.id_seller, g.id_owner) AS id_owner,
+            COALESCE(vo.ts_offer_created, g.ts_created) AS ts_offer_created,
+            COALESCE(vo.last_price_offered_by_buyer, g.last_price_offered_by_buyer) AS last_price_offered_by_buyer
         FROM
             datalake_firestore.sale_offer AS g
         FULL OUTER JOIN
@@ -404,23 +404,23 @@ data_sources AS (
             ON vo.id_offer = g.id
     LEFT JOIN
         relation_booking_offer AS rbo
-            ON rbo.id_offer = COALESCE(g.id, vo.id_offer)
+            ON rbo.id_offer = COALESCE(vo.id_offer, g.id)
     FULL OUTER JOIN
         datalake_gsheets.sale_hub_offer AS ohc
-            ON ohc.id_offer = COALESCE(g.id, vo.id_offer)
+            ON ohc.id_offer = COALESCE(vo.id_offer, g.id)
     LEFT JOIN
         datalake_ebdb_user.user AS du_vo
             ON vo.id_user_agent = du_vo.id
             AND vo.id_user_agent IS NOT NULL
     LEFT JOIN
         datalake_firestore.monday AS mo
-            ON mo.id_offer = COALESCE(g.id, vo.id_offer)
+            ON mo.id_offer = COALESCE(vo.id_offer, g.id)
     LEFT JOIN
         work_contract AS wc
             ON wc.id_user_agent = rbo.id_user_agent
-            AND COALESCE(g.ts_created, vo.ts_offer_created) >= wc.ts_work_contract_start
+            AND COALESCE(vo.ts_offer_created, g.ts_created) >= wc.ts_work_contract_start
             AND (
-                (COALESCE(g.ts_created, vo.ts_offer_created) <= wc.ts_work_contract_end)
+                (COALESCE(vo.ts_offer_created, g.ts_created) <= wc.ts_work_contract_end)
                 OR (wc.ts_work_contract_end IS NULL)
             )
     LEFT JOIN
@@ -525,16 +525,16 @@ offer_portfolio AS (
 -- RANK OFFER
 rank_offers AS (
   SELECT
-    COALESCE(g.id, vo.id_offer) AS id,
+    COALESCE(vo.id_offer, g.id) AS id,
     ROW_NUMBER() OVER (
         PARTITION BY
-            COALESCE(g.id_buyer, vo.id_buyer)
-                ORDER BY COALESCE(g.ts_created, vo.ts_offer_created)
+            COALESCE(vo.id_buyer, g.id_buyer)
+                ORDER BY COALESCE(vo.ts_offer_created, g.ts_created)
     ) AS buyer_rank_offers,
     ROW_NUMBER() OVER (
         PARTITION BY
-            COALESCE(g.id_house, vo.id_house)
-                ORDER BY COALESCE(g.ts_created, vo.ts_offer_created)
+            COALESCE(vo.id_house, g.id_house)
+                ORDER BY COALESCE(vo.ts_offer_created, g.ts_created)
     ) AS house_rank_offers
   FROM
         datalake_firestore.sale_offer AS g
