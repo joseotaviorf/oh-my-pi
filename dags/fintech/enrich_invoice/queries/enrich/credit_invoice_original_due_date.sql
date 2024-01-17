@@ -1,4 +1,19 @@
-WITH credit_holidays AS (
+WITH
+debt_forgiveness AS (
+  SELECT
+    i.id_external,
+    i.id_contract_external,
+    i.id,
+    i.id_contract,
+    i.purpose,
+    i.status,
+    i.due_amount
+  FROM datalake_retsuko.invoice AS i
+  INNER JOIN datalake_retsuko.debt_forgiveness AS d
+  ON i.id_external = d.id_invoice
+  WHERE status IN ("not-payable", "canceled")
+),
+credit_holidays AS (
     SELECT
         12 AS day,
         10 AS month,
@@ -51,6 +66,7 @@ WITH credit_holidays AS (
 ), invoices AS (
     SELECT
         inv.id,
+        inv.id_external AS id_invoice,
         inv.id_contract,
         inv.status,
         inv.paid_amount,
@@ -62,19 +78,23 @@ WITH credit_holidays AS (
         inv.accrual_year_month,
         DATE_ADD(ADD_MONTHS(DATE_FORMAT(CAST(UNIX_TIMESTAMP(CONCAT(CAST(inv.accrual_year_month AS STRING),'01'),'yyyyMMdd') AS TIMESTAMP), 'yyyy-MM-dd'),1),6) AS static_original_due_date,
         inv.purpose,
-        acc.type AS account_type
+        acc.type AS account_type,
+        IF(df.id_external IS NOT NULL,TRUE,FALSE) AS is_debt_forgiveness
     FROM
         datalake_retsuko.invoice AS inv
     JOIN
         datalake_retsuko_clean.account AS acc
     ON
         inv.id_contract = acc.id_contract
+    LEFT JOIN debt_forgiveness df
+        ON df.id_external = inv.id_external
     WHERE
         acc.type = 'tenant'
-        AND inv.due_amount < 0
+        AND (inv.due_amount < 0 OR df.id_external IS NOT NULL)
 ), invoices_fixed AS (
   SELECT
         inv.id,
+        inv.id_invoice,
         inv.id_contract,
         inv.status,
         inv.paid_amount,
@@ -131,7 +151,8 @@ WITH credit_holidays AS (
         ELSE
             inv.static_original_due_date END) AS original_due_date,
         inv.purpose,
-        inv.account_type
+        inv.account_type,
+        inv.is_debt_forgiveness
   FROM
     invoices  AS inv
   LEFT JOIN
@@ -142,6 +163,7 @@ WITH credit_holidays AS (
 )
 SELECT
     inv.id,
+    inv.id_invoice,
     inv.id_contract AS id_contract_retsuko,
     ebdb_cntrct.id AS id_contract_ebdb,
     ebdb_cntrct.id_proposal,
@@ -200,6 +222,7 @@ SELECT
     (CASE
         WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.original_due_date) >= 180 THEN TRUE
     ELSE FALSE END) AS is_over_180,
+    inv.is_debt_forgiveness,
     inv.accrual_year_month,
     inv.original_due_date,
     inv.ts_paid,

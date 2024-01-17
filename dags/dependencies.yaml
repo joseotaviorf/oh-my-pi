@@ -1628,6 +1628,7 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.enrich_retsuko:load-enrich-debt-forgiveness
 bietlejuice.enrich_itbi_addresses:
   - bietlejuice.itbi:load-clean-itbi-bh
   - bietlejuice.itbi:load-clean-itbi-sp

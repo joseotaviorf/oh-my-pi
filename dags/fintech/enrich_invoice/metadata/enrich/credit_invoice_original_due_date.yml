@@ -9,6 +9,10 @@ columns:
     lineage:
       - datalake_retsuko.invoice.id
     description: "Internal ID of invoice, i.e id of invoice inside datalake_retsuko_clean.invoice, not the external value"
+  id_invoice:
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: "External Invoice ID"
   id_contract_retsuko:
     lineage:
       - datalake_retsuko.invoice.id_contract
@@ -130,6 +134,10 @@ columns:
       - datalake_retsuko.invoice.accrual_year_month
       - datalake_retsuko.invoice.ts_paid
     description: "categorical classification of delay of invoice - boolean to check if is higher than 180"
+  is_debt_forgiveness:
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: "Flag to indicate whether an invoice with debt has been forgiven"
   accrual_year_month:
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
