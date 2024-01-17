@@ -238,7 +238,7 @@ plugin_tasks = [
             f"--output_stats_table={Tables.condo_compounds}_daily_diff_stats",
             f"--output_diff_table={Tables.condo_compounds}_daily_diff",
             f"--output_label=condo_compounds_${yesterday}_vs_{today}",
-            f"--append_results",
+            f"--save_mode=append",
         ],
         task_id="plugins_diff_condo_compounds"
     ),
@@ -252,7 +252,7 @@ plugin_tasks = [
             f"--output_stats_table={Tables.house_compounds}_daily_diff_stats",
             f"--output_diff_table={Tables.house_compounds}_daily_diff",
             f"--output_label=house_compounds_${yesterday}_vs_{today}",
-            f"--append_results",
+            f"--save_mode=append",
         ],
         task_id="plugins_diff_house_compounds"
     ),
@@ -267,7 +267,7 @@ plugin_tasks = [
             f"--output_stats_table={Tables.golden_set_condo_compounds_diff}_stats",
             f"--output_diff_table={Tables.golden_set_condo_compounds_diff}",
             f"--output_label=condo_compounds_employee_sample_v1_vs_{today}",
-            f"--append_results",
+            f"--save_mode=append",
         ],
         task_id="plugins_diff_golden_set_condo_compounds"
     ),
