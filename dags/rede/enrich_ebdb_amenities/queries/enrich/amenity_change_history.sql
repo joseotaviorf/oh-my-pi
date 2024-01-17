@@ -10,7 +10,7 @@ WITH amenities_aud AS (
         r.ts_revision AS ts_change
     FROM
         datalake_ebdb_clean.info_amenities_aud AS i
-    JOIN 
+    LEFT JOIN 
         datalake_ebdb_clean.amenities AS a
             ON i.id_amenity = a.id
     JOIN 
@@ -45,7 +45,7 @@ condo_amenities_aud AS (
         r.ts_revision AS ts_change
     FROM
         datalake_ebdb_clean.info_condo_amenities_aud AS i
-    JOIN 
+    LEFT JOIN 
         datalake_ebdb_clean.condo_amenities AS a
             ON i.id_amenity = a.id_condo_amenity
     JOIN 
