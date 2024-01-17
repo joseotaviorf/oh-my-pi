@@ -624,9 +624,17 @@ SELECT DISTINCT
     pcd.dt_ended_propose AS dt_analyst_annulment_input,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
     IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
-    IF(p.id < 5000000, old.ts_evaluation_started, esd.ts_evaluation_started) AS ts_evaluation_started,
+    CASE
+        WHEN 3p.id_propose IS NULL AND p.id < 5000000 THEN old.ts_evaluation_started
+        WHEN 3p.id_propose IS NULL AND p.id >= 5000000 THEN esd.ts_evaluation_started
+        WHEN 3p.id_propose IS NOT NULL THEN COALESCE(DATE(c.ts_began), old.dt_contract_started)
+    END AS ts_evaluation_started,
     IF(p.id < 5000000, old.ts_rejected, rd.ts_rejected) AS ts_rejected,
-    IF(p.id < 5000000, old.ts_sign_started, ssd.ts_sign_started) AS ts_sign_started,
+    CASE
+        WHEN 3p.id_propose IS NULL AND p.id < 5000000 THEN old.ts_sign_started
+        WHEN 3p.id_propose IS NULL AND p.id >= 5000000 THEN ssd.ts_sign_started
+        WHEN 3p.id_propose IS NOT NULL THEN COALESCE(DATE(c.ts_began), old.dt_contract_started)
+    END AS ts_sign_started,
     IF(p.id < 5000000, old.ts_signed, psd.ts_signed) AS ts_signed,
     IF(p.id < 5000000, old.ts_paid, pd.ts_paid) AS ts_paid,
     IF(p.id < 5000000, old.ts_activation, ad.ts_activation) AS ts_activation,

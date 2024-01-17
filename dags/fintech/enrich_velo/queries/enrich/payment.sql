@@ -63,7 +63,7 @@ SELECT DISTINCT
     p.id_subscription,
     p.invoice_url,
     p.description,
-    IF(p.billing_type = 'ANNUAL_CREDIT_CARD', p.value / p.installments, p.value) AS due_amount,
+    p.value AS due_amount,
     CAST(NULL AS DOUBLE) AS net_amount,
     DATE(p.ts_client_payment) > DATE(p.ts_due) AS is_paid_late,
     p.ts_due_original IS NOT NULL AND p.ts_due_original <> p.ts_due AS is_due_modified,

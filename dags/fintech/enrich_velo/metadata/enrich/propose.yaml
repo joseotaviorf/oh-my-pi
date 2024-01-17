@@ -130,7 +130,7 @@ columns:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_evaluation_started:
-    description: Timestamp of when the propose's evaluation has started
+    description: Timestamp of when the propose's evaluation has started. When 3P proposes, set to be a copy of dt_contract_started.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
@@ -140,7 +140,7 @@ columns:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
   ts_sign_started:
-    description: Timestamp of when the propose has opened to be sign
+    description: Timestamp of when the propose has opened to be sign. When 3P proposes, set to be a copy of dt_contract_started.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
