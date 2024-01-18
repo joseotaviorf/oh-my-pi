@@ -66,7 +66,7 @@ booking AS(
       AND (b.ts_created <= hl.ts_listing_version_end OR hl.ts_listing_version_end IS NULL)
 ),
 booking_3p_demand_agent AS (
-  SELECT
+    SELECT
         b.id_schedule,
         wc.id_company_hubspot AS id_company_demand,
         wc.3p_partner AS partner_3p_demand
@@ -81,6 +81,7 @@ booking_3p_demand_agent AS (
             ON wc.id = ac.id_work_contract
     WHERE
         is_3p_contract
+    GROUP BY 1, 2, 3
 )
 SELECT
   CONCAT(b.id_visit_status_log, ranking) AS id_visit_status_events,
