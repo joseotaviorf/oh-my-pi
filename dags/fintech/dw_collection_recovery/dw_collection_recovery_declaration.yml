@@ -6,6 +6,9 @@ workflow:
   type: query
   layer: dw
   custom_schema: collection_recovery
+  tables_customization:
+    fact_collection:
+      partitions: ["year", "month", "day"]
   inner_dependencies:
     fact_invoice_collections_cycle:
       - fact_debt

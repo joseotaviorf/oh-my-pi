@@ -45,6 +45,9 @@ SELECT
     INT(SUM(agreement)) AS total_agreement,
     INT(SUM(failure)) AS total_failure,
     dt_occurrence,
+    YEAR(dt_occurrence) AS year,
+    MONTH(dt_occurrence) AS month,
+    DAY(dt_occurrence) AS day,
     NOW() AS ts_load
 FROM collection_calculation
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 14

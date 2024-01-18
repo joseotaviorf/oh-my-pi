@@ -45,10 +45,6 @@ columns:
     lineage:
       - datalake_recupera_clean.historical.historical_description
     description: Occurence. Examples - ACORDO PARCELADO, EM NEGOCIACAO...
-  dt_occurrence:
-    lineage:
-      - datalake_recupera.collection.ts_occurrence
-    description: The date of the occurence
   total_esforco:
     lineage:
       - datalake_recupera.collection.esforco
@@ -81,5 +77,21 @@ columns:
       - datalake_recupera.collection.failure
     description: Total number of times an error occurred
       Occurence IDs categorized as 'insucesso' - CLNLOCAL,NATENDE,OCUPADO,FAX,LIGAMUDA,QUEDALIG
+  dt_occurrence:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+    description: The date of the occurence
+  year:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+    description: Year of the occurence
+  month:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+    description: Month of the occurence
+  day:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+    description: Day of the occurence
   ts_load:
     description: Timestamp of when the data was inserted into the table

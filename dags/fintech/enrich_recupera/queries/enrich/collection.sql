@@ -64,9 +64,9 @@ SELECT
     END AS failure,
     ts_occurrence,
     NOW() AS ts_load,
-    YEAR(CAST(ts_occurrence AS DATE)) AS year,
-    MONTH(CAST(ts_occurrence AS DATE)) AS month,
-    DAY(CAST(ts_occurrence AS DATE)) AS day
+    year,
+    month,
+    day
 FROM
     datalake_recupera_clean.historical_records
 WHERE

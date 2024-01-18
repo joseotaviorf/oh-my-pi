@@ -58,12 +58,12 @@ columns:
   year:
     description: Year from ts_occurrence
     lineage:
-      - datalake_recupera_clean.historical_records.ts_occurrence
+      - datalake_recupera_clean.historical_records.year
   month:
     description: Month from ts_occurrence
     lineage:
-      - datalake_recupera_clean.historical_records.ts_occurrence
+      - datalake_recupera_clean.historical_records.month
   day:
     description: Day from ts_occurrence
     lineage:
-      - datalake_recupera_clean.historical_records.ts_occurrence
+      - datalake_recupera_clean.historical_records.day
