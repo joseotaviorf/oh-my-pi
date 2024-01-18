@@ -47,3 +47,4 @@ WHERE
     sr.year = {year}
     AND sr.month = {month}
     AND sr.day = {day}
+    AND sr.score IN ('good', 'bad')
