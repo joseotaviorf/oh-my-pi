@@ -109,7 +109,7 @@ dags_out_of_pattern:
         "wonka.user_most_viewed_region",
         "wonka.house_embeddings_main",
         "wonka.user_embeddings_main",
-        "quintoml.recs.house_user_embeddings.inference",
+        "quintoml.recs.house_user_embeddings_quintoml.inference",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks

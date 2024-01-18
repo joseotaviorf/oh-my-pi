@@ -889,18 +889,18 @@ wonka.house_sale_search_page_viewed:
 
 wonka.house_embeddings_main:
   add:
-    - quintoml.recs.house_user_embeddings.inference:batch-predict
+    - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
 
 wonka.user_embeddings_main:
   add:
-    - quintoml.recs.house_user_embeddings.inference:batch-predict
+    - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
 
 wonka.house_listing_business_context:
   add:
     - bietlejuice.ebdb:load-clean-listing-business-context-aud
     - bietlejuice.ebdb:load-clean-user-revision-entity
 
-quintoml.recs.house_user_embeddings.inference:
+quintoml.recs.house_user_embeddings_quintoml.inference:
   add:
     - wonka.house_listing_business_context:load-house_listing_business_context
     - wonka.house_main:load-house_main
