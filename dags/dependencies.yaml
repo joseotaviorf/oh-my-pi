@@ -2279,13 +2279,9 @@ bietlejuice.enrich_sale_listings:
 bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.ebdb:load-clean-access-authorization-type
   - bietlejuice.ebdb:load-clean-access-type-aud
-  - bietlejuice.ebdb:load-clean-amenities
   - bietlejuice.ebdb:load-clean-booking
-  - bietlejuice.ebdb:load-clean-condo-amenities
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-predicted-price
-  - bietlejuice.ebdb:load-clean-info-amenities-aud
-  - bietlejuice.ebdb:load-clean-info-condo-amenities-aud
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.ebdb:load-clean-listing-business-context-aud
   - bietlejuice.ebdb:load-clean-listing-sale-model
@@ -2294,6 +2290,8 @@ bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation
   - bietlejuice.enrich_booking:load-enrich-booking-review
+  - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity
+  - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_house:load-enrich-maintenance-condition-history
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history

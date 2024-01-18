@@ -1,68 +1,32 @@
-WITH amenities_aud AS (
-    SELECT
-        LAST_VALUE(i.id_house, TRUE) OVER (PARTITION BY i.id_info_amenity ORDER BY i.rev) AS id_house,
-        LAST_VALUE(a.code, TRUE) OVER (PARTITION BY i.id_info_amenity ORDER BY i.rev) AS code,
-        i.rev_type,
-        IF(i.has_feature IS NOT NULL, UPPER(CAST(i.has_feature AS STRING)), 'NULL') AS has_feature,
-        r.ts_revision AS ts_change
-    FROM
-        datalake_ebdb_clean.info_amenities_aud AS i
-    LEFT JOIN 
-        datalake_ebdb_clean.amenities AS a
-            ON i.id_amenity = a.id
-    LEFT JOIN 
-        datalake_ebdb_user.user_revision_entity AS r
-            ON i.rev = r.id
-),
-condo_amenities_aud AS (
-    SELECT
-        LAST_VALUE(i.id_house, TRUE) OVER (PARTITION BY i.id_info_condo_amenity ORDER BY i.rev) AS id_house,
-        LAST_VALUE(a.code, TRUE) OVER (PARTITION BY i.id_info_condo_amenity ORDER BY i.rev) AS code,
-        i.rev_type,
-        IF(i.has_feature IS NOT NULL, UPPER(CAST(i.has_feature AS STRING)), 'NULL') AS has_feature,
-        r.ts_revision AS ts_change
-    FROM
-        datalake_ebdb_clean.info_condo_amenities_aud AS i
-    LEFT JOIN 
-        datalake_ebdb_clean.condo_amenities AS a
-            ON i.id_amenity = a.id_condo_amenity
-    LEFT JOIN 
-        datalake_ebdb_user.user_revision_entity AS r
-            ON i.rev = r.id
-),
-amenities_full_log AS (
-    SELECT 
-        id_house,
-        code,
-        has_feature,
-        TIMESTAMPADD(MILLISECOND, RANK() OVER (PARTITION BY id_house, code, ts_change ORDER BY rev_type DESC) - 1, ts_change) AS ts_change
-    FROM
-        amenities_aud
-    UNION ALL
-    SELECT 
-        id_house,
-        CONCAT(code, '_CONDO') AS code,
-        has_feature,
-        TIMESTAMPADD(MILLISECOND, RANK() OVER (PARTITION BY id_house, code, ts_change ORDER BY rev_type DESC) - 1, ts_change) AS ts_change
-    FROM 
-        condo_amenities_aud
+WITH amenities_history AS (
+  SELECT
+    id_house,
+    IF(h.is_condo_amenity, CONCAT(code, "_CONDO"), code) AS code,
+    COALESCE(UPPER(has_feature::STRING), "NULL") AS has_feature,
+    ts_change
+  FROM
+    datalake_ebdb_amenities.amenity_change_history AS h
+  LEFT JOIN 
+    datalake_ebdb_amenities.amenity AS a
+      USING(id_amenity, is_condo_amenity)
 ),
 amenities AS (
-    SELECT
-        id_house,
-        code,
-        has_feature,
-        DATE(ts_change) AS dt_change
-    FROM
-        amenities_full_log
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_house, code, DATE(ts_change) ORDER BY ts_change DESC) = 1
+  SELECT
+      id_house,
+      code,
+      has_feature,
+      DATE(ts_change) AS dt_change
+  FROM
+      amenities_history
+  QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_house, code, DATE(ts_change) ORDER BY ts_change DESC) = 1
 ),
 amenities_pivoted AS (
     SELECT 
         id_house,
         dt_change,
         is_penthouse,
+        is_pet_friendly,
         has_kitchen_cupboard,
         has_bathroom_cabinet,
         has_air_conditioning,
@@ -98,6 +62,7 @@ amenities_pivoted AS (
       "PISCINA_CONDO" AS has_condo_pool,
       "PISCINA_PRIVATIVA" AS has_private_pool,
       "PLAYGROUND_CONDO" AS has_condo_playground,
+      "PODE_TER_ANIMAIS_DE_ESTIMACAO" AS is_pet_friendly,
       "QUADRA_ESPORTIVA_CONDO" AS has_condo_sports_court,
       "SALAO_DE_FESTAS_CONDO" AS has_condo_party_hall,
       "SAUNA_CONDO" AS has_condo_sauna,
