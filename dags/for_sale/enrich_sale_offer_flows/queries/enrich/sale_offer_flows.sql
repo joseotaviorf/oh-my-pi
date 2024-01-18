@@ -791,7 +791,7 @@ SELECT
     p.status AS payment_status,
     p.fgts_value,
     p.down_payment_value,
-    CASE WHEN p.payment_method = 'FINANCED_USING_FGTS'
+    CASE WHEN p.payment_method LIKE '%USING_FGTS'
          THEN TRUE
          ELSE FALSE
     END AS has_used_fgts_in_payment,

@@ -291,6 +291,7 @@ data_sources AS (
         vo.ts_signed AS vo_sale_agreement_signed_date,
         vo.id_user_consultant AS vo_id_user_consultant,
         vo.id_pendency,
+        vo.sale_price_agreed AS vo_sale_price_agreed,
         vo.id_user_agent AS vo_id_user_agent,
         vo.id_agent AS vo_id_agent,
         du_vo.id_agent AS du_vo_id_agent,
@@ -742,6 +743,7 @@ business_rules AS (
                     END)
             ELSE COALESCE(ds.last_price_offered_by_buyer,ds.mo_sale_price_agreed)
         END AS last_price_offered_by_buyer,
+        vo_sale_price_agreed,
         COALESCE(vo_financing_bank, mo_financing_bank) AS financing_bank,
         COALESCE(vo_id_user_consultant, mo_id_closing_specialist) AS id_closing_specialist,
         COALESCE(vo_sale_agreement_status, mo_sale_agreement_status) AS sale_agreement_status,
@@ -945,7 +947,7 @@ SELECT
     sale_price,
     first_price_offered_by_buyer,
     last_price_offered_by_buyer,
-    last_price_offered_by_buyer AS sale_price_agreed,
+    COALESCE(vo_sale_price_agreed, last_price_offered_by_buyer) AS sale_price_agreed,
     CASE
         WHEN sale_price IS NULL
         OR first_price_offered_by_buyer IS NULL
