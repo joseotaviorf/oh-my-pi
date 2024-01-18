@@ -11,6 +11,9 @@ WITH json_extraction AS (
     WHERE
         source = 'MOX'
         AND attributes LIKE '%IMSS%'
+        AND YEAR(rev.ts_created) = {year}
+        AND MONTH(rev.ts_created) = {month}
+        AND DAY(rev.ts_created) = {day}
 ),
 data_formatting AS (
     SELECT
@@ -23,11 +26,9 @@ data_formatting AS (
         GET_JSON_OBJECT(work_history, "$.antiguedad") AS time_worked,
         TO_DATE(GET_JSON_OBJECT(work_history, "$.fechaAlta"), 'dd/MM/yyyy') AS dt_work_started,
         IF(GET_JSON_OBJECT(work_history, "$.fechaBaja") = 'Vigente', NULL, TO_DATE(GET_JSON_OBJECT(work_history, "$.fechaBaja"), 'dd/MM/yyyy')) AS dt_work_ended,
-        MAX(ts_created) AS ts_report
+        ts_created AS ts_report
     FROM
         json_extraction
-    GROUP BY
-        1, 2, 3, 4, 5, 6, 7, 8, 9
 )
 SELECT
     curp,

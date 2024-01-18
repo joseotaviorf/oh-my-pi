@@ -6,10 +6,10 @@ SELECT
     INT(GET_JSON_OBJECT(aud.attributes, "$.IMSS.data.semanasCotizadas.semanasCotizadas")) AS weeks_worked,
     INT(GET_JSON_OBJECT(aud.attributes, "$.IMSS.data.semanasCotizadas.semanasDescontadas")) AS weeks_discounted,
     INT(GET_JSON_OBJECT(aud.attributes, "$.IMSS.data.semanasCotizadas.semanasReintegradas")) AS weeks_recovered,
-    MAX(rev.ts_created) AS ts_report,
-    YEAR(MAX(rev.ts_created)) AS year,
-    MONTH(MAX(rev.ts_created)) AS month,
-    DAY(MAX(rev.ts_created)) AS day
+    rev.ts_created AS ts_report,
+    YEAR(rev.ts_created) AS year,
+    MONTH(rev.ts_created) AS month,
+    DAY(rev.ts_created) AS day
 FROM
     datalake_arquivo_confidencial_clean.presumed_income_report_aud AS aud
 JOIN
@@ -18,5 +18,6 @@ JOIN
 WHERE
     source = 'MOX'
     AND attributes LIKE '%IMSS%'
-GROUP BY
-    1, 2, 3, 4, 5, 6, 7
+    AND YEAR(rev.ts_created) = {year}
+    AND MONTH(rev.ts_created) = {month}
+    AND DAY(rev.ts_created) = {day}
