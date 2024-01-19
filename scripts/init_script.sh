@@ -1,5 +1,14 @@
 #! /bin/bash
 
+r="deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted"
+add-apt-repository --remove "${r}"
+r="deb http://archive.ubuntu.com/ubuntu/ focal-updates universe"
+add-apt-repository --remove "${r}"
+r="deb http://security.ubuntu.com/ubuntu/ focal-security main restricted"
+add-apt-repository --remove "${r}"
+
+sudo apt-get update --fix-missing
+
 echo "BEGIN: Install Spark external JARs with Maven"
 apt-get install maven -yqq
 
