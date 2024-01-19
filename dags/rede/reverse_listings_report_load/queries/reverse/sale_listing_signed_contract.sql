@@ -4,7 +4,7 @@ SELECT
     fsde.sk_house AS property_id,
     dc.uuid_company AS company_uuid,
     'SALE' AS business_context,
-    dsa.sale_price_agreed AS contract_value,
+    dsa.sale_price_agreed::FLOAT AS contract_value,
     fsde.ts_event,
     fsde.year,
     fsde.month,
