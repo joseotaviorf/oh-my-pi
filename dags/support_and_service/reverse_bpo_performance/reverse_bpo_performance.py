@@ -3,19 +3,10 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
-from databricks_plugin import (
-    QuintoAndarDatabricksExecuteJobClusterOperator,
-)
 from airflow.operators.quintoandar_databricks import (
+    QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-)
-from bietlejuice.base.airflow.task_creators.dag_execution_context import (
-    DagExecutionContext,
-)
-from bietlejuice.base.airflow.task_creators.task_creator_factory import (
-    TaskCreatorFactory,
-    TaskEnum,
 )
 from pendulum import timezone
 
@@ -72,28 +63,17 @@ dag = DAG(
     ),
 )
 
-execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
-    databricks_conn_id="databricks_job_cluster",
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
-    task_id="execute-job-cluster",
+    task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
 
-dag_execution_context = DagExecutionContext(
-    dag=dag, 
-    environment=ENV, 
-    bucket="", 
-    base_spark_jobs_path=reverse_spark_job_path, 
-    dag_args={}, 
-    workflow_args={}, 
-    cluster_args={}
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
 )
-task_creator_factory = TaskCreatorFactory(dag_execution_context)
-dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-    TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
-).create_task()
 
 load_tasks = []
 for table in tables_to_send.keys():
@@ -116,4 +96,4 @@ for table in tables_to_send.keys():
     )
     load_tasks.append(send_data_task)
 
-execute_job_cluster_task >> load_tasks >> dummy_job_cluster_finished_task_creator
+create_cluster_task >> load_tasks >> terminate_cluster_task
