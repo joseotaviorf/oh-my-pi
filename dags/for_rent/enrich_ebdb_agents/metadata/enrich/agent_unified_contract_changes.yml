@@ -40,7 +40,7 @@ columns:
     description: Whether the agent is active, as specified by Main's agent data.
     lineage:
       - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.is_agent_active
-  is_agent_suspended:
+  has_blocked_schedule:
     description: Whether the agent is suspended, which is the same as being marked with "Agenda Bloqueada".
   is_agent_for_sale:
     description: Whether the agent works in the For Sale context.

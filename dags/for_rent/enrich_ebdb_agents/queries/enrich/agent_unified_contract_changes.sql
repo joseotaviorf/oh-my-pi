@@ -117,7 +117,7 @@ having_last_changes AS (
         END AS id_work_contract,
         COALESCE(ascc_action, bcc_action) AS action,
         is_agent_active,
-        COALESCE(id_work_contract = 6, FALSE) AS is_agent_suspended,
+        COALESCE(id_work_contract IN (6, 450, 550, 813), FALSE) AS has_blocked_schedule,
         is_agent_for_sale,
         is_agent_for_rent,
         ROUND(
@@ -136,8 +136,8 @@ having_last_changes AS (
         LAST(
             CASE
                 WHEN has_changed_work_contract
-                AND id_work_contract = 6
-                OR id_previous_work_contract = 6
+                AND id_work_contract IN (6, 450, 550, 813)
+                OR id_previous_work_contract IN (6, 450, 550, 813)
                     THEN ts_status_started 
             END, TRUE
         ) OVER (
@@ -166,7 +166,7 @@ SELECT
     hlc.action,
     hlc.days_in_status,
     hlc.is_agent_active,
-    hlc.is_agent_suspended,
+    hlc.has_blocked_schedule,
     hlc.is_agent_for_sale,
     hlc.is_agent_for_rent,
     hlc.ts_last_contract_changed,
