@@ -119,4 +119,13 @@ endpoints:
         - "phones.phonesDFF"
         - "religions"
         - "visasPermits"
-
+  benefit_enrollments:
+    has_partitions: true
+    column_to_partition: "LastUpdateDate"
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "costs"
+        - "providers"
+        - "dependents"
