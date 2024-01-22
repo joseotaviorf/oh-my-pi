@@ -30,7 +30,7 @@ WITH first_listing_event AS (
 ),
 contract_signed_event AS (
     SELECT DISTINCT
-        hrlc.id_user AS id_cib,
+        CAST(hrlc.id_user AS BIGINT) AS id_cib,
         rde.id_contract AS id_event,
         hrlc.id_house,
         rde.id_house_listing,
@@ -57,7 +57,7 @@ contract_signed_event AS (
 ),
 offer_accepted_event AS (
     SELECT DISTINCT
-        hrlc.id_user AS id_cib,
+        CAST(hrlc.id_user AS BIGINT) AS id_cib,
         rde.id_offer AS id_event,
         hrlc.id_house,
         rde.id_house_listing,
