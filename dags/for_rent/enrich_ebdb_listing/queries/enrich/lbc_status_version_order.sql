@@ -385,7 +385,7 @@ trigger AS (
     h.status,
     h.status_reason,
     h.ts_state_started,
-    h.ts_state_ended,
+    IF(h.state_order = lhs.state_order, COALESCE(fls.ts_state_started, h.ts_state_ended), h.ts_state_ended) AS ts_state_ended,
     DATEDIFF(h.ts_state_ended, h.ts_state_started)  AS days_in_state,
     DATEDIFF(h.ts_state_ended, h.ts_state_started)  AS days_in_status,
     IF(LAG(h.status) OVER(PARTITION BY h.id_house ORDER BY h.ts_state_started, COALESCE(h.ts_state_ended,(CURRENT_TIMESTAMP - INTERVAL 1 DAY))) IS NULL, TRUE, FALSE) AS is_first_status,
@@ -401,6 +401,8 @@ trigger AS (
     house AS h
   JOIN last_house_state AS lhs
     ON lhs.id_house = h.id_house
+  LEFT JOIN first_lbc_state AS fls
+    ON fls.id_house = h.id_house
 
   UNION ALL
 
