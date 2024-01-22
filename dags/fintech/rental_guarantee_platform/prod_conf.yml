@@ -233,4 +233,10 @@ tables:
   - table_name: sap
     date_filter_column: created_at
     extraction_type: incremental
+  - table_name: agreement_payment_legacy
+    date_filter_column: updated_at
+    extraction_type: incremental
+  - table_name: agreement_payment_legacy_aud
+    date_filter_column: created_at
+    extraction_type: incremental
 partition_cols: ["year", "month", "day"]

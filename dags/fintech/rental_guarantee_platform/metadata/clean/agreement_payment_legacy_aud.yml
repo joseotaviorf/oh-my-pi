@@ -1,0 +1,129 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: agreement_payment_legacy_aud
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.id
+  rev:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.rev
+  rev_end:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.revend
+  rev_type:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.revtype
+  id_propose:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.propose
+  mod_id_propose:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.propose_mod
+  unicid:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.unicid
+  mod_unicid:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.unicid_mod
+  version:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.version
+  value:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.value
+  mod_value:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.value_mod
+  net_value:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.net_value
+  mod_net_value:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.net_value_mod
+  fine_value:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.fine_value
+  mod_fine_value:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.fine_value_mod
+  interest_value:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.interest_value
+  mod_interest_value:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.interest_value_mod
+  billing_type:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.billing_type
+  mod_billing_type:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.billing_type_mod
+  status:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.status
+  mod_status:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.status_mod
+  invoice_url:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.invoice_url
+  mod_invoice_url:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.invoice_url_mod
+  payment_link:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.payment_link
+  mod_payment_link:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.payment_link_mod
+  description:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.description
+  mod_description:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.description_mod
+  json_raw_response:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.raw_response
+  mod_json_raw_response:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.raw_response_mod
+  dt_due:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.due_date
+  mod_dt_due:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.due_date_mod
+  dt_due_original:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.original_due_date
+  mod_dt_due_original:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.original_due_date_mod
+  dt_client_payment:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.client_payment_date
+  mod_dt_client_payment:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.client_payment_date_mod
+  dt_confirmed_payment:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.confirmed_payment_date
+  mod_dt_confirmed_payment:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.confirmed_payment_date_mod
+  ts_created:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.created_at
+  year:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.year
+  month:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.month
+  day:
+    lineage:
+    - datalake_rental_guarantee_platform_raw.agreement_payment_legacy_aud.day
