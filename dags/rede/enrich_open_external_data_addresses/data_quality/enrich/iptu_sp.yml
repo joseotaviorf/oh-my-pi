@@ -1,9 +1,9 @@
 ---
-table_name: datalake_itbi_addresses.itbi_sp
+table_name: datalake_open_external_data_addresses.iptu_sp
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 140000
+    greater_than: 1000000
     severity_level: Error
 column_level_validations:
   id_address:

@@ -297,7 +297,7 @@ if __name__ == "__main__":
                     zipcode,
                     city
                 FROM 
-                    datalake_itbi_addresses.itbi_sp
+                    datalake_open_external_data_addresses.itbi_sp
                 UNION ALL 
                 SELECT 
                     id_address,
@@ -308,7 +308,19 @@ if __name__ == "__main__":
                     zipcode,
                     city
                 FROM 
-                    datalake_itbi_addresses.itbi_bh
+                    datalake_open_external_data_addresses.itbi_bh
+            ),
+            iptu AS (
+                SELECT 
+                    id_address,
+                    'iptu' AS source,
+                    address,
+                    number,
+                    neighborhood,
+                    zipcode,
+                    city
+                FROM
+                    datalake_open_external_data_addresses.iptu_sp
             ),
             union_solutions AS (
                 SELECT 
@@ -325,6 +337,11 @@ if __name__ == "__main__":
                     *
                 FROM 
                     itbi
+                UNION ALL 
+                SELECT 
+                    *
+                FROM 
+                    iptu
             )
             SELECT
                 u.id_address,

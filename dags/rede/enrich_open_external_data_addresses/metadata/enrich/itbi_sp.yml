@@ -1,9 +1,9 @@
 ---
-database_name: datalake_itbi_addresses
+database_name: datalake_open_external_data_addresses
 table_name: itbi_sp
 description: "Table with all the distinct residential addresses present in the ITBI SP table. Used to retrieve the latitude and longitude via Geocoding."
-domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+domain: Rede
+owner: guilherme.ventura@quintoandar.com.br
 columns:
   id_address:
     description: Hash of the street name plus the number plus the source of the information, being unique for each address.

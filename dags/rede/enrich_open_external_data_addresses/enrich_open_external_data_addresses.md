@@ -1,4 +1,4 @@
-## Enrich Open External Data
+## Enrich Open External Data Addresses
 
 ### Purpose
 
@@ -14,9 +14,10 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Produces the following output tables in `datalake_itbi_addresses`:
+Produces the following output tables in `datalake_open_external_data_addresses`:
 
 **Fully:**
+- `iptu_sp`
 - `itbi_sp`
 - `itbi_bh`
 

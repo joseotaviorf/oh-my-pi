@@ -1,0 +1,14 @@
+dag: 
+  name: enrich_open_external_data
+  owner: Data Rede
+  schedule_start_date: 2020, 8, 29
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    itbi_all_residential_transactions:
+      - itbi_sp_residential_transactions
+      - itbi_bh_residential_transactions
+  default_extraction_type: full
+cluster:
+  type: databricks_10_4_min_general_cluster

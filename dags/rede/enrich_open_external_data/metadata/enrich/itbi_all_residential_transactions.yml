@@ -1,8 +1,8 @@
 database_name: datalake_open_external_data
 table_name: itbi_all_residential_transactions
 description: "Table with the sum of all ITBI transactions available at QuintoAndar. The source is indicated in the column itbi_region."
-domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+domain: Data Rede
+owner: guilherme.ventura@quintoandar.com.br
 columns:
   id_itbi_transaction:
     lineage:
