@@ -2778,6 +2778,10 @@ bietlejuice.reverse_bic_ss:
   - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
   - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
+bietlejuice.reverse_bpo_performance:
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
 bietlejuice.reverse_inside_sales_whitelist:

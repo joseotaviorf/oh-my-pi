@@ -81,6 +81,7 @@ dags_out_of_pattern:
         "regions_polygon",
         "reverse_atento",
         "reverse_bic_ss",
+        "reverse_bpo_performance",
         "reverse_ccv_price_report_load",
         "reverse_ccv_price_report_access",
         "reverse_inside_sales_whitelist",
