@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: mexico_supply_targets
 description: Google Sheets that contains supply targets inputed manually by P&P team in Benvi.
-domain: Growth Benvi
+domain: International
 owner: guilherme.dorella@quintoandar.com.br
 columns:
   city_group:

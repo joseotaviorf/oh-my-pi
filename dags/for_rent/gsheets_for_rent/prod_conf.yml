@@ -89,36 +89,6 @@ sheets_info:
     clean_table_name: listings_with_agreed_discounts
     sheet_context: for_rent
 
-  mexico_demand_targets_2022:
-    sheet_id: 1bVwi_m_x-lxrXcx--VyPmbbqDovwbiST1vnTEXBO1FQ
-    sheet_name: demand_targets_mx_2022
-    clean_table_name: mexico_demand_targets_2022
-    sheet_context: for_rent
-
-  mexico_ongoing_listings_targets:
-    sheet_id: 1Ij2Yek5ZZaCmSHk6xHLiLF2LqviORn3tzDrdc5hMMI8
-    sheet_name: ongoing_listings_target
-    clean_table_name: mexico_ongoing_listings_target
-    sheet_context: for_rent
-
-  mexico_rental_cohort_demand:
-    sheet_id: 1U6lqAKjhxyOPdS_tq278KttKINq6DCGDiadQ80ATZqM
-    sheet_name: mexico_rental_cohort_demand
-    clean_table_name: mexico_rental_cohort_demand
-    sheet_context: for_rent
-
-  mexico_rental_cohort_supply:
-    sheet_id: 1y7cXmEgj6cQzTLJJFMhHIJT9reO5rhl-UdNyztoc9Bw
-    sheet_name: mexico_rental_cohort_supply
-    clean_table_name: mexico_rental_cohort_supply
-    sheet_context: for_rent
-  
-  mexico_supply_targets:
-    sheet_id: 1TjQeIaP021r4l71ldiIl7XtZkqBqo7C-2e1BJEby3n0
-    sheet_name: mexico_supply_targets
-    clean_table_name: mexico_supply_targets
-    sheet_context: for_rent
-
   ongoing_listings_targets:
     sheet_id: 16BHKdlbn4stT8q4bdoGJ_0Fo9i4Z_ibOFevsBR4lD5s
     sheet_name: ongoing_listings_target
