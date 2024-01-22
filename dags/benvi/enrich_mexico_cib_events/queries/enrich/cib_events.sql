@@ -1,6 +1,6 @@
 WITH first_listing_event AS (
     SELECT
-        hrlc.id_user AS id_cib,
+        CAST(hrlc.id_user AS BIGINT) AS id_cib,
         COALESCE(plb2b.id_house_listing, -1) AS id_event,
         hrlc.id_house,
         COALESCE(plb2b.id_house_listing, -1) AS id_house_listing,
@@ -84,6 +84,6 @@ offer_accepted_event AS (
 )
 SELECT * FROM first_listing_event
 UNION ALL
-SELECT * FROM  contract_signed_event
+SELECT * FROM contract_signed_event
 UNION ALL
 SELECT * FROM offer_accepted_event

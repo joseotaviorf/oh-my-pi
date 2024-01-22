@@ -1,6 +1,6 @@
 WITH dim_cib AS (
     SELECT
-        CAST(GET_JSON_OBJECT(a.details, '$.userExternalId') AS INTEGER) AS id_user,
+        CAST(GET_JSON_OBJECT(a.details, '$.userExternalId') AS BIGINT) AS id_user,
         DATE(GET_JSON_OBJECT(a.details, '$.registeredAt')) AS dt_registered
     FROM
         datalake_big_agent.agent AS a
