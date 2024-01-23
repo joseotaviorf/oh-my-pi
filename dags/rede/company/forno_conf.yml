@@ -110,5 +110,27 @@ tables:
     date_filter_column: created_at
     raw_extraction_type: incremental
     clean_extraction_type: incremental
-
+inner_dependencies:
+  address:
+    - address_aud
+  banking_information:
+    - banking_information_aud
+  company:
+    - company_aud
+  company_address:
+    - company_address_aud
+  company_document:
+    - company_document_aud
+  document:
+    - document_aud 
+  member_profile:
+    - member_profile_aud
+  product:
+    - product_aud
+  profile_hierarchy:
+    - profile_hierarchy_aud
+  revenue_share:
+    - revenue_share_aud
+  user_requirements:
+    - user_requirements_aud
 partition_cols: ["year", "month", "day"]

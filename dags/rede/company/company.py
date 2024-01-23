@@ -10,6 +10,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.helpers.task_flow_helper import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -81,6 +82,8 @@ task_group = DatalakeTaskGroup(
 )
 
 tables = config_service.get_config("tables")
+inner_dependencies = config_service.get_config("inner_dependencies")
+clean_task_groups = {}
 
 for table in tables:
     table_name = table["table_name"]
@@ -120,7 +123,10 @@ for table in tables:
         partitions=partition_cols if clean_extraction_type == "incremental" else None,
     )
 
+    clean_task_groups[table_name] = clean_task_group
+
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+    
 
     cross_downstream(
         DatalakeTaskGroup.last_tasks(raw_task_group),
@@ -128,3 +134,12 @@ for table in tables:
     )
 
     terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=clean_task_groups,
+    dag_inner_dependencies=inner_dependencies,
+)
