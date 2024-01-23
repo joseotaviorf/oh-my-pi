@@ -54,10 +54,17 @@ columns:
       - datalake_inspections.item_media.id_inspection
       - datalake_inspections.item_review.id_inspection
   sk_user:
-    description: Unique identifier of attachment creator/responsable
     lineage:
       - datalake_inspections.item_media.id_user
       - datalake_inspections.item_review.id_user
+    description:
+      Unique identifier of attachment creator/responsable (number). This field is legacy,
+      meaning it is no longer updated. The column that currently contains this
+      information is id_reviewer.
+  sk_reviewer:
+    lineage:
+      - datalake_inspections.item_review.id_reviewer
+    description: Unique identifier of attachment creator/responsable (number)
   is_review_media:
     description: Indicates whether the attachment is a media generated during the inspection review by the tenant or owner.
   ts_created:

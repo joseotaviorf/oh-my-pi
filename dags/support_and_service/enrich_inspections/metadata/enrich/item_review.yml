@@ -22,9 +22,15 @@ columns:
     lineage:
       - datalake_inspections_clean.review_media.id_main
   id_user:
-    description: Reviewer user unique identifier.
     lineage:
       - datalake_inspections_clean.review.id_user
+    description: Reviewer user unique identifier (number). This field is legacy,
+      meaning it is no longer updated. The column that currently contains this
+      information is id_reviewer.
+  id_reviewer:
+    lineage:
+      - datalake_inspections_clean.review.id_reviewer
+    description: Reviewer unique identifier (number)
   id_assessment:
     description: Unique identifier of an Assessment.
       This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.

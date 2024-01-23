@@ -18,7 +18,20 @@ columns:
   id_user:
     lineage:
       - datalake_inspections_raw.review.user_id
-    description: Reviewer user unique identifier (number)
+    description: Reviewer user unique identifier (number). This field is legacy,
+      meaning it is no longer updated. The column that currently contains this
+      information is id_reviewer.
+
+      Some records can be found with both the id_user and the id_reviewer null.
+      This is because some people are still using the old tool (they shouldn't be), but it will
+      be completely deactivated in Q1/2024, so after that, these cases will definitely end.
+  id_reviewer:
+    lineage:
+      - datalake_inspections_raw.review.reviewer_id
+    description: Reviewer unique identifier (number)
+      Some records can be found with both the id_user and the id_reviewer null.
+      This is because some people are still using the old tool (they shouldn't be), but it will
+      be completely deactivated in Q1/2024, so after that, these cases will definitely end.
   user_type:
     lineage:
       - datalake_inspections_raw.review.user_type

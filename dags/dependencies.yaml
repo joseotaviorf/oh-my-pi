@@ -467,6 +467,7 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
   - bietlejuice.gsheets_support_and_service:done-clean-inspectors-control
   - bietlejuice.inspections:load-clean-assessment
+  - bietlejuice.inspections:load-clean-reviewer
 bietlejuice.dw_invoice_entries:
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
   - bietlejuice.enrich_invoice:load-enrich-invoice-revenues

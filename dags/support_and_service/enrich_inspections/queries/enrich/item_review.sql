@@ -4,6 +4,7 @@ SELECT
     r.id_item,
     rm.id_main AS id_external_media,
     r.id_user,
+    r.id_reviewer,
     i.id_assessment,
     i.id_inspection,
     r.user_type,
