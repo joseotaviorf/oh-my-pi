@@ -76,7 +76,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 load_tasks = []
-for table in tables_to_send.keys():
+for table, config in tables_to_send.items():
     send_data_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"load_{table}_data_to_minority_report",
         dag=dag,
@@ -88,7 +88,9 @@ for table in tables_to_send.keys():
                     DAG_NAME,
                     minority_report_endpoint,
                     table,
-                    json.dumps(tables_to_send[table]),
+                    json.dumps(config),
+                    config.get("key_name"),
+                    config.get("type"),
                     "{{ ds }}",
                 ],
             }

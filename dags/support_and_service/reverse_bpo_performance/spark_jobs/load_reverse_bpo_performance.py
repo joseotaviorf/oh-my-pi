@@ -1,5 +1,6 @@
 import json
 import requests
+import logging
 from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -68,6 +69,8 @@ if __name__ == "__main__":
     parser.add_argument("minority_report_endpoint")
     parser.add_argument("table")
     parser.add_argument("table_details")
+    parser.add_argument("key_name")
+    parser.add_argument("type")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -76,16 +79,16 @@ if __name__ == "__main__":
     dag_name = args.dag_name
     minority_report_endpoint = args.minority_report_endpoint
     minority_request_header = {"Content-Type": "application/json"}
-    table_to_send = args.table_to_send
+    table = args.table
     table_details = args.table_details
-    api_type = table_details['type']
-    key_name = table_details['key_name']
+    api_type = args.type
+    key_name = args.key_name
     execution_date = args.execution_date
 
     spark_client = SparkClient()
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-        dag_name=dag_name, layer=LayerEnum.REVERSE.value, table_name=table_to_send
+        dag_name=dag_name, layer=LayerEnum.REVERSE.value, table_name=table
     )
     df = spark_client.conn.sql(query)
 
