@@ -6,7 +6,10 @@ description: Each row in this table is a house status in QuintoAndar with it's I
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
-  id:
+  id_house_status:
+    lineage:
+      - datalake_ebdb_listing.house_listing.status
+      - datalake_ebdb_listing.house_listing.status_reason
     description: Unique ID of the house status.
       It's created by concatenating the status and status_reason columns and hashing the concatenation.
   house_status:

@@ -15,7 +15,7 @@ SELECT
   rejectionReason as rejection_reason,
   criadoEm as ts_created,
   atualizadoEm as ts_updated,
-  iteration,
+  iteration,  
   expirationDate as ts_expired,
   type,
   godfatherUpdatedAt as ts_updated_godfather,
