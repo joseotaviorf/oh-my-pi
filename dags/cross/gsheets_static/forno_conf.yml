@@ -203,16 +203,16 @@ sheets_info:
     clean_table_name: monday_users
     sheet_context: static
 
-  mra_historical:
-    sheet_id: 1VS3SgHgFlqPJKxXMHsAgtUk0Xb6x2-Ey66I1iRmKAqI
-    sheet_name: mra_historical
-    clean_table_name: mra_historical
-    sheet_context: static
-
   nexxera_holly_days:
     sheet_id: 1bGLFxjHFVTRXLEHJBbX8mwJyQVaYbCVaxFgzpACQmlQ
     sheet_name: nexxera_holly_days
     clean_table_name: nexxera_holly_days
+    sheet_context: static
+
+  mra_historical:
+    sheet_id: 1VS3SgHgFlqPJKxXMHsAgtUk0Xb6x2-Ey66I1iRmKAqI
+    sheet_name: mra_historical
+    clean_table_name: mra_historical
     sheet_context: static
 
   offline_and_branding_marketing_costs:
@@ -249,6 +249,36 @@ sheets_info:
     sheet_id: 1-Rxvtw0cgEk8WoZtnaFWTMchN6e6cNrsU8h06kRghBI
     sheet_name: sale_business_unit_standardization
     clean_table_name: sale_business_unit_standardization
+    sheet_context: static
+
+  sale_demand_targets_bps_retro:
+    sheet_id: 1mPwAGGO718zyor0el6KcknTOhRZaNv_xMqpbA7p2Gy4
+    sheet_name: sale_demand_targets_bps_retro
+    clean_table_name: sale_demand_targets_bps_retro
+    sheet_context: static
+
+  sale_demand_targets_retro:
+    sheet_id: 1JZu3YMRP4eJ0H8X2oEwJ6g12dXhi-k4KzRUtinVjJzY
+    sheet_name: sale_demand_targets_retro
+    clean_table_name: sale_demand_targets_retro
+    sheet_context: static
+
+  sale_demand_targets_retro_cohort:
+    sheet_id: 10QwoUw34eo0eYGC6rQKS0l5WdbXbpvRdV0lJypK4Th8
+    sheet_name: sale_demand_targets_retro_cohort
+    clean_table_name: sale_demand_targets_retro_cohort
+    sheet_context: static
+
+  sale_supply_targets_retro:
+    sheet_id: 1JT7z_XvxC48gFBf8Q9IwqH5_5-cQG1dIszQxXR48-ZE
+    sheet_name: sale_supply_targets_retro
+    clean_table_name: sale_supply_targets_retro
+    sheet_context: static
+
+  sale_supply_targets_retro_cohort:
+    sheet_id: 177cfcQNYBOneX3mIMTtw-1Gw___dPVCIpWi-HrtklvQ
+    sheet_name: sale_supply_targets_retro_cohort
+    clean_table_name: sale_supply_targets_retro_cohort
     sheet_context: static
 
   supply_processor_status_reasons:
@@ -305,16 +335,16 @@ sheets_info:
     clean_table_name: survival_estimation_new_version
     sheet_context: static
 
-  ticket_rate_classification:
-    sheet_id: 1LCwmoOjlf8Yi8XdTt4GFTDm_uUIM3273rKOqY53Pbog
-    sheet_name: ticket_rate_classification
-    clean_table_name: ticket_rate_classification
-    sheet_context: static
-
   tax_calculation:
     sheet_id: 1HljRQN9W-7dHH5OHMz48NLUVX1vLVP4mfaRBrmMd9-s
     sheet_name: tabela
     clean_table_name: tax_calculation
+    sheet_context: static
+
+  ticket_rate_classification:
+    sheet_id: 1LCwmoOjlf8Yi8XdTt4GFTDm_uUIM3273rKOqY53Pbog
+    sheet_name: ticket_rate_classification
+    clean_table_name: ticket_rate_classification
     sheet_context: static
 
   tqc_registered_agents:

@@ -251,6 +251,36 @@ sheets_info:
     clean_table_name: sale_business_unit_standardization
     sheet_context: static
 
+  sale_demand_targets_bps_retro:
+    sheet_id: 1mPwAGGO718zyor0el6KcknTOhRZaNv_xMqpbA7p2Gy4
+    sheet_name: sale_demand_targets_bps_retro
+    clean_table_name: sale_demand_targets_bps_retro
+    sheet_context: static
+
+  sale_demand_targets_retro:
+    sheet_id: 1JZu3YMRP4eJ0H8X2oEwJ6g12dXhi-k4KzRUtinVjJzY
+    sheet_name: sale_demand_targets_retro
+    clean_table_name: sale_demand_targets_retro
+    sheet_context: static
+
+  sale_demand_targets_retro_cohort:
+    sheet_id: 10QwoUw34eo0eYGC6rQKS0l5WdbXbpvRdV0lJypK4Th8
+    sheet_name: sale_demand_targets_retro_cohort
+    clean_table_name: sale_demand_targets_retro_cohort
+    sheet_context: static
+
+  sale_supply_targets_retro:
+    sheet_id: 1JT7z_XvxC48gFBf8Q9IwqH5_5-cQG1dIszQxXR48-ZE
+    sheet_name: sale_supply_targets_retro
+    clean_table_name: sale_supply_targets_retro
+    sheet_context: static
+
+  sale_supply_targets_retro_cohort:
+    sheet_id: 177cfcQNYBOneX3mIMTtw-1Gw___dPVCIpWi-HrtklvQ
+    sheet_name: sale_supply_targets_retro_cohort
+    clean_table_name: sale_supply_targets_retro_cohort
+    sheet_context: static
+
   supply_processor_status_reasons:
     sheet_id: 1Yud6fXc1ugqAKrUAD4Mw5i7tbR3q9oP3BVxCSbZdffs
     sheet_name: reasons

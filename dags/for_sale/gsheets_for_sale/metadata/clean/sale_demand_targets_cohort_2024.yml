@@ -1,0 +1,48 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_demand_targets_cohort_2024
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.city_group
+  hub_offer:
+    description: Informs which associated hub the offer came from.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.hub_offer
+  weeks_conversion:
+    description: Indicator of the cohort. Represents by the number of weeks between the events. 'W0' stands for Week 0, 'W1' stands for Week 1 and so on.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.weeks_conversion
+  vb2vc:
+    description: Target volume of visits booked that converted into visits completed.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.vb2vc
+  vc2os:
+    description: Target volume of visits completed that converted into offers submitted.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.vc2os
+  os2oa:
+    description: Target volume of offers submitted that converted into offers approved.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.os2oa
+  oa2ccv:
+    description: Target volume of offers approved that converted into contracts.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.oa2ccv
+  ccv_signed:
+    description: Target volume of contracts signed.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.ccv_signed
+  os2ccv:
+    description: Target volume of offers submitted that converted into contracts.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.os2ccv
+  is_rede:
+    description: If it comes from rede.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.is_rede
+  dt_week_started:
+    description: Week of the target.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets_retro_cohort.week_start

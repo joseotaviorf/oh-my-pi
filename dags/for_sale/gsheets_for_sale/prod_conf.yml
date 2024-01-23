@@ -95,6 +95,24 @@ sheets_info:
     clean_table_name: sale_demand_targets
     sheet_context: for_sale
 
+  sale_demand_targets_2024:
+    sheet_id: 1CJyVGqKtg6iX0vuNZAeRqPgjO-t3OU106U1hABafc84
+    sheet_name: sale_demand_targets_2024
+    clean_table_name: sale_demand_targets_2024
+    sheet_context: for_sale
+
+  sale_demand_targets_bps_2024:
+    sheet_id: 1OQOYnQ1cYnfShiAgOPdJ0NRu3afAq1zHCElEHVekvs8
+    sheet_name: sale_demand_targets_bps_2024
+    clean_table_name: sale_demand_targets_bps_2024
+    sheet_context: for_sale
+
+  sale_demand_targets_cohort_2024:
+    sheet_id: 1enCFfw9bhLMqoVzzlP64Up8usIBLX2nLqnd9I9I7tTg
+    sheet_name: sale_demand_targets_cohort_2024
+    clean_table_name: sale_demand_targets_cohort_2024
+    sheet_context: for_sale
+
   sale_ongoing_listings_targets:
     sheet_id: 1w6mujHGpk5nvL_N6AWVwO6z8xRISLSq1Vu4p3U3SM9Y
     sheet_name: sale_ongoing_listings_targets
@@ -117,6 +135,18 @@ sheets_info:
     sheet_id: 1D0ocZdAiabVBMg9lp3KTuACv5mgG7ninW3zdgXLuFiU
     sheet_name: sale_supply_targets
     clean_table_name: sale_supply_targets
+    sheet_context: for_sale
+
+  sale_supply_targets_2024:
+    sheet_id: 1x2kuGYZwtTVBBsprOf7e8V_q0gYWgcDhB_U0TMey7I4
+    sheet_name: sale_supply_targets_2024
+    clean_table_name: sale_supply_targets_2024
+    sheet_context: for_sale
+
+  sale_supply_targets_cohort_2024:
+    sheet_id: 1XhxyBcF-cvvYTLpsDOt7B3q95Sx1qWxxlkXjMRr_VTg
+    sheet_name: sale_supply_targets_cohort_2024
+    clean_table_name: sale_supply_targets_cohort_2024
     sheet_context: for_sale
 
   sale_tof_daily_targets:
@@ -181,7 +211,7 @@ sheets_info:
     sheet_context: for_sale
     preload_time_in_seconds: 30
 
-  vespucio_condo_golden_set: 
+  vespucio_condo_golden_set:
     sheet_id: 1m_PJ_47dOvWnfuyz3aR3d018NPWc4cZCL_l5GbaMy7g
     sheet_name: TreatedFormToBeImported
     clean_table_name: vespucio_condo_golden_set
