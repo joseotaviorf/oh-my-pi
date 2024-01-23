@@ -12,6 +12,7 @@ SELECT
     details,
     access,
     administrators,
+    owner_agent,
     photos,
     lead_hash,
     cnpj,

@@ -84,6 +84,14 @@ columns:
     description: 'Sometimes, the same house might be sent multiple times. Those submissions become different leads, but they share the same lead hash.
       This column identifies the ID of the first lead that contains this lead hash sent by this particular company. It might have been sent by other companies before,
       which would make the id_lead_first_version_global different from this one.'
+  id_external_owner_agent:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.owner_agent
+    description: ID of the owner agent.
+  uuid_person_owner_agent:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.owner_agent
+    description: UUID of the owner agent in the person database.
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.lead_hash
@@ -201,6 +209,26 @@ columns:
     description: Person type of the house owner.
     categories:
       NATURAL_PERSON: 'Natural person.'
+  owner_agent_name:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_owner_agent
+    description: Name of the owner agent.
+  owner_agent_email:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_owner_agent
+    description: Email of the owner agent.
+  owner_agent_phone:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_owner_agent
+    description: Phone number of the owner agent.
+  owner_agent_relationship:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_owner_agent
+    description: Relationship of the owner agent with the house owner.
+  owner_agent_refusal_reason:
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_owner_agent
+    description: Reasons of refusal of the owner agent.
   access_type:
     lineage:
       - datalake_brokers_supply_processor_clean.lead_3p.access

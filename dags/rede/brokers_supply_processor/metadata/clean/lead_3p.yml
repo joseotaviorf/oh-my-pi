@@ -41,6 +41,9 @@ columns:
   administrators:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.administrators
+  owner_agent:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p.owner_agent
   photos:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.photos
