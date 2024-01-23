@@ -1683,6 +1683,9 @@ bietlejuice.enrich_legaut:
   - bietlejuice.legaut:load-clean-meusite-project
   - bietlejuice.legaut:load-clean-meusite-state
   - bietlejuice.legaut:load-clean-meusite-unit
+bietlejuice.enrich_listing_accuracy_review:
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_booking:load-enrich-booking-review
 bietlejuice.enrich_listing_contracts:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
@@ -2109,6 +2112,17 @@ bietlejuice.enrich_rent_flows:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+bietlejuice.enrich_rent_listings_lenses:
+  - bietlejuice.ebdb:load-clean-house-aud
+  - bietlejuice.ebdb:load-clean-listing-business-context
+  - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity
+  - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
+  - bietlejuice.enrich_ebdb_house:load-enrich-maintenance-condition-history
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
+  - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_listing_accuracy_review:load-enrich-listing-accuracy-history
 bietlejuice.enrich_rent_potential_listing:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent

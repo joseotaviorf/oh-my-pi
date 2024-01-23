@@ -1,0 +1,15 @@
+---
+database_name: datalake_listing_accuracy_review
+table_name: listing_accuracy
+description: Table with information on the last review received for the house. In other words, it shows if the information is accurate with the listing.
+domain: Data Rede
+owner: guilherme.ventura@quintoandar.com.br
+columns:
+  id_house:
+    description: Id of the house.
+    lineage:
+      - datalake_listing_accuracy_review.listing_accuracy_history.id_house
+  is_listing_accurate:
+    description: Boolean if the listing has the information exactly as published.
+    lineage:
+      - datalake_listing_accuracy_review.listing_accuracy_history.is_listing_accurate

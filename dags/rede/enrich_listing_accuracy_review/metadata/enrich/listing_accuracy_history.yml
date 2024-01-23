@@ -1,0 +1,21 @@
+---
+database_name: datalake_listing_accuracy_review
+table_name: listing_accuracy_history
+description: |
+  At every visit the listing can receive a review indicating whether the property has the exact information described in the listing. This table is a daily history of the listing's information accuracy status.
+  If there is more than one review on the same day, if there is a false one, the information is not accurate
+domain: Data Rede
+owner: guilherme.ventura@quintoandar.com.br
+columns:
+  id_house:
+    description: Id of the house.
+    lineage:
+      - datalake_booking.booking.id_house
+  is_listing_accurate:
+    description: Boolean if the listing has the information exactly as published.
+    lineage:
+      - datalake_booking.booking_review.is_listing_accurate
+  dt_change:
+    description: The day a review happened. If there is more than one review on the same day, if there is a false one, the information is not accurate.
+  dt_next_change:
+    description: Date of the next change (if any).
