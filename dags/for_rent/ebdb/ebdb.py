@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta
 from pendulum import timezone
 
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -26,7 +26,6 @@ SOURCE = "ebdb"
 DAG_ID = "bietlejuice.{}".format(SOURCE)
 MAIN_START_DATE = datetime(2019, 5, 31, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "10 21 * * *"
-CLUSTER_DESCRIPTION = "databricks_ebdb_cluster"
 
 config_service = ConfigurationService(SOURCE)
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -36,7 +35,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
-cluster_configuration = Variable.get(CLUSTER_DESCRIPTION, deserialize_json=True)
+cluster_configuration = config_service.get_config("custom_cluster")
 
 EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"

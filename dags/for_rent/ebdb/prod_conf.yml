@@ -5,3 +5,22 @@ custom_cluster:
   num_workers: 6
   aws_attributes:
     availability: ON_DEMAND
+  custom_tags:
+    - key: app
+      value: airflow
+    - key: service
+      value: airflow
+    - key: owner
+      value: data
+    - key: ecosystem
+      value: data
+    - key: "dag id"
+      value: "{{ dag.dag_id }}"
+    - key: granulate-cluster-name
+      value: "{{ dag.dag_id }}"
+  spark_conf:
+    spark.sql.shuffle.partitions: "200"
+    spark.hadoop.fs.s3a.connection.maximum: "480"
+  spark_env_vars:
+    GRANULATE_DBX_WORKSPACE_URL: "{{ var.value.GRANULATE_DBX_WORKSPACE_URL_PATH }}"
+    GRANULATE_DBX_TOKEN: "{{ var.value.GRANULATE_DBX_TOKEN_PATH }}"
