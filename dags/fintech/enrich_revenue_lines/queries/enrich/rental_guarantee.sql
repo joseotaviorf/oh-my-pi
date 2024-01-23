@@ -40,7 +40,7 @@ WITH after_12_months_revenue_by_guarantee_bill_items AS (
       LEFT JOIN datalake_retsuko_clean.account AS rcab ON rcab.id = rce.id_to_account
       LEFT JOIN datalake_retsuko_clean.contract AS rcc ON rcc.id = rci.id_contract
     WHERE
-      bi.bill_item = UPPER('rental-guarantee-fee')
+      bi.bill_item IN (UPPER('rental-guarantee-fee'), UPPER("pro-guarantor-5A-installment"))
       AND rca.type = 'tenant'
       AND rcab.type = 'contract'
       AND rci.due_amount <= 0
@@ -111,7 +111,7 @@ deposit_view AS (
       BASE_CHARGES
     WHERE
       TRUE
-      AND ts_charge_created <= dt_start + interval '10' day             
+      AND ts_charge_created <= dt_start + interval '10' day
   ),
   base_unica_contrato AS (
     SELECT
@@ -158,18 +158,18 @@ deposit_view AS (
 ),
   guarantee_aud AS (
     WITH aud AS (
-      SELECT 
-        *,  
-        ROW_NUMBER() OVER(PARTITION BY id_contract_ebdb ORDER BY rev ASC) AS rowNumber 
-      FROM 
+      SELECT
+        *,
+        ROW_NUMBER() OVER(PARTITION BY id_contract_ebdb ORDER BY rev ASC) AS rowNumber
+      FROM
         datalake_rental_guarantee_clean.guarantee_aud
     )
-    SELECT 
-      id_contract_ebdb, 
-      final_value/100 AS final_value 
-    FROM 
-      aud 
-    WHERE 
+    SELECT
+      id_contract_ebdb,
+      final_value/100 AS final_value
+    FROM
+      aud
+    WHERE
       id_contract_ebdb IS NOT NULL
 ),
 down_payment_guarantees_no_deposit AS (
@@ -191,13 +191,13 @@ down_payment_guarantees_no_deposit AS (
         date_trunc('month', current_date)
       ) AS dt_ended_imported,
       COALESCE(
-        aud.final_value, 
+        aud.final_value,
         guarantee.final_value
       ) AS guarantee_total_value,
       COALESCE(
         aud.final_value/12,
         guarantee.final_value/12
-        )  AS valor_mensal_garantia, 
+        )  AS valor_mensal_garantia,
       charge.id AS id_charge,
       charge.installments AS installments,
       charge.charge_type,
