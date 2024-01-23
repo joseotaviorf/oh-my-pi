@@ -1,7 +1,7 @@
 SELECT
     id,
     lead_uuid AS uuid_lead,
-    real_estate_id AS id_real_estate,
+    NULL::BIGINT AS id_real_estate,
     id_by_real_estate,
     company_uuid AS uuid_company,
     brokers,
@@ -11,7 +11,7 @@ SELECT
     blueprint,
     details,
     access,
-    administrators,
+    NULL::STRING AS administrators,
     owner_agent,
     photos,
     lead_hash,
