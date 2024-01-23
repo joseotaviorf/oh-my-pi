@@ -1,0 +1,94 @@
+database_name: datalake_rent_listings_lenses
+table_name: pricing_lens
+description: This table contains the lens information regarding Listing pricing. Each tier is a pricing status, and each pricing status can have several price changes in the same status, if it doesn't leave the same tier..
+  This tier is assembled based on the owner pricing relative to the price from QuintoAndar For Rent calculator (Casio).
+domain: For Rent
+owner: guilherme.ventura@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_pricing.rent_listing_price_changes.id_house
+      - datalake_ebdb_listing.house.id_house
+    description:  Column referring to the house ID. Can be joined with dw_quintoandar.dim_house
+      and all other rent modeling tables.
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+    description: 
+      Id of the versioning of the house, where the last 3 numbers show the version of the house. Can be joined with dim_house_listing and other rent models.
+  id_region:
+    lineage:
+      - datalake_ebdb_pricing.rent_listing_price_changes.id_region
+      - datalake_ebdb_listing.house.id_region
+    description: ID column of region where house listing is located in. Can be joined with dw_public.dim_region.
+  pricing_bins:
+    description: Range of difference between the published price and the calculator's predicted price for the property.
+    categories:
+      TXX Undefined: Listing that did not have a calculator information at the time of the price change.
+      T6 < -25%: The published price is 25% lower than the predicted price for the listing.
+      T5 (-25% | 0%]: The published price is between 0% and 25% lower than the predicted price for the listing.
+      T4 (0% | 15%]: The published price is between 0% and 15% higher than the predicted price for the listing.
+      T3 (15% | 25%]: The published price is between 15% and 25% higher than the predicted price for the listing.
+      T2 (25% | 50%]: The published price is between 25% and 50% higher than the predicted price for the listing.
+      T1 > 50%: The published price is 50% higher than the predicted price for the listing.
+  certainty_calculator_bins:
+    lineage:
+      - datalake_ebdb_pricing.rent_listing_price_changes.calculator_certainty
+      - datalake_ebdb_clean.house_predicted_price.certainty
+    description: 'Calculator column. Tells the certainty level of the prediction calculated
+      by the calculator. It is strongly related to the intensity of the QuintoAndar
+      performance with the listing region. Can be one of these: - HIGH - MEDIUM -
+      LOW - NONE Or null'
+    categories:
+      HIGH: If the prediction has a low confidence interval, having a high certainty
+        in the prediction.
+      MEDIUM: If the prediction has a medium confidence interval, having a medium
+        certainty in the prediction.
+      LOW: If the prediction has a high confidence interval, having a low certainty
+        in the prediction.
+      NONE: If the prediction has no certainty at all.
+  tier:
+    description: 'The tiers created to represent the segmentation of a listing with respect to its level.
+      We use two components to define this tier: the difference from the published price to the calculator price, and the degree of certainty of the prediction. With this, we were able to understand the pricing tier of a listing by its seller and how this would affect demand
+      Example: A listing with the publication price exactly equal to the calculator price and with a high degree of prediction will be classified as P5 - Great Price.'
+    categories:
+      P5: |
+        The P5 tier indicates that the Listing has an excellent price. In technical terms: the Listing's price is below the prediction (P50), we have high confidence in the prediction and/or the Listing has the Great Price Tag active.
+      P4: |
+        The P4 tier indicates that the listing has a good publication price. It fits at least one of the following criteria:
+          1 - The listing's publication price is lower than the price predicted by the calculator, and we have medium confidence in this prediction (P50).
+          2 - The listing's publication price is up to 15% higher than the price estimated by the calculator, but we have high confidence in this prediction (P50).
+      P3: |
+        The P3 tier indicates that the listing is priced fairly or slightly above the ideal. It fits at least one of the following criteria:
+          1 - The listing's publication price is up to 15% higher than the price estimated by the calculator, and we have medium confidence in this prediction.
+          2 - The listing price is up to 25% higher than the price estimated by the calculator, and we have high confidence in this prediction.
+          3 - The listing price is lower than the price estimated by the calculator, but we have no confidence in this prediction.
+      P2: |
+        The P2 tier indicates that the listing is priced above the ideal. It fits at least one of the following criteria:
+          1 - The listing's publication price is up to 25% higher than the price estimated by the calculator, and we have medium confidence in this prediction.
+          2 - The listing's publication price is up to 50% higher than the price estimated by the calculator, and we have high confidence in this prediction.
+      P1: | 
+        The P1 tier indicates that the listing is priced well above the ideal. It fits at least one of the following criteria:
+          1 - The listing's publication price is up to 25% higher than the price estimated by the calculator, but we have no confidence in this prediction.
+          2 - The listing price is up to 50% higher than the price estimated by the calculator, and we have medium confidence in this prediction.
+          3 - The listing does not fit any of the criteria of the other tiers.
+  tier_name:
+    description: Just a long name for the expensive Tier segment.
+    categories:
+      Great Price: It represents P5. Listings that we're pretty sure are below their market price.
+      Good Price: It represents P4. Listings that are well priced.
+      Fair Price: It represents P3. Listings are slightly above the price indicated by the calculator.
+      Slightly Overpriced:  It represents P2. Listings that are above the price indicated by the calculator.
+      Significantly Overpriced:  It represents P1. Listings are way above the price of the calculator.
+  tier_disclaimer:
+    description: Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a tier.
+  is_last_tier:
+    description: This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current tier or a tier that is part of a listing's history.
+  ts_tier_started:
+    lineage:
+      - datalake_ebdb_pricing.rent_listing_price_changes.ts_price_started
+    description: Date of the price change that caused the change in the Listing Pricing score.
+  ts_tier_ended:
+    lineage:
+      - datalake_ebdb_pricing.rent_listing_price_changes.ts_price_started
+    description: Date of the second-to-last price change (for the observed row) that caused the Listing Pricing Score to change.
