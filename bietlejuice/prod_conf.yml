@@ -55,6 +55,7 @@ dags_out_of_pattern:
         "dw_user_sales_rep",
         "dw_velo",
         "ebdb",
+        "enrich_ebdb_listing",
         "enrich_house_feature_inference",
         "enrich_losses",
         "enrich_lost_listings",

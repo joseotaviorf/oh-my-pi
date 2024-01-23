@@ -19,6 +19,7 @@ SELECT
   COALESCE(hldi.id_partner, -1) AS sk_partner,
   COALESCE(hldi.id_partner_big_agent, -1) AS sk_partner_big_agent,
   COALESCE(hldi.id_region, -1) AS sk_region,
+  COALESCE(hldi.id_house_status, -1) AS sk_house_status,
   COALESCE(cs.sk_company, -1) AS sk_company_supply,
   BIGINT(DATE_FORMAT(DATE(ts_status_started), 'yyyyMMdd')) AS sk_status_started_date,
   BIGINT(COALESCE(DATE_FORMAT(DATE(ts_status_ended), 'yyyyMMdd'), -1)) AS sk_status_ended_date,

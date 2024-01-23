@@ -53,6 +53,10 @@ columns:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.id_region
     description: Key of house's region.
+  sk_house_status:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_house_status
+    description: Key of house's status and status_reason.
   sk_company_supply:
     lineage:
     - datalake_rede_company.company_sks.sk_company

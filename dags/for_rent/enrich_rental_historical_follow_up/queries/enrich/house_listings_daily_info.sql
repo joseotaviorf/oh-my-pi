@@ -99,6 +99,7 @@ listings_states_per_day AS (
         hbh.id_partner,
         lcod.id_partner AS id_partner_big_agent,
         h.id_region,
+        hs.id_house_status,
         IF(h.is_rent_3p_supply, h.uuid_company, NULL) AS uuid_company,
         IF(h.is_rent_3p_supply, h.id_company_hubspot, NULL) AS id_company_hubspot,
         IF(h.is_rent_3p_supply, h.partner_3p_supply, NULL) AS partner_3p_supply,
@@ -191,6 +192,10 @@ listings_states_per_day AS (
     JOIN
         b2b
             ON COALESCE(pled.id_house, hl.id_house) = b2b.id_house
+    LEFT JOIN
+        datalake_ebdb_listing.house_status AS hs
+            ON hls.status_history <=> hs.house_status
+            AND hls.status_change_reason <=> hs.status_reason
     /* 
     This table is used for For_Rent and
     should be similar to fact_house_listing_status, so
@@ -211,6 +216,7 @@ SELECT
     id_partner,
     id_partner_big_agent,
     id_region,
+    id_house_status,
     uuid_company,
     id_company_hubspot,
     partner_3p_supply,

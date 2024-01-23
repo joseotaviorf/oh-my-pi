@@ -540,6 +540,9 @@ bietlejuice.enrich_rental_crawlers_listings:
     - bietlejuice.listings.olx:load-clean-olx
     - bietlejuice.listings.viva_real:load-clean-viva-real
     - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
+bietlejuice.enrich_rental_historical_follow_up:
+  add:
+    - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
 bietlejuice.enrich_repairs:
   remove:
     - bietlejuice.repairs:load-clean-repair-expense
