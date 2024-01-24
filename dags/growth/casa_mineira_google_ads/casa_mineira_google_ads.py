@@ -22,7 +22,7 @@ MAIN_START_DATE = datetime(2021, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_med_io-general_cluster"
 CUSTOM_LIBRARIES = [
-    {"pypi": {"package": "google-ads"}},
+    {"pypi": {"package": "google-ads==22.1.0"}},
     {"pypi": {"package": "google-auth==2.23"}},
 ]
 
