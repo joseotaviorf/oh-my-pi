@@ -18,6 +18,7 @@ This pipeline produces the following output table in DW, via full load:
 - `dw_credit.dim_experiment`
 - `dw_credit.dim_guarantee_policy`
 - `dw_credit.dim_variant`
+- `dw_credit.dim_credit_analysis_retenants`
 - `dw_credit.fact_proposal_credit_flows`
 - `dw_credit.fact_fintechops_tasks`
 - `dw_credit.fact_credit_engine_analysis_request`
