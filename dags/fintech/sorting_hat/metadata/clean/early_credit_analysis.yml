@@ -25,6 +25,9 @@ columns:
   version:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.version
+  risk_category_canon:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.version
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.created_at

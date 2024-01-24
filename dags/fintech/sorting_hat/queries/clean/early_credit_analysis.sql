@@ -7,6 +7,7 @@ SELECT
     result,
     city,
     version,
+    risk_category_canon,
     created_at AS ts_created,
     expiration_date AS ts_expired
 FROM
