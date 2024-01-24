@@ -1,5 +1,11 @@
 #! /bin/bash
 
+# The code below was inserted to solve a problem during on-call. Databricks VMs was caching old mirrors, so the Maven
+# installation wasn't working. The link below provides more details about the solution.
+# https://community.databricks.com/t5/data-engineering/library-installation-fails-with-mirror-sync-issue/td-p/12429
+
+echo "BEGIN: Refreshing VM mirrors"
+
 r="deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted"
 add-apt-repository --remove "${r}"
 r="deb http://archive.ubuntu.com/ubuntu/ focal-updates universe"
@@ -8,6 +14,7 @@ r="deb http://security.ubuntu.com/ubuntu/ focal-security main restricted"
 add-apt-repository --remove "${r}"
 
 sudo apt-get update --fix-missing
+echo "END: Refreshing VM mirrors"
 
 echo "BEGIN: Install Spark external JARs with Maven"
 apt-get install maven -yqq
