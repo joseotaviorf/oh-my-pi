@@ -11,6 +11,9 @@ workflow:
   tables_customization:
     dim_drop_reason:
       custom_schema: public
+  inner_dependencies:
+    fact_proposal_credit_flows:
+      - dim_drop_reason
 cluster:
   type: databricks_10_4_med_general_cluster
   access_control_list:
