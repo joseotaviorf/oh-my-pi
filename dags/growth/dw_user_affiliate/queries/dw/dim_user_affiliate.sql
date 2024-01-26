@@ -50,6 +50,8 @@ region_ddd AS (
     datalake_region.region
   WHERE
     is_city
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY city_ddd, city_group ORDER BY regional DESC) = 1
 ),
 region_city AS (
   SELECT DISTINCT
@@ -60,6 +62,8 @@ region_city AS (
     datalake_region.region
   WHERE
     is_city
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY city_name, city_group ORDER BY regional DESC) = 1
 ),
 affiliate_mkt_city_group AS (
   SELECT
@@ -132,8 +136,7 @@ applied_taxonomy AS (
     COALESCE(tax.mkt_source, 'Not Mapped') AS mkt_source
   FROM
     aff_city_group_with_region AS acg
-  LEFT JOIN
-    taxonomy AS tax
+  LEFT JOIN taxonomy AS tax
       ON tax.affiliate_type = COALESCE(acg.affiliate_type, '')
       AND tax.tracking_medium = COALESCE(acg.tracking_medium, '')
       AND tax.tracking_source = COALESCE(acg.tracking_source, '')
