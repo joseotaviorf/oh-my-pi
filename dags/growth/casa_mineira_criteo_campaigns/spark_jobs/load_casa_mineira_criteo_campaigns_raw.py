@@ -56,10 +56,14 @@ if __name__ == "__main__":
     criteo_client = CriteoClient(
         client_id=credentials["client_id"], client_secret=credentials["client_secret"]
     )
-    api_response = criteo_client.get_data(request_body, request_headers)
-    api_response = [
-        {f"{k[0].upper()}{k[1:]}": v for k, v in res.items()} for res in api_response
-    ]
+
+    try:
+        api_response = criteo_client.get_data(request_body, request_headers)
+        api_response = [
+            {f"{k[0].upper()}{k[1:]}": v for k, v in res.items()} for res in api_response
+        ]
+    except KeyError:
+        logger.error(f"No data found for date range: {load_start_date} to {load_end_date}")
 
     if api_response:
         spark_client = SparkClient()
