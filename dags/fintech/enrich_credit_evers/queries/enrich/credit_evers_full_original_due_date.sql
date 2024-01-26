@@ -84,7 +84,7 @@ SELECT
     months_of_contract,
     contract_mob_number,
     contract_ever_number,
-    IF(flag_ever = 1, max_invoice_mob, NULL) AS invoice_anchor,
+    MAX(IF(flag_ever = 1, max_invoice_mob, NULL)) AS invoice_anchor,
     CAST(MAX(flag_ever) AS BOOLEAN) AS is_ever,
     CAST(SUM(flag_ever) AS INTEGER) AS num_overs_in_mob_window,
     SUM(IF(flag_ever = 1, due_amount, 0)) AS total_due_amount_in_mob_window,
@@ -95,7 +95,7 @@ SELECT
     dt_contract_updated
 FROM ever_rule
 GROUP BY
-    1,2,3,4,5,6,7,13,14,15
+    1,2,3,4,5,6,13,14,15
 HAVING
     (is_ever = FALSE
         AND (months_of_contract > contract_mob_number)
