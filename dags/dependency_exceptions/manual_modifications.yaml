@@ -323,6 +323,7 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
     - bietlejuice.casa_mineira_facebook_insights:load-clean-facebook-insights
     - bietlejuice.enrich_region:load-enrich-region
     - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
+    - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
 bietlejuice.enrich_consolidated_marketing_metrics:
   remove:
     - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes

@@ -1115,7 +1115,6 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
 bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
-  - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
   - bietlejuice.casa_mineira_google_ads:load-clean-ads-performance
   - bietlejuice.casa_mineira_google_ads:load-clean-campaigns-performance
   - bietlejuice.casa_mineira_google_ads:load-clean-keywords-performance

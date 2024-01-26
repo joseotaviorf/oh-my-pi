@@ -64,6 +64,7 @@ if __name__ == "__main__":
         ]
     except KeyError:
         logger.error(f"No data found for date range: {load_start_date} to {load_end_date}")
+        api_response = None 
 
     if api_response:
         spark_client = SparkClient()
