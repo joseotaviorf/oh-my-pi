@@ -1,5 +1,6 @@
 WITH taxonomy_combinations AS (
   SELECT
+    NULL AS id_media_setup,
     fs.value AS funnel_side,
     ci.value AS campaign_strategy_intent,
     ct.value AS campaign_business_context,
@@ -31,8 +32,33 @@ WITH taxonomy_combinations AS (
     AND lp.taxonomy_level = 'landing_page'
 ),
 
+ad_hoc_rules AS (
+  SELECT
+    data.id_media_setup,
+    data.funnel_side,
+    data.campaign_strategy_intent,
+    data.campaign_business_context,
+    data.landing_page,
+    data.behavior_type,
+    data.medium,
+    data.source
+  FROM VALUES (-2,'Lost Tracking','Lost Tracking','Lost Tracking','Lost Tracking','Lost Tracking','Lost Tracking','Lost Tracking'),
+    (1,'Demand', 'Acquisition','NA', 'NA', 'organic','Direct','NA'),
+    (2, 'Demand', 'Acquisition', 'Hybrid','NA','non organic','Referral','Agents') 
+    AS data(id_media_setup,
+      funnel_side,
+      campaign_strategy_intent,
+      campaign_business_context,
+      landing_page,
+      behavior_type,
+      medium,
+      source)
+  UNION ALL (SELECT * FROM taxonomy_combinations)
+),
+
 naming_convention_prefixes AS (
   SELECT
+    id_media_setup,
     LOWER(LEFT(campaign_strategy_intent,3)) AS prefix_campaign_strategy_intent,
     LOWER(COALESCE(LEFT(SPLIT(behavior_type, " ")[0],3) ||LEFT(SPLIT(behavior_type, " ")[1],3), LEFT(behavior_type, 3))) AS prefix_behavior_type,
     LOWER(COALESCE(LEFT(SPLIT(landing_page, " ")[0],3) ||LEFT(SPLIT(landing_page, " ")[1],3), LEFT(landing_page, 3))) AS prefix_landing_page,
@@ -48,7 +74,7 @@ naming_convention_prefixes AS (
     source,
     funnel_side
   FROM
-    taxonomy_combinations
+    ad_hoc_rules
 ),
 
 last_id_values AS (
@@ -60,6 +86,7 @@ last_id_values AS (
 
 SELECT
   COALESCE(
+      nc.id_media_setup,
       ms.id_media_setup,
       liv.max_id_media_setup + MONOTONICALLY_INCREASING_ID() + 1
   ) AS id_media_setup,
