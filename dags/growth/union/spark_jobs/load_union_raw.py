@@ -119,6 +119,7 @@ if __name__ == "__main__":
         df = reduce(
             DataFrame.unionAll, table_data
         )
+        df = df.na.drop(subset=raw_partition_cols)
 
         logger.info(f"m=__main__, msg={len(table_data)} of {len(time_range)} requested dates returned data for {raw_table_name}.")
 
