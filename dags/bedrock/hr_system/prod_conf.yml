@@ -129,3 +129,13 @@ endpoints:
         - "costs"
         - "providers"
         - "dependents"
+  salaries:
+      has_partitions: true
+      column_to_partition: "LastUpdateDate"
+      params:
+        onlyData: true
+        limit: 100
+        expand:
+          - "salaryComponents"
+          - "salaryPayRateComponents"
+          - "salarySimpleComponents"
