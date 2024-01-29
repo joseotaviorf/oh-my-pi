@@ -176,6 +176,7 @@ Produces the following output tables:
     `region`
     `region_business_contexts_served`
     `region_business_contexts_served_aud`
+    `region_config`
     `rental_administrator_change_request`
     `rental_administrator_change_request_aud`
     `restriction_type_aud`

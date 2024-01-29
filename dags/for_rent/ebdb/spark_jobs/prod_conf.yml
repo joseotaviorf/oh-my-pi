@@ -219,7 +219,6 @@ table_block_list:
   - OwnerInfo_AUD
   - OccupantType_AUD
   - AquisicaoImovel
-  - RegionConfig
   - Lead_imagens_AUD
   - OwnerInfo
   - Instalacao_AUD
