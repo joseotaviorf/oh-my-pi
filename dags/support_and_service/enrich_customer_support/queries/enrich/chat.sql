@@ -328,6 +328,7 @@ csat AS (
   WHERE
     sa.id IS NOT NULL
     AND DATE(c.ts_attended) >= DATE('2018-01-01')
+    AND sa.rating IS NOT NULL
 ),
 chat_csat AS (
   SELECT

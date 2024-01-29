@@ -161,7 +161,7 @@ conversation AS (
     FROM
       datalake_bigfone_twilio.call_ivr_events
     WHERE
-      COALESCE(csat_1, csat_2) IS NOT NULL
+      csat_2 IS NOT NULL
   ),
   csat_events AS (
     SELECT
