@@ -337,5 +337,7 @@ SELECT
     day
 FROM
     datalake_union_raw.imovel
+WHERE
+    year <> 1900
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY pkImovel ORDER BY Cap_AtuaEm DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY pkImovel ORDER BY paratime DESC) = 1
