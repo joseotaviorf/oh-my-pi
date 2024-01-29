@@ -4,6 +4,7 @@ vsl AS (
     id_visit_status_log,
     id_visit,
     id_schedule,
+    event_type,
     ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created ASC) AS ranking,
     CASE
       WHEN ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) == 1 THEN TRUE
@@ -34,6 +35,7 @@ booking AS(
     vsl.id_visit_status_log,
     vsl.id_visit,
     vsl.id_schedule,
+    vsl.event_type,
     vsl.ranking,
     vsl.is_visit_last_event,
     vsl.author_user_type,
@@ -84,7 +86,7 @@ booking_3p_demand_agent AS (
     GROUP BY 1, 2, 3
 )
 SELECT
-  CONCAT(b.id_visit_status_log, ranking) AS id_visit_status_events,
+  CONCAT(b.id_visit_status_log,'R',ranking) AS id_visit_status_events,
   b.id_visit_status_log,
   b.id_visit,
   b.id_schedule,
@@ -103,6 +105,7 @@ SELECT
   b.partner_3p_supply,
   b3da.partner_3p_demand,
   b.business_context,
+  b.event_type,
   b.ranking,
   b.author_user_type,
   b.author_user_role,
