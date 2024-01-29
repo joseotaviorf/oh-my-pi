@@ -99,6 +99,8 @@ csat_answers AS (
     ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_response) AS rw_number_asc
   FROM
     csat
+  WHERE
+    csat_score IS NOT NULL
 ),
 csat_first_and_last_ts AS (
   SELECT
