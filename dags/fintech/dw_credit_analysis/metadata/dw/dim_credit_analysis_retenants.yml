@@ -19,7 +19,7 @@ columns:
     description: "Classification of the proposal based on the proponents CPF and the previous contract, if applied. If the main proponent present in the proposal has ever signed a contract with QuintoAndar, the proposal is classified as 'retenant'. Otherwise the main proponent of the proposal is a new user."
   main_proponent_with_more_proponents_in_proposal:
     description: "Classification of the proposal based on the proponents CPF and the previous contract, if applied. If the main proponent present in the proposal has ever signed a contract with QuintoAndar, and there are more proponents in the proposal than in the previous one, this column is classified as 'retenant'. Otherwise the main proponent of the proposal is a new user."
-  main_proponent_with_different_proponents:
+  main_proponent_with_different_proponents_in_proposal:
     description: "Classification of the proposal based on the proponents CPF and the previous contract, if applied. If the main proponent present in the proposal has ever signed a contract with QuintoAndar, and there are different proponents CPF in the proposal, this column is classified as 'retenant'. Otherwise the main proponent of the proposal is a new user."
   main_proponent_with_fewer_proponents_in_proposal:
     description: "Classification of the proposal based on the proponents CPF and the previous contract, if applied. If the main proponent present in the proposal has ever signed a contract with QuintoAndar, and there are less proponents in the proposal than in the previous one, this column is classified as 'retenant'. Otherwise the main proponent of the proposal is a new user."
@@ -37,7 +37,7 @@ columns:
     description: "Timestamp of the proposal creation date."
   ts_last_contract_created:
     lineage:
-    - datalake_ebdb_contract.contract.ts_created
+      - datalake_ebdb_contract.contract.ts_created
     description: "Timestamp of the contract creation date. It may be null for new users."
   ts_load:
     description: "Timestamp of data recorded in the table."
