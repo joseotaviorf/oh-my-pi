@@ -20,6 +20,9 @@ columns:
   event_trigger:
     lineage:
     - datalake_ebdb_raw.houseenrichment.event_trigger
+  granularity:
+    lineage:
+    - datalake_ebdb_raw.houseenrichment.granularity
   version_id_dejavu:
     lineage:
     - datalake_ebdb_raw.houseenrichment.dejavu_id_version
