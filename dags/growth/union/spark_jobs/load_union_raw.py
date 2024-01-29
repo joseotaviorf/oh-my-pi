@@ -39,6 +39,7 @@ def _checkPath(source_bucket: str, file_path: str) -> DataFrame:
 def _create_dataframe(s3_source_bucket: str, raw_table_name:str, date: datetime, date_increment_col: str) -> DataFrame:
     file_path = f"{raw_table_name}/{date.year}/{date.month:01}/{date.day:01}"
     df = None
+    logger.info("msg=Trying to read data from s3://{s3_source_bucket}/{file_path}/")
     if _checkPath(s3_source_bucket, file_path):
         df = spark_client.conn.read.option("header", True).option("delimiter",";").option("multiline", True).csv(f"s3://{s3_source_bucket}/{file_path}/*")
         if df is not None:
@@ -75,8 +76,8 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket", type=str, help="target bucket")
     parser.add_argument("source")
-    parser.add_argument("date_increment_col")
     parser.add_argument("raw_table_name")
+    parser.add_argument("date_increment_col")
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
 
@@ -84,8 +85,8 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.env}, source={args.source}, raw_table_name={args.raw_table_name},
-            date_increment_col={args.date_increment_col}, raw_table_name={args.raw_table_name},
+            m={JOB_NAME}, environment={args.env}, source={args.source}, 
+            raw_table_name={args.raw_table_name}, date_increment_col={args.date_increment_col},
             load_start_date={args.load_start_date},load_end_date={args.load_end_date}
             msg=print spark jobs args
         """
