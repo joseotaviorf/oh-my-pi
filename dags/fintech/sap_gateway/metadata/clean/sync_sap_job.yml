@@ -20,6 +20,9 @@ columns:
   status:
     lineage:
       - datalake_sap_gateway_raw.sync_sap_job.status
+  erp_solution:
+    lineage:
+      - datalake_sap_gateway_raw.sync_sap_job.erp_solution
   sap_payload:
     lineage:
       - datalake_sap_gateway_raw.sync_sap_job.sap_payload

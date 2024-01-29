@@ -5,6 +5,7 @@ SELECT
     response,
     `type`,
     `status`,
+    erp_solution,
     sap_payload,
     charge_back_of,
     error,
