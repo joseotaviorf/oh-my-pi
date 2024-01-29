@@ -4,7 +4,7 @@ WITH repair_request_chat AS (
     ,rrc.ts_started AS ts_started
   FROM datalake_repairs_clean.repair_request_chat AS rrc
   QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY rrc.id ORDER BY rrc.ts_started ASC) = 1
+    ROW_NUMBER() OVER (PARTITION BY rrc.id_repair_request ORDER BY rrc.ts_started ASC) = 1
 ),
 repair_request_budget AS (
   SELECT
@@ -12,7 +12,7 @@ repair_request_budget AS (
     ,b.id_budget_sender AS id_budget_sender
   FROM datalake_repairs_clean.repair_request_budget AS b
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY b.id ORDER BY b.ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY b.id_repair_request ORDER BY b.ts_updated DESC) = 1
 )
 
 SELECT
