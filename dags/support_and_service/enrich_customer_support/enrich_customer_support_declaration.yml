@@ -19,6 +19,10 @@ workflow:
         received_demand:
             - call
             - email
+        unified_tickets:
+            - call
+            - chat
+            - email
 cluster:
     type: custom_cluster
     custom_configurations:
