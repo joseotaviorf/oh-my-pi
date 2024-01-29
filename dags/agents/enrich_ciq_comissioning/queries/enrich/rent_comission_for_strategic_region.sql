@@ -63,4 +63,4 @@ FROM
 LEFT JOIN 
     rent_strategic_regions AS sr
         ON l.concat_city_neighborhood = sr.concat_city_neighborhood
-        sAND l.year_month_publication_reference = sr.year_month_reference
+        AND l.year_month_publication_reference = sr.year_month_reference
