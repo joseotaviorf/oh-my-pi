@@ -270,6 +270,39 @@ prop_history AS (
                 propose_history
         )
 ),
+first_status_canceled AS ( -- get dt_ended for proposes that have the first status as canceled
+    SELECT
+        p.id AS id_propose,
+        DATE(
+            COALESCE(MAX(c.ts_done),MAX(CAST(h.ts_history AS TIMESTAMP)))
+        ) AS dt_ended_contract, -- condition when prioritizing contract table date (dt_ended on fact table)
+        DATE(
+            COALESCE(MAX(CAST(h.ts_history AS TIMESTAMP)), MAX(c.ts_done))
+        ) AS dt_ended_propose -- condition when prioritizing propose table date (dt_analyst_annulment_input on fact table)
+    FROM
+        datalake_rental_guarantee_platform_clean.propose AS p
+    LEFT JOIN
+        prop_history AS h
+        ON p.id = h.id_propose
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.propose_status AS ps
+        ON p.id_propose_status = ps.id
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.contract AS c
+        ON c.id_propose = p.id
+    LEFT JOIN
+        datalake_rental_guarantee_platform_clean.contract_status AS cs
+        ON c.id_status = cs.id
+    LEFT JOIN
+        old_system_dates AS old
+            ON old.id_propose = p.id
+            AND p.id < 5000000
+    WHERE
+        old.dt_ended IS NULL
+        AND ps.name IN ('Contrato Cancelado', 'Proposta Cancelada') -- there are proposes that have ts_updated for cancellation history but are reopen
+    GROUP BY
+        1
+),
 ended_date AS (
     SELECT
         p.id AS id_propose,
@@ -619,9 +652,9 @@ SELECT DISTINCT
     IF(3p.id_propose IS NULL, FALSE, TRUE) AS is_3p,
     pym.dt_last_payment,
     COALESCE(DATE(c.ts_began), old.dt_contract_started) AS dt_contract_started,
-    pcd.dt_ended_contract AS dt_ended,
+    COALESCE(pcd.dt_ended_contract, fsc.dt_ended_contract) AS dt_ended,
     c.dt_next_renewal,
-    pcd.dt_ended_propose AS dt_analyst_annulment_input,
+    COALESCE(pcd.dt_ended_propose, fsc.dt_ended_propose) AS dt_analyst_annulment_input,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
     IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
     CASE
@@ -732,3 +765,6 @@ LEFT JOIN
     old_system_dates AS old
         ON old.id_propose = p.id
         AND p.id < 5000000
+LEFT JOIN
+    first_status_canceled AS fsc
+        ON fsc.id_propose = p.id
