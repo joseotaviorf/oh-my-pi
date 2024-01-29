@@ -1,0 +1,125 @@
+---
+database_name: datalake_schedules_clean
+table_name: appointment
+description: Scheduling data currently only includes Inspections, but in the future it should contain data on Visits and Photos scheduling.
+domain: Cross
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_schedules_raw.appointment.id
+    description: Unique ID of the schedule.
+  id_parente:
+    lineage:
+      - datalake_schedules_raw.appointment.parent_id
+    description: ""
+  id_location_reference:
+    lineage:
+      - datalake_schedules_raw.appointment.location_reference_id
+    description: ""
+  id_internal_reference:
+    lineage:
+      - datalake_schedules_raw.appointment.internal_reference_id
+    description: ""
+  id_visitant_reference:
+    lineage:
+      - datalake_schedules_raw.appointment.visitant_reference_id
+    description: ""
+  version:
+    lineage:
+      - datalake_schedules_raw.appointment.version
+    description: ""
+  type:
+    lineage:
+      - datalake_schedules_raw.appointment.type
+    description: ""
+  dated_at:
+    lineage:
+      - datalake_schedules_raw.appointment.dated_at
+    description: ""
+  slot_of_day:
+    lineage:
+      - datalake_schedules_raw.appointment.slot_of_day
+    description: ""
+  duration_in_slots:
+    lineage:
+      - datalake_schedules_raw.appointment.duration_in_slots
+    description: ""
+  status:
+    lineage:
+      - datalake_schedules_raw.appointment.status
+    description: ""
+  check_in_status:
+    lineage:
+      - datalake_schedules_raw.appointment.check_in_status
+    description: ""
+  last_app_origin:
+    lineage:
+      - datalake_schedules_raw.appointment.last_app_origin
+    description: ""
+  code:
+    lineage:
+      - datalake_schedules_raw.appointment.code
+    description: ""
+  business_context:
+    lineage:
+      - datalake_schedules_raw.appointment.business_context
+    description: ""
+  location_reference_name:
+    lineage:
+      - datalake_schedules_raw.appointment.location_reference_name
+    description: ""
+  internal_reference_name:
+    lineage:
+      - datalake_schedules_raw.appointment.internal_reference_name
+    description: ""
+  visitant_date_time:
+    lineage:
+      - datalake_schedules_raw.appointment.visitant_date_time
+    description: ""
+  visitant_reference_name:
+    lineage:
+      - datalake_schedules_raw.appointment.visitant_reference_name
+    description: ""
+  business_metadata:
+    lineage:
+      - datalake_schedules_raw.appointment.business_metadata
+    description: ""
+  datetime:
+    lineage:
+      - datalake_schedules_raw.appointment.datetime
+    description: ""
+  timezone:
+    lineage:
+      - datalake_schedules_raw.appointment.timezone
+    description: ""
+  is_confirmed:
+    lineage:
+      - datalake_schedules_raw.appointment.confirmed
+    description: ""
+  is_fixed_agent:
+    lineage:
+      - datalake_schedules_raw.appointment.fixed_agent
+    description: 
+      Indicates whether the inspection was scheduled with a specific agent,
+      rather than a temporary random assignment.
+  ts_created:
+    lineage:
+      - datalake_schedules_raw.appointment.created_at
+    description: Appointment creation date.
+  ts_updated:
+    lineage:
+      - datalake_schedules_raw.appointment.updated_at
+    description: Appointment update date.
+  year:
+    lineage:
+      - datalake_schedules_raw.appointment.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_schedules_raw.appointment.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_schedules_raw.appointment.day
+    description: Day of update date.

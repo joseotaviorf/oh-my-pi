@@ -1,0 +1,24 @@
+dag:
+  name: schedules
+  schedule_start_date: 2024, 1, 1
+  schedule_interval: 0 0 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: New Service for managing the QuintoAndar schedulling operations.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: schedules
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  dbutils_secret_key: SCHEDULES_DB
+  tables_customization:
+    appointment:
+      date_filter_column: updated_at
+    appointment_history:
+      date_filter_column: updated_at
+    attendee:
+      date_filter_column: updated_at
+cluster:
+  type: databricks_10_4_min_general_cluster
