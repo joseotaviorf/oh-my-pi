@@ -1133,6 +1133,13 @@ bietlejuice.enrich_casa_mineira_portal:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-clean-responses
+bietlejuice.enrich_ciq_comissioning:
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
+  - bietlejuice.gsheets_agents:load-clean-rent-comission-for-strategic-region
+  - bietlejuice.gsheets_agents:load-clean-sale-comission-for-strategic-region
 bietlejuice.enrich_company:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
