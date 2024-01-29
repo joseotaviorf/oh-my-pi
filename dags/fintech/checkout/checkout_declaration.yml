@@ -1,0 +1,37 @@
+dag: 
+    name: checkout
+    owner: Data Fintech
+workflow:
+    type: database_pull
+    layer: raw
+    database_type: postgres
+    tables_customization:
+      bank_account:
+        clean_table_name: bank_account
+      bolecode:
+        clean_table_name: bolecode
+      boleto:
+        clean_table_name: boleto
+      charge_status_log:
+        clean_table_name: charge_status_log
+      charge:
+        clean_table_name: charge
+      order:
+        clean_table_name: order
+      payment_config:
+        clean_table_name: payment_config
+      payment_gateway_error:
+        clean_table_name: payment_gateway_error
+      pix_refund:
+        clean_table_name: pix_refund
+      pix:
+        clean_table_name: pix
+      requester:
+        clean_table_name: requester
+      webhook:
+        clean_table_name: webhook
+cluster:
+    type: databricks_10_4_med_general_photon_cluster
+    access_control_list:
+        group_name: analytics-engineers
+        permission_level: CAN_MANAGE
