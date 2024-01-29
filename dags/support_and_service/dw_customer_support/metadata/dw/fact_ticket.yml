@@ -249,7 +249,6 @@ columns:
       - The ticket area must be CX;
       - The ticket team could be anyone but Ong Back;
       - The ticket must be front or back, depending on the channel;
-      - The ticket must be outside the journey steps of Compra e Venda (Buy and Sell) or Cross;
       - The ticket must not belong to a few departments (Rescisão por Inadimplência [OFF][POS][BACK], Offboarding Reparos [OFF] [POS] [BACK],
       Offboarding pré saída [OFF] [POS] [BACK], Proteção QuintoAndar [OFF] [POS] [BACK], Rescisão - Despejo [OFF][POS][BACK]
       or Rescisão 1 [OFF] [POS] [BACK]);

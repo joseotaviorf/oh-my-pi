@@ -39,7 +39,6 @@ WITH call_tickets AS (
     IF(
       front_or_back = 'front'
       AND DATE(ts_ticket_ended) >= DATE('2022-01-01')
-      AND journey_step NOT IN ('Compra e Venda', 'Cross')
       AND team <> 'Ong Back'
       AND area = 'CX'
       AND last_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
@@ -152,7 +151,6 @@ chat_tickets AS (
     IF(
       front_or_back = 'front'
       AND DATE(ts_ticket_ended) >= DATE('2022-01-01')
-      AND journey_step NOT IN ('Compra e Venda', 'Cross')
       AND team <> 'Ong Back'
       AND area = 'CX'
       AND last_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
@@ -261,7 +259,6 @@ email_tickets AS (
     IF(
       front_or_back IN ('back', 'front')
       AND DATE(ts_ticket_solved) >= DATE('2022-01-01')
-      AND journey_step NOT IN ('Compra e Venda', 'Cross')
       AND team <> 'Ong Back'
       AND area = 'CX'
       AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
