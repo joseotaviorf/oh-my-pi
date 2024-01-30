@@ -356,12 +356,6 @@ columns:
   presumed_income_range:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_faixa_renda_presumida
-  model_total_income:
-    lineage:
-      - datalake_velo_neurotech_raw.logs_credit_granting.calc_modelo_renda_total
-  elected_income:
-    lineage:
-      - datalake_velo_neurotech_raw.logs_credit_granting.calc_renda_eleita
   branch_activity:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_ramo_atividade

@@ -117,8 +117,6 @@ SELECT
     calc_idade AS main_proponent_age,
     prop_email_titular AS main_proponent_email,
     calc_faixa_renda_presumida AS presumed_income_range,
-    calc_modelo_renda_total AS model_total_income,
-    calc_renda_eleita AS elected_income,
     prop_ramo_atividade AS branch_activity,
     log_usuario AS log_user,
     log_resultado AS log_result,
