@@ -27,33 +27,43 @@ relisting_distinct AS (
     GROUP BY 1
 ),
 repairs_interaction AS (
-   SELECT
+    SELECT
         rr.id AS id_request,
-        rc.ts_started,
-        COALESCE(MIN(rr.ts_updated) - INTERVAL 3 HOUR, rc.ts_started - INTERVAL 3 HOUR) AS ts_first_interaction,
-        IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation
+        MIN(rr.ts_updated) AS ts_updated
     FROM
         datalake_repairs_clean.repair_request AS rr
-    LEFT JOIN
-        datalake_repairs_clean.repair_request_chat AS rc
-            ON rr.id = rc.id_repair_request
     WHERE
         (STRING(GET_JSON_OBJECT(rr.owner_approval, '$.approved')) IS NOT NULL)
         AND CAST(rr.ts_created AS DATE) >= DATE('2023-01-01')
         AND rr.id_third_party_crm_ticket_external IS NOT NULL
     GROUP BY 
-        rr.id, rc.ts_started 
+        rr.id
 ),
 service_provider AS (
-  SELECT
-    rr.id_third_party_crm_ticket_external AS sk_ticket,
-    rr.id AS id_repair_request,
-    rr.service_provider,
-    rr.ts_created
-  FROM 
-    datalake_repairs_clean.repair_request AS rr
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated DESC) = 1
+    SELECT
+        rr.id_third_party_crm_ticket_external AS sk_ticket,
+        rr.id AS id_repair_request,
+        rr.service_provider,
+        rr.ts_created
+    FROM 
+        datalake_repairs_clean.repair_request AS rr
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated DESC) = 1
+),
+first_interaction AS(
+    SELECT
+        rr.id_third_party_crm_ticket_external,
+        COALESCE(ri.ts_updated - INTERVAL 3 HOUR, rc.ts_started - INTERVAL 3 HOUR) AS ts_first_interaction,
+        IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation
+    FROM
+        datalake_repairs_clean.repair_request AS rr
+    LEFT JOIN
+        datalake_repairs_clean.repair_request_chat AS rc
+        ON rr.id = rc.id_repair_request
+    LEFT JOIN 
+        repairs_interaction AS ri
+        ON ri.id_request = rr.id
+    GROUP BY rc.ts_started, ri.ts_updated, rr.id_third_party_crm_ticket_external
 )
 
 SELECT 
@@ -80,13 +90,13 @@ SELECT
     csat.improvement_tags AS csat_tags,
     csat.satisfaction_score AS csat_score,
     csat.secondary_satisfaction_score AS csat_partes,
-    ri.has_chat_negociation,
+    fi.has_chat_negociation,
     tfm.reopens,
     tfm.replies,
     rd.relisting,
     tfm.minutes_reply_calendar AS minutes_first_reply_time_calendar,
     c.dt_entered AS entrance_date,
-    ri.ts_first_interaction,
+    fi.ts_first_interaction,
     tf.ts_created_local,
     tf.ts_updated_local,
     tfm.ts_closed_local,
@@ -131,14 +141,14 @@ LEFT JOIN
     datalake_repairs_clean.repair_request AS rr_first_interaction
         ON tf.id_ticket = rr_first_interaction.id_third_party_crm_ticket_external
         AND rr_first_interaction.id_third_party_crm_ticket_external IS NOT NULL
-LEFT JOIN
-    datalake_repairs_clean.repair_request_chat rct 
-        ON rr_first_interaction.id = rct.id_repair_request
+LEFT JOIN 
+    first_interaction fi
+        ON fi.id_third_party_crm_ticket_external = tf.id_ticket
 WHERE 
-  tf.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
-  AND (tf.ts_created >= DATE_ADD(CURRENT_DATE,-20*7) OR tfm.ts_solved >= date('2023-01-01') OR tfm.ts_solved IS NULL)
-  AND tf.channel NOT IN ('call')
-  AND tf.status NOT IN ('deleted')
-  AND tf.tags NOT LIKE '%caso_ticket_agregador%'
+    tf.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
+    AND (tf.ts_created >= DATE_ADD(CURRENT_DATE,-20*7) OR tfm.ts_solved >= date('2023-01-01') OR tfm.ts_solved IS NULL)
+    AND tf.channel NOT IN ('call')
+    AND tf.status NOT IN ('deleted')
+    AND tf.tags NOT LIKE '%caso_ticket_agregador%'
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY tf.id_ticket ORDER BY tf.ts_updated_local DESC) = 1
