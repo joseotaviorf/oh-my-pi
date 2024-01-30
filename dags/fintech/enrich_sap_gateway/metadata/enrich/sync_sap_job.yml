@@ -28,6 +28,10 @@ columns:
     description: "Status description"
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.status
+  erp_solution:
+    description: "If the job is related to SAP B1 or SAP 4HANA"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.erp_solution
   sap_payload:
     description: "SAP Payload"
     lineage:
