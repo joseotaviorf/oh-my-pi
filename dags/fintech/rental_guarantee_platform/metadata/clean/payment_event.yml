@@ -1,0 +1,36 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: payment_event
+owner: data-ae-fintech@quintoandar.com.br
+domain: fintech
+columns:
+    id:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.id
+    id_payment:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.payment
+    fine:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.fine
+    interest:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.interest
+    status:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.status
+    event:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.event
+    ts_created:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.created_at
+    year:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.year
+    month:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.month
+    day:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.payment_event.day

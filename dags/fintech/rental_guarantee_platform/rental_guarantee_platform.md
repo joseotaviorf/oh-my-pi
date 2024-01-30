@@ -37,6 +37,7 @@ Via **incremental load**:
     - `revinfo`
     - `user_account`
     - `sap`
+    - `payment_event`
 
 Velo 3.0 tables:
 
@@ -104,6 +105,7 @@ Via **incremental load**:
     - `revinfo`
     - `user_account`
     - `sap`
+    - `payment_event`
 
 Velo 3.0 tables:
 
