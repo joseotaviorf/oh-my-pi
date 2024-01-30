@@ -1,5 +1,5 @@
 SELECT
-    DATE_FORMAT(CURRENT_DATE, 'yyyyMMdd') AS id_snapshot,
+    DATE_FORMAT(DATE_ADD(DATE('{year}-{month}-{day}'), 1), 'yyyyMMdd') AS id_snapshot,
     CASE
         WHEN MONTH(TO_DATE(CAST(fc.sk_base_event_date AS STRING), 'yyyyMMdd')) <= 6 THEN 1
         ELSE 2
@@ -77,9 +77,9 @@ SELECT
     TO_DATE(DATE_TRUNC('week', dt.date), 'yyyy-mm-dd') AS dt_week_started,
     NOW() AS ts_snapshot,
     fc.country_code,
-    YEAR(fc.ts_load) AS year,
-    MONTH(fc.ts_load) AS month,
-    DAY(fc.ts_load) AS day
+    year,
+    month,
+    day
 FROM
     dw_rent.fact_rent_cohort_conversions AS fc
 INNER JOIN
@@ -105,4 +105,6 @@ INNER JOIN
 INNER JOIN
     dw_rent.dim_proposal AS dp
         ON fd.sk_proposal = dp.sk_proposal
+WHERE
+    MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 59, 60, 61, 62, 63, 64, 65, 66

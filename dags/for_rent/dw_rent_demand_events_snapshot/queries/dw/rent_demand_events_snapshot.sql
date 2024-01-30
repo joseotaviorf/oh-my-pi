@@ -1,5 +1,5 @@
 SELECT
-  DATE_FORMAT(CURRENT_DATE, 'yyyyMMdd') AS id_snapshot,
+  DATE_FORMAT(DATE_ADD(DATE('{year}-{month}-{day}'), 1), 'yyyyMMdd') AS id_snapshot,
   CASE
     WHEN MONTH(TO_DATE(CAST(sk_event_date AS STRING), 'yyyyMMdd')) <= 6 THEN 1
     ELSE 2
@@ -38,17 +38,17 @@ SELECT
   TO_DATE(DATE_TRUNC('week', dt.date), 'yyyy-mm-dd') AS dt_week_started,
   NOW() AS ts_snapshot,
   fde.country_code,
-  YEAR(fde.ts_load) AS year,
-  MONTH(fde.ts_load) AS month,
-  DAY(fde.ts_load) AS day
+  year,
+  month,
+  day
 FROM
   dw_rent.fact_rent_demand_events AS fde
 JOIN
   dw_public.dim_date AS dt -- event date
-    ON (dt.sk_date = fde.sk_event_date)
+    ON dt.sk_date = fde.sk_event_date
 LEFT JOIN
   dw_public.dim_region AS dr -- city_groups
-    ON (dr.sk_region = fde.sk_region)
+    ON dr.sk_region = fde.sk_region
 LEFT JOIN
   dw_rent.dim_house_listing AS dhl -- listings info
     ON fde.sk_house_listing = dhl.sk_house_listing
@@ -61,4 +61,6 @@ LEFT JOIN
 LEFT JOIN
   dw_rent.dim_proposal AS dp -- guarantee
     ON fde.sk_proposal = dp.sk_proposal
+WHERE
+    MAKE_DATE(year, month, day) = DATE_ADD(DATE('{year}-{month}-{day}'), 1)
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 21, 22, 23, 24, 25, 26, 27
