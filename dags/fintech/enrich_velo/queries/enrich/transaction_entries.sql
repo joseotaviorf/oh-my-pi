@@ -123,6 +123,24 @@ propose_person AS (
         pp_doc.id_propose IS NOT NULL
         AND p_doc.id_propose IS NOT NULL
         AND p_doc.is_contract IS TRUE
+
+
+    UNION ALL
+
+    SELECT
+        pp_doc.*,
+        p_doc.dt_contract_started,
+        p_doc.dt_ended
+    FROM
+        datalake_velo.propose_person_legacy AS pp_doc
+    LEFT JOIN
+        datalake_velo.propose_legacy AS p_doc
+            ON p_doc.id_propose = pp_doc.id_propose
+    WHERE
+        pp_doc.id_propose IS NOT NULL
+        AND p_doc.id_propose IS NOT NULL
+        AND p_doc.is_contract IS TRUE
+
 ),
 cash_flow_propose AS (
     SELECT DISTINCT
