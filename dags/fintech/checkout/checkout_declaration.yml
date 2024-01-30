@@ -1,6 +1,7 @@
 dag: 
     name: checkout
     owner: Data Fintech
+    schedule_interval: 0 3 * * *
 workflow:
     type: database_pull
     layer: raw
