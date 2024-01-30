@@ -14,6 +14,48 @@ columns:
   analysis_result:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.resultado
+  v3_model_score:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_argonautv3_score
+  proponents_count:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_quantidade_proponentes
+  first_proponent_age:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_idade_rf1
+  second_proponent_age:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_idade_rf2
+  third_proponent_age:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_idade_rf3
+  forth_proponent_age:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_idade_rf4
+  elected_income_type:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_tipo_renda_eleita
+  refin_pefin_occurrence_type:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_tipo_ocorrencia
+  refin_pefin_occurrence_type_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_tipo_ocorrencia_total
+  reason_document_on_blocklist_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_tipo_bloqueio_total
+  document_status_federal:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_rfpf_situacao
+  document_status_federal_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_rfpf_situacao_total
+  bigdataboost_document_status:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdataboost_taxidstatus
+  bigdataboost_document_status_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdataboost_taxidstatus_acumulado
   model_score:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_modelo_def
@@ -182,6 +224,39 @@ columns:
   neoway_income_mean:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_neoway_income_mean
+  proposal_package_amount:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_valor_pacote
+  total_declared_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_renda_decl_total
+  elected_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_renda_eleita
+  model_total_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_modelo_renda_total
+  refin_pefin_occurrence_amount:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_valor_ocorrencia
+  protest_amount:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_valor_protesto
+  rent_amount:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_valor_aluguel
+  name_check_rating:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_comparacao_fonetica_nome
+  refin_pefin_occurrence_amount_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_valor_ocorrencia_total
+  protest_amount_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_valor_protesto_total
+  name_check_rating_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_comparacao_fonetica_nome_total
   proposal_cpfs:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_cpf_titular
@@ -245,6 +320,24 @@ columns:
   dti_calculated:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_dti_apurado
+  calculated_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_renda_apurada
+  score_bigid:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigidbgc_score
+  score_bigid_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigidbgc_score1
+  score_bigid_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigidbgc_score2
+  score_bigid_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigidbgc_score3
+  score_bigid_forth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigidbgc_score4
   package_range:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_faixa_pacote
@@ -317,9 +410,42 @@ columns:
   is_package_value_approved:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.rgr_valor_pacote
+  is_desenrola_document:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_argonautv3_flag_desenrola
+  is_blocklist_document:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_block
+  is_blocklist_document_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_block_total
+  is_foreign_document:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_estrangeiro
+  is_foreign_document_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_estrangeiro_total
   has_lawsuits:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_processos
+  is_first_proponent_pep:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_pep1
+  is_second_proponent_pep:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_pep2
+  is_third_proponent_pep:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_pep3
+  is_forth_proponent_pep:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_pep4
+  is_minor_age_document:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.`bigdataboost_5andar.result.message`
+  is_minor_age_document_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_message_total
   ts_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.instante

@@ -44,7 +44,7 @@ def create_yml_for_table(
             yml_body["columns"][column.output_name].update(
                         {"lineage": [f"{first_table_name}.{column.this}"]}
                         )
-    
+
 
     return yml_body
 
@@ -125,5 +125,6 @@ if __name__ == "__main__":
                     sql, db_template, table_name, file_path, dag_owner, do_lineage
                 )
                 save_yml(file_path, yml_body)
-            except Exception:
+            except Exception as e:
+                print(e)
                 print(f"ERROR database_name={database_name}, table_name={table_name}")
