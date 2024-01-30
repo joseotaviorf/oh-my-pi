@@ -15,7 +15,13 @@ workflow:
   tables_customization:
     coincident_events_volume_changes_snapshot:
       extra_query_template_params:
-        "MAKE_DATE(year, month, day)": "DATE_ADD(MAKE_DATE({year}, {month}, {day}), 1)"
+        "MAKE_DATE(year, month, day)": "DATE_ADD(DATE('{year}-{month}-{day}'), 1)"
+    rent_cohort_conversions_snapshot:
+      extra_query_template_params:
+        "DATE(ts_snapshot)": "DATE_ADD(DATE('{year}-{month}-{day}'), 1)"
+    rent_demand_events_snapshot:
+      extra_query_template_params:
+        "DATE(ts_snapshot)": "DATE_ADD(DATE('{year}-{month}-{day}'), 1)"
 cluster:
   type: custom_cluster
   custom_configurations:
