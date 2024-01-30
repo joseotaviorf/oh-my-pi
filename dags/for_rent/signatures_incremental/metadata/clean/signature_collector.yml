@@ -1,0 +1,42 @@
+database_name: datalake_signatures_clean
+table_name: signature_collector
+columns:
+  id:
+    lineage:
+      - datalake_signatures_raw.signature_collector.id
+  id_external_reference:
+    lineage:
+      - datalake_signatures_raw.signature_collector.external_reference_id
+  external_reference_name:
+    lineage:
+      - datalake_signatures_raw.signature_collector.external_reference_name
+  version:
+    lineage:
+      - datalake_signatures_raw.signature_collector.version
+  status:
+    lineage:
+      - datalake_signatures_raw.signature_collector.status
+  ts_started:
+    lineage:
+      - datalake_signatures_raw.signature_collector.started_at
+  ts_completed:
+    lineage:
+      - datalake_signatures_raw.signature_collector.completed_at
+  ts_sent:
+    lineage:
+      - datalake_signatures_raw.signature_collector.sent_at
+  ts_created:
+    lineage:
+      - datalake_signatures_raw.signature_collector.created_at
+  ts_updated:
+    lineage:
+      - datalake_signatures_raw.signature_collector.updated_at
+  year:
+    lineage:
+      - datalake_signatures_raw.signature_collector.updated_at
+  month:
+    lineage:
+      - datalake_signatures_raw.signature_collector.updated_at
+  day:
+    lineage:
+      - datalake_signatures_raw.signature_collector.updated_at

@@ -1,0 +1,45 @@
+database_name: datalake_signatures_clean
+table_name: recipient
+columns:
+  id:
+    lineage:
+      - datalake_signatures_raw.recipient.id
+  id_internal_reference:
+    lineage:
+      - datalake_signatures_raw.recipient.internal_reference_id
+  id_external_reference:
+    lineage:
+      - datalake_signatures_raw.recipient.external_reference_id
+  internal_reference_name:
+    lineage:
+      - datalake_signatures_raw.recipient.internal_reference_name
+  external_reference_name:
+    lineage:
+      - datalake_signatures_raw.recipient.external_reference_name
+  version:
+    lineage:
+      - datalake_signatures_raw.recipient.version
+  name:
+    lineage:
+      - datalake_signatures_raw.recipient.name
+  email:
+    lineage:
+      - datalake_signatures_raw.recipient.email
+  type:
+    lineage:
+      - datalake_signatures_raw.recipient.dtype
+  ts_created:
+    lineage:
+      - datalake_signatures_raw.recipient.created_at
+  ts_updated:
+    lineage:
+      - datalake_signatures_raw.recipient.updated_at
+  year:
+    lineage:
+      - datalake_signatures_raw.recipient.updated_at
+  month:
+    lineage:
+      - datalake_signatures_raw.recipient.updated_at
+  day:
+    lineage:
+      - datalake_signatures_raw.recipient.updated_at

@@ -1,0 +1,66 @@
+database_name: datalake_signatures_clean
+table_name: recipient_aud
+columns:
+  id_recipient:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.id
+  id_internal_reference:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.internal_reference_id
+  id_external_reference:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.external_reference_id
+  rev:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.rev
+  rev_end:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.revend
+  rev_type:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.revtype
+  internal_reference_name:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.internal_reference_name
+  external_reference_name:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.external_reference_name
+  version:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.version
+  name:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.name
+  email:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.email
+  type:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.dtype
+  mod_id_internal_reference:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.internal_reference_mod
+  mod_id_external_reference:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.external_reference_mod
+  mod_name:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.name_mod
+  mod_email:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.email_mod
+  ts_created:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.updated_at
+  year:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.updated_at
+  month:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.updated_at
+  day:
+    lineage:
+      - datalake_signatures_raw.recipient_aud.updated_at
