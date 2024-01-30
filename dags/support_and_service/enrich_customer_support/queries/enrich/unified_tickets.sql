@@ -546,14 +546,6 @@ SELECT DISTINCT
     bt.is_back_ticket_open,
     bt.is_solved,
     bt.is_fcr,
-    --IF(bt.sk_ticket = fc.sk_main_session, TRUE, FALSE) AS is_ticket_session,
-    --IF(bt.sk_ticket = fc.sk_main_session, fc.is_fcr_customer, FALSE) AS is_fcr_customer,
-    --CASE
-    --  WHEN bt.sk_ticket <> fc.sk_main_session
-    --  THEN TRUE
-    --  WHEN bt.sk_ticket = fc.sk_main_session
-    --  THEN FALSE
-    --END AS is_recontact,
     bt.has_transfers,
     bt.total_minutes_reception_time,
     bt.total_minutes_talk_time,
