@@ -9,10 +9,12 @@ SELECT
     signed_at AS ts_signed,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    year(updated_at) AS year,
-    month(updated_at) AS month,
-    day(updated_at) AS day
+    year,
+    month,
+    day
 FROM
-    datalake_signatures_raw.signature
+    datalake_signatures_incremental_raw.signature
 WHERE
-    date(updated_at) = date('{year}-{month}-{day}')
+    year = {year}
+    AND month = {month}
+    AND day = {day}
