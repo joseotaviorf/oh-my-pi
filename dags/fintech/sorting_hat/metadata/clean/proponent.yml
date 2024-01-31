@@ -33,7 +33,6 @@ columns:
   dt_admitted:
     lineage:
       - datalake_sorting_hat_raw.proponent.admission_date
-    description: 
   cell_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent.cell_phone
@@ -117,7 +116,7 @@ columns:
   residence_condition:
     lineage:
       - datalake_sorting_hat_raw.proponent.residence_condition
-    description:  Proponent's residence condition (Proprio, Alugado, Familiares..)
+    description: Proponent's residence condition (Proprio, Alugado, Familiares..)
   residence_time:
     lineage:
       - datalake_sorting_hat_raw.proponent.residence_time
@@ -158,3 +157,7 @@ columns:
     lineage:
       - datalake_sorting_hat_raw.proponent.screening_result_id
     description: Screening result ID
+  scr_income:
+    lineage:
+      - datalake_sorting_hat_raw.proponent.scr_income
+    description: SCR income. This data is only available to the main proponent.

@@ -1,5 +1,6 @@
 select
     id,
+    screening_result_id as id_screening_result,
     name,
     cpf,
     income_nature,
@@ -37,5 +38,5 @@ select
     proposal_id as id_proposal,
     boavista_score,
     serasa_score,
-    screening_result_id as id_screening_result
+    scr_income
 from datalake_sorting_hat_raw.proponent
