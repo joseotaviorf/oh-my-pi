@@ -1,4 +1,8 @@
 ---
+custom_cluster:
+  driver_node_type_id: m5a.xlarge
+  node_type_id: m5a.xlarge
+  num_workers: 2
 tables:
   - table_name: house
     partitions: [country_code]
