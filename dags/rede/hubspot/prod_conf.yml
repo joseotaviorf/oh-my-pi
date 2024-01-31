@@ -25,6 +25,7 @@ tables:
         - data_em_que_se_tornou_qualificado
         - domain
         - e_mail
+        - esta_carteirizada_
         - estado
         - hs_analytics_source
         - hs_analytics_source_data_1
