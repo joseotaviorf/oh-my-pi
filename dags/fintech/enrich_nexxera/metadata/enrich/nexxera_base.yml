@@ -136,3 +136,15 @@ columns:
     lineage:
       - datalake_nexxera.financial.dt_sale
       - datalake_nexxera.adjustments.dt_sale_adjustment
+  year:
+    description: Year of load
+    lineage:
+      - datalake_nexxera.financial.year
+  month:
+    description: Month of load
+    lineage:
+      - datalake_nexxera.financial.month
+  day:
+    description: Day of load
+    lineage:
+      - datalake_nexxera.financial.day

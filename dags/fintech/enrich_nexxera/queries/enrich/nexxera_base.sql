@@ -63,7 +63,10 @@ WITH bank_grouper_0 AS (
             c0.total_sale_net_amount,
             c0.discount_charge,
             COALESCE(bg.end_id_bank_grouper, c0.id_bank_grouper, -1) AS id_bank_grouper,
-            COALESCE(bg.rn_bank, -1) AS rn_bank
+            COALESCE(bg.rn_bank, -1) AS rn_bank,
+            c0.year,
+            c0.month,
+            c0.day
         FROM
             datalake_nexxera.financial c0
         LEFT JOIN bank_grouper bg
@@ -91,7 +94,10 @@ WITH bank_grouper_0 AS (
             a0.net_adjustment_value,
             a0.adjustment_value_tax,
             a0.counter_adjustments,
-            COALESCE(bg.rn_bank, -1) AS rn_bank
+            COALESCE(bg.rn_bank, -1) AS rn_bank,
+            a0.year,
+            a0.month,
+            a0.day
         FROM
             datalake_nexxera.adjustments a0
         LEFT JOIN
@@ -132,7 +138,10 @@ WITH bank_grouper_0 AS (
             COALESCE(a1.adjustment_value_tax, 0.00) AS adjustment_tax_value,
             COALESCE(a1.dt_adjustment_launch, '-1') AS dt_credit_adjustment,
             c1.dt_installment_credit AS dt_credit,
-            c1.dt_sale
+            c1.dt_sale,
+            c1.year,
+            c1.month,
+            c1.day
         FROM
             credit c1
         LEFT JOIN
@@ -173,7 +182,10 @@ WITH bank_grouper_0 AS (
             a0.adjustment_value_tax AS adjustment_tax_value,
             a0.dt_adjustment_launch AS dt_credit_adjustment,
             a0.dt_adjustment_launch AS dt_credit,
-            a0.dt_sale_adjustment AS dt_sale
+            a0.dt_sale_adjustment AS dt_sale,
+            a0.year,
+            a0.month,
+            a0.day
         FROM (
                 SELECT
                     a1.*
@@ -235,6 +247,9 @@ WITH bank_grouper_0 AS (
         adjustment_tax_value,
         dt_credit_adjustment,
         dt_credit,
-        dt_sale
+        dt_sale,
+        year,
+        month,
+        day
     FROM
         end_union

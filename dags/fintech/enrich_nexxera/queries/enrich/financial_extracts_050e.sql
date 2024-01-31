@@ -4,7 +4,10 @@ WITH datalake_nexxera_clean_financial_extracts_050e_0 AS  (
         launch_value,
         UPPER(LEFT(TRIM(REGEXP_EXTRACT(history_description, '^[^ ]+ ([^ ]+) .*$', 1)),4)) AS id_flag,
         CAST(REGEXP_EXTRACT(TRIM(history_description),'^[^0-9]+([0-9]+)$',1) AS INT) AS id_ec,
-        ts_ingested
+        ts_ingested,
+        year,
+        month,
+        day
     FROM
         datalake_nexxera_clean.financial_extracts_050e
     WHERE
@@ -17,7 +20,10 @@ SELECT
     id_ec,
     ROW_NUMBER() OVER(ORDER BY dt_launch, id_flag, id_ec) AS rn_bank,
     SUM(launch_value) AS launch_value,
-    dt_launch
+    dt_launch,
+    year,
+    month,
+    day
 FROM
     datalake_nexxera_clean_financial_extracts_050e_0
 WHERE
@@ -25,4 +31,7 @@ WHERE
 GROUP BY
     dt_launch,
     id_flag,
-    id_ec
+    id_ec,
+    year,
+    month,
+    day

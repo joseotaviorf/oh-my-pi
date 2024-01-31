@@ -87,3 +87,15 @@ columns:
     description: Banking grouping in which the sale was settled
     lineage:
       - datalake_nexxera_clean.financial.id_bank_grouper
+  year:
+    description: Year of load
+    lineage:
+      - datalake_nexxera_clean.financial.year
+  month:
+    description: Month of load
+    lineage:
+      - datalake_nexxera_clean.financial.month
+  day:
+    description: Day of load
+    lineage:
+      - datalake_nexxera_clean.financial.day

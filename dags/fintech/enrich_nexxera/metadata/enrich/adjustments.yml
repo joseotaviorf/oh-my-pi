@@ -71,3 +71,15 @@ columns:
     description: Counter of adjustments
     lineage:
       - datalake_nexxera_clean.adjustments.adjustment_value
+  year:
+    description: Year of load
+    lineage:
+      - datalake_nexxera_clean.adjustments.year
+  month:
+    description: Month of load
+    lineage:
+      - datalake_nexxera_clean.adjustments.month
+  day:
+    description: Day of load
+    lineage:
+      - datalake_nexxera_clean.adjustments.day

@@ -1,0 +1,3 @@
+---
+external_s3_bucket: nexxera-forno-data
+partition_cols: ["year", "month", "day"]

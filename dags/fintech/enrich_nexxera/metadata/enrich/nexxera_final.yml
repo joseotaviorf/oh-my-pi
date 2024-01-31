@@ -125,3 +125,15 @@ columns:
     description: "Due date"
     lineage:
       - datalake_nexxera_raw.sales.col_30
+  year:
+    description: Year of load
+    lineage:
+      - datalake_nexxera.nexxera_base.year
+  month:
+    description: Month of load
+    lineage:
+      - datalake_nexxera.nexxera_base.month
+  day:
+    description: Day of load
+    lineage:
+      - datalake_nexxera.nexxera_base.day

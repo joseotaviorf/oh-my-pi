@@ -238,7 +238,10 @@ WITH base AS (
               a0.adjustment_original_reason,
               CAST(a0.original_pos AS INT) AS original_pos,
               a0.launch_type,
-              a0.adjustment_value
+              a0.adjustment_value,
+              a0.year,
+              a0.month,
+              a0.day
           FROM
               datalake_nexxera_clean.adjustments a0
             LEFT JOIN
@@ -277,7 +280,10 @@ WITH base AS (
       SUM(IF(launch_type = 'C', adjustment_value, 0.00)) AS adjustment_value_tax,
       COUNT(*) AS counter_adjustments,
       dt_adjustment_launch,
-      dt_sale_adjustment
+      dt_sale_adjustment,
+      year,
+      month,
+      day
   FROM
       base
   GROUP BY dt_adjustment_launch,
@@ -291,4 +297,7 @@ WITH base AS (
       nsu_cv,
       id_authorization,
       flag,
-      id_flag
+      id_flag,
+      year,
+      month,
+      day

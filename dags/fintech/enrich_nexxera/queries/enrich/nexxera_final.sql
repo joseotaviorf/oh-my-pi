@@ -124,7 +124,10 @@ JDT_C AS (
         ROUND(ja.adjustment_gross_value - activate_value,2) AS adj_incoming_value, -- NOT_STANDARD | ja.adjustment_sale_value AS adj_incoming_value
         ja.id_external_payment AS U_ExternalPaymentId,
         ja.description_memo AS Memo,
-        'cc:'||substring(sha1(ja.TaxDate||ja.flag||ja.EC), 1, 29) AS U_RSD_UUIDSB
+        'cc:'||substring(sha1(ja.TaxDate||ja.flag||ja.EC), 1, 29) AS U_RSD_UUIDSB,
+        year,
+        month,
+        day
     FROM
         JDT_A ja
     LEFT JOIN
@@ -160,7 +163,10 @@ JDT AS (
         '' AS CostingCode,
         '' AS CostingCode2,
         MAX(DueDate) AS DueDate_,
-        launch_value AS original_bank_value
+        launch_value AS original_bank_value,
+        year,
+        month,
+        day
     FROM
         JDT_C
     GROUP BY
@@ -173,7 +179,10 @@ JDT AS (
         bank_account,
         BPLID,
         launch_value,
-        U_RSD_UUIDSB
+        U_RSD_UUIDSB,
+        year,
+        month,
+        day
     UNION ALL
     SELECT
         EC,
@@ -199,7 +208,10 @@ JDT AS (
         CostingCode,
         CostingCode2,
         DueDate AS DueDate_,
-        0.00 AS original_bank_value
+        0.00 AS original_bank_value,
+        year,
+        month,
+        day
     FROM
         JDT_C
     UNION ALL
@@ -226,7 +238,10 @@ JDT AS (
         CostingCode,
         CostingCode2,
         DueDate AS DueDate_,
-        0.00 AS original_bank_value
+        0.00 AS original_bank_value,
+        year,
+        month,
+        day
     FROM
         JDT_C
     UNION ALL
@@ -254,7 +269,10 @@ JDT AS (
         '' AS CostingCode,
         '' AS CostingCode2,
         DueDate AS DueDate_,
-        0.00 AS original_bank_value
+        0.00 AS original_bank_value,
+        year,
+        month,
+        day
     FROM
         JDT_C
     UNION ALL
@@ -282,7 +300,10 @@ JDT AS (
         '' AS CostingCode,
         '' AS CostingCode2,
         DueDate AS DueDate_,
-        0.00 AS original_bank_value
+        0.00 AS original_bank_value,
+        year,
+        month,
+        day
     FROM
         JDT_C
     UNION ALL
@@ -310,7 +331,10 @@ JDT AS (
         '' AS CostingCode,
         '' AS CostingCode2,
         DueDate AS DueDate_,
-        0.00 AS original_bank_value
+        0.00 AS original_bank_value,
+        year,
+        month,
+        day
     FROM
         JDT_C
     UNION ALL
@@ -338,7 +362,10 @@ JDT AS (
         '' AS CostingCode,
         '' AS CostingCode2,
         DueDate AS DueDate_,
-        0.00 AS original_bank_value
+        0.00 AS original_bank_value,
+        year,
+        month,
+        day
     FROM
         JDT_C
 ),
@@ -395,7 +422,10 @@ STATUS_JDT AS (
         jj.U_FinanceEntityEntryId,
         jj.CostingCode,
         jj.CostingCode2,
-        jj.DueDate_
+        jj.DueDate_,
+        jj.year,
+        jj.month,
+        jj.day
     FROM
         JDT jj
     LEFT JOIN

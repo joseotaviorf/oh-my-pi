@@ -33,6 +33,9 @@ SELECT
     U_FinanceEntityEntryId,
     CostingCode,
     CostingCode2,
-    DueDate_
-FROM 
+    DueDate_,
+    year,
+    month,
+    day
+FROM
     datalake_nexxera.nexxera_final

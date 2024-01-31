@@ -2987,6 +2987,8 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_for_sale:done-clean-forbrokers-3p-partner-conditions
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers
   - bietlejuice.hub_services:load-clean-business-unit
+bietlejuice.reverse_nexxera:
+  - bietlejuice.enrich_nexxera:load-enrich-dtw-filter
 bietlejuice.reverse_sale_unavailable_listings_access:
   - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
 bietlejuice.reverse_sale_unavailable_listings_load:
