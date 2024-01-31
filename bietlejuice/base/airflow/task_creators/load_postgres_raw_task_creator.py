@@ -27,6 +27,7 @@ class LoadPostgresRawTaskCreator(BaseTaskCreator):
         date_filter_column = table_attributes.table_customization.get(
             "date_filter_column", ""
         )
+        db_schema = table_attributes.table_customization.get("db_schema", "public")
 
         return [
             self.dag_execution_context.environment,
@@ -39,4 +40,5 @@ class LoadPostgresRawTaskCreator(BaseTaskCreator):
             str(table_attributes.partitions),
             date_filter_column,
             self.dag_execution_context.execution_date,
+            db_schema,
         ]

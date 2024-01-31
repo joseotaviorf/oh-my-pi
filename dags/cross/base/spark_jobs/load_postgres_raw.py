@@ -30,6 +30,7 @@ def parse_arguments():
     parser.add_argument("partition_cols")
     parser.add_argument("date_filter_column")
     parser.add_argument("execution_date")
+    parser.add_argument("db_schema")
 
     return parser.parse_args()
 
@@ -62,6 +63,7 @@ def main():
     partition_cols = json.loads(args.partition_cols.replace("'", '"'))
     date_filter_column = args.date_filter_column
     execution_date = args.execution_date
+    db_schema = args.db_schema
 
     logger.info(
         f"""
@@ -73,6 +75,7 @@ def main():
     )
 
     conn_config = get_conn_config(dbutils_secret_key)
+    conn_config["schema"] = db_schema
     spark_client = SparkClient()
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
 

@@ -1,3 +1,0 @@
----
-schemas: ["business"]
-tables_allow_list: ["offer"]
