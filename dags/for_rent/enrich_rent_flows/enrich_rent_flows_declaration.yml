@@ -1,0 +1,26 @@
+dag:
+    name: enrich_rent_flows
+    owner: Data ForRent
+    schedule_start_date: 2014, 6, 17
+    documentation: 
+      dag_purpose: |
+            This DAG creates the enriched tables about rent flows and its entities (property, tenant prospect,
+            booking, offer, contract, etc.).
+workflow:
+    type: query
+    layer: enrich
+    default_extraction_type: full
+    default_partitions: [country_code]
+    inner_dependencies:
+      rent_flows_types:
+        - rent_flows
+cluster:
+    type: custom_cluster
+    custom_configurations:
+      driver_node_type_id: m5d.2xlarge
+      node_type_id: m5d.4xlarge
+      runtime_engine: PHOTON
+      num_workers: 3
+      spark_version: 11.3.x-scala2.12
+      aws_attributes:
+        availability: ON_DEMAND
