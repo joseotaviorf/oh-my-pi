@@ -10,6 +10,9 @@ columns:
   id_dimension_entity:
     lineage:
       - datalake_wololo_raw.prospect_aud.dimensionentity_id
+  country_code:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.country
   address:
     lineage:
       - datalake_wololo_raw.prospect_aud.address

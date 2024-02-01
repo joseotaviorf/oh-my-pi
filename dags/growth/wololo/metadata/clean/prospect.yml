@@ -19,6 +19,9 @@ columns:
   id_external:
     lineage:
       - datalake_wololo_raw.prospect.externalid
+  country_code:
+    lineage:
+      - datalake_wololo_raw.prospect.country
   status:
     lineage:
       - datalake_wololo_raw.prospect.status

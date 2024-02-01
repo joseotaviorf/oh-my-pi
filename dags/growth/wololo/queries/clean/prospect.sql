@@ -5,6 +5,7 @@ SELECT
     affiliateid AS id_affiliate,
     taskid AS id_task,
     externalid AS id_external,
+    country AS country_code,
     status,
     address,
     number,
