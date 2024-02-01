@@ -29,5 +29,5 @@ SELECT
 FROM
     datalake_nexxera.dtw_filter
 WHERE
-    OK = 'false'
-    AND CAST(ts_ingested AS DATE) = (CAST(NOW() AS DATE) - 1)
+    OK = 'true'
+    AND DATE_TRUNC('MONTH', ts_ingested) = ADD_MONTHS(DATE_TRUNC('MONTH', now()),-1)

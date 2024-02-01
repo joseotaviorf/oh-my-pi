@@ -64,6 +64,7 @@ WITH bank_grouper_0 AS (
             c0.discount_charge,
             COALESCE(bg.end_id_bank_grouper, c0.id_bank_grouper, -1) AS id_bank_grouper,
             COALESCE(bg.rn_bank, -1) AS rn_bank,
+            c0.ts_ingested,
             c0.year,
             c0.month,
             c0.day
@@ -95,6 +96,7 @@ WITH bank_grouper_0 AS (
             a0.adjustment_value_tax,
             a0.counter_adjustments,
             COALESCE(bg.rn_bank, -1) AS rn_bank,
+            a0.ts_ingested,
             a0.year,
             a0.month,
             a0.day
@@ -139,6 +141,7 @@ WITH bank_grouper_0 AS (
             COALESCE(a1.dt_adjustment_launch, '-1') AS dt_credit_adjustment,
             c1.dt_installment_credit AS dt_credit,
             c1.dt_sale,
+            c1.ts_ingested,
             c1.year,
             c1.month,
             c1.day
@@ -183,6 +186,7 @@ WITH bank_grouper_0 AS (
             a0.dt_adjustment_launch AS dt_credit_adjustment,
             a0.dt_adjustment_launch AS dt_credit,
             a0.dt_sale_adjustment AS dt_sale,
+            a0.ts_ingested,
             a0.year,
             a0.month,
             a0.day
@@ -248,6 +252,7 @@ WITH bank_grouper_0 AS (
         dt_credit_adjustment,
         dt_credit,
         dt_sale,
+        ts_ingested,
         year,
         month,
         day

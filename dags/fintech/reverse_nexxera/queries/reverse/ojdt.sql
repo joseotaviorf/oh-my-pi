@@ -30,3 +30,4 @@ FROM
     datalake_nexxera.dtw_filter
 WHERE
     OK = 'true'
+    AND CAST(ts_ingested AS DATE) = (CAST(NOW() AS DATE) - 1)

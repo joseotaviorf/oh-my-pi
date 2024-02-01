@@ -34,6 +34,7 @@ SELECT
     CostingCode,
     CostingCode2,
     DueDate_,
+    ts_ingested,
     year,
     month,
     day

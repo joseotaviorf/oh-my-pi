@@ -23,6 +23,10 @@ columns:
     description: Launch value
     lineage:
       - datalake_nexxera_clean.financial_extracts_050e.launch_value
+  ts_ingested:
+    description: Timestamp of load
+    lineage:
+      - datalake_nexxera_clean.financial_extracts_050e.ts_ingested
   year:
     description: Year of load
     lineage:

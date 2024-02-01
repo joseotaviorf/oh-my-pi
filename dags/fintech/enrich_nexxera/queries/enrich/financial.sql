@@ -30,6 +30,7 @@ WITH base AS (
             c0.total_sale_net_amount,
             CAST(c0.discount_charge AS double) AS discount_charge,
             CAST(c0.id_bank_grouper AS INT) AS id_bank_grouper,
+            c0.ts_ingested,
             year,
             month,
             day
@@ -37,10 +38,8 @@ WITH base AS (
             datalake_nexxera_clean.financial c0
         LEFT JOIN
             datalake_gsheets_clean.nexxera_holly_days hd ON hd.holly_day = c0.dt_installment_credit
-        WHERE
-            CAST(c0.ts_ingested AS DATE) < (CAST(NOW() AS DATE) - 1)
         GROUP BY
-            1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+            1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 )
     SELECT
         id_bank_grouper,
@@ -64,6 +63,7 @@ WITH base AS (
         discount_charge,
         dt_installment_credit,
         dt_sale,
+        ts_ingested,
         year,
         month,
         day

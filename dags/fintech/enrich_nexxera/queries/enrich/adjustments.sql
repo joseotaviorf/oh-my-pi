@@ -239,6 +239,7 @@ WITH base AS (
               CAST(a0.original_pos AS INT) AS original_pos,
               a0.launch_type,
               a0.adjustment_value,
+              a0.ts_ingested,
               a0.year,
               a0.month,
               a0.day
@@ -247,8 +248,6 @@ WITH base AS (
             LEFT JOIN
                 datalake_gsheets_clean.nexxera_holly_days hd
                 ON hd.holly_day = a0.dt_adjustment_launch
-            WHERE
-                CAST(a0.ts_ingested AS DATE) < (CAST(NOW() AS DATE) - 1)
 )
 
    SELECT
@@ -281,6 +280,7 @@ WITH base AS (
       COUNT(*) AS counter_adjustments,
       dt_adjustment_launch,
       dt_sale_adjustment,
+      ts_ingested,
       year,
       month,
       day
@@ -298,6 +298,7 @@ WITH base AS (
       id_authorization,
       flag,
       id_flag,
+      ts_ingested,
       year,
       month,
       day

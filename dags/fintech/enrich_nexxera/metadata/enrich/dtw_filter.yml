@@ -127,6 +127,10 @@ columns:
     description: "Due date"
     lineage:
       - datalake_nexxera.nexxera_final.DueDate_
+  ts_ingested:
+    description: Timestamp of load
+    lineage:
+      - datalake_nexxera_clean.nexxera_final.ts_ingested
   year:
     description: Year of load
     lineage:

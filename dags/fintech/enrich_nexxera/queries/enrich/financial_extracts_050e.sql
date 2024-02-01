@@ -21,17 +21,17 @@ SELECT
     ROW_NUMBER() OVER(ORDER BY dt_launch, id_flag, id_ec) AS rn_bank,
     SUM(launch_value) AS launch_value,
     dt_launch,
+    ts_ingested,
     year,
     month,
     day
 FROM
     datalake_nexxera_clean_financial_extracts_050e_0
-WHERE
-    CAST(ts_ingested AS DATE) < (CAST(NOW() AS DATE) - 1)
 GROUP BY
     dt_launch,
     id_flag,
     id_ec,
+    ts_ingested,
     year,
     month,
     day

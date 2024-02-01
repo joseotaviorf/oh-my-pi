@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
             destination_path = f"{table}"
             file_name = (
-                f'{table}_{(execution_date.strftime("%Y_%m_%d_%H_%M_%S%z"))}.csv'
+                f'_{(execution_date.strftime("%Y_%m_%d"))}.csv'
             )
             with io.StringIO() as csv_buffer:
                 df.toPandas().convert_dtypes().to_csv(

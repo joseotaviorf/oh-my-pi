@@ -125,6 +125,7 @@ JDT_C AS (
         ja.id_external_payment AS U_ExternalPaymentId,
         ja.description_memo AS Memo,
         'cc:'||substring(sha1(ja.TaxDate||ja.flag||ja.EC), 1, 29) AS U_RSD_UUIDSB,
+        ts_ingested,
         year,
         month,
         day
@@ -164,6 +165,7 @@ JDT AS (
         '' AS CostingCode2,
         MAX(DueDate) AS DueDate_,
         launch_value AS original_bank_value,
+        ts_ingested,
         year,
         month,
         day
@@ -180,6 +182,7 @@ JDT AS (
         BPLID,
         launch_value,
         U_RSD_UUIDSB,
+        ts_ingested,
         year,
         month,
         day
@@ -209,6 +212,7 @@ JDT AS (
         CostingCode2,
         DueDate AS DueDate_,
         0.00 AS original_bank_value,
+        ts_ingested,
         year,
         month,
         day
@@ -239,6 +243,7 @@ JDT AS (
         CostingCode2,
         DueDate AS DueDate_,
         0.00 AS original_bank_value,
+        ts_ingested,
         year,
         month,
         day
@@ -270,6 +275,7 @@ JDT AS (
         '' AS CostingCode2,
         DueDate AS DueDate_,
         0.00 AS original_bank_value,
+        ts_ingested,
         year,
         month,
         day
@@ -301,6 +307,7 @@ JDT AS (
         '' AS CostingCode2,
         DueDate AS DueDate_,
         0.00 AS original_bank_value,
+        ts_ingested,
         year,
         month,
         day
@@ -332,6 +339,7 @@ JDT AS (
         '' AS CostingCode2,
         DueDate AS DueDate_,
         0.00 AS original_bank_value,
+        ts_ingested,
         year,
         month,
         day
@@ -363,6 +371,7 @@ JDT AS (
         '' AS CostingCode2,
         DueDate AS DueDate_,
         0.00 AS original_bank_value,
+        ts_ingested,
         year,
         month,
         day
@@ -423,6 +432,7 @@ STATUS_JDT AS (
         jj.CostingCode,
         jj.CostingCode2,
         jj.DueDate_,
+        jj.ts_ingested,
         jj.year,
         jj.month,
         jj.day

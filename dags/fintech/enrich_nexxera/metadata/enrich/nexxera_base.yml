@@ -136,6 +136,11 @@ columns:
     lineage:
       - datalake_nexxera.financial.dt_sale
       - datalake_nexxera.adjustments.dt_sale_adjustment
+  ts_ingested:
+    description: Timestamp of load
+    lineage:
+      - datalake_nexxera.financial.ts_ingested
+      - datalake_nexxera.adjustments.ts_ingested
   year:
     description: Year of load
     lineage:
