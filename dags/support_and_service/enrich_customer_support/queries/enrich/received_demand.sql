@@ -140,7 +140,9 @@ call AS (
       contact_theme_tag,
       contact_theme_detail_tag,
       step_tag,
-      request_type
+      request_type,
+      area,
+      front_or_back
     FROM
       datalake_customer_support.call
     QUALIFY
@@ -158,6 +160,8 @@ call AS (
     cs.customer_phone,
     NULL AS customer_email,
     cs.department,
+    ct.area,
+    ct.front_or_back,
     ct.client_type,
     ct.customer_type_tag,
     ct.contact_motivation_tag,
@@ -264,6 +268,8 @@ chat AS (
       c.contact_theme_detail_tag,
       c.step_tag,
       c.request_type,
+      c.area,
+      c.front_or_back,
       tr.is_answered,
       tr.ts_reservation_created,
       tr.ts_created
@@ -285,6 +291,8 @@ chat AS (
     customer_phone,
     NULL AS customer_email,
     department,
+    area,
+    front_or_back,
     client_type,
     customer_type_tag,
     contact_motivation_tag,
@@ -326,6 +334,8 @@ email AS (
     NULL AS customer_phone,
     ce.email AS customer_email,
     department,
+    area,
+    front_or_back,
     client_type,
     customer_type_tag,
     contact_motivation_tag,
@@ -400,6 +410,8 @@ SELECT
   rd.request_type,
   rd.completion_reason,
   rd.status,
+  rd.area,
+  rd.front_or_back,
   art.average_reply_time,
   rd.is_answered,
   rd.ts_reservation_created,

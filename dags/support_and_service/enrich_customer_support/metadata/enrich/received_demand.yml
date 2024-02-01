@@ -140,6 +140,18 @@ columns:
       IN PROGRESS: Valid for email channel, when the email ticket is still being solved
       IDLED: Valid for chat channel, when the conversation terminated due to the customer not responding
       EXPIRED: Valid for chat channel, when the session timeouts
+  area:
+    lineage:
+      - datalake_customer_suppor.call.area
+      - datalake_customer_suppor.chat.area
+      - datalake_customer_suppor.email.area
+    description: Department area (e.g. CX).
+  front_or_back:
+    lineage:
+      - datalake_customer_suppor.call.front_or_back
+      - datalake_customer_suppor.chat.front_or_back
+      - datalake_customer_suppor.email.front_or_back
+    description: Department classification as front or back.
   is_answered:
     description:
       The status of the demand, whether it was answered or not, is determined
