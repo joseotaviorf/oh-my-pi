@@ -9,12 +9,7 @@ workflow:
   type: query
   layer: dw
   custom_schema: repairs
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
-  tables_customization:
-    dim_repair_ongoing:
-      extraction_type: full
-      partitions: []
+  default_extraction_type: full
 cluster:
   type: databricks_10_4_med_io-memory_photon_cluster
   access_control_list:

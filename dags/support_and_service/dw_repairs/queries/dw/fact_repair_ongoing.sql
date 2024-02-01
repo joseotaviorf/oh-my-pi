@@ -61,7 +61,3 @@ FROM datalake_repairs.repair_tickets AS rt
   LEFT JOIN
     repair_request_chat AS rrc
       ON rrc.sk_repair_request = rt.id_request
-WHERE
-    rt.year = {year}
-    AND rt.month = {month}
-    AND rt.day = {day}
