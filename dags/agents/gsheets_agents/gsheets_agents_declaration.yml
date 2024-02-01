@@ -1,6 +1,6 @@
 dag:
   name: gsheets_agents
-  schedule_interval: 30 23 28-31 * *
+  schedule_interval: 00 19 28-31 * *
   owner: Data Agents
 cluster:
   type: databricks_10_4_med_general_cluster
