@@ -1,0 +1,29 @@
+dag:
+  name: enrich_satisfaction_rating
+  schedule_start_date: 2022, 4, 19
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG unifies various sources of satisfaction survey data, so that it is possible to stack
+      and enrich these sources in a single view for the Support and Service line.
+workflow:
+  type: query
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  inner_dependencies:
+    satisfaction_answers:
+      - bigfone_surveys
+      - chat_fup_surveys
+      - gsheets_surveys
+      - survicate_surveys
+      - zendesk_surveys
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    aws_attributes:
+      availability: ON_DEMAND

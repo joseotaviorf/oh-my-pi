@@ -1,0 +1,48 @@
+dag:
+  name: enrich_inspections
+  schedule_start_date: 2022, 1, 19
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for the union tables between new Inspection Services data and old PWA data, 
+      as well as the construction of metrics through this data.
+
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    item:
+      - inspection_booking
+      - item_group
+    item_issue:
+      - item
+    item_media:
+      - item
+    item_review:
+      - item
+  tables_customization:
+    inspection_booking: {}
+    item_group:
+      partitions: [year, month, day]
+      extraction_type: incremental
+    item_issue:
+      partitions: [year, month, day]
+      extraction_type: incremental
+    item_media:
+      partitions: [year, month, day]
+      extraction_type: incremental
+    item_review:
+      partitions: [year, month, day]
+      extraction_type: incremental
+    item:
+      partitions: [year, month, day]
+      extraction_type: incremental
+    room:
+      partitions: [year, month, day]
+      extraction_type: incremental
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.4xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 3

@@ -1,0 +1,13 @@
+dag:
+  name: enrich_amplitude_magic_link
+  schedule_start_date: 2022, 9, 22
+  owner: Data SS
+  documentation:
+    dag_purpose: Formatting and json extract in Amplitude Magic Link 2.0 data.
+workflow:
+  type: query
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+cluster:
+  type: databricks_10_4_med_io-memory_photon_cluster

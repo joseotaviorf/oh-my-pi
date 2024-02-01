@@ -1,0 +1,31 @@
+dag:
+  name: enrich_offboarding
+  schedule_start_date: 2020, 7, 1
+  owner: Data SS
+  documentation:
+    dag_purpose: Compile different tables of offboading context, to better elaborate questions about it.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    customer_support:
+      - ongoing
+    consolidate_data:
+      - budgeting_window
+      - customer_support
+      - inspection_analysis
+      - ongoing
+      - tickets
+      - nps_agg
+    inspection_analysis:
+      - ongoing
+    ongoing:
+      - contract_termination
+    nps:
+      - contract_termination
+    nps_agg:
+      - nps
+    tickets:
+      - ongoing
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
