@@ -3,19 +3,19 @@ WITH persona_type_pivot AS (
     pt.id_snapshot,
     pt.id_user,
     pt.id_country,
-    COALESCE(pt.cpf, -1) AS id_personal_number,
+    COALESCE(MAX(pt.cpf), -1) AS id_personal_number,
     pt.country_code,
     pt.main_phone,
     pt.name,
     pt.email,
     pt.is_active,
     pt.is_blocked,
-    COALESCE(pt.dt_birth, CAST('1900-01-01' AS TIMESTAMP)) AS dt_user_birth,
-    COALESCE(pt.ts_user_updated, CAST('1900-01-01' AS TIMESTAMP)) AS ts_user_updated,
-    COALESCE(pt.ts_user_created, CAST('1900-01-01' AS TIMESTAMP)) AS ts_user_created,
     year,
     month,
     day,
+    COALESCE(MAX(pt.dt_birth), CAST('1900-01-01' AS TIMESTAMP)) AS dt_user_birth,
+    COALESCE(MAX(pt.ts_user_updated), CAST('1900-01-01' AS TIMESTAMP)) AS ts_user_updated,
+    COALESCE(MAX(pt.ts_user_created), CAST('1900-01-01' AS TIMESTAMP)) AS ts_user_created,
     MAX(CASE WHEN pt.client_type = 'tenant' THEN pt.journey_step ELSE NULL END) AS tenant_journey_step,
     MAX(CASE WHEN pt.client_type = 'tenant' THEN pt.persona_step ELSE NULL END) AS tenant_persona_step,
     MAX(CASE WHEN pt.client_type = 'tenant' THEN pt.is_offboarding ELSE FALSE END) AS is_tenant_offboarding,
@@ -47,7 +47,7 @@ WITH persona_type_pivot AS (
     pt.year = {year}
     AND pt.month = {month}
     AND pt.day = {day}
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+  GROUP BY 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13
 )
 SELECT
   ptp.id_snapshot,
