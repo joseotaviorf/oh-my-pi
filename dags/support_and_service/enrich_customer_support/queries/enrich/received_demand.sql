@@ -410,8 +410,8 @@ SELECT
   rd.request_type,
   rd.completion_reason,
   rd.status,
-  rd.area,
-  rd.front_or_back,
+  COALESCE(rd.area, dc.area) AS area,
+  LOWER(COALESCE(rd.front_or_back, dc.front_or_back)) AS front_or_back,
   art.average_reply_time,
   rd.is_answered,
   rd.ts_reservation_created,
@@ -423,3 +423,6 @@ LEFT JOIN
     ON art.id_task = rd.id_task
     AND art.agent_email = rd.agent_email
     AND channel = 'chat'
+LEFT JOIN
+  datalake_gsheets_clean.department_control AS dc
+    ON dc.department = rd.department

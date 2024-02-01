@@ -145,12 +145,14 @@ columns:
       - datalake_customer_suppor.call.area
       - datalake_customer_suppor.chat.area
       - datalake_customer_suppor.email.area
+      - datalake_gsheets_clean.department_control.area
     description: Department area (e.g. CX).
   front_or_back:
     lineage:
       - datalake_customer_suppor.call.front_or_back
       - datalake_customer_suppor.chat.front_or_back
       - datalake_customer_suppor.email.front_or_back
+      - datalake_gsheets_clean.department_control.front_or_back
     description: Department classification as front or back.
   is_answered:
     description:
