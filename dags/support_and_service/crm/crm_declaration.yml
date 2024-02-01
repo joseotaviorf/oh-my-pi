@@ -1,13 +1,15 @@
 dag:
-  name: crm_test
+  name: crm
   schedule_start_date: 2021, 2, 18
   schedule_interval: 0 0 * * *
-  owner: Data Engineering
+  owner: Data SS
+  documentation:
+    dag_purpose: Retrieves data from CRM (Customer Relationship Management) and load it on datalake.
 workflow:
   type: database_pull
   layer: raw
-  custom_schema: crm_test
   database_type: mongo
+  lineage_product_database_name: crm
   dbutils_secret_key: CRM_DB
   tables_customization:
     tasks:
