@@ -145,8 +145,8 @@ propose_person AS (
 cash_flow_propose AS (
     SELECT DISTINCT
         cf.id_securities,
-        pp_doc.id_propose,
-        ROW_NUMBER() OVER (PARTITION BY cf.id_securities, cf.id_client ORDER BY pp_doc.id_propose DESC) AS rn
+        COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose) AS id_propose,
+        ROW_NUMBER() OVER (PARTITION BY cf.id_securities, cf.id_client ORDER BY COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose) DESC) AS rn
     FROM
         datalake_velo_omie.cash_flows AS cf
     LEFT JOIN
@@ -159,8 +159,11 @@ cash_flow_propose AS (
         propose_person AS pp_doc
             ON pp_doc.document = COALESCE(ccpf.document_number, ccnpj.document_number)
             AND COALESCE(cf.dt_due BETWEEN pp_doc.dt_contract_started AND DATE_ADD(pp_doc.dt_ended, 31), 1=1)
+    LEFT JOIN
+        propose_person AS pp_doc_fallback
+            ON pp_doc_fallback.document = COALESCE(ccpf.document_number, ccnpj.document_number)
     WHERE
-        pp_doc.id_propose IS NOT NULL
+        COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose) IS NOT NULL
 )
 SELECT
     CAST(CONCAT(ct.id_securities, REPLACE(ct.id_category, '.', '')) AS BIGINT) AS id_transaction_entry,
