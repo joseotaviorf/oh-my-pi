@@ -11,6 +11,7 @@ WITH consolidated_sources AS (
         utm_term,
         utm_content,
         utm_campaign,
+        NULL AS city_group,
         desktop_cost,
         mobile_cost,
         other_cost,
@@ -34,6 +35,7 @@ WITH consolidated_sources AS (
         NULL AS utm_term,
         NULL AS utm_content,
         utm_campaign,
+        NULL AS city_group,
         0.0 AS desktop_cost,
         0.0 AS mobile_cost,
         other_cost,
@@ -57,6 +59,7 @@ WITH consolidated_sources AS (
         NULL AS utm_term,
         NULL AS utm_content,
         utm_campaign,
+        NULL AS city_group,
         0.0 AS desktop_cost,
         0.0 AS mobile_cost,
         other_cost,
@@ -80,6 +83,7 @@ WITH consolidated_sources AS (
         NULL AS utm_term,
         NULL AS utm_content,
         utm_campaign,
+        NULL AS city_group,
         desktop_cost,
         mobile_cost,
         0.0 AS other_cost,
@@ -103,6 +107,7 @@ WITH consolidated_sources AS (
         NULL AS utm_term,
         NULL AS utm_content,
         utm_campaign,
+        NULL AS city_group,
         desktop_cost,
         mobile_cost,
         0.0 AS other_cost,
@@ -126,6 +131,7 @@ WITH consolidated_sources AS (
         utm_term,
         utm_content,
         utm_campaign,
+        NULL AS city_group,
         desktop_cost,
         mobile_cost,
         other_cost,
@@ -136,6 +142,31 @@ WITH consolidated_sources AS (
         datalake_consolidated_marketing_metrics.facebook_consolidated_metrics
     WHERE
         id_date BETWEEN INT(REPLACE(DATE('{load_start_date}'), '-', '')) AND INT(REPLACE(DATE('{load_end_date}'), '-', ''))
+    -- BRAZE
+    UNION ALL
+    SELECT 
+        id_date,
+        'braze' AS origin,
+        NULL AS business_context,
+        campaign_name,
+        account_name,
+        NULL AS report_type,
+        NULL AS ad_type,
+        NULL AS utm_term,
+        NULL AS utm_content,   
+        NULL AS utm_campaign,
+        city_group,
+        0.0 AS desktop_cost,
+        0.0 AS mobile_cost,
+        0.0 AS other_cost,
+        cost AS total_cost,
+        0 AS impressions,
+        0 AS clicks
+    FROM
+        datalake_consolidated_marketing_metrics.braze_consolidated_metrics
+    WHERE
+        id_date BETWEEN INT(REPLACE(DATE('{load_start_date}'), '-', '')) AND INT(REPLACE(DATE('{load_end_date}'), '-', ''))
+        AND id_date >= 20220912               
 )
 
 SELECT
@@ -155,7 +186,10 @@ SELECT
             THEN 'Doorman'
         ELSE 'Other'
     END AS campaign_origin_acquisition,
-    COALESCE(ch.city_group, sr.city_group, dr.city_group, 'Not Mapped') AS city_group,
+    CASE 
+        WHEN origin = 'braze' THEN cs.city_group
+        ELSE COALESCE(ch.city_group, sr.city_group, dr.city_group, 'Not Mapped') 
+    END AS city_group,
     cs.report_type,
     cs.ad_type,
     cs.utm_campaign,
