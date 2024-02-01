@@ -113,6 +113,12 @@ sheets_info:
     clean_table_name: contract_attribution_models
     sheet_context: growth
 
+  cost_taxonomy_translation_dictionary:
+    sheet_id: 1S3Zk5cn_XgkAa2YvMOQ0-C-cOanVTEDPBkJMNW6mppQ
+    sheet_name: dictionary
+    clean_table_name: cost_taxonomy_translation_dictionary
+    sheet_context: growth
+    
   costs_targets:
     sheet_id: 1g_HngmcykZuj-c5PfhGeBo0m969ipBEQ04Hy2diIns4
     sheet_name: costs_targets

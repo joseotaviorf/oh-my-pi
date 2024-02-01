@@ -1,0 +1,16 @@
+SELECT
+  account_name,
+  campaign_name, 
+  report_type, 
+  ad_type, 
+  origin, 
+  funnel_side, 
+  campaign_name_convention,
+  campaign_strategy_intent, 
+  behavior_type, 
+  medium, 
+  source, 
+  campaign_business_context, 
+  landing_page
+FROM
+  datalake_gsheets_raw.cost_taxonomy_translation_dictionary
