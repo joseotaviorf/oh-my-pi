@@ -24,6 +24,8 @@ WITH call_tickets AS (
     MD5("N/A") AS id_service_status,
     'call' AS channel,
     ticket_origin,
+    contact_theme_tag AS theme,
+    contact_theme_detail_tag AS theme_detail,
     last_csat_score AS csat_score,
     first_csat_score,
     status,
@@ -108,7 +110,7 @@ WITH call_tickets AS (
     ts_csat_last_response AS ts_survey
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
 ),
 chat_tickets AS (
   SELECT
@@ -136,6 +138,8 @@ chat_tickets AS (
     MD5(service_status) AS id_service_status,
     'chat' AS channel,
     ticket_origin,
+    contact_theme_tag AS theme,
+    contact_theme_detail_tag AS theme_detail,
     last_csat_score AS csat_score,
     first_csat_score,
     status,
@@ -216,7 +220,7 @@ chat_tickets AS (
     ts_csat_last_response AS ts_survey
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
 ),
 email_tickets AS (
   SELECT
@@ -244,6 +248,8 @@ email_tickets AS (
     MD5("N/A") AS id_service_status,
     'email' AS channel,
     'N/A' AS ticket_origin,
+    contact_theme_tag AS theme,
+    contact_theme_detail_tag AS theme_detail,
     csat_score,
     first_csat_score,
     status,
@@ -323,7 +329,7 @@ email_tickets AS (
     NULL AS ts_survey
   FROM
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
 ),
 historical_call_tickets AS (
   SELECT
@@ -351,6 +357,8 @@ historical_call_tickets AS (
     MD5("N/A") AS id_service_status,
     'call' AS channel,
     'N/A' AS ticket_origin,
+    NULL AS theme,
+    NULL AS theme_detail,
     NULL AS csat_score,
     NULL AS first_csat_score,
     status,
@@ -389,7 +397,7 @@ historical_call_tickets AS (
     NULL AS ts_survey
   FROM
     datalake_customer_support.historical_call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
 ),
 historical_chat_tickets AS (
   SELECT
@@ -417,6 +425,8 @@ historical_chat_tickets AS (
     MD5("N/A") AS id_service_status,
     'chat' AS channel,
     'N/A' AS ticket_origin,
+    NULL AS theme,
+    NULL AS theme_detail,
     csat_score,
     NULL AS first_csat_score,
     status,
@@ -480,7 +490,7 @@ historical_chat_tickets AS (
     NULL AS ts_survey
   FROM
     datalake_customer_support.historical_chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
 ),
 base_tickets AS (
   SELECT
@@ -523,6 +533,14 @@ SELECT DISTINCT
     bt.id_service_status,
     bt.channel,
     bt.ticket_origin,
+    bt.theme,
+    bt.theme_detail,
+    CASE
+      WHEN tr.sub_journey IN ('Contract to Entrance', 'Listing & Search', 'Offboarding', 'Onboarding', 'Visits to Offer') THEN 'ForRent'
+      WHEN tr.sub_journey = 'For Sale' THEN 'ForSale'
+      WHEN tr.sub_journey = 'Partners' THEN 'Partners'
+      ELSE NULL
+    END AS context,
     bt.csat_score,
     bt.first_csat_score,
     bt.status,
@@ -536,8 +554,17 @@ SELECT DISTINCT
     bt.back_tickets,
     bt.resolution_survey,
     CASE
-      WHEN bt.is_ticket_rate AND bt.front_or_back = 'front' THEN 1
-      WHEN bt.is_ticket_rate AND bt.front_or_back = 'back' THEN 2
+      WHEN bt.is_ticket_rate AND tr.sub_journey = 'Ongoing' THEN
+        CASE
+          WHEN bt.front_or_back = 'front' THEN 15
+          WHEN bt.front_or_back = 'back' THEN 30
+        END
+      WHEN bt.is_ticket_rate AND tr.sub_journey IN ('Contract to Entrance', 'For Sale',
+        'Listing & Search', 'Offboarding', 'Onboarding', 'Partners', 'Visits to Offer') THEN 
+          CASE
+            WHEN bt.front_or_back = 'front' THEN 1
+            WHEN bt.front_or_back = 'back' THEN 2
+          END
       ELSE NULL
     END AS ticket_rate_weight,
     bt.is_ticket_rate,
@@ -566,3 +593,7 @@ SELECT DISTINCT
     bt.ts_survey
 FROM
     base_tickets AS bt
+LEFT JOIN
+  datalake_gsheets_clean.ticket_rate_classification AS tr
+    ON bt.theme_detail = tr.micro_taxonomy
+      AND bt.theme = tr.macro_taxonomy

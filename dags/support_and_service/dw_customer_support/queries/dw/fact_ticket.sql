@@ -33,6 +33,7 @@ SELECT DISTINCT
     fc.sk_next_ticket,
     ut.channel,
     ut.ticket_origin,
+    ut.context,
     ut.csat_score,
     ut.first_csat_score,
     ut.status,
@@ -45,11 +46,7 @@ SELECT DISTINCT
     ut.last_back_ticket,
     ut.back_tickets,
     ut.resolution_survey,
-    CASE
-      WHEN ut.is_ticket_rate AND ut.front_or_back = 'front' THEN 1
-      WHEN ut.is_ticket_rate AND ut.front_or_back = 'back' THEN 2
-      ELSE NULL
-    END AS ticket_rate_weight,
+    ut.ticket_rate_weight,
     ut.is_ticket_rate,
     ut.has_answered_csat,
     ut.has_back_ticket,

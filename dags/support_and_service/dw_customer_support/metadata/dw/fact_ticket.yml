@@ -79,6 +79,15 @@ columns:
     description: It is the source channel of the chat ticket, which can be whatsapp or chat5A.
     lineage:
       - datalake_customer_support.unified_tickets.ticket_origin
+  context:
+    description: Context of the ticket.
+    categories:
+      "ForRent": Ticket is considered from the ForRent context because has subjourney 'Contract to Entrance',
+        'Listing & Search', 'Offboarding', 'Onboarding' or 'Visits to Offer'.
+      "ForSale": Ticket is considered from the ForSale context because has subjourney 'For Sale'.
+      "Partners": Ticket is considered from the Partners context because has subjourney 'Partners'.
+    lineage:
+      - datalake_customer_support.unified_tickets.context
   csat_score:
     lineage:
       - datalake_customer_support.unified_tickets.csat_score
@@ -148,8 +157,12 @@ columns:
       - datalake_customer_support.unified_tickets.ticket_rate_weight
     description: The weight applied to the ticket if it's part of the ticket rate calculation.
     categories:
-      "1": Ticket rate weight is 1 and is based on being a front ticket.
-      "2": Ticket rate weight is 2 and is based on being a back ticket.
+      "1": Ticket rate weight is 1 and is based on being a front ticket and in the sub journeys 'Contract to Entrance',
+        'For Sale', 'Listing & Search', 'Offboarding', 'Onboarding', 'Partners' or 'Visits to Offer'.
+      "2": Ticket rate weight is 2 and is based on being a back ticket and in the sub journeys 'Contract to Entrance',
+        'For Sale', 'Listing & Search', 'Offboarding', 'Onboarding', 'Partners' or 'Visits to Offer'.
+      "15": Ticket rate weight is 15 and is based on being a front ticket and in the sub journey 'Ongoing'.
+      "30": Ticket rate weight is 30 and is based on being a back ticket and in the sub journey 'Ongoing'.
       "Null": No weight applied if the ticket is not part of the ticket rate rules.
   is_ticket_rate:
     lineage:
