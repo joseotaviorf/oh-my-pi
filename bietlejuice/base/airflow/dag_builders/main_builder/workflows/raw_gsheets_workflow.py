@@ -314,7 +314,13 @@ class RawGsheetsWorkflow(BaseWorkflow):
             json={
                 "spark_python_task": {
                     "python_file": f"{self.base_spark_jobs_path}load_modified_gsheets_id.py",
-                    "parameters": [self.env, self.datalake_bucket, dag_name],
+                    "parameters": [
+                        self.env,
+                        self.datalake_bucket,
+                        dag_name,
+                        self.credentials_key,
+                        self.credentials_scope,
+                    ],
                 }
             },
             do_output_xcom_push=True,

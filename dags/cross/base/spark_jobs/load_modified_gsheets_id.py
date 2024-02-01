@@ -44,14 +44,14 @@ def build_drive_api_service(scoped_credentials) -> Any:
     return drive_service
 
 
-def __get_auth(dbutils):
+def __get_auth(dbutils, credentials_scope, credentials_key):
     """
     This method gets credentials from the Gsheets API.
     @param dbutils: DBUtils.
     @return: dict and str
     """
     credentials = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.GSHEETS_CREDENTIALS)
+        dbutils.secrets.get(scope=credentials_scope, key=credentials_key)
     )
     scope = credentials.pop("scope")
     return credentials, scope
@@ -63,12 +63,16 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket")
     parser.add_argument("dag_name")
+    parser.add_argument("credentials_key", help="Credentials to access the Google Sheets API")
+    parser.add_argument("credentials_scope", help="Databricks secret scope")
 
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     dag_name = args.dag_name
+    credentials_key = args.credentials_key
+    credentials_scope = args.credentials_scope
 
     config_service = ConfigurationService(dag_name)
     sheet_details = config_service.get_config("sheets_info")
@@ -77,7 +81,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    credentials, scope = __get_auth(dbutils)
+    credentials, scope = __get_auth(dbutils, credentials_scope, credentials_key)
     gsheets_client = GoogleSheetsClient(credentials, scope)
 
     scoped_credentials = build_scoped_credentials(credentials)
