@@ -129,6 +129,7 @@ metabase_dashboard_enrich as (
         WHEN mc.readable_location like 'BedRock%' THEN 'BedRock'
         WHEN mc.readable_location like 'Tech Platform%' THEN 'Tech Platform'
         WHEN mc.readable_location like 'Support and Services%' THEN 'Support and Services'
+        WHEN mc.readable_location like 'People%' THEN 'People'
         ELSE Null
       END as domain,
       case

@@ -42,3 +42,5 @@ data-services-support:
   - "**/dags/support_and_service/**"
 data-fintech:
   - "**/dags/fintech/**"
+data-people:
+  - "**/dags/people/**"
