@@ -1,4 +1,0 @@
----
-dag_documentation:
-  dag_purpose: |
-    Creates enriched tables for the context `Listing Jobs` of multiple sources.

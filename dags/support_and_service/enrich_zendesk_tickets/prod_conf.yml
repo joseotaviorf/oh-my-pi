@@ -1,5 +1,0 @@
----
-dag_documentation:
-  dag_purpose: |
-    This is the second layer of the enrichment phase of the Zendesk data preparation.
-    Zendesk is responsible for the tickets of the customer services.

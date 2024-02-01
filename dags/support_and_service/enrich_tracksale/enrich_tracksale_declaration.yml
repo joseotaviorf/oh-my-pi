@@ -1,0 +1,22 @@
+dag:
+    name: enrich_tracksale
+    schedule_start_date: 2020, 7, 21
+    owner: Data SS
+    documentation: 
+        dag_purpose: |
+          Prepares [Tracksale](https://www.tracksale.co/) data for business utilization. Tracksale is an external service that manages NPS data.
+workflow:
+    type: query
+    layer: enrich
+    inner_dependencies:
+      answer_cities:
+        - answer_tags
+      answer_tags:
+        - answer
+      customer_conversions:
+        - answer
+        - dispatch
+      answer_justifications:
+        - answer
+cluster:
+    type: databricks_10_4_med_compute_cluster
