@@ -1,0 +1,50 @@
+dag:
+  name: repairs
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 0 1 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG handles the ingestion of the raw and clean data for our Repairs Service, \n
+      which is a Service that was created to make repairs experience faster and easier for \n
+      Tenants and Landlords. Check [its own repository](https://github.com/quintoandar/repairs) \n
+      for more informations.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: repairs
+  dbutils_secret_key: REPAIRS_DB
+  tables_customization:
+    instant_approval_preference:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+    repair_evidence:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+    repair_expense: {}
+    repair_expense_group: {}
+    repair_request:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+    repair_request_chat: {}
+    repair_request_item:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+    repair_request_tenant_negotiation_follow_up:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+    service_request:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+    attachment: {}
+    repair_request_budget: {}
+    repair_request_budget_attachment: {}
+cluster:
+  type: databricks_10_4_med_general_cluster
