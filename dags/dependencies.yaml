@@ -2193,6 +2193,7 @@ bietlejuice.enrich_repairs:
   - bietlejuice.enrich_survicate:load-enrich-repairs-surveys
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+  - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-history
   - bietlejuice.repairs:load-clean-repair-request-chat
 bietlejuice.enrich_reports_validation:
   - bietlejuice.reports:load-clean-daily-listings-summary
@@ -2683,11 +2684,11 @@ bietlejuice.enrich_zendesk_custom_fields:
 bietlejuice.enrich_zendesk_ticket_funnels:
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
-  - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements
-  - bietlejuice.enrich_zendesk_tickets:load-enrich-zendesk-users-contact
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
 bietlejuice.enrich_zendesk_tickets:
+  - bietlejuice.enrich_date:load-enrich-workday-window
   - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
+  - bietlejuice.zendesk_tickets:load-clean-tickets-history
 bietlejuice.enrich_zendesk_users:
   - bietlejuice.bigfone:load-clean-event
   - bietlejuice.quinto_messenger:load-clean-task

@@ -77,8 +77,10 @@ SELECT
     tf.tags,
     tf.ticket_via,
     tf.channel,
+    tf.agent_name,
     tf.agent_email,
     tf.agent_organization,
+    th.contestation_task_origin,
     rr.service_provider,
     COALESCE(chat.contact_theme_tag, call.contact_theme_tag, email.contact_theme_tag) AS theme,
     COALESCE(chat.contact_theme_detail_tag, call.contact_theme_detail_tag, email.contact_theme_detail_tag) AS theme_detail,
@@ -90,12 +92,17 @@ SELECT
     csat.improvement_tags AS csat_tags,
     csat.satisfaction_score AS csat_score,
     csat.secondary_satisfaction_score AS csat_partes,
+    th.is_closed_by_merge,
+    th.is_contestation_backlog,
+    th.is_ticket_followup,
     fi.has_chat_negociation,
     tfm.reopens,
     tfm.replies,
     rd.relisting,
     tfm.minutes_reply_calendar AS minutes_first_reply_time_calendar,
     c.dt_entered AS entrance_date,
+    th.dt_contestation,
+    th.dt_resolution_contestation,
     fi.ts_first_interaction,
     tf.ts_created_local,
     tf.ts_updated_local,
@@ -144,6 +151,9 @@ LEFT JOIN
 LEFT JOIN 
     first_interaction fi
         ON fi.id_third_party_crm_ticket_external = tf.id_ticket
+LEFT JOIN
+    datalake_zendesk_tickets.ticket_history AS th
+        ON tf.id_ticket = th.id_ticket
 WHERE 
     tf.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
     AND (tf.ts_created >= DATE_ADD(CURRENT_DATE,-20*7) OR tfm.ts_solved >= date('2023-01-01') OR tfm.ts_solved IS NULL)
