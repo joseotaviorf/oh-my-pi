@@ -1471,6 +1471,7 @@ bietlejuice.enrich_ebdb_pricing:
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:load-clean-pre-proposal
   - bietlejuice.ebdb:load-clean-pre-proposal-aud

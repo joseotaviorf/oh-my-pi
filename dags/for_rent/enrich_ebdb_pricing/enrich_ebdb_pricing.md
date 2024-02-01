@@ -16,5 +16,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 - `rent_listing_price_changes`
+- `rent_percentile_price_changes`
 
 </details>
