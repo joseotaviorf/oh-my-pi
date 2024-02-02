@@ -36,8 +36,8 @@ spec:
         - github-packages
 
   channels:
-    squad: "#data-ingestion"
-    alerts: "#alerts-de-airflow-dags"
+    squad: "data-ingestion"
+    alerts: "alerts-de-airflow-dags"
 
   dates:
     launch: 27/10/2016
