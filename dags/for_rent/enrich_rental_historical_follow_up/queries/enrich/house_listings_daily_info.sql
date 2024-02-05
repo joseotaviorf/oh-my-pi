@@ -109,7 +109,10 @@ listings_states_per_day AS (
         heh.doorman_type,
         awk.first_key_location,
         heh.key_location,
-        rph.rent,
+        rlpc.price AS rent,
+        rppc.p_10,
+        rppc.p_90,
+        rppc.certainty,
         hls.status_history,
         hls.status_change_reason,
         hl.listing_category,
@@ -172,11 +175,10 @@ listings_states_per_day AS (
             AND dbase.dt_day < COALESCE(DATE(heh.ts_entrance_ended), '2100-01-01')
             AND heh.is_last_status_of_day = True
     LEFT JOIN
-        datalake_ebdb_smart_price.rental_price_history AS rph
-            ON COALESCE(pled.id_house, hl.id_house) = rph.id_house
-            AND dbase.dt_day >= DATE(rph.ts_price_started)
-            AND dbase.dt_day < COALESCE(DATE(rph.ts_price_ended), '2100-01-01')
-            AND rph.is_last_status_of_day = True
+        datalake_ebdb_pricing.rent_listing_price_changes AS rlpc
+            ON COALESCE(pled.id_house, hl.id_house) = rlpc.id_house
+            AND dbase.dt_day >= DATE(rlpc.ts_price_started)
+            AND dbase.dt_day < COALESCE(DATE(rlpc.ts_price_ended), '2100-01-01')
     LEFT JOIN
         datalake_pro_owners.house_b2b_history AS hbh
             ON COALESCE(pled.id_house, hl.id_house) = hbh.id_house
@@ -196,6 +198,12 @@ listings_states_per_day AS (
         datalake_ebdb_listing.house_status AS hs
             ON hls.status_history <=> hs.house_status
             AND hls.status_change_reason <=> hs.status_reason
+    LEFT JOIN
+        datalake_ebdb_pricing.rent_percentile_price_changes AS rppc
+            ON COALESCE(pled.id_house, hl.id_house) = rppc.id_house
+            AND dbase.dt_day >= DATE(rppc.ts_price_started)
+            AND dbase.dt_day < COALESCE(DATE(rppc.ts_price_ended), '2100-01-01')
+            AND rppc.is_last_status_of_day = True
     /* 
     This table is used for For_Rent and
     should be similar to fact_house_listing_status, so
@@ -227,6 +235,9 @@ SELECT
     first_key_location,
     key_location,
     rent,
+    p_10,
+    p_90,
+    certainty,
     status_history,
     status_change_reason,
     listing_category,
