@@ -35,27 +35,27 @@ proposal_tenant AS (
     pt.cpf IS NOT NULL
 ),
 proposal_last_contract AS (
-    SELECT
-        plt.id_proposal,
-        plt.proposal_ts_created,
-        plt.proposal_cpf,
-        tc.sk_user_fcp,
-        tc.contract_cpf,
-        tc.id_contract,
-        tc.contract_ts_created,
-        tc.contract_dt_start,
-        tc.contract_dt_annulment,
-        tc.contract_id_proposal,
-        tc.sk_client_flrf
-    FROM
-        proposal_tenant AS plt
-    INNER JOIN
-        tenant_contract AS tc
-          ON tc.contract_cpf = plt.proposal_cpf
-    WHERE
-        plt.proposal_ts_created > tc.contract_dt_start
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY plt.id_proposal, plt.proposal_cpf ORDER BY tc.contract_dt_start DESC) = 1
+  SELECT
+    plt.id_proposal,
+    plt.proposal_ts_created,
+    plt.proposal_cpf,
+    tc.sk_user_fcp,
+    tc.contract_cpf,
+    tc.id_contract,
+    tc.contract_ts_created,
+    tc.contract_dt_start,
+    tc.contract_dt_annulment,
+    tc.contract_id_proposal,
+    tc.sk_client_flrf
+  FROM
+    proposal_tenant AS plt
+  INNER JOIN
+    tenant_contract AS tc
+      ON tc.contract_cpf = plt.proposal_cpf
+  WHERE
+    plt.proposal_ts_created > tc.contract_dt_start
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY plt.id_proposal, plt.proposal_cpf ORDER BY tc.contract_dt_start DESC) = 1
 ),
 proposal_retenant AS (
   SELECT
@@ -148,12 +148,15 @@ proposal_contract_label AS (
   SELECT
     prc.id_proposal,
     ca.id_credit_analysis AS sk_credit_analysis,
-    prc.last_contract AS id_last_contract,
-    DATEDIFF(
-      MONTH,
-      DATE_TRUNC('month', prc.contract_dt_annulment),
-      DATE_TRUNC('month', DATE(prc.proposal_ts_created))
-    ) AS contract_age,
+    prc.last_contract AS last_active_contract,
+    CASE
+      WHEN prc.contract_dt_annulment < prc.proposal_ts_created THEN DATEDIFF(
+        MONTH,
+        DATE_TRUNC('month', prc.contract_dt_annulment),
+        DATE_TRUNC('month', DATE(prc.proposal_ts_created))
+      )
+      ELSE NULL
+    END AS contract_age,
     (
       CASE
         WHEN prc.count_cpf_contract <> 0 THEN 'retenant'
@@ -218,6 +221,7 @@ proposal_contract_label AS (
 )
 SELECT
   sk_credit_analysis,
+  last_active_contract,
   contract_age,
   any_proponent,
   main_proponent,
