@@ -1,11 +1,11 @@
 WITH business_context_operation AS (
-    SELECT 
+    SELECT
         id_region,
         SOME(business_context = 'RENT') AS has_rent_operation,
         SOME(business_context = 'SALE') AS has_sale_operation
-    FROM 
+    FROM
         datalake_ebdb_clean.region_business_contexts_served
-    GROUP BY 
+    GROUP BY
         1
 )
 SELECT
@@ -18,7 +18,7 @@ SELECT
     r.level,
     COALESCE(r.name, ar.neighbourhood) AS name,
     mr.name AS macro_region_name,
-    COALESCE(ar.city, c.name) AS city_name,
+    COALESCE(c.name, ar.city) AS city_name,
     ar.city_group,
     CAST(ar.ddd AS STRING) AS city_ddd,
     ar.region_code,
@@ -61,6 +61,6 @@ JOIN
 LEFT JOIN
   datalake_gsheets_clean.auxiliary_region AS ar
     ON r.id = ar.id
-LEFT JOIN 
+LEFT JOIN
   business_context_operation AS bco
     ON bco.id_region = r.id
