@@ -17,16 +17,20 @@ workflow:
   tables_customization:
     t_journey_content:
       extraction_type: full
+      clean_table_name: journey_content
     t_rule:
       extraction_type: full
+      clean_table_name: rule
     t_journey_flow:
       date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]
+      clean_table_name: journey_flow
     t_dialog:
       date_filter_column: creation
       extraction_type: incremental
       partitions: [year, month, day]
+      clean_table_name: dialog
 
 cluster:
   type: custom_cluster
