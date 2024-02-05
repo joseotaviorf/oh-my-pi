@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_clean
+table_name: work_contract
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.workcontract.id
+  contract_name:
+    lineage:
+      - datalake_ebdb_raw.workcontract.contractname
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.workcontract.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.workcontract.atualizadoem

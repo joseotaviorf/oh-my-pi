@@ -1,0 +1,36 @@
+database_name: datalake_ebdb_clean
+table_name: contract_version
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.contractversion.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.contractversion.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.contractversion.criadoem
+  description:
+    lineage:
+      - datalake_ebdb_raw.contractversion.description
+  name:
+    lineage:
+      - datalake_ebdb_raw.contractversion.name
+  has_residential_insurance:
+    lineage:
+      - datalake_ebdb_raw.contractversion.hasresidentialinsurance
+  internal_display_label:
+    lineage:
+      - datalake_ebdb_raw.contractversion.internaldisplaylabel
+  version_display_contract:
+    lineage:
+      - datalake_ebdb_raw.contractversion.versiondisplaycontract
+  is_auth_with_admin_contract:
+    lineage:
+      - datalake_ebdb_raw.contractversion.isauthwithadmincontract
+  should_calculate_first_payment:
+    lineage:
+      - datalake_ebdb_raw.contractversion.shouldcalculatefirstpayment
+  is_self_condo:
+    lineage:
+      - datalake_ebdb_raw.contractversion.isselfcondo
