@@ -9,5 +9,5 @@ SELECT
     created_at AS ts_created,
     updated_at AS ts_updated,
     approved_at AS ts_approved
-FROM 
-    datalake_journey_flow_raw.t_rule 
+FROM
+    datalake_journey_flow_raw.t_rule

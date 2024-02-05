@@ -50,3 +50,12 @@ columns:
   ts_created:
     lineage:
       - datalake_journey_flow_raw.t_dialog.creation
+  year:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.creation
+  month:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.creation
+  day:
+    lineage:
+      - datalake_journey_flow_raw.t_dialog.creation
