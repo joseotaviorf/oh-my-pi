@@ -1,0 +1,15 @@
+dag:
+  name: enrich_tqc_referral
+  schedule_start_date: 2020,7,1
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+       TQC referral process
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    sale_events_flow:
+      - unified_lead_referral_flow
+cluster:
+  type: databricks_10_4_med_general_cluster
