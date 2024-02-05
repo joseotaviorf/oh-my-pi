@@ -1,6 +1,0 @@
----
-lineage_product_database_name: signatures
-custom_cluster:
-  driver_node_type_id: m5.2xlarge
-  node_type_id: r3.2xlarge
-  num_workers: 2
