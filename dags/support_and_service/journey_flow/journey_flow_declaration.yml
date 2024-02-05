@@ -15,15 +15,15 @@ workflow:
   lineage_product_database_name: journey_flow
   dbutils_secret_key: JOURNEY_FLOW_DB
   tables_customization:
-    journey_content:
+    t_journey_content:
       extraction_type: full
-    rule:
+    t_rule:
       extraction_type: full
-    journey_flow:
+    t_journey_flow:
       date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]
-    dialog:
+    t_dialog:
       date_filter_column: creation
       extraction_type: incremental
       partitions: [year, month, day]
