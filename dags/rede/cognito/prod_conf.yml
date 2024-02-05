@@ -8,8 +8,8 @@ tables:
   - table_name: rede_user_pool
     user_pool_id: us-east-1_YGGKO9kNZ
 custom_cluster:
-  driver_node_type_id: m5a.xlarge
-  node_type_id: m5a.xlarge
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.2xlarge
   num_workers: 3
   # autoscale:
   #   max_workers: 3
