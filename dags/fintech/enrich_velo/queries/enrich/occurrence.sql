@@ -61,6 +61,8 @@ LEFT JOIN
                                 WHEN o.id_status = 3 THEN 'FINISHED'
                                 WHEN o.id_status = 4 THEN 'UNDER_AGREEMENT'
                                 WHEN o.id_status = 5 THEN 'REQUESTED_AGREEMENT'
+                                WHEN o.id_status = 6 THEN 'ACTIVE_FALSE'
+                                WHEN o.id_status = 7 THEN 'FORGIVEN'
                                 ELSE NULL
                             END
         AND jk2.desc_master_type = 'Occurrence Status'

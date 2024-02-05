@@ -22,6 +22,7 @@ columns:
       Loja: store
       Outros: other
       Sala: business room
+      Depósito: warehouse
   street:
     description: Property address street
     lineage:
