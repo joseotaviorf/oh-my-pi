@@ -150,6 +150,44 @@ terminations AS (
         datalake_terminator_clean.termination
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) = 1
+),
+ended_rentals_confirmed AS ( 
+    SELECT 
+    	hl.id_house_listing,
+    	hl.id_house,
+    	(hl.id_house_listing + 1) as next_id_house_listing,
+    	c.id AS id_contract,
+    	DATE(COALESCE(caad.ts_analyst_annulment_input,c.dt_termination)) AS dt_ended_rental_confirmed
+    FROM 
+      datalake_ebdb_clean.contract AS c
+    JOIN
+      contract_analyst_annulment_date AS caad
+        ON caad.id_contract = c.id
+    LEFT JOIN
+      datalake_ebdb_listing.house_listing AS hl
+        ON hl.id_contract = c.id
+    WHERE 
+        c.status = 'Finalizado'
+        AND COALESCE(caad.ts_analyst_annulment_input,c.dt_termination) IS NOT NULL
+    
+),
+contract_signed AS (
+  SELECT
+      DATE(c.ts_signed) AS contract_signed_date,
+      MONTH(c.ts_signed) AS contract_signed_month,
+      hl.id_house_listing,
+      c.id AS id_contract
+  FROM 
+    datalake_ebdb_listing.house_listing AS hl
+  LEFT JOIN 
+    datalake_ebdb_clean.contract AS c
+      ON hl.id_contract = c.id
+  WHERE
+    c.ts_signed IS NOT NULL
+    AND c.status IN ('Ativo','Finalizado')
+    AND DATE(c.ts_signed) < CURRENT_DATE
+  GROUP BY 
+    1,2,3,4
 )
 SELECT
   c.id,
@@ -158,6 +196,16 @@ SELECT
   c.id_house,
   ch.country_code,
   c.rent,
+  CASE 
+    WHEN 
+      c.rent <= 1500 THEN '1. Low value'
+    WHEN 
+      c.rent < 2500 THEN '2. Mid value'
+    WHEN 
+      c.rent >= 2500 THEN '3. High value'
+    ELSE 
+      'Undefined'
+  END AS value_segment,
   fre.first_rent AS first_rent_charged,
   c.billing_day_of_month,
   c.guarantee_type,
@@ -183,6 +231,11 @@ SELECT
   c.signature_type,
   c.status_closing,
   regexp_extract(cv.version_display_contract, '^v[^_]+', 0) AS contract_version,
+  IF(
+      contract_signed_date IS NOT NULL AND dt_ended_rental_confirmed IS NOT NULL, 
+      DATEDIFF(contract_signed_date, dt_ended_rental_confirmed),
+      NULL
+  ) AS days_er2rr,
   COALESCE(oc.is_ongoing_contract, FALSE) AS is_ongoing_contract,
   cm.is_waiting_to_be_signed,
   cm.is_active_or_ended,
@@ -235,3 +288,9 @@ JOIN
 LEFT JOIN
   terminations AS t
     ON t.id_contract = c.id
+LEFT JOIN 
+  ended_rentals_confirmed AS erc
+    ON erc.id_contract = c.id
+LEFT JOIN 
+  contract_signed AS cs
+    ON cs.id_house_listing = erc.next_id_house_listing
