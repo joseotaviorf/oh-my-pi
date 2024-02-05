@@ -8,13 +8,41 @@ WITH base_fcr AS (
     datalake_customer_resolution.customer_resolution_static
 ),
 fcr_customer AS (
-  SELECT
+  SELECT DISTINCT
     sk_main_session,
     CAST(ticket_recontact_list[FIND_IN_SET(recontact_ticket, CONCAT_WS(',',ticket_recontact_list))] AS BIGINT) AS sk_next_ticket,
     recontact_ticket,
     is_fcr_customer
   FROM
     base_fcr
+),
+missing_theme_tickets AS (
+  SELECT DISTINCT
+    front_or_back AS ticket_type,
+    main_department AS department,
+    SUM(ticket_rate_weight) AS missing_theme_tickets,
+    DATE(ts_solved) AS dt_started
+  FROM
+    datalake_customer_support.unified_tickets
+  WHERE
+    is_ticket_rate = TRUE
+    AND theme_detail IS NULL
+  GROUP BY 1, 2, 4
+),
+abandoned_calls AS (
+  SELECT
+    front_or_back AS ticket_type,
+    department,
+    COUNT(DISTINCT COALESCE(CONCAT(id_call, 'call'), CONCAT(id_session, 'chat'), CONCAT(id_ticket, 'email'))) AS contacts,
+    DATE(ts_created) AS dt_started
+  FROM
+    datalake_customer_support.received_demand
+  WHERE
+    channel = 'call'
+    AND front_or_back = 'front'
+    AND area = 'CX'
+    AND is_answered = FALSE
+  GROUP BY 1, 2, 4
 )
 SELECT DISTINCT
     ut.id_ticket AS sk_ticket,
@@ -47,6 +75,12 @@ SELECT DISTINCT
     ut.back_tickets,
     ut.resolution_survey,
     ut.ticket_rate_weight,
+    IF(ut.is_ticket_rate = TRUE,
+      ut.ticket_rate_weight + 
+        COALESCE(ut.ticket_rate_weight / CAST((SUM(ticket_rate_weight) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back, ut.main_department)) AS DECIMAL(12,7)) * mt.missing_theme_tickets, 0)  + 
+            COALESCE(ut.ticket_rate_weight / CAST((SUM(ticket_rate_weight) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back, ut.main_department)) AS DECIMAL(12,7)) * ac.contacts, 0),
+          NULL)
+    AS total_tickets_proportional,
     ut.is_ticket_rate,
     ut.has_answered_csat,
     ut.has_back_ticket,
@@ -80,3 +114,13 @@ FROM
 LEFT JOIN
   fcr_customer AS fc
     ON ut.id_ticket = fc.recontact_ticket
+LEFT JOIN
+    missing_theme_tickets AS mt
+      ON mt.dt_started = DATE(ut.ts_solved)
+      AND mt.ticket_type = ut.front_or_back
+      AND mt.department = ut.main_department
+LEFT JOIN
+    abandoned_calls AS ac
+      ON ac.dt_started = DATE(ut.ts_solved)
+      AND ac.ticket_type = ut.front_or_back
+      AND ac.department = ut.main_department

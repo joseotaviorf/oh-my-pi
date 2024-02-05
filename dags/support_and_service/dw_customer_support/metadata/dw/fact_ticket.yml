@@ -164,6 +164,10 @@ columns:
       "15": Ticket rate weight is 15 and is based on being a front ticket and in the sub journey 'Ongoing'.
       "30": Ticket rate weight is 30 and is based on being a back ticket and in the sub journey 'Ongoing'.
       "Null": No weight applied if the ticket is not part of the ticket rate rules.
+  total_tickets_proportional:
+    description: The total tickets proportional calculation related to the ticket, considering the ticket's weight,
+      abandoned calls and tickets without theme.
+      This column is exclusive for tickets that are part of the Ticket Rate metric.
   is_ticket_rate:
     lineage:
       - datalake_customer_support.unified_tickets.is_ticket_rate
