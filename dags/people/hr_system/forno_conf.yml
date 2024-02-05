@@ -129,6 +129,22 @@ endpoints:
         - "costs"
         - "providers"
         - "dependents"
+  personal_payment_methods:
+    has_partitions: false
+    params:
+      onlyData: true
+      limit: 100
+  payroll_relationships:
+    has_partitions: false
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "PayRelationshipsDDF"
+        - "payrollAssignments.PayrollRelationshipGroupsDDF"
+        - "payrollAssignments.assignedPayrolls"
+        - "payrollAssignments.payrollAssignmentDates"
+        - "payrollRelationshipDates"
   salaries:
       has_partitions: true
       column_to_partition: "LastUpdateDate"
