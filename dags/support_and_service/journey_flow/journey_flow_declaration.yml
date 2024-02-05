@@ -13,7 +13,7 @@ workflow:
   layer: raw
   database_type: postgres
   lineage_product_database_name: journey_flow
-  dbutils_secret_key: JOURNEY_FLOW
+  dbutils_secret_key: JOURNEY_FLOW_DB
   tables_customization:
     journey_content:
       extraction_type: full
