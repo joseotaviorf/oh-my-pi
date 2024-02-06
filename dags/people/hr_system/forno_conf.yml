@@ -155,3 +155,8 @@ endpoints:
           - "salaryComponents"
           - "salaryPayRateComponents"
           - "salarySimpleComponents"
+  departments_lov:
+    has_partitions: false
+    params:
+      onlyData: true
+      limit: 100
