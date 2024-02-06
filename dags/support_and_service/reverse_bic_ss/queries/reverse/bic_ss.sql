@@ -110,6 +110,7 @@ WITH bic AS (
         WHEN usm.is_landlord IS TRUE THEN ljs.total_active_termination_contracts
         ELSE NULL
     END AS total_active_termination_contracts,
+    usm.app_version,
     usm.is_pp_multi,
     usm.is_tenant,
     usm.is_broker,
