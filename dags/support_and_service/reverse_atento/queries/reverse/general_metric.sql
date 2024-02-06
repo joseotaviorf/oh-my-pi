@@ -42,9 +42,15 @@ SELECT DISTINCT
   YEAR(CURRENT_DATE) AS year,
   MONTH(CURRENT_DATE) AS month,
   DAY(CURRENT_DATE) AS day,
-  NOW() AS ts_load
+  NOW() AS ts_load,
+  t.minutes_requester_wait_time_business,
+  t.minutes_first_reply_time_business,
+  t.minutes_full_resolution_time_business
 FROM
   dw_customer_support.fact_ticket AS ft
+LEFT JOIN 
+  dw_tickets.fact_tickets AS t
+    ON ft.sk_ticket = t.sk_ticket
 LEFT JOIN
   dw_customer_support.dim_channel AS dc
     ON ft.sk_channel = dc.sk_channel
