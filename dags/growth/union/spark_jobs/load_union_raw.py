@@ -2,6 +2,7 @@ import logging
 from argparse import ArgumentParser
 from functools import reduce
 import datetime as datetime
+from pyspark.sql.functions import lit
 
 from pyspark.sql import DataFrame
 
@@ -36,22 +37,26 @@ def _checkPath(source_bucket: str, file_path: str) -> DataFrame:
   return exists
 
 
-def _create_dataframe(s3_source_bucket: str, raw_table_name:str, date: datetime, date_increment_col: str) -> DataFrame:
+def _create_dataframe(s3_source_bucket: str, raw_table_name:str, date: datetime) -> DataFrame:
     file_path = f"{raw_table_name}/{date.year}/{date.month:01}/{date.day:01}"
     df = None
-    logger.info("msg=Trying to read data from s3://{s3_source_bucket}/{file_path}/")
+    logger.info(f"msg=Trying to read data from s3://{s3_source_bucket}/{file_path}/")
     if _checkPath(s3_source_bucket, file_path):
         df = spark_client.conn.read.option("header", True).option("delimiter",";").option("multiline", True).csv(f"s3://{s3_source_bucket}/{file_path}/*")
         if df is not None:
             df = (df_service
             .input(df)
-            .create_year_month_day_columns_from_dataframe_column(date_increment_col)
             .convert_struct_type_to_json()
             .output()
             )
 
             logger.info(f"""m=_create_dataframe, source_bucket={s3_source_bucket}, table_name={raw_table_name}, msg=Succesfully got data from s3://{s3_source_bucket}/{file_path}/""")
-            return df
+            return (
+                df
+                .withColumn("year", lit(date.year))
+                .withColumn("month", lit(date.month))
+                .withColumn("day", lit(date.day))
+            )
         
         logger.warning(f"m=_create_dataframe, msg=Empty bucket for s3://{s3_source_bucket}/{file_path}/")
     return None
@@ -77,7 +82,6 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", type=str, help="target bucket")
     parser.add_argument("source")
     parser.add_argument("raw_table_name")
-    parser.add_argument("date_increment_col")
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
 
@@ -86,7 +90,7 @@ if __name__ == "__main__":
     logger.info(
         f"""
             m={JOB_NAME}, environment={args.env}, source={args.source}, 
-            raw_table_name={args.raw_table_name}, date_increment_col={args.date_increment_col},
+            raw_table_name={args.raw_table_name},
             load_start_date={args.load_start_date},load_end_date={args.load_end_date}
             msg=print spark jobs args
         """
@@ -95,7 +99,6 @@ if __name__ == "__main__":
     env = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
-    date_increment_col = args.date_increment_col
     raw_table_name = args.raw_table_name
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
@@ -112,7 +115,7 @@ if __name__ == "__main__":
     
     time_range = _generate_date_range(load_start_date=load_start_date, load_end_date = load_end_date)
 
-    table_data = [_create_dataframe(s3_source_bucket, raw_table_name, date, date_increment_col) for date in time_range]
+    table_data = [_create_dataframe(s3_source_bucket, raw_table_name, date) for date in time_range]
     table_data = [i for i in table_data if i is not None]
 
     if len(table_data) > 0:

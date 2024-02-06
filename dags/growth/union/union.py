@@ -102,7 +102,6 @@ for table in tables_config:
         raw_spark_job_extra_args=[
                 SOURCE,
                 tables_config[table]['raw_table_name'].lower(),
-                tables_config[table]['date_increment_col'],
                 "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}",
                 "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
             ],

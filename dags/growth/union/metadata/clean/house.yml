@@ -1316,6 +1316,18 @@ columns:
     description: Condominium with privative area.
     lineage:
       - datalake_union_raw.imovel.det_areaprivativa
+  year:
+    description: Load year.
+    lineage:
+      - datalake_union_raw.imovel.year
+  month:
+    description: Load year.
+    lineage:
+      - datalake_union_raw.imovel.month
+  day:
+    description: Load year.
+    lineage:
+      - datalake_union_raw.imovel.day
 
 
 

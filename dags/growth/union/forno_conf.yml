@@ -7,4 +7,3 @@ tables_config:
   imovel:
     raw_table_name: Imovel
     clean_table_name: house
-    date_increment_col: paratime
