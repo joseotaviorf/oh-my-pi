@@ -1,0 +1,19 @@
+dag:
+    name: dw_visit
+    owner: Data ForSale
+    schedule_start_date: 2024, 1, 1
+    documentation:
+      dag_purpose:
+        This DAG loads to DW our base of Visits (Including rent and sale).
+workflow:
+    type: query
+    layer: dw
+    custom_schema: visit
+    tables_customization:
+      dim_visit:
+        custom_schema: public
+cluster:
+    type: databricks_10_4_med_general_photon_cluster
+    access_control_list:
+        group_name: analytics-engineers
+        permission_level: CAN_MANAGE
