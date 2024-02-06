@@ -79,7 +79,7 @@ vans_formated AS ( --Change columns name to match CAP layout
       WHEN UPPER(pagamento) LIKE 'ANTECIPA%' THEN 'MRA'
       WHEN UPPER(pagamento) LIKE 'CIQ%' THEN 'CIQ'
       WHEN UPPER(pagamento) LIKE 'ONG%' THEN 'Aluguel'
-      WHEN regexp_like(UPPER(pagamento),'^MULTA RESCISÓRIA|^CONTAS DE CONSUMO|^ALUGUEL|^CORRETORES|^IPTU|^REPASSE B2B|ˆREPASSE-B2B|^BAND-AID|^CRÉDITO A SALDAR|^EARLY TERMINATION') THEN pagamento
+      WHEN regexp_like(UPPER(pagamento),'^MULTA RESCISÓRIA|^CONTAS DE CONSUMO|^ALUGUEL|^CORRETORES|^IPTU|^REPASSE B2B|ˆREPASSE-B2B|^BAND-AID|^CRÉDITO A SALDAR|^EARLY TERMINATION|^REPASSES EXTRAS|^REPASSES BAND-AID|^CONDOMÍNIO DEPÓSITO|^MRA|^ALUGUEL MANUAL|^CORRETOR 3P|^ONGOING MANUAL|^B2B|^CONTAS DE CONSUMO') THEN pagamento
       WHEN regexp_like(UPPER(pagamento),'^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
       ELSE NULL
     END AS payment_reason_classification,
@@ -108,6 +108,14 @@ vans_formated AS ( --Change columns name to match CAP layout
             WHEN regexp_like((p.company_use), '^[0-9]+R[0-9]+$') THEN 'Early termination'
             WHEN regexp_like((p.company_use), '^[0-9]+!MO[0-9]+$') THEN 'Ongoing'
             WHEN regexp_like((p.company_use), '^[0-9]+Corretor$') THEN 'Corretores'
+            WHEN regexp_like((p.company_use),'^[0-9]+![0-9]+ME[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Repasses Extras'
+            WHEN regexp_like((p.company_use),'^[0-9]+![0-9]+MC[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Repasses Band-Aid'
+            WHEN regexp_like((p.company_use),'^[0-9]+![0-9]+MCP[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Condomínio Depósito'
+            WHEN regexp_like((p.company_use),'^[0-9]+![0-9]+MA[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'MRA'
+            WHEN regexp_like((p.company_use),'^[0-9]+![0-9]+MT[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Aluguel Manual'
+            WHEN regexp_like((p.company_use),'^[0-9]+![0-9]+MC3P[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Corretor 3P'
+            WHEN regexp_like((p.company_use),'^[0-9]+![0-9]+MO[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Ongoing Manual'
+            WHEN regexp_like((p.company_use),'^[0-9]+![0-9]+MB[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'B2B'
         END as pagamento
     FROM
       datalake_vans_clean.payment p
@@ -132,6 +140,7 @@ vans_formated AS ( --Change columns name to match CAP layout
         WHEN regexp_like((company_use),'^[0-9]+![0-9]+MC[0-9]+$') THEN 'Condominio v9'
         WHEN regexp_like((company_use),'^[0-9]+![0-9]+MT[0-9]+$') THEN 'Aluguel'
         WHEN regexp_like((company_use),'^[0-9]+![0-9]+MCD[0-9]+$') THEN 'Condominio v9 - Despejo'
+        WHEN regexp_like((company_use),'^[0-9]+![0-9]+MCCM[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Contas de Consumo'
       END as pagamento
 
     FROM
