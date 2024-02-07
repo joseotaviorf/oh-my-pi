@@ -183,7 +183,6 @@ conversation AS (
   call_metrics AS (
     SELECT
       id_task,
-      id_call,
       COUNT(DISTINCT queue_name) AS number_of_departments,
       COUNT(DISTINCT id_reservation) AS number_of_tasks,
       SUM(CAST(is_answered AS SMALLINT)) AS reservations_accepted,
@@ -195,7 +194,7 @@ conversation AS (
       datalake_bigfone_twilio.call_flex_reservations
     WHERE
       is_answered = TRUE
-    GROUP BY 1,2
+    GROUP BY 1
   ),
   twilio_time_metrics AS (
     SELECT
