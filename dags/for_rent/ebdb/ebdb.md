@@ -65,13 +65,6 @@ Produces the following output tables:
     `conservation_item`
     `conservation_room`
     `consumption_bill`
-    `contract`
-    `contract_aud`
-    `contract_negotiation`
-    `contract_partnership_data`
-    `contract_person`
-    `contract_person_aud`
-    `contract_version`
     `conversion_lead`
     `conversion_lead_aud`
     `country`
@@ -87,7 +80,6 @@ Produces the following output tables:
     `financial_data`
     `follow_up_details`
     `follow_up_details_feedback_tag`
-    `full_contract`
     `house`
     `house_agent_aud`
     `house_aud`
@@ -148,8 +140,6 @@ Produces the following output tables:
     `photographer_job`
     `photographer_job_aud`
     `polygon_region`
-    `portability`
-    `portability_aud`
     `pre_proposal`
     `pre_proposal_aud`
     `pre_proposal_condition`
@@ -187,7 +177,6 @@ Produces the following output tables:
     `shop_window_aud`
     `shop_window_listing_business_context`
     `shop_window_listing_business_context_aud`
-    `signature`
     `special_condition`
     `special_condition_aud`
     `state`

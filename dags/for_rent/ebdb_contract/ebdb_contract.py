@@ -20,7 +20,7 @@ SOURCE = "ebdb"
 DAG_NAME = "ebdb_contract"
 DAG_ID = "bietlejuice.{}".format(DAG_NAME)
 MAIN_START_DATE = datetime(2023, 8, 15, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "30 19 * * *"
+MAIN_SCHEDULE_INTERVAL = "40 21 * * *"
 
 config_service = ConfigurationService(DAG_NAME)
 datalake_bucket = config_service.get_config("datalake_bucket")

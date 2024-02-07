@@ -296,6 +296,17 @@ table_block_list:
   - ShopWindow_ListingBusinessContext_AUD
   - ShopWindow_ListingBusinessContext
   - ShopWindow
+  - Assinatura
+  - ContractNegotiation
+  - ContractPartnershipData
+  - ContractVersion
+  - Contrato
+  - Contrato_AUD
+  - ContratoPessoa
+  - ContratoPessoa_AUD
+  - Portability
+  - Portability_AUD
+  - WorkContract
 
 view_allow_list:
   - MapRegiao
