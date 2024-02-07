@@ -109,6 +109,7 @@ tables:
         - categoria_do_membro
         - status_do_lead___for_rent
         - categoria_do_membro___for_rent
+        - esta_carteirizada_
   contact:
     is_incremental: true
     bring_archived: true

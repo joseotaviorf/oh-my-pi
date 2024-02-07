@@ -20,6 +20,7 @@ SELECT
     END AS product,
     COALESCE(c.sale_member_category, 'Unknown') AS sale_member_category,
     COALESCE(c.rent_member_category, 'Unknown') AS rent_member_category,
+    COALESCE(c.company_cluster, 'Unknown') AS company_cluster,
     COALESCE(c.member_type, 'Unknown') AS member_type,
     COALESCE(c.address, ce.public_area, 'Unknown') AS address,
     COALESCE(c.zip_code, ce.zip_code, 'Unknown') AS zip_code,

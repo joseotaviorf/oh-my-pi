@@ -28,6 +28,7 @@ SELECT
     -- After that, member_category will be deprecated and we will remove the row above
     COALESCE(c.sale_member_category, 'Unknown') AS sale_member_category,
     COALESCE(c.rent_member_category, 'Unknown') AS rent_member_category,
+    COALESCE(c.company_cluster, 'Unknown') as company_cluster,
     COALESCE(c.member_type, 'Unknown') AS member_type,
     COALESCE(ce.public_area, c.address, 'Unknown') AS address,
     COALESCE(ce.zip_code, c.zip_code, 'Unknown') AS zip_code,

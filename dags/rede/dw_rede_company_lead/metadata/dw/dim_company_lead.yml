@@ -69,6 +69,10 @@ columns:
       Prata: 'Silver'
       Ouro: 'Gold'
       Diamante: 'Diamond'
+  company_cluster:
+    lineage:
+    - datalake_hubspot.company.company_cluster
+    description: 'Cluster assigned to the company by the Ops team'
   member_type:
     description: 'Type of the member, as in ForSale or ForRent.'
     categories:

@@ -36,6 +36,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.name'), '') AS name,
     NULLIF(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), '') AS tag_real_estate_agency,
     NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(properties, '$.tag_imobiliarias'), r'\[3(?i:p)(?i:BH)?\-(.+?)\]'), '') AS extracted_3p_tag,
+    NULLIF(GET_JSON_OBJECT(properties, '$.esta_carteirizada_'), '') AS company_cluster,
     NULLIF(GET_JSON_OBJECT(properties, '$.tipo_de_membro'), '') AS member_type,
     NULLIF(GET_JSON_OBJECT(properties, '$.categoria_do_membro'), '') AS member_category,
     -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
@@ -77,6 +78,17 @@ SELECT
             updatedByUserId:string
         >>'
     ) AS rent_member_category_history,
+    FROM_JSON(
+        GET_JSON_OBJECT(properties_with_history, '$.esta_carteirizada_'),
+        'array<struct<
+            value:string,
+            timestamp:timestamp,
+            sourceType:string,
+            sourceId:string,
+            sourceLabel:string,
+            updatedByUserId:string
+        >>'
+    ) AS company_cluster_history,
     NULLIF(GET_JSON_OBJECT(properties, '$.origem_do_lead'), '') AS lead_origin,
     NULLIF(GET_JSON_OBJECT(properties, '$.phone'), '') AS phone,
     NULLIF(GET_JSON_OBJECT(properties, '$.tipo_de_parceria'), '') AS partnership_type,

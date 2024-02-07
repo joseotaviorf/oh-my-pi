@@ -196,11 +196,13 @@ SELECT
     -- After that, member_category will be deprecated and we will remove the row above
     ch.sale_member_category,
     ch.rent_member_category,
+    ch.company_cluster,
     ch.member_category_history,
     -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
     -- After that, member_category_history will be deprecated and we will remove the row above
     ch.sale_member_category_history,
     ch.rent_member_category_history,
+    ch.company_cluster_history,
     ch.lead_origin,
     ch.phone,
     ch.partnership_type,

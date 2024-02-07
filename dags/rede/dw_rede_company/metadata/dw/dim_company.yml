@@ -94,6 +94,10 @@ columns:
     description: 'Type of the member, as in ForSale or ForRent.'
     categories:
       'B2B Sales': ForSale
+  company_cluster:
+    lineage:
+      - datalake_hubspot.company.company_cluster
+    description: 'Cluster assigned to the company by the Ops team'
   address:
     lineage:
     - datalake_company.company.public_area
