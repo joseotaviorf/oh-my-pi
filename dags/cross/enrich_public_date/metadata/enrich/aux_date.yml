@@ -45,9 +45,13 @@ columns:
   total_working_days_in_month:
     description: The total of working days in a month
   is_brz_holiday:
-    description: Indicates wheter is a brazilian holiday or not
+    description: Indicates whether the day is a brazilian holiday or not. The dates listed as holidays are the same dates Google Calendar reports as holidays.
+  is_brz_business_day:
+    description: Indicates, based on the fields weekend and is_brz_holiday, whether the day is a brazilian business day or not. The dates listed as business days are the same dates reported by Google Calendar based on the Brazilian national holiday calendar.
+  next_brz_business_day:
+    description: Indicates, based on the fields weekend and is_brz_holiday, the next brazilian business day
   is_mx_holiday:
-    description: Indicates wheter is a mexican holiday or not
+    description: Indicates whether is a mexican holiday or not
   date:
     description: Date in %Y-%m-%d format
   brz_date:

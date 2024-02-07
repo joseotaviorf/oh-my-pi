@@ -8,137 +8,145 @@ columns:
   sk_date:
     description: Date ID (%Y%m%d format)
     lineage:
-    - datalake_quintoandar.aux_date.id_date
+      - datalake_quintoandar.aux_date.id_date
   day:
     description: Day of month
     lineage:
-    - datalake_quintoandar.aux_date.day
+      - datalake_quintoandar.aux_date.day
   day_of_year:
     description: Integer that represents the day of the year
     lineage:
-    - datalake_quintoandar.aux_date.day_of_year
+      - datalake_quintoandar.aux_date.day_of_year
   week_day:
     description: The number of the day of the week. The day is given as an integer, ranging from 0 (Sunday) to 6 (Saturday)
     lineage:
-    - datalake_quintoandar.aux_date.week_day
+      - datalake_quintoandar.aux_date.week_day
   weekday_name:
     description: "The name of the day of the week. Values: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday"
     lineage:
-    - datalake_quintoandar.aux_date.weekday_name
+      - datalake_quintoandar.aux_date.weekday_name
   calendar_week:
     description: Week number of a year
     lineage:
-    - datalake_quintoandar.aux_date.calendar_week
+      - datalake_quintoandar.aux_date.calendar_week
   weekend:
     description: Indicates wheter is weekend or weekday
     lineage:
-    - datalake_quintoandar.aux_date.weekend
+      - datalake_quintoandar.aux_date.weekend
   month:
     description: Number of the month
     lineage:
-    - datalake_quintoandar.aux_date.month
+      - datalake_quintoandar.aux_date.month
   month_name:
     description: Name of the month
     lineage:
-    - datalake_quintoandar.aux_date.month_name
+      - datalake_quintoandar.aux_date.month_name
   quarter:
     description: The quarter of the year.
     categories:
       "1": January to March
-      "2": April to June 
+      "2": April to June
       "3": July to September
       "4": October to December
     lineage:
-    - datalake_quintoandar.aux_date.quarter
+      - datalake_quintoandar.aux_date.quarter
   brz_season:
     description: "The season in Brazil: Summer, Autumn, Winter, Sprint"
     lineage:
-    - datalake_quintoandar.aux_date.brz_season
+      - datalake_quintoandar.aux_date.brz_season
   year:
     description: Year
     lineage:
-    - datalake_quintoandar.aux_date.year
+      - datalake_quintoandar.aux_date.year
   year_calendar_week:
     description: Week number/year
     lineage:
-    - datalake_quintoandar.aux_date.year_calendar_week
+      - datalake_quintoandar.aux_date.year_calendar_week
   year_month:
     description: Year/month
     lineage:
-    - datalake_quintoandar.aux_date.year_month
+      - datalake_quintoandar.aux_date.year_month
   year_quarter:
     description: Year/quarter
     lineage:
-    - datalake_quintoandar.aux_date.year_quarter
+      - datalake_quintoandar.aux_date.year_quarter
   working_days_in_month:
     description: Cumulative sum of business days in the month counting from the first day to the day in question (date field)
     lineage:
-    - datalake_quintoandar.aux_date.working_days_in_month
+      - datalake_quintoandar.aux_date.working_days_in_month
   total_working_days_in_month:
     description: The total of working days in a month
     lineage:
-    - datalake_quintoandar.aux_date.total_working_days_in_month
+      - datalake_quintoandar.aux_date.total_working_days_in_month
   is_brz_holiday:
-    description: Indicates wheter is a brazilian holiday or not
+    description: Indicates whether the day is a brazilian nacional holiday not. The dates listed as holidays are the same dates Google Calendar reports as holidays.
     lineage:
-    - datalake_quintoandar.aux_date.is_brz_holiday
+      - datalake_quintoandar.aux_date.is_brz_holiday
+  is_brz_business_day:
+    description: Indicates, based on the fields weekend and is_brz_holiday, whether the day is a brazilian business day or not. The dates listed as business days are the same dates reported by Google Calendar based on the Brazilian national holiday calendar.
+    lineage:
+      - datalake_quintoandar.aux_date.is_brz_business_day
+  next_brz_business_day:
+    description: Indicates, based on the fields weekend and is_brz_holiday, the next brazilian business day.
+    lineage:
+      - datalake_quintoandar.aux_date.next_brz_business_day
   is_mx_holiday:
-    description: Indicates wheter is a mexican holiday or not
+    description: Indicates whether is a mexican holiday or not
     lineage:
-    - datalake_quintoandar.aux_date.is_mx_holiday
+      - datalake_quintoandar.aux_date.is_mx_holiday
   date:
     description: Date in %Y-%m-%d format
     lineage:
-    - datalake_quintoandar.aux_date.date
+      - datalake_quintoandar.aux_date.date
   brz_date:
     description: Date in %d/%m/%Y format
     lineage:
-    - datalake_quintoandar.aux_date.brz_date
+      - datalake_quintoandar.aux_date.brz_date
   universal_date:
     description: Date in %Y/%m/%d format
     lineage:
-    - datalake_quintoandar.aux_date.universal_date
+      - datalake_quintoandar.aux_date.universal_date
   week_start:
     description: The day when the week starts
     lineage:
-    - datalake_quintoandar.aux_date.week_start
+      - datalake_quintoandar.aux_date.week_start
   week_end:
     description: The day when the week ended
     lineage:
-    - datalake_quintoandar.aux_date.week_end
+      - datalake_quintoandar.aux_date.week_end
   month_start:
     description: The first day of the month
     lineage:
-    - datalake_quintoandar.aux_date.month_start
+      - datalake_quintoandar.aux_date.month_start
   month_end:
     description: The last day of the month
     lineage:
-    - datalake_quintoandar.aux_date.month_end
+      - datalake_quintoandar.aux_date.month_end
   last_day:
     description: Previous day (date - 1 day)
     lineage:
-    - datalake_quintoandar.aux_date.last_day
-  last_week: 
+      - datalake_quintoandar.aux_date.last_day
+  last_week:
     description: Previous week (date - 7 days)
     lineage:
-    - datalake_quintoandar.aux_date.last_week
-  last_2_weeks: 
+      - datalake_quintoandar.aux_date.last_week
+  last_2_weeks:
     description: Previous 2 weeks (date - 14 days)
     lineage:
-    - datalake_quintoandar.aux_date.last_2_weeks
+      - datalake_quintoandar.aux_date.last_2_weeks
   last_4_weeks:
     description: Previous 4 weeks (date - 28 days)
     lineage:
-    - datalake_quintoandar.aux_date.last_4_weeks
+      - datalake_quintoandar.aux_date.last_4_weeks
   last_month:
     description: Previous month (date - 1 month)
     lineage:
-    - datalake_quintoandar.aux_date.last_month
+      - datalake_quintoandar.aux_date.last_month
   last_quarter:
     description: Previous quarter (date - 3 month)
     lineage:
-    - datalake_quintoandar.aux_date.last_quarter
+      - datalake_quintoandar.aux_date.last_quarter
   last_year:
     description: Previous year (date - 1 year)
     lineage:
-    - datalake_quintoandar.aux_date.last_year
+      - datalake_quintoandar.aux_date.last_year

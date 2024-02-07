@@ -17,6 +17,8 @@ SELECT
     working_days_in_month,
     total_working_days_in_month,
     is_brz_holiday,
+    is_brz_business_day,
+    next_brz_business_day,
     is_mx_holiday,
     date,
     brz_date,

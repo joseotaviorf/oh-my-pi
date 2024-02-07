@@ -98,7 +98,7 @@ WITH base_date AS (
 
   ORDER BY 1
 )
-SELECT
+SELECT DISTINCT
     id_date,
     day,
     day_of_year,
@@ -117,6 +117,8 @@ SELECT
     working_days_in_month,
     MAX(working_days_in_month) OVER (PARTITION BY year, month) AS total_working_days_in_month,
     is_brz_holiday,
+    IF(weekend = "Weekday" AND is_brz_holiday = "No holiday", TRUE, FALSE) is_brz_business_day,
+    LEAD(IF(weekend = "Weekday" AND is_brz_holiday = "No holiday", date, NULL)) IGNORE NULLS OVER (ORDER BY DATE(date) ASC) next_brz_business_day,
     is_mx_holiday,
     date,
     brz_date,
