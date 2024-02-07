@@ -1,6 +1,7 @@
 SELECT
     i.id_inspection AS sk_inspection,
     i.id_external AS sk_main_inspection,
+    i.id_client_side AS sk_client_side,
     i.id_previous_inspection AS sk_previous_inspection,
     i.id_inspector AS sk_inspector,
     i.id_assessment AS sk_assessment,
@@ -17,6 +18,8 @@ SELECT
     i.is_d0_canceled,
     i.is_d1_canceled,
     i.is_not_canceled_by_inspector,
+    i.is_first_schedule,
+    i.is_executed_in_first_schedule,
     i.dt_contract_entrance,
     i.dt_contract_termination,
     i.dt_execution_limit,

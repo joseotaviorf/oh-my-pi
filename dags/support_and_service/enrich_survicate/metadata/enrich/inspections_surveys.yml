@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_survicate.survey_responses.response_url
     description: Contract unique identifier
+  id_inspection:
+    lineage:
+      - datalake_survicate.survey_responses.response_url
+    description: Inspection unique identifier (uuid)
   id_respondent:
     lineage:
       - datalake_ebdb_clean.contract.id_user

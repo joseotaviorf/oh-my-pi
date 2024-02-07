@@ -37,6 +37,11 @@ columns:
       - datalake_satisfaction_rating.bigfone_surveys.id_ticket
       - datalake_satisfaction_rating.survicate_surveys.id_ticket
       - datalake_satisfaction_rating.chat_fup_surveys.id_ticket
+  id_origin:
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.id_origin
+    description: |
+      Crossover key with the originating service of the satisfaction survey. For example: Inspections, Repairs, Keys, etc.
   id_respondent:
     description: Identifier of the person who answered the form.
     lineage:

@@ -54,6 +54,11 @@ columns:
     lineage:
       - datalake_survicate.repairs_surveys.id_ticket
       - datalake_survicate.keys_surveys.id_ticket
+  id_origin:
+    lineage:
+      - datalake_survicate.inspections_surveys.id_inspection
+    description: |
+      Crossover key with the originating service of the satisfaction survey. For example: Inspections, Repairs, Keys, etc.
   id_respondent:
     description: Identifier of the person who answered the form.
     lineage:

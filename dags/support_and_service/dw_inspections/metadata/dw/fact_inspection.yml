@@ -22,6 +22,10 @@ columns:
         description: Inspection correlational unique identifier in the PWA database.
         lineage:
             - datalake_inspections_metrics.inspection_booking.id_external
+    sk_client_side:
+        lineage:
+            - datalake_inspections.inspection_booking.id_client_side
+        description: Inspection unique identifier (uuid)
     sk_previous_inspection:
         description:
             If there is a previous inspection for the same contract, it will be indicated in this column.
@@ -93,6 +97,14 @@ columns:
         description: Indicates that the inspection was not canceled because of the inspector.
         lineage:
             - datalake_inspections.inspection_booking.is_not_canceled_by_inspector
+    is_first_schedule:
+        description: Indicates whether scheduling the inspection is the first in the process.
+        lineage:
+            - datalake_inspections.inspection_booking.is_first_schedule
+    is_executed_in_first_schedule:
+        description: Indicates whether the inspection took place in the first scheduled time.
+        lineage:
+            - datalake_inspections.inspection_booking.is_executed_in_first_schedule    
     dt_contract_entrance:
         description: Date defined in the contract of when the tenant will enter in the property.
         lineage:
