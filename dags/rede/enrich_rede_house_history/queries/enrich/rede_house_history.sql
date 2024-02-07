@@ -275,7 +275,7 @@ add_status_changes AS (
 -- We can retroactively fix that: if it ever became 3P supply before it was unpublished, then it should be 3P Supply since the moment it was published.
 -- In other words, if the next time it was marked as 3P Supply is before the next time it was published or unpublished, it is 3P Supply
 add_next AS (
-    SELECT 
+    SELECT
         id_house,
         NULLIF(LAST(
             CASE WHEN is_3p_supply IS NOT NULL THEN COALESCE(id_company_hubspot_extracted, -1) END, TRUE
@@ -361,6 +361,24 @@ legacy_deduplicated AS (
         OR LAG(partner_3p_supply) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM partner_3p_supply
         OR LAG(is_3p_supply) OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started) IS DISTINCT FROM is_3p_supply
 ),
+legacy_with_end_date_aux (
+    SELECT
+        hlr.id_related,
+        hlr.id_listing_business_context
+    FROM
+        datalake_ebdb_clean.house_listing_relation AS hlr
+    JOIN
+        datalake_company_clean.company AS c
+        ON hlr.id_related = c.uuid_company
+    JOIN
+        datalake_company_clean.company_product AS cp
+            ON c.id = cp.id_company
+   WHERE
+        hlr.related_as = 'LISTING_OWNER'
+        AND hlr.source_type = 'COMPANY_REF'
+        AND  cp.id_product <> 29 --PP MULTI
+        GROUP BY 1, 2
+),
 legacy_with_end_date AS (
     SELECT
         fd.id_house,
@@ -387,10 +405,8 @@ legacy_with_end_date AS (
             ON lbc.id_house = fd.id_house
             AND fd.business_context = lbc.business_context
     LEFT JOIN
-        datalake_ebdb_clean.house_listing_relation AS hlr
+        legacy_with_end_date_aux AS hlr
             ON hlr.id_listing_business_context = lbc.id
-            AND hlr.related_as = 'LISTING_OWNER'
-            AND hlr.source_type = 'COMPANY_REF'
     WHERE
         fd.ts_status_started < ('2023-05-01'::TIMESTAMP) -- After this date, we'll only use the company domain
         OR ( -- Except the ones which are nor in hubspot nor company, like SHPrimeComprada. These are mostly old listings

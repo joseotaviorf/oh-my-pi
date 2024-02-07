@@ -37,9 +37,9 @@ house_aud AS (
 listing_info AS (
   SELECT
     lbc.id_house,
-    BOOL_OR(lbc.ownership = 'THIRD_PARTY' OR COALESCE(lrm.rental_administrator = 'THIRD_PARTY', FALSE)) AS is_3p_supply,
-    BOOL_OR(lbc.ownership = 'THIRD_PARTY' AND lbc.business_context = 'SALE') AS is_sale_3p_supply,
-    BOOL_OR(lrm.rental_administrator = 'THIRD_PARTY') AS is_rent_3p_supply,
+    BOOL_OR((lbc.ownership = 'THIRD_PARTY' AND cp.id_product <> 29) OR (COALESCE(lrm.rental_administrator = 'THIRD_PARTY', FALSE) AND cp.id_product <> 29)) AS is_3p_supply,
+    BOOL_OR(lbc.ownership = 'THIRD_PARTY' AND lbc.business_context = 'SALE' AND cp.id_product <> 29) AS is_sale_3p_supply,
+    BOOL_OR(lrm.rental_administrator = 'THIRD_PARTY' AND cp.id_product <> 29) AS is_rent_3p_supply,
     BOOL_OR(lsm.is_primary_market) AS is_sale_primary_market,
     BOOL_OR(lsm.has_great_sale_price_tag) AS has_sale_great_price_tag
   FROM
@@ -52,6 +52,15 @@ listing_info AS (
     datalake_ebdb_clean.listing_rent_model AS lrm
         ON lbc.id = lrm.id_listing_business_context
         AND lbc.business_context = 'RENT'
+  LEFT JOIN
+    datalake_ebdb_clean.house_listing_relation AS hlr
+      ON lbc.id_house = hlr.id_house
+  LEFT JOIN
+    datalake_company_clean.company AS c
+      ON hlr.id_related = c.uuid_company
+  LEFT JOIN
+    datalake_company_clean.company_product AS cp
+      ON c.id = cp.id_company
   GROUP BY
     1
 ),
@@ -66,9 +75,18 @@ listing_ownership_aux AS (
   JOIN
     datalake_ebdb_clean.listing_business_context AS lbc
       ON lbc.id = hlr.id_listing_business_context
+  JOIN
+    datalake_company_clean.company AS c
+      ON hlr.id_related = c.uuid_company
+  JOIN
+    datalake_company_clean.company_product AS cp
+      ON c.id = cp.id_company
+  JOIN datalake_company_clean.product AS p
+    ON p.id = cp.id_product
   WHERE
     hlr.related_as = 'LISTING_OWNER'
     AND hlr.source_type = 'COMPANY_REF'
+    AND cp.id_product <> 29 -- PP_MULTI
   GROUP BY 1
 ),
 listing_ownership AS (
@@ -90,7 +108,7 @@ listing_ownership AS (
       ON hc.uuid_company = loa.uuid_company
 ),
 smart_price AS (
-  SELECT 
+  SELECT
       l.id_house,
       SOME(p.status = 'ACTIVE' AND l.business_context = 'SALE') AS has_sale_smart_price_activated,
       SOME(p.status = 'ACTIVE' AND l.business_context = 'RENT') AS has_rent_smart_price_activated
@@ -98,8 +116,8 @@ smart_price AS (
     datalake_ebdb_clean.dynamic_pricing_house AS p
   INNER JOIN
     datalake_ebdb_clean.listing_business_context AS l
-      ON l.id = p.id_listing_business_context 
-  GROUP BY 
+      ON l.id = p.id_listing_business_context
+  GROUP BY
     1
 )
 SELECT
@@ -361,6 +379,6 @@ LEFT JOIN
 LEFT JOIN
   listing_ownership AS lo
     ON lo.id_house = h.id
-LEFT JOIN 
+LEFT JOIN
   smart_price AS sp
     ON sp.id_house = h.id

@@ -1415,6 +1415,9 @@ bietlejuice.enrich_ebdb_house:
   - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_country:load-enrich-user
 bietlejuice.enrich_ebdb_listing:
+  - bietlejuice.company:load-clean-company
+  - bietlejuice.company:load-clean-company-product
+  - bietlejuice.company:load-clean-product
   - bietlejuice.ebdb:load-clean-access-authorization-type
   - bietlejuice.ebdb:load-clean-access-type
   - bietlejuice.ebdb:load-clean-access-type-aud
@@ -2070,6 +2073,8 @@ bietlejuice.enrich_rede_company_event:
   - bietlejuice.enrich_hubspot:load-enrich-ticket-stage
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
 bietlejuice.enrich_rede_house_history:
+  - bietlejuice.company:load-clean-company
+  - bietlejuice.company:load-clean-company-product
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb:load-clean-house-listing-relation-aud
