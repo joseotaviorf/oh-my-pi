@@ -152,7 +152,7 @@ LEFT JOIN
     first_interaction fi
         ON fi.id_third_party_crm_ticket_external = tf.id_ticket
 LEFT JOIN
-    datalake_zendesk_tickets.ticket_history AS th
+    datalake_zendesk_history.ticket_history AS th
         ON tf.id_ticket = th.id_ticket
 WHERE 
     tf.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
