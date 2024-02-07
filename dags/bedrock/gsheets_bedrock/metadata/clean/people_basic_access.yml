@@ -1,7 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: people_basic_access
-columns:
+columns: 
   teams:
     lineage:
       - datalake_gsheets_raw.basic_access.teams

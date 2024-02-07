@@ -277,8 +277,6 @@ bietlejuice.enrich_app_installed:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
-bietlejuice.enrich_bigid:
-  override: []
 bietlejuice.enrich_brand_tracking:
   remove:
     - bietlejuice.gsheets_growth:done-clean-ipsos-brandtracking-questions
@@ -364,9 +362,6 @@ bietlejuice.enrich_customer_support:
     - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
     - bietlejuice.zendesk_tickets:load-clean-tickets
     - bietlejuice.zendesk_tickets:load-clean-users
-bietlejuice.enrich_docato:
-  add:
-    - bietlejuice.gsheets_static:done-clean-legal-base-docato
 bietlejuice.enrich_ebdb_affiliates_cost:
   remove:
     - bietlejuice.ebdb:load-clean-conversion-lead
@@ -454,9 +449,6 @@ bietlejuice.enrich_marketing_manual_daily_costs:
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
 bietlejuice.enrich_media_plan:
   override: []
-bietlejuice.enrich_money_laundering_prevention:
-  add:
-    - bietlejuice.enrich_offer:load-enrich-offer
   remove:
     - bietlejuice.docx:load-clean-credit-evaluation
     - bietlejuice.docx:load-clean-document

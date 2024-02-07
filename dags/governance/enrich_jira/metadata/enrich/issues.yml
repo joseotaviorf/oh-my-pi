@@ -1,0 +1,111 @@
+---
+database_name: datalake_jira
+table_name: issues
+description: Datailed information from the Issues created in Jira
+domain: governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira_clean.issues.key
+    description: ""
+  id_parent_issue:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  id_project:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  summary:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  issue_description:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  project_name:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  issue_type:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  current_status:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  current_status_category:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  assignee:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  reporter:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  owner_person:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  team_name:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  priority:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  resolution:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  root_cause_resolution:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  incident_category:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  incident_owner:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  last_cycle:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  labels:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  cycles:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  story_points:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  story_points_estimate:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  dt_started:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  ts_created:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""
+  ts_resolved:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: ""

@@ -1,0 +1,52 @@
+---
+database_name: datalake_jira
+table_name: issue_status_changes
+description: Status changes from the Issues in Jira
+domain: governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira_clean.issues.key
+    description: ""
+  id_change:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  id_author:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  field:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  field_type:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  from_queue:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  to_queue:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  author_email:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  author_name:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  minutes_in_origin_queue:
+    lineage:
+      - datalake_jira.issues.ts_created
+      - datalake_jira_clean.issues.change_log
+    description: ""
+  ts_updated:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+    description: ""

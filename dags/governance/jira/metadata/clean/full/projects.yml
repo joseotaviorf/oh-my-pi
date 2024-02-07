@@ -1,0 +1,58 @@
+database_name: datalake_jira_clean
+table_name: projects
+description: 
+domain: governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  avatar_urls:
+    lineage:
+      - datalake_jira_raw.projects.avatarurls
+    description: ""
+  id_entity:
+    lineage:
+      - datalake_jira_raw.projects.entityid
+    description: ""
+  expand:
+    lineage:
+      - datalake_jira_raw.projects.expand
+    description: ""
+  id:
+    lineage:
+      - datalake_jira_raw.projects.id
+    description: ""
+  is_private:
+    lineage:
+      - datalake_jira_raw.projects.isprivate
+    description: ""
+  key:
+    lineage:
+      - datalake_jira_raw.projects.key
+    description: ""
+  name:
+    lineage:
+      - datalake_jira_raw.projects.name
+    description: ""
+  project_type_key:
+    lineage:
+      - datalake_jira_raw.projects.projecttypekey
+    description: ""
+  properties:
+    lineage:
+      - datalake_jira_raw.projects.properties
+    description: ""
+  self:
+    lineage:
+      - datalake_jira_raw.projects.self
+    description: ""
+  is_simplified:
+    lineage:
+      - datalake_jira_raw.projects.simplified
+    description: ""
+  style:
+    lineage:
+      - datalake_jira_raw.projects.style
+    description: ""
+  uuid:
+    lineage:
+      - datalake_jira_raw.projects.uuid
+    description: ""
