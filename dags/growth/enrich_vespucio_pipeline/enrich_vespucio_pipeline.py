@@ -21,7 +21,9 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 VESPUCIO_PACKAGE_VERSION = "0.2.6"
-VESPUCIO_WHEEL_FILE = f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
+VESPUCIO_WHEEL_FILE = (
+    f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
+)
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 8, 24, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -49,11 +51,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-LIBRARIES = [
-    {
-        "whl": f"{artifacts_bucket}/vespucio/{VESPUCIO_WHEEL_FILE}"
-    }
-]
+LIBRARIES = [{"whl": f"{artifacts_bucket}/vespucio/{VESPUCIO_WHEEL_FILE}"}]
 DAG_DOCUMENTATION = config_service.get_config("dag_documentation")
 DAG_OWNER = DAGOwnerEnum.DATA_GROWTH
 
@@ -82,6 +80,7 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=LIBRARIES,
 )
+
 
 def create_task(entry_point: str, parameters: str, task_id: str = None):
     return QuintoAndarDatabricksCheckJobTaskOperator(
@@ -119,8 +118,15 @@ class Tables:
     condo_compounds = "vespucio_prod_delta.condo_compounds"
     house_compounds = "vespucio_prod_delta.house_compounds"
 
-    golden_set_condo_compounds = "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
-    golden_set_condo_compounds_diff = "vespucio_goldenset_delta.condo_compounds_goldenset_diff"
+    golden_set_condo_compounds = (
+        "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
+    )
+    golden_set_condo_compounds_diff = (
+        "vespucio_goldenset_delta.condo_compounds_goldenset_diff"
+    )
+
+    ebdb_clean_house_enrichment = "datalake_ebdb_clean.house_enrichment"
+
 
 source_tasks = [
     create_task(
@@ -225,7 +231,19 @@ plugin_tasks = [
             f"--input_condo_compounds={Tables.condo_compounds}",
             f"--input_house_compounds={Tables.house_compounds}",
             f"--input_geocode_cache={Tables.step2_geocode_cache}",
-            f"--output_index_prefix=vespucio_prod"
+            f"--output_index_prefix=vespucio_prod",
+        ],
+    ),
+    create_task(
+        entry_point="plugins_rede_house_enrichment_consolidate",
+        parameters=[
+            f"--sqs_queue_url=https://sqs.us-east-1.amazonaws.com/632540934959/ProdMainHouseEnrichmentHousesToBeReEnriched",
+            f"--sqs_region=us-east-1",
+            f"--sqs_batch_size=10",
+            f"--sqs_num_writers=10",
+            f"--input_ebdb_house_enrichment={Tables.ebdb_clean_house_enrichment}",
+            f"--input_condo_compounds={Tables.condo_compounds}",
+            f"--input_house_compounds={Tables.house_compounds}",
         ],
     ),
     create_task(
@@ -240,7 +258,7 @@ plugin_tasks = [
             f"--output_label=condo_compounds_${yesterday}_vs_{today}",
             f"--save_mode=append",
         ],
-        task_id="plugins_diff_condo_compounds"
+        task_id="plugins_diff_condo_compounds",
     ),
     create_task(
         entry_point="plugins_diff_tables",
@@ -254,7 +272,7 @@ plugin_tasks = [
             f"--output_label=house_compounds_${yesterday}_vs_{today}",
             f"--save_mode=append",
         ],
-        task_id="plugins_diff_house_compounds"
+        task_id="plugins_diff_house_compounds",
     ),
     create_task(
         entry_point="plugins_diff_tables",
@@ -269,7 +287,7 @@ plugin_tasks = [
             f"--output_label=condo_compounds_employee_sample_v1_vs_{today}",
             f"--save_mode=append",
         ],
-        task_id="plugins_diff_golden_set_condo_compounds"
+        task_id="plugins_diff_golden_set_condo_compounds",
     ),
 ]
 
