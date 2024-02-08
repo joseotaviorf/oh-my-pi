@@ -38,3 +38,13 @@
      `python generate_data_documentation_from_lineage.py --dag_folder "*" --table "*"`
   4. Generate for all DAGs on DW layer:
      `python generate_data_documentation_from_lineage.py --dag_folder "dw_*" --table "*"`
+
+## generate_enrich_template_from_py_file.py
+
+   This script was created to help with the migration to the DAG Builder. It generates the template for the DAG declaration of enrich DAGs, and fills a few fields
+   automatically by using regexes in the Python file and reading the config file. Its automatic filling SHOULD NOT be trusted, and instead verified carefully.
+
+   This is how you use it:
+   `python generate_enrich_template_from_py_file.py -d enrich_buyer_prospect`
+
+   It will generate a DAG declaration file in the DAG's folder.
