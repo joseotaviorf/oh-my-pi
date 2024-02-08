@@ -2573,6 +2573,7 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-contract
   - bietlejuice.rental_guarantee_platform:load-clean-contract-status
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-aud
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
   - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-fianca-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-object-legacy

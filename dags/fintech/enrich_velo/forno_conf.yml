@@ -18,3 +18,5 @@ inner_dependencies:
     - junk
   occurrence:
     - junk
+  delinquency_timeline:
+    - propose
