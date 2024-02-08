@@ -8,10 +8,10 @@ tables:
     clean_table_name: negotiation
     load_incremental: True
   - table_name: cbparcela
-    clean_table_name: cbparcela
+    clean_table_name: debt
     load_incremental: True
   - table_name: cbcontrato
-    clean_table_name: customer
+    clean_table_name: contract
     load_incremental: True
   - table_name: cbpagamento
     clean_table_name: agreement_payment
