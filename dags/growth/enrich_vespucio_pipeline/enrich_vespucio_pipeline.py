@@ -20,7 +20,7 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
-VESPUCIO_PACKAGE_VERSION = "0.2.6"
+VESPUCIO_PACKAGE_VERSION = "0.2.7"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
@@ -130,27 +130,33 @@ class Tables:
 
 source_tasks = [
     create_task(
-        entry_point="sources_ebdb_condo",
+        entry_point="sources_sql_job",
         parameters=[
             f"--script=ebdb_condo.sql",
         ],
     ),
     create_task(
-        entry_point="sources_kodak_metadata_condo",
+        entry_point="sources_sql_job",
         parameters=[
             f"--script=kodak_metadata_condo.sql",
         ],
     ),
     create_task(
-        entry_point="sources_sindiconet_condo",
+        entry_point="sources_sql_job",
         parameters=[
             f"--script=sindiconet_condo.sql",
         ],
     ),
     create_task(
-        entry_point="sources_ebdb_house",
+        entry_point="sources_sql_job",
         parameters=[
             f"--script=ebdb_house.sql",
+        ],
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=union_house.sql",
         ],
     ),
 ]
