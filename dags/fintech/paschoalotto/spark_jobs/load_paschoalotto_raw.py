@@ -2,6 +2,7 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
+from ast import literal_eval
 
 from pyspark.sql.functions import current_timestamp, lit
 from pyspark.sql.utils import AnalysisException
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     source_root_path = args.source_root_path
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
-    load_incremental = args.load_incremental
+    load_incremental = literal_eval(args.load_incremental)
     partition_cols = json.loads(args.partition_cols)
     format = json.loads(args.format)
 
