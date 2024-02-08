@@ -46,7 +46,7 @@ if __name__ == "__main__":
     source_root_path = args.source_root_path
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
-    load_incremental = json.loads(args.load_incremental)
+    load_incremental = args.load_incremental
     partition_cols = json.loads(args.partition_cols)
     format = json.loads(args.format)
 
