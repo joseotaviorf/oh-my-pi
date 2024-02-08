@@ -1,0 +1,28 @@
+dag:
+  name: jaiminho
+  schedule_start_date: 2021, 11, 30
+  schedule_interval: 0 3 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Retrieves data from the Jaiminho database (PostgreSQL). [Jaiminho](https://github.com/quintoandar/jaiminho)
+      is a microservice that handles notification schedule processing.
+
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: jaiminho
+  dbutils_secret_key: JAIMINHO_DB
+  tables_customization:
+    user_notifications_view:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+      clean_table_name: user_notifications
+
+cluster:
+  type: databricks_10_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

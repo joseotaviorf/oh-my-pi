@@ -1,15 +1,16 @@
 SELECT
     id,
-    ticket_id as id_ticket,
-    attendant_email,
-    timestamp(created_at) as ts_created,
-    timestamp(updated_at) as ts_updated,
+    ticket_id AS id_ticket,
     attendant_name,
-    bot_answered as is_bot_answered,
+    attendant_email,
     customer_email,
     customer_name,
     customer_phone,
-    timestamp(attended_at) as ts_attended,
     group_name,
-    timestamp(ticket_updated_at) as ts_ticket_updated
-FROM datalake_chat_fup_raw.chats_chat
+    bot_answered AS is_bot_answered,
+    TIMESTAMP(attended_at) AS ts_attended,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(ticket_updated_at) AS ts_ticket_updated,
+    TIMESTAMP(updated_at) AS ts_updated
+FROM
+    datalake_chat_fup_raw.chats_chat

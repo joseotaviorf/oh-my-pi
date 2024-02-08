@@ -1,5 +1,6 @@
-select
+SELECT
    id,
-   active as is_active,
-   type
-from datalake_insider_raw.template
+   type,
+   active AS is_active
+FROM
+   datalake_insider_raw.template

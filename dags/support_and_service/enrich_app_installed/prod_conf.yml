@@ -1,9 +1,0 @@
----
-dag_documentation:
-  dag_purpose: Consolidate events related to usage of the QuintoAndar App per client.
-
-custom_cluster:
-  driver_node_type_id: m5d.4xlarge
-  node_type_id: m5d.4xlarge
-  runtime_engine: PHOTON
-  num_workers: 4

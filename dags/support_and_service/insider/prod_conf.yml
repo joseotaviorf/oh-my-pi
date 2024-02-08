@@ -1,6 +1,0 @@
----
-lineage_product_database_name: insider
-dag_documentation:
-  dag_purpose: |
-    Retrieves data from the Insider database (PostgreSQL). [Insider](https://github.com/quintoandar/insider)
-    is a manager for follow ups. In other words, the purpose of it is to store and manage Follow Ups (A.K.A. reviews).

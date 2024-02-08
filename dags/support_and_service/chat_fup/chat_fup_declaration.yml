@@ -1,0 +1,37 @@
+dag:
+  name: chat_fup
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 0 3 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Extraction of [Chat FUP](https://github.com/quintoandar/chatfup) tables into data lake.
+      Chat FUP is a service to manage followups for whatsapp chats.
+
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: chatfup
+  dbutils_secret_key: CHAT_FUP_DB
+  tables_customization:
+    chats_chat:
+      extraction_type: full
+    surveys_answer:
+      extraction_type: full
+    surveys_survey:
+      extraction_type: full
+    message_voting:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+    rating:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

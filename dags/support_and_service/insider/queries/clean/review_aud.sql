@@ -1,14 +1,15 @@
-select
-  id as id_review,
-  reviewed_id as id_reviewed,
-  reviewer_id as id_reviewer,
+SELECT
+  id AS id_review,
+  reviewed_id AS id_reviewed,
+  reviewer_id AS id_reviewer,
   rev,
   labels,
   status,
-  status_mod as mod_is_status,
   type,
-  revtype as rev_type,
+  revtype AS rev_type,
   comment,
   revend,
-  creation_date as dt_creation
-from datalake_insider_raw.review_aud
+  status_mod AS mod_is_status,
+  creation_date AS dt_creation
+FROM
+  datalake_insider_raw.review_aud

@@ -1,0 +1,39 @@
+dag:
+  name: insider
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 30 1 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Retrieves data from the Insider database (PostgreSQL). [Insider](https://github.com/quintoandar/insider)
+      is a manager for follow ups. In other words, the purpose of it is to store and manage Follow Ups (A.K.A. reviews).
+
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: insider
+  dbutils_secret_key: INSIDER_DB
+  tables_customization:
+    feature:
+      extraction_type: full
+    resource:
+      extraction_type: full
+    review_aud:
+      extraction_type: full
+    review_feature:
+      extraction_type: full
+    review:
+      extraction_type: full
+    template_feature:
+      extraction_type: full
+    template:
+      extraction_type: full
+    user_revision_entity:
+      extraction_type: full
+
+cluster:
+  type: databricks_10_4_med_2xlarge_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

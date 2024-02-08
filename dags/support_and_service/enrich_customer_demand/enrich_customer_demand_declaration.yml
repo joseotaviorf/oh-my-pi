@@ -1,0 +1,35 @@
+dag:
+    name: enrich_customer_demand
+    schedule_start_date: 2021, 11, 16
+    owner: Data SS
+    documentation:
+        dag_purpose: Tranform and centralize tasks from different sources to calculate the backoffice demand and SLA rate.
+
+workflow:
+    type: query
+    layer: enrich
+    inner_dependencies:
+        demand_metrics_tasks:
+            - base_tasks
+        demand_metrics:
+            - demand_metrics_tasks
+        backlog_metrics_tasks:
+            - base_tasks
+        backlog_metrics:
+            - base_tasks
+        quality_metrics:
+            - base_tasks
+    tables_customization:
+        backlog_metrics_tasks:
+            partitions: [year, month, day]
+            extraction_type: incremental
+
+cluster:
+    type: custom_cluster
+    custom_configurations:
+        driver_node_type_id: r5d.8xlarge
+        node_type_id: r5d.8xlarge
+        runtime_engine: PHOTON
+        num_workers: 3
+        aws_attributes:
+            ebs_volume_size: 300

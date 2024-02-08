@@ -1,8 +1,9 @@
 SELECT
     id,
+    chat_id AS id_chat,
     token,
-    pending as is_pending,
-    timestamp(created_at) as ts_created,
-    timestamp(updated_at) as ts_updated,
-    chat_id as id_chat
-FROM datalake_chat_fup_raw.surveys_survey
+    pending AS is_pending,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+FROM
+    datalake_chat_fup_raw.surveys_survey

@@ -1,0 +1,18 @@
+dag:
+    name: enrich_app_installed
+    schedule_start_date: 2023, 4, 18
+    owner: Data SS
+    documentation:
+        dag_purpose: Consolidate events related to usage of the QuintoAndar App per client.
+
+workflow:
+    type: query
+    layer: enrich
+
+cluster:
+    type: custom_cluster
+    custom_configurations:
+        driver_node_type_id: m5d.4xlarge
+        node_type_id: m5d.4xlarge
+        runtime_engine: PHOTON
+        num_workers: 4
