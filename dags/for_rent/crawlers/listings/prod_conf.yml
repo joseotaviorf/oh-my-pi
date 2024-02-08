@@ -10,3 +10,7 @@ viva_real:
 zap_imoveis:
   origin: 'zapimoveis'
 partition_cols: ["city", "year", "month", "day"]
+custom_cluster:
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.2xlarge
+  num_workers: 3
