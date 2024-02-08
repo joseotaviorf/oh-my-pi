@@ -1,0 +1,125 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: contract
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: General customer data
+columns:
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.id_cbcontrato_int
+  id_product:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.id_cbtiponegocio_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.id_geusuario_int
+  id_customer_history:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.id_cbsituacaocontrato_int
+  id_collection_step:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.id_cbetapa_int
+  contract:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.contrato_str
+  name:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.nome_str
+  cpf:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.cpf_str
+  address:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.endereco_str
+  additional_address:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.complemento_str
+  neighborhood:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.bairro_str
+  zip_code:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.cep_str
+  city:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.cidade_str
+  state:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.estado_str
+  telephone:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.telefone_str
+  marital_status:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.estado_civil_str
+  observation:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.observacao_str
+  email:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.email_str
+  is_customer_located:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.cliente_localizado_bit
+  dt_stand_by:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.data_stand_by_dat
+  dt_contact:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.data_contato_dat
+  dt_first_distribution:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.data_primeira_distrib_dat
+  dt_last_distribution:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.data_ultima_distrib_dat
+  dt_request:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.data_solicitacao_dat
+  dt_located:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.data_localizado_dat
+  ts_timestamp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"
+  year:
+    description: "Year based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.year
+  month:
+    description: "Month based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.month
+  day:
+    description: "Day based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.day

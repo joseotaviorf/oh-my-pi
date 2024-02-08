@@ -1,0 +1,24 @@
+SELECT
+    BIGINT(id_cbtiponegocio_int) AS id_product,
+    npjur_id_jupessoa AS id_npjur,
+    codigo_str AS code,
+    descricao_str AS description,
+    quitacao_str AS discharge,
+    inclusao_despesa_str AS expense_inclusion,
+    descricao_npjur_str AS description_npjur,
+    mostra_parcela_str AS mostra_installment,
+    cgc_str AS cgc,
+    cep_str AS zip_code,
+    endereco1_str AS address_1,
+    endereco2_str AS address_2,
+    neg_uf_str AS negotiation_state,
+    neg_bairro_str AS negotiation_neighborhood,
+    taxa_ano_str AS year_rate,
+    CAST(REPLACE(dias_quitacao_num, ',', '.') AS DECIMAL(10, 2)) AS discharge_days,
+    CAST(REPLACE(parcelas_num, ',', '.') AS DECIMAL(10, 2)) AS installments,
+    CAST(REPLACE(valor_mora_num, ',', '.') AS DECIMAL(10, 2)) AS default_amount,
+    CAST(REPLACE(valor_cp_num, ',', '.') AS DECIMAL(10, 2)) AS amount_cp,
+    TO_TIMESTAMP(tstamp, 'dd/MM/yyyy HH:mm:ss') AS ts_timestamp,
+    NOW() AS ts_load
+FROM datalake_paschoalotto_raw.cbtiponegocio
+QUALIFY ROW_NUMBER() OVER(PARTITION BY id_cbtiponegocio_int ORDER BY DATE(CONCAT(year, "-", month, "-", day)) DESC, ts_load DESC) = 1

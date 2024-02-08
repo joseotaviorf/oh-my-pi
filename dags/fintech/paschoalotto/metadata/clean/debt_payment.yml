@@ -1,0 +1,101 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: debt_payment
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Payment details in debt
+columns:
+  id_debt_payment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.id_cbparcelapagamento_int
+  id_agreement_payment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.id_cbpagamento_int
+  id_debt:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.id_cbparcela_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.id_geusuario_int
+  principal:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.principal_num
+  cp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.cp_num
+  fine:
+    description: "Fine amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.multa_num
+  notification:
+    description: "Notification"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.notificacao_num
+  bank_expense:
+    description: "Bank Expense"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.despesa_banco_num
+  discount:
+    description: "Discount amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.desconto_num
+  principal_discount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.desconto_principal_num
+  reduction:
+    description: "Reduction (abatimento) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.abatimento_num
+  default_interest:
+    description: "Interest on arrears (juros e mora) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.juros_mora_num
+  fees:
+    description: "Fees (honorários)"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.honorarios_num
+  commissioning:
+    description: "Commissioning"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.comissionamento_num
+  total_amount:
+    description: "Total bank slip (bill) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.valor_total_num
+  retained:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.retido_num
+  addition:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.acrescimo_num
+  addition_np:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.acrescimo_np_num
+  dt_due:
+    description: "Installment due date"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.data_vencimento_dat
+  ts_insert:
+    description: "Date and time when the record was added"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.tstamp_mdm_inclusao
+  ts_update:
+    description: "Date and time when the record was updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.tstamp_mdm_alteracao
+  ts_timestamp:
+    description: "Date and time when the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"

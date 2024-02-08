@@ -1,0 +1,27 @@
+SELECT
+    BIGINT(id_cbparcelapagamento_int) AS id_debt_payment,
+    BIGINT(id_cbpagamento_int) AS id_agreement_payment,
+    BIGINT(id_cbparcela_int) AS id_debt,
+    BIGINT(id_geusuario_int) AS id_user,
+    CAST( REPLACE(principal_num, ',', '.') AS DECIMAL(10, 2)) AS principal,
+    CAST(REPLACE(cp_num, ',', '.') AS DECIMAL(10, 2)) AS cp,
+    CAST(REPLACE(multa_num, ',', '.') AS DECIMAL(10, 2)) AS fine,
+    CAST(REPLACE(notificacao_num, ',', '.') AS DECIMAL(10, 2)) AS notification,
+    CAST(REPLACE(despesa_banco_num, ',', '.') AS DECIMAL(10, 2)) AS bank_expense,
+    CAST(REPLACE(desconto_num, ',', '.') AS DECIMAL(10, 2)) AS discount,
+    CAST(REPLACE(desconto_principal_num, ',', '.') AS DECIMAL(10, 2)) AS principal_discount,
+    CAST(REPLACE(abatimento_num, ',', '.') AS DECIMAL(10, 2)) AS reduction,
+    CAST(REPLACE(juros_mora_num, ',', '.') AS DECIMAL(10, 2)) AS default_interest,
+    CAST(REPLACE(honorarios_num, ',', '.') AS DECIMAL(10, 2)) AS fees,
+    CAST(REPLACE(comissionamento_num, ',', '.') AS DECIMAL(10, 2)) AS commissioning,
+    CAST(REPLACE(valor_total_num, ',', '.') AS DECIMAL(10, 2)) AS total_amount,
+    CAST(REPLACE(retido_num, ',', '.') AS DECIMAL(10, 2)) AS retained,
+    CAST(REPLACE(acrescimo_num, ',', '.') AS DECIMAL(10, 2)) AS addition,
+    CAST(REPLACE(acrescimo_np_num, ',', '.') AS DECIMAL(10, 2)) AS addition_np,
+    TO_DATE(data_vencimento_dat, 'dd/MM/yyyy HH:mm:ss') AS dt_due,
+    TO_TIMESTAMP(tstamp_mdm_inclusao, 'dd/MM/yyyy HH:mm:ss') AS ts_insert,
+    TO_TIMESTAMP(tstamp_mdm_alteracao, 'dd/MM/yyyy HH:mm:ss') AS ts_update,
+    TO_TIMESTAMP(tstamp, 'dd/MM/yyyy HH:mm:ss') AS ts_timestamp,
+    NOW() AS ts_load
+FROM datalake_paschoalotto_raw.cbparcelapagamento
+QUALIFY ROW_NUMBER() OVER(PARTITION BY id_cbparcelapagamento_int ORDER BY DATE(CONCAT(year, "-", month, "-", day)) DESC, ts_load DESC) = 1

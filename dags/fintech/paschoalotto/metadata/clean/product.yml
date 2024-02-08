@@ -1,0 +1,89 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: product
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Customer product specification
+columns:
+  id_product:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.id_cbtiponegocio_int
+  code:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.codigo_str
+  description:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.descricao_str
+  discharge:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.quitacao_str
+  expense_inclusion:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.inclusao_despesa_str
+  description_npjur:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.descricao_npjur_str
+  mostra_installment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.mostra_parcela_str
+  cgc:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.cgc_str
+  zip_code:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.cep_str
+  address_1:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.endereco1_str
+  address_2:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.endereco2_str
+  negotiation_state:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.neg_uf_str
+  negotiation_neighborhood:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.neg_bairro_str
+  npjur_id_jupessoa:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.npjur_id_jupessoa
+  year_rate:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.taxa_ano_str
+  discharge_days:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.dias_quitacao_num
+  installments:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.parcelas_num
+  default_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.valor_mora_num
+  amount_cp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.valor_cp_num
+  ts_timestamp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"

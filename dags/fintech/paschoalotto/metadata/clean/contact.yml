@@ -1,0 +1,192 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: contact
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Type of contact made with the customer
+columns:
+  id_contact:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_geqlcontato_int
+  id_customer:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_geqlcliente_int
+  id_contact_type:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_geqltipocontato_int
+  id_address:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_geqlendereco_int
+  id_customer_map_keys:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_geqlcontrato_int
+  id_user:
+    description: "Sequential autoincremental primary key (PK) of the 'geusuario' table"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_geusuario_int
+  id_user_inclusion:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_geusuario_inclusao_int
+  id_cemetery:
+    description: "Cemetery ID"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_cemiterio_int
+  contact:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.contato_str
+  phone_classification:
+    description: "Phone classification"
+    categories:
+      1 - Excelente: ""
+      2 - Bom: ""
+      3 - Ruim: ""
+      9 - Indefinido: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.classificacao_str
+  origin_table:
+    description: "Phone origin table"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.tabela_origem_str
+  note:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.observacao_str
+  contact_name:
+    description: "Contact name"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.nome_contato_str
+  cpf:
+    description: "Customer CPF"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.cpf_str
+  rg:
+    description: "Customer RG"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.rg_str
+  is_deleted:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.excluido_bit
+  old_contact:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.contato_antigo_str
+  score:
+    description: "Phone score"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.score
+  score_lemit:
+    description: "Lemit score"
+    categories:
+      "0": " "
+      "1": " "
+      "2": " "
+      "3": " "
+      "4": " "
+      "5": " "
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.score_lemit_int
+  person_type:
+    description: "person type"
+    categories:
+      AVALISTA: ""
+      DEVEDOR: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.tipo_pessoa_str
+  telephone_extension:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.ramal_str
+  whatsapp:
+    description: "If the phone number has WhatsApp"
+    categories:
+      I: ""
+      N: ""
+      S: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.whatsapp_str
+  holiday_lock:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.trava_feriado_str
+  reason:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.motivo_str
+  is_contact_paid_easily:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.contatopagoufacil_bit
+  ranking_lemit:
+    description: "Lemit ranking"
+    categories:
+      "1": ""
+      "2": ""
+      "3": ""
+      "4": ""
+      "5": ""
+      "99": ""
+      "9999": ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.ranking_lemit_int
+  inhibition_suspicious_phone_note:
+    description: ""
+    categories:
+      CONTATO BLOQUEADO DEVIDO ESTAR NA LISTA DE NÃO PERTURBE: ""
+      CONTATO INIBIDO DEVIDO ESTAR NA LISTA DE BLOQUEIO DE DESCONHECE CLIENTE: ""
+      CONTATO INIBIDO DEVIDO ESTAR NA LISTA DE BLOQUEIO DE TELEFONE SUSPEITO: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.obs_inibicao_tel_suspeito_str
+  dt_score:
+    description: "Score date"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.data_score_dat
+  dt_score_update:
+    description: "Score update date"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.data_alteracao_score_dat
+  dt_ranking_update:
+    description: "Ranking update date"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.data_alteracao_ranking_dat
+  ts_sent:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.tstamp_envio
+  ts_return:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.tstamp_retorno
+  ts_cemetery:
+    description: "If the phone is in the cemetery"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.data_cemiterio_tst
+  ts_inhibition_suspicious_phone:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.data_inibicao_tel_suspeito_tstamp
+  ts_phone_insert:
+    description: "Date and time when the phone was added"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.tstamp_inclusao
+  ts_insert:
+    description: "Date and time when the record was added"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.tstamp_mdm_inclusao
+  ts_update:
+    description: "Date and time when the record was updated"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.tstamp_mdm_alteracao
+  ts_timestamp:
+    description: "Date and time when the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"

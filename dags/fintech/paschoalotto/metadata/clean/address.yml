@@ -1,0 +1,65 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: address
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Contact Address
+columns:
+  id_address:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.id_geqlendereco_int
+  id_customer:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.id_geqlcliente_int
+  address:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.endereco_str
+  additional_address:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.complemento_str
+  neighborhood:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.bairro_str
+  zip_code:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.cep_str
+  city:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.cidade_str
+  state:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.estado_str
+  classification:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.classificacao_str
+  is_deleted:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.excluido_bit
+  ts_inclusion:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.tstamp_inclusao
+  ts_insert:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.tstamp_mdm_inclusao
+  ts_update:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.tstamp_mdm_alteracao
+  ts_timestamp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"

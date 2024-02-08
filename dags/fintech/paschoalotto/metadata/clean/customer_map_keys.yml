@@ -1,0 +1,29 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: customer_map_keys
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Key to relationship with Customer contact data
+columns:
+  id_customer_map_keys:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontrato.id_geqlcontrato_int
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontrato.id_cbcontrato_int
+  id_product:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontrato.id_cbtiponegocio_int
+  contract:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontrato.contrato_str
+  ts_timestamp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontrato.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"

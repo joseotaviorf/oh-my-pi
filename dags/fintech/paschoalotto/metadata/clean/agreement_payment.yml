@@ -1,0 +1,214 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: agreement_payment
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Agreement payment information
+columns:
+  id_agreement_payment:
+    description: "Table sequence/ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_cbpagamento_int
+  id_agreement_detail:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_cbitembordero_int
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_cbcontrato_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_geusuario_int
+  id_cbtipopagamento:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_cbtipopagamento_int
+  id_geempresa:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_geempresa_int
+  id_gefilial:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_gefilial_int
+  id_gecliente:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_gecliente_int
+  sequence:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.sequencia_int
+  receipt_series:
+    description: ""
+    categories:
+      CDB: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.serie_recibo_str
+  observation:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.observacao_txt
+  receipt_type:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.tipo_recibo_str
+  bill_status:
+    description: "Bank slip (bill) status"
+    categories:
+      C: ""
+      E: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.situacao_str
+  magnetic:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.pc_magnetico_str
+  payment_status:
+    description: "Payment status"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.situacao_pagto_str
+  payment_type:
+    description: "Payment type"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.tipo_pagamento_str
+  is_paid_in_installments:
+    description: "Whether the bill is paid in installments or not"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.parcelado_str
+  bank_slip_note:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.observacao_boleto_str
+  product:
+    description: "Product"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.produto_str
+  discharge:
+    description: "If the bank slip (bill) is a discharge"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.quitacao_str
+  password:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.senha_str
+  access_key:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.chave_acesso_int
+  modality:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.modalidade_num
+  installment:
+    description: "Installment"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.parcelamento_str
+  mattress:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.colchao_str
+  principal:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.principal_num
+  cp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.cp_num
+  fine:
+    description: "Fine amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.multa_num
+  notification:
+    description: "Notification"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.notificacao_num
+  bank_expense:
+    description: "Bank Expense"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.despesa_banco_num
+  discount:
+    description: "Discount amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.desconto_num
+  principal_discount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.desconto_principal_num
+  reduction:
+    description: "Reduction (abatimento) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.abatimento_num
+  default_interest:
+    description: "Interest on arrears (juros e mora) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.juros_mora_num
+  fees:
+    description: "Fees (honorários)"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.honorarios_num
+  commissioning:
+    description: "Commissioning"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.comissionamento_num
+  total_amount:
+    description: "Total bank slip (bill) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.valor_total_num
+  retained:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.retido_num
+  receipt:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.recibo_num
+  addition:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.acrescimo_num
+  addition_np:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.acrescimo_np_num
+  percentage_discount:
+    description: "Percentage discount"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.percentual_desconto_num
+  dt_calculation:
+    description: "Calculation date"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.data_calculo_dat
+  dt_payment:
+    description: "Payment date"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.data_pagamento_dat
+  dt_register:
+    description: "Registration date"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.data_cadastro_dat
+  dt_return:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.data_retorno_dat
+  dt_bank_return:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.data_retorno_banco_dat
+  ts_insert:
+    description: "Date and time when the record was added"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.tstamp_mdm_inclusao
+  ts_update:
+    description: "Date and time when the record was updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.tstamp_mdm_alteracao
+  ts_timestamp:
+    description: "Date and time when the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"

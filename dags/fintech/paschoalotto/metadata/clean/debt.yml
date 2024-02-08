@@ -1,0 +1,396 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: debt
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: General customer debt data
+columns:
+  id_debt:
+    description: "Table sequence/ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.id_cbparcela_int
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.id_cbcontrato_int
+  id_user:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.id_geusuario_int
+  id_esregua:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.id_esregua_int
+  id:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.id_str
+  installment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.parcela_int
+  installment_status:
+    description: "Installment status"
+    categories:
+      "0": " "
+      "1": " "
+      "2": " "
+      "4": " "
+      "6": " "
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.situacao_int
+  installment_status_note:
+    description: "Note on installment status"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.observacao_str
+  id_installment:
+    description: "Installment unique number"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.numero_unico_str
+  type:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.tipo_str
+  record:
+    description: "Record"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.es_des_regis_str
+  contract_quintoandar:
+    description: "QuintoAndar Contract"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.quintoandar_des_contr_str
+  contract:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.contrato_int
+  contract_rao:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.contrato_rao_str
+  index:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.desc_indice_str
+  changed:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.alterado_edi_str
+  reference:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.referencia_str
+  status_record:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.status_registro_str
+  manual:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.manual_str
+  product:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.produto_int
+  product_name:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.nome_produto_str
+  modality:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.modalidade_int
+  agency:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.agencia_int
+  mci:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.mci_int
+  bearer_name:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.nome_portador_str
+  card_cycle:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.ciclo_cartao_str
+  card_age:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.ciclo_cartao_str
+  status_cacs:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.situacao_cacs_str
+  delay_cycle:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.ciclo_atraso_str
+      - datalake_paschoalotto_raw.cbparcela.ciclo_atraso_int
+  notified:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.notificado_str
+  invoice:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.nota_fiscal_str
+  attribution:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.atribuicao_str
+  segment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.segmento_str
+  beat:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.batimento_str
+  accounting_text:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.texto_contabil_str
+  system:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.sistema_str
+  payment_format:
+    description: ""
+    categories:
+      Boleto Bancario: ""
+      Cartao de Credito: ""
+      Pergunte ao cliente: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.forma_pagamento_str
+  our_number:
+    description: "Our number"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.nosso_numero_int
+  velo_real_estate:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_imobiliaria_str
+  velo_contracts:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_contratos_str
+  velo_pf:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_pf_str
+  delay_days:
+    description: "Delay days"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.dias_atraso_int
+  corrected_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.es_valor_corrigido_num
+  charges_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.es_valor_encargos_num
+  minimum_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.es_valor_minimo_num
+  main_amount:
+    description: "Main amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.valor_principal_num
+  paid_amount:
+    description: "Amount paid"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.valor_pago_num
+  total_debt_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.vlr_devedor_total_num
+  debt_balance:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.saldo_devedor_num
+  debt_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.valor_devedor_num
+  expired_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.vencidop_num
+  fine_amount:
+    description: "Fine amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.valor_multa_num
+  fine_discharge_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.valor_multa_quitacao_num
+  commission_amount:
+    description: "Commission amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.valor_comissao_perm_num
+  currency_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.qtd_moeda_num
+  currency_index:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.indice_moeda_num
+  fare_charge:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.tarifa_cobranca_num
+  cp_installment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.cp_parcela_num
+  limit_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.valor_limite_num
+  spent_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.valor_gastos_num
+  last_payment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.ultimo_pagamento_num
+  max_balance:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.saldo_maximo_num
+  min_balance:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.saldo_minimo_num
+  velo_rentals:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_alugueis_num
+  velo_damage:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_danos_num
+  velo_rescission:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_rescisao_num
+  velo_condominium:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_condominio_num
+  velo_signature:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_assinatura_num
+  velo_fine:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_multa_num
+  velo_fees:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.velo_juros_num
+  dt_due:
+    description: "Installment due date"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_vencimento_dat
+  dt_payment:
+    description: "Payment day"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_pagamento_dat
+  dt_first_contract_distribution:
+    description: "Date of first contract distribution"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_primeira_distrib_dat
+  dt_last_contract_distribution:
+    description: "Date of last contract distribution"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_ultima_distrib_dat
+  dt_deadline_return:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_limite_retorno_dat
+  dt_performance:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_performance_dat
+  dt_riscocl:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_riscocl_dat
+  dt_entry:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_entrada_ca_dat
+  dt_frozen:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_congelada_dat
+  dt_last_invoice:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_ultima_fatura_dat
+  dt_conventional_calculation:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.calculo_convencionais_dat
+  dt_status:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_status_dat
+  dt_expiration:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_validade_dat
+  dt_last_payment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.ultimo_pagamento_dat
+  dt_closing:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_fechamento_dat
+  dt_max_balance:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_saldo_maximo_dat
+  dt_min_balance:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.data_saldo_minimo_dat
+  dt_emission:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.emissao_dat
+  ts_insert:
+    description: "Date and time when the record was inserted"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.tstamp_mdm_inclusao
+  ts_update:
+    description: "Date and time when the record was updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.tstamp_mdm_alteracao
+  ts_timestamp:
+    description: "Date and time when the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"
+  year:
+    description: "Year based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.year
+  month:
+    description: "Month based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.month
+  day:
+    description: "Day based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.day

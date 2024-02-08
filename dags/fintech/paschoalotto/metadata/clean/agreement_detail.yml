@@ -1,0 +1,323 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: agreement_detail
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: detail of the agreement generated
+columns:
+  id_agreement_detail:
+    description: "Table sequence/ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_cbitembordero_int
+  id_negotiation_grouping:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_cbbordero_int
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_cbcontrato_int
+  id_address:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_geqlendereco_int
+  id_contact:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_geqlcontato_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_geusuario_int
+  id_cbinstrucao1:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_cbinstrucao1_int
+  id_cbinstrucao2:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_cbinstrucao2_int
+  id_geusuario_boleto:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_geusuario_boleto_int
+  id_gecidade:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.id_gecidade_int
+  our_number:
+    description: "Our bank slip (bill) number"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.nosso_numero_str
+      - datalake_paschoalotto_raw.cbitembordero.nosso_numero_int
+  bank_slip:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.boleto_int
+  command:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.comando_str
+  email_destination:
+    description: "bank slip destination"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.destino_str
+  digitable_line:
+    description: "bank slip (bill) digitizable line"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.linha_digitavel_str
+  bar_code:
+    description: "bank slip (bill) barcode"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.cod_barra_str
+  bar:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.barra_str
+  dv:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.dv_int
+  instruction_1:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.instrucao_1_str
+  instruction_2:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.instrucao_2_str
+  instruction_3:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.instrucao_3_str
+  instruction_4:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.instrucao_4_str
+  instruction_5:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.instrucao_5_str
+  instruction_6:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.instrucao_6_str
+  instruction_7:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.instrucao_7_str
+  final_instruction:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.instrucao_final_str
+  installment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.parcelamento_str
+  payment_status:
+    description: "Payment status"
+    categories:
+      C: ""
+      S: ""
+      X: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.pago_str
+  agreement:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.acordo_int
+  discharge:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.quitacao_str
+  bank_slip_note:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.observacao_boleto_str
+  type_destiny:
+    description: "Bank skip (Bill) destination type"
+    categories:
+      C: ""
+      E: ""
+      O: ""
+      W: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.tipo_destino_str
+  bank_slip_installment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.boleto_parcelamento_str
+  is_generated_by_operator:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.tipo_geracao_str"
+  id_installment:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.codigo_parcelamento_ws_str
+  is_sent_action_api:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.acao_enviado_api_int
+  is_sent_billing:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.boletagem_enviada_int
+  carta_boleto:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.carta_boleto_quintoandar_str
+  is_boletagem_remessa:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.boletagem_remessa_quintoandar_str
+  formalized_agreement:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.acordo_formalizado_int
+  third_file:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.arquivo_terc_str
+  jpg_sent:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.envio_jpg_str
+  origin_ws:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.origem_ws_int
+  discount_amount:
+    description: "Bank slip (Bill) discount amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.valor_desconto_num
+  principal:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.principal_num
+  cp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.cp_num
+  cp_original:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.cp_original_num
+  fine:
+    description: "Fine amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.multa_num
+  notification:
+    description: "Notification"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.notificacao_num
+  bank_expense:
+    description: "Bank Expense"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.despesa_banco_num
+  discount:
+    description: "Discount amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.desconto_num
+  reduction:
+    description: "Reduction (abatimento) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.abatimento_num
+  default_interest:
+    description: "Interest on arrears (juros e mora) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.juros_mora_num
+  fees:
+    description: "Fees (honorários)"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.honorarios_num
+  commissioning:
+    description: "Commissioning"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.comissionamento_num
+  total_amount:
+    description: "Total bank slip (bill) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.valor_total_num
+  retained:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.retido_num
+  addition:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.acrescimo_num
+  addition_np:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.acrescimo_np_num
+  discount_percentage:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.perc_desc_num
+  principal_original:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.principal_original_num
+  discount_original:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.desconto_original_num
+  pc_ho:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.pc_ho_num
+  pc_commissioning:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.pc_comissionamento_num
+  hour_bank_skip:
+    description: "Emission Hour"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.hora_boleto_tim
+  dt_due:
+    description: "Bank slip (bill) due date"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.vencimento_dat
+  dt_shipping:
+    description: "Shipping date"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.data_envio_dat
+  dt_resend:
+    description: "Resend date"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.data_reenvio_dat
+  dt_discount:
+    description: "Discount date"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.data_desconto_dat
+  dt_emission:
+    description: "Emission date"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.emissao_dat
+  dt_bank_slip:
+    description: "Bank Slip (bill) emission date"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.data_boleto_dat
+  ts_bank_slip_recording:
+    description: "Date and time when the record was added"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.boleto_gravacao_tim
+  ts_insert:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.tstamp_mdm_inclusao
+  ts_update:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.tstamp_mdm_alteracao
+  ts_tstamp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.tstamp
+  ts_timestamp:
+    description: "Date and time when the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.timestamp
+  ts_load:
+    description: "Timestamp of ingestion"

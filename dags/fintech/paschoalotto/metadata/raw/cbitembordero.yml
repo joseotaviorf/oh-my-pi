@@ -1,0 +1,8 @@
+---
+database_name: datalake_paschoalotto_raw
+table_name: cbitembordero
+owner: bianca.martins@quintoandar.com.br
+columns:
+  destino_str:
+    tags:
+      - Confidential

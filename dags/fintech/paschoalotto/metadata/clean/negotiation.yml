@@ -1,0 +1,165 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: negotiation
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Negotiation/Bordereau data
+columns:
+  id_negotiation_grouping:
+    description: "Table sequence/ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_cbbordero_int
+  id_product:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_cbtiponegocio_int
+  id_customer:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_gecliente_int
+  id_geempresa:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_geempresa_int
+  id_gefilial:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_gefilial_int
+  id_fibanco:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_fibanco_int
+  id_ficcbanco:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_ficcbanco_int
+  id_cbtipopagamento:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_cbtipopagamento_int
+  id_cbtiponegocio:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_cbtiponegocio_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_geusuario_int
+  id_cbconvenio:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_cbconvenio_int
+  id_geusuario_execut:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_geusuario_execut_int
+  bordereau:
+    description: "Border number"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.bordero_int
+  items:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.itens_int
+  status:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.situacao_int
+  file:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.arquivo_str
+  portfolio:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.carteira_int
+  generated:
+    description: ""
+    categories:
+      "0": " "
+      "1": " "
+      "2": " "
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.gerado_str
+  is_followup:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.followup_str
+  letter_template:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.modelo_carta_int
+  our_number_type:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.tipo_nosso_numero_int
+  repeat_contract:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.repete_contrato_str
+  discharge:
+    description: "Whether the invoice is discharge of the contract or not"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.quitacao_str
+  bordereau_type:
+    description: "Bordereau type"
+    categories:
+      C: ""
+      P: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.tipo_bordero_str
+  origin:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.origem_str
+  payment_type:
+    description: ""
+    categories:
+      B: ""
+      H: ""
+      P: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.forma_pagamento_api_recupera_str
+  card_link:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.link_cartao_api_recupera_str
+  calculation:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.seq_calculo
+  agreement_number_ws:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.numero_acordo_ws_int
+      - datalake_paschoalotto_raw.cbbordero.numero_acordo_ws_str
+  total:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.total_num
+  date:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.data_dat
+  ts_tstamp:
+    description: "Date and time when the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.tstamp
+  ts_timestamp:
+    description: "Date and time when the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.timestamp
+  ts_load:
+    description: "Timestamp of ingestion"
+  year:
+    description: "Year based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.year
+  month:
+    description: "Month based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.month
+  day:
+    description: "Day based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.day

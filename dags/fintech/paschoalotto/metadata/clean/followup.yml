@@ -1,0 +1,134 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: followup
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Data from the last contact with the customer (or attempted contact)
+columns:
+  id_followup:
+    description: "Table sequence/ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.id_cbfollowup_int
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.id_cbcontrato_int
+  id_debt:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.id_cbparcela_int
+  id_collection_history:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.id_cbsitcontato_int
+  id_contact:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.id_geqlcontato_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.id_geusuario_int
+  id_deliquency_reason:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.id_gemotivoinadimplencia_int
+  followup_description:
+    description: "Description of the follow-up"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.historico_str
+  contact_type:
+    description: ""
+    categories:
+      A: ""
+      L: ""
+      N: ""
+      R: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.tipo_contato_str
+  action_sent_api:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.acao_enviado_api_int
+  is_stand:
+    description: "If the follow puts stand in the contract"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.coloca_stand_str
+  is_updated:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.alterado_str
+  status_record:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.status_registro_str
+  call_key:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.call_key_str
+  instance:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.instancia_str
+  call_duration:
+    description: "Call duration"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.tempo_ligacao_tim
+  dt_event:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.data_evento_dat
+  dt_followup:
+    description: "Follow-up date"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.data_dat
+  dt_stand_by:
+    description: "Stand-by date, if applicable"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.data_stand_by_dat
+  dt_collection:
+    description: "Collection date"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.data_cobranca_dat
+  ts_collection_start:
+    description: "Collection start time"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.cobranca_inicio_tim
+  ts_collection_end:
+    description: "Collection end time"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.cobranca_final_tim
+  ts_collection_hour:
+    description: "Collection hour"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.hora_cobranca_tim
+  ts_hour:
+    description: "Collection date and hour"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.hora_tim
+  ts_timestamp:
+    description: "Date and time the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.tstamp
+  ts_insert:
+    description: "Record inclusion"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.tstamp_mdm_inclusao
+  ts_update:
+    description: "Record update"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.tstamp_mdm_alteracao
+  ts_load:
+    description: "Timestamp of ingestion"
+  year:
+    description: "Year based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.year
+  month:
+    description: "Month based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.month
+  day:
+    description: "Day based on the date the file was made available"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.day

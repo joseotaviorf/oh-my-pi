@@ -1,0 +1,41 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: email
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Contact e-mail
+columns:
+  id_email:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.id_geqlemail_int
+  id_customer:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.id_geqlcliente_int
+  email:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.email_str
+  classification:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.classificacao_str
+  is_deleted:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.excluido_bit
+  ts_insert:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.tstamp_mdm_inclusao
+  ts_update:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.tstamp_mdm_alteracao
+  ts_timestamp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"

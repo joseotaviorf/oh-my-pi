@@ -1,0 +1,33 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: collection_step
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Customer billing stage
+columns:
+  id_collection_step:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbetapa.id_cbetapa_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbetapa.id_geusuario_int
+  id_customer:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbetapa.id_gecliente_int
+  code:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbetapa.codigo_str
+  description:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbetapa.descricao_str
+  ts_timestamp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbetapa.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"

@@ -1,0 +1,33 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: customer_history
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: History of modifications to the customer's general status
+columns:
+  id_customer_history:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbsituacaocontrato.id_cbsituacaocontrato_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbsituacaocontrato.id_geusuario_int
+  code:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbsituacaocontrato.codigo_str
+  description:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbsituacaocontrato.descricao_str
+  action:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbsituacaocontrato.acao_str
+  with_password:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbsituacaocontrato.com_senha_str
+  ts_load:
+    description: "Timestamp of ingestion"

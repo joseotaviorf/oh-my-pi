@@ -1,0 +1,22 @@
+---
+database_name: datalake_paschoalotto_raw
+table_name: geqlendereco
+columns:
+  endereco_str:
+    tags:
+      - Restricted
+  complemento_str:
+    tags:
+      - Restricted
+  bairro_str:
+    tags:
+      - Restricted
+  cep_str:
+    tags:
+      - Restricted
+  cidade_str:
+    tags:
+      - Restricted
+  estado_str:
+    tags:
+      - Restricted
