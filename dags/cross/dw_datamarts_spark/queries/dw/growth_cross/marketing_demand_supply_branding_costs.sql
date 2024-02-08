@@ -729,7 +729,7 @@ supply_landlords_cost AS (
     WHERE
         co.funnel_side = 'supply'
         AND dbt.date BETWEEN DATE('2020-01-01') AND CURRENT_DATE - INTERVAL "1" day
-        AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels')
+        AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels','Test')
         AND co.mkt_channel != 'Girafa'
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
