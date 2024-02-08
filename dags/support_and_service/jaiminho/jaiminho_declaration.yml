@@ -16,6 +16,7 @@ workflow:
   dbutils_secret_key: JAIMINHO_DB
   tables_customization:
     user_notifications_view:
+      db_schema: jaiminho
       date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]
