@@ -107,6 +107,7 @@ for app_group in app_groups_list:
             target_database_base_name=SOURCE,
             extraction_spark_job_file=RAW_SPARK_JOB_PATH,
             raw_spark_job_extra_args=parameters,
+            has_hive_sync=False,
         )
         raw_task_groups[table_name] = raw_task_group
 

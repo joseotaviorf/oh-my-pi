@@ -21,6 +21,64 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def _schema_enforcement(identifier: str, results: list):
+  try:
+    if identifier == 'canvas':
+      logger.info("Creating DataFrame for 'canvas' identifier")
+      df = spark.createDataFrame(
+        [
+          {
+            "created_at": str(row['created_at']),
+            "updated_at": str(row['updated_at']),
+            "name": str(row['name']),
+            "description": str(row['description']),
+            "archived": str(row['archived']),
+            "draft": str(row['draft']),
+            "enabled": str(row['enabled']),
+            "schedule_type": str(row['schedule_type']),
+            "first_entry": str(row['first_entry']),
+            "last_entry": str(row['last_entry']),
+            "channels": str(row['channels']),
+            "variants": str(row['variants']),
+            "tags": str(row['tags']),
+            "teams": str(row['teams']),
+            "steps": str(row['steps']),
+            "canvas_id": str(row['canvas_id'])
+          } for row in results
+        ]
+      )
+    elif identifier == 'campaign':
+      logger.info("Creating DataFrame for 'campaign' identifier")
+      df = spark.createDataFrame(
+        [
+          {
+            "created_at": str(row['created_at']),
+            "updated_at": str(row["updated_at"]),
+            "name": str(row["name"]),
+            "description": str(row["description"]),
+            "archived": str(row["archived"]),
+            "enabled": str(row["enabled"]),
+            "draft": str(row["draft"]),
+            "schedule_type": str(row["schedule_type"]),
+            "channels": str(row["channels"]),
+            "first_sent": str(row["first_sent"]),
+            "last_sent": str(row["last_sent"]),
+            "tags": str(row["tags"]),
+            "teams": str(row["teams"]),
+            "messages": str(row["messages"]),
+            "conversion_behaviors": str(row["conversion_behaviors"]),
+            "campaign_id": str(row["campaign_id"])
+          } for row in results
+        ]
+      )
+  except Exception as exception:
+      logging.error(f"Fail to transform data. Schema error:{exception}")
+      raise exception
+
+  logger.info("Returning DataFrame for context")
+  return df
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment")
@@ -87,8 +145,8 @@ if __name__ == "__main__":
     raw_results = [consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc) for chunk in id_chunks]
     results = [item for sublist in raw_results for item in sublist]
 
-    df = spark_client.create_dataframe(results)
-    if not df.rdd.isEmpty():
+    if len(results) > 0:
+        df = _schema_enforcement(identifier, results)
         s3_loader.load_df(
             df=df, s3_path=f"{filesystem_path}{table_name}", format_options=file_type
         )
