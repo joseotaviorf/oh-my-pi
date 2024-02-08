@@ -4,6 +4,6 @@ SELECT
     token,
     pending AS is_pending,
     TIMESTAMP(created_at) AS ts_created,
-    TIMESTAMP(updated_at) AS ts_updated,
+    TIMESTAMP(updated_at) AS ts_updated
 FROM
     datalake_chat_fup_raw.surveys_survey
