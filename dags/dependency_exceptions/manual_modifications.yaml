@@ -466,6 +466,7 @@ bietlejuice.enrich_media_plan:
 bietlejuice.enrich_nps_answer_drivers:
   add:
     - bietlejuice.enrich_tracksale:load-enrich-answer
+  remove:
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
 bietlejuice.enrich_nps_reversion:
   override: []
