@@ -126,7 +126,7 @@ for table in tables:
     clean_task_groups[table_name] = clean_task_group
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
-    
+
 
     cross_downstream(
         DatalakeTaskGroup.last_tasks(raw_task_group),
