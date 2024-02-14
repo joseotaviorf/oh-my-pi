@@ -117,7 +117,7 @@ rent_flows AS (
     flrf.sk_offer,
     flrf.sk_offer_approved_date,
     flrf.sk_offer_submitted_date,
-    cap.id_proposal AS sk_proposal,
+    flrf.sk_proposal,
     flrf.sk_region,
     flrf.sk_tenant_doc_complete_date,
     flrf.sk_tenant_first_doc_sent_date,

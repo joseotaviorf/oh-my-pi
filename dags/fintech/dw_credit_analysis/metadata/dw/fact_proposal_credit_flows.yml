@@ -104,7 +104,7 @@ columns:
     description: "Key of date when offer was submitted by client."
   sk_proposal:
     lineage:
-      - datalake_credit_analysis.credit_analysis_proposals.id_proposal
+      - dw_rent.fact_listing_rent_flows.sk_proposal
     description: "Key of proposal (offer that was accepted)."
   sk_region:
     lineage:
