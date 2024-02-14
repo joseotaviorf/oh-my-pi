@@ -1,0 +1,77 @@
+---
+database_name: datalake_dai_report
+table_name: dai_report
+description: DAI (declaração de atividades imobiliárias) contains informations about tributes in the state of São Paulo - SP (Brazil)
+domain: Bedrock
+owner: marlon.simas@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - dw_quintoandar.dim_house.sk_house
+      - datalake_ebdb_clean.house.id
+    description: ""
+  dt_transaction:
+    lineage:
+      - dw_public.dim_date.date
+      - datalake_ebdb_clean.contract.ts_signed
+    description: ""
+  transaction_amount:
+    lineage:
+      - dw_sale.dim_sale_agreement.sale_price_agreed
+      - datalake_ebdb_clean.contract.rent
+    description: ""
+  address:
+    lineage:
+      - dw_quintoandar.dim_house.address
+      - datalake_ebdb_clean.house.address
+    description: ""
+  address_number:
+    lineage:
+      - dw_quintoandar.dim_house.number
+      - datalake_ebdb_clean.house.number
+    description: ""
+  address_complement:
+    lineage:
+      - dw_quintoandar.dim_house.complement
+      - datalake_ebdb_clean.house.complement
+    description: ""
+  address_neighborhood:
+    lineage:
+      - dw_quintoandar.dim_house.neighborhood
+      - datalake_ebdb_clean.house.neighborhood
+    description: ""
+  address_zipcode:
+    lineage:
+      - dw_quintoandar.dim_house.zipcode
+      - datalake_ebdb_clean.house.zipcode
+    description: ""
+  useful_area:
+    lineage:
+      - dw_quintoandar.dim_house.total_area
+      - datalake_ebdb_clean.house.total_area
+    description: ""
+  total_area:
+    lineage:
+      - dw_quintoandar.dim_house.total_area
+      - datalake_ebdb_clean.house.total_area
+    description: ""
+  terrain_area:
+    lineage:
+      - dw_quintoandar.dim_house.land_area
+      - datalake_ebdb_clean.house.land_area
+    description: ""
+  parking_slots:
+    lineage:
+      - dw_quintoandar.dim_house.parking_slots
+      - datalake_ebdb_clean.house.parking_slots
+    description: ""
+  bedrooms:
+    lineage:
+      - dw_quintoandar.dim_house.bedrooms
+      - datalake_ebdb_clean.house.bedrooms
+    description: ""
+  bathrooms:
+    lineage:
+      - dw_quintoandar.dim_house.bathrooms
+      - datalake_ebdb_clean.house.bathrooms
+    description: ""

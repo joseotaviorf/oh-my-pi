@@ -1262,6 +1262,13 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
   - bietlejuice.zendesk_tickets:load-clean-tickets-history
+bietlejuice.enrich_dai_report:
+  - bietlejuice.dw_house:load-dw-quintoandar-dim-house
+  - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.ebdb_contract:load-clean-contract
 bietlejuice.enrich_dashboard_governance:
   - bietlejuice.looker:load-clean-dashboard-elements
   - bietlejuice.looker:load-clean-dashboards
