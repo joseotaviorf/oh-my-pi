@@ -74,3 +74,45 @@ class TestTrinoClient:
 
         # assert
         mocked_cursor.execute.assert_called_once_with(command, parameters)
+
+    def test_register_table(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+        table_location = "location"
+
+        command = f"""
+            CALL hive.system.register_table(
+                schema_name => '{schema_name}',
+                table_name => '{table_name}',
+                table_location => '{table_location}'
+            )
+            """
+
+        mocked_trino_client.run = Mock()
+
+        # act
+        mocked_trino_client.register_table(schema_name, table_name, table_location)
+
+        # assert
+        mocked_trino_client.run.assert_called_once_with(command)
+
+    def test_unregister_table(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        command = f"""
+            CALL hive.system.unregister_table(
+                schema_name => '{schema_name}',
+                table_name => '{table_name}'
+            )
+            """
+
+        mocked_trino_client.run = Mock()
+
+        # act
+        mocked_trino_client.unregister_table(schema_name, table_name)
+
+        # assert
+        mocked_trino_client.run.assert_called_once_with(command)

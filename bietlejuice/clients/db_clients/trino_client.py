@@ -1,6 +1,7 @@
 import trino
 from quintoandar_logger import QuintoAndarLogger
 from trino import constants
+from trino.exceptions import TrinoUserError
 
 from bietlejuice.clients.db_clients.db_client import DBClient
 
@@ -81,3 +82,64 @@ class TrinoClient(DBClient):
         with self.conn as conn:
             cur = conn.cursor()
             cur.execute(command, parameters)
+
+    def register_table(
+        self,
+        schema_name: str,
+        table_name: str,
+        table_location: str,
+        throw_if_already_exists: bool = False,
+    ) -> None:
+        """
+        Registers a table in Trino. Particularly useful for Delta Lake tables.
+
+        :param schema_name: the schema name of the table
+        :type schema_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param table_location: the table location in the file system
+        :type table_location: str
+        :param throw_if_already_exists: if True, raises an exception if the table
+            already exists
+        :type throw_if_already_exists: bool
+        """
+        try:
+            self.run(
+                f"""
+            CALL {self.conn.catalog}.system.register_table(
+                schema_name => '{schema_name}',
+                table_name => '{table_name}',
+                table_location => '{table_location}'
+            )
+            """
+            )
+        except TrinoUserError as e:
+            if e.error_name != "ALREADY_EXISTS" or throw_if_already_exists:
+                raise e
+
+    def unregister_table(
+        self, schema_name: str, table_name: str, throw_if_not_exists: bool = False
+    ):
+        """
+        Unregisters a table from Trino. Particularly useful for Delta Lake tables.
+
+        :param schema_name: the schema name of the table
+        :type schema_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param throw_if_not_exists: if True, raises an exception if the table
+            does not exist
+        :type throw_if_not_exists: bool
+        """
+        try:
+            self.run(
+                f"""
+            CALL {self.conn.catalog}.system.unregister_table(
+                schema_name => '{schema_name}',
+                table_name => '{table_name}'
+            )
+            """
+            )
+        except TrinoUserError as e:
+            if e.error_name != "NOT_FOUND" or throw_if_not_exists:
+                raise e
