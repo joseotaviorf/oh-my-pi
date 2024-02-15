@@ -473,8 +473,6 @@ bietlejuice.enrich_nps_reversion:
 bietlejuice.enrich_offboarding:
   add:
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
-  remove:
-    - bietlejuice.enrich_tracksale:load-enrich-dispatch-attributes
 bietlejuice.enrich_offboarding_repairs_probability:
   remove:
     - bietlejuice.enrich_inspections:load-enrich-item
