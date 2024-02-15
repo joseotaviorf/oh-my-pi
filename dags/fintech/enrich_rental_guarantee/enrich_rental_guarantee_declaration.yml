@@ -1,0 +1,10 @@
+---
+dag:
+  name: enrich_rental_guarantee
+  schedule_start_date: 2020, 7, 1
+  owner: Data Fintech
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_min_io-memory_cluster
