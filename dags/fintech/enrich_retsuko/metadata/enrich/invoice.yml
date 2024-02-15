@@ -29,6 +29,14 @@ columns:
     description: "Latest audit ID associated with an invoice entry"
     lineage:
       - datalake_retsuko_clean.entry.id_audit
+  id_checkout_order:
+    description: "External ID that indicates the Order in Checkout product"
+    lineage:
+      - datalake_retsuko_clean.invoice.id_checkout_order
+  id_checkout_charge:
+    description: "External ID that indicates the Charge in Checkout product"
+    lineage:
+      - datalake_retsuko_clean.invoice.id_checkout_charge
   status:
     description: "Invoice payment status"
     lineage:
@@ -141,6 +149,10 @@ columns:
     description: Invoice due to timestamp"
     lineage:
       - datalake_retsuko_clean.invoice.ts_due
+  ts_nf_requested:
+    description: "Indicates when Seu Barriga requested erp solution to issue the NFe"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_nf_requested
   ts_created:
     description: "Invoice creation timestamp"
     lineage:

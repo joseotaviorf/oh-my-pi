@@ -21,6 +21,14 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.contract_id
+  id_checkout_order:
+    description: "External ID that indicates the Order in Checkout product"
+    lineage:
+      - datalake_retsuko_raw.invoice.checkout_order_id
+  id_checkout_charge:
+    description: "External ID that indicates the Charge in Checkout product"
+    lineage:
+      - datalake_retsuko_raw.invoice.checkout_charge_id
   status:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
@@ -89,6 +97,10 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.created_at
+  ts_nf_requested:
+    description: "Indicates when Seu Barriga requested erp solution to issue the NFe"
+    lineage:
+      - datalake_retsuko_raw.invoice.nf_requested_at
   ts_retsuko_created:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:

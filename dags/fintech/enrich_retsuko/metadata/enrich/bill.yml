@@ -17,6 +17,10 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.boleto.id_invoice
+  id_checkout_boleto:
+    description: "Indicates the external ID to join with Checkout Product"
+    lineage:
+      - datalake_retsuko_clean.boleto.id_checkout_boleto
   identifier:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
@@ -45,6 +49,10 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_clean.boleto.inputtable_line
+  external_source:
+    description: "Indicates if the bill was created with Checkout API or Vans CNAB"
+    lineage:
+      - datalake_retsuko_clean.boleto.external_source
   ts_due:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:

@@ -17,6 +17,10 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.boleto.invoice_id
+  id_checkout_boleto:
+    description: "External ID that indicates the Boleto in Checkout Product"
+    lineage:
+      - datalake_retsuko_raw.boleto.checkout_boleto_id
   identifier:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
@@ -45,6 +49,10 @@ columns:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.boleto.inputtable_line
+  external_source:
+    description: "Indicates if the boleto was created in Vans or Checkout"
+    lineage:
+      - datalake_retsuko_raw.boleto.external_source
   ts_due:
     description: "TODO FINISH DESCRIPTIONS"
     lineage:

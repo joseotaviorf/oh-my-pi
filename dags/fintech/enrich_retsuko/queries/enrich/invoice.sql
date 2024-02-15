@@ -16,6 +16,8 @@ SELECT
     in.id_contract,
     c.id_external AS id_contract_external,
     la.id_audit,
+    in.id_checkout_order,
+    in.id_checkout_charge,
     in.status,
     in.substatus,
     in.negotiation_status,
@@ -31,6 +33,7 @@ SELECT
     in.ts_canceled,
     in.ts_sent,
     in.ts_due,
+    in.ts_nf_requested,
     in.ts_created,
     in.ts_retsuko_updated
 FROM
