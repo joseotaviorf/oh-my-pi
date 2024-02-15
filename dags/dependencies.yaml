@@ -787,7 +787,7 @@ bietlejuice.dw_smart_price:
 bietlejuice.dw_supply_outbound_contacts:
   - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
 bietlejuice.dw_tenant_documentation:
-  - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
   - bietlejuice.ebdb:load-clean-proponent-info-resend-request
   - bietlejuice.ebdb:load-clean-proponent-proposal
   - bietlejuice.ebdb:load-clean-proposal
@@ -1309,8 +1309,8 @@ bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-dag-metadata
   - bietlejuice.documentation_metrics:load-clean-lineage-and-tags
 bietlejuice.enrich_docx:
-  - bietlejuice.docx:load-clean-credit-evaluation
-  - bietlejuice.docx:load-clean-document
+  - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
+  - bietlejuice.docx_user_documents:load-clean-document
 bietlejuice.enrich_ebdb_affiliate:
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
@@ -2333,8 +2333,8 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.hub_services:load-clean-business-unit
 bietlejuice.enrich_sale_offer_flows:
-  - bietlejuice.docx:load-clean-folder
-  - bietlejuice.docx:load-clean-folder-reference
+  - bietlejuice.docx_user_documents:load-clean-folder
+  - bietlejuice.docx_user_documents:load-clean-folder-reference
   - bietlejuice.monopoly:load-clean-sale-revision
   - bietlejuice.sales_flow:load-clean-buyer-data
   - bietlejuice.sales_flow:load-clean-cash-payment
@@ -3010,7 +3010,7 @@ bietlejuice.reverse_sale_unavailable_listings_load:
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
 bietlejuice.reverse_tracksale:
-  - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-dim-contract-person
