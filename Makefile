@@ -378,3 +378,13 @@ freeze-dependency-exceptions:
 	@echo "=========="
 	@echo ""
 	@PYTHONPATH=. python3 scripts/dependency_handling/freeze_dependency_exceptions.py
+
+
+.PHONY: generate-enrich-dag-declaration
+## Automatically generates the DAG Declaration yaml file of an existing enrich DAG, by reading the Python file and other configuration files.
+generate-enrich-dag-declaration:
+	@echo ""
+	@echo "Generating Enrich dag declaration based on dag file"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/artifact_generation/generate_enrich_template_from_py_file.py -d $(dag_name)
