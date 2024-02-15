@@ -7,6 +7,7 @@ from delta.tables import DeltaTable
 
 from pyspark.sql.functions import row_number
 from pyspark.sql.window import Window
+from pyspark.sql.utils import AnalysisException
 
 JOB_NAME = "load_cdc_raw"
 
@@ -33,9 +34,14 @@ def get_df_from_transactional(datalake_bucket, schema, table_name, execution_dat
     Dataframe.
     """
     path = f"s3://{datalake_bucket}/transactional/{schema}/{table_name}/year={execution_date.year}/month={execution_date:%m}/day={execution_date:%d}"
-    transactional_delta_table = DeltaTable.forPath(spark, path)
-
-    transactional_df = transactional_delta_table.toDF()
+    try:
+        transactional_delta_table = DeltaTable.forPath(spark, path)
+        transactional_df = transactional_delta_table.toDF()
+    except AnalysisException as e:
+        logger.info(
+            f"m=get_df_from_transactional, msg=Unable to read delta table from transactional layer, error={e}"
+        )
+        return None
 
     return transactional_df
 
@@ -68,8 +74,7 @@ def create_raw_delta_table(
         f"m=create_raw_delta_table, msg=Creating raw table using Delta format..."
     )
     df.write.format("delta").option("mergeSchema", True).mode("overwrite").saveAsTable(
-        full_raw_table_name,
-        path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
+        full_raw_table_name, path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/"
     )
     raw_delta_table = DeltaTable.forName(spark, full_raw_table_name)
 
@@ -97,11 +102,7 @@ def dml_processor(transactional_df, table_id):
     return transactional_df
 
 
-def merge_transactional_into_raw_table(
-    transactional_df,
-    table_id,
-    raw_delta_table,
-):
+def merge_transactional_into_raw_table(transactional_df, table_id, raw_delta_table):
     """
     Apply merge operations to Delta table, to consolidate
     Transactional layer table DML operations.
@@ -147,6 +148,14 @@ def main():
         datalake_bucket, schema, table_name, dt_execution
     )
 
+    if not transactional_df:
+        logger.info(
+            f"""
+            m=__main__, msg=Transactional Dataframe is empty, there is no changes to propagate.
+            """
+        )
+        return
+
     transactional_df = dml_processor(transactional_df, table_id)
 
     spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_{schema}_raw`")
@@ -156,11 +165,7 @@ def main():
 
     if not raw_delta_table:
         raw_delta_table = create_raw_delta_table(
-            transactional_df,
-            full_raw_table_name,
-            datalake_bucket,
-            schema,
-            table_name,
+            transactional_df, full_raw_table_name, datalake_bucket, schema, table_name
         )
 
     merge_transactional_into_raw_table(transactional_df, table_id, raw_delta_table)
