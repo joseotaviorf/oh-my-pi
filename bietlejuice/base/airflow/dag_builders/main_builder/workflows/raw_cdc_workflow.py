@@ -29,7 +29,6 @@ class RawCDCWorkflow(BaseWorkflow):
         )
         for raw_table_name, table_parameters in tables_customization.items():
             self._check_table_id_parameter(table_parameters)
-            self._check_cdc_connector_type_parameter(table_parameters)
             raw_initial_task, raw_final_task = self._create_raw_tasks(
                 table_name=raw_table_name,
                 dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
@@ -179,16 +178,5 @@ class RawCDCWorkflow(BaseWorkflow):
         if table_id is None:
             raise ValueError(
                 "The parameter 'table_id' cannot be None and must be informed in the dag declaration for each table."
-            )
-        return
-
-    def _check_cdc_connector_type_parameter(self, table_parameters):
-        """
-        Checks if the parameter cdc_connector_type is informed in the dag declaration
-        """
-        cdc_connector_type = table_parameters.get("cdc_connector_type")
-        if cdc_connector_type is None:
-            raise ValueError(
-                "The parameter 'cdc_connector_type' cannot be None and must be informed in the dag declaration file."
             )
         return

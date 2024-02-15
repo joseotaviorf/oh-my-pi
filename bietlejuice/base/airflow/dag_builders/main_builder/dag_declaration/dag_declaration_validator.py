@@ -53,12 +53,6 @@ class DAGDeclarationValidator(Validator):
                 "source_schema": {"type": "string", "empty": False},
                 "custom_schema": {"type": "string", "empty": False},
                 "database_type": {"type": "string", "empty": False, "required": False},
-                "cdc_connector_type": {
-                    "type": "string",
-                    "empty": False,
-                    "required": False,
-                    "allowed": ["mysql"],
-                },
                 "default_extraction_type": {"type": "string", "empty": False},
                 "default_partitions": {"type": "list", "empty": False},
                 "extra_query_template_params": {"type": "dict", "empty": False},

@@ -14,12 +14,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 
-TRANSACTION_ID_COLUMN_NAMES = {
-    "mysql": "source.gtid",
-    "postgres": None,  # TO BE DEFINED
-}
-
-
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
@@ -28,7 +22,6 @@ def parse_arguments():
     parser.add_argument("schema")
     parser.add_argument("table_name")
     parser.add_argument("execution_date")
-    parser.add_argument("cdc_connector_type")
     parser.add_argument("partitions")
 
     return parser.parse_args()
@@ -84,13 +77,12 @@ def get_incoming_data(datalake_bucket, environment, schema, table_name, executio
     return df
 
 
-def format_and_deduplicate_df(df, transaction_id_column, partitions):
+def format_and_deduplicate_df(df, partitions):
     """
     Extract and format informations from Debezium payload
     and Deduplicate
 
     :param df: Debezium payload as DataFrame
-    :param transaction_id_column: Column with unique transaction id
     :param partitions: Table partitions
     :return transactional_df:
     """
@@ -100,7 +92,6 @@ def format_and_deduplicate_df(df, transaction_id_column, partitions):
     df_without_delete_op = df.filter(df.op != lit("d")).select(
         col("after").alias("data"),
         "op",
-        col(transaction_id_column).alias("cdc_transaction_id"),
         "ts_ms",
         *partitions,
     )
@@ -108,7 +99,6 @@ def format_and_deduplicate_df(df, transaction_id_column, partitions):
     df_deletes = df.filter(df.op == lit("d")).select(
         col("before").alias("data"),
         "op",
-        col(transaction_id_column).alias("cdc_transaction_id"),
         "ts_ms",
         *partitions,
     )
@@ -124,7 +114,6 @@ def format_and_deduplicate_df(df, transaction_id_column, partitions):
 
     transactional_df = incoming_df.select(
         col("data.*"),
-        col("cdc_transaction_id"),
         col("op").alias("op_cdc"),
         from_unixtime(col("ts_ms") / 1000, "yyyy-MM-dd HH:mm:ss").alias(
             "ts_cdc_transaction"
@@ -132,9 +121,7 @@ def format_and_deduplicate_df(df, transaction_id_column, partitions):
         *partitions,
     )
 
-    transactional_df = transactional_df.dropDuplicates(["cdc_transaction_id"])
-
-    transactional_df = transactional_df.drop("cdc_transaction_id")
+    transactional_df = transactional_df.dropDuplicates()
 
     return transactional_df
 
@@ -147,14 +134,13 @@ def main():
     schema = args.schema
     table_name = args.table_name
     execution_date = args.execution_date
-    cdc_connector_type = args.cdc_connector_type
     partitions = json.loads(args.partitions.replace("'", '"'))
 
     logger.info(
         f"""
         m=__main__, environment={environment},  datalake_bucket={datalake_bucket},
         schema={schema}, table_name={table_name}, execution_date={execution_date},
-        cdc_connector_type={cdc_connector_type}, partitions={partitions}
+        partitions={partitions}
         msg=Starting spark job...
         """
     )
@@ -173,9 +159,7 @@ def main():
         )
         return
 
-    transaction_id_column = TRANSACTION_ID_COLUMN_NAMES.get(cdc_connector_type)
-
-    transactional_df = format_and_deduplicate_df(df, transaction_id_column, partitions)
+    transactional_df = format_and_deduplicate_df(df, partitions)
 
     logger.info("m=__main__, msg=Load table into transactional layer...")
     spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_cdc_{schema}_transactional`")

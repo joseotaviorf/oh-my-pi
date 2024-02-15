@@ -9,9 +9,6 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
     _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
     SPARK_JOB_NAME = "load_cdc_transactional"
 
-    def _get_cdc_connector_type(self) -> str:
-        return self.dag_execution_context.workflow_args.get("cdc_connector_type", "")
-
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         partitions = ["year", "month", "day", "hour"]
 
@@ -26,7 +23,6 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
             table_attributes.schema,
             table_attributes.table_name,
             self.dag_execution_context.execution_date,
-            self._get_cdc_connector_type(),
             str(partitions),
         ]
         return parameters
