@@ -1,9 +1,0 @@
-SELECT
-  id_demand_operation_flow,
-  bk_operation_flow,
-  operation_channel,
-  referral_type,
-  ts_combination_created,
-  ts_load
-FROM
-  datalake_growth_taxonomy.demand_operation_flow_staging
