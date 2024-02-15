@@ -12,5 +12,6 @@ class TaskEnum(Enum):
     LOAD_POSTGRES_RAW = "load_postgres_raw"
     LOAD_QUERY = "load_query"
     PROPAGATE_METADATA = "propagate_metadata"
+    REGISTER_DELTA_TABLE = "register_delta_table"
     SYNC_HIVE_PARTITIONS = "sync_hive_partitions"
     SYNC_HIVE_STRUCTURE = "sync_hive_structure"

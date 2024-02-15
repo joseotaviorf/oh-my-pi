@@ -62,11 +62,8 @@ class RawCDCWorkflow(BaseWorkflow):
         self.load_cdc_clean_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_CDC_CLEAN
         )
-        self.sync_hive_structure_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.SYNC_HIVE_STRUCTURE
-        )
-        self.sync_hive_partitions_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.SYNC_HIVE_PARTITIONS
+        self.register_delta_table_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.REGISTER_DELTA_TABLE
         )
         self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
@@ -99,32 +96,23 @@ class RawCDCWorkflow(BaseWorkflow):
 
         load_raw_task = self.load_cdc_raw_task_creator.create_task(raw_table_attributes)
 
-        sync_metastore_structure_raw_task = self.sync_hive_structure_task_creator.create_task(
+        register_delta_table_raw_task = self.register_delta_table_task_creator.create_task(
             raw_table_attributes
         )
 
-        sync_metastore_partitions_raw_task = self.sync_hive_partitions_task_creator.create_task(
-            raw_table_attributes
-        )
-
-        (
-            load_cdc_transactional_task
-            >> load_raw_task
-            >> sync_metastore_structure_raw_task
-            >> sync_metastore_partitions_raw_task
-        )
+        (load_cdc_transactional_task >> load_raw_task >> register_delta_table_raw_task)
 
         if self._check_include_propagate_metadata_task(raw_table_attributes):
             propagate_table_lineage_raw_task = self.propagate_metadata_task_creator.create_task(
                 raw_table_attributes
             )
             (
-                sync_metastore_partitions_raw_task
+                register_delta_table_raw_task
                 >> propagate_table_lineage_raw_task
                 >> dummy_terminate_job_cluster_task
             )
         else:
-            sync_metastore_partitions_raw_task >> dummy_terminate_job_cluster_task
+            register_delta_table_raw_task >> dummy_terminate_job_cluster_task
 
         if self._check_include_data_quality_task(raw_table_attributes):
             data_quality_tests_raw_task = self.data_quality_task_creator.create_task(
@@ -160,11 +148,7 @@ class RawCDCWorkflow(BaseWorkflow):
             clean_table_attributes
         )
 
-        sync_metastore_structure_clean_task = self.sync_hive_structure_task_creator.create_task(
-            clean_table_attributes
-        )
-
-        sync_metastore_partitions_clean_task = self.sync_hive_partitions_task_creator.create_task(
+        register_delta_table_clean_task = self.register_delta_table_task_creator.create_task(
             clean_table_attributes
         )
 
@@ -174,8 +158,7 @@ class RawCDCWorkflow(BaseWorkflow):
 
         (
             load_clean_task
-            >> sync_metastore_structure_clean_task
-            >> sync_metastore_partitions_clean_task
+            >> register_delta_table_clean_task
             >> propagate_table_metadata_clean_task
         )
 

@@ -28,6 +28,9 @@ from bietlejuice.base.airflow.task_creators.load_query_task_creator import (
 from bietlejuice.base.airflow.task_creators.propagate_metadata_task_creator import (
     PropagateMetadataTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.register_delta_table_task_creator import (
+    RegisterDeltaTableTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.sync_hive_partitions_task_creator import (
     SyncHivePartitionsTaskCreator,
 )
@@ -55,6 +58,7 @@ class TaskCreatorFactory:
         TaskEnum.LOAD_POSTGRES_RAW: LoadPostgresRawTaskCreator,
         TaskEnum.LOAD_QUERY: LoadQueryTaskCreator,
         TaskEnum.PROPAGATE_METADATA: PropagateMetadataTaskCreator,
+        TaskEnum.REGISTER_DELTA_TABLE: RegisterDeltaTableTaskCreator,
         TaskEnum.SYNC_HIVE_PARTITIONS: SyncHivePartitionsTaskCreator,
         TaskEnum.SYNC_HIVE_STRUCTURE: SyncHiveStructureTaskCreator,
     }
