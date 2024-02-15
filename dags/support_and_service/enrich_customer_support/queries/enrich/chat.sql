@@ -470,6 +470,8 @@ chat_back_tickets_metrics AS (
     last_and_first_back_tickets_timestamps AS lt
       ON lt.front_ticket = cbt.front_ticket
         AND lt.ts_last_solved = cbt.ts_solved
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY cbt.front_ticket ORDER BY lt.ts_first_created DESC) = 1
 ),
 -- TODO: this CTE should be revisited, current rule is to keep the last ticket of a session.
 zendesk_tickets_unique AS (

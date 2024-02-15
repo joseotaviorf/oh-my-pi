@@ -1,53 +1,53 @@
 -- TO RUN ON DATABRICKS: replace double brackets ('{{', '}}') for single ones
-WITH segment AS (
-  WITH last_updated_reservations AS (
-    SELECT
-        id_reservation,
-        MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
-    FROM
-        datalake_bigfone_twilio.call_flex_reservations
-    GROUP BY 1
-  ),
-  twilio_timestamp AS (
-    SELECT
-        id_reservation,
-        MIN(ts_created_local) AS ts_twilio_created_local,
-        MIN(ts_created_utc) AS ts_twilio_created_utc,
-        MAX(ts_created_local) AS ts_twilio_closed_local,
-        MAX(ts_created_utc) AS ts_twilio_closed_utc
-    FROM
-        datalake_bigfone_twilio.call_flex_events
-    WHERE
-        event_type LIKE 'reservation.%'
-    GROUP BY 1
-  ),
-  agent_info AS (
-    SELECT DISTINCT
-      id_task,
-      id_reservation,
-      LOWER(agent_email) AS agent_email
-    FROM
-      datalake_bigfone_twilio.call_flex_events cfe
-    WHERE
-      id_reservation IS NOT NULL
-  ),
-  transfer_reason AS (
-    SELECT DISTINCT
-      id_reviewed AS id_reservation,
-      rating_selected[0] AS transference_reason
-    FROM
-      datalake_insider_clean.review r
-    JOIN
-      datalake_insider_clean.review_feature rf
-        ON r.id = rf.id_review
-    JOIN
-      datalake_insider_clean.feature f
-        ON rf.id_feature = f.id
-    WHERE
-      f.name = 'ticket_transfer_reason'
-      AND r.type = 'ticket_transfer'
-      AND id_reviewed like 'WR%'
-  )
+WITH last_updated_reservations AS (
+  SELECT
+    id_reservation,
+    MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
+  FROM
+    datalake_bigfone_twilio.call_flex_reservations
+  GROUP BY 1
+),
+twilio_timestamp AS (
+  SELECT
+    id_reservation,
+    MIN(ts_created_local) AS ts_twilio_created_local,
+    MIN(ts_created_utc) AS ts_twilio_created_utc,
+    MAX(ts_created_local) AS ts_twilio_closed_local,
+    MAX(ts_created_utc) AS ts_twilio_closed_utc
+  FROM
+    datalake_bigfone_twilio.call_flex_events
+  WHERE
+    event_type LIKE 'reservation.%'
+  GROUP BY 1
+),
+agent_info AS (
+  SELECT DISTINCT
+    id_task,
+    id_reservation,
+    LOWER(agent_email) AS agent_email
+  FROM
+    datalake_bigfone_twilio.call_flex_events cfe
+  WHERE
+    id_reservation IS NOT NULL
+),
+transfer_reason AS (
+  SELECT DISTINCT
+    id_reviewed AS id_reservation,
+    rating_selected[0] AS transference_reason
+  FROM
+    datalake_insider_clean.review r
+  JOIN
+    datalake_insider_clean.review_feature rf
+      ON r.id = rf.id_review
+  JOIN
+    datalake_insider_clean.feature f
+      ON rf.id_feature = f.id
+  WHERE
+    f.name = 'ticket_transfer_reason'
+    AND r.type = 'ticket_transfer'
+    AND id_reviewed like 'WR%'
+),
+segment AS (
   SELECT
     r.id_reservation,
     COALESCE(id_call, r.id_task) AS sk_call,
@@ -87,8 +87,8 @@ WITH segment AS (
     datalake_bigfone_twilio.call_flex_reservations r
   JOIN
     last_updated_reservations lur
-        ON lur.id_reservation = r.id_reservation
-        AND lur.dt_last_updated = DATE(CONCAT(r.year, '-', r.month, '-', r.day))
+      ON lur.id_reservation = r.id_reservation
+      AND lur.dt_last_updated = DATE(CONCAT(r.year, '-', r.month, '-', r.day))
   JOIN
     agent_info ae
       ON ae.id_task = r.id_task
@@ -102,132 +102,131 @@ WITH segment AS (
   WHERE
     is_answered = TRUE
 ),
-conversation AS (
-  WITH ivr_events AS (
-    SELECT
-      id_call,
-      from_number,
-      to_number,
-      customer_phone,
-      (UNIX_TIMESTAMP(MAX(ts_created_local)) - UNIX_TIMESTAMP(MIN(ts_created_local)))/60 AS total_minutes_reception_time,
-      MIN(id_task) AS id_task, -- workaround to filter 1 instance with duplicity
-      MIN(ts_created_local) AS ts_first_event,
-      MAX(ts_created_local) AS ts_last_event,
-      MIN(ts_created_local_unix) AS ts_first_event_local_unix,
-      MAX(ts_created_local_unix) AS ts_last_event_local_unix
-    FROM
-      datalake_bigfone_twilio.call_ivr_events
-    GROUP BY 1,2,3,4
-  ),
-  call_events AS (
-    SELECT
-      id_task,
-      id_call,
-      id_conversation,
-      customer_phone,
-      from_number,
-      to_number,
-      direction,
-      is_scheduled,
-      scheduling_source,
-      MIN(ts_created_local) AS ts_first_event,
-      MAX(ts_created_local) AS ts_last_event,
-      MIN(ts_created_local_unix) AS ts_first_event_local_unix,
-      MAX(ts_created_local_unix) AS ts_last_event_local_unix,
-      MAX(ts_wrapup_event_local_unix) AS ts_wrapup_event_local_unix
-    FROM
-      datalake_bigfone_twilio.call_flex_events
-    WHERE
-      event_type != 'task.updated'
-      AND (
-        GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') IS NULL
-        OR GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') <> 'true'
-        OR (
-              GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') = 'true'
-              AND GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.conversations.conversation_attribute_1') = 2
-        )
-      )
-    GROUP BY 1,2,3,4,5,6,7,8,9
-  ),
-  csat AS (
-    SELECT DISTINCT
-      id_call,
-      id_task,
-      csat_1,
-      csat_2,
-      ts_created_local,
-      ROW_NUMBER() OVER (PARTITION BY id_call ORDER BY ts_created_local) AS rw_number_asc,
-      ROW_NUMBER() OVER (PARTITION BY id_call ORDER BY ts_created_local DESC) AS rw_number_desc
-    FROM
-      datalake_bigfone_twilio.call_ivr_events
-    WHERE
-      csat_2 IS NOT NULL
-  ),
-  csat_events AS (
-    SELECT
-      ca.id_call,
-      ca.csat_2 AS last_csat_score,
-      ca2.csat_2 AS first_csat_score,
-      ca.ts_created_local AS ts_last_response,
-      ca2.ts_created_local AS ts_first_response,
-      ca.csat_1
-    FROM
-      csat AS ca
-    INNER JOIN
-      csat AS ca2
-        ON ca2.id_call = ca.id_call
-        AND ca2.rw_number_asc = 1
-    WHERE
-      ca.rw_number_desc = 1
-  ),
-  call_metrics AS (
-    SELECT
-      id_task,
-      COUNT(DISTINCT queue_name) AS number_of_departments,
-      COUNT(DISTINCT id_reservation) AS number_of_tasks,
-      SUM(CAST(is_answered AS SMALLINT)) AS reservations_accepted,
-      SUM(seconds_wait_time) AS wait_time_flex,
-      SUM(seconds_talk_time) AS talk_time,
-      MIN(ts_created) AS ts_first_reservation,
-      MAX(ts_created) AS ts_last_reservation
-    FROM
-      datalake_bigfone_twilio.call_flex_reservations
-    WHERE
-      is_answered = TRUE
-    GROUP BY 1
-  ),
-  twilio_time_metrics AS (
-    SELECT
-      ctm.id_segment,
-      CASE
-        WHEN SUM(ctm.total_talk_time) IS NULL THEN 0
-        ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)
-      END AS total_talk_time,
-      CASE
-        WHEN SUM(ctm.total_queue_time) IS NULL THEN 0
-        ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)
-      END AS total_queue_time,
-      CASE
-        WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0
-        ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)
-      END AS total_wrap_up_time,
-      CASE
-        WHEN SUM(ctm.total_handling_time) IS NULL THEN 0
-        ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)
-      END AS total_handling_time
-    FROM
-      datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
-    GROUP BY 1
-  )
+ivr_events AS (
   SELECT
+    id_call,
+    from_number,
+    to_number,
+    (UNIX_TIMESTAMP(MAX(ts_created_local)) - UNIX_TIMESTAMP(MIN(ts_created_local)))/60 AS total_minutes_reception_time,
+    MIN(id_task) AS id_task, -- workaround to filter 1 instance with duplicity
+    MIN(ts_created_local) AS ts_first_event,
+    MAX(ts_created_local) AS ts_last_event,
+    MIN(ts_created_local_unix) AS ts_first_event_local_unix,
+    MAX(ts_created_local_unix) AS ts_last_event_local_unix
+  FROM
+    datalake_bigfone_twilio.call_ivr_events
+  GROUP BY 1,2,3
+),
+call_events AS (
+  SELECT
+    id_task,
+    id_call,
+    id_conversation,
+    channel_type,
+    from_number,
+    to_number,
+    direction,
+    is_scheduled,
+    scheduling_source,
+    MIN(ts_created_local) AS ts_first_event,
+    MAX(ts_created_local) AS ts_last_event,
+    MIN(ts_created_local_unix) AS ts_first_event_local_unix,
+    MAX(ts_created_local_unix) AS ts_last_event_local_unix,
+    MAX(ts_wrapup_event_local_unix) AS ts_wrapup_event_local_unix
+  FROM
+    datalake_bigfone_twilio.call_flex_events
+  WHERE
+    event_type != 'task.updated'
+    AND (
+      GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') IS NULL
+      OR GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') <> 'true'
+      OR (
+        GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') = 'true'
+        AND GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.conversations.conversation_attribute_1') = 2
+      )
+    )
+  GROUP BY 1,2,3,4,5,6,7,8,9
+),
+csat AS (
+  SELECT DISTINCT
+    id_call,
+    id_task,
+    csat_1,
+    csat_2,
+    ts_created_local,
+    ROW_NUMBER() OVER (PARTITION BY id_call ORDER BY ts_created_local) AS rw_number_asc,
+    ROW_NUMBER() OVER (PARTITION BY id_call ORDER BY ts_created_local DESC) AS rw_number_desc
+  FROM
+    datalake_bigfone_twilio.call_ivr_events
+  WHERE
+    csat_2 IS NOT NULL
+),
+csat_events AS (
+  SELECT
+    ca.id_call,
+    ca.csat_2 AS last_csat_score,
+    ca2.csat_2 AS first_csat_score,
+    ca.ts_created_local AS ts_last_response,
+    ca2.ts_created_local AS ts_first_response,
+    ca.csat_1
+  FROM
+    csat AS ca
+  INNER JOIN
+    csat AS ca2
+      ON ca2.id_call = ca.id_call
+      AND ca2.rw_number_asc = 1
+  WHERE
+    ca.rw_number_desc = 1
+),
+call_metrics AS (
+  SELECT
+    id_task,
+    COUNT(DISTINCT queue_name) AS number_of_departments,
+    COUNT(DISTINCT id_reservation) AS number_of_tasks,
+    SUM(CAST(is_answered AS SMALLINT)) AS reservations_accepted,
+    SUM(seconds_wait_time) AS wait_time_flex,
+    SUM(seconds_talk_time) AS talk_time,
+    MIN(ts_created) AS ts_first_reservation,
+    MAX(ts_created) AS ts_last_reservation
+  FROM
+    datalake_bigfone_twilio.call_flex_reservations
+  WHERE
+    is_answered = TRUE
+  GROUP BY 1
+),
+twilio_time_metrics AS (
+  SELECT
+    ctm.id_segment,
+    CASE
+      WHEN SUM(ctm.total_talk_time) IS NULL THEN 0
+      ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)
+    END AS total_talk_time,
+    CASE
+      WHEN SUM(ctm.total_queue_time) IS NULL THEN 0
+      ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)
+    END AS total_queue_time,
+    CASE
+      WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0
+      ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)
+    END AS total_wrap_up_time,
+    CASE
+      WHEN SUM(ctm.total_handling_time) IS NULL THEN 0
+      ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)
+    END AS total_handling_time
+  FROM
+    datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
+  GROUP BY 1
+),
+conversation AS (
+  SELECT DISTINCT
     COALESCE(ie.id_call, fe.id_call) AS id_call,
     COALESCE(ie.id_call, fe.id_call, fe.id_conversation, fe.id_task) AS sk_call,
     fe.id_conversation,
     COALESCE(fe.id_task, ie.id_task) AS id_task,
-    COALESCE(ie.from_number,fe.from_number) AS from_phone_number,
-    COALESCE(ie.to_number,fe.to_number) AS to_phone_number,
+    COALESCE(ie.from_number, fe.from_number) AS from_phone_number,
+    COALESCE(ie.to_number, fe.to_number) AS to_phone_number,
     fe.direction,
-    cfe.channel_type,
+    fe.channel_type,
     fe.scheduling_source,
     COALESCE(cm.number_of_tasks,0) AS number_of_tasks,
     COALESCE(cm.number_of_departments,0) AS number_of_departments,
@@ -239,25 +238,30 @@ conversation AS (
     ctm.total_queue_time AS seconds_total_queue_time,
     ctm.total_wrap_up_time AS seconds_total_wrap_up_time,
     ctm.total_handling_time AS seconds_total_handling_time,
-    COALESCE(CAST(ce.first_csat_score AS string), CAST(ce.csat_1 AS string)) IS NOT NULL AS is_csat_answered,
+    COALESCE(
+      CAST(ce.first_csat_score AS string),
+      CAST(ce.csat_1 AS string)
+    ) IS NOT NULL AS is_csat_answered,
     ce.csat_1 = 1 AS is_solved,
     ce.last_csat_score,
     ce.first_csat_score,
     ie.total_minutes_reception_time,
-    GREATEST(ie.ts_last_event_local_unix,fe.ts_last_event_local_unix) - COALESCE(ie.ts_first_event_local_unix,fe.ts_first_event_local_unix) AS seconds_duration,
-    COALESCE(ie.ts_first_event,fe.ts_first_event) AS ts_started,
+    GREATEST(
+      ie.ts_last_event_local_unix, fe.ts_last_event_local_unix
+    ) - COALESCE(
+      ie.ts_first_event_local_unix,
+      fe.ts_first_event_local_unix
+    ) AS seconds_duration,
+    COALESCE(ie.ts_first_event, fe.ts_first_event) AS ts_started,
     ce.ts_first_response AS ts_csat_first_response,
     ce.ts_last_response AS ts_csat_last_response,
-    GREATEST(ie.ts_last_event,fe.ts_last_event) AS ts_ended,
-    cfe.ts_created_local AS ts_created
+    GREATEST(ie.ts_last_event, fe.ts_last_event) AS ts_ended,
+    fe.ts_first_event AS ts_created
   FROM
     ivr_events ie
   FULL JOIN
     call_events fe
       ON fe.id_call = ie.id_call
-  LEFT JOIN
-    datalake_bigfone_twilio.call_flex_events cfe
-      ON fe.id_task = cfe.id_task
   LEFT JOIN
     csat_events ce
       ON ce.id_call = ie.id_call
@@ -266,7 +270,7 @@ conversation AS (
       ON cm.id_task = fe.id_task
   LEFT JOIN
     twilio_time_metrics ctm
-      ON cfe.id_task = ctm.id_segment
+      ON fe.id_task = ctm.id_segment
 ),
 zendesk_tickets_unique AS (
   --this CTE fix the error of multiple tickets openned for a single call
@@ -322,7 +326,7 @@ back_tickets AS (
     zd.ts_solved
   FROM
     zendesk_aditional_ticket_info zd
-  JOIN
+  INNER JOIN
     conversation c
       ON c.id_task = COALESCE(
         NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
@@ -331,7 +335,7 @@ back_tickets AS (
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
       ON dc.department = zd.zendesk_ticket_department
-  JOIN
+  INNER JOIN
     zendesk_aditional_ticket_info zd2
       ON zd2.id_call = c.sk_call
   WHERE
@@ -367,6 +371,8 @@ last_back_ticket AS (
     last_and_first_back_tickets_timestamps lt
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_solved
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY bt.front_ticket ORDER BY lt.ts_first_created DESC) = 1
 ),
 conversation_and_segment AS (
   SELECT
@@ -416,7 +422,7 @@ conversation_and_segment AS (
     c.ts_ended
   FROM
     conversation c
-  JOIN
+  INNER JOIN
     segment t
       ON t.sk_call = c.sk_call
       AND t.id_task = c.id_task
@@ -460,10 +466,10 @@ SELECT DISTINCT
   c.transference_type,
   c.transference_reason,
   CASE
-      WHEN c.seconds_total_wait_time <= 60 AND c.is_answered THEN TRUE
-      WHEN c.seconds_total_wait_time > 60 AND c.is_answered THEN FALSE
-      ELSE NULL
-   END AS sla_achieved,
+    WHEN c.seconds_total_wait_time <= 60 AND c.is_answered THEN TRUE
+    WHEN c.seconds_total_wait_time > 60 AND c.is_answered THEN FALSE
+    ELSE NULL
+  END AS sla_achieved,
   c.total_minutes_reception_time,
   c.segment_minutes_duration,
   c.segment_minutes_wait_time,

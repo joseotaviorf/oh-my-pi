@@ -170,6 +170,8 @@ last_back_ticket AS (
     last_and_first_back_tickets_timestamps lt
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_ticket_solved
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY bt.front_ticket ORDER BY lt.ts_first_created DESC) = 1
 )
 SELECT DISTINCT
   ze.id_ticket,
