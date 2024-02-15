@@ -1902,7 +1902,6 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_tracksale:load-enrich-campaign
   - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
   - bietlejuice.enrich_tracksale:load-enrich-dispatch
-  - bietlejuice.enrich_tracksale:load-enrich-dispatch-attributes
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
