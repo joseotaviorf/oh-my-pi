@@ -1,36 +1,32 @@
 dag:
   name: rental_guarantee
   owner: Data Fintech
+  schedule_interval: 0 0 * * *
 workflow:
   type: database_pull
   layer: raw
   database_type: postgres
   tables_customization:
-    charge_aud:
-      clean_table_name: charge_aud
+    charge_aud: {}
     charge:
       clean_table_name: charge
       date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]
-    guarantee_aud:
-      clean_table_name: guarantee_aud
+    guarantee_aud: {}
     guarantee:
       clean_table_name: guarantee
       date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]
-    renewal:
-      clean_table_name: renewal
+    renewal: {}
     revinfo:
       clean_table_name: rev_info
       date_filter_column: revtstmp
       extraction_type: incremental
       unixtime_measure: milliseconds
       partitions: [year, month, day]
-    risk_category_aud:
-      clean_table_name: risk_category_aud
-    risk_category:
-      clean_table_name: risk_category
+    risk_category_aud: {}
+    risk_category: {}
 cluster:
   type: databricks_10_4_med_general_cluster
