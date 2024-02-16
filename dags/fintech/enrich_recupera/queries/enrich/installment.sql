@@ -111,10 +111,10 @@ LEFT JOIN
 LEFT JOIN
     datalake_recupera_clean.indicator_contracts ci
         ON ci.id_creditor = isd.id_creditor
-          AND ci.id_product = isd.id_product
-          AND ci.id_contract = isd.id_contract
-          AND ci.id_customer = isd.id_customer
-          AND LOWER(ci.id_indicator) = 'status'
+            AND ci.id_product = isd.id_product
+            AND ci.id_contract = isd.id_contract
+            AND ci.id_customer = isd.id_customer
+            AND LOWER(ci.id_indicator) = 'status'
 WHERE
-    i.id_sequence_number = 0
-    AND i.dt_installment <= current_date()-1
+    i.dt_installment <= CURRENT_DATE() - 1
+    AND i.is_installment_active IS TRUE
