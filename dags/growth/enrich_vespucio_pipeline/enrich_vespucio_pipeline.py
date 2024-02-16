@@ -134,30 +134,35 @@ source_tasks = [
         parameters=[
             f"--script=ebdb_condo.sql",
         ],
+        task_id="ebdb_condo",
     ),
     create_task(
         entry_point="sources_sql_job",
         parameters=[
             f"--script=kodak_metadata_condo.sql",
         ],
+        task_id="kodak_metadata_condo",
     ),
     create_task(
         entry_point="sources_sql_job",
         parameters=[
             f"--script=sindiconet_condo.sql",
         ],
+        task_id="sindiconet_condo",
     ),
     create_task(
         entry_point="sources_sql_job",
         parameters=[
             f"--script=ebdb_house.sql",
         ],
+        task_id="ebdb_house",
     ),
     create_task(
         entry_point="sources_sql_job",
         parameters=[
             f"--script=union_house.sql",
         ],
+        task_id="union_house",
     ),
 ]
 
