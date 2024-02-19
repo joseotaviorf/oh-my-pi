@@ -17,6 +17,8 @@ workflow:
       - ongoing
       - tickets
       - nps_agg
+    contract_anomaly:
+      - contract_termination
     inspection_analysis:
       - ongoing
     ongoing:
