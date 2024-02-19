@@ -6,7 +6,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 
 class FullTableLoaderPipeline(TableLoaderPipeline):
-    def load_and_register(self, df, format_options):
+    def load_and_register(self, df, format_options, **load_options):
 
         spark_client = SparkClient()
 
@@ -18,6 +18,7 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
             format_options=format_options,
             s3_path=self.target_database_location + self.table_name,
             partitions=self.partitions,
+            **load_options,
         )
 
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)

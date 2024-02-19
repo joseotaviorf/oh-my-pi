@@ -75,7 +75,7 @@ class TableLoaderPipeline(AbstractPipeline):
         self.load_and_register(df, format_options)
 
     @abstractmethod
-    def load_and_register(self, df, format_options):
+    def load_and_register(self, df, format_options, **load_options):
         raise NotImplementedError()
 
     def register_udf(self, spark_client, udf_identifier):
