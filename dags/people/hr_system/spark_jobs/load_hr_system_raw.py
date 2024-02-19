@@ -45,6 +45,14 @@ def insert_columns(df, endpoint_details):
     df = df.withColumn("day", date_format(col(column_to_partition), "dd"))
     return df
 
+def delete_columns(df, endpoint_details):
+  spark.conf.set('spark.sql.caseSensitive', True)
+  columns_to_delete = endpoint_details['columns_to_delete']
+  for column in columns_to_delete:
+      df = df.drop(column)
+  spark.conf.set('spark.sql.caseSensitive', False)
+  return df
+
 
 def load_raw(
     spark_client,
@@ -118,6 +126,8 @@ if __name__ == "__main__":
         f"table_name={endpoint_id}, msg=Starting spark job..."
     )
     df = run_sync(endpoint_id, url, token, endpoint_details)
+    if endpoint_details['has_columns_to_delete']:
+        df = delete_columns(df, endpoint_details)
     if endpoint_details["has_partitions"]:
         df = insert_columns(df, endpoint_details)
         load_raw(
