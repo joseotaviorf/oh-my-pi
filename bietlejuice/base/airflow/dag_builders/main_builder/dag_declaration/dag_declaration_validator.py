@@ -93,6 +93,7 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "load_options": {"type": "dict", "empty": False, "required": False},
             },
         },
         "cluster": {

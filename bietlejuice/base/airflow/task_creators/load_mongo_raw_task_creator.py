@@ -1,6 +1,7 @@
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
+import json
 
 
 class LoadMongoRawTaskCreator(BaseTaskCreator):
@@ -17,6 +18,15 @@ class LoadMongoRawTaskCreator(BaseTaskCreator):
 
         return self._create_spark_job_task(self.SPARK_JOB_NAME, task_id, parameters)
 
+    def _get_load_options(self, table_attributes: TableAttributes) -> str:
+        default_load_options = self.dag_execution_context.workflow_args.get(
+            "load_options", {}
+        )
+        table_load_options = table_attributes.table_customization.get(
+            "load_options", default_load_options
+        )
+        return json.dumps(table_load_options)
+
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         date_filter_column = table_attributes.table_customization.get(
             "date_filter_column", ""
@@ -24,6 +34,7 @@ class LoadMongoRawTaskCreator(BaseTaskCreator):
         dbutils_secret_key = self.dag_execution_context.workflow_args.get(
             "dbutils_secret_key", f"{table_attributes.schema.upper()}_DB"
         )
+        load_options = self._get_load_options(table_attributes)
 
         return [
             self.dag_execution_context.environment,
@@ -35,4 +46,5 @@ class LoadMongoRawTaskCreator(BaseTaskCreator):
             date_filter_column,
             dbutils_secret_key,
             self.dag_execution_context.execution_date,
+            load_options,
         ]

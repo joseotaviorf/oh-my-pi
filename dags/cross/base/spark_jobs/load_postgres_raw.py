@@ -1,6 +1,6 @@
 import json
 import logging
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -18,7 +18,7 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def parse_arguments():
+def parse_arguments() -> Namespace:
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
     parser.add_argument("datalake_bucket")
@@ -31,11 +31,16 @@ def parse_arguments():
     parser.add_argument("date_filter_column")
     parser.add_argument("execution_date")
     parser.add_argument("db_schema")
+    parser.add_argument(
+        "load_options",
+        type=str,
+        help="S3 load options for spark dataframe, in JSON format",
+    )
 
     return parser.parse_args()
 
 
-def get_conn_config(dbutils_secret_key: str):
+def get_conn_config(dbutils_secret_key: str) -> dict:
     """Returns the connection configuration from Databricks Secrets."""
 
     base_dbutils = BaseDBUtils()
@@ -43,9 +48,7 @@ def get_conn_config(dbutils_secret_key: str):
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
-    conn_config_json = dbutils.secrets.get(
-        scope="quintoandar", key=dbutils_secret_key
-    )
+    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
 
     return json.loads(conn_config_json)
 
@@ -64,12 +67,14 @@ def main():
     date_filter_column = args.date_filter_column
     execution_date = args.execution_date
     db_schema = args.db_schema
+    load_options = json.loads(args.load_options) if args.load_options else {}
 
     logger.info(
         f"""
         m=__main__, environment={environment}, dbutils_secret_key={dbutils_secret_key}, datalake_bucket={datalake_bucket},
         schema={schema}, table_name={table_name}, unixtime_measure={unixtime_measure}, extraction_type={extraction_type},
         date_filter_column={date_filter_column}, partition_cols={partition_cols}, execution_date={execution_date},
+        db_schema={db_schema}, load_options={load_options}
         msg=Starting spark job...
         """
     )
@@ -105,12 +110,12 @@ def main():
             LayerEnum.RAW,
             None,
             partition_cols,
-        ).load_and_register(df, format_options)
+        ).load_and_register(df, format_options, **load_options)
     else:
         df = postgres_consumer.get_data_from_table(table_name)
         FullTableLoaderPipeline(
             database_name, table_name, database_location, LayerEnum.RAW, None
-        ).load_and_register(df, format_options)
+        ).load_and_register(df, format_options, **load_options)
 
 
 if __name__ == "__main__":
