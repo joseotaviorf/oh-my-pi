@@ -1,22 +1,23 @@
 WITH cte_base AS (
     SELECT DISTINCT
         d.id AS id_delinquency,
-        d.id_propose,
+        del.id_propose,
         CASE
-            WHEN d.id_type = 0 THEN 'SIGNATURE'
-            WHEN d.id_type = 1 THEN 'GUARANTEE'
-            WHEN d.id_type = 2 THEN 'TERMINATION'
-            WHEN d.id_type = 3 THEN 'BILLING'
-            WHEN d.id_type = 4 THEN 'RENEWAL'
+            WHEN del.id_type = 0 THEN 'SIGNATURE'
+            WHEN del.id_type = 1 THEN 'GUARANTEE'
+            WHEN del.id_type = 2 THEN 'TERMINATION'
+            WHEN del.id_type = 3 THEN 'BILLING'
+            WHEN del.id_type = 4 THEN 'RENEWAL'
             ELSE NULL
         END AS type_description,
-        d.value AS delinquency_amount,
-        d.original_value,
+        del.value AS delinquency_amount,
+        del.original_value,
         d.amount_paid,
         d.value - d.amount_paid AS open_amount,
+        IF( d.amount_paid > 0 AND (LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY r.ts_created) <> d.amount_paid) , d.amount_paid - LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY r.ts_created) , 0) AS amount_paid_added,
         d.value <= d.amount_paid AS is_finished,
-        d.is_legacy_agreement,
-        d.id_propose < 5000000 AS is_legacy_propose,
+        del.is_legacy_agreement,
+        del.id_propose < 5000000 AS is_legacy_propose,
         d.dt_due,
         CASE
             WHEN d.dt_paid IS NOT NULL THEN d.dt_paid
@@ -42,6 +43,30 @@ WITH cte_base AS (
     WHERE
         d.mod_amount_paid <> 0
         OR d.rev_type = 0
+),
+cte_final AS (
+    SELECT
+        id_delinquency,
+        id_propose,
+        type_description,
+        delinquency_amount,
+        original_value,
+        amount_paid,
+        amount_paid_added,
+        open_amount,
+        is_finished,
+        is_legacy_agreement,
+        is_legacy_propose,
+        dt_due,
+        CASE
+            WHEN amount_paid > 0 AND dt_paid IS NULL AND (LAG(amount_paid) OVER (PARTITION BY id_delinquency ORDER BY dt_updated) = amount_paid) THEN LAG(dt_paid) IGNORE NULLS OVER (PARTITION BY id_delinquency ORDER BY dt_updated)
+            ELSE dt_paid
+        END AS dt_paid,
+        dt_ended_propose,
+        dt_updated,
+        dt_created
+    FROM
+        cte_base
 )
 
 SELECT
@@ -51,17 +76,16 @@ SELECT
     delinquency_amount,
     original_value,
     amount_paid,
+    MAX(amount_paid_added) AS amount_paid_added,
     open_amount,
     is_finished,
     is_legacy_agreement,
     is_legacy_propose,
     dt_due,
-    CASE
-        WHEN amount_paid > 0 AND dt_paid IS NULL AND (LAG(amount_paid) OVER (PARTITION BY id_delinquency ORDER BY dt_updated) = amount_paid) THEN LAG(dt_paid) IGNORE NULLS OVER (PARTITION BY id_delinquency ORDER BY dt_updated)
-        ELSE dt_paid
-    END AS dt_paid,
+    dt_paid,
     dt_ended_propose,
-    dt_updated,
+    MIN(dt_updated) AS dt_updated,
     dt_created
 FROM
-    cte_base
+    cte_final
+GROUP BY 1,2,3,4,5,6,8,9,10,11,12,13,14,16

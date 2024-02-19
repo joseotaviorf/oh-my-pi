@@ -27,6 +27,8 @@ columns:
     description: 'Amount already paid on the dt_updated window'
     lineage:
     - datalake_rental_guarantee_platform_clean.delinquency_aud.amount_paid
+  amount_paid_added:
+    description: 'Amount that was added on this update to the amount_paid column'
   open_amount:
     description: 'Open amount on the dt_updated window (delinquency_amount - open_amount)'
   is_finished:
