@@ -64,7 +64,7 @@ repair_tickets AS (
             on rc.id_ticket = tf.id_ticket
     LEFT JOIN 
         datalake_date.workday_window AS ww 
-            ON ww.dt_Ref = DATE(cd.contestation_date) AND id_city = 39
+            ON ww.dt_Ref = DATE(cd.ts_contestation) AND id_city = 39
     WHERE 
         tf.group_name IN ('FullService [Back]','Prestadores Parceiros [SO]','Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]')
         AND (DATE(tfm.ts_solved_local) >= DATE('2023-06-01') OR tfm.ts_solved_local IS NULL)
