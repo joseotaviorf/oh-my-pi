@@ -14,3 +14,7 @@ tables:
     is_incremental: true
     partition_cols: ["address_city", "year", "month", "day"]
 weekday_run: [1, 2, 4]
+custom_cluster:
+  driver_node_type_id: r5.xlarge
+  node_type_id: c5d.4xlarge
+  num_workers: 2
