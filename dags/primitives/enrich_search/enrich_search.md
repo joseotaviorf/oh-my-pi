@@ -1,0 +1,23 @@
+## Enrich Search
+### Purpose
+
+Then this pipeline calculates the target used to monitor online search.
+
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+### Execution Interval
+
+This DAG is triggered once per day via Mediator.
+
+More information about run time [here]({chart_url}{dag_id}).
+
+### Outputs
+
+This pipeline produces the following output table on enrich layer:
+- `item_interaction`
+
+### Responsible Data Team
+​
+For any questions or concerns about this DAG, please contact the Search team in Data Products.
+
+</details>

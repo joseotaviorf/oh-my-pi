@@ -2430,6 +2430,11 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
+bietlejuice.enrich_search:
+  - bietlejuice.ebdb:load-clean-offer
+  - bietlejuice.enrich_recommendations:load-enrich-recommendation-catalog
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+  - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
 bietlejuice.enrich_search_session_event:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.ebdb:load-clean-region

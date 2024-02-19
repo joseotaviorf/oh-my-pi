@@ -1,0 +1,80 @@
+database_name: datalake_search
+table_name: item_interaction
+owner: thays.silva@quintoandar.com.br
+domain: primitives
+description: |
+  User interaction data. Required for calculating recommendation
+  metrics such as precision and recall. Granularity: one user-item pair per row
+columns:
+  id_user:
+    description: Identifier of the user
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.id_user
+      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.id_amplitude
+      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.id_user
+      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.id_amplitude
+      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.id_user
+      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.id_amplitude
+      - datalake_amplitude_clean_staging.170698_share_listing_events.id_user
+      - datalake_amplitude_clean_staging.170698_share_listing_events.id_amplitude
+      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.id_user
+      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.id_amplitude
+      - datalake_rent_flows.id_tenant_prospect
+  id_item:
+    description: Identifier of the interacted item
+    lineage:
+    - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.event_properties
+    - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.event_properties
+    - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.event_properties
+    - datalake_amplitude_clean_staging.170698_share_listing_events.event_properties
+    - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.event_properties
+    - datalake_rent_flows.id_house
+  business_context:
+    description: Business context
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.event_properties
+      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.event_properties
+      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.event_properties
+      - datalake_amplitude_clean_staging.170698_share_listing_events.event_properties
+      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.event_properties
+  interaction_type:
+    description: |
+      Type of interaction between user and item. Could be Values:
+        - visit-intent-clicked
+        - visitblock-alert-clicked
+        - listing-favorite-intent
+        - share-listing
+        - visitblock-similares-clicked
+        - proper-offer-submitted
+  ts_interaction:
+    description: Timestamp at which the user interaction happened
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.ts_event
+      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.ts_event
+      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.ts_event
+      - datalake_amplitude_clean_staging.170698_share_listing_events.ts_event
+      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.ts_event
+      - datalake_rent_flows.ts_created
+  dt_interaction:
+    description: Date of the user interaction
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.ts_event
+      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.ts_event
+      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.ts_event
+      - datalake_amplitude_clean_staging.170698_share_listing_events.ts_event
+      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.ts_event
+      - datalake_rent_flows.ts_created
+  type_item:
+    description: |
+      The type of item that was interacted. Currently we
+      only recommend houses, so we only have house-related
+      interactions
+      interactions.
+  id_search:
+    description:  Identifier of a search related to a specific house and user
+    lineage:
+      - datalake_search_session_event.search_session_event.id_search
+  search_rendering_type:
+    description:  Identifier the type of a search associated with id_search
+    lineage:
+      - datalake_search_session_event.search_session_event.search_rendering_type
