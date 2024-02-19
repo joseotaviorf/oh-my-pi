@@ -20,7 +20,7 @@ missing_theme_tickets AS (
   SELECT DISTINCT
     front_or_back AS ticket_type,
     main_department AS department,
-    SUM(ticket_rate_weight) AS missing_theme_tickets,
+    COUNT(DISTINCT id_ticket) AS missing_theme_tickets,
     DATE(ts_solved) AS dt_started
   FROM
     datalake_customer_support.unified_tickets
@@ -76,11 +76,13 @@ SELECT DISTINCT
     ut.resolution_survey,
     ut.ticket_rate_weight,
     IF(ut.is_ticket_rate = TRUE,
-      ut.ticket_rate_weight + 
-        COALESCE(ut.ticket_rate_weight / CAST((SUM(ticket_rate_weight) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back, ut.main_department)) AS DECIMAL(12,7)) * mt.missing_theme_tickets, 0)  + 
-            COALESCE(ut.ticket_rate_weight / CAST((SUM(ticket_rate_weight) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back, ut.main_department)) AS DECIMAL(12,7)) * ac.contacts, 0),
-          NULL)
-    AS total_tickets_proportional,
+        ut.ticket_rate_weight * 
+            (1 +
+                COALESCE(1/(COUNT(ut.id_ticket) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back)) * mt.missing_theme_tickets, 0)  + 
+                COALESCE(1/(COUNT(ut.id_ticket) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back)) * ac.contacts, 0)
+            ),
+        NULL
+    ) AS total_tickets_proportional,
     ut.is_ticket_rate,
     ut.has_answered_csat,
     ut.has_back_ticket,
