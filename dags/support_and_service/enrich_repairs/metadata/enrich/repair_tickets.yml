@@ -149,14 +149,14 @@ columns:
     description: Date on which the contract came into effect.
     lineage:
       - datalake_ebdb_contract.contract.dt_entered
-  dt_contestation:
+  ts_contestation:
     description: Information such as date that indicates when the contestation was requested.
     lineage:
-      - datalake_zendesk_tickets.ticket_history.dt_contestation
-  dt_resolution_contestation:
+      - datalake_zendesk_tickets.ticket_history.ts_contestation
+  ts_resolution_contestation:
     description: Boolean type data that indicates when the contestation demand was resolved.
     lineage:
-      - datalake_zendesk_tickets.ticket_history.dt_resolution_contestation
+      - datalake_zendesk_tickets.ticket_history.ts_resolution_contestation
   ts_first_interaction:
     description: Date in timestamp format of the first iteration of the repair request.
   ts_created_local:

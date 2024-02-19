@@ -9,7 +9,7 @@ WITH ticket_history_base AS (
 contestation_date AS (
     SELECT
         id_ticket,
-        MIN(DATE(ts_updated)) contestation_date
+        MIN(ts_updated) AS ts_contestation
     FROM 
         ticket_history_base
     WHERE
@@ -22,7 +22,7 @@ contestation_date AS (
 resolution_contestation_date AS (
     SELECT
         id_ticket,
-        MIN(DATE(ts_updated)) AS resolution_contestation_date
+        MIN(ts_updated) AS ts_resolution_contestation
     FROM 
         ticket_history_base
     WHERE
@@ -47,10 +47,10 @@ repair_tickets AS (
           ) AND tf.tags NOT LIKE '%ticket_acompanhamento%' THEN 'CX'
         END AS contestation_task_origin, 
         IF(tf.tags LIKE '%closed_by_merge%', TRUE, FALSE) AS is_closed_by_merge,
-        IF(ww.dt_end_1 > (CURRENT_DATE - INTERVAL 1 DAY) AND resolution_contestation_date IS NULL AND DATE(tfm.ts_solved_local) IS NULL, TRUE, FALSE) AS is_contestation_backlog,
+        IF(ww.dt_end_1 > (CURRENT_DATE - INTERVAL 1 DAY) AND ts_resolution_contestation IS NULL AND DATE(tfm.ts_solved_local) IS NULL, TRUE, FALSE) AS is_contestation_backlog,
         IF(tf.tags LIKE '%ticket_acompanhamento%', TRUE, FALSE) AS is_ticket_followup,
-        cd.contestation_date AS dt_contestation,
-        rc.resolution_contestation_date AS dt_resolution_contestation
+        cd.ts_contestation,
+        rc.ts_resolution_contestation
     FROM 
         datalake_zendesk_ticket_funnels.ticket_funnel AS tf
     LEFT JOIN
@@ -78,7 +78,7 @@ SELECT DISTINCT
     is_closed_by_merge,
     is_contestation_backlog,
     is_ticket_followup,
-    dt_contestation,
-    dt_resolution_contestation
+    ts_contestation,
+    ts_resolution_contestation
 FROM 
     repair_tickets

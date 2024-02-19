@@ -18,11 +18,11 @@ columns:
     description: Boolean type data that indicates whether the ticket is still a contestation demand that is in the backlog.
   is_ticket_followup:
     description: Boolean type data that indicates whether the ticket is a follow-up ticket.
-  dt_contestation:
+  ts_contestation:
     description: Information such as date that indicates when the contestation was requested.
     lineage:
       - datalake_zendesk_tickets_clean.tickets_history.ts_updated
-  dt_resolution_contestation:
+  ts_resolution_contestation:
     description: Boolean type data that indicates when the contestation demand was resolved.
     lineage:
       - datalake_zendesk_tickets_clean.tickets_history.ts_updated
