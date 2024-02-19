@@ -76,11 +76,11 @@ SELECT DISTINCT
     ut.resolution_survey,
     ut.ticket_rate_weight,
     IF(ut.is_ticket_rate = TRUE,
-        ut.ticket_rate_weight * 
+        CAST(ut.ticket_rate_weight * 
             (1 +
                 COALESCE(1/(COUNT(ut.id_ticket) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back)) * mt.missing_theme_tickets, 0)  + 
                 COALESCE(1/(COUNT(ut.id_ticket) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back)) * ac.contacts, 0)
-            ),
+            ) AS DOUBLE),
         NULL
     ) AS total_tickets_proportional,
     ut.is_ticket_rate,
