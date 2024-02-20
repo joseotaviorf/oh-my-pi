@@ -7,12 +7,19 @@ PARTITION_COLUMNS:
   - day
 DATABASE_SKIP_LIST:
   - bureaus
+  - data_platform_metrics
+  - data_listings
   - datalake_static_files_raw
   - default
+  - diogodourado
   - ds4a
   - credit
+  - eizonishime
+  - gabrielmota
   - girafales
+  - jenniferbaia
   - model_academy
+  - raimundoneto
   - smart_pricing
   - wonka
   - feature_store

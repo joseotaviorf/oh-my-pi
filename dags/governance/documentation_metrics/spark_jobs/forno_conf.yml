@@ -7,6 +7,9 @@ PARTITION_COLUMNS:
   - day
 DATABASE_SKIP_LIST:
   - bureaus
+  - data_platform_metrics
+  - datalake_ebdb_test_clean
+  - datalake_ebdb_test_raw
   - datalake_static_files_raw
   - default
   - ds4a
