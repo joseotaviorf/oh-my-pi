@@ -1,4 +1,5 @@
 from typing import Tuple
+
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
@@ -18,9 +19,15 @@ class RawCDCWorkflow(BaseWorkflow):
         super().__init__(dag_args, workflow_args, cluster_args)
 
     def build_dag(self):
-        dag = super().dag_instance()
+        dag = self.dag_instance(
+            user_defined_macros={"get_date_param": self.get_date_param}
+        )
         bucket = self.config_service.get_config("datalake_bucket")
-        dag_execution_context = self._get_dag_execution_context(dag, bucket)
+        start_date = "{{ get_date_param(dag_run, ds, yesterday_ds, 'start_date') }}"
+        end_date = "{{ get_date_param(dag_run, ds, yesterday_ds, 'end_date') }}"
+        dag_execution_context = self._get_dag_execution_context(
+            dag, bucket, start_date=start_date, end_date=end_date
+        )
         self._initialize_task_creators(dag_execution_context)
         tables_customization = self.workflow_args["tables_customization"]
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()

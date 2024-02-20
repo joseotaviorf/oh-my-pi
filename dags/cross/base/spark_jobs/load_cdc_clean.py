@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from datetime import datetime
 import re
+from pyspark.sql.functions import col
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 from quintoandar_logger import QuintoAndarLogger
@@ -19,7 +20,8 @@ def parse_arguments():
     parser.add_argument("datalake_bucket")
     parser.add_argument("schema")
     parser.add_argument("table_name")
-    parser.add_argument("execution_date")
+    parser.add_argument("start_date")
+    parser.add_argument("end_date")
     parser.add_argument("table_id")
 
     return parser.parse_args()
@@ -104,14 +106,15 @@ def main():
     datalake_bucket = args.datalake_bucket
     schema = args.schema
     table_name = args.table_name
-    execution_date = args.execution_date
+    start_date = args.start_date
+    end_date = args.end_date
     table_id = args.table_id
 
     logger.info(
         f"""
         m=__main__, environment={environment}, dag_name={dag_name}
         datalake_bucket={datalake_bucket},
-        schema={schema}, table_name={table_name}, execution_date={execution_date},
+        schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
         clean_table_id={table_id}
         msg=Starting spark job...
         """
@@ -126,9 +129,7 @@ def main():
     cdc_columns = ["op_cdc", "ts_cdc_transaction"]
 
     query_with_cdc_columns = insert_columns_into_query(clean_query, cdc_columns)
-    clean_updates_df = spark.sql(query_with_cdc_columns).where(
-        f"ts_cdc_transaction >= '{execution_date}'"
-    )
+    clean_updates_df = spark.sql(query_with_cdc_columns).filter(col("ts_cdc_transaction").cast("date").between(start_date, end_date))
 
     spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_{schema}_clean`")
     full_clean_table_name = f"`datalake_{schema}_clean`.`{table_name}`"

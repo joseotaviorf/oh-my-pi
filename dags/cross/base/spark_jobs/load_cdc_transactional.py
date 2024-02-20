@@ -1,11 +1,9 @@
 import logging
 import json
 from argparse import ArgumentParser
-from datetime import datetime
-
 from quintoandar_logger import QuintoAndarLogger
 
-from pyspark.sql.functions import col, from_unixtime, lit
+from pyspark.sql.functions import col, from_unixtime, lit, make_date
 
 JOB_NAME = "load_cdc_transactional"
 
@@ -21,7 +19,8 @@ def parse_arguments():
     parser.add_argument("source_schema")
     parser.add_argument("schema")
     parser.add_argument("table_name")
-    parser.add_argument("execution_date")
+    parser.add_argument("start_date")
+    parser.add_argument("end_date")
     parser.add_argument("partitions")
 
     return parser.parse_args()
@@ -48,7 +47,7 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
     )
 
 
-def get_incoming_data(datalake_bucket, environment, schema, table_name, execution_date):
+def get_incoming_data(datalake_bucket, environment, schema, table_name, start_date, end_date):
     """
     Reads incoming data as a DataFrame
 
@@ -56,7 +55,8 @@ def get_incoming_data(datalake_bucket, environment, schema, table_name, executio
     :param environment: forno / prod env.
     :param schema: Database schema.
     :param table_name: Table name.
-    :param execution_date: Airflow DAG execution date.
+    :param start_date: Airflow DAG start date.
+    :param end_date: Airflow DAG end date.
     :return df:
     """
     path = (
@@ -64,14 +64,12 @@ def get_incoming_data(datalake_bucket, environment, schema, table_name, executio
     )
 
     logger.info(
-        f"m=get_incoming_data, execution_date={execution_date}, path={path}, msg=reading Incoming data..."
+        f"m=get_incoming_data, start_date={start_date}, end_date={end_date}, path={path}, msg=reading Incoming data..."
     )
     df = (
         spark.read.option("compression", "gzip")
         .json(path)
-        .filter(
-            f"year = {execution_date.year} AND month = {execution_date:%m} AND day = {execution_date:%d}"
-        )
+        .filter(make_date(col("year"), col("month"), col("day")).between(start_date, end_date))
     )
 
     return df
@@ -133,22 +131,22 @@ def main():
     source_schema = args.source_schema
     schema = args.schema
     table_name = args.table_name
-    execution_date = args.execution_date
+    start_date = args.start_date
+    end_date = args.end_date
     partitions = json.loads(args.partitions.replace("'", '"'))
 
     logger.info(
         f"""
         m=__main__, environment={environment},  datalake_bucket={datalake_bucket},
-        schema={schema}, table_name={table_name}, execution_date={execution_date},
+        schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
         partitions={partitions}
         msg=Starting spark job...
         """
     )
 
-    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
 
     df = get_incoming_data(
-        datalake_bucket, environment, source_schema, table_name, dt_execution
+        datalake_bucket, environment, source_schema, table_name, start_date, end_date
     )
 
     if df.isEmpty():

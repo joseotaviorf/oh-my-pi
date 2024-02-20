@@ -22,7 +22,8 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
             source_schema,
             table_attributes.schema,
             table_attributes.table_name,
-            self.dag_execution_context.execution_date,
+            self.dag_execution_context.start_date,
+            self.dag_execution_context.end_date,
             str(partitions),
         ]
         return parameters

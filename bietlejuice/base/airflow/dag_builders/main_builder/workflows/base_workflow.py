@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import re
 
 from airflow import DAG
 from pendulum import timezone
@@ -38,7 +39,16 @@ class BaseWorkflow(BuilderInterface):
 
         self.local_tz = timezone("America/Sao_Paulo")
 
-    def dag_instance(self):
+    def get_date_param(self, dag_run, ds, yesterday_ds, date_param_name):
+        date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
+        if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
+            return date_param
+        if date_param_name == "start_date":
+            return yesterday_ds
+        if date_param_name == "end_date":
+            return ds
+
+    def dag_instance(self, **kwargs):
         schedule_start_date = self._get_start_date()
         doc_md = self._get_dag_documentation()
 
@@ -53,6 +63,7 @@ class BaseWorkflow(BuilderInterface):
             start_date=schedule_start_date,
             schedule_interval=self.dag_args.get("schedule_interval", None),
             doc_md=doc_md,
+            **kwargs,
         )
 
         return dag
@@ -87,7 +98,9 @@ class BaseWorkflow(BuilderInterface):
 
         return doc_md
 
-    def _get_dag_execution_context(self, dag: DAG, bucket: str) -> DagExecutionContext:
+    def _get_dag_execution_context(
+        self, dag: DAG, bucket: str, **kwargs
+    ) -> DagExecutionContext:
         databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"
         )
@@ -100,6 +113,7 @@ class BaseWorkflow(BuilderInterface):
             self.dag_args,
             self.workflow_args,
             self.cluster_args,
+            **kwargs,
         )
 
     def _check_include_data_quality_task(

@@ -12,6 +12,8 @@ class DagExecutionContext:
     dag_args: dict
     workflow_args: dict
     cluster_args: dict
+    start_date: str = "{{ ds }}"
+    end_date: str = "{{ ds }}"
     execution_date: str = "{{ ds }}"
 
     def __post_init__(self):

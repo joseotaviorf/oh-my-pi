@@ -21,7 +21,8 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
             self.dag_execution_context.bucket,
             table_attributes.schema,
             table_attributes.table_name,
-            self.dag_execution_context.execution_date,
+            self.dag_execution_context.start_date,
+            self.dag_execution_context.end_date,
             clean_table_id,
         ]
 

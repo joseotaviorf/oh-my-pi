@@ -1,11 +1,10 @@
 from argparse import ArgumentParser
-from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
 from delta.tables import DeltaTable
 
-from pyspark.sql.functions import row_number
+from pyspark.sql.functions import row_number, col, make_date
 from pyspark.sql.window import Window
 from pyspark.sql.utils import AnalysisException
 
@@ -22,21 +21,22 @@ def parse_arguments():
     parser.add_argument("datalake_bucket")
     parser.add_argument("schema")
     parser.add_argument("table_name")
-    parser.add_argument("execution_date")
+    parser.add_argument("start_date")
+    parser.add_argument("end_date")
     parser.add_argument("table_id")
 
     return parser.parse_args()
 
 
-def get_df_from_transactional(datalake_bucket, schema, table_name, execution_date):
+def get_df_from_transactional(datalake_bucket, schema, table_name, start_date, end_date):
     """
     Extract Delta table from Transactional layer, transforms into a
     Dataframe.
     """
-    path = f"s3://{datalake_bucket}/transactional/{schema}/{table_name}/year={execution_date.year}/month={execution_date:%m}/day={execution_date:%d}"
+    path = f"s3://{datalake_bucket}/transactional/{schema}/{table_name}"
     try:
         transactional_delta_table = DeltaTable.forPath(spark, path)
-        transactional_df = transactional_delta_table.toDF()
+        transactional_df = transactional_delta_table.toDF().filter(make_date(col("year"), col("month"), col("day")).between(start_date, end_date))
     except AnalysisException as e:
         logger.info(
             f"m=get_df_from_transactional, msg=Unable to read delta table from transactional layer, error={e}"
@@ -130,22 +130,21 @@ def main():
     datalake_bucket = args.datalake_bucket
     schema = args.schema
     table_name = args.table_name
-    execution_date = args.execution_date
+    start_date = args.start_date
+    end_date = args.end_date
     table_id = args.table_id
 
     logger.info(
         f"""
         m=__main__, environment={environment},  datalake_bucket={datalake_bucket},
-        schema={schema}, table_name={table_name}, execution_date={execution_date},
+        schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
         table_id={table_id},
         msg=Starting spark job...
         """
     )
 
-    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
-
     transactional_df = get_df_from_transactional(
-        datalake_bucket, schema, table_name, dt_execution
+        datalake_bucket, schema, table_name, start_date, end_date
     )
 
     if not transactional_df:
