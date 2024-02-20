@@ -96,8 +96,8 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     partitions=PARTITION_COLS,
     has_create_external_table_task=False,
     extra_query_template_params={
-        "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
-        "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
+        "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}",
+        "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
     },
 )
 

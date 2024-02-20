@@ -101,8 +101,8 @@ for report_type in REPORT_TYPE_LIST:
         extraction_spark_job_file=raw_spark_job_file,
         raw_spark_job_extra_args=[
             SOURCE,
-            "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
-            "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
+            "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}",
+            "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
             table_name,
             report_type,
         ],
@@ -117,8 +117,8 @@ for report_type in REPORT_TYPE_LIST:
         partitions=PARTITION_COLS,
         execution_date="",
         extra_query_template_params={
-            "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_start_date') }}",
-            "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -3), 'load_end_date') }}",
+            "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}",
+            "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}",
         },
     )
 

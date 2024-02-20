@@ -27,7 +27,7 @@ List of URLs retrieved in this DAG currently:
 
 ## Execution Interval
 
-Daily (retrieves D-4 data). More information about run time [here]({chart_url}{dag_id}).
+Daily (retrieves between D-7 and D-1 data). More information about run time [here]({chart_url}{dag_id}).
 
 ## Outputs
 

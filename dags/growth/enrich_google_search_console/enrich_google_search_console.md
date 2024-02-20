@@ -7,7 +7,7 @@ This DAG generates tables to track demand user behaviors in the Google Search Co
 
 ### Execution Interval
 
-Daily. More information about run time [here]({chart_url}{dag_id}).
+Daily (retrieves between D-7 and D-1 data). More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
