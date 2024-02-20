@@ -64,7 +64,6 @@ abandoned_calls AS (
       ON dt.sk_taxonomy = frc.sk_taxonomy
   WHERE
     dd.front_or_back = 'front'
-    AND dd.journey_step NOT IN ('Compra e Venda', 'Cross')
     AND dd.area = 'CX'
     AND frc.is_answered = false
     AND frc.channel = 'call'
