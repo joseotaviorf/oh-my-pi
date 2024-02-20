@@ -1,0 +1,71 @@
+---
+database_name: datalake_demand_flows
+table_name: buyer_prospect_status
+owner: isabela.matsumoto@quintoandar.com.br
+domain: growth
+description: Each row of this table is status change event according to Growths buyer prospect journey rules. 
+  This enrich is equivalent to an Slowly Changing Dimension (SCD), so the same buyer prospect will have multiple lines to track its status changes across the time.
+columns:
+  id_demand_prospect_conversion_event:
+    description: 'Unique identifier for demand prospect conversion event'
+    lineage: 
+    - datalake_demand_flows.demand_prospect_conversion_events.id_demand_prospect_conversion_event
+  id_buyer_prospect:
+    description: 'Identifier of a user flow with a house in rent context.'
+    lineage:
+    - datalake_demand_flows.demand_prospect_conversion_events.id_prospect
+    - datalake_sale_demand_events.sale_demand_events.id_buyer
+  status_trigger_event_name:
+    description: 'Name of the event that trigged the change to that current row status.'
+    categories:
+      VISIT BOOKED: User booked a visit to a house that is for sale and it make them be marked as ACTIVE.
+      OFFER SUBMITTED: User sent an offer to a house that is for sale and it make them be marked as ACTIVE.
+      TALK TO AGENT: User talked to an agent about a house that is for sale and it make them be marked as ACTIVE.
+      SALE AGREEMENT SIGNED: User signed a sale agreement and it make them be marked as DEACTIVATED BY CCV SIGNED.
+    lineage:
+    - datalake_demand_flows.demand_prospect_conversion_events.event_name
+  prospect_event_name:
+    description: 'Name of the event related to that row.'
+    categories:
+      USER FIRST ACTIVATION: User made its first Booking or Offer IN SALE CONTEXT. Here we count them as New Buyer Prospects.
+      USER FIRST ACTIVATION IN CITY GROUP: User made its first Booking or Offer IN SALE CONTEXT, in that specific city group.
+      USER DEACTIVATION BY CCV SIGNED: User signed a sale agreement and will no long be considered as an active buyer.
+      USER CHURN: User spent more than 90 since its last booking or offer in sale context.
+      USER RECOVERY: User was churned or deactivated and returned to make bookings or offers with the intention to buy a house. Here we count them as Retained Buyer Prospects.
+  city_group:
+    description: 'City group of the house related to row event.'
+    lineage:
+    - datalake_region.region.city_group
+  city_group_of_first_activation:
+    description: 'City group of the house where user became new buyer prospect.'
+    lineage:
+    - datalake_region.region.city_group
+  status:
+    description: 'Status to what the buyer prospect was moved.'
+    categories:
+      ACTIVE: User made a booking or offer within the last 90 days.
+      CHURNED: More than 90 days has passed since users last booking or offer.
+      SIGNED CCV: User signed a sale agreement and will no long be considered as an active buyer.
+  status_detail:
+    description: 'Description of the status chage cause.'
+    categories:
+      NEW BUYER PROSPECT: User made its first Booking or Offer IN SALE CONTEXT. Here we count them as New Buyer Prospects.
+      RECOVERED AFTE SALE AGREEMENT SIGNED: User was deactivated and returned to make bookings or offers with the intention to buy a house. Here we count them as Retained Buyer Prospects.
+      FIRST ACTIVATION IN CITY GROUP: User made its first Booking or Offer IN SALE CONTEXT in that specific city group. This event can happen multiple times, for different city groups (i.e. RMSP and Rio de Janeiro)
+      RECOVERED AFTER CHURN: User was churned and returned to make bookings or offers with the intention to buy a house. Here we count them as Retained Buyer Prospects.
+      INACTIVITY: More than 90 days has passed since users last booking or offer.
+      DEACTIVATED BY SIGNING SALE AGREEMENT: User signed a sale agreement and will no long be considered as an active buyer.
+  ts_status_started:
+    description: 'Time marker of the start of when that status was valid.'
+    lineage:
+    - datalake_demand_flows.demand_prospect_conversion_events.ts_event
+    - datalake_sale_demand_events.sale_demand_events.ts_event
+  ts_status_ended:
+    description: 'Time marker of the end of when that status was valid.'
+    lineage:
+    - datalake_demand_flows.demand_prospect_conversion_events.ts_event
+    - datalake_sale_demand_events.sale_demand_events.ts_event
+  ts_first_activation:
+    description: 'Static timestamp of when the user became a new buyer prospect.'
+    lineage:
+    - datalake_demand_flows.demand_prospect_conversion_events.ts_event

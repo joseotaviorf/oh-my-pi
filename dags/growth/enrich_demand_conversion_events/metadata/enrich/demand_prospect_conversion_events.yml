@@ -1,7 +1,7 @@
 ---
 database_name: datalake_demand_flows
 table_name: demand_prospect_conversion_events_staging
-owner: thiago.jesus@quintoandar.com.br
+owner: isabela.matsumoto@quintoandar.com.br
 domain: growth
 description: Each row of this table is a demand prospect conversion event (visit booked, offer submited or talk to agent) from both Rent and Sale busness contexts.
 columns:
@@ -181,11 +181,5 @@ columns:
     description: 'Day of the conversion event'
     lineage:
     - datalake_sale_demand_events.sale_demand_events.ts_event
-    - datalake_rent_demand_events.rent_demand_events.ts_event
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
-  id_event_date:
-    description: 'ID of the date in format yyyyMMdd.'
-    lineage:
-    - datalake_sale_demand_events.sale_demand_events.dt_event
     - datalake_rent_demand_events.rent_demand_events.ts_event
     - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts

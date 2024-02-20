@@ -6,7 +6,7 @@ WITH conversion_events AS (
     sk_event_type AS id_event_type,
     "VISIT BOOKED" AS event_name,
     id_booking,
-    id_offer,
+    NULL AS id_offer,
     id_house,
     id_region,
     id_buyer AS id_prospect,
@@ -19,7 +19,8 @@ WITH conversion_events AS (
     datalake_sale_demand_events.sale_demand_events
   WHERE
     sk_event_type = 1
-    AND dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND id_buyer != id_seller
+    AND dt_event = DATE(CONCAT_WS('-', {year}, {month}, {day}))
   UNION ALL
   -- SALE OFFER SUBMITTED
   SELECT
@@ -27,7 +28,7 @@ WITH conversion_events AS (
     id_sale_flow,
     sk_event_type AS id_event_type,
     "OFFER SUBMITTED" AS event_name,
-    id_booking,
+    NULL AS id_booking,
     id_offer,
     id_house,
     id_region,
@@ -41,7 +42,7 @@ WITH conversion_events AS (
     datalake_sale_demand_events.sale_demand_events
   WHERE
     sk_event_type = 3  
-    AND dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND dt_event = DATE(CONCAT_WS('-', {year}, {month}, {day}))
   UNION ALL
   -- RENT VISIT BOOKED
   SELECT DISTINCT
@@ -64,7 +65,7 @@ WITH conversion_events AS (
   WHERE
     id_event_type = 1
     AND id_event = id_booking
-    AND DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND DATE(ts_event) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
   UNION ALL
   -- OFFER SUBMITED
   SELECT DISTINCT
@@ -72,7 +73,7 @@ WITH conversion_events AS (
     NULL AS id_sale_flow, 
     id_event_type,
     "OFFER SUBMITTED" AS event_name,
-    id_booking,
+    NULL AS id_booking,
     id_offer,
     id_house,
     id_region,
@@ -87,7 +88,7 @@ WITH conversion_events AS (
   WHERE
     id_event_type = 3
     AND id_event = id_offer
-    AND DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND DATE(ts_event) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
 ),
 
 booking_attribution AS (
@@ -108,6 +109,7 @@ booking_attribution AS (
       IF(acc.visit_code IS NOT NULL, acc.final_attribution_source, src.utm_source) AS utm_source,
       IF(acc.visit_code IS NOT NULL, acc.final_attribution_medium, src.utm_medium) AS utm_medium,
       IF(acc.visit_code IS NOT NULL, acc.final_attribution_campaign, src.utm_campaign) AS utm_campaign,
+      IF(acc.visit_code IS NOT NULL, acc.final_attribution_term, src.utm_term) AS utm_term,
       IF(acc.visit_code IS NOT NULL, COALESCE(acc.final_attribution_branded, "Outro"), COALESCE(src.branded, "Outro")) AS branded,
       IF(acc.visit_code IS NOT NULL, acc.final_attribution_origin, 'old_attribution') AS final_attribution_origin,
       bce.dt_event,
@@ -117,16 +119,39 @@ booking_attribution AS (
   LEFT JOIN
     datalake_booking.booking AS b
       ON bce.id_booking = b.id
-        AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND DATE(b.ts_created) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
   LEFT JOIN datalake_amplitude_visit.amplitude_visit AS src
       ON b.code = src.id_visit
-        AND DATE(src.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND DATE(src.ts_event) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
   LEFT JOIN datalake_tracked_events.attribution_cross_channel acc
       ON b.code = acc.visit_code
         AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')
-        AND DATE(CONCAT_WS('-', acc.year, acc.month, acc.day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+        AND acc.year = {year}
+        AND acc.month = {month}
+        AND acc.day = {day}
   WHERE
       bce.id_event_type = 1
+),
+
+sale_offer_from_amplitude AS (
+  SELECT
+    id_user,
+    id_house,
+    id_offer,
+    app_type,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_term,
+    branded,
+    ts_event,
+    year,
+    month,
+    day
+  FROM
+     datalake_amplitude_offer.sale_offer_raw_events
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_offer ORDER BY ts_event ASC) = 1 
 ),
 
 sale_offer_attribution AS (
@@ -147,6 +172,7 @@ sale_offer_attribution AS (
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_source, sor.utm_source) AS utm_source,
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_medium, sor.utm_medium) AS utm_medium,
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_campaign, sor.utm_campaign) AS utm_campaign,
+    IF(acc.id_firestore IS NOT NULL, acc.final_attribution_term, sor.utm_term) AS utm_term,
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_branded, sor.branded) AS branded,
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_origin, 'old_attribution') AS final_attribution_origin,
     soce.dt_event,
@@ -154,18 +180,43 @@ sale_offer_attribution AS (
   FROM
     conversion_events AS soce
   LEFT JOIN
-    datalake_amplitude_offer.sale_offer_raw_events AS sor
+    sale_offer_from_amplitude AS sor
       ON soce.id_offer = sor.id_offer
-      AND soce.ts_event = sor.ts_event
-        AND DATE(CONCAT_WS('-', sor.year, sor.month, sor.day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+      AND (soce.id_prospect = sor.id_user OR soce.id_house = sor.id_house)
+        AND sor.year = {year}
+        AND sor.month = {month}
+        AND sor.day = {day}
   LEFT JOIN
     datalake_tracked_events.attribution_cross_channel AS acc
       ON sor.id_offer = acc.id_firestore
         AND acc.event_name = 'sale_offer_form_accepted' 
-        AND DATE(CONCAT_WS('-', acc.year, acc.month, acc.day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+        AND acc.year = {year}
+        AND acc.month = {month}
+        AND acc.day = {day}
   WHERE
     soce.id_event_type = 3
     AND soce.business_context = 'sale'
+),
+
+rent_offer_from_amplitude AS (
+  SELECT
+    id_user,
+    id_house,
+    id_firestore,
+    app_type,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_term,
+    branded,
+    ts_event,
+    year,
+    month,
+    day
+  FROM
+    datalake_amplitude_offer.offer_submitted_events
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_firestore ORDER BY ts_event ASC) = 1 
 ),
 
 rent_offer_attribution AS (
@@ -175,7 +226,8 @@ rent_offer_attribution AS (
     roce.id_event_type,
     roce.event_name,
     roce.id_booking,
-    off.id_firestore AS id_offer,
+    roce.id_offer,
+    off.id_firestore,
     roce.id_house,
     roce.id_region,
     roce.id_prospect,
@@ -186,6 +238,7 @@ rent_offer_attribution AS (
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_source, aos.utm_source) AS utm_source,
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_medium, aos.utm_medium) AS utm_medium,
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_campaign, aos.utm_campaign) AS utm_campaign,
+    IF(acc.id_firestore IS NOT NULL, acc.final_attribution_term, aos.utm_term) AS utm_term,
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_branded, aos.branded) AS branded,
     IF(acc.id_firestore IS NOT NULL, acc.final_attribution_origin, 'old_attribution') AS final_attribution_origin,
     roce.dt_event,
@@ -196,20 +249,22 @@ rent_offer_attribution AS (
     datalake_offer.offer AS off
       ON roce.id_offer = off.id_offer_context
   LEFT JOIN
-    datalake_amplitude_offer.offer_submitted_events AS aos
+    rent_offer_from_amplitude AS aos
       ON off.id_firestore = aos.id_firestore
-      AND roce.ts_event = aos.ts_event
-        AND DATE(CONCAT_WS('-', aos.year, aos.month, aos.day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+      AND (roce.id_prospect = aos.id_user OR roce.id_house = aos.id_house)
+      AND aos.year = {year}
+      AND aos.month = {month}
+      AND aos.day = {day}
   LEFT JOIN 
     datalake_tracked_events.attribution_cross_channel AS acc
-      ON aos.id_firestore = acc.id_firestore
+      ON off.id_firestore = acc.id_firestore
         AND acc.event_name = 'offer_submitted'
-        AND DATE(CONCAT_WS('-', acc.year, acc.month, acc.day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+        AND acc.year = {year}
+        AND acc.month = {month}
+        AND acc.day = {day}
   WHERE
     roce.id_event_type = 3
     AND roce.business_context = 'rent'
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY aos.id_firestore ORDER BY aos.ts_event ASC) = 1 
 ),
 
 legacy_data_talk_to_agent AS (
@@ -221,6 +276,7 @@ legacy_data_talk_to_agent AS (
       "TALK TO AGENT" AS event_name,
       NULL AS id_booking,
       NULL AS id_offer,
+      NULL AS id_firestore,
       INT(a.house_id) AS id_house,
       h.id_region,
       INT(a.tenant_id) AS id_prospect,
@@ -231,6 +287,7 @@ legacy_data_talk_to_agent AS (
       a.utm_medium,
       a.utm_source,
       a.utm_campaign,
+      a.utm_term,
       a.branded,
       DATE(a.first_message_ts) AS dt_event,
       TO_TIMESTAMP(a.first_message_ts) AS ts_event
@@ -240,7 +297,7 @@ legacy_data_talk_to_agent AS (
       datalake_ebdb_clean.house AS h
         ON h.id = a.house_id
     WHERE
-      DATE(a.first_message_ts) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      DATE(a.first_message_ts) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
 ),
 
 events_with_attribution AS (
@@ -252,6 +309,7 @@ events_with_attribution AS (
     event_name,
     id_booking,
     id_offer,
+    NULL AS id_firestore,
     NULL AS id_talk_to_agent,
     id_house,
     id_region,
@@ -263,6 +321,7 @@ events_with_attribution AS (
     utm_medium,
     utm_source,
     utm_campaign,
+    utm_term,
     branded,
     dt_event,
     ts_event
@@ -277,6 +336,7 @@ events_with_attribution AS (
     event_name,
     id_booking,
     id_offer,
+    id_offer AS id_firestore,
     NULL AS id_talk_to_agent,
     id_house,
     id_region,
@@ -288,6 +348,7 @@ events_with_attribution AS (
     utm_medium,
     utm_source,
     utm_campaign,
+    utm_term,
     branded,
     dt_event,
     ts_event
@@ -302,6 +363,7 @@ events_with_attribution AS (
     event_name,
     id_booking,
     id_offer,
+    id_firestore,
     NULL AS id_talk_to_agent,
     id_house,
     id_region,
@@ -313,6 +375,7 @@ events_with_attribution AS (
     utm_medium,
     utm_source,
     utm_campaign,
+    utm_term,
     branded,
     dt_event,
     ts_event
@@ -327,6 +390,7 @@ events_with_attribution AS (
     event_name,
     id_booking,
     id_offer,
+    id_firestore,
     id_talk_to_agent,
     id_house,
     id_region,
@@ -338,11 +402,30 @@ events_with_attribution AS (
     utm_medium,
     utm_source,
     utm_campaign,
+    utm_term,
     branded,
     dt_event,
     ts_event
   FROM
     legacy_data_talk_to_agent
+),
+
+booking_info AS (
+  SELECT
+    b.id AS id_booking,
+    CASE
+      WHEN b.id_user_creation = b.id_user_sale_agent THEN 'Agent'
+      WHEN b.id_user_creation = b.id_visitor THEN 'SelfService'
+      WHEN b.id_user_creation = b.id_user_sale_attendence_5a THEN 'Secretaria'
+      WHEN b.user_creation_email LIKE '%quintoandar.com.br' THEN 'Admin/CX'
+      ELSE 'Other'
+    END AS user_booking_creator,
+    first_update_source,
+    is_3p_demand,
+    is_via_reschedule AS flg_via_reschedule,
+    ts_created
+  FROM
+    datalake_booking.booking AS b
 )
 
 SELECT
@@ -364,6 +447,7 @@ SELECT
   e.event_name,
   e.id_booking,
   e.id_offer,
+  e.id_firestore,
   e.id_talk_to_agent,
   e.id_house,
   e.id_region,
@@ -371,14 +455,16 @@ SELECT
   e.id_owner,
   e.id_agent,
   e.business_context,
-  b.user_sale_booking_creator AS booking_creator,
+  b.user_booking_creator AS booking_creator,
   b.first_update_source AS product_origin,
   b.is_3p_demand,
-  e.app_type,
-  e.utm_medium,
-  e.utm_source,
-  e.utm_campaign,
-  e.branded,
+  b.flg_via_reschedule,
+  NULLIF(e.app_type,'') AS app_type,
+  NULLIF(e.utm_medium,'') AS utm_medium,
+  NULLIF(e.utm_source,'') AS utm_source,
+  NULLIF(e.utm_campaign,'') AS utm_campaign,
+  NULLIF(e.utm_term,'') AS utm_term,
+  NULLIF(e.branded,'') AS branded,
   COALESCE(h.country_code, 'Undefined') AS country_code,
   e.dt_event,
   e.ts_event,
@@ -388,12 +474,13 @@ SELECT
 FROM
   events_with_attribution AS e
 LEFT JOIN
-  datalake_booking.booking AS b
-    ON e.id_booking = b.id
-    AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  booking_info AS b
+    ON e.id_booking = b.id_booking
+    AND DATE(b.ts_created) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
 LEFT JOIN
   datalake_ebdb_listing.house AS h
     ON e.id_house = h.id
 WHERE
   e.id_prospect IS NOT NULL
   AND e.id_house IS NOT NULL
+  AND h.dt_creation < e.ts_event
