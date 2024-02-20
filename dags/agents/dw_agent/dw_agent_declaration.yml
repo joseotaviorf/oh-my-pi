@@ -1,6 +1,6 @@
 dag:
   name: dw_agent
-  owner: Data ForRent
+  owner: Data Agents
 workflow:
   type: query
   layer: dw

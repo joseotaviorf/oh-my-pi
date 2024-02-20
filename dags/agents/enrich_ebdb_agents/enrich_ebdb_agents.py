@@ -52,7 +52,7 @@ inner_dependencies = config_service.get_config("inner_dependencies")
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_RENT,
+        "owner": DAGOwnerEnum.DATA_AGENTS,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
