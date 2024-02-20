@@ -8,6 +8,7 @@ class UDFEnum(Enum):
 
     SF_REMOVE_ACCENTUATION = "SF_REMOVE_ACCENTUATION"
     SF_ALPHANUMERIC_SNAKE_CASE = "SF_ALPHANUMERIC_SNAKE_CASE"
+    SF_NORMALIZE_STRING = "SF_NORMALIZE_STRING"
     FINTECHOPS_WORK_MIN_SLA = "FINTECHOPS_WORK_MIN_SLA"
     GET_PROFILING_DATA_QUALITY = "GET_PROFILING_DATA_QUALITY"
     GROWTH_VESPUCIO_SCORE = "GROWTH_VESPUCIO_SCORE"
@@ -36,6 +37,7 @@ class UDFEnum(Enum):
         return {
             cls.SF_REMOVE_ACCENTUATION: StringFormatter.replace_accents,
             cls.SF_ALPHANUMERIC_SNAKE_CASE: StringFormatter.set_alphanumeric_snake_case,
+            cls.SF_NORMALIZE_STRING: StringFormatter.normalize_string,
             cls.FINTECHOPS_WORK_MIN_SLA: FintechUDFs.fintechops_work_min_sla,
             cls.GET_PROFILING_DATA_QUALITY: ProfilingFromYaml.get_profiling_data_quality,
             cls.GROWTH_VESPUCIO_SCORE: VespucioScoreCalculator.get_score,
