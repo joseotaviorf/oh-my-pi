@@ -10,9 +10,12 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
     SPARK_JOB_NAME = "load_cdc_clean"
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
-        raw_table_id = table_attributes.table_customization.get("raw_table_id")
-        clean_table_id = table_attributes.table_customization.get(
-            "clean_table_id", raw_table_id
+        raw_primary_keys = ",".join(
+            table_attributes.table_customization.get("raw_primary_keys", [])
+        )
+        clean_primary_keys = (
+            ",".join(table_attributes.table_customization.get("clean_primary_keys", []))
+            or raw_primary_keys
         )
 
         return [
@@ -23,7 +26,7 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
             table_attributes.table_name,
             self.dag_execution_context.start_date,
             self.dag_execution_context.end_date,
-            clean_table_id,
+            clean_primary_keys,
         ]
 
     def create_task(

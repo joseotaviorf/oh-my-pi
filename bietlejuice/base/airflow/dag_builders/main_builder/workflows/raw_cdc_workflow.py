@@ -35,7 +35,7 @@ class RawCDCWorkflow(BaseWorkflow):
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
         for raw_table_name, table_parameters in tables_customization.items():
-            self._check_table_id_parameter(table_parameters)
+            self._check_primary_keys_parameter(table_parameters)
             raw_initial_task, raw_final_task = self._create_raw_tasks(
                 table_name=raw_table_name,
                 dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
@@ -177,13 +177,13 @@ class RawCDCWorkflow(BaseWorkflow):
 
         return load_clean_task, propagate_table_metadata_clean_task
 
-    def _check_table_id_parameter(self, table_parameters):
+    def _check_primary_keys_parameter(self, table_parameters):
         """
-        Checks if the parameter table_id is informed in the dag declaration
+        Checks if the parameter raw_primary_keys is informed in the dag declaration
         """
-        table_id = table_parameters.get("raw_table_id")
+        table_id = table_parameters.get("raw_primary_keys")
         if table_id is None:
             raise ValueError(
-                "The parameter 'table_id' cannot be None and must be informed in the dag declaration for each table."
+                "The parameter 'raw_primary_keys' cannot be None and must be informed in the dag declaration for each table."
             )
         return

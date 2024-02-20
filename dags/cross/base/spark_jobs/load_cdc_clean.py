@@ -22,7 +22,7 @@ def parse_arguments():
     parser.add_argument("table_name")
     parser.add_argument("start_date")
     parser.add_argument("end_date")
-    parser.add_argument("table_id")
+    parser.add_argument("primary_keys", help="Comma separated list of primary keys")
 
     return parser.parse_args()
 
@@ -79,7 +79,7 @@ def create_clean_delta_table(
     return clean_delta_table
 
 
-def apply_deletes_to_clean_table(clean_delta_table, table_id, clean_updates):
+def apply_deletes_to_clean_table(clean_delta_table, primary_keys, clean_updates):
     """
     Updates clean table based on raw modifications by applying
     deletes.
@@ -87,9 +87,12 @@ def apply_deletes_to_clean_table(clean_delta_table, table_id, clean_updates):
     logger.info(
         f"m=consolidate_clean_table, msg=Updating clean table based on raw modifications"
     )
+    join_condition = " AND ".join([
+        f"clean_table.{col} = clean_updates.{col}" for col in primary_keys
+    ])
     clean_delta_table.alias("clean_table").merge(
         clean_updates.alias("clean_updates"),
-        f"clean_table.{table_id} = clean_updates.{table_id}",
+        join_condition,
     ).whenMatchedDelete(condition=f"clean_updates.op_cdc = 'd'").whenMatchedUpdate(
         condition=f"clean_updates.ts_cdc_transaction >= clean_table.ts_cdc_transaction",
         set=dict((col, f"clean_updates.{col}") for col in clean_updates.columns),
@@ -108,14 +111,14 @@ def main():
     table_name = args.table_name
     start_date = args.start_date
     end_date = args.end_date
-    table_id = args.table_id
+    primary_keys = [key.strip() for key in args.primary_keys.split(",")]
 
     logger.info(
         f"""
         m=__main__, environment={environment}, dag_name={dag_name}
         datalake_bucket={datalake_bucket},
         schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
-        clean_table_id={table_id}
+        clean_primary_keys={primary_keys}
         msg=Starting spark job...
         """
     )
@@ -148,7 +151,7 @@ def main():
             table_name,
         )
 
-    apply_deletes_to_clean_table(clean_delta_table, table_id, clean_updates_df)
+    apply_deletes_to_clean_table(clean_delta_table, primary_keys, clean_updates_df)
 
 
 if __name__ == "__main__":

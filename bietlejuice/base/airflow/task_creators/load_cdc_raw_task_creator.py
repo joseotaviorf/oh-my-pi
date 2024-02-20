@@ -10,7 +10,9 @@ class LoadCDCRawTaskCreator(BaseTaskCreator):
     SPARK_JOB_NAME = "load_cdc_raw"
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
-        table_id = table_attributes.table_customization.get("raw_table_id")
+        primary_keys = ",".join(
+            table_attributes.table_customization.get("raw_primary_keys", [])
+        )
 
         return [
             self.dag_execution_context.environment,
@@ -19,7 +21,7 @@ class LoadCDCRawTaskCreator(BaseTaskCreator):
             table_attributes.table_name,
             self.dag_execution_context.start_date,
             self.dag_execution_context.end_date,
-            table_id,
+            primary_keys,
         ]
 
     def create_task(

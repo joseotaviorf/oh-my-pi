@@ -23,7 +23,7 @@ def parse_arguments():
     parser.add_argument("table_name")
     parser.add_argument("start_date")
     parser.add_argument("end_date")
-    parser.add_argument("table_id")
+    parser.add_argument("primary_keys", help="Comma separated list of primary keys")
 
     return parser.parse_args()
 
@@ -81,7 +81,7 @@ def create_raw_delta_table(
     return raw_delta_table
 
 
-def dml_processor(transactional_df, table_id):
+def dml_processor(transactional_df, primary_keys):
     """
     Applies deduplication to Transactional layer
     table by preserving the latest operation of
@@ -90,7 +90,7 @@ def dml_processor(transactional_df, table_id):
     logger.info(
         "m=dml_processor, msg=Applying deduplication and preserving the lasest operation on Transactional layer..."
     )
-    window_spec = Window.partitionBy(transactional_df[table_id]).orderBy(
+    window_spec = Window.partitionBy(*primary_keys).orderBy(
         transactional_df["ts_cdc_transaction"].desc()
     )
     transactional_df = transactional_df.withColumn(
@@ -102,7 +102,7 @@ def dml_processor(transactional_df, table_id):
     return transactional_df
 
 
-def merge_transactional_into_raw_table(transactional_df, table_id, raw_delta_table):
+def merge_transactional_into_raw_table(transactional_df, primary_keys: list, raw_delta_table):
     """
     Apply merge operations to Delta table, to consolidate
     Transactional layer table DML operations.
@@ -110,9 +110,12 @@ def merge_transactional_into_raw_table(transactional_df, table_id, raw_delta_tab
     logger.info(
         "m=merge_transactional_into_raw_table, msg=Updating Raw Delta table with Transactional table using soft-delete strategy..."
     )
+    join_condition = " AND ".join([
+        f"raw_table.{col} = transactional_table.{col}" for col in primary_keys
+    ])
     raw_delta_table.alias("raw_table").merge(
         transactional_df.alias("transactional_table"),
-        f"raw_table.{table_id} = transactional_table.{table_id}",
+        join_condition,
     ).whenMatchedUpdate(
         set=dict(
             (col, f"transactional_table.{col}") for col in transactional_df.columns
@@ -132,13 +135,13 @@ def main():
     table_name = args.table_name
     start_date = args.start_date
     end_date = args.end_date
-    table_id = args.table_id
+    primary_keys = [key.strip() for key in args.primary_keys.split(",")]
 
     logger.info(
         f"""
         m=__main__, environment={environment},  datalake_bucket={datalake_bucket},
         schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
-        table_id={table_id},
+        primary_keys={primary_keys},
         msg=Starting spark job...
         """
     )
@@ -155,7 +158,7 @@ def main():
         )
         return
 
-    transactional_df = dml_processor(transactional_df, table_id)
+    transactional_df = dml_processor(transactional_df, primary_keys)
 
     spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_{schema}_raw`")
     full_raw_table_name = f"`datalake_{schema}_raw`.`{table_name}`"
@@ -167,7 +170,7 @@ def main():
             transactional_df, full_raw_table_name, datalake_bucket, schema, table_name
         )
 
-    merge_transactional_into_raw_table(transactional_df, table_id, raw_delta_table)
+    merge_transactional_into_raw_table(transactional_df, primary_keys, raw_delta_table)
 
 
 if __name__ == "__main__":
