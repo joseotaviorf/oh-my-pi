@@ -339,7 +339,8 @@ WITH listing_rent_flows AS (
                     OR sk_contract_created_date < 0)
                 THEN 'credit_approved'
             WHEN sk_credit_analysis_init_date > 0
-                AND sk_credit_analysis_approved_date < 0
+                AND (sk_credit_analysis_approved_date < 0
+                    OR sk_tenant_first_doc_complete_date > 0)
                 THEN 'document_completed'
             WHEN (
                     CASE
@@ -452,15 +453,15 @@ SELECT
                              'contract_created',
                              'credit_approved')
             THEN dimcon_cancellation_reason
+        WHEN funnel_step = 'offer_submitted'
+            THEN dimoff_cancellation_reason
         WHEN funnel_step IN ('document_completed',
                              'document_sent',
-                             'offer_submitted')
-        THEN dimoff_cancellation_reason
-        WHEN funnel_step = 'offer_aproved'
+                             'offer_approved')
             THEN dimprop_cancellation_reason
         WHEN funnel_step IN ('visit_completed',
                              'visit_booked')
-            THEN dimboo_cancellation_reason
+        THEN dimboo_cancellation_reason
         ELSE 'Not Mapped'
     END AS funnel_step_drop_reason,
     is_visit_completed AS flg_visit_completed,

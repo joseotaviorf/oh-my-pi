@@ -137,13 +137,13 @@ get_categories AS (
         'PropertyRented5A',
         'PROPERTY_UNPUBLISHED',
         'UnpublishedHouse',
-        'HouseReserved',
         'OwnerSoldHouse',
         'OwnerSoldApartment',
         'TENANT_UNABLE_TO_LEAVE',
         'OWNER_UNABLE_TO_LEAVE'
       ) THEN 'PROPERTY UNAVAILABLE'
       WHEN c.desc_funnel_step_drop_reason IN (
+        'HouseReserved',
         'OwnerRentedForAnotherTenant5A',
         'TenantRentedAnother5A',
         'TenantRentedAnother5A'
@@ -175,7 +175,7 @@ get_categories AS (
     FROM
         cte_union_dimensions AS c
     LEFT JOIN
-        cte_id_master_type AS cmt 
+        cte_id_master_type AS cmt
             ON cmt.desc_drop_origin = c.desc_drop_origin
 )
 SELECT
