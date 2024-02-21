@@ -11,3 +11,8 @@ sheets_info:
     clean_table_name: sale_comission_for_strategic_region
     sheet_context: agents
     partitioned: true
+  tqc_pro_pilot_program_cognito_form:
+    sheet_id: 1SjZ0bCKopwhhEv2RLrLEHNHsT_vrP0Kn_9g3hY2qe2U
+    sheet_name: Programa Piloto Traz Quem Compra Pro
+    clean_table_name: tqc_pro_pilot_program_cognito_form
+    sheet_context: agents

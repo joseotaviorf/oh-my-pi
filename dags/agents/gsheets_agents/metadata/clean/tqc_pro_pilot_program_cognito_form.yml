@@ -1,0 +1,49 @@
+---
+database_name: datalake_gsheets_clean
+table_name: tqc_pro_pilot_program_cognito_form
+columns:
+  id:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.programapilototrazquemcomprapro_id
+  associate_infos:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_infos
+  associate_infos_label:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_infos_label
+  associate_cpf:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_qualoseucpf
+  associate_name_and_phone:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_nometelefone
+  buyer_name:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_nomedocomprador
+  buyer_phone:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_telefonedocomprador
+  buyer_email:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_emaildocomprador
+  house_or_region_of_interest:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_qualoimoveleouregiaodeinteressedocompradorinformeaquiocodigodoimovellinkdoanuncioenderecooubairroessainformacaoeessencialparaocadastrodocompradoreparavalidarasuaparticipacaonoprograma
+  entry_status:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_status
+  is_buyer_aware_of_register:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_ocompradorestacientedocadastro
+  is_associate_invited_by_quintoandar:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_vocefoiconvidadoaparticipardestepilotopeloquintoandar
+  dt_entry_created:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_datecreated
+  dt_entry_submitted:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_datesubmitted
+  dt_entry_updated:
+    lineage:
+      - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_dateupdated
