@@ -19,7 +19,6 @@ fcr_customer AS (
 missing_theme_tickets AS (
   SELECT DISTINCT
     front_or_back AS ticket_type,
-    main_department AS department,
     COUNT(DISTINCT id_ticket) AS missing_theme_tickets,
     DATE(ts_solved) AS dt_started
   FROM
@@ -27,12 +26,11 @@ missing_theme_tickets AS (
   WHERE
     is_ticket_rate = TRUE
     AND theme_detail IS NULL
-  GROUP BY 1, 2, 4
+  GROUP BY 1, 3
 ),
 abandoned_calls AS (
   SELECT
     front_or_back AS ticket_type,
-    department,
     COUNT(DISTINCT COALESCE(CONCAT(id_call, 'call'), CONCAT(id_session, 'chat'), CONCAT(id_ticket, 'email'))) AS contacts,
     DATE(ts_created) AS dt_started
   FROM
@@ -42,7 +40,29 @@ abandoned_calls AS (
     AND front_or_back = 'front'
     AND area = 'CX'
     AND is_answered = FALSE
-  GROUP BY 1, 2, 4
+  GROUP BY 1, 3
+),
+ticket_rate_proportion AS (
+  SELECT DISTINCT
+    ut.id_ticket,
+    CAST(ut.ticket_rate_weight * 
+            (1 +
+                COALESCE(1/(COUNT(ut.id_ticket) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back)) * mt.missing_theme_tickets, 0)  + 
+                COALESCE(1/(COUNT(ut.id_ticket) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back)) * ac.contacts, 0)
+            ) AS DOUBLE
+    ) AS total_tickets_proportional
+  FROM
+    datalake_customer_support.unified_tickets AS ut
+  LEFT JOIN
+    missing_theme_tickets AS mt
+      ON mt.dt_started = DATE(ut.ts_solved)
+      AND mt.ticket_type = ut.front_or_back
+  LEFT JOIN
+    abandoned_calls AS ac
+      ON ac.dt_started = DATE(ut.ts_solved)
+      AND ac.ticket_type = ut.front_or_back
+  WHERE
+    ut.is_ticket_rate = TRUE
 )
 SELECT DISTINCT
     ut.id_ticket AS sk_ticket,
@@ -75,14 +95,7 @@ SELECT DISTINCT
     ut.back_tickets,
     ut.resolution_survey,
     ut.ticket_rate_weight,
-    IF(ut.is_ticket_rate = TRUE,
-        CAST(ut.ticket_rate_weight * 
-            (1 +
-                COALESCE(1/(COUNT(ut.id_ticket) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back)) * mt.missing_theme_tickets, 0)  + 
-                COALESCE(1/(COUNT(ut.id_ticket) OVER(PARTITION BY DATE(ut.ts_solved), ut.front_or_back)) * ac.contacts, 0)
-            ) AS DOUBLE),
-        NULL
-    ) AS total_tickets_proportional,
+    tr.total_tickets_proportional,
     ut.is_ticket_rate,
     ut.has_answered_csat,
     ut.has_back_ticket,
@@ -117,12 +130,5 @@ LEFT JOIN
   fcr_customer AS fc
     ON ut.id_ticket = fc.recontact_ticket
 LEFT JOIN
-    missing_theme_tickets AS mt
-      ON mt.dt_started = DATE(ut.ts_solved)
-      AND mt.ticket_type = ut.front_or_back
-      AND mt.department = ut.main_department
-LEFT JOIN
-    abandoned_calls AS ac
-      ON ac.dt_started = DATE(ut.ts_solved)
-      AND ac.ticket_type = ut.front_or_back
-      AND ac.department = ut.main_department
+  ticket_rate_proportion AS tr
+    ON tr.id_ticket = ut.id_ticket
