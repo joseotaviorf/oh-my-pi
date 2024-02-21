@@ -24,8 +24,29 @@ missing_theme_tickets AS (
   FROM
     datalake_customer_support.unified_tickets
   WHERE
-    is_ticket_rate = TRUE
-    AND theme_detail IS NULL
+    -- It's necessary to apply all Ticket Rate rules but considering tickets that has no theme (taxonomy)
+    theme_detail IS NULL
+    AND (
+      channel IN ('call', 'chat') AND front_or_back = 'front'
+      OR channel = 'email' AND front_or_back IN ('back', 'front')
+    )
+    AND ts_solved >= '2022-01-01'
+    AND team <> 'Ong Back'
+    AND area = 'CX'
+    AND main_department NOT IN
+      ('Rescisão por Inadimplência [OFF][POS][BACK]',
+        'Offboarding Reparos [OFF] [POS] [BACK]',
+        'Offboarding pré saída [OFF] [POS] [BACK]',
+        'Proteção QuintoAndar [OFF] [POS] [BACK]',
+        'Rescisão - Despejo [OFF][POS][BACK]',
+        'Rescisão 1 [OFF] [POS] [BACK]'
+      )
+    AND (channel <> 'call'
+      OR (channel = 'call'
+        AND direction IN ('inbound', 'outbound-api')
+        OR channel_type = 'call-in-app'
+      )
+    )
   GROUP BY 1, 3
 ),
 abandoned_calls AS (
@@ -43,6 +64,8 @@ abandoned_calls AS (
   GROUP BY 1, 3
 ),
 ticket_rate_proportion AS (
+  /** For the Ticket Rate proportional calculation, we're considering only tickets marked as Ticket Rate
+    and that has a taxonomy **/ 
   SELECT DISTINCT
     ut.id_ticket,
     CAST(ut.ticket_rate_weight * 
