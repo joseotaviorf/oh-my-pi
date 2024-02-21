@@ -1,5 +1,8 @@
 from argparse import ArgumentParser
 
+from bietlejuice.base.cdc.primary_key_identifiers.mysql_primary_key_identifier import (
+    MySqlPrimaryKeyIdentifier,
+)
 from quintoandar_logger import QuintoAndarLogger
 
 from delta.tables import DeltaTable
@@ -19,6 +22,7 @@ def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source_schema")
     parser.add_argument("schema")
     parser.add_argument("table_name")
     parser.add_argument("start_date")
@@ -131,11 +135,19 @@ def main():
     args = parse_arguments()
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    source_schema = args.source_schema
     schema = args.schema
     table_name = args.table_name
     start_date = args.start_date
     end_date = args.end_date
-    primary_keys = [key.strip() for key in args.primary_keys.split(",")]
+    if args.primary_keys:
+        primary_keys = [key.strip() for key in args.primary_keys.split(",")]
+    else:
+        # Hardcoded for now, while we don't have other sources such as Postgres
+        pk_identifier = MySqlPrimaryKeyIdentifier(
+            f"s3://{datalake_bucket}/incoming/{environment}-{source_schema}/"
+        )
+        primary_keys = pk_identifier.find_primary_keys(source_schema, table_name)
 
     logger.info(
         f"""
