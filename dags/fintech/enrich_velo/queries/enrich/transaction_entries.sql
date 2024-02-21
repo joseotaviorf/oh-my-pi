@@ -142,11 +142,46 @@ propose_person AS (
         AND p_doc.is_contract IS TRUE
 
 ),
+propose_company AS (
+    SELECT
+        -- pc_doc.*,
+        pc_doc.id_company,
+        pc_doc.cnpj,
+        p_doc.id_propose,
+        p_doc.dt_contract_started,
+        p_doc.dt_ended
+    FROM
+        datalake_velo.propose_company AS pc_doc
+    LEFT JOIN
+        datalake_velo.propose AS p_doc
+            ON p_doc.id_propose_company = pc_doc.id_company
+    WHERE
+        p_doc.id_propose IS NOT NULL
+        AND p_doc.is_contract IS TRUE
+
+
+    UNION ALL
+
+    SELECT
+        pc_doc.id_company,
+        cc.document AS cnpj,
+        p_doc.id_propose,
+        p_doc.dt_contract_started,
+        p_doc.dt_ended
+    FROM
+        datalake_rental_guarantee_platform_clean.fiancavelo_proposecompany_legacy AS pc_doc
+    LEFT JOIN
+        datalake_velo.propose_legacy AS p_doc
+            ON p_doc.id_propose_company = pc_doc.id_company
+    LEFT JOIN
+        datalake_velo_clean.clientes_company AS cc
+            ON cc.id = pc_doc.id_company
+),
 cash_flow_propose AS (
     SELECT DISTINCT
         cf.id_securities,
-        COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose) AS id_propose,
-        ROW_NUMBER() OVER (PARTITION BY cf.id_securities, cf.id_client ORDER BY COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose) DESC) AS rn
+        COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose, pc_doc.id_propose, pc_doc_fallback.id_propose) AS id_propose,
+        ROW_NUMBER() OVER (PARTITION BY cf.id_securities, cf.id_client ORDER BY COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose, pc_doc.id_propose, pc_doc_fallback.id_propose) DESC) AS rn
     FROM
         datalake_velo_omie.cash_flows AS cf
     LEFT JOIN
@@ -157,17 +192,24 @@ cash_flow_propose AS (
             ON ccnpj.id_client = cf.id_client
     LEFT JOIN
         propose_person AS pp_doc
-            ON pp_doc.document = COALESCE(ccpf.document_number, ccnpj.document_number)
+            ON pp_doc.document = ccpf.document_number
             AND COALESCE(cf.dt_due BETWEEN pp_doc.dt_contract_started AND DATE_ADD(pp_doc.dt_ended, 31), 1=1)
     LEFT JOIN
         propose_person AS pp_doc_fallback
-            ON pp_doc_fallback.document = COALESCE(ccpf.document_number, ccnpj.document_number)
+            ON pp_doc_fallback.document = ccpf.document_number
+    LEFT JOIN
+        propose_company AS pc_doc
+            ON pc_doc.cnpj = ccnpj.document_number
+            AND COALESCE(cf.dt_due BETWEEN pc_doc.dt_contract_started AND DATE_ADD(pc_doc.dt_ended, 31), 1=1)
+    LEFT JOIN
+        propose_company AS pc_doc_fallback
+            ON pc_doc.cnpj = ccnpj.document_number
     WHERE
-        COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose) IS NOT NULL
+        COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose, pc_doc.id_propose, pc_doc_fallback.id_propose) IS NOT NULL
 )
 SELECT
     CAST(CONCAT(ct.id_securities, REPLACE(ct.id_category, '.', '')) AS BIGINT) AS id_transaction_entry,
-    CAST(CONCAT(ct.id_securities, CASE WHEN ct.transaction_type = 'CONTA_A_RECEBER' THEN '0' ELSE '1' END) AS BIGINT) AS id_trasaction,
+    CAST(CONCAT(ct.id_securities, CASE WHEN ct.transaction_type = 'CONTA_A_RECEBER' THEN '0' ELSE '1' END) AS BIGINT) AS id_transaction,
     ct.id_category,
     cfp.id_propose,
     ct.id_bank_account,

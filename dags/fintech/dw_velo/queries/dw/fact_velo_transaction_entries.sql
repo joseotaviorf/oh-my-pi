@@ -1,6 +1,6 @@
 SELECT
     id_transaction_entry AS sk_transaction_entry,
-    COALESCE(id_trasaction, -1) AS sk_transaction,
+    COALESCE(id_transaction, -1) AS sk_transaction,
     COALESCE(id_category, -1) AS sk_category,
     id_propose AS sk_propose,
     COALESCE(id_bank_account, -1) AS sk_bank_account,
