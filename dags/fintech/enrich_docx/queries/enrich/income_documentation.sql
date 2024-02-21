@@ -20,7 +20,8 @@ SELECT
         WHEN id_document_context = 4 THEN 'Buyer'
         WHEN id_document_context = 5 THEN 'Seller'
     END AS document_context,
-    GET_JSON_OBJECT(attributes, '$.grossIncome') AS monthly_salary,
+    CAST(GET_JSON_OBJECT(attributes, '$.verifiedIncome') AS DOUBLE) AS verified_income,
+    CAST(GET_JSON_OBJECT(attributes, '$.grossIncome') AS DOUBLE) AS monthly_salary,
     GET_JSON_OBJECT(attributes, '$.incomeNature.companyName') AS company_name,
     GET_JSON_OBJECT(attributes, '$.incomeNature.companyPhone') AS company_phone_number,
     GET_JSON_OBJECT(attributes, '$.incomeNatureType') AS emp_link,

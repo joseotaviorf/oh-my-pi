@@ -1,0 +1,64 @@
+database_name: dw_credit
+table_name: fact_proponent_income_sources
+description: This table stores the different income sources (proponent monthly income, verified income, SCR income and presumed income) from a proponent submitted in the credit evaluation process within a proposal. Based on the informed income and presumed income it is calculated the proposal elected income.
+domain: Fintech
+owner: isabella.santos@quintoandar.com.br
+columns:
+  sk_credit_evaluation_proponent:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.id
+    description: Unique identifier of the proponent credit evaluation.
+  sk_user:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_user
+    description: ID of the main user of the proposal.
+  sk_credit_evaluation:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.id_credit_evaluation
+    description: ID of the latest credit evaluation submitted within a proposal.
+  sk_proposal:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_proposal
+    description: ID of the proposal.
+  proponent_cpf:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.cpf
+    description: Proponent CPF number.
+  proponent_monthly_income:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.monthly_income
+    description: Latest monthly income submitted by the proponent to a credit evaluation.
+  proponent_scr_income:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.scr_income
+    description: Proponent SCR income. This income is only available to the main proponent of a proposal
+  proponent_verified_income:
+    lineage:
+      - datalake_docx.income_documentation.verified_income
+    description: Proponent verified income by the credit desk.
+  proponent_presumed_income_neoway:
+    lineage:
+      - datalake_arquivo_confidencial_clean.presumed_income_report.presumed_income
+    description: Presumed income calculated by Neoway bureau to the proponent. It can be null if the presumed income is not available.
+  proponent_presumed_income_transunion:
+    lineage:
+      - datalake_arquivo_confidencial_clean.presumed_income_report.presumed_income
+    description: Presumed income calculated by Transunion bureau to the proponent. It can be null if the presumed income is not available.
+  proposal_elected_income:
+    description: Elected income calculated to a proposal. If the ration between the proposal presumed income and informed income is equal or greater than 0.8, then the elected income is the proposal informed income. Otherwise it is the proposal presumed income. The proposal presumed income is the greatest value of the sum of the proponents presumed incomes by bureau. The proposal informed income is the sum of all proponents monthly income in the proposal.
+  total_credit_evaluations:
+    description: Total credit evaluations submitted to a proposal
+  is_main_user:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.proponent_type
+    description: Boolean indicating if the proponent is the proposal main user (proponent_type = USER)
+  is_resident:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.resident
+    description: Boolean indicating if the proponent is going to live in the residence
+  ts_last_credit_evaluation:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_created
+    description: Timestamp of the latest credit evaluation submitted within a proposal
+  ts_load:
+    description: Timestamp of data recorded in the table

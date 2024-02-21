@@ -1,0 +1,40 @@
+database_name: dw_credit
+table_name: dim_proponent_proposal_informed_incomes
+description: This dimension stores all the informed proponent incomes per proposal. The monthly income is submitted during the credit evaluation process.
+domain: Fintech
+owner: isabella.santos@quintoandar.com.br
+columns:
+  sk_proposal:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_proposal
+    description: ID of the proposal.
+  proponent_cpf:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.cpf
+    description: Proponent CPF number.
+  occupation_area:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.occupation_area
+    description: Proponent informed occupation area.
+  proponent_monthly_income:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.monthly_income
+    description: Monthly income submitted by the proponent to a credit evaluation.
+  proponent_type:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.proponent_type
+    description: Type of the proponent. It can be USER when the proponent is the proposal main user or PERSON.
+  income_nature:
+    lineage:
+      - datalake_sorting_hat_clean.proponent.income_nature
+    description: Proponent income nature.
+  is_resident:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.resident
+    description: Boolean indicating if the proponent is going to live in the residence.
+  ts_informed_income:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.ts_created
+    description: Timestamp of the informed income submitted within a credit evaluation.
+  ts_load:
+    description: Timestamp of data recorded in the table

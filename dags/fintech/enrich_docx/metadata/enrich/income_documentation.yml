@@ -7,19 +7,19 @@ columns:
   id:
     lineage:
       - datalake_docx_clean.document.id
-    description: "Id of the income documentation"  
+    description: "Id of the income documentation"
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
-    description: "Id of the folder"  
+    description: "Id of the folder"
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Id of the document type"  
+    description: "Id of the document type"
   id_document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
-    description: "Id of the document context"  
+    description: "Id of the document context"
   id_context_external:
     lineage:
       - datalake_docx_clean.document.id_context_external
@@ -46,50 +46,54 @@ columns:
       Affiliate: ""
       Buyer: ""
       Seller: ""
+  verified_income:
+    lineage:
+      - datalake_docx_clean.document.attributes
+    description: "Tenant verified income. The verification is done by the credit desk to tenants who the documentation policy applied is FULL."
   monthly_salary:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant monthly salary"  
+    description: "Tenant monthly salary"
   company_name:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant company name"  
+    description: "Tenant company name"
   company_phone_number:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant company phone number"  
+    description: "Tenant company phone number"
   emp_link:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant type of job" 
+    description: "Tenant type of job"
   profession:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant profession" 
+    description: "Tenant profession"
   additional_income:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant additional income" 
+    description: "Tenant additional income"
   source_of_income:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant source of income" 
+    description: "Tenant source of income"
   documentation_extra_comment:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Documentation extra comment" 
+    description: "Documentation extra comment"
   payslips:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant payslip" 
+    description: "Tenant payslip"
   ctps_pages:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant ctps pages" 
+    description: "Tenant ctps pages"
   bank_statements:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant bank statements" 
+    description: "Tenant bank statements"
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
