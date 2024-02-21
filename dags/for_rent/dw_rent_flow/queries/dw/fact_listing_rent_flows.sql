@@ -359,7 +359,7 @@ WITH listing_rent_flows AS (
                         ELSE sk_tenant_auto_first_doc_sent_date
                     END
                 ) < 0 -- sk_tenant_first_doc_sent_date
-                THEN 'offer_aproved'
+                THEN 'offer_approved'
             WHEN sk_offer_submitted_date > 0
                 AND sk_offer_approved_date < 0
                 THEN 'offer_submitted'
