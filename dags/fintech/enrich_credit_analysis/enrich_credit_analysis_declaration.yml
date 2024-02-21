@@ -1,0 +1,16 @@
+---
+dag:
+  name: enrich_credit_analysis
+  schedule_start_date: 2020, 7, 1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for the `Credit Analysis` context.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    credit_analysis:
+      - credit_analysis_proposals
+cluster:
+  type: databricks_10_4_med_general_cluster
