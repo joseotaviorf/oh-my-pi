@@ -1,6 +1,0 @@
----
-tables:
-  - Chat
-  - Chat_users
-  - User
-  - User_chats

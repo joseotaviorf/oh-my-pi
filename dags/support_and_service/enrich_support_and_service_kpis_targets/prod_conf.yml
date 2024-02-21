@@ -1,3 +1,0 @@
----
-dag_documentation:
-  dag_purpose: Transform the KPIs target gsheets to a readable and mergeable format to insert on LookML.

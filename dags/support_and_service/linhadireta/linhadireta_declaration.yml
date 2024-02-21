@@ -1,0 +1,28 @@
+dag: 
+  name: linhadireta
+  owner: Data SS
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 0 5 * * *
+  documentation:
+    dag_purpose:
+      This DAG imports the tables from [LinhaDireta](https://github.com/quintoandar/linha-direta),
+      our service for chat management.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: linhadireta
+  tables_customization:
+    chat_users:
+      extraction_type: full
+    chat:
+      extraction_type: full
+    user_chats:
+      extraction_type: full
+    user:
+      extraction_type: full
+cluster:
+  type: databricks_10_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
