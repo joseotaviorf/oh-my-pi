@@ -23,6 +23,10 @@ WITH call_tickets AS (
     id_session AS id_session,
     MD5("N/A") AS id_service_status,
     'call' AS channel,
+    channel_type,
+    direction,
+    team,
+    area,
     ticket_origin,
     contact_theme_tag AS theme,
     contact_theme_detail_tag AS theme_detail,
@@ -41,7 +45,7 @@ WITH call_tickets AS (
     IF(
       front_or_back = 'front'
       AND DATE(ts_ticket_ended) >= DATE('2022-01-01')
-      AND journey_step NOT IN ('Compra e Venda', 'Cross')
+      AND contact_theme_detail_tag IS NOT NULL
       AND team <> 'Ong Back'
       AND area = 'CX'
       AND last_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
@@ -110,7 +114,7 @@ WITH call_tickets AS (
     ts_csat_last_response AS ts_survey
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55
 ),
 chat_tickets AS (
   SELECT
@@ -137,6 +141,10 @@ chat_tickets AS (
     id_session AS id_session,
     MD5(service_status) AS id_service_status,
     'chat' AS channel,
+    NULL AS channel_type,
+    NULL AS direction,
+    team,
+    area,
     ticket_origin,
     contact_theme_tag AS theme,
     contact_theme_detail_tag AS theme_detail,
@@ -155,7 +163,7 @@ chat_tickets AS (
     IF(
       front_or_back = 'front'
       AND DATE(ts_ticket_ended) >= DATE('2022-01-01')
-      AND journey_step NOT IN ('Compra e Venda', 'Cross')
+      AND contact_theme_detail_tag IS NOT NULL
       AND team <> 'Ong Back'
       AND area = 'CX'
       AND last_department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
@@ -220,7 +228,7 @@ chat_tickets AS (
     ts_csat_last_response AS ts_survey
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55
 ),
 email_tickets AS (
   SELECT
@@ -247,6 +255,10 @@ email_tickets AS (
     -1 AS id_session,
     MD5("N/A") AS id_service_status,
     'email' AS channel,
+    NULL AS channel_type,
+    direction,
+    team,
+    area,
     'N/A' AS ticket_origin,
     contact_theme_tag AS theme,
     contact_theme_detail_tag AS theme_detail,
@@ -265,7 +277,7 @@ email_tickets AS (
     IF(
       front_or_back IN ('back', 'front')
       AND DATE(ts_ticket_solved) >= DATE('2022-01-01')
-      AND journey_step NOT IN ('Compra e Venda', 'Cross')
+      AND contact_theme_detail_tag IS NOT NULL
       AND team <> 'Ong Back'
       AND area = 'CX'
       AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
@@ -329,7 +341,7 @@ email_tickets AS (
     NULL AS ts_survey
   FROM
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55
 ),
 historical_call_tickets AS (
   SELECT
@@ -356,6 +368,10 @@ historical_call_tickets AS (
     -1 AS id_session,
     MD5("N/A") AS id_service_status,
     'call' AS channel,
+    NULL AS channel_type,
+    NULL AS direction,
+    NULL AS team,
+    NULL AS area,
     'N/A' AS ticket_origin,
     NULL AS theme,
     NULL AS theme_detail,
@@ -397,7 +413,7 @@ historical_call_tickets AS (
     NULL AS ts_survey
   FROM
     datalake_customer_support.historical_call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55
 ),
 historical_chat_tickets AS (
   SELECT
@@ -424,6 +440,10 @@ historical_chat_tickets AS (
     -1 AS id_session,
     MD5("N/A") AS id_service_status,
     'chat' AS channel,
+    NULL AS channel_type,
+    NULL AS direction,
+    NULL AS team,
+    NULL AS area,
     'N/A' AS ticket_origin,
     NULL AS theme,
     NULL AS theme_detail,
@@ -490,7 +510,7 @@ historical_chat_tickets AS (
     NULL AS ts_survey
   FROM
     datalake_customer_support.historical_chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55
 ),
 base_tickets AS (
   SELECT
@@ -532,6 +552,10 @@ SELECT DISTINCT
     bt.id_session,
     bt.id_service_status,
     bt.channel,
+    bt.channel_type,
+    bt.direction,
+    bt.team,
+    bt.area,
     bt.ticket_origin,
     bt.theme,
     bt.theme_detail,

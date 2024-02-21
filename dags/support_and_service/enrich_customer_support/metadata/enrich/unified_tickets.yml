@@ -136,6 +136,27 @@ columns:
     description: Identifier of the next ticket for this user within the same session.
   channel:
     description: Identify the channel for this ticket (call, chat, email).
+  channel_type:
+    lineage:
+      - datalake_customer_support.call.channel_type
+    description: Identify the channel type for this ticket. Only available for call tickets.
+  direction: 
+    lineage:
+      - datalake_customer_support.call.direction
+      - datalake_customer_support.email.direction
+    description: Identify the direction for this ticket. Only available for call or email tickets.
+  team:
+    lineage:
+      - datalake_customer_support.call.team
+      - datalake_customer_support.chat.team
+      - datalake_customer_support.email.team
+    description: Team responsible for the ticket.
+  area:
+    lineage:
+      - datalake_customer_support.call.area
+      - datalake_customer_support.chat.area
+      - datalake_customer_support.email.area
+    description: Area responsible for the ticket.
   ticket_origin:
     description: It is the source channel of the chat ticket, which can be whatsapp or chat5A.
     lineage:
