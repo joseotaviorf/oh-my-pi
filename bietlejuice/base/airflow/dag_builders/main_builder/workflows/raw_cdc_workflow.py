@@ -62,7 +62,7 @@ class RawCDCWorkflow(BaseWorkflow):
             TaskEnum.LOAD_CDC_RAW
         )
         self.load_cdc_clean_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.LOAD_CDC_CLEAN
+            TaskEnum.LOAD_CDC_CLEAN, self.config_service
         )
         self.register_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.REGISTER_DELTA_TABLE

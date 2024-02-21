@@ -1,6 +1,10 @@
-from argparse import ArgumentParser
-from datetime import datetime
+from argparse import ArgumentParser, Namespace
 import re
+from typing import List
+
+from bietlejuice.base.cdc.primary_key_identifiers.clean_primary_key_identifier import (
+    CleanPrimaryKeyIdentifier,
+)
 from pyspark.sql.functions import col
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
@@ -18,15 +22,31 @@ def parse_arguments():
     parser.add_argument("dag_name")
     parser.add_argument("env", type=str, help="forno/prod environment")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("data_documentation_bucket")
     parser.add_argument("schema")
     parser.add_argument("table_name")
     parser.add_argument("start_date")
     parser.add_argument("end_date")
-    parser.add_argument("primary_keys", help="Comma separated list of primary keys")
+    parser.add_argument("primary_keys", help="Comma separated list of primary keys for the clean table")
 
     return parser.parse_args()
 
 
+def get_primary_keys_from_args(args: Namespace) -> List[str]:
+    """
+    Returns the primary keys of the clean table. It is either informed manually, or identified automatically by reading
+    the lineage file.
+    """
+
+    if args.primary_keys:
+       return [key.strip() for key in args.primary_keys.split(",")]
+    
+    clean_pk_identifier = CleanPrimaryKeyIdentifier(
+        args.data_documentation_bucket,
+    )
+    return clean_pk_identifier.find_primary_keys(args.schema, args.table_name)
+
+    
 def insert_columns_into_query(query, columns):
     """
     Insert CDC columns to persist those informations
@@ -111,14 +131,14 @@ def main():
     table_name = args.table_name
     start_date = args.start_date
     end_date = args.end_date
-    primary_keys = [key.strip() for key in args.primary_keys.split(",")]
+    clean_primary_keys = get_primary_keys_from_args(args)
 
     logger.info(
         f"""
         m=__main__, environment={environment}, dag_name={dag_name}
         datalake_bucket={datalake_bucket},
         schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
-        clean_primary_keys={primary_keys}
+        clean_primary_keys={clean_primary_keys}, 
         msg=Starting spark job...
         """
     )
@@ -151,7 +171,7 @@ def main():
             table_name,
         )
 
-    apply_deletes_to_clean_table(clean_delta_table, primary_keys, clean_updates_df)
+    apply_deletes_to_clean_table(clean_delta_table, clean_primary_keys, clean_updates_df)
 
 
 if __name__ == "__main__":

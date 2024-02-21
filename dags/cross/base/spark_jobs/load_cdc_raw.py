@@ -69,7 +69,7 @@ def load_raw_delta_table(full_table_name):
 
 
 def create_raw_delta_table(
-    df, full_raw_table_name, datalake_bucket, schema, table_name
+    df, full_raw_table_name, datalake_bucket, schema, table_name, primary_keys
 ):
     """
     Create raw Delta table.
@@ -79,6 +79,10 @@ def create_raw_delta_table(
     )
     df.write.format("delta").option("mergeSchema", True).mode("overwrite").saveAsTable(
         full_raw_table_name, path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/"
+    )
+    comma_separated_primary_keys = ",".join(primary_keys)
+    spark.sql(
+        f"ALTER TABLE {full_raw_table_name} SET TBLPROPERTIES ('primary_keys' = '{comma_separated_primary_keys}')"
     )
     raw_delta_table = DeltaTable.forName(spark, full_raw_table_name)
 
@@ -179,7 +183,12 @@ def main():
 
     if not raw_delta_table:
         raw_delta_table = create_raw_delta_table(
-            transactional_df, full_raw_table_name, datalake_bucket, schema, table_name
+            transactional_df,
+            full_raw_table_name,
+            datalake_bucket,
+            schema,
+            table_name,
+            primary_keys,
         )
 
     merge_transactional_into_raw_table(transactional_df, primary_keys, raw_delta_table)
