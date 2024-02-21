@@ -15,6 +15,7 @@ class DagExecutionContext:
     start_date: str = "{{ ds }}"
     end_date: str = "{{ ds }}"
     execution_date: str = "{{ ds }}"
+    incoming_bucket: str = None
 
     def __post_init__(self):
         assert self.dag is not None, "DAG is required"

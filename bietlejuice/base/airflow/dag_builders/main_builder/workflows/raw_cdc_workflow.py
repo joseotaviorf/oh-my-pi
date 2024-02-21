@@ -23,10 +23,15 @@ class RawCDCWorkflow(BaseWorkflow):
             user_defined_macros={"get_date_param": self.get_date_param}
         )
         bucket = self.config_service.get_config("datalake_bucket")
+        incoming_bucket = self.config_service.get_config("incoming_bucket")
         start_date = "{{ get_date_param(dag_run, ds, yesterday_ds, 'start_date') }}"
         end_date = "{{ get_date_param(dag_run, ds, yesterday_ds, 'end_date') }}"
         dag_execution_context = self._get_dag_execution_context(
-            dag, bucket, start_date=start_date, end_date=end_date
+            dag,
+            bucket,
+            start_date=start_date,
+            end_date=end_date,
+            incoming_bucket=incoming_bucket,
         )
         self._initialize_task_creators(dag_execution_context)
         tables_customization = self.workflow_args["tables_customization"]

@@ -15,6 +15,7 @@ spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
+    parser.add_argument("incoming_bucket")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source_schema")
     parser.add_argument("schema")
@@ -47,7 +48,7 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
     )
 
 
-def get_incoming_data(datalake_bucket, environment, schema, table_name, start_date, end_date):
+def get_incoming_data(incoming_bucket, environment, schema, table_name, start_date, end_date):
     """
     Reads incoming data as a DataFrame
 
@@ -60,7 +61,7 @@ def get_incoming_data(datalake_bucket, environment, schema, table_name, start_da
     :return df:
     """
     path = (
-        f"s3://{datalake_bucket}/incoming/{environment}-{schema}.{schema}.{table_name}/"
+        f"s3://{incoming_bucket}/{schema}/{environment}-{schema}.{schema}.{table_name}/"
     )
 
     logger.info(
@@ -127,6 +128,7 @@ def format_and_deduplicate_df(df, partitions):
 def main():
     args = parse_arguments()
     environment = args.env
+    incoming_bucket = args.incoming_bucket
     datalake_bucket = args.datalake_bucket
     source_schema = args.source_schema
     schema = args.schema
@@ -138,15 +140,15 @@ def main():
     logger.info(
         f"""
         m=__main__, environment={environment},  datalake_bucket={datalake_bucket},
-        schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
-        partitions={partitions}
+        incoming_bucket={incoming_bucket}, schema={schema}, table_name={table_name},
+        start_date={start_date}, end_date={end_date}, partitions={partitions}
         msg=Starting spark job...
         """
     )
 
 
     df = get_incoming_data(
-        datalake_bucket, environment, source_schema, table_name, start_date, end_date
+        incoming_bucket, environment, source_schema, table_name, start_date, end_date
     )
 
     if df.isEmpty():

@@ -18,6 +18,7 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
 
         parameters = [
             self.dag_execution_context.environment,
+            self.dag_execution_context.incoming_bucket,
             self.dag_execution_context.bucket,
             source_schema,
             table_attributes.schema,

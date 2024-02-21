@@ -21,6 +21,7 @@ spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
+    parser.add_argument("incoming_bucket")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source_schema")
     parser.add_argument("schema")
@@ -32,7 +33,9 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def get_df_from_transactional(datalake_bucket, schema, table_name, start_date, end_date):
+def get_df_from_transactional(
+    datalake_bucket, schema, table_name, start_date, end_date
+):
     """
     Extract Delta table from Transactional layer, transforms into a
     Dataframe.
@@ -40,7 +43,11 @@ def get_df_from_transactional(datalake_bucket, schema, table_name, start_date, e
     path = f"s3://{datalake_bucket}/transactional/{schema}/{table_name}"
     try:
         transactional_delta_table = DeltaTable.forPath(spark, path)
-        transactional_df = transactional_delta_table.toDF().filter(make_date(col("year"), col("month"), col("day")).between(start_date, end_date))
+        transactional_df = transactional_delta_table.toDF().filter(
+            make_date(col("year"), col("month"), col("day")).between(
+                start_date, end_date
+            )
+        )
     except AnalysisException as e:
         logger.info(
             f"m=get_df_from_transactional, msg=Unable to read delta table from transactional layer, error={e}"
@@ -110,7 +117,9 @@ def dml_processor(transactional_df, primary_keys):
     return transactional_df
 
 
-def merge_transactional_into_raw_table(transactional_df, primary_keys: list, raw_delta_table):
+def merge_transactional_into_raw_table(
+    transactional_df, primary_keys: list, raw_delta_table
+):
     """
     Apply merge operations to Delta table, to consolidate
     Transactional layer table DML operations.
@@ -118,12 +127,11 @@ def merge_transactional_into_raw_table(transactional_df, primary_keys: list, raw
     logger.info(
         "m=merge_transactional_into_raw_table, msg=Updating Raw Delta table with Transactional table using soft-delete strategy..."
     )
-    join_condition = " AND ".join([
-        f"raw_table.{col} = transactional_table.{col}" for col in primary_keys
-    ])
+    join_condition = " AND ".join(
+        [f"raw_table.{col} = transactional_table.{col}" for col in primary_keys]
+    )
     raw_delta_table.alias("raw_table").merge(
-        transactional_df.alias("transactional_table"),
-        join_condition,
+        transactional_df.alias("transactional_table"), join_condition
     ).whenMatchedUpdate(
         set=dict(
             (col, f"transactional_table.{col}") for col in transactional_df.columns
@@ -138,6 +146,7 @@ def merge_transactional_into_raw_table(transactional_df, primary_keys: list, raw
 def main():
     args = parse_arguments()
     environment = args.env
+    incoming_bucket = args.incoming_bucket
     datalake_bucket = args.datalake_bucket
     source_schema = args.source_schema
     schema = args.schema
@@ -149,13 +158,13 @@ def main():
     else:
         # Hardcoded for now, while we don't have other sources such as Postgres
         pk_identifier = MySqlPrimaryKeyIdentifier(
-            f"s3://{datalake_bucket}/incoming/{environment}-{source_schema}/"
+            f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/"
         )
         primary_keys = pk_identifier.find_primary_keys(source_schema, table_name)
 
     logger.info(
         f"""
-        m=__main__, environment={environment},  datalake_bucket={datalake_bucket},
+        m=__main__, environment={environment},  incoming_bucket={incoming_bucket}, datalake_bucket={datalake_bucket},
         schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
         primary_keys={primary_keys},
         msg=Starting spark job...
