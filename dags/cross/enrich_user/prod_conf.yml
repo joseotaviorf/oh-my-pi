@@ -8,7 +8,7 @@ dag_documentation:
 inner_dependencies:
   persona_type:
     - broker_user
-    - tenant_user
+    - tenant
     - photographer_user
     - landlord
 
@@ -22,7 +22,7 @@ tables:
   landlord:
     partition_cols: [year, month, day]
     has_hive_sync: False
-  tenant_user:
+  tenant:
     partition_cols: [year, month, day]
     has_hive_sync: False
   persona_type:

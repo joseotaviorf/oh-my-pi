@@ -45,7 +45,7 @@ WITH ll_and_tt_journeys AS (
         month,
         day
     FROM
-        datalake_user.tenant_user
+        datalake_user.tenant
     WHERE
         year = {year}
         AND month = {month}

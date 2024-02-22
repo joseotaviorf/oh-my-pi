@@ -27,10 +27,6 @@ columns:
     description:
       It considers the last csi ticket created per user. By csi ticket, these are tickets
       from the departments of "Midias Ops [POS] [BACK]" or "[CE]" related.
-  country_code:
-    lineage:
-      - datalake_user.persona_type.country_code
-    description: Country code of the user.
   main_phone:
     lineage:
       - datalake_user.persona_type.main_phone

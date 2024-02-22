@@ -1,6 +1,6 @@
 ---
 database_name: datalake_user
-table_name: tenant_user
+table_name: tenant
 description:
   Tenant users and their respective journey step. Each row in the table represents a
   specific customer on a daily snapshot.
