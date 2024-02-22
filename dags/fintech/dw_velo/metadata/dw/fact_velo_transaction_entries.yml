@@ -11,7 +11,7 @@ columns:
     description: Transaction entry's identification number (ID)
   sk_transaction:
     lineage:
-    - datalake_velo.transaction_entries.id_trasaction
+    - datalake_velo.transaction_entries.id_transaction
     description: Transaction's identification number (ID). This key connects to the table dw_velo.dim_velo_transaction
   sk_category:
     lineage:

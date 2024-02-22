@@ -6,7 +6,7 @@ owner: ae-fintech@quintoandar.com.br
 columns:
   sk_transaction:
     lineage:
-    - datalake_velo.transaction_entries.id_trasaction
+    - datalake_velo.transaction_entries.id_transaction
     description: Transaction ID
   project:
     lineage:

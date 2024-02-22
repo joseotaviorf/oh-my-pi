@@ -1,5 +1,5 @@
 SELECT
-    id_trasaction AS sk_transaction,
+    id_transaction AS sk_transaction,
     project,
     status,
     transaction_type,

@@ -12,14 +12,19 @@ workflow:
   layer: raw
   database_type: postgres
   lineage_product_database_name: linhadireta
+  dbutils_secret_key: ENV_LINHADIRETA
   tables_customization:
-    chat_users:
+    Chat_users:
+      clean_table_name: chat_users
       extraction_type: full
-    chat:
+    Chat:
+      clean_table_name: chat
       extraction_type: full
-    user_chats:
+    User_chats:
+      clean_table_name: user_chats
       extraction_type: full
-    user:
+    User:
+      clean_table_name: user
       extraction_type: full
 cluster:
   type: databricks_10_4_med_general_cluster
