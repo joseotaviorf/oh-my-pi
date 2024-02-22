@@ -19,21 +19,20 @@ WITH base_tickets AS (
   LEFT JOIN
     dw_customer_support.dim_department AS dd
       ON ft.sk_main_department = dd.sk_department
-  LEFT JOIN
-    dw_customer_support.dim_channel AS dc
-      ON ft.sk_channel = dc.sk_channel
   WHERE
     ft.is_ticket_rate = TRUE
-  GROUP BY
-    1, 2, 3, 4, 5, 6, 7, 8, 9
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 missing_tickets AS (
   SELECT
     DATE(ft.ts_solved) AS dt_started,
     dd.front_or_back AS ticket_type,
-    COUNT(DISTINCT sk_ticket) AS missing_theme_tickets
+    COUNT(DISTINCT ft.sk_ticket) AS missing_theme_tickets
   FROM
     dw_customer_support.fact_ticket AS ft
+  JOIN  -- temporary join
+    datalake_customer_support.unified_tickets AS ut
+      ON ut.id_ticket = ft.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_department AS dd
       ON ft.sk_main_department = dd.sk_department
@@ -44,10 +43,29 @@ missing_tickets AS (
     dw_customer_support.dim_channel AS dc
       ON ft.sk_channel = dc.sk_channel
   WHERE
-    ft.is_ticket_rate = TRUE
-    AND dt.theme_detail IS NULL
-  GROUP BY
-    1, 2
+    dt.theme_detail IS NULL
+    AND (
+      ft.channel IN ('call', 'chat') AND ft.front_or_back = 'front'
+      OR ft.channel = 'email' AND ft.front_or_back IN ('back', 'front')
+    )
+    AND ft.ts_solved >= '2022-01-01'
+    AND dd.team <> 'Ong Back'
+    AND dd.area = 'CX'
+    AND ft.main_department NOT IN
+      ('Rescisão por Inadimplência [OFF][POS][BACK]',
+        'Offboarding Reparos [OFF] [POS] [BACK]',
+        'Offboarding pré saída [OFF] [POS] [BACK]',
+        'Proteção QuintoAndar [OFF] [POS] [BACK]',
+        'Rescisão - Despejo [OFF][POS][BACK]',
+        'Rescisão 1 [OFF] [POS] [BACK]'
+      )
+    AND (ft.channel <> 'call'
+      OR (ft.channel = 'call'
+        AND dc.direction IN ('inbound', 'outbound-api')
+        OR ut.channel_type = 'call-in-app'  -- to adjust
+      )
+    )
+  GROUP BY 1, 2
 ),
 abandoned_calls AS (
   SELECT
@@ -59,16 +77,12 @@ abandoned_calls AS (
   LEFT JOIN
     dw_customer_support.dim_department AS dd
       ON frc.sk_department = dd.sk_department
-  LEFT JOIN
-    dw_customer_support.dim_taxonomy AS dt
-      ON dt.sk_taxonomy = frc.sk_taxonomy
   WHERE
     dd.front_or_back = 'front'
     AND dd.area = 'CX'
     AND frc.is_answered = false
     AND frc.channel = 'call'
-  GROUP BY
-    1, 2
+  GROUP BY 1, 2
 ),
 base_themes AS (
   SELECT

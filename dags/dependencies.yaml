@@ -2898,6 +2898,7 @@ bietlejuice.metric_rent__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
 bietlejuice.metric_rent_benvi__supply:
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel
