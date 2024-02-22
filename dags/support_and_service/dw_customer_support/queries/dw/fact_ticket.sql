@@ -43,8 +43,7 @@ missing_theme_tickets AS (
       )
     AND (channel <> 'call'
       OR (channel = 'call'
-        AND direction IN ('inbound', 'outbound-api')
-        OR channel_type = 'call-in-app'
+        AND ticket_origin IN ('call inapp', 'call inbound')
       )
     )
   GROUP BY 1, 3

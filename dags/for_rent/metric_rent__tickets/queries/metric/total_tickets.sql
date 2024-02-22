@@ -30,9 +30,6 @@ missing_tickets AS (
     COUNT(DISTINCT ft.sk_ticket) AS missing_theme_tickets
   FROM
     dw_customer_support.fact_ticket AS ft
-  JOIN  -- temporary join
-    datalake_customer_support.unified_tickets AS ut
-      ON ut.id_ticket = ft.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_department AS dd
       ON ft.sk_main_department = dd.sk_department
@@ -61,8 +58,7 @@ missing_tickets AS (
       )
     AND (ft.channel <> 'call'
       OR (ft.channel = 'call'
-        AND dc.direction IN ('inbound', 'outbound-api')
-        OR ut.channel_type = 'call-in-app'  -- to adjust
+        AND ft.ticket_origin IN ('call inapp', 'call inbound')
       )
     )
   GROUP BY 1, 2

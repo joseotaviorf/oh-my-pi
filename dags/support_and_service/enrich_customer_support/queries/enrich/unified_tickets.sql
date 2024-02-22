@@ -55,10 +55,7 @@ WITH call_tickets AS (
         'Rescisão - Despejo [OFF][POS][BACK]',
         'Rescisão 1 [OFF] [POS] [BACK]'
       )
-      AND (
-        direction IN ('inbound', 'outbound-api')
-        OR channel_type = 'call-in-app'
-      ),
+      AND ticket_origin IN ('call inapp', 'call inbound'),
       TRUE,
       FALSE
     ) AS is_ticket_rate,
