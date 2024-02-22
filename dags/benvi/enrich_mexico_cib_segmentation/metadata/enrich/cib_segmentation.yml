@@ -11,17 +11,17 @@ columns:
       - datalake_big_agent.agent.details
     description: ID of the CIB, from EBDB. It's the user external ID from Big Agent.
   id_segmentation:
+    lineage:
+      - datalake_gsheets_clean.mexico_cib_segmentation_rules_segmentation_variables.id_segmentation
     description: ID of the segmentation that CIB fits into, in the corresponding month (dt_month_started_segmentation), according to the stipulated rules.
   type_calculation:
     description: The type of calculation used in the segmentation rule to obtain CIB segmentation.
     categories:
       AVG: 'The calculation is the average occurrence of the event.'
   segmentation:
+    lineage:
+      - datalake_gsheets_clean.mexico_cib_segmentation_rules_segmentation_variables.name_segmentation
     description: The segmentation that CIB fits into, in the corresponding month (dt_month_started_segmentation), according to the stipulated rules.
-    categories:
-      Elite: 'CIB that had an average of 5 or more FL and an average of 1 or more CS in the period analyzed for calculation.'
-      Plus: 'CIB that had an average FL greater than 1 in the period analyzed for calculation. Or also the CIB that has been registered for 2 months or less.'
-      Inter: 'CIB that had an average FL less than or equal to 1 in the period analyzed for calculation.'
   first_listings:
     lineage:
       - datalake_mexico_cib_events.cib_events.event_type

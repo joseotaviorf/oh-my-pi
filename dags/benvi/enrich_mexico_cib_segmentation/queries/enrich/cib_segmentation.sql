@@ -10,23 +10,72 @@ WITH dim_cib AS (
     WHERE
         u.country_code = 'MX'
 ),
+last_rule_global_variables AS (
+    SELECT
+        MAX(dt_modification) AS dt_last_modification
+    FROM
+        datalake_gsheets_clean.mexico_cib_segmentation_rules_global_variables
+    WHERE
+        dt_modification <= MAKE_DATE({year},{month},{day}) + INTERVAL 1 DAY
+),
+global_variables AS (
+    SELECT
+        g.shorter_months_calculation,
+        g.longer_months_calculation,
+        g.dt_modification AS dt_last_modification
+    FROM
+        datalake_gsheets_clean.mexico_cib_segmentation_rules_global_variables AS g
+    INNER JOIN
+        last_rule_global_variables AS lr
+            ON lr.dt_last_modification = g.dt_modification
+),
+last_rule_segmentation_variables AS (
+    SELECT
+        MAX(dt_modification) AS dt_last_modification
+    FROM
+        datalake_gsheets_clean.mexico_cib_segmentation_rules_segmentation_variables
+    WHERE
+        dt_modification <= MAKE_DATE({year},{month},{day}) + INTERVAL 1 DAY
+),
+segmentation_variables AS (
+    SELECT
+        g.id_segmentation,
+        g.name_segmentation,
+        g.min_months_registered,
+        g.max_months_registered,
+        g.min_fl,
+        g.max_fl,
+        g.min_cs,
+        g.max_cs,
+        g.dt_modification AS dt_last_modification
+    FROM
+        datalake_gsheets_clean.mexico_cib_segmentation_rules_segmentation_variables AS g
+    INNER JOIN
+        last_rule_segmentation_variables AS lr
+            ON lr.dt_last_modification = g.dt_modification
+),
 base_months_since_registration AS (
     SELECT DISTINCT
         dc.id_user,
         dc.dt_registered,
         ROUND(MONTHS_BETWEEN(ad.month_end, dc.dt_registered), 1) AS months_registered,
-        ADD_MONTHS(ad.month_start, 1) AS dt_month_started_segmentation,
+        (ad.month_end + INTERVAL 1 DAY) AS dt_month_started_segmentation,
         GREATEST(ad.month_start, dc.dt_registered) AS dt_started,
-        ad.month_end AS dt_ended
+        ad.month_end AS dt_ended,
+        gv.shorter_months_calculation,
+        gv.longer_months_calculation
     FROM
         datalake_quintoandar.aux_date AS ad
     INNER JOIN
         dim_cib AS dc
             ON ad.month_start >= DATE_TRUNC('month' , dt_registered)
             AND ad.month_start <= MAKE_DATE({year}, {month}, 01)
+    INNER JOIN
+        global_variables AS gv
+            ON (ad.month_end + INTERVAL 1 DAY) >= ADD_MONTHS(gv.dt_last_modification, -(gv.longer_months_calculation-1))
     WHERE
         dc.id_user IS NOT NULL
-        AND ad.month_start >= GREATEST(ADD_MONTHS(MAKE_DATE({year}, {month}, 01), -1), DATE_TRUNC('month', dt_registered))
+        AND ad.month_start >= GREATEST(ADD_MONTHS(MAKE_DATE({year}, {month}, 01), -(gv.longer_months_calculation-1)), DATE_TRUNC('month', dt_registered))
 ),
 events_by_month AS (
     SELECT
@@ -43,24 +92,40 @@ events_by_month AS (
     GROUP BY
         1, 4
 ),
+avg_calculation_shorter_months AS (
+    SELECT
+        ebm.id_user,
+        AVG(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY ebm.id_user) AS avg_fl,
+        AVG(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY ebm.id_user) AS avg_cs,
+        ebm.dt_started
+    FROM
+        base_months_since_registration AS bmsr
+    INNER JOIN
+        events_by_month AS ebm
+            ON ebm.id_user = bmsr.id_user
+            AND ebm.dt_started = bmsr.dt_started
+    WHERE
+        bmsr.months_registered <= bmsr.longer_months_calculation
+        AND ebm.dt_started >= ADD_MONTHS(MAKE_DATE({year}, {month}, 01), -(bmsr.shorter_months_calculation-1))
+),
 segmentation_rule_calculation AS (
     SELECT
         bmsr.id_user AS id_cib,
         'AVG' AS type_calculation,
         IF(
-            bmsr.months_registered <= 2,
-            AVG(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY bmsr.id_user ORDER BY bmsr.dt_started ASC ROWS BETWEEN 0 PRECEDING AND CURRENT ROW),
-            AVG(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY bmsr.id_user ORDER BY bmsr.dt_started ASC ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)
+            bmsr.months_registered <= bmsr.longer_months_calculation,
+            acsm.avg_fl,
+            AVG(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY bmsr.id_user)
         ) AS avg_fl,
         IF(
-            bmsr.months_registered <= 2,
-            AVG(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY bmsr.id_user ORDER BY bmsr.dt_started ASC ROWS BETWEEN 0 PRECEDING AND CURRENT ROW),
-            AVG(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY bmsr.id_user ORDER BY bmsr.dt_started ASC ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)
+            bmsr.months_registered <= bmsr.longer_months_calculation,
+            acsm.avg_cs,
+            AVG(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY bmsr.id_user)
         ) AS avg_cs,
         bmsr.months_registered,
-        IF(months_registered <= 2, 1, 2) AS months_calculation,
+        IF(months_registered <= bmsr.longer_months_calculation, bmsr.shorter_months_calculation, bmsr.longer_months_calculation) AS months_calculation,
         bmsr.dt_month_started_segmentation,
-        IF(months_registered <= 2, bmsr.dt_started, GREATEST(ADD_MONTHS(bmsr.dt_started, -1), bmsr.dt_registered)) AS dt_started,
+        IF(months_registered <= bmsr.longer_months_calculation, bmsr.dt_started, GREATEST(ADD_MONTHS(bmsr.dt_started, -((bmsr.longer_months_calculation)-1)), bmsr.dt_registered)) AS dt_started,
         bmsr.dt_ended,
         YEAR(dt_month_started_segmentation) AS year,
         MONTH(dt_month_started_segmentation) AS month
@@ -70,28 +135,16 @@ segmentation_rule_calculation AS (
         events_by_month AS ebm
             ON ebm.id_user = bmsr.id_user
             AND ebm.dt_started = bmsr.dt_started
+    LEFT JOIN
+        avg_calculation_shorter_months AS acsm
+            ON acsm.id_user = bmsr.id_user
+            AND acsm.dt_started = bmsr.dt_started
 )
 SELECT
     id_cib,
-    CASE
-        WHEN months_registered <= 2 THEN 1
-        ELSE
-          CASE
-            WHEN avg_fl >= 5 AND avg_cs >= 1 THEN 2
-            WHEN avg_fl > 1 THEN 1
-            ELSE 0
-          END
-    END AS id_segmentation,
+    sv.id_segmentation,
     type_calculation,
-    CASE
-        WHEN months_registered <= 2 THEN 'Plus'
-        ELSE
-          CASE
-            WHEN avg_fl >= 5 AND avg_cs >= 1 THEN 'Elite'
-            WHEN avg_fl > 1 THEN 'Plus'
-            ELSE 'Inter'
-          END
-    END AS segmentation,
+    sv.name_segmentation AS segmentation,
     avg_fl AS first_listings,
     avg_cs AS contracts_signed,
     months_registered,
@@ -102,6 +155,17 @@ SELECT
     year,
     month
 FROM
-    segmentation_rule_calculation
+    segmentation_rule_calculation AS src
+INNER JOIN
+    segmentation_variables AS sv
+        ON src.dt_month_started_segmentation >= sv.dt_last_modification
+        AND months_registered >= sv.min_months_registered
+        AND months_registered <= sv.max_months_registered
+        AND avg_fl >= sv.min_fl
+        AND avg_fl <= sv.max_fl
+        AND avg_cs >= sv.min_cs
+        AND avg_cs <= sv.max_cs
 WHERE
     dt_month_started_segmentation = MAKE_DATE({year},{month},{day}) + INTERVAL 1 DAY
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_cib, dt_month_started_segmentation ORDER BY sv.id_segmentation DESC) = 1

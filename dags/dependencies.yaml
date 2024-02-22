@@ -1829,6 +1829,8 @@ bietlejuice.enrich_mexico_cib_segmentation:
   - bietlejuice.enrich_big_agent:load-enrich-agent
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_mexico_cib_events:load-enrich-cib-events
+  - bietlejuice.gsheets_benvi:done-clean-mexico-cib-segmentation-rules-global-variables
+  - bietlejuice.gsheets_benvi:done-clean-mexico-cib-segmentation-rules-segmentation-variables
 bietlejuice.enrich_mexico_consolidated_marketing_metrics:
   - bietlejuice.enrich_mexico_google_ads:load-enrich-ads-performance
   - bietlejuice.enrich_mexico_google_ads:load-enrich-campaigns-performance
