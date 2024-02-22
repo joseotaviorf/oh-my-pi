@@ -111,6 +111,14 @@ customers_info AS (
             AND (b.dt_event + INTERVAL '30' day)
     WHERE
         b.sk_user IS NOT NULL
+),
+previous_sent_id_drivers AS (
+  SELECT id_driver
+    FROM customers_info
+    WHERE (
+        ((payment_method IS NULL OR payment_method LIKE 'FINANCED%') AND ts_house_registry_ended IS NOT NULL AND DATE_ADD(dt_event, 114) <= CAST(ts_house_registry_ended AS TIMESTAMP))
+        OR ((payment_method IS NULL OR payment_method LIKE 'CASH%') AND ts_house_registry_ended IS NOT NULL AND DATE_ADD(dt_event, 45) <= CAST(ts_house_registry_ended AS TIMESTAMP))
+      )
 )
 SELECT
     customer_name,
@@ -127,6 +135,7 @@ SELECT
 FROM
     customers_info
 WHERE
-  (ts_house_registry_ended IS NOT NULL AND DATEDIFF(CURRENT_DATE, ts_house_registry_ended) = 2)
+  ((ts_house_registry_ended IS NOT NULL AND DATEDIFF(CURRENT_DATE, ts_house_registry_ended) = 2)
   OR ((payment_method IS NULL OR payment_method LIKE 'FINANCED%') AND ts_house_registry_ended IS NULL AND DATEDIFF(CURRENT_DATE, dt_event) = 114)
-  OR (payment_method LIKE 'CASH%' AND ts_house_registry_ended IS NULL AND DATEDIFF(CURRENT_DATE, dt_event) = 45)
+  OR (payment_method LIKE 'CASH%' AND ts_house_registry_ended IS NULL AND DATEDIFF(CURRENT_DATE, dt_event) = 45))
+  AND id_driver NOT IN (SELECT id_driver FROM previous_sent_id_drivers)
