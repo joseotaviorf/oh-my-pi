@@ -1,44 +1,27 @@
 SELECT DISTINCT
-    ljs.id_snapshot,
-    ljs.id_owner AS id_user,
-    u.id_country,
+    id_snapshot,
+    id_owner AS id_user,
     'landlord' AS client_type,
-    COALESCE(ct.code, 'Undefined') AS country_code,
-    u.main_phone,
-    u.name,
-    u.email,
-    u.cpf,
-    ljs.journey_step,
-    ljs.persona_step,
-    ljs.total_houses,
-    ljs.ongoing_houses,
-    u.is_active,
-    u.is_blocked,
-    ljs.is_offboarding,
-    ljs.is_ongoing,
-    ljs.is_onboarding,
-    ljs.is_contract_to_entrance,
-    ljs.is_visits_to_offer,
-    ljs.is_listing_and_search,
-    ljs.is_pre_contract,
-    ljs.is_post_contract,
-    ljs.is_pp_multi,
-    ljs.ongoing_houses >= 5 OR ljs.is_pp_multi AS is_pp_multi_5_more_ongoing_houses,
-    DATE(u.dt_birth) AS dt_birth,
-    u.ts_created AS ts_user_created,
-    u.ts_updated AS ts_user_updated,
+    journey_step,
+    persona_step,
+    total_houses,
+    ongoing_houses,
+    is_offboarding,
+    is_ongoing,
+    is_onboarding,
+    is_contract_to_entrance,
+    is_visits_to_offer,
+    is_listing_and_search,
+    is_pre_contract,
+    is_post_contract,
+    is_pp_multi,
+    ongoing_houses >= 5 OR is_pp_multi AS is_pp_multi_5_more_ongoing_houses,
     {year} AS year,
     {month} AS month,
     {day} AS day
 FROM
-    datalake_landlord_journey.landlord_journey_step AS ljs
-LEFT JOIN
-    datalake_ebdb_clean.user AS u
-        ON ljs.id_owner = u.id
-LEFT JOIN
-    datalake_ebdb_clean.country AS ct
-        ON ct.id = u.id_country
+    datalake_landlord_journey.landlord_journey_step
 WHERE
-  ljs.year = {year}
-  AND ljs.month = {month}
-  AND ljs.day = {day}
+  year = {year}
+  AND month = {month}
+  AND day = {day}

@@ -12,4 +12,19 @@ inner_dependencies:
     - photographer_user
     - landlord
 
-partition_cols: [country_code, year, month, day]
+tables:
+  broker_user:
+    partition_cols: [year, month, day]
+    has_hive_sync: False
+  photographer_user:
+    partition_cols: [year, month, day]
+    has_hive_sync: False
+  landlord:
+    partition_cols: [year, month, day]
+    has_hive_sync: False
+  tenant_user:
+    partition_cols: [year, month, day]
+    has_hive_sync: False
+  persona_type:
+    partition_cols: [client_type, year, month, day]
+    has_hive_sync: True

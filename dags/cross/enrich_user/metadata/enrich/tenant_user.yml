@@ -17,32 +17,8 @@ columns:
     description:
       The client id, which is the user id that has searched a house in the amplitude
       events or the tenant prospect id that has an event in the rent demand funnel
-  id_country:
-    lineage:
-      - datalake_ebdb_clean.user.id_country
-    description: The user country id.
   client_type:
     description: Client type defined as tenant.
-  country_code:
-    lineage:
-      - datalake_ebdb_clean.country.country_code
-    description: Country code of the user. Also, a partition of this table.
-  main_phone:
-    lineage:
-      - datalake_ebdb_clean.user.main_phone
-    description: The user main_phone.
-  name:
-    lineage:
-      - datalake_ebdb_clean.user.name
-    description: The user full_name.
-  email:
-    lineage:
-      - datalake_ebdb_clean.user.email
-    description: The user email.
-  cpf:
-    lineage:
-      - datalake_ebdb_clean.user.cpf
-    description: The user individual brazilian registry.
   journey_step:
     lineage:
       - datalake_tenant_journey.tenant_journey_step.journey_step
@@ -87,14 +63,6 @@ columns:
         If the user has taken any step in offboarding, ongoing, or onboarding, it
         indicates that the user is in a post-contract step
       Not_Apply: If the user is not in the pre or post contract steps
-  is_active:
-    lineage:
-      - datalake_ebdb_clean.user.is_active
-    description: If the user is active or not.
-  is_blocked:
-    lineage:
-      - datalake_ebdb_clean.user.is_blocked
-    description: If the user is blocked or not.
   is_offboarding:
     lineage:
       - datalake_tenant_journey.tenant_journey_step.is_offboarding
@@ -151,18 +119,6 @@ columns:
     description:
       If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
       that the user is in a post-contract step
-  dt_birth:
-    lineage:
-      - datalake_ebdb_clean.user.dt_birth
-    description: The user birth date.
-  ts_user_created:
-    lineage:
-      - datalake_ebdb_clean.user.ts_created
-    description: The user creation date in the system.
-  ts_user_updated:
-    lineage:
-      - datalake_ebdb_clean.user.ts_updated
-    description: The user last updated date in the system.
   year:
     lineage:
       - datalake_tenant_journey.tenant_journey_step.year

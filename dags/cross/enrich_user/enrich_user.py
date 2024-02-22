@@ -49,7 +49,7 @@ default_libraries = config_service.get_config("default_libraries")
 inner_dependencies = config_service.get_config("inner_dependencies")
 
 dag_documentation = config_service.get_config("dag_documentation")
-partition_cols = config_service.get_config("partition_cols")
+tables = config_service.get_config("tables")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -91,15 +91,14 @@ datalake_task_group = DatalakeTaskGroup(
 
 enrich_task_groups = {}
 
-tables = datalake_task_group._get_table_names_from_sql_files(layer=LayerEnum.ENRICH)
-
-for table_name in tables:
+for table_name, table_details in tables.items():
     enrich_task_groups[table_name] = datalake_task_group.build_enrich_task_group(
         table_name=table_name,
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         is_incremental=True,
-        partitions=partition_cols,
+        partitions=table_details["partition_cols"],
+        has_hive_sync=table_details["has_hive_sync"]
     )
 
 (

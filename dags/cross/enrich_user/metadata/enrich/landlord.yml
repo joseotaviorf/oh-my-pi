@@ -9,34 +9,10 @@ columns:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"
   id_user:
     lineage:
-      - datalake_ebdb_clean.user.id
-    description: The user id in the main.
-  id_country:
-    lineage:
-      - datalake_ebdb_clean.user.id_country
-    description: The user country id.
+      - datalake_landlord_journey.landlord_journey_step.id_owner
+    description: The user id in Main/EBDB.
   client_type:
     description: Client type defined as property owner.
-  country_code:
-    lineage:
-      - datalake_ebdb_clean.country.country_code
-    description: Country code of the user. Also, a partition of this table.
-  main_phone:
-    lineage:
-      - datalake_ebdb_clean.user.main_phone
-    description: The user main_phone.
-  name:
-    lineage:
-      - datalake_ebdb_clean.user.name
-    description: The user full_name.
-  email:
-    lineage:
-      - datalake_ebdb_clean.user.email
-    description: The user email.
-  cpf:
-    lineage:
-      - datalake_ebdb_clean.user.cpf
-    description: The user individual brazilian registry.
   journey_step:
     lineage:
       - datalake_landlord_journey.landlord_journey_step.journey_step
@@ -82,22 +58,13 @@ columns:
   total_houses:
     lineage:
       - datalake_landlord_journey.landlord_journey_step.total_houses
-    description:
-      Number of houses the owner had in a reference date (id_snapshot or year, month and day column)
+    description: Number of houses the owner had in a reference date (id_snapshot or year, month and day column)
   ongoing_houses:
     lineage:
       - datalake_landlord_journey.landlord_journey_step.ongoing_houses
     description:
       Number of houses the owner had in a reference date (id_snapshot or year, month and day column)
       that were in published, rented or suspended status.
-  is_active:
-    lineage:
-      - datalake_ebdb_clean.user.is_active
-    description: If the user is active or not.
-  is_blocked:
-    lineage:
-      - datalake_ebdb_clean.user.is_blocked
-    description: If the user is blocked or not.
   is_pp_multi:
     lineage:
       - datalake_landlord_journey.landlord_journey_step.is_pp_multi
@@ -159,20 +126,7 @@ columns:
       If the user has taken any step in offboarding, ongoing, or onboarding, it indicates
       that the user is in a post-contract step
   is_pp_multi_5_more_ongoing_houses:
-    description:
-      If the user is a PP Multi or has 5 or more ongoing houses.
-  dt_birth:
-    lineage:
-      - datalake_ebdb_clean.user.dt_birth
-    description: The user birth date.
-  ts_user_created:
-    lineage:
-      - datalake_ebdb_clean.user.ts_created
-    description: The user creation date in the system.
-  ts_user_updated:
-    lineage:
-      - datalake_ebdb_clean.user.ts_updated
-    description: The user last updated date in the system.
+    description: If the user is a PP Multi or has 5 or more ongoing houses.
   year:
     description: Snapshot year, partition column.
   month:
