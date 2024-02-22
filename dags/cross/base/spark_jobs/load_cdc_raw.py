@@ -3,6 +3,9 @@ from argparse import ArgumentParser
 from bietlejuice.base.cdc.primary_key_identifiers.mysql_primary_key_identifier import (
     MySqlPrimaryKeyIdentifier,
 )
+from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
+    MySqlCdcSchemaFinder,
+)
 from quintoandar_logger import QuintoAndarLogger
 
 from delta.tables import DeltaTable
@@ -158,7 +161,9 @@ def main():
     else:
         # Hardcoded for now, while we don't have other sources such as Postgres
         pk_identifier = MySqlPrimaryKeyIdentifier(
-            f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/"
+            MySqlCdcSchemaFinder(
+                f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/"
+            )
         )
         primary_keys = pk_identifier.find_primary_keys(source_schema, table_name)
 

@@ -2,6 +2,12 @@ import logging
 import json
 from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
+    MySqlCdcSchemaFinder,
+)
+from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_treatment import (
+    MySqlCdcSchemaTreatment,
+)
 
 from pyspark.sql.functions import col, from_unixtime, lit, make_date
 
@@ -11,6 +17,7 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
+
 
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
@@ -48,7 +55,9 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
     )
 
 
-def get_incoming_data(incoming_bucket, environment, schema, table_name, start_date, end_date):
+def get_incoming_data(
+    incoming_bucket, environment, schema, table_name, start_date, end_date
+):
     """
     Reads incoming data as a DataFrame
 
@@ -70,7 +79,11 @@ def get_incoming_data(incoming_bucket, environment, schema, table_name, start_da
     df = (
         spark.read.option("compression", "gzip")
         .json(path)
-        .filter(make_date(col("year"), col("month"), col("day")).between(start_date, end_date))
+        .filter(
+            make_date(col("year"), col("month"), col("day")).between(
+                start_date, end_date
+            )
+        )
     )
 
     return df
@@ -89,17 +102,11 @@ def format_and_deduplicate_df(df, partitions):
         f"m=format_incoming_df, msg=Transforming Debezium payload into Transactional layer table..."
     )
     df_without_delete_op = df.filter(df.op != lit("d")).select(
-        col("after").alias("data"),
-        "op",
-        "ts_ms",
-        *partitions,
+        col("after").alias("data"), "op", "ts_ms", *partitions
     )
 
     df_deletes = df.filter(df.op == lit("d")).select(
-        col("before").alias("data"),
-        "op",
-        "ts_ms",
-        *partitions,
+        col("before").alias("data"), "op", "ts_ms", *partitions
     )
 
     if df_without_delete_op.isEmpty():
@@ -146,7 +153,6 @@ def main():
         """
     )
 
-
     df = get_incoming_data(
         incoming_bucket, environment, source_schema, table_name, start_date, end_date
     )
@@ -160,6 +166,18 @@ def main():
         return
 
     transactional_df = format_and_deduplicate_df(df, partitions)
+
+    logger.info("m=__main__, msg=Applying schema pre treatment...")
+
+    # Hardcoded for now, while we don't have other sources such as Postgres
+    pre_treatment = MySqlCdcSchemaTreatment(
+        MySqlCdcSchemaFinder(
+            f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/"
+        )
+    )
+    transactional_df = pre_treatment.treat_dataframe(
+        source_schema, table_name, transactional_df
+    )
 
     logger.info("m=__main__, msg=Load table into transactional layer...")
     spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_cdc_{schema}_transactional`")
