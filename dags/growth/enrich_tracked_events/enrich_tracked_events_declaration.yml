@@ -1,0 +1,43 @@
+---
+dag:
+  name: enrich_tracked_events
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Prepare and make available event data with the correct attribution of touch-points.
+      [Here](https://docs.google.com/presentation/d/1hMn14Zbgp4ntAcpBDtXX97zWixefCpFBo5SdpH_234g/edit#slide=id.g124fe06d010_0_0) you can find more context about the project to reduce lost tracking metrics.
+    additional_information: |
+      - Offline Attribution Table
+      The offline assignment table aims to record the events that happen through Secretaria and CX offline touch-points and perform Booking assignment to the last offline touch-point.
+      It's basically composed of events from the old Casa Mineira CRM system, the new events from demand-contact-submission product, events from gsheets with historical data from plaquinhas `datalake_gsheets_clean.users_cx_plaquinhas`  and events from the CX team considering the filter by exclusive CX phones numbers for plaquinhas contacts.
+
+      - Attribution Cross Channel Table
+      The Attribution Cross table contains the correct attribution of the event (Booking and Offer) considering the 3 sources (amplitude (web), app and Offline).
+      It consolidates events from all channels by joining the online_attribution and offline_attribution tables. The final output is all of a user's touchpoints over time specifying the last touchpoints before conversion
+
+      ## Attention Points
+      * The final attribution orders the user's touchpoints and then get the attribution of the event immediately preceding the conversion event. If there is no event immediately preceding the conversion event, get the attribution of the conversion event;
+      * If there is more than 1 final attribution by id_offer/visit_code we consider the first one;
+      * We consider `visit_schedule_confirmed` attribution over `debug_visit_schedule_confirmed` one if they have the same visit_code because `debug_visit_schedule_confirmed` is a backend input.
+
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    offline_attribution:
+      - plaquinhas_offline_touchpoints
+      - secretaria_offline_touchpoints
+    cross_channel_full:
+      - offline_attribution
+    attribution_cross_channel:
+      - cross_channel_full
+  default_partitions: [year, month, day]
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12

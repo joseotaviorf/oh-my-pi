@@ -1,0 +1,20 @@
+---
+dag:
+  name: enrich_marketing_costs_offline
+  schedule_start_date: 2021, 3, 31
+  owner: Data Growth
+  documentation:
+    dag_purpose: This DAG enriches offline costs manually defined and ingested via gsheets.
+    additional_information: |
+      Currently, there are the following output tables in our enrich layer:
+        - offline_manual_costs
+        - offline-costs-and-budget
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    offline_costs_and_budget:
+      - offline_manual_costs
+  custom_schema: marketing_costs
+cluster:
+  type: databricks_10_4_min_general_photon_cluster

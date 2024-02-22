@@ -1,7 +1,7 @@
 database_name: datalake_bob
 table_name: house_draft_aud
 description: This table contains house draft audit information saved during the process of registering a house by a PP or IS teams.
-domain: For Rent
+domain: Growth
 owner: arthur.gonzaga@quintoandar.com.br
 columns:
   id_house_draft:
