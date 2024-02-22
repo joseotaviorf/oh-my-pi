@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: teste_123
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.teste_123.city_group
+  tier:
+    lineage:
+      - datalake_gsheets_raw.teste_123.tier
+  supply_origin:
+    lineage:
+      - datalake_gsheets_raw.teste_123.supply_origin
+  supply_channel:
+    lineage:
+      - datalake_gsheets_raw.teste_123.supply_channel
+  supply_medium:
+    lineage:
+      - datalake_gsheets_raw.teste_123.supply_medium
+  supply_source:
+    lineage:
+      - datalake_gsheets_raw.teste_123.supply_source
+  traffic:
+    lineage:
+      - datalake_gsheets_raw.teste_123.traffic
+  leads:
+    lineage:
+      - datalake_gsheets_raw.teste_123.leads
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.teste_123.date
+  dt_week:
+    lineage:
+      - datalake_gsheets_raw.teste_123.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.teste_123.month
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.teste_123.quarter
+  half_year:
+    lineage:
+      - datalake_gsheets_raw.teste_123.half_year
