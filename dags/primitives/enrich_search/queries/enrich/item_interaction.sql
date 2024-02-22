@@ -13,7 +13,7 @@ WITH visit_intent_clicked AS (
         events.year AS year,
         events.month AS month,
         events.day AS day,
-        COALESCE(events.id_user, events.id_amplitude) AS id_user,
+        COALESCE(events.id_user, events.id_device) AS id_user,
         LOWER(
             GET_JSON_OBJECT(
                 events.event_properties, '$.business_context'
@@ -51,7 +51,7 @@ WITH visit_intent_clicked AS (
         AND events.ts_event BETWEEN recommendation_catalog.ts_status_started
         AND recommendation_catalog.ts_status_ended
     QUALIFY ROW_NUMBER() OVER (PARTITION BY search.id_house,
-    COALESCE(events.id_user, events.id_amplitude)
+    COALESCE(events.id_user, events.id_device)
         ORDER BY search.ts_event DESC) = 1
 ),
 visitblock_alert_clicked AS (
@@ -68,7 +68,7 @@ visitblock_alert_clicked AS (
         events.year AS year,
         events.month AS month,
         events.day AS day,
-        COALESCE(events.id_user, events.id_amplitude) AS id_user,
+        COALESCE(events.id_user, events.id_device) AS id_user,
         LOWER(
             GET_JSON_OBJECT(
                 event_properties, '$.business_context'
@@ -105,7 +105,7 @@ visitblock_alert_clicked AS (
         AND GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
         AND events.ts_event BETWEEN recommendation_catalog.ts_status_started AND recommendation_catalog.ts_status_ended
     QUALIFY ROW_NUMBER() OVER (PARTITION BY search.id_house,
-    COALESCE(events.id_user, events.id_amplitude)
+    COALESCE(events.id_user, events.id_device)
         ORDER BY search.ts_event DESC) = 1
 ),
 listing_favorite_intent AS (
@@ -122,7 +122,7 @@ listing_favorite_intent AS (
         events.year AS year,
         events.month AS month,
         events.day AS day,
-        COALESCE(events.id_user, events.id_amplitude) AS id_user,
+        COALESCE(events.id_user, events.id_device) AS id_user,
         LOWER(
             GET_JSON_OBJECT(
                 event_properties, '$.business_context'
@@ -159,7 +159,7 @@ listing_favorite_intent AS (
         AND GET_JSON_OBJECT(event_properties, '$.business_context') IS NOT NULL
         AND events.ts_event BETWEEN recommendation_catalog.ts_status_started AND recommendation_catalog.ts_status_ended
     QUALIFY ROW_NUMBER() OVER (PARTITION BY search.id_house,
-    COALESCE(events.id_user, events.id_amplitude)
+    COALESCE(events.id_user, events.id_device)
         ORDER BY search.ts_event DESC) = 1
 ),
  share_listing AS (
@@ -176,7 +176,7 @@ listing_favorite_intent AS (
         events.year AS year,
         events.month AS month,
         events.day AS day,
-        COALESCE(events.id_user, events.id_amplitude) AS id_user,
+        COALESCE(events.id_user, events.id_device) AS id_user,
         LOWER(
             GET_JSON_OBJECT(
                 event_properties, '$.business_context'
@@ -214,7 +214,7 @@ listing_favorite_intent AS (
         AND events.ts_event BETWEEN recommendation_catalog.ts_status_started
         AND recommendation_catalog.ts_status_ended
     QUALIFY ROW_NUMBER() OVER (PARTITION BY search.id_house,
-    COALESCE(events.id_user, events.id_amplitude)
+    COALESCE(events.id_user, events.id_device)
         ORDER BY search.ts_event DESC) = 1
 ),
 visitblock_similares_clicked AS (
@@ -231,7 +231,7 @@ visitblock_similares_clicked AS (
         events.year AS year,
         events.month AS month,
         events.day AS day,
-        COALESCE(events.id_user, events.id_amplitude) AS id_user,
+        COALESCE(events.id_user, events.id_device) AS id_user,
         LOWER(
             GET_JSON_OBJECT(
                 event_properties, '$.business_context'
@@ -270,7 +270,7 @@ visitblock_similares_clicked AS (
         AND events.ts_event BETWEEN recommendation_catalog.ts_status_started
         AND recommendation_catalog.ts_status_ended
     QUALIFY ROW_NUMBER() OVER (PARTITION BY search.id_house,
-    COALESCE(events.id_user, events.id_amplitude)
+    COALESCE(events.id_user, events.id_device)
         ORDER BY search.ts_event DESC) = 1
 ),
 proper_offer AS (

@@ -5,13 +5,14 @@ dag:
 workflow:
   type: query
   layer: enrich
+  default_extraction_type: incremental
   extra_query_template_params:
-    start_date: MAKE_DATE({year}, {month}, {day})
-    end_date: "DATE_ADD(MAKE_DATE({year}, {month}, {day})), 1)"
-    days_past: 7
-    year:  "{year}"
-    month: "{month}"
-    day: "{day}"
+    "start_date": "{{ ds }}"
+    "end_date": "{{ tomorrow_ds }}"
+    "days_past": 7
+    "year":  "{year}"
+    "month": "{month}"
+    "day": "{day}"
   tables_customization:
     item_interaction:
       partitions:
@@ -21,3 +22,6 @@ workflow:
       - interaction_type
 cluster:
   type: databricks_10_4_med_memory_photon_cluster
+  access_control_list:
+      group_name: data-products
+      permission_level: CAN_MANAGE
