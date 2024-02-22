@@ -12,7 +12,4 @@ workflow:
     kpis_target:
       extraction_type: full
 cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: databricks_10_4_min_general_cluster
-    node_type_id: databricks_10_4_min_general_cluster
+  type: databricks_10_4_min_memory_photon_cluster
