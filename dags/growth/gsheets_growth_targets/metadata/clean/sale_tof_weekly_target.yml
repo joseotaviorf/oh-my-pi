@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: sale_tof_weekly_target
+columns:
+  behavior_type:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_target.behavior_type
+  campaign_strategy_intent:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_target.campaign_strategy_intent
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_target.city_group
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_target.week_start
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_target.funnel_side
+  medium:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_target.medium
+  tof_events:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_target.tof_events
+  tof_users:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_target.tof_users

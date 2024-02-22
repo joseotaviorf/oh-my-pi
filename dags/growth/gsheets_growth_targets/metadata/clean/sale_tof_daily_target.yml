@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: sale_tof_daily_target
+columns:
+  behavior_type:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_daily_target.behavior_type
+  campaign_strategy_intent:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_daily_target.campaign_strategy_intent
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_daily_target.city_group
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_daily_target.date
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_daily_target.funnel_side
+  medium:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_daily_target.medium
+  tof_events:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_daily_target.tof_events
+  tof_users:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_daily_target.tof_users

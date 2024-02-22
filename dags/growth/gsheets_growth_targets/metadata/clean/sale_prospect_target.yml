@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: sale_prospect_target
+columns:
+  behavior_type:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.behavior_type
+  campaign_strategy_intent:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.campaign_strategy_intent
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.city_group
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.date
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.funnel_side
+  medium:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.medium
+  nbp:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.nbp
+  operation_channel:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.operation_channel
+  referral_type:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.referral_type
+  rbp:
+    lineage:
+      - datalake_gsheets_raw.sale_prospect_target.rbp

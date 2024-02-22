@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: mkt_cost_target
+columns:
+  behavior_type:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_target.behavior_type
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_target.business_context
+  campaign_strategy_intent:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_target.campaign_strategy_intent
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_target.city_group
+  cost:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_target.cost
+  date:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_target.date
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_target.funnel_side
+  medium:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_target.medium
