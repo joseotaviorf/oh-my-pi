@@ -823,6 +823,9 @@ bietlejuice.reverse_inspections:
 bietlejuice.reverse_ccv_price_report_load:
   # We will remove these dependencies because we will only run this DAG once a month. So we don't want to trigger it every time these tables below are updated.
   override: []
+bietlejuice.reverse_dsat_report_access:
+  add:
+    - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
 bietlejuice.reverse_listings_report_access:
   add:
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
