@@ -25,7 +25,7 @@ DAG_NAME = f"enrich_mexico_marketing_automatic_daily_costs"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2022, 6, 1, tzinfo=timezone("America/Mexico_City"))
 MAIN_SCHEDULE_INTERVAL = None
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_photon_cluster"
+CLUSTER_DESCRIPTION = "databricks_10_4_med_general_photon_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
