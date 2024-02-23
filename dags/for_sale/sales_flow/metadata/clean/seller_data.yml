@@ -23,21 +23,9 @@ columns:
   holding_value:
     lineage:
       - datalake_sales_flow_raw.seller_data.holding_value
-  party_kind:
-    lineage:
-      - datalake_sales_flow_raw.seller_data.party_kind
-  is_on_register:
-    lineage:
-      - datalake_sales_flow_raw.seller_data.on_register
-  is_active:
-    lineage:
-      - datalake_sales_flow_raw.seller_data.active
   is_ccv_signer:
     lineage:
       - datalake_sales_flow_raw.seller_data.is_ccv_signer
-  is_pj:
-    lineage:
-      - datalake_sales_flow_raw.seller_data.is_pj
   ts_created:
     lineage:
       - datalake_sales_flow_raw.seller_data.created_at
