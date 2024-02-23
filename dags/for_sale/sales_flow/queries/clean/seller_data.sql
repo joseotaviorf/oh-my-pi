@@ -4,7 +4,7 @@ SELECT
     docx_folder_id AS id_docx_folder,
     name,
     email,
-    share_percentage,
+    CAST(share_percentage AS VARCHAR(10)) AS share_percentage,
     holding_value,
     is_ccv_signer,
     created_at AS ts_created,
