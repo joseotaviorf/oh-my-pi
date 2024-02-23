@@ -98,7 +98,7 @@ def _extract_table_from_database(
 
         _load_dataframe_in_datalake(
             df=df,
-            table_name=table_name,
+            table_name=table_name.lower(),
             is_incremental=True,
             force_recreate=False,
             **load_options,
@@ -106,7 +106,7 @@ def _extract_table_from_database(
 
         spark_metastore_service.create_new_partitions_from_df(
             database_name=databricks_database_name,
-            table_name=table_name,
+            table_name=table_name.lower(),
             df=df,
             partition_cols=partition_cols,
         )
@@ -114,7 +114,9 @@ def _extract_table_from_database(
         logger.info(f"m=_extract_table_from_database, msg=Performing full load...")
         df = mongo_consumer.get_data_from_table(table_name=table_name)
 
-        _load_dataframe_in_datalake(df=df, table_name=table_name)
+        _load_dataframe_in_datalake(
+            df=df, table_name=table_name.lower(), **load_options
+        )
 
 
 def parse_arguments() -> Namespace:

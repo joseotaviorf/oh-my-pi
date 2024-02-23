@@ -105,7 +105,7 @@ def main():
 
         IncrementalTableLoaderPipeline(
             database_name,
-            table_name,
+            table_name.lower(),
             database_location,
             LayerEnum.RAW,
             None,
@@ -114,7 +114,7 @@ def main():
     else:
         df = postgres_consumer.get_data_from_table(table_name)
         FullTableLoaderPipeline(
-            database_name, table_name, database_location, LayerEnum.RAW, None
+            database_name, table_name.lower(), database_location, LayerEnum.RAW, None
         ).load_and_register(df, format_options, **load_options)
 
 

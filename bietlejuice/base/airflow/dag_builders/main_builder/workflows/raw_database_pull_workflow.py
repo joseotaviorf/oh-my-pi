@@ -37,7 +37,9 @@ class RawDatabasePullWorkflow(BaseWorkflow):
                 dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
             )
             clean_initial_task, clean_final_task = self._create_clean_tasks(
-                table_name=table_parameters.get("clean_table_name", raw_table_name),
+                table_name=table_parameters.get(
+                    "clean_table_name", raw_table_name
+                ).lower(),
                 table_customization=table_parameters,
                 dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
             )
@@ -82,11 +84,17 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         and the last tasks of the dependency flow.
         """
         raw_table_attributes = TableAttributes(
-            self.dag_args, self.workflow_args, LayerEnum.RAW, table_name
+            self.dag_args,
+            self.workflow_args,
+            LayerEnum.RAW,
+            table_name.lower(),  # The table name must be lower case for most of the tasks, to avoid problems with Hive
         )
 
         load_raw_task = self.load_database_pull_raw_task_creator.create_task(
-            raw_table_attributes
+            TableAttributes.from_attributes(
+                raw_table_attributes,
+                table_name=table_name,  # The exception is the load task, which must have the original table name, for it to be found in the source database
+            )
         )
 
         sync_metastore_structure_raw_task = self.sync_hive_structure_task_creator.create_task(
