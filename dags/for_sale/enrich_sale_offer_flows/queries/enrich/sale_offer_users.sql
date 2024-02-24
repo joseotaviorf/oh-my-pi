@@ -169,11 +169,11 @@ seller_data AS (
         email,
         share_percentage,
         holding_value,
-        NULL AS party_kind,
-        NULL AS is_on_register,
-        NULL AS is_active,
+        CAST(NULL AS STRING) AS party_kind,
+        CAST(NULL AS STRING) AS is_on_register,
+        CAST(NULL AS STRING) AS is_active,
         is_ccv_signer,
-        NULL AS is_pj,
+        CAST(NULL AS STRING) AS is_pj,
         ts_created,
         ts_updated
     FROM
