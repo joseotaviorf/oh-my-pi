@@ -1,0 +1,39 @@
+---
+database_name: datalake_consolidated_growth_metrics
+table_name: criteo_consolidated_metrics
+owner: '@data-growth'
+domain: Growth
+description: Table that consolidates metrics extracted from criteo ads platform
+columns:
+  id_date:
+    description: Date segmentation
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.dt_attribution
+  campaign_name:
+    description: Name of campaign segmentation
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.campaign_name
+  account_name:
+    description: Accont name at criteo ads platform
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.advertiser_name
+  utm_campaign:
+    description: utm_campaign applied on growth marketing platform
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.campaign_name
+  other_cost:
+    description: Cost from any platform different from desktop or mobile
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.cost
+  total_cost:
+    description: Total cost
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.cost
+  clicks:
+    description: Clicks from criteo platform
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.clicks
+  impressions:
+    description: Impressions from criteo platform
+    lineage:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.impressions

@@ -1,0 +1,39 @@
+---
+database_name: datalake_consolidated_growth_metrics
+table_name: rtb_consolidated_metrics
+owner: '@data-growth'
+domain: Growth
+description: Table that consolidates metrics extracted from rtb platform
+columns:
+  id_date:
+    description: Date segmentation
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.dt_attribution
+  campaign_name:
+    description: Name of campaign segmentation
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name
+  account_name:
+    description: Accont name at rtb platform
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.account_name
+  utm_campaign:
+    description: utm_campaign applied on growth marketing platform
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name
+  other_cost:
+    description: Cost from any platform different from desktop or mobile
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.cost
+  total_cost:
+    description: Total cost
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.cost
+  impressions:
+    description: Impressions from facebook ads platform
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.impressions
+  clicks:
+    description: Clicks from facebook ads platform
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.clicks

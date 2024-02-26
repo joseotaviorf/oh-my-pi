@@ -1,0 +1,154 @@
+---
+database_name: datalake_consolidated_growth_metrics
+table_name: consolidated_media_metrics
+owner: cristina.cardoso@quintoandar.com.br
+domain: Growth
+description: Table that union costs extract from growth marketing platforms
+columns:
+  id_date:
+    description: Date segmentation
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.id_date
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.id_date
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.id_date
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.id_date
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.id_date
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.id_date
+  origin:
+    description: Marketing platform where data were extracted from
+  account_name:
+    description: Accont name segmentation
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.account_name
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.account_name
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.account_name
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.account_name
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.account_name
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.account_name
+  campaign_name:
+    description: Name of campaign segmentation
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.campaign_name
+  campaign_origin_acquisition:
+    description: mkt_origin which marketing campaign was intent to destiate effort
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.campaign_name
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.campaign_name
+    categories: 
+      Agents: ''
+      New Channels: ''
+      Other: ''
+      Doorman: ''
+  city_group:
+    description: City group segmentation
+    lineage:
+      - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
+      - datalake_region.region.city_group
+  report_type:
+    description: Type of report extracted from google ads platform
+    lineage:
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.report_type
+    categories: 
+      VIDEO_PERFORMANCE_REPORT: ''
+      CAMPAIGN_PERFORMANCE_REPORT: ''
+      AD_PERFORMANCE_REPORT: ''
+      KEYWORDS_PERFORMANCE_REPORT: ''
+  ad_type:
+    description: Type of ad report extracted from google ads platform. For other platforms, ad_type = other
+    lineage:
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.ad_type
+    categories: 
+      display_ad: ''
+      other: ''
+      dsa_ad: ''
+      resp_search_ad: ''
+      exp_text_ad: ''
+  utm_campaign:
+    description: utm_campaign applied on growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.utm_campaign
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.utm_campaign
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.utm_campaign
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.utm_campaign
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.utm_campaign
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.utm_campaign
+  utm_term:
+    description: utm_term applied on growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.utm_term
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.utm_term
+  utm_content:
+    description: utm_content applied on growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.utm_content
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.utm_content
+  desktop_cost:
+    description: Cost spent on desktop plataform
+    lineage:
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.desktop_cost
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.desktop_cost
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.desktop_cost
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.desktop_cost
+      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+  mobile_cost:
+    description: Cost spent on mobile plataform
+    lineage:
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.mobile_cost
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.mobile_cost
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.mobile_cost
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.mobile_cost
+      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+  other_cost:
+    description: Cost from any platform different from desktop or mobile
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.other_cost
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.other_cost
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.other_cost
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.other_cost
+      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+  total_cost:
+    description: Total cost
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.total_cost
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.total_cost
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.total_cost
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.total_cost
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.total_cost
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.total_cost
+      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+  impressions:
+    description: Impressions from growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.impressions
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.impressions
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.impressions
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.impressions
+      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+  clicks:
+    description: Clicks from growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.clicks
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.clicks
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.clicks
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.clicks
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.clicks
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.clicks
+      - datalake_marketing_costs_sharing_rules.sharing_rules.share
+  business_context:
+    description: To which business context (Rent or Sale) the metrics belongs to.
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.business_context
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.business_context
+      - datalake_consolidated_growth_metrics.google_consolidated_metrics.business_context
+      - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.business_context
+      - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.business_context
+      - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.business_context

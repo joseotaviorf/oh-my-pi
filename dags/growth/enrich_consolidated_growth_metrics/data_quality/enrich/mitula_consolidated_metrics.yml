@@ -1,0 +1,10 @@
+---
+table_name: datalake_consolidated_growth_metrics.mitula_consolidated_metrics
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_date:
+    is_complete:
+  campaign_name:
+    is_complete:
+  account_name:
+    is_complete:
