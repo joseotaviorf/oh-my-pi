@@ -1,0 +1,31 @@
+---
+database_name: datalake_growth_costs_sharing_rules
+table_name: sharing_rules
+domain: Growth
+owner: henrique.miamoto@quintoandar.com.br
+description: This table concat all share rules by date
+columns:
+  id_date:
+    description: Date segmentation
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.id_date
+  id_rule:
+    description: Id rule
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.id_rule
+  city_group:
+    description: city_group segmentation
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.city_group
+  share:
+    description: Percentage of cost that will be applied to specific city_group
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.share
+  funnel_side:
+    description: Marketplace side of business
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.funnel_side
+  business_context:
+    description: Business context of the rule.
+    lineage:
+      - datalake_growth_costs_sharing_rules.a002a.business_context
