@@ -94,19 +94,18 @@ for table in tables:
     table_name = table["table_name"]
     extraction_type = table["extraction_type"]
     clean_table_name = table.get("clean_table_name", table_name)
-    parameters = [SOURCE, table_name]
-    raw_spark_job_path = f"{s3_prefix}/spark_jobs/{CONTEXT}/load_{extraction_type}_mission_control_raw.py"
+    parameters = [SOURCE, table_name, extraction_type]
+    raw_spark_job_path = f"{s3_prefix}/spark_jobs/{CONTEXT}/load_mission_control_raw.py"
     is_incremental = table.get("extraction_type") == "incremental"
     partitions = partition_cols if is_incremental else None
-
-    if extraction_type == "incremental":
-        extended_parameters = [
-            json.dumps(partition_cols),
-            table["date_filter_column"],
-            "{{ ds }}",
-        ]
-        extended_parameters = list(filter(None, extended_parameters))
-        parameters.extend(extended_parameters)
+    
+    extended_parameters = [
+        json.dumps(partition_cols),
+        table["date_filter_column"],
+        "{{ ds }}",
+    ]
+    extended_parameters = list(filter(None, extended_parameters))
+    parameters.extend(extended_parameters)
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,

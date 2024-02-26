@@ -170,15 +170,3 @@ columns:
     description: Timestamp of when the period ended.
     lineage:
     - datalake_mission_control_raw.contract.end_period
-  year:
-    description: Year integer value of the record's update. Also it's a partition.
-    lineage:
-    - datalake_mission_control_raw.contract.year
-  month:
-    description: Month integer value of the record's update. Also it's a partition.
-    lineage:
-    - datalake_mission_control_raw.contract.month
-  day:
-    description: Day integer value of the record's update. Also it's a partition.
-    lineage:
-    - datalake_mission_control_raw.contract.day

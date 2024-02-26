@@ -1,12 +1,12 @@
 ---
 custom_cluster:
   driver_node_type_id: m5a.xlarge
-  node_type_id: m5a.large
+  node_type_id: m5a.xlarge
   num_workers: 2
 tables:
   - table_name: Contract
-    extraction_type: incremental
-    date_filter_column: updated_on
+    extraction_type: full
+    date_filter_column: created_on
     clean_table_name: contract
   - table_name: ContractPerson
     extraction_type: incremental

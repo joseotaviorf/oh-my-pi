@@ -39,13 +39,6 @@ SELECT
   last_sync AS ts_last_synced,
   start_charge AS ts_charge_started,
   start_period AS ts_period_started,
-  end_period AS ts_period_ended,
-  year,
-  month,
-  day
+  end_period AS ts_period_ended
 FROM
   datalake_mission_control_raw.contract
-WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}

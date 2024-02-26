@@ -5,11 +5,13 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import MySqlConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_mission_control_into_datalake"
@@ -23,6 +25,7 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("table_name")
+    parser.add_argument("extraction_type", type=str)
     parser.add_argument("partition_cols")
     parser.add_argument("date_filter_column", help="Date filter column")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
@@ -32,17 +35,26 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
+    extraction_type = args.extraction_type
     partition_cols = json.loads(args.partition_cols)
     date_filter_column = args.date_filter_column
     execution_date = args.execution_date
-
-    logger.info(
-        f"""
-                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-                table_name={table_name}, date_filter_column={date_filter_column}, execution_date={execution_date},
-                partition_cols={args.partition_cols} msg=Starting spark job...
-        """
-    )
+    
+    if extraction_type == "incremental":
+        logger.info(
+            f"""
+                    m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+                    table_name={table_name}, extraction_type={extraction_type}, date_filter_column={date_filter_column},
+                    execution_date={execution_date}, partition_cols={args.partition_cols} msg=Starting spark job...
+            """
+        )
+    else:
+        logger.info(
+            f"""
+                    m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+                    table_name={table_name}, extraction_type={extraction_type} msg=Starting spark job...
+            """
+        )
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -67,29 +79,30 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
-    df = mysql_consumer.get_incremental_data_from_table(
-        table_name=table_name,
-        date_filter_column=date_filter_column,
-        date_filter_value=execution_date,
-    )
-
-    if df:
-        # the table names in the datalake must be lowercase
-        s3_loader.load_df(
-            df=df,
-            s3_path=f"{database_location}{table_name.lower()}",
-            format_options=format_options,
-            database_location=database_location,
-            partitions=partition_cols,
+    if extraction_type == "incremental":
+        df = mysql_consumer.get_incremental_data_from_table(
+            table_name=table_name,
+            date_filter_column=date_filter_column,
+            date_filter_value=execution_date,
         )
-        spark_metastore_loader.update_metastore(
-            df,
-            database_name,
-            table_name.lower(),
-            format_options,
-            database_location,
-            partitions=partition_cols,
-        )
-    
+        if not df.rdd.isEmpty():
+            logger.info("m=__main__, msg=RDD is not empty. Loading into S3.")
+            IncrementalTableLoaderPipeline(
+                database_name,
+                table_name.lower(),
+                database_location,
+                LayerEnum.RAW,
+                None,
+                partition_cols,
+            ).load_and_register(df, format_options)
+        else:
+            logger.info("m=__main__, msg=RDD is empty")
     else:
-        logger.info(f"m=__main__, msg={table_name}'s dataframe is empty")
+        df = mysql_consumer.get_data_from_table(table_name)
+        if not df.rdd.isEmpty():
+            logger.info("m=__main__, msg=RDD is not empty. Loading into S3.")
+            FullTableLoaderPipeline(
+                database_name, table_name.lower(), database_location, LayerEnum.RAW, None
+            ).load_and_register(df, format_options)
+        else:
+            logger.info("m=__main__, msg=RDD is empty")
