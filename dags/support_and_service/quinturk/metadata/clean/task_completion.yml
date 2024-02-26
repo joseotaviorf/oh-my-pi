@@ -34,9 +34,9 @@ columns:
   is_ground_truth:
     lineage:
       - datalake_quinturk_raw.task_completion.ground_truth
-  was_canceled:
+  was_cancelled:
     lineage:
-      - datalake_quinturk_raw.task_completion.task_id
+      - datalake_quinturk_raw.task_completion.was_cancelled
   ts_created:
     lineage:
       - datalake_quinturk_raw.task_completion.created_at

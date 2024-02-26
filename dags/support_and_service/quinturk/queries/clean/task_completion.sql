@@ -10,7 +10,7 @@ SELECT
     result_count,
     last_action,
     ground_truth AS is_ground_truth,
-    was_canceled,
+    was_cancelled,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
