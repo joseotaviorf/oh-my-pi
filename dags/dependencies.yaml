@@ -419,7 +419,6 @@ bietlejuice.dw_datamarts_spark.growth_cross:
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-daily-targets
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-monthly-targets
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-weekly-targets
-  - bietlejuice.gsheets_for_sale:done-clean-secretariat-hierarchy
   - bietlejuice.gsheets_growth:done-clean-affiliates-extra-user-bonus
   - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.gsheets_growth:done-clean-ciq-costs
@@ -1052,7 +1051,6 @@ bietlejuice.enrich_booking:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.gsheets_for_sale:done-clean-secretariat-hierarchy
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature
@@ -2296,7 +2294,6 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
-  - bietlejuice.gsheets_for_sale:done-clean-secretariat-hierarchy
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.hub_services:load-clean-business-unit-aud
   - bietlejuice.hub_services:load-clean-lead

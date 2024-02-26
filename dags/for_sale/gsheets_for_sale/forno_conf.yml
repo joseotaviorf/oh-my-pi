@@ -167,12 +167,6 @@ sheets_info:
     clean_table_name: sale_tof_weekly_targets
     sheet_context: for_sale
 
-  secretariat_hierarchy:
-    sheet_id: 1JTWdWtoDrjoSD3pmf_-eks8ycXDN0V776jWegCw_M1M
-    sheet_name: secretariat_hierarchy
-    clean_table_name: secretariat_hierarchy
-    sheet_context: for_sale
-
   split_ciq_bh:
     sheet_id: 19ywiHG8h2xi2RFRiMuu7LFX8vOu32VH-0_nzQa6WnC8
     sheet_name: entries_import
