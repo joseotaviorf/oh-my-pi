@@ -47,4 +47,5 @@ if __name__ == "__main__":
     trino_client = get_trino_client()
     table_location = f"{spark_ms.database_location}/{table_name}".replace("s3://", "s3a://") # Required by Trino
 
+    trino_client.run(f"CREATE SCHEMA IF NOT EXISTS delta.{spark_ms.spark_database_name}")
     trino_client.register_table(schema_name=spark_ms.spark_database_name, table_name=table_name, table_location=table_location)
