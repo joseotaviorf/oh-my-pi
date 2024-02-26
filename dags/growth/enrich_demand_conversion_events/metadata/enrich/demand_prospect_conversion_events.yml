@@ -1,6 +1,6 @@
 ---
 database_name: datalake_demand_flows
-table_name: demand_prospect_conversion_events_staging
+table_name: demand_prospect_conversion_events
 owner: isabela.matsumoto@quintoandar.com.br
 domain: growth
 description: Each row of this table is a demand prospect conversion event (visit booked, offer submited or talk to agent) from both Rent and Sale busness contexts.
