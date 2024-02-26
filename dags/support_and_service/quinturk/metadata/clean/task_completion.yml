@@ -19,18 +19,18 @@ columns:
   id_last_created_by:
     lineage:
       - datalake_quinturk_raw.task_completion.last_created_by_id
-  pediction:
+  prediction:
     lineage:
-      - datalake_quinturk_raw.task_completion.task_id
+      - datalake_quinturk_raw.task_completion.prediction
   lead_time:
     lineage:
-      - datalake_quinturk_raw.task_completion.task_id
+      - datalake_quinturk_raw.task_completion.lead_time
   result_count:
     lineage:
-      - datalake_quinturk_raw.task_completion.task_id
+      - datalake_quinturk_raw.task_completion.result_count
   last_action:
     lineage:
-      - datalake_quinturk_raw.task_completion.task_id
+      - datalake_quinturk_raw.task_completion.last_action
   is_ground_truth:
     lineage:
       - datalake_quinturk_raw.task_completion.ground_truth

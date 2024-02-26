@@ -5,7 +5,7 @@ SELECT
     file_upload_id AS id_file_upload,
     inner_id AS id_inner,
     total_annotations,
-    canceled_annotations,
+    cancelled_annotations,
     total_predictions,
     overlap,
     data,

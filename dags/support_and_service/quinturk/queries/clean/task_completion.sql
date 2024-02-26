@@ -5,7 +5,7 @@ SELECT
     parent_prediction_id AS id_parent_prediction,
     completed_by_id AS id_completed_by,
     last_created_by_id AS id_last_created_by,
-    pediction,
+    prediction,
     lead_time,
     result_count,
     last_action,
