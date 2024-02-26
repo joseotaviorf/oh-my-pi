@@ -102,10 +102,6 @@ responsible AS (
         a1.date_contact,
         a1.id_responsible AS last_responsible_id,
         sh.id_user_5a AS last_secretariat_user,
-        UPPER(sh.secretariat_name) AS last_secretariat_name,
-        LOWER(sh.email) AS last_secretariat_email,
-        UPPER(sh.allocation) AS last_allocation,
-        UPPER(sh.manager) AS last_secretariat_manager,
         a2.ts_assigned AS ts_first_assignment,
         a1.ts_assigned AS ts_last_assignment
     FROM
@@ -118,9 +114,9 @@ responsible AS (
         hs_users AS u
             ON a1.id_responsible = u.id_user
     LEFT JOIN
-        datalake_gsheets_clean.secretariat_hierarchy AS sh
+        datalake_hub_services.secretariat_hierarchy AS sh
             ON u.id_external = sh.id_user_5a
-            AND sh.status = 'Ativo'
+            AND sh.is_active
     WHERE
         a1.last_assignment_marker = 1
 )

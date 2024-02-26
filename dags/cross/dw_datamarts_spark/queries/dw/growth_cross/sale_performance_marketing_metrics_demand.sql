@@ -5,7 +5,8 @@ WITH
 users_secretaria AS (
     SELECT
         id_user_5a::BIGINT AS id_user_attendence_5a
-    FROM datalake_gsheets_clean.secretariat_hierarchy
+    FROM
+        datalake_hub_services.secretariat_hierarchy
 ),
 buyer_prospect_status as (
     SELECT

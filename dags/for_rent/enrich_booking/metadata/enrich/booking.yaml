@@ -56,7 +56,7 @@ columns:
       and not by the visitor himself
   id_user_sale_attendence_5a:
     lineage:
-    - datalake_gsheets_clean.secretariat_hierarchy.id_user_5a
+    - datalake_hub_services.secretariat_hierarchy.id_user_5a
     description: User id of the secretary
   id_rent_flow:
     lineage:

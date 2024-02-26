@@ -288,14 +288,6 @@ booking_3p_demand_agent AS (
     WHERE
         is_3p_contract
 ),
-secretariat_users AS (
-    SELECT
-        id_user_5a
-    FROM
-        datalake_gsheets_clean.secretariat_hierarchy
-    GROUP BY
-        id_user_5a
-),
 base_booking AS (
     SELECT
         b.id,
@@ -557,7 +549,7 @@ base_booking AS (
         datalake_ebdb_clean.user AS ua
             ON ua.id_agent = b.id_agent
     LEFT JOIN
-        secretariat_users AS su
+        datalake_hub_services.secretariat_hierarchy AS su
             ON su.id_user_5a = fba.id_user_creation
     LEFT JOIN
         datalake_ebdb_user.user AS u
