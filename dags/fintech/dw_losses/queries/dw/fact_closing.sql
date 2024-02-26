@@ -1,11 +1,65 @@
 WITH closing_union AS(
   SELECT
-    *
+    id_invoice,
+    id_contract,
+    accrual_year_month,
+    closing_month_status,
+    due_amount,
+    frequency,
+    invoice_type,
+    contract_guarantee,
+    is_guarantee_paid,
+    is_before_started,
+    is_before_started_raw,
+    is_canceled_in_dead_time,
+    is_international,
+    is_paid_in_closing_day,
+    is_writtendown_in_dead_time,
+    has_repair_offboarding_bill_item,
+    paid_amount,
+    payment_status,
+    user,
+    origin_factor,
+    dt_closing,
+    dt_contract_signature,
+    dt_annulment,
+    dt_due,
+    dt_paid,
+    dt_sent,
+    dt_snapshot
   FROM
     datalake_losses.closing
+
   UNION
+
   SELECT
-    *
+    id_invoice,
+    id_contract,
+    accrual_year_month,
+    closing_month_status,
+    due_amount,
+    frequency,
+    invoice_type,
+    contract_guarantee,
+    is_guarantee_paid,
+    is_before_started,
+    is_before_started_raw,
+    is_canceled_in_dead_time,
+    is_international,
+    is_paid_in_closing_day,
+    is_writtendown_in_dead_time,
+    NULL AS has_repair_offboarding_bill_item,
+    paid_amount,
+    payment_status,
+    user,
+    origin_factor,
+    dt_closing,
+    dt_contract_signature,
+    dt_annulment,
+    dt_due,
+    dt_paid,
+    dt_sent,
+    dt_snapshot
   FROM
     datalake_losses.historical_closing
 )
