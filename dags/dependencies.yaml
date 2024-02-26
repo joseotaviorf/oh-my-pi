@@ -1885,6 +1885,10 @@ bietlejuice.enrich_nexxera:
   - bietlejuice.nexxera:load-clean-adjustments
   - bietlejuice.nexxera:load-clean-financial
   - bietlejuice.nexxera:load-clean-financial-extracts-050e
+  - bietlejuice.nexxera:load-clean-cnab-payments-237-seg-a
+  - bietlejuice.nexxera:load-clean-cnab-payments-341-seg-a
+  - bietlejuice.nexxera:load-clean-cnab-payments-341-seg-j
+  - bietlejuice.nexxera:load-clean-cnab-payments-341-seg-o
   - bietlejuice.rental_guarantee_platform:load-clean-address
   - bietlejuice.rental_guarantee_platform:load-clean-property-propose
   - bietlejuice.rental_guarantee_platform:load-clean-propose

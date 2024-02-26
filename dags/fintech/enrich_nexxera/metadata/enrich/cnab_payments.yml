@@ -1,0 +1,120 @@
+---
+database_name: datalake_nexxera
+table_name: cnab_payments
+description: "Table containing all cnab payments returns and segment 'a', 'o' and 'j'. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  id_bank:
+    description: Bank identification number from Febraban
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.id_bank
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.id_bank
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.id_bank
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.id_bank
+  bank_account:
+    description: 5A QuintoAndar's bank account number
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.bank_account
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.bank_account
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.bank_account
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.bank_account
+  segment_type:
+    description: Payment's type
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.segment_type
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.segment_type
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.segment_type
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.segment_type
+  company_use:
+    description: Number created by 5A to identify transaction
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.company_use
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.company_use
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.company_use
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.company_use
+  our_number:
+    description: Number created by the bank to identify transaction
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.our_number
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.our_number
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.our_number
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.our_number
+  beneficiarys_name:
+    description: Person's name that are receiving the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.beneficiarys_name
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.beneficiarys_name
+  cpf_cnpj:
+    description: Person's document that are receiving the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.cpf_cnpj
+  occurrence_code:
+    description: Code that identify if a payment was complete, and if not, the error reason
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.occurrence_code
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.occurrence_code
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.occurrence_code
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.occurrence_code
+  is_done:
+    description: Field that identify if a payment was complete or not
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.is_done
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.is_done
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.is_done
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.is_done
+  due_amount:
+    description: Original amount that the payment must to be done
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.due_amount
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.due_amount
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.due_amount
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.due_amount
+  paid_amount:
+    description: Amount actually paid
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.paid_amount
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.paid_amount
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.paid_amount
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.paid_amount
+  dt_due:
+    description: Original date that the payment must to be done
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.dt_due
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.dt_due
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.dt_due
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.dt_due
+  dt_paid:
+    description: Date actually paid
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.dt_paid
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.dt_paid
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.dt_paid
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.dt_paid
+  ts_ingested:
+    description: Timestamp of load
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.ts_ingested
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.ts_ingested
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.ts_ingested
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.ts_ingested
+  year:
+    description: Year of load
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.year
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.year
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.year
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.year
+  month:
+    description: Month of load
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.month
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.month
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.month
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.month
+  day:
+    description: Day of load
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.day
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.day
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.day
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.day

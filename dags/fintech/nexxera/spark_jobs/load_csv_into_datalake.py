@@ -47,6 +47,12 @@ def list_files(table_name, source_root_path, format, datetime_to_ingest):
         pattern = re.compile(f".*{datetime_to_ingest.strftime('%y%m%d')}.*")
         filtered_files = list(filter(pattern.match, files))
 
+    elif format == 'ret':
+        s3_files_path = f"{source_root_path}"
+        files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
+        pattern = re.compile(f".*{datetime_to_ingest.strftime('%y%m%d')}.*")
+        filtered_files = list(filter(pattern.match, files))
+
     return filtered_files
 
 def generate_schema(col_names: list):
@@ -141,6 +147,31 @@ if __name__ == "__main__":
                     df.value.substr(4,4).alias('id_service_batch'),
                     df.value.substr(8,1).alias('record_type'),
                     df.value.substr(9,240).alias('metadata'),
+
+                    )
+                df = df.withColumn('file_name', lit(path))
+                dfs.append(df)
+
+            df = reduce(DataFrame.unionAll, dfs)
+            df = (
+                SparkDataFrameService()
+                .input(df)
+                .create_year_month_day_columns_from_date(datetime_to_ingest)
+                .output()
+            )
+
+        elif format == 'ret':
+            dfs = []
+
+            for path in filtered_files:
+                df = spark.read.text(path)
+                df = df.select(
+                    df.value.substr(1,3).alias('id_bank'),
+                    df.value.substr(4,4).alias('id_service_batch'),
+                    df.value.substr(8,1).alias('record_type'),
+                    df.value.substr(9, 5).alias('record_sequence_number'),
+                    df.value.substr(14, 1).alias('segment_type'),
+                    df.value.substr(15,225).alias('metadata'),
 
                     )
                 df = df.withColumn('file_name', lit(path))

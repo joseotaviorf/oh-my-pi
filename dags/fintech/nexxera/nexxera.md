@@ -31,6 +31,7 @@ In datalake raw and clean, via incremental load:
 - `group_header`
 - `group_trailer`
 - `inadvance`
+- `payments_cnab`
 - `sales`
 - `transaction`
 

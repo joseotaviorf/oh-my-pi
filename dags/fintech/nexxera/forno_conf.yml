@@ -55,6 +55,17 @@ tables:
       - col_43
       - col_44
       - col_45
+  - table_name: cnab_payments
+    source_root_path: "s3://5a-datalake-forno/temp/nexxera/return/pag"
+    format: "ret"
+    has_raw: True
+    col_names:
+      - col_1
+      - col_2
+      - col_3
+      - col_4
+      - col_5
+      - col_6
   - table_name: financial
     source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
     format: "csv"
@@ -297,6 +308,14 @@ tables:
     has_raw: False
   - table_name: financial_extracts_050e
     has_raw: False
+  - table_name: cnab_payments_237_seg_a
+    has_raw: False
+  - table_name: cnab_payments_341_seg_a
+    has_raw: False
+  - table_name: cnab_payments_341_seg_j
+    has_raw: False
+  - table_name: cnab_payments_341_seg_o
+    has_raw: False
 inner_dependencies:
   acquirer_header:
     - adjustments
@@ -310,6 +329,14 @@ inner_dependencies:
     - inadvance
     - sales
     - transaction
+  cnab_payments_237_seg_a:
+    - cnab_payments
+  cnab_payments_341_seg_a:
+    - cnab_payments
+  cnab_payments_341_seg_j:
+    - cnab_payments
+  cnab_payments_341_seg_o:
+    - cnab_payments
   establishment_header:
     - adjustments
     - financial
