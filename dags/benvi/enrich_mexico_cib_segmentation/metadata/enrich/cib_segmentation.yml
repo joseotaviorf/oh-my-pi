@@ -18,6 +18,7 @@ columns:
     description: The type of calculation used in the segmentation rule to obtain CIB segmentation.
     categories:
       AVG: 'The calculation is the average occurrence of the event.'
+      SUM: 'The calculation is the sum occurrence of the event.'
   segmentation:
     lineage:
       - datalake_gsheets_clean.mexico_cib_segmentation_rules_segmentation_variables.name_segmentation

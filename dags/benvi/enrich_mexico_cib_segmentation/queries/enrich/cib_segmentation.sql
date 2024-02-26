@@ -92,11 +92,11 @@ events_by_month AS (
     GROUP BY
         1, 4
 ),
-avg_calculation_shorter_months AS (
+sum_calculation_shorter_months AS (
     SELECT
         ebm.id_user,
-        AVG(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY ebm.id_user) AS avg_fl,
-        AVG(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY ebm.id_user) AS avg_cs,
+        SUM(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY ebm.id_user) AS sum_fl,
+        SUM(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY ebm.id_user) AS sum_cs,
         ebm.dt_started
     FROM
         base_months_since_registration AS bmsr
@@ -111,17 +111,17 @@ avg_calculation_shorter_months AS (
 segmentation_rule_calculation AS (
     SELECT
         bmsr.id_user AS id_cib,
-        'AVG' AS type_calculation,
+        'SUM' AS type_calculation,
         IF(
             bmsr.months_registered <= bmsr.longer_months_calculation,
-            acsm.avg_fl,
-            AVG(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY bmsr.id_user)
-        ) AS avg_fl,
+            scsm.sum_fl,
+            SUM(COALESCE(ebm.first_listings, 0)) OVER (PARTITION BY bmsr.id_user)
+        ) AS sum_fl,
         IF(
             bmsr.months_registered <= bmsr.longer_months_calculation,
-            acsm.avg_cs,
-            AVG(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY bmsr.id_user)
-        ) AS avg_cs,
+            scsm.sum_cs,
+            SUM(COALESCE(ebm.contracts_signed, 0)) OVER (PARTITION BY bmsr.id_user)
+        ) AS sum_cs,
         bmsr.months_registered,
         IF(months_registered <= bmsr.longer_months_calculation, bmsr.shorter_months_calculation, bmsr.longer_months_calculation) AS months_calculation,
         bmsr.dt_month_started_segmentation,
@@ -136,17 +136,17 @@ segmentation_rule_calculation AS (
             ON ebm.id_user = bmsr.id_user
             AND ebm.dt_started = bmsr.dt_started
     LEFT JOIN
-        avg_calculation_shorter_months AS acsm
-            ON acsm.id_user = bmsr.id_user
-            AND acsm.dt_started = bmsr.dt_started
+        sum_calculation_shorter_months AS scsm
+            ON scsm.id_user = bmsr.id_user
+            AND scsm.dt_started = bmsr.dt_started
 )
 SELECT
     id_cib,
     sv.id_segmentation,
     type_calculation,
     sv.name_segmentation AS segmentation,
-    avg_fl AS first_listings,
-    avg_cs AS contracts_signed,
+    sum_fl AS first_listings,
+    sum_cs AS contracts_signed,
     months_registered,
     months_calculation,
     dt_month_started_segmentation,
@@ -161,10 +161,10 @@ INNER JOIN
         ON src.dt_month_started_segmentation >= sv.dt_last_modification
         AND months_registered >= sv.min_months_registered
         AND months_registered <= sv.max_months_registered
-        AND avg_fl >= sv.min_fl
-        AND avg_fl <= sv.max_fl
-        AND avg_cs >= sv.min_cs
-        AND avg_cs <= sv.max_cs
+        AND sum_fl >= sv.min_fl
+        AND sum_fl <= sv.max_fl
+        AND sum_cs >= sv.min_cs
+        AND sum_cs <= sv.max_cs
 WHERE
     dt_month_started_segmentation = MAKE_DATE({year},{month},{day}) + INTERVAL 1 DAY
 QUALIFY
