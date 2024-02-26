@@ -137,12 +137,66 @@ BASE_ACORDOS_GLOBAL AS(
 ),
 closing_union AS(
   SELECT
-    *
+    id_invoice,
+    id_contract,
+    accrual_year_month,
+    closing_month_status,
+    due_amount,
+    frequency,
+    invoice_type,
+    contract_guarantee,
+    is_guarantee_paid,
+    is_before_started,
+    is_before_started_raw,
+    is_canceled_in_dead_time,
+    is_international,
+    is_paid_in_closing_day,
+    is_writtendown_in_dead_time,
+    has_repair_offboarding_bill_item,
+    paid_amount,
+    payment_status,
+    user,
+    origin_factor,
+    dt_closing,
+    dt_contract_signature,
+    dt_annulment,
+    dt_due,
+    dt_paid,
+    dt_sent,
+    dt_snapshot
   FROM
     datalake_losses.closing
+
   UNION
+
   SELECT
-    *
+    id_invoice,
+    id_contract,
+    accrual_year_month,
+    closing_month_status,
+    due_amount,
+    frequency,
+    invoice_type,
+    contract_guarantee,
+    is_guarantee_paid,
+    is_before_started,
+    is_before_started_raw,
+    is_canceled_in_dead_time,
+    is_international,
+    is_paid_in_closing_day,
+    is_writtendown_in_dead_time,
+    NULL AS has_repair_offboarding_bill_item,
+    paid_amount,
+    payment_status,
+    user,
+    origin_factor,
+    dt_closing,
+    dt_contract_signature,
+    dt_annulment,
+    dt_due,
+    dt_paid,
+    dt_sent,
+    dt_snapshot
   FROM
     datalake_losses.historical_closing
 ),
@@ -156,7 +210,8 @@ base_step0_delay AS(
     d.dt_min_due_date_at_deal AS deal_anchor_due_date,
     v.dt_due as dt_due_general_accrual,
     is_international,
-    is_before_started
+    is_before_started,
+    has_repair_offboarding_bill_item
   FROM
     closing_union fc
   LEFT JOIN
@@ -184,7 +239,8 @@ base_step1_delay AS(
     datediff(deal_anchor_due_date, dt_closing) AS full_delay_at_deal,
     is_international,
     is_before_started,
-    is_writtendown_in_dead_time
+    is_writtendown_in_dead_time,
+    has_repair_offboarding_bill_item
   FROM
     base_step0_delay
 ),
@@ -279,7 +335,8 @@ base_step2_delay_mid AS(
         END AS deal_delay_rule_e,
     is_international,
     is_before_started,
-    is_writtendown_in_dead_time
+    is_writtendown_in_dead_time,
+    has_repair_offboarding_bill_item
   FROM
     base_step2_delay m
   LEFT JOIN
@@ -333,7 +390,8 @@ base_step3_delay AS(
     aux_hr.flag_is_HR,
     is_international,
     is_before_started,
-    is_writtendown_in_dead_time
+    is_writtendown_in_dead_time,
+    has_repair_offboarding_bill_item
   FROM base_step2_delay_mid m
   LEFT JOIN
     base_aux_ref_contract_delays AS aux
@@ -395,7 +453,8 @@ base_step4_delay AS(
     END AS flag_risk,
     is_international,
     is_before_started,
-    is_writtendown_in_dead_time
+    is_writtendown_in_dead_time,
+    has_repair_offboarding_bill_item
   FROM
     base_step3_delay
 ),
@@ -525,7 +584,8 @@ SELECT
   dt_snapshot,
   is_international,
   is_before_started,
-  is_writtendown_in_dead_time
+  is_writtendown_in_dead_time,
+  has_repair_offboarding_bill_item
 FROM
   base_step4_delay
 )
@@ -587,6 +647,7 @@ SELECT
   is_invoice_deal,
   is_international,
   is_writtendown_in_dead_time,
+  has_repair_offboarding_bill_item,
   dt_closing,
   dt_created_deal,
   dt_due_adjs,

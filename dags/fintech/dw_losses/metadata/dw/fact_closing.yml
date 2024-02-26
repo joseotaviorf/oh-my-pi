@@ -80,6 +80,10 @@ columns:
       - datalake_losses.closing.is_writtendown_in_dead_time
       - datalake_losses.historical_closing.is_writtendown_in_dead_time
     description: Flag to show if the invoice is writtendown in the deadtime.
+  has_repair_offboarding_bill_item:
+    lineage:
+      - datalake_losses.closing.has_repair_offboarding_bill_item
+    description: Flag to indicate the existence of 'repair offboarding' bill item for an invoice
   payment_status:
     lineage:
       - datalake_losses.closing.payment_status

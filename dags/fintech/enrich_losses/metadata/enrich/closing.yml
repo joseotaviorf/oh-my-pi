@@ -45,6 +45,8 @@ columns:
     description: Flag to show if the invoice is paid within the closing day.
   is_writtendown_in_dead_time:
     description: Flag to show if the invoice is writtendown in the deadtime.
+  has_repair_offboarding_bill_item:
+    description: Flag to indicate the existence of 'repair offboarding' bill item for an invoice
   paid_amount:
     lineage:
       - dw_payment_snapshot.dim_invoice_snapshot

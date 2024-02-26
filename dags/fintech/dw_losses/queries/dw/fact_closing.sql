@@ -25,6 +25,7 @@ SELECT
     is_international,
     is_paid_in_closing_day,
     is_writtendown_in_dead_time,
+    has_repair_offboarding_bill_item,
     payment_status,
     origin_factor,
     dt_annulment,
