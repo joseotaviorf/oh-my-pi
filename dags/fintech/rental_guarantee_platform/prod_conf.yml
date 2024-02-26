@@ -245,4 +245,16 @@ tables:
   - table_name: delinquency_aud
     date_filter_column: created_at
     extraction_type: incremental
+  - table_name: delinquency_cancellation
+    date_filter_column: updated_at
+    extraction_type: incremental
+  - table_name: delinquency_cancellation_aud
+    date_filter_column: created_at
+    extraction_type: incremental
+  - table_name: lannister_payment_register_aud
+    date_filter_column: updated_at
+    extraction_type: incremental
+  - table_name: lannister_payment_register
+    date_filter_column: updated_at
+    extraction_type: incremental
 partition_cols: ["year", "month", "day"]

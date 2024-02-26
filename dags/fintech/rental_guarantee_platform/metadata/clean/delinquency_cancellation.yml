@@ -1,0 +1,37 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: delinquency_cancellation
+columns:
+    id:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.id
+    id_delinquency:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.delinquency
+    type:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.type
+    id_user_insert:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.userinsert
+    id_user_update:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.userupdate
+    version:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.version
+    ts_created:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.created_at
+    ts_updated:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.updated_at
+    year:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.year
+    month:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.month
+    day:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.delinquency_cancellation.day

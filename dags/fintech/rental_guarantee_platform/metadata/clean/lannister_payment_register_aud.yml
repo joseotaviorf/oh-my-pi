@@ -1,0 +1,109 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: lannister_payment_register_aud
+columns:
+    id:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.id
+    rev:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.rev
+    rev_end:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.revend
+    rev_type:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.revtype
+    id_user:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.user_id
+    mod_id_user:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.user_id_mod
+    id_external:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.external_id
+    mod_id_external:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.external_id_mod
+    id_source:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.source_id
+    mod_id_source:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.source_id_mod
+    payment_type:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_type
+    mod_payment_type:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_type_mod
+    paid_value:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.paid_value
+    mod_paid_value:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.paid_value_mod
+    id_payment_request:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_request_id
+    mod_id_payment_request:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_request_id_mod
+    status:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.status
+    mod_status:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.status_mod
+    raw_request:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.raw_request
+    mod_raw_request:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.raw_request_mod
+    raw_response:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.raw_response
+    mod_raw_response:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.raw_response_mod
+    id_next_attempt:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.next_attempt_id
+    mod_id_next_attempt:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.next_attempt_id_mod
+    id_propose:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.propose_id
+    mod_id_propose:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.propose_id_mod
+    dt_event:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.event_date
+    mod_dt_event:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.event_date_mod
+    dt_payment_scheduled:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_schedule_date
+    mod_dt_payment_scheduled:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_schedule_date_mod
+    ts_created:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.created_at
+    ts_updated:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.updated_at
+    year:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.year
+    month:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.month
+    day:
+        lineage:
+            - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.day
