@@ -22,7 +22,7 @@ workflow:
       date_filter_column: updated_at
       partitions: [year, month, day]
       extraction_type: incremental
-    proect:
+    project:
       date_filter_column: updated_at
       partitions: [year, month, day]
       extraction_type: incremental

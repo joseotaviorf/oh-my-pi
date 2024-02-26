@@ -7,9 +7,6 @@ columns:
   id_task:
     lineage:
       - datalake_quinturk_raw.task_completion.task_id
-  id_project:
-    lineage:
-      - datalake_quinturk_raw.task_completion.project_id
   id_parent_annotation:
     lineage:
       - datalake_quinturk_raw.task_completion.parent_annotation_id

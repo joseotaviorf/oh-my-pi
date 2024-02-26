@@ -32,7 +32,10 @@ SELECT
     evaluate_predictions_automatically AS has_auto_evaluate_predictions,
     reveal_preannotations_interactively AS has_interactive_reveal_preannotations,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_quinturk_raw.project
 WHERE

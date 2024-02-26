@@ -1,7 +1,6 @@
 SELECT
     id,
     task_id AS id_task,
-    project_id AS id_project,
     parent_annotation_id AS id_parent_annotation,
     parent_prediction_id AS id_parent_prediction,
     completed_by_id AS id_completed_by,
