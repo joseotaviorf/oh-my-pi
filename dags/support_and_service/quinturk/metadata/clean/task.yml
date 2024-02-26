@@ -1,0 +1,45 @@
+database_name: datalake_quinturk_clean
+table_name: task
+columns:
+  id:
+    lineage:
+      - datalake_quinturk_raw.task.id
+  id_project:
+    lineage:
+      - datalake_quinturk_raw.task.project_id
+  id_updated_by:
+    lineage:
+      - datalake_quinturk_raw.task.updated_by_id
+  id_file_upload:
+    lineage:
+      - datalake_quinturk_raw.task.file_upload_id
+  id_inner:
+    lineage:
+      - datalake_quinturk_raw.task.inner_id
+  total_annotations:
+    lineage:
+      - datalake_quinturk_raw.task.id
+  canceled_annotations:
+    lineage:
+      - datalake_quinturk_raw.task.id
+  total_predictions:
+    lineage:
+      - datalake_quinturk_raw.task.id
+  overlap:
+    lineage:
+      - datalake_quinturk_raw.task.id
+  data:
+    lineage:
+      - datalake_quinturk_raw.task.id
+  meta:
+    lineage:
+      - datalake_quinturk_raw.task.id
+  is_labeled:
+    lineage:
+      - datalake_quinturk_raw.task.id
+  ts_created:
+    lineage:
+      - datalake_quinturk_raw.task.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinturk_raw.task.updated_at

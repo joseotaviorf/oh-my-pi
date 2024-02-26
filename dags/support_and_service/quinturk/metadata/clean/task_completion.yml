@@ -1,0 +1,48 @@
+database_name: datalake_quinturk_clean
+table_name: task_completion
+columns:
+  id:
+    lineage:
+      - datalake_quinturk_raw.task_completion.id
+  id_task:
+    lineage:
+      - datalake_quinturk_raw.task_completion.task_id
+  id_project:
+    lineage:
+      - datalake_quinturk_raw.task_completion.project_id
+  id_parent_annotation:
+    lineage:
+      - datalake_quinturk_raw.task_completion.parent_annotation_id
+  id_parent_prediction:
+    lineage:
+      - datalake_quinturk_raw.task_completion.parent_prediction_id
+  id_completed_by:
+    lineage:
+      - datalake_quinturk_raw.task_completion.completed_by_id
+  id_last_created_by:
+    lineage:
+      - datalake_quinturk_raw.task_completion.last_created_by_id
+  pediction:
+    lineage:
+      - datalake_quinturk_raw.task_completion.task_id
+  lead_time:
+    lineage:
+      - datalake_quinturk_raw.task_completion.task_id
+  result_count:
+    lineage:
+      - datalake_quinturk_raw.task_completion.task_id
+  last_action:
+    lineage:
+      - datalake_quinturk_raw.task_completion.task_id
+  is_ground_truth:
+    lineage:
+      - datalake_quinturk_raw.task_completion.ground_truth
+  was_canceled:
+    lineage:
+      - datalake_quinturk_raw.task_completion.task_id
+  ts_created:
+    lineage:
+      - datalake_quinturk_raw.task_completion.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinturk_raw.task_completion.updated_at

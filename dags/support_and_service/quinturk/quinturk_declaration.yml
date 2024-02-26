@@ -1,0 +1,31 @@
+dag:
+  name: quinturk
+  schedule_start_date: 2024, 2, 20
+  schedule_interval: 0 3 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Retrieves data from the Quinturk database
+
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: quinturk
+  dbutils_secret_key: QUINTURK_DB
+  tables_customization:
+    task:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+      extraction_type: incremental
+    task_completion:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+      extraction_type: incremental
+    proect:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+      extraction_type: incremental
+
+cluster:
+  type: databricks_10_4_med_general_cluster
