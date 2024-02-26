@@ -6,7 +6,10 @@ WITH prospect_status_events AS (
     'CONVERSION' AS event_type,
     tps.prospect_event_name AS event_name,
     tps.status_trigger_event_name AS event_detail,
-    tps.ts_status_started AS ts_event
+    tps.ts_status_started AS ts_event,
+    tps.year,
+    tps.month,
+    tps.day
   FROM
     datalake_demand_flows.tenant_prospect_status AS tps
   WHERE 
@@ -21,7 +24,10 @@ WITH prospect_status_events AS (
     'CONVERSION' AS event_type,
     bps.prospect_event_name AS event_name,
     bps.status_trigger_event_name AS event_detail,
-    bps.ts_status_started AS ts_event
+    bps.ts_status_started AS ts_event,
+    bps.year,
+    bps.month,
+    bps.day
   FROM
     datalake_demand_flows.buyer_prospect_status AS bps
   WHERE 
@@ -60,17 +66,14 @@ prospect_results AS (
     pcr.utm_source,
     pcr.utm_term,
     pse.ts_event,
-    pcr.year,
-    pcr.month,
-    pcr.day
+    pse.year,
+    pse.month,
+    pse.day
   FROM
     prospect_status_events AS pse
   LEFT JOIN
     datalake_demand_flows.prospect_results AS pcr
       ON pse.id_demand_prospect_conversion_event = pcr.id_demand_prospect_conversion_event
-        AND pcr.year = {year}
-        AND pcr.month = {month}
-        AND pcr.day = {day}  
   UNION ALL
   SELECT
     pcr.id_demand_prospect_conversion_event,
