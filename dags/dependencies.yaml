@@ -158,13 +158,13 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_docx:load-enrich-income-documentation
-  - bietlejuice.enrich_docx:load-enrich-personal-documentation
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-analysis-request
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-checklist
   - bietlejuice.enrich_credit_analysis:load-enrich-early-credit-analysis
+  - bietlejuice.enrich_docx:load-enrich-income-documentation
+  - bietlejuice.enrich_docx:load-enrich-personal-documentation
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_offer:load-enrich-offer
@@ -1302,16 +1302,16 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
   - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
   - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_offer:load-enrich-offer
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
-  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
+  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
 bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-categories-documentation
   - bietlejuice.documentation_metrics:load-clean-columns-documentation
@@ -2540,32 +2540,6 @@ bietlejuice.enrich_tracked_events:
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-answer
   - bietlejuice.tracksale:load-clean-dispatch
-bietlejuice.enrich_unified_listing_flow:
-  - bietlejuice.ebdb:load-clean-lead-aud
-  - bietlejuice.ebdb:load-clean-lead-reason
-  - bietlejuice.ebdb:load-clean-partner
-  - bietlejuice.ebdb:load-clean-partner-agent
-  - bietlejuice.ebdb:load-clean-photographer-job
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-  - bietlejuice.enrich_ebdb_photo_jobs:load-enrich-photo-job
-  - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-  - bietlejuice.enrich_lead:load-enrich-conversion-lead
-  - bietlejuice.enrich_lead:load-enrich-lead
-  - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
-  - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
-bietlejuice.enrich_unified_potential_listing:
-  - bietlejuice.ebdb:load-clean-partner
-  - bietlejuice.ebdb:load-clean-partner-agent
-  - bietlejuice.enrich_crm_lead:load-enrich-lead-tasks
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-  - bietlejuice.enrich_lead:load-enrich-lead
-  - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
-  - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks
-  - bietlejuice.enrich_unified_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
 bietlejuice.enrich_user:
   - bietlejuice.ebdb:load-clean-agent-data
   - bietlejuice.ebdb:load-clean-agent-data-business-contexts-served

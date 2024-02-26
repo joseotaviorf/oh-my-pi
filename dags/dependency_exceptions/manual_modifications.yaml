@@ -721,18 +721,6 @@ bietlejuice.enrich_tracksale:
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
     - bietlejuice.tracksale:load-clean-campaign
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
-bietlejuice.enrich_unified_listing_flow:
-  remove:
-    - bietlejuice.ebdb:load-clean-affiliate-data
-    - bietlejuice.ebdb:load-clean-doorman-affiliate-data
-    - bietlejuice.ebdb:load-clean-house-guarantees-aud
-    - bietlejuice.ebdb:load-clean-photographer-job-aud
-    - bietlejuice.enrich_listing_flow:load-enrich-discards-reason-by-context
-    - bietlejuice.enrich_listing_flow:load-enrich-listing-flow
-    - bietlejuice.rene_descartes:load-clean-lead-rejection
-    - bietlejuice.wololo:load-clean-context-discard
-    - bietlejuice.wololo:load-clean-conversion
-    - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_velo:
   add:
     - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposecompany-legacy
