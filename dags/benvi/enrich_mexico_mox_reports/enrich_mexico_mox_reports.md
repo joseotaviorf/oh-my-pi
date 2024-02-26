@@ -14,6 +14,7 @@ This pipeline produces the following output table in the enrich layer, via incre
 
 - `imss`
 - `imss_work_history`
+- `issste`
 - `issste_address`
 - `issste_clinic`
 - `issste_work_history`
