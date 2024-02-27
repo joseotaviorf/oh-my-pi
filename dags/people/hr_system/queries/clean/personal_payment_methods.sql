@@ -1,9 +1,9 @@
 SELECT 
+    PersonalPaymentMethodId AS id_personal_payment_method,
     BankAccountId AS id_bank_account,
     PartyId AS id_party,
     OrgPaymentMethodId AS id_org_payment_method,
     PayrollRelationshipId AS id_payroll_relationship,    
-    PersonalPaymentMethodId AS id_personal_payment_method,
     PersonNumber AS person_number,
     Name AS name,
     PaymentAmountType AS payment_amount_type,

@@ -9,6 +9,7 @@ dag_documentation:
 
 endpoints:
   absences:
+    deduplication_key: "absenceCaseId"
     has_partitions: true
     column_to_partition: "CreationDate"
     has_columns_to_delete: true
@@ -24,6 +25,7 @@ endpoints:
         - "absenceRecordingDFF"
         - "absenceRecordingsDDF"
   benefit_enrollments:
+    deduplication_key: "EnrollmentResultId"
     has_partitions: true
     column_to_partition: "CreationDate"
     has_columns_to_delete: false
@@ -41,6 +43,7 @@ endpoints:
       onlyData: true
       limit: 100
   hcm_contacts:
+    deduplication_key: PersonId
     has_partitions: true
     column_to_partition: "CreationDate"
     has_columns_to_delete: false
@@ -66,6 +69,7 @@ endpoints:
         - "religions"
         - "visasPermits"
   jobs:
+    deduplication_key: "JobId"
     has_partitions: true
     column_to_partition: "CreationDate"
     has_columns_to_delete: false
@@ -76,6 +80,7 @@ endpoints:
         - "JobCustomerFlex"
         - "validGrades"
   payroll_relationships:
+    deduplication_key: "PayrollRelationshipId"
     has_partitions: false
     has_columns_to_delete: false
     params:
@@ -88,6 +93,7 @@ endpoints:
         - "payrollAssignments.payrollAssignmentDates"
         - "payrollRelationshipDates"
   performance_goals:
+    deduplication_key: "GoalId"
     has_partitions: false
     has_columns_to_delete: false
     params:
@@ -96,23 +102,26 @@ endpoints:
       expand:
         - "associatedGoalPlans"
   personal_payment_methods:
+    deduplication_key: "PersonalPaymentMethodId"
     has_partitions: false
     has_columns_to_delete: false
     params:
       onlyData: true
       limit: 100
   salaries:
-      has_partitions: true
-      column_to_partition: "CreationDate"
-      has_columns_to_delete: false
-      params:
-        onlyData: true
-        limit: 100
-        expand:
-          - "salaryComponents"
-          - "salaryPayRateComponents"
-          - "salarySimpleComponents"
+    deduplication_key: "SalaryId"
+    has_partitions: true
+    column_to_partition: "CreationDate"
+    has_columns_to_delete: false
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "salaryComponents"
+        - "salaryPayRateComponents"
+        - "salarySimpleComponents"
   talent_person_profiles:
+    deduplication_key: "ProfileId"
     has_partitions: true
     column_to_partition: "CreationDate"
     has_columns_to_delete: false
@@ -154,6 +163,7 @@ endpoints:
         - "performanceRatings.performanceRatingsDFF"
         - "userDefinedRatingSections"
   workers:
+    deduplication_key: "PersonId"
     has_partitions: true
     column_to_partition: "CreationDate"
     has_columns_to_delete: false

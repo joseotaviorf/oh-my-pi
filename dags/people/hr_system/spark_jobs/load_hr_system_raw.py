@@ -30,10 +30,11 @@ def create_spark_dataframe(endpoint_id, json_data, spark_client, hr_system_clien
 def run_sync(endpoint_id, url, token, endpoint_details):
     hr_system_client = HrSystemClient(api_url=url, api_token=token)
     endpoint_params = endpoint_details["params"]
+    deduplication_key = endpoint_details.get("deduplication_key", None)
     endpoint_id = endpoint_id.replace("_", "").upper()
     consumer_instance = get_consumer(hr_system_client, endpoint_id)
     path = consumer_instance.path
-    json_data = consumer_instance.sync(params=endpoint_params)
+    json_data = consumer_instance.sync(params=endpoint_params, deduplication_key=deduplication_key)
     return create_spark_dataframe(path, json_data, spark_client, hr_system_client)
 
 

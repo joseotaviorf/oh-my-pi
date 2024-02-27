@@ -1,7 +1,7 @@
 SELECT
+  PayrollRelationshipId AS id_payroll_relationship,
   OverridingPeriodId AS id_overriding_period,
   PartyId AS id_party,
-  PayrollRelationshipId AS id_payroll_relationship,
   Country AS country,
   PayrollRelationshipNumber AS payroll_relationship_number,
   PersonNumber AS person_number,

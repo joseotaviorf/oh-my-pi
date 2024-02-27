@@ -1,6 +1,6 @@
 SELECT
-    PersonId AS id_person,
     ProfileId AS id_profile,
+    PersonId AS id_person,
     PersonNumber AS person_number,
     ProfileCode AS profile_code,
     DisplayName AS display_name,
