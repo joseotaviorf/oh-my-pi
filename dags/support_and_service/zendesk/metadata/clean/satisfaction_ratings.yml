@@ -1,0 +1,45 @@
+database_name: datalake_zendesk_tickets_clean
+table_name: satisfaction_ratings
+columns:
+  id:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.id
+  id_ticket:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.ticket_id
+  id_reason:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.reason_id
+  id_group:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.group_id
+  id_assignee:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.assignee_id
+  id_requester:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.requester_id
+  score:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.score
+  satisfaction_rating_url:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.url
+  reason:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.reason
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.created_at
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.updated_at
+  year:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.updated_at
+  month:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.updated_at
+  day:
+    lineage:
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.updated_at

@@ -1,0 +1,81 @@
+database_name: datalake_zendesk_tickets_clean
+table_name: ticket_fields
+columns:
+  id_ticket_fields:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.id
+  title:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.title
+  description:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.description
+  agent_description:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.agent_description
+  url_ticket_fields:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.url
+  raw_title:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.raw_title
+  raw_title_in_portal:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.raw_title_in_portal
+  raw_description:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.raw_description
+  custom_field_options:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.custom_field_options
+  is_removable:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.removable
+  is_position:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.position
+  is_required:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.required
+  type:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.type
+  is_active:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.active
+  is_collapsed_for_agents:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.collapsed_for_agents
+  is_visible_in_portal:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.visible_in_portal
+  is_required_in_portal:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.required_in_portal
+  is_editable_in_portal:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.editable_in_portal
+  is_title_in_portal:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.title_in_portal
+  dt_extracted:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.dt
+  ts_created_local:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.created_at
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.created_at
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.updated_at
+  year:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.updated_at
+  month:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.updated_at
+  day:
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_fields.updated_at

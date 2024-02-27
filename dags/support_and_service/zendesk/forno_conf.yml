@@ -1,0 +1,33 @@
+dag_documentation:
+  dag_purpose: |
+    Load data of the Zendesk to the Clean layer, the Raw layer is loaded by Stitch.
+    Zendesk is responsible for the tickets of the customer services.
+
+partition_cols: ["year", "month", "day"]
+tables:
+  group_memberships:
+    is_incremental: true
+  groups:
+    is_incremental: true
+  organizations:
+    is_incremental: true
+  satisfaction_ratings:
+    is_incremental: true
+  ticket_fields:
+    is_incremental: true
+  ticket_metrics:
+    is_incremental: true
+  tickets:
+    is_incremental: true
+  users:
+    is_incremental: true
+
+custom_cluster:
+  driver_node_type_id: r5d.8xlarge
+  node_type_id: r5d.8xlarge
+  runtime_engine: PHOTON
+  num_workers: 4
+  aws_attributes:
+    availability: ON_DEMAND
+  spark_conf:
+    spark.driver.maxResultSize: "0"

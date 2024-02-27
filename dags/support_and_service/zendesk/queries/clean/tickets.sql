@@ -1,0 +1,35 @@
+SELECT
+    id AS id_ticket,
+    assignee_id AS id_assignee,
+    brand_id AS id_brand,
+    collaborator_ids AS ids_collaborator,
+    group_id AS id_group,
+    requester_id AS id_requester,
+    submitter_id AS id_submitter,
+    ticket_form_id AS id_ticket_form,
+    custom_fields,
+    description,
+    priority,
+    raw_subject,
+    recipient,
+    satisfaction_rating,
+    subject,
+    status,
+    tags,
+    type,
+    url AS url_ticket,
+    via,
+    allow_channelback,
+    has_incidents,
+    is_public,
+    dt AS dt_extracted,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    NOW() AS ts_load,
+    YEAR(CAST(dt AS DATE)) AS year,
+    MONTH(CAST(dt AS DATE)) AS month,
+    DAY(CAST(dt AS DATE)) AS day
+FROM
+    datalake_zendesk_tickets_raw.tickets
+WHERE
+    dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)
