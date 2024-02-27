@@ -46,6 +46,12 @@ tables:
   - table_name: geqlcontrato
     clean_table_name: customer_map_keys
     load_incremental: False
+  - table_name: cbparcelaitembordero
+    clean_table_name: debt_negotiation_details
+    load_incremental: False
+  - table_name: geusuario
+    clean_table_name: user
+    load_incremental: False
 partition_cols:
   - year
   - month

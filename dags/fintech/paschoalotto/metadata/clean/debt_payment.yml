@@ -21,15 +21,15 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.id_geusuario_int
-  principal:
-    description: ""
+  main_amount:
+    description: "Main amount"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.principal_num
   cp:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.cp_num
-  fine:
+  fine_amount:
     description: "Fine amount"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.multa_num
@@ -41,15 +41,15 @@ columns:
     description: "Bank Expense"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.despesa_banco_num
-  discount:
+  discount_amount:
     description: "Discount amount"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.desconto_num
-  principal_discount:
+  main_discount:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.desconto_principal_num
-  reduction:
+  is_write_off:
     description: "Reduction (abatimento) amount"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.abatimento_num
@@ -57,11 +57,11 @@ columns:
     description: "Interest on arrears (juros e mora) amount"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.juros_mora_num
-  fees:
+  has_honorarium:
     description: "Fees (honorários)"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.honorarios_num
-  commissioning:
+  has_commissioning:
     description: "Commissioning"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.comissionamento_num

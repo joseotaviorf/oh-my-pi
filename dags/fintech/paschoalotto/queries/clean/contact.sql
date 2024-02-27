@@ -1,14 +1,20 @@
 SELECT
     BIGINT(id_geqlcontato_int) AS id_contact,
     BIGINT(id_geqlcliente_int) AS id_customer,
-    BIGINT(id_geqltipocontato_int) AS id_contact_type,
     BIGINT(id_geqlendereco_int) AS id_address,
     BIGINT(id_geqlcontrato_int) AS id_customer_map_keys,
     BIGINT(id_geusuario_int) AS id_user,
-    BIGINT(id_cemiterio_int) AS id_cemetery,
-    INT(id_geusuario_inclusao_int) AS id_user_inclusion,
+    BIGINT(id_geqltipocontato_int) AS id_geqltipocontato,
+    BIGINT(id_cemiterio_int) AS id_cemiterio,
+    INT(id_geusuario_inclusao_int) AS id_geusuario_inclusao,
     contato_str AS contact,
-    classificacao_str AS phone_classification,
+    CASE
+        WHEN classificacao_str = "1" THEN "Excelente"
+        WHEN classificacao_str = "2" THEN "Bom"
+        WHEN classificacao_str = "3" THEN "Ruim"
+        WHEN classificacao_str = "9" THEN "Indefinido"
+        ELSE NULLIF(classificacao_str,"")
+    END AS phone_classification,
     tabela_origem_str AS origin_table,
     observacao_str AS note,
     nome_contato_str AS contact_name,
@@ -20,10 +26,10 @@ SELECT
     INT(score_lemit_int) AS score_lemit,
     tipo_pessoa_str AS person_type,
     ramal_str AS telephone_extension,
-    whatsapp_str AS whatsapp,
+    IF(whatsapp_str = "S", TRUE, FALSE) AS has_whatsapp,
     trava_feriado_str AS holiday_lock,
     motivo_str AS reason,
-    BOOLEAN(contatopagoufacil_bit) is_contact_paid_easily,
+    BOOLEAN(contatopagoufacil_bit) is_pagoufacil,
     INT(ranking_lemit_int) AS ranking_lemit,
     obs_inibicao_tel_suspeito_str AS inhibition_suspicious_phone_note,
     TO_DATE(data_score_dat, 'dd/MM/yyyy HH:mm:ss') AS dt_score,

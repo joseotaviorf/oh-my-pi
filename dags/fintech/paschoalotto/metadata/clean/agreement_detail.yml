@@ -9,24 +9,24 @@ columns:
     description: "Table sequence/ID"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_cbitembordero_int
-  id_negotiation_grouping:
-    description: ""
+  id_negotiation:
+    description: "Negotiation ID. FK of table negotiation"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_cbbordero_int
   id_contract:
-    description: "Contract ID"
+    description: "Contract ID. FK of table contract"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_cbcontrato_int
   id_address:
-    description: ""
+    description: "Address ID. FK of table address"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_geqlendereco_int
   id_contact:
-    description: ""
+    description: "Contact ID. FK of table contact"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_geqlcontato_int
   id_user:
-    description: ""
+    description: "User ID. FK of table user"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_geusuario_int
   id_cbinstrucao1:
@@ -45,6 +45,10 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_gecidade_int
+  id_agreement:
+    description: "Agreement number"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.acordo_int
   our_number:
     description: "Our bank slip (bill) number"
     lineage:
@@ -70,12 +74,12 @@ columns:
     description: "bank slip (bill) barcode"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.cod_barra_str
-  bar:
-    description: ""
+  bank_slip_bar:
+    description: "Bank slip bar"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.barra_str
   dv:
-    description: ""
+    description: "Bank slip dv (verifying digit)"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.dv_int
   instruction_1:
@@ -116,18 +120,10 @@ columns:
       - datalake_paschoalotto_raw.cbitembordero.parcelamento_str
   payment_status:
     description: "Payment status"
-    categories:
-      C: ""
-      S: ""
-      X: ""
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.pago_str
-  agreement:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbitembordero.acordo_int
-  discharge:
-    description: ""
+  is_settlement:
+    description: "Whether the invoice is settlement of the contract or not"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.quitacao_str
   bank_slip_note:
@@ -160,7 +156,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.acao_enviado_api_int
   is_sent_billing:
-    description: ""
+    description: "If the bill (bank slip) was sent"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.boletagem_enviada_int
   carta_boleto:
@@ -191,8 +187,8 @@ columns:
     description: "Bank slip (Bill) discount amount"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.valor_desconto_num
-  principal:
-    description: ""
+  main_amount:
+    description: "Main amount"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.principal_num
   cp:
@@ -203,7 +199,7 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.cp_original_num
-  fine:
+  fine_amount:
     description: "Fine amount"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.multa_num
@@ -215,11 +211,11 @@ columns:
     description: "Bank Expense"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.despesa_banco_num
-  discount:
+  discount_amount:
     description: "Discount amount"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.desconto_num
-  reduction:
+  write_off:
     description: "Reduction (abatimento) amount"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.abatimento_num
@@ -227,7 +223,7 @@ columns:
     description: "Interest on arrears (juros e mora) amount"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.juros_mora_num
-  fees:
+  honorarium_amount:
     description: "Fees (honorários)"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.honorarios_num
@@ -304,11 +300,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.boleto_gravacao_tim
   ts_insert:
-    description: ""
+    description: "Date and time when the record was inserted"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.tstamp_mdm_inclusao
   ts_update:
-    description: ""
+    description: "Date and time when the record was updated"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.tstamp_mdm_alteracao
   ts_tstamp:

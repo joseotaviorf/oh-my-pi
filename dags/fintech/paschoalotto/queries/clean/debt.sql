@@ -5,13 +5,20 @@ SELECT
     BIGINT(id_esregua_int) AS id_esregua,
     BIGINT(id_str) AS id,
     BIGINT(parcela_int) AS installment,
-    INT(situacao_int) AS installment_status,
+    CASE
+        WHEN situacao_int = "0" THEN "ABERTO"
+        WHEN situacao_int = "1" THEN "BOLETO GERADO (MANUAL)"
+        WHEN situacao_int = "2" THEN "BOLETO BANCO"
+        WHEN situacao_int = "4" THEN "PAGO/BAIXA PAGAMENTO"
+        WHEN situacao_int = "6" THEN "CANCELADO/RETIRADA"
+        ELSE NULLIF(situacao_int,"")
+    END AS installment_status,
     observacao_str AS installment_status_note,
-    numero_unico_str AS id_installment,
+    numero_unico_str AS id_invoice_seubarriga,
+    quintoandar_des_contr_str AS id_contract_quintoandar,
     BIGINT(COALESCE(NULLIF(nosso_numero_int,""), nosso_numero_str)) AS our_number,
     tipo_str AS type,
-    es_des_regis_str AS record,
-    quintoandar_des_contr_str AS contract_quintoandar,
+    es_des_regis_str AS cpf,
     INT(contrato_int) AS contract,
     contrato_rao_str AS contract_rao,
     desc_indice_str AS index,
@@ -36,10 +43,14 @@ SELECT
     batimento_str AS beat,
     texto_contabil_str AS accounting_text,
     sistema_str AS system,
-    forma_pagamento_str AS payment_format,
+    NULLIF(forma_pagamento_str,"") AS payment_format,
     velo_imobiliaria_str AS velo_real_estate,
     velo_contratos_str AS velo_contracts,
-    velo_pf_str AS velo_pf,
+    CASE
+        WHEN velo_pf_str = "PF" THEN "PESSOA FISICA"
+        WHEN velo_pf_str = "PJ" THEN "PESSOA JURÍDICA"
+        ELSE NULL
+    END AS velo_person_type,
     INT(dias_atraso_int) AS delay_days,
     CAST(REPLACE(es_valor_corrigido_num, ',', '.') AS DECIMAL(10, 2)) AS corrected_amount,
     CAST(REPLACE(es_valor_encargos_num, ',', '.') AS DECIMAL(10, 2)) AS charges_amount,
@@ -51,7 +62,7 @@ SELECT
     CAST(REPLACE(valor_devedor_num, ',', '.') AS DECIMAL(10, 2)) AS debt_amount,
     CAST(REPLACE(vencidop_num, ',', '.') AS DECIMAL(10, 2)) AS expired_amount,
     CAST(REPLACE(valor_multa_num, ',', '.') AS DECIMAL(10, 2)) AS fine_amount,
-    CAST(REPLACE(valor_multa_quitacao_num, ',', '.') AS DECIMAL(10, 2)) AS fine_discharge_amount,
+    CAST(REPLACE(valor_multa_quitacao_num, ',', '.') AS DECIMAL(10, 2)) AS fine_settlement_amount,
     CAST(REPLACE(valor_comissao_perm_num, ',', '.') AS DECIMAL(10, 2)) AS commission_amount,
     CAST(REPLACE(qtd_moeda_num, ',', '.') AS DECIMAL(10, 2)) AS currency_amount,
     CAST(REPLACE(indice_moeda_num, ',', '.') AS DECIMAL(10, 2)) AS currency_index,

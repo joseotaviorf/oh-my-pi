@@ -14,23 +14,23 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_cbcontrato_int
   id_debt:
-    description: ""
+    description: "Debt ID"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_cbparcela_int
   id_collection_history:
-    description: ""
+    description: "Collection History ID"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_cbsitcontato_int
   id_contact:
-    description: ""
+    description: "Contact ID"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_geqlcontato_int
   id_user:
-    description: ""
+    description: "User ID"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_geusuario_int
   id_deliquency_reason:
-    description: ""
+    description: "Deliquency reason ID"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_gemotivoinadimplencia_int
   followup_description:
@@ -38,16 +38,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.historico_str
   contact_type:
-    description: ""
-    categories:
-      A: ""
-      L: ""
-      N: ""
-      R: ""
+    description: "Contact type"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.tipo_contato_str
-  action_sent_api:
-    description: ""
+  is_sent_to_api:
+    description: "If the same actions are sent to the API"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.acao_enviado_api_int
   is_stand:
@@ -55,19 +50,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.coloca_stand_str
   is_updated:
-    description: ""
+    description: "Whether it has been changed or not"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.alterado_str
   status_record:
-    description: ""
+    description: "Record status"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.status_registro_str
   call_key:
-    description: ""
+    description: "Call key"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.call_key_str
   instance:
-    description: ""
+    description: "Instantiation"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.instancia_str
   call_duration:
@@ -75,7 +70,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.tempo_ligacao_tim
   dt_event:
-    description: ""
+    description: "Event date"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.data_evento_dat
   dt_followup:

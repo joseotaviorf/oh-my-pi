@@ -7,8 +7,14 @@ SELECT
     BIGINT(id_geusuario_int) AS id_user,
     BIGINT(id_gemotivoinadimplencia_int) AS id_deliquency_reason,
     historico_str AS followup_description,
-    tipo_contato_str AS contact_type,
-    INT(acao_enviado_api_int) AS action_sent_api,
+    CASE
+        WHEN tipo_contato_str = "A" THEN "Ativo"
+        WHEN tipo_contato_str = "R" THEN "Receptivo"
+        WHEN tipo_contato_str = "N" THEN "Nenhum"
+        WHEN tipo_contato_str = "L" THEN "Legal"
+        ELSE NULLIF(tipo_contato_str,"")
+    END AS contact_type,
+    IF(acao_enviado_api_int = "1", TRUE, FALSE) AS is_sent_to_api,
     status_registro_str AS status_record,
     call_key_str AS call_key,
     instancia_str AS instance,

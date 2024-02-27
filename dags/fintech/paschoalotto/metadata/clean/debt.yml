@@ -31,34 +31,28 @@ columns:
       - datalake_paschoalotto_raw.cbparcela.parcela_int
   installment_status:
     description: "Installment status"
-    categories:
-      "0": " "
-      "1": " "
-      "2": " "
-      "4": " "
-      "6": " "
     lineage:
       - datalake_paschoalotto_raw.cbparcela.situacao_int
   installment_status_note:
     description: "Note on installment status"
     lineage:
       - datalake_paschoalotto_raw.cbparcela.observacao_str
-  id_installment:
-    description: "Installment unique number"
+  id_invoice_seubarriga:
+    description: "SeuBarriga ID Invoice"
     lineage:
       - datalake_paschoalotto_raw.cbparcela.numero_unico_str
+  id_contract_quintoandar:
+    description: "QuintoAndar Contract"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcela.quintoandar_des_contr_str
   type:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcela.tipo_str
-  record:
-    description: "Record"
+  cpf:
+    description: "cpf"
     lineage:
       - datalake_paschoalotto_raw.cbparcela.es_des_regis_str
-  contract_quintoandar:
-    description: "QuintoAndar Contract"
-    lineage:
-      - datalake_paschoalotto_raw.cbparcela.quintoandar_des_contr_str
   contract:
     description: ""
     lineage:
@@ -176,7 +170,7 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_contratos_str
-  velo_pf:
+  velo_person_type:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_pf_str
@@ -224,7 +218,7 @@ columns:
     description: "Fine amount"
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_multa_num
-  fine_discharge_amount:
+  fine_settlement_amount:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_multa_quitacao_num

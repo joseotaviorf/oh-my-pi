@@ -28,6 +28,7 @@ In datalake raw and clean, via full load:
 - `geqlcontrato`
 
 In datalake raw and clean, via incremental load:
+
 - `cbpagamento`
 - `cbfollowup`
 - `cbbordero`

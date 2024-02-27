@@ -6,17 +6,13 @@ domain: Fintech
 description: Type of contact made with the customer
 columns:
   id_contact:
-    description: ""
+    description: "Table sequence/ID"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geqlcontato_int
   id_customer:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geqlcliente_int
-  id_contact_type:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.geqlcontato.id_geqltipocontato_int
   id_address:
     description: ""
     lineage:
@@ -29,25 +25,24 @@ columns:
     description: "Sequential autoincremental primary key (PK) of the 'geusuario' table"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geusuario_int
-  id_user_inclusion:
+  id_geqltipocontato:
     description: ""
     lineage:
-      - datalake_paschoalotto_raw.geqlcontato.id_geusuario_inclusao_int
-  id_cemetery:
+      - datalake_paschoalotto_raw.geqlcontato.id_geqltipocontato_int
+  id_cemiterio:
     description: "Cemetery ID"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_cemiterio_int
-  contact:
+  id_geusuario_inclusao:
     description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.id_geusuario_inclusao_int
+  contact:
+    description: "Phone number"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.contato_str
   phone_classification:
     description: "Phone classification"
-    categories:
-      1 - Excelente: ""
-      2 - Bom: ""
-      3 - Ruim: ""
-      9 - Indefinido: ""
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.classificacao_str
   origin_table:
@@ -55,7 +50,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.tabela_origem_str
   note:
-    description: ""
+    description: "Observation/note"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.observacao_str
   contact_name:
@@ -71,11 +66,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.rg_str
   is_deleted:
-    description: ""
+    description: "If it has been deleted/inactivated"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.excluido_bit
   old_contact:
-    description: ""
+    description: "Old or obsolete contact"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.contato_antigo_str
   score:
@@ -101,15 +96,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.tipo_pessoa_str
   telephone_extension:
-    description: ""
+    description: "Telephone extension (ramal)"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.ramal_str
-  whatsapp:
+  has_whatsapp:
     description: "If the phone number has WhatsApp"
-    categories:
-      I: ""
-      N: ""
-      S: ""
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.whatsapp_str
   holiday_lock:
@@ -117,11 +108,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.trava_feriado_str
   reason:
-    description: ""
+    description: "Reason"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.motivo_str
-  is_contact_paid_easily:
-    description: ""
+  is_pagoufacil:
+    description: "If the contact is PagouFacil"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.contatopagoufacil_bit
   ranking_lemit:
@@ -137,7 +128,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.ranking_lemit_int
   inhibition_suspicious_phone_note:
-    description: ""
+    description: "Inibition description"
     categories:
       CONTATO BLOQUEADO DEVIDO ESTAR NA LISTA DE NÃO PERTURBE: ""
       CONTATO INIBIDO DEVIDO ESTAR NA LISTA DE BLOQUEIO DE DESCONHECE CLIENTE: ""
@@ -157,11 +148,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.data_alteracao_ranking_dat
   ts_sent:
-    description: ""
+    description: "Shipping date and time"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.tstamp_envio
   ts_return:
-    description: ""
+    description: "Return date and time"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.tstamp_retorno
   ts_cemetery:
@@ -169,7 +160,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.data_cemiterio_tst
   ts_inhibition_suspicious_phone:
-    description: ""
+    description: "date the phone was inhibited"
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.data_inibicao_tel_suspeito_tstamp
   ts_phone_insert:

@@ -1,0 +1,19 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: user
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: It contains user system data.
+columns:
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geusuario.id_geusuario_int
+  login_name:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geusuario.nomelogin_str
+  full_name:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.geusuario.nomecompleto_str

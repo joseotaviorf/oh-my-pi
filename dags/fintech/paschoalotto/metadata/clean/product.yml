@@ -17,7 +17,7 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.descricao_str
-  discharge:
+  settlement:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.quitacao_str
@@ -65,7 +65,7 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.taxa_ano_str
-  discharge_days:
+  settlement_days:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.dias_quitacao_num

@@ -10,35 +10,31 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_cbpagamento_int
   id_agreement_detail:
-    description: ""
+    description: "Agreement Detail ID. FK of table agreement_detail"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_cbitembordero_int
   id_contract:
-    description: "Contract ID"
+    description: "Contract ID. FK of table contract"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_cbcontrato_int
   id_user:
-    description: ""
+    description: "User ID. FK of table user"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_geusuario_int
-  id_cbtipopagamento:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.id_cbtipopagamento_int
-  id_geempresa:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.id_geempresa_int
-  id_gefilial:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.id_gefilial_int
-  id_gecliente:
-    description: ""
+  creditor:
+    description: "Creditor extract from table gecliente"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_gecliente_int
+  company:
+    description: "Company name extract from tabe gempresa"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_geempresa_int
+  branch:
+    description: "Branch (city) extract from table gefilial"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_gefilial_int
   sequence:
-    description: ""
+    description: "Bank slip sequence"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.sequencia_int
   receipt_series:
@@ -57,23 +53,24 @@ columns:
       - datalake_paschoalotto_raw.cbpagamento.tipo_recibo_str
   bill_status:
     description: "Bank slip (bill) status"
-    categories:
-      C: ""
-      E: ""
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.situacao_str
   magnetic:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.pc_magnetico_str
-  payment_status:
+  is_paid:
     description: "Payment status"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.situacao_pagto_str
-  payment_type:
+  type_payment:
     description: "Payment type"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.tipo_pagamento_str
+  payment_type:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.id_cbtipopagamento_int
   is_paid_in_installments:
     description: "Whether the bill is paid in installments or not"
     lineage:
@@ -86,8 +83,8 @@ columns:
     description: "Product"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.produto_str
-  discharge:
-    description: "If the bank slip (bill) is a discharge"
+  is_settlement:
+    description: "If the bank slip (bill) is a settlement"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.quitacao_str
   password:
@@ -110,50 +107,50 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.colchao_str
-  principal:
-    description: ""
+  has_notification:
+    description: "Notification"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.notificacao_num
+  has_bank_expense:
+    description: "Indicates if it has a Bank Expense"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.despesa_banco_num
+  is_write_off:
+    description: "Indicates if it is a write off (abatimento)"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.abatimento_num
+  has_honorarium:
+    description: "Indicated if it has fees (honorários)"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.honorarios_num
+  has_commissioning:
+    description: "Indicated if it has commissioning"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.comissionamento_num
+  main_amount:
+    description: "Main amount"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.principal_num
   cp:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.cp_num
-  fine:
+  fine_amount:
     description: "Fine amount"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.multa_num
-  notification:
-    description: "Notification"
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.notificacao_num
-  bank_expense:
-    description: "Bank Expense"
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.despesa_banco_num
-  discount:
+  discount_amount:
     description: "Discount amount"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.desconto_num
-  principal_discount:
-    description: ""
+  main_discount:
+    description: "Main discount"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.desconto_principal_num
-  reduction:
-    description: "Reduction (abatimento) amount"
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.abatimento_num
   default_interest:
     description: "Interest on arrears (juros e mora) amount"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.juros_mora_num
-  fees:
-    description: "Fees (honorários)"
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.honorarios_num
-  commissioning:
-    description: "Commissioning"
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.comissionamento_num
   total_amount:
     description: "Total bank slip (bill) amount"
     lineage:

@@ -5,64 +5,65 @@ owner: bianca.martins@quintoandar.com.br
 domain: Fintech
 description: Negotiation/Bordereau data
 columns:
-  id_negotiation_grouping:
+  id_negotiation:
     description: "Table sequence/ID"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_cbbordero_int
   id_product:
-    description: ""
+    description: "FK (foreign key) of table product (cbtiponegocio)"
+    categories:
+      "1": "Padrão"
+      "2": "Velo Assinatura"
+      "3": "Velo Garantia"
+      "4": "TESTE"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_cbtiponegocio_int
-  id_customer:
-    description: ""
+  id_user:
+    description: "User ID. FK (foreign key) of table user"
     lineage:
-      - datalake_paschoalotto_raw.cbbordero.id_gecliente_int
+      - datalake_paschoalotto_raw.cbbordero.id_geusuario_int
   id_geempresa:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_geempresa_int
-  id_gefilial:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbbordero.id_gefilial_int
-  id_fibanco:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbbordero.id_fibanco_int
-  id_ficcbanco:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbbordero.id_ficcbanco_int
-  id_cbtipopagamento:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbbordero.id_cbtipopagamento_int
-  id_cbtiponegocio:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbbordero.id_cbtiponegocio_int
-  id_user:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbbordero.id_geusuario_int
-  id_cbconvenio:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbbordero.id_cbconvenio_int
   id_geusuario_execut:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_geusuario_execut_int
   bordereau:
-    description: "Border number"
+    description: "bordereau number"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.bordero_int
+  creditor:
+    description: "Customer extract from gecliente table ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_gecliente_int
+  branch:
+    description: "Branch extract from gefilial table ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_gefilial_int
+  bank:
+    description: "Bank extract from fibanco table ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_fibanco_int
+  bank_detail:
+    description: "ficcbanco table ID. 1 = CONTA 00050520-6 AGENCIA 1370-0"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_ficcbanco_int
+  payment_type:
+    description: "Payment type extract from cbtipopagamento table ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_cbtipopagamento_int
+  convenio:
+    description: "Convenio extract from table cbconvenio"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.id_cbconvenio_int
   items:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbbordero.itens_int
   status:
-    description: ""
+    description: "status"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.situacao_int
   file:
@@ -73,12 +74,8 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbbordero.carteira_int
-  generated:
-    description: ""
-    categories:
-      "0": " "
-      "1": " "
-      "2": " "
+  bill_creation:
+    description: "Indicates if the bank_slip (bill) was created"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.gerado_str
   is_followup:
@@ -97,27 +94,20 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbbordero.repete_contrato_str
-  discharge:
-    description: "Whether the invoice is discharge of the contract or not"
+  is_settlement:
+    description: "Whether the invoice is settlement of the contract or not"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.quitacao_str
   bordereau_type:
     description: "Bordereau type"
-    categories:
-      C: ""
-      P: ""
     lineage:
       - datalake_paschoalotto_raw.cbbordero.tipo_bordero_str
   origin:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbbordero.origem_str
-  payment_type:
+  payment_type_recupera:
     description: ""
-    categories:
-      B: ""
-      H: ""
-      P: ""
     lineage:
       - datalake_paschoalotto_raw.cbbordero.forma_pagamento_api_recupera_str
   card_link:
@@ -133,12 +123,12 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbbordero.numero_acordo_ws_int
       - datalake_paschoalotto_raw.cbbordero.numero_acordo_ws_str
-  total:
-    description: ""
+  total_amount:
+    description: "Total amount"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.total_num
-  date:
-    description: ""
+  dt_bordereau:
+    description: "Bordereau date"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.data_dat
   ts_tstamp:

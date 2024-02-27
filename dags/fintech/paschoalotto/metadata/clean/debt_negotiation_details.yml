@@ -1,0 +1,150 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: debt_negotiation_details
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Negotiation detail in debt view
+columns:
+  id_debt_negotiation_details:
+    description: "Table sequence/ID"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbparcelaitembordero_int
+  id_customer_map_keys:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_geqlcontrato_int
+  id_customer:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_geqlcliente_int
+  id_gecliente:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_gecliente_int
+  id_product:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbtiponegocio_int
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbcontrato_int
+  id_user:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_geusuario_int
+  id_agreement_detail:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbitembordero_int
+  id_debt:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbparcela_int
+  contract:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.contrato_str
+  is_selected:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.selecionado_int
+  has_notification:
+    description: "Notification"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.notificacao_num
+  has_bank_expense:
+    description: "Indicates if has Bank Expense"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.despesa_banco_num
+  is_write_off:
+    description: "Indicates if it is reduction (abatimento) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.abatimento_num
+  has_honorarium:
+    description: "Indicates if it has honorarium fees (honorários)"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.honorarios_num
+  has_commissioning:
+    description: "Indicates if it has commissioning"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.comissionamento_num
+  main_amount:
+    description: "Main amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.principal_num
+  cp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.cp_num
+  fine_amount:
+    description: "Fine amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.multa_num
+  discount_amount:
+    description: "Discount amoun"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.desconto_num
+  default_interest:
+    description: "Interest on arrears (juros e mora) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.juros_mora_num
+
+  total_amount:
+    description: "Total bank slip (bill) amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.valor_total_num
+  retained:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.retido_num
+  addition:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.acrescimo_num
+  addition_np:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.acrescimo_np_num
+  installment_amount:
+    description: "Installment amount"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.valor_parcela_num
+  discount_percentage:
+    description: "Discount percentage"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.percentual_desconto_num
+  cp_original_amount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.cp_original_num
+  original_discount:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.desconto_original_num
+  dt_due:
+    description: "Installment due date"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.data_vencimento_dat
+  dt_file:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.data_arquivo_dat
+  ts_insert:
+    description: "Date and time when the record was added"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.tstamp_mdm_inclusao
+  ts_update:
+    description: "Date and time when the record was updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.tstamp_mdm_alteracao
+  ts_timestamp:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.timestamp
+  ts_tstamp:
+    description: "Date and time when the record was added or updated"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.tstamp
+  ts_load:
+    description: "Timestamp of ingestion"
