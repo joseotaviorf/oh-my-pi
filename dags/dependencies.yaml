@@ -209,8 +209,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
-bietlejuice.dw_demand_taxonomy:
-- bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results 
 bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
@@ -454,6 +452,8 @@ bietlejuice.dw_date:
 bietlejuice.dw_debt_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
+bietlejuice.dw_demand_taxonomy:
+  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
 bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
@@ -1771,7 +1771,9 @@ bietlejuice.enrich_listing_temp:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
 bietlejuice.enrich_losses:
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-entry-snapshot
   - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-snapshot
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-fact-invoice-entries-snapshot
   - bietlejuice.dw_fintech_snapshot:load-dw-public-snapshot-dim-contract-snapshot
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
@@ -1780,8 +1782,6 @@ bietlejuice.enrich_losses:
   - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
-  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-entry-snapshot
-  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-fact-invoice-entries-snapshot
 bietlejuice.enrich_losses_daily:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_retsuko:load-enrich-entry
@@ -1895,12 +1895,12 @@ bietlejuice.enrich_monopoly:
   - bietlejuice.monopoly:load-clean-sale-transaction
 bietlejuice.enrich_nexxera:
   - bietlejuice.nexxera:load-clean-adjustments
-  - bietlejuice.nexxera:load-clean-financial
-  - bietlejuice.nexxera:load-clean-financial-extracts-050e
   - bietlejuice.nexxera:load-clean-cnab-payments-237-seg-a
   - bietlejuice.nexxera:load-clean-cnab-payments-341-seg-a
   - bietlejuice.nexxera:load-clean-cnab-payments-341-seg-j
   - bietlejuice.nexxera:load-clean-cnab-payments-341-seg-o
+  - bietlejuice.nexxera:load-clean-financial
+  - bietlejuice.nexxera:load-clean-financial-extracts-050e
   - bietlejuice.rental_guarantee_platform:load-clean-address
   - bietlejuice.rental_guarantee_platform:load-clean-property-propose
   - bietlejuice.rental_guarantee_platform:load-clean-propose
