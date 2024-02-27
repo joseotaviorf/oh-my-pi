@@ -343,7 +343,8 @@ bietlejuice.enrich_consolidated_growth_metrics:
     - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
     - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
     - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
-    - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary    
+    - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary
+    - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
 bietlejuice.enrich_content_funnel:
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking

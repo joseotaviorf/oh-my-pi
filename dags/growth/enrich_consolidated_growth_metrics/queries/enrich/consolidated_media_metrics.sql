@@ -172,7 +172,7 @@ WITH consolidated_sources AS (
 SELECT
     cs.id_date,
     cs.origin,
-    COALESCE(sr.business_context, cs.business_context) AS business_context,
+    COALESCE(sr_utm.business_context, sr.business_context, cs.business_context) AS business_context,
     cs.account_name,
     COALESCE(ctd.campaign_name_convention, cs.campaign_name) AS campaign_name,
     CASE
@@ -188,7 +188,7 @@ SELECT
     END AS campaign_origin_acquisition,
     CASE 
         WHEN cs.origin = 'braze' THEN cs.city_group
-        ELSE COALESCE(ch.city_group, sr.city_group, dr.city_group, 'Not Mapped') 
+        ELSE COALESCE(ch.city_group, sr_utm.city_group, sr.city_group, dr.city_group, 'Not Mapped') 
     END AS city_group,
     cs.report_type,
     cs.ad_type,
@@ -210,6 +210,11 @@ LEFT JOIN
 LEFT JOIN
     datalake_consolidated_marketing_costs.city_group_old_campaigns_historic ch
         ON cs.campaign_name = ch.campaign_name
+LEFT JOIN
+    datalake_growth_costs_sharing_rules.sharing_rules sr_utm
+        ON SPLIT(cs.campaign_name, '[.]')[0] = sr_utm.id_rule
+        AND cs.id_date = sr_utm.id_date 
+        AND cs.campaign_name = sr_utm.utm_campaign            
 LEFT JOIN
     datalake_region.region dr
         ON SPLIT(cs.campaign_name, '[.]')[0] = dr.id
