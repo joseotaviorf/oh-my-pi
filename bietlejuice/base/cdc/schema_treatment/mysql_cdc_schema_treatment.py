@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, from_unixtime, to_timestamp
+from pyspark.sql.functions import col, to_timestamp, to_date
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_treatment import (
     CdcSchemaTreatment,
 )
@@ -28,16 +28,19 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
     ) -> DataFrame:
         """CDC saves date and datetime columns as unix timestamps. This method converts them back to datetime."""
 
-        timestamp_types = ("DATE", "DATETIME")
-        timestamp_columns = [
-            column["name"]
-            for column in latest_table_change["columns"]
-            if column["typeName"] in timestamp_types
-        ]
-        for timestamp_column in timestamp_columns:
-            transactional_dataframe = transactional_dataframe.withColumn(
-                timestamp_column,
-                to_timestamp(from_unixtime(col(timestamp_column) / 1000)),
-            )
+        for column in latest_table_change["columns"]:
+            if column["typeName"] == "DATE":  # Comes in days
+                transactional_dataframe = transactional_dataframe.withColumn(
+                    column["name"],
+                    to_date(to_timestamp(col(column["name"]) * 24 * 60 * 60)),
+                )
+            elif column["typeName"] == "DATETIME":  # Comes in milliseconds
+                transactional_dataframe = transactional_dataframe.withColumn(
+                    column["name"], to_timestamp(col(column["name"]) / 1000)
+                )
+            elif column["typeName"] == "TIMESTAMP":  # Comes as string
+                transactional_dataframe = transactional_dataframe.withColumn(
+                    column["name"], to_timestamp(col(column["name"]))
+                )
 
         return transactional_dataframe
