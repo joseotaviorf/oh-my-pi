@@ -26,6 +26,6 @@ SELECT
     MONTH(dt) AS month,
     DAY(dt) AS day
 FROM
-    datalake_zendesk_tickets_raw.ticket_fields
+    datalake_zendesk_raw.ticket_fields
 WHERE
     dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)

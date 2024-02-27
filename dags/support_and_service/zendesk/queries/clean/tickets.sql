@@ -30,6 +30,6 @@ SELECT
     MONTH(CAST(dt AS DATE)) AS month,
     DAY(CAST(dt AS DATE)) AS day
 FROM
-    datalake_zendesk_tickets_raw.tickets
+    datalake_zendesk_raw.tickets
 WHERE
     dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)

@@ -12,6 +12,6 @@ SELECT
     MONTH(dt) AS month,
     DAY(dt) AS day
 FROM
-    datalake_zendesk_tickets_raw.group_memberships
+    datalake_zendesk_raw.group_memberships
 WHERE
     dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)

@@ -805,9 +805,6 @@ bietlejuice.dw_tickets:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.zendesk:load-clean-organizations
-  - bietlejuice.zendesk:load-clean-tickets
-  - bietlejuice.zendesk:load-clean-users
   - bietlejuice.zendesk_tickets:load-clean-tickets
   - bietlejuice.zendesk_tickets:load-clean-users
 bietlejuice.dw_tracksale:
@@ -952,8 +949,6 @@ bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
-  - bietlejuice.zendesk:load-clean-groups
-  - bietlejuice.zendesk:load-clean-users
   - bietlejuice.zendesk_tickets:load-clean-groups
   - bietlejuice.zendesk_tickets:load-clean-users
 bietlejuice.enrich_amplitude_offer:
@@ -1274,10 +1269,6 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.insider:load-clean-review-feature
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
-  - bietlejuice.zendesk:load-clean-groups
-  - bietlejuice.zendesk:load-clean-satisfaction-ratings
-  - bietlejuice.zendesk:load-clean-tickets
-  - bietlejuice.zendesk:load-clean-users
   - bietlejuice.zendesk_tickets:load-clean-tickets-history
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
@@ -2457,7 +2448,6 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.gsheets_fintech:done-clean-tenant-entrance-inspection-csat
   - bietlejuice.gsheets_support_and_service:done-clean-csat-reimbursement-true
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat
-  - bietlejuice.zendesk:load-clean-satisfaction-ratings
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
@@ -2693,8 +2683,6 @@ bietlejuice.enrich_wordpress_baroes:
   - bietlejuice.wordpress_baroes:load-clean-conteudos-data
   - bietlejuice.wordpress_baroes:load-clean-meulugar-data
 bietlejuice.enrich_zendesk_custom_fields:
-  - bietlejuice.zendesk:load-clean-ticket-fields
-  - bietlejuice.zendesk:load-clean-tickets
   - bietlejuice.zendesk_tickets:load-clean-ticket-fields
   - bietlejuice.zendesk_tickets:load-clean-tickets
 bietlejuice.enrich_zendesk_history:
@@ -2708,19 +2696,11 @@ bietlejuice.enrich_zendesk_ticket_funnels:
   - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements
   - bietlejuice.enrich_zendesk_tickets:load-enrich-zendesk-users-contact
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
-  - bietlejuice.zendesk:load-clean-groups
-  - bietlejuice.zendesk:load-clean-tickets
 bietlejuice.enrich_zendesk_tickets:
   - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
-  - bietlejuice.zendesk:load-clean-ticket-metrics
-  - bietlejuice.zendesk:load-clean-tickets
-  - bietlejuice.zendesk:load-clean-users
 bietlejuice.enrich_zendesk_users:
   - bietlejuice.bigfone:load-clean-event
   - bietlejuice.quinto_messenger:load-clean-task
-  - bietlejuice.zendesk:load-clean-organizations
-  - bietlejuice.zendesk:load-clean-tickets
-  - bietlejuice.zendesk:load-clean-users
   - bietlejuice.zendesk_tickets:load-clean-organizations
   - bietlejuice.zendesk_tickets:load-clean-tickets
   - bietlejuice.zendesk_tickets:load-clean-users
