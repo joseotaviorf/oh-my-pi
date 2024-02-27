@@ -270,6 +270,31 @@ app_183047_form_submitted_events_rene AS (
         -- but in datalake_rene_descartes_clean_prod.house_lead
             AND DATE(app_183047_form_submitted_events.ts_event) >= DATE('2021-07-15')
 ),
+app_183047_intro_page_viewed_events AS(
+  SELECT
+    CAST(GET_JSON_OBJECT(event_properties, '$.lead_id') AS BIGINT) AS id_lead,
+    NULL AS id_firestore,
+    NULL AS formfield_lead_uuid,
+    5 AS rule_num,
+    'opr' AS rule,
+    country AS user_country,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
+    ts_event,
+    up_utm_campaign AS utm_campaign,
+    up_utm_medium AS utm_medium,
+    up_utm_source AS utm_source,
+    up_utm_content AS utm_content,
+    up_utm_term AS utm_term,
+    CAST(GET_JSON_OBJECT(user_properties , '$.platform') AS STRING) AS platform,
+    CAST(GET_JSON_OBJECT(user_properties , '$.referring_domain') AS STRING) AS referring_domain,
+    region,
+    city,
+    uuid
+  FROM
+    datalake_amplitude_clean.183047_intro_page_viewed_events
+  WHERE
+    GET_JSON_OBJECT(event_properties, '$.lead_id') IS NOT NULL
+),
 lead_events_union AS (
     SELECT
         *,
@@ -290,6 +315,11 @@ lead_events_union AS (
         *,
         RANK() OVER(PARTITION BY formfield_lead_uuid ORDER BY ts_event DESC) AS rn
     FROM app_183047_form_submitted_events_rene
+    UNION
+    SELECT
+        *,
+        RANK() OVER(PARTITION BY id_lead ORDER BY ts_event DESC) AS rn
+    FROM app_183047_intro_page_viewed_events
 )
 SELECT
     id_lead,
