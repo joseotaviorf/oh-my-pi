@@ -1,14 +1,8 @@
 SELECT
     BIGINT(id_cbparcelaitembordero_int) AS id_debt_negotiation_details,
-    BIGINT(id_geqlcontrato_int) AS id_customer_map_keys,
-    BIGINT(id_geqlcliente_int) AS id_customer,
-    BIGINT(id_gecliente_int) AS id_gecliente,
-    BIGINT(id_cbtiponegocio_int) AS id_product,
-    BIGINT(id_cbcontrato_int) AS id_contract,
     BIGINT(id_geusuario_int) AS id_user,
     BIGINT(id_cbitembordero_int) AS id_agreement_detail,
     BIGINT(id_cbparcela_int) AS id_debt,
-    contrato_str AS contract,
     IF(INT(selecionado_int) = 1, TRUE, FALSE) AS is_selected,
     IF(notificacao_num = "1", TRUE, FALSE) AS has_notification,
     IF(despesa_banco_num = "1", TRUE, FALSE) AS has_bank_expense,
@@ -33,7 +27,6 @@ SELECT
     TO_TIMESTAMP(tstamp_mdm_inclusao, 'dd/MM/yyyy HH:mm:ss') AS ts_insert,
     TO_TIMESTAMP(tstamp_mdm_alteracao, 'dd/MM/yyyy HH:mm:ss') AS ts_update,
     TO_TIMESTAMP(timestamp, 'dd/MM/yyyy HH:mm:ss') AS ts_timestamp,
-    TO_TIMESTAMP(tstamp, 'dd/MM/yyyy HH:mm:ss') AS ts_tstamp,
     NOW() AS ts_load
 FROM datalake_paschoalotto_raw.cbparcelaitembordero
 QUALIFY ROW_NUMBER() OVER(PARTITION BY id_cbparcelaitembordero_int ORDER BY DATE(CONCAT(year, "-", month, "-", day)) DESC, ts_load DESC) = 1

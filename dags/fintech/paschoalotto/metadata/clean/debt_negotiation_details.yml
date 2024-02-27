@@ -9,26 +9,6 @@ columns:
     description: "Table sequence/ID"
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbparcelaitembordero_int
-  id_customer_map_keys:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelaitembordero.id_geqlcontrato_int
-  id_customer:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelaitembordero.id_geqlcliente_int
-  id_gecliente:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelaitembordero.id_gecliente_int
-  id_product:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbtiponegocio_int
-  id_contract:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbcontrato_int
   id_user:
     description: ""
     lineage:
@@ -41,10 +21,6 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbparcela_int
-  contract:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelaitembordero.contrato_str
   is_selected:
     description: ""
     lineage:
@@ -142,9 +118,5 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.timestamp
-  ts_tstamp:
-    description: "Date and time when the record was added or updated"
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelaitembordero.tstamp
   ts_load:
     description: "Timestamp of ingestion"

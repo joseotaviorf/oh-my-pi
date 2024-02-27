@@ -58,7 +58,7 @@ SELECT
     IF(notificacao_num = "1", TRUE, FALSE) AS has_notification,
     CAST(REPLACE(cp_original_num, ',', '.') AS DECIMAL(10, 2)) AS cp_original,
     CAST(REPLACE(cp_num, ',', '.') AS DECIMAL(10, 2)) AS cp,
-    CAST(REPLACE(valor_desconto_num, ',', '.') AS DECIMAL(10, 2)) AS discount_amount,
+    CAST(REPLACE(valor_desconto_num, ',', '.') AS DECIMAL(10, 2)) AS bank_slip_discount_amount,
     CAST(REPLACE(principal_num, ',', '.') AS DECIMAL(10, 2)) AS main_amount,
     CAST(REPLACE(multa_num, ',', '.') AS DECIMAL(10, 2)) AS fine_amount,
     CAST(REPLACE(despesa_banco_num, ',', '.') AS DECIMAL(10, 2)) AS bank_expense,

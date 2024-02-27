@@ -183,7 +183,7 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.origem_ws_int
-  discount_amount:
+  bank_slip_discount_amount:
     description: "Bank slip (Bill) discount amount"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.valor_desconto_num
