@@ -1,0 +1,21 @@
+dag:
+  name: ebdb_test
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 10 21 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Retrieves data from incoming CDC replication from EBDB and load it on datalake.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb_test
+  source_schema: ebdb
+  tables_customization:
+    FluxoLocacao_DadosAgente:
+      clean_table_name: agent_rent_flow
+    Contrato:
+      clean_table_name: contract
+    Imovel:
+      clean_table_name: house
+cluster:
+  type: databricks_12_2_med_general_cluster
