@@ -87,6 +87,15 @@ endpoints:
         - "payrollAssignments.assignedPayrolls"
         - "payrollAssignments.payrollAssignmentDates"
         - "payrollRelationshipDates"
+  performance_goals:
+    has_partitions: false
+    has_columns_to_delete: false
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "associatedGoalPlans"
+  
   personal_payment_methods:
     has_partitions: false
     has_columns_to_delete: false
