@@ -154,7 +154,7 @@ def extract_tables_customization(conf_file: dict) -> dict:
         for table_name, table in conf_file["tables"].items():
             tables_customization[table_name] = {}
             if table.get("is_incremental") in table:
-                tables_customization[table_name]["default_extraction_type"] = "incremental"
+                tables_customization[table_name]["extraction_type"] = "incremental"
             if "partitions" in table:
                 tables_customization[table_name]["partitions"] = table["partitions"]
             if "partition_cols" in table:
@@ -176,7 +176,7 @@ def extract_tables_customization(conf_file: dict) -> dict:
     for table_name in conf_file.get("incremental_tables", []):
         if table_name not in tables_customization:
             tables_customization[table_name] = {}
-        tables_customization[table_name]["default_extraction_type"] = "incremental"
+        tables_customization[table_name]["extraction_type"] = "incremental"
 
     # Delete tables that have no customization
     for table_name in list(tables_customization.keys()):
