@@ -1,3 +1,20 @@
 ---
 external_s3_bucket: nexxera-prod
 partition_cols: ["year", "month", "day"]
+tables:
+  - table_name: ojdt_error
+    is_monthly: False
+  - table_name: ojdt_ok
+    is_monthly: False
+  - table_name: jdt1_error
+    is_monthly: False
+  - table_name: jdt1_ok
+    is_monthly: False
+  - table_name: consolidated_ojdt_error
+    is_monthly: True
+  - table_name: consolidated_ojdt_ok
+    is_monthly: True
+  - table_name: consolidated_jdt1_error
+    is_monthly: True
+  - table_name: consolidated_jdt1_ok
+    is_monthly: True

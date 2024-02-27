@@ -49,10 +49,9 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 default_libraries = config_service.get_config("default_libraries")
-
 external_s3_bucket = config_service.get_config("external_s3_bucket")
-
 partition_cols = config_service.get_config("partition_cols")
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -97,6 +96,7 @@ datalake_task_groups = task_group.build_task_group_from_sql_files(
     partitions=partition_cols,
 )
 
+
 external_bucket_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"load_s3_data_into_external_bucket",
     dag=dag,
@@ -104,10 +104,11 @@ external_bucket_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": reverse_spark_job_path,
             "parameters": [ENV,
-                           datalake_bucket,
-                           SOURCE,
-                           external_s3_bucket,
-                           "{{ ds }}"],
+                        datalake_bucket,
+                        SOURCE,
+                        external_s3_bucket,
+                        "{{ ds }}"
+                        ],
         }
     },
 )

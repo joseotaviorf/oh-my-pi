@@ -8,8 +8,8 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.services.s3_service import S3Service
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
 
 import boto3
 from pyspark.sql.utils import AnalysisException
@@ -51,37 +51,54 @@ if __name__ == "__main__":
 
     logger.info(
         f"""m=__main__, environment={environment}, source={source}, execution_date={execution_date},
-        datalake_bucket={datalake_bucket}, external_bucket={external_bucket}
+        datalake_bucket={datalake_bucket}, external_bucket={external_bucket},
         """
     )
     datalake_path_prefix = f"reverse/{source}/"
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
 
-    tables = __get_first_layer_folders_s3(datalake_bucket, datalake_path_prefix)
-    execution_date = datetime.strptime(execution_date, "%Y-%m-%d").date()
+    config_service = ConfigurationService(f"reverse_{source}")
 
+
+    tables = __get_first_layer_folders_s3(datalake_bucket, datalake_path_prefix)
+    tables_config = config_service.get_config("tables")
+    execution_date = datetime.strptime(execution_date, "%Y-%m-%d").date()
 
     s3_client = boto3.client("s3")
 
     for table in tables:
+        table_config = [conf for conf in tables_config if conf['table_name'] == table][0]
+        if table_config.get("is_monthly", False) and execution_date.day != '1':
+            logger.info(
+                    f"m=__main__, message={table} is monthly and should not run today, execution_date={execution_date}"
+                )
+            continue
+
         datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}{table}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
         files = S3Service(boto3.resource("s3")).list_objects(datalake_path)
         if len(files) > 0:
             try:
                 df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
-            except AnalysisException:
-                df = None
+            except AnalysisException as e:
+                logger.info(
+                        f"m=__main__, message=AnalysisException for {table}, datalake_path={datalake_path}, exception: {e}"
+                    )
+                continue
         else:
-            df = None
+            logger.info(
+                    f"m=__main__, message=Found 0 files for {table}, datalake_path={datalake_path}, len(files): {len(files)}"
+                )
+            continue
 
         if df is not None:
             df = df.drop("year", "month", "day")
 
-            destination_path = f"{table}"
+            destination_path = f"{table}/{execution_date.year}/{execution_date.month}/{execution_date.day}/"
             file_name = (
-                f'_{(execution_date.strftime("%Y_%m_%d"))}.csv'
+                f'{table}_{(execution_date.strftime("%Y_%m_%d"))}.csv'
             )
+
             with io.StringIO() as csv_buffer:
                 df.toPandas().convert_dtypes().to_csv(
                     csv_buffer, index=False, header=True
