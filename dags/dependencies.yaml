@@ -874,6 +874,7 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics
   - bietlejuice.velo_zendesk:load-clean-users
 bietlejuice.dw_visit:
+  - bietlejuice.ebdb:load-clean-entrance
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
 bietlejuice.enrich_3p:

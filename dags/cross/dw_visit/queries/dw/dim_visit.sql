@@ -11,7 +11,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   booking_type,
   ts_created AS dt_created,
   ts_updated AS dt_updated,
-  NOW() AS dt_timestamp
+  NOW() AS ts_load
 FROM
   datalake_ebdb_clean.visit AS v
 LEFT JOIN

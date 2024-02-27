@@ -1,7 +1,7 @@
 database_name: dw_public
 table_name: dim_visit
-description: Information about Rent and Sale visits, which is a subset of bookings. 
-  A visit is when a tenant prospect/buyer prospect visits a property because it's interested in it. 
+description: Information about Rent and Sale visits, which is a subset of bookings.
+  A visit is when a tenant prospect/buyer prospect visits a property because it's interested in it.
   Each line is an unique visit.
 domain: For Rent
 owner: gustavo.alencar@quintoandar.com.br
@@ -61,5 +61,5 @@ columns:
     lineage:
     - datalake_ebdb_clean.visit.ts_updated
     description: Timestamp of visit last status
-  dt_timestamp:
-    description: Timestamp of table loading
+  ts_load:
+    description: Timestamp of the ingestion data.

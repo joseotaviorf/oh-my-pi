@@ -3,7 +3,8 @@ SELECT
     author_type,
     author_user_role,
     on_behalf_of,
-    channel
+    channel,
+    NOW() AS ts_load
 FROM
 (
     SELECT 1 AS sk_seq, 'PERSON' AS author_type

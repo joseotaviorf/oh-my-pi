@@ -17,3 +17,5 @@ columns:
     description: An identification to say the author is present at this event on behalf of those
   channel:
     description: Name of used channel.
+  ts_load:
+    description: Timestamp of the ingestion data.

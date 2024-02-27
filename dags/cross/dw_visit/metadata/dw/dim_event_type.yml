@@ -8,3 +8,5 @@ columns:
     description: Id of the event.
   event_name:
     description: Name of the event.
+  ts_load:
+    description: Timestamp of the ingestion data.
