@@ -1,6 +1,0 @@
----
-inner_dependencies:
-  city_groups_per_periods:
-    - region
-partition_cols:
-  - country_code

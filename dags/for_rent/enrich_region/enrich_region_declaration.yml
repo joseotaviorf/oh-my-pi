@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_region
+  schedule_start_date: 2020, 7, 1
+  documentation: 
+    dag_purpose: |
+          Creates enriched tables for the context `Region`.
+  owner: Data ForRent
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    city_groups_per_periods:
+    - region
+  default_partitions:
+  - country_code
+cluster:
+  type: databricks_10_4_min_general_photon_cluster
