@@ -180,7 +180,7 @@ def main():
     )
 
     logger.info("m=__main__, msg=Load table into transactional layer...")
-    spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_cdc_{schema}_transactional`")
+    spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_{schema}_transactional`")
     load_df_into_transactional(
         transactional_df, datalake_bucket, schema, table_name, partitions
     )
