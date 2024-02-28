@@ -39,18 +39,19 @@ class BaseWorkflow(BuilderInterface):
 
         self.local_tz = timezone("America/Sao_Paulo")
 
-    def get_date_param(self, dag_run, ds, yesterday_ds, date_param_name):
+    def get_date_param(self, dag_run, default_date, date_param_name) -> str:
+        """Macro to get date parameter from dag_run conf. If not found, returns default_date."""
+
         date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
         if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
             return date_param
-        if date_param_name == "start_date":
-            return yesterday_ds
-        if date_param_name == "end_date":
-            return ds
+        return default_date
 
     def dag_instance(self, **kwargs):
         schedule_start_date = self._get_start_date()
         doc_md = self._get_dag_documentation()
+        user_defined_macros = {"get_date_param": self.get_date_param}
+        user_defined_macros.update(kwargs.get("user_defined_macros", {}))
 
         dag = DAG(
             dag_id=self.dag_id,
@@ -63,6 +64,7 @@ class BaseWorkflow(BuilderInterface):
             start_date=schedule_start_date,
             schedule_interval=self.dag_args.get("schedule_interval", None),
             doc_md=doc_md,
+            user_defined_macros=user_defined_macros,
             **kwargs,
         )
 

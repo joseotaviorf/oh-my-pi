@@ -19,13 +19,11 @@ class RawCDCWorkflow(BaseWorkflow):
         super().__init__(dag_args, workflow_args, cluster_args)
 
     def build_dag(self):
-        dag = self.dag_instance(
-            user_defined_macros={"get_date_param": self.get_date_param}
-        )
+        dag = self.dag_instance()
         bucket = self.config_service.get_config("datalake_bucket")
         incoming_bucket = self.config_service.get_config("incoming_bucket")
-        start_date = "{{ get_date_param(dag_run, ds, yesterday_ds, 'start_date') }}"
-        end_date = "{{ get_date_param(dag_run, ds, yesterday_ds, 'end_date') }}"
+        start_date = "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"
+        end_date = "{{ get_date_param(dag_run, ds, 'end_date') }}"
         dag_execution_context = self._get_dag_execution_context(
             dag,
             bucket,
