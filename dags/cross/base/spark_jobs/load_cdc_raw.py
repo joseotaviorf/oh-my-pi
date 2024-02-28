@@ -109,13 +109,14 @@ def dml_processor(transactional_df, primary_keys):
         "m=dml_processor, msg=Applying deduplication and preserving the lasest operation on Transactional layer..."
     )
     window_spec = Window.partitionBy(*primary_keys).orderBy(
-        transactional_df["ts_cdc_transaction"].desc()
+        transactional_df["ts_cdc_transaction"].desc(), transactional_df["cdc_binlog_position"].desc()
     )
     transactional_df = transactional_df.withColumn(
         "row_number", row_number().over(window_spec)
     )
     transactional_df = transactional_df.where(transactional_df["row_number"] == 1)
     transactional_df = transactional_df.drop("row_number")
+    transactional_df = transactional_df.drop("cdc_binlog_position")
 
     return transactional_df
 

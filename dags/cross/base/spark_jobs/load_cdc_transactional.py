@@ -102,11 +102,11 @@ def format_and_deduplicate_df(df, partitions):
         f"m=format_incoming_df, msg=Transforming Debezium payload into Transactional layer table..."
     )
     df_without_delete_op = df.filter(df.op != lit("d")).select(
-        col("after").alias("data"), "op", "ts_ms", *partitions
+        col("after").alias("data"), "op", "ts_ms", "source", *partitions
     )
 
     df_deletes = df.filter(df.op == lit("d")).select(
-        col("before").alias("data"), "op", "ts_ms", *partitions
+        col("before").alias("data"), "op", "ts_ms", "source", *partitions
     )
 
     if df_without_delete_op.isEmpty():
@@ -124,6 +124,7 @@ def format_and_deduplicate_df(df, partitions):
         to_timestamp(col("ts_ms") / 1000).alias(
             "ts_cdc_transaction"
         ),
+        col("source.pos").alias("cdc_binlog_position"),
         *partitions,
     )
 
