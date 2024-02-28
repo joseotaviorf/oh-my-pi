@@ -7,7 +7,7 @@ import json
 class LoadMongoRawTaskCreator(BaseTaskCreator):
     """Creates the task that extracts data from a MongoDB table and sink into the raw layer."""
 
-    _TASK_ID_TEMPLATE = "load-{layer}-{schema}-{table_name}"
+    _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
     SPARK_JOB_NAME = "load_mongo_raw"
 
     def create_task(

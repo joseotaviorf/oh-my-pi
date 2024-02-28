@@ -13,7 +13,7 @@ class DataQualityTestsTaskCreator(BaseTaskCreator):
     determined by the workflow.
     """
 
-    _TASK_ID_TEMPLATE = "data-quality-tests-{layer}-{schema}-{table_name}"
+    _TASK_ID_TEMPLATE = "data-quality-tests-{layer}-{table_name}"
 
     DEFAULT_SPARK_JOB_NAME = "data_quality_tests"
 

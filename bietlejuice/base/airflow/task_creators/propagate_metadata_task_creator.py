@@ -11,7 +11,7 @@ class PropagateMetadataTaskCreator(BaseTaskCreator):
     and no product database name is configured. That should be determined by the workflow.
     """
 
-    _TASK_ID_TEMPLATE = "propagate-table-metadata-{layer}-{schema}-{table_name}"
+    _TASK_ID_TEMPLATE = "propagate-table-metadata-{layer}-{table_name}"
 
     DEFAULT_SPARK_JOB_NAME = "propagate_table_metadata"
     LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING = {

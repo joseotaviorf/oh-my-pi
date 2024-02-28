@@ -10,7 +10,7 @@ class RegisterDeltaTableTaskCreator(BaseTaskCreator):
     already available at Databricks Metastore.
     """
 
-    _TASK_ID_TEMPLATE = "register-table-{layer}-{schema}-{table_name}"
+    _TASK_ID_TEMPLATE = "register-table-{layer}-{table_name}"
     SPARK_JOB_NAME = "register_delta_table"
 
     def create_task(

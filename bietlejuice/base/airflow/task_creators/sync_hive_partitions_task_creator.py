@@ -10,7 +10,7 @@ class SyncHivePartitionsTaskCreator(BaseTaskCreator):
     already available at Databricks Metastore.
     """
 
-    _TASK_ID_TEMPLATE = "sync-hive-metastore-partitions-{layer}-{schema}-{table_name}"
+    _TASK_ID_TEMPLATE = "sync-hive-metastore-partitions-{layer}-{table_name}"
     SPARK_JOB_NAME = "sync_metastore_tables_partitions"
 
     def create_task(

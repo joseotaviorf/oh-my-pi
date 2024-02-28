@@ -10,7 +10,7 @@ class SyncHiveStructureTaskCreator(BaseTaskCreator):
     it to the table already available at Databricks Metastore.
     """
 
-    _TASK_ID_TEMPLATE = "sync-hive-metastore-structure-{layer}-{schema}-{table_name}"
+    _TASK_ID_TEMPLATE = "sync-hive-metastore-structure-{layer}-{table_name}"
     SPARK_JOB_NAME = "sync_metastore_tables_structure"
 
     def create_task(
