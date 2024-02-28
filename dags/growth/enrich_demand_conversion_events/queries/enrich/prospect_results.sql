@@ -82,7 +82,7 @@ media_setup_ids AS (
     dpce.event_name,
     INT(SPLIT(dpce.utm_adhoc_rule, "[.]")[1]) AS id_media_setup_from_adhoc,
     INT(SPLIT(dpce.utm_campaign, "[.]")[1]) AS id_media_setup_from_naming_convention,
-    INT(SPLIT(ef.correct_utm_camapign, "[.]")[1]) AS id_media_setup_from_exception_flow,
+    INT(SPLIT(ef.correct_utm_campaign, "[.]")[1]) AS id_media_setup_from_exception_flow,
     dict.sk_media_setup AS id_media_setup_from_dictionary,
     dpce.id_rent_flow,
     dpce.id_sale_flow, 
@@ -119,7 +119,7 @@ media_setup_ids AS (
       AND COALESCE(SF_NORMALIZE_STRING(dpce.utm_source),0) = COALESCE(LOWER(dict.utm_source),0)
       AND COALESCE(SF_NORMALIZE_STRING(dpce.utm_medium),0) = COALESCE(LOWER(dict.utm_medium),0)
   LEFT JOIN
-    datalake_gsheets_raw.taxonomy_demand_exception_flow AS ef
+    datalake_gsheets_clean.taxonomy_demand_exception_flow AS ef
       ON LOWER(dpce.utm_campaign) = LOWER(ef.utm_campaign)
       AND LOWER(dpce.utm_source) = LOWER(ef.utm_source)
       AND LOWER(dpce.utm_medium) = LOWER(ef.utm_medium)

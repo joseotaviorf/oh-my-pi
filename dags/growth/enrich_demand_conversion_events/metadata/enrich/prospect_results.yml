@@ -70,7 +70,7 @@ columns:
   id_media_setup_from_exception_flow:
     description: 'Identifier for media setup originating from exception flow gsheets.'
     lineage:
-      - datalake_gsheets_raw.taxonomy_demand_exception_flow.correct_utm_camapign
+      - datalake_gsheets_clean.taxonomy_demand_exception_flow.correct_utm_campaign
   id_media_setup_from_naming_convention:
     description: 'Identifier for media setup originating from naming convention.'
     lineage:

@@ -1,0 +1,136 @@
+---
+database_name: datalake_demand_flows
+table_name: top_of_funnel_results
+owner: isabela.matsumoto@quintoandar.com.br
+domain: growth
+description: 'This table tracks the top of the funnel interactions by users across different platforms and marketing channels. It includes ad hoc rules for media setup identification, user interaction details, and platform categorization.'
+
+columns:
+  id_top_of_funnel_event:
+    description: 'Unique identifier for the top of funnel event.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.id
+  id_tof_user:
+    description: 'Unique identifier for the user at the top of the funnel.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.id_tof_user
+  id_house:
+    description: 'Identifier of the property related to the user interaction.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.id_house
+  sk_region:
+    description: 'Identifier representing the region of the interaction or property.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.sk_region
+  id_media_setup_from_adhoc:
+    description: 'Identifier for media setup derived from ad hoc rules.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_campaign
+      - datalake_top_of_funnel_demand.user_interactions.utm_source
+      - datalake_top_of_funnel_demand.user_interactions.utm_medium
+      - datalake_top_of_funnel_demand.user_interactions.app_type
+  id_media_setup_from_dictionary:
+    description: 'Identifier for media setup derived from taxonomy dictionary matches.'
+    lineage:
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.sk_media_setup
+  id_media_setup_from_exception_flow:
+    description:  'Identifier for media setup derived from exception flows.'
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand_exception_flow.correct_utm_campaign 
+  id_media_setup_from_naming_convention:
+    description:  'Identifier for media setup derived from naming convention of utm_campaign.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_campaign
+  final_id_media_setup:
+    description: 'The final media setup identifier selected based on a priority order from adhoc, dictionary, exception flow, and naming convention.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_campaign
+      - datalake_top_of_funnel_demand.user_interactions.utm_source
+      - datalake_top_of_funnel_demand.user_interactions.utm_medium
+      - datalake_top_of_funnel_demand.user_interactions.app_type
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.sk_media_setup
+      - datalake_gsheets_clean.taxonomy_demand_exception_flow.correct_utm_campaign 
+  final_media_setup_id_origin:
+    description: 'Describes the source from which the final media setup identifier was derived, indicating the priority rule or source.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_campaign
+      - datalake_top_of_funnel_demand.user_interactions.utm_source
+      - datalake_top_of_funnel_demand.user_interactions.utm_medium
+      - datalake_top_of_funnel_demand.user_interactions.app_type
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.sk_media_setup
+      - datalake_gsheets_clean.taxonomy_demand_exception_flow.correct_utm_campaign 
+  utm_adhoc_rule:
+    description: 'Ad hoc rule applied based on utm parameters and app type to categorize the interaction.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_campaign
+      - datalake_top_of_funnel_demand.user_interactions.utm_source
+      - datalake_top_of_funnel_demand.user_interactions.utm_medium
+      - datalake_top_of_funnel_demand.user_interactions.app_type
+  utm_medium:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_medium  
+  utm_source:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_source  
+  utm_campaign:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_campaign  
+  utm_content:
+    description: 'Marketing parameter providing additional content information for the campaign.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_content
+  utm_term:
+    description: 'Marketing parameter providing term information used in the marketing campaign.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.utm_term
+  app_type:
+    description: 'Application from which the user made the conversion event.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.app_type 
+  operation_channel:
+    description: 'Physical agent, internal or external, who performed the conversion in the funnel stage under analysis'
+    categories:
+      SelfService: 'Conversions that took place without the aid of any operation being carried out by the Prospect itself at the time of conversion.'
+  origin:
+    description: QuintoAndar application where the conversion was carried out in the funnel stage under analysis. 
+  platform:
+    description: Platform of the prospect device where the evaluated event took place.
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.app_type 
+  content_page:
+    description: Classification of content pages depending on the strategy adopted.  
+  entrance_uri:
+    description: 'The URI through which the user entered the site or application.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.entrance_uri
+  referrer:
+    description: 'Referring URL or entity that led the user to the interaction.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.referrer
+  branded:
+    description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.branded  
+  dt_event:
+    description: 'Date of the event'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.dt_event
+  ts_event:
+    description: 'Timestamp of the event.'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.ts_event
+  year:
+    description: 'Year of the event'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.year
+  month:
+    description: 'Month of the event'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.month
+  day:
+    description: 'Day of the event'
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.day

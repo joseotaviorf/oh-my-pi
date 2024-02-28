@@ -1314,7 +1314,9 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
 bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-categories-documentation
   - bietlejuice.documentation_metrics:load-clean-columns-documentation
