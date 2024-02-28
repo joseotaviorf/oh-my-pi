@@ -23,7 +23,7 @@ SELECT
     CAST(SUBSTRING(metadata, 185, 18)/ 100 AS DECIMAL(16,2)) AS credit_value,
     SUBSTRING(metadata, 203, 28) AS cnab_reserved_field,
     TO_DATE(SUBSTRING(metadata, 133, 8), 'ddMMyyyy') AS dt_final_balance,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day

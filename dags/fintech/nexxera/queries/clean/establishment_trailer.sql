@@ -14,7 +14,7 @@ SELECT
     CAST(col_12 AS INT) AS total_sale_installments,
     CAST(col_13 AS INT) AS total_sale_statements,
     CAST(col_14 AS INT) AS total_sale_summary,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
@@ -44,7 +44,7 @@ SELECT
     CAST(col_12 AS INT) AS total_sale_installments,
     CAST(col_13 AS INT) AS total_sale_statements,
     CAST(col_14 AS INT) AS total_sale_summary,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
@@ -74,7 +74,7 @@ SELECT
     CAST(col_12 AS INT) AS total_sale_installments,
     CAST(col_13 AS INT) AS total_sale_statements,
     CAST(col_14 AS INT) AS total_sale_summary,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
@@ -105,7 +105,7 @@ SELECT
     CAST(col_12 AS INT) AS total_sale_installments,
     CAST(col_13 AS INT) AS total_sale_statements,
     CAST(col_14 AS INT) AS total_sale_summary,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
@@ -136,7 +136,7 @@ SELECT
     CAST(col_12 AS INT) AS total_sale_installments,
     CAST(col_13 AS INT) AS total_sale_statements,
     CAST(col_14 AS INT) AS total_sale_summary,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day

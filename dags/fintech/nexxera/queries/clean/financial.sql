@@ -53,7 +53,7 @@ SELECT
   TO_DATE(col_24, 'ddMMyy') AS dt_sent_to_bank,
   TO_DATE(col_11, 'ddMMyy') AS dt_sale,
   TO_DATE(col_15, 'ddMMyy') AS dt_installment_credit,
-  NOW() AS ts_ingested,
+  TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
   year,
   month,
   day

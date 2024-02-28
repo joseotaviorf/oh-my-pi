@@ -6,7 +6,7 @@ SELECT
     CAST(SUBSTRING(metadata, 10, 6) AS INTEGER) AS file_batch_amount,
     CAST(SUBSTRING(metadata, 16, 6) AS INTEGER) AS file_registers_amount,
     CAST(SUBSTRING(metadata, 22, 6) AS INTEGER) AS file_accounts_amount,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day

@@ -30,7 +30,7 @@ SELECT
     file_name,
     TO_DATE(SUBSTRING(metadata, 127, 8), 'ddMMyyyy') AS dt_accounting,
     TO_DATE(SUBSTRING(metadata, 135, 8), 'ddMMyyyy') AS dt_launch,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day

@@ -44,7 +44,7 @@ SELECT
   TO_DATE(col_35, 'ddMMyy') AS dt_reference_negotiation,
   TO_DATE(col_30, 'ddMMyy') AS dt_summary_adjustment,
   TO_DATE(col_23, 'ddMMyy') AS dt_sent_to_bank,
-  NOW() AS ts_ingested,
+  TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
   year,
   month,
   day

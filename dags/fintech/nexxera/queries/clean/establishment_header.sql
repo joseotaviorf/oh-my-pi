@@ -5,7 +5,7 @@ SELECT
     col_4 AS acquirer_name,
     col_5 AS establishment_cnpj,
     "adjustments" AS source_file,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
@@ -26,7 +26,7 @@ SELECT
     col_4 AS acquirer_name,
     col_5 AS establishment_cnpj,
     "financial" AS source_file,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
@@ -47,7 +47,7 @@ SELECT
     col_4 AS acquirer_name,
     col_5 AS establishment_cnpj,
     "inadvance" AS source_file,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
@@ -68,7 +68,7 @@ SELECT
     col_4 AS acquirer_name,
     col_5 AS establishment_cnpj,
     "sales" AS source_file,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
@@ -89,7 +89,7 @@ SELECT
     col_4 AS acquirer_name,
     col_5 AS establishment_cnpj,
     "transaction" AS source_file,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day

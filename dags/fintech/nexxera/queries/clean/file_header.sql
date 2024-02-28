@@ -23,7 +23,7 @@ SELECT
     SUBSTRING(metadata, 226, 7) AS cnab_reserved_field,
     SUBSTRING(metadata, 144, 6) AS hr_file_generated,
     TO_DATE(SUBSTRING(metadata, 136, 8), 'ddMMyyyy') AS dt_file_generated,
-    NOW() AS ts_ingested,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day

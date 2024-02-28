@@ -20,7 +20,7 @@ SELECT
   CAST(col_16 / 100 AS DECIMAL(10,2)) AS summary_installment_paid_amount,
   TO_DATE(col_8, 'ddMMyy') AS dt_installment_credit,
   TO_DATE(col_6, 'ddMMyy') AS dt_rv_summary,
-  NOW() AS ts_ingested,
+  TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
   year,
   month,
   day
