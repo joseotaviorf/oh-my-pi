@@ -23,6 +23,10 @@ columns:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract
     description: "Key of contract. This column can be used to join with the table dw_rent.dim_contract to get the contract details. When the sk_contract value is -1, it means that the contract has not been created yet."
+  sk_contract_created_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
+    description: "Key of date when contract was created."
   sk_contract_signed_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
