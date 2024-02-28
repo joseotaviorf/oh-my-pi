@@ -1,4 +1,4 @@
 ---
 queue_url: 'https://sqs.us-east-1.amazonaws.com/569412621543/FornoRiskAndMortgageCustomerSatisfaction'
 database_name: reverse_dsat_report
-tables: sale_dsat_report
+tables: [sale_dsat_report]

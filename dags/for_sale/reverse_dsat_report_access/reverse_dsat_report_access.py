@@ -74,7 +74,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 load_to_sqs_tasks = []
-for table_name, table_config in tables.items():
+for table_name in tables:
     load_to_sqs_tasks.append(
         QuintoAndarDatabricksSubmitRunOperator(
             task_id=StringFormatter.slugify(f"load-{table_name}-into_sqs"),
