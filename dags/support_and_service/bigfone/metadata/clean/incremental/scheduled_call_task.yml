@@ -1,0 +1,33 @@
+database_name: datalake_bigfone_clean
+table_name: scheduled_call_task
+columns:
+  id:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.id
+  id_task:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.task_id
+  id_user:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.user_id
+  id_session:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.session_id
+  task_attributes:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.task_attributes
+  task_status:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.task_status
+  task_resource:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.task_resource
+  user_phone:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.user_phone
+  ts_created:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.created_at
+  ts_updated:
+    lineage:
+      - datalake_bigfone_raw.scheduled_call_task.updated_at

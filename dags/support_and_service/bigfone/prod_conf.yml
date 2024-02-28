@@ -23,6 +23,11 @@ tables:
     raw_table_name: "ivr_closed_history"
     raw_extraction_type: full
     clean_extraction_type: full
+  ScheduledCallTask:
+    raw_table_name: "scheduled_call_task"
+    raw_extraction_type: incremental
+    clean_extraction_type: incremental
+    date_filter_column: updated_at
 partition_cols: ["year", "month", "day"]
 
 custom_cluster:
