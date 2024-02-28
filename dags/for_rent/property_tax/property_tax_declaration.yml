@@ -9,9 +9,10 @@ workflow:
   layer: raw
   database_type: postgres
   dbutils_secret_key: PROPERTY_TAX_DB
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
   tables_customization:
     tax_report:
-      extraction_type: incremental
       date_filter_column: updated_at
       read_from_sql: True
 cluster:
