@@ -92,6 +92,15 @@ endpoints:
         - "payrollAssignments.assignedPayrolls"
         - "payrollAssignments.payrollAssignmentDates"
         - "payrollRelationshipDates"
+  performance_evaluations:
+    deduplication_key: "EvaluationId"
+    has_partitions: false
+    has_columns_to_delete: false
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "Roles.Participants.Tasks"
   performance_goals:
     deduplication_key: "GoalId"
     has_partitions: false
@@ -101,7 +110,6 @@ endpoints:
       limit: 100
       expand:
         - "associatedGoalPlans"
-  
   personal_payment_methods:
     deduplication_key: "PersonalPaymentMethodId"
     has_partitions: false
