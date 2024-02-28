@@ -9,7 +9,7 @@ from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_treatment import (
     MySqlCdcSchemaTreatment,
 )
 
-from pyspark.sql.functions import col, from_unixtime, lit, make_date
+from pyspark.sql.functions import col, to_timestamp, lit, make_date
 
 JOB_NAME = "load_cdc_transactional"
 
@@ -121,7 +121,7 @@ def format_and_deduplicate_df(df, partitions):
     transactional_df = incoming_df.select(
         col("data.*"),
         col("op").alias("op_cdc"),
-        from_unixtime(col("ts_ms") / 1000, "yyyy-MM-dd HH:mm:ss").alias(
+        to_timestamp(col("ts_ms") / 1000).alias(
             "ts_cdc_transaction"
         ),
         *partitions,
