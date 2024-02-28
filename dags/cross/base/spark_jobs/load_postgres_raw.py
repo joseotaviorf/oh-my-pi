@@ -6,6 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
@@ -36,6 +37,7 @@ def parse_arguments() -> Namespace:
         type=str,
         help="S3 load options for spark dataframe, in JSON format",
     )
+    parser.add_argument("read_from_sql")
 
     return parser.parse_args()
 
@@ -68,6 +70,7 @@ def main():
     execution_date = args.execution_date
     db_schema = args.db_schema
     load_options = json.loads(args.load_options) if args.load_options else {}
+    read_from_sql = True if args.read_from_sql.lower() == "true" else False
 
     logger.info(
         f"""
@@ -95,13 +98,23 @@ def main():
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(database_name)
 
-    if is_incremental:
-        df = postgres_consumer.get_incremental_data_from_table(
-            table_name=table_name,
-            date_filter_column=date_filter_column,
-            date_filter_value=execution_date,
-            unixtime_measure=unixtime_measure,
+    if read_from_sql:
+        query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
+            dag_name=schema, layer=LayerEnum.RAW.value, table_name=table_name
         )
+
+    if is_incremental:
+        if read_from_sql:
+            df = postgres_consumer.get_data_from_query(
+                query.format(execution_date=execution_date)
+            )
+        else:
+            df = postgres_consumer.get_incremental_data_from_table(
+                table_name=table_name,
+                date_filter_column=date_filter_column,
+                date_filter_value=execution_date,
+                unixtime_measure=unixtime_measure,
+            )
 
         IncrementalTableLoaderPipeline(
             database_name,
@@ -112,7 +125,11 @@ def main():
             partition_cols,
         ).load_and_register(df, format_options, **load_options)
     else:
-        df = postgres_consumer.get_data_from_table(table_name)
+        if read_from_sql:
+            df = postgres_consumer.get_data_from_query(query)
+        else:
+            df = postgres_consumer.get_data_from_table(table_name)
+
         FullTableLoaderPipeline(
             database_name, table_name.lower(), database_location, LayerEnum.RAW, None
         ).load_and_register(df, format_options, **load_options)

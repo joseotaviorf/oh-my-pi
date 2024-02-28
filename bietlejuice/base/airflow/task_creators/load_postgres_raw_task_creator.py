@@ -39,6 +39,7 @@ class LoadPostgresRawTaskCreator(BaseTaskCreator):
         )
         db_schema = table_attributes.table_customization.get("db_schema", "public")
         load_options = self._get_load_options(table_attributes)
+        read_from_sql = table_attributes.table_customization.get("read_from_sql", "")
 
         return [
             self.dag_execution_context.environment,
@@ -53,4 +54,5 @@ class LoadPostgresRawTaskCreator(BaseTaskCreator):
             self.dag_execution_context.execution_date,
             db_schema,
             load_options,
+            read_from_sql,
         ]
