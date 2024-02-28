@@ -1,0 +1,16 @@
+dag:
+  name: enrich_mexico_marketing_manual_daily_costs
+  schedule_start_date: 2019, 1, 1
+  documentation:
+    dag_purpose: |
+      This DAG generates the Benvi's Mexico operation manual costs (i.e. gathered from gsheets tables).
+      This is the [pipeline draw](https://www.figma.com/file/2FgsVbpgwtEmnn9RzbYZEU/Mexico-Marketing-Costs-Pipeline?node-id=0-1&t=L4OLMNfrjwCA3tfm-0]) related to the mexican marketing costs pipeline.
+      This DAG is triggered by Mediator via full load.
+      Notice that the used gsheet is loaded during the middle of the day, so this pipeline will only be available during the middle of the day.
+  owner: Data International
+workflow:
+  type: query
+  layer: enrich
+  default_partitions: [id_date, flow_type]
+cluster:
+  type: databricks_10_4_min_general_photon_cluster
