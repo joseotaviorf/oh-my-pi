@@ -12,3 +12,5 @@ columns:
     description: Abbreviation of the event.
   stage:
     description: Stage of the event.
+  ts_load:
+    description: Timestamp of when the data was loaded into our systems.
