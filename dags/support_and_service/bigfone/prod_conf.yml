@@ -31,11 +31,8 @@ tables:
 partition_cols: ["year", "month", "day"]
 
 custom_cluster:
-  driver_node_type_id: r5a.2xlarge
-  node_type_id: r5a.xlarge
-  num_workers: 3
+  driver_node_type_id: r5a.xlarge
+  node_type_id: r5a.2xlarge
+  num_workers: 2
   aws_attributes:
     ebs_volume_size: 200
-  spark_conf:
-    # This heuristic is based on the idea of having a balanced workload across the available resources (num_cores * 4)
-    spark.sql.shuffle.partitions: "48"
