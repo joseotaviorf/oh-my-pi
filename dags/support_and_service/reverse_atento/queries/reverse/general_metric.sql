@@ -2,7 +2,7 @@ SELECT DISTINCT
   ft.sk_ticket,
   ft.sk_last_agent AS sk_agent,
   ft.channel,
-  ft.csat_score,
+  ft.first_csat_score AS csat_score,
   ft.status,
   CASE
     WHEN ft.csat_score BETWEEN 4 AND 5 THEN 'Satisfied'
@@ -10,7 +10,7 @@ SELECT DISTINCT
     WHEN ft.csat_score BETWEEN 1 AND 2 THEN 'Dissatisfied'
     ELSE NULL
   END AS csat_type,
-  ft.csat_comment,
+  ft.first_csat_comment AS csat_comment,
   ft.main_department,
   dc.direction,
   dd.area,
@@ -36,7 +36,7 @@ SELECT DISTINCT
   ft.resolution_survey AS is_resolution,
   ft.ts_started,
   ft.ts_survey,
-  ft.ts_csat_response,
+  ft.ts_csat_first_response AS ts_csat_response,
   ft.ts_solved,
   ft.ts_closed,
   YEAR(CURRENT_DATE) AS year,
