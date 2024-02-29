@@ -1,7 +1,0 @@
----
-custom_cluster:
-  driver_node_type_id: m5a.xlarge
-  node_type_id: c5ad.8xlarge
-  num_workers: 2
-  aws_attributes:
-    availability: ON_DEMAND

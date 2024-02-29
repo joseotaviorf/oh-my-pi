@@ -1,0 +1,21 @@
+---
+dag:
+  name: enrich_amplitude_visit
+  schedule_start_date: 2020, 7, 1
+  owner: Data ForRent
+  documentation: 
+    dag_purpose: |
+      Enrich visit context events in Amplitude and load into data lake.
+      This DAG enriches data coming from Amplitude events that have a visit confirmed.
+      Thus, we can have the information about the Urchin Tracking and understand better
+      the behavior behind a visit confirmed.
+      This DAG is triggered by Mediator and loads the table via full load.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.large
+    node_type_id: m5d.2xlarge
+    num_workers: 3
