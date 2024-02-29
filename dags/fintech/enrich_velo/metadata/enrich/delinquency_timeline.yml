@@ -12,17 +12,17 @@ columns:
   id_propose:
     description: 'ID of related propose'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.id_propose
+    - datalake_rental_guarantee_platform_clean.delinquency.id_propose
   type_description:
     description: 'Description of this delinquency`s type'
   delinquency_amount:
     description: 'Total delinquency amount to be charged'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.value
+    - datalake_rental_guarantee_platform_clean.delinquency.value
   original_value:
     description: 'Original debt value'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.original_value
+    - datalake_rental_guarantee_platform_clean.delinquency.original_value
   amount_paid:
     description: 'Amount already paid on the dt_updated window'
     lineage:
@@ -36,15 +36,17 @@ columns:
   is_legacy_agreement:
     description: 'If this delinquency is legacy'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.is_legacy_agreement
+    - datalake_rental_guarantee_platform_clean.delinquency.is_legacy_agreement
   is_legacy_propose:
     description: 'If this propose is legacy'
+  is_currently_active:
+    description: 'If this propose is active on the delinquency table'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.id_propose < 5000000
+    - datalake_rental_guarantee_platform_clean.delinquency.is_active
   dt_due:
     description: 'Date Due for this debt'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.dt_due
+    - datalake_rental_guarantee_platform_clean.delinquency.dt_due
   dt_paid:
     description: 'Date of the last payment for this debt on the dt_updated window'
     lineage:
@@ -52,12 +54,12 @@ columns:
   dt_ended_propose:
     description: 'Date the propose/contract related ended'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.p.dt_ended
+    - datalake_velo.propose.dt_ended
   dt_updated:
     description: 'Date reference of this line`s update. Basically this orders the table to build a timeline'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.ts_created
+    - datalake_rental_guarantee_platform_clean.rev_info.ts_created
   dt_created:
     description: 'Date of creation for this delinquency'
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency_aud.ts_created
+    - datalake_rental_guarantee_platform_clean.delinquency.ts_created

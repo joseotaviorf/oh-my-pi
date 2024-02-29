@@ -19,3 +19,7 @@ inner_dependencies:
     - junk
   delinquency_timeline:
     - propose
+  collections_wallet:
+    - delinquency_timeline
+    - propose
+    - propose_person

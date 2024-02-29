@@ -119,7 +119,7 @@ if __name__ == "__main__":
             db_template = f"{database_name}"
 
         with open(file_path, "r") as stream:
-            sql = stream.read()
+            sql = stream.read().replace('`', '"')
             try:
                 yml_body = create_yml_for_table(
                     sql, db_template, table_name, file_path, dag_owner, do_lineage

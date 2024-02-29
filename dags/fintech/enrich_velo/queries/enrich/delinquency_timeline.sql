@@ -18,6 +18,7 @@ WITH cte_base AS (
         d.value <= d.amount_paid AS is_finished,
         del.is_legacy_agreement,
         del.id_propose < 5000000 AS is_legacy_propose,
+        del.is_active AS is_currently_active,
         d.dt_due,
         CASE
             WHEN d.dt_paid IS NOT NULL THEN d.dt_paid
@@ -57,6 +58,7 @@ cte_final AS (
         is_finished,
         is_legacy_agreement,
         is_legacy_propose,
+        is_currently_active,
         dt_due,
         CASE
             WHEN amount_paid > 0 AND dt_paid IS NULL AND (LAG(amount_paid) OVER (PARTITION BY id_delinquency ORDER BY dt_updated) = amount_paid) THEN LAG(dt_paid) IGNORE NULLS OVER (PARTITION BY id_delinquency ORDER BY dt_updated)
@@ -81,6 +83,7 @@ SELECT
     is_finished,
     is_legacy_agreement,
     is_legacy_propose,
+    is_currently_active,
     dt_due,
     dt_paid,
     dt_ended_propose,
@@ -88,4 +91,4 @@ SELECT
     dt_created
 FROM
     cte_final
-GROUP BY 1,2,3,4,5,6,8,9,10,11,12,13,14,16
+GROUP BY 1,2,3,4,5,6,8,9,10,11,12,13,14,15,17
