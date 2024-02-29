@@ -20,9 +20,10 @@ class StringFormatter:
         Returns the string in lower case and non-accentuated format.
         e.g.: IndicaAí => indicaai
         """
-        str_value = cls.replace_accents(str_value)
-        str_value = str_value.lower()
-        return str_value
+        if str_value:
+            str_value = cls.replace_accents(str_value)
+            str_value = str_value.lower()
+            return str_value
 
     @staticmethod
     def slugify(str_value: str) -> str:
