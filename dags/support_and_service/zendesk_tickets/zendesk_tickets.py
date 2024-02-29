@@ -98,7 +98,6 @@ clean_task_groups = {}
 for table_name, configs in tables.items():
     partitions = configs.get("partition_cols")
     is_incremental = configs.get("is_incremental")
-    has_create_external_table = configs.get("has_create_external_table")
     no_raw = configs.get("no_raw")
 
     if not no_raw:
@@ -115,7 +114,6 @@ for table_name, configs in tables.items():
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         is_incremental=is_incremental,
-        has_create_external_table_task=has_create_external_table,
         partitions=partitions,
     )
 
@@ -142,3 +140,7 @@ chain(
     terminate_cluster_task,
 )
 TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
+
+TaskFlowHelper().cross_downstream_task_groups(
+    raw_task_groups["tickets"], clean_task_groups["tickets_history"]
+)

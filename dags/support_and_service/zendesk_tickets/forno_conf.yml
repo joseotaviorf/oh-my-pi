@@ -23,7 +23,6 @@ tables:
   tickets_history:
     no_raw: true
     is_incremental: true
-    has_create_external_table: false
     partition_cols: ["year", "month", "day"]
   tickets:
     is_incremental: false
