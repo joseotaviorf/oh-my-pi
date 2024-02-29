@@ -1,7 +1,6 @@
 SELECT
   h.id AS sk_house,
   h.id % 892700000 AS id_short_house,
-  h.id_user AS sk_owner,
   h.condo,
   h.land_area,
   h.total_area,
