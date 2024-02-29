@@ -31,8 +31,8 @@ tables:
 partition_cols: ["year", "month", "day"]
 
 custom_cluster:
-  driver_node_type_id: r5a.xlarge
-  node_type_id: r5a.2xlarge
-  num_workers: 2
+  driver_node_type_id: m5a.xlarge
+  node_type_id: m5a.4xlarge
+  num_workers: 1
   aws_attributes:
     ebs_volume_size: 200
