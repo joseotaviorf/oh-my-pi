@@ -32,6 +32,11 @@ columns:
       - datalake_ebdb_clean.house_aud.id_region
     description: >
       Foreign key of region where listing is located in.
+  id_revision:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.rev
+    description: >
+      Foreign key reffering to the revision entity of the price change.
   status_history:
     description: >
       Rent status linked to a certain point in time of the listing.

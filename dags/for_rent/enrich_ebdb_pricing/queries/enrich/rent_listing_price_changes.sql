@@ -4,6 +4,7 @@ WITH house_aud AS (
       r.id_user AS id_user_revision, 
       h_aud.id_user AS id_owner,
       h_aud.id_region,
+      h_aud.rev AS id_revision,
       h_aud.rent AS price,
       CASE 
          WHEN lbc.ts_first_publication >= FROM_UNIXTIME(r.ts_revision/1000) THEN 'UNPUBLISHED' 
@@ -35,6 +36,7 @@ price_changes_raw AS (
       id_user_revision,
       id_owner,
       id_region,
+      id_revision,
       price,
       reason,
       dt_change,
@@ -54,6 +56,7 @@ price_changes_clean AS (
       id_user_revision,
       id_owner,
       id_region,
+      id_revision,
       price,
       LAG(price) OVER (PARTITION BY id_house ORDER BY ts_revision) AS lag_price,
       reason,
@@ -71,6 +74,7 @@ price_changes_enriched AS (
       id_user_revision,
       id_owner,
       id_region,
+      id_revision,
       price,
       lag_price,
       CASE
@@ -97,6 +101,7 @@ price_changes AS (
       END AS id_user_revision,
       id_owner,
       id_region,
+      id_revision,
       CASE
          WHEN is_first_price = TRUE THEN 'PUBLISHED' 
          ELSE NULL 
@@ -186,6 +191,7 @@ SELECT
    pc.id_user_revision,
    pc.id_owner,
    pc.id_region,
+   pc.id_revision,
    COALESCE(pc.status, rls.status_history, 'PUBLISHED') AS status_history, 
    pc.price,
    pc.lag_price AS previous_price,
