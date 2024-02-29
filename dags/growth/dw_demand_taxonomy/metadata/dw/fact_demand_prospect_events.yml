@@ -140,4 +140,6 @@ columns:
   day:
     description: 'Day of the conversion event'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.day  
+      - datalake_demand_flows.prospect_daily_results.day
+  ts_load:
+    description: 'Timestamp of when the table was loaded'         

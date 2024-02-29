@@ -30,7 +30,8 @@ SELECT
   ts_event,
   year,
   month,
-  day
+  day,
+  NOW() AS ts_load
 FROM 
   datalake_demand_flows.prospect_daily_results
 WHERE

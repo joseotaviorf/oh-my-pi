@@ -1,0 +1,106 @@
+---
+database_name: dw_growth
+table_name: fact_demand_top_of_funnel_events
+owner: isabela.matsumoto@quintoandar.com.br
+domain: growth
+description: 'This table tracks the top of the funnel interactions by users across different platforms and marketing channels. It includes ad hoc rules for media setup identification, user interaction details, and platform categorization.'
+
+columns:
+  sk_tof_event:
+    description: 'Unique identifier for the top of funnel event.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.id_top_of_funnel_event
+  sk_tof_user:
+    description: 'Unique identifier for the user at the top of the funnel.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.id_tof_user
+  sk_house:
+    description: 'Identifier of the property related to the user interaction.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.id_house
+  sk_region:
+    description: 'Identifier representing the region of the interaction or property.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.sk_region
+  sk_media_setup:
+    description: 'The final media setup identifier selected based on a priority order from adhoc, dictionary, exception flow, and naming convention.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.final_id_media_setup
+  business_context:
+    description: 'Context in witch that tof event happened.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.business_context
+  utm_medium:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.utm_medium  
+  utm_source:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.utm_source  
+  utm_campaign:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.utm_campaign  
+  utm_content:
+    description: 'Marketing parameter providing additional content information for the campaign.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.utm_content
+  utm_term:
+    description: 'Marketing parameter providing term information used in the marketing campaign.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.utm_term
+  app_type:
+    description: 'Application from which the user made the conversion event.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.app_type 
+  operation_channel:
+    description: 'Physical agent, internal or external, who performed the conversion in the funnel stage under analysis'
+    categories:
+      SelfService: 'Conversions that took place without the aid of any operation being carried out by the Prospect itself at the time of conversion.'
+  origin:
+    description: QuintoAndar application where the conversion was carried out in the funnel stage under analysis. 
+  platform:
+    description: Platform of the prospect device where the evaluated event took place.
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.app_type 
+  content_page:
+    description: Classification of content pages depending on the strategy adopted.  
+  entrance_uri:
+    description: 'The URI through which the user entered the site or application.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.entrance_uri
+  referrer:
+    description: 'Referring URL or entity that led the user to the interaction.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.referrer
+  branded:
+    description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.branded
+  is_rede_demand:
+    description: 'Flag indicating if this house came from a rede partner'
+    lineage:
+      - datalake_ebdb_clean.house.internal_admin_info
+  dt_event:
+    description: 'Date of the event'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.dt_event
+  ts_event:
+    description: 'Timestamp of the event.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.ts_event
+  year:
+    description: 'Year of the event'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.year
+  month:
+    description: 'Month of the event'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.month
+  day:
+    description: 'Day of the event'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.day
+  ts_load:
+    description: 'Timestamp of when the table was loaded'    

@@ -453,7 +453,9 @@ bietlejuice.dw_debt_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
 bietlejuice.dw_demand_taxonomy:
+  - bietlejuice.ebdb:load-clean-house
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
+  - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results
 bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
