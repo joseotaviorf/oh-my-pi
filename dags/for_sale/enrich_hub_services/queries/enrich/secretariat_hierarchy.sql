@@ -48,7 +48,7 @@ hub_services_secretariat AS (
     WHERE
         bu.hub_name NOT LIKE '[For rent]%'
     QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY u.id_external ORDER BY u.ts_updated DESC) = 1
+        ROW_NUMBER() OVER(PARTITION BY u.id_external ORDER BY u.ts_updated DESC, mp.is_active DESC) = 1
 ),
 legacy_secretariat AS (
     SELECT
