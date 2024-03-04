@@ -170,14 +170,14 @@ columns:
     lineage:
     - datalake_hr_system_raw.workers.ts_load
   year:
-    description: 'Year of the update of the worker record [Partition]'
+    description: 'Year of the creation of the worker record [Partition]'
     lineage:
     - datalake_hr_system_raw.workers.year
   month:
-    description: 'Month of the update of the worker record [Partition]'
+    description: 'Month of the creation of the worker record [Partition]'
     lineage:
     - datalake_hr_system_raw.workers.month
   day:
-    description: 'Day of the update of the worker record [Partition]'
+    description: 'Day of the creation of the worker record [Partition]'
     lineage:
     - datalake_hr_system_raw.workers.day

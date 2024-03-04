@@ -396,12 +396,12 @@ columns:
   year:
     lineage:
       - datalake_hr_system_raw.absences.year
-    description: "Year of the update of the record [Partition]"
+    description: "Year of the creation of the record [Partition]"
   month:
     lineage:
       - datalake_hr_system_raw.absences.month
-    description: "Month of the update of the record [Partition]"
+    description: "Month of the creation of the record [Partition]"
   day:
     lineage:
       - datalake_hr_system_raw.absences.day
-    description: "Day of the update of the record [Partition]"
+    description: "Day of the creation of the record [Partition]"

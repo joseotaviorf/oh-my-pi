@@ -278,14 +278,14 @@ columns:
     lineage:
     - datalake_hr_system_raw.salaries.ts_load
   year:
-    description: 'Year of the update of the salary record [Partition]'
+    description: 'Year of the creation of the salary record [Partition]'
     lineage:
     - datalake_hr_system_raw.salaries.year
   month:
-    description: 'Month of the update of the salary record [Partition]'
+    description: 'Month of the creation of the salary record [Partition]'
     lineage:
     - datalake_hr_system_raw.salaries.month
   day:
-    description: 'Day of the update of the salary record [Partition]'
+    description: 'Day of the creation of the salary record [Partition]'
     lineage:
     - datalake_hr_system_raw.salaries.day

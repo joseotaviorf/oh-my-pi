@@ -1,0 +1,95 @@
+---
+database_name: datalake_hr_system_clean
+table_name: organizations
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: "The organizations resource includes all the organizations"
+columns:
+  id_organization:
+    description: 'System generated primary key column.'
+    lineage:
+    - datalake_hr_system_raw.organizations.OrganizationId
+  id_location_lov:
+    description: ''
+    lineage:
+    - datalake_hr_system_raw.organizations.LocationIdLOV
+  id_location:
+    description: 'Identifier of location to which the Organization Unit belongs.'
+    lineage:
+    - datalake_hr_system_raw.organizations.LocationId
+  organization_code:
+    description: ''
+    lineage:
+    - datalake_hr_system_raw.organizations.OrganizationCode
+  status:
+    description: ''
+    lineage:
+    - datalake_hr_system_raw.organizations.status
+  org_code:
+    description: 'Custom OrganizationCode to be used instead of auto generated code.'
+    lineage:
+    - datalake_hr_system_raw.organizations.OrgCode
+  organization_classification_va:
+    description: ''
+    lineage:
+    - datalake_hr_system_raw.organizations.OrgClassificationVA
+  organizationd_dff:
+    description: "Customer's flexfield for organization."
+    lineage:
+    - datalake_hr_system_raw.organizations.OrganizationDFF
+  status_lov:
+    description: ''
+    lineage:
+    - datalake_hr_system_raw.organizations.StatusLOV
+  extra_information:
+    description: 'Extra information about the organization'
+    lineage:
+    - datalake_hr_system_raw.organizations.extraInformation
+  name:
+    description: 'Denotes the translated name for the Organization Unit.'
+    lineage:
+    - datalake_hr_system_raw.organizations.name
+  title:
+    description: 'Denotes the translated title for the Organization Unit.'
+    lineage:
+    - datalake_hr_system_raw.organizations.title
+  classification_code:
+    description: 'Foreign key to HR_ORG_CLASSIFICATIONS table.'
+    lineage:
+    - datalake_hr_system_raw.organizations.ClassificationCode
+  internal_address_line:
+    description: 'Internal address of the organization.'
+    lineage:
+    - datalake_hr_system_raw.organizations.InternalAddressLine
+  dt_effective_start:
+    description: 'Date Effective Entity: indicates the date at the beginning of the date range within which the row is effective.'
+    lineage:
+    - datalake_hr_system_raw.organizations.EffectiveStartDate
+  dt_effective_end:
+    description: 'Date Effective Entity: indicates the date at the end of the date range within which the row is effective.'
+    lineage:
+    - datalake_hr_system_raw.organizations.EffectiveEndDate
+  ts_created:
+    description: 'Timestamp of the creation of the organization record'
+    lineage:
+    - datalake_hr_system_raw.organizations.CreationDate
+  ts_last_update:
+    description: 'Timestamp of the last update of the organization record'
+    lineage:
+    - datalake_hr_system_raw.LastUpdateDate
+  ts_load:
+    description: 'Timestamp of the load of the organization record in the data lake'
+    lineage:
+    - datalake_hr_system_raw.salaries.ts_load
+  year:
+    description: 'Year of the creation of the organization record [Partition]'
+    lineage:
+    - datalake_hr_system_raw.salaries.year
+  month:
+    description: 'Month of the creation of the organization record [Partition]'
+    lineage:
+    - datalake_hr_system_raw.salaries.month
+  day:
+    description: 'Day of the creation of the organization record [Partition]'
+    lineage:
+    - datalake_hr_system_raw.salaries.day

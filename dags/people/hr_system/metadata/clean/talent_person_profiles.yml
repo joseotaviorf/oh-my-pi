@@ -146,14 +146,14 @@ columns:
     lineage:
     - datalake_hr_system_raw.talent_person_profiles.ts_load
   year:
-    description: 'Year of the update of the profile record [Partition]'
+    description: 'Year of the creation of the profile record [Partition]'
     lineage:
     - datalake_hr_system_raw.talent_person_profiles.year
   month:
-    description: 'Month of the update of the profile record [Partition]'
+    description: 'Month of the creation of the profile record [Partition]'
     lineage:
     - datalake_hr_system_raw.talent_person_profiles.month
   day:
-    description: 'Day of the update of the profile record [Partition]'
+    description: 'Day of the creation of the profile record [Partition]'
     lineage:
     - datalake_hr_system_raw.talent_person_profiles.day

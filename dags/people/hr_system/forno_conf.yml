@@ -79,6 +79,17 @@ endpoints:
       expand:
         - "JobCustomerFlex"
         - "validGrades"
+  organizations:
+    deduplication_key: "OrganizationId"
+    has_partitions: true
+    column_to_partition: "CreationDate"
+    has_columns_to_delete: false
+    params:
+      onlyData: true
+      limit: 100
+      expand:
+        - "OrganizationDFF"
+        - "extraInformation"
   payroll_relationships:
     deduplication_key: "PayrollRelationshipId"
     has_partitions: false

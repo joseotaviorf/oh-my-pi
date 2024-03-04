@@ -134,14 +134,14 @@ columns:
     lineage:
     - hr_system.hcm_contacts.ts_load
   year:
-    description: 'Year of the update of the worker record [Partition]'
+    description: 'Year of the creation of the contact record [Partition]'
     lineage:
     - hr_system.hcm_contacts.year
   month:
-    description: 'Month of the update of the worker record [Partition]'
+    description: 'Month of the creation of the contact record [Partition]'
     lineage:
     - hr_system.hcm_contacts.month
   day:
-    description: 'Day of the update of the worker record [Partition]'
+    description: 'Day of the creation of the contact record [Partition]'
     lineage:
     - hr_system.hcm_contacts.day

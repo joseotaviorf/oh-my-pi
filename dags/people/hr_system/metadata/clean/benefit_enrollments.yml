@@ -116,12 +116,12 @@ columns:
   year:
     lineage:
     - datalake_hr_system_raw.benefit_enrollments.year
-    description: 'Year of the update of the worker record [Partition]'
+    description: 'Year of the creation of the record [Partition]'
   month:
     lineage:
     - datalake_hr_system_raw.benefit_enrollments.month
-    description: 'Month of the update of the worker record [Partition]'
+    description: 'Month of the creation of the record [Partition]'
   day:
     lineage:
     - datalake_hr_system_raw.benefit_enrollments.day
-    description: 'Day of the update of the worker record [Partition]'
+    description: 'Day of the creation of the record [Partition]'
