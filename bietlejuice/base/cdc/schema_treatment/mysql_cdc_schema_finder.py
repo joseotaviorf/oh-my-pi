@@ -1,16 +1,20 @@
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder import CdcSchemaFinder
 from bietlejuice.base.spark import BaseSparkContext
-from pyspark.sql.functions import explode, col
+from pyspark.sql.functions import explode, col, make_date
 
 
 class MySqlCdcSchemaFinder(CdcSchemaFinder):
-    def __init__(self, schema_changes_path: str) -> None:
+    def __init__(
+        self, schema_changes_path: str, start_date: str, end_date: str
+    ) -> None:
         """
         This class identifies the schema of the table based on the topic that registers schema changes. The path to the topic
         saved on S3 is passed as a parameter. The schema changes are saved in JSON format.
         """
 
         self.schema_changes_path = schema_changes_path
+        self.start_date = start_date
+        self.end_date = end_date
 
     def find_latest_table_definition(self, schema: str, table_name: str) -> dict:
         """
@@ -35,6 +39,11 @@ class MySqlCdcSchemaFinder(CdcSchemaFinder):
                 explode(col("tableChanges")).alias("table_change"), "ts_ms"
             )
             .select("table_change.*", "ts_ms")
+            .filter(
+                make_date(col("year"), col("month"), col("day")).between(
+                    self.start_date, self.end_date
+                )
+            )
             .filter(f'id = \'"{schema}"."{table_name}"\'')
         )
         try:

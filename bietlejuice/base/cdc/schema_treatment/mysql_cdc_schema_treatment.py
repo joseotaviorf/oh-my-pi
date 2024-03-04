@@ -1,46 +1,154 @@
+from typing import Optional
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, to_timestamp, to_date
+from pyspark.sql.utils import AnalysisException
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_treatment import (
     CdcSchemaTreatment,
 )
 from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
     MySqlCdcSchemaFinder,
 )
+from bietlejuice.base.spark import BaseSparkContext
 
 
 class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
-    def __init__(self, schema_finder: MySqlCdcSchemaFinder) -> None:
+    def __init__(
+        self, schema_finder: MySqlCdcSchemaFinder, datalake_table_schema: str
+    ) -> None:
         self.schema_finder = schema_finder
+        self.datalake_table_schema = datalake_table_schema
 
     def treat_dataframe(
         self, schema: str, table_name: str, transactional_dataframe: DataFrame
     ) -> DataFrame:
-        latest_table_change = self.schema_finder.find_latest_table_definition(
-            schema, table_name
+        latest_table_change = self._try_find_latest_table_definition(schema, table_name)
+        datalake_dataframe = self._try_find_existing_datalake_table(
+            self.datalake_table_schema, table_name
         )
+
         transactional_dataframe = self._treat_timestamp_columns(
-            transactional_dataframe, latest_table_change
+            transactional_dataframe, latest_table_change, datalake_dataframe
         )
+
         return transactional_dataframe
 
+    def _try_find_latest_table_definition(
+        self, schema: str, table_name: str
+    ) -> Optional[dict]:
+        """Try to find the latest table definition, if it exists."""
+        try:
+            return self.schema_finder.find_latest_table_definition(schema, table_name)
+        except ValueError:
+            return None
+
+    def _try_find_existing_datalake_table(
+        self, datalake_table_schema: str, table_name: str
+    ) -> Optional[DataFrame]:
+        """Try to find a saved datalake table, if it exists."""
+        try:
+            return BaseSparkContext.spark.table(f"{datalake_table_schema}.{table_name}")
+        except AnalysisException:
+            return None
+
     def _treat_timestamp_columns(
+        self,
+        transactional_dataframe: DataFrame,
+        latest_table_change: dict = None,
+        datalake_dataframe: DataFrame = None,
+    ) -> DataFrame:
+        if latest_table_change:
+            transactional_dataframe = self._treat_timestamp_columns_from_schema_topic(
+                transactional_dataframe, latest_table_change
+            )
+        if datalake_dataframe:
+            transactional_dataframe = self._treat_timestamp_columns_from_existing_datalake_table(
+                transactional_dataframe, datalake_dataframe
+            )
+
+        return transactional_dataframe
+
+    def _treat_timestamp_columns_from_schema_topic(
         self, transactional_dataframe: DataFrame, latest_table_change: dict
     ) -> DataFrame:
-        """CDC saves date and datetime columns as unix timestamps. This method converts them back to datetime."""
+        """
+        CDC saves date and datetime columns as unix timestamps. This method converts them back to datetime, identifying
+        the columns that are timestamps by looking at the latest DDL change in the schema topic, and treating them accordingly.
+        """
+        days_unix_columns = []
+        milliseconds_unix_columns = []
+        string_columns = []
 
         for column in latest_table_change["columns"]:
-            if column["typeName"] == "DATE":  # Comes in days
-                transactional_dataframe = transactional_dataframe.withColumn(
-                    column["name"],
-                    to_date(to_timestamp(col(column["name"]) * 24 * 60 * 60)),
-                )
-            elif column["typeName"] == "DATETIME":  # Comes in milliseconds
-                transactional_dataframe = transactional_dataframe.withColumn(
-                    column["name"], to_timestamp(col(column["name"]) / 1000)
-                )
-            elif column["typeName"] == "TIMESTAMP":  # Comes as string
-                transactional_dataframe = transactional_dataframe.withColumn(
-                    column["name"], to_timestamp(col(column["name"]))
-                )
+            if column["typeName"] == "DATE":
+                days_unix_columns.append(column["name"])
+            elif column["typeName"] == "DATETIME":
+                milliseconds_unix_columns.append(column["name"])
+            elif column["typeName"] == "TIMESTAMP":
+                string_columns.append(column["name"])
+
+        return self._treat_timestamp_columns_from_column_lists(
+            transactional_dataframe,
+            days_unix_columns,
+            milliseconds_unix_columns,
+            string_columns,
+        )
+
+    def _treat_timestamp_columns_from_existing_datalake_table(
+        self, transactional_dataframe: DataFrame, datalake_dataframe: DataFrame
+    ) -> DataFrame:
+        """
+        CDC saves date and datetime columns as unix timestamps. This method converts them back to datetime, identifying
+        the columns that are timestamps by looking at the schema of the existing datalake table, and treating them accordingly.
+        """
+        days_unix_columns = []
+        milliseconds_unix_columns = []
+        string_columns = []
+
+        for column in datalake_dataframe.columns:
+            if transactional_dataframe.schema[column].dataType.typeName() in (
+                "date",
+                "timestamp",
+            ):
+                continue
+
+            if datalake_dataframe.schema[column].dataType.typeName() == "date":
+                days_unix_columns.append(column)
+            elif (
+                datalake_dataframe.schema[column].dataType.typeName() == "timestamp"
+                and transactional_dataframe.schema[column].dataType.typeName()
+                == "string"
+            ):
+                string_columns.append(column)
+            elif datalake_dataframe.schema[column].dataType.typeName() == "timestamp":
+                milliseconds_unix_columns.append(column)
+
+        return self._treat_timestamp_columns_from_column_lists(
+            transactional_dataframe,
+            days_unix_columns,
+            milliseconds_unix_columns,
+            string_columns,
+        )
+
+    def _treat_timestamp_columns_from_column_lists(
+        self,
+        transactional_dataframe: DataFrame,
+        days_unix_columns: list,
+        milliseconds_unix_columns: list,
+        string_columns: list,
+    ) -> DataFrame:
+        """CDC saves date and datetime columns as unix timestamps. This method converts them back to datetime"""
+
+        for column in days_unix_columns:
+            transactional_dataframe = transactional_dataframe.withColumn(
+                column, to_date(to_timestamp(col(column) * 24 * 60 * 60))
+            )
+        for column in milliseconds_unix_columns:
+            transactional_dataframe = transactional_dataframe.withColumn(
+                column, to_timestamp(col(column) / 1000)
+            )
+        for column in string_columns:
+            transactional_dataframe = transactional_dataframe.withColumn(
+                column, to_timestamp(col(column))
+            )
 
         return transactional_dataframe

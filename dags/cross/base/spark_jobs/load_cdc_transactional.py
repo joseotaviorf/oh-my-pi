@@ -173,8 +173,11 @@ def main():
     # Hardcoded for now, while we don't have other sources such as Postgres
     pre_treatment = MySqlCdcSchemaTreatment(
         MySqlCdcSchemaFinder(
-            f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/"
-        )
+            f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/",
+            start_date=start_date,
+            end_date=end_date,
+        ),
+        datalake_table_schema=f"datalake_{schema}_transactional",
     )
     transactional_df = pre_treatment.treat_dataframe(
         source_schema, table_name, transactional_df

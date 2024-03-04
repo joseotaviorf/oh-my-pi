@@ -163,8 +163,11 @@ def main():
         # Hardcoded for now, while we don't have other sources such as Postgres
         pk_identifier = MySqlPrimaryKeyIdentifier(
             MySqlCdcSchemaFinder(
-                f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/"
-            )
+                f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/",
+                start_date=start_date,
+                end_date=end_date,
+            ),
+            datalake_table_schema=f"datalake_{schema}_raw",
         )
         primary_keys = pk_identifier.find_primary_keys(source_schema, table_name)
 
