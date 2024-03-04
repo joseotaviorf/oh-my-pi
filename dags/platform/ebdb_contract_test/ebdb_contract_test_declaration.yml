@@ -1,0 +1,39 @@
+dag:
+  name: ebdb_contract_test
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 10 21 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Retrieves data from incoming CDC replication from EBDB and load it on datalake.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb_test
+  source_schema: ebdb
+  tables_customization:
+    Contrato_AUD:
+      clean_table_name: contract_aud
+    ContractNegotiation:
+      clean_table_name: contract_negotiation
+    ContractPartnershipData:
+      clean_table_name: contract_partnership_data
+    ContratoPessoa_AUD:
+      clean_table_name: contract_person_aud
+    ContratoPessoa:
+      clean_table_name: contract_person
+    ContractVersion:
+      clean_table_name: contract_version
+    Contrato:
+      clean_table_name: contract
+    ContratoFull:
+      clean_table_name: full_contract
+    Portability_AUD:
+      clean_table_name: portability_aud
+    Portability:
+      clean_table_name: portability
+    Assinatura:
+      clean_table_name: signature
+    WorkContract:
+      clean_table_name: work_contract      
+cluster:
+  type: databricks_12_2_med_general_cluster

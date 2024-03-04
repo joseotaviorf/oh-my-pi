@@ -1,5 +1,5 @@
 dag:
-  name: ebdb_test
+  name: ebdb_rent_flow_test
   schedule_start_date: 2021, 2, 20
   schedule_interval: 10 21 * * *
   owner: Data Engineering
@@ -11,11 +11,13 @@ workflow:
   custom_schema: ebdb_test
   source_schema: ebdb
   tables_customization:
-    Imovel_AUD:
-      clean_table_name: house_aud
-    Imovel:
-      clean_table_name: house
-    UsuarioRevisionEntity:
-      clean_table_name: user_revision_entity
+    FluxoLocacao_DadosAgente:
+      clean_table_name: agent_rent_flow
+    Onboarding:
+      clean_table_name: onboarding
+    FluxoLocacao_AUD:
+      clean_table_name: rent_flow_aud
+    FluxoLocacao:
+      clean_table_name: rent_flow
 cluster:
   type: databricks_12_2_med_general_cluster
