@@ -1,29 +1,28 @@
-import json
 import os
 from datetime import datetime
 from pendulum import timezone
 
 from airflow.models import DAG
+from airflow.operators.python_operator import ShortCircuitOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import chain, cross_downstream
+from airflow.utils.helpers import cross_downstream
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import DAGRunDateValidators
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
-
 
 # Pipeline Inputs
 SOURCE = "google_calendar"
 CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 4, 3, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 12 1 * *"
+MAIN_SCHEDULE_INTERVAL = "0 12 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
 
 config_service = ConfigurationService(dag_name=SOURCE)
@@ -72,7 +71,11 @@ dag = DAG(
         dag_owner=DAG_OWNER,
     ),
 )
-
+skip_run_task = ShortCircuitOperator(
+    task_id=f"check-day-to-skip-execution",
+    python_callable=DAGRunDateValidators.check_is_specific_day_of_month,
+    op_args=["{{ macros.ds_add(ds, 1) }}", 1],
+)
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
@@ -133,3 +136,5 @@ for table in tables:
     )
 
     terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
+
+skip_run_task.set_downstream(create_cluster_task)
