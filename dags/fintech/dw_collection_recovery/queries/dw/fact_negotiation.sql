@@ -96,7 +96,7 @@ recupera_negotiation AS (
     negotiated_to_be_due_amount,
     negotiated_overdue_amount,
     negotiation_discount_amount AS original_discount_amount, -- Negotiated amount (negotiated_amount) - debt amount (total_debt_amount = expense amount = original + fine + fee + credit card)
-    GREATEST(ROUND(total_debt_amount - negotiated_amount, 2), 0) AS discount_amount,
+    GREATEST(ROUND(expense_amount - negotiated_amount, 2), 0) AS discount_amount,
     GREATEST(ROUND((expense_amount - adm_fee_amount) - negotiated_amount, 2), 0) AS discount_amount_without_adm_fee, -- Negotiated amount (negotiated_amount) - debt amount without credit card fee (debt_amount_without_adm_fee = original + fine + fee = expense_amount - adm_fee_amount)
     negotiated_amount,
     down_payment_amount,
