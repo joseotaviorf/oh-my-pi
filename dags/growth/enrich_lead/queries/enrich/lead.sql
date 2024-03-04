@@ -1,3 +1,15 @@
+WITH rene_origin AS (
+  SELECT 
+    hl.id AS id_rene,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.type') AS STRING) AS lead_type,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) AS lead_source
+  FROM datalake_rene_descartes_clean.house_lead AS hl
+  JOIN datalake_rene_descartes_clean.acquisition_misc_data AS amd
+    ON hl.id_acquisition = amd.id
+  WHERE CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) = 'OwnerPropertyRegistration'
+  GROUP BY 1, 2, 3
+)
+
 SELECT DISTINCT
     l.id,
     rg.id_country,
@@ -32,7 +44,10 @@ SELECT DISTINCT
     l.condo_price,
     l.iptu,
     l.status,
-    l.source,
+    CASE
+        WHEN l.source = 'Other' AND amd.lead_source != 'Other' THEN amd.lead_source
+        ELSE l.source
+    END AS source,
     l.unbounce_page_variant,
     l.unbounce_page_name,
     l.reason AS original_reason,
@@ -101,3 +116,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_region.region AS rg
         ON l.id_region = rg.id
+LEFT JOIN
+    rene_origin AS amd
+      ON (hl.id_acquisition = amd.id_rene)

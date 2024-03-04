@@ -1697,6 +1697,7 @@ bietlejuice.enrich_lead:
   - bietlejuice.ebdb:load-clean-lead-reason
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-address
   - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_lead_tracking:
