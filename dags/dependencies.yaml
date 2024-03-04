@@ -128,6 +128,7 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_velo:load-enrich-junk
   - bietlejuice.enrich_velo:load-enrich-occurrence
   - bietlejuice.recupera:load-clean-complementary-records
+  - bietlejuice.recupera:load-clean-complementary-records-written-down
   - bietlejuice.recupera:load-clean-contracts
   - bietlejuice.recupera:load-clean-creditor-pending
   - bietlejuice.recupera:load-clean-historical
@@ -136,12 +137,11 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.recupera:load-clean-operators
   - bietlejuice.recupera:load-clean-records
   - bietlejuice.recupera:load-clean-status
-  - bietlejuice.recupera:load-clean-complementary-records-written-down
   - bietlejuice.trato_feito:load-clean-accounting-installment
-  - bietlejuice.trato_feito:load-clean-eviction
-  - bietlejuice.trato_feito:load-clean-eviction-data
   - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.trato_feito:load-clean-debtor
+  - bietlejuice.trato_feito:load-clean-eviction
+  - bietlejuice.trato_feito:load-clean-eviction-data
   - bietlejuice.trato_feito:load-clean-negotiation
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
@@ -1516,6 +1516,7 @@ bietlejuice.enrich_ebdb_smart_price:
   - bietlejuice.ebdb:load-clean-dynamic-pricing-house-aud
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.enrich_ebdb_listing:load-enrich-lbc-status-version-order
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:load-clean-affiliate-data
