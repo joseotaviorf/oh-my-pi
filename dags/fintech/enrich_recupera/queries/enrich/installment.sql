@@ -47,7 +47,7 @@ creditor_pending AS (
     GROUP BY installment_code
 )
 SELECT
-    CAST(i.id_installment AS BIGINT) AS id_negotiation,
+    STRING(i.id_installment) AS id_negotiation,
     isd.id_contract AS id_contract,
     i.id_operator,
     i.id_customer AS customer_document,
