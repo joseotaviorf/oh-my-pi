@@ -311,24 +311,6 @@ sheets_info:
     clean_table_name: marketshare_seasonality
     sheet_context: growth
 
-  mexico_demand_marketing_cost_per_source_actual:
-    sheet_id: 17p7m9Kk04LXKMvEV6KawPVaw52uMROFvfqiT69o_oFQ
-    sheet_name: mkt_cost_per_source
-    clean_table_name: mexico_demand_marketing_cost_per_source_actual
-    sheet_context: growth
-
-  mexico_rental_flows_targets:
-    sheet_id: 1C1ULA1wW_By-xFwoVioNs-P0VXPb6IX3pUNYwDHkNHs
-    sheet_name: rental_flows_targets
-    clean_table_name: mexico_rental_flows_targets
-    sheet_context: growth
-
-  mexico_supply_costs_financial_and_actual:
-    sheet_id: 1znOU1En-d0d--Ppec6xUeAxcMvUEqMMhiM1FP_A3Sqg
-    sheet_name: costs_targets_mx
-    clean_table_name: mexico_supply_costs_financial_and_actual
-    sheet_context: growth
-
   media_plan:
     sheet_id: 1aief4f2Iu0vEZ68ZOxq7cRjkzdz1ePOhZf2lN6rcITQ
     sheet_name: media_plan

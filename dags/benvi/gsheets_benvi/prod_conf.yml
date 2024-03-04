@@ -17,6 +17,12 @@ sheets_info:
     clean_table_name: mexico_cib_segmentation_rules_segmentation_variables
     sheet_context: international
 
+  mexico_demand_marketing_cost_per_source_actual:
+    sheet_id: 17p7m9Kk04LXKMvEV6KawPVaw52uMROFvfqiT69o_oFQ
+    sheet_name: mkt_cost_per_source
+    clean_table_name: mexico_demand_marketing_cost_per_source_actual
+    sheet_context: international
+
   mexico_demand_targets_2022:
     sheet_id: 1bVwi_m_x-lxrXcx--VyPmbbqDovwbiST1vnTEXBO1FQ
     sheet_name: demand_targets_mx_2022
@@ -39,6 +45,18 @@ sheets_info:
     sheet_id: 1y7cXmEgj6cQzTLJJFMhHIJT9reO5rhl-UdNyztoc9Bw
     sheet_name: mexico_rental_cohort_supply
     clean_table_name: mexico_rental_cohort_supply
+    sheet_context: international
+
+  mexico_rental_flows_targets:
+    sheet_id: 1C1ULA1wW_By-xFwoVioNs-P0VXPb6IX3pUNYwDHkNHs
+    sheet_name: rental_flows_targets
+    clean_table_name: mexico_rental_flows_targets
+    sheet_context: international
+
+  mexico_supply_costs_financial_and_actual:
+    sheet_id: 1znOU1En-d0d--Ppec6xUeAxcMvUEqMMhiM1FP_A3Sqg
+    sheet_name: costs_targets_mx
+    clean_table_name: mexico_supply_costs_financial_and_actual
     sheet_context: international
 
   mexico_supply_targets:
