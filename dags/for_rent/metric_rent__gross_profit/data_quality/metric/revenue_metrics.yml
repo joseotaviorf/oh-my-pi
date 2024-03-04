@@ -8,8 +8,7 @@ column_level_validations:
     has_min_value:
       greater_than: 0
   rental_brokerage:
-    has_min_value:
-      greater_than: 0
+    is_complete:
   partner_share_management:
     has_max_value:
       less_than_or_equal_to: 0
