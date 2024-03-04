@@ -11,7 +11,11 @@ WITH deduplicate_creditor_pending AS (
       ELSE id_creditor
     END AS id_creditor,
     id_customer,
-    id_installment
+    id_installment,
+    interest_fee_amount,
+    amount_fine AS fine_fee_amount,
+    discount_amount,
+    transfer_amount AS debt_amount
   FROM datalake_recupera_clean.creditor_pending
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
 ),
@@ -32,15 +36,31 @@ deduplicate_complementary_records AS (
   FROM datalake_recupera_clean.complementary_records
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
 ),
+trato_feito_debts AS (
+  SELECT
+    id_external AS id_invoice,
+    interest_fee_amount,
+    fine_fee_amount,
+    discount_amount,
+    original_amount + interest_fee_amount + fine_fee_amount - discount_amount AS debt_amount
+  FROM datalake_trato_feito_clean.debt
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_external ORDER BY ts_created DESC) = 1
+),
 debts AS (
   SELECT
     COALESCE(cp.creditor, cr.creditor) AS creditor,
     COALESCE(cp.id_creditor, cr.id_creditor) AS id_creditor,
     COALESCE(cp.id_customer, cr.id_customer) AS id_customer,
-    COALESCE(cp.id_installment, cr.id_installment) AS id_invoice
+    COALESCE(cp.id_installment, cr.id_installment) AS id_invoice,
+    COALESCE(tfd.interest_fee_amount, cp.interest_fee_amount) AS interest_fee_amount,
+    tfd.fine_fee_amount,
+    COALESCE(tfd.discount_amount, cp.discount_amount) AS discount_amount,
+    COALESCE(tfd.debt_amount, cp.debt_amount) AS debt_amount
   FROM deduplicate_creditor_pending AS cp
   FULL OUTER JOIN deduplicate_complementary_records AS cr
     ON cp.id_installment  = cr.id_installment
+  LEFT JOIN trato_feito_debts AS tfd
+    ON cp.id_installment = tfd.id_invoice
 ),
 union_quintoandar_quintocred AS (
   SELECT
@@ -51,8 +71,8 @@ union_quintoandar_quintocred AS (
     i.substatus AS invoice_status,
     ABS(i.due_amount) AS invoice_due_amount,
     i.paid_amount AS invoice_paid_amount,
-    DATE(i.ts_due) AS invoice_dt_due,
-    DATE(i.ts_paid) AS invoice_dt_paid
+    DATE(i.ts_due) AS dt_invoice_due,
+    DATE(i.ts_paid) AS dt_invoice_paid
   FROM datalake_retsuko.invoice AS i
   LEFT JOIN datalake_retsuko.invoice_info AS ii
     ON i.id_external = ii.id_invoice
@@ -67,8 +87,8 @@ union_quintoandar_quintocred AS (
     NULL AS invoice_status,
     o.due_amount AS invoice_due_amount,
     o.paid_amount AS invoice_paid_amount,
-    DATE(COALESCE(o.dt_due, o.dt_due_legacy)) AS invoice_dt_due,
-    DATE(o.ts_paid) AS invoice_dt_paid
+    DATE(COALESCE(o.dt_due, o.dt_due_legacy)) AS dt_invoice_due,
+    DATE(o.ts_paid) AS dt_invoice_paid
   FROM datalake_velo.occurrence AS o
   LEFT JOIN datalake_velo.junk AS j
     ON o.id_occurrence_status = j.id_junk
@@ -84,8 +104,12 @@ SELECT DISTINCT
   u.invoice_status,
   u.invoice_due_amount,
   u.invoice_paid_amount,
-  u.invoice_dt_due,
-  u.invoice_dt_paid,
+  d.interest_fee_amount,
+  d.fine_fee_amount,
+  d.discount_amount,
+  d.debt_amount,
+  u.dt_invoice_due,
+  u.dt_invoice_paid,
   NOW() AS ts_load
 FROM debts AS d
 INNER JOIN union_quintoandar_quintocred AS u

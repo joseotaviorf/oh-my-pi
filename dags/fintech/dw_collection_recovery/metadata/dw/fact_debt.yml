@@ -71,13 +71,36 @@ columns:
       - datalake_retsuko.invoice.paid_amount
       - datalake_velo.occurrence.paid_amount
     description: Invoice paid amount. This field will be filled int for rows where the original invoice is paid or the status is written down and there is a negotiation
-  invoice_dt_due:
+  interest_fee_amount:
+    lineage:
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+      - datalake_recupera_clean.creditor_pending.interest_fee_amount
+    description: Interest fee amount (juros)
+  fine_fee_amount:
+    lineage:
+      - datalake_trato_feito_clean.debt.fine_fee_amount
+      - datalake_recupera_clean.creditor_pending.amount_fine
+    description: Fine fee amount(multa)
+  discount_amount:
+    lineage:
+      - datalake_trato_feito_clean.debt.discount_amount
+      - datalake_recupera_clean.creditor_pending.discount_amount
+    description: Discount amount
+  debt_amount:
+    lineage:
+      - datalake_trato_feito_clean.debt.original_amount
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+      - datalake_trato_feito_clean.debt.fine_fee_amount
+      - datalake_trato_feito_clean.debt.discount_amount
+      - datalake_recupera_clean.creditor_pending.transfer_amount
+    description: Total debt amount. It is invoice_due_amount + interest_fee_amount + fine_fee_amount - discount_amount
+  dt_invoice_due:
     lineage:
       - datalake_retsuko.invoice.ts_due
       - datalake_velo.occurrence.dt_due_legacy
       - datalake_velo.occurrence.dt_due
     description: Invoice due date
-  invoice_dt_paid:
+  dt_invoice_paid:
     lineage:
       - datalake_retsuko.invoice.ts_paid
       - datalake_velo.occurrence.ts_paid

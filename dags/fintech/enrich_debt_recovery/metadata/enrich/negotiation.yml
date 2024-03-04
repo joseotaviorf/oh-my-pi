@@ -45,11 +45,23 @@ columns:
     description: "Negotiation discount amount"
     lineage:
       - datalake_trato_feito_clean.debt.discount_amount
+  interest_fee_amount:
+    description: "Negotiation interest fee amount"
+    lineage:
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+  fine_fee_amount:
+    description: "Negotiation fine fee amount"
+    lineage:
+      - datalake_trato_feito_clean.debt.fine_fee_amount
   negotiation_fees_amount:
     description: "Negotiation fees amount"
     lineage:
       - datalake_trato_feito_clean.debt.interest_fee_amount
       - datalake_trato_feito_clean.debt.fine_fee_amount
+  credit_card_fee_amount:
+    description: "Credit card fee amount"
+    lineage:
+      - datalake_trato_feito_clean.negotiation.payload
   breached_installment:
     description: "Breached installment number"
   is_contract_recurrent_debtor:
@@ -57,13 +69,17 @@ columns:
     lineage:
       - datalake_trato_feito_clean.negotiation.id_debtor_external
   has_renegotiated:
-    description: "Indicates if there was a renegotiation"
+    description: "Indicates if the negotiation is a renegotiation"
     lineage:
       - datalake_trato_feito_clean.accounting_installment.id
   dt_expected_end:
     description: "Installment due date"
     lineage:
       - datalake_trato_feito_clean.installment.dt_due
+  ts_first_payment:
+    description: "Timestamp indicating when the first installment was paid"
+    lineage:
+      - datalake_trato_feito_clean.installment.ts_updated
   ts_paid_all:
     description: "Timestamp indicating when all installments have been paid"
     lineage:

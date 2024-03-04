@@ -1,11 +1,30 @@
-WITH cte_paid AS (
+WITH
+extract_array_credit_card_fee AS (
+  SELECT
+    id,
+    GET_JSON_OBJECT(payload, "$.debts[*].debts_fee_amount") AS debt_array_string
+  FROM datalake_trato_feito_clean.negotiation
+),
+extract_total_credit_card_fee AS (
+    SELECT
+        id,
+        ROUND(
+            AGGREGATE(
+                SPLIT(REGEXP_REPLACE(debt_array_string, r"\[|\]",""), ","),
+                CAST(0 AS double),  -- Accumulator has to be of the same type as the input
+                (value, acc) -> value + acc)
+        ,2) credit_card_fee_amount
+    FROM extract_array_credit_card_fee
+),
+cte_paid AS (
     SELECT
         n.`id` AS id_negotiation,
         SUM(i.total_amount) AS paid_amount,
         COUNT(i.`id`) AS qt_paid,
+        MIN(i.ts_updated) AS ts_first_payment,
         MAX(i.ts_updated) AS ts_last_payment
     FROM
-        datalake_trato_feito_clean.negotiation AS n
+       datalake_trato_feito_clean.negotiation AS n
     LEFT JOIN
         datalake_trato_feito_clean.installment AS i
             ON n.id = i.id_negotiation
@@ -34,6 +53,7 @@ cte_recurrent AS (
     GROUP BY 1
 ),
 cte_renegotiated AS (
+    -- If the invoice that exists in the debt table exists in the account_installment it means that it is the extra invoice created by another broken negotiation, i.e, the current negotiation is a renegotiation
     SELECT
         d.id_negotiation,
         BOOLEAN(SUM(IF(ac.id IS NOT NULL, 1, 0))) AS renegotiated
@@ -82,6 +102,8 @@ cte_debts AS (
         id_negotiation,
         SUM(original_amount) AS negotiation_original_amount,
         SUM(discount_amount) AS negotiation_discount_amount,
+        SUM(interest_fee_amount) AS interest_fee_amount,
+        SUM(fine_fee_amount) AS fine_fee_amount,
         SUM(interest_fee_amount) + SUM(fine_fee_amount) AS negotiation_fees_amount
     FROM
         datalake_trato_feito_clean.debt AS d
@@ -99,11 +121,15 @@ SELECT
     cp.paid_amount,
     d.negotiation_original_amount,
     d.negotiation_discount_amount,
+    d.interest_fee_amount,
+    d.fine_fee_amount,
     d.negotiation_fees_amount,
+    cc.credit_card_fee_amount,
     cb.breached_installment,
     cr.recurrent AS is_contract_recurrent_debtor,
     COALESCE(crn.renegotiated, False) AS has_renegotiated,
     ci.dt_expected_end,
+    cp.ts_first_payment,
     CASE
         WHEN ci.qt_installments = cp.qt_paid THEN cp.ts_last_payment
         ELSE NULL
@@ -130,3 +156,5 @@ LEFT JOIN
 LEFT JOIN
     cte_breach AS cb
         ON n.`id` = cb.id_negotiation
+LEFT JOIN extract_total_credit_card_fee AS cc
+    ON cc.`id` = n.`id`

@@ -5,14 +5,14 @@ base AS (
     d.id_invoice,
     ni.id_invoice_extra,
     COALESCE(n.id_negotiation_trato_feito, n.sk_negotiation) AS id_negotiation,
-    d.invoice_dt_due,
+    d.dt_invoice_due,
     n.negotiation_status,
     n.negotiated_amount,
     n.dt_promisse,
-    n.dt_expected_end,
+    n.dt_expected_ending,
     n.number_of_installments,
     n.paid_installments,
-    n.ts_paid_all
+    n.dt_paid_all_installments
   FROM dw_collection_recovery.fact_debt AS d
   LEFT JOIN dw_collection_recovery.bridge_map_debt_negotiation AS b
     ON  d.sk_debt = b.sk_debt
@@ -26,7 +26,7 @@ tracking_invoice AS (
   SELECT
     id_contract,
     MIN(id_invoice) AS id_invoice,
-    MAX(IF(negotiation_status="finished", ts_paid_all, NULL)) AS dt_debt_paid
+    MAX(IF(negotiation_status = "finished", dt_paid_all_installments, NULL)) AS dt_debt_paid
   FROM base
   GROUP BY 1
 ),
@@ -34,16 +34,16 @@ negotiation_info AS (
   -- Get data on the most recent negotiation (i.e, the one that has not been cancelled) for each invoice.
   SELECT
     id_invoice,
-    invoice_dt_due,
-    MAX(CASE WHEN negotiation_status!="canceled" THEN DATE(ts_paid_all) END) AS dt_paid_all_installments,
-    MAX(CASE WHEN negotiation_status!="canceled" THEN id_negotiation END) AS id_negotiation,
-    MAX(CASE WHEN negotiation_status!="canceled" THEN negotiation_status END) AS negotiation_status,
+    dt_invoice_due,
+    MAX(CASE WHEN negotiation_status != "canceled" THEN dt_paid_all_installments END) AS dt_paid_all_installments,
+    MAX(CASE WHEN negotiation_status != "canceled" THEN id_negotiation END) AS id_negotiation,
+    MAX(CASE WHEN negotiation_status != "canceled" THEN negotiation_status END) AS negotiation_status,
     COUNT(DISTINCT id_negotiation) AS total_negotiations,
-    MAX(CASE WHEN negotiation_status!="canceled" THEN negotiated_amount END) AS negotiation_amount,
-    MAX(CASE WHEN negotiation_status!="canceled" THEN dt_promisse END) AS dt_negotiation_created,
-    MAX(CASE WHEN negotiation_status!="canceled" THEN dt_expected_end END) AS dt_expect_finish_negotiation,
-    MAX(CASE WHEN negotiation_status!="canceled" THEN number_of_installments END) AS total_negotiation_installments,
-    MAX(CASE WHEN negotiation_status!="canceled" THEN paid_installments END) AS total_paid_negotiation_installments
+    MAX(CASE WHEN negotiation_status != "canceled" THEN negotiated_amount END) AS negotiation_amount,
+    MAX(CASE WHEN negotiation_status != "canceled" THEN dt_promisse END) AS dt_negotiation_created,
+    MAX(CASE WHEN negotiation_status != "canceled" THEN dt_expected_ending END) AS dt_expect_finish_negotiation,
+    MAX(CASE WHEN negotiation_status != "canceled" THEN number_of_installments END) AS total_negotiation_installments,
+    MAX(CASE WHEN negotiation_status != "canceled" THEN paid_installments END) AS total_paid_negotiation_installments
   FROM base
   GROUP BY 1,2
 ),
@@ -75,17 +75,17 @@ SELECT
   DATE(i.ts_created) AS dt_invoice_created,
   DATE(i.ts_due) AS dt_invoice_due,
   CASE
-    WHEN dd.week_day = 0 THEN (n.invoice_dt_due + interval "1" day) -- sunday
-    WHEN dd.week_day = 6 THEN (n.invoice_dt_due + interval "2" day) -- saturday
+    WHEN dd.week_day = 0 THEN (n.dt_invoice_due + interval "1" day) -- sunday
+    WHEN dd.week_day = 6 THEN (n.dt_invoice_due + interval "2" day) -- saturday
     WHEN dd.week_day BETWEEN 1
         AND 4
-        AND dd.is_brz_holiday = "Holiday" THEN (n.invoice_dt_due + interval "1" day)
+        AND dd.is_brz_holiday = "Holiday" THEN (n.dt_invoice_due + interval "1" day)
     WHEN dd.week_day = 5
-        AND dd.is_brz_holiday = "Holiday" THEN (n.invoice_dt_due + interval "3" day)
-    ELSE n.invoice_dt_due
+        AND dd.is_brz_holiday = "Holiday" THEN (n.dt_invoice_due + interval "3" day)
+    ELSE n.dt_invoice_due
   END AS dt_debt_creation,
   DATE(i.ts_paid) AS dt_paid,
-  IF(status="written-down", DATE(i.ts_paid), NULL) AS dt_written_down,
+  IF(status = "written-down", DATE(i.ts_paid), NULL) AS dt_written_down,
   it.dt_debt_paid AS dt_original_debt_paid,
   n.dt_negotiation_created,
   n.dt_expect_finish_negotiation,
