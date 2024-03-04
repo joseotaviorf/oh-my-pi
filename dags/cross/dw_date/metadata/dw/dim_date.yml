@@ -74,26 +74,50 @@ columns:
     description: Cumulative sum of business days in the month counting from the first day to the day in question (date field)
     lineage:
       - datalake_quintoandar.aux_date.working_days_in_month
+  working_days_in_month_fintech:
+    description: Cumulative sum of business days, based on bank calendar (Fintech), in the month counting from the first day to the day in question (date field)
+    lineage:
+      - datalake_quintoandar.aux_date.working_days_in_month_fintech
   total_working_days_in_month:
     description: The total of working days in a month
     lineage:
       - datalake_quintoandar.aux_date.total_working_days_in_month
+  total_working_days_in_month_fintech:
+    description: The total of working days in a month based on bank calendar (Fintech)
+    lineage:
+      - datalake_quintoandar.aux_date.total_working_days_in_month_fintech
   is_brz_holiday:
     description: Indicates whether the day is a brazilian nacional holiday not. The dates listed as holidays are the same dates Google Calendar reports as holidays.
     lineage:
       - datalake_quintoandar.aux_date.is_brz_holiday
+  is_brz_fintech_holiday:
+    description: "Brazilian bank holidays used for fintech models. Disregards holidays: Carnival end, Black Awareness Day, Christmas Eve"
+    lineage:
+      - datalake_quintoandar.aux_date.is_brz_fintech_holiday
   is_brz_business_day:
     description: Indicates, based on the fields weekend and is_brz_holiday, whether the day is a brazilian business day or not. The dates listed as business days are the same dates reported by Google Calendar based on the Brazilian national holiday calendar.
     lineage:
       - datalake_quintoandar.aux_date.is_brz_business_day
+  is_brz_fintech_business_day:
+    description: Indicates, based on the fields weekend and is_brz_fintech_holiday, whether the day is a brazilian business day or not. The dates listed as business days are the same dates reported by Google Calendar based on the Brazilian national holiday calendar.
+    lineage:
+      - datalake_quintoandar.aux_date.is_brz_fintech_business_day
   next_brz_business_day:
     description: Indicates, based on the fields weekend and is_brz_holiday, the next brazilian business day.
     lineage:
       - datalake_quintoandar.aux_date.next_brz_business_day
+  next_brz_fintech_business_day:
+    description: Indicates, based on the fields weekend and is_brz_fintech_holiday, the next brazilian business day
+    lineage:
+      - datalake_quintoandar.aux_date.next_brz_fintech_business_day
   is_mx_holiday:
     description: Indicates whether is a mexican holiday or not
     lineage:
       - datalake_quintoandar.aux_date.is_mx_holiday
+  mx_holiday_name:
+    description: Name of the mexican holiday
+    lineage:
+      - datalake_quintoandar.aux_date.mx_holiday_name
   date:
     description: Date in %Y-%m-%d format
     lineage:

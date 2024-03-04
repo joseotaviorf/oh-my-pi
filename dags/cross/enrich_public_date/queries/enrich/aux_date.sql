@@ -5,7 +5,26 @@ SPARK 3.x is necessary (YEAROFWEEK is necessary to get the year related to week 
 
 */
 
-WITH base_date AS (
+WITH
+mexican_holidays AS (
+    SELECT
+        holiday_name,
+        holiday_category,
+        holiday_name,
+        dt_holiday_start
+    FROM datalake_google_calendar_clean.mexican_holidays
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY dt_holiday_start, dt_holiday_end ORDER BY ts_updated DESC) = 1
+),
+brazillian_holidays AS (
+    SELECT
+        holiday_name,
+        holiday_category,
+        holiday_name,
+        dt_holiday_start
+    FROM datalake_google_calendar_clean.brazillian_holidays
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY dt_holiday_start, dt_holiday_end ORDER BY ts_updated DESC) = 1
+),
+base_date AS (
     SELECT
         CAST(REPLACE(dt, '-','') AS BIGINT) AS id_date,
         DAY(dt) AS day,
@@ -43,16 +62,41 @@ WITH base_date AS (
                     ELSE 1
                 END
             ) OVER(PARTITION BY date_trunc('month',dt) ORDER BY DAY(dt) ROWS UNBOUNDED PRECEDING) AS working_days_in_month,
+        SUM(
+                CASE
+                    WHEN ((CASE
+                            WHEN DAYOFWEEK(dt) IN (1, 7) THEN 'Weekend'
+                            ELSE 'Weekday'
+                            END) = 'Weekend'
+                            OR (CASE
+                                    WHEN LOWER(br_holiday_name) LIKE "%carnival end (until 2pm)%" THEN 'No holiday'
+                                    WHEN LOWER(br_holiday_name) LIKE "%black awareness day%" THEN 'No holiday'
+                                    WHEN LOWER(br_holiday_name) LIKE "%christmas eve (from 2pm)" THEN 'No holiday'
+                                    WHEN DATE_FORMAT(dt, 'MMdd') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') OR is_br_holliday IS TRUE THEN 'Holiday'
+                                    ELSE 'No holiday'
+                                END) = 'Holiday') THEN 0
+                    ELSE 1
+                END
+            ) OVER(PARTITION BY date_trunc('month',dt) ORDER BY DAY(dt) ROWS UNBOUNDED PRECEDING) AS working_days_in_month_fintech,
         -- Fixed holidays + Dinamic days
         CASE
             WHEN DATE_FORMAT(dt, 'MMdd') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') OR is_br_holliday IS TRUE THEN 'Holiday'
             ELSE 'No holiday'
         END AS is_brz_holiday,
+        CASE
+            WHEN LOWER(br_holiday_name) LIKE "%carnival end (until 2pm)%" THEN 'No holiday'
+            WHEN LOWER(br_holiday_name) LIKE "%black awareness day%" THEN 'No holiday'
+            WHEN LOWER(br_holiday_name) LIKE "%christmas eve (from 2pm)" THEN 'No holiday'
+            WHEN DATE_FORMAT(dt, 'MMdd') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') OR is_br_holliday IS TRUE THEN 'Holiday'
+            ELSE 'No holiday'
+        END AS is_brz_fintech_holiday,
+        br_holiday_name,
         -- Fixed holidays + Dinamic days
         CASE
             WHEN is_mx_holliday IS TRUE THEN 'Holiday'
             ELSE 'No holiday'
         END AS is_mx_holiday,
+        mx_holiday_name,
         dt AS date,
         DATE_FORMAT(dt, 'dd/MM/yyyy') AS brz_date,
         DATE_FORMAT(dt, 'MM/dd/yyyy') AS usa_date,
@@ -71,7 +115,9 @@ WITH base_date AS (
     FROM (
         SELECT
             dt,
+            bz.holiday_name AS br_holiday_name,
             IF(bz.dt_holiday_start IS NOT NULL, TRUE, FALSE) AS is_br_holliday,
+            mx.holiday_name AS mx_holiday_name,
             IF(mx.dt_holiday_start IS NOT NULL OR mx.holiday_name like 'Revolution Day%' OR bz.holiday_name like 'Good Friday%', TRUE, FALSE) AS is_mx_holliday
         FROM
         (
@@ -84,12 +130,12 @@ WITH base_date AS (
         ) DQ
 
         LEFT JOIN
-            datalake_google_calendar_clean.brazillian_holidays AS bz
+            brazillian_holidays AS bz
                 ON dt = bz.dt_holiday_start
-                AND holiday_category = "Public holiday"
-                AND holiday_name <> 'Public Service Holiday'
+                AND bz.holiday_category = "Public holiday"
+                AND bz.holiday_name <> 'Public Service Holiday'
         LEFT JOIN
-            datalake_google_calendar_clean.mexican_holidays AS mx
+            mexican_holidays AS mx
                 ON dt = mx.dt_holiday_start
                 AND (mx.holiday_category = "Public holiday" OR mx.holiday_name like 'Revolution Day%')
 
@@ -115,11 +161,18 @@ SELECT DISTINCT
     year_month,
     year_quarter,
     working_days_in_month,
+    working_days_in_month_fintech,
     MAX(working_days_in_month) OVER (PARTITION BY year, month) AS total_working_days_in_month,
+    MAX(working_days_in_month_fintech) OVER (PARTITION BY year, month) AS total_working_days_in_month_fintech,
     is_brz_holiday,
+    is_brz_fintech_holiday,
+    br_holiday_name,
     IF(weekend = "Weekday" AND is_brz_holiday = "No holiday", TRUE, FALSE) is_brz_business_day,
+    IF(weekend = "Weekday" AND is_brz_fintech_holiday = "No holiday", TRUE, FALSE) is_brz_fintech_business_day,
     LEAD(IF(weekend = "Weekday" AND is_brz_holiday = "No holiday", date, NULL)) IGNORE NULLS OVER (ORDER BY DATE(date) ASC) next_brz_business_day,
+    LEAD(IF(weekend = "Weekday" AND is_brz_fintech_holiday = "No holiday", date, NULL)) IGNORE NULLS OVER (ORDER BY DATE(date) ASC) next_brz_fintech_business_day,
     is_mx_holiday,
+    mx_holiday_name,
     date,
     brz_date,
     usa_date,
