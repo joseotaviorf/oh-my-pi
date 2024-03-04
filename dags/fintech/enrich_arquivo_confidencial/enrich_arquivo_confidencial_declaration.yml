@@ -1,0 +1,16 @@
+---
+dag:
+  name: enrich_arquivo_confidencial
+  schedule_start_date: 2023, 1, 26
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for Arquivo Confidencial data.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    scr_pivot:
+      - scr
+cluster:
+  type: databricks_10_4_min_io-memory_cluster
