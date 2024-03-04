@@ -102,9 +102,9 @@ agreements AS (
     da.advisory,
     da.agreement_type,
     o.dt_next_due,
-    IF(i.installment_number = "000", i.dt_paid, NULL) AS dt_down_payment,
     o.total_negotiated_to_be_due_amount,
     o.total_negotiated_overdue_amount,
+    MAX(IF(i.installment_number = "000", i.dt_paid, NULL)) AS dt_down_payment,
     MAX(i.dt_due) AS dt_negotiation_expected_end,
     MAX(IF(i.dt_paid IS NOT NULL AND i.dt_paid <= CURRENT_DATE, i.dt_paid, NULL)) AS dt_last_payment,
     COUNT(IF(i.dt_paid IS NOT NULL AND i.dt_paid <= CURRENT_DATE, i.id_installment, NULL)) AS paid_installments,
@@ -136,7 +136,7 @@ agreements AS (
     ON i.id_installment = da.id_negotiation
     AND i.id_customer = da.id_customer
   WHERE i.is_installment_active IS TRUE
-  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 deduplicated_installment_canceled AS (
   SELECT
