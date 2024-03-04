@@ -54,6 +54,10 @@ columns:
     lineage:
       - datalake_customer_support.received_demand.id_user
     description: MD5 unique identifier for every user ID.
+  sk_agent:
+    lineage:
+      - datalake_customer_support.received_demand.agent_email
+    description: Unique agent identifier key.
   sk_department:
     lineage:
       - datalake_customer_support.received_demand.department

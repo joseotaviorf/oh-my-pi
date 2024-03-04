@@ -50,6 +50,7 @@ SELECT
     sk_taxonomy,
     sk_ticket,
     sk_user,
+    MD5(agent_email) AS sk_agent,
     channel,
     status,
     completion_reason,
