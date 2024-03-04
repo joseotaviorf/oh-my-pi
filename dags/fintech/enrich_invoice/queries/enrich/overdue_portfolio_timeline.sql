@@ -11,16 +11,7 @@ WITH target_invoices AS (
         i.paid_amount,
         c.status AS contract_status,
         DATE(i.ts_due) AS dt_due,
-        CASE
-            WHEN dd.week_day = 0 THEN (DATE(i.ts_due) + interval "1" day) -- sunday
-            WHEN dd.week_day = 6 THEN (DATE(i.ts_due) + interval "2" day) -- saturday
-            WHEN dd.week_day BETWEEN 1
-                AND 4
-                AND dd.is_brz_holiday = "Holiday" THEN (DATE(i.ts_due) + interval "1" day)
-            WHEN dd.week_day = 5
-                AND dd.is_brz_holiday = "Holiday" THEN (DATE(i.ts_due) + interval "3" day)
-            ELSE DATE(i.ts_due)
-        END AS dt_due_adjusted,
+        i.dt_due_adjusted,
         DATE(i.ts_paid) AS dt_paid,
         c.dt_termination AS dt_contract_annulled
     FROM
@@ -32,9 +23,6 @@ WITH target_invoices AS (
         ON c.id = i.id_contract_external
     LEFT JOIN datalake_proposal.proposal AS p
         ON p.id = c.id_proposal
-    LEFT JOIN
-        datalake_quintoandar.aux_date AS dd
-            ON dd.date = DATE(i.ts_due)
     WHERE
         LOWER(i.status) != "canceled"
         AND LOWER(c.status) != "cancelado" -- only active or finalized
@@ -48,8 +36,8 @@ invoices_timeline AS (
         dd.month_end,
         dd.date AS reference_date,
         CASE
-            WHEN dd.working_days_in_month = 0 THEN 1
-            ELSE dd.working_days_in_month
+            WHEN dd.working_days_in_month_fintech = 0 THEN 1
+            ELSE dd.working_days_in_month_fintech
         END AS business_day,
         i.id_contract,
         i.id_proposal,

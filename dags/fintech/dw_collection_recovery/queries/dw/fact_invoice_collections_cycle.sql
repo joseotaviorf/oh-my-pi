@@ -74,16 +74,7 @@ SELECT
   i.accrual_year_month,
   DATE(i.ts_created) AS dt_invoice_created,
   DATE(i.ts_due) AS dt_invoice_due,
-  CASE
-    WHEN dd.week_day = 0 THEN (n.dt_invoice_due + interval "1" day) -- sunday
-    WHEN dd.week_day = 6 THEN (n.dt_invoice_due + interval "2" day) -- saturday
-    WHEN dd.week_day BETWEEN 1
-        AND 4
-        AND dd.is_brz_holiday = "Holiday" THEN (n.dt_invoice_due + interval "1" day)
-    WHEN dd.week_day = 5
-        AND dd.is_brz_holiday = "Holiday" THEN (n.dt_invoice_due + interval "3" day)
-    ELSE n.dt_invoice_due
-  END AS dt_debt_creation,
+  i.dt_due_adjusted AS dt_debt_creation,
   DATE(i.ts_paid) AS dt_paid,
   IF(status = "written-down", DATE(i.ts_paid), NULL) AS dt_written_down,
   it.dt_debt_paid AS dt_original_debt_paid,

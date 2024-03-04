@@ -110,9 +110,7 @@ columns:
     description: Invoice due date
   dt_invoice_due_adjust:
     lineage:
-      - datalake_quintoandar.aux_date.week_day
-      - datalake_quintoandar.aux_date.is_brz_holiday
-      - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice.dt_due_adjusted
     description: Invoice due date adjust for next business day
   dt_invoice_paid:
     lineage:

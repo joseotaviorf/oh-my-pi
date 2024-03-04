@@ -133,6 +133,12 @@ columns:
     description: "File that Seu Barriga created with Vans to communicate with bank"
     lineage:
       - datalake_retsuko_clean.invoice.sispag_file
+  dt_due_adjusted:
+    description: "Invoice due date adjusted based on the fintech (bank) holidays."
+    lineage:
+      - datalake_quintoandar.aux_date.week_day
+      - datalake_quintoandar.aux_date.is_brz_holiday
+      - datalake_retsuko.invoice.ts_due
   ts_paid:
     description: "Timestamp in which invoice was paid, for payable invoices"
     lineage:

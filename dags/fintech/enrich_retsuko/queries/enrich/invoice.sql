@@ -29,6 +29,7 @@ SELECT
     in.paid_amount,
     in.accrual_year_month,
     in.sispag_file,
+    IF(dd.is_brz_fintech_business_day, DATE(in.ts_due), dd.next_brz_fintech_business_day) AS dt_due_adjusted,
     in.ts_paid,
     in.ts_canceled,
     in.ts_sent,
@@ -44,5 +45,7 @@ ON in.id = la.id_invoice
 LEFT JOIN
   datalake_retsuko_clean.contract AS c
       ON c.id = in.id_contract
+LEFT JOIN datalake_quintoandar.aux_date AS dd
+  ON dd.date = DATE(in.ts_due)
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY in.id ORDER BY in.ts_retsuko_updated DESC) = 1
