@@ -11,7 +11,7 @@ SELECT
     StatusLOV AS status_lov,
     ClassificationCode AS classification_code,
     InternalAddressLine AS internal_address_line,
-    OrganizationDFF AS organizationd_dff,
+    OrganizationDFF AS organization_dff,
     extraInformation AS extra_information,
     to_date(EffectiveStartDate, 'yyyy-MM-dd') AS dt_effective_start,
     to_date(EffectiveEndDate, 'yyyy-MM-dd') AS dt_effective_end,

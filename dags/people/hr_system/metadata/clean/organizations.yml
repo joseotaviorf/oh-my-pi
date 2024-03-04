@@ -33,7 +33,7 @@ columns:
     description: ''
     lineage:
     - datalake_hr_system_raw.organizations.OrgClassificationVA
-  organizationd_dff:
+  organization_dff:
     description: "Customer's flexfield for organization."
     lineage:
     - datalake_hr_system_raw.organizations.OrganizationDFF
