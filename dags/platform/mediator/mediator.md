@@ -11,9 +11,9 @@ To force the Mediator to skip a DAG temporarily, use the variable [MEDIATOR_SKIP
 
 ### Execution Interval
 
-Runs at every 15 minutes, starting at minute 0 of each hour. More information about run time [here]({chart_url}{dag_id}).
+Runs at every 10 minutes, starting at minute 0 of each hour. More information about run time [here]({chart_url}{dag_id}).
 
-*Dies (timeout) after 13 minutes.*
+*Dies (timeout) after 9 minutes.*
 
 ### Additional Information
 
