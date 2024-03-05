@@ -1,20 +1,20 @@
 ---
-external_s3_bucket: nexxera-forno-data
+external_s3_bucket: recon-credit-card-forno
 partition_cols: ["year", "month", "day"]
 tables:
-  - table_name: ojdt_error
+  - table_name: consolidated_entries
     is_monthly: False
-  - table_name: ojdt_ok
+  - table_name: consolidated_header
     is_monthly: False
-  - table_name: jdt1_error
+  - table_name: divergence_entries
     is_monthly: False
-  - table_name: jdt1_ok
+  - table_name: divergence_header
     is_monthly: False
-  - table_name: consolidated_ojdt_error
+  - table_name: monthly_consolidated_entries
     is_monthly: True
-  - table_name: consolidated_ojdt_ok
+  - table_name: monthly_consolidated_header
     is_monthly: True
-  - table_name: consolidated_jdt1_error
+  - table_name: monthly_divergence_entries
     is_monthly: True
-  - table_name: consolidated_jdt1_ok
+  - table_name: monthly_divergence_header
     is_monthly: True

@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     for table in tables:
         table_config = [conf for conf in tables_config if conf['table_name'] == table][0]
-        if table_config.get("is_monthly", False) and execution_date.day != '1':
+        if table_config.get("is_monthly", False) and execution_date.day != 1:
             logger.info(
                     f"m=__main__, message={table} is monthly and should not run today, execution_date={execution_date}"
                 )
@@ -93,11 +93,18 @@ if __name__ == "__main__":
 
         if df is not None:
             df = df.drop("year", "month", "day")
-
-            destination_path = f"{table}/{execution_date.year}/{execution_date.month}/{execution_date.day}/"
-            file_name = (
+            if table_config.get("is_monthly", True):
+                destination_path = f"{execution_date.year}/{execution_date.month:02d}/{execution_date.day:02d}/monthly/"
+                table = table.replace('monthly','')
+                file_name = (
                 f'{table}_{(execution_date.strftime("%Y_%m_%d"))}.csv'
-            )
+                )
+
+            else:
+                destination_path = f"{execution_date.year}/{execution_date.month:02d}/{execution_date.day:02d}/daily/"
+                file_name = (
+                    f'{table}_{(execution_date.strftime("%Y_%m_%d"))}.csv'
+                )
 
             with io.StringIO() as csv_buffer:
                 df.toPandas().convert_dtypes().to_csv(
