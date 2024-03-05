@@ -1,6 +1,7 @@
 database_name: dw_credit
 table_name: dim_credit_analysis
-description: "This table takes all credit analysis from Sorting Hat to a given proposal
+description:
+  "This table takes all credit analysis from Sorting Hat to a given proposal
   and all of its properties."
 domain: Fintech
 owner: isabella.santos@quintoandar.com.br
@@ -28,32 +29,41 @@ columns:
   bypass:
     lineage:
       - datalake_credit_analysis.credit_analysis.bypass
-    description: "Indicate the reason that led a credit analysis to receive the bypass
+    description:
+      "Indicate the reason that led a credit analysis to receive the bypass
       treatment (if conditions apply)."
     categories:
       FOREIGNER: "Indicates when a proposal contains a proponent from another country."
-      HIGH_INCOME: "Indicates when the total income from subset is above the defined
+      HIGH_INCOME:
+        "Indicates when the total income from subset is above the defined
         threshold (25k)."
       LOW_DTI: "Indicates when the DTI is less then the defined threshold (0.1)."
       MANUAL: "Indicates the case in which was made a bypass via manual credit analysis."
-      MISSING_5A_SCORE: "Indicates when the proposal does not have an internal score
+      MISSING_5A_SCORE:
+        "Indicates when the proposal does not have an internal score
         available."
-      MISSING_EXTERNAL_SCORE: "Indicates when one or more proponents does not have
+      MISSING_EXTERNAL_SCORE:
+        "Indicates when one or more proponents does not have
         scores available on Serasa/Boavista."
-      OCCUPATION_AREA: "Indicates when some proponent have occupation_area = COMMUNICATION
+      OCCUPATION_AREA:
+        "Indicates when some proponent have occupation_area = COMMUNICATION
         and one or more proponents have income nature defined as AUTONOMOUS or BUSINESSMAN."
-      RECENT_TENANT: "Indicates when one or more proponents have a contract with 5A
+      RECENT_TENANT:
+        "Indicates when one or more proponents have a contract with 5A
         in the last 6 months."
-      RELIABLE_EX_TENANT: "Indicates when one or more proponents was classified as
+      RELIABLE_EX_TENANT:
+        "Indicates when one or more proponents was classified as
         a reliable ex-tenant."
-      RELIABLE_TENANT: "Indicates when one or more proponents was classified as a reliable
+      RELIABLE_TENANT:
+        "Indicates when one or more proponents was classified as a reliable
         tenant."
-      RENTAL_GUARANTEE: "Indicates when the proposal have a guarantee from Rental Guarantee
+      RENTAL_GUARANTEE:
+        "Indicates when the proposal have a guarantee from Rental Guarantee
         product."
   category:
     lineage:
       - datalake_credit_analysis.credit_analysis.category
-    description: 'Guarantee policy identification. 0 marks a Free guarantee, null indicates a Clear No reject and all others are accessible via dim_credit.dim_guarantee_policy.'
+    description: "Guarantee policy identification. 0 marks a Free guarantee, null indicates a Clear No reject and all others are accessible via dim_credit.dim_guarantee_policy."
   category_within_ca:
     lineage:
       - datalake_credit_analysis.credit_analysis.category_within_ca
@@ -65,20 +75,25 @@ columns:
   documentation_policy:
     lineage:
       - datalake_credit_analysis.credit_analysis.documentation_policy
-    description: "Indicates what documentation policy was applied to a given credit
+    description:
+      "Indicates what documentation policy was applied to a given credit
       analysis."
     categories:
-      FULL_CONTROL_GROUP: "Cases in which a FULL documentation policy is requested
+      FULL_CONTROL_GROUP:
+        "Cases in which a FULL documentation policy is requested
         to remove the bias on Credit Decision ML models."
-      FULL: "Documentation is requested and fully analyzed. This is the option that
+      FULL:
+        "Documentation is requested and fully analyzed. This is the option that
         might result in more bias as it requests documentation and a thorough analysis
         is made, thus eliminating people with insufficient income, invalid informed
         income, income that is difficult to validate (informal workers) and etc."
-      FLEX: "Documentation is requested, but is not thoroughly analyzed. This reduces
+      FLEX:
+        "Documentation is requested, but is not thoroughly analyzed. This reduces
         a bit the conversion when compared with LIGHT_APPROVAL, as it requires documents
         to be sent. It has a certain level of analysis and helps to filter some income
         outliers."
-      LIGHT_APPROVAL: "It includes a personal document check and sometimes a manual
+      LIGHT_APPROVAL:
+        "It includes a personal document check and sometimes a manual
         analysis is made."
   guarantee_category:
     lineage:
@@ -93,7 +108,7 @@ columns:
       LEVEL_2: "Indicates a more problematic situation that should be evaluated by an experienced analyst."
   liquidity:
     lineage:
-    - datalake_credit_analysis.credit_analysis.liquidity
+      - datalake_credit_analysis.credit_analysis.liquidity
     description: "Enginnering is not sure, it is not used currently (2023)."
     categories:
       A: "l"
@@ -112,7 +127,8 @@ columns:
   standalone_factor:
     lineage:
       - datalake_credit_analysis.credit_analysis.standalone_factor
-    description: "Indicates the standalone factor applied to a given credit analysis
+    description:
+      "Indicates the standalone factor applied to a given credit analysis
       (If it's a standalone proposal)."
     categories:
       Standalone High: "More expensive option we have for standalone contracts."
@@ -124,15 +140,20 @@ columns:
   risk_category:
     lineage:
       - datalake_credit_analysis.credit_analysis.risk_category
-    description: "Indicates the risk category defined to a given credit analysis. The
-      definition of each letter is done by the Credit Ops team."
+    description:
+      "Indicates the risk category defined to a given credit analysis. The
+      definition of each letter is done by the Credit Ops team. It was deprecated in favor to risk_category_canon."
     categories:
       A: "Best people evaluated"
       B: "Riskier people, but enough to have access to free guarantee"
       C: "Riskier than B, it's given the cheapest paid options dependending on the city."
       D: "Riskier than C, it's given more expensive paid options. Also depends on the city."
-      E: 'Riskier than D, its given the deposit option, factor dependending on the city.'
-      F: 'Riskier than E, clear-no.'
+      E: "Riskier than D, its given the deposit option, factor dependending on the city."
+      F: "Riskier than E, clear-no."
+  risk_category_canon:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.risk_category_canon
+    description: "New risk score given by the credit model."
   internal_score:
     lineage:
       - datalake_credit_analysis.credit_analysis.internal_score
@@ -140,19 +161,23 @@ columns:
   max_bypass:
     lineage:
       - datalake_credit_analysis.credit_analysis.max_bypass
-    description: "Indicates the if there is a bypass category applied to a given proposal
+    description:
+      "Indicates the if there is a bypass category applied to a given proposal
       (if conditions apply)."
   result:
     lineage:
       - datalake_credit_analysis.credit_analysis.result
     description: "Indicates the result applied to a given credit analysis."
     categories:
-      ADVISABLE: "status given when a manual evaluator requests a doument resend, but
+      ADVISABLE:
+        "status given when a manual evaluator requests a doument resend, but
         leaves the recommendation to approve."
       APPROVED: "Approved"
-      INADVISABLE: "status given when a manual evaluator requests a doument resend,
+      INADVISABLE:
+        "status given when a manual evaluator requests a doument resend,
         but leaves the recommendation to reject"
-      NEW: "usually indicates a new proposal. If it got to closing, look for other
+      NEW:
+        "usually indicates a new proposal. If it got to closing, look for other
         clues to approved or rejected"
       REJECTED: "Rejected"
   credit_decision_cluster:
@@ -211,7 +236,7 @@ columns:
     description: "Timestamp of a credit analysis creation."
   ts_guarantee_accepted:
     lineage:
-      -  datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
+      - datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
     description: "Timestamp of the date in which the guarantee was accepted by the tenant prospect."
   ts_load:
     description: "Timestamp of data recorded in the table."

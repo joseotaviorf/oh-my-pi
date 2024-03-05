@@ -21,13 +21,14 @@ SELECT
   cap.liquidity,
   cap.paid_guarantee_type,
   CASE
-    WHEN rsc.category_level = 40 
+    WHEN rsc.category_level = 40
       AND rsc.standalone_factor = 0.96 THEN 'Standalone Low'
     WHEN rsc.category_level = 41
       AND rsc.standalone_factor = 1.20 THEN 'Standalone High'
   END AS standalone_factor,
   ca.reason,
   cap.risk_category,
+  sr.risk_category_canon,
   cap.internal_score,
   cap.max_bypass,
   cav.max_ca_category,
@@ -43,7 +44,7 @@ SELECT
       AND cap.id_proposal_from_rg IS NULL THEN 'Free'
     WHEN COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null) = 0 THEN 'Free'
     WHEN rsc.is_standalone_allowed = TRUE THEN 'Brokerage Only'
-    WHEN rsc.is_guarantee_allowed = TRUE AND rsc.is_deposit_allowed = FALSE AND rsc.is_pro_guarantor_allowed = FALSE THEN 'Insurance' 
+    WHEN rsc.is_guarantee_allowed = TRUE AND rsc.is_deposit_allowed = FALSE AND rsc.is_pro_guarantor_allowed = FALSE THEN 'Insurance'
     WHEN rsc.is_guarantee_allowed = FALSE AND rsc.is_deposit_allowed = FALSE AND rsc.is_pro_guarantor_allowed = TRUE THEN 'Pro Guarantor'
     WHEN rsc.is_guarantee_allowed = TRUE AND rsc.is_deposit_allowed = TRUE AND rsc.is_pro_guarantor_allowed = FALSE THEN 'Insurance or Deposit'
     WHEN rsc.is_guarantee_allowed = FALSE AND rsc.is_deposit_allowed = TRUE AND rsc.is_pro_guarantor_allowed = TRUE THEN 'Pro Guarantor or Deposit'
@@ -108,7 +109,7 @@ SELECT
   cap.ts_guarantee_accepted,
   ca.ts_created AS ts_credit_analysis_created
 FROM
-  datalake_sorting_hat_clean.credit_analysis AS ca 
+  datalake_sorting_hat_clean.credit_analysis AS ca
 LEFT JOIN
   datalake_credit_analysis.credit_analysis_proposals AS cap
     ON ca.id_proposal = cap.id_proposal
@@ -118,3 +119,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_rental_guarantee_clean.risk_category AS rsc
     ON rsc.category_level = COALESCE(cap.guarantee_category, COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null))
+LEFT JOIN
+  datalake_sorting_hat_clean.screening_result AS sr
+    ON sr.id_proposal = ca.id_proposal

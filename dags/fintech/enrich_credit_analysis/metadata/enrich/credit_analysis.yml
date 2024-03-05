@@ -64,6 +64,10 @@ columns:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.risk_category
     description: "Risk score given by the model result plus the credit policy. Useful, but deprecated in favor to risk_category_canon."
+  risk_category_canon:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.risk_category_canon
+    description: "New risk score given by the credit model."
   internal_score:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.internal_score
@@ -113,7 +117,7 @@ columns:
     description: "True if the analysis is reprocessed"
   ts_guarantee_accepted:
     lineage:
-      -  datalake_credit_analysis.credit_analysis_proposals.ts_guarantee_accepted
+      - datalake_credit_analysis.credit_analysis_proposals.ts_guarantee_accepted
     description: "Timestamp of the date in which the guarantee was accepted by the tenant prospect."
   ts_credit_analysis_created:
     lineage:

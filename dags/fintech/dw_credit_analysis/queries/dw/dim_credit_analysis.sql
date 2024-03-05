@@ -27,6 +27,7 @@ SELECT
   ca.standalone_factor,
   ca.reason,
   ca.risk_category,
+  ca.risk_category_canon,
   ca.internal_score,
   ca.max_bypass,
   ca.result,
