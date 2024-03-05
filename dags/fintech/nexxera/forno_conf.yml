@@ -57,7 +57,7 @@ tables:
       - col_45
   - table_name: cnab_payments
     source_root_path: "s3://5a-datalake-forno/temp/nexxera/return/pag"
-    format: "ret"
+    format: "ret_pag"
     has_raw: True
     col_names:
       - col_1
@@ -66,6 +66,13 @@ tables:
       - col_4
       - col_5
       - col_6
+  - table_name: cnab_charges
+    source_root_path: "s3://5a-datalake-forno/temp/nexxera/return/cob"
+    format: "ret_cob"
+    has_raw: True
+    col_names:
+      - col_1
+      - col_2
   - table_name: financial
     source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
     format: "csv"
@@ -308,6 +315,8 @@ tables:
     has_raw: False
   - table_name: financial_extracts_050e
     has_raw: False
+  - table_name: cnab_charges_341
+    has_raw: False
   - table_name: cnab_payments_237_seg_a
     has_raw: False
   - table_name: cnab_payments_341_seg_a
@@ -329,6 +338,8 @@ inner_dependencies:
     - inadvance
     - sales
     - transaction
+  cnab_charges_341:
+    - cnab_charges
   cnab_payments_237_seg_a:
     - cnab_payments
   cnab_payments_341_seg_a:

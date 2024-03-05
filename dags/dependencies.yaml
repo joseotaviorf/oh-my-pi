@@ -1897,6 +1897,7 @@ bietlejuice.enrich_monopoly:
   - bietlejuice.monopoly:load-clean-sale-transaction
 bietlejuice.enrich_nexxera:
   - bietlejuice.nexxera:load-clean-adjustments
+  - bietlejuice.nexxera:load-clean-cnab-charges-341
   - bietlejuice.nexxera:load-clean-cnab-payments-237-seg-a
   - bietlejuice.nexxera:load-clean-cnab-payments-341-seg-a
   - bietlejuice.nexxera:load-clean-cnab-payments-341-seg-j

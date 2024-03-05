@@ -55,13 +55,27 @@ columns:
       - datalake_nexxera_clean.cnab_payments_341_seg_j.occurrence_code
       - datalake_nexxera_clean.cnab_payments_341_seg_o.occurrence_code
       - datalake_nexxera_clean.cnab_payments_237_seg_a.occurrence_code
-  is_done:
-    description: Field that identify if a payment was complete or not
+  file_name:
+    description: Name from the file that arrived the charge occurrence
     lineage:
-      - datalake_nexxera_clean.cnab_payments_341_seg_a.is_done
-      - datalake_nexxera_clean.cnab_payments_341_seg_j.is_done
-      - datalake_nexxera_clean.cnab_payments_341_seg_o.is_done
-      - datalake_nexxera_clean.cnab_payments_237_seg_a.is_done
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.file_name
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.file_name
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.file_name
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.file_name
+  payment_attempts:
+    description: Field that identify number of payments attempts
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.our_number
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.our_number
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.our_number
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.our_number
+  is_latest_attempt:
+    description: Boolean field that indicates if this is the lasted attempt from a payment - using our_number and file_name as reference
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.our_number
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.our_number
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.our_number
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.our_number
   due_amount:
     description: Original amount that the payment must to be done
     lineage:

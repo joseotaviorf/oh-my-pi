@@ -9,6 +9,7 @@ SELECT
   company_use,
   our_number,
   occurrence_code,
+  file_name,
   due_amount,
   paid_amount,
   dt_due,
@@ -19,7 +20,6 @@ SELECT
   day
 FROM
   datalake_nexxera_clean.cnab_payments_341_seg_a
-QUALIFY ROW_NUMBER() OVER (PARTITION BY company_use ORDER BY file_name DESC) = 1
 
 UNION ALL
 
@@ -32,6 +32,7 @@ SELECT
   company_use,
   our_number,
   occurrence_code,
+  file_name,
   due_amount,
   paid_amount,
   dt_due,
@@ -42,7 +43,6 @@ SELECT
   day
 FROM
   datalake_nexxera_clean.cnab_payments_341_seg_j
-QUALIFY ROW_NUMBER() OVER (PARTITION BY company_use ORDER BY file_name DESC) = 1
 
 UNION ALL
 
@@ -55,6 +55,7 @@ SELECT
   company_use,
   our_number,
   occurrence_code,
+  file_name,
   due_amount,
   paid_amount,
   dt_due,
@@ -65,7 +66,6 @@ SELECT
   day
 FROM
   datalake_nexxera_clean.cnab_payments_341_seg_o
-QUALIFY ROW_NUMBER() OVER (PARTITION BY company_use ORDER BY file_name DESC) = 1
 
 UNION ALL
 
@@ -78,6 +78,7 @@ SELECT
   company_use,
   our_number,
   occurrence_code,
+  file_name,
   due_amount,
   paid_amount,
   dt_due,
@@ -88,7 +89,6 @@ SELECT
   day
 FROM
   datalake_nexxera_clean.cnab_payments_237_seg_a
-QUALIFY ROW_NUMBER() OVER (PARTITION BY company_use ORDER BY file_name DESC) = 1
 
 )
 
@@ -106,7 +106,9 @@ SELECT DISTINCT
   UPPER(TRIM(beneficiarys_name)) AS beneficiarys_name,
   cpf_cnpj,
   TRIM(occurrence_code) AS occurrence_code,
-  IF(TRIM(occurrence_code) = '00', TRUE, FALSE) AS is_done,
+  file_name,
+  ROW_NUMBER() OVER (PARTITION BY TRIM(our_number) ORDER BY file_name) AS payment_attempts,
+  IF(ROW_NUMBER() OVER (PARTITION BY TRIM(our_number) ORDER BY file_name DESC) = 1, TRUE, FALSE) AS is_latest_attempt,
   due_amount,
   paid_amount,
   dt_due,

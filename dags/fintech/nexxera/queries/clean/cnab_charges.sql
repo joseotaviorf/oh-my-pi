@@ -1,16 +1,12 @@
 SELECT 
-    id_bank,
-    id_service_batch,
     record_type,
-    record_sequence_number,
-    segment_type,
     metadata as description,
     TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
     day
 FROM
-    datalake_nexxera_raw.cnab_payments
+    datalake_nexxera_raw.cnab_charges
 WHERE
     year = {year}
 AND 

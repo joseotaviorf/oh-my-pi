@@ -1,0 +1,128 @@
+---
+database_name: datalake_nexxera_clean
+table_name: cnab_charges_341
+description: "Table containing Itaú (341) charges data from CNAB files. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+columns:
+  id_bank:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.file_name
+  id_document_type:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  id_wallet:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  id_bank_clearinghouse:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  id_liquidated:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  id_cancel_instruction:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  record_type:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.record_type
+  cpf_cnpj:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  bank_agency:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  bank_account:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  account_verification_digit:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  company_use:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  our_number:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  our_number_verification_digit:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  wallet_number:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  occurrence_code:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  document_number:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  our_number_confirmation:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  agency_liquidated:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  agency_liquidated_verification_digit:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  charge_type:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  payers_name:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  notice:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  sequential_number:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  file_name:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.file_name
+  is_dda_bill:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  due_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  interest_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  net_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  billing_fee_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  iof_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  rebate_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  discount_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  others_credit_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  dt_due:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  dt_credit:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  dt_occurence_code:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.metadata
+  ts_ingested:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.ts_ingested
+  year:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.year
+  month:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.month
+  day:
+    lineage:
+      - datalake_nexxera_raw.cnab_charges.day
