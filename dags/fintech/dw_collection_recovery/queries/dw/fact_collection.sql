@@ -6,7 +6,6 @@ WITH historical_code_description AS (
 ),
 collection_calculation AS (
     SELECT
-        DENSE_RANK() OVER(ORDER BY c.ts_occurrence) AS sk_collection,
         c.id_customer AS sk_debtor,
         CASE
         WHEN c.id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
@@ -18,36 +17,36 @@ collection_calculation AS (
         UPPER(c.occurrence) AS id_occurrence,
         UPPER(h.historical_description) AS occurrence,
         DATE(c.ts_occurrence) AS dt_occurrence,
-        c.alo,
-        c.cpc,
-        c.promisse,
-        c.agreement,
-        c.failure,
-        c.esforco
+        INT(SUM(c.esforco)) AS total_esforco,
+        INT(SUM(c.alo)) AS total_alo,
+        INT(SUM(c.cpc)) AS total_cpc,
+        INT(SUM(c.promisse)) AS total_promisse,
+        INT(SUM(c.agreement)) AS total_agreement,
+        INT(SUM(c.failure)) AS total_failure
     FROM datalake_recupera.collection AS c
     LEFT JOIN datalake_recupera_clean.operators AS o
-        ON c.operator_name = o.id_operator
+        ON UPPER(c.operator_name) = UPPER(o.id_operator)
     LEFT JOIN historical_code_description AS h
         ON c.occurrence = h.id_historical
+    GROUP BY 1, 2, 3, 4, 5, 6, 7
 )
 SELECT
-    sk_collection,
+    md5(CONCAT(sk_debtor, creditor, id_operator, id_occurrence, dt_occurrence)) AS sk_collection,
     sk_debtor,
     creditor,
     id_operator,
     id_operator_registration,
     id_occurrence,
     occurrence,
-    INT(SUM(esforco)) AS total_esforco,
-    INT(SUM(alo)) AS total_alo,
-    INT(SUM(cpc)) AS total_cpc,
-    INT(SUM(promisse)) AS total_promisse,
-    INT(SUM(agreement)) AS total_agreement,
-    INT(SUM(failure)) AS total_failure,
+    total_esforco,
+    total_alo,
+    total_cpc,
+    total_promisse,
+    total_agreement,
+    total_failure,
     dt_occurrence,
     YEAR(dt_occurrence) AS year,
     MONTH(dt_occurrence) AS month,
     DAY(dt_occurrence) AS day,
     NOW() AS ts_load
 FROM collection_calculation
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 14
