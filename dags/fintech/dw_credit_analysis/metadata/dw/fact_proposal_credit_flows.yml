@@ -192,5 +192,41 @@ columns:
       OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.
       QUINTOANDAR: Default rental administrator, which is QuintoAndar.
       THIRD_PARTY: The rental administrator is a third party real estate agency.
+  dt_offer_submitted_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_offer_submitted_date
+    description: "Date when offer was submitted by the TP."
+  dt_offer_approved_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_offer_approved_date
+    description: "Date when offer was approved."
+  dt_tenant_doc_complete_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_tenant_doc_complete_date
+    description: "Date when the TP completed the documentation."
+  dt_credit_evaluation_approved_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_negative
+    description: "Date when the credit evaluation was approved."
+  dt_credit_analysis_approved_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_credit_analysis_approved_date
+    description: "Date when the credit analysis was approved."
+  dt_guarantee_accepted_date:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
+    description: "Date when the guarantee was accepted."
+  dt_guarantee_paid_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_guarantee_paid_date
+    description: "Date when the guarantee was paid."
+  dt_contract_created_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_contract_created_date
+    description: "Date when the contract was created."
+  dt_contract_signed_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
+    description: "Date when the contract was signed."
   ts_load:
     description: "Timestamp of data recorded in the table."

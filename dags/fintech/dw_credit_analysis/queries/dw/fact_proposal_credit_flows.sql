@@ -86,11 +86,14 @@ rent_flows AS (
     flrf.sk_contract,
     CAST(flrf.sk_house_listing / 1000 AS INTEGER) AS sk_house,
     flrf.sk_contract_created_date,
+    TO_DATE(flrf.sk_contract_created_date::STRING, 'yyyyMMdd') AS dt_contract_created_date,
     flrf.sk_contract_signed_date,
+    TO_DATE(flrf.sk_contract_signed_date::STRING, 'yyyyMMdd') AS dt_contract_signed_date,
     CAST(COALESCE(ca.id_credit_analysis, -1) AS INTEGER) AS sk_credit_analysis,
     CAST(COALESCE(ce.id_analysis_request, -1) AS INTEGER) AS sk_analysis_request,
     CAST(COALESCE(ce.id_checklist, -1) AS INTEGER) AS sk_checklist,
     flrf.sk_credit_analysis_approved_date,
+    TO_DATE(flrf.sk_credit_analysis_approved_date::STRING, 'yyyyMMdd') AS dt_credit_analysis_approved_date,
     COALESCE(
       NULLIF(flrf.sk_last_credit_evaluation_positive, -1),
       CASE
@@ -109,6 +112,7 @@ rent_flows AS (
     ) AS sk_last_variant_not_null,
     COALESCE(ca.category, -1) AS sk_guarantee_category,
     flrf.sk_guarantee_paid_date,
+    TO_DATE(flrf.sk_guarantee_paid_date::STRING, 'yyyyMMdd') AS dt_guarantee_paid_date,
     CAST(
       COALESCE(cap.id_last_credit_analysis, -1) AS INTEGER
     ) AS sk_last_credit_analysis,
@@ -117,11 +121,14 @@ rent_flows AS (
     flrf.sk_last_credit_evaluation_positive,
     flrf.sk_offer,
     flrf.sk_offer_approved_date,
+    TO_DATE(flrf.sk_offer_approved_date::STRING, 'yyyyMMdd') AS dt_offer_approved_date,
     flrf.sk_offer_submitted_date,
     flrf.sk_proposal,
     flrf.sk_region,
+    TO_DATE(flrf.sk_tenant_doc_complete_date::STRING, 'yyyyMMdd') AS dt_tenant_doc_complete_date,
     flrf.sk_tenant_doc_complete_date,
     flrf.sk_tenant_first_doc_sent_date,
+    TO_DATE(ca.ts_guarantee_accepted) AS dt_guarantee_accepted_date,
     COALESCE(CAST(DATE_FORMAT(ca.ts_guarantee_accepted, "yyyyMMdd") AS BIGINT), -1) AS sk_guarantee_accepted_date,
     COALESCE(dp.id, -1) AS sk_drop_reason,
     flrf.funnel_step,
@@ -137,7 +144,7 @@ rent_flows AS (
       TRUE,
       FALSE
     ) AS is_last_credit_evaluation,
-    dd.date AS dt_offer_submitted,
+    dd.date AS dt_offer_submitted_date,
     hl.country_code,
     hl.rental_administrator,
     hl.version,
@@ -178,6 +185,7 @@ proposal_credit_flows AS (
     rf.sk_analysis_request,
     rf.sk_checklist,
     rf.sk_credit_analysis_approved_date,
+    TO_DATE(rf.sk_credit_evaluation_approved_date::STRING, 'yyyyMMdd') AS dt_credit_evaluation_approved_date,
     rf.sk_credit_evaluation_approved_date,
     rf.sk_first_credit_analysis,
     rf.sk_first_variant,
@@ -215,15 +223,22 @@ proposal_credit_flows AS (
     rf.is_first_credit_evaluation,
     rf.is_last_credit_evaluation,
     CASE
-      WHEN rf.dt_offer_submitted
+      WHEN rf.dt_offer_submitted_date
         BETWEEN eca.dt_created
         AND eca.dt_expired
       THEN TRUE
       ELSE FALSE
     END AS has_early_credit,
+    rf.dt_tenant_doc_complete_date,
+    rf.dt_credit_analysis_approved_date,
+    rf.dt_offer_approved_date,
+    rf.dt_guarantee_accepted_date,
+    rf.dt_guarantee_paid_date,
+    rf.dt_contract_created_date,
+    rf.dt_contract_signed_date,
     eca.dt_created AS dt_ec_created,
     eca.dt_expired AS dt_ec_expired,
-    rf.dt_offer_submitted,
+    rf.dt_offer_submitted_date,
     rf.country_code,
     rf.rental_administrator,
     rf.guarantee_not_accepted,
@@ -282,6 +297,15 @@ SELECT
   guarantee_not_accepted,
   country_code,
   rental_administrator,
+  dt_offer_submitted_date,
+  dt_offer_approved_date,
+  dt_tenant_doc_complete_date,
+  dt_credit_evaluation_approved_date,
+  dt_credit_analysis_approved_date,
+  dt_guarantee_accepted_date,
+  dt_guarantee_paid_date,
+  dt_contract_created_date,
+  dt_contract_signed_date,
   NOW() AS ts_load
 FROM
   proposal_credit_flows
