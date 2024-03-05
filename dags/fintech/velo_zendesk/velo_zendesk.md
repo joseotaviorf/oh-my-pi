@@ -16,6 +16,7 @@ We perform a full load of the following table into the datalake Clean.
 
 - `group_memberships`
 - `groups`
+- `ticket_audits`
 - `ticket_fields`
 - `ticket_metrics`
 - `tickets`

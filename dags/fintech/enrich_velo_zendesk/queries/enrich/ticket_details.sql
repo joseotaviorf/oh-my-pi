@@ -28,11 +28,11 @@ last_register AS (
         th.id_submitter,
         CASE
             WHEN th.custom_fields LIKE '%"inadimplência_2_dias_sem_juros_e_multa"%' THEN '2 days'
-            WHEN cf.request_type LIKE '%"receber_em_2_dias"%' THEN '2 days'
-            WHEN cf.request_type LIKE '%"inadimplência_15_dias_com_juros_e_multa"%' THEN '15 days'
-            WHEN cf.request_type LIKE '%"receber_em_15_dias"%' THEN '15 days'
-            WHEN cf.request_type LIKE '%"cancelamento_de_contrato_com_acionamento_de_garantia"%' THEN 'Cancellation'
-            WHEN cf.guarantee_activation LIKE '%"com_acionamento"%' THEN 'Cancellation'
+            WHEN cf.request_type LIKE '%receber_em_2_dias%' THEN '2 days'
+            WHEN cf.request_type LIKE '%inadimplência_15_dias_com_juros_e_multa%' THEN '15 days'
+            WHEN cf.request_type LIKE '%receber_em_15_dias%' THEN '15 days'
+            WHEN cf.request_type LIKE '%cancelamento_de_contrato_com_acionamento_de_garantia%' THEN 'Cancellation'
+            WHEN cf.guarantee_activation LIKE '%com_acionamento%' THEN 'Cancellation'
             ELSE NULL
         END AS short_request_type,
         th.description,

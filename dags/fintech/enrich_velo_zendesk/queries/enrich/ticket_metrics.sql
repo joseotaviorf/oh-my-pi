@@ -26,8 +26,8 @@ WITH last_extracted AS (
             datalake_velo_zendesk_clean.ticket_metrics tm
         QUALIFY
             ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY dt_extracted DESC) = 1
-      )
-
+      ),
+base_overdue_amount AS (
     SELECT
         le.id_ticket,
         t.id_assignee,
@@ -37,6 +37,8 @@ WITH last_extracted AS (
         cf.id_propose,
         le.group_stations,
         le.assignee_stations,
+        DATEDIFF(cf.dt_due_original, CAST(le.ts_created AS DATE)) AS waiting_period_creation,
+        DATEDIFF(cf.dt_due_original, CAST(le.ts_solved AS DATE)) AS waiting_period_resolution,
         le.minutes_reply_calendar,
         le.minutes_reply_business,
         le.minutes_first_resolution_business,
@@ -51,13 +53,16 @@ WITH last_extracted AS (
         le.minutes_full_resolution_calendar,
         le.reopens,
         le.replies,
-        cf.overdue_amount,
+        CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(SPLIT(IF(cf.overdue_amount LIKE '% 90 %', NULL, cf.overdue_amount),'\\+')[0], '[a-zA-Zóòôöõúùûüíìîïéèêëáàâãäç~!@$%^&*()_-|\=?;:<>{}.]', ''),',','.'),'#[0-9]{4,9}','') AS FLOAT) AS overdue_amount_1,
+        CAST(REGEXP_REPLACE(REGEXP_REPLACE(SPLIT(cf.overdue_amount,'\\+')[1], '[a-zA-Zóòôöõúùûüíìîïéèêëáàâãäç~!@#$%^&*()_-|\=?;:<>{}.]', ''),',','.') AS FLOAT) AS overdue_amount_2,
+        CAST(REGEXP_REPLACE(REGEXP_REPLACE(SPLIT(cf.overdue_amount,'\\+')[2], '[a-zA-Zóòôöõúùûüíìîïéèêëáàâãäç~!@#$%^&*()_-|\=?;:<>{}.]', ''),',','.') AS FLOAT) AS overdue_amount_3,
         (le.minutes_full_resolution_calendar/60.000)/24.000 AS leadtime_calendar_days,
         (le.minutes_full_resolution_business/60.000)/10.000 AS leadtime_business_days,
         (le.minutes_reply_calendar/60.000)/24.000 as interval_first_response,
         DATE_TRUNC('month',FROM_UTC_TIMESTAMP(le.ts_solved, 'Brazil/East')) as first_day_of_month,
         le.minutes_requester_wait_calendar/60.000/24.000 AS broker_waiting_analyst,
         le.minutes_agent_wait_calendar/60.000/24.000 AS analyst_waiting_broker,
+        ROW_NUMBER() OVER(PARTITION BY cf.id_propose ORDER BY le.ts_created) AS ticket_order,
         le.dt_extracted,
         cf.dt_request_return,
         cf.dt_submission,
@@ -83,3 +88,61 @@ WITH last_extracted AS (
     LEFT JOIN
         datalake_velo_zendesk_clean.tickets t
         ON le.id_ticket = t.id_ticket
+)
+
+SELECT
+    id_ticket,
+    id_assignee,
+    id_group,
+    id_requester,
+    id_submitter,
+    id_propose,
+    group_stations,
+    assignee_stations,
+    waiting_period_creation,
+    waiting_period_resolution,
+    minutes_reply_calendar,
+    minutes_reply_business,
+    minutes_first_resolution_business,
+    minutes_first_resolution_calendar,
+    minutes_requester_wait_business,
+    minutes_requester_wait_calendar,
+    minutes_agent_wait_business,
+    minutes_agent_wait_calendar,
+    minutes_on_hold_business,
+    minutes_on_hold_calendar,
+    minutes_full_resolution_business,
+    minutes_full_resolution_calendar,
+    reopens,
+    replies,
+    ROUND(COALESCE(overdue_amount_1, 0) + COALESCE(overdue_amount_2, 0) + COALESCE(overdue_amount_3, 0),2) AS overdue_amount,
+    leadtime_calendar_days,
+    leadtime_business_days,
+    interval_first_response,
+    first_day_of_month,
+    broker_waiting_analyst,
+    analyst_waiting_broker,
+    ticket_order,
+    CASE
+        WHEN COALESCE(overdue_amount_1, 0) + COALESCE(overdue_amount_2, 0) + COALESCE(overdue_amount_3, 0) > 0 AND dt_payment_scheduled IS NOT NULL THEN TRUE
+        ELSE FALSE
+    END AS has_payment_forwarded,
+    dt_extracted,
+    dt_request_return,
+    dt_submission,
+    dt_due_original,
+    dt_started,
+    dt_payment_scheduled,
+    dt_payment_forwarded,
+    ts_created,
+    ts_created_local,
+    ts_updated,
+    ts_updated_local,
+    ts_initially_assigned,
+    ts_initially_assigned_local,
+    ts_assigned,
+    ts_solved,
+    ts_solved_local,
+    ts_load
+FROM
+    base_overdue_amount

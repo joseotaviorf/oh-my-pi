@@ -24,6 +24,9 @@ tables:
     partition_cols: ["year", "month", "day"]
   users:
     is_incremental: false
+  ticket_audits:
+    is_incremental: true
+    partition_cols: ["year", "month", "day"]
 
 custom_cluster:
   driver_node_type_id: r5d.large

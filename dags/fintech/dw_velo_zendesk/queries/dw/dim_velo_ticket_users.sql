@@ -1,7 +1,7 @@
 SELECT
     id_user AS sk_ticket_user,
-    id_organization AS sk_organization,
-    id_default_group AS sk_default_group,
+    id_organization AS organization,
+    id_default_group AS default_group,
     url_user,
     name AS user_name,
     email AS user_email,

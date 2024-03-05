@@ -36,6 +36,14 @@ columns:
     description: "Number of assignee stations"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.assignee_stations
+  waiting_period_creation:
+    description: "Waiting period in days from the claim original date to the date when the ticket was opened"
+    lineage:
+      - datalake_velo_zendesk.ticket_metrics.waiting_period_creation
+  waiting_period_resolution:
+    description: "Waiting period in days from the claim original date to the date when the ticket was solved"
+    lineage:
+      - datalake_velo_zendesk.ticket_metrics.waiting_period_resolution
   minutes_reply_calendar:
     description: "Amount of calendar minutes the ticket took to be replied"
     lineage:
@@ -120,6 +128,10 @@ columns:
     description: "Amount of calendar days the agent had to wait for a reply"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.analyst_waiting_broker
+  has_payment_forwarded:
+    description: "Flag to identify if the ticket has its payment forwarded"
+    lineage:
+      - datalake_velo_zendesk.ticket_metrics.has_payment_forwarded
   dt_extracted:
     description: "Extraction date of the register"
     lineage:
