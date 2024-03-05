@@ -1,6 +1,6 @@
 dag:
   name: gsheets_people
-  schedule_interval: 50 21 * * *
+  schedule_interval: 0 2 * * *
   owner: Data People
 cluster:
   type: databricks_10_4_med_people_cluster
