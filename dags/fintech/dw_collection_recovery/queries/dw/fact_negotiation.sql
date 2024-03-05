@@ -151,10 +151,10 @@ union_sources AS (
     tfn.is_contract_recurrent_debtor AS is_recurrent_debtor,
     COALESCE(tfn.status, rn.negotiation_status) AS negotiation_status,
     CASE
+      WHEN COALESCE(tfn.status, rn.negotiation_status) = "canceled" THEN "PROMESSA QUEBRADA"
       WHEN oi.total_invoices_negotiated >= 1 AND number_of_installments > 1 THEN "ACORDO"
       WHEN oi.total_invoices_negotiated > 1 AND number_of_installments = 1 THEN "QUITAÇÃO"
       WHEN oi.total_invoices_negotiated = 1 AND number_of_installments = 1 THEN "SUBSTITUIÇÃO"
-      WHEN COALESCE(tfn.status, rn.negotiation_status) = "canceled" THEN "PROMESSA QUEBRADA"
       WHEN COALESCE(tfn.status, rn.negotiation_status) = "started" THEN "PROMESSA"
       ELSE "INDEFINIDO"
     END AS negotiation_classification,
@@ -226,12 +226,13 @@ SELECT
   is_renegotiation,
   has_been_renegotiated,
   CASE
-    WHEN DATEDIFF(dt_due_invoice_anchor, dt_promisse) <= 0 THEN "Current"
-    WHEN DATEDIFF(dt_due_invoice_anchor, dt_promisse) <= 30  THEN "1-30"
-    WHEN DATEDIFF(dt_due_invoice_anchor, dt_promisse) <= 60  THEN "31-60"
-    WHEN DATEDIFF(dt_due_invoice_anchor, dt_promisse) <= 90  THEN "61-90"
-    WHEN DATEDIFF(dt_due_invoice_anchor, dt_promisse) <= 120 THEN "91-120"
-    WHEN DATEDIFF(dt_due_invoice_anchor, dt_promisse) <= 180 THEN "121-180"
+    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 0 THEN "Current"
+    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 30  THEN "1-30"
+    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 60  THEN "31-60"
+    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 90  THEN "61-90"
+    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 120 THEN "91-120"
+    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 180 THEN "121-180"
+    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) IS NULL THEN NULL
     ELSE "over 180"
   END AS delay_contamined_range,
   total_invoices_negotiated,
@@ -258,9 +259,9 @@ SELECT
   down_payment_amount,
   paid_amount,
   total_next_due,
-  DATEDIFF(dt_due_invoice_anchor, dt_down_payment) AS sla_debt_anchor_to_promisse_payment,
-  DATEDIFF(dt_due_invoice_anchor, dt_promisse)  AS sla_debt_anchor_to_promisse,
-  DATEDIFF(dt_down_payment, dt_ending) AS sla_promisse_payment_to_negotiation_ending,
+  DATEDIFF(dt_down_payment, dt_due_invoice_anchor) AS sla_debt_anchor_to_promisse_payment,
+  DATEDIFF(dt_promisse, dt_due_invoice_anchor)  AS sla_debt_anchor_to_promisse,
+  DATEDIFF(dt_ending, dt_down_payment) AS sla_promisse_payment_to_negotiation_ending,
   dt_due_invoice_anchor,
   dt_promisse,
   dt_due_promisse,
