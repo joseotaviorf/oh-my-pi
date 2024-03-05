@@ -118,4 +118,4 @@ LEFT JOIN
         ON l.id_region = rg.id
 LEFT JOIN
     rene_origin AS amd
-      ON (hl.id_acquisition = amd.id_rene)
+      ON (hl.id = amd.id_rene)
