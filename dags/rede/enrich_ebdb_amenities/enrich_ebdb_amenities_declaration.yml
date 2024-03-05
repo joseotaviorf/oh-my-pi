@@ -1,0 +1,17 @@
+---
+dag:
+  name: enrich_ebdb_amenities
+  schedule_start_date: 2021, 8, 24
+  owner: Data Rede
+  documentation: 
+    dag_purpose: |
+      Creates enriched tables for EBDB amenities.
+      This DAG is triggered by Mediator and loads the table via full load.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    pivotted_amenities:
+    - amenity_change_history
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
