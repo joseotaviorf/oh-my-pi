@@ -96,5 +96,9 @@ columns:
       Boolean flag indicating if the event happened between the listing's version start date and the listing's
       previous version contract end date.
       This flag may help understanding events during Early Demand, for example.
+  ts_event:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Timestamp of when the event happened.
   ts_load:
     description: Load date.

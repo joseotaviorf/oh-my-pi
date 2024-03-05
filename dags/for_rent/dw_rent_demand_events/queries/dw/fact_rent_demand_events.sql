@@ -18,6 +18,7 @@ SELECT
     COALESCE(CAST(DATE_FORMAT(rde.ts_event, "yyyyMMdd") AS BIGINT), -1) AS sk_event_date,
     rde.country_code,
     rde.is_during_termination,
+    rde.ts_event,
     NOW() AS ts_load
 FROM
     datalake_rent_demand_events.rent_demand_events AS rde
