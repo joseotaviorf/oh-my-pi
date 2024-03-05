@@ -1,0 +1,82 @@
+---
+database_name: datalake_gsheets
+table_name: sales_supply_targets
+description: Table that consolidates the sales demand targets, with historical data and data from the present year.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.city_group
+      - datalake_gsheets_clean.sale_supply_targets_retro.city_group
+  lead_processing_operation:
+    description: Operation that processed the listing lead.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.lead_processing_operation
+      - datalake_gsheets_clean.sale_supply_targets_retro.lead_processing_operation
+  supply_mkt_origin_detailed:
+    description: Market origin of the lead.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.supply_mkt_origin_detailed
+      - datalake_gsheets_clean.sale_supply_targets_retro.supply_mkt_origin_detailed
+  planning_taxonomy:
+    description: What is the planning taxonomy.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.planning_taxonomy
+      - datalake_gsheets_clean.sale_supply_targets_retro.planning_taxonomy
+  prospects:
+    description: Target volume of prospects.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.prospects
+      - datalake_gsheets_clean.sale_supply_targets_retro.prospects
+  qualifieds:
+    description: Target volume of qualifieds.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.qualifieds
+      - datalake_gsheets_clean.sale_supply_targets_retro.qualifieds
+  opportunities:
+    description: Target volume of opportunities.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.opportunities
+      - datalake_gsheets_clean.sale_supply_targets_retro.opportunities
+  available_qualifieds:
+    description: Target volume of available qualifieds.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.available_qualifieds
+      - datalake_gsheets_clean.sale_supply_targets_retro.available_qualifieds
+  first_listings:
+    description: Target volume of first listings.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.first_listings
+      - datalake_gsheets_clean.sale_supply_targets_retro.first_listings
+  sheet:
+    description: Which sheet come the information.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.sheet
+      - datalake_gsheets_clean.sale_supply_targets_retro.sheet
+  year:
+    description: Year of target.
+    lineage:
+      - datalake_quintoandar.aux_date.year
+  month:
+    description: Month of target.
+    lineage:
+      - datalake_quintoandar.aux_date.month
+  day:
+    description: Day of target.
+    lineage:
+      - datalake_quintoandar.aux_date.day
+  quarter:
+    description: Quarter of target.
+    lineage:
+      - datalake_quintoandar.aux_date.quarter
+  week_start:
+    description: Week of target.
+    lineage:
+      - datalake_quintoandar.aux_date.week_start
+  dt_target:
+    description: Date of the target.
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.dt_target
+      - datalake_gsheets_clean.sale_supply_targets_retro.dt_target

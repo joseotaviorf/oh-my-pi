@@ -1,0 +1,94 @@
+---
+database_name: datalake_gsheets
+table_name: sales_demand_targets
+description: Table that consolidates the sales demand targets, with historical data and data from the present year.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.city_group
+      - datalake_gsheets_clean.sale_demand_targets_retro.city_group
+      - datalake_gsheets_clean.sale_demand_targets_bps_2024.city_group
+  hub_offer:
+    description: Informs which associated hub the offer came from.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.hub_offer
+      - datalake_gsheets_clean.sale_demand_targets_retro.hub_offer
+      - datalake_gsheets_clean.sale_demand_targets_bps_2024.hub_offer
+  visits_booked:
+    description: Target volume of visits booked.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.visits_booked
+      - datalake_gsheets_clean.sale_demand_targets_retro.visits_booked
+  visits_completed:
+    description: Target volume of visits completed.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.visits_completed
+      - datalake_gsheets_clean.sale_demand_targets_retro.visits_completed
+  offers_submitted:
+    description: Target volume of offers submitted.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.offers_submitted
+      - datalake_gsheets_clean.sale_demand_targets_retro.offers_submitted
+  offers_accepted:
+    description:  Target volume of offers accepted.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.offers_accepted
+      - datalake_gsheets_clean.sale_demand_targets_retro.offers_accepted
+  ccv_signed:
+    description: Target volume of contracts signed.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.ccv_signed
+      - datalake_gsheets_clean.sale_demand_targets_retro.ccv_signed
+  new_buyer_prospect:
+    description: Target volume of new buyers prospects.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.new_buyer_prospect
+      - datalake_gsheets_clean.sale_demand_targets_retro.new_buyer_prospect
+      - datalake_gsheets_clean.sale_demand_targets_bps_2024.new_buyer_prospect
+  recovered_buyer_prospect:
+    description: Target volume of recovered buyers prospect.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.recovered_buyer_prospect
+      - datalake_gsheets_clean.sale_demand_targets_retro.recovered_buyer_prospect
+      - datalake_gsheets_clean.sale_demand_targets_bps_2024.recovered_buyer_prospect
+  is_rede:
+    description: If it comes from rede.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.is_rede
+      - datalake_gsheets_clean.sale_demand_targets_retro.is_rede
+      - datalake_gsheets_clean.sale_demand_targets_bps_2024.is_rede
+  sheet:
+    description: Which sheet come the information.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.sheet
+      - datalake_gsheets_clean.sale_demand_targets_retro.sheet
+      - datalake_gsheets_clean.sale_demand_targets_bps_2024.sheet
+  year:
+    description: Year of target.
+    lineage:
+      - datalake_quintoandar.aux_date.year
+  month:
+    description: Month of target.
+    lineage:
+      - datalake_quintoandar.aux_date.month
+  day:
+    description: Day of target.
+    lineage:
+      - datalake_quintoandar.aux_date.day
+  quarter:
+    description: Quarter of target.
+    lineage:
+      - datalake_quintoandar.aux_date.quarter
+  week_start:
+    description: Week of target.
+    lineage:
+      - datalake_quintoandar.aux_date.week_start
+  dt_target:
+    description: Date of the target.
+    lineage:
+      - datalake_gsheets_clean.sale_demand_targets_2024.dt_target
+      - datalake_gsheets_clean.sale_demand_targets_retro.dt_target
+      - datalake_gsheets_clean.sale_demand_targets_bps_2024.dt_target
