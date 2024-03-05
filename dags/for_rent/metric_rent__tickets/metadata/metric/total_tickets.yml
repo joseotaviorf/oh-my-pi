@@ -4,7 +4,7 @@ table_name: total_tickets
 description: Daily total tickets.
   This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate. The granularity is by contact_theme_detail and day.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   dt_started:
     lineage:

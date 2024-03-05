@@ -1,0 +1,6 @@
+---
+table_name: metric_rent.total_tickets_monthly
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  dt_month:
+    is_complete:

@@ -2895,6 +2895,10 @@ bietlejuice.metric_rent__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.metric_rent__contracts:load-metric-ended-rentals-confirmed-daily
+  - bietlejuice.metric_rent__contracts:load-metric-new-contracts-signed-daily
+  - bietlejuice.metric_rent__contracts:load-metric-ongoing-rentals-daily
 bietlejuice.metric_rent_benvi__supply:
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel
