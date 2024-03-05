@@ -34,4 +34,4 @@ FROM
     datalake_velo_zendesk_clean.ticket_audits ta
 LEFT JOIN
     filtered_body fb
-        ON fb.id = ta.id
+        ON fb.id_ticket_audit = ta.id_ticket_audit
