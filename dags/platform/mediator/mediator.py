@@ -73,6 +73,7 @@ sensor_task = QuintoAndarShortCircuitExternalSensor(
     skip_list=extract_skip_list(),
     allow_rerun=False,
     retries=0,
+    read_dags_from_db=True,
 )
 
 trigger_dependent_dags_list = []
