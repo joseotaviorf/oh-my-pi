@@ -2,7 +2,7 @@ WITH
 filtered_events AS (
     SELECT
         id_ticket_audit,
-        EXPLODE(SPLIT(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REGEXP_REPLACE(events, '(?!)', ''), 'id:', ''), ',value', ''), '[', ''), ']', ''), '{', ''), '},')) AS events
+        EXPLODE(SPLIT(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REGEXP_REPLACE(events, '(?!)', ''), 'id:', ''), ',value', ''), '[', ''), ']', ''), '{{', ''), '}},')) AS events
     FROM
         datalake_velo_zendesk_clean.ticket_audits),
 filtered_body AS (
