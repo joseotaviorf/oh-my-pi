@@ -1,7 +1,7 @@
 WITH contract_signed AS (
     SELECT
         SUM(new_contracts_signed) AS new_contracts_signed,
-        DATE_TRUNC('month', day) AS dt_month
+        DATE(DATE_TRUNC('month', day)) AS dt_month
     FROM
         metric_rent.new_contracts_signed_daily
     WHERE
@@ -12,14 +12,14 @@ WITH contract_signed AS (
 ccv AS (
     SELECT 
         COUNT(DISTINCT CASE WHEN fo.sk_sale_agreement_signed_date > 0 THEN sk_offer END) AS ccvs,
-        DATE_TRUNC('month', dd.date) AS dt_month
+        dd.month_start AS dt_month
     FROM 
         dw_sale.fact_offers fo
     INNER JOIN 
         dw_public.dim_date dd 
             ON dd.sk_date = fo.sk_sale_agreement_signed_date
     WHERE
-        dd.date >= DATE('2022-01-01')
+        sk_date >= 20220101
     GROUP BY 2
 ),
 aux_ongoing_rentals AS (
@@ -29,7 +29,7 @@ aux_ongoing_rentals AS (
     **/
     SELECT
         MAX(day) AS dt_last_day,
-        DATE_TRUNC('month', day) AS dt_month
+        DATE(DATE_TRUNC('month', day)) AS dt_month
     FROM
         metric_rent.ongoing_rentals_daily
     GROUP BY 2
@@ -50,7 +50,7 @@ ongoing_rentals AS (
 ended_rentals AS (
     SELECT
         SUM(ended_rentals_confirmed) AS ended_rentals,
-        DATE_TRUNC('month', day) AS dt_month
+        DATE(DATE_TRUNC('month', day)) AS dt_month
     FROM 
         metric_rent.ended_rentals_confirmed_daily
     WHERE 
@@ -59,7 +59,7 @@ ended_rentals AS (
     GROUP BY 2
 ),
 drivers AS (
-    SELECT 
+    SELECT DISTINCT
         cs.new_contracts_signed,
         ccv.ccvs,
         ors.ongoing_rentals,
@@ -84,7 +84,7 @@ drivers AS (
 ),
 total_tickets_prep AS (
     SELECT 
-        DATE_TRUNC('month', ts_solved) AS dt_month,
+        DATE(DATE_TRUNC('month', ts_solved)) AS dt_month,
         CASE 
             WHEN dt.sub_journey NOT IN ('Partners', 'For Sale') THEN 'ForRent'
             WHEN dt.sub_journey IN ('For Sale') THEN 'ForSale'
@@ -119,13 +119,13 @@ total_tickets_prep AS (
             ON ft.sk_main_department = dd.sk_department
     LEFT JOIN 
         drivers AS dv
-            ON DATE_TRUNC('month', ft.ts_solved) = dv.dt_month
+            ON DATE(DATE_TRUNC('month', ft.ts_solved)) = dv.dt_month
     WHERE 
         ft.is_ticket_rate = TRUE
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 )
 SELECT
-    DATE(dt_month) AS dt_month,
+    dt_month,
     context,
     journey,
     sub_journey,
