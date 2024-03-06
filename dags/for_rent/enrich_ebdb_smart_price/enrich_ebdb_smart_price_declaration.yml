@@ -1,0 +1,19 @@
+---
+dag:
+  name: enrich_ebdb_smart_price
+  schedule_start_date: 2020, 7, 1
+  owner: Data ForRent
+  documentation: 
+    dag_purpose: |
+      Creates enriched tables for the context `Smart Price` of ebdb adding dynamic pricing to listing information.
+      In addition, tables that are base for price tracking for rental or sales are being allocated here too.
+      This DAG is triggered by Mediator and loads the table via full load.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r4.xlarge
+    node_type_id: c5.4xlarge
+    num_workers: 3
