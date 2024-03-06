@@ -137,6 +137,7 @@ def merge_transactional_into_raw_table(
     raw_delta_table.alias("raw_table").merge(
         transactional_df.alias("transactional_table"), join_condition
     ).whenMatchedUpdate(
+        condition=f"transactional_table.ts_cdc_transaction >= raw_table.ts_cdc_transaction",
         set=dict(
             (col, f"transactional_table.{col}") for col in transactional_df.columns
         )
