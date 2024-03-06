@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from functools import reduce
 import datetime as datetime
 from pyspark.sql.functions import lit
+from pyspark.sql.functions import *
 
 from pyspark.sql import DataFrame
 
@@ -73,6 +74,16 @@ def _generate_date_range(load_start_date, load_end_date):
 
     return date_index
 
+def _soft_union_all(df1: DataFrame, df2: DataFrame) -> DataFrame:
+
+    common_cols = [col for col in df1.columns if col in df2.columns] + [col for col in df2.columns if col in df1.columns]
+    df1_full = df1.select(*df1.columns, *[lit(None).alias(col) for col in [col for col in df2.columns if col not in common_cols]])
+    df2_full = df2.select(*df2.columns, *[lit(None).alias(col) for col in [col for col in df1.columns if col not in common_cols]])
+
+    df = df1_full.unionByName(df2_full)
+
+    return df
+
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
@@ -120,7 +131,7 @@ if __name__ == "__main__":
 
     if len(table_data) > 0:
         df = reduce(
-            DataFrame.unionAll, table_data
+            _soft_union_all, table_data
         )
         df = df.na.drop(subset=raw_partition_cols)
 
@@ -158,7 +169,7 @@ if __name__ == "__main__":
             format_options,
             database_location,
             raw_partition_cols,
-            force_recreate=False,
+            force_recreate=True,
         )
 
         spark_metastore_service.create_new_partitions_from_df(
