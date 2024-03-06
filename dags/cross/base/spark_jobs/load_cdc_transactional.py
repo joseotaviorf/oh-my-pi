@@ -10,6 +10,7 @@ from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_treatment import (
 )
 
 from pyspark.sql.functions import col, to_timestamp, lit, make_date
+from pyspark.sql.utils import AnalysisException
 
 JOB_NAME = "load_cdc_transactional"
 
@@ -76,15 +77,23 @@ def get_incoming_data(
     logger.info(
         f"m=get_incoming_data, start_date={start_date}, end_date={end_date}, path={path}, msg=reading Incoming data..."
     )
-    df = (
-        spark.read.option("compression", "gzip")
-        .json(path)
-        .filter(
-            make_date(col("year"), col("month"), col("day")).between(
-                start_date, end_date
+    try:
+        df = (
+            spark.read.option("compression", "gzip")
+            .json(path)
+            .filter(
+                make_date(col("year"), col("month"), col("day")).between(
+                    start_date, end_date
+                )
             )
         )
-    )
+    except AnalysisException as e:
+        if e.getErrorClass() != "PATH_NOT_FOUND":
+            raise e
+        logger.info(
+            f"m=get_incoming_data, msg=Path {path} not found, returning empty DataFrame."
+        )
+        return None
 
     return df
 
@@ -157,6 +166,20 @@ def main():
     df = get_incoming_data(
         incoming_bucket, environment, source_schema, table_name, start_date, end_date
     )
+
+    if df is None:
+        if not spark.catalog.tableExists(
+            f"datalake_{schema}_transactional.{table_name}"
+        ):
+            raise FileNotFoundError(
+                "No data was found in the incoming bucket, and the table does not exist in the datalake. Since this is the first execution, "
+                "please make sure to trigger a snapshot of the table in the source database."
+            )
+
+        logger.info(
+            f"m=__main__, msg=Incoming Dataframe is None, there is no change to propagate."
+        )
+        return
 
     if df.isEmpty():
         logger.info(
