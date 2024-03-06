@@ -76,7 +76,7 @@ invoices_timeline AS (
                 OR (i.dt_paid >= dd.month_start
                 AND i.dt_paid > i.dt_due_adjusted)) -- it's only entered into collections portfolio
     WHERE
-        dd.date BETWEEN DATE_TRUNC("month", CURRENT_DATE - INTERVAL "24" MONTH)
+        dd.date BETWEEN DATE_TRUNC("month", CURRENT_DATE - INTERVAL "48" MONTH)
         AND CURRENT_DATE - INTERVAL "1" DAY
 ),
 tainted_delay AS ( -- sum all contract debts and place at the earliest due_date
