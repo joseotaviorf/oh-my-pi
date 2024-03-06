@@ -26,7 +26,6 @@ MAIN_START_DATE = datetime(2021, 8, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 21 * * *"
 
 config_service = ConfigurationService(SOURCE)
-athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
@@ -81,7 +80,6 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=athena_query_results_bucket,
 )
 
 tables = config_service.get_config("tables")
@@ -89,10 +87,11 @@ tables = config_service.get_config("tables")
 for table in tables:
     table_name = table["table_name"]
     clean_table_name = table.get("clean_table_name", table_name)
-    extraction_type = table.get("extraction_type", "incremental")
+    raw_extraction_type = table.get("raw_extraction_type", "incremental")
+    clean_extraction_type = table.get("clean_extraction_type", "incremental")
     partition_cols = (
         None
-        if extraction_type == "full"
+        if clean_extraction_type == "full"
         else config_service.get_config("partition_cols")
     )
     parameters = [SOURCE, table_name]
@@ -100,7 +99,7 @@ for table in tables:
     extended_parameters = [
         table["date_filter_column"],
         "{{ ds }}",
-        extraction_type,
+        raw_extraction_type,
         table.get("unixtime_measure", None),
     ]
 
@@ -119,7 +118,7 @@ for table in tables:
         source_database_base_name=CONTEXT,
         target_database_base_name=CONTEXT,
         table_name=clean_table_name,
-        is_incremental=extraction_type == "incremental",
+        is_incremental=clean_extraction_type == "incremental",
         partitions=partition_cols,
     )
 

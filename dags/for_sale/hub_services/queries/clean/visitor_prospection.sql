@@ -20,7 +20,5 @@ SELECT
     day
 FROM 
     datalake_hub_services_raw.visitor_prospection
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1
