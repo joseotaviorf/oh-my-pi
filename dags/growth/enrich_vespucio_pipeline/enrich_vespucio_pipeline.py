@@ -20,7 +20,7 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
-VESPUCIO_PACKAGE_VERSION = "0.2.7"
+VESPUCIO_PACKAGE_VERSION = "0.2.8"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
