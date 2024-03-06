@@ -1,0 +1,98 @@
+---
+database_name: datalake_growth_costs
+table_name: daily_costs
+owner: '@data-growth'
+domain: Growth
+description: Table that consolidates costs extract from growth marketing platforms
+columns:
+  id_date:
+    description: Date segmentation
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.id_date   
+  origin:
+    description: Growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.origin
+    categories: 
+      mitula: ''
+      trovit: ''
+      criteo: ''
+      facebook: ''
+      google: ''
+  business_context:
+    description: Growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.business_context      
+  account_name:
+    description: Accont name at braze platform
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.account_name
+  campaign_name:
+    description: Name of campaign segmentation
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.campaign_name
+  utm_campaign:
+    description: utm_campaign applied on growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.utm_campaign
+  utm_term:
+    description: utm_term applied on growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.utm_term
+  utm_content:
+    description: utm_content applied on growth marketing platform
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.utm_content
+  city_group:
+    description: City group segmentation
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.city_group
+      - datalake_marketing_costs_sharing_rules.sharing_rules.city_group
+      - datalake_marketing_manual_daily_costs_clean.marketing_manual_shared_costs.city_group
+  campaign_business_context:
+    description: Level of growth marketing taxonomy
+    lineage:
+      - datalake_growth_taxonomy.media_setup.campaign_business_context
+    categories: 
+      Rent: ''
+      Sale: ''
+      Hybrid: ''
+      Other: ''
+      Lost Tracking: ''
+  campaign_strategy_intent:
+    description: Level of growth marketing taxonomy
+    lineage:
+      - datalake_growth_taxonomy.media_setup.campaign_strategy_intent
+    categories:
+      Acquisition: ''
+      Activation: ''
+      Brand Awareness: ''
+      Engagement: ''
+      Lost Tracking: ''
+      Other: ''
+      Recovery: ''
+  behavior_type:
+    description: Level of growth marketing taxonomy
+    lineage:
+      - datalake_growth_taxonomy.media_setup.behavior_type
+    categories:
+      Lost Tracking: ''
+      Other: ''
+      non organic: ''
+      organic: ''
+  landing_page:
+    description: Level of growth marketing taxonomy
+    lineage:
+      - datalake_growth_taxonomy.media_setup.landing_page
+  medium:
+    description: Level of growth marketing taxonomy
+    lineage:
+      - datalake_growth_taxonomy.media_setup.medium
+  source:
+    description: Level of growth marketing taxonomy
+    lineage:
+      - datalake_growth_taxonomy.media_setup.source
+  funnel_side:
+    description: Level of growth marketing taxonomy
+    lineage:
+      - datalake_growth_taxonomy.media_setup.funnel_side

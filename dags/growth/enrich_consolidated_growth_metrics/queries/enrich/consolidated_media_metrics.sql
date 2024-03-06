@@ -171,6 +171,7 @@ WITH consolidated_sources AS (
 
 SELECT
     cs.id_date,
+    'BR' AS country_code,
     cs.origin,
     COALESCE(sr_utm.business_context, sr.business_context, cs.business_context) AS business_context,
     cs.account_name,
@@ -205,20 +206,25 @@ FROM
     consolidated_sources cs
 LEFT JOIN
     datalake_marketing_costs_sharing_rules.sharing_rules sr
-        ON SPLIT(cs.campaign_name, '[.]')[0] = sr.id_rule
-        AND cs.id_date = sr.id_date
-LEFT JOIN
-    datalake_consolidated_marketing_costs.city_group_old_campaigns_historic ch
-        ON cs.campaign_name = ch.campaign_name
+ON 
+    SPLIT(cs.campaign_name, '[.]')[0] = sr.id_rule
+    AND cs.id_date = sr.id_date
 LEFT JOIN
     datalake_growth_costs_sharing_rules.sharing_rules sr_utm
-        ON SPLIT(cs.campaign_name, '[.]')[0] = sr_utm.id_rule
-        AND cs.id_date = sr_utm.id_date 
-        AND cs.campaign_name = sr_utm.utm_campaign            
+ON 
+    SPLIT(cs.campaign_name, '[.]')[0] = sr_utm.id_rule
+    AND cs.id_date = sr_utm.id_date 
+    AND cs.campaign_name = sr_utm.utm_campaign        
 LEFT JOIN
-    datalake_region.region dr
-        ON SPLIT(cs.campaign_name, '[.]')[0] = dr.id
-LEFT JOIN datalake_gsheets_clean.cost_taxonomy_translation_dictionary AS ctd
+    datalake_consolidated_marketing_costs.city_group_old_campaigns_historic ch
+ON 
+    cs.campaign_name = ch.campaign_name    
+LEFT JOIN 
+    datalake_region.region dr 
+ON 
+    SPLIT(cs.campaign_name, '[.]')[0] = dr.id
+LEFT JOIN 
+    datalake_gsheets_clean.cost_taxonomy_translation_dictionary AS ctd
 ON
   cs.account_name = ctd.account_name
   AND cs.campaign_name = ctd.campaign_name
