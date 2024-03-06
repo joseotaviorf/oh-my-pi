@@ -1,0 +1,15 @@
+---
+dag:
+  name: enrich_velo_zendesk
+  schedule_start_date: 2020, 7, 1
+  owner: Data Fintech
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    ticket_details:
+    - custom_fields
+    ticket_metrics:
+    - custom_fields
+cluster:
+  type: databricks_10_4_med_general_cluster
