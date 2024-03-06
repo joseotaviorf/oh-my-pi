@@ -1,0 +1,65 @@
+database_name: datalake_bob
+table_name: house_draft_business_context
+description: This table contains house draft enriched with house information and business context. Each row means a draft for a business context.
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+columns:
+  id_draft:
+    description: Identifier for house draft.
+    lineage:
+      - datalake_bob.house_draft.id
+  id_house:
+    description: Identifier for house, is the same id_house for the Main/EBDB.
+    lineage:
+      - datalake_bob_clean.submission_progress.id_external
+  id_region:
+    description: Identifier for the region.
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+      - datalake_bob_clean.location.id_region
+  id_city:
+    description: Identifier for the city.
+    lineage:
+      - datalake_ebdb_clean.house.city
+      - datalake_bob_clean.location.city
+  id_user_registrant:
+    description: Identifier for the user that register this house. Is the same key that id_user in Main/EBDB.
+    lineage:
+      - datalake_bob_clean.registrar.id_main
+  business_context:
+    description: Array of business contexts.
+    lineage:
+      - datalake_bob.house_draft.is_for_rent
+      - datalake_bob.house_draft.is_for_sale
+  status:
+    description: Status of the house draft.
+    lineage:
+      - datalake_bob.house_draft.status
+  type:
+    description: Type of the house draft.
+    lineage:
+      - datalake_bob.house_draft.type
+  ops_team:
+    description: Operations team associated with the house draft.
+    lineage:
+      - datalake_bob.house_draft.ops_team
+  ops_company:
+    description: Operations company associated with the house draft.
+    lineage:
+      - datalake_bob.house_draft.ops_company
+  ops_contact_type:
+    description: Type of contact associated with the operations.
+    lineage:
+      - datalake_bob.house_draft.ops_contact_type
+  ops_contact_channel:
+    description: Contact channel associated with the operations.
+    lineage:
+      - datalake_bob.house_draft.ops_contact_channel
+  ts_created:
+    description: Timestamp indicating creation time.
+    lineage:
+      - datalake_bob.house_draft.ts_created
+  ts_updated:
+    description: Timestamp indicating last update time.
+    lineage:
+      - datalake_bob.house_draft.ts_updated

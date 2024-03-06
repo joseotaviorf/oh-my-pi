@@ -1,7 +1,7 @@
 ---
 database_name: datalake_olos_dialer
 table_name: outbound_mailing
-owner: ana.araujo@quintoandar.com.br
+owner: arthur.gonzaga@quintoandar.com.br
 domain: growth
 description: Contains information about the contacts that will be dialed by the system. This table contains the list of leads and which sales_company will contact them.
 columns:

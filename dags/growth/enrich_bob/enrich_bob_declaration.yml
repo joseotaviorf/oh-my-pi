@@ -16,6 +16,9 @@ workflow:
       - year
       - month
       - day
+  inner_dependencies:
+    house_draft_business_context:
+      - house_draft
 cluster:
   type: custom_cluster
   custom_configurations:

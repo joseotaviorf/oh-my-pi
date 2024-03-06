@@ -99,5 +99,5 @@ LEFT JOIN
   customer_last_register AS customer
     ON customer.id_customer = campaign_customer.id_customer
 WHERE
-  DATE(CONCAT(outbound.year, '-', outbound.month, '-', outbound.day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  MAKE_DATE(outbound.year, outbound.month, outbound.day) BETWEEN DATE_SUB(DATE('{load_start_date}'), {days_past}) AND DATE('{load_end_date}')
   AND customer.name = 'Inside Sales'

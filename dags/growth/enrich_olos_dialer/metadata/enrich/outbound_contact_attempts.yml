@@ -1,7 +1,7 @@
 ---
 database_name: datalake_olos_dialer
 table_name: outbound_contact_attempts
-owner: ana.araujo@quintoandar.com.br
+owner: arthur.gonzaga@quintoandar.com.br
 domain: growth
 description: A compilation of all contacts attempts realized with our prospects through Olos Dialer.
 columns:

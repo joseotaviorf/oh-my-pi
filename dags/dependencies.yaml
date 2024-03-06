@@ -1030,6 +1030,10 @@ bietlejuice.enrich_bigfone_twilio:
 bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-house-draft
   - bietlejuice.bob:load-clean-house-draft-aud
+  - bietlejuice.bob:load-clean-location
+  - bietlejuice.bob:load-clean-registrar
+  - bietlejuice.bob:load-clean-submission-progress
+  - bietlejuice.ebdb:load-clean-house
 bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-clean-affiliate-data
   - bietlejuice.ebdb:load-clean-agent-data-aud
@@ -1987,12 +1991,14 @@ bietlejuice.enrich_offer:
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
   - bietlejuice.hub_services:load-clean-business-unit
 bietlejuice.enrich_olos_dialer:
+  - bietlejuice.ebdb:load-clean-user
   - bietlejuice.olos_dialer:load-clean-attempts-raw-data
   - bietlejuice.olos_dialer:load-clean-campaign
   - bietlejuice.olos_dialer:load-clean-campaign-customer
   - bietlejuice.olos_dialer:load-clean-customer
   - bietlejuice.olos_dialer:load-clean-disposition
   - bietlejuice.olos_dialer:load-clean-info-campaign-type
+  - bietlejuice.olos_dialer:load-clean-reprocessing-mailing
   - bietlejuice.olos_dialer:load-clean-users
 bietlejuice.enrich_online_attribution:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -2494,6 +2500,9 @@ bietlejuice.enrich_ss_logic_model:
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_user:load-enrich-persona-type
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
+bietlejuice.enrich_supply_acquisition:
+  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
+  - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners
