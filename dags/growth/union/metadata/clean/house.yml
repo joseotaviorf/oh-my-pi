@@ -1321,23 +1321,10 @@ columns:
     lineage:
       - datalake_union_raw.imovel.year
   month:
-    description: Load year.
+    description: Load month.
     lineage:
       - datalake_union_raw.imovel.month
   day:
-    description: Load year.
+    description: Load day.
     lineage:
       - datalake_union_raw.imovel.day
-
-
-
-
-
-
-
-
-
-
-
-
-

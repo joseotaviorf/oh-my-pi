@@ -10,3 +10,9 @@ tables_config:
   fotos:
     raw_table_name: Fotos
     clean_table_name: photos
+  empresa:
+    raw_table_name: Empresa
+    clean_table_name: company
+  imovel_2:
+    raw_table_name: imovel2
+    clean_table_name: house_2
