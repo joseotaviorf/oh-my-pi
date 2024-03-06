@@ -19,9 +19,9 @@ SELECT
     CAST(CostingCode AS STRING) AS CostingCode,
     CAST(CostingCode2 AS STRING) AS CostingCode2,
     CAST(DueDate_ AS STRING) AS DueDate,
-    year,
-    month,
-    day
+    YEAR(CURRENT_DATE) AS year,
+    MONTH(CURRENT_DATE) AS month,
+    DAY(CURRENT_DATE) AS day
 FROM
     datalake_nexxera.dtw_filter
 WHERE

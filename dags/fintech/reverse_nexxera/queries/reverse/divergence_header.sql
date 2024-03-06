@@ -17,9 +17,9 @@ SELECT
     CAST(U_ExternalPaymentId AS STRING) AS U_ExternalPaymentId,
     CAST(U_SourceClient AS STRING)AS U_SourceClient,
     CAST(U_RSD_UUIDSB AS STRING) AS U_RSD_UUIDSB,
-    year,
-    month,
-    day
+    YEAR(CURRENT_DATE) AS year,
+    MONTH(CURRENT_DATE) AS month,
+    DAY(CURRENT_DATE) AS day
 FROM
     datalake_nexxera.dtw_filter
 WHERE

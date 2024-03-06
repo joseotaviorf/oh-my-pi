@@ -95,7 +95,7 @@ if __name__ == "__main__":
             df = df.drop("year", "month", "day")
             if table_config.get("is_monthly", True):
                 destination_path = f"{execution_date.year}/{execution_date.month:02d}/{execution_date.day:02d}/monthly/"
-                table = table.replace('monthly','')
+                table = table.replace('monthly_','')
                 file_name = (
                 f'{table}_{(execution_date.strftime("%Y_%m_%d"))}.csv'
                 )
