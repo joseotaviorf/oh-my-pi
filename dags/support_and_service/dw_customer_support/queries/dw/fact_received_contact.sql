@@ -33,7 +33,14 @@ WITH received_contact AS (
         customer_email,
         agent_email,
         average_reply_time,
+        total_talk_time,
+        total_queue_time,
+        total_wrap_up_time,
+        total_waiting_time,
+        first_reply_time,
+        total_handling_time,
         is_answered,
+        is_per_team_task,
         ts_reservation_created,
         ts_created
     FROM
