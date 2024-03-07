@@ -1,7 +1,8 @@
 WITH get_credit_evaluations_count AS (
   SELECT
     id_proposal,
-    COUNT(id) AS total_credit_evaluations
+    COUNT(id) AS total_credit_evaluations,
+    MAX(ts_created) AS ts_max_created
   FROM
     datalake_docx_clean.credit_evaluation
   GROUP BY id_proposal
@@ -28,11 +29,12 @@ LEFT JOIN
 LEFT JOIN
   datalake_docx_clean.credit_evaluation AS ce
     ON ce.id = cep.id_credit_evaluation
+    AND ce.id_proposal = pt.id_proposal
 LEFT JOIN
   get_credit_evaluations_count AS cec
     ON cec.id_proposal = ce.id_proposal
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY ce.id_proposal, cep.cpf ORDER BY ce.ts_created DESC) = 1
+-- Get the latest credit evaluation
+WHERE ce.ts_created = cec.ts_max_created
 ),
 
 get_proponent_income_data AS (
