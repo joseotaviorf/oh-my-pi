@@ -1,0 +1,259 @@
+depends_on:
+  - lint
+  - tests
+  - validations
+
+steps:
+  make-package-python:
+    image: python:3.7.16
+    commands:
+      - make package
+    when:
+      event: [push, tag]
+      branch: [master, forno, hotfix/*]
+
+  prepare-release-forno:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
+    when:
+      event: push
+      branch: forno
+
+  prepare-release-prod:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+
+  export-releases-to-s3-prod:
+    image: plugins/s3
+    settings:
+      bucket: artifacts.s3.data.quintoandar.com.br
+      source: dist/*.whl
+      target: bi-etl-ejuice/
+      strip_prefix: dist/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+
+  export-releases-to-s3-forno:
+    image: plugins/s3
+    settings:
+      bucket: artifacts.s3.forno.data.quintoandar.com.br
+      source: dist/*.whl
+      target: bi-etl-ejuice/
+      strip_prefix: dist/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: forno
+
+  export-init-script-to-s3-forno:
+    image: plugins/s3
+    settings:
+      bucket: artifacts.s3.forno.data.quintoandar.com.br
+      source: scripts/init_script.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: forno
+
+  export-init-script-to-s3-prod:
+    image: plugins/s3
+    settings:
+      bucket: artifacts.s3.data.quintoandar.com.br
+      source: scripts/init_script.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+
+  export-coverage:
+    image: plugins/s3
+    settings:
+      bucket: 5a-coverage
+      source: coverage_badge.svg
+      target: ${CI_REPO_NAME}/
+      acl: public-read
+      cache_control: no-cache
+    when:
+      event: [push]
+      branch: [master]
+
+  create-dag-files:
+    image: python:3.7.16
+    commands:
+      - make create-dag-files
+    when:
+      event: push
+      branch: [forno, master, hotfix/*]
+
+  upload-bi-etl-ejuice-modules-gcs-forno:
+    image: quintoandar/drone-gcs-sync
+    settings:
+      bucket: us-east4-airflow-forno2-7f52154d-bucket
+      source: bietlejuice/
+      target: dags/bietlejuice/
+      delete: true
+      dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [forno]
+
+  upload-bi-etl-ejuice-modules-gcs-prod:
+    image: quintoandar/drone-gcs-sync
+    settings:
+      bucket: us-east4-airflow-prod2-fdaf9748-bucket
+      source: bietlejuice/
+      target: dags/bietlejuice/
+      delete: true
+      dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  upload-dag-packages-dags-gcs-forno:
+    image: quintoandar/drone-gcs-sync
+    settings:
+      bucket: us-east4-airflow-forno2-7f52154d-bucket
+      source: dags/
+      target: dags/dags/
+      delete: true
+      dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [forno]
+
+  upload-dag-packages-dags-gcs-prod:
+    image: quintoandar/drone-gcs-sync
+    settings:
+      bucket: us-east4-airflow-prod2-fdaf9748-bucket
+      source: dags/
+      target: dags/dags/
+      delete: true
+      dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  upload-dag-packages-spark-jobs-s3-forno:
+    image: python:3.7.16
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
+    when:
+      event: push
+      branch: forno
+
+  upload-dag-packages-spark-jobs-s3-prod:
+    image: python:3.7.16
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  upload-dag-packages-queries-s3-forno:
+    image: python:3.7.16
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br queries
+    when:
+      event: push
+      branch: forno
+
+  upload-dag-packages-queries-s3-prod:
+    image: python:3.7.16
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  upload-dag-packages-data-quality-s3-forno:
+    image: python:3.7.16
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br data_quality
+    when:
+      event: push
+      branch: forno
+
+  upload-dag-packages-data-quality-s3-prod:
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks data_quality
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  load-metadata-files-to-s3-forno:
+    image: python:3.7.3
+    commands:
+      - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
+      - make requirements-scripts
+      - PYTHONPATH=. python scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.forno.data.quintoandar.com.br" --host "https://metadata-propagator.forno.data.quintoandar.com.br/"
+    when:
+      event: push
+      branch: forno
+
+  load-metadata-files-to-s3-prod:
+    image: python:3.7.3
+    commands:
+      - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
+      - make requirements-scripts
+      - PYTHONPATH=. python scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.data.quintoandar.com.br" --host "https://metadata-propagator.data.quintoandar.com.br/"
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  load-all-metadata-files-information-to-s3-forno:
+    image: python:3.7.3
+    environment:
+      ENVIRONMENT: forno
+    commands:
+      - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.3
+      - make requirements-scripts
+      - PYTHONPATH=. python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
+    when:
+      event: push
+      branch: forno
+
+  load-all-metadata-files-information-to-s3-prod:
+    image: python:3.7.3
+    environment:
+      ENVIRONMENT: prod
+    commands:
+      - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.3
+      - make requirements-scripts
+      - PYTHONPATH=. python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py 5a-databricks
+    when:
+      event: push
+      branch: [master, hotfix/*]

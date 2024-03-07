@@ -1,0 +1,63 @@
+steps:
+  validate-dag-declaration-files:
+    image: python:3.7.16
+    commands:
+      - pip install tqdm==4.64.1 Cerberus==1.3.4
+      - make requirements-scripts
+      - make validate-dag-declaration-files level=debug
+    when:
+      event: push
+
+  validate-dags-dependencies-forno:
+    image: python:3.7.16
+    environment:
+      ENVIRONMENT: forno
+    commands:
+      - make requirements-scripts
+      - make validate-dags-dependencies
+    when:
+      event: push
+      branch:
+        exclude:
+          - master
+          - hotfix/*
+
+  validate-dags-dependencies-prod:
+    image: python:3.7.16
+    environment:
+      ENVIRONMENT: prod
+    commands:
+      - make requirements-scripts
+      - make validate-dags-dependencies
+    when:
+      event: push
+      branch: [master, hotfix/*]
+
+  validate-dependency-file-correctness:
+    image: python:3.7.16
+    commands:
+      - make requirements
+      - make requirements-scripts
+      - make validate-dependency-file-correctness
+    when:
+      event: push
+
+  validate-metadata-files-content:
+    image: python:3.7.16
+    commands:
+      - make requirements-scripts
+      - make validate-metadata-files-content
+    when:
+      event: push
+      branch:
+        exclude: [forno, hotfix/*]
+
+  validate-metadata-files-exist:
+    image: python:3.7.3
+    commands:
+      - make requirements-scripts
+      - make validate-metadata-files-exist
+    when:
+      event: push
+      branch:
+        exclude: [forno, hotfix/*]

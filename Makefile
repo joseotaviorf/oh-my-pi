@@ -248,7 +248,7 @@ validate-metadata-files-content:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_content.py -b "$(DRONE_BRANCH)" -v
+	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_content.py -b "$(CI_COMMIT_BRANCH)" -v
 
 .PHONY: validate-metadata-files-exist
 validate-metadata-files-exist:
@@ -257,7 +257,7 @@ validate-metadata-files-exist:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_exist.py -b "$(DRONE_BRANCH)" -v
+	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v
 
 ###############################################################################
 ###################### Common commands ########################################

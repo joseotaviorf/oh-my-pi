@@ -1,0 +1,26 @@
+when:
+  event: push
+
+steps:
+  unit-tests-python:
+    image: quintoandar/pyspark:0.2
+    commands:
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
+      - make requirements-test
+      - make requirements
+      - make unit-tests
+      - make cov-badge
+    when:
+      event: push
+
+  integration-tests-python:
+    image: quintoandar/pyspark:0.2
+    commands:
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
+      - make requirements-test
+      - make requirements
+      - make integration-tests
+    when:
+      event: push

@@ -1,4 +1,5 @@
 *                                                                       @quintoandar/bi-etl-ejuice-code-owners
+.woodpecker/**                                                           @quintoandar/data-ingestion-code-owners
 .drone.yml                                                              @quintoandar/data-ingestion-code-owners
 Makefile                                                                @quintoandar/data-ingestion-code-owners
 bietlejuice/base/airflow/**                                             @quintoandar/data-ingestion-code-owners
