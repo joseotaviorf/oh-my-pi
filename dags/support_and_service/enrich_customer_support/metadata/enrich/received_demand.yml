@@ -167,6 +167,10 @@ columns:
       It is used to track how quickly workers are able to start working on tasks once
       they are assigned to them, which can help optimize workflows and improve customer
       satisfaction. For Zendesk E-mail Tickets, the demand is always considered answered.
+  is_per_team_task:
+    description:
+      Boolean attribute in a task that defines if it is transfer between differente departments. This value is used to
+      build the "segments per team" metric.
   average_reply_time:
     lineage:
       - datalake_quinto_messenger.message.reply_time

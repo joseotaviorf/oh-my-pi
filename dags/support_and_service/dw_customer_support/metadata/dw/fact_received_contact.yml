@@ -110,6 +110,30 @@ columns:
     lineage:
       - datalake_customer_support.received_demand.average_reply_time
     description: Average reply time for every agent on a task - considering all messages the agent exchanged with the customer.
+  total_queue_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
+    description: Total time of the conversation spent in queue
+  total_talk_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
+    description: Total time of the conversation spent talking
+  total_wrap_up_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_wrap_up_time
+    description: Wrap up time is the time spent by the agent after it has talked to the customer
+  total_handling_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
+    description: Total time spent by the agent handled the customer task. This is the sum of talk, queue and wrap up time
+  total_waiting_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_waiting_time
+    description: Total time the customer spent waiting for an agent
+  first_reply_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.first_reply_time
+    description: Time until the first reply of the agent
   is_answered:
     lineage:
       - datalake_customer_support.received_demand.is_answered
@@ -125,6 +149,10 @@ columns:
       It is used to track how quickly workers are able to start working on tasks once
       they are assigned to them, which can help optimize workflows and improve customer
       satisfaction. For Zendesk E-mail Tickets, the demand is always considered answered.
+  is_per_team_task:
+    description:
+      Boolean attribute in a task that defines if it is transfer between differente departments. This value is used to
+      build the "segments per team" metric.
   is_first_interaction:
     lineage:
       - datalake_customer_support.received_demand.id_call

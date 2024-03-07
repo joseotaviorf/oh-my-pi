@@ -175,7 +175,7 @@ call AS (
       WHEN ROW_NUMBER() OVER(PARTITION BY cs.id_call, cs.id_reservation ORDER BY cs.ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
-    ct.id_external_service IS NOT NULL AS is_answered,
+    cfr.is_answered,
     NULL AS ts_reservation_created,
     cs.ts_created
   FROM
@@ -184,6 +184,9 @@ call AS (
     call_tickets AS ct
       ON cs.id_task = ct.id_external_service
       AND cs.id_reservation = ct.id_segment
+  LEFT JOIN
+    datalake_bigfone_twilio.call_flex_reservations AS cfr
+      ON cs.id_reservation = cfr.id_reservation
 ),
 chat AS (
   WITH current_queue AS (
@@ -388,6 +391,22 @@ average_reply_time AS (
   WHERE
     msg_sender LIKE "%@%.com%"
   GROUP BY 1, 2
+),
+time_metrics AS (
+  SELECT
+    id_conversation,
+    id_segment AS id_task,
+    id_reservation,
+    total_queue_time,
+    total_talk_time,
+    total_wrap_up_time,
+    total_handling_time,
+    total_waiting_time,
+    first_reply_time
+  FROM
+    datalake_twilio_flex_insights_clean.conversation_time_metrics
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_segment ORDER BY dt_created DESC) = 1
 )
 SELECT
   rd.id_call,
@@ -413,6 +432,12 @@ SELECT
   COALESCE(rd.area, dc.area) AS area,
   LOWER(COALESCE(rd.front_or_back, dc.front_or_back)) AS front_or_back,
   art.average_reply_time,
+  tm.total_talk_time,
+  tm.total_queue_time,
+  tm.total_wrap_up_time,
+  tm.total_waiting_time,
+  tm.first_reply_time,
+  tm.total_handling_time,
   rd.is_answered,
   rd.ts_reservation_created,
   rd.ts_created
@@ -423,6 +448,10 @@ LEFT JOIN
     ON art.id_task = rd.id_task
     AND art.agent_email = rd.agent_email
     AND channel = 'chat'
+LEFT JOIN
+  time_metrics AS tm
+    ON tm.id_task = rd.id_task
+    OR tm.id_reservation = rd.id_reservation
 LEFT JOIN
   datalake_gsheets_clean.department_control AS dc
     ON dc.department = rd.department

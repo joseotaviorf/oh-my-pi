@@ -1,13 +1,15 @@
 SELECT
-    ctm.conversation AS id_conversation,
-    ctm.segment AS id_segment,
-    CAST(ctm.total_queue_time AS FLOAT) AS total_queue_time,
-    CAST(ctm.total_talk_time AS FLOAT) AS total_talk_time,
-    CAST(ctm.total_wrap_up_time AS FLOAT) AS total_wrap_up_time,
-    CAST(ctm.total_handling_time AS FLOAT) AS total_handling_time,
-    CAST(ctm.date AS DATE) AS dt_created,
-    ctm.year,
-    ctm.month,
-    ctm.day
+    conversation AS id_conversation,
+    segment AS id_segment,
+    conversation_attribute_4 AS id_reservation,
+    CAST(total_queue_time AS FLOAT) AS total_queue_time,
+    CAST(total_talk_time AS FLOAT) AS total_talk_time,
+    CAST(total_wrap_up_time AS FLOAT) AS total_wrap_up_time,
+    CAST(total_handling_time AS FLOAT) AS total_handling_time,
+    CAST(total_waiting_time AS FLOAT) AS total_waiting_time,
+    CAST(first_reply_time AS FLOAT) AS first_reply_time,
+    year,
+    month,
+    day
 FROM
-    datalake_twilio_flex_insights_raw.conversation_time_metrics AS ctm
+    datalake_twilio_flex_insights_raw.conversation_time_metrics
