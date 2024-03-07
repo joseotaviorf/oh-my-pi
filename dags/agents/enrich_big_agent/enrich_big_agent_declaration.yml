@@ -1,0 +1,24 @@
+---
+dag:
+  name: enrich_big_agent
+  schedule_start_date: 2020, 7, 1
+  owner: Data Agents
+  documentation: 
+    dag_purpose: |
+      Creates enriched tables for Big Agent.
+      Some tables are deduplicated versions from the clean layer, but there are some table enriching the data.
+      This DAG is triggered by Mediator and loads the table via full load.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    house_consultant_history:
+    - house
+    - enrollment
+    - program
+    house_rent_listing_consultant:
+    - house_consultant_history
+    house_sale_listing_consultant:
+    - house_consultant_history
+cluster:
+  type: databricks_10_4_med_general_photon_cluster

@@ -1,6 +1,0 @@
----
-custom_cluster:
-  driver_node_type_id: r5d.large
-  node_type_id: r5d.large
-  runtime_engine: PHOTON
-  num_workers: 2
