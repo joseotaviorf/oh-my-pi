@@ -176,6 +176,7 @@ call AS (
       ELSE 'TRANSFERRED'
     END AS status,
     cfr.is_answered,
+    NULL AS is_per_team_task,
     NULL AS ts_reservation_created,
     cs.ts_created
   FROM
@@ -197,6 +198,15 @@ chat AS (
       datalake_quinto_messenger_clean.task_event
     QUALIFY
       ROW_NUMBER() OVER(PARTITION BY GET_JSON_OBJECT(event_payload,'$.TaskQueueSid') ORDER BY ts_created DESC) = 1
+  ),
+  per_team_attr AS (
+    SELECT
+      id_external AS id_task,
+      GET_JSON_OBJECT(task_attributes,'$.conversations.conversation_attribute_2') AS is_per_team_task
+    FROM
+      datalake_quinto_messenger_clean.task
+    QUALIFY
+      ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
   ),
   reservation_created_events AS (
     SELECT
@@ -237,6 +247,7 @@ chat AS (
         WHEN t.completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
         ELSE TRUE
       END AS is_answered,
+      pta.is_per_team_task,
       t.ts_created AS ts_task_created,
       rce.ts_reservation_created,
       COALESCE(rce.ts_reservation_created, t.ts_created) AS ts_created
@@ -254,6 +265,9 @@ chat AS (
     LEFT JOIN
       datalake_quinto_messenger.chat AS c
         ON c.id_chat = t.id_chat
+    LEFT JOIN
+      per_team_attr AS pta
+        ON pta.id_task = t.id_task
   ),
   ticket_assignment AS (
     SELECT DISTINCT
@@ -274,6 +288,7 @@ chat AS (
       c.area,
       c.front_or_back,
       tr.is_answered,
+      pta.is_per_team_task,
       tr.ts_reservation_created,
       tr.ts_created
     FROM
@@ -313,6 +328,7 @@ chat AS (
       ELSE 'TRANSFERRED'
     END AS status,
     is_answered,
+    is_per_team_task,
     ts_reservation_created,
     ts_created
   FROM
@@ -352,6 +368,7 @@ email AS (
       ELSE 'IN PROGRESS'
     END AS status,
     TRUE AS is_answered,
+    NULL AS is_per_team_task,
     NULL AS ts_reservation_created,
     ts_ticket_started AS ts_created
   FROM
@@ -439,6 +456,7 @@ SELECT
   tm.first_reply_time,
   tm.total_handling_time,
   rd.is_answered,
+  rd.is_per_team_task,
   rd.ts_reservation_created,
   rd.ts_created
 FROM
