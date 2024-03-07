@@ -27,6 +27,7 @@ SELECT
     ip_address,
     location_lat,
     location_lng,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     os_name,
     os_version,
     platform,

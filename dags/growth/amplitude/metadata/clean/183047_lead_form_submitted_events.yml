@@ -8,6 +8,9 @@ columns:
   ids_amplitude_attributed:
     lineage:
       - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.ids_amplitude_attributed
+  id_lead_ebdb:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_properties
   adid:
     lineage:
       - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.adid
@@ -189,5 +192,8 @@ columns:
     lineage:
       - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
   formfield_lead_uuid:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_properties
+  country_code:
     lineage:
       - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_properties

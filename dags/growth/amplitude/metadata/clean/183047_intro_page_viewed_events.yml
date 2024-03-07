@@ -13,6 +13,10 @@ columns:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.ids_amplitude_attributed
     description: Amplitude user identifier after attritution
+  id_lead_ebdb:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.event_properties
+    description: Lead identifier
   adid:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.adid
@@ -65,6 +69,10 @@ columns:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.id_device
     description: Device identifier
+  country_code:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.user_properties
+    description: User property that identifies the country code
   device_manufacturer:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.device_manufacturer
@@ -229,6 +237,14 @@ columns:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.user_properties
     description: User property that identifies the utm term
+  up_platform:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.user_properties
+    description: User property that identifies the platform
+  up_referring_domain:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.user_properties
+    description: User property that identifies the referring domain
   ep_ub_page_variant:
     lineage:
       - datalake_amplitude_clean_staging.183047_intro_page_viewed_events.event_properties

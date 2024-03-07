@@ -50,6 +50,9 @@ columns:
   country:
     lineage:
       - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.country
+  country_code:
+    lineage:
+      - datalake_amplitude_clean_staging.205027_referral_form_accepted_events.user_properties
   data:
     lineage:
       - datalake_amplitude_clean_staging.205027_referral_form_discarded_events.data
