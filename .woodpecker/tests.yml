@@ -22,14 +22,14 @@ steps:
     when:
       event: push
 
-  export-coverage:
-    image: plugins/s3
-    settings:
-      bucket: 5a-coverage
-      source: coverage_badge.svg
-      target: ${CI_REPO_NAME}/
-      acl: public-read
-      cache_control: no-cache
-    when:
-      event: push
-      branch: master
+#  export-coverage:
+#    image: plugins/s3
+#    settings:
+#      bucket: 5a-coverage
+#      source: coverage_badge.svg
+#      target: ${CI_REPO_NAME}/
+#      acl: public-read
+#      cache_control: no-cache
+#    when:
+#      event: push
+#      branch: master
