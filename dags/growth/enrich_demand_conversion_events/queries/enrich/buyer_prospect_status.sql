@@ -264,4 +264,4 @@ SELECT
 FROM
   status_rules
 WHERE 
-  DATE(ts_status_started) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+  DATE(ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

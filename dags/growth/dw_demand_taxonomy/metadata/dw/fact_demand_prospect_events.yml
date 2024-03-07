@@ -24,6 +24,11 @@ columns:
   sk_sale_flow:
     description: 'Identifier of a user flow with a house in sale context.'
     lineage:
+      - datalake_demand_flows.prospect_daily_results.id_sale_flow
+  sk_flow:
+    description: 'Identifier of a user flow with a house'
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_rent_flow  
       - datalake_demand_flows.prospect_daily_results.id_sale_flow  
   sk_booking:
     description: 'Id of the visit booking.'
@@ -124,7 +129,14 @@ columns:
     lineage:
       - datalake_demand_flows.prospect_daily_results.app_type 
   content_page:
-    description: Classification of content pages depending on the strategy adopted.  
+    description: Classification of content pages depending on the strategy adopted.
+  flow_order:
+    description: 'User flow order with the house, depending on the event type and business context.'
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_rent_flow  
+      - datalake_demand_flows.prospect_daily_results.id_sale_flow
+      - datalake_demand_flows.prospect_daily_results.id_event_type 
+      - datalake_demand_flows.prospect_daily_results.business_context        
   ts_event:
     description: 'Timestamp of the conversion event'
     lineage:

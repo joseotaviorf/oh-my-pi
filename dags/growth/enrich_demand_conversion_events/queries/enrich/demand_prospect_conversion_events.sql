@@ -20,7 +20,7 @@ WITH conversion_events AS (
   WHERE
     sk_event_type = 1
     AND id_buyer != id_seller
-    AND dt_event = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+    AND dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   UNION ALL
   -- SALE OFFER SUBMITTED
   SELECT
@@ -42,7 +42,7 @@ WITH conversion_events AS (
     datalake_sale_demand_events.sale_demand_events
   WHERE
     sk_event_type = 3  
-    AND dt_event = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+    AND dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   UNION ALL
   -- RENT VISIT BOOKED
   SELECT DISTINCT
@@ -65,7 +65,7 @@ WITH conversion_events AS (
   WHERE
     id_event_type = 1
     AND id_event = id_booking
-    AND DATE(ts_event) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+    AND DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   UNION ALL
   -- OFFER SUBMITED
   SELECT DISTINCT
@@ -88,7 +88,7 @@ WITH conversion_events AS (
   WHERE
     id_event_type = 3
     AND id_event = id_offer
-    AND DATE(ts_event) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+    AND DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 
 booking_attribution AS (
@@ -119,17 +119,15 @@ booking_attribution AS (
   LEFT JOIN
     datalake_booking.booking AS b
       ON bce.id_booking = b.id
-        AND DATE(b.ts_created) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+        AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   LEFT JOIN datalake_amplitude_visit.amplitude_visit AS src
       ON b.code = src.id_visit
-        AND DATE(src.ts_event) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+        AND DATE(src.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   LEFT JOIN datalake_tracked_events.attribution_cross_channel acc
       ON b.code = acc.visit_code
         AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')
-        AND acc.year = {year}
-        AND acc.month = {month}
-        AND acc.day = {day}
-  WHERE
+        AND DATE(acc.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  WHERE      
       bce.id_event_type = 1
 ),
 
@@ -183,16 +181,12 @@ sale_offer_attribution AS (
     sale_offer_from_amplitude AS sor
       ON soce.id_offer = sor.id_offer
       AND (soce.id_prospect = sor.id_user OR soce.id_house = sor.id_house)
-        AND sor.year = {year}
-        AND sor.month = {month}
-        AND sor.day = {day}
+      AND sor.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   LEFT JOIN
     datalake_tracked_events.attribution_cross_channel AS acc
       ON sor.id_offer = acc.id_firestore
         AND acc.event_name = 'sale_offer_form_accepted' 
-        AND acc.year = {year}
-        AND acc.month = {month}
-        AND acc.day = {day}
+        AND DATE(acc.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   WHERE
     soce.id_event_type = 3
     AND soce.business_context = 'sale'
@@ -252,16 +246,12 @@ rent_offer_attribution AS (
     rent_offer_from_amplitude AS aos
       ON off.id_firestore = aos.id_firestore
       AND (roce.id_prospect = aos.id_user OR roce.id_house = aos.id_house)
-      AND aos.year = {year}
-      AND aos.month = {month}
-      AND aos.day = {day}
+      AND aos.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   LEFT JOIN 
     datalake_tracked_events.attribution_cross_channel AS acc
       ON off.id_firestore = acc.id_firestore
         AND acc.event_name = 'offer_submitted'
-        AND acc.year = {year}
-        AND acc.month = {month}
-        AND acc.day = {day}
+        AND acc.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   WHERE
     roce.id_event_type = 3
     AND roce.business_context = 'rent'
@@ -297,7 +287,7 @@ legacy_data_talk_to_agent AS (
       datalake_ebdb_clean.house AS h
         ON h.id = a.house_id
     WHERE
-      DATE(a.first_message_ts) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+      DATE(a.first_message_ts) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 
 events_with_attribution AS (
@@ -476,7 +466,7 @@ FROM
 LEFT JOIN
   booking_info AS b
     ON e.id_booking = b.id_booking
-    AND DATE(b.ts_created) = DATE(CONCAT_WS('-', {year}, {month}, {day}))
+    AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 LEFT JOIN
   datalake_ebdb_listing.house AS h
     ON e.id_house = h.id

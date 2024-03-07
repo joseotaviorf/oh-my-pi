@@ -45,9 +45,7 @@ WITH adhoc_rules AS (
   FROM
     datalake_top_of_funnel_demand.user_interactions AS ui
   WHERE
-    ui.year = {year}
-    AND ui.month = {month}
-    AND ui.day = {day}   
+    ui.dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')    
 ),
 media_setup_ids AS (
   SELECT

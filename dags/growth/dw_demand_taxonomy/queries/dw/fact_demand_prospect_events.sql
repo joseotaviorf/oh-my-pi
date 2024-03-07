@@ -1,9 +1,11 @@
+WITH prospect_results AS (
 SELECT
   id_prospect_event AS sk_prospect_event,
   id_prospect AS sk_prospect,
   id_media_setup AS sk_media_setup,
   id_rent_flow AS sk_rent_flow,
-  id_sale_flow AS sk_sale_flow, 
+  id_sale_flow AS sk_sale_flow,
+  COALESCE(id_rent_flow, id_sale_flow) AS sk_flow,
   id_booking AS sk_booking,
   id_offer AS sk_offer,
   id_talk_to_agent AS sk_talk_to_agent,
@@ -26,6 +28,7 @@ SELECT
   utm_medium,
   utm_source,
   utm_term,
+  ROW_NUMBER() OVER(PARTITION BY COALESCE(id_rent_flow, id_sale_flow), event_type, business_context ORDER BY ts_event ASC) AS flow_order,
   id_event_date AS sk_event_date,
   ts_event,
   year,
@@ -34,7 +37,9 @@ SELECT
   NOW() AS ts_load
 FROM 
   datalake_demand_flows.prospect_daily_results
+)
+SELECT
+  *
+FROM prospect_results
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    DATE(ts_event) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))

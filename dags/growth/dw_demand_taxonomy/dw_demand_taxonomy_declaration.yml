@@ -8,9 +8,21 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: dw_growth
+  custom_schema: growth
   default_extraction_type: incremental 
-  default_partitions: ["year", "month", "day"]
+  tables_customization:
+    fact_demand_prospect_events:
+      partitions: ["year", "month", "day"]
+      extra_query_template_params:
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
+    fact_demand_top_of_funnel_events:
+      partitions: ["year", "month", "day"]
+      extra_query_template_params:
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
 cluster:
   type: databricks_10_4_med_general_cluster
   access_control_list:

@@ -68,9 +68,7 @@ WITH adhoc_rules AS (
   FROM
     datalake_demand_flows.demand_prospect_conversion_events AS dpce
   WHERE 
-    dpce.year = {year}
-    AND dpce.month = {month}
-    AND dpce.day = {day}  
+    dpce.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')  
 ),
 
 media_setup_ids AS (
