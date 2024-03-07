@@ -67,6 +67,12 @@ sheets_info:
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: people_reference_column
 
+  performance_review:
+    clean_table_name: performance_review
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: performance_review
+
   position_class:
     clean_table_name: position_class
     sheet_context: people
@@ -78,6 +84,12 @@ sheets_info:
     sheet_context: people
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: position_history
+
+  talent_review:
+    clean_table_name: talent_review
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: talent_review
 
   targets_pwd:
     clean_table_name: targets_pwd
