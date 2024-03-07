@@ -2,7 +2,7 @@ dag:
     name: enrich_customer_support
     schedule_start_date: 2021, 5, 12
     owner: Data SS
-    documentation: 
+    documentation:
         dag_purpose: |
             Apply all the business rules needed to build an unified ticket vision on DW (Customer Support model).
             Each row of Call and Chat tables represent one task from a ticket. Each row in the Email table represents one ticket.
@@ -19,6 +19,7 @@ workflow:
         received_demand:
             - call
             - email
+            - chat
         unified_tickets:
             - call
             - chat
