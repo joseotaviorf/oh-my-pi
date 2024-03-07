@@ -10,6 +10,7 @@ dag:
 workflow:
   type: query
   layer: enrich
+  custom_schema: mexico_marketing_costs
   default_extraction_type: incremental
   default_partitions: [id_date, flow_type]
   extra_query_template_params:
