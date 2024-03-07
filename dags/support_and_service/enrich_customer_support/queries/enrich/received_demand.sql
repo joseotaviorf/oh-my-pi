@@ -288,7 +288,7 @@ chat AS (
       c.area,
       c.front_or_back,
       tr.is_answered,
-      pta.is_per_team_task,
+      tr.is_per_team_task,
       tr.ts_reservation_created,
       tr.ts_created
     FROM
