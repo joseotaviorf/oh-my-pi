@@ -99,7 +99,7 @@ SELECT
     prop_renda_declarada AS proposal_declared_income,
     calc_percentual_aprovado AS proposal_approved_percentage,
     calc_rating AS proposal_rating,
-    prop_num_proposta AS proposal_number,
+    CAST(CAST(prop_num_proposta AS DOUBLE) AS INT) AS proposal_number,
     calc_dti AS dti,
     calc_dti_maximo AS dti_max,
     calc_dti_real AS dti_real,
