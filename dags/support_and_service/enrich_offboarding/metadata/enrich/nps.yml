@@ -1,40 +1,55 @@
 ---
 database_name: datalake_offboarding
 table_name: nps
+description: Enrichment table that aims to gather nps information for the 
+  offboarding context. The granularity of this table is the contract.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contract:
+    description: Contract identification key.
     lineage:
       - datalake_offboarding.contract_termination.id_contract
   id_nps_answer:
+    description: NPS response identification key.
     lineage:
       - datalake_offboarding.contract_termination.id_nps_answer
   score:
+    description: Numerical information indicating the NPS score sent per contract.
     lineage:
       - datalake_offboarding.contract_termination.score_category
   customer_type:
+    description: Type of customer related to the contract.
     lineage:
       - datalake_offboarding.contract_termination.customer_type
   comment:
+    description: Comment related to nps sent.
     lineage:
       - datalake_offboarding.contract_termination.nps_comment
   ldt_dt_termination_to_answer:
+    description: Numerical information that indicates the number of days between sending the nps response and the beginning of the contract.
     lineage:
       - datalake_offboarding.contract_termination.ts_nps_answer_sent
       - datalake_offboarding.contract_termination.dt_termination
   ldt_termination_finished_to_answer:
+    description: Numerical information that indicates the number of days between sending the nps response and the end of the contract.
     lineage:
       - datalake_offboarding.contract_termination.ts_nps_answer_sent
       - datalake_offboarding.contract_termination.ts_termination_finished
   dt_sent:
+    description: Date when the nps campaign trigger was sent.
     lineage:
       - datalake_tracksale.dispatch_attributes.dispatch_time
       - datalake_casa_mineira_tracksale.dispatch_attributes.dispatch_time
   dt_termination:
+    description: Contract date.
     lineage:
       - datalake_offboarding.contract_termination.dt_termination
   dt_termination_finished:
+    description: Contract end date.
     lineage:
       - datalake_offboarding.contract_termination.ts_termination_finished
   ts_answer_sent:
+    description: Date in timestamp format that indicates when the nps survey response was sent.
     lineage:
       - datalake_offboarding.contract_termination.ts_nps_answer_sent

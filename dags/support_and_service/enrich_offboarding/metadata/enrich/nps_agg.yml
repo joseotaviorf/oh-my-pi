@@ -1,22 +1,32 @@
 ---
 database_name: datalake_offboarding
 table_name: nps_agg
+description: Enrichment table that brings together aggregated information 
+  from general nps. The granularity of this table is the contract.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contract:
+    description: Unique contract identification key.
     lineage:
       - datalake_offboarding.nps.id_contract
   number_of_responses:
+    description: Numeric indicator indicating the total number of nps responses.
     lineage:
       - datalake_offboarding.nps.id_nps_answer
   number_of_responses_iq:
+    description: Numeric indicator indicating the total number of nps responses sent by the tenant.
     lineage:
       - datalake_offboarding.nps.id_nps_answer
   number_of_responses_pp:
+    description: Numeric indicator indicating the total number of nps responses sent by the owner.
     lineage:
       - datalake_offboarding.nps.id_nps_answer
   nps_iq:
+    description: Sum of the nps score sent by the tenant, grouped by contract.
     lineage:
       - datalake_offboarding.nps.score
   nps_pp:
+    description: Sum of the nps score sent by the owner, grouped by contract.
     lineage:
       - datalake_offboarding.nps.score

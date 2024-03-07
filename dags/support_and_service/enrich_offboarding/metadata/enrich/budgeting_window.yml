@@ -53,7 +53,7 @@ columns:
     lineage:
       - datalake_customer_support.email.custom_fields
   client_description:
-    description: 
+    description: Customer description related to service.
     lineage:
       - datalake_customer_support.email.custom_fields
   repairs_sent_pp:
@@ -144,11 +144,11 @@ columns:
     description: Date on which the repair reanalysis occurred.
     lineage:
       - datalake_customer_support.email.custom_fields
-  ts_ticket_started:
-    description: Date in timestamp format that indicates the start of the ticket.
+  dt_started:
+    description: Date format that indicates the start of the ticket.
     lineage:
       - datalake_customer_support.email.dt_started
-  ts_ticket_ended:
-    description: Date in timestamp format that indicates the completion of the ticket.
+  dt_closed:
+    description: Date that indicates the completion of the ticket.
     lineage:
       - datalake_customer_support.email.dt_closed

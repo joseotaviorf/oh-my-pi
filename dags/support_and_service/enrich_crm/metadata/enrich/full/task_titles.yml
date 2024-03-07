@@ -1,18 +1,26 @@
 database_name: datalake_crm
 table_name: task_titles
+description: Enrichment table that aims to gather information from the title of CRM tasks.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
+    description: Identification key for the task title in the crm.
     lineage:
       - datalake_crm_clean.task_titles.id
   workgroup_ids:
+    description: Typo array information that lists group id names.
     lineage:
       - datalake_crm_clean.task_titles.workgroup_ids
   description:
+    description: Description of the task in the crm.
     lineage:
       - datalake_crm_clean.task_titles.description
   title:
+    description: Title of the task in the crm.
     lineage:
       - datalake_crm_clean.task_titles.title
   slug:
+    description: Keywords related to the content of the task in the crm.
     lineage:
       - datalake_crm_clean.task_titles.slug
