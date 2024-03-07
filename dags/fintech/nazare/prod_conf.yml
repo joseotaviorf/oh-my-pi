@@ -1,5 +1,0 @@
----
-tables_exclusion_list:
-  - schema_migrations
-  - change_owner_control
-lineage_product_database_name: nazare
