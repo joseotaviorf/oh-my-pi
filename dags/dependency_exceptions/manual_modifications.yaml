@@ -458,6 +458,8 @@ bietlejuice.enrich_lost_listings:
 bietlejuice.enrich_losses_daily:
   remove:
     - bietlejuice.enrich_losses:load-enrich-provision-factor
+bietlejuice.enrich_growth_costs_sharing_rules:
+  override: []
 bietlejuice.enrich_growth_automatic_daily_costs:
   override: []
 bietlejuice.enrich_marketing_automatic_daily_costs:

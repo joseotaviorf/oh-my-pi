@@ -1,9 +1,9 @@
 ---
 database_name: datalake_growth_costs_sharing_rules
-table_name: a002a
+table_name: a009a
 owner: monica.faria@quintoandar.com.br
 domain: Growth
-description: Allocation of classified ad campaign costs among all cities in Brasil.
+description: Allocation based on prospects from the last week, coming from new affiliate users who joined in the prospect's month, with tracking sources Facebook or Google, and non-branded campaigns.
 columns:
   business_context:
     description: Business context of the rule.
@@ -12,7 +12,7 @@ columns:
     lineage:
       - datalake_region.region.city_group
   funnel_side:
-    description: Marketplace side of business     
+    description: Marketplace side of business      
   id_date:
     description: Date of applied share
     lineage:

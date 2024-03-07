@@ -8,9 +8,9 @@ WITH monthly_budget_share AS (
         ) AS share
     FROM
         datalake_gsheets_clean.marketing_affiliates_targets_replanning AS atr
-	INNER JOIN
-		datalake_quintoandar.aux_date AS adt
-	        ON DATE(NULLIF(atr.dt_target, '')) = adt.date
+    INNER JOIN
+        datalake_quintoandar.aux_date AS adt
+            ON DATE(NULLIF(atr.dt_target, '')) = adt.date
 ),
 date_region_cross_join AS (
     SELECT DISTINCT
@@ -26,8 +26,7 @@ SELECT
     drc.city_group,
     COALESCE(mbs.share,0) AS share,
     'affiliates' AS funnel_side,
-    CAST(NULL AS STRING) AS business_context,
-    NULL::STRING AS utm_campaign
+    CAST(NULL AS STRING) AS business_context
 FROM
     date_region_cross_join AS drc
 INNER JOIN
