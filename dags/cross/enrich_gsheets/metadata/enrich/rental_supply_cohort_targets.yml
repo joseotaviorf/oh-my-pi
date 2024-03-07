@@ -30,6 +30,27 @@ columns:
       - datalake_gsheets_clean.supply_targets_2024_cohort.rental_administrator
       - datalake_gsheets_clean.supply_targets_retro_cohort.rental_administrator
     description: Rental administrator related to the target.
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2024_cohort.planning_conversion
+      - datalake_gsheets_clean.supply_targets_retro_cohort.planning_conversion
+    description: Detailed conversion operation type.
+      Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
+  planning_operation:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2024_cohort.planning_operation
+      - datalake_gsheets_clean.supply_targets_retro_cohort.planning_operation
+    description: Identifies the conversion operation type.
+  planning_cluster:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2024_cohort.planning_cluster
+      - datalake_gsheets_clean.supply_targets_retro_cohort.planning_cluster
+    description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2024_cohort.company_report_origin
+      - datalake_gsheets_clean.supply_targets_retro_cohort.company_report_origin
+    description: Acquisition channel for IS and FSS operations and conversion source for the others (CIQ, Rede, PP Multi, Captaí).
   weeks_conversion:
     lineage:
       - datalake_gsheets_clean.supply_targets_2024_cohort.weeks_conversion
