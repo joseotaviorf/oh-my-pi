@@ -173,9 +173,10 @@ SELECT
     cs.id_date,
     'BR' AS country_code,
     cs.origin,
-    COALESCE(sr_utm.business_context, sr.business_context, cs.business_context) AS business_context,
+    COALESCE(sr_utm.business_context, sr.business_context, ctd.campaign_business_context, SPLIT(cs.campaign_name, '[.]')[1]) AS business_context,
     cs.account_name,
-    COALESCE(ctd.campaign_name_convention, cs.campaign_name) AS campaign_name,
+    cs.campaign_name,
+    COALESCE(ctd.campaign_name_convention, ARRAY_JOIN(SLICE(SPLIT(cs.campaign_name,'[.]'), 2, 7), '.')) AS campaign_name_convention_media_setup,
     CASE
         WHEN LOWER(cs.campaign_name) LIKE '%calc%'
             THEN 'Calculator'
@@ -214,7 +215,7 @@ LEFT JOIN
 ON 
     SPLIT(cs.campaign_name, '[.]')[0] = sr_utm.id_rule
     AND cs.id_date = sr_utm.id_date 
-    AND cs.campaign_name = sr_utm.utm_campaign        
+    AND SUBSTRING(cs.utm_campaign, INSTR(cs.utm_campaign, '.') + 1) = sr_utm.utm_campaign
 LEFT JOIN
     datalake_consolidated_marketing_costs.city_group_old_campaigns_historic ch
 ON 

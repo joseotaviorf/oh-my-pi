@@ -23,7 +23,7 @@ FROM
 LEFT JOIN
     datalake_growth_taxonomy.media_setup msp
 ON
-    ARRAY_JOIN(SLICE(SPLIT(cmm.campaign_name,'[.]'), 2, 7), '.') = msp.naming_convention_sufix
+    cmm.campaign_name_convention_media_setup = msp.naming_convention_sufix
 WHERE 
     cmm.id_date BETWEEN INT(REPLACE('{load_start_date}', '-', ''))
     AND INT(REPLACE('{load_end_date}', '-', ''))
