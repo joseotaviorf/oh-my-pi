@@ -1,9 +1,0 @@
----
-reports_list:
-  - ads_performance
-  - campaigns_performance
-  - keywords_performance
-  - videos_performance
-partition_cols:
-  - account_snake_case
-  - dt_loaded

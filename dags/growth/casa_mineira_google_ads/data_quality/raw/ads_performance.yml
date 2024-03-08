@@ -1,9 +1,0 @@
----
-table_name: datalake_casa_mineira_google_ads_raw.ads_performance
-alert_channel: "#alerts-de-airflow-dags"
-is_incremental:
-  incremental_date_column: dt_created
-  incremental_date_mask: yyyy-MM-dd
-table_level_validations:
-  has_size:
-    greater_than: 400
