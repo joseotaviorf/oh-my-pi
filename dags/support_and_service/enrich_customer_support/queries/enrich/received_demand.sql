@@ -175,8 +175,7 @@ call AS (
       WHEN ROW_NUMBER() OVER(PARTITION BY cs.id_call, cs.id_reservation ORDER BY cs.ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
-    cfr.is_answered,
-    NULL AS is_per_team_task,
+    ct.id_external_service IS NOT NULL AS is_answered,
     NULL AS ts_reservation_created,
     cs.ts_created
   FROM
@@ -185,9 +184,6 @@ call AS (
     call_tickets AS ct
       ON cs.id_task = ct.id_external_service
       AND cs.id_reservation = ct.id_segment
-  LEFT JOIN
-    datalake_bigfone_twilio.call_flex_reservations AS cfr
-      ON cs.id_reservation = cfr.id_reservation
 ),
 chat AS (
   WITH current_queue AS (
@@ -198,15 +194,6 @@ chat AS (
       datalake_quinto_messenger_clean.task_event
     QUALIFY
       ROW_NUMBER() OVER(PARTITION BY GET_JSON_OBJECT(event_payload,'$.TaskQueueSid') ORDER BY ts_created DESC) = 1
-  ),
-  per_team_attr AS (
-    SELECT
-      id_external AS id_task,
-      GET_JSON_OBJECT(task_attributes,'$.conversations.conversation_attribute_2') AS is_per_team_task
-    FROM
-      datalake_quinto_messenger_clean.task
-    QUALIFY
-      ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
   ),
   reservation_created_events AS (
     SELECT
@@ -247,7 +234,6 @@ chat AS (
         WHEN t.completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
         ELSE TRUE
       END AS is_answered,
-      pta.is_per_team_task,
       t.ts_created AS ts_task_created,
       rce.ts_reservation_created,
       COALESCE(rce.ts_reservation_created, t.ts_created) AS ts_created
@@ -265,9 +251,6 @@ chat AS (
     LEFT JOIN
       datalake_quinto_messenger.chat AS c
         ON c.id_chat = t.id_chat
-    LEFT JOIN
-      per_team_attr AS pta
-        ON pta.id_task = t.id_task
   ),
   ticket_assignment AS (
     SELECT DISTINCT
@@ -288,7 +271,6 @@ chat AS (
       c.area,
       c.front_or_back,
       tr.is_answered,
-      tr.is_per_team_task,
       tr.ts_reservation_created,
       tr.ts_created
     FROM
@@ -328,7 +310,6 @@ chat AS (
       ELSE 'TRANSFERRED'
     END AS status,
     is_answered,
-    is_per_team_task,
     ts_reservation_created,
     ts_created
   FROM
@@ -368,7 +349,6 @@ email AS (
       ELSE 'IN PROGRESS'
     END AS status,
     TRUE AS is_answered,
-    NULL AS is_per_team_task,
     NULL AS ts_reservation_created,
     ts_ticket_started AS ts_created
   FROM
@@ -408,22 +388,6 @@ average_reply_time AS (
   WHERE
     msg_sender LIKE "%@%.com%"
   GROUP BY 1, 2
-),
-time_metrics AS (
-  SELECT
-    id_conversation,
-    id_segment AS id_task,
-    id_reservation,
-    total_queue_time,
-    total_talk_time,
-    total_wrap_up_time,
-    total_handling_time,
-    total_waiting_time,
-    first_reply_time
-  FROM
-    datalake_twilio_flex_insights_clean.conversation_time_metrics
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_segment ORDER BY dt_created DESC) = 1
 )
 SELECT
   rd.id_call,
@@ -449,14 +413,7 @@ SELECT
   COALESCE(rd.area, dc.area) AS area,
   LOWER(COALESCE(rd.front_or_back, dc.front_or_back)) AS front_or_back,
   art.average_reply_time,
-  tm.total_talk_time,
-  tm.total_queue_time,
-  tm.total_wrap_up_time,
-  tm.total_waiting_time,
-  tm.first_reply_time,
-  tm.total_handling_time,
   rd.is_answered,
-  rd.is_per_team_task,
   rd.ts_reservation_created,
   rd.ts_created
 FROM
@@ -466,10 +423,6 @@ LEFT JOIN
     ON art.id_task = rd.id_task
     AND art.agent_email = rd.agent_email
     AND channel = 'chat'
-LEFT JOIN
-  time_metrics AS tm
-    ON tm.id_task = rd.id_task
-    OR tm.id_reservation = rd.id_reservation
 LEFT JOIN
   datalake_gsheets_clean.department_control AS dc
     ON dc.department = rd.department
