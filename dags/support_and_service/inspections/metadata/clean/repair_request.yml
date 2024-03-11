@@ -19,12 +19,10 @@ columns:
     lineage:
       - datalake_inspections_raw.repair_request.main_id
     description: Item id in Main monolith
-  is_exempted:
+  responsibility:
     lineage:
-      - datalake_inspections_raw.repair_request.exempted
-    description:
-      Indicates whether the repair suggested by the AN1 team was exempted
-      by the owner or a member of AN1
+      - datalake_inspections_raw.repair_request.responsibility
+    description: Indicates who will be responsible for the repair, as well as whether QuintoAndar will absorb a repair
   id_item_group:
     lineage:
       - datalake_inspections_raw.repair_request.item_group_id
@@ -53,6 +51,12 @@ columns:
     lineage:
       - datalake_inspections_raw.repair_request.comment
     description: Commentary detailing the repair needed
+  is_exempted:
+    lineage:
+      - datalake_inspections_raw.repair_request.exempted
+    description:
+      Indicates whether the repair suggested by the AN1 team was exempted
+      by the owner or a member of AN1
   is_from_analysis:
     lineage:
       - datalake_inspections_raw.repair_request.from_analysis
