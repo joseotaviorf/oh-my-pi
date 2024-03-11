@@ -4,36 +4,60 @@ columns:
   city_group:
     description: City group.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.city_group
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.city_group
+  lead_processing_operation:
+    description: Operation that processed the listing lead.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.lead_processing_operation
+  supply_mkt_origin_detailed:
+    description: Market origin of the lead.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.supply_mkt_origin_detailed
   planning_taxonomy:
     description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.planning_taxonomy
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.planning_taxonomy
+  planning_conversion:
+    description: Field that identifies what kind of conversion detailed. Distinguishing the Inside Sales Operation with Inbound, Outbound and IS Expert.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.planning_conversion
+  planning_operation:
+    description: Identifies the conversion operation type.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.planning_operation
+  planning_cluster:
+    description: Field used to segmenting the channel in the Cluster for affiliates and Medium for Owners PWA and Price Calculator FR/FS.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.planning_cluster
+  company_report_origin:
+    description: Identifies the acquisition channel for operation (IS and FSS) and the conversion fonts for every else, like CIQ, Rede, PP Multi and Captaí.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.company_report_origin
   op2q:
     description: Target volume of owner prospects that converted into a qualified in the cohort.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.op2q
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.op2q
   q2opp:
     description: Target volume of qualifieds that converted into an opportunity in the cohort.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.q2opp
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.q2opp
   opp2fl:
     description: Target volume of opportunities that converted into a first listing in the cohort.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.opp2fl
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.opp2fl
   fl:
     description: Target volume of first listings.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.fl
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.fl
   q2avq:
     description: Target volume of qualifieds that converted into an available qualified in the cohort.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.q2avq
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.q2avq
   avq2opp:
     description: Target volume of available qualifieds that converted into an opportunity in the cohort.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.avq2opp
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.avq2opp
   dt_week_started:
     description: Week of the target.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_retro_cohort.week_start
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2024.week_start
