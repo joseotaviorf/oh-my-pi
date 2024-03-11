@@ -43,10 +43,12 @@ columns:
     lineage:
       - datalake_survicate.response_content.ts_collected
     description: Date and time of first time visitor responded to a survey
+  dt_load:
+    description: Data loading date into the datalake
   year:
     lineage:
       - datalake_survicate.response_content.year
-    description: "Year of response submission date "
+    description: Year of response submission date
   month:
     lineage:
       - datalake_survicate.response_content.month

@@ -1,56 +1,74 @@
 database_name: datalake_crm_tasks_transitions
 table_name: tasks_transitions
+description: Data from case transitions between CRM tasks
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_transition:
+    description: Unique identifier of the transition
     lineage:
       - datalake_crm.workflows_transitions.id_transition
   id_workflow:
+    description: Unique identifier of the workflow
     lineage:
       - datalake_crm.workflows_transitions.id_workflow
   id_task_from:
+    description: Unique identifier of the task to be transferred
     lineage:
       - datalake_crm.workflows_transitions.id_task_from
   origin_type:
+    description: Identifies the origin of the task, whether it is frontEnd or backEnd service 
     lineage:
       - datalake_crm.tasks.type
   id_task_to:
+    description: Unique identifier of the task receiving the transfer
     lineage:
       - datalake_crm.workflows_transitions.id_task_to
   destination_type:
+    description: Indicates the completion of the transition to occur
     lineage:
       - datalake_crm.tasks.type
   status:
+    description: Transition status
     lineage:
       - datalake_crm.workflows_transitions.status
   conclusion_option:
+    description: Indicates the reason that resulted in the transition of tasks
     lineage:
       - datalake_crm.workflows_transitions.release_minuta
       - datalake_crm.workflows_transitions.owner_pendency
       - datalake_crm.workflows_transitions.tenant_pendency
       - datalake_crm.workflows_transitions.reject_proposal
   conclusion_context:
+    description: Describe the reason for the transition of tasks
     lineage:
       - datalake_crm.workflows_transitions.release_minuta
       - datalake_crm.workflows_transitions.owner_pendency
       - datalake_crm.workflows_transitions.tenant_pendency
       - datalake_crm.workflows_transitions.reject_proposal
   context:
+    description: Json with the option and description of the reason that resulted in the task transition
     lineage:
       - datalake_crm.workflows_transitions.context
   contact_channel:
+    description: Indicates the contact channel with PP/IQ
     lineage:
       - datalake_crm.workflows_transitions.owner_contact_channel
       - datalake_crm.workflows_transitions.frontend_contact_channel
       - datalake_crm.workflows_transitions.tenant_contact_channel
   ts_transitioned:
+    description: Task transition timestamp
     lineage:
       - datalake_crm.workflows_transitions.ts_transitioned
   year:
+    description: Year of task transition
     lineage:
       - datalake_crm.workflows_transitions.year
   month:
+    description: Month of task transition
     lineage:
       - datalake_crm.workflows_transitions.month
   day:
+    description: Day of task transition
     lineage:
       - datalake_crm.workflows_transitions.day

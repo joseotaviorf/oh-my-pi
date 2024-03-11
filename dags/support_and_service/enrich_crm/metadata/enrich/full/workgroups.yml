@@ -1,12 +1,18 @@
 database_name: datalake_crm
 table_name: workgroups
+description: Data on possible workgroup types for CRM tasks
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_crm_clean.workgroups.id
+    description: Workgroup identifier tag
   task_type:
     lineage:
       - datalake_crm_clean.workgroups.task_types
+    description: The type of task to be performed
   title:
     lineage:
       - datalake_crm_clean.workgroups.title
+    description: The title of the task to be performed

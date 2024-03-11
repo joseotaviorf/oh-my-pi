@@ -1,39 +1,65 @@
 database_name: datalake_crm
 table_name: tasks_actions
+description: Data about the actions performed within a given task
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_crm_clean.tasks.actions
+    description: Unique identifier of the action
   id_task:
     lineage:
       - datalake_crm_clean.tasks.id
+    description: Unique identifier of the task
   id_user_action:
     lineage:
       - datalake_crm_clean.tasks.actions
+    description: Unique identifier of the user responsible for the action
   action_user_name:
     lineage:
       - datalake_crm_clean.tasks.actions
+    description: Name of the user responsible for the action
   action_type:
     lineage:
       - datalake_crm_clean.tasks.actions
+    description: The type of action to be performed
+    categories:
+      REALIZE: 
+        Happens when an analyst clicks the "Mark as done" button in the CRM. In these cases, the userId must be filled in. 
+        If the userId is null, it may be the result of a bug in the CRM, as these cases should only occur for the RESOLVE type. 
+        The only exception is for proposals that are canceled, as these will be of the REALIZE type and the userId will be null.
+      RESOLVE: It is an automatic action, by system. For these cases, the userId must be null.
+      COMMENT: ""
+      UPDATE: ""
+      CREATE: ""
+      UPDATE_METADATA: ""
+      SNOOZE: ""
   metadata_key:
     lineage:
       - datalake_crm_clean.tasks.actions
+    description: When the action type is UPDATE, the metadata can be updated. This column will indicate which metadata is being updated.
   metadata_old_value:
     lineage:
       - datalake_crm_clean.tasks.actions
+    description: When the action type is UPDATE, the metadata can be updated. This column will indicate the old metadata value to be updated.
   notification_source:
     lineage:
       - datalake_crm_clean.tasks.actions
+    description: Action notification origin
   ts_action:
     lineage:
       - datalake_crm_clean.tasks.actions
+    description: Timestamp of when the action occurred
   year:
     lineage:
       - datalake_crm_clean.tasks.year
+    description: Year of when the action occurred
   month:
     lineage:
       - datalake_crm_clean.tasks.month
+    description: Month of when the action occurred
   day:
     lineage:
       - datalake_crm_clean.tasks.day
+    description: Day of when the action occurred

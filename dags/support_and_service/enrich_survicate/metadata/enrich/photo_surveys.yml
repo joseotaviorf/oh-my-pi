@@ -40,6 +40,10 @@ columns:
     lineage:
       - datalake_survicate.response_content.answer_content
     description: Predefined tags to categorize respondent satisfaction
+  respondent_comments:
+    lineage:
+      - datalake_survicate.response_content.answer_content
+    description: Respondent open comment
   user_comment:
     lineage:
       - datalake_survicate.response_content.answer_content
@@ -54,10 +58,12 @@ columns:
     lineage:
       - datalake_survicate.response_content.ts_collected
     description: Date and time of first time visitor responded to a survey
+  dt_load:
+    description: Data loading date into the datalake
   year:
     lineage:
       - datalake_survicate.response_content.year
-    description: "Year of response submission date "
+    description: Year of response submission date
   month:
     lineage:
       - datalake_survicate.response_content.month

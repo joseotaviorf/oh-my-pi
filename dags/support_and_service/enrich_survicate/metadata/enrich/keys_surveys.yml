@@ -75,7 +75,7 @@ columns:
       - datalake_survicate.response_content.year
       - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
       - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
-    description: "Year of response submission date "
+    description: Year of response submission date
   month:
     lineage:
       - datalake_survicate.response_content.month

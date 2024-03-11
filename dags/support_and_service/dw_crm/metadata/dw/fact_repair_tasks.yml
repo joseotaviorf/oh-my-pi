@@ -60,7 +60,7 @@ columns:
   sk_tenant:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_client
-    description: ""
+    description: User's ID who is tenant related to task
   sk_user_action:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action

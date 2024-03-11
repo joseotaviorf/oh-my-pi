@@ -9,37 +9,40 @@ owner: marcus.pinto@quintoandar.com.br
 columns:
   sk_transition:
     lineage:
-    - datalake_crm.workflows_transitions.id_transition
+      - datalake_crm.workflows_transitions.id_transition
     description: Key to identify a transition. When there is a migration from one
       task to another
   sk_workflow:
     lineage:
-    - datalake_crm.workflows_transitions.id_workflow
+      - datalake_crm.workflows_transitions.id_workflow
     description: Key to identify a workflow that ties transitions between tasks
   sk_origin_task:
     lineage:
-    - datalake_crm.workflows_transitions.id_task_from
+      - datalake_crm.workflows_transitions.id_task_from
     description: Key to identify a task that started a transition
   sk_destination_task:
     lineage:
-    - datalake_crm.workflows_transitions.id_task_to
+      - datalake_crm.workflows_transitions.id_task_to
     description: Key to identify a destinated task from a transition
   sk_transitioned_date:
     lineage:
-    - datalake_crm.workflows_transitions.ts_transitioned
+      - datalake_crm.workflows_transitions.ts_transitioned
     description: Key to identify date of tasks transition
   is_end_of_workflow:
     lineage:
-    - datalake_crm.workflows_transitions.is_end_of_workflow
+      - datalake_crm.workflows_transitions.is_end_of_workflow
     description: Boolean if workflow ended in that transition or not
   year:
     lineage:
-    - datalake_crm.workflows_transitions.year
+      - datalake_crm.workflows_transitions.year
+    description: Integer type data that indicates the year in which we had the task action in the crm.
   month:
     lineage:
-    - datalake_crm.workflows_transitions.month
+      - datalake_crm.workflows_transitions.month
+    description: Integer type data that indicates the month in which we had the task action in the crm.
   day:
     lineage:
-    - datalake_crm.workflows_transitions.day
+      - datalake_crm.workflows_transitions.day
+    description: Integer type data that indicates the day in which we had the task action in the crm.
   ts_load:
     description: Timestamp of when the data was last loaded in this table
