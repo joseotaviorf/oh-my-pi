@@ -1,0 +1,14 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: quintocred_process_evictions
+columns:
+  parte_contraria_nome:
+    tags:
+    - PII
+    - Confidential
+  cpf_cnpj:
+    tags:
+    - Confidential
+  padronizar_cpf:
+    tags:
+    - Confidential

@@ -206,3 +206,10 @@ sheets_info:
     sheet_name: vistoria_bugs_v2
     clean_table_name: inspection_bugs_v2
     sheet_context: fintech
+
+  quintocred_process_evictions:
+    sheet_id: 1kBgfI0W1jXmUtzwLTHYiXimGZ7GU-PaR1GGOOwR1oco
+    sheet_name: Processos Velo (Fintech Ops)
+    clean_table_name: quintocred_process_evictions
+    sheet_context: fintech
+

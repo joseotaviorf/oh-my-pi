@@ -1,0 +1,180 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: quintocred_process_evictions
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_process:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.processo_id
+  id_external:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.id_externo
+  id_broker:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.id_imob
+  id_opposing_party:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.parte_contraria_id
+  id_status:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.id_status
+  id_group:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.grupo_id
+  contract_number:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.numero_do_contrato
+  process_number:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.numero_do_processo
+  company:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.empresa
+  name_opposing_party:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.parte_contraria_nome
+  party_process:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.processo_parte
+  type_party_process:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.tipo_de_parte
+  status:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.status
+  summary:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.resumo
+  group:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.grupo
+  action_type:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.acao
+  process_class_type:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.processo_classificacao
+  process_justice_type:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.processo_tipo_de_justica
+  external_office_responsible:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.escritorio_externo_responsavel
+  process_fase:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.fase
+  team:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.time
+  cpf_cnpj:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.cpf_cnpj
+  state:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.estado
+  country:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.pais
+  process_motive:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.motivo
+  broker_name:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.nome_imob
+  broker_commercial_name:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.nome_comercial_imob
+  size_pauta:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.volume_pauta
+  size_progress:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.volume_andamento
+  status_lead_time:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.lead_time_status
+  promise_volume:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.vol_promessa
+  promise_per_month_volume:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.vol_promessa_mes
+  active_contracts:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.contratos_ativos
+  contacts_per_month:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.vol_contato_pos_mes
+  finalization_batch:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.lt_finalizacao
+  has_progress:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.existe_andamento
+  has_pauta:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.existe_pauta
+  is_dismissal:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.exoneracao
+  is_archived:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.arquivamento
+  has_analysis:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.em_analise
+  is_finished:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.finalizado
+  is_suspended:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.suspenso
+  has_broker_return:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.ag_retorno_imob
+  has_written_distribution:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.distrib_escrit
+  dt_reanalisys_allowed:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.apto_reanalise_data
+      'yyyy-MM-dd')
+  dt_suspended:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.suspenso_data
+  dt_status:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.data_status
+  dt_written_distribution:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.distrib_escrit_data
+      'yyyy-MM-dd')
+  dt_broker_return:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.ag_retorno_imob_data
+      'yyyy-MM-dd')
+  dt_analysis:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.em_analise_data
+  dt_dismissal:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.exoneracao_data
+  dt_finalized:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.finalizado_data
+  dt_negative_citation:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.citacao_neg_data
+  dt_paid:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.data_pagamento
+  dt_register:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.data_registrado
+  dt_distribution:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.distribuicao
+  ts_load:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.ts_load

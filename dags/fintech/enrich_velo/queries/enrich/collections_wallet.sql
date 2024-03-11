@@ -60,6 +60,7 @@ timeline AS (
 SELECT
     name,
     document,
+    MAX(id_propose) AS id_propose,
     MAX(mob_delinquency) AS mob,
     array_distinct(array_agg(type_description)) AS type_description_array,
     CASE
