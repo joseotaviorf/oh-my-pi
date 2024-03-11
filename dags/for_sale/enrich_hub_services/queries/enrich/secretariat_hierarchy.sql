@@ -29,11 +29,6 @@ hub_services_secretariat AS (
         u.name,
         u.email,
         bu.hub_name AS allocation,
-        CASE
-            WHEN bu.hub_name LIKE 'SEC Growth%' THEN 'Growth'
-            WHEN bu.hub_name LIKE 'HUB%' THEN 'HUB'
-            WHEN bu.hub_name LIKE 'CENTRAL%' THEN 'Central'
-        END AS segment,
         mp.profile AS member_profile,
         mp.is_active,
         mp.dt_relationship_started
@@ -58,11 +53,6 @@ legacy_secretariat AS (
         secretariat_name AS name,
         email,
         allocation,
-        CASE
-            WHEN allocation LIKE 'SEC Growth%' THEN 'Growth'
-            WHEN allocation LIKE 'HUB%' THEN 'HUB'
-            WHEN allocation LIKE 'CENTRAL%' THEN 'Central'
-        END AS segment,
         NULL::STRING AS member_profile,
         status = 'Ativo' AS is_active,
         dt_started AS dt_relationship_started
@@ -78,7 +68,15 @@ SELECT
     COALESCE(hss.name, ls.name) AS name,
     COALESCE(hss.email, ls.email) AS email,
     COALESCE(hss.allocation, ls.allocation) AS allocation,
-    COALESCE(hss.segment, ls.segment) AS segment,
+    CASE
+        WHEN COALESCE(hss.allocation, ls.allocation) LIKE '%HUB%' THEN 'HUB'
+        WHEN COALESCE(hss.allocation, ls.allocation) LIKE '%Growth%' THEN 'Growth'
+        WHEN COALESCE(hss.allocation, ls.allocation) LIKE '%3P%' THEN '3P'
+        WHEN COALESCE(hss.allocation, ls.allocation) LIKE '%CENTRAL%' THEN 'Central'
+        WHEN COALESCE(hss.allocation, ls.allocation) LIKE '%Lite%' THEN 'NBP'
+        WHEN COALESCE(hss.allocation, ls.allocation) LIKE '%BWA%' THEN 'BWA'
+        ELSE 'Other'
+    END AS segment,
     COALESCE(hss.member_profile, ls.member_profile) AS member_profile,
     COALESCE(hss.is_active, ls.is_active) AS is_active,
     COALESCE(hss.dt_relationship_started, ls.dt_relationship_started) AS dt_relationship_started

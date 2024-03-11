@@ -484,7 +484,14 @@ base_booking AS (
         (b.type = 'Vistoria') AS is_inspection,
         (b.type = 'Visita') AS is_visit,
         (b.type = 'SessaoFotos') AS is_photo_session,
-        COALESCE(b.visit_fup IN ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho'), FALSE) AS is_visit_completed,
+        COALESCE(
+            CASE
+                -- Bookings migrated from Casa Mineira don't have a visit_fup
+                WHEN vo.first_update_source = 'MigracaoCasaMineira' THEN (b.status = 'Realizado')
+                ELSE (b.visit_fup IN ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho'))
+            END,
+            FALSE
+        ) AS is_visit_completed,
         COALESCE(b.visit_fup IS NOT NULL AND vab.agent_absence_reason = 'Absent', FALSE) AS is_visit_performed,
         -- is a reschedule from another booking
         (b.id_rescheduled_booking IS NOT NULL) AS is_via_reschedule,
