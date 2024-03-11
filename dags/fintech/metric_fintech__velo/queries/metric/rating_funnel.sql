@@ -1,6 +1,6 @@
 WITH ES AS (
     SELECT
-        DATE_TRUNC('week',DATE(ts_evaluation_started)) AS dt_es,
+        DATE_TRUNC('day',DATE(ts_evaluation_started)) AS dt_es,
         r.rating,
         COUNT(ph.sk_propose) AS Total_es
     FROM
@@ -13,7 +13,7 @@ WITH ES AS (
 
 ), CA AS (
     SELECT
-        DATE_TRUNC('week',DATE(ts_sign_started)) AS dt_ca,
+        DATE_TRUNC('day',DATE(ts_sign_started)) AS dt_ca,
         r.rating,
         COUNT(ph.sk_propose) AS Total_ca
     FROM
@@ -25,7 +25,7 @@ WITH ES AS (
         1, 2
 ), CS AS (
     SELECT
-        DATE_TRUNC('week',dt_contract_started) AS dt_cs,
+        DATE_TRUNC('day',dt_contract_started) AS dt_cs,
         r.rating,
         COUNT(ph.sk_propose) AS Total_cs
     FROM
@@ -38,7 +38,7 @@ WITH ES AS (
 
 ), date_rating AS (
     SELECT DISTINCT
-        DATE_TRUNC('week', d.date) AS week,
+        d.date,
         es.rating AS rating
     FROM
         dw_public.dim_date AS d
@@ -46,7 +46,7 @@ WITH ES AS (
         ON d.date = es.dt_es
 )
 SELECT
-    dr.week,
+    dr.date,
     dr.rating,
     es.total_es,
     ca.total_ca,
@@ -55,17 +55,17 @@ FROM
     date_rating AS dr
 LEFT JOIN
     ES AS es
-        ON (dr.week = es.dt_es
+        ON (dr.date = es.dt_es
         AND dr.rating = es.rating)
 LEFT JOIN
     CA AS ca
-        ON (dr.week = ca.dt_ca
+        ON (dr.date = ca.dt_ca
         AND dr.rating = ca.rating)
 LEFT JOIN
     CS  AS cs
-        ON (dr.week = cs.dt_cs
+        ON (dr.date = cs.dt_cs
             AND dr.rating = cs.rating)
 WHERE
-    CAST(dr.week AS DATE) >= CAST('2022-08-01' AS DATE)
+    dr.date >= CAST('2022-08-01' AS DATE)
 ORDER BY
     1 DESC, 2
