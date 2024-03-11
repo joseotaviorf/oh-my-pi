@@ -10,6 +10,12 @@ dag:
 workflow:
   type: query
   layer: enrich
+  inner_dependencies:
+    consolidated_media_metrics:
+      - facebook_consolidated_metrics
+      - google_consolidated_metrics
+      - mitula_consolidated_metrics
+      - trovit_consolidated_metrics
   default_extraction_type: incremental
   default_partitions: [id_date]
   extra_query_template_params:
