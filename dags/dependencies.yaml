@@ -610,6 +610,8 @@ bietlejuice.dw_region:
 bietlejuice.dw_rent_demand_events:
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
 bietlejuice.dw_rent_demand_events_snapshot:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_proposal:load-dw-rent-dim-proposal

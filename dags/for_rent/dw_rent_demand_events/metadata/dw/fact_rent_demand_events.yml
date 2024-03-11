@@ -57,6 +57,10 @@ columns:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_rent_flow
     description: Id of the rent flow.
+  sk_rent_flow_type:
+    lineage:
+      - datalake_rent_flows.rent_flows_types.id_rent_flow_type
+    description: Id of the rent flow type. It joins with dw_rent.dim_rent_flow_type.
   sk_house_listing:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_house_listing
