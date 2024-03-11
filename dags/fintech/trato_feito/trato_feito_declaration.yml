@@ -1,0 +1,29 @@
+dag:
+  name: trato_feito
+  owner: Data Fintech
+  schedule_interval: 0 3 * * *
+  documentation:
+    dag_purpose: |
+      [Trato Feito](https://github.com/quintoandar/trato-feito) is a microservice that manages the negotiation flows between QuintoAndar and its debtors.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  custom_schema: trato_feito
+  dbutils_secret_key: TRATO_FEITO_DB
+  lineage_product_database_name: tratofeito
+  tables_customization:
+    accounting_installment: {}
+    bill: {}
+    client: {}
+    contract: {}
+    debt: {}
+    debtor: {}
+    eviction_data: {}
+    eviction: {}
+    evictions_report: {}
+    installment: {}
+    negotiation: {}
+    payment: {}
+cluster:
+  type: databricks_10_4_med_general_cluster

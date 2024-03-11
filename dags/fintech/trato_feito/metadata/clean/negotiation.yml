@@ -1,6 +1,9 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: negotiation
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: "Data about negotiations of debts"
 columns:
   id:
     lineage:
