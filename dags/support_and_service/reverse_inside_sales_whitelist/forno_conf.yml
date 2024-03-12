@@ -13,6 +13,9 @@ tables_to_send:
   phone_numbers:
     key_name: phoneNumber
     type: CUSTOMER_PHONE_NUMBER_WHITELIST
+  pp_multi_assistants:
+    key_name: phoneNumber
+    type: CUSTOMER_PHONE_NUMBER_WHITELIST
 
 custom_cluster:
   driver_node_type_id: r5dn.4xlarge

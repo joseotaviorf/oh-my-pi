@@ -4,6 +4,7 @@ from datetime import datetime
 from pendulum import timezone
 
 from airflow.models import DAG
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -96,4 +97,6 @@ for table in tables_to_send.keys():
     )
     load_tasks.append(send_data_task)
 
-create_cluster_task >> load_tasks >> terminate_cluster_task
+chain(*load_tasks)
+chain(create_cluster_task, load_tasks)
+chain(load_tasks, terminate_cluster_task)
