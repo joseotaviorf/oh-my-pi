@@ -34,6 +34,7 @@ In datalake RAW, via incremental load:
 - `feature`
 - `operation`
 - `sync_sap_job`
+- `webhook_log`
 
 
 
@@ -60,3 +61,4 @@ In datalake CLEAN, via incremental load:
 - `feature`
 - `operation`
 - `sync_sap_job`
+- `webhook_log`
