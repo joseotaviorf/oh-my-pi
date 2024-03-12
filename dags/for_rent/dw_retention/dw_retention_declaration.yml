@@ -1,0 +1,17 @@
+dag:
+  name: dw_retention
+  schedule_start_date: 2024,03,07
+  owner: Data ForRent
+  documentation: 
+      dag_purpose: |
+            This DAG loads to DW our Retention Data Model.
+            This DAG is triggered by Mediator and loads the tables via full load.
+workflow:
+  type: query
+  layer: dw
+  inner_dependencies:
+    fact_contract_termination:
+      - dim_termination
+      - dim_nps_answer  
+cluster:
+  type: databricks_10_4_med_general_cluster

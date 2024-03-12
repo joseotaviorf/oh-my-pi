@@ -1,0 +1,24 @@
+database_name: dw_retention
+table_name: fact_contract_termination
+description: Fact table containing information regarding contract termination. Each row corresponds to a unique contract termination process.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  sk_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.id
+    description: ID of the contract.
+  sk_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.id_termination
+    description: ID of the contract termination.
+  sk_nps_answer_owner:
+    lineage:
+      - dw_retention.dim_nps_answer.sk_nps_answer
+    description: ID of the landlord's NPS answer.
+  sk_nps_answer_tenant:
+    lineage:
+      - dw_retention.dim_nps_answer.sk_nps_answer
+    description: ID of the tenant's NPS answer.
+  ts_load:
+    description: Timestamp of when this data was loaded.

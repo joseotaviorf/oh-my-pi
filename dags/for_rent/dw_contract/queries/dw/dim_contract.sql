@@ -33,15 +33,19 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
   contract_b2b.b2b_type,
   contract_b2b.b2b_prime_type,
   contract_b2b.contract_plan,
+  c.value_segment,
   CAST(contract_b2b.administration_split_percentage AS DECIMAL(5, 3)) AS administration_split_percentage,
   CAST(contract_b2b.brokerage_split_percentage AS DECIMAL(5, 3)) AS brokerage_split_percentage,
   c.is_ongoing_contract,
   c.is_tenant_service_fee_opt_out,
   c.is_exit_inspection_opted_out,
+  ct.is_repair_tenant_duty,
+  ca.is_anomaly,
   c.dt_started AS dt_start,
   c.dt_entered AS dt_entrance,
   c.dt_contract_expected_end AS dt_intended_end,
   c.dt_termination AS dt_annulment,
+  ct.ts_created AS ts_termination_requested,
   c.ts_created,
   c.ts_updated,
   c.ts_expected_termination,
@@ -59,3 +63,10 @@ LEFT JOIN
 LEFT JOIN 
     datalake_b2b.house_listing b2b
       ON b2b.id_contract = c.id
+LEFT JOIN
+    datalake_offboarding.contract_termination AS ct
+      ON ct.id_contract = c.id
+        AND ct.status <> 'CANCELED'
+LEFT JOIN
+    datalake_offboarding.contract_anomaly AS ca
+      ON ca.id_contract = c.id

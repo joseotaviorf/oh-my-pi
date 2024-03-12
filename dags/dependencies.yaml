@@ -149,6 +149,8 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
+  - bietlejuice.enrich_offboarding:load-enrich-contract-anomaly
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
 bietlejuice.dw_contract_temp:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-dim-contract-person
@@ -690,6 +692,17 @@ bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
 bietlejuice.dw_reservation_temp:
   - bietlejuice.dw_reservation:load-dw-rent-dim-reservation
+bietlejuice.dw_retention:
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
+  - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_tracksale:load-enrich-answer
+  - bietlejuice.enrich_tracksale:load-enrich-campaign
+  - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
+  - bietlejuice.enrich_tracksale:load-enrich-dispatch
 bietlejuice.dw_revenue_lines:
   - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
   - bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment
@@ -843,6 +856,7 @@ bietlejuice.dw_user:
   - bietlejuice.enrich_big_agent:load-enrich-agent-current-program
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_country:load-enrich-user
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
   - bietlejuice.enrich_ebdb_user:load-enrich-user

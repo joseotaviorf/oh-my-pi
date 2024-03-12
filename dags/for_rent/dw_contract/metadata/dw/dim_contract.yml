@@ -250,6 +250,15 @@ columns:
     lineage:
     - datalake_ebdb_contract.contract_b2b.contract_plan
     description: Type of contract plan.
+  value_segment:
+    lineage:
+    - datalake_ebdb_contract.contract.value_segment
+    description: Rent categorization based on value.
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
   administration_split_percentage:
     lineage:
     - datalake_ebdb_contract.contract_b2b.administration_split_percentage
@@ -270,6 +279,14 @@ columns:
     lineage:
     - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
     description: Boolean indicating if the exit inspection is opted out.
+  is_repair_tenant_duty:
+    description: Boolean identifying whether repairs are due by the Tenant.
+    lineage:
+    - datalake_offboarding.contract_termination.is_repair_tenant_duty
+  is_anomaly:
+    lineage:
+    - datalake_offboarding.contract_anomaly.is_anomaly
+    description: Boolean indicating if this contract termination is an anomaly.
   dt_start:
     lineage:
     - datalake_ebdb_contract.contract.dt_started
@@ -287,6 +304,11 @@ columns:
     - datalake_ebdb_contract.contract.dt_termination
     description: Date of the annulment from the contract. The contract being annulled means that it ended
       after signature, which can be between the signatures and the contract's start or after the start.
+      At this point, the tenant already left the property.
+  ts_termination_requested:
+    lineage:
+    - datalake_offboarding.contract_termination.ts_created
+    description: Timestamp of when the termination was requested.
   ts_created:
     lineage:
     - datalake_ebdb_contract.contract.ts_created

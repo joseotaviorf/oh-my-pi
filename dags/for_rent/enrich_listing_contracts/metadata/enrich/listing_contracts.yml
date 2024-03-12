@@ -50,6 +50,15 @@ columns:
     lineage:
       - datalake_terminator_clean.termination.status
     description: The termination status, if the contract has any termination created.
+  days_ended_rental_to_relisting:
+    description: Number of days between the end of the rental contract for the listing.
+      and the relisting
+  days_relisting_to_re_rental:
+    description: Number of days between the relisting and a new rental contract for
+      the listing.
+  days_ended_rental_to_re_rented:
+    description: Number of days between the end of the rental contract and a new rental.
+      contract for the listing
   is_early_relisting:
     lineage:
       - datalake_ebdb_listing.house_listing.is_early_relisting

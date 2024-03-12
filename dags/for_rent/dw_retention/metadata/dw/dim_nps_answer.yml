@@ -1,0 +1,48 @@
+database_name: dw_retention
+table_name: dim_nps_answer
+description: Dimension table with NPS answers collected during the rental's offboarding process. Each row is a unique NPS answer to our offboarding survey.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  sk_nps_answer:
+    lineage:
+      - datalake_tracksale.answer.id
+      - datalake_casa_mineira_tracksale.answer.id
+    description: ID of the NPS answer.
+  score_category:
+    lineage:
+      - datalake_tracksale.answer.score_category
+      - datalake_casa_mineira_tracksale.answer.score_category
+    description: Category of the NPS score.
+    categories:
+      detractor: Score value beetween 0 and 6.
+      passive: Score value beetween 7 and 8.
+      promoter: Score value beetween 9 and 10.
+  customer_type:
+    lineage:
+      - datalake_tracksale.campaign.customer_type
+      - datalake_casa_mineira_tracksale.campaign.customer_type
+    description: Type of the customer responding this NPS survey.
+    categories:
+      PP: Owner.
+      IQ: Tenant.
+  score:
+    lineage:
+      - datalake_tracksale.answer.nps_answer
+      - datalake_casa_mineira_tracksale.answer.nps_answer
+    description: NPS score according with the responding customer.
+  ts_answered:
+    lineage:
+      - datalake_tracksale.answer.ts_answer_sent_local
+      - datalake_casa_mineira_tracksale.answer.ts_answer_sent_local
+    description: Timestamp of when this NPS survey was responded.
+  nps_campaign:
+    lineage:
+      - datalake_tracksale.campaign.metric_group
+      - datalake_casa_mineira_tracksale.campaign.metric_group
+    description: NPS campaign type.
+    categories:
+      iqoffboarding: NPS responded only by tentants going through the offboarding process.
+      ppoffboarding: NPS responded only by owners going through the offboarding process.
+  ts_load:
+    description: Timestamp of when this data was loaded.

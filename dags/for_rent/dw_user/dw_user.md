@@ -17,6 +17,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables, partitioned by `country_code`:
 
 - `dim_owner_category`
+- `dim_owner`
 - `dim_partner`
 - `dim_partner_agent`
 - `dim_user`
