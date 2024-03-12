@@ -65,6 +65,9 @@ columns:
   dt_confirmed:
     lineage:
       - datalake_velo_raw.fiancavelo_payment.confirmeddate
+  dt_credit:
+    lineage:
+      - datalake_velo_raw.fiancavelo_payment.creditDate
   ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_payment.dateinsert

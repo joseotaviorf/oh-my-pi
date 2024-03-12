@@ -20,6 +20,7 @@ SELECT
     datecreated AS dt_created,
     clientPaymentDate AS dt_client_payment,
     confirmedDate AS dt_confirmed,
+    creditDate AS dt_credit,
     dateinsert AS ts_inserted,
     dateupdate AS ts_updated
 FROM
