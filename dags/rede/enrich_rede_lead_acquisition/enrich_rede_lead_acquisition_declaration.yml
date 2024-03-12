@@ -1,0 +1,15 @@
+---
+dag:
+  name: enrich_rede_lead_acquisition
+  schedule_start_date: 2020, 8, 29
+  owner: Data Rede
+  documentation: 
+    dag_purpose: |
+      This DAG creates the enriched table that tells us the acquisition team of each lead,
+      which depends on when the company became a Rede member and when the lead was sent.
+      This DAG is triggered by Mediator and loads the table via full load.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_cluster

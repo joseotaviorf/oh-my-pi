@@ -1,0 +1,30 @@
+---
+dag:
+  name: enrich_rede_supply
+  schedule_start_date: 2021, 8, 24
+  owner: Data Rede
+  documentation: 
+    dag_purpose: |
+      Creates tables for the context `enrich_rede_supply`, enriching supply information from Rede QuintoAndar.
+      This DAG is triggered by Mediator.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    lead_3p_status_changes:
+      - simplified_lead_3p_status_changes
+    lead_3p_status:
+      - lead_3p_status_changes
+    lead_3p_reason_changes:
+      - lead_3p_status_changes
+    lead_3p_reasons:
+      - lead_3p_reason_changes
+  tables_customization:
+    simplified_lead_3p_status_changes:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+cluster:
+  type: databricks_10_4_med_memory_cluster
