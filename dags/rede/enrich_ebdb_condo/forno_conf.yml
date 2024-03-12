@@ -1,7 +1,0 @@
----
-dag_documentation:
-  dag_purpose: Enriches condo information from EBDB.
-tables:
-  condo_amenities:
-    is_incremental: false
-inner_dependencies: {}

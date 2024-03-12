@@ -1,0 +1,14 @@
+---
+dag:
+  name: enrich_ebdb_condo
+  schedule_start_date: 2021, 8, 24
+  owner: Data Rede
+  documentation: 
+    dag_purpose: |
+      Enriches condo information from EBDB.
+      This DAG is triggered by Mediator and loads the table via full load.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_cluster
