@@ -26,6 +26,7 @@ SELECT
     to_date(OriginalCoverageStartDate, 'yyyy-mm-dd') AS dt_original_coverage_start,
     to_timestamp(substr(replace(CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
     to_timestamp(substr(replace(LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
+    ts_load,
     year,
     month,
     day
