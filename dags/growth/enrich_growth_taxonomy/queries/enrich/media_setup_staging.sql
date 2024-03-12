@@ -4,7 +4,7 @@ WITH taxonomy_combinations AS (
     fs.value AS funnel_side,
     ci.value AS campaign_strategy_intent,
     ct.value AS campaign_business_context,
-    lp.value AS landing_page,
+    lp.value AS campaign_landing_page,
     bt.value AS behavior_type,
     m.value AS medium,
     src.value AS source
@@ -38,7 +38,7 @@ ad_hoc_rules AS (
     data.funnel_side,
     data.campaign_strategy_intent,
     data.campaign_business_context,
-    data.landing_page,
+    data.campaign_landing_page,
     data.behavior_type,
     data.medium,
     data.source
@@ -49,7 +49,7 @@ ad_hoc_rules AS (
       funnel_side,
       campaign_strategy_intent,
       campaign_business_context,
-      landing_page,
+      campaign_landing_page,
       behavior_type,
       medium,
       source)
@@ -61,15 +61,15 @@ naming_convention_prefixes AS (
     id_media_setup,
     LOWER(LEFT(campaign_strategy_intent,3)) AS prefix_campaign_strategy_intent,
     LOWER(COALESCE(LEFT(SPLIT(behavior_type, " ")[0],3) ||LEFT(SPLIT(behavior_type, " ")[1],3), LEFT(behavior_type, 3))) AS prefix_behavior_type,
-    LOWER(COALESCE(LEFT(SPLIT(landing_page, " ")[0],3) ||LEFT(SPLIT(landing_page, " ")[1],3), LEFT(landing_page, 3))) AS prefix_landing_page,
+    LOWER(COALESCE(LEFT(SPLIT(campaign_landing_page, " ")[0],3) ||LEFT(SPLIT(campaign_landing_page, " ")[1],3), LEFT(campaign_landing_page, 3))) AS prefix_campaign_landing_page,
     LOWER(LEFT(campaign_business_context,4)) AS prefix_campaign_business_context,
-    LOWER(COALESCE(LEFT(SPLIT(medium, " ")[0],3) ||LEFT(SPLIT(medium, " ")[1],3), LEFT(medium,3))) AS prefix_medium,
-    LOWER(COALESCE(LEFT(SPLIT(source, " ")[0],3) ||LEFT(SPLIT(source, " ")[1],3), LEFT(source,3))) AS prefix_source,
+    LOWER(LEFT(REPLACE(medium, ' ', ''), 20)) AS prefix_medium,
+    LOWER(LEFT(REPLACE(source, ' ', ''), 20)) AS prefix_source,
     LOWER(LEFT(funnel_side,1)) AS prefix_funnel_side,
     campaign_strategy_intent,
     behavior_type,
     campaign_business_context,
-    landing_page,
+    campaign_landing_page,
     medium,
     source,
     funnel_side
@@ -94,7 +94,7 @@ SELECT
       nc.prefix_campaign_business_context,
       nc.prefix_campaign_strategy_intent,
       nc.prefix_behavior_type,
-      nc.prefix_landing_page,
+      nc.prefix_campaign_landing_page,
       nc.prefix_funnel_side,
       nc.prefix_medium,
       nc.prefix_source
@@ -102,14 +102,14 @@ SELECT
   nc.campaign_business_context,
   nc.campaign_strategy_intent,
   nc.behavior_type,
-  nc.landing_page,
+  nc.campaign_landing_page,
   nc.funnel_side,
   nc.medium,
   nc.source,
   nc.prefix_campaign_business_context,
   nc.prefix_campaign_strategy_intent,
   nc.prefix_behavior_type,
-  nc.prefix_landing_page,
+  nc.prefix_campaign_landing_page,
   nc.prefix_funnel_side,
   nc.prefix_medium,
   nc.prefix_source,
@@ -123,7 +123,7 @@ LEFT JOIN
   datalake_growth_taxonomy.media_setup AS ms
     ON nc.campaign_business_context = ms.campaign_business_context
       AND nc.campaign_strategy_intent = ms.campaign_strategy_intent
-      AND nc.landing_page = ms.landing_page
+      AND nc.campaign_landing_page = ms.campaign_landing_page
       AND nc.behavior_type = ms.behavior_type
       AND nc.medium = ms.medium
       AND nc.source = ms.source
