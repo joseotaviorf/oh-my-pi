@@ -81,5 +81,5 @@ SELECT
     array_agg(dt_paid) AS dt_paid_array
 FROM
     timeline
-GROUP BY 1,2,13
-ORDER BY 13, 1
+GROUP BY 1,2,14
+ORDER BY 14, 1
