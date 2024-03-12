@@ -1,0 +1,61 @@
+---
+dag:
+  name: enrich_hubspot_crm
+  schedule_start_date: 2021, 8, 24
+  owner: Data Rede
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: hubspot
+  inner_dependencies:
+    company:
+      - company_contact
+      - company_history
+    company_contact:
+      - contact
+    company_status:
+      - company
+    contact:
+      - contact_history
+    contact_status:
+      - contact
+    deal:
+      - deal_history
+    deal_stage:
+      - deal
+      - stage
+    pipeline:
+      - pipeline_history
+    stage:
+      - stage_history
+    ticket:
+      - ticket_history
+    ticket_stage:
+      - ticket
+  tables_customization:
+    company_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    contact_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    deal_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    ticket_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+cluster:
+  type: databricks_10_4_med_memory_cluster

@@ -1,0 +1,69 @@
+---
+dag:
+  name: enrich_hubspot_management
+  schedule_start_date: 2021, 8, 24
+  owner: Data Rede
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: hubspot
+  inner_dependencies:
+    call:
+      - call_history
+    communication:
+      - communication_history
+    email:
+      - email_history
+    meeting:
+      - meeting_history
+    note:
+      - note_history
+    owner:
+      - owner_history
+    task:
+      - task_history
+  tables_customization:
+    call_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    communication_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    email_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    meeting_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    note_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    owner_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    task_history:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+cluster:
+  type: databricks_10_4_med_memory_cluster

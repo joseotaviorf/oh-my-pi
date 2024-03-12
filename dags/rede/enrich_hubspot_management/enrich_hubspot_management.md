@@ -1,8 +1,9 @@
-## Enrich Hubspot
+## Enrich Hubspot Management
 
 ### Purpose
 
 Creates enriched tables for `hubspot`.
+Due to limitation of Job Cluster, the enrich_hubspot was separated in two DAGs (enrich_hubspot_management and enrich_hubspot_crm).
 
 ​<details>
 
@@ -26,38 +27,21 @@ Produces the following output tables in `datalake_hubspot`:
 
 **Incrementally:**
 - `call_history`
-- `company_history`
 - `communication_history`
-- `contact_history`
-- `deal_history`
 - `email_history`
 - `meeting_history`
 - `note_history`
-- `task_history`
-- `ticket_history`
 - `owner_history`
+- `task_history`
 
 **Fully:**
-- `call_history`
-- `company`
-- `company_contact`
-- `company_status`
-- `communication_history`
-- `contact`
-- `contact_status`
-- `deal`
-- `deal_stage`
+- `call`
+- `communication`
 - `email`
 - `meeting`
 - `note`
-- `task`
-- `ticket`
-- `ticket_stage`
-- `pipeline`
-- `pipeline_history`
-- `stage`
-- `stage_history`
 - `owner`
+- `task`
 - `team`
 - `team_user`
 

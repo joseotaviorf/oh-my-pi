@@ -574,7 +574,7 @@ bietlejuice.dw_quinto_messenger:
 bietlejuice.dw_rede_company:
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.enrich_company:load-enrich-company
-  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_rede_company_lead:
   - bietlejuice.ebdb:load-clean-listing-business-context
@@ -582,7 +582,7 @@ bietlejuice.dw_rede_company_lead:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_company_event:load-enrich-company-event
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
@@ -592,7 +592,7 @@ bietlejuice.dw_rede_supply:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-file
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_company:load-enrich-company
-  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition
   - bietlejuice.enrich_rede_lead_crawler:load-enrich-lead-3p-freshness
@@ -1116,7 +1116,7 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
   - bietlejuice.company:load-clean-company
   - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
 bietlejuice.enrich_bureaus:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
@@ -1460,7 +1460,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
-  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
 bietlejuice.enrich_ebdb_photo_jobs:
   - bietlejuice.ebdb:load-clean-country
   - bietlejuice.ebdb:load-clean-house
@@ -1585,27 +1585,28 @@ bietlejuice.enrich_hub_services:
   - bietlejuice.hub_services:load-clean-responsible
   - bietlejuice.hub_services:load-clean-users
   - bietlejuice.hub_services:load-clean-visitor
-bietlejuice.enrich_hubspot:
+bietlejuice.enrich_hubspot_crm:
   - bietlejuice.company:load-clean-address
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-company-document
   - bietlejuice.company:load-clean-document
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb:load-clean-listing-business-context
-  - bietlejuice.hubspot:load-clean-call
-  - bietlejuice.hubspot:load-clean-communication
   - bietlejuice.hubspot:load-clean-company
   - bietlejuice.hubspot:load-clean-contact
   - bietlejuice.hubspot:load-clean-deal
   - bietlejuice.hubspot:load-clean-deal-pipeline
+  - bietlejuice.hubspot:load-clean-ticket
+  - bietlejuice.hubspot:load-clean-ticket-pipeline
+bietlejuice.enrich_hubspot_management:
+  - bietlejuice.hubspot:load-clean-call
+  - bietlejuice.hubspot:load-clean-communication
   - bietlejuice.hubspot:load-clean-email
   - bietlejuice.hubspot:load-clean-meeting
   - bietlejuice.hubspot:load-clean-note
   - bietlejuice.hubspot:load-clean-owner
   - bietlejuice.hubspot:load-clean-task
   - bietlejuice.hubspot:load-clean-team
-  - bietlejuice.hubspot:load-clean-ticket
-  - bietlejuice.hubspot:load-clean-ticket-pipeline
 bietlejuice.enrich_inspections:
   - bietlejuice.ebdb:load-clean-country
   - bietlejuice.ebdb:load-clean-house
@@ -2072,19 +2073,20 @@ bietlejuice.enrich_rede_company:
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-  - bietlejuice.enrich_hubspot:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
 bietlejuice.enrich_rede_company_event:
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-  - bietlejuice.enrich_hubspot:load-enrich-company-status
-  - bietlejuice.enrich_hubspot:load-enrich-deal
-  - bietlejuice.enrich_hubspot:load-enrich-deal-stage
-  - bietlejuice.enrich_hubspot:load-enrich-pipeline
-  - bietlejuice.enrich_hubspot:load-enrich-stage
-  - bietlejuice.enrich_hubspot:load-enrich-ticket
-  - bietlejuice.enrich_hubspot:load-enrich-ticket-stage
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company-status
+  - bietlejuice.enrich_hubspot_crm:load-enrich-deal
+  - bietlejuice.enrich_hubspot_crm:load-enrich-deal-stage
+  - bietlejuice.enrich_hubspot_crm:load-enrich-pipeline
+  - bietlejuice.enrich_hubspot_crm:load-enrich-stage
+  - bietlejuice.enrich_hubspot_crm:load-enrich-ticket
+  - bietlejuice.enrich_hubspot_crm:load-enrich-ticket-stage
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
 bietlejuice.enrich_rede_house_history:
   - bietlejuice.company:load-clean-company
@@ -2098,8 +2100,8 @@ bietlejuice.enrich_rede_house_history:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-  - bietlejuice.enrich_hubspot:load-enrich-company
-  - bietlejuice.enrich_hubspot:load-enrich-company-history
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company-history
 bietlejuice.enrich_rede_lead_acquisition:
   - bietlejuice.enrich_rede_company_event:load-enrich-company-event
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
