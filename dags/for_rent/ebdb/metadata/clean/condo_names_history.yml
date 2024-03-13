@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: condo_names_history
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.id
+  id_condo:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.condo_id
+  input_condo_name:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.inputCondoName
+  type_registrant:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.registrantType
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.condonameshistory.atualizadoEm
