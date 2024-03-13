@@ -9,9 +9,10 @@ dag:
 workflow:
   type: query
   layer: dw
+  custom_schema: retention
   inner_dependencies:
     fact_contract_termination:
       - dim_termination
-      - dim_nps_answer  
+      - dim_nps_answer
 cluster:
   type: databricks_10_4_med_general_cluster
