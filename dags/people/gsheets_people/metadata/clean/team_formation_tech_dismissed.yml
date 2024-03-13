@@ -1,0 +1,114 @@
+---
+database_name: datalake_gsheets_clean
+table_name: team_formation_tech_dismissed
+description: "" 
+domain: People
+owner: data-people@quintoandar.com.br
+columns:
+  name:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.nome
+    description: ""
+  email:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.email
+    description: ""
+  band:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.banda
+    description: ""
+  manager:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.gestor
+    description: ""
+  position:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.cargo
+    description: ""
+  department:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.departamento
+    description: ""
+  cost_center:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.centro_de_custo
+    description: ""
+  subdirectorate:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.sub_diretoria
+    description: ""
+  is_leader:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.fl_lider
+    description: ""
+  direct_headcount:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.hc_direto
+    description: ""
+  squad_1_primaria:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.squad_1_primaria
+    description: ""
+  squad_2:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.squad_2
+    description: ""
+  squad_3:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.squad_3
+    description: ""
+  squad_4:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.squad_4
+    description: ""
+  squad_5:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.squad_5
+    description: ""
+  squad_6:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.squad_6
+    description: ""
+  tribe_1_primary:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.tribo_time_1_primaria
+  tribe_2:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.tribo_time_2
+    description: ""
+  tribe_3:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.tribo_time_3
+    description: ""
+  tribe_4:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.tribo_time_4
+    description: ""
+  tribe_5:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.tribo_time_5
+    description: ""
+  tribe_6:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.tribo_time_6
+    description: ""
+  line_type:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.tipo_de_linha
+    description: ""
+  line:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.linha
+    description: ""
+  internal_job:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.internal_job
+    description: ""
+  position_equivalency:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.equivalencia_cargos
+    description: ""
+  squad_or_tribe_leader:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_dismissed.squad_or_tribe_leader
+    description: ""

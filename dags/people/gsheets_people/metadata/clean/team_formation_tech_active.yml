@@ -1,0 +1,183 @@
+---
+database_name: datalake_gsheets_clean
+table_name: team_formation_tech_active
+description: ""
+domain: People
+owner: data-people@quintoandar.com.br
+columns:
+  employees_name:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.employees_name
+    description: ""
+  email:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.email
+    description: ""
+  admission:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.admission
+    description: ""
+  manager:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.manager
+    description: ""
+  department:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.department
+    description: ""
+  cost_center:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.cost_center
+    description: ""
+  subdirectorate:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.subdirectorate
+    description: ""
+  is_leader:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.fl_lider
+    description: ""
+  direct_headcount:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.direct_headcount
+    description: ""
+  squad_1_primary:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_1_primary
+    description: ""
+  squad_2:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_2
+    description: ""
+  squad_3:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_3
+    description: ""
+  squad_4:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_4
+    description: ""
+  squad_5:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_5
+    description: ""
+  squad_6:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_6
+    description: ""
+  squad_7:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_7
+    description: ""
+  squad_8:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_8
+    description: ""
+  squad_9: 
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_9
+    description: ""
+  squad_10:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.squad_10
+    description: ""
+  tribe_1_primary:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_1_primary
+    description: ""
+  tribe_2:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_2
+    description: ""
+  tribe_3:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_3
+    description: ""
+  tribe_4:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_4
+    description: ""
+  tribe_5:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_5
+    description: ""
+  tribe_6:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_6
+    description: ""
+  tribe_7:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_7
+    description: ""
+  tribe_8:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_8
+    description: ""
+  tribe_9:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_9
+    description: ""
+  tribe_10:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_10
+    description: ""
+  line_type:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.line_type
+    description: ""
+  line:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.line
+    description: ""
+  internal_job:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.internal_job
+    description: ""
+  position_equivalency:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.equivalencia_cargos
+    description: ""
+  tribe_or_squad_leader:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.tribe_or_squad_leader
+    description: ""
+  api_squad_1_primary:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_1_primary
+    description: ""
+  api_squad_2:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_2
+    description: ""
+  api_squad_3:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_3
+    description: ""
+  api_squad_4:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_4
+    description: ""
+  api_squad_5:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_5
+    description: ""
+  api_squad_6:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_6
+    description: ""
+  api_squad_7:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_7
+    description: ""
+  api_squad_8:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_8
+    description: ""
+  api_squad_9:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_9
+    description: ""
+  api_squad_10:
+    lineage:
+      - datalake_gsheets_raw.team_formation_tech_active.api_squad_10
+    description: ""
