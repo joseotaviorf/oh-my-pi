@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     id AS id_user,
     locale_id AS id_locale,
     custom_role_id AS id_custom_role,
@@ -32,7 +32,7 @@ SELECT
     verified AS is_verified,
     two_factor_auth_enabled AS is_two_factor_auth_enabled,
     suspended AS is_suspended,
-    dt AS dt_extracted,
+    CAST(dt AS DATE) AS dt_extracted,
     last_login_at AS ts_last_login,
     created_at AS ts_created,
     updated_at AS ts_updated,

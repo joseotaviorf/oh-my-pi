@@ -1,9 +1,9 @@
-SELECT
+SELECT DISTINCT
     id AS id_group,
     url,
     name,
     deleted AS is_deleted,
-    dt AS dt_extracted,
+    CAST(dt AS DATE) AS dt_extracted,
     created_at AS ts_created,
     updated_at AS ts_updated,
     NOW() AS ts_load,

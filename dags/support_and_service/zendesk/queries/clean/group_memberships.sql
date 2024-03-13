@@ -1,10 +1,10 @@
-SELECT
+SELECT DISTINCT
     id AS id_group_membership,
     group_id AS id_group,
     user_id AS id_user,
     url,
     default AS is_default,
-    dt AS dt_extracted,
+    CAST(dt AS DATE) AS dt_extracted,
     created_at AS ts_created,
     updated_at AS ts_updated,
     NOW() AS ts_load,

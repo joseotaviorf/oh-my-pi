@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     id AS id_ticket_field,
     title,
     description,
@@ -18,7 +18,7 @@ SELECT
     required_in_portal AS is_required_in_portal,
     editable_in_portal AS is_editable_in_portal,
     title_in_portal AS is_title_in_portal,
-    dt AS dt_extracted,
+    CAST(dt AS DATE) AS dt_extracted,
     created_at AS ts_created,
     updated_at AS ts_updated,
     NOW() AS ts_load,

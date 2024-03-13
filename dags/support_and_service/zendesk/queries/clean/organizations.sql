@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
   id AS id_organization,
   group_id AS id_group,
   external_id AS id_external,
@@ -11,7 +11,7 @@ SELECT
   tags,
   details,
   notes,
-  dt AS dt_extracted,
+  CAST(dt AS DATE) AS dt_extracted,
   updated_at AS ts_updated,
   created_at AS ts_created,
   deleted_at AS ts_deleted,

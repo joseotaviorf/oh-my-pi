@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     id AS id_ticket,
     assignee_id AS id_assignee,
     brand_id AS id_brand,
@@ -22,13 +22,13 @@ SELECT
     allow_channelback,
     has_incidents,
     is_public,
-    dt AS dt_extracted,
+    CAST(dt AS DATE) AS dt_extracted,
     created_at AS ts_created,
     updated_at AS ts_updated,
     NOW() AS ts_load,
-    YEAR(CAST(dt AS DATE)) AS year,
-    MONTH(CAST(dt AS DATE)) AS month,
-    DAY(CAST(dt AS DATE)) AS day
+    YEAR(dt) AS year,
+    MONTH(dt) AS month,
+    DAY(dt) AS day
 FROM
     datalake_zendesk_raw.tickets
 WHERE

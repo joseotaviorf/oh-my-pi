@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
   id AS id_satisfaction_rating,
   ticket_id AS id_ticket,
   reason_id AS id_reason,
@@ -8,7 +8,7 @@ SELECT
   score,
   url
   reason,
-  dt AS dt_extracted,
+  CAST(dt AS DATE) AS dt_extracted,
   created_at AS ts_created,
   updated_at AS ts_updated,
   NOW() AS ts_load,
