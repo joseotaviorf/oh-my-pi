@@ -47,8 +47,8 @@ SELECT
             THEN TRUE
         ELSE FALSE
     END  AS is_leader,
-    make_date(split(dt_inicio, '/')[2], split(dt_inicio, '/')[0], split(dt_inicio, '/')[1]) AS dt_employee_admission,
-    make_date(split(dt_desligamento, '/')[2], split(dt_desligamento, '/')[0], split(dt_desligamento, '/')[1]) AS dt_employee_dismissal,
-    make_date(split(dt_nascimento, '/')[2], split(dt_nascimento, '/')[0], split(dt_nascimento, '/')[1]) AS dt_employee_birth,
+    to_date(dt_inicio) AS dt_employee_admission,
+    to_date(dt_desligamento) AS dt_employee_dismissal,
+    to_date(dt_desligamento) AS dt_employee_birth,
     ts_load AS ts_load
 FROM datalake_gsheets_raw.navent_convenia_like
