@@ -78,7 +78,8 @@ pp_multi_assistants AS (
 )
 SELECT
   REGEXP_REPLACE(phone_number, "\\s|-|\\(|\\)", "") AS phone_number,
-  COLLECT_SET(contract_user) AS users
+  COLLECT_SET(contract_user) AS users,
+  "pp_multi_assistants" AS whitelist_group
 FROM
   pp_multi_assistants
 WHERE

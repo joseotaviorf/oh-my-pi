@@ -47,7 +47,8 @@ SELECT DISTINCT
   COLLECT_SET(id_user_bic) AS users,
   MAX(is_tenant_post_contract) AS is_tenant_post_contract,
   MAX(is_landlord_post_contract) AS is_landlord_post_contract,
-  MAX(COALESCE(has_published_listings, FALSE)) AS has_published_listings
+  MAX(COALESCE(has_published_listings, FALSE)) AS has_published_listings,
+  "inside_sales" AS whitelist_group
 FROM
   base
 WHERE

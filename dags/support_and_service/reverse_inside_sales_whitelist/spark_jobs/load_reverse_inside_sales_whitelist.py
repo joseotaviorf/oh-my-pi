@@ -31,6 +31,7 @@ def create_data_payload(item):
         "is_tenant_post_contract": item.get("is_tenant_post_contract"),
         "is_landlord_post_contract": item.get("is_landlord_post_contract"),
         "has_published_listings": item.get("has_published_listings"),
+        "whitelist_group": item.get("whitelist_group"),
     }
 
     data["contextFields"] = context_fields
