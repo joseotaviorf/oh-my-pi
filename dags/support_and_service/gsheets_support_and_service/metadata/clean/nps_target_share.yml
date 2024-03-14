@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: nps_target_share
+columns:
+  support:
+    description: "Campaign group in full."
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.apoio
+  campaign_group:
+    description: "Name of campaign group."
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.campaign_group
+  customer_journey:
+    description: "Customer journey."
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.customer_journey
+  target:
+    description: "Target"
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.target
+  share:
+    description: "Represents the share that a given element holds within a larger set."
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.share
+  quarter:
+    description: "Quarter"
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.quarter
+  dt_start:
+    description: "Initial target and share effective date."
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.data_inicio
+  dt_end:
+    description: "End date of target and share."
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.data_fim
+  year:
+    description: "Year of target and share"
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.ano
+  macro_customer_journey:
+    description: "Macro customer journey."
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.macro_customer_journey
+  share_macro:
+    description: "Share Macro."
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.share_macro
+  share_nps_global:
+    description:  "Share nps global"
+    lineage:
+      - datalake_gsheets_raw.nps_target_share.share_nps_global

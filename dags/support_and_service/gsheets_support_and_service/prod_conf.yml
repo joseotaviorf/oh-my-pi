@@ -146,3 +146,9 @@ sheets_info:
     sheet_name: AE - Data Ingestion
     clean_table_name: tool_access_mapping
     sheet_context: support_and_service
+  
+  target_share_nps:
+    sheet_id: 1CeePKuTu8eDoXHjJsX0NAh8rhu-6tjjagTxOb_wJzdw
+    sheet_name: DB Target Share
+    clean_table_name: nps_target_share
+    sheet_context: support_and_service
