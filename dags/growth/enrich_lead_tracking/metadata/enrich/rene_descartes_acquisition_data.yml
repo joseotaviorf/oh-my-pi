@@ -1,5 +1,5 @@
-database_name: datalake_supply_flows_migrate
-table_name: rene_acquisition_data
+database_name: datalake_lead_tracking
+table_name: rene_descartes_acquisition_data
 domain: Growth
 owner: arthur.gonzaga@quintoandar.com.br
 description: This table contains acquisition data extracted from the René Descartes service that will be used to track our leads in the supply domain.

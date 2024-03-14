@@ -24,4 +24,4 @@ SELECT
 FROM datalake_rene_descartes_clean.house_lead AS hl
 LEFT JOIN datalake_rene_descartes_clean.acquisition_misc_data AS amd
     ON hl.id_acquisition = amd.id
-WHERE DATE(amd.ts_created) BETWEEN DATE_SUB(DATE('{load_start_date}'), {days_past}) AND DATE('{load_end_date}')
+WHERE DATE(amd.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

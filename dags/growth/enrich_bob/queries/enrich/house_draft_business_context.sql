@@ -3,7 +3,7 @@ WITH enriched_data AS (
         hda.id AS id_draft,
         sp.id_external AS id_house,
         COALESCE(h.id_region, l.id_region) AS id_region,
-        COALESCE(h.city, l.city) AS id_city,
+        COALESCE(h.city, l.city) AS city,
         r.id_main AS id_user_registrant,
         EXPLODE(
             ARRAY(

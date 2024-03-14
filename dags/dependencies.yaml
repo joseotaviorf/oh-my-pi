@@ -1713,6 +1713,8 @@ bietlejuice.enrich_lead:
 bietlejuice.enrich_lead_tracking:
   - bietlejuice.ebdb:load-clean-lead
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
+  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
+  - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_legaut:
   - bietlejuice.legaut:load-clean-crawlers-crawler
   - bietlejuice.legaut:load-clean-crawlers-crawlergroup
@@ -2515,8 +2517,17 @@ bietlejuice.enrich_ss_logic_model:
   - bietlejuice.enrich_user:load-enrich-persona-type
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_supply_acquisition:
-  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
-  - bietlejuice.rene_descartes:load-clean-house-lead
+  - bietlejuice.bob:load-clean-location
+  - bietlejuice.bob:load-clean-submission-progress
+  - bietlejuice.ebdb:load-clean-conversion-lead
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.ebdb:load-clean-listing-business-context
+  - bietlejuice.ebdb:load-clean-listing-business-context-aud
+  - bietlejuice.enrich_bob:load-enrich-house-draft-business-context
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
+  - bietlejuice.rene_descartes:load-clean-house-lead-conversion
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners

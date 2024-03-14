@@ -17,8 +17,8 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.id_region
       - datalake_bob_clean.location.id_region
-  id_city:
-    description: Identifier for the city.
+  city:
+    description: City of the house draft.
     lineage:
       - datalake_ebdb_clean.house.city
       - datalake_bob_clean.location.city

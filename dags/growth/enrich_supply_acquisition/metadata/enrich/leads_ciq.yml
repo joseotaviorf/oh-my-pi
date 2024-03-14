@@ -1,0 +1,71 @@
+database_name: datalake_supply_flows_migrate
+table_name: leads_ciq
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table contains information about leads extracted from the Bob service that will be used to track our leads in the CIQ source.
+columns:
+  sk_supply_lead:
+    description: The unique identifier for each lead in the supply tables. Its unique between CIQ, 3P and 1P tables.
+    lineage: 
+      - datalake_supply_flows.leads_sks.sks
+  id_lead:
+    description: The unique identifier for each draft in this dataset.
+    lineage: 
+      - datalake_bob.house_draft_business_context.id_draft
+  id_lead_ebdb:
+    description: The unique identifier for each draft in this dataset. Its not the same from EBDB.
+    lineage: 
+      - datalake_bob.house_draft_business_context.id_draft
+  id_region:
+    description: Identifier for the region.
+    lineage: 
+      - datalake_bob.house_draft_business_context.id_region
+  id_user_registrant:
+    description: Identifier for the user that register this house. Is the same key that id_user in Main/EBDB.
+    lineage: 
+      - datalake_bob.house_draft_business_context.id_user_registrant
+  supply_source:
+    description: The source of the lead, referring to the source where the lead originated in Supply funnel. Should be CIQ, 3P or 1P, but for this table is always CIQ.
+    lineage: 
+      - datalake_supply_flows.leads_sks.source
+  business_context:
+    description: The business context of the lead, referring to the business context where the lead originated.
+    lineage: 
+      - datalake_bob.house_draft_business_context.business_context
+    category: 
+      - SALE: The CIQ lead is for sale.
+      - RENT: The CIQ lead is for rent.
+  business_event:
+    description: The business event of the lead, referring which action was taken in the business context.
+  funnel_step:
+    description: The funnel step of the lead, referring to the step where the lead is in the funnel.
+  funnel_level:
+    description: The funnel level of the lead, referring to the level where the lead is in the funnel. In this table is always 1.
+  aux_product_status:
+    description: The status of the draft in Bob tables.
+    lineage: 
+      - datalake_bob.house_draft_business_context.status
+  city:
+    description: The city associated with the draft.
+    lineage: 
+      - datalake_bob.house_draft_business_context.city
+  ts_event:
+    description: Timestamp indicating the time of the event.
+    lineage:
+      - datalake_bob.house_draft_business_context.ts_created
+  ts_load:
+    description: Timestamp indicating last update time of register.
+    lineage: 
+      - datalake_bob.house_draft_business_context.ts_updated
+  year:
+    description: Column for partition table derived from the ts_created column.
+    lineage:
+      - datalake_bob.house_draft_business_context.ts_created
+  month:
+    description: Column for partition table derived from the ts_created column.
+    lineage:
+      - datalake_bob.house_draft_business_context.ts_created
+  day:
+    description: Column for partition table derived from the ts_created column.
+    lineage:
+      - datalake_bob.house_draft_business_context.ts_created

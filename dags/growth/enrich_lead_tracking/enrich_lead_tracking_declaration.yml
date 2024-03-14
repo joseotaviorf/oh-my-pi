@@ -1,0 +1,21 @@
+---
+dag:
+  name: enrich_lead_tracking
+  schedule_start_date: 2020, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for the lead tracking context.
+      This context is responsible for tracking the leads and prospects data.
+workflow:
+  type: query
+  layer: enrich
+  tables_customization:
+    rene_acquisition_data:
+      extraction_type: incremental
+      partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_10_4_med_general_photon_cluster

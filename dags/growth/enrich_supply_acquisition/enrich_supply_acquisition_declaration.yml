@@ -12,11 +12,33 @@ workflow:
   custom_schema: supply_flows_migrate
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
+  tables_customization:
+    conversion_lookup:
+      extraction_type: full
+    landing_3p:
+      extraction_type: full
+    acquisition_tracking:
+      extraction_type: full
+  inner_dependencies:
+    leads_3p:
+      - landing_3p
+    prospects_3p:
+      - leads_3p
+      - landing_3p
+    acquisition_tracking:
+      - leads_3p
+      - prospects_3p
+      - leads_ciq
+      - prospects_ciq
+      # TO-DO: Migrate after delta tables are available
+      # - leads_1p
+      # - prospects_1p
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:
-    load_start_date: "{{ yesterday_ds }}"
-    load_end_date: "{{ ds }}"
-    days_past: 7
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_10_4_min_io-memory_photon_cluster
+  custom_configurations:
+    spark_version: 12.2.x-scala2.12
