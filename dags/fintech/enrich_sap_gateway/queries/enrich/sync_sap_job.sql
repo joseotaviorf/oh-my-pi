@@ -1,7 +1,9 @@
 SELECT
     id_sync_sap_job,
     id_feature,
+    id_consolidated,
     `hash`,
+    idoc,
     response,
     `type`,
     `status`,
@@ -10,6 +12,8 @@ SELECT
     charge_back_of,
     error,
     retryable,
+    num_retry,
+    ts_updated_from_webhook,
     ts_synced,
     ts_created,
     ts_updated,

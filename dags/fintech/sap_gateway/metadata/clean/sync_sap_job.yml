@@ -8,9 +8,15 @@ columns:
   id_feature:
     lineage:
       - datalake_sap_gateway_raw.sync_sap_job.feature_id
+  id_consolidated:
+    lineage:
+      - datalake_sap_gateway_raw.sync_sap_job.consolidated_id
   hash:
     lineage:
       - datalake_sap_gateway_raw.sync_sap_job.hash
+  idoc:
+    lineage:
+      - datalake_sap_gateway_raw.sync_sap_job.idoc
   response:
     lineage:
       - datalake_sap_gateway_raw.sync_sap_job.response
@@ -35,6 +41,12 @@ columns:
   retryable:
     lineage:
       - datalake_sap_gateway_raw.sync_sap_job.retryable
+  num_retry:
+    lineage:
+      - datalake_sap_gateway_raw.sync_sap_job.num_retry
+  ts_updated_from_webhook:
+    lineage:
+      - datalake_sap_gateway_raw.sync_sap_job.updated_from_webhook_at
   ts_synced:
     lineage:
       - datalake_sap_gateway_raw.sync_sap_job.synced_at

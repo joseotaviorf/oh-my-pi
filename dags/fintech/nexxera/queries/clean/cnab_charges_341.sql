@@ -35,7 +35,7 @@ SELECT
     CAST(SUBSTRING(metadata, 279, 13)/100 AS DECIMAL(16,2)) as others_credit_amount,
     TO_DATE(SUBSTRING(metadata, 146, 6), 'ddMMyy') as dt_due,
     TO_DATE(SUBSTRING(metadata, 295, 6), 'ddMMyy') as dt_credit,
-    TO_DATE(SUBSTRING(metadata, 110, 6), 'ddMMyy') as dt_occurence_code,
+    TO_DATE(SUBSTRING(metadata, 110, 6), 'ddMMyy') as dt_occurrence_code,
     TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
     year,
     month,
