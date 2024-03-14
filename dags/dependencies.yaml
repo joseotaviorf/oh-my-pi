@@ -1081,6 +1081,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
+  - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.insider:load-clean-feature

@@ -288,6 +288,30 @@ booking_3p_demand_agent AS (
     WHERE
         is_3p_contract
 ),
+secretariat_on_visit_date AS (
+    SELECT
+        b.id,
+        bsc.id_external_responsible AS id_user_secretariat_on_visit_date
+    FROM
+        datalake_ebdb_clean.booking AS b
+    JOIN
+        datalake_hub_services.buyer_secretariat_changes AS bsc
+            ON b.id_visitor = bsc.id_external_lead
+            AND b.dt_booking BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, GREATEST(NOW(), b.dt_booking))
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY b.id ORDER BY bsc.ts_assigned DESC) = 1
+),
+last_secretariat as (
+    SELECT
+        b.id,
+        bsc.id_external_responsible AS id_user_last_secretariat
+    FROM
+        datalake_ebdb_clean.booking AS b
+    JOIN
+        datalake_hub_services.buyer_secretariat_changes AS bsc
+            ON b.id_visitor = bsc.id_external_lead
+            AND bsc.is_last_responsible 
+),
 base_booking AS (
     SELECT
         b.id,
@@ -302,6 +326,8 @@ base_booking AS (
         ua.id AS id_user_sale_agent,
         b.id_attendant,
         su.id_user_5a AS id_user_sale_attendence_5a,
+        sod.id_user_secretariat_on_visit_date,
+        ls.id_user_last_secretariat,
         b.id_rent_flow,
         IF(b.business_context = 'SALE',
           CONCAT(b.id_visitor, '_', b.id_house),
@@ -570,6 +596,12 @@ base_booking AS (
     LEFT JOIN
         datalake_ebdb_clean.visit_checkin AS v_cin
             ON v_cin.id_visit = b.id_visit
+    LEFT JOIN
+        secretariat_on_visit_date AS sod
+            ON sod.id = b.id
+    LEFT JOIN
+        last_secretariat AS ls
+            ON ls.id = b.id
 )
 -- custom columns that need pre-calculated ones
 SELECT
