@@ -358,6 +358,8 @@ bietlejuice.enrich_credit_analysis:
 bietlejuice.enrich_crm_tasks_flows:
   add:
     - bietlejuice.enrich_crm:load-enrich-tasks-actions
+  remove:
+    - bietlejuice.enrich_heimdall:load-enrich-activity
 bietlejuice.enrich_crm_tasks_history_flows:
   add:
     - bietlejuice.enrich_crm:load-enrich-tasks-actions
