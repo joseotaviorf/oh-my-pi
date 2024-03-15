@@ -15,6 +15,9 @@ workflow:
       - bridge_map_debt_negotiation
       - fact_negotiation
       - fact_negotiation_installment
+    fact_quintocred_portfolio_timeline:
+      - fact_negotiation_installment
+      - fact_negotiation
 cluster:
   type: databricks_10_4_min_general_cluster
   access_control_list:

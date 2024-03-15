@@ -120,11 +120,14 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
+  - bietlejuice.enrich_recupera:load-enrich-changes-debts-distribution
   - bietlejuice.enrich_recupera:load-enrich-collection
   - bietlejuice.enrich_recupera:load-enrich-installment
   - bietlejuice.enrich_recupera:load-enrich-negotiation
+  - bietlejuice.enrich_recupera:load-enrich-snapshot-daily-debts
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.enrich_velo:load-enrich-collections-wallet
   - bietlejuice.enrich_velo:load-enrich-junk
   - bietlejuice.enrich_velo:load-enrich-occurrence
   - bietlejuice.recupera:load-clean-complementary-records

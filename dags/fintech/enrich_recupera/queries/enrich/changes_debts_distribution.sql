@@ -14,8 +14,10 @@ base AS (
         WHEN COALESCE(advisory,distributor) IN ("DAT130","DAT3160","DAT61","DONBOARD","DACOINTE","DBOLPULA","DPREEVIC", "DACOVNQB") THEN "INTERNO"
         WHEN COALESCE(advisory,distributor) IN ("DLEGAL","DPCOB","DPCOBFR") THEN "INTERNO BLOQUEADO"
         WHEN COALESCE(advisory,distributor) IN ("DVAT130","DVAT3160","DVCOBINT", "DVESPBX") THEN "INTERNO VELO"
-        WHEN COALESCE(advisory,distributor) IN ("VIAFWS","QPASCHWS","VPASCHWS") THEN "PASCHOALOTTO"
+        WHEN COALESCE(advisory,distributor) IN ("V5PASCHW", "QPASCHWS","VPASCHWS") THEN "PASCHOALOTTO"
+        WHEN COALESCE(advisory,distributor) IN ("VIAFWS","V5IAFWS", 'QIAFWS') THEN "IAF"
         WHEN COALESCE(advisory,distributor) IN ("DESPBXQT","DACOBLGQ","DCBINTQT") THEN "QUITEI BLOQUEADO"
+        WHEN COALESCE(advisory,distributor) IN ("QWHELPWS","WEBHELP") THEN "WEBHELP"
         ELSE COALESCE(advisory,distributor)
     END AS partner,
     ts_snapshot
