@@ -7,7 +7,7 @@ WITH distributions_timeline AS (
             datalake_recupera.snapshot_daily_debts
         WHERE
             id_creditor IN (3,5)
-        GROUP BY ALL
+        GROUP BY id_customer, id_contract
     )
     SELECT
         c.document,
