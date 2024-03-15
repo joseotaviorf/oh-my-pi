@@ -62,7 +62,7 @@ collection_recovery_team AS (
 WHERE
     FNI.dt_paid >= "2023-08-01"
     AND FN.creditor = 'IQ QuintoCred'
-GROUP BY ALL
+GROUP BY dt_month_paid, document, team
 HAVING
     team <> "TIME NAO LOCALIZADO"
 QUALIFY
