@@ -460,7 +460,7 @@ bietlejuice.dw_date:
 bietlejuice.dw_debt_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
-bietlejuice.dw_demand_taxonomy:
+bietlejuice.dw_demand:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
   - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results
