@@ -200,6 +200,10 @@ tables:
     extraction_type: full
   - table_name: fiancavelo_realestatehistory
     extraction_type: full
+  - table_name: customer_propose
+    extraction_type: full
+  - table_name: quintoandar_integration
+    extraction_type: full
 
 partition_columns: [year, month, day]
 lineage_product_database_name: velo

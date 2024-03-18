@@ -1,0 +1,21 @@
+---
+database_name: datalake_velo_clean
+table_name: customer_propose
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_velo_raw.customer_propose.id
+  id_customer:
+    lineage:
+    - datalake_velo_raw.customer_propose.customer
+  id_propose:
+    lineage:
+    - datalake_velo_raw.customer_propose.propose
+  ts_inserted:
+    lineage:
+    - datalake_velo_raw.customer_propose.dateinsert
+  ts_updated:
+    lineage:
+    - datalake_velo_raw.customer_propose.dateupdate

@@ -1,0 +1,27 @@
+---
+database_name: datalake_velo_clean
+table_name: quintoandar_integration
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_velo_raw.quintoandar_integration.id
+  url:
+    lineage:
+    - datalake_velo_raw.quintoandar_integration.url
+  method:
+    lineage:
+    - datalake_velo_raw.quintoandar_integration.method
+  request:
+    lineage:
+    - datalake_velo_raw.quintoandar_integration.request
+  response:
+    lineage:
+    - datalake_velo_raw.quintoandar_integration.response
+  response_status:
+    lineage:
+    - datalake_velo_raw.quintoandar_integration.response_status
+  ts_inserted:
+    lineage:
+    - datalake_velo_raw.quintoandar_integration.dateinsert
