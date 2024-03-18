@@ -7,6 +7,9 @@ from bietlejuice.base.airflow.task_creators.dummy_job_cluster_finished_task_crea
 from bietlejuice.base.airflow.task_creators.execute_job_cluster_task_creator import (
     ExecuteJobClusterTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.generate_postgres_table_metrics_task_creator import (
+    GeneratePostgresTableMetricsTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.load_cdc_clean_task_creator import (
     LoadCDCCleanTaskCreator,
 )
@@ -51,6 +54,7 @@ class TaskCreatorFactory:
         TaskEnum.DATA_QUALITY_TESTS: DataQualityTestsTaskCreator,
         TaskEnum.DUMMY_JOB_CLUSTER_FINISHED: DummyJobClusterFinishedTaskCreator,
         TaskEnum.EXECUTE_JOB_CLUSTER: ExecuteJobClusterTaskCreator,
+        TaskEnum.GENERATE_POSTGRES_TABLE_METRICS: GeneratePostgresTableMetricsTaskCreator,
         TaskEnum.LOAD_CDC_CLEAN: LoadCDCCleanTaskCreator,
         TaskEnum.LOAD_CDC_RAW: LoadCDCRawTaskCreator,
         TaskEnum.LOAD_CDC_TRANSACTIONAL: LoadCDCTransactionalTaskCreator,
