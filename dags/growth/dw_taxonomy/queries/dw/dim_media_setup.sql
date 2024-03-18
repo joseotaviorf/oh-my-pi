@@ -1,0 +1,20 @@
+SELECT 
+    id_media_setup AS sk_media_setup,
+    naming_convention_sufix,
+    campaign_business_context,
+    campaign_strategy_intent,
+    behavior_type,
+    campaign_landing_page,
+    medium,
+    source,
+    prefix_campaign_business_context,
+    prefix_campaign_strategy_intent,
+    prefix_behavior_type,
+    prefix_campaign_landing_page,
+    prefix_funnel_side,
+    prefix_medium,
+    prefix_source,
+    funnel_side,
+    ts_combination_created,
+    ts_load
+FROM datalake_growth_taxonomy.media_setup
