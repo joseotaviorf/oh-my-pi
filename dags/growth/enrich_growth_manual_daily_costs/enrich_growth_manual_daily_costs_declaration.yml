@@ -1,0 +1,17 @@
+---
+dag:
+  name: enrich_growth_manual_daily_costs
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation: 
+    dag_purpose: |
+      This DAG generates the manual costs (i.e. gathered from gsheets tables) and saves its part in the final Fact Marketing Daily Costs aside Enrich Marketing Automatic Daily Costs. 
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: growth_costs
+  default_partitions:
+  - id_date
+  - flow_type
+cluster:
+  type: databricks_10_4_min_general_photon_cluster

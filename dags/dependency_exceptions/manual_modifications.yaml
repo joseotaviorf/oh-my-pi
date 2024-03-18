@@ -325,26 +325,6 @@ bietlejuice.enrich_consolidated_marketing_metrics:
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a033a
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a034a
     - bietlejuice.enrich_region:load-enrich-region
-bietlejuice.enrich_consolidated_growth_metrics:
-  remove:
-    - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
-    - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes
-    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a028a
-    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a033a
-    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a034a
-    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
-    - bietlejuice.enrich_region:load-enrich-region
-    - bietlejuice.facebook_insights:load-clean-facebook-insights
-    - bietlejuice.google_ads:load-clean-ads-performance
-    - bietlejuice.google_ads:load-clean-campaigns-performance
-    - bietlejuice.google_ads:load-clean-keywords-performance
-    - bietlejuice.google_ads:load-clean-videos-performance
-    - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
-    - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
-    - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
-    - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
-    - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary
-    - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
 bietlejuice.enrich_content_funnel:
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
@@ -400,6 +380,14 @@ bietlejuice.enrich_ebdb_photo_jobs:
 bietlejuice.enrich_ebdb_user:
   add:
     - bietlejuice.ebdb:load-clean-user-merge
+bietlejuice.enrich_growth_automatic_daily_costs:
+  override: []
+bietlejuice.enrich_growth_manual_daily_costs:
+  override: []
+bietlejuice.enrich_growth_costs_sharing_rules:
+  override: []
+bietlejuice.enrich_consolidated_growth_metrics:
+  override: []  
 bietlejuice.enrich_growth_taxonomy:
   remove:
     - bietlejuice.ebdb:load-clean-visit-origin
@@ -460,10 +448,6 @@ bietlejuice.enrich_lost_listings:
 bietlejuice.enrich_losses_daily:
   remove:
     - bietlejuice.enrich_losses:load-enrich-provision-factor
-bietlejuice.enrich_growth_costs_sharing_rules:
-  override: []
-bietlejuice.enrich_growth_automatic_daily_costs:
-  override: []
 bietlejuice.enrich_marketing_automatic_daily_costs:
   remove:
     - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-braze-consolidated-metrics
