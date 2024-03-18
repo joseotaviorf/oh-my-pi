@@ -111,7 +111,7 @@ columns:
   dt_credit:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
-  dt_occurence_code:
+  dt_occurrence_code:
     lineage:
       - datalake_nexxera_raw.cnab_charges.metadata
   ts_ingested:
