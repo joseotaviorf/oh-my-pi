@@ -25,6 +25,7 @@ SELECT
     in.purpose,
     in.closing_mode,
     in.reason,
+    c.country_code,
     in.due_amount,
     in.paid_amount,
     in.accrual_year_month,

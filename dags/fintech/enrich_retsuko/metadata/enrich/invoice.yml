@@ -117,6 +117,10 @@ columns:
       non-specified: "reason not specified"
     lineage:
       - datalake_retsuko_clean.invoice.reason
+  country_code:
+    description: "Country Code: BR or MX"
+    lineage:
+      - datalake_retsuko_clean.contract.country_code
   due_amount:
     description: "Invoice amount, negative means its a due value TO 5A, and positive means its a due value FROM 5A"
     lineage:
