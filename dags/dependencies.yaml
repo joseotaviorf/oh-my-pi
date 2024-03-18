@@ -1325,6 +1325,7 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
@@ -1566,6 +1567,7 @@ bietlejuice.enrich_greenseer:
   - bietlejuice.journey_flow:load-clean-journey-flow
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_growth_taxonomy:
+  - bietlejuice.gsheets_growth:done-clean-dict-taxonomy-supply
   - bietlejuice.gsheets_growth:done-clean-taxonomy-levels-values
 bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_fintech:done-clean-fdic-acquisition-2023

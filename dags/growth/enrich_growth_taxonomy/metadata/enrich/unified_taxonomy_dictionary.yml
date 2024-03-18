@@ -1,0 +1,76 @@
+---
+database_name: datalake_growth_taxonomy
+table_name: unified_taxonomy_dictionary
+owner: arthur.gonzaga@quintoandar.com.br
+domain: growth
+description: This dictionary contains the relation between taxonomy levels and the extracted data from Supply and Demand events.
+  It is used to enrich the taxonomy data with the UTM medium, source and campaign to connect with a new naming convention.
+  Here, the unified taxonomy union Supply and Demand taxonomies and demand dictionary is taken as the primary source as it contains more classifications. 
+columns: 
+  sk_media_setup:
+    description: 'Unique id for the combination of (campaign_strategy_intent & campaign_business_context & campaign_landing_page & behavior_type & medium & source). Used as input in the campaigns UTM parameters.'
+    lineage:
+      - atalake_growth_taxonomy.media_setup.id_media_setup
+  utm_campaign:
+    description: The extracted field from raw utm_campaign in the UTM parameters.
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.campaign
+  utm_medium:
+    description: The extracted field from raw utm_medium in the UTM parameters.
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.medium
+  utm_source:
+    description: The extracted field from raw utm_source in the UTM parameters.
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.source
+  campaign_strategy_intent:
+    description: 'Intention of the actions/campaigns adopted in relation to the growth strategy.'
+    categories: 
+      Brand Awareness: 'One of these objectives is to get people to know QuintoAndar and consider the company as an option at some point: Reach people, drive traffic to the website regardless of the page or generate brand recognition.'
+      Acquisition: 'It aims to bring people to QuintoAndar who are already in the consideration phase'
+      Activation: 'Its objective is to make people perform their 1st flow at QuintoAndar.'
+      Engagement: 'Its objective is to keep people engaged through flows on QuintoAndar.'
+      Recovery: 'Its objective is to make people who have become churned users carry out new flows.'
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.audience
+  behavior_type:
+    description: 'Type of user behavior in relation to their search decision and entry into the QuintoAndar environment.'
+    categories: 
+      Organic: 'Conversions in which the decision to search for and enter the QuintoAndar environment was made by the user.'
+      Non Organic: 'Conversions in which entry into the QuintoAndar environment was forced by QuintoAndar.'    
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.payment_type
+  medium:
+    description: 'QuintoAndar external medium responsible for generating the result. '
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.mkt_medium
+  source:
+    description: 'QuintoAndar external platform/operation responsible for generating the result.'
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.mkt_source
+  campaign_business_context:
+    description: 'Intention of the actions/campaigns adopted in relation to the business context.'
+    categories: 
+      rent: 'Campaign/Action aims to generate results in Rent'
+      sale: 'Campaign/Action aims to generate results in Sale'   
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.campaign_context
+  campaign_landing_page:
+    description: 'Landing page/domain of QuintoAndar to which the campaign directs.'
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.landing_page
+  owner:
+    description: The main stakeholder which is responsible for the campaign.
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.owner
+  funnel_side:
+    description: 'Side of the funnel to which that campaign was directed.'
+    categories:
+      demand: 'Campaign made to bring potential buyers or tenants to our platform.'
+      supply: 'Campaign made to bring potential house owners to our platform.'
+      affiliates: 'Campaign made to bring affiliates to our platform.'
+      branding: 'Campaign created by the Branding team.'
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.funnel_side
+  dict_source:
+    description: 'Source of the dictionary. It can be either supply or demand.'
