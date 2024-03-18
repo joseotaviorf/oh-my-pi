@@ -315,6 +315,8 @@ tables:
     has_raw: False
   - table_name: financial_extracts_050e
     has_raw: False
+  - table_name: cnab_charges_341
+    has_raw: False
   - table_name: cnab_payments_237_seg_a
     has_raw: False
   - table_name: cnab_payments_341_seg_a
@@ -336,6 +338,8 @@ inner_dependencies:
     - inadvance
     - sales
     - transaction
+  cnab_charges_341:
+    - cnab_charges
   cnab_payments_237_seg_a:
     - cnab_payments
   cnab_payments_341_seg_a:
