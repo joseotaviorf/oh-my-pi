@@ -5,6 +5,7 @@ WITH visit_before_offer AS (
             COALESCE(g.id, vo.id_offer) AS id_offer,
             bs.id AS id_booking,
             bs.id_agent,
+            bs.id_user_sale_attendence_5a AS id_user_secretariat_booking_creator,
             du.id AS id_user_agent,
             bs.id_company_demand,
             du.name AS agent_name,
@@ -50,6 +51,7 @@ booking_before_offer AS (
             COALESCE(vo.id_offer, g.id) AS id_offer,
             bs.id AS id_booking,
             bs.id_agent,
+            bs.id_user_sale_attendence_5a AS id_user_secretariat_booking_creator,
             du.id AS id_user_agent,
             bs.id_company_demand,
             du.name AS agent_name,
@@ -94,6 +96,10 @@ relation_booking_offer AS (
         COALESCE(vo.id_offer, bo.id_offer) AS id_offer,
         COALESCE(vo.id_booking, bo.id_booking) AS id_booking,
         COALESCE(vo.id_agent, bo.id_agent) AS id_agent,
+        CASE 
+            WHEN vo.id_booking IS NOT NULL THEN vo.id_user_secretariat_booking_creator
+            ELSE bo.id_user_secretariat_booking_creator
+        END AS id_user_secretariat_booking_creator,
         COALESCE(vo.id_user_agent, bo.id_user_agent) AS id_user_agent,
         CASE
             WHEN vo.is_3p_demand IS NOT NULL THEN vo.id_company_demand
@@ -245,6 +251,7 @@ data_sources AS (
         rbo.id_user_agent AS rbo_id_user_agent,
         rbo.id_booking,
         rbo.id_company_demand,
+        rbo.id_user_secretariat_booking_creator,
         UPPER(rbo.agent_name) AS rbo_agent_name,
         rbo.partner_3p_demand,
         COALESCE(rbo.is_3p_demand, FALSE) AS is_3p_demand,
@@ -565,6 +572,7 @@ business_rules AS (
                 ds.wc_id_agent
         END AS id_agent,
         ds.id_booking,
+        ds.id_user_secretariat_booking_creator,
         ds.id_vendas,
         ds.id_pendency,
         ds.vo_id_user_team_lead AS id_user_team_lead,
@@ -861,9 +869,86 @@ business_rules AS (
     LEFT JOIN
         datalake_ebdb_listing.house AS h
             ON h.id = COALESCE(ds.id_house,ds.ohc_id_house)
+),
+-- SECRETARIATS
+secretariat_on_offer_submitted_date AS (
+    SELECT
+        b.id_offer,
+        bsc.id_external_responsible AS id_user_secretariat_on_offer_submitted_date
+    FROM
+        business_rules AS b
+    JOIN
+        datalake_hub_services.buyer_secretariat_changes AS bsc
+            ON b.id_buyer = bsc.id_external_lead
+            AND b.ts_offer_submitted BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+),
+secretariat_on_offer_accepted_date AS (
+    SELECT
+        b.id_offer,
+        bsc.id_external_responsible AS id_user_secretariat_on_offer_accepted_date
+    FROM
+        business_rules AS b
+    JOIN
+        datalake_hub_services.buyer_secretariat_changes AS bsc
+            ON b.id_buyer = bsc.id_external_lead
+            AND b.dt_offer_accepted BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+),
+secretariat_on_offer_dismissed_date AS (
+    SELECT
+        b.id_offer,
+        bsc.id_external_responsible AS id_user_secretariat_on_offer_dismissed_date
+    FROM
+        business_rules AS b
+    JOIN
+        datalake_hub_services.buyer_secretariat_changes AS bsc
+            ON b.id_buyer = bsc.id_external_lead
+            AND b.dt_offer_dismissed BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+),
+secretariat_on_sale_agreement_created_date AS (
+    SELECT
+        b.id_offer,
+        bsc.id_external_responsible AS id_user_secretariat_on_sale_agreement_created_date
+    FROM
+        business_rules AS b
+    JOIN
+        datalake_hub_services.buyer_secretariat_changes AS bsc
+            ON b.id_buyer = bsc.id_external_lead
+            AND b.dt_sale_agreement_created BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+),
+secretariat_on_sale_agreement_signed_date AS (
+    SELECT
+        b.id_offer,
+        bsc.id_external_responsible AS id_user_secretariat_on_sale_agreement_signed_date
+    FROM
+        business_rules AS b
+    JOIN
+        datalake_hub_services.buyer_secretariat_changes AS bsc
+            ON b.id_buyer = bsc.id_external_lead
+            AND b.dt_sale_agreement_signed BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+),
+last_secretariat as (
+    SELECT
+        b.id_offer,
+        bsc.id_external_responsible AS id_user_last_secretariat
+    FROM
+        business_rules AS b
+    JOIN
+        datalake_hub_services.buyer_secretariat_changes AS bsc
+            ON b.id_buyer = bsc.id_external_lead
+            AND bsc.is_last_responsible 
 )
 SELECT
-    id_offer,
+    br.id_offer,
     id_sale_flow,
     id_buyer,
     id_house,
@@ -875,6 +960,13 @@ SELECT
     CAST(id_user_consultant AS BIGINT) AS id_user_consultant,
     CAST(id_user_agent AS BIGINT) AS id_user_agent,
     id_consultant,
+    id_user_secretariat_booking_creator,
+    id_user_secretariat_on_offer_submitted_date,
+    id_user_secretariat_on_offer_accepted_date,
+    id_user_secretariat_on_offer_dismissed_date,
+    id_user_secretariat_on_sale_agreement_created_date,
+    id_user_secretariat_on_sale_agreement_signed_date,
+    id_user_last_secretariat,
     id_booking,
     id_closing_specialist,
     id_vendas,
@@ -1020,6 +1112,24 @@ SELECT
     ts_updated
 FROM
     business_rules AS br
+LEFT JOIN
+    secretariat_on_offer_submitted_date AS sosd
+        ON sosd.id_offer = br.id_offer
+LEFT JOIN
+    secretariat_on_offer_accepted_date AS soad
+        ON soad.id_offer = br.id_offer
+LEFT JOIN
+    secretariat_on_offer_dismissed_date AS sodd
+        ON sodd.id_offer = br.id_offer
+LEFT JOIN
+    secretariat_on_sale_agreement_created_date AS socd
+        ON socd.id_offer = br.id_offer
+LEFT JOIN
+    secretariat_on_sale_agreement_signed_date AS sosa
+        ON sosa.id_offer = br.id_offer
+LEFT JOIN
+    last_secretariat AS ls
+        ON ls.id_offer = br.id_offer
 LEFT JOIN
     datalake_rede_company.company_sks AS cs_demand
         ON (br.id_company_demand IS NOT NULL

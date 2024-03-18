@@ -64,6 +64,34 @@ columns:
       - datalake_firestore.monday.id_consultant
       - datalake_sale_offer_flows.sale_offer_flows.id_consultant
     description: Deal Maker user ID on SalesFlow tables
+  id_user_secretariat_booking_creator:
+    lineage:
+      - datalake_booking.booking.id_user_sale_attendence_5a
+    description: Id of the secretariat user that created the booking
+  id_user_secretariat_on_offer_submitted_date:
+    lineage:
+      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+    description: Id of the secretariat user associated with the buyer when the offer was submitted
+  id_user_secretariat_on_offer_accepted_date:
+    lineage:
+      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+    description: Id of the secretariat user associated with the buyer when the offer was accepted
+  id_user_secretariat_on_offer_dismissed_date:
+    lineage:
+      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+    description: Id of the secretariat user associated with the buyer when the offer was dismissed
+  id_user_secretariat_on_sale_agreement_created_date:
+    lineage:
+      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+    description: Id of the secretariat user associated with the buyer when the sale agreement was created
+  id_user_secretariat_on_sale_agreement_signed_date:
+    lineage:
+      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+    description: Id of the secretariat user associated with the buyer when the sale agreement was signed
+  id_user_last_secretariat:
+    lineage:
+      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+    description: Id of the last secretariat user associated with the buyer
   id_booking:
     lineage:
       - datalake_booking.booking.id
