@@ -13,7 +13,7 @@ SELECT
     COALESCE(msp.campaign_business_context, 'Not Mapped') AS campaign_business_context,
     COALESCE(msp.campaign_strategy_intent, 'Not Mapped') AS campaign_strategy_intent,
     COALESCE(msp.behavior_type, 'Not Mapped') AS behavior_type,
-    COALESCE(msp.landing_page, 'Not Mapped') AS landing_page,
+    COALESCE(msp.campaign_landing_page, 'Not Mapped') AS campaign_landing_page,
     COALESCE(msp.medium, 'Not Mapped') AS medium,
     COALESCE(msp.source, 'Not Mapped') AS source,
     COALESCE(msp.funnel_side, 'Not Mapped') AS funnel_side,

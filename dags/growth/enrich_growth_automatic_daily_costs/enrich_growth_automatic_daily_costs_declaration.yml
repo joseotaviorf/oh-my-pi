@@ -1,0 +1,26 @@
+---
+dag:
+  name: enrich_growth_automatic_daily_costs
+  schedule_start_date: 2021, 1, 17
+  owner: Data Growth
+  documentation: 
+    dag_purpose: |
+      This DAG generates the automatic costs (i.e. gathered from medias API/Crawlers) combined with the taxonomy tables.
+workflow:
+  type: query
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+  - id_date
+  - flow_type
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
