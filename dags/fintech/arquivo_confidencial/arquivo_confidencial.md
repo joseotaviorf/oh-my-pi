@@ -15,9 +15,9 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 
 In datalake raw and clean, via full load:
-- `integration_report_aud`
 - `presumed_income_report`
 - `presumed_income_report_aud`
+- `truora_check_process_aud`
 
 In datalake raw and clean, via incremental load:
 - `documentation_report`
@@ -26,7 +26,9 @@ In datalake raw and clean, via incremental load:
 - `emailage_result`
 - `emailage_result_aud`
 - `integration_report`
+- `integration_report_aud`
 - `rev_info`
+- `truora_check_process`
 - `unico_check_document`
 - `unico_check_document_aud`
 - `unico_check_process`
