@@ -1,0 +1,30 @@
+dag:
+  name: taskmaster
+  schedule_start_date: 2022, 7, 27
+  schedule_interval: 0 3 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: This DAG imports the tables from [Taskmaster](https://github.com/quintoandar/taskmaster)
+    
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: taskmaster
+  load_options:
+    max_records_per_file: 250000
+  dbutils_secret_key: TASKMASTER_DB
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    task:
+      date_filter_column: updated_at
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_conf:
+      spark.sql.session.timeZone: "America/Sao_Paulo"
