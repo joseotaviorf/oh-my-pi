@@ -3,7 +3,7 @@ when:
 
 steps:
   check-style-python:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
@@ -11,7 +11,7 @@ steps:
       - make check-style
 
   files-validation-python:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
