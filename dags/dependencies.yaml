@@ -2936,6 +2936,10 @@ bietlejuice.metric_rent__listings:
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
+bietlejuice.metric_rent__retention:
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_retention:load-dw-retention-dim-nps-answer
+  - bietlejuice.dw_retention:load-dw-retention-fact-contract-termination
 bietlejuice.metric_rent__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department

@@ -1,0 +1,16 @@
+## Metric Rent Retention
+
+### Purpose
+
+To build metrics related to retention.
+
+### Execution Interval
+
+Daily. More information about run time [here]({chart_url}{dag_id}).
+
+### Outputs
+
+Currently, there is the following output tables in the metric layer:
+
+- `nps_pp_with_repairs_monthly`
+- `nps_pp_without_repairs_monthly`
