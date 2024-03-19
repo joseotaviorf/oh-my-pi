@@ -71,6 +71,7 @@ SELECT
     calc_transunion_qtd_endereco_amin AS transunion_number_addresses_amin,
     calc_transunion_qtd_endereco_sum AS transunion_number_addresses_sum,
     calc_transunion_qtd_endereco_bureau AS transunion_number_addresses_bureau,
+    TRANSFORM(SPLIT(NULLIF(calc_api_v3_serasa_score_hspn, 'NaN'), '#@#'), x -> CAST(x AS INT)) AS serasa_score_hspn_api_v3_list,
     calc_neoway_income_bureau AS neoway_income_bureau,
     calc_neoway_income_mean AS neoway_income_mean,
     CAST(prop_valor_pacote AS DECIMAL(32,2)) AS proposal_package_amount,

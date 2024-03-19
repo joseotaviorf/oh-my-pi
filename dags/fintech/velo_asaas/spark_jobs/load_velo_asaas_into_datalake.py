@@ -67,6 +67,7 @@ if __name__ == "__main__":
     table_name = args.table_name
     api_consumer_id = args.api_consumer_id
     consumer_args = args.consumer_args
+    consumer_args = eval(consumer_args)
     execution_date = args.execution_date
     execution_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
     tomorrow_date = execution_datetime + timedelta(days=1)

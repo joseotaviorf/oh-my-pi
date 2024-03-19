@@ -218,6 +218,9 @@ columns:
   transunion_number_addresses_bureau:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_transunion_qtd_endereco_bureau
+  serasa_score_hspn_api_v3_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_api_v3_serasa_score_hspn
   neoway_income_bureau:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_neoway_income_bureau
