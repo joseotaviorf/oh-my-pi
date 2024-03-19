@@ -1,6 +1,6 @@
 dag:
   name: dw_taxonomy
-  schedule_start_date: 2024,3,18
+  schedule_start_date: 2022,10,1
   owner: Data Growth
   documentation: 
     dag_purpose: |
