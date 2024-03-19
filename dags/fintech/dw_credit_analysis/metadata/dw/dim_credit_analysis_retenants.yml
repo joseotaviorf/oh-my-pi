@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.id
     description: Last active contract ID at the proposal creation date. If there was more than one active contract, it is considered the latest one. This column will be null for new users.
+  number_of_contracts:
+    lineage:
+      - datalake_ebdb_contract.contract.id
+    description: Number of contracts previously associated with the proponents from a credit analysis. If there is no contract (new users) this column is 0.
   contract_age:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination

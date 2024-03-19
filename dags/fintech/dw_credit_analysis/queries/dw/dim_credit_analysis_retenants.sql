@@ -217,22 +217,35 @@ proposal_contract_label AS (
       ON p.id = prc.id_proposal
   LEFT JOIN datalake_sorting_hat_clean.credit_analysis AS ca
     ON ca.id_proposal = prc.id_proposal
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY ca.id_proposal ORDER BY ca.ts_updated DESC) = 1
+),
+get_active_contract_per_credit_analysis AS (
+  SELECT
+    sk_credit_analysis,
+    COUNT(DISTINCT last_active_contract) AS number_of_contracts
+  FROM
+    proposal_contract_label
+  GROUP BY sk_credit_analysis
 )
 SELECT
-  sk_credit_analysis,
-  last_active_contract,
-  contract_age,
-  any_proponent,
-  main_proponent,
-  main_proponent_with_more_proponents_in_proposal,
-  main_proponent_with_different_proponents_in_proposal,
-  main_proponent_with_fewer_proponents_in_proposal,
-  equal_proponents_in_proposal,
-  retenant_policy,
-  dt_contract_annulment,
-  ts_proposal_created,
-  ts_last_contract_created,
+  pcl.sk_credit_analysis,
+  pcl.last_active_contract,
+  cpca.number_of_contracts,
+  pcl.contract_age,
+  pcl.any_proponent,
+  pcl.main_proponent,
+  pcl.main_proponent_with_more_proponents_in_proposal,
+  pcl.main_proponent_with_different_proponents_in_proposal,
+  pcl.main_proponent_with_fewer_proponents_in_proposal,
+  pcl.equal_proponents_in_proposal,
+  pcl.retenant_policy,
+  pcl.dt_contract_annulment,
+  pcl.ts_proposal_created,
+  pcl.ts_last_contract_created,
   NOW() AS ts_load
 FROM
-  proposal_contract_label
+  proposal_contract_label AS pcl
+LEFT JOIN
+  get_active_contract_per_credit_analysis AS cpca
+    ON cpca.sk_credit_analysis = pcl.sk_credit_analysis
+WHERE pcl.sk_credit_analysis IS NOT NULL
+QUALIFY ROW_NUMBER() OVER (PARTITION BY pcl.sk_credit_analysis ORDER BY pcl.ts_last_contract_created DESC) = 1
