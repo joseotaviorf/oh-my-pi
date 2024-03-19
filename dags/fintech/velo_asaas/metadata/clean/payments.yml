@@ -1,0 +1,141 @@
+---
+database_name: datalake_velo_asaas_clean
+table_name: payments
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_velo_asaas_raw.payments.id
+  id_customer:
+    lineage:
+    - datalake_velo_asaas_raw.payments.customer
+  id_subscription:
+    lineage:
+    - datalake_velo_asaas_raw.payments.subscription
+  id_external_reference:
+    lineage:
+    - datalake_velo_asaas_raw.payments.externalReference
+  payment_link:
+    lineage:
+    - datalake_velo_asaas_raw.payments.paymentLink
+  description:
+    lineage:
+    - datalake_velo_asaas_raw.payments.description
+  billint_type:
+    lineage:
+    - datalake_velo_asaas_raw.payments.billingType
+  pix_transaction:
+    lineage:
+    - datalake_velo_asaas_raw.payments.pixTransaction
+  status:
+    lineage:
+    - datalake_velo_asaas_raw.payments.status
+  installment_number:
+    lineage:
+    - datalake_velo_asaas_raw.payments.installmentNumber
+  invoice_url:
+    lineage:
+    - datalake_velo_asaas_raw.payments.invoiceUrl
+  invoice_number:
+    lineage:
+    - datalake_velo_asaas_raw.payments.invoiceNumber
+  transaction_receipt_url:
+    lineage:
+    - datalake_velo_asaas_raw.payments.transactionReceiptUrl
+  our_number:
+    lineage:
+    - datalake_velo_asaas_raw.payments.nossoNumero
+  bank_slip_url:
+    lineage:
+    - datalake_velo_asaas_raw.payments.bankSlipUrl
+  discount_type:
+    lineage:
+    - datalake_velo_asaas_raw.payments.discount_type
+  fine_type:
+    lineage:
+    - datalake_velo_asaas_raw.payments.fine_type
+  postal_service:
+    lineage:
+    - datalake_velo_asaas_raw.payments.postalService
+  interest_type:
+    lineage:
+    - datalake_velo_asaas_raw.payments.interest_type
+  custody:
+    lineage:
+    - datalake_velo_asaas_raw.payments.custody
+  refunds:
+    lineage:
+    - datalake_velo_asaas_raw.payments.refunds
+  discount_value:
+    lineage:
+    - datalake_velo_asaas_raw.payments.discount_value
+  fine_value:
+    lineage:
+    - datalake_velo_asaas_raw.payments.fine_value
+  interest_value:
+    lineage:
+    - datalake_velo_asaas_raw.payments.interestValue
+  value:
+    lineage:
+    - datalake_velo_asaas_raw.payments.value
+  net_value:
+    lineage:
+    - datalake_velo_asaas_raw.payments.netValue
+  original_value:
+    lineage:
+    - datalake_velo_asaas_raw.payments.originalValue
+  pix_qrcode:
+    lineage:
+    - datalake_velo_asaas_raw.payments.pixQrCodeId
+  credit_card_brand:
+    lineage:
+    - datalake_velo_asaas_raw.payments.creditCard_creditCardBrand
+  can_be_paid_after_due:
+    lineage:
+    - datalake_velo_asaas_raw.payments.canBePaidAfterDueDate
+  is_deleted:
+    lineage:
+    - datalake_velo_asaas_raw.payments.deleted
+  is_anticipated:
+    lineage:
+    - datalake_velo_asaas_raw.payments.anticipated
+  is_anticiplable:
+    lineage:
+    - datalake_velo_asaas_raw.payments.anticipable
+  dt_invoice_last_viewed:
+    lineage:
+    - datalake_velo_asaas_raw.payments.lastInvoiceViewedDate
+  dt_bank_slip_last_viewed:
+    lineage:
+    - datalake_velo_asaas_raw.payments.lastBankSlipViewedDate
+  dt_discount_limit:
+    lineage:
+    - datalake_velo_asaas_raw.payments.discount_limitDate
+  dt_due_date_limit:
+    lineage:
+    - datalake_velo_asaas_raw.payments.discount_dueDateLimitDays
+  dt_confirmed:
+    lineage:
+    - datalake_velo_asaas_raw.payments.confirmedDate
+  dt_due:
+    lineage:
+    - datalake_velo_asaas_raw.payments.dueDate
+  dt_original_due:
+    lineage:
+    - datalake_velo_asaas_raw.payments.originalDueDate
+  dt_payment:
+    lineage:
+    - datalake_velo_asaas_raw.payments.paymentDate
+  dt_client_payment:
+    lineage:
+    - datalake_velo_asaas_raw.payments.clientPaymentDate
+  dt_credit:
+    lineage:
+    - datalake_velo_asaas_raw.payments.creditDate
+  dt_estimated_credit:
+    lineage:
+    - datalake_velo_asaas_raw.payments.estimatedCreditDate
+  dt_created:
+    lineage:
+    - datalake_velo_asaas_raw.payments.dateCreated
