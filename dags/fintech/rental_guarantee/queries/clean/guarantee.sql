@@ -12,6 +12,7 @@ SELECT
     CAST(base_value/100.00 AS DECIMAL(12,2)) AS base_value,
     CAST(final_value/100.00 AS DECIMAL(12,2)) AS final_value,
     type AS guarantee_type,
+    payment_recurrence,
     created_at AS ts_created,
     updated_at AS ts_updated,
     billed_at AS ts_billed,

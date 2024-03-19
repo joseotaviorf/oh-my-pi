@@ -40,6 +40,9 @@ columns:
   final_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.final_value
+  payment_recurrence:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.type
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.created_at
