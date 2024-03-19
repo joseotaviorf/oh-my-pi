@@ -2999,6 +2999,19 @@ bietlejuice.reverse_atento_access:
   - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
   - bietlejuice.reverse_atento:load-reverse-taxonomia-email
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+bietlejuice.reverse_atlas_pricing_report_access:
+  - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-engagement
+  - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-listing-price-history
+bietlejuice.reverse_atlas_pricing_report_load:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.dw_contract_temp:load-dw-public-dim-contract
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
+  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listing-status
+  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
+  - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-fact-listing-price-changes
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
 bietlejuice.reverse_bic_ss:
   - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics

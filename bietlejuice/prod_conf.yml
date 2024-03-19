@@ -87,6 +87,8 @@ dags_out_of_pattern:
         "metric_fintech__velo",
         "quintoandar",
         "reports",
+        "reverse_atlas_pricing_report_access",
+        "reverse_atlas_pricing_report_load",
         "regions_polygon",
         "reverse_atento",
         "reverse_bic_ss",
