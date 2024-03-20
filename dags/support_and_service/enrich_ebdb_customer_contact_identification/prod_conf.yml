@@ -1,5 +1,0 @@
----
-dag_documentation:
-  dag_purpose: |
-    Creates enriched tables for the context `Customer Contact Identification`
-    of ebdb adding information like emails and phone numbers for customer.
