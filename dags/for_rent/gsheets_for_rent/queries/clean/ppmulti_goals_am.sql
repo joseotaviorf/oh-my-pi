@@ -8,3 +8,5 @@ SELECT
     INT(year) AS year
 FROM
     datalake_gsheets_raw.ppmulti_goals_am
+WHERE
+    goal_name != ""
