@@ -34,7 +34,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_into_datalake.py"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_io-general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 
 default_libs = config_service.get_config("default_libraries")
 custom_libs = config_service.get_config("cluster_libs")
@@ -71,7 +71,7 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
-    execution_timeout_hours=200
+    execution_timeout_hours=3
 )
 
 tables = config_service.get_config("tables")
