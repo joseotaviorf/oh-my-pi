@@ -13,17 +13,31 @@ workflow:
   dbutils_secret_key: TRATO_FEITO_DB
   lineage_product_database_name: tratofeito
   tables_customization:
-    accounting_installment: {}
-    bill: {}
+    accounting_installment:
+      get_table_metrics:
+        count: id
+    bill:
+      get_table_metrics:
+        count: id
     client: {}
     contract: {}
-    debt: {}
+    debt:
+      get_table_metrics:
+        count: id
     debtor: {}
-    eviction_data: {}
-    eviction: {}
+    eviction_data:
+      get_table_metrics:
+        count: id
+    eviction:
+      get_table_metrics:
+        count: id
     evictions_report: {}
-    installment: {}
-    negotiation: {}
+    installment:
+      get_table_metrics:
+        count: id
+    negotiation:
+      get_table_metrics:
+        count: id
     payment: {}
 cluster:
   type: databricks_10_4_med_general_cluster
