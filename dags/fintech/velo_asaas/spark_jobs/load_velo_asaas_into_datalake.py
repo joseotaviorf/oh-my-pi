@@ -8,7 +8,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, BaseSparkContext
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.spark.spark_dataframe_service import SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     client = AsaasApiClientPythonClient(conn_config["api_token"])
     consumer_instance = CONSUMERS[api_consumer_id](TABLES_ENDPOINT_ENUM[table_name], client)
 
-    json_list = consumer_instance.sync(**consumer_args, executor_type='spark', executor_spark_context=BaseSparkContext.sc)
+    json_list = consumer_instance.sync(**consumer_args)
 
     json_list = consumer_instance.sync(**consumer_args)
     json_list = [dict_flatner(record) for record in json_list]
