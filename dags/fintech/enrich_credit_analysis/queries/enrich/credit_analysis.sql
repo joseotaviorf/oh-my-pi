@@ -5,8 +5,9 @@ WITH credit_analysis_versions AS (
   FROM
     datalake_sorting_hat_clean.credit_analysis_version
   GROUP BY 1
-)
+),
 
+credit_analysis AS (
 SELECT
   ca.id_credit_analysis,
   ca.id_proposal,
@@ -20,12 +21,6 @@ SELECT
   ca.level,
   cap.liquidity,
   cap.paid_guarantee_type,
-  CASE
-    WHEN rsc.category_level = 40
-      AND rsc.standalone_factor = 0.96 THEN 'Standalone Low'
-    WHEN rsc.category_level = 41
-      AND rsc.standalone_factor = 1.20 THEN 'Standalone High'
-  END AS standalone_factor,
   ca.reason,
   cap.risk_category,
   sr.risk_category_canon,
@@ -33,28 +28,58 @@ SELECT
   cap.max_bypass,
   cav.max_ca_category,
   ca.result,
+  IF(ca.category IS NULL AND ca.bypass IS NOT NULL, TRUE, FALSE) AS is_bypass,
+  cap.id_proposal_from_rg,
+  cap.last_category,
+  IF(ca.id_analyst IS NULL, FALSE, TRUE) AS is_manual_analysis,
   CASE
-    WHEN ca.id_proposal IS NULL THEN 'Error'
-    WHEN ca.bypass IS NOT NULL AND cap.id_proposal_from_rg IS NULL THEN 'bypass'
-    WHEN cap.max_bypass IS NOT NULL AND cap.id_proposal_from_rg IS NULL THEN 'bypass max'
-    WHEN (
-      (COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null) = 0)
-      OR (cap.guarantee_type = 'SeguroFairfax')
-    )
-      AND cap.id_proposal_from_rg IS NULL THEN 'Free'
-    WHEN COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null) = 0 THEN 'Free'
-    WHEN rsc.is_standalone_allowed = TRUE THEN 'Brokerage Only'
-    WHEN rsc.is_guarantee_allowed = TRUE AND rsc.is_deposit_allowed = FALSE AND rsc.is_pro_guarantor_allowed = FALSE THEN 'Insurance'
-    WHEN rsc.is_guarantee_allowed = FALSE AND rsc.is_deposit_allowed = FALSE AND rsc.is_pro_guarantor_allowed = TRUE THEN 'Pro Guarantor'
-    WHEN rsc.is_guarantee_allowed = TRUE AND rsc.is_deposit_allowed = TRUE AND rsc.is_pro_guarantor_allowed = FALSE THEN 'Insurance or Deposit'
-    WHEN rsc.is_guarantee_allowed = FALSE AND rsc.is_deposit_allowed = TRUE AND rsc.is_pro_guarantor_allowed = TRUE THEN 'Pro Guarantor or Deposit'
-    WHEN rsc.is_guarantee_allowed = FALSE AND rsc.is_deposit_allowed = TRUE AND rsc.is_pro_guarantor_allowed = FALSE THEN 'Deposit'
-    WHEN cap.ts_first_credit_evaluation_positive IS NOT NULL OR cap.guarantee_source = 'CRM_DOCUMENTATION_ANALYSIS' THEN 'ea_approved'
-    WHEN COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null) IS NULL THEN 'Clear-No'
-    ELSE 'Error'
-  END AS credit_decision_cluster,
+    WHEN cap.guarantee_source = 'CRM_DOCUMENTATION_ANALYSIS' THEN TRUE
+    ELSE FALSE
+  END AS is_reprocessed,
+  cap.ts_guarantee_accepted,
+  ca.ts_created AS ts_credit_analysis_created
+FROM
+  datalake_sorting_hat_clean.credit_analysis AS ca
+  LEFT JOIN
+    datalake_credit_analysis.credit_analysis_proposals AS cap
+      ON ca.id_proposal = cap.id_proposal
+  LEFT JOIN
+    credit_analysis_versions AS cav
+      ON ca.id_credit_analysis = cav.id_credit_analysis
+  LEFT JOIN
+    datalake_sorting_hat_clean.screening_result AS sr
+      ON sr.id_proposal = ca.id_proposal
+)
+
+SELECT
+  ca.id_credit_analysis,
+  ca.id_proposal,
+  ca.id_analyst,
+  ca.bypass,
+  ca.category,
+  ca.category_within_ca,
+  ca.category_within_proposal,
+  ca.documentation_policy,
+  ca.guarantee_category,
+  ca.level,
+  ca.liquidity,
+  ca.paid_guarantee_type,
+  ca.reason,
+  ca.risk_category,
+  ca.risk_category_canon,
+  ca.internal_score,
+  ca.max_bypass,
+  ca.max_ca_category,
+  ca.result,
+  ca.last_category,
   CASE
-    WHEN rsc.is_standalone_allowed = TRUE THEN 'BROKERAGE_ONLY'
+    WHEN rsc.category_level = 40
+    AND rsc.standalone_factor = 0.96 THEN 'Standalone Low'
+    WHEN rsc.category_level = 41
+    AND rsc.standalone_factor = 1.20 THEN 'Standalone High'
+  END AS standalone_factor,
+  CASE
+    WHEN rsc.is_standalone_allowed = TRUE THEN 'STANDALONE'
     WHEN rsc.is_third_party_guarantee_allowed = TRUE THEN 'THIRD_PARTY_GUARANTEE'
     WHEN (
       rsc.is_guarantee_allowed = TRUE
@@ -81,44 +106,46 @@ SELECT
       AND rsc.is_deposit_allowed = TRUE
       AND rsc.is_pro_guarantor_allowed = FALSE
     ) THEN 'DEPOSIT'
-    WHEN rsc.category_level = 0
+    WHEN (rsc.category_level = 0)
     OR (
-      ca.category IS NULL
-      AND ca.bypass IS NOT NULL
-    ) THEN 'FREE'
+      ca.is_bypass = TRUE
+      AND ca.id_proposal_from_rg IS NULL
+    )
+    THEN 'FREE'
+    WHEN (
+      ca.is_bypass = TRUE
+      AND ca.paid_guarantee_type IS NOT NULL
+    ) THEN ca.paid_guarantee_type
     WHEN (
       ca.category IS NULL
-      AND ca.bypass IS NULL
+      AND ca.is_bypass = FALSE
       AND ca.reason IN ('CLEAR_NO')
     ) THEN 'CLEAR_NO'
     WHEN ca.category = -1 THEN 'UNDEFINED'
     ELSE NULL
   END AS guarantee_offered,
   CASE
-    WHEN (
-      cap.guarantee_type = 'SeguroFairfax'
-      OR cap.id_proposal_from_rg IS NULL
+    WHEN (ca.last_category = 0) OR (
+      ca.is_bypass = TRUE
+      AND ca.id_proposal_from_rg IS NULL
     ) THEN 'FREE'
-    ELSE cap.paid_guarantee_type
+    WHEN (ca.last_category IS NULL AND ca.is_bypass = FALSE) THEN 'CLEAR_NO'
+    WHEN (ca.last_category IS NOT NULL AND ca.id_proposal_from_rg IS NOT NULL) OR (
+      ca.is_bypass = TRUE
+      AND ca.last_category IS NULL
+      AND ca.id_proposal_from_rg IS NOT NULL
+    ) THEN ca.paid_guarantee_type
+    WHEN (
+      ca.id_proposal_from_rg IS NULL
+      AND ca.last_category IS NOT NULL
+    ) THEN 'NOT_ACCEPTED'
   END AS guarantee_accepted,
-  IF(ca.id_analyst IS NULL, FALSE, TRUE) AS is_manual_analysis,
-  CASE
-    WHEN cap.guarantee_source = 'CRM_DOCUMENTATION_ANALYSIS' THEN TRUE
-    ELSE FALSE
-  END AS is_reprocessed,
-  cap.ts_guarantee_accepted,
-  ca.ts_created AS ts_credit_analysis_created
+  ca.is_manual_analysis,
+  ca.is_reprocessed,
+  ca.is_bypass,
+  ca.ts_guarantee_accepted,
+  ca.ts_credit_analysis_created
 FROM
-  datalake_sorting_hat_clean.credit_analysis AS ca
-LEFT JOIN
-  datalake_credit_analysis.credit_analysis_proposals AS cap
-    ON ca.id_proposal = cap.id_proposal
-LEFT JOIN
-  credit_analysis_versions AS cav
-    ON ca.id_credit_analysis = cav.id_credit_analysis
-LEFT JOIN
-  datalake_rental_guarantee_clean.risk_category AS rsc
-    ON rsc.category_level = COALESCE(cap.guarantee_category, COALESCE(COALESCE(ca.category, cav.max_ca_category), cap.last_category_not_null))
-LEFT JOIN
-  datalake_sorting_hat_clean.screening_result AS sr
-    ON sr.id_proposal = ca.id_proposal
+  credit_analysis AS ca
+  LEFT JOIN datalake_rental_guarantee_clean.risk_category AS rsc
+    ON rsc.category_level = ca.category

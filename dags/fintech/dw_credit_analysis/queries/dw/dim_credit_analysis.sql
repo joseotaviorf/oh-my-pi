@@ -34,6 +34,7 @@ SELECT
   ca.credit_decision_cluster,
   ca.guarantee_offered,
   ca.guarantee_accepted,
+  ca.is_bypass,
   ca.is_manual_analysis,
   ca.is_reprocessed,
   ca.ts_guarantee_accepted,

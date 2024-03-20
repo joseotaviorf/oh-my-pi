@@ -6,6 +6,7 @@ WITH credit_analysis AS (
     guarantee_accepted,
     category,
     max_ca_category,
+    is_bypass,
     ts_guarantee_accepted
   FROM
     datalake_credit_analysis.credit_analysis
@@ -148,6 +149,7 @@ rent_flows AS (
     hl.country_code,
     hl.rental_administrator,
     hl.version,
+    ca.is_bypass,
     IF(g.guarantee_not_accepted = 1, TRUE, FALSE) AS guarantee_not_accepted
   FROM
     dw_rent.fact_listing_rent_flows AS flrf
@@ -222,6 +224,7 @@ proposal_credit_flows AS (
     ) AS sk_ec_expired_date,
     rf.is_first_credit_evaluation,
     rf.is_last_credit_evaluation,
+    rf.is_bypass,
     CASE
       WHEN rf.dt_offer_submitted_date
         BETWEEN eca.dt_created
@@ -293,6 +296,7 @@ SELECT
   guarantee_accepted,
   is_first_credit_evaluation,
   is_last_credit_evaluation,
+  is_bypass,
   has_early_credit,
   guarantee_not_accepted,
   country_code,

@@ -95,15 +95,14 @@ columns:
       INSURANCE: "The offered guarantee is the paid guarantee INSURANCE"
       STANDALONE: "The offered guarantee is the paid guarantee STANDALONE"
       THIRD_PARTY_GUARANTEE: "The offered guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
-      BROKERAGE_ONLY: "The offered guarantee is the paid guarantee BROKERAGE_ONLY"
-      INSURANCE, DEPOSIT: "The offered guarantee is the paid guarantee INSURANCE or DEPOSIT"
-      PRO_GUARANTOR, DEPOSIT: "The offered guarantee is the paid guarantee PRO_GUARANTOR or DEPOSIT"
+      INSURANCE_OR_DEPOSIT: "The offered guarantee is the paid guarantee INSURANCE or DEPOSIT"
+      PRO_GUARANTOR_OR_DEPOSIT: "The offered guarantee is the paid guarantee PRO_GUARANTOR or DEPOSIT"
       CLEAR_NO: "The guarantee was denied to the TP and it could not be offered. It may happen for income reasons, fraud risk or other reasons evaluated by the credit model"
       UNDEFINED: "The offered guarantee could not be calculated. In this case the guarantee category is -1"
   guarantee_accepted:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
-    description: "This column indicates the guarantee type accepted by the tenant prospect after a positive evaluation. For paid guarantee, the TP has to accept the offered guarantee to move to the Document Sent step. Free guarantees are automatically accepted."
+    description: "This column indicates the guarantee type accepted by the tenant prospect after a positive evaluation. For paid guarantee, the TP has to accept the offered guarantee to move to the Document Sent step. Free guarantees are automatically accepted. When the TP does not accept the guarantee offered this column is tagged with NOT ACCEPTED. The guarantee accpeted corresponds to the decision made to the last credit analysis submitted within the proposal."
     categories:
       FREE: "The accepted guarantee is free"
       PRO_GUARANTOR: "The accepted guarantee is the paid guarantee PRO_GUARANTOR"
@@ -111,8 +110,12 @@ columns:
       INSURANCE: "The accepted guarantee is the paid guarantee INSURANCE"
       STANDALONE: "The accepted guarantee is the paid guarantee STANDALONE"
       THIRD_PARTY_GUARANTEE: "The accepted guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
+      CLEAR_NO: "When no guarantee was accepted, as it was denied by some reason (such as income reasons)"
+      NOT_ACCEPTED: "When 5A has offered a paid guarantee to the TP, but the person has not accepted it."
   is_manual_analysis:
     description: "True if the analysis is manual"
+  is_bypass:
+    description: "True if the analysis was bypassed."
   is_reprocessed:
     description: "True if the analysis is reprocessed"
   ts_guarantee_accepted:
