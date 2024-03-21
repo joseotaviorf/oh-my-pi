@@ -206,7 +206,7 @@ SELECT
 FROM
     consolidated_sources cs
 LEFT JOIN
-    datalake_marketing_costs_sharing_rules.sharing_rules sr
+    datalake_growth_costs_sharing_rules.sharing_rules sr
 ON 
     SPLIT(cs.campaign_name, '[.]')[0] = sr.id_rule
     AND cs.id_date = sr.id_date
