@@ -22,32 +22,32 @@ SELECT
     process_comunication_status,
     city,
     validator_execution,
-
-    CASE 
+    action_type,
+    CASE
         WHEN is_cav = "Sim" THEN TRUE
         WHEN is_cav = "Não" THEN FALSE
     END AS is_cav,
-    CASE 
+    CASE
         WHEN is_fraud = "Sim" THEN TRUE
         WHEN is_fraud = "Não" THEN FALSE
     END AS is_fraud,
-    
-    CASE 
+
+    CASE
         WHEN abandonment_bool = "Sim" THEN TRUE
         WHEN abandonment_bool = "Não" THEN FALSE
     END AS is_abandonment,
 
-    CASE 
+    CASE
         WHEN iq_comunicated_bool = "Sim" THEN TRUE
         WHEN iq_comunicated_bool = "Não" THEN FALSE
     END AS is_iq_comunicated,
 
-    CASE 
+    CASE
         WHEN reoccurent_bool = "Sim" THEN TRUE
         WHEN reoccurent_bool = "Não" THEN FALSE
     END AS is_reoccurent,
 
-    CASE 
+    CASE
         WHEN office_comunicated_bool = "Sim" THEN TRUE
         WHEN office_comunicated_bool = "Não" THEN FALSE
     END AS is_office_comunicated,

@@ -65,6 +65,9 @@ columns:
   validator_execution:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.validator_execution
+  action_type:
+    lineage:
+      - datalake_gsheets_raw.evictions_processes_forrent.action_type
   city:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.city
@@ -137,7 +140,7 @@ columns:
   dt_registry_date:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.massive_dt
-    description: Date in which the closing of the last update of the process was registred 
+    description: Date in which the closing of the last update of the process was registred
   dt_process_closing:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.second_massive_dt
@@ -145,7 +148,3 @@ columns:
   dt_validity:
     lineage:
       - datalake_gsheets_raw.evictions_processes_forrent.validity
-
-  
-  
-
