@@ -21,7 +21,6 @@ SELECT
     refunds,
     CAST(discount_value AS DOUBLE) AS discount_value,
     CAST(fine_value AS DOUBLE) AS fine_value,
-    CAST(interest_value AS DOUBLE) AS interest_value,
     CAST(value AS DOUBLE) AS value,
     CAST(netValue AS DOUBLE) AS net_value,
     CAST(originalValue AS DOUBLE) AS original_value,
