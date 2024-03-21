@@ -1,0 +1,56 @@
+database_name: dw_customer_support
+table_name: fact_support_analysts_snapshot
+description: 
+  Fact table that aims to gather data on metrics related to analysts' performance. This table is a 
+  periodic snapshot type with the frequency being daily, this means that the base will contain a day-by-day 
+  photo of each analyst's performance numbers. The granularity of this table is sk_agent + date.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_snapshot:
+    lineage:
+      - datalake_zendesk_users.agents.email
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated
+    description: Unique snapshot identifier (a concatenation of id_agent + date).
+  sk_agent:
+    lineage:
+      - datalake_zendesk_users.agents.email
+    description: Analyst identification key.
+  total_tickets:
+    description: Information of integer type that indicates the total number of tickets that the analyst handled on the day.
+  ticket_reopenings:
+    description: Information of integer type that indicates the number of ticket reopenings linked to the analyst on the day.
+  ticket_responses:
+    description: Information of integer type that indicates the number of responses linked to the analyst on the day.
+  total_attendance_time:
+    description: Information of integer type that indicates the service time (in minutes) linked to the analyst on the day.
+  tickets_with_csat_score:
+    description: Information of integer type that indicates the number of tickets with the csat score sent on the day.
+  tickets_csat_satisfied:
+    description: Integer type information that indicates the number of tickets with csat marked as "satisfied" on the day.
+  tickets_csat_neutral:
+    description: Integer type information that indicates the number of tickets with csat marked as "neutral" on the day.
+  tickets_csat_dissatisfied:
+    description: Integer type information that indicates the number of tickets with csat marked as "dissatisfied" on the day.
+  tickets_with_resolution_answered:
+    description: Integer type information that indicates the number of tickets with a resolution response linked to the analyst on the day.
+  tickets_with_resolution:
+    description: Integer type information that indicates the number of tickets with resolution linked to the analyst on the day.
+  tickets_transferred:
+    description: Integer type information that indicates the number of tickets that were transferred on the day.
+  tickets_in_backlog:
+    description: Integer type information that indicates the number of tickets that were in the analyst's backlog that day.
+  backlog_within_sla:
+    description: Integer type information that indicates the number of tickets that were in the analyst's backlog still within the SLA on the day.
+  backlog_with_exceed_sla:
+    description: Integer type information that indicates the number of tickets that exceeded the sla in the analyst's backlog on the day.
+  dt_last_ticket_updated:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated
+    description: Date type information that represents the reference date of the data.
+  year:
+    description: Year of reference date.
+  month:
+    description: Month of reference date.
+  day:
+    description: Day of reference date.

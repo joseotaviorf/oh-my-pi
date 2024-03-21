@@ -214,6 +214,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_customer_support:load-enrich-received-demand
   - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_users:load-enrich-agents
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
