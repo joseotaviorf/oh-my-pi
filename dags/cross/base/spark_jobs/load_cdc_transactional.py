@@ -8,6 +8,11 @@ from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
 from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_treatment import (
     MySqlCdcSchemaTreatment,
 )
+from bietlejuice.base.cdc.schema_treatment.schema_changes_notifier import (
+    SchemaChangesNotifier,
+)
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+
 
 from pyspark.sql.functions import col, to_timestamp, lit, make_date
 from pyspark.sql.utils import AnalysisException
@@ -153,6 +158,7 @@ def main():
     start_date = args.start_date
     end_date = args.end_date
     partitions = json.loads(args.partitions.replace("'", '"'))
+    full_table_name = f"datalake_{schema}_transactional.{table_name}"
 
     logger.info(
         f"""
@@ -169,7 +175,7 @@ def main():
 
     if df is None:
         if not spark.catalog.tableExists(
-            f"datalake_{schema}_transactional.{table_name}"
+            full_table_name
         ):
             raise FileNotFoundError(
                 "No data was found in the incoming bucket, and the table does not exist in the datalake. Since this is the first execution, "
@@ -204,6 +210,12 @@ def main():
     )
     transactional_df = pre_treatment.treat_dataframe(
         source_schema, table_name, transactional_df
+    )
+
+    SchemaChangesNotifier.alert_schema_changes(
+        full_table_name,
+        transactional_df,
+        dbutils.secrets.get(scope="quintoandar", key=GchatWebhooksEnum.GCHAT_SCHEMA_CHANGES)
     )
 
     logger.info("m=__main__, msg=Load table into transactional layer...")
