@@ -12,6 +12,7 @@ class TaskEnum(Enum):
     LOAD_MONGO_RAW = "load_mongo_raw"
     LOAD_POSTGRES_RAW = "load_postgres_raw"
     LOAD_QUERY = "load_query"
+    OPTIMIZE_DELTA_TABLE = "optimize_delta_table"
     PROPAGATE_METADATA = "propagate_metadata"
     REGISTER_DELTA_TABLE = "register_delta_table"
     SYNC_HIVE_PARTITIONS = "sync_hive_partitions"

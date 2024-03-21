@@ -22,6 +22,8 @@ class TestDatalakeMetastoreMapping:
             "db_raw_path": "s3a://bucket-forno/raw/_my_src_/",
             "db_enrich_name": "datalake__my_src_",
             "db_enrich_path": "s3a://bucket-forno/enrich/_my_src_/",
+            "db_transactional_name": "datalake__my_src__transactional",
+            "db_transactional_path": "s3a://bucket-forno/transactional/_my_src_/",
         }
 
     def test_get_all_datalake_info_for_prod(self):
@@ -44,6 +46,8 @@ class TestDatalakeMetastoreMapping:
             "db_raw_path": "s3a://5a-datalake-prod/raw/_my_src_/",
             "db_enrich_name": "datalake__my_src_",
             "db_enrich_path": "s3a://5a-datalake-prod/enrich/_my_src_/",
+            "db_transactional_name": "datalake__my_src__transactional",
+            "db_transactional_path": "s3a://5a-datalake-prod/transactional/_my_src_/",
         }
         assert db_info_dict == expected
 
@@ -61,6 +65,16 @@ class TestDatalakeMetastoreMapping:
         # assert
         assert expected_db_name == "datalake__my_src__raw"
         assert expected_db_location == "s3a://bucket-forno/raw/_my_src_/"
+
+    def test_get_schema_from_database_for_transactional(self):
+        # arrange
+        database = "datalake_my_schema_transactional"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
 
     def test_get_schema_from_database_for_raw(self):
         # arrange

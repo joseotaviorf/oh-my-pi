@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from os import path
+from typing import Union
 
 from airflow.models.baseoperator import BaseOperator
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
@@ -27,7 +28,9 @@ class BaseTaskCreator(ABC):
         self.dag_execution_context = dag_execution_context
 
     @abstractmethod
-    def create_task(self, table_attributes: TableAttributes = None) -> BaseOperator:
+    def create_task(
+        self, table_attributes: Union[TableAttributes, list] = None
+    ) -> BaseOperator:
         """Returns an Airflow task."""
 
     def _create_spark_job_task(

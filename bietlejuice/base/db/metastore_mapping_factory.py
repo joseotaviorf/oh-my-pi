@@ -16,6 +16,7 @@ class MetastoreMappingFactory:
         layer: LayerEnum, source: str, bucket: str
     ) -> MetastoreMapping:
         return {
+            LayerEnum.TRANSACTIONAL: DatalakeMetastoreMapping,
             LayerEnum.RAW: DatalakeMetastoreMapping,
             LayerEnum.CLEAN: DatalakeMetastoreMapping,
             LayerEnum.CLEAN_STAGING: DatalakeMetastoreMapping,

@@ -23,7 +23,10 @@ class TableAttributes:
 
     @staticmethod
     def from_attributes(
-        table: "TableAttributes", layer: str = None, table_name: str = None
+        table: "TableAttributes",
+        layer: str = None,
+        table_name: str = None,
+        table_customization: dict = None,
     ) -> None:
         """
         Creates a copy of another TableAttributes, optionally overriding some attributes. This is very common, since workflows often
@@ -35,6 +38,7 @@ class TableAttributes:
             workflow_args=table._workflow_args,
             layer=layer or table.layer,
             table_name=table_name or table.table_name,
+            table_customization=table_customization or table.table_customization,
         )
 
     def _get_table_customization(self):

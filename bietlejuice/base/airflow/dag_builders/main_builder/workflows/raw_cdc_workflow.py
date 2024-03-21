@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
@@ -32,24 +32,12 @@ class RawCDCWorkflow(BaseWorkflow):
             incoming_bucket=incoming_bucket,
         )
         self._initialize_task_creators(dag_execution_context)
-        tables_customization = self.workflow_args["tables_customization"]
-        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
-        dummy_terminate_job_cluster_task = (
-            self.dummy_job_cluster_finished_task_creator.create_task()
-        )
-        for raw_table_name, table_parameters in tables_customization.items():
-            raw_initial_task, raw_final_task = self._create_raw_tasks(
-                table_name=raw_table_name,
-                dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
-            )
-            clean_initial_task, clean_final_task = self._create_clean_tasks(
-                table_name=table_parameters.get("clean_table_name", raw_table_name),
-                table_customization=table_parameters,
-                dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
-            )
-            execute_job_cluster_task >> raw_initial_task
-            raw_final_task >> clean_initial_task
-            clean_final_task >> dummy_terminate_job_cluster_task
+
+        transactional_tables = self._get_transactional_tables()
+        raw_tables = self._get_raw_tables(transactional_tables)
+        clean_tables = self._get_clean_tables(raw_tables)
+
+        self._create_all_tasks(transactional_tables, raw_tables, clean_tables)
 
         return dag
 
@@ -70,6 +58,9 @@ class RawCDCWorkflow(BaseWorkflow):
         self.register_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.REGISTER_DELTA_TABLE
         )
+        self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.OPTIMIZE_DELTA_TABLE
+        )
         self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
         )
@@ -80,32 +71,120 @@ class RawCDCWorkflow(BaseWorkflow):
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
 
+    def _get_transactional_tables(self) -> List[TableAttributes]:
+        """Returns the table attributes for all the tables in the transactional layer."""
+        return [
+            TableAttributes(
+                self.dag_args, self.workflow_args, LayerEnum.TRANSACTIONAL, table_name
+            )
+            for table_name in self.workflow_args["tables_customization"]
+        ]
+
+    def _get_raw_tables(
+        self, transactional_tables: List[TableAttributes]
+    ) -> List[TableAttributes]:
+        """Returns the table attributes for all the tables in the raw layer, by copying from the transactional layer."""
+        return [
+            TableAttributes.from_attributes(table, layer=LayerEnum.RAW)
+            for table in transactional_tables
+        ]
+
+    def _get_clean_tables(
+        self, raw_tables: List[TableAttributes]
+    ) -> List[TableAttributes]:
+        """Returns the table attributes for all the tables in the clean layer, by copying from the raw layer."""
+        return [
+            TableAttributes.from_attributes(
+                table,
+                layer=LayerEnum.CLEAN,
+                table_name=table.table_customization.get(
+                    "clean_table_name", table.table_name
+                ),
+            )
+            for table in raw_tables
+        ]
+
+    def _create_all_tasks(
+        self,
+        transactional_tables: List[TableAttributes],
+        raw_tables: List[TableAttributes],
+        clean_tables: List[TableAttributes],
+    ) -> None:
+        """Creates all the tasks for the workflow and sets their dependencies."""
+
+        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
+        dummy_terminate_job_cluster_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
+        )
+        optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
+            transactional_tables
+        )
+        optimize_raw_task = self.optimize_delta_table_task_creator.create_task(
+            raw_tables
+        )
+        optimize_clean_task = self.optimize_delta_table_task_creator.create_task(
+            clean_tables
+        )
+
+        for transactional_table, raw_table, clean_table in zip(
+            transactional_tables, raw_tables, clean_tables
+        ):
+            transactional_initial_task, transactional_final_task = self._create_transactional_tasks(
+                transactional_table, optimize_transactional_task
+            )
+            raw_initial_task, raw_final_task = self._create_raw_tasks(
+                raw_table,
+                optimize_raw_task,
+                dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
+            )
+            clean_initial_task, clean_final_task = self._create_clean_tasks(
+                clean_table,
+                optimize_clean_task,
+                dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
+            )
+            execute_job_cluster_task >> transactional_initial_task
+            transactional_final_task >> raw_initial_task
+            raw_final_task >> clean_initial_task
+            clean_final_task >> dummy_terminate_job_cluster_task
+
+        optimize_transactional_task >> dummy_terminate_job_cluster_task
+        optimize_raw_task >> dummy_terminate_job_cluster_task
+        optimize_clean_task >> dummy_terminate_job_cluster_task
+
+    def _create_transactional_tasks(
+        self,
+        transactional_table_attributes: TableAttributes,
+        optimize_transactional_task,
+    ) -> Tuple:
+        """
+        Creates transactional tasks, sets their internal dependencies and returns the first
+        and the last tasks of the dependency flow.
+        """
+        load_cdc_transactional_task = self.load_transactional_task_creator.create_task(
+            transactional_table_attributes
+        )
+
+        load_cdc_transactional_task >> optimize_transactional_task
+
+        return load_cdc_transactional_task, load_cdc_transactional_task
+
     def _create_raw_tasks(
-        self, table_name: str, dummy_terminate_job_cluster_task
+        self,
+        raw_table_attributes: TableAttributes,
+        optimize_raw_task,
+        dummy_terminate_job_cluster_task,
     ) -> Tuple:
         """
         Creates raw tasks, sets their internal dependencies and returns the first
         and the last tasks of the dependency flow.
         """
-        transactional_table_attributes = TableAttributes(
-            self.dag_args, self.workflow_args, LayerEnum.TRANSACTIONAL, table_name
-        )
-
-        load_cdc_transactional_task = self.load_transactional_task_creator.create_task(
-            transactional_table_attributes
-        )
-
-        raw_table_attributes = TableAttributes.from_attributes(
-            transactional_table_attributes, layer=LayerEnum.RAW
-        )
-
         load_raw_task = self.load_cdc_raw_task_creator.create_task(raw_table_attributes)
 
         register_delta_table_raw_task = self.register_delta_table_task_creator.create_task(
             raw_table_attributes
         )
 
-        (load_cdc_transactional_task >> load_raw_task >> register_delta_table_raw_task)
+        load_raw_task >> (register_delta_table_raw_task, optimize_raw_task)
 
         if self._check_include_propagate_metadata_task(raw_table_attributes):
             propagate_table_lineage_raw_task = self.propagate_metadata_task_creator.create_task(
@@ -129,25 +208,18 @@ class RawCDCWorkflow(BaseWorkflow):
                 >> dummy_terminate_job_cluster_task
             )
 
-        return load_cdc_transactional_task, load_raw_task
+        return load_raw_task, load_raw_task
 
     def _create_clean_tasks(
         self,
-        table_name: str,
-        table_customization: dict,
+        clean_table_attributes: TableAttributes,
+        optimize_clean_task,
         dummy_terminate_job_cluster_task,
     ) -> Tuple:
         """
         Creates clean tasks, sets their internal dependencies and returns the first
         and the last tasks of the dependency flow.
         """
-        clean_table_attributes = TableAttributes(
-            self.dag_args,
-            self.workflow_args,
-            LayerEnum.CLEAN,
-            table_name,
-            table_customization,
-        )
 
         load_clean_task = self.load_cdc_clean_task_creator.create_task(
             clean_table_attributes
@@ -166,6 +238,7 @@ class RawCDCWorkflow(BaseWorkflow):
             >> register_delta_table_clean_task
             >> propagate_table_metadata_clean_task
         )
+        load_clean_task >> optimize_clean_task
 
         if self._check_include_data_quality_task(clean_table_attributes):
             data_quality_tests_clean_task = self.data_quality_task_creator.create_task(

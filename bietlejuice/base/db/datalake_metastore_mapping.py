@@ -7,12 +7,13 @@ class DatalakeMetastoreMapping(MetastoreMapping):
     """Datalake properties mapping for Hive Metastore."""
 
     DATABASE_PATTERN = re.compile(
-        r"(?<=^datalake_)(?P<schema>[\w|_]*?)(?:_raw|_clean|_clean_staging)?$"
+        r"(?<=^datalake_)(?P<schema>[\w|_]*?)(?:_transactional|_raw|_clean|_clean_staging)?$"
     )
 
     def get_full_database_name(self, layer: LayerEnum = None) -> str:
         """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
         return {
+            "transactional": f"datalake_{self.source}_transactional",
             "raw": f"datalake_{self.source}_raw",
             "clean": f"datalake_{self.source}_clean",
             "clean_staging": f"datalake_{self.source}_clean_staging",
@@ -22,6 +23,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
     def get_full_database_path(self, layer: LayerEnum = None):
         """Following the pattern according to the layer, source and bucket (given in the constructor), returns the full file path."""
         return {
+            "transactional": f"s3a://{self.bucket}/transactional/{self.source}/",
             "raw": f"s3a://{self.bucket}/raw/{self.source}/",
             "clean": f"s3a://{self.bucket}/clean/{self.source}/",
             "clean_staging": f"s3a://{self.bucket}/clean_staging/{self.source}/",
@@ -37,6 +39,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
         database_name = {
             f"db_{layer.value}_name": self.get_full_database_name(layer)
             for layer in (
+                LayerEnum.TRANSACTIONAL,
                 LayerEnum.RAW,
                 LayerEnum.CLEAN,
                 LayerEnum.CLEAN_STAGING,
@@ -46,6 +49,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
         s3_files_path = {
             f"db_{layer.value}_path": self.get_full_database_path(layer)
             for layer in (
+                LayerEnum.TRANSACTIONAL,
                 LayerEnum.RAW,
                 LayerEnum.CLEAN,
                 LayerEnum.CLEAN_STAGING,
