@@ -27,6 +27,8 @@ columns:
       - datalake_marketing_costs_sharing_rules.d020d.business_context
       - datalake_marketing_costs_sharing_rules.d021d.business_context
       - datalake_marketing_costs_sharing_rules.d023d.business_context
+      - datalake_marketing_costs_sharing_rules.d046d.business_context
+      - datalake_marketing_costs_sharing_rules.d047d.business_context
       - datalake_marketing_costs_sharing_rules.p014p.business_context
       - datalake_marketing_costs_sharing_rules.s012s.business_context
       - datalake_marketing_costs_sharing_rules.s019s.business_context
@@ -60,6 +62,8 @@ columns:
       - datalake_marketing_costs_sharing_rules.d020d.city_group
       - datalake_marketing_costs_sharing_rules.d021d.city_group
       - datalake_marketing_costs_sharing_rules.d023d.city_group
+      - datalake_marketing_costs_sharing_rules.d046d.city_group
+      - datalake_marketing_costs_sharing_rules.d047d.city_group
       - datalake_marketing_costs_sharing_rules.p014p.city_group
       - datalake_marketing_costs_sharing_rules.s012s.city_group
       - datalake_marketing_costs_sharing_rules.s019s.city_group
@@ -96,6 +100,8 @@ columns:
       - datalake_marketing_costs_sharing_rules.d020d.funnel_side
       - datalake_marketing_costs_sharing_rules.d021d.funnel_side
       - datalake_marketing_costs_sharing_rules.d023d.funnel_side
+      - datalake_marketing_costs_sharing_rules.d046d.funnel_side
+      - datalake_marketing_costs_sharing_rules.d047d.funnel_side
       - datalake_marketing_costs_sharing_rules.p014p.funnel_side
       - datalake_marketing_costs_sharing_rules.s012s.funnel_side
       - datalake_marketing_costs_sharing_rules.s019s.funnel_side
@@ -129,6 +135,8 @@ columns:
       - datalake_marketing_costs_sharing_rules.d020d.id_date
       - datalake_marketing_costs_sharing_rules.d021d.id_date
       - datalake_marketing_costs_sharing_rules.d023d.id_date
+      - datalake_marketing_costs_sharing_rules.d046d.id_date
+      - datalake_marketing_costs_sharing_rules.d047d.id_date
       - datalake_marketing_costs_sharing_rules.p014p.id_date
       - datalake_marketing_costs_sharing_rules.s012s.id_date
       - datalake_marketing_costs_sharing_rules.s019s.id_date
@@ -162,6 +170,8 @@ columns:
       - datalake_marketing_costs_sharing_rules.d020d.id_rule
       - datalake_marketing_costs_sharing_rules.d021d.id_rule
       - datalake_marketing_costs_sharing_rules.d023d.id_rule
+      - datalake_marketing_costs_sharing_rules.d046d.id_rule
+      - datalake_marketing_costs_sharing_rules.d047d.id_rule
       - datalake_marketing_costs_sharing_rules.p014p.id_rule
       - datalake_marketing_costs_sharing_rules.s012s.id_rule
       - datalake_marketing_costs_sharing_rules.s019s.id_rule
@@ -195,6 +205,8 @@ columns:
       - datalake_marketing_costs_sharing_rules.d020d.share
       - datalake_marketing_costs_sharing_rules.d021d.share
       - datalake_marketing_costs_sharing_rules.d023d.share
+      - datalake_marketing_costs_sharing_rules.d046d.share
+      - datalake_marketing_costs_sharing_rules.d047d.share
       - datalake_marketing_costs_sharing_rules.p014p.share
       - datalake_marketing_costs_sharing_rules.s012s.share
       - datalake_marketing_costs_sharing_rules.s019s.share
@@ -210,3 +222,4 @@ columns:
     description: utm_campaign segmentation
     lineage: 
       - datalake_marketing_costs_sharing_rules.d046d.utm_campaign
+      - datalake_marketing_costs_sharing_rules.d047d.utm_campaign
