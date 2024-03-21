@@ -1,42 +1,59 @@
 database_name: datalake_crm
 table_name: task_status_histories
+description:
+  Base responsible for processing the task status history data, with id as its main key.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
+    description: Key that identifies the task status history.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   id_task:
+    description: Key that identifies the task.
     lineage:
       - datalake_crm_clean.task_status_histories.id
   id_user_action:
+    description: Key that identifies the user who performed the action.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   id_assignee:
+    description: Key that identifies the assignee of the task.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   action_user_name:
+    description: Name of the user who performed the action.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   action_type:
+    description: Type of the action performed.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   action_reason:
+    description: Reason for the action performed.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   task_status:
+    description: Status of the task.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   version:
+    description: Version of the task status history.
     lineage:
       - datalake_crm_clean.task_status_histories.version
   ts_action:
+    description: Timestamp of the action performed.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   year:
+    description: Year of the action performed.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   month:
+    description: Month of the action performed.
     lineage:
       - datalake_crm_clean.task_status_histories.history
   day:
+    description: Day of the action performed.
     lineage:
       - datalake_crm_clean.task_status_histories.history
