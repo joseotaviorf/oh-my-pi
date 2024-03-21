@@ -19,6 +19,7 @@ from quintoandar_asaas_api_client.clients.asaas_api_client_python_client import 
 from quintoandar_asaas_api_client.consumers import CONSUMERS
 from quintoandar_asaas_api_client.constants.endpoint_enum import EndpointEnum
 
+from pyspark.sql.types import StructType, StructField, StringType
 JOB_NAME = "load_velo_asaas_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -40,6 +41,16 @@ def dict_flatner(dic: dict):
         else:
             final_result[key] = str(val)
     return final_result
+
+def create_schema(json_list: list):
+    cols = set()
+    for row in json_list:
+        [cols.add(key) for key in row.keys()]
+
+    schema = []
+    for col in cols:
+        schema.append(StructField(col, StringType(), True))
+    return StructType(schema)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -107,7 +118,7 @@ if __name__ == "__main__":
     json_list = consumer_instance.sync(**consumer_args)
     json_list = [dict_flatner(record) for record in json_list]
 
-    df = spark_client.create_dataframe(json_list)
+    df = spark_client.create_dataframe(json_list, create_schema(json_list))
     if df:
         if load_mode == 'incremental':
             df = (
