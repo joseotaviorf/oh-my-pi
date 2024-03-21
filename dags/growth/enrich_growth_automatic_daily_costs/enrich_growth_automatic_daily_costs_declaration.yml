@@ -9,6 +9,7 @@ dag:
 workflow:
   type: query
   layer: enrich
+  custom_schema: growth_costs
   default_extraction_type: incremental
   default_partitions:
   - id_date
