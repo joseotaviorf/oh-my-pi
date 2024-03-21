@@ -1,18 +1,16 @@
 dag:
   name: enrich_search
-  schedule_start_date: 2021, 8, 24
+  schedule_start_date: 2022, 1, 1
   owner: Data Primitives
 workflow:
   type: query
   layer: enrich
-  default_extraction_type: incremental
+  default_extraction_type: full
   extra_query_template_params:
-    "start_date": "{{ ds }}"
-    "end_date": "{{ tomorrow_ds }}"
-    "days_past": 7
-    "year":  "{year}"
-    "month": "{month}"
-    "day": "{day}"
+        "days_past": 14
+  inner_dependencies:
+    item_interaction:
+      - amplitude_user_device
   tables_customization:
     item_interaction:
       partitions:

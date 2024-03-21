@@ -9,67 +9,15 @@ columns:
   id_user:
     description: Identifier of the user
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.id_user
-      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.id_amplitude
-      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.id_user
-      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.id_amplitude
-      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.id_user
-      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.id_amplitude
-      - datalake_amplitude_clean_staging.170698_share_listing_events.id_user
-      - datalake_amplitude_clean_staging.170698_share_listing_events.id_amplitude
-      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.id_user
-      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.id_amplitude
       - datalake_rent_flows.id_tenant_prospect
   id_item:
     description: Identifier of the interacted item
     lineage:
-    - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.event_properties
-    - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.event_properties
-    - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.event_properties
-    - datalake_amplitude_clean_staging.170698_share_listing_events.event_properties
-    - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.event_properties
     - datalake_rent_flows.id_house
-  business_context:
-    description: Business context
-    lineage:
-      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.event_properties
-      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.event_properties
-      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.event_properties
-      - datalake_amplitude_clean_staging.170698_share_listing_events.event_properties
-      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.event_properties
   interaction_type:
     description: |
       Type of interaction between user and item. Could be Values:
-        - visit-intent-clicked
-        - visitblock-alert-clicked
-        - listing-favorite-intent
-        - share-listing
-        - visitblock-similares-clicked
-        - proper-offer-submitted
-  ts_interaction:
-    description: Timestamp at which the user interaction happened
-    lineage:
-      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.ts_event
-      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.ts_event
-      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.ts_event
-      - datalake_amplitude_clean_staging.170698_share_listing_events.ts_event
-      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.ts_event
-      - datalake_rent_flows.ts_created
-  dt_interaction:
-    description: Date of the user interaction
-    lineage:
-      - datalake_amplitude_clean_staging.170698_visit_intent_clicked_events.ts_event
-      - datalake_amplitude_clean_staging.170698_visitblock_alert_clicked_events.ts_event
-      - datalake_amplitude_clean_staging.170698_listing_favorite_intent_events.ts_event
-      - datalake_amplitude_clean_staging.170698_share_listing_events.ts_event
-      - datalake_amplitude_clean_staging.170698_visitblock_similares_clicked_events.ts_event
-      - datalake_rent_flows.ts_created
-  type_item:
-    description: |
-      The type of item that was interacted. Currently we
-      only recommend houses, so we only have house-related
-      interactions
-      interactions.
+        - proper_offer
   id_search:
     description:  Identifier of a search related to a specific house and user
     lineage:
@@ -78,3 +26,36 @@ columns:
     description:  Identifier the type of a search associated with id_search
     lineage:
       - datalake_search_session_event.search_session_event.search_rendering_type
+  type_item:
+    description: |
+      The type of item that was interacted. Currently we
+      only recommend houses, so we only have house-related
+      interactions.
+  ts_interaction:
+    description: Timestamp at which the user interaction happened
+    lineage:
+      - datalake_rent_flows.ts_created
+  ts_search:
+    description: Timestamp at which the search was performed
+    lineage:
+      - datalake_search_session_event.search_session_event.ts_event
+  dt_interaction:
+    description: Date of the user interaction
+    lineage:
+      - datalake_rent_flows.ts_created
+  business_context:
+    description: |
+      Business context (rent, sale)
+      For now, only rent is available
+  year:
+    description: Year of the user interaction
+    lineage:
+      - datalake_rent_flows.ts_created
+  month:
+    description: Month of the user interaction
+    lineage:
+      - datalake_rent_flows.ts_created
+  day:
+    description: Day of the user interaction
+    lineage:
+      - datalake_rent_flows.ts_created

@@ -1,8 +1,0 @@
-tables:
-  item_interaction:
-    is_incremental: true
-    partition_cols:
-      - year
-      - month
-      - day
-      - interaction_type
