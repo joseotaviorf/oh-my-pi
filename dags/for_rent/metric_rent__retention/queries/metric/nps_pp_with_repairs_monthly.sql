@@ -19,12 +19,32 @@ dataset_aux AS (
         AND nps.nps_campaign LIKE '%offboarding%' 
         AND dc.is_repair_tenant_duty = TRUE
         AND DATE(nps.ts_answered) >= DATE_TRUNC('month', DATE(nps.ts_answered)) 
-        AND DATE(nps.ts_answered) < ADD_MONTHS(CURRENT_DATE, 1)
 ),
 dataset_final AS (
     SELECT 
         month_answers,
-        'Overall' AS category,
+        category,
+        COUNT(
+            CASE
+                WHEN score_category = 'promoter' THEN 0 
+            END
+        ) AS promoters_repairs_need,
+        COUNT(
+            CASE 
+                WHEN 
+                    score_category = 'detractor' THEN 0 
+            END
+        ) AS detractors_repairs_need,
+        COUNT(1) AS total_answers_repairs_need
+    FROM 
+        dataset_aux
+    GROUP BY 1,2
+
+    UNION
+    
+    SELECT 
+        month_answers,
+        'OVERALL' AS category,
         COUNT(
             CASE
                 WHEN score_category = 'promoter' THEN 0 

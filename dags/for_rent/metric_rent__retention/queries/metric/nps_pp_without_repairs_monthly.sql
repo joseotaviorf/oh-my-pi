@@ -3,7 +3,7 @@ dataset_aux AS (
     SELECT DISTINCT
         nps.sk_nps_answer,
         nps.score_category,
-        DATE_TRUNC('month', DATE(nps.ts_answered)) AS month_answers,
+        DATE_TRUNC('MONTH', DATE(nps.ts_answered)) AS month_answers,
         dc.value_segment AS category
     FROM 
         dw_retention.fact_contract_termination AS fct
@@ -11,20 +11,37 @@ dataset_aux AS (
         dw_retention.dim_nps_answer AS nps
             ON nps.sk_nps_answer = fct.sk_nps_answer_owner
     LEFT JOIN 
-        dw_rent.dim_contract dc
+        dw_rent.dim_contract AS dc
             ON fct.sk_contract = dc.sk_contract
     WHERE
         DATE(nps.ts_answered) >= DATE('2023-01-01')
         AND DATE(nps.ts_answered) < ADD_MONTHS(CURRENT_DATE, 1)
         AND nps.nps_campaign LIKE '%offboarding%'
         AND dc.is_repair_tenant_duty <> TRUE
-        AND DATE(nps.ts_answered) >= DATE_TRUNC('month', DATE(nps.ts_answered))
-        AND DATE(nps.ts_answered) < ADD_MONTHS(CURRENT_DATE, 1)
+        AND DATE(nps.ts_answered) >= DATE_TRUNC('MONTH', DATE(nps.ts_answered))
 ),
 dataset_final AS (
     SELECT 
         month_answers,
-        'Overall' AS category,
+        category,
+        COUNT(CASE
+            WHEN
+                score_category = 'promoter' THEN 0 
+            END) AS promoters_no_repairs_need,
+        COUNT( CASE 
+            WHEN 
+                score_category = 'detractor' THEN 0 
+            END) detractors_no_repairs_need,
+        COUNT(1) AS total_answers_no_repairs_need
+    FROM 
+        dataset_aux
+    GROUP BY 1,2
+
+    UNION
+    
+    SELECT 
+        month_answers,
+        'OVERALL' AS category,
         COUNT(CASE
             WHEN
                 score_category = 'promoter' THEN 0 
