@@ -6,6 +6,7 @@ dag_documentation:
     This dag aims to load a copy of the databases that will be sent to Atento to our datalake, before actually sending them.
 
 custom_cluster:
-  driver_node_type_id: m5a.2xlarge
-  node_type_id: m5a.2xlarge
+  runtime_engine: PHOTON
+  driver_node_type_id: r5d.xlarge
+  node_type_id: r5d.2xlarge
   num_workers: 3
