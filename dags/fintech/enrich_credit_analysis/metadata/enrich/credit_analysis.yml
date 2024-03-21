@@ -84,8 +84,6 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.result
     description: "Result of the analysis"
-  credit_decision_cluster:
-    description: "Credit decision cluster of the analysis"
   guarantee_offered:
     description: "If the tenant prospect is not a clear no by income reasons, 5A offers one or more type of guarantee.  The offered guarantee can be paid or free. This column indicates which guarantee was offered to the TP after the evaluation process. The guarantee offered might be null if the credit analysis was transfered or had a later approval to free."
     categories:

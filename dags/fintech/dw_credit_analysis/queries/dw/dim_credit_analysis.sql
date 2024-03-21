@@ -31,7 +31,6 @@ SELECT
   ca.internal_score,
   ca.max_bypass,
   ca.result,
-  ca.credit_decision_cluster,
   ca.guarantee_offered,
   ca.guarantee_accepted,
   ca.is_bypass,

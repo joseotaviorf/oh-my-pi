@@ -180,23 +180,6 @@ columns:
         "usually indicates a new proposal. If it got to closing, look for other
         clues to approved or rejected"
       REJECTED: "Rejected"
-  credit_decision_cluster:
-    lineage:
-      - datalake_credit_analysis.credit_analysis.credit_decision_cluster
-    description: "Indicates the decision cluster applied to a given credit analysis."
-    categories:
-      Brokerage Only: "Proposals with Brokerage Only business model."
-      Clear-No: "Proposals denied any guarantee option."
-      Deposit: "Proposals with only deposit guarantee option"
-      Error: "Proposals without any credit options"
-      Free: "Proposals with Free guarantee option."
-      Insurance: "Proposals with external insurance guarantee option."
-      Insurance or Deposit: "Proposals with external insurance guarantee or deposit option."
-      Pro Guarantor: "Proposals with internal insurance guarantee option."
-      Pro Guarantor or Deposit: "Proposals with internal insurance guarantee or deposit option."
-      bypass: "Proposals that end up with Free guarantee due to a special reason that leads to a special analysis."
-      bypass max: "Proposals that end up with Free guarantee due to a special reason that leads to a special analysis, but reason is not on last credit analysis,"
-      ea_approved: "Proposals with Evaluation positive date even though there isn't any category that indicates such situation."
   guarantee_offered:
     description: "If the tenant prospect is not a clear no by income reasons, 5A offers one or more type of guarantee.  The offered guarantee can be paid or free. This column indicates which guarantee was offered to the TP after the evaluation process. The guarantee offered might be null if the credit analysis was transfered or had a later approval to free."
     categories:
