@@ -141,7 +141,8 @@ rent_flows AS (
       FALSE
     ) AS is_first_credit_evaluation,
     IF(
-      cap.id_last_credit_analysis = ca.id_credit_analysis,
+      -- If the id_credit_analysis is null, it means that the proposal has dropped before ES
+      (cap.id_last_credit_analysis = ca.id_credit_analysis OR ca.id_credit_analysis IS NULL),
       TRUE,
       FALSE
     ) AS is_last_credit_evaluation,
@@ -210,6 +211,28 @@ proposal_credit_flows AS (
     rf.funnel_step,
     rf.guarantee_offered,
     rf.guarantee_accepted,
+    CASE
+      WHEN rf.sk_offer_submitted_date > 0
+      AND rf.sk_offer_approved_date < 0 THEN 'OS2OA'
+      WHEN rf.sk_offer_approved_date > 0
+      AND (
+        rf.sk_last_credit_evaluation_init < 0
+        OR rf.sk_last_credit_evaluation_init IS NULL
+      ) THEN 'OA2ES'
+      WHEN (
+        rf.sk_last_credit_evaluation_init > 0
+        AND rf.sk_credit_evaluation_approved_date < 0
+      ) THEN 'ES2EP'
+      WHEN (
+        rf.sk_credit_evaluation_approved_date > 0
+        AND rf.sk_tenant_first_doc_sent_date < 0
+      ) THEN 'EP2DS'
+      WHEN rf.sk_tenant_first_doc_sent_date > 0
+      AND rf.sk_credit_analysis_approved_date < 0 THEN 'DS2CA'
+      WHEN rf.sk_credit_analysis_approved_date > 0
+      AND rf.sk_contract_signed_date < 0 THEN 'CA2CS'
+      ELSE NULL
+    END AS funnel_drop_step,
     CAST(
       COALESCE(
         REGEXP_REPLACE(CAST(eca.dt_created AS VARCHAR(8)), '-', ''),
@@ -292,6 +315,11 @@ SELECT
   sk_ec_created_date,
   sk_ec_expired_date,
   funnel_step,
+  -- This rule is necessary to guarantee that the drop step is correct when the guarantee is not accepted
+  CASE
+	  WHEN funnel_drop_step = 'EP2DS' AND guarantee_accepted = 'NOT_ACCEPTED' THEN 'ES2EP'
+	  ELSE funnel_drop_step
+  END AS funnel_drop_step,
   guarantee_offered,
   guarantee_accepted,
   is_first_credit_evaluation,
