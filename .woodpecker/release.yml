@@ -5,7 +5,7 @@ depends_on:
 
 steps:
   make-package-python:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make package
     when:
@@ -13,7 +13,7 @@ steps:
       branch: [master, forno, hotfix/*]
 
   prepare-release-forno:
-    image: alpine:3.10
+    image: public.ecr.aws/docker/library/alpine:3.10
     commands:
       - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
     when:
@@ -21,7 +21,7 @@ steps:
       branch: forno
 
   prepare-release-prod:
-    image: alpine:3.10
+    image: public.ecr.aws/docker/library/alpine:3.10
     commands:
       - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
     when:
@@ -81,7 +81,7 @@ steps:
       branch: [master, hotfix/*]
 
   create-dag-files:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make create-dag-files
     when:
@@ -89,7 +89,7 @@ steps:
       branch: [forno, master, hotfix/*]
 
   upload-bi-etl-ejuice-modules-gcs-forno:
-    image: quintoandar/drone-gcs-sync
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
     settings:
       bucket: us-east4-airflow-forno2-7f52154d-bucket
       source: bietlejuice/
@@ -104,7 +104,7 @@ steps:
       branch: [forno]
 
   upload-bi-etl-ejuice-modules-gcs-prod:
-    image: quintoandar/drone-gcs-sync
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
     settings:
       bucket: us-east4-airflow-prod2-fdaf9748-bucket
       source: bietlejuice/
@@ -119,7 +119,7 @@ steps:
       branch: [master, hotfix/*]
 
   upload-dag-packages-dags-gcs-forno:
-    image: quintoandar/drone-gcs-sync
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
     settings:
       bucket: us-east4-airflow-forno2-7f52154d-bucket
       source: dags/
@@ -134,7 +134,7 @@ steps:
       branch: [forno]
 
   upload-dag-packages-dags-gcs-prod:
-    image: quintoandar/drone-gcs-sync
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
     settings:
       bucket: us-east4-airflow-prod2-fdaf9748-bucket
       source: dags/
@@ -149,7 +149,7 @@ steps:
       branch: [master, hotfix/*]
 
   upload-dag-packages-spark-jobs-s3-forno:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
@@ -158,7 +158,7 @@ steps:
       branch: forno
 
   upload-dag-packages-spark-jobs-s3-prod:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
@@ -167,7 +167,7 @@ steps:
       branch: [master, hotfix/*]
 
   upload-dag-packages-queries-s3-forno:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br queries
@@ -176,7 +176,7 @@ steps:
       branch: forno
 
   upload-dag-packages-queries-s3-prod:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
@@ -185,7 +185,7 @@ steps:
       branch: [master, hotfix/*]
 
   upload-dag-packages-data-quality-s3-forno:
-    image: python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br data_quality
@@ -194,7 +194,7 @@ steps:
       branch: forno
 
   upload-dag-packages-data-quality-s3-prod:
-    image: python:3.7.3
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks data_quality
@@ -203,7 +203,7 @@ steps:
       branch: [master, hotfix/*]
 
   load-metadata-files-to-s3-forno:
-    image: python:3.7.3
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
       - make requirements-scripts
@@ -213,7 +213,7 @@ steps:
       branch: forno
 
   load-metadata-files-to-s3-prod:
-    image: python:3.7.3
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
       - make requirements-scripts
@@ -223,7 +223,7 @@ steps:
       branch: [master, hotfix/*]
 
   load-all-metadata-files-information-to-s3-forno:
-    image: python:3.7.3
+    image: public.ecr.aws/docker/library/python:3.7.16
     environment:
       ENVIRONMENT: forno
     commands:
@@ -235,7 +235,7 @@ steps:
       branch: forno
 
   load-all-metadata-files-information-to-s3-prod:
-    image: python:3.7.3
+    image: public.ecr.aws/docker/library/python:3.7.16
     environment:
       ENVIRONMENT: prod
     commands:
