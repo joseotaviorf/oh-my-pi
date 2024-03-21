@@ -260,8 +260,8 @@ SELECT
     business_context,
     NULL::STRING AS utm_campaign
 FROM 
-    datalake_growth_costs_sharing_rules.d023d
-UNION ALL 
+    datalake_growth_costs_sharing_rules.d023d    
+UNION ALL
 SELECT
     id_date,
     id_rule,
@@ -285,6 +285,30 @@ SELECT
     SUBSTRING(utm_campaign, INSTR(utm_campaign, '.') + 1) AS utm_campaign
 FROM 
     datalake_growth_costs_sharing_rules.d047d
+UNION ALL 
+SELECT
+    id_date,
+    id_rule,
+    'BR' AS country_code, 
+    city_group,
+    share,
+    funnel_side,
+    business_context,
+    SUBSTRING(utm_campaign, INSTR(utm_campaign, '.') + 1) AS utm_campaign
+FROM 
+    datalake_growth_costs_sharing_rules.d048d
+UNION ALL 
+SELECT
+    id_date,
+    id_rule,
+    'BR' AS country_code, 
+    city_group,
+    share,
+    funnel_side,
+    business_context,
+    SUBSTRING(utm_campaign, INSTR(utm_campaign, '.') + 1) AS utm_campaign
+FROM 
+    datalake_growth_costs_sharing_rules.d049d
 UNION ALL 
 SELECT
     id_date,
