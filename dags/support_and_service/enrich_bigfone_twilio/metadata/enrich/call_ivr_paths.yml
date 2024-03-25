@@ -1,36 +1,50 @@
 database_name: datalake_bigfone_twilio
 table_name: call_ivr_paths
+description: "Table with tasks related to Twilio IVR"
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_bigfone_events.events.id
+    description: ID of the event
   id_event:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: ID of the event
   id_call:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: ID of the call
   id_task:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: ID of the task
   step_name:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: IVR step name
   event_type:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Type of event
   digits:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Digits pressed
   ts_created:
     lineage:
       - datalake_bigfone_events.events.metadata
+    description: Timestamp of when the event was created
   year:
     lineage:
       - datalake_bigfone_events.events.year
+    description: Partition column
   month:
     lineage:
       - datalake_bigfone_events.events.month
+    description: Partition column
   day:
     lineage:
       - datalake_bigfone_events.events.day
+    description: Partition column
