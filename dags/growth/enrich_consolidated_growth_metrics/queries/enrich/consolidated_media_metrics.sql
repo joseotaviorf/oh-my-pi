@@ -218,17 +218,17 @@ ON
     AND SUBSTRING(cs.utm_campaign, INSTR(cs.utm_campaign, '.') + 1) = sr_utm.utm_campaign
 LEFT JOIN
     datalake_consolidated_marketing_costs.city_group_old_campaigns_historic ch
-ON 
+ON
     cs.campaign_name = ch.campaign_name    
-LEFT JOIN 
+LEFT JOIN
     datalake_region.region dr 
-ON 
+ON
     SPLIT(cs.campaign_name, '[.]')[0] = dr.id
-LEFT JOIN 
+LEFT JOIN
     datalake_gsheets_clean.cost_taxonomy_translation_dictionary AS ctd
 ON
   cs.account_name = ctd.account_name
-  AND cs.campaign_name = ctd.campaign_name
-  AND cs.report_type = ctd.report_type
-  AND cs.ad_type = ctd.ad_type
-  AND cs.origin = ctd.origin
+  AND COALESCE(cs.campaign_name,"") = COALESCE(ctd.campaign_name,"")
+  AND COALESCE(cs.report_type,"") = COALESCE(ctd.report_type,"")
+  AND COALESCE(cs.ad_type,"") = COALESCE(ctd.ad_type,"")
+  AND COALESCE(cs.origin,"") = COALESCE(ctd.origin,"")
