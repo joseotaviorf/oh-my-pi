@@ -85,5 +85,7 @@ workflow:
         count: id
         max: created_at
         min: created_at
+    Variant:
+      clean_table_name: variant
 cluster:
   type: databricks_10_4_med_general_cluster

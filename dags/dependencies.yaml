@@ -185,7 +185,7 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-experiment
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
-  - bietlejuice.sorting_hat:load-clean-variant
+  - bietlejuice.sorting_hat_credit_engine:load-clean-variant
 bietlejuice.dw_crm:
   - bietlejuice.ebdb:load-clean-inspection
   - bietlejuice.ebdb:load-clean-pre-proposal

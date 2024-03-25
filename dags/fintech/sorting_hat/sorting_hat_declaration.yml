@@ -38,7 +38,5 @@ workflow:
       clean_table_name: screening_result_version
     User:
       clean_table_name: user
-    Variant:
-      clean_table_name: variant
 cluster:
   type: databricks_10_4_med_general_cluster
