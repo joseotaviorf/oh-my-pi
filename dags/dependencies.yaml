@@ -821,6 +821,7 @@ bietlejuice.dw_supply_outbound_contacts:
   - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
 bietlejuice.dw_taxonomy:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
 bietlejuice.dw_tenant_documentation:
   - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
   - bietlejuice.ebdb:load-clean-proponent-info-resend-request
