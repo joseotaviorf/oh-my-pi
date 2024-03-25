@@ -810,6 +810,8 @@ bietlejuice.dw_search_session_event:
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
+bietlejuice.dw_secretariat_user:
+  - bietlejuice.enrich_hub_services:load-enrich-secretariat-allocation-history
 bietlejuice.dw_smart_price:
   - bietlejuice.ebdb:load-clean-dynamic-pricing-house
   - bietlejuice.ebdb:load-clean-dynamic-pricing-house-aud
