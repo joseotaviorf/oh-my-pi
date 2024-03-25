@@ -6,6 +6,8 @@ from bietlejuice.base.cdc.primary_key_identifiers.mysql_primary_key_identifier i
 from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
     MySqlCdcSchemaFinder,
 )
+from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
+from bietlejuice.loaders.delta_loader import DeltaLoader
 from quintoandar_logger import QuintoAndarLogger
 
 from delta.tables import DeltaTable
@@ -17,8 +19,6 @@ from pyspark.sql.utils import AnalysisException
 JOB_NAME = "load_cdc_raw"
 
 logger = QuintoAndarLogger(JOB_NAME)
-
-spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 
 
 def parse_arguments():
@@ -60,45 +60,6 @@ def get_df_from_transactional(
     return transactional_df
 
 
-def load_raw_delta_table(full_table_name):
-    """
-    Load and return raw Delta table if exists.
-    """
-    logger.info(
-        f"m=load_raw_delta_table, table_name={full_table_name}, msg=Reading raw Delta table..."
-    )
-    try:
-        delta_table = DeltaTable.forName(spark, full_table_name)
-    except Exception as e:
-        logger.info(
-            f"m=load_raw_delta_table, msg=Unable to read delta table, error={e}"
-        )
-        return None
-
-    return delta_table
-
-
-def create_raw_delta_table(
-    df, full_raw_table_name, datalake_bucket, schema, table_name, primary_keys
-):
-    """
-    Create raw Delta table.
-    """
-    logger.info(
-        f"m=create_raw_delta_table, msg=Creating raw table using Delta format..."
-    )
-    df.write.format("delta").option("mergeSchema", True).mode("overwrite").saveAsTable(
-        full_raw_table_name, path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/"
-    )
-    comma_separated_primary_keys = ",".join(primary_keys)
-    spark.sql(
-        f"ALTER TABLE {full_raw_table_name} SET TBLPROPERTIES ('primary_keys' = '{comma_separated_primary_keys}')"
-    )
-    raw_delta_table = DeltaTable.forName(spark, full_raw_table_name)
-
-    return raw_delta_table
-
-
 def dml_processor(transactional_df, primary_keys):
     """
     Applies deduplication to Transactional layer
@@ -119,33 +80,6 @@ def dml_processor(transactional_df, primary_keys):
     transactional_df = transactional_df.drop("cdc_binlog_position")
 
     return transactional_df
-
-
-def merge_transactional_into_raw_table(
-    transactional_df, primary_keys: list, raw_delta_table
-):
-    """
-    Apply merge operations to Delta table, to consolidate
-    Transactional layer table DML operations.
-    """
-    logger.info(
-        "m=merge_transactional_into_raw_table, msg=Updating Raw Delta table with Transactional table using soft-delete strategy..."
-    )
-    join_condition = " AND ".join(
-        [f"raw_table.{col} = transactional_table.{col}" for col in primary_keys]
-    )
-    raw_delta_table.alias("raw_table").merge(
-        transactional_df.alias("transactional_table"), join_condition
-    ).whenMatchedUpdate(
-        condition=f"transactional_table.ts_cdc_transaction >= raw_table.ts_cdc_transaction",
-        set=dict(
-            (col, f"transactional_table.{col}") for col in transactional_df.columns
-        )
-    ).whenNotMatchedInsert(
-        values=dict(
-            (col, f"transactional_table.{col}") for col in transactional_df.columns
-        )
-    ).execute()
 
 
 def main():
@@ -195,22 +129,17 @@ def main():
 
     transactional_df = dml_processor(transactional_df, primary_keys)
 
-    spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_{schema}_raw`")
-    full_raw_table_name = f"`datalake_{schema}_raw`.`{table_name}`"
+    full_raw_table_name = f"datalake_{schema}_raw.{table_name}"
 
-    raw_delta_table = load_raw_delta_table(full_raw_table_name)
-
-    if not raw_delta_table:
-        raw_delta_table = create_raw_delta_table(
-            transactional_df,
-            full_raw_table_name,
-            datalake_bucket,
-            schema,
-            table_name,
-            primary_keys,
-        )
-
-    merge_transactional_into_raw_table(transactional_df, primary_keys, raw_delta_table)
+    loader = DeltaLoader()
+    loader.load_table(
+        table_name=full_raw_table_name,
+        path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
+        source_df=transactional_df,
+        merge_on=primary_keys,
+        when_matched_update_condition="source.ts_cdc_transaction >= target.ts_cdc_transaction"
+    )
+    SparkTablePropertyHelper.set_property(full_raw_table_name, "primary_keys", ",".join(primary_keys))
 
 
 if __name__ == "__main__":

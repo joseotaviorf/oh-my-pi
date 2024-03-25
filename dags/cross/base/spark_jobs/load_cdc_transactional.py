@@ -14,6 +14,7 @@ from bietlejuice.base.cdc.schema_treatment.schema_changes_notifier import (
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 
 
+from bietlejuice.loaders.delta_loader import DeltaLoader
 from pyspark.sql.functions import col, to_timestamp, lit, make_date
 from pyspark.sql.utils import AnalysisException
 
@@ -21,8 +22,6 @@ JOB_NAME = "load_cdc_transactional"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-
-spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 
 
 def parse_arguments():
@@ -54,10 +53,12 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
         f"m=load_df_into_transactional, file_format=delta, msg=Loading DataFrame into transactional layer..."
     )
 
-    df.write.format("delta").option("mergeSchema", True).mode("overwrite").saveAsTable(
+    loader = DeltaLoader()
+    loader.load_table(
         f"datalake_{schema}_transactional.{table_name}",
         path=f"s3://{datalake_bucket}/transactional/{schema}/{table_name}/",
-        partitionBy=partitions,
+        source_df=df,
+        partition_by=partitions
     )
 
 
@@ -219,7 +220,6 @@ def main():
     )
 
     logger.info("m=__main__, msg=Load table into transactional layer...")
-    spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_{schema}_transactional`")
     load_df_into_transactional(
         transactional_df, datalake_bucket, schema, table_name, partitions
     )

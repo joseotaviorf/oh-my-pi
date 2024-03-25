@@ -5,8 +5,10 @@ from typing import List
 from bietlejuice.base.cdc.primary_key_identifiers.clean_primary_key_identifier import (
     CleanPrimaryKeyIdentifier,
 )
-from pyspark.sql.functions import col
+from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
+from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from pyspark.sql.functions import col
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -63,65 +65,6 @@ def insert_columns_into_query(query, columns):
     return rejoined_query
 
 
-def load_clean_delta_table(full_table_name):
-    """
-    Load and return Clean Delta table if exists.
-    """
-    logger.info(
-        f"m=load_clean_delta_table, table_name={full_table_name}, msg=Reading Clean Delta table..."
-    )
-    try:
-        delta_table = DeltaTable.forName(spark, full_table_name)
-    except Exception as e:
-        logger.info(
-            f"m=load_clean_delta_table, msg=Unable to read delta table, error={e}"
-        )
-        return None
-
-    return delta_table
-
-
-def create_clean_delta_table(
-    df, full_clean_table_name, datalake_bucket, schema, table_name
-):
-    """
-    Create Clean Delta table.
-    """
-    logger.info(
-        f"m=create_clean_delta_table, msg=Creating clean table using Delta format..."
-    )
-    df.write.format("delta").option("mergeSchema", True).mode("overwrite").saveAsTable(
-        full_clean_table_name,
-        path=f"s3://{datalake_bucket}/clean/{schema}/{table_name}/",
-    )
-    clean_delta_table = DeltaTable.forName(spark, full_clean_table_name)
-
-    return clean_delta_table
-
-
-def apply_deletes_to_clean_table(clean_delta_table, primary_keys, clean_updates):
-    """
-    Updates clean table based on raw modifications by applying
-    deletes.
-    """
-    logger.info(
-        f"m=consolidate_clean_table, msg=Updating clean table based on raw modifications"
-    )
-    join_condition = " AND ".join([
-        f"clean_table.{col} = clean_updates.{col}" for col in primary_keys
-    ])
-    clean_delta_table.alias("clean_table").merge(
-        clean_updates.alias("clean_updates"),
-        join_condition,
-    ).whenMatchedDelete(condition=f"clean_updates.op_cdc = 'd'").whenMatchedUpdate(
-        condition=f"clean_updates.ts_cdc_transaction >= clean_table.ts_cdc_transaction",
-        set=dict((col, f"clean_updates.{col}") for col in clean_updates.columns),
-    ).whenNotMatchedInsert(
-        condition="clean_updates.op_cdc != 'd'",
-        values=dict((col, f"clean_updates.{col}") for col in clean_updates.columns),
-    ).execute()
-
-
 def main():
     args = parse_arguments()
     dag_name = args.dag_name
@@ -154,24 +97,16 @@ def main():
     query_with_cdc_columns = insert_columns_into_query(clean_query, cdc_columns)
     clean_updates_df = spark.sql(query_with_cdc_columns).filter(col("ts_cdc_transaction").cast("date").between(start_date, end_date))
 
-    spark.sql(f"CREATE DATABASE IF NOT EXISTS `datalake_{schema}_clean`")
-    full_clean_table_name = f"`datalake_{schema}_clean`.`{table_name}`"
-
-    clean_delta_table = load_clean_delta_table(full_clean_table_name)
-
-    if not clean_delta_table:
-        clean_updates_without_deletes = clean_updates_df.filter(
-            clean_updates_df.op_cdc != "d"
-        )
-        clean_delta_table = create_clean_delta_table(
-            clean_updates_without_deletes,
-            full_clean_table_name,
-            datalake_bucket,
-            schema,
-            table_name,
-        )
-
-    apply_deletes_to_clean_table(clean_delta_table, clean_primary_keys, clean_updates_df)
+    full_clean_table_name = f"datalake_{schema}_clean.{table_name}"
+    loader = DeltaLoader()
+    loader.load_table(
+        table_name=full_clean_table_name,
+        path=f"s3://{datalake_bucket}/clean/{schema}/{table_name}/",
+        source_df=clean_updates_df,
+        merge_on=clean_primary_keys,
+        when_not_matched_insert_condition="source.op_cdc != 'd'",
+        when_matched_delete_condition="source.ts_cdc_transaction >= target.ts_cdc_transaction",
+    )
 
 
 if __name__ == "__main__":
