@@ -1,0 +1,17 @@
+---
+dag:
+  name: enrich_top_of_funnel_affiliates
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: This DAG is a derivation of Amplitude enrich layer, this DAG generates tables to track affiliates user behaviors in the top of the funnel.
+workflow:
+  type: query
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+  - year
+  - month
+  - day
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
