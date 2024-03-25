@@ -1,4 +1,4 @@
-## Regions polygon
+## Reverse Regions polygon
 
 ### Purpose
 

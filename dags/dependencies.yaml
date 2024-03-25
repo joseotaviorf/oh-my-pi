@@ -2985,7 +2985,7 @@ bietlejuice.metric_rent_benvi__supply:
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
-bietlejuice.regions_polygon:
+bietlejuice.reverse_regions_polygon:
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.reports:
