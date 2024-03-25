@@ -3,7 +3,7 @@ dag:
   name: enrich_ebdb_contract
   schedule_start_date: 2020, 7, 1
   owner: Data ForRent
-  documentation: 
+  documentation:
     dag_purpose: |
       Creates enriched tables for the context `Contract` of ebdb.
       This DAG is triggered by Mediator and loads the table via full load.
@@ -15,7 +15,7 @@ workflow:
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.2xlarge
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: c5d.9xlarge
     num_workers: 2
     spark_version: 10.4.x-scala2.12
