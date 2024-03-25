@@ -21,7 +21,7 @@ WITH without_agg_infos AS (
         bmt.is_backlog_not_in_time,
         IF(bmt.is_backlog_in_time OR bmt.is_backlog_not_in_time, TRUE, FALSE) AS is_backlog,
         ut.ts_csat_response,
-        DATE(tf.ts_updated) AS dt_ticket_updated
+        DATE(tf.ts_updated) AS dt_last_ticket_updated
     FROM
         datalake_customer_support.unified_tickets AS ut
     LEFT JOIN
@@ -47,8 +47,9 @@ WITH without_agg_infos AS (
         ROW_NUMBER() OVER (PARTITION BY ut.id_ticket ORDER BY tf.ts_updated DESC) = 1
 )
 SELECT
-    wa.id_agent || dt_ticket_updated AS sk_snapshot,
+    wa.id_agent || dt_last_ticket_updated AS sk_snapshot,
     wa.id_agent AS sk_agent,
+    COALESCE(DATE_FORMAT(wa.dt_last_ticket_updated, 'yyyyMMdd'), -1) AS sk_last_ticket_updated_date,
     COUNT(id_ticket) AS total_tickets,
     SUM(wa.reopened_tickets) AS ticket_reopenings,
     SUM(wa.replied_tickets) AS ticket_responses,
@@ -113,11 +114,10 @@ SELECT
     COUNT_IF(wa.is_backlog = TRUE) AS tickets_in_backlog,
     COUNT_IF(wa.is_backlog_in_time = TRUE) AS backlog_within_sla,
     COUNT_IF(wa.is_backlog_not_in_time = TRUE) AS backlog_with_exceed_sla,
-    wa.dt_ticket_updated AS dt_last_ticket_updated,
-    YEAR(wa.dt_ticket_updated) AS year,
-    MONTH(wa.dt_ticket_updated) AS month,
-    DAY(wa.dt_ticket_updated) AS day
+    YEAR(wa.dt_last_ticket_updated) AS year,
+    MONTH(wa.dt_last_ticket_updated) AS month,
+    DAY(wa.dt_last_ticket_updated) AS day
 FROM 
     without_agg_infos AS wa
 GROUP BY 
-    2, dt_ticket_updated
+    2, dt_last_ticket_updated

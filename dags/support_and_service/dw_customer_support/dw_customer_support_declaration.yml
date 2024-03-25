@@ -17,7 +17,7 @@ workflow:
     fact_agent_daily_productivity:
       partitions: [year, month, day]
       extraction_type: incremental
-    fact_support_analysts_snapshot:
+    fact_analysts_performance:
       partitions: [year, month, day]
       extraction_type: incremental
 cluster:

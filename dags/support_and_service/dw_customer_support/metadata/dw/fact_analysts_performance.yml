@@ -1,5 +1,5 @@
 database_name: dw_customer_support
-table_name: fact_support_analysts_snapshot
+table_name: fact_analysts_performance
 description: 
   Fact table that aims to gather data on metrics related to analysts' performance. This table is a 
   periodic snapshot type with the frequency being daily, this means that the base will contain a day-by-day 
@@ -16,6 +16,10 @@ columns:
     lineage:
       - datalake_zendesk_users.agents.email
     description: Analyst identification key.
+  sk_last_ticket_updated_date:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated
+    description: Identification key for the update date of the last ticket handled by the analyst.
   total_tickets:
     description: Information of integer type that indicates the total number of tickets that the analyst handled on the day.
   ticket_reopenings:
@@ -44,10 +48,6 @@ columns:
     description: Integer type information that indicates the number of tickets that were in the analyst's backlog still within the SLA on the day.
   backlog_with_exceed_sla:
     description: Integer type information that indicates the number of tickets that exceeded the sla in the analyst's backlog on the day.
-  dt_last_ticket_updated:
-    lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated
-    description: Date type information that represents the reference date of the data.
   year:
     description: Year of reference date.
   month:
