@@ -2944,8 +2944,11 @@ bietlejuice.metric_rent__listings:
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
 bietlejuice.metric_rent__retention:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_retention:load-dw-retention-dim-nps-answer
   - bietlejuice.dw_retention:load-dw-retention-fact-contract-termination
+  - bietlejuice.dw_retention:load-dw-retention-fact-owner-retention
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
 bietlejuice.metric_rent__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
