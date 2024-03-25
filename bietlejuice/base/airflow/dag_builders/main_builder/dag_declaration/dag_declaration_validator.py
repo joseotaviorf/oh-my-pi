@@ -94,6 +94,11 @@ class DAGDeclarationValidator(Validator):
                     "required": False,
                 },
                 "load_options": {"type": "dict", "empty": False, "required": False},
+                "bucket_config_name": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
             },
         },
         "cluster": {

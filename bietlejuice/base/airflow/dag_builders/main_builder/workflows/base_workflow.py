@@ -151,3 +151,12 @@ class BaseWorkflow(BuilderInterface):
             layer=table_attributes.layer.value,
             table_name=table_attributes.table_name,
         )
+
+    def _check_include_sync_hive_tasks(self, table_attributes: TableAttributes) -> bool:
+        """
+        Checks if sync hive structure task should be added into the workflow.
+        """
+        default_has_hive_sync = self.workflow_args.get("has_hive_sync", True)
+        return table_attributes.table_customization.get(
+            "has_hive_sync", default_has_hive_sync
+        )

@@ -27,8 +27,8 @@ class EnrichQueryWorkflow(BaseWorkflow):
 
     def build_dag(self):
         dag = self.dag_instance()
-
-        bucket = self.config_service.get_config("datalake_bucket")
+        bucket_config = self.workflow_args.get("bucket_config_name", "datalake_bucket")
+        bucket = self.config_service.get_config(bucket_config)
         dag_execution_context = self._get_dag_execution_context(dag, bucket)
         self._initialize_task_creators(dag_execution_context)
 
@@ -74,25 +74,24 @@ class EnrichQueryWorkflow(BaseWorkflow):
         """Returns a tuple with the first (Load) and last (Load) tasks of the table."""
 
         load = self.load_enrich_task_creator.create_task(table)
-        sync_metastore_structure = self.sync_hive_structure_task_creator.create_task(
-            table
-        )
-        sync_metastore_partitions = self.sync_hive_partitions_task_creator.create_task(
-            table
-        )
-        propagate_metadata = self.propagate_metadata_task_creator.create_task(table)
-        (
-            load
-            >> sync_metastore_structure
-            >> sync_metastore_partitions
-            >> propagate_metadata
-            >> job_cluster_finished_task
-        )
-
+        if self._check_include_sync_hive_tasks(table):
+            sync_metastore_structure = self.sync_hive_structure_task_creator.create_task(
+                table
+            )
+            sync_metastore_partitions = self.sync_hive_partitions_task_creator.create_task(
+                table
+            )
+            propagate_metadata = self.propagate_metadata_task_creator.create_task(table)
+            (
+                load
+                >> sync_metastore_structure
+                >> sync_metastore_partitions
+                >> propagate_metadata
+                >> job_cluster_finished_task
+            )
         if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
             load >> data_quality >> job_cluster_finished_task
-
         return load, load
 
     def _set_dependencies(
