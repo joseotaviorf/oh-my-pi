@@ -5,6 +5,10 @@ SELECT
     Nome AS franchise_name,
     CategoriaFranquia AS franchise_category,
     TpFranquia AS franchise_type,
+    CASE
+        WHEN despachante IS FALSE THEN 'retail'
+        WHEN despachante IS TRUE THEN 'hubs'
+    END AS fowarding_type,
     PercRoyalties AS royalties_percentage_value,
     PercFundoMarketing AS martketing_fund_percentage,
     CarenciaRoyalties AS grace_period_royalties,
