@@ -271,7 +271,8 @@ proposal_credit_flows AS (
     ROW_NUMBER() OVER (
       PARTITION BY rf.sk_client,
       rf.sk_credit_analysis,
-      rf.sk_house
+      rf.sk_house,
+      rf.sk_offer
       ORDER BY
         rf.version DESC
     ) AS linsting_rank
