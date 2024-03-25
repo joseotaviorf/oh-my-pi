@@ -19,12 +19,13 @@ SELECT DISTINCT
     type,
     url AS url_ticket,
     via,
+    CAST(GET_JSON_OBJECT(via, '$.channel') AS STRING) AS via_channel,
     allow_channelback,
     has_incidents,
     is_public,
     CAST(dt AS DATE) AS dt_extracted,
-    created_at AS ts_created,
-    updated_at AS ts_updated,
+    CAST(created_at AS TIMESTAMP) AS ts_created,
+    CAST(updated_at AS TIMESTAMP) AS ts_updated,
     NOW() AS ts_load,
     YEAR(dt) AS year,
     MONTH(dt) AS month,
@@ -32,4 +33,4 @@ SELECT DISTINCT
 FROM
     datalake_zendesk_raw.tickets
 WHERE
-    dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)
+    dt IN ('{year}-{month}-{day}', CAST((CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY) AS STRING))

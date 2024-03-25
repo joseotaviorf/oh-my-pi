@@ -27,10 +27,10 @@ columns:
       - datalake_zendesk_tickets_raw.groups.updated_at
   year:
     lineage:
-      - datalake_zendesk_tickets_raw.groups.updated_at
+      - datalake_zendesk_tickets_raw.groups.dt
   month:
     lineage:
-      - datalake_zendesk_tickets_raw.groups.updated_at
+      - datalake_zendesk_tickets_raw.groups.dt
   day:
     lineage:
-      - datalake_zendesk_tickets_raw.groups.updated_at
+      - datalake_zendesk_tickets_raw.groups.dt

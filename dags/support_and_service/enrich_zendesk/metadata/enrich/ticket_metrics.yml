@@ -1,0 +1,98 @@
+database_name: datalake_zendesk
+table_name: ticket_metrics
+description: Table with all metrics related to the ticket
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.id_ticket
+    description: Zendesk's ticket ID
+  group_stations:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.group_stations
+    description: Number of groups the ticket passed through
+  assignee_stations:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.assignee_stations
+    description: Number of agents assigned to the ticket
+  reopens:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.reopens
+    description: Number of times the ticket was reopened
+  replies:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.replies
+    description: Number of public replies the agent added to the ticket
+  reply_time_min_calendar:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.reply_time_min
+    description: Number of minutes to the first reply during calendar hours
+  reply_time_min_business:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.reply_time_min
+    description: Number of minutes to the first reply during business hours
+  first_resolution_time_min_business:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.first_resolution_time_min
+    description: Number of minutes to the first resolution time during business hours
+  first_resolution_time_min_calendar:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.first_resolution_time_min
+    description: Number of minutes to the first resolution time during calendar hours
+  full_resolution_time_min_business:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.full_resolution_time_min
+    description: Number of minutes to the full resolution during business hours
+  full_resolution_time_min_calendar:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.full_resolution_time_min
+    description: Number of minutes to the full resolution during calendar hours
+  requester_wait_time_min_business:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.requester_wait_time_min
+    description: Number of minutes the requester spent waiting during business hours
+  requester_wait_time_min_calendar:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.requester_wait_time_min
+    description: Number of minutes the requester spent waiting during calendar hours
+  agent_wait_time_min_business:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.agent_wait_time_min
+    description: Number of minutes the agent spent waiting during business hours
+  agent_wait_time_min_calendar:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.agent_wait_time_min
+    description: Number of minutes the agent spent waiting during calendar hours
+  on_hold_time_min_business:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.on_hold_time_min
+    description: Number of minutes on hold during business hours
+  on_hold_time_min_calendar:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.on_hold_time_min
+    description: Number of minutes on hold during calendar hours
+  ts_assigned:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.ts_initially_assigned
+    description: Timestamp of when the ticket was last assigned
+  ts_initially_assigned:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.ts_initially_assigned
+    description: Timestamp of when the ticket was initially assigned
+  ts_latest_comment_added:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.ts_latest_comment_added
+    description: Timestamp of the latest comment added to the ticket
+  ts_solved:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.ts_solved
+    description: Timestamp of when the ticket was solved
+  ts_load:
+    description: Timestamp of when data was loaded
+  year:
+    descriptiopn: Partition column
+  month:
+    descriptiopn: Partition column
+  day:
+    descriptiopn: Partition column

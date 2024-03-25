@@ -30,10 +30,10 @@ columns:
       - datalake_zendesk_raw.group_memberships.updated_at
   year:
     lineage:
-      - datalake_zendesk_raw.group_memberships.updated_at
+      - datalake_zendesk_raw.group_memberships.dt
   month:
     lineage:
-      - datalake_zendesk_raw.group_memberships.updated_at
+      - datalake_zendesk_raw.group_memberships.dt
   day:
     lineage:
-      - datalake_zendesk_raw.group_memberships.updated_at
+      - datalake_zendesk_raw.group_memberships.dt

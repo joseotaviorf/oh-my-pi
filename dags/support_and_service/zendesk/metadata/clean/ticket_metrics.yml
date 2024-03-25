@@ -82,18 +82,15 @@ columns:
   ts_created:
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.created_at
-  ts_created_local:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.created_at
   ts_updated:
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.updated_at
   year:
     lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.updated_at
+      - datalake_zendesk_tickets_raw.ticket_metrics.dt
   month:
     lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.updated_at
+      - datalake_zendesk_tickets_raw.ticket_metrics.dt
   day:
     lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.updated_at
+      - datalake_zendesk_tickets_raw.ticket_metrics.dt

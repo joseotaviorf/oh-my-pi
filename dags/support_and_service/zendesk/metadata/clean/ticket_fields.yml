@@ -61,9 +61,6 @@ columns:
   dt_extracted:
     lineage:
       - datalake_zendesk_tickets_raw.ticket_fields.dt
-  ts_created_local:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_fields.created_at
   ts_created:
     lineage:
       - datalake_zendesk_tickets_raw.ticket_fields.created_at
@@ -72,10 +69,10 @@ columns:
       - datalake_zendesk_tickets_raw.ticket_fields.updated_at
   year:
     lineage:
-      - datalake_zendesk_tickets_raw.ticket_fields.updated_at
+      - datalake_zendesk_tickets_raw.ticket_fields.dt
   month:
     lineage:
-      - datalake_zendesk_tickets_raw.ticket_fields.updated_at
+      - datalake_zendesk_tickets_raw.ticket_fields.dt
   day:
     lineage:
-      - datalake_zendesk_tickets_raw.ticket_fields.updated_at
+      - datalake_zendesk_tickets_raw.ticket_fields.dt

@@ -23,9 +23,8 @@ tables:
     is_incremental: true
 
 custom_cluster:
-  driver_node_type_id: r5d.8xlarge
-  node_type_id: r5d.8xlarge
-  runtime_engine: PHOTON
+  driver_node_type_id: r5d.4xlarge
+  node_type_id: r5d.4xlarge
   num_workers: 4
   aws_attributes:
     availability: ON_DEMAND

@@ -12,13 +12,13 @@ SELECT DISTINCT
   details,
   notes,
   CAST(dt AS DATE) AS dt_extracted,
-  updated_at AS ts_updated,
-  created_at AS ts_created,
-  deleted_at AS ts_deleted,
+  CAST(created_at AS TIMESTAMP) AS ts_created,
+  CAST(updated_at AS TIMESTAMP) AS ts_updated,
+  CAST(deleted_at AS TIMESTAMP) AS ts_deleted,
   YEAR(dt) AS year,
   MONTH(dt) AS month,
   DAY(dt) AS day
 FROM
   datalake_zendesk_raw.organizations
 WHERE
-  dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)
+  dt IN ('{year}-{month}-{day}', CAST((CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY) AS STRING))

@@ -120,10 +120,10 @@ columns:
       - datalake_zendesk_tickets_raw.users.updated_at
   year:
     lineage:
-      - datalake_zendesk_tickets_raw.users.updated_at
+      - datalake_zendesk_tickets_raw.users.dt
   month:
     lineage:
-      - datalake_zendesk_tickets_raw.users.updated_at
+      - datalake_zendesk_tickets_raw.users.dt
   day:
     lineage:
-      - datalake_zendesk_tickets_raw.users.updated_at
+      - datalake_zendesk_tickets_raw.users.dt

@@ -36,10 +36,10 @@ columns:
       - datalake_zendesk_tickets_raw.satisfaction_ratings.updated_at
   year:
     lineage:
-      - datalake_zendesk_tickets_raw.satisfaction_ratings.updated_at
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.dt
   month:
     lineage:
-      - datalake_zendesk_tickets_raw.satisfaction_ratings.updated_at
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.dt
   day:
     lineage:
-      - datalake_zendesk_tickets_raw.satisfaction_ratings.updated_at
+      - datalake_zendesk_tickets_raw.satisfaction_ratings.dt

@@ -14,21 +14,21 @@ WITH ticket_metrics AS (
     agent_wait_time_in_minutes,
     on_hold_time_in_minutes,
     CAST(dt AS DATE) AS dt_extracted,
-    requester_updated_at AS ts_requester_updated,
-    solved_at AS ts_solved,
-    latest_comment_added_at AS ts_latest_comment_added,
-    assigned_at AS ts_assigned,
-    initially_assigned_at AS ts_initially_assigned,
-    assignee_updated_at AS ts_assignee_updated,
-    created_at AS ts_created,
-    updated_at AS ts_updated,
+    CAST(requester_updated_at AS TIMESTAMP) AS ts_requester_updated,
+    CAST(solved_at AS TIMESTAMP) AS ts_solved,
+    CAST(latest_comment_added_at AS TIMESTAMP) AS ts_latest_comment_added,
+    CAST(assigned_at AS TIMESTAMP) AS ts_assigned,
+    CAST(initially_assigned_at AS TIMESTAMP) AS ts_initially_assigned,
+    CAST(assignee_updated_at AS TIMESTAMP) AS ts_assignee_updated,
+    CAST(created_at AS TIMESTAMP) AS ts_created,
+    CAST(updated_at AS TIMESTAMP) AS ts_updated,
     YEAR(dt) AS year,
     MONTH(dt) AS month,
     DAY(dt) AS day
 FROM
     datalake_zendesk_raw.ticket_metrics
 WHERE
-    dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)
+    dt IN ('{year}-{month}-{day}', CAST((CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY) AS STRING))
 )
 SELECT
     id_ticket_metric,

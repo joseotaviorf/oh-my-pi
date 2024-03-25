@@ -33,9 +33,9 @@ SELECT DISTINCT
     two_factor_auth_enabled AS is_two_factor_auth_enabled,
     suspended AS is_suspended,
     CAST(dt AS DATE) AS dt_extracted,
-    last_login_at AS ts_last_login,
-    created_at AS ts_created,
-    updated_at AS ts_updated,
+    CAST(last_login_at AS TIMESTAMP) AS ts_last_login,
+    CAST(created_at AS TIMESTAMP) AS ts_created,
+    CAST(updated_at AS TIMESTAMP) AS ts_updated,
     NOW() AS ts_load,
     YEAR(dt) AS year,
     MONTH(dt) AS month,
@@ -43,4 +43,4 @@ SELECT DISTINCT
 FROM
     datalake_zendesk_raw.users
 WHERE
-    dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY)
+    dt IN ('{year}-{month}-{day}', CAST((CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY) AS STRING))

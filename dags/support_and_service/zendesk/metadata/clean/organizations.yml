@@ -48,10 +48,10 @@ columns:
       - datalake_zendesk_tickets_raw.organizations.deleted_at
   year:
     lineage:
-      - datalake_zendesk_tickets_raw.organizations.updated_at
+      - datalake_zendesk_tickets_raw.organizations.dt
   month:
     lineage:
-      - datalake_zendesk_tickets_raw.organizations.updated_at
+      - datalake_zendesk_tickets_raw.organizations.dt
   day:
     lineage:
-      - datalake_zendesk_tickets_raw.organizations.updated_at
+      - datalake_zendesk_tickets_raw.organizations.dt

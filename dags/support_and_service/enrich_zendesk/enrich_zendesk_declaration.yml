@@ -1,0 +1,14 @@
+dag:
+    name: enrich_zendesk
+    schedule_start_date: 2024, 4, 1
+    owner: Data SS
+    documentation:
+        dag_purpose: |
+            This DAG comprises all the logic on ticket and ticket metrics from Zendesk.
+workflow:
+    type: query
+    layer: enrich
+    default_extraction_type: incremental
+    default_partitions: ["year", "month", "day"]
+cluster:
+    type: databricks_10_4_max_io-memory_photon_cluster
