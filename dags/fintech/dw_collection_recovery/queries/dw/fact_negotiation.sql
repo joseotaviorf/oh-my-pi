@@ -2,31 +2,47 @@ WITH
 trato_feito_negotiation AS (
   SELECT
     id_negotiation_recupera,
-    id_negotiation,
-    id_contract,
-    is_contract_recurrent_debtor,
-    status,
-    has_renegotiated AS is_renegotiation,
-    qt_installments,
-    negotiation_original_amount,
-    interest_fee_amount,
-    fine_fee_amount,
-    credit_card_fee_amount,
-    ROUND(negotiation_original_amount + fine_fee_amount + interest_fee_amount, 2) AS debt_amount_without_adm_fee,
-    ROUND(negotiation_original_amount + fine_fee_amount + interest_fee_amount + credit_card_fee_amount, 2) AS total_debt_amount,
-    negotiation_discount_amount AS total_discount_amount, -- Total debt (total_debt_amount = original + fine + fee + credit card) - Negotiated amount (total_expected_amount)
-    GREATEST(ROUND((negotiation_original_amount + fine_fee_amount + interest_fee_amount) - total_expected_amount, 2), 0) AS discount_amount_without_adm_fee, -- Total debt without credit card fee (debt_amount_without_adm_fee = original + fine + fee) - Negotiated amount (total_expected_amount)
-    total_expected_amount AS negotiated_amount,
-    paid_amount,
-    INT(qt_installments_paid) AS qt_installments_paid,
-    breached_installment,
-    dt_expected_end,
-    DATE(ts_created_at) AS dt_promisse,
-    DATE(ts_first_payment) AS dt_first_payment,
-    DATE(ts_paid_all) AS dt_paid_all,
-    DATE(ts_breach) AS dt_breach
-  FROM datalake_debt_recovery.negotiation
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_recupera ORDER BY ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
+    n.id_negotiation,
+    n.id_contract,
+    CASE
+      WHEN n.debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
+      WHEN n.debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
+      WHEN n.debtor = "velo_delinquency_tenant" THEN "IQ QuintoCred"
+    END AS creditor,
+    n.is_contract_recurrent_debtor,
+    n.status,
+    n.has_renegotiated AS is_renegotiation,
+    IF(i.purpose = 'extra' AND i.reason = 'negotiation-5A', TRUE, FALSE) AS is_ssn, --SSN boletão (BOSSN)
+    n.qt_installments,
+    n.negotiation_original_amount,
+    n.interest_fee_amount,
+    n.fine_fee_amount,
+    n.credit_card_fee_amount,
+    ROUND(n.negotiation_original_amount + n.fine_fee_amount + n.interest_fee_amount, 2) AS debt_amount_without_adm_fee,
+    ROUND(n.negotiation_original_amount + n.fine_fee_amount + n.interest_fee_amount + n.credit_card_fee_amount, 2) AS total_debt_amount,
+    n.negotiation_discount_amount AS total_discount_amount, -- Total debt (total_debt_amount = original + fine + fee + credit card) - Negotiated amount (total_expected_amount)
+    GREATEST(ROUND((n.negotiation_original_amount + n.fine_fee_amount + n.interest_fee_amount) - n.total_expected_amount, 2), 0) AS discount_amount_without_adm_fee, -- Total debt without credit card fee (debt_amount_without_adm_fee = original + fine + fee) - Negotiated amount (total_expected_amount)
+    n.total_expected_amount AS negotiated_amount,
+    n.paid_amount,
+    INT(n.qt_installments_paid) AS qt_installments_paid,
+    n.breached_installment,
+    n.dt_expected_end,
+    DATE(n.ts_created_at) AS dt_promisse,
+    DATE(n.ts_first_payment) AS dt_first_payment,
+    DATE(n.ts_paid_all) AS dt_paid_all,
+    DATE(n.ts_breach) AS dt_breach
+  FROM 
+      datalake_debt_recovery.negotiation AS n
+  LEFT JOIN 
+      datalake_trato_feito_clean.installment AS ii
+        ON ii.id_negotiation = n.id_negotiation
+  LEFT JOIN 
+      datalake_trato_feito_clean.accounting_installment AS ai
+        ON ii.id = ai.id_installment
+  LEFT JOIN 
+      datalake_retsuko.invoice AS i
+        ON ai.id_external = i.id_external
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY n.id_contract, n.id_negotiation_recupera ORDER BY n.ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
 ),
 creditor_pending As (
   SELECT
@@ -132,16 +148,17 @@ invalid_negotiations AS (
 ),
 union_sources AS (
   SELECT
-    STRING(rn.id_negotiation) AS sk_negotiation,
+    STRING(COALESCE(tfn.id_negotiation_recupera, rn.id_negotiation)) AS sk_negotiation,
     rn.customer_document AS sk_debtor,
     tfn.id_negotiation AS id_negotiation_trato_feito,
     COALESCE(tfn.id_contract, invn.id_contract) AS id_contract,
     rn.id_operator,
-    CASE
-      WHEN rn.id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
-      WHEN rn.id_creditor IN (3,5) THEN "IQ QuintoCred"
-      WHEN rn.id_creditor IN (2,6) THEN "PP QuintoAndar"
-    END AS creditor,
+    COALESCE(tfn.creditor,
+      CASE
+        WHEN rn.id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
+        WHEN rn.id_creditor IN (3,5) THEN "IQ QuintoCred"
+        WHEN rn.id_creditor IN (2,6) THEN "PP QuintoAndar"
+    END) AS creditor,
     invn.is_invalid_negotiation,
     invn.invalid_reason,
     rn.agreement_type,
@@ -160,6 +177,7 @@ union_sources AS (
     END AS negotiation_classification,
     rn.agreement_promise,
     rn.promisse_payment_method,
+    COALESCE(tfn.is_ssn, FALSE) AS is_ssn,
     rn.agreement_in_delay,
     rn.down_payment AS is_down_payment_paid,
     tfn.is_renegotiation,
@@ -194,10 +212,12 @@ union_sources AS (
     NOW() AS ts_load
   FROM
     recupera_negotiation AS rn
-  LEFT JOIN trato_feito_negotiation AS tfn
-    ON rn.id_negotiation = tfn.id_negotiation_recupera
-  LEFT JOIN renegotiation AS r
-    ON tfn.id_negotiation = r.id_negotiation
+  FULL OUTER JOIN 
+      trato_feito_negotiation AS tfn
+        ON rn.id_negotiation = tfn.id_negotiation_recupera
+  LEFT JOIN 
+      renegotiation AS r
+        ON tfn.id_negotiation = r.id_negotiation
   LEFT JOIN original_invoices AS oi
     ON tfn.id_negotiation = oi.id_negotiation
   LEFT JOIN invalid_negotiations AS invn
@@ -221,6 +241,7 @@ SELECT
   negotiation_classification,
   agreement_promise,
   promisse_payment_method,
+  is_ssn,
   agreement_in_delay,
   is_down_payment_paid,
   is_renegotiation,

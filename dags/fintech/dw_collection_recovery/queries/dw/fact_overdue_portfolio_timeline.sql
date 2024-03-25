@@ -1,11 +1,24 @@
+WITH
+ssn_original_payment AS (
+    -- Service Self Negotiation where customer paid the original invoice
+    SELECT DISTINCT
+        event_properties:contract_id AS id_contract,
+        event_properties:invoice_id AS id_invoice
+    FROM 
+        datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events
+    WHERE
+        event_properties:contract_id IS NOT NULL
+        AND event_properties:invoice_id IS NOT NULL
+)
 SELECT
-    CONCAT(id_invoice, "-", DATE_FORMAT(dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
-    id_contract,
-    id_invoice,
+    CONCAT(o.id_invoice, "-", DATE_FORMAT(dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
+    o.id_contract,
+    o.id_invoice,
     id_proposal,
     contract_status,
     invoice_type,
     payment_status,
+    IF(ssn.id_invoice IS NOT NULL AND reason NOT IN ("negotiation-recupera", "agreement") AND payment_status = "paid", TRUE, FALSE) AS is_paid_by_ssn,
     debtor_type,
     delay_contamined_range,
     contract_overdue_invoices,
@@ -22,4 +35,9 @@ SELECT
     dt_month_end,
     dt_reference,
     NOW() AS ts_load
-FROM datalake_invoice.overdue_portfolio_timeline
+FROM 
+    datalake_invoice.overdue_portfolio_timeline AS o
+LEFT JOIN 
+    ssn_original_payment AS ssn
+        ON ssn.id_invoice = o.id_invoice
+        AND ssn.id_contract = o.id_contract

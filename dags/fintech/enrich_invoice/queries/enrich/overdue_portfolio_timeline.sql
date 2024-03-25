@@ -1,4 +1,5 @@
-WITH target_invoices AS (
+WITH
+target_invoices AS (
     SELECT DISTINCT
         i.id_contract_external AS id_contract,
         p.id AS id_proposal,
@@ -7,6 +8,7 @@ WITH target_invoices AS (
         i.purpose AS invoice_type,
         i.status AS payment_status,
         i.substatus,
+        i.reason,
         i.due_amount,
         i.paid_amount,
         c.status AS contract_status,
@@ -53,6 +55,7 @@ invoices_timeline AS (
             ELSE "open"
         END AS payment_status,
         i.substatus,
+        i.reason,
         CASE
             WHEN dd.date < i.dt_contract_annulled THEN "Active"
             WHEN dd.date >= i.dt_contract_annulled THEN "Finished"
@@ -163,6 +166,7 @@ SELECT
     invoice_type,
     payment_status,
     substatus,
+    reason,
     debtor_type,
     due_amount,
     CASE

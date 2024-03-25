@@ -17,6 +17,15 @@ columns:
     description: "Contract unique ID"
     lineage:
       - datalake_trato_feito_clean.negotiation.id_debtor_external
+  debtor:
+    description: "Debtor"
+    categories:
+      "rental_contract_landlord": "PP QuintoAndar"
+      "rental_contract_tenant": "IQ QuintoAndar"
+      "velo_delinquency_tenant": "IQ QuintoCred"
+    lineage:
+      - datalake_trato_feito_clean.debtor.origin
+      - datalake_trato_feito_clean.debtor.type
   status:
     description: "Status of the negotiation"
     lineage:

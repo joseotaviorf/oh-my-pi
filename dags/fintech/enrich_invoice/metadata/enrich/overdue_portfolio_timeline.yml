@@ -41,6 +41,10 @@ columns:
     lineage:
       - datalake_retsuko.invoice.substatus
     description: Invoice Substatus - debt, ongoing-negotiation or none.
+  reason:
+    lineage:
+      - datalake_retsuko.invoice.reason
+    description: Invoice Reason. Example negotiation-recupera, negotiation-5A, agreement ...
   debtor_type:
     lineage:
       - datalake_retsuko.invoice.ts_due
