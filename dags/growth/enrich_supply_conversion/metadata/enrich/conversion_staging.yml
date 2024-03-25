@@ -1,0 +1,113 @@
+database_name: datalake_supply_flows
+table_name: conversion_staging
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table is responsible to consolidate all conversion events from different sources, without applying any business rule.
+columns:
+  id_entity:
+    description: The identifier of house (if the event is related to conversion) or prospect (if the event is related to discard).
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.photographer_job_aud.id_house
+      - datalake_bob.house_draft_business_context.id_house
+      - datalake_supply_flows.prospects_events.id_entity
+  id_source:
+    description: The id related to event in the source database
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.id_listing_business_context
+      - datalake_ebdb_clean.photographer_job_aud.id_photographer_job
+      - datalake_bob.house_draft_business_context.id_draft
+      - datalake_supply_flows.prospects_events.id_source
+  id_user_registrant:
+    description: Identifier for the user that discard or convert prospect.
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+      - datalake_bob.house_draft_business_context.id_user_registrant
+      - datalake_supply_flows.prospects_events.id_user_registrant
+  id_lead:
+    description: Unique identifier for the lead in EBDB.
+    lineage:
+      - datalake_supply_flows.conversion_lookup.id_lead
+      - datalake_supply_flows.prospects_events.id_lead
+  rev:
+    description: The id of discard or conversion event in Wololo or aud tables. For Bob is -1 because we don't use aud table.
+    lineage:
+      - datalake_ebdb_clean.house_aud.rev
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+      - datalake_ebdb_clean.photographer_job_aud.rev
+      - datalake_supply_flows.prospects_events.rev
+  business_context:
+    description: Business context for the event. Can be Sale or Rent.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.business_context
+      - datalake_bob.house_draft_business_context.business_context
+      - datalake_supply_flows.prospects_events
+  status:
+    description: Current status of the prospects in Wololo.
+    lineage:
+      - datalake_ebdb_clean.house_aud.status
+      - datalake_ebdb_clean.listing_business_context_aud.status
+      - datalake_ebdb_clean.photographer_job_aud.status
+      - datalake_bob.house_draft_business_context.status
+      - datalake_supply_flows.prospects_events.status
+  source:
+    description: This columns indicating the source of the event.
+    categories:
+      - Wololo: Wololo Microservice to manage prospects.
+      - Bob: Bob Microservice to manage drafts of houses.
+      - EBDB: EBDB Monolith to manage houses, listings.
+      - PJ: EBDB tables which has the photographer job information.
+  step:
+    description: Funnel step where the table is related.
+  weight:
+    description: Weight related to the importance of the event for the funnel.
+  reason:
+    description: Reason associated with the prospect drop.
+    lineage:
+      - datalake_supply_flows.prospects_events.reason
+  drop_step:
+    description: Step where the lead was dropped.
+    lineage:
+      - datalake_supply_flows.prospects_events.drop_step
+  ts_event:
+    description: Timestamp indicating the time of the event.
+    lineage:
+      - datalake_ebdb_clean.photographer_job_aud.ts_photo_job_requested
+      - datalake_ebdb_clean.photographer_job_aud.ts_scheduled
+      - datalake_ebdb_clean.photographer_job_aud.ts_session_started
+      - datalake_ebdb_clean.photographer_job_aud.ts_photos_uploaded
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_bob.house_draft_business_context.ts_created
+      - datalake_supply_flows.prospects_events.ts_event
+  year:
+    description: Year indicating the time of the event.
+    lineage:
+      - datalake_ebdb_clean.photographer_job_aud.ts_photo_job_requested
+      - datalake_ebdb_clean.photographer_job_aud.ts_scheduled
+      - datalake_ebdb_clean.photographer_job_aud.ts_session_started
+      - datalake_ebdb_clean.photographer_job_aud.ts_photos_uploaded
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_bob.house_draft_business_context.ts_created
+      - datalake_supply_flows.prospects_events.ts_event
+      - 
+  month:
+    description: Month indicating the time of the event.
+    lineage:
+      - datalake_ebdb_clean.photographer_job_aud.ts_photo_job_requested
+      - datalake_ebdb_clean.photographer_job_aud.ts_scheduled
+      - datalake_ebdb_clean.photographer_job_aud.ts_session_started
+      - datalake_ebdb_clean.photographer_job_aud.ts_photos_uploaded
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_bob.house_draft_business_context.ts_created
+      - datalake_supply_flows.prospects_events.ts_event
+  day:
+    description: Day indicating the time of the event.
+    lineage:
+      - datalake_ebdb_clean.photographer_job_aud.ts_photo_job_requested
+      - datalake_ebdb_clean.photographer_job_aud.ts_scheduled
+      - datalake_ebdb_clean.photographer_job_aud.ts_session_started
+      - datalake_ebdb_clean.photographer_job_aud.ts_photos_uploaded
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_bob.house_draft_business_context.ts_created
+      - datalake_supply_flows.prospects_events.ts_event

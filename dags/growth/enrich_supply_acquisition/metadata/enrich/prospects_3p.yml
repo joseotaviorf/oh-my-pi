@@ -1,4 +1,4 @@
-database_name: datalake_supply_flows_migrate
+database_name: datalake_supply_flows
 table_name: prospects_3p
 domain: Growth
 owner: arthur.gonzaga@quintoandar.com.br
@@ -11,25 +11,25 @@ columns:
   id_lead:
     description: The unique identifier for each lead in the 3P tables.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.id_lead
+      - datalake_supply_flows.landing_3p.id_lead
   id_lead_ebdb:
     description: The unique identifier for each lead in the 3P tables. Its not the same that id_lead for 3P.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.id_lead
+      - datalake_supply_flows.landing_3p.id_lead
   id_house:
     description: The identifier for each house related in the 3P tables.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.id_house
+      - datalake_supply_flows.landing_3p.id_house
   id_region:
     description: The unique identifier for each region in the 3P tables.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.id_region
+      - datalake_supply_flows.landing_3p.id_region
   supply_source:
     description: The source of the lead, referring to the source where the lead originated. For this table is always 3P.
   business_context:
     description: The business context of the lead, referring to the business context where the lead originated.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.business_context
+      - datalake_supply_flows.landing_3p.business_context
     category: 
       - SALE: The 3P lead is for sale.
       - RENT: The 3P lead is for rent.
@@ -38,7 +38,7 @@ columns:
   drop_step_reason:
     description: The reason for the drop of the lead, referring to the drop step reason in supply funnel.
     lineage:
-      - datalake_supply_flows_migrate.landing_3p.reason
+      - datalake_supply_flows.landing_3p.reason
   funnel_step:
     description: The funnel step of the lead, referring to the funnel step in supply funnel. In this table is always lead.
   funnel_level:
@@ -46,26 +46,26 @@ columns:
   aux_product_status:
     description: The product status of the lead, referring to the product status in Broker Processor.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.status
+      - datalake_supply_flows.landing_3p.status
   aux_hash:
     description: The hash of the lead.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.aux_hash
+      - datalake_supply_flows.landing_3p.aux_hash
   ts_event:
     description: The timestamp of the event.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.ts_event
+      - datalake_supply_flows.landing_3p.ts_event
   ts_load:
     description: The timestamp of the load.
   year:
     description: The year of the event.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.ts_event
+      - datalake_supply_flows.landing_3p.ts_event
   month:
     description: The month of the event.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.ts_event
+      - datalake_supply_flows.landing_3p.ts_event
   day:
     description: The day of the event.
     lineage: 
-      - datalake_supply_flows_migrate.landing_3p.ts_event
+      - datalake_supply_flows.landing_3p.ts_event

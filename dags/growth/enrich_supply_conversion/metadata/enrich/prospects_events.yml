@@ -1,0 +1,65 @@
+database_name: datalake_supply_flows_migrate
+table_name: prospects_events
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table is responsible to generate P2Q/Q2AQ/AQ2O drop events on funnel.
+columns:
+  id_entity:
+    description: The prospect identifier in Wololo.
+    lineage:
+      - datalake_wololo_clean.prospect.id
+  id_source:
+    description: The prospect identifier in Wololo.
+    lineage:
+      - datalake_wololo_clean.prospect.id
+  id_user_registrant:
+    description: Identifier for the user that discard prospect.
+    lineage:
+      - datalake_wololo_clean.context_discard.id_user
+  id_lead:
+    description: Unique identifier for the lead in EBDB.
+    lineage:
+      - datalake_wololo_clean.prospect.id_reference
+  rev:
+    description: The id of discard event in Wololo.
+    lineage:
+      - datalake_wololo_clean.context_discard.id
+  business_context:
+    description: Business context for the event. Can be Sale or Rent.
+    lineage:
+      - datalake_wololo_clean.prospect.is_for_rent
+      - datalake_wololo_clean.prospect.is_for_sale
+  status:
+    description: Current status of the prospects in Wololo.
+    lineage:
+      - datalake_wololo_clean.prospect.status
+  source:
+    description: For this table is always Wololo.
+  step:
+    description: For this table is always prospect.
+  weight:
+    description: The weight of the funnel step, for this table is always 4, because conversion steps is more important than discards.
+  reason:
+    description: Reason associated with the prospect drop.
+    lineage:
+      - datalake_wololo_clean.context_discard.reason
+  drop_step:
+    description: Step where the lead was dropped.
+    lineage:
+      - datalake_supply_flows.supply_discards_settings.drop_step
+  ts_event:
+    description: Timestamp indicating the time of the event.
+    lineage:
+      - datalake_wololo_clean.prospect.ts_created
+  year:
+    description: Year indicating the time of the event.
+    lineage:
+      - datalake_wololo_clean.prospect.ts_created
+  month:
+    description: Month indicating the time of the event.
+    lineage:
+      - datalake_wololo_clean.prospect.ts_created
+  day:
+    description: Day indicating the time of the event.
+    lineage:
+      - datalake_wololo_clean.prospect.ts_created

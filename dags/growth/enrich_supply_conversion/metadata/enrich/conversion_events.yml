@@ -1,0 +1,81 @@
+database_name: datalake_supply_flows
+table_name: conversion_events
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table is responsible to consolidate all conversion and drop events, applying rules to identify |
+  the conversion and drop funnel step and the business context. Here we join with 3P and 1P events to fill missing events.
+columns:
+  id_lead:
+    description: Unique identifier for the lead in EBDB.
+    lineage:
+      - datalake_supply_flows.conversion_staging.id_lead
+      - datalake_supply_flows.conversion_events_3p.id_lead
+  id_entity:
+    description: The identifier of house (if the event is related to conversion) or prospect (if the event is related to discard).
+    lineage:
+      - datalake_supply_flows.conversion_staging.id_entity
+      - datalake_supply_flows.conversion_events_3p.id_entity
+  id_user_registrant: 
+    description: Identifier for the user that discard or convert prospect.
+    lineage:
+      - datalake_supply_flows.conversion_staging.id_user_registrant
+      - datalake_supply_flows.conversion_events_3p.id_user_registrant
+  business_context:
+    description: Business context for the event. Can be Sale or Rent.
+    lineage:
+      - datalake_supply_flows.conversion_staging.business_context
+      - datalake_supply_flows.conversion_events_3p.business_context
+  supply_source:
+    description: Indicates the source from which the lead was obtained, such as 1P, 3P or CIQ.
+    lineage:
+      - datalake_supply_flows.conversion_staging.supply_source
+      - datalake_supply_flows.conversion_events_3p.supply_source
+  step:
+    description: Stage of the supply funnel the lead is in.
+    lineage:
+      - datalake_supply_flows.conversion_staging.step
+      - datalake_supply_flows.conversion_events_3p.step
+  weight:
+    description: Weight related to the importance of the event for the funnel.
+    lineage:
+      - datalake_supply_flows.conversion_staging.weight
+      - datalake_supply_flows.conversion_events_3p.weight
+  ts_event_original:
+    description: Timestamp of the original event in the source database.
+    lineage:
+      - datalake_supply_flows.conversion_staging.ts_event
+      - datalake_supply_flows.conversion_events_3p.ts_event_original
+  ts_event_adjusted:
+    description: Timestamp of the event adjusted to the fix possible inconsistencies in the original event.
+    lineage:
+      - datalake_supply_flows.conversion_staging.ts_event
+      - datalake_supply_flows.conversion_events_3p.ts_event_adjusted
+  ts_first_discard:
+    description: Timestamp of the first discard event for the lead.
+    lineage:
+      - datalake_supply_flows.conversion_staging.ts_event
+      - datalake_supply_flows.conversion_events_3p.ts_first_discard
+  ts_last_discard:
+    description: Timestamp of the last discard event for the lead.
+    lineage:
+      - datalake_supply_flows.conversion_staging.ts_event
+      - datalake_supply_flows.conversion_events_3p.ts_last_discard
+  rev:
+    description: The id of discard or conversion event in Wololo or aud tables. For Bob is -1 because we don't use aud table.
+    lineage:
+      - datalake_supply_flows.conversion_staging.rev
+      - datalake_supply_flows.conversion_events_3p.rev
+  business_event:
+    description: Indicates if the event is a conversion or a discard.
+    lineage:
+      - datalake_supply_flows.conversion_staging.business_event
+      - datalake_supply_flows.conversion_events_3p.business_event
+  reason:
+    description: Reason for the discard event.
+    lineage:
+      - datalake_supply_flows.conversion_staging.reason
+      - datalake_supply_flows.conversion_events_3p.reason
+  aux_group:
+    description: Group of the event, used to identify the conversion and discard events.
+  aux_data_event:
+    description: Tag to control the where the event is created by data rules.

@@ -1,0 +1,50 @@
+database_name: datalake_supply_flows
+table_name: last_pj_attribution
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table is responsible to store the last photo job attribution for each house in determined business context.
+columns:
+  id_house:
+    description: This column represents the unique identifier for each house
+    lineage:
+      - datalake_supply_flows.conversion_staging.id_house
+  id_lead:
+    description: The unique identifier associated with a lead.
+    lineage:
+      - datalake_supply_flows.conversion_staging.id_lead
+  business_context:
+    description: Business context for the event. Can be Sale or Rent.
+    lineage:
+      - datalake_supply_flows.conversion_staging.business_context
+  id_user_registrant:
+    description: Identifier for the user that convert this photo job.
+    lineage:
+      - datalake_supply_flows.conversion_staging.id_user_registrant
+  email:
+    description: The email address associated with the user who converted the photo job.
+    lineage:
+      - datalake_ebdb_clean.user.email
+  ops_agent:
+    description: Information about the agent involved in the operational process related to the event.
+    lineage:
+      - datalake_supply_flows.operations_agents.ops_agent
+  ops_objective:
+    description: This column describes the objective operational process. It always conversion, except for capta aí teams.
+    lineage:
+      - datalake_supply_flows.operations_agents.ops_objective
+  ops_partner:
+    description: The third party team that realize this operational conversion.
+    lineage:
+      - datalake_supply_flows.operations_agents.ops_partner
+  ops_approach:
+    description: Details of the approach used by analysts in the operational process.
+    lineage:
+      - datalake_supply_flows.operations_agents.ops_approach
+  ops_contact_medium:
+    description: Details of the medium used by analysts in the operational process.
+    lineage:
+      - datalake_supply_flows.operations_agents.ops_contact_medium
+  ts_event:
+    description: Timestamp indicating the time of the event.
+    lineage:
+      - datalake_supply_flows.conversion_staging.ts_event

@@ -1,4 +1,4 @@
-database_name: datalake_supply_flows_migrate
+database_name: datalake_supply_flows
 table_name: acquisition_tracking
 domain: Growth
 owner: arthur.gonzaga@quintoandar.com.br
