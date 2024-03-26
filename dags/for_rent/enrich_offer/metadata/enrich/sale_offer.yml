@@ -596,6 +596,10 @@ columns:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.ts_buyer_fup
     description: Date when the Closing Analyst sent a message to the Buyer.
+  ts_booking_created:
+    lineage:
+      - datalake_booking.booking.ts_created
+    description: Timestamp when the booking or visit that preceded this offer was created.
   ts_updated:
     lineage:
       - datalake_firestore.sale_offer.ts_updated

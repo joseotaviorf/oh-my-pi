@@ -117,6 +117,7 @@ bietlejuice.dw_chattermill:
 bietlejuice.dw_cib_segmentation:
   - bietlejuice.enrich_mexico_cib_segmentation:load-enrich-cib-segmentation
 bietlejuice.dw_collection_recovery:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
@@ -145,9 +146,8 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-debtor
   - bietlejuice.trato_feito:load-clean-eviction
   - bietlejuice.trato_feito:load-clean-eviction-data
-  - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-installment
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.trato_feito:load-clean-negotiation
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -1320,10 +1320,10 @@ bietlejuice.enrich_date:
 bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-debtor
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
-  - bietlejuice.trato_feito:load-clean-debtor
 bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
@@ -2987,9 +2987,6 @@ bietlejuice.metric_rent_benvi__supply:
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
   - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel
   - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
-bietlejuice.reverse_regions_polygon:
-  - bietlejuice.ebdb:load-clean-polygon-region
-  - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.reports:
   - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-accepted-into-sns
   - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-sent-into-sns
@@ -3130,6 +3127,9 @@ bietlejuice.reverse_nazare:
   - bietlejuice.hub_services:load-clean-business-unit
 bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter
+bietlejuice.reverse_regions_polygon:
+  - bietlejuice.ebdb:load-clean-polygon-region
+  - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.reverse_sale_unavailable_listings_access:
   - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
 bietlejuice.reverse_sale_unavailable_listings_load:

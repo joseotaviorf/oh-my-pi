@@ -19,7 +19,8 @@ WITH visit_before_offer AS (
                     COALESCE(g.id, vo.id_offer)
                 ORDER BY
                     (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_booking_utc))
-            ) AS rw_visit_completed
+            ) AS rw_visit_completed,
+            bs.ts_created AS ts_booking_created
         FROM
             datalake_firestore.sale_offer AS g
         FULL OUTER JOIN
@@ -66,7 +67,8 @@ booking_before_offer AS (
                 ORDER BY
                     is_canceled,
                     (unix_timestamp(COALESCE( vo.ts_offer_created, g.ts_created))-unix_timestamp(bs.ts_created))
-            ) AS rw_booking
+            ) AS rw_booking,
+            bs.ts_created AS ts_booking_created
         FROM
             datalake_firestore.sale_offer AS g
         FULL OUTER JOIN
@@ -114,7 +116,8 @@ relation_booking_offer AS (
         COALESCE(vo.hours_visit_to_offer, bo.hours_visit_to_offer) AS hours_visit_to_offer,
         COALESCE(vo.is_3p_demand, bo.is_3p_demand) AS is_3p_demand,
         COALESCE(bo.flg_booking_before_offer,vo.flg_visit_completed_before_offer) AS flg_booking_before_offer,
-        vo.flg_visit_completed_before_offer
+        vo.flg_visit_completed_before_offer,
+        COALESCE(vo.ts_booking_created, bo.ts_booking_created) AS ts_booking_created
     FROM
         visit_before_offer AS vo
     FULL OUTER JOIN
@@ -259,6 +262,7 @@ data_sources AS (
         COALESCE(rbo.flg_visit_completed_before_offer,FALSE) AS flg_visit_completed_before_offer,
         rbo.hours_booking_to_offer,
         rbo.hours_visit_to_offer,
+        rbo.ts_booking_created,
         -- data from gsheets
         ohc.id_offer AS ohc_id_offer,
         ohc.id_buyer AS ohc_id_buyer,
@@ -840,7 +844,8 @@ business_rules AS (
         ds.vo_dt_sale_agreement_rescued AS dt_sale_agreement_rescued,
         ds.vo_dt_offer_rescued AS dt_offer_rescued,
         ds.vo_ts_seller_fup AS ts_seller_fup,
-        ds.vo_ts_buyer_fup AS ts_buyer_fup
+        ds.vo_ts_buyer_fup AS ts_buyer_fup,
+        ds.ts_booking_created
     FROM
         data_sources AS ds
     LEFT JOIN
@@ -1094,6 +1099,7 @@ SELECT
     is_ccv_5a_model,
     flg_booking_before_offer,
     flg_visit_completed_before_offer,
+    ts_booking_created,
     dt_sale_agreement_rescued,
     dt_offer_rescued,
     dt_sale_transacton_paid,
