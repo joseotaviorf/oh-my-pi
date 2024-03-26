@@ -11,6 +11,14 @@ columns:
   repair_cost:
     lineage:
       - datalake_offboarding.contract_termination.repair_cost
-    description: Cost of repairs
+    description: Cost of repairs.
+  status:
+    lineage:
+      - datalake_offboarding.contract_termination.status
+    description: Status of the contract termination.
+  ts_created:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_created
+    description: Timestamp of when the contract termination was requested.
   ts_load:
     description: Timestamp of when this data was loaded.
