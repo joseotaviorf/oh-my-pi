@@ -3,7 +3,7 @@ WITH inspections AS (
     id_inspection,
     id_client_side,
     id_contract,
-    inspection_type,
+    type AS inspection_type,
     ts_created,
     ts_updated
   FROM
