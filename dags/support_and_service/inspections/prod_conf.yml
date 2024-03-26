@@ -67,6 +67,9 @@ tables:
   reviewer:
     is_incremental: True
     date_column: updated_at
+  reviewer_aud:
+    is_incremental: True
+    date_column: updated_at
   room:
     is_incremental: True
     date_column: updated_at

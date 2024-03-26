@@ -35,6 +35,7 @@ columns:
       DISAGREE: ""
       SAME: ""
       REPAIR_NEGOTIATED: ""
+      OTHER: ""
   ts_created:
     lineage:
       - datalake_inspections_raw.contestation.created_at

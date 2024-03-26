@@ -13,6 +13,10 @@ columns:
     lineage:
       - datalake_inspections_raw.reviewer.user_id
     description: Id of the user who performed the review
+  id_assessment:
+    lineage:
+      - datalake_inspections_raw.reviewer.assessment_id
+    description: Indicates which assessment this reviewer belongs to
   uuid:
     lineage:
       - datalake_inspections_raw.reviewer.uuid
@@ -25,14 +29,30 @@ columns:
       OWNER: Owner of the property.
       TENANT: Tenant of the property.
       ADMIN: Team of Repair Analysis.
-  id_assessment:
+  approval_type:
     lineage:
-      - datalake_inspections_raw.reviewer.assessment_id
-    description: Indicates which assessment this reviewer belongs to
+      - datalake_inspections_raw.reviewer.approval_type
+    description: Refers to the context in which the approval occurred
+    categories:
+      REVIEW: Approval made by the analyst, owner or tenant, after completing the review of the inspection report and the required repairs.
+      REPAIR_ANALYSIS: Approval made by the analyst, after completing the analysis of the inspection report and creating repair requests
+      CONTESTATION_ANALYSIS: Approval made by the analyst, after completing the dispute analyzes and new repair requests made by the owner and tenant
+  approval_reason:
+    lineage:
+      - datalake_inspections_raw.reviewer.approval_reason
+    description: Reason why the reviewer approved or disapproved
+  approval_comment:
+    lineage:
+      - datalake_inspections_raw.reviewer.approval_comment
+    description: Reviewer's comment about approving or disapproving
   is_approved:
     lineage:
       - datalake_inspections_raw.reviewer.approved
     description: Indicates whether the owner completed the review manually
+  ts_approved:
+    lineage:
+      - datalake_inspections_raw.reviewer.approved_at
+    description: Timestamp of when it was approved
   ts_created:
     lineage:
       - datalake_inspections_raw.reviewer.created_at

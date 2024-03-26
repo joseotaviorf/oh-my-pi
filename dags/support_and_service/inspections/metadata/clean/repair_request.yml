@@ -51,6 +51,18 @@ columns:
     lineage:
       - datalake_inspections_raw.repair_request.comment
     description: Commentary detailing the repair needed
+  repair_service:
+    lineage:
+      - datalake_inspections_raw.repair_request.repair_service
+    description: ""
+  title:
+    lineage:
+      - datalake_inspections_raw.repair_request.title
+    description: ""
+  cost:
+    lineage:
+      - datalake_inspections_raw.repair_request.cost
+    description: ""
   is_exempted:
     lineage:
       - datalake_inspections_raw.repair_request.exempted
@@ -61,6 +73,10 @@ columns:
     lineage:
       - datalake_inspections_raw.repair_request.from_analysis
     description: Indicates whether the repair request was created by AN1
+  is_finished:
+    lineage:
+      - datalake_inspections_raw.repair_request.finished
+    description: ""
   ts_granted:
     lineage:
       - datalake_inspections_raw.repair_request.granted_at
