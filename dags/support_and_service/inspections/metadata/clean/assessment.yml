@@ -61,13 +61,13 @@ columns:
     lineage:
       - datalake_inspections_raw.assessment.owner_limit_revision_date
     description:
-      indicates the deadline for the owner to conclude its review of the report.
+      Indicates the deadline for the owner to conclude its review of the report.
       After this date, completion is compulsory.
   dt_tenant_limit_revision:
     lineage:
       - datalake_inspections_raw.assessment.tenant_limit_revision_date
     description:
-      indicates the deadline for tenant to complete its review of the report.
+      Indicates the deadline for tenant to complete its review of the report.
       After this date, completion is compulsory.
   ts_created:
     lineage:

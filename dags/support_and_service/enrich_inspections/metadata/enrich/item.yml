@@ -44,11 +44,11 @@ columns:
   id_inspection:
     description: Inspection unique identifier.
     lineage:
-      - datalake_inspections.inspection_booking.id_inspection
+      - datalake_inspections_clean.inspection.id_inspection
   id_inspector:
     description: Unique identifier of the inspector responsible for carrying out the inspection.
     lineage:
-      - datalake_inspections.inspection_booking.id_inspector
+      - datalake_inspections_clean.inspection.id_inspector
   uuid:
     description: Item unique identifier (uuid).
     lineage:

@@ -7,6 +7,7 @@ SELECT
     r.id_reviewer,
     i.id_assessment,
     i.id_inspection,
+    rm.uuid AS uuid_media,
     r.user_type,
     CASE
         WHEN r.comment = '' THEN NULL

@@ -17,6 +17,10 @@ columns:
     description: Item Media correlational unique identifier in the PWA database.
     lineage:
       - datalake_inspections_clean.item_media.id_main
+  uuid:
+    description: Item Media unique identifier (uuid)
+    lineage:
+      - datalake_inspections_clean.item_media.uuid
   id_room:
     description: Room unique identifier.
     lineage:

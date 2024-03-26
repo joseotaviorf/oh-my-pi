@@ -2,6 +2,7 @@ SELECT
     im.id_item_media,
     im.id_item,
     im.id_main AS id_external_media,
+    im.uuid,
     i.id_room,
     i.id_assessment,
     i.id_inspection,

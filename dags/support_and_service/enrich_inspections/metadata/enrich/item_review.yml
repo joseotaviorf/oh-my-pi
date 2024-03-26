@@ -42,6 +42,10 @@ columns:
     description: Inspection unique identifier.
     lineage:
       - datalake_inspections.item.id_inspection
+  uuid:
+    description: Item Media unique identifier (uuid)
+    lineage:
+      - datalake_inspections_clean.review_media.uuid
   user_type:
     description: Indicates whether the user who reviewed was the tenant or owner.
     lineage:

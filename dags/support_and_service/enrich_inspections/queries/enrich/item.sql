@@ -49,8 +49,11 @@ JOIN
     datalake_inspections_clean.room r
         ON r.id_room = ig.id_room
 JOIN
-    datalake_inspections.inspection_booking AS ih
-        ON ih.id_assessment = r.id_assessment
+    datalake_inspections_clean.assessment AS a
+        ON a.id_assessment = r.id_assessment
+JOIN
+    datalake_inspections_clean.inspection AS ih
+        ON ih.id_inspection = a.id_inspection
 WHERE
     i.year = {year}
     AND i.month = {month}
