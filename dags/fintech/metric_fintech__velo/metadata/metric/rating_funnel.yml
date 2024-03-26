@@ -11,11 +11,10 @@ columns:
   rating:
     description: Level of risk assessed in credit approval
     lineage:
-    - datalake_velo.neurotech_rating.rating
+      - datalake_velo.neurotech_rating.rating
     metric:
       name: Rating Funnel
-      description:
-        Level of risk assessed in credit approval
+      description: Level of risk assessed in credit approval
       acronym: RF
       is_additive: True
       business_stage: Other
@@ -30,4 +29,7 @@ columns:
     dimension: True
   total_cs:
     description: Contracts that have had guarantee deposit activated in the reference period.
+    dimension: True
+  distinct_cs:
+    description: Distinct number of contracts that have had guarantee deposit activated in the reference period.
     dimension: True

@@ -27,7 +27,8 @@ WITH ES AS (
     SELECT
         DATE_TRUNC('day',dt_contract_started) AS dt_cs,
         r.rating,
-        COUNT(ph.sk_propose) AS Total_cs
+        COUNT(ph.sk_propose) AS Total_cs,
+        COUNT(DISTINCT ph.sk_propose) AS Distinct_cs
     FROM
         dw_velo.fact_velo_propose AS ph
     LEFT JOIN
@@ -50,7 +51,8 @@ SELECT
     dr.rating,
     es.total_es,
     ca.total_ca,
-    cs.total_cs
+    cs.total_cs,
+    cs.distinct_cs
 FROM
     date_rating AS dr
 LEFT JOIN

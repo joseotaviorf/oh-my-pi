@@ -1,0 +1,28 @@
+---
+database_name: metric_fintech__velo
+table_name: claims_emission
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Metrics related to QuintoCred claims emissions"
+columns:
+    dt_emission:
+        description: Date base for each metric
+        dimension: True
+    sum_guarantee:
+        description: Sum of guarantee emisisons
+        dimension: True
+    sum_termination:
+        description: Sum of termination emisisons
+        dimension: True
+    total_emission:
+        description: Sum of total emisisons
+        dimension: True
+    count_guarantee:
+        description: Quantity of distinct guarantee emisisons
+        dimension: True
+    count_termination:
+        description: Quantity of distinct termination emisisons
+        dimension: True
+    count_total_emission:
+        description: Quantity of distinct emisisons
+        dimension: True

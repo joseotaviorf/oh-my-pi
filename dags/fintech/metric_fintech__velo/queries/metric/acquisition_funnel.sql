@@ -46,6 +46,17 @@ cte_ACS AS (
         dt_ended IS NULL
     GROUP BY
         DATE(dt_contract_started)
+),
+cte_EC AS (
+    SELECT
+        DATE(dt_analyst_annulment_input) AS date_EC,
+        COUNT(DISTINCT sk_propose) AS qty_EC
+    FROM
+        dw_velo.fact_velo_propose
+    WHERE
+        is_contract = TRUE
+    GROUP BY
+        DATE(dt_analyst_annulment_input)
 )
 SELECT
     dd.date,
@@ -54,11 +65,14 @@ SELECT
     SUM(qty_CA) AS credit_approved,
     SUM(qty_CS) AS contract_started,
     SUM(qty_active_contract_started) AS active_contract_started,
+    SUM(qty_EC) AS contract_ended,
     SUM(qty_ES) / (sum(qty_PS)*1.0000) AS PC2ES,
     SUM(qty_CS) / (SUM(qty_PS)*1.0000) AS PC2CS,
     SUM(qty_CA) / (SUM(qty_ES)*1.0000) AS ES2CA,
     SUM(qty_CS) / (SUM(qty_CA)*1.0000) AS CA2CS,
-    SUM(qty_CS) / (SUM(qty_active_contract_started)*1.0000) AS CS2ACS
+    SUM(qty_CS) / (SUM(qty_active_contract_started)*1.0000) AS CS2ACS,
+    SUM(qty_CS) / (SUM(qty_ES)*1.0000) AS ES2NC,
+    SUM(qty_CS) / (SUM(qty_CA)*1.0000) AS CA2NC
 FROM
     dw_public.dim_date AS dd
 LEFT JOIN
@@ -76,6 +90,9 @@ LEFT JOIN
 LEFT JOIN
     cte_ACS
     ON dd.date = cte_ACS.begin
+LEFT JOIN
+    cte_EC
+    ON dd.date = cte_EC.date_EC
 WHERE
     dd.date < current_date
 GROUP BY 1

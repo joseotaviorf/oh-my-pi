@@ -1,0 +1,34 @@
+---
+database_name: metric_fintech__velo
+table_name: finance_metrics
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Metrics related to QuintoCred finance numbers"
+columns:
+    date:
+        description: Date base for each metric
+        dimension: True
+    ended_contracts:
+        description: Quantity of cancelled contracts in the reference date
+        dimension: True
+    new_contracts:
+        description: Number of contracts that have had guarantee deposit activated in the reference date
+        dimension: True
+    plan_percent:
+        description: Total plan percent value on the reference date
+        dimension: True
+    gmv_new_contracts:
+        description: Gross Merchandise Value (GMV) of new contracts on the reference date
+        dimension: True
+    gmv_ended_contracts:
+        description: Gross Merchandise Value (GMV) of cancelled contracts on the reference date
+        dimension: True
+    revenue_new_contracts:
+        description: Revenue of new contracts on the reference date
+        dimension: True
+    revenue_ended_contracts:
+        description: Revenue of cancelled contracts on the reference date
+        dimension: True
+    activation_fee:
+        description: Total activation fee on the reference date
+        dimension: True

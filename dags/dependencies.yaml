@@ -2946,8 +2946,12 @@ bietlejuice.metric_fintech__losses:
 bietlejuice.metric_fintech__velo:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-transaction
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-transaction-category
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-transaction-entries
   - bietlejuice.enrich_velo:load-enrich-neurotech-rating
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
 bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_region:load-dw-public-dim-region
