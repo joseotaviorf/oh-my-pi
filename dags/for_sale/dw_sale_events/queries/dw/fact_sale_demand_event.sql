@@ -13,6 +13,9 @@ WITH bookings AS (
         fv.sk_business_unit,
         fv.sk_company_supply,
         fv.sk_company_demand,
+        fv.sk_secretariat_booking_creator,
+        fv.sk_secretariat_on_visit,
+        fv.sk_last_secretariat,
         fv.ts_booking_created,
         fv.ts_visit_completed,
         fv.ts_visit_canceled
@@ -44,6 +47,13 @@ offers AS (
         fo.sk_business_unit,
         fo.sk_company_supply,
         fo.sk_company_demand,
+        fo.sk_secretariat_booking_creator,
+        fo.sk_secretariat_on_offer_submitted,
+        fo.sk_secretariat_on_offer_accepted,
+        fo.sk_secretariat_on_offer_dismissed,
+        fo.sk_secretariat_on_sale_agreement_created,
+        fo.sk_secretariat_on_sale_agreement_signed,
+        fo.sk_last_secretariat,
         fo.ts_offer_submitted,
         fo.ts_offer_accepted,
         fo.ts_sale_agreement_created,
@@ -51,9 +61,6 @@ offers AS (
         fo.ts_offer_dismissed
     FROM
         dw_sale.fact_offers AS fo
-    JOIN
-        datalake_offer.sale_offer AS so
-            ON fo.sk_offer = so.id_offer
     LEFT JOIN
         datalake_booking.booking b
             ON b.id = fo.sk_booking
@@ -77,6 +84,9 @@ events AS (
         sk_business_unit,
         sk_company_supply,
         sk_company_demand,
+        sk_secretariat_booking_creator,
+        sk_secretariat_on_visit AS sk_secretariat_on_event,
+        sk_last_secretariat,
         ts_booking_created AS ts_event
     FROM
         bookings
@@ -97,6 +107,9 @@ events AS (
         sk_business_unit,
         sk_company_supply,
         sk_company_demand,
+        sk_secretariat_booking_creator,
+        sk_secretariat_on_visit AS sk_secretariat_on_event,
+        sk_last_secretariat,
         ts_visit_completed AS ts_event
     FROM
         bookings
@@ -117,6 +130,9 @@ events AS (
         sk_business_unit,
         sk_company_supply,
         sk_company_demand,
+        sk_secretariat_booking_creator,
+        sk_secretariat_on_offer_submitted AS sk_secretariat_on_event,
+        sk_last_secretariat,
         ts_offer_submitted AS ts_event
     FROM
         offers
@@ -137,6 +153,9 @@ events AS (
         sk_business_unit,
         sk_company_supply,
         sk_company_demand,
+        sk_secretariat_booking_creator,
+        sk_secretariat_on_offer_accepted AS sk_secretariat_on_event,
+        sk_last_secretariat,
         ts_offer_accepted AS ts_event
     FROM
         offers
@@ -157,6 +176,9 @@ events AS (
         sk_business_unit,
         sk_company_supply,
         sk_company_demand,
+        sk_secretariat_booking_creator,
+        sk_secretariat_on_sale_agreement_created AS sk_secretariat_on_event,
+        sk_last_secretariat,
         ts_sale_agreement_created AS ts_event
     FROM
         offers
@@ -177,6 +199,9 @@ events AS (
         sk_business_unit,
         sk_company_supply,
         sk_company_demand,
+        sk_secretariat_booking_creator,
+        sk_secretariat_on_sale_agreement_signed AS sk_secretariat_on_event,
+        sk_last_secretariat,
         ts_sale_agreement_signed AS ts_event
     FROM
         offers
@@ -197,6 +222,9 @@ events AS (
         sk_business_unit,
         sk_company_supply,
         sk_company_demand,
+        sk_secretariat_booking_creator,
+        sk_secretariat_on_visit AS sk_secretariat_on_event,
+        sk_last_secretariat,
         ts_visit_canceled AS ts_event
     FROM
         bookings
@@ -217,6 +245,9 @@ events AS (
         sk_business_unit,
         sk_company_supply,
         sk_company_demand,
+        sk_secretariat_booking_creator,
+        sk_secretariat_on_sale_agreement_signed AS sk_secretariat_on_event,
+        sk_last_secretariat,
         ts_offer_dismissed AS ts_event
     FROM
         offers
@@ -247,6 +278,9 @@ SELECT
     COALESCE(e.sk_business_unit, -1) AS sk_business_unit,
     COALESCE(e.sk_company_supply, -1) AS sk_company_supply,
     COALESCE(e.sk_company_demand, -1) AS sk_company_demand,
+    COALESCE(e.sk_secretariat_booking_creator, -1) AS sk_secretariat_booking_creator,
+    COALESCE(e.sk_secretariat_on_event, -1) AS sk_secretariat_on_event,
+    COALESCE(e.sk_last_secretariat, -1) AS sk_last_secretariat,
     dd.year,
     dd.month,
     dd.day,

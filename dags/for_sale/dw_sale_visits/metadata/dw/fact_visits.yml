@@ -65,6 +65,22 @@ columns:
     lineage:
     - datalake_sale_visit.sale_visit.id_user_cancelation
     description: ID of the user who canceled the booking.
+  sk_secretariat_booking_creator:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who created the booking. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_secretariat_on_visit:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who was associated with the buyer on the visit date. If the visit has not happened yet, it will be the latest secretariat before
+      the visit date. Can be joined with dw_secretariat.dim_secretariat_user_version, on field sk_secretariat_user_version.
+      This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_last_secretariat:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who was last associated with the buyer. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version.
   sk_visit:
     lineage:
     - datalake_sale_visit.sale_visit.id_visit

@@ -70,6 +70,41 @@ columns:
     lineage:
     - datalake_offer.sale_offer.id_closing_specialist
     description: ID user of the closing specialyst
+  sk_secretariat_booking_creator:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who created the booking. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_secretariat_on_offer_submitted:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who was associated with the buyer when the offer was submitted. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_secretariat_on_offer_accepted:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who was associated with the buyer when the offer was accepted. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_secretariat_on_offer_dismissed:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who was associated with the buyer when the offer was dismissed. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_secretariat_on_sale_agreement_created:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who was associated with the buyer when the sale agreement was created. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_secretariat_on_sale_agreement_signed:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who was associated with the buyer when the sale agreement was was signed. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_last_secretariat:
+    lineage:
+    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
+    description: Surrogate key of the secretariat who was last associated with the buyer. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version.
   sk_offer_submitted_date:
     lineage:
     - datalake_offer.sale_offer.ts_offer_submitted

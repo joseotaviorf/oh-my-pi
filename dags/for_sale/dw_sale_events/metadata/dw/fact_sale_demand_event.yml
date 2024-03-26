@@ -91,6 +91,28 @@ columns:
     - dw_sale.fact_offers.sk_company_demand
     description: Key of the agents's company in Rede Demand at the start of the funnel,
       if that is the case. It can be joined with dw_rede.dim_company.
+  sk_secretariat_booking_creator:
+    lineage:
+    - dw_sale.fact_visits.sk_secretariat_booking_creator
+    - dw_sale.fact_offers.sk_secretariat_booking_creator
+    description: Surrogate key of the secretariat who created the booking. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the creation, such as their team allocation.
+  sk_secretariat_on_event:
+    lineage:
+    - dw_sale.fact_visits.sk_secretariat_on_visit
+    - dw_sale.fact_offers.sk_secretariat_on_offer_submitted
+    - dw_sale.fact_offers.sk_secretariat_on_offer_accepted
+    - dw_sale.fact_offers.sk_secretariat_on_offer_dismissed
+    - dw_sale.fact_offers.sk_secretariat_on_sale_agreement_created
+    - dw_sale.fact_offers.sk_secretariat_on_sale_agreement_signed
+    description: Surrogate key of the secretariat who was associated with the buyer on the date of the event. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+  sk_last_secretariat:
+    lineage:
+    - dw_sale.fact_visits.sk_last_secretariat
+    - dw_sale.fact_offers.sk_last_secretariat
+    description: Surrogate key of the secretariat who was last associated with the buyer. Can be joined with dw_secretariat.dim_secretariat_user_version,
+      on field sk_secretariat_user_version.
   year:
     lineage:
     - dw_public.dim_date.year

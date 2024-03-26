@@ -738,7 +738,6 @@ bietlejuice.dw_sale_events:
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_offer:load-enrich-sale-offer
 bietlejuice.dw_sale_flow:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
@@ -791,6 +790,7 @@ bietlejuice.dw_sale_offer_users:
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users-info
 bietlejuice.dw_sale_offers:
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
+  - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
@@ -806,6 +806,7 @@ bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
 bietlejuice.dw_sale_visits:
+  - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation
   - bietlejuice.enrich_sale_visit:load-enrich-sale-visit
 bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers

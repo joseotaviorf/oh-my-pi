@@ -1,4 +1,3 @@
-
 SELECT
     COALESCE(id_booking, -1) AS sk_booking,
     COALESCE(id_sale_flow, -1) AS sk_sale_flow,
@@ -15,6 +14,9 @@ SELECT
     COALESCE(id_seller, -1) AS sk_seller,
     COALESCE(id_user_creation, -1) AS sk_user_creation,
     COALESCE(id_user_cancelation, -1) AS sk_user_cancelation,
+    COALESCE(sa_creator.sk_secretariat_user_version, -1) AS sk_secretariat_booking_creator,
+    COALESCE(sa_visit_date.sk_secretariat_user_version, -1) AS sk_secretariat_on_visit,
+    COALESCE(sa_last_secretariat.sk_secretariat_user_version, -1) AS sk_last_secretariat,
     COALESCE(id_visit, -1) AS sk_visit,
     visit_code AS sk_visit_code,
     COALESCE(id_offer, -1) AS sk_offer,
@@ -48,4 +50,16 @@ SELECT
     ts_buyer_review_rating,
     NOW() AS ts_load
 FROM
-    datalake_sale_visit.sale_visit
+    datalake_sale_visit.sale_visit AS sv
+LEFT JOIN
+    datalake_hub_services.daily_secretariat_allocation AS sa_creator
+        ON sa_creator.id_secretariat_user = sv.id_user_sale_attendence_5a
+        AND sa_creator.dt_snapshot = DATE(sv.ts_booking_created)
+LEFT JOIN
+    datalake_hub_services.daily_secretariat_allocation AS sa_visit_date
+        ON sa_visit_date.id_secretariat_user = sv.id_user_secretariat_on_visit_date
+        AND sa_visit_date.dt_snapshot = LEAST(DATE(sv.ts_visit), CURRENT_DATE - INTERVAL '1' DAY)
+LEFT JOIN
+    datalake_hub_services.daily_secretariat_allocation AS sa_last_secretariat
+        ON sa_last_secretariat.id_secretariat_user = sv.id_user_last_secretariat
+        AND sa_last_secretariat.dt_snapshot = (CURRENT_DATE - INTERVAL '1' DAY)
