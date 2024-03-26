@@ -1,0 +1,22 @@
+dag:
+  name: enrich_amplitude_inspections
+  schedule_start_date: 2022, 1, 19
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Formatting and json extract in Inspection Service APP data.
+
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    inspection_review_access:
+      - inspection_review_page_viewed_events
+  tables_customization:
+    inspection_review_access: {}
+    inspection_review_page_viewed_events:
+      partitions: [year, month, day]
+      extraction_type: incremental
+
+cluster:
+  type: databricks_10_4_med_io-memory_photon_cluster

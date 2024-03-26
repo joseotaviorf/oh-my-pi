@@ -976,6 +976,9 @@ bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-leads
   - bietlejuice.airtable:load-clean-wallet
   - bietlejuice.airtable:load-clean-wallet-history
+bietlejuice.enrich_amplitude_inspections:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.inspections:load-clean-inspection-aud
 bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.rene_descartes:load-clean-house-lead
