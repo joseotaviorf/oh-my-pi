@@ -1,0 +1,21 @@
+---
+dag:
+  name: enrich_reports_validation
+  schedule_start_date: 2021, 8, 24
+  owner: Data Rede
+  documentation:
+    dag_purpose: |
+      Compares what was sent to the reports service (via the reverse_listings_report_access
+      DAG) to what was actually received. This is a quality assurance for the Reverse
+      ETL process.
+      This DAG is triggered by Mediator and loads the table via incremental load.
+workflow:
+  type: query
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: 
+    - year
+    - month
+    - day
+cluster:
+  type: databricks_10_4_med_general_cluster
