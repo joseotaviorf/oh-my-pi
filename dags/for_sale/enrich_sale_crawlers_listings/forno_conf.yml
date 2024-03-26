@@ -40,8 +40,9 @@ custom_libraries:
   - pypi:
       package: apache-sedona
 init_script:
-  - dbfs:
-      destination: "dbfs:/FileStore/sedona/sedona-init.sh"
+  - s3:
+      destination: "s3://artifacts.s3.forno.data.quintoandar.com.br/sedona/sedona-init.sh"
+      region: ""
 spark_conf:
   spark.serializer: "org.apache.spark.serializer.KryoSerializer"
   spark.sql.extensions: "org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions"
