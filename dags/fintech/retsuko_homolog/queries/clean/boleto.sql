@@ -2,6 +2,7 @@ SELECT
     id,
     external_id as id_external,
     invoice_id as id_invoice,
+    checkout_boleto_id AS id_checkout_boleto,
     identifier,
     due_amount,
     our_number,
@@ -9,6 +10,7 @@ SELECT
     wallet_number,
     barcode,
     inputtable_line,
+    external_source,
     timestamp(due_date) as ts_due,
     timestamp(issue_date) as ts_issued,
     timestamp(created_at) as ts_created,
@@ -18,12 +20,10 @@ SELECT
     month,
     day
 FROM
-    datalake_homolog_retsuko_raw.boleto
+    datalake_retsuko_homolog_raw.boleto
 WHERE
     (
-        year = {year}
-        AND month = {month}
-        AND day = {day} - 1
+        MAKE_DATE(year,month,day) = MAKE_DATE({year}, {month}, {day}) - 1
     )
     OR
     (

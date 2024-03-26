@@ -8,4 +8,4 @@ select
     is_savings,
     bank_info_updated_at AS ts_bank_info_updated
 from
-    datalake_homolog_retsuko_raw.account
+    datalake_retsuko_homolog_raw.account

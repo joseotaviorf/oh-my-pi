@@ -7,6 +7,7 @@ SELECT
     from_account_id AS id_from_account,
     to_account_id AS id_to_account,
     reversed_entry_external_id AS id_external_reversed_entry,
+    accounting_transaction_identifier,
     amount,
     bill_item,
     description,
@@ -20,12 +21,10 @@ SELECT
     month,
     day
 FROM
-    datalake_homolog_retsuko_raw.entry
+    datalake_retsuko_homolog_raw.entry
 WHERE
     (
-        year = {year}
-        AND month = {month}
-        AND day = {day} - 1
+        MAKE_DATE(year,month,day) = MAKE_DATE({year}, {month}, {day}) - 1
     )
     OR
     (

@@ -1,24 +1,19 @@
 ---
 database_name: datalake_retsuko_clean
 table_name: invoice
-owner: athos.sampayo@quintoandar.com.br
+owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: "TODO FINISH DESCRIPTIONS"
 columns:
   id:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.id
   id_external:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.external_id
   id_account:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.account_id
   id_contract:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.contract_id
   id_checkout_order:
@@ -30,23 +25,18 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.checkout_charge_id
   status:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.status
   substatus:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.sub_status
   paid_via:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.paid_via
   purpose:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.purpose
   closing_mode:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.closing_mode
   reason:
@@ -62,15 +52,12 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.reason
   due_amount:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.due_amount
   paid_amount:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.paid_amount
   accrual_year_month:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.accrual_year_month
   sispag_file:
@@ -78,23 +65,18 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.sispag_file
   ts_paid:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.paid_date
   ts_canceled:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.canceled_at
   ts_sent:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.sent_at
   ts_due:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.due_date
   ts_created:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.created_at
   ts_nf_requested:
@@ -102,11 +84,9 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.nf_requested_at
   ts_retsuko_created:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.retsuko_created_at
   ts_retsuko_updated:
-    description: "TODO FINISH DESCRIPTIONS"
     lineage:
       - datalake_retsuko_raw.invoice.retsuko_updated_at
   year:

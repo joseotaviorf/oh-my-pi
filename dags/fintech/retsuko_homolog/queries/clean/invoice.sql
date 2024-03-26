@@ -3,6 +3,8 @@ SELECT
     external_id AS id_external,
     account_id AS id_account,
     contract_id AS id_contract,
+    checkout_order_id AS id_checkout_order,
+    checkout_charge_id AS id_checkout_charge,
     status,
     sub_status AS substatus,
     CAST(NULL AS STRING) AS negotiation_status,
@@ -13,23 +15,23 @@ SELECT
     due_amount,
     paid_amount,
     accrual_year_month,
+    sispag_file,
     timestamp(paid_date) AS ts_paid,
     timestamp(canceled_at) AS ts_canceled,
     timestamp(sent_at) AS ts_sent,
     timestamp(due_date) AS ts_due,
     timestamp(created_at) AS ts_created,
+    timestamp(nf_requested_at) as ts_nf_requested,
     timestamp(retsuko_created_at) AS ts_retsuko_created,
     timestamp(retsuko_updated_at) AS ts_retsuko_updated,
     year,
     month,
     day
 FROM
-    datalake_homolog_retsuko_raw.invoice
+    datalake_retsuko_homolog_raw.invoice
 WHERE
     (
-        year = {year}
-        AND month = {month}
-        AND day = {day} - 1
+        MAKE_DATE(year,month,day) = MAKE_DATE({year}, {month}, {day}) - 1
     )
     OR
     (
