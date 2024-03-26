@@ -607,7 +607,7 @@ SELECT
   phones.AreaCode AS area_code,
   phones.PhoneNumber AS phone_number,
   -- -- address,
-  concat_ws(addresses.AddlAddressAttribute3, ' ', addresses.AddressLine1) address,
+  concat(addresses.AddlAddressAttribute3, ' ', addresses.AddressLine1) AS address,
   addresses.AddressLine2 AS address_number,
   addresses.AddressLine3 AS address_complement,
   addresses.AddressLine4 AS address_district,
