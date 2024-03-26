@@ -11,3 +11,6 @@ workflow:
     default_partitions: ["year", "month", "day"]
 cluster:
     type: databricks_10_4_max_io-memory_photon_cluster
+    custom_configurations:
+        spark_conf:
+            spark.sql.mapKeyDedupPolicy: "LAST_WIN"
