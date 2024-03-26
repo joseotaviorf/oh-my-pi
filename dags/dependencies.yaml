@@ -492,6 +492,7 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-item-review
   - bietlejuice.enrich_inspections:load-enrich-repair-exempted
   - bietlejuice.enrich_inspections:load-enrich-report-approval
+  - bietlejuice.enrich_inspections:load-enrich-report-review-media
   - bietlejuice.enrich_inspections:load-enrich-reviewer
   - bietlejuice.enrich_inspections:load-enrich-room
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements

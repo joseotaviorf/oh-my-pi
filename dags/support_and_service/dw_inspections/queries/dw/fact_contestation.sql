@@ -3,7 +3,7 @@ WITH contestation_media AS (
         orm.id_origin AS id_contestation,
         COUNT(DISTINCT orm.id_media) AS total_media
     FROM
-        datalake_inspection.report_review_media AS orm
+        datalake_inspections.report_review_media AS orm
     WHERE
         orm.origin = "contestation"
         AND orm.year <= {year}
