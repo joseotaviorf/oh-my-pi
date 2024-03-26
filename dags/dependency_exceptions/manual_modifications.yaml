@@ -844,7 +844,7 @@ bietlejuice.reverse_navent_bigquery:
   override: []
 bietlejuice.reverse_nps_reversion:
   override: []
-bietlejuice.reverse_atlas_pricing_report_load:
+bietlejuice.enrich_atlas_pricing_report:
   remove:
     - bietlejuice.dw_smart_price:load-dw-quintoandar-fact-listing-price-changes
 bietlejuice.reverse_atlas_pricing_report_access:

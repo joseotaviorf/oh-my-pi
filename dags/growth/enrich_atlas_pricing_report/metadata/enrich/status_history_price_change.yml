@@ -1,0 +1,6 @@
+---
+database_name: datalake_atlas_pricing_report
+table_name: status_history_price_change
+owner: '@data-growth'
+domain: Growth
+description: WIP

@@ -2,12 +2,11 @@ WITH amplitude_events AS (
     SELECT
         ep_house_id AS id_house,
         id_amplitude,
-        ts_event,
         LOWER(business_context) AS business_context,
-        DATE(ts_event) AS dt_event
     FROM datalake_amplitude_clean.170698_listing_page_viewed_events
     WHERE
-        ts_event >= CURRENT_DATE() - INTERVAL '7' DAY
+        DATE(year::STRING || month::STRING || day::STRING) >= (CURRENT_DATE - INTERVAL '30' DAY)
+        AND ts_event >= (CURRENT_DATE - INTERVAL '7' DAY)
  ),
  
 houses AS (

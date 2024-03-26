@@ -1,0 +1,6 @@
+---
+database_name: datalake_atlas_pricing_report
+table_name: new_pricing_report_engagement
+owner: '@data-growth'
+domain: Growth
+description: WIP

@@ -1,0 +1,52 @@
+WITH amplitude_events AS (
+    SELECT
+        ep_house_id AS id_house,
+        id_amplitude,
+        LOWER(business_context) AS business_context
+    FROM datalake_amplitude_clean.170698_listing_page_viewed_events
+    WHERE
+        DATE(year::STRING || month::STRING || day::STRING) >= (CURRENT_DATE - INTERVAL '30' DAY)
+        AND ts_event >= (CURRENT_DATE - INTERVAL '7' DAY)
+),
+
+houses AS (
+    SELECT
+        llf.sk_house AS id_house,
+        llf.sk_region,
+        LOWER(llf.origin_table) AS business_context,
+        MIN(dd.date) AS dt_first_listing
+    FROM dw_datamarts.lead_listing_flows llf
+    JOIN dw_public.dim_date dd
+        ON llf.sk_first_listing_date = dd.sk_date
+    WHERE
+        llf.sk_first_listing_date > 0
+    GROUP BY 1, 2, 3
+),
+
+house_views AS (
+    SELECT
+        e.id_house,
+        e.business_context,
+        dr.sk_region,
+        dr.name AS neighborhood,
+        COUNT(DISTINCT e.id_amplitude) AS views_quantity
+    FROM amplitude_events e
+    JOIN houses h
+        ON e.id_house::BIGINT = h.id_house
+        AND e.business_context = h.business_context
+    JOIN dw_public.dim_region dr
+        ON h.sk_region = dr.sk_region
+        AND dr.country_code != 'MX'
+    GROUP BY 1, 2, 3, 4
+)
+     
+SELECT DISTINCT
+    m.sk_region AS id_region,
+    m.neighborhood,
+    UPPER(m.business_context),
+    APPROX_PERCENTILE(m.views_quantity, 0.50) OVER(PARTITION BY m.business_context, m.sk_region) AS lpv_p_50,
+    a.mdape_city
+FROM house_views m
+LEFT JOIN datalake_atlas_pricing_report.region_metrics AS a
+    ON m.sk_region = a.id_region
+    AND LOWER(m.business_context) = LOWER(a.business_context)

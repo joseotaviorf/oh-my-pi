@@ -1025,6 +1025,24 @@ bietlejuice.enrich_atento_reports:
   - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
   - bietlejuice.reverse_atento:load-reverse-taxonomia-email
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+bietlejuice.enrich_atlas_pricing_report:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.dw_contract_temp:load-dw-public-dim-contract
+  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
+  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listing-status
+  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
+  - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-fact-listing-price-changes
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.ebdb:load-clean-house-predicted-price
+  - bietlejuice.ebdb:load-clean-house-predicted-price-aud
+  - bietlejuice.ebdb:load-clean-listing-business-context
+  - bietlejuice.ebdb:load-clean-listing-business-context-aud
+  - bietlejuice.ebdb:load-clean-user-revision-entity
 bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-log-isolve-v1
   - bietlejuice.atta:load-clean-log-isolve-v2
@@ -3055,16 +3073,6 @@ bietlejuice.reverse_atento_access:
 bietlejuice.reverse_atlas_pricing_report_access:
   - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-engagement
   - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-listing-price-history
-bietlejuice.reverse_atlas_pricing_report_load:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.dw_contract_temp:load-dw-public-dim-contract
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listing-status
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
-  - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-fact-listing-price-changes
-  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
-  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
 bietlejuice.reverse_bic_ss:
   - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics

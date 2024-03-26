@@ -87,7 +87,6 @@ for table_name, table_config in tables.items():
                         table_name,
                         table_config["event_type"],
                         sns_topic_arn,
-                        "{{ ds }}",
                     ],
                 }
             },

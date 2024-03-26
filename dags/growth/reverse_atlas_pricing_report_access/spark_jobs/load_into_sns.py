@@ -2,7 +2,7 @@ import logging
 import json
 
 from argparse import ArgumentParser
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from typing import Tuple
 
 import boto3
@@ -29,9 +29,6 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     parser.add_argument("table_name", help="Name of the table to be loaded")
     parser.add_argument("event_type", help="Type of event to be sent to SNS")
     parser.add_argument("sns_topic_arn", help="ARN of the SNS topic")
-    parser.add_argument(
-        "execution_date", help="Date of the execution in the format YYYY-MM-DD"
-    )
 
     args = parser.parse_args()
 
@@ -39,9 +36,8 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     table_name = args.table_name
     event_type = args.event_type
     sns_topic_arn = args.sns_topic_arn
-    execution_date = datetime.fromisoformat(args.execution_date)
 
-    return database_name, table_name, event_type, sns_topic_arn, execution_date
+    return database_name, table_name, event_type, sns_topic_arn
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
@@ -50,19 +46,11 @@ def json_serial(obj):
         return obj.isoformat()
     raise TypeError("Type %s not serializable" % type(obj))
 
-def send_message_dict_to_sns(sns_client, sns_topic_arn: str, message: dict):
-    """
-    Send a message to SNS.
-    """
-    sns_client.publish(
-        TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial)
-    )
-
 def format_sns_message(message: dict):
     """
     Format a message to SNS.
     """
-    return {'Id': str(uuid4()), 'Message': json.dumps(message, default=json_serial)}
+    return {'Id': message['id'], 'Message': json.dumps(message, default=json_serial)}
 
 def publish_batch_to_sns(region: str, sns_topic_arn: str,batch: list):
     """
@@ -100,7 +88,13 @@ def load_table_into_sns(
     
     message_contents = df.collect()
     messages = [
-        format_sns_message({"event_type": event_type, "payload": row.asDict()}) for row in message_contents
+        format_sns_message(
+            {
+                "id": str(uuid4()),
+                "ts_event": str(datetime.now(timezone.utc).timestamp()),
+                "event_type": event_type, 
+                "payload": row.asDict()
+            }) for row in message_contents
     ]
     
     messages_batches = split_in_chunks(messages, 10)
@@ -122,12 +116,12 @@ def main():
     """
     Start the pipeline.
     """
-    database_name, table_name, event_type, sns_topic_arn, execution_date = (
+    database_name, table_name, event_type, sns_topic_arn = (
         parse_arguments()
     )
     logger.info(
         f"""m=__main__, database_name={database_name}, table_name={table_name},
-        event_type={event_type}, sns_topic_arn={sns_topic_arn}, execution_date={execution_date}"""
+        event_type={event_type}, sns_topic_arn={sns_topic_arn}"""
     )
 
     load_table_into_sns(
