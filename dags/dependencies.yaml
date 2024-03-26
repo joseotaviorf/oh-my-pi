@@ -482,16 +482,23 @@ bietlejuice.dw_house_amenities:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_inspections:
+  - bietlejuice.enrich_amplitude_inspections:load-enrich-inspection-review-access
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
+  - bietlejuice.enrich_inspections:load-enrich-inspection-status-change
   - bietlejuice.enrich_inspections:load-enrich-item
   - bietlejuice.enrich_inspections:load-enrich-item-group
   - bietlejuice.enrich_inspections:load-enrich-item-issue
   - bietlejuice.enrich_inspections:load-enrich-item-media
   - bietlejuice.enrich_inspections:load-enrich-item-review
+  - bietlejuice.enrich_inspections:load-enrich-repair-exempted
+  - bietlejuice.enrich_inspections:load-enrich-report-approval
+  - bietlejuice.enrich_inspections:load-enrich-reviewer
   - bietlejuice.enrich_inspections:load-enrich-room
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
   - bietlejuice.gsheets_support_and_service:done-clean-inspectors-control
   - bietlejuice.inspections:load-clean-assessment
+  - bietlejuice.inspections:load-clean-contestation
+  - bietlejuice.inspections:load-clean-repair-request
   - bietlejuice.inspections:load-clean-reviewer
 bietlejuice.dw_invoice_entries:
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries

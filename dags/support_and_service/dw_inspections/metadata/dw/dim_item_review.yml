@@ -12,6 +12,10 @@ columns:
     description: Review unique identifier.
     lineage:
       - datalake_inspections.item_review.id_review
+  sk_item:
+    description: Item unique identifier.
+    lineage:
+      - datalake_inspections.item_review.id_item
   review_comment:
     description: Displays a reviewer user comment
     lineage:

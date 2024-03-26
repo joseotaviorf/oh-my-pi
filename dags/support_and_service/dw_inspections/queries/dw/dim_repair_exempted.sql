@@ -1,0 +1,18 @@
+SELECT DISTINCT
+    re.id_repair_request AS sk_repair_request,
+    re.id_granted_by AS sk_exemption_granted_by,
+    re.exemption_granted_by,
+    re.responsibility,
+    re.is_exempted,
+    re.is_improper_repair,
+    re.ts_granted,
+    NOW() AS ts_load,
+    re.year,
+    re.month,
+    re.day
+FROM
+    datalake_inspections.repair_exempted AS re
+WHERE
+    re.year = {year}
+    AND re.month = {month}
+    AND re.day = {day}

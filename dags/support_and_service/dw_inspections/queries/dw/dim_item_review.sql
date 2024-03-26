@@ -1,5 +1,6 @@
 SELECT DISTINCT
     ir.id_review AS sk_item_review,
+    ir.id_item AS sk_item,
     ir.user_comment AS review_comment,
     ir.user_type AS review_creator,
     ir.ts_created,

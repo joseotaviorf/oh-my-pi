@@ -14,11 +14,11 @@ columns:
   id_repair_request:
     lineage:
       - datalake_inspections_raw.contestation.repair_request_id
-    description: ID of the repair the dispute is referring to
+    description: ID of the repair the contestation is referring to
   id_reviewer:
     lineage:
       - datalake_inspections_raw.contestation.reviewer_id
-    description: Creator of the contestation. For this case, it will be the tenant
+    description: Creator of the contestation
   uuid:
     lineage:
       - datalake_inspections_raw.contestation.uuid
