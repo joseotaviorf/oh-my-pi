@@ -11,7 +11,7 @@ WITH repair_exempted AS (
 SELECT
     r.id_assessment AS sk_assessment,
     r.id_previous_assessment AS sk_previous_assessment,
-    r.id_inspection AS sk_inspection,
+    CAST(r.id_inspection AS STRING) AS sk_inspection,
     COUNT(DISTINCT rr.id_repair_request) AS total_repair_request,
     COUNT(DISTINCT rr.id_repair_request) FILTER(WHERE r.reviewer_type = 'ADMIN') AS total_repair_request_by_analyst,
     COUNT(DISTINCT rr.id_repair_request) FILTER(WHERE r.reviewer_type = 'OWNER') AS total_repair_request_by_owner,

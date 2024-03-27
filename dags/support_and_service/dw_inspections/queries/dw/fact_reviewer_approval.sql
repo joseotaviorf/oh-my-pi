@@ -1,7 +1,7 @@
 SELECT
     r.id_reviewer AS sk_reviewer,
     r.id_assessment AS sk_assessment,
-    r.id_inspection AS sk_inspection,
+    CAST(r.id_inspection AS STRING) AS sk_inspection,
     r.approval_reason,
     r.approval_comment,
     r.approval_type,

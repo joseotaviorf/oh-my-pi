@@ -49,6 +49,9 @@ workflow:
     room:
       partitions: [year, month, day]
       extraction_type: incremental
+    reviewer:
+      partitions: [year, month, day]
+      extraction_type: incremental
 cluster:
   type: custom_cluster
   custom_configurations:

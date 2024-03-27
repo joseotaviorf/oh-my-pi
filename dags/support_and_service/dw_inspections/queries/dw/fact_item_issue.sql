@@ -2,7 +2,7 @@ SELECT DISTINCT
     ii.id_item_issue AS sk_item_issue,
     ii.id_item AS sk_item,
     ii.id_assessment AS sk_assessment,
-    ii.id_inspection AS sk_inspection,
+    CAST(ii.id_inspection AS STRING) AS sk_inspection,
     ii.ts_created,
     ii.ts_updated,
     NOW() AS ts_load,
