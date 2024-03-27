@@ -160,6 +160,7 @@ paschoalotto_operator AS (
     ON ad.id_contract = d.id_contract
   LEFT JOIN datalake_paschoalotto_clean.user AS u
       ON ad.id_user = u.id_user
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_contract_quintoandar, ad.id_installment ORDER BY ad.ts_update DESC) = 1
 ),
 union_sources AS (
   SELECT
@@ -311,7 +312,7 @@ SELECT
 FROM union_sources AS u
 LEFT JOIN paschoalotto_operator AS po
   ON
-    u.id_operator LIKE "%PASCH%"
+    UPPER(u.id_operator) LIKE "%PASCH%"
     AND po.id_contract = u.id_contract
     AND po.id_negotiation = u.sk_negotiation
     AND po.dt_promisse = u.dt_promisse
