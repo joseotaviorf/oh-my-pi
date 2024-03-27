@@ -12,9 +12,9 @@ SELECT DISTINCT
   CAST(created_at AS TIMESTAMP) AS ts_created,
   CAST(updated_at AS TIMESTAMP) AS ts_updated,
   NOW() AS ts_load,
-  YEAR(dt) AS year,
-  MONTH(dt) AS month,
-  DAY(dt) AS day
+  YEAR(CAST(dt AS DATE)) AS year,
+  MONTH(CAST(dt AS DATE)) AS month,
+  DAY(CAST(dt AS DATE)) AS day
 FROM
   datalake_zendesk_raw.satisfaction_ratings
 WHERE

@@ -1,0 +1,74 @@
+database_name: datalake_zendesk_users
+table_name: zendesk_users
+description: Contains data from all Zendesk users
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_user_main:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+    description: ID of the user, from EBDB
+  id_user_zendesk:
+    lineage:
+      - datalake_zendesk_clean.users.id_user
+    description: ID of the user, from Zendesk
+  id_organization:
+    lineage:
+      - datalake_zendesk_clean.organizations.id
+    description: ID of the organization the user belongs to
+  id_external:
+    lineage:
+      - datalake_zendesk_clean.users.id_user_external
+    description: User identifier in main.
+  phone:
+    lineage:
+      - datalake_zendesk_clean.users.phone
+    description: User phone number
+  email:
+    lineage:
+      - datalake_zendesk_clean.users.email
+    description: User email
+  name:
+    lineage:
+      - datalake_zendesk_clean.users.name
+    description: User name
+  role:
+    lineage:
+      - datalake_zendesk_clean.users.role
+    description: User role
+  organization:
+    lineage:
+      - datalake_zendesk_clean.organizations.name
+    description: Name of the organization the user belongs to
+  locale:
+    lineage:
+      - datalake_zendesk_clean.users.locale
+    description: Location of the user
+  ticket_restriction:
+    lineage:
+      - datalake_zendesk_clean.users.ticket_restriction
+    description: Which tickets the user has access to
+  time_zone:
+    lineage:
+      - datalake_zendesk_clean.users.time_zone
+    description: User time zone
+  is_active:
+    lineage:
+      - datalake_zendesk_clean.users.is_active
+    description: If the user is active on Zendesk
+  is_permanently_deleted:
+    lineage:
+      - datalake_zendesk_clean.users.is_permanently_deleted
+    description: If the user is permanently deleted
+  ts_last_login:
+    lineage:
+      - datalake_zendesk_clean.users.ts_last_login
+    description: Timestamp of the last login of the user
+  ts_created:
+    lineage:
+      - datalake_zendesk_clean.users.ts_created
+    description: Timestamp of user creation
+  ts_updated:
+    lineage:
+      - datalake_zendesk_clean.users.ts_updated
+    description: Timestamp of user update

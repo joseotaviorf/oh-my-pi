@@ -22,9 +22,9 @@ WITH ticket_metrics AS (
     CAST(assignee_updated_at AS TIMESTAMP) AS ts_assignee_updated,
     CAST(created_at AS TIMESTAMP) AS ts_created,
     CAST(updated_at AS TIMESTAMP) AS ts_updated,
-    YEAR(dt) AS year,
-    MONTH(dt) AS month,
-    DAY(dt) AS day
+    YEAR(CAST(dt AS DATE)) AS year,
+    MONTH(CAST(dt AS DATE)) AS month,
+    DAY(CAST(dt AS DATE)) AS day
 FROM
     datalake_zendesk_raw.ticket_metrics
 WHERE

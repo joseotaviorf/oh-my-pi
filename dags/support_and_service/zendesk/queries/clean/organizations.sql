@@ -6,8 +6,8 @@ SELECT DISTINCT
   domain_names,
   url,
   organization_fields,
-  shared_tickets AS has_shared_tickets,
-  shared_comments AS has_shared_comments,
+  CAST(shared_tickets AS BOOLEAN) AS has_shared_tickets,
+  CAST(shared_comments AS BOOLEAN) AS has_shared_comments,
   tags,
   details,
   notes,
@@ -15,9 +15,9 @@ SELECT DISTINCT
   CAST(created_at AS TIMESTAMP) AS ts_created,
   CAST(updated_at AS TIMESTAMP) AS ts_updated,
   CAST(deleted_at AS TIMESTAMP) AS ts_deleted,
-  YEAR(dt) AS year,
-  MONTH(dt) AS month,
-  DAY(dt) AS day
+  YEAR(CAST(dt AS DATE)) AS year,
+  MONTH(CAST(dt AS DATE)) AS month,
+  DAY(CAST(dt AS DATE)) AS day
 FROM
   datalake_zendesk_raw.organizations
 WHERE

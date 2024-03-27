@@ -133,6 +133,10 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_velo:load-enrich-collections-wallet
   - bietlejuice.enrich_velo:load-enrich-junk
   - bietlejuice.enrich_velo:load-enrich-occurrence
+  - bietlejuice.paschoalotto:load-clean-agreement-detail
+  - bietlejuice.paschoalotto:load-clean-contract
+  - bietlejuice.paschoalotto:load-clean-debt
+  - bietlejuice.paschoalotto:load-clean-user
   - bietlejuice.recupera:load-clean-complementary-records
   - bietlejuice.recupera:load-clean-complementary-records-written-down
   - bietlejuice.recupera:load-clean-contracts
@@ -150,10 +154,6 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-eviction-data
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
-  - bietlejuice.paschoalotto:load-clean-agreement-detail
-  - bietlejuice.paschoalotto:load-clean-contract
-  - bietlejuice.paschoalotto:load-clean-debt
-  - bietlejuice.paschoalotto:load-clean-user
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -2618,6 +2618,13 @@ bietlejuice.enrich_supply_outbound_flows:
 bietlejuice.enrich_support_and_service_kpis_targets:
   - bietlejuice.gsheets_support_and_service:done-clean-target-service-kpis
   - bietlejuice.gsheets_support_and_service:done-clean-target-support-kpis
+bietlejuice.enrich_support_users:
+  - bietlejuice.bigfone:load-clean-event
+  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
+  - bietlejuice.quinto_messenger:load-clean-task
+  - bietlejuice.zendesk:load-clean-organizations
+  - bietlejuice.zendesk:load-clean-tickets
+  - bietlejuice.zendesk:load-clean-users
 bietlejuice.enrich_survicate:
   - bietlejuice.gsheets_support_and_service:done-clean-owner-offboarding-keys-csat
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-onboarding-keys-csat
