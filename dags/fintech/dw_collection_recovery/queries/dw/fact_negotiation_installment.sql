@@ -55,7 +55,12 @@ SELECT DISTINCT
       WHEN ri.id_creditor IN (2,6) THEN "PP QuintoAndar"
     END AS creditor,
   ri.is_special_installment,
-  tfi.installment_status,
+  CASE
+      WHEN tfi.installment_status = 'paid' OR i.installment_status = 'Pago' THEN 'paid'
+      WHEN tfi.installment_status IS NULL AND i.installment_status = 'Quebrado' THEN 'canceled'
+      WHEN tfi.installment_status IS NULL AND i.installment_status = 'Em aberto' THEN 'pending'
+      ELSE tfi.installment_status
+  END AS installment_status,
   i.delay_days,
   i.main_amount,
   ri.amount_to_pay,

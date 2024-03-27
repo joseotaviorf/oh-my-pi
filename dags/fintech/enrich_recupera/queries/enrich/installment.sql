@@ -68,7 +68,8 @@ SELECT
     CASE
         WHEN LOWER(i.installment_situation) = "parcela em aberta" THEN 'Em aberto'
         WHEN LOWER(i.installment_situation) = "parcela paga" THEN 'Pago'
-        WHEN LOWER(i.installment_situation) = "acordo cancelado" THEN 'Quebrado'
+        WHEN LOWER(i.installment_situation) = "acordo cancelado" AND dm.dt_paid IS NULL THEN 'Quebrado'
+        WHEN LOWER(i.installment_situation) = "acordo cancelado" AND dm.dt_paid IS NOT NULL THEN 'Pago'
         ELSE NULL
     END AS installment_status,
     CASE
