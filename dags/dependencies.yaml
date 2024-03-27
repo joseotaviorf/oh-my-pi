@@ -523,7 +523,7 @@ bietlejuice.dw_lead:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
-  - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
+  - bietlejuice.enrich_wololo:load-enrich-lead-sales-company
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:load-clean-condo
   - bietlejuice.ebdb:load-clean-house
@@ -1803,7 +1803,7 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
-  - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
+  - bietlejuice.enrich_wololo:load-enrich-lead-sales-company
   - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_crm_tasks:load-enrich-task-status
@@ -2604,7 +2604,7 @@ bietlejuice.enrich_supply_conversion_3p:
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners
-  - bietlejuice.enrich_wololo_prospect:load-enrich-prospect-calls
+  - bietlejuice.enrich_wololo:load-enrich-prospect-calls
   - bietlejuice.jaiminho:load-clean-user-notifications
   - bietlejuice.wololo:load-clean-whatsapp
 bietlejuice.enrich_support_and_service_kpis_targets:
@@ -2794,13 +2794,12 @@ bietlejuice.enrich_webhelp_reports:
   - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
   - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
-bietlejuice.enrich_wololo_lead:
+bietlejuice.enrich_wololo:
+  - bietlejuice.wololo:load-clean-contact
+  - bietlejuice.wololo:load-clean-prospect
   - bietlejuice.wololo:load-clean-prospect-aud
   - bietlejuice.wololo:load-clean-prospect-dimension-aud
   - bietlejuice.wololo:load-clean-rev-info
-bietlejuice.enrich_wololo_prospect:
-  - bietlejuice.wololo:load-clean-contact
-  - bietlejuice.wololo:load-clean-prospect
   - bietlejuice.wololo:load-clean-round
 bietlejuice.enrich_wordpress_baroes:
   - bietlejuice.wordpress_baroes:load-clean-conteudos-data

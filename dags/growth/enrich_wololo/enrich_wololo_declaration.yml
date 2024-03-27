@@ -1,0 +1,25 @@
+---
+dag:
+  name: enrich_wololo
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: Creates enriched tables for the supply context based on Wololo data.
+workflow:
+  type: query
+  layer: enrich
+  tables_customization:
+    lead_sales_company:
+      custom_schema: wololo_lead
+    prospect_calls:
+      custom_schema: wololo_prospect
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
