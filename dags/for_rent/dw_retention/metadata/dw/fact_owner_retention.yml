@@ -20,5 +20,9 @@ columns:
       lineage:
         - datalake_ebdb_contract.contract.id
       description: ID of the contract.
+    days_until_next_rental:
+      description: Number of days after the contract termination until re-rental.
+    days_until_next_listing:
+      description: Number of days after the contract termination until relisting.
     ts_load:
       description: Timestamp of when this data was loaded.

@@ -707,6 +707,8 @@ bietlejuice.dw_reservation:
 bietlejuice.dw_reservation_temp:
   - bietlejuice.dw_reservation:load-dw-rent-dim-reservation
 bietlejuice.dw_retention:
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
