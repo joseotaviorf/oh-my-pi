@@ -13,7 +13,9 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.airflow.task_groups.dw_task_group import DWTaskGroup
+from bietlejuice.base.airflow.task_groups.dw_task_group_all_purpose import (
+    DWTaskGroupAllPurpose,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
@@ -76,7 +78,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-dw_task_group = DWTaskGroup(
+dw_task_group = DWTaskGroupAllPurpose(
     dag=dag,
     env=ENV,
     dw_bucket=dw_bucket,
@@ -110,8 +112,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
+chain(create_cluster_task, DWTaskGroupAllPurpose.all_first_tasks(dw_staging_task_group))
 
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_groups)
 
-chain(DWTaskGroup.all_last_tasks(dw_task_groups), terminate_cluster_task)
+chain(DWTaskGroupAllPurpose.all_last_tasks(dw_task_groups), terminate_cluster_task)
