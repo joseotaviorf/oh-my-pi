@@ -27,8 +27,11 @@ SELECT
     credit_analysis_entities_mod,
     tenant_company_mod AS id_tenant_company_mod,
     contract_mod AS id_contract_mod,
+    annual_value,
     annual_value_mod,
+    monthly_value,
     monthly_value_mod,
+    total_coverage,
     total_coverage_mod,
     active AS is_active,
     dateinsert AS ts_inserted

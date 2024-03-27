@@ -117,14 +117,26 @@ columns:
     description: ''
     lineage:
     - datalake_rental_guarantee_platform_raw.propose_aud.contract_mod
+  annual_value:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.annual_value
   annual_value_mod:
     description: ''
     lineage:
     - datalake_rental_guarantee_platform_raw.propose_aud.annual_value_mod
+  monthly_value:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.monthly_value
   monthly_value_mod:
     description: ''
     lineage:
     - datalake_rental_guarantee_platform_raw.propose_aud.monthly_value_mod
+  total_coverage:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_raw.propose_aud.total_coverage
   total_coverage_mod:
     description: ''
     lineage:
