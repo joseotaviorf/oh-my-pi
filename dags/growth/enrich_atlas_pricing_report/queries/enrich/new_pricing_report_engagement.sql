@@ -5,10 +5,10 @@ SELECT DISTINCT
     COALESCE(pre.lpv_temperature_region_context, 'NO VIEWS') AS demand_level,
     hm.condominium_price_median,
     hm.urban_property_tax_median,
-    hm.on_mkt.on_market_price_median,
-    hm.on_mkt.on_market_price_by_square_meter,
-    hm.off_mkt.off_market_price_median,
-    hm.off_mkt.off_market_price_by_square_meter,
+    hm.on_market_price_median,
+    hm.on_market_price_by_square_meter,
+    hm.off_market_price_median,
+    hm.off_market_price_by_square_meter,
     hm.median_days_to_contract_sign
 FROM datalake_ebdb_clean.listing_business_context lbc
 JOIN dw_public.dim_house_listing dhl
