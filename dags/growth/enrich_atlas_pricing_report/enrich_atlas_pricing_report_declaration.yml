@@ -19,7 +19,7 @@ workflow:
     new_pricing_report_listing_price_history:
     - status_history_house_listing
     - status_history_house_negotiation
-    - status_history_price_change
+    - status_history_house_price_change
     - status_history_house_unpublished
     new_pricing_report_engagement:
     - house_pricing_metrics
