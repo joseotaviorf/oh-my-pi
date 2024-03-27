@@ -39,12 +39,18 @@ columns:
       paid: ""
       written-down: ""
       divergent-payment: ""
-  is_paid_by_ssn:
+  is_ssn:
     lineage:
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_invoice
       - datalake_invoice.overdue_portfolio_timeline.reason
       - datalake_invoice.overdue_portfolio_timeline.payment_status
-    description: "Boolean to indicate if the invoice was paid by SSN - Self Service Negotiation. In this case, the customer paid the original invoice without a negotiation through the app's SSN screen."
+      - datalake_trato_feito_clean.debt.id_external
+    description: "Boolean to indicate if the invoice was paid by SSN - Self Service Negotiation."
+  type_ssn:
+    description: Indicate the type of SSN.
+    categories:
+      "POSSN (payment of original)": "In this case, the customer paid the original invoice without a negotiation through the app's SSN screen."
+      "BOSSN (single debt negotiation)": "Boletão. In this case, the customer himself paid the debts through a negotiation that resulted in a single installment/invoice. This was carried out without the help of external advisors or a 5A employee"
   debtor_type:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.debtor_type

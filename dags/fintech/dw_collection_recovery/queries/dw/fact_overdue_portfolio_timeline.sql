@@ -4,11 +4,27 @@ ssn_original_payment AS (
     SELECT DISTINCT
         event_properties:contract_id AS id_contract,
         event_properties:invoice_id AS id_invoice
-    FROM 
+    FROM
         datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events
     WHERE
         event_properties:contract_id IS NOT NULL
         AND event_properties:invoice_id IS NOT NULL
+),
+ssn_boletao AS (
+    SELECT DISTINCT
+        d.id_external AS id_invoice,
+        i.id_external AS id_invoice_extra,
+        i.id_contract_external AS id_contract
+    FROM datalake_retsuko.invoice AS i
+    LEFT JOIN datalake_trato_feito_clean.accounting_installment AS ai
+        ON ai.id_external = i.id_external
+    LEFT JOIN datalake_debt_recovery.installment AS ii
+        ON ii.id = ai.id_installment
+    LEFT JOIN datalake_debt_recovery.negotiation AS n
+        ON ii.id_negotiation = n.id_negotiation
+    LEFT JOIN datalake_trato_feito_clean.debt AS d
+        ON ii.id_negotiation = d.id_negotiation
+    WHERE i.purpose = 'extra' and i.reason = 'negotiation-5A'
 )
 SELECT
     CONCAT(o.id_invoice, "-", DATE_FORMAT(dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
@@ -18,7 +34,16 @@ SELECT
     contract_status,
     invoice_type,
     payment_status,
-    IF(ssn.id_invoice IS NOT NULL AND reason NOT IN ("negotiation-recupera", "agreement") AND payment_status = "paid", TRUE, FALSE) AS is_paid_by_ssn,
+    CASE
+        WHEN possn.id_invoice IS NOT NULL AND reason NOT IN ("negotiation-recupera", "agreement") AND payment_status = "paid" THEN TRUE
+        WHEN bossn.id_invoice IS NOT NULL AND payment_status = "written-down" THEN TRUE
+        ELSE FALSE
+    END AS is_ssn,
+    CASE
+        WHEN possn.id_invoice IS NOT NULL AND reason NOT IN ("negotiation-recupera", "agreement") AND payment_status = "paid" THEN "POSSN (payment of original)"
+        WHEN bossn.id_invoice IS NOT NULL AND payment_status = "written-down" THEN "BOSSN (single debt negotiation)"
+        ELSE NULL
+    END AS type_ssn,
     debtor_type,
     delay_contamined_range,
     contract_overdue_invoices,
@@ -35,9 +60,12 @@ SELECT
     dt_month_end,
     dt_reference,
     NOW() AS ts_load
-FROM 
+FROM
     datalake_invoice.overdue_portfolio_timeline AS o
-LEFT JOIN 
-    ssn_original_payment AS ssn
-        ON ssn.id_invoice = o.id_invoice
-        AND ssn.id_contract = o.id_contract
+LEFT JOIN
+    ssn_original_payment AS possn
+        ON possn.id_invoice = o.id_invoice
+        AND possn.id_contract = o.id_contract
+LEFT JOIN ssn_boletao AS bossn
+    ON bossn.id_invoice = o.id_invoice
+    AND bossn.id_contract = o.id_contract
