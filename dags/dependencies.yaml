@@ -148,6 +148,10 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-eviction-data
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
+  - bietlejuice.paschoalotto:load-clean-agreement-detail
+  - bietlejuice.paschoalotto:load-clean-contract
+  - bietlejuice.paschoalotto:load-clean-debt
+  - bietlejuice.paschoalotto:load-clean-user
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract

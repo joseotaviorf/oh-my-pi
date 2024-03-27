@@ -31,15 +31,15 @@ trato_feito_negotiation AS (
     DATE(n.ts_first_payment) AS dt_first_payment,
     DATE(n.ts_paid_all) AS dt_paid_all,
     DATE(n.ts_breach) AS dt_breach
-  FROM 
+  FROM
       datalake_debt_recovery.negotiation AS n
-  LEFT JOIN 
+  LEFT JOIN
       datalake_trato_feito_clean.installment AS ii
         ON ii.id_negotiation = n.id_negotiation
-  LEFT JOIN 
+  LEFT JOIN
       datalake_trato_feito_clean.accounting_installment AS ai
         ON ii.id = ai.id_installment
-  LEFT JOIN 
+  LEFT JOIN
       datalake_retsuko.invoice AS i
         ON ai.id_external = i.id_external
   QUALIFY ROW_NUMBER() OVER(PARTITION BY n.id_contract, n.id_negotiation_recupera ORDER BY n.ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
@@ -146,13 +146,28 @@ invalid_negotiations AS (
   FROM datalake_recupera.negotiation
   GROUP BY 1,2
 ),
+paschoalotto_operator AS (
+  SELECT DISTINCT
+    d.id_contract_quintoandar AS id_contract,
+    ad.id_installment AS id_negotiation,
+    UPPER(u.login_name) AS id_operator,
+    UPPER(u.full_name) AS operator_name,
+    DATE(ad.dt_emission) AS dt_promisse
+  FROM datalake_paschoalotto_clean.agreement_detail AS ad
+  LEFT JOIN datalake_paschoalotto_clean.contract AS c
+    ON ad.id_contract = c.id_contract
+  LEFT JOIN datalake_paschoalotto_clean.debt AS d
+    ON ad.id_contract = d.id_contract
+  LEFT JOIN datalake_paschoalotto_clean.user AS u
+      ON ad.id_user = u.id_user
+),
 union_sources AS (
   SELECT
     STRING(COALESCE(tfn.id_negotiation_recupera, rn.id_negotiation)) AS sk_negotiation,
     rn.customer_document AS sk_debtor,
     tfn.id_negotiation AS id_negotiation_trato_feito,
     COALESCE(tfn.id_contract, invn.id_contract) AS id_contract,
-    rn.id_operator,
+    UPPER(rn.id_operator) AS id_operator,
     COALESCE(tfn.creditor,
       CASE
         WHEN rn.id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
@@ -212,10 +227,10 @@ union_sources AS (
     NOW() AS ts_load
   FROM
     recupera_negotiation AS rn
-  FULL OUTER JOIN 
+  FULL OUTER JOIN
       trato_feito_negotiation AS tfn
         ON rn.id_negotiation = tfn.id_negotiation_recupera
-  LEFT JOIN 
+  LEFT JOIN
       renegotiation AS r
         ON tfn.id_negotiation = r.id_negotiation
   LEFT JOIN original_invoices AS oi
@@ -224,11 +239,11 @@ union_sources AS (
     ON invn.id_negotiation = rn.id_negotiation
 )
 SELECT
-  sk_negotiation,
+  u.sk_negotiation,
   sk_debtor,
   id_negotiation_trato_feito,
-  id_contract,
-  id_operator,
+  u.id_contract,
+  COALESCE(po.operator_name, u.id_operator) AS id_operator,
   creditor,
   is_invalid_negotiation,
   invalid_reason,
@@ -247,13 +262,13 @@ SELECT
   is_renegotiation,
   has_been_renegotiated,
   CASE
-    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 0 THEN "Current"
-    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 30  THEN "1-30"
-    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 60  THEN "31-60"
-    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 90  THEN "61-90"
-    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 120 THEN "91-120"
-    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) <= 180 THEN "121-180"
-    WHEN DATEDIFF(dt_promisse, dt_due_invoice_anchor) IS NULL THEN NULL
+    WHEN DATEDIFF(u.dt_promisse, dt_due_invoice_anchor) <= 0 THEN "Current"
+    WHEN DATEDIFF(u.dt_promisse, dt_due_invoice_anchor) <= 30  THEN "1-30"
+    WHEN DATEDIFF(u.dt_promisse, dt_due_invoice_anchor) <= 60  THEN "31-60"
+    WHEN DATEDIFF(u.dt_promisse, dt_due_invoice_anchor) <= 90  THEN "61-90"
+    WHEN DATEDIFF(u.dt_promisse, dt_due_invoice_anchor) <= 120 THEN "91-120"
+    WHEN DATEDIFF(u.dt_promisse, dt_due_invoice_anchor) <= 180 THEN "121-180"
+    WHEN DATEDIFF(u.dt_promisse, dt_due_invoice_anchor) IS NULL THEN NULL
     ELSE "over 180"
   END AS delay_contamined_range,
   total_invoices_negotiated,
@@ -281,10 +296,10 @@ SELECT
   paid_amount,
   total_next_due,
   DATEDIFF(dt_down_payment, dt_due_invoice_anchor) AS sla_debt_anchor_to_promisse_payment,
-  DATEDIFF(dt_promisse, dt_due_invoice_anchor)  AS sla_debt_anchor_to_promisse,
+  DATEDIFF(u.dt_promisse, dt_due_invoice_anchor)  AS sla_debt_anchor_to_promisse,
   DATEDIFF(dt_ending, dt_down_payment) AS sla_promisse_payment_to_negotiation_ending,
   dt_due_invoice_anchor,
-  dt_promisse,
+  u.dt_promisse,
   dt_due_promisse,
   dt_cancellation,
   dt_next_due,
@@ -293,4 +308,10 @@ SELECT
   dt_expected_ending,
   dt_ending,
   ts_load
-FROM union_sources
+FROM union_sources AS u
+LEFT JOIN paschoalotto_operator AS po
+  ON
+    u.id_operator LIKE "%PASCH%"
+    AND po.id_contract = u.id_contract
+    AND po.id_negotiation = u.sk_negotiation
+    AND po.dt_promisse = u.dt_promisse
