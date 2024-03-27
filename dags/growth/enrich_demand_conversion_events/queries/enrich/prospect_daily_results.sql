@@ -13,7 +13,7 @@ WITH prospect_status_events AS (
   FROM
     datalake_demand_flows.tenant_prospect_status AS tps
   WHERE 
-    tps.ts_status_started BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')   
+    DATE(tps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')   
   UNION ALL 
   SELECT
     bps.id_demand_prospect_conversion_event,
@@ -29,7 +29,7 @@ WITH prospect_status_events AS (
   FROM
     datalake_demand_flows.buyer_prospect_status AS bps
   WHERE 
-    bps.ts_status_started BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')   
+    DATE(bps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')   
 ),
 
 prospect_results AS (
@@ -106,7 +106,7 @@ prospect_results AS (
   FROM
     datalake_demand_flows.prospect_results AS pcr
   WHERE 
-    pcr.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')    
+    DATE(pcr.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')    
   QUALIFY   
     ROW_NUMBER() OVER(PARTITION BY id_demand_prospect_conversion_event ORDER BY ts_event ASC) = 1 
 )
