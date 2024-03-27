@@ -50,7 +50,7 @@ SELECT
     hic.condominium_price_median,
     hic.urban_property_tax_median
 FROM
-    listings l
+    datalake_atlas_pricing_report.similar_listings l
 LEFT JOIN
     house_on_market_median_prices hon
 ON

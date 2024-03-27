@@ -2,7 +2,7 @@ WITH amplitude_events AS (
     SELECT
         ep_house_id AS id_house,
         id_amplitude,
-        LOWER(business_context) AS business_context,
+        LOWER(business_context) AS business_context
     FROM datalake_amplitude_clean.170698_listing_page_viewed_events
     WHERE
         DATE(year::STRING || month::STRING || day::STRING) >= (CURRENT_DATE - INTERVAL '30' DAY)

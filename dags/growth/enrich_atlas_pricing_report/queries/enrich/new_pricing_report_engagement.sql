@@ -1,6 +1,6 @@
 SELECT DISTINCT
     lbc.id_house,
-    lbc.business_context,
+    UPPER(lbc.business_context) AS business_context,
     COALESCE(pre.views_quantity, 0) AS views_quantity,
     COALESCE(pre.lpv_temperature_region_context, 'NO VIEWS') AS demand_level,
     hm.condominium_price_median,

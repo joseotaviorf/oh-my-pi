@@ -1,7 +1,7 @@
 WITH negotiation_status AS (
     SELECT DISTINCT
         lbc.id_house,
-        lbc.business_context,
+        UPPER(lbc.business_context) AS business_context,
         CASE
             WHEN lbc.business_context = 'RENT' AND dc.ts_signature IS NOT NULL THEN dc.ts_signature
             WHEN lbc.business_context = 'SALE' AND fo.sk_sale_agreement_signed_date > 0 THEN dd.date

@@ -15,7 +15,7 @@ WITH listings AS (
             WHEN lbc.business_context = 'RENT' THEN p_rent.rent
             WHEN lbc.business_context = 'SALE' THEN p_sale.price
         END AS price,
-        'First Listing' AS status        
+        'FIRST_LISTING' AS status        
     FROM datalake_ebdb_clean.listing_business_context lbc
     LEFT JOIN dw_quintoandar.fact_listing_price_changes p_rent
         ON (p_rent.sk_house_listing / 1000)::BIGINT = lbc.id_house 
@@ -30,7 +30,7 @@ WITH listings AS (
 first_listing AS (
     SELECT
         id_house,
-        business_context,
+        UPPER(business_context) AS business_context,
         dt_price_updated,
         price,
         status    

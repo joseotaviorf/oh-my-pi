@@ -1,6 +1,6 @@
 SELECT 
     id_house,
-    business_context,
+    UPPER(business_context) AS business_context,
     FROM_UNIXTIME(ts_revision / 1000) AS dt_price_updated,
     NULL::FLOAT AS price,
     status

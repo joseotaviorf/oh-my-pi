@@ -1,6 +1,6 @@
 SELECT DISTINCT
     bl.id_house,
-    bl.business_context,
+    UPPER(bl.business_context) AS business_context,
     CASE
         WHEN business_context = 'RENT' THEN p_rent.ts_price_started
         WHEN business_context = 'SALE' THEN dd.date
