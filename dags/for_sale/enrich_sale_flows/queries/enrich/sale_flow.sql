@@ -9,9 +9,9 @@ WITH sale_booking AS (
         b.id_visitor AS id_buyer,
         b.id_house,
         MIN(b.ts_created) AS ts_first_booking_created,
-        MIN(CASE WHEN b.visit_fup = 'VaiNegociar' THEN b.ts_booking_utc END) AS ts_first_visit_completed,
+        MIN(CASE WHEN b.is_visit_completed THEN b.ts_booking_utc END) AS ts_first_visit_completed,
         COUNT(DISTINCT b.id) AS nbr_bookings,
-        COUNT(DISTINCT CASE WHEN b.visit_fup = 'VaiNegociar' THEN b.id END) AS nbr_visits_completed
+        COUNT(DISTINCT CASE WHEN b.is_visit_completed THEN b.id END) AS nbr_visits_completed
     FROM
         datalake_booking.booking AS b
     WHERE
@@ -103,7 +103,13 @@ ajusted_house AS (
         id_user,
         id_house,
         id_region,
-        CAST(ts_first_day_as_seller AS TIMESTAMP) AS ts_first_day_as_seller,
+        CASE
+            WHEN lag_id_user IS NULL -- First seller
+                -- Arbitrarily low timestamp before operations began, for every house to have an associated seller at any point
+                -- (fixes problems caused by Casa Mineira historical migration)
+                THEN '2010-01-01'::TIMESTAMP 
+            ELSE CAST(ts_first_day_as_seller AS TIMESTAMP)
+        END AS ts_first_day_as_seller,
         CAST(ts_last_day_as_seller AS TIMESTAMP) AS ts_last_day_as_seller
     FROM
         h_with_lag

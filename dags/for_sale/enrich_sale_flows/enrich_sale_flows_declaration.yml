@@ -1,0 +1,12 @@
+---
+dag:
+  name: enrich_sale_flows
+  schedule_start_date: 2020, 8, 29
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates the enriched table for Sale Flows, getting all data about the demand ForSale context.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
