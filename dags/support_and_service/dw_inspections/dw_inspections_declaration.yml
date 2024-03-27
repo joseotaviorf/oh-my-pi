@@ -23,6 +23,9 @@ workflow:
     fact_inspection:
       extraction_type: full
       partitions: []
+    fact_repair_request:
+      extraction_type: full
+      partitions: []
     fact_report_review:
       extraction_type: full
       partitions: []    
