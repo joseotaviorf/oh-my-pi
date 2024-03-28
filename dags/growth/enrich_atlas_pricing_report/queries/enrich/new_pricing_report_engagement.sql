@@ -17,7 +17,7 @@ LEFT JOIN datalake_atlas_pricing_report.house_pricing_metrics hm
     ON lbc.id_house = hm.id_house
     AND LOWER(lbc.business_context) = LOWER(hm.business_context)
 LEFT JOIN datalake_atlas_pricing_report.house_listing_views_metrics pre
-    ON lbc.id_house = pre.id_house
+    ON lbc.id_house = pre.id_house::BIGINT
     AND LOWER(lbc.business_context) = LOWER(pre.business_context)
 WHERE
     DATEDIFF(dhl.ts_house_update, CURRENT_DATE) <= 365

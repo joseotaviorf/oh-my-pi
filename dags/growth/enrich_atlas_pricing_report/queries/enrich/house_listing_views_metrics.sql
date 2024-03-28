@@ -8,7 +8,7 @@ WITH amplitude_events AS (
         DATE(year::STRING || month::STRING || day::STRING) >= (CURRENT_DATE - INTERVAL '30' DAY)
         AND ts_event >= (CURRENT_DATE - INTERVAL '7' DAY)
  ),
- 
+
 houses AS (
     SELECT
         llf.sk_house AS id_house,
@@ -37,7 +37,7 @@ aux AS (
     ),
 
 metrics AS (
-    SELECT 
+    SELECT
         id_house,
         business_context,
         views_quantity,
@@ -51,6 +51,9 @@ SELECT
     id_house,
     business_context,
     views_quantity,
+    lpv_p_25,
+    lpv_p_50,
+    lpv_p_75,
     CASE
         WHEN views_quantity < lpv_p_25 THEN 'LOW'
         WHEN views_quantity > lpv_p_75 THEN 'HIGH'
