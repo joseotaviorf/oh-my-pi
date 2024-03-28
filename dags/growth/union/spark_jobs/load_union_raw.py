@@ -43,7 +43,7 @@ def _create_dataframe(s3_source_bucket: str, raw_table_name:str, date: datetime)
     df = None
     logger.info(f"msg=Trying to read data from s3://{s3_source_bucket}/{file_path}/")
     if _checkPath(s3_source_bucket, file_path):
-        df = spark_client.conn.read.option("header", True).option("delimiter",";").option("multiline", True).csv(f"s3://{s3_source_bucket}/{file_path}/*")
+        df = spark_client.conn.read.option("header", True).option("delimiter","@#@").option("multiline", True).csv(f"s3://{s3_source_bucket}/{file_path}/*")
         if df is not None:
             df = (df_service
             .input(df)
