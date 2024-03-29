@@ -19,5 +19,6 @@ This pipeline produces the following tables in enrich layer, via full load:
 - `citadel`
 - `girafales`
 - `casio`
+- `emma_watson`
 
 ​</details>

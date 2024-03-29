@@ -1,0 +1,109 @@
+---
+database_name: datalake_emlio
+table_name: emma_watson
+owner: "ralph.filho@quintoandar.com.br"
+domain: MLOps
+description:
+  Data extracted from user chats that are processed by emma watson service.
+  The purpose is to track and monitor data drifts and serve as input for metrics computations.
+columns:
+  id_service:
+    description: ID of the service ('emma_watson').
+    lineage:
+      - datalake_emlio_clean.emlio_logs.id_service
+  service_version:
+    description: Version of the emma watson service.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.service_version
+  prompt:
+    description: User text.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+  session_id:
+    description: User's session identification.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  id_user:
+    description: User's unique identification.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  pipeline:
+    description: Identify the source of the user's text.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  llm_model:
+    description: Which LLM was used for inference.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  prompt_faqs:
+    description: User selected questions.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  top_5_faqs:
+    description: User's ranked questions.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  score:
+    description: Model's score result.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  prompt_token_length:
+    description: Length of the user typed text.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  response_token_length:
+    description: Length of the response sent to the user.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  retrieval_response_time_start:
+    description: Retrieval's start timestamp.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  retrieval_response_time_finish:
+    description: Retrieval's finish timestamp.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  retrieval_response_time_total:
+    description: Difference of the retrieval timestamp start and finish.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  generator_response_time_start:
+    description: Response generator's start timestamp.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  generator_response_time_finish:
+    description: Response generator's finish timestamp.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  total_response_time:
+    description: Total time used for the response.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  generator_response_time_total:
+    description: Difference of the generator's timestamp start and finish.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  is_experimental_prompt_enabled:
+    description: Whether experimental prompt is enabled or not.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  is_gpt_4_experimental_enabled:
+    description: Whether GPT 4 is used or not.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.keys
+  result:
+    description: Generated response.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+  year:
+    description: Year of the log.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.year
+  month:
+    description: Month of the log.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.month
+  day:
+    description: Day of the log.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.day
