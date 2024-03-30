@@ -37,7 +37,7 @@ house_off_market_median_days_to_contract_sign AS (
     GROUP BY 1, 2, 3
 )
 
-SELECT
+SELECT DISTINCT
     l.id_house,
     l.business_context,
     l.house_neighborhood,

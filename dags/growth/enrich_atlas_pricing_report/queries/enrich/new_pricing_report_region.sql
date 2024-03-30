@@ -39,11 +39,11 @@ house_views AS (
         AND dr.country_code != 'MX'
     GROUP BY 1, 2, 3, 4
 )
-     
+
 SELECT DISTINCT
     m.sk_region AS id_region,
     m.neighborhood,
-    UPPER(m.business_context),
+    UPPER(m.business_context) AS business_context,
     APPROX_PERCENTILE(m.views_quantity, 0.50) OVER(PARTITION BY m.business_context, m.sk_region) AS lpv_p_50,
     a.mdape_city
 FROM house_views m
