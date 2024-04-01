@@ -1,0 +1,12 @@
+---
+dag:
+  name: enrich_sale_demand_events
+  schedule_start_date: 2023, 9, 10
+  owner: Data ForSale
+  documentation:
+    dag_purpose: Creates an enriched table containing the ForSale demand events, in which each line is an event related to the scope.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_photon_cluster

@@ -1,0 +1,19 @@
+---
+dag:
+  name: enrich_sale_listings
+  schedule_start_date: 2020, 8, 29
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates the enriched tables for Sale Listings context.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    sale_listing:
+    - sale_status_version_order
+    sale_listing_status:
+    - sale_status_version_order
+    sale_listing_price_changes:
+    - sale_status_version_order
+cluster:
+  type: databricks_10_4_med_memory_photon_cluster

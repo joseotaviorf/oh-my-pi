@@ -1,0 +1,12 @@
+---
+dag:
+  name: enrich_sale_closing_flows
+  schedule_start_date: 2020, 8, 29
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates the enriched table for Sale Closing Flows, in order to create metrics for monitor and analyze the closing funnel in For Sale.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_cluster

@@ -1,9 +1,0 @@
----
-inner_dependencies:
-  lead_flow:
-    - casa_mineira_lead_flow
-    - classified_lead_flow
-    - hub_services_lead_flow
-    - quintoandar_lead_flow
-dag_documentation:
-  dag_purpose: Creates enriched tables for the context `sale_lead_flows`, enriching leads from Casa Mineira, Classifieds, Hub Services and QuintoAndar.

@@ -1,4 +1,0 @@
----
-dag_documentation:
-  dag_purpose: This dag is responsible for enriching and grouping demand information about sale listings,
-    such as first sales flow, first booking, first offer, total offers, and others. 
