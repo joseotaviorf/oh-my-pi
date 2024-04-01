@@ -16,6 +16,7 @@ workflow:
     - month
   short_circuit_customization:
     function: CHECK_IS_SPECIFIC_DAY_OF_MONTH
+    execution_date: "{{ macros.ds_add(ds, 1) }}"
     function_params:
       day: 1
 cluster:
