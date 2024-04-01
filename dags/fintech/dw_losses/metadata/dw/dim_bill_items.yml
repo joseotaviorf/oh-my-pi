@@ -9,10 +9,6 @@ columns:
     lineage:
       - datalake_losses.bill_items.id_invoice
     description: Invoice ID
-  id_contract:
-    lineage:
-      - datalake_losses.bill_items.id_contract
-    description: Contract ID.
   bill_item_name:
     lineage:
       - datalake_losses.bill_items.bill_item_name

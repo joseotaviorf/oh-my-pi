@@ -1,6 +1,5 @@
 SELECT
     id_invoice AS sk_invoice,
-    id_contract,
     bill_item_name,
     bill_item_cluster_name,
     bill_item_due_amount,
