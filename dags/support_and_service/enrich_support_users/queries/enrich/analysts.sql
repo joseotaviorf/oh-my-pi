@@ -27,7 +27,7 @@ zendesk_analysts AS (
         zendesk_tickets AS zt
     LEFT JOIN
         datalake_support_users.zendesk_users AS zu
-            ON zt.id_assignee = zu.id_user
+            ON zt.id_assignee = zu.id_user_zendesk
 ),
 bigfone_analysts AS (
     SELECT DISTINCT
