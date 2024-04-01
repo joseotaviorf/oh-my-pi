@@ -18,3 +18,4 @@ Produces the following output tables, via full load:
 - `historical_closing`
 - `provision`
 - `provision_factor`
+- `bill_items`

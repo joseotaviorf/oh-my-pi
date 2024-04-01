@@ -18,3 +18,4 @@ This pipeline produces the following output table in DW, via full load :
 - `dw_losses.fact_delay`
 - `dw_losses.fact_provision`
 - `dw_losses.dim_provision_factor`
+- `dw_losses.dim_bill_items`

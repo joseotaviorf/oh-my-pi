@@ -1,0 +1,43 @@
+---
+database_name: dw_losses
+table_name: dim_bill_items
+description: "DW table with the invoice's bill items"
+owner: bianca.martinss@quintoandar.com.br
+domain: fintech
+columns:
+  sk_invoice:
+    lineage:
+      - datalake_losses.bill_items.id_invoice
+    description: Invoice ID
+  id_contract:
+    lineage:
+      - datalake_losses.bill_items.id_contract
+    description: Contract ID.
+  bill_item_name:
+    lineage:
+      - datalake_losses.bill_items.bill_item_name
+    description: Invoice entry type according to bill_item
+  bill_item_cluster_name:
+    lineage:
+      - datalake_losses.bill_items.bill_item_cluster_name
+    description: A suggestion of group/cluster of bill items. This category was defined by our Data Analytics and Analytics Engineering team. Feel free to use another one.
+    categories:
+      ACORDO: "Bill items that represent the invoice as a negotiation of a previous debt. Bill items included: DEBIT-NEGOTIATION"
+      CONDOMINIO: "Bill items associated with expenses of condominium, this cluster representes single-time charges due to process of internalization of condominium debt by 5A from the landlord. Bill items included: CONDOMINIUM-5A-PAID, CONDOMINIUM-DEFAULTING, CONDOMINIUM-USAGE"
+      MULTA-RECISORIA: "Bill items that represent the charge due to early termination of contract. Bill items included: EARLY-TERMINATION-FEE"
+      MULTAS ONGOING: "Bill items that represent late fees due to previous delay. Bill items included: PROPERTY-DAMAGE-FINE, FINE-AND-INTEREST"
+      RENTAL-CORE: "Bill items that build the monthly invoices in general. Bill items included: SERVICE-FEE, HOME-INSURANCE, RENTAL, IPTU, CONDOMINIUM"
+      REPAROS: "Bill items associated with repairs in the house. Bill items included: RESIDENTIAL-PROTECTION-5A-ACQUITTANCE, RESIDENTIAL-PROTECTION-5A-FUND-TRANSFER, REPAIR-OFFBOARDING, REPAIR-ONGOING"
+      UTILIDADES: "Bill items that represent default in light, water and/ or gas. Bill items included: LIGHT-WATER-OR-GAS, UTILITIES-DEFAULTING"
+      GUARANTEE-RENOVATION: "Bill items dedicated to the charge of guarantee past 12 months from the beginning of the contract. They are charged monthly. Bill items included: RENTAL-GUARANTEE-FEE, PRO-GUARANTOR-5A-INSTALLMENT"
+      OUTROS: "All bill items not categorized as one of the above options."
+  bill_item_due_amount:
+    lineage:
+      - datalake_losses.bill_items.bill_item_due_amount
+    description: Invoice entry due value, considering debit or credit related to the contract cash flow
+  dt_closing:
+    lineage:
+      - datalake_losses.bill_items.dt_closing
+    description: Last day of the month.
+  ts_load:
+    description: Timestamp of when this table was loaded.

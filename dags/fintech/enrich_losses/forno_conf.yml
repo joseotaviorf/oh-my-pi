@@ -1,5 +1,7 @@
 ---
 inner_dependencies:
+  closing:
+    - bill_items
   delay:
     - closing
   provision:

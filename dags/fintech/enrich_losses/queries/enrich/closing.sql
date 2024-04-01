@@ -75,31 +75,13 @@ CONTRACT_AUX AS (
       WHERE
             year = 2022 AND month  = 10 AND day = 4
 ),
-DIM_INVOICE_ENTRY_SNAPSHOT AS (
+repair_offboarding AS (
       SELECT DISTINCT
-            sk_invoice_entry,
-            entry_type,
-            year,
-            month,
-            day
-      FROM dw_payment_snapshot.dim_invoice_entry_snapshot
-),
-BASE_BILL_ITEMS AS (
-      SELECT
-            fies.sk_invoice,
-            fies.sk_contract,
-            dd.month_end AS dt_closing,
-            SUM(IF(dies.entry_type = 'repair offboarding', fies.brl_entry_due_amount, 0)) AS total_bill_items_repair_offboarding
-      FROM dw_payment_snapshot.fact_invoice_entries_snapshot AS fies
-      LEFT JOIN dim_invoice_entry_snapshot AS dies
-            ON dies.sk_invoice_entry = fies.sk_invoice_entry
-                  AND dies.year = fies.year
-                  AND dies.month = fies.month
-                  AND dies.day = fies.day
-      LEFT JOIN dw_public.dim_date dd
-            ON dd.sk_date = BIGINT(DATE_FORMAT(DATEADD(MONTH, -1, fies.ts_snapshot), "yyyyMMdd"))
-      WHERE fies.sk_invoice <> -1
-      GROUP BY 1,2,3
+            id_invoice,
+            dt_closing
+      FROM
+            datalake_losses.bill_items
+      WHERE bill_item_name = 'repair offboarding'
 ),
 BASE_CLOSING_DRAFT AS (
       SELECT
@@ -124,7 +106,7 @@ BASE_CLOSING_DRAFT AS (
             coalesce(c.guarantee_type, c_backup.guarantee_type) as guarantee_type,
             coalesce(c.flag_is_international, c_backup.flag_is_international) as flag_is_international,
             coalesce(c.flag_is_before_started_raw, c_backup.flag_is_before_started_raw) as flag_is_before_started_raw,
-            IF(total_bill_items_repair_offboarding > 0, TRUE, FALSE) AS has_repair_offboarding_bill_item,
+            IF(b.id_invoice IS NOT NULL, TRUE, FALSE) AS has_repair_offboarding_bill_item,
             CASE
               WHEN coalesce(c.dt_annulment, current_date) <= (date_trunc('month', m.dt_snapshot) - interval '1' day) THEN 'Finalizado'
             ELSE 'Ativo' END AS status_mes_fechamento,
@@ -149,8 +131,8 @@ BASE_CLOSING_DRAFT AS (
             CONTRACT_AUX as c_backup
                   ON c_backup.id = cr.id_external
       LEFT JOIN
-            BASE_BILL_ITEMS AS b
-                  ON b.sk_invoice = m.sk_invoice and b.dt_closing = m.closing_day
+            repair_offboarding AS b
+                  ON b.id_invoice = m.sk_invoice and b.dt_closing = m.closing_day
 )
 SELECT
       sk_invoice AS id_invoice,
