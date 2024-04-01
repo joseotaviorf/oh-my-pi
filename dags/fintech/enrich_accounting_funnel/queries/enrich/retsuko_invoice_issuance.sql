@@ -103,7 +103,7 @@ sap AS (
 )
 
 SELECT 
-  'IN'||'-'||id_finance_entity||'-'||'1'||'-'|| 
+  'IN'||'-'||id_invoice||'-'||'1'||'-'|| 
     CASE
       WHEN revenue_name = 'adm fee' THEN '1'
       WHEN revenue_name = 'brokerage' THEN '2' 
