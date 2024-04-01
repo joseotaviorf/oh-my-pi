@@ -7,6 +7,9 @@ columns:
   operacao:
     lineage:
       - datalake_gsheets_raw.sale_payment_concluded_targets.operacao
+  model:
+    lineage:
+      - datalake_gsheets_raw.sale_payment_concluded_targets.model
   forma_pagamento:
     lineage:
       - datalake_gsheets_raw.sale_payment_concluded_targets.forma_pagamento

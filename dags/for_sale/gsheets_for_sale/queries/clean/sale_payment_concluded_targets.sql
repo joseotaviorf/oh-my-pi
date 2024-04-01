@@ -1,6 +1,7 @@
 SELECT
     city_group,
     operacao,
+    model,
     forma_pagamento,
     payment_concluded,
     credito_fim,
