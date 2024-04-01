@@ -1,7 +1,7 @@
 SELECT
    id_service,
    prompts.prompt,
-   service_version,
+   regexp_replace(service_version, "[^0-9a-zA-Z_\-]+", "_") as service_version,
    keys.session_id,
    keys.userId as id_user,
    keys.pipeline,
