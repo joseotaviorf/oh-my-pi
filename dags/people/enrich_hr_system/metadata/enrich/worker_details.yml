@@ -85,6 +85,10 @@ columns:
     description: 'Last social name of the worker'
     lineage:
     - datalake_hr_system_clean.workers.names.NameInformation16
+  dismissal_type:
+    description: 'Type of dismissal of the worker'
+    lineage:
+    - datalake_hr_system_clean.workers.work_relationships.assignments.ActionCode
   assignment_name:
     description: 'Name of the job of the worker'
     lineage:
@@ -101,6 +105,10 @@ columns:
     description: 'Name of the business unit for the worker assignment'
     lineage:
     - datalake_hr_system_clean.workers.work_relationships.assignments.BusinessUnitName
+  brand:
+    description: 'Brand of the worker'
+    lineage:
+    - datalake_hr_system_clean.workers.work_relationships.assignments.assignmentsDFF.marcaProduto
   assignment_status_type:
     description: 'Assignment status type for the worker such as Active, Inactive, or Suspended'
     lineage:
@@ -117,6 +125,10 @@ columns:
     description: 'User-defined category for the assignment such as full-time, permanent, and so on'
     lineage:
     - datalake_hr_system_clean.workers.work_relationships.assignments.AssignmentCategory
+  action_code:
+    description: 'Action code for the assignment, last action performed'
+    lineage:
+    - datalake_hr_system_clean.workers.work_relationships.assignments.ActionCode
   reason_code:
     description: 'Reason for the action being performed on the assignment, last action performed'
     lineage:

@@ -70,6 +70,7 @@ WITH hr_system_workers AS (
     assignments['JobCode'] AS JobCode,
     assignments['AssignmentName'] AS AssignmentName,
     assignments['AssignmentCategory'] AS AssignmentCategory,
+    assignments['ActionCode'] AS ActionCode,
     assignments['ReasonCode'] AS ReasonCode,
     assignments['ReasonName'] AS ReasonName,
     assignments['GradeCode'] AS GradeCode,
@@ -116,7 +117,8 @@ WITH hr_system_workers AS (
     assignmentsDFF["EffectiveEndDate"] AS EffectiveEndDate,
     assignmentsDFF["funcionarioMarcaPonto"] AS funcionarioMarcaPonto,
     assignmentsDFF["trilha"] AS trilha,
-    assignmentsDFF["targetPlr"] AS targetPlr
+    assignmentsDFF["targetPlr"] AS targetPlr,
+    assignmentsDFF['marcaProduto'] AS marcaProduto
   FROM assignmentsDFF_step1
   QUALIFY assignmentsDFF["EffectiveEndDate"] = MAX(assignmentsDFF["EffectiveEndDate"]) over (PARTITION BY id_person, PeriodOfServiceId, AssignmentId)
 ), work_relationship_data AS (
@@ -140,6 +142,7 @@ WITH hr_system_workers AS (
     assignments.JobCode,
     assignments.AssignmentName,
     assignments.AssignmentCategory,
+    assignments.ActionCode,
     assignments.ReasonCode,
     assignments.ReasonName,
     assignments.GradeCode,
@@ -151,7 +154,8 @@ WITH hr_system_workers AS (
     assignmentsDFF.dataFinalDaExperiencia2,
     assignmentsDFF.funcionarioMarcaPonto,
     assignmentsDFF.trilha,
-    assignmentsDFF.targetPlr
+    assignmentsDFF.targetPlr,
+    assignmentsDFF.marcaProduto
   FROM work_rel
   LEFT JOIN assignments
     ON work_rel.id_person = assignments.id_person
@@ -194,29 +198,6 @@ WITH hr_system_workers AS (
     nationalIdentifiersDFF["ufDeEmissao"] AS ufDeEmissao,
     nationalIdentifiersDFF["orgaoDeEmissao"] AS orgaoDeEmissao
   FROM nationalIdentifiersDFF_step1
-), national_identifiers_data AS (
-  SELECT DISTINCT
-    ni2_cpf.id_person,
-    ni2_cpf.person_number,
-    ni2_cpf.NationalIdentifierId NationalIdentifierId_cpf,
-    ni2_cpf.NationalIdentifierNumber AS cpf,
-    ni2_rg.NationalIdentifierId NationalIdentifierId_rg,
-    ni2_rg.NationalIdentifierNumber AS rg,
-    ni2_pis.NationalIdentifierId AS NationalIdentifierId_pis,
-    ni2_pis.NationalIdentifierNumber AS pis,
-    nidff.ufDeEmissao as uf_emissao_rg,
-    nidff.orgaoDeEmissao AS orgao_emissao_rg
-  FROM national_identifiers_step2  ni2_cpf
-  FULL OUTER JOIN national_identifiers_step2  ni2_rg
-    ON ni2_cpf.id_person = ni2_rg.id_person
-  FULL OUTER JOIN national_identifiers_step2 ni2_pis
-    ON ni2_cpf.id_person = ni2_pis.id_person
-  LEFT JOIN nationalIdentifiersDFF nidff
-    ON ni2_rg.id_person = nidff.id_person 
-      AND ni2_rg.NationalIdentifierId = nidff.NationalIdentifierId
-  WHERE ni2_cpf.NationalIdentifierType = 'CPF'
-    AND ni2_rg.NationalIdentifierType = 'RG'
-    AND ni2_pis.NationalIdentifierType = 'PIS' 
 ), ethnicities_step1 AS (
   SELECT  
     id_person,
@@ -487,14 +468,24 @@ SELECT
   names.NameInformation15 AS first_social_name,
   names.NameInformation16 AS last_social_name,
   -- -- assignment info,
+  CASE
+    WHEN work_rel.ActionCode = 'RESIGNATION'
+      THEN 'Desligamento Voluntário'
+    WHEN work_rel.ActionCode = 'TERMINATION'
+      THEN 'Desligamento Involuntário'
+    WHEN work_rel.ActionCode = 'DEATH'
+      THEN 'Falecimento'
+  END AS dismissal_type,
   work_rel.AssignmentName AS assignment_name,
   work_rel.WorkerType AS worker_type,
   work_rel.LegalEmployerName AS legal_employer_name,
   work_rel.BusinessUnitName AS business_unit_name,
-  work_rel.AssignmentStatusType AS assignment_status_type,
+  work_rel.marcaProduto AS brand,
+  NVL(work_rel.AssignmentStatusType, 'PENDING') AS assignment_status_type,
   work_rel.DepartmentName AS department_name,
   work_rel.JobCode AS job_code,
   work_rel.AssignmentCategory AS assignment_category,
+  work_rel.ActionCode AS action_code,
   work_rel.ReasonCode AS reason_code,
   arl.action_reason AS reason_code_description,
   work_rel.GradeCode AS band,
@@ -518,11 +509,11 @@ SELECT
   workers.birth_region,
   workers.birth_country,
   -- -- docs info,
-  ni.cpf,
-  ni.rg,
-  ni.pis,
-  ni.uf_emissao_rg AS issuing_state_rg,
-  ni.orgao_emissao_rg AS issuing_authority_rg,
+  ni2_cpf.NationalIdentifierNumber AS cpf,
+  ni2_rg.NationalIdentifierNumber AS rg,
+  ni2_pis.NationalIdentifierNumber AS pis,
+  nidff.ufDeEmissao AS issuing_state_rg,
+  nidff.orgaoDeEmissao AS issuing_authority_rg,
   li.ctpsNumber AS ctps_number,
   li.ctpsSeries AS ctps_series,
   li.issuingState AS issuing_state_ctps,
@@ -657,8 +648,6 @@ LEFT JOIN salaries
 LEFT JOIN ethnicities
   ON workers.id_person = ethnicities.id_person
   AND work_rel.LegislationCode = ethnicities.LegislationCode
-LEFT JOIN national_identifiers_data AS ni
-  ON workers.id_person = ni.id_person
 LEFT JOIN legislative_info_data AS li
   ON workers.id_person = li.id_person
   AND work_rel.LegislationCode = li.LegislationCode
@@ -689,4 +678,16 @@ LEFT JOIN datalake_hr_system_clean.action_reasons_lov arl
   ON work_rel.ReasonCode = arl.action_reason_code
 LEFT JOIN external_identifiers ei 
   ON workers.id_person = ei.id_person
+LEFT JOIN national_identifiers_step2  ni2_cpf
+  ON workers.id_person = ni2_cpf.id_person
+  AND ni2_cpf.NationalIdentifierType = 'CPF'
+LEFT JOIN national_identifiers_step2  ni2_rg
+  ON workers.id_person = ni2_rg.id_person
+  AND ni2_rg.NationalIdentifierType = 'RG'
+LEFT JOIN national_identifiers_step2 ni2_pis
+  ON workers.id_person = ni2_pis.id_person
+  AND ni2_pis.NationalIdentifierType = 'PIS'
+LEFT JOIN nationalIdentifiersDFF nidff
+  ON workers.id_person = nidff.id_person 
+  AND ni2_rg.NationalIdentifierId = nidff.NationalIdentifierId
 WHERE ei.id_person is null
