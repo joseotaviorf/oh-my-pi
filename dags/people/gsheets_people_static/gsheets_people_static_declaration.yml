@@ -18,3 +18,4 @@ workflow:
   custom_schema: gsheets
   has_hive_sync: False
   credentials_scope: people
+  bucket_config_name: people_bucket

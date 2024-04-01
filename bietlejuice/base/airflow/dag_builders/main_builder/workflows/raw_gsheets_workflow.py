@@ -55,7 +55,8 @@ class RawGsheetsWorkflow(BaseWorkflow):
             "dag_purpose"
         ].format(dag_context=self.dag_name.replace("gsheets_", ""))
         self.env = os.environ.get("ENVIRONMENT")
-        self.datalake_bucket = self.config_service.get_config("datalake_bucket")
+        bucket_config = workflow_args.get("bucket_config_name", "datalake_bucket")
+        self.datalake_bucket = self.config_service.get_config(bucket_config)
         self.task_pool = "gsheets_pool"
         self.databricks_bietlejuice_repo_path = self.config_service.get_config(
             "databricks_bietlejuice_repo_path"

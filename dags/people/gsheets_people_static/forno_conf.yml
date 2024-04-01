@@ -1,6 +1,3 @@
-datalake_bucket: people-s3-forno-data-quintoandar-com-br
-has_hive_sync: False
-
 sheets_info:
   dismissal_forms_bp:
     clean_table_name: dismissal_forms_bp
