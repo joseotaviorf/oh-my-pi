@@ -1,0 +1,12 @@
+---
+dag:
+  name: enrich_buyer_prospect
+  schedule_start_date: 2020, 7, 1
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates the enriched table for buyer prospect context.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_cluster

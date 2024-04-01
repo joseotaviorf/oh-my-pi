@@ -1,0 +1,13 @@
+---
+dag:
+  name: enrich_nps_answer_drivers
+  schedule_start_date: 2020, 7, 30
+  owner: Data ForSale
+  documentation:
+    dag_purpose: Prepares [Tracksale](https://www.tracksale.co/) and EBDB ([Main's](https://github.com/quintoandar/main) database)
+       data for business utilization. Tracksale is an external service that manages NPS data.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_cluster

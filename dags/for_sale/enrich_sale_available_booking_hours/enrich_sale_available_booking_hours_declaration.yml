@@ -1,0 +1,12 @@
+---
+dag:
+  name: enrich_sale_available_booking_hours
+  schedule_start_date: 2022, 7, 22
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This dag is intended to handle the enriched table for sale of available times for booking for each listing.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_memory_cluster
