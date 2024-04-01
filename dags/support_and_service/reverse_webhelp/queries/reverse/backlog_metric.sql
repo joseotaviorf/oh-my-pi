@@ -25,6 +25,8 @@ SELECT DISTINCT
     bmt.dt_metric_reference,
     bmt.ts_started,
     bmt.ts_solved,
+    tf.replies,
+    dti.ticket_via,
     YEAR(CURRENT_DATE - 1) AS year,
     MONTH(CURRENT_DATE - 1) AS month,
     DAY(CURRENT_DATE - 1) AS day,
@@ -43,6 +45,13 @@ LEFT JOIN
 LEFT JOIN
     dw_customer_support.dim_agent AS da
         ON bmt.sk_agent = da.sk_agent
+LEFT JOIN 
+    dw_customer_support.fact_ticket AS tf
+        ON tf.sk_ticket = bmt.sk_task
+LEFT JOIN 
+    dw_tickets.dim_ticket AS dti
+        ON dti.sk_ticket = bmt.sk_task
+
 WHERE
     DATE(bmt.dt_metric_reference) >= '2022-07-19'
     AND dd.is_partner IS TRUE
