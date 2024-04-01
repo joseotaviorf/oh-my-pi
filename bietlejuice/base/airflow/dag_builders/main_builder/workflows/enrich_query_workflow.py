@@ -104,7 +104,6 @@ class EnrichQueryWorkflow(BaseWorkflow):
         inner_dependencies = self.workflow_args.get("inner_dependencies", {})
 
         dependency_table_names = set()
-
         try:
             for table_name, table_first_task in table_first_tasks.items():
                 if table_name in inner_dependencies:
@@ -118,6 +117,10 @@ class EnrichQueryWorkflow(BaseWorkflow):
                 f"Error finding table '{e.args[0]}' during inner dependencies settings. "
                 "Make sure this table is named correctly and its query exists."
             )
+
+        if self._check_include_skip_run_task():
+            skip_run_task = self.skip_run_task_creator.create_task()
+            skip_run_task >> execute_job_cluster_task
 
         job_cluster_finished_task.set_upstream(
             [
@@ -140,6 +143,9 @@ class EnrichQueryWorkflow(BaseWorkflow):
         )
         self.propagate_metadata_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.PROPAGATE_METADATA
+        )
+        self.skip_run_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.SKIP_RUN
         )
         self.sync_hive_structure_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SYNC_HIVE_STRUCTURE

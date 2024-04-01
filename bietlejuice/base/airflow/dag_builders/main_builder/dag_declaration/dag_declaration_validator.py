@@ -66,7 +66,9 @@ class DAGDeclarationValidator(Validator):
                             "type": "string",
                             "empty": False,
                             "allowed": ShortCircuitFunctionEnum.get_available_enum_values(),
-                        }
+                        },
+                        "execution_date": {"type": "string", "required": False},
+                        "function_params": {"type": "dict", "required": False},
                     },
                 },
                 "inner_dependencies": {"type": "dict", "empty": False},

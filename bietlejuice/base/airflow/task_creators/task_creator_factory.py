@@ -40,6 +40,9 @@ from bietlejuice.base.airflow.task_creators.propagate_metadata_task_creator impo
 from bietlejuice.base.airflow.task_creators.register_delta_table_task_creator import (
     RegisterDeltaTableTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.skip_run_task_creator import (
+    SkipRunTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.sync_hive_partitions_task_creator import (
     SyncHivePartitionsTaskCreator,
 )
@@ -71,6 +74,7 @@ class TaskCreatorFactory:
         TaskEnum.OPTIMIZE_DELTA_TABLE: OptimizeDeltaTableTaskCreator,
         TaskEnum.PROPAGATE_METADATA: PropagateMetadataTaskCreator,
         TaskEnum.REGISTER_DELTA_TABLE: RegisterDeltaTableTaskCreator,
+        TaskEnum.SKIP_RUN: SkipRunTaskCreator,
         TaskEnum.SYNC_HIVE_PARTITIONS: SyncHivePartitionsTaskCreator,
         TaskEnum.SYNC_HIVE_STRUCTURE: SyncHiveStructureTaskCreator,
     }

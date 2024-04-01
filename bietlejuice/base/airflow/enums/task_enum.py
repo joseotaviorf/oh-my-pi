@@ -16,5 +16,6 @@ class TaskEnum(Enum):
     OPTIMIZE_DELTA_TABLE = "optimize_delta_table"
     PROPAGATE_METADATA = "propagate_metadata"
     REGISTER_DELTA_TABLE = "register_delta_table"
+    SKIP_RUN = "skip_run"
     SYNC_HIVE_PARTITIONS = "sync_hive_partitions"
     SYNC_HIVE_STRUCTURE = "sync_hive_structure"

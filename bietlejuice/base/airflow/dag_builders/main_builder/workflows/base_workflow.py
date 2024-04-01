@@ -160,3 +160,11 @@ class BaseWorkflow(BuilderInterface):
         return table_attributes.table_customization.get(
             "has_hive_sync", default_has_hive_sync
         )
+
+    def _check_include_skip_run_task(self) -> bool:
+        """
+        Checks if short circuit operator (skip run) task should be added into the workflow.
+        This method is used to check if the skip run task should be placed before the execute-job-cluster task.
+        """
+
+        return "short_circuit_customization" in self.workflow_args
