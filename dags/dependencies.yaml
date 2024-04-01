@@ -2601,6 +2601,8 @@ bietlejuice.enrich_supply_conversion:
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.enrich_bob:load-enrich-house-draft-business-context
+  - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-events
+  - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-mailing
   - bietlejuice.enrich_supply_acquisition:load-enrich-acquisition-tracking
   - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
   - bietlejuice.enrich_supply_conversion_3p:load-enrich-conversion-events-3p
@@ -2615,6 +2617,14 @@ bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_wololo:load-enrich-prospect-calls
   - bietlejuice.jaiminho:load-clean-user-notifications
   - bietlejuice.wololo:load-clean-whatsapp
+bietlejuice.enrich_supply_taxonomy:
+  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.enrich_bob:load-enrich-house-draft-business-context
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
+  - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
+  - bietlejuice.wololo:load-clean-context-discard
+  - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_support_and_service_kpis_targets:
   - bietlejuice.gsheets_support_and_service:done-clean-target-service-kpis
   - bietlejuice.gsheets_support_and_service:done-clean-target-support-kpis

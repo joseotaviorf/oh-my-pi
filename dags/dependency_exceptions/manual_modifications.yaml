@@ -396,6 +396,10 @@ bietlejuice.enrich_supply_conversion_3p:
   add:
     - bietlejuice.enrich_supply_acquisition:load-enrich-landing-3p
     - bietlejuice.enrich_supply_acquisition:load-enrich-prospects-3p
+bietlejuice.enrich_supply_taxonomy:
+  add:
+    - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
+    - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
 bietlejuice.enrich_growth_taxonomy:
   remove:
     - bietlejuice.ebdb:load-clean-visit-origin

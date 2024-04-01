@@ -1,0 +1,101 @@
+database_name: datalake_supply_flows
+table_name: manual_reprocessing_events
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table is responsible to consolidate all manual reprocessing events. |
+  In this table we are going to process data from Olos to identify the mailing and conversion events from Reprocessing Flows. |
+columns:
+  id_entity:
+    description: Identifier of the lead that was reprocessed. Sometimes can be id_house or id_lead.
+    lineage:
+      - datalake_supply_flows.conversion_events.id_entity
+      - datalake_supply_flows.conversion_staging.id_lead
+      - datalake_supply_flows.acquisition_tracking.id_lead_ebdb
+  business_context:
+    description: Business context of the reprocessing event, should be Rent or Sale.
+    categories:
+      RENT: 'For rent lead or house'
+      SALE: 'For sale lead or house'
+    lineage:
+      - datalake_supply_flows.conversion_events.business_context
+      - datalake_supply_flows.conversion_staging.business_context
+      - datalake_supply_flows.acquisition_tracking.business_context
+  id_user_registrant:
+    description: Identifier of the user that registered the reprocessing event.
+    lineage:
+      - datalake_olos_dialer.reprocessing_events.id_user_registrant
+  reprocessing_entity_type:
+    description: Identifier of the entity that was reprocessed.
+    categories:
+      lead: When we are reprocessing a lead
+      house: When we are reprocessing a house
+    lineage: 
+      -  datalake_supply_flows.conversion_staging.entity_type
+      -  datalake_supply_flows.conversion_events.entity_type
+  reprocessing_type:
+    description: Type of the reprocessing event
+    categories:
+      cross_listing_rent: Listing a property already listed for rent in sale context
+      cross_listing_sale: Listing a property already listed for rent in sale context
+      manual_reprocessed: Reprocessed manually by the IS team
+      automatically_reprocessed: Reprocessed automatically by the Rene Descartes (this process is triggered by SWE team)
+      other: Non classified type of reprocessing event
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.type
+  id_campaign:
+    description: Identifier of the campaign that reprocessed the entity.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.id_campaign
+  table_name:
+    description: Table name that entity was uploaded by Olos dialer.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.table_name
+  description:
+    description: Description of the mailing table.description
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.
+  ops_agent:
+    description: Agent that reprocessed the lead. For this scenario is always outbound team.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ops_agent
+  ops_objective:
+    description: Objective of the reprocessing event, is always to convert the lead in this source.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ops_objective
+  ops_approach:
+    description: Approach of the reprocessing event, is always to active this source.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ops_approach
+  ops_contact_medium:
+    description: Medium of the reprocessing event, is always phone call.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ops_contact_medium
+  application: 
+    description: Application that reprocessed the lead, for reprocessing events is Olos Dialer or Rene Descartes.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.application
+      - datalake_supply_flows.acquisition_tracking.application
+  ts_conversion_event:
+    description: Captured timestamp of the conversion event in Olos tabulation.
+    lineage:
+      - datalake_olos_dialer.reprocessing_events.ts_event
+  ts_created: 
+    description: Timestamp of lead input on reprocessing mailing.
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ts_created
+      - datalake_supply_flows.acquisition_tracking.ts_event
+  year:
+    description: Year of entry into the reprocessing mailing
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ts_created
+      - datalake_supply_flows.acquisition_tracking.ts_event
+  month:
+    description: Month of entry into the reprocessing mailing
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ts_created
+      - datalake_supply_flows.acquisition_tracking.ts_event
+  day:
+    description: Day of entry into the reprocessing mailing
+    lineage:
+      - datalake_olos_dialer.reprocessing_mailing.ts_created
+      - datalake_supply_flows.acquisition_tracking.ts_event

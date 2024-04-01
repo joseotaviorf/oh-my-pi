@@ -1,0 +1,109 @@
+database_name: datalake_supply_flows
+table_name: conversion_taxonomy
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table is repsonsible for storing the taxonomy of the conversion events in the supply flows, ie, |
+  the taxonomy that is used when the supply flow associated with fallback taxonomy which is a recovery of data.
+columns:
+  id_lead:
+    description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
+    lineage:
+      - datalake_wololo_clean.prospect.id_reference
+      - datalake_supply_flows.fallback_taxonomy.id_lead
+      - datalake_supply_flows.conversion_lookup.id_lead
+  id_house:
+    description: The identifier for each house.
+    lineage:
+      - datalake_bob.house_draft_business_context.id_house
+      - datalake_supply_flows.fallback_taxonomy.id_house
+  business_context:
+    description: Business context of the conversion event.
+    categories:
+      RENT: 'For rent lead or house'
+      SALE: 'For sale lead or house'
+    lineage:
+      - datalake_bob.house_draft_business_context.business_context
+      - datalake_wololo_clean.context_discard.business_context
+      - datalake_wololo_clean.prospect.is_for_rent
+      - datalake_wololo_clean.prospect.is_for_sale
+      - datalake_supply_flows.fallback_taxonomy.business_context
+  id_user_registrant:
+    description: Identifier of the user that registered the conversion event.
+    lineage:
+      - datalake_bob.house_draft_business_context.id_user_registrant
+      - datalake_wololo_clean.context_discard.id_user
+      - datalake_supply_flows.fallback_taxonomy.id_user_registrant
+  source:
+    description: Source of information of the taxonomy.
+  application:
+    description: Origin of conversion in the PWAs.
+    lineage:
+      - datalake_bob.house_draft_business_context.type
+      - datalake_supply_flows.fallback_taxonomy.application
+  funnel_step:
+    description: The funnel step of the taxonomy, referring to the funnel step in supply funnel.
+    lineage:
+      - datalake_supply_flows.supply_discards_settings.funnel_step
+      - datalake_supply_flows.fallback_taxonomy.funnel_step
+  id_region:
+    description: The identifier for region
+    lineage:
+      - datalake_bob.house_draft_business_context.id_region
+      - datalake_ebdb_clean.lead.id_region
+      - datalake_supply_flows.fallback_taxonomy.id_region
+  ops_partner:
+    description: The name of the company that register the lead.
+    lineage:
+      - datalake_bob.house_draft_business_context.ops_company
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_supply_flows.fallback_taxonomy.ops_partner
+      - datalake_supply_flows.operations_agents.ops_partner
+  ops_agent:
+    description: Agent that reprocessed the lead. For this scenario is always outbound team.
+    lineage:
+      - datalake_bob.house_draft_business_context.ops_team
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_supply_flows.fallback_taxonomy.ops_agent
+      - datalake_supply_flows.operations_agents.ops_agent
+  ops_objective:
+    description: Objective of the conversion event.
+  ops_approach:
+    description: Approach of the conversion event.
+    lineage:
+      - datalake_bob.house_draft_business_context.ops_contact_type
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_supply_flows.fallback_taxonomy.ops_approach
+  ops_contact_medium:
+    description: Medium of the conversion event.
+    lineage:
+      - datalake_bob.house_draft_business_context.ops_contact_channel
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_supply_flows.fallback_taxonomy.ops_contact_medium
+  has_ops_agents_table:
+    description: If we gathering data from datalake_supply_flows.operations_agents table.
+  ts_event:
+    description: Timestamp of the event.
+    lineage:
+      - datalake_bob.house_draft_business_context.ts_created
+      - datalake_wololo_clean.context_discard.ts_created
+      - datalake_supply_flows.fallback_taxonomy.ts_event
+  ts_load:
+    description: Timestamp of the load.
+  year:
+    description: Year of the event.
+    lineage:
+      - datalake_bob.house_draft_business_context.ts_created
+      - datalake_wololo_clean.context_discard.ts_created
+      - datalake_supply_flows.fallback_taxonomy.ts_event
+  month:
+    description: Month of the event.
+    lineage:
+      - datalake_bob.house_draft_business_context.ts_created
+      - datalake_wololo_clean.context_discard.ts_created
+      - datalake_supply_flows.fallback_taxonomy.ts_event
+  day:
+    description: Day of the event.
+    lineage:
+      - datalake_bob.house_draft_business_context.ts_created
+      - datalake_wololo_clean.context_discard.ts_created
+      - datalake_supply_flows.fallback_taxonomy.ts_event

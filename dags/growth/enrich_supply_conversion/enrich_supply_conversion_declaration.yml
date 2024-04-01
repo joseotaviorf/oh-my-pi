@@ -21,12 +21,15 @@ workflow:
       - conversion_staging
     conversion_events:
       - conversion_original_events
+    manual_reprocessing_events:
+      - conversion_events
+      - conversion_staging
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
-  type: databricks_10_4_min_io-memory_photon_cluster
+  type: databricks_10_4_med_memory_photon_cluster
   custom_configurations:
     spark_version: 12.2.x-scala2.12

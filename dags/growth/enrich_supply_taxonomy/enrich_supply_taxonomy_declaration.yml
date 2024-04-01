@@ -1,0 +1,23 @@
+---
+dag:
+  name: enrich_supply_taxonomy
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation: 
+    dag_purpose: |
+      This DAG is responsible for enriching the supply flows data with the taxonomy data.
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: supply_flows_migrate
+  default_extraction_type: full
+  default_partitions: ["year", "month", "day"]
+  inner_dependencies:
+    conversion_taxonomy:
+      - fallback_taxonomy
+  spark_session_configs:
+    udfs: [SF_NORMALIZE_STRING]
+cluster:
+  type: databricks_10_4_min_io-memory_photon_cluster
+  custom_configurations:
+    spark_version: 12.2.x-scala2.12

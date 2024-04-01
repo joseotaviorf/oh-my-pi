@@ -17,11 +17,6 @@ workflow:
   layer: enrich
   default_extraction_type: incremental
   default_partitions: [year, month, day]
-  tables_customization:
-    reprocessing_events:
-      extraction_type: full
-    reprocessing_mailing:
-      extraction_type: full
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:

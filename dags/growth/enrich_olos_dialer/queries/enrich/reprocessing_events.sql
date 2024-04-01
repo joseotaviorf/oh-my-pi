@@ -21,4 +21,4 @@ LEFT JOIN datalake_ebdb_clean.user AS u
 WHERE
   LOWER(olos_disposition) LIKE 'opportunity%'
   AND olc.id_lead IS NOT NULL
-QUALIFY ROW_NUMBER() OVER (PARTITION BY olc.id_lead, business_context ORDER BY olc.ts_call_ended DESC) = 1 -- Getting the last event for each lead and business context
+  AND DATE(olc.ts_call_ended) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
