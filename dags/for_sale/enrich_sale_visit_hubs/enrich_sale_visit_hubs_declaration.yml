@@ -1,0 +1,13 @@
+---
+dag:
+  name: enrich_sale_visit_hubs
+  schedule_start_date: 2022, 8, 26
+  owner: Data ForSale
+  documentation:
+    dag_purpose: Creates the enriched tables for the context `sale_visit_hubs` enriched from Teams, EBDB and gsheets.
+      The intention is to follow the business units that the agent is part of at the time of the visit, considering teams as the main source.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_cluster

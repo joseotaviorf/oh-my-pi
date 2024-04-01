@@ -1,0 +1,19 @@
+---
+dag:
+  name: enrich_sale_listings_lenses
+  schedule_start_date: 2022, 6, 20
+  owner: Data ForSale
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    sellability_lens:
+    - segmentation_bins
+    listing_lenses:
+    - availability_lens
+    - demand_lens
+    - pricing_lens
+    - sellability_lens
+    - segmentation_bins
+cluster:
+  type: databricks_10_4_med_memory_cluster

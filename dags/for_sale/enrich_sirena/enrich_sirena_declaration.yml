@@ -1,0 +1,12 @@
+---
+dag:
+  name: enrich_sirena
+  schedule_start_date: 2020, 8, 29
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates the enriched table for Sirena, getting all data about the manual messages and flat some jsons structs.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_10_4_med_general_photon_cluster

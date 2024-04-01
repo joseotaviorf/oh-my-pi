@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_sale_offer_flows
+  schedule_start_date: 2021, 12, 1
+  owner: Data ForSale
+  documentation:
+    dag_purpose: Creates enriched tables for the context `sale_offer_flows` enriching from sale_flows.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    sale_offer_flows:
+    - offer_specialists
+    - sale_offer_status
+    sale_offer_users_info:
+    - sale_offer_users
+cluster:
+  type: databricks_10_4_med_general_cluster

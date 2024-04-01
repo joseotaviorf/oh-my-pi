@@ -1,7 +1,0 @@
----
-inner_dependencies:
-  sale_offer_flows:
-    - offer_specialists
-    - sale_offer_status
-  sale_offer_users_info:
-    - sale_offer_users
