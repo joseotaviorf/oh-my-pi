@@ -300,10 +300,18 @@ columns:
     description: Cover & New Installs Session - This column specifies whether a house or property specifically has a plaquinha
     lineage:
       - datalake_zendesk_clean.tickets.custom_fields
+  custom_fields:
+    lineage:
+      - datalake_zendesk_clean.tickets.custom_fields
+    description: Map with all custom fields of the ticket
   is_public:
     description: If the ticket has public comments
     lineage:
       - datalake_zendesk_clean.tickets.is_public
+  dt_extracted:
+    lineage:
+      - datalake_zendesk_clean.tickets.dt_extracted
+    description: Extraction date of the data
   ts_created:
     description: Timestamp of ticket creation
     lineage:

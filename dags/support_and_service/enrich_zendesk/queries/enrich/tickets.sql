@@ -2,6 +2,9 @@ WITH tickets AS (
     SELECT
         id_ticket,
         id_assignee,
+        id_requester,
+        id_submitter,
+        id_ticket_form,
         id_group,
         subject,
         description,
@@ -23,9 +26,9 @@ WITH tickets AS (
                 REGEXP_REPLACE(
                     REGEXP_REPLACE(
                         custom_fields,
-                        '^\\[|\\{{([^\\n\\{{\\}}\\[\\]](?!value":(?!null)))*\\}}(,|)|\\]$', ""
+                        '^\\\[|\\\{{([^\\\n\\\{{\\\}}\\\[\\\]](?!value":(?!null)))*\\\}}(,|)|\\\]$', ""
                     ),
-                ',$|\\{{|\\}}|"id":|,"value"|"', ""
+                ',$|\\\{{|\\\}}|"id":|,"value"|"', ""
                 )
             ),
             (k, v) -> v IS NOT NULL AND v != "" AND v != " "
@@ -37,6 +40,7 @@ WITH tickets AS (
         type,
         satisfaction_rating,
         is_public,
+        dt_extracted,
         ts_created,
         ts_updated
     FROM
@@ -44,12 +48,11 @@ WITH tickets AS (
     WHERE
         (
             raw_subject != "scrubbed"
-            AND status != "deleted"
+            AND via_channel IS NOT NULL
         )
         AND year IN (YEAR(CAST('{year}-{month}-{day}' AS DATE)), YEAR(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
         AND month IN (MONTH(CAST('{year}-{month}-{day}' AS DATE)), MONTH(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
         AND day IN (DAY(CAST('{year}-{month}-{day}' AS DATE)), DAY(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
-        AND ts_updated <= TIMESTAMP(CAST("{year}-{month}-{day}" AS DATE) + INTERVAL 1 DAY) + INTERVAL 3 HOUR
 ),
 custom_field_values AS (
     SELECT
@@ -173,7 +176,8 @@ custom_field_values AS (
         cf_map["7647210235917"] AS video_comments, -- custom_field '[AQ] Comentários do Vídeo'
         cf_map["14216500749837"] AS dt_first_fup,  -- custom_field '[Data] Data Primeiro FUP Manual Realizado'
         cf_map["14216477864717"] AS dt_first_reply, -- custom_field '[Data] Data do first reply'
-        cf_map AS custom_fields
+        cf_map AS custom_fields,
+        ts_updated
     FROM
         tickets
 )
@@ -189,6 +193,7 @@ SELECT
     cfv.id_job,
     cfv.id_house_so,
     cfv.id_house_aq,
+    cfv.custom_fields,
     cfv.task_sid_twilio,
     cfv.contact_ticket,
     cfv.analyst_email,
@@ -240,6 +245,8 @@ SELECT
     cfv.house_classification_reason,
     cfv.signboard_location,
     cfv.video_comments,
+    cfv.has_plaquinha,
+    t.is_public,
     cfv.dt_communicated_tt,
     cfv.dt_intermediate,
     cfv.dt_agreement_executed,
@@ -251,19 +258,19 @@ SELECT
     cfv.dt_install,
     cfv.dt_first_fup,
     cfv.dt_first_reply,
-    cfv.has_plaquinha,
-    t.is_public,
+    t.dt_extracted,
     t.ts_created,
     t.ts_updated,
     NOW() AS ts_load,
-    {year} AS year,
-    {month} AS month,
-    {day} AS day
+    YEAR(t.dt_extracted) AS year,
+    MONTH(t.dt_extracted) AS month,
+    DAY(t.dt_extracted) AS day
 FROM
     tickets AS t
 INNER JOIN
     custom_field_values AS cfv
         ON cfv.id_ticket = t.id_ticket
+        AND cfv.ts_updated = t.ts_updated
 WHERE
     t.via_channel != "api"
     OR (
