@@ -93,12 +93,12 @@ clean_task_groups = {}
 
 for table in tables:
     table_name = table["table_name"]
-    has_raw = table["has_raw"]
+    has_raw = table.get("has_raw", True)
 
     if has_raw == True:
         SOURCE_ROOT_PATH = table["source_root_path"]
         format = table["format"]
-        col_names = table["col_names"]
+        col_names = table.get("col_names")
         raw_task_groups[table_name] = task_group.build_raw_task_group_for_single_table(
             source=SOURCE,
             table_name=table_name,
