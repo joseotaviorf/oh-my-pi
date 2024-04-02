@@ -287,6 +287,16 @@ tables:
       - col_2
       - col_3
       - col_4
+  - table_name: cnab_charges_recupera_quintoandar
+    source_root_path: "s3://5a-vans-prod-recupera/prod/nexxera/return/quintoandar/ArquivosBaixados"
+    format: "ret_cob"
+  - table_name: cnab_charges_recupera_velo
+    source_root_path: "s3://5a-vans-prod-recupera/prod/nexxera/return/velo/ArquivosBaixados"
+    format: "ret_cob"
+  - table_name: cnab_charges_recupera_velo_2
+    source_root_path: "s3://5a-vans-prod-recupera/prod/nexxera/return/velo2/ArquivosBaixados"
+    format: "ret_cob"
+    has_raw: True
   - table_name: financial_legacy
     has_raw: False
   - table_name: acquirer_header

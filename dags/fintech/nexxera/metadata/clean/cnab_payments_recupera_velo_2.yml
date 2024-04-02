@@ -1,0 +1,116 @@
+---
+database_name: datalake_nexxera_clean
+table_name: cnab_charges_recupera_velo_2
+description: "Table containing Recupera's generated charges for Velo 2.0. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+columns:
+  id_bank:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.id_bank
+  id_destination_bank:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  id_service_batch:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.id_service_batch
+  bank_account:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.file_name
+  record_type:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.record_type
+  recupera_creditor_name:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.file_name
+  record_sequence_number:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.record_sequence_number
+  segment_type:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.segment_type
+  transaction_type:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  transaction_instruction_code:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  transaction_instruction_code:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  destination_bank_agency:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  destination_bank_agency_verification_digit:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  destination_bank_account:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  destination_bank_account_verification_digit:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  destination_agency_account_verification_digit:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  beneficiarys_name:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  company_use:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  currency:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  currency_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  our_number:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  notice:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  doc_purpose:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  ted_purpose:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.file_name
+  additional_purpose:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  cnab:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  beneficiarys_notice:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  occurrence_code:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  file_name:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.file_name
+  due_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  paid_amount:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  dt_due:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  dt_paid:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.metadata
+  ts_ingested:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.ts_ingested
+  year:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.year
+  month:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.month
+  day:
+    lineage:
+      - datalake_nexxera_raw.cnab_payments.day

@@ -56,7 +56,8 @@ def list_files(table_name, source_root_path, format, datetime_to_ingest):
     elif format == 'ret_cob':
         s3_files_path = f"{source_root_path}"
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
-        pattern = re.compile(f".*{datetime_to_ingest.strftime('_%d%m%y_')}.*")
+        dt_pattern = '_%d%m%y_' if 'recupera' not in s3_files_path else '_%d%m%y'
+        pattern = re.compile(f".*{datetime_to_ingest.strftime(dt_pattern)}.*")
         filtered_files = list(filter(pattern.match, files))
 
     return filtered_files

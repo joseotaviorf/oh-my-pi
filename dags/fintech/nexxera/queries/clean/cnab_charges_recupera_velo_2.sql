@@ -1,0 +1,53 @@
+SELECT
+    SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(file_name, '/', -1), '_', 2), '_', -1) as id_bank,
+    SUBSTRING(metadata, 1, 2) as id_document_type,
+    SUBSTRING(metadata, 107, 1) as id_wallet,
+    SUBSTRING(metadata, 165, 3) as id_bank_clearinghouse,
+    SUBSTRING(metadata, 392, 2) as id_liquidated,
+    SUBSTRING(metadata, 301, 4) as id_cancel_instruction,
+    record_type,
+    SUBSTRING_INDEX(SUBSTRING_INDEX(file_name, '/', -3), '/', 1) as recupera_creditor_name,
+    SUBSTRING(metadata, 3, 14) as cpf_cnpj,
+    SUBSTRING(metadata, 17, 4) as bank_agency,
+    SUBSTRING(metadata, 22, 5) as bank_account,
+    SUBSTRING(metadata, 28, 1) as account_verification_digit,
+    SUBSTRING(metadata, 37, 25) as company_use,
+    SUBSTRING(metadata, 62, 8) as our_number,
+    SUBSTRING(metadata, 93, 1) as our_number_verification_digit,
+    SUBSTRING(metadata, 82, 3) as wallet_number,
+    SUBSTRING(metadata, 108, 2) as occurrence_code,
+    SUBSTRING(metadata, 116, 10) as document_number,
+    SUBSTRING(metadata, 126, 8) as our_number_confirmation,
+    SUBSTRING(metadata, 168, 4) as agency_liquidated,
+    SUBSTRING(metadata, 172, 1) as agency_liquidated_verification_digit,
+    SUBSTRING(metadata, 173, 2) as charge_type,
+    SUBSTRING(metadata, 324, 30) as payers_name,
+    SUBSTRING(metadata, 377, 8) as notice,
+    SUBSTRING(metadata, 394, 6) as sequential_number,
+    SUBSTRING_INDEX(file_name, '/', -1) as file_name,
+    SUBSTRING(metadata, 292, 1) as is_dda_bill,
+    CAST(SUBSTRING(metadata, 152, 13)/100 AS DECIMAL(16,2)) as due_amount,
+    CAST(SUBSTRING(metadata, 266, 13)/100 AS DECIMAL(16,2)) as interest_amount,
+    CAST(SUBSTRING(metadata, 253, 13)/100 AS DECIMAL(16,2)) as net_amount,
+    CAST(SUBSTRING(metadata, 175, 13)/100 AS DECIMAL(16,2)) as billing_fee_amount,
+    CAST(SUBSTRING(metadata, 214, 13)/100 AS DECIMAL(16,2)) as iof_amount,
+    CAST(SUBSTRING(metadata, 227, 13)/100 AS DECIMAL(16,2)) as rebate_amount,
+    CAST(SUBSTRING(metadata, 240, 13)/100 AS DECIMAL(16,2)) as discount_amount,
+    CAST(SUBSTRING(metadata, 279, 13)/100 AS DECIMAL(16,2)) as others_credit_amount,
+    TO_DATE(SUBSTRING(metadata, 146, 6), 'ddMMyy') as dt_due,
+    TO_DATE(SUBSTRING(metadata, 295, 6), 'ddMMyy') as dt_credit,
+    TO_DATE(SUBSTRING(metadata, 110, 6), 'ddMMyy') as dt_occurrence_code,
+    TO_TIMESTAMP(CONCAT(year, '-', month, '-', day)) AS ts_ingested,
+    year,
+    month,
+    day
+FROM
+    datalake_nexxera_raw.cnab_charges_recupera_velo_2
+WHERE
+    record_type = '1'
+AND
+    year = {year}
+AND
+    month = {month}
+AND
+    day = {day}

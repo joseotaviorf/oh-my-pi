@@ -1,0 +1,186 @@
+---
+database_name: datalake_nexxera
+table_name: cnab_charges_recupera
+description: "Table containing all cnab charges returns for Recupera. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  id_bank:
+    description: Bank identification number from file_name
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.id_bank
+  id_document_type:
+    description: Indicates the document type of cpf_cnpj column (1=CPF or 2=CNPJ)
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.id_document_type
+  recupera_creditor_name:
+    description: Indicates the document type of cpf_cnpj column (1=CPF or 2=CNPJ)
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.recupera_creditor_name
+  bank_agency:
+    description: Bank agency number
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.bank_agency
+  bank_account:
+    description: Bank account number
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.bank_account
+  account_verification_digit:
+    description: Bank account verification digit
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.account_verification_digit
+  cpf_cnpj:
+    description: Document number
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.cpf_cnpj
+  company_use:
+    description: Number created by 5A to identify transaction
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.company_use
+  our_number:
+    description: Number created by the bank to identify transaction with the verification code
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.our_number
+  document_number:
+    description: Number created by 5A to identify transaction - more filled than our_number column
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.document_number
+  payers_name:
+    description: Person's name that are receiving the charge
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.payers_name
+  occurrence_code:
+    description: Code that identify if a payment was complete, and if not, the error reason
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.occurrence_code
+  file_name:
+    description: Name from the file that arrived the charge occurrence
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.file_name
+  payment_attempts:
+    description: Field that identify number of charges attempts
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.our_name
+  is_latest_attempt:
+    description: Boolean field that indicates if this is the lasted attempt from a charges - using our_number and file_name as reference
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.our_name
+  due_amount:
+    description: Original amount that the payment must to be done
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.due_amount
+  interest_amount:
+    description: Interest amount from the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.interest_amount
+  net_amount:
+    description: Net amount from the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.net_amount
+  billing_fee_amount:
+    description: Billing fee amount from the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.billing_fee_amount
+  iof_amount:
+    description: IOF amount from the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.iof_amount
+  rebate_amount:
+    description: Rebate amount from the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.rebate_amount
+  discount_amount:
+    description: Discount amount from the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.discount_amount
+  others_credit_amount:
+    description: Other credit amount from the payment
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.others_credit_amount
+  dt_due:
+    description: Original date that the payment must to be done
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.dt_due
+  dt_credit:
+    description: Date that the money was credited
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.dt_credit
+  dt_occurrence_code:
+    description: Date from the occurrece
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.dt_occurrence_code
+  ts_ingested:
+    description: Timestamp of load
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.ts_ingested
+  year:
+    description: Year of load
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.year
+  month:
+    description: Month of load
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.month
+  day:
+    description: Day of load
+    lineage:
+      - datalake_nexxera_clean.cnab_charges_quintoandar
+      - datalake_nexxera_clean.cnab_charges_velo
+      - datalake_nexxera_clean.cnab_charges_velo_2.day
