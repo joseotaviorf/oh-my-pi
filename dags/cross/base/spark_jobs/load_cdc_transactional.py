@@ -221,7 +221,7 @@ def main():
 
     logger.info("m=__main__, msg=Load table into transactional layer...")
     load_df_into_transactional(
-        transactional_df, datalake_bucket, schema, table_name, partitions
+        transactional_df, datalake_bucket, schema, table_name.lower(), partitions
     )
 
 

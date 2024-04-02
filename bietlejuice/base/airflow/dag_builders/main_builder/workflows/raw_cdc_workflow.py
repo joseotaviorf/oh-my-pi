@@ -87,7 +87,9 @@ class RawCDCWorkflow(BaseWorkflow):
     ) -> List[TableAttributes]:
         """Returns the table attributes for all the tables in the raw layer, by copying from the transactional layer."""
         return [
-            TableAttributes.from_attributes(table, layer=LayerEnum.RAW)
+            TableAttributes.from_attributes(
+                table, layer=LayerEnum.RAW, table_name=table.table_name
+            )
             for table in transactional_tables
         ]
 
@@ -101,7 +103,7 @@ class RawCDCWorkflow(BaseWorkflow):
                 layer=LayerEnum.CLEAN,
                 table_name=table.table_customization.get(
                     "clean_table_name", table.table_name
-                ),
+                ).lower(),
             )
             for table in raw_tables
         ]
@@ -182,15 +184,21 @@ class RawCDCWorkflow(BaseWorkflow):
         """
         load_raw_task = self.load_cdc_raw_task_creator.create_task(raw_table_attributes)
 
+        # We need to create a new TableAttributes object with the table_name in lower case, to follow the convention
+        # The exception is for the load_raw_task, since we need the original table_name to load data from the incoming layer.
+        # It is then forced to lowercase in the Spark job.
+        raw_table_attributes_lower_case = TableAttributes.from_attributes(
+            raw_table_attributes, table_name=raw_table_attributes.table_name.lower()
+        )
         register_delta_table_raw_task = self.register_delta_table_task_creator.create_task(
-            raw_table_attributes
+            raw_table_attributes_lower_case
         )
 
         load_raw_task >> (register_delta_table_raw_task, optimize_raw_task)
 
-        if self._check_include_propagate_metadata_task(raw_table_attributes):
+        if self._check_include_propagate_metadata_task(raw_table_attributes_lower_case):
             propagate_table_lineage_raw_task = self.propagate_metadata_task_creator.create_task(
-                raw_table_attributes
+                raw_table_attributes_lower_case
             )
             (
                 register_delta_table_raw_task
@@ -200,9 +208,9 @@ class RawCDCWorkflow(BaseWorkflow):
         else:
             register_delta_table_raw_task >> dummy_terminate_job_cluster_task
 
-        if self._check_include_data_quality_task(raw_table_attributes):
+        if self._check_include_data_quality_task(raw_table_attributes_lower_case):
             data_quality_tests_raw_task = self.data_quality_task_creator.create_task(
-                raw_table_attributes
+                raw_table_attributes_lower_case
             )
             (
                 load_raw_task

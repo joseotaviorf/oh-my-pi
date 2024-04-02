@@ -89,7 +89,7 @@ def main():
     datalake_bucket = args.datalake_bucket
     source_schema = args.source_schema
     schema = args.schema
-    table_name = args.table_name
+    table_name = args.table_name.lower()
     start_date = args.start_date
     end_date = args.end_date
     if args.primary_keys:
@@ -104,7 +104,7 @@ def main():
             ),
             datalake_table_schema=f"datalake_{schema}_raw",
         )
-        primary_keys = pk_identifier.find_primary_keys(source_schema, table_name)
+        primary_keys = pk_identifier.find_primary_keys(source_schema, args.table_name) # We don't use the table name in lowercase, because this is case sensitive
 
     logger.info(
         f"""
