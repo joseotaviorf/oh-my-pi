@@ -1,0 +1,33 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: request_tracker
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.id
+  id_integration_report:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.integration_report_id
+  business_unit:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.business_unit
+  version:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.version
+  is_cached:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.is_cached
+  ts_created:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.created_at
+  ts_updated:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.updated_at
+  year:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.year
+  month:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.month
+  day:
+    lineage:
+      - datalake_arquivo_confidencial_raw.request_tracker.day

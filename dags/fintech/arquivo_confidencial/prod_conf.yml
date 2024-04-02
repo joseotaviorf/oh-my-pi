@@ -25,6 +25,9 @@ tables:
     extraction_type: full
   - table_name: presumed_income_report_aud
     extraction_type: full
+  - table_name: request_tracker
+    extraction_type: incremental
+    date_filter_column: created_at
   - table_name: revinfo
     extraction_type: incremental
     date_filter_column: revtstmp
