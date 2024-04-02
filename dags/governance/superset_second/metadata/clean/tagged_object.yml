@@ -1,0 +1,40 @@
+---
+database_name: datalake_superset_clean
+table_name: tagged_object
+description: Table that lists all dashboards in Superset and their metadata
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.tagged_object.id
+  id_tag:
+    lineage:
+      - datalake_superset_raw.tagged_object.tag_id
+  id_object:
+    lineage:
+      - datalake_superset_raw.tagged_object.object_id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.tagged_object.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.tagged_object.changed_by_fk
+  object_type:
+    lineage:
+      - datalake_superset_raw.tagged_object.object_type
+  ts_created:
+    lineage:
+      - datalake_superset_raw.tagged_object.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.tagged_object.changed_on
+  year:
+    lineage:
+      - datalake_superset_raw.tagged_object.year
+  month:
+    lineage:
+      - datalake_superset_raw.tagged_object.month
+  day:
+    lineage:
+      - datalake_superset_raw.tagged_object.day

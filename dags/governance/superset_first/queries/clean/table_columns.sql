@@ -1,0 +1,25 @@
+SELECT 
+    id,
+    table_id AS id_table,
+    created_by_fk AS id_user_created,
+    changed_by_fk AS id_user_changed,
+    column_name,
+    type,
+    groupby,
+    filterable,
+    description,
+    expression,
+    verbose_name,
+    python_date_format,
+    uuid,
+    extra,
+    advanced_data_type,
+    is_dttm,
+    is_active,
+    created_on AS ts_created,
+    changed_on AS ts_changed,
+    year,
+    month,
+    day
+FROM datalake_superset_raw.table_columns
+WHERE year = {year} AND month = {month} AND day = {day}

@@ -1,0 +1,40 @@
+---
+database_name: datalake_superset_clean
+table_name: tag
+description: Table that lists all tags in Superset
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.tag.id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.tag.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.tag.changed_by_fk
+  tag_name:
+    lineage:
+      - datalake_superset_raw.tag.name
+  type:
+    lineage:
+      - datalake_superset_raw.tag.type
+  description:
+    lineage:
+      - datalake_superset_raw.tag.description
+  ts_created:
+    lineage:
+      - datalake_superset_raw.tag.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.tag.changed_on
+  year:
+    lineage:
+      - datalake_superset_raw.tag.year
+  month:
+    lineage:
+      - datalake_superset_raw.tag.month
+  day:
+    lineage:
+      - datalake_superset_raw.tag.day

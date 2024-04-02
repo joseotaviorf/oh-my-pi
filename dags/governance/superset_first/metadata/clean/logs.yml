@@ -1,0 +1,43 @@
+---
+database_name: datalake_superset_clean
+table_name: logs
+description: Table with Superset log data
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.logs.id
+  id_user:
+    lineage:
+      - datalake_superset_raw.logs.user_id
+  id_dashboard:
+    lineage:
+      - datalake_superset_raw.logs.dashboard_id
+  id_slice:
+    lineage:
+      - datalake_superset_raw.logs.slice_id
+  action:
+    lineage:
+      - datalake_superset_raw.logs.action
+  json:
+    lineage:
+      - datalake_superset_raw.logs.json
+  duration_ms:
+    lineage:
+      - datalake_superset_raw.logs.duration_ms
+  referrer:
+    lineage:
+      - datalake_superset_raw.logs.referrer
+  ts_event:
+    lineage:
+      - datalake_superset_raw.logs.dttm
+  year:
+    lineage:
+      - datalake_superset_raw.logs.year
+  month:
+    lineage:
+      - datalake_superset_raw.logs.month
+  day:
+    lineage:
+      - datalake_superset_raw.logs.day

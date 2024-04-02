@@ -1,0 +1,73 @@
+---
+database_name: datalake_superset_clean
+table_name: table_columns
+description: Table that lists all dashboards in Superset and their metadata
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.table_columns.id
+  id_table:
+    lineage:
+      - datalake_superset_raw.table_columns.table_id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.table_columns.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.table_columns.changed_by_fk
+  column_name:
+    lineage:
+      - datalake_superset_raw.table_columns.column_name
+  type:
+    lineage:
+      - datalake_superset_raw.table_columns.type
+  groupby:
+    lineage:
+      - datalake_superset_raw.table_columns.groupby
+  filterable:
+    lineage:
+      - datalake_superset_raw.table_columns.filterable
+  description:
+    lineage:
+      - datalake_superset_raw.table_columns.description
+  expression:
+    lineage:
+      - datalake_superset_raw.table_columns.expression
+  verbose_name:
+    lineage:
+      - datalake_superset_raw.table_columns.verbose_name
+  python_date_format:
+    lineage:
+      - datalake_superset_raw.table_columns.python_date_format
+  uuid:
+    lineage:
+      - datalake_superset_raw.table_columns.uuid
+  extra:
+    lineage:
+      - datalake_superset_raw.table_columns.extra
+  advanced_data_type:
+    lineage:
+      - datalake_superset_raw.table_columns.advanced_type
+  is_ddtm:
+    lineage:
+      - datalake_superset_raw.table_columns.is_dttm
+  is_active:
+    lineage:
+      - datalake_superset_raw.table_columns.is_active
+  ts_created:
+    lineage:
+      - datalake_superset_raw.table_columns.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.table_columns.changed_on
+  year:
+    lineage:
+      - datalake_superset_raw.table_columns.year
+  month:
+    lineage:
+      - datalake_superset_raw.table_columns.month
+  day:
+    lineage:
+      - datalake_superset_raw.table_columns.day

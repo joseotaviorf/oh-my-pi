@@ -1,0 +1,67 @@
+database_name: datalake_superset_clean
+table_name: dashboards
+description: Table that lists all dashboards in Superset and their metadata
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.dashboards.id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.dashboards.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.dashboards.changed_by_fk
+  dashboard_title:
+    lineage:
+      - datalake_superset_raw.dashboards.dashboard_title
+  position_json:
+    lineage:
+      - datalake_superset_raw.dashboards.position_json
+  css:
+    lineage:
+      - datalake_superset_raw.dashboards.css
+  json_metadata:
+    lineage:
+      - datalake_superset_raw.dashboards.json_metadata
+  description:
+    lineage:
+      - datalake_superset_raw.dashboards.description
+    description: Always empty since version 3.1.1 doesn't allow edition on this field. It's kept for compatibility reasons.
+  slug:
+    lineage:
+      - datalake_superset_raw.dashboards.slug
+  published:
+    lineage:
+      - datalake_superset_raw.dashboards.published
+  uuid:
+    lineage:
+      - datalake_superset_raw.dashboards.uuid
+  certified_by:
+    lineage:
+      - datalake_superset_raw.dashboards.certified_by
+  certification_details:
+    lineage:
+      - datalake_superset_raw.dashboards.certification_details
+  is_managed_externally:
+    lineage:
+      - datalake_superset_raw.dashboards.is_managed_externally
+  external_url:
+    lineage:
+      - datalake_superset_raw.dashboards.external_url
+  ts_created:
+    lineage:
+      - datalake_superset_raw.dashboards.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.dashboards.changed_on
+  year:
+    lineage:
+      - datalake_superset_raw.dashboards.year
+  month:
+    lineage:
+      - datalake_superset_raw.dashboards.month
+  day:
+    lineage:
+      - datalake_superset_raw.dashboards.day

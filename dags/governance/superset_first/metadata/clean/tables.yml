@@ -1,0 +1,97 @@
+---
+database_name: datalake_superset_clean
+table_name: tables
+description: Table that lists all tables in Superset and their metadata
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.tables.id
+  id_database:
+    lineage:
+      - datalake_superset_raw.tables.database_id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.tables.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.tables.changed_by_fk
+  table_name:
+    lineage:
+      - datalake_superset_raw.tables.table_name
+  main_dttm_col:
+    lineage:
+      - datalake_superset_raw.tables.main_dttm_col
+  offset:
+    lineage:
+      - datalake_superset_raw.tables.offset
+  description:
+    lineage:
+      - datalake_superset_raw.tables.description
+  is_featured:
+    lineage:
+      - datalake_superset_raw.tables.is_featured
+  cache_timeout:
+    lineage:
+      - datalake_superset_raw.tables.cache_timeout
+  default_endpoint:
+    lineage:
+      - datalake_superset_raw.tables.default_endpoint
+  schema:
+    lineage:
+      - datalake_superset_raw.tables.schema
+  sql_code:
+    lineage:
+      - datalake_superset_raw.tables.sql
+  params:
+    lineage:
+      - datalake_superset_raw.tables.params
+  perm:
+    lineage:
+      - datalake_superset_raw.tables.perm
+  filter_select_enabled:
+    lineage:
+      - datalake_superset_raw.tables.filter_select_enabled
+  fetch_values_predicate:
+    lineage:
+      - datalake_superset_raw.tables.fetch_values_predicate
+  is_sqllab_view:
+    lineage:
+      - datalake_superset_raw.tables.is_sqllab_view
+  template_params:
+    lineage:
+      - datalake_superset_raw.tables.template_params
+  schema_perm:
+    lineage:
+      - datalake_superset_raw.tables.schema_perm  
+  extra:
+    lineage:
+      - datalake_superset_raw.tables.extra
+  uuid:
+    lineage:
+      - datalake_superset_raw.tables.uuid
+  is_managed_externally:
+    lineage:
+      - datalake_superset_raw.tables.is_managed_externally
+  external_url:
+    lineage:
+      - datalake_superset_raw.tables.external_url
+  normalize_columns:
+    lineage:
+      - datalake_superset_raw.tables.normalize_columns
+  ts_created:
+    lineage:
+      - datalake_superset_raw.tables.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.tables.changed_on
+  year:
+    lineage:
+      - datalake_superset_raw.tables.year
+  month:
+    lineage:
+      - datalake_superset_raw.tables.month
+  day:
+    lineage:
+      - datalake_superset_raw.tables.day

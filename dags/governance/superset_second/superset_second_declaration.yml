@@ -1,0 +1,37 @@
+dag:
+  name: superset_first
+  schedule_start_date: 2024, 3, 1
+  schedule_interval: 0 0 * * *
+  owner: Data Governance
+workflow:
+  type: database_pull
+  layer: raw
+  custom_schema: superset
+  database_type: postgres
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  dbutils_secret_key: SUPERSET_DB
+  tables_customization:
+    dashboard_slices: 
+      extraction_type: full
+      partitions: []
+    dashboard_user:
+      extraction_type: full
+      partitions: []
+    dashboards:
+      date_filter_column: changed_on
+    slice_user:
+      extraction_type: full
+      partitions: []
+    slices:
+      date_filter_column: changed_on
+    tag:
+      date_filter_column: changed_on
+    tagged_object:
+      date_filter_column: changed_on
+cluster:
+  type: databricks_10_4_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+

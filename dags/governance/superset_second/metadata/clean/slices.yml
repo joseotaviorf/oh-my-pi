@@ -1,0 +1,79 @@
+---
+database_name: datalake_superset_clean
+table_name: slices
+description: Table that lists all charts in Superset and their metadata
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.slices.id
+  id_datasource:
+    lineage:
+      - datalake_superset_raw.slices.datasource_id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.slices.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.slices.changed_by_fk
+  slice_name:
+    lineage:
+      - datalake_superset_raw.slices.slice_name
+  datasource_type:
+    lineage:
+      - datalake_superset_raw.slices.datasource_type
+  viz_type:
+    lineage:
+      - datalake_superset_raw.slices.viz_type
+  params:
+    lineage:
+      - datalake_superset_raw.slices.params
+  description:
+    lineage:
+      - datalake_superset_raw.slices.description
+  cache_timeout:
+    lineage:
+      - datalake_superset_raw.slices.cache_timeout
+  perm:
+    lineage:
+      - datalake_superset_raw.slices.perm
+  schema_perm:
+    lineage:
+      - datalake_superset_raw.slices.schema_perm
+  uuid:
+    lineage:
+      - datalake_superset_raw.slices.uuid
+  external_url:
+    lineage:
+      - datalake_superset_raw.slices.external_url
+  query_context:
+    lineage:
+      - datalake_superset_raw.slices.query_context
+  certified_by:
+    lineage:
+      - datalake_superset_raw.slices.certified_by
+  certification_details:
+    lineage:
+      - datalake_superset_raw.slices.certification_details
+  is_managed_externally:
+    lineage:
+      - datalake_superset_raw.slices.is_managed_externally
+  ts_created:
+    lineage:
+      - datalake_superset_raw.slices.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.slices.changed_on
+  ts_last_saved:
+    lineage:
+      - datalake_superset_raw.slices.last_saved_at
+  year:
+    lineage:
+      - datalake_superset_raw.slices.year
+  month:
+    lineage:
+      - datalake_superset_raw.slices.month
+  day:
+    lineage:
+      - datalake_superset_raw.slices.day

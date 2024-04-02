@@ -1,0 +1,16 @@
+---
+database_name: datalake_superset_clean
+table_name: dashboard_slices
+description: Table that links dashboards to slices
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.dashboard_slices.id
+  id_dashboard:
+    lineage:
+      - datalake_superset_raw.dashboard_slices.dashboard_id
+  id_slice:
+    lineage:
+      - datalake_superset_raw.dashboard_slices.slice_id

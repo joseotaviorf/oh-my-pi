@@ -1,0 +1,55 @@
+---
+database_name: datalake_superset_clean
+table_name: ab_user
+description: Table that lists all users in Superset
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.ab_user.id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.ab_user.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.ab_user.changed_by_fk
+  first_name:
+    lineage:
+      - datalake_superset_raw.ab_user.first_name
+  last_name:
+    lineage:
+      - datalake_superset_raw.ab_user.last_name
+  username:
+    lineage:
+      - datalake_superset_raw.ab_user.username
+  email:
+    lineage:
+      - datalake_superset_raw.ab_user.email
+  is_active:
+    lineage:
+      - datalake_superset_raw.ab_user.active
+  login_count:
+    lineage:
+      - datalake_superset_raw.ab_user.login_count
+  fail_login_count:
+    lineage:
+      - datalake_superset_raw.ab_user.fail_login_count
+  ts_created:
+    lineage:
+      - datalake_superset_raw.ab_user.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.ab_user.changed_on
+  ts_last_login:
+    lineage:
+      - datalake_superset_raw.ab_user.last_login
+  year:
+    lineage:
+      - datalake_superset_raw.ab_user.year
+  month:
+    lineage:
+      - datalake_superset_raw.ab_user.month
+  day:
+    lineage:
+      - datalake_superset_raw.ab_user.day

@@ -1,0 +1,64 @@
+---
+database_name: datalake_superset_clean
+table_name: sql_metrics
+description: Table that lists all metrics registered on datasets on Superset
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.sql_metrics.id
+  id_table:
+    lineage:
+      - datalake_superset_raw.sql_metrics.table_id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.sql_metrics.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.sql_metrics.changed_by_fk
+  metric_name:
+    lineage:
+      - datalake_superset_raw.sql_metrics.metric_name
+  verbose_name:
+    lineage:
+      - datalake_superset_raw.sql_metrics.verbose_name
+  metric_type:
+    lineage:
+      - datalake_superset_raw.sql_metrics.metric_type
+  expression:
+    lineage:
+      - datalake_superset_raw.sql_metrics.expression
+  description:
+    lineage:
+      - datalake_superset_raw.sql_metrics.description
+  d3format:
+    lineage:
+      - datalake_superset_raw.sql_metrics.d3format
+  warning_text:
+    lineage:
+      - datalake_superset_raw.sql_metrics.warning_text
+  extra:
+    lineage:
+      - datalake_superset_raw.sql_metrics.extra
+  uuid:
+    lineage:
+      - datalake_superset_raw.sql_metrics.uuid
+  currency:
+    lineage:
+      - datalake_superset_raw.sql_metrics.is_currency
+  ts_created:
+    lineage:
+      - datalake_superset_raw.sql_metrics.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.sql_metrics.changed_on
+  year:
+    lineage:
+      - datalake_superset_raw.sql_metrics.year
+  month:
+    lineage:
+      - datalake_superset_raw.sql_metrics.month
+  day:
+    lineage:
+      - datalake_superset_raw.sql_metrics.day

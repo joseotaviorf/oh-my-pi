@@ -1,0 +1,52 @@
+---
+database_name: datalake_superset_clean
+table_name: table_schema
+description: Table that lists all tables and their schemas.
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.table_schema.id
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.table_schema.created_by_fk
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.table_schema.changed_by_fk
+  id_tab_state:
+    lineage:
+      - datalake_superset_raw.table_schema.tab_state_id
+  id_database:
+    lineage:
+      - datalake_superset_raw.table_schema.database_id
+  extra_json:
+    lineage:
+      - datalake_superset_raw.table_schema.extra_json
+  schema: 
+    lineage:
+      - datalake_superset_raw.table_schema.schema
+  table: 
+    lineage:
+      - datalake_superset_raw.table_schema.table
+  description:
+    lineage:
+      - datalake_superset_raw.table_schema.description
+  expanded:
+    lineage:
+      - datalake_superset_raw.table_schema.expanded
+  ts_created:
+    lineage:
+      - datalake_superset_raw.table_schema.created_on
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.table_schema.changed_on
+  "year":
+    lineage:
+      - datalake_superset_raw.table_schema.year
+  "month":
+    lineage:
+      - datalake_superset_raw.table_schema.month
+  "day":
+    lineage:
+      - datalake_superset_raw.table_schema.day

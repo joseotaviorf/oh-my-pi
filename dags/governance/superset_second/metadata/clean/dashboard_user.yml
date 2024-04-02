@@ -1,0 +1,16 @@
+---
+database_name: datalake_superset_clean
+table_name: dashboard_user
+description: Table that links dashboards to owner users
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.dashboard_user.id
+  id_user:
+    lineage:
+      - datalake_superset_raw.dashboard_user.user_id
+  id_dashboard:
+    lineage:
+      - datalake_superset_raw.dashboard_user.dashboard_id
