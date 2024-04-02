@@ -22,3 +22,5 @@ FROM
   datalake_zendesk_raw.organizations
 WHERE
   dt IN ('{year}-{month}-{day}', CAST((CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY) AS STRING))
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY id_organization, ts_updated ORDER BY dt_extracted DESC) = 1
