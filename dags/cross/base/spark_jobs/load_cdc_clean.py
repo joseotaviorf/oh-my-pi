@@ -105,7 +105,8 @@ def main():
         source_df=clean_updates_df,
         merge_on=clean_primary_keys,
         when_not_matched_insert_condition="source.op_cdc != 'd'",
-        when_matched_delete_condition="source.ts_cdc_transaction >= target.ts_cdc_transaction",
+        when_matched_update_condition="source.ts_cdc_transaction >= target.ts_cdc_transaction",
+        when_matched_delete_condition="source.op_cdc = 'd'",
     )
 
 
