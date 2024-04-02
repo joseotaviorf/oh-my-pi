@@ -563,11 +563,11 @@ bietlejuice.dw_listing_temp:
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
 bietlejuice.dw_losses:
+  - bietlejuice.enrich_losses:load-enrich-bill-items
   - bietlejuice.enrich_losses:load-enrich-closing
   - bietlejuice.enrich_losses:load-enrich-delay
   - bietlejuice.enrich_losses:load-enrich-historical-closing
   - bietlejuice.enrich_losses:load-enrich-provision
-  - bietlejuice.enrich_losses:load-enrich-bill-items
 bietlejuice.dw_offer:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
@@ -1043,6 +1043,7 @@ bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
+  - bietlejuice.dw_sale_flow:load-dw-sale-fact-listing-sale-flows
   - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-fact-listing-price-changes
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement

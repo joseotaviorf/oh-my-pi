@@ -10,7 +10,7 @@ WITH listings AS (
         END AS house_status,
         dhl.house_total_area,
         dhl.house_bedrooms,
-        dhl.house_neighborhood,
+        COALESCE(dr_fr.name,dr_fs.name) AS neighborhood,
         CASE
             WHEN LOWER(dhl.house_type) IN ('apartamento', 'studiooukitchenette') THEN 'apartamento'
             WHEN LOWER(dhl.house_type) IN ('casa', 'casacondominio') THEN 'casa'
@@ -25,7 +25,8 @@ WITH listings AS (
         END AS price_m2,
         CASE
             WHEN lbc.business_context = 'RENT' AND fhl.days_listing_to_contract_signed >= 0 THEN days_listing_to_contract_signed
-            WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL THEN DATEDIFF(dd.date, ff.ts_sale_agreement_signed)
+            WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL AND dd.date <= ff.ts_sale_agreement_signed
+                THEN DATEDIFF(dd.date, ff.ts_sale_agreement_signed)
         END AS days_to_contract_sign,
         dhl.house_condo,
         dhl.house_iptu,
@@ -39,8 +40,15 @@ WITH listings AS (
         ON lbc.id_house = fl.sk_house
     LEFT JOIN dw_sale.fact_offers ff
         ON ff.sk_house = lbc.id_house
+        AND ff.ts_sale_agreement_signed IS NOT NULL
+    LEFT JOIN dw_sale.fact_listing_sale_flows sf
+        ON SUBSTRING(sf.sk_house_listing,0,9) = fl.sk_house
     LEFT JOIN dw_public.dim_date dd
-        ON dd.sk_date = fl.sk_last_publication_date
+        ON dd.sk_date = fl.sk_house_listing_date
+    LEFT JOIN dw_public.dim_region dr_fr
+        ON dr_fr.sk_region = fhl.sk_region
+    LEFT JOIN dw_public.dim_region dr_fs
+        ON dr_fs.sk_region = fl.sk_region
     WHERE
         DATEDIFF(dhl.ts_house_update, CURRENT_DATE) <= 365
 )
@@ -49,7 +57,7 @@ SELECT DISTINCT
     lr.id_house,
     lr.business_context,
     lr.sk_region,
-    lr.house_neighborhood,
+    lr.neighborhood,
     lr.house_bedrooms,
     lr.house_total_area,
     lr.house_type,
@@ -59,7 +67,7 @@ SELECT DISTINCT
     s.house_price AS similar_house_price,
     s.price_m2 AS similar_price_m2,
     s.days_to_contract_sign AS similar_days_to_contract_sign,
-    s.house_neighborhood AS similar_house_neighborhood,
+    s.neighborhood AS similar_neighborhood,
     s.house_bedrooms AS similar_house_bedrooms,
     s.house_total_area AS similar_house_total_area,
     s.house_type AS similar_house_type

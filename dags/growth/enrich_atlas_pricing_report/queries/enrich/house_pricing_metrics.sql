@@ -2,7 +2,7 @@ WITH house_on_market_median_prices AS (
     SELECT
         id_house,
         business_context,
-        house_neighborhood,
+        neighborhood,
         similar_house_status,
         APPROX_PERCENTILE(similar_house_price, 0.5) AS on_market_price_median,
         APPROX_PERCENTILE(similar_price_m2, 0.5) AS on_market_price_by_square_meter
@@ -15,8 +15,8 @@ house_off_market_median_prices AS (
     SELECT
         id_house,
         business_context,
-        house_neighborhood,
-        similar_house_status,
+        neighborhood,
+        similar_status,
         APPROX_PERCENTILE(similar_house_price, 0.5) AS off_market_price_median,
         APPROX_PERCENTILE(similar_price_m2, 0.5) AS off_market_price_by_square_meter
     FROM datalake_atlas_pricing_report.similar_listings
@@ -28,7 +28,7 @@ house_off_market_median_days_to_contract_sign AS (
     SELECT
         id_house,
         business_context,
-        house_neighborhood,
+        neighborhood,
         APPROX_PERCENTILE(similar_days_to_contract_sign, 0.5) AS median_days_to_contract_sign
     FROM datalake_atlas_pricing_report.similar_listings
     WHERE
@@ -40,7 +40,7 @@ house_off_market_median_days_to_contract_sign AS (
 SELECT DISTINCT
     l.id_house,
     l.business_context,
-    l.house_neighborhood,
+    l.neighborhood,
     hon.on_market_price_median,
     hon.on_market_price_by_square_meter,
     hoff.off_market_price_median,
@@ -48,24 +48,15 @@ SELECT DISTINCT
     hcs.median_days_to_contract_sign,
     hic.condominium_price_median,
     hic.urban_property_tax_median
-FROM
-    datalake_atlas_pricing_report.similar_listings l
-LEFT JOIN
-    house_on_market_median_prices hon
-ON
-    l.id_house = hon.id_house
+FROM datalake_atlas_pricing_report.similar_listings l
+LEFT JOIN house_on_market_median_prices hon
+    ON l.id_house = hon.id_house
     AND l.business_context = hon.business_context
-LEFT JOIN
-    house_off_market_median_prices hoff
-ON
-    l.id_house = hoff.id_house
+LEFT JOIN house_off_market_median_prices hoff
+    ON l.id_house = hoff.id_house
     AND l.business_context = hoff.business_context
-LEFT JOIN
-    house_off_market_median_days_to_contract_sign hcs
-ON
-    l.id_house = hcs.id_house
+LEFT JOIN house_off_market_median_days_to_contract_sign hcs
+    ON l.id_house = hcs.id_house
     AND l.business_context = hcs.business_context
-LEFT JOIN
-    datalake_atlas_pricing_report.house_condo_metrics hic
-ON
-    l.id_house = hic.id_house
+LEFT JOIN datalake_atlas_pricing_report.house_condo_metrics hic
+    ON l.id_house = hic.id_house
