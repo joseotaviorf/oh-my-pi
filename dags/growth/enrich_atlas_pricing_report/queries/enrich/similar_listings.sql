@@ -44,7 +44,7 @@ WITH listings AS (
     LEFT JOIN dw_sale.fact_listing_sale_flows sf
         ON SUBSTRING(sf.sk_house_listing,0,9) = fl.sk_house
     LEFT JOIN dw_public.dim_date dd
-        ON dd.sk_date = fl.sk_house_listing_date
+        ON dd.sk_date = sf.sk_house_listing_date
     LEFT JOIN dw_public.dim_region dr_fr
         ON dr_fr.sk_region = fhl.sk_region
     LEFT JOIN dw_public.dim_region dr_fs
