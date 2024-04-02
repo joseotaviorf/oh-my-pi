@@ -1,4 +1,8 @@
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
+)
+from bietlejuice.services.configuration_service import ConfigurationService
 from databricks_plugin import QuintoAndarDatabricksExecuteJobClusterOperator
 
 
@@ -7,10 +11,23 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
 
     _TASK_ID = "execute-job-cluster"
 
-    def __init__(self, dag_execution_context, config_service):
+    def __init__(
+        self,
+        dag_execution_context: DagExecutionContext,
+        config_service: ConfigurationService,
+        minimum_databricks_version: str = None,
+    ):
         super().__init__(dag_execution_context)
         self.cluster_args = dag_execution_context.cluster_args
         self.config_service = config_service
+        self.minimum_databricks_version = minimum_databricks_version
+        if minimum_databricks_version:
+            self.minimum_databricks_major_version = int(
+                minimum_databricks_version.split(".")[0]
+            )
+            self.minimum_databricks_minor_version = int(
+                minimum_databricks_version.split(".")[1]
+            )
 
     def __get_access_control_list(self) -> list:
         # TODO: change access_control_list to be a list of dicts directly in the DAG declarations
@@ -29,6 +46,28 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
         )
         return updated_cluster_configuration
 
+    def __validate_databricks_version(self, cluster_configuration: dict):
+        if self.minimum_databricks_version:
+            current_databricks_version = cluster_configuration.get("spark_version")
+            current_databricks_major_version = int(
+                current_databricks_version.split(".")[0]
+            )
+            current_databricks_minor_version = int(
+                current_databricks_version.split(".")[1]
+            )
+            if (
+                current_databricks_major_version < self.minimum_databricks_major_version
+                or (
+                    current_databricks_major_version
+                    == self.minimum_databricks_major_version
+                    and current_databricks_minor_version
+                    < self.minimum_databricks_minor_version
+                )
+            ):
+                raise ValueError(
+                    f"Current Databricks version ({current_databricks_version}) is below the minimum required version ({self.minimum_databricks_version})"
+                )
+
     def __get_libraries(self) -> list:
         default_libraries = self.config_service.get_config("default_libraries")
         # TODO: add custom_libraries feature
@@ -38,12 +77,14 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
         """
         Creates the ExecuteJobCluster task to enable Spark Jobs to run on Databricks Job Cluster
         """
+        cluster_configuration = self.__get_cluster_configuration()
+        self.__validate_databricks_version(cluster_configuration)
 
         return QuintoAndarDatabricksExecuteJobClusterOperator(
             databricks_conn_id="databricks_job_cluster",
             dag=self.dag_execution_context.dag,
             task_id=self._TASK_ID,
-            cluster_configuration=self.__get_cluster_configuration(),
+            cluster_configuration=cluster_configuration,
             libraries=self.__get_libraries(),
             access_control_list=self.__get_access_control_list(),
         )

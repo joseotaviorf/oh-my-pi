@@ -44,7 +44,9 @@ class RawCDCWorkflow(BaseWorkflow):
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         task_creator_factory = TaskCreatorFactory(dag_execution_context)
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.EXECUTE_JOB_CLUSTER, self.config_service
+            TaskEnum.EXECUTE_JOB_CLUSTER,
+            self.config_service,
+            minimum_databricks_version="12.2",
         )
         self.load_transactional_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_CDC_TRANSACTIONAL

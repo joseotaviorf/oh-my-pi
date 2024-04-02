@@ -10,6 +10,7 @@ class WorkflowEnum(Enum):
     DATABASE_PULL_WORKFLOW = "database_pull"
     GSHEETS_WORKFLOW = "gsheets"
     QUERY_WORKFLOW = "query"
+    QUERY_DELTA_WORKFLOW = "query_delta"
 
     @classmethod
     def get_available_enum_values(cls):

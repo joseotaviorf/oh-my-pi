@@ -1,0 +1,153 @@
+from typing import List, Tuple
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
+    BaseWorkflow,
+)
+from bietlejuice.base.airflow.task_creators.task_creator_factory import (
+    TaskCreatorFactory,
+    TaskEnum,
+)
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
+)
+from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+
+
+class EnrichQueryDeltaWorkflow(BaseWorkflow):
+    """
+    Inherits the dag build base to define the flow that creates Delta tables from sql files, in the enrich Layer.
+    :param dag_args: A dictionary containing the definition of the dag with parameters received from each dag yaml file.
+    :param workflow_args: A dictionary containing arguments that will be used to decide which tasks to define in the dag.
+    :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
+    """
+
+    def __init__(self, dag_args, workflow_args, cluster_args):
+        super().__init__(dag_args, workflow_args, cluster_args)
+
+    def build_dag(self):
+        dag = self.dag_instance()
+        bucket_config = self.workflow_args.get("bucket_config_name", "datalake_bucket")
+        bucket = self.config_service.get_config(bucket_config)
+        dag_execution_context = self._get_dag_execution_context(dag, bucket)
+        self._initialize_task_creators(dag_execution_context)
+
+        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
+        dummy_terminate_job_cluster_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
+        )
+
+        table_first_tasks = {}
+        table_last_tasks = {}
+        tables = self._get_tables()
+        optimize_delta_tables = self.optimize_delta_table_task_creator.create_task(
+            tables
+        )
+        for table in tables:
+            (
+                table_first_tasks[table.table_name],
+                table_last_tasks[table.table_name],
+            ) = self._create_enrich_tasks(table, optimize_delta_tables)
+
+        self._set_dependencies(
+            execute_job_cluster_task,
+            table_first_tasks,
+            table_last_tasks,
+            optimize_delta_tables,
+            dummy_terminate_job_cluster_task,
+        )
+
+        return dag
+
+    def _get_tables(self) -> List[TableAttributes]:
+        """Returns the table attributes for all the tables in the enrich layer."""
+
+        table_names = DAGPackagesPathService.list_queries_files_in_composer(
+            dag_name=self.dag_name, layer=LayerEnum.ENRICH.value
+        )
+        return [
+            TableAttributes(
+                self.dag_args, self.workflow_args, LayerEnum.ENRICH, table_name
+            )
+            for table_name in table_names
+        ]
+
+    def _create_enrich_tasks(self, table: TableAttributes, last_task) -> Tuple:
+        """Returns a tuple with the first (Load) and last (Load) tasks of the table."""
+
+        load = self.load_enrich_task_creator.create_task(table)
+        if self._check_include_sync_hive_tasks(table):
+            register_table = self.register_delta_table_task_creator.create_task(table)
+            propagate_metadata = self.propagate_metadata_task_creator.create_task(table)
+            (load >> register_table >> propagate_metadata >> last_task)
+        if self._check_include_data_quality_task(table):
+            data_quality = self.data_quality_tests_task_creator.create_task(table)
+            load >> data_quality >> last_task
+        return load, load
+
+    def _set_dependencies(
+        self,
+        execute_job_cluster_task,
+        table_first_tasks: dict,
+        table_last_tasks: dict,
+        optimize_delta_tables_task,
+        job_cluster_finished_task,
+    ) -> None:
+        inner_dependencies = self.workflow_args.get("inner_dependencies", {})
+
+        dependency_table_names = set()
+        try:
+            for table_name, table_first_task in table_first_tasks.items():
+                if table_name in inner_dependencies:
+                    for inner_dependency in inner_dependencies[table_name]:
+                        table_last_tasks[inner_dependency] >> table_first_task
+                        dependency_table_names.add(inner_dependency)
+                else:
+                    execute_job_cluster_task >> table_first_task
+        except KeyError as e:
+            raise ValueError(
+                f"Error finding table '{e.args[0]}' during inner dependencies settings. "
+                "Make sure this table is named correctly and its query exists."
+            )
+
+        if self._check_include_skip_run_task():
+            skip_run_task = self.skip_run_task_creator.create_task()
+            skip_run_task >> execute_job_cluster_task
+
+        optimize_delta_tables_task.set_upstream(
+            [
+                table_task
+                for table_name, table_task in table_last_tasks.items()
+                if table_name not in dependency_table_names
+            ]
+        )
+        optimize_delta_tables_task >> job_cluster_finished_task
+
+    def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
+        task_creator_factory = TaskCreatorFactory(dag_execution_context)
+        self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.EXECUTE_JOB_CLUSTER,
+            self.config_service,
+            minimum_databricks_version="12.2",
+        )
+        self.load_enrich_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.LOAD_DELTA
+        )
+        self.data_quality_tests_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.DATA_QUALITY_TESTS, self.config_service
+        )
+        self.propagate_metadata_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.PROPAGATE_METADATA
+        )
+        self.skip_run_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.SKIP_RUN
+        )
+        self.register_delta_table_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.REGISTER_DELTA_TABLE
+        )
+        self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.OPTIMIZE_DELTA_TABLE
+        )
+        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        )
