@@ -40,13 +40,16 @@ class DeltaLoader:
         database_name = table_name.split(".")[0].replace("`", "")
         BaseSparkContext.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
 
-        if not DeltaTable.isDeltaTable(BaseSparkContext.spark, path):
+        if not BaseSparkContext.spark.catalog.tableExists(table_name):
             logger.info(
-                f"Path {path} is not a Delta Table. Creating a new empty table {table_name} on location."
+                f"Table {table_name} does not exist. Creating a new empty table {table_name} on location."
             )
             self._create_empty_table(
                 table_name, path, source_df, partition_by, replace_if_exists=True
             )
+        elif not DeltaTable.isDeltaTable(BaseSparkContext.spark, path):
+            logger.info(f"Path {path} is not a Delta Table. Running conversion.")
+            self._convert_to_delta_table(table_name)
 
         if not merge_on:
             logger.info(f"Writing to table {table_name} on path {path}.")
@@ -84,6 +87,11 @@ class DeltaLoader:
             builder = builder.partitionedBy(*partition_by)
         builder = builder.location(path)
         return builder.execute()
+
+    def _convert_to_delta_table(self, table_name: str) -> None:
+        """Convert a table to a Delta table"""
+        BaseSparkContext.spark.sql(f"CONVERT TO DELTA {table_name}")
+        logger.info(f"Table {table_name} converted to Delta format.")
 
     def _write_to_table(
         self,

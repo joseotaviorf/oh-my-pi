@@ -56,6 +56,7 @@ class TestDeltaLoader:
         with mock.patch(
             "bietlejuice.loaders.delta_loader.BaseSparkContext"
         ) as mock_spark_context:
+            mock_spark_context.spark.catalog.tableExists.return_value = True
             yield mock_spark_context
 
     def test_create_empty_table_when_it_doesnt_exist(
@@ -68,7 +69,7 @@ class TestDeltaLoader:
         table_name = "test_database.test_table"
         path = "test_path"
         partition_by = ["column1", "column2"]
-        mock_delta_table.isDeltaTable.return_value = False
+        mock_spark_context.spark.catalog.tableExists.return_value = False
 
         delta_loader = DeltaLoader()
         delta_loader.load_table(table_name, path, mock_source_df, partition_by)
@@ -86,6 +87,18 @@ class TestDeltaLoader:
         delta_table_builder_mock.location.assert_called_once_with(path)
         delta_table_builder_mock.partitionedBy.assert_called_once_with(*partition_by)
         delta_table_builder_mock.execute.assert_called_once()
+
+    def test_convert_to_delta_when_it_exists_but_is_not_delta(
+        self, mock_spark_context, mock_delta_table, mock_source_df
+    ):
+        table_name = "test_table"
+        mock_spark_context.spark.catalog.tableExists.return_value = True
+        mock_delta_table.isDeltaTable.return_value = False
+
+        delta_loader = DeltaLoader()
+        delta_loader.load_table(table_name, None, mock_source_df)
+
+        mock_spark_context.spark.sql.assert_called_with("CONVERT TO DELTA test_table")
 
     def test_write_to_table(self, mock_source_df):
         table_name = "test_table"
