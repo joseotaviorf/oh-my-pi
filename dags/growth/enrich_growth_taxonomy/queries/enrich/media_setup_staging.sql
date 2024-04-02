@@ -31,31 +31,6 @@ WITH taxonomy_combinations AS (
     AND src.taxonomy_level = 'source'
     AND lp.taxonomy_level = 'landing_page'
 ),
-
-ad_hoc_rules AS (
-  SELECT
-    data.id_media_setup,
-    data.funnel_side,
-    data.campaign_strategy_intent,
-    data.campaign_business_context,
-    data.campaign_landing_page,
-    data.behavior_type,
-    data.medium,
-    data.source
-  FROM VALUES (-2,'Lost Tracking','Lost Tracking','Lost Tracking','Lost Tracking','Lost Tracking','Lost Tracking','Lost Tracking'),
-    (1,'Demand', 'Acquisition','NA', 'NA', 'organic','Direct','NA'),
-    (2, 'Demand', 'Acquisition', 'Hybrid','NA','non organic','Referral','Agents') 
-    AS data(id_media_setup,
-      funnel_side,
-      campaign_strategy_intent,
-      campaign_business_context,
-      campaign_landing_page,
-      behavior_type,
-      medium,
-      source)
-  UNION ALL (SELECT * FROM taxonomy_combinations)
-),
-
 naming_convention_prefixes AS (
   SELECT
     id_media_setup,
@@ -74,7 +49,7 @@ naming_convention_prefixes AS (
     source,
     funnel_side
   FROM
-    ad_hoc_rules
+    taxonomy_combinations
 ),
 
 last_id_values AS (
