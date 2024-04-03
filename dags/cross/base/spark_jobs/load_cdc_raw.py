@@ -98,7 +98,7 @@ def main():
         # Hardcoded for now, while we don't have other sources such as Postgres
         pk_identifier = MySqlPrimaryKeyIdentifier(
             MySqlCdcSchemaFinder(
-                f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/",
+                f"s3://{incoming_bucket}/{source_schema}/{environment}_{source_schema}.data/",
                 start_date=start_date,
                 end_date=end_date,
             ),

@@ -77,7 +77,7 @@ def get_incoming_data(
     :return df:
     """
     path = (
-        f"s3://{incoming_bucket}/{schema}/{environment}-{schema}.{schema}.{table_name}/"
+        f"s3://{incoming_bucket}/{schema}/{environment}_{schema}.data.{schema}.{table_name}/"
     )
 
     logger.info(
@@ -200,10 +200,10 @@ def main():
 
     logger.info("m=__main__, msg=Applying schema pre treatment...")
 
-    # Hardcoded for now, while we don't have other sources such as Postgres
+    # Hardcoded for now, while we don't have other sources such as Postgres.
     pre_treatment = MySqlCdcSchemaTreatment(
         MySqlCdcSchemaFinder(
-            f"s3://{incoming_bucket}/{source_schema}/{environment}-{source_schema}/",
+            f"s3://{incoming_bucket}/{source_schema}/{environment}_{source_schema}.data/",
             start_date=start_date,
             end_date=end_date,
         ),
