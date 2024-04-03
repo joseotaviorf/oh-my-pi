@@ -1,0 +1,17 @@
+---
+database_name: datalake_webhelp_clean
+table_name: stages
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Stages data
+columns:
+  id_occurrence_stage:
+    description: "Occurrence stage ID. PK of table"
+    lineage:
+      - datalake_webhelp_raw.estagios.cod_est
+  name_occurrence_stage:
+    description: "Name of the occurrence stage"
+    lineage:
+      - datalake_webhelp_raw.estagios.nom_est
+  ts_load:
+    description: "Timestamp when data was loaded"

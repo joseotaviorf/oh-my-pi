@@ -1,0 +1,28 @@
+azure_container_name: lake-quinto-andar-sftp
+azure_sub_folder: EXPORTACOES/ATENDIMENTO
+format: parquet
+tables:
+  - table_name: HISTORICOS_CLIENTES
+    clean_table_name: historical_customers
+  - table_name: HISTORICOS_CLIENTES_TITULOS
+    clean_table_name: historical_customers_titles
+  - table_name: LOGIN
+    clean_table_name: login
+  - table_name: OCORRENCIAS_CLIENTES
+    clean_table_name: customer_occurrences
+  - table_name: ESTAGIOS
+    clean_table_name: stages
+  - table_name: TITULOS
+    clean_table_name: titles
+  - table_name: TIPO_CONTRATO
+    clean_table_name: contract_type
+  - table_name: CREDORES
+    clean_table_name: creditors
+  - table_name: PARCELAS
+    clean_table_name: installments
+  - table_name: DEVEDORES
+    clean_table_name: debtors
+  - table_name: GRUPO_OCORRENCIAS
+    clean_table_name: group_occurrences
+  - table_name: IMPORTACAO
+    clean_table_name: import

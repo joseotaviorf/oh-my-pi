@@ -1,0 +1,17 @@
+---
+database_name: datalake_webhelp_clean
+table_name: creditors
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Creditors data
+columns:
+  id_creditor:
+    description: "Creditor/portfolio/company ID. PK of table"
+    lineage:
+      - datalake_webhelp_raw.credores.cod_cred
+  creditor_name:
+    description: "Creditor/portfolio/company name"
+    lineage:
+      - datalake_webhelp_raw.credores.nome_cred
+  ts_load:
+    description: "Timestamp when data was loaded"
