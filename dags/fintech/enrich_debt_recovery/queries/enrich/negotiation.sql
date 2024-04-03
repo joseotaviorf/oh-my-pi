@@ -115,6 +115,7 @@ SELECT
     n.id_collector_external AS id_negotiation_recupera,
     n.id_debtor_external AS id_contract,
     CONCAT(d.origin, "_", d.type) AS debtor,
+    c.name AS collector,
     n.status,
     ci.qt_installments,
     cp.qt_paid AS qt_installments_paid,
@@ -139,7 +140,7 @@ SELECT
     n.ts_created AS ts_created_at
 FROM
     datalake_trato_feito_clean.negotiation AS n
-LEFT JOIN 
+LEFT JOIN
     datalake_trato_feito_clean.debtor AS d
         ON n.id_debtor = d.id
 LEFT JOIN
@@ -162,3 +163,5 @@ LEFT JOIN
         ON n.`id` = cb.id_negotiation
 LEFT JOIN extract_total_credit_card_fee AS cc
     ON cc.`id` = n.`id`
+LEFT JOIN datalake_trato_feito_clean.collector AS c
+    ON n.id_collector = c.id

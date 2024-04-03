@@ -121,8 +121,7 @@ columns:
     description: "Boolean to indicate if the negotiation is a renegotiation, i.e, there was a previous negotiation"
   is_ssn:
     lineage:
-      - datalake_retsuko.invoice.purpose
-      - datalake_retsuko.invoice.reason
+      - datalake_debt_recovery.negotiation.collector
     description: "Boolean to indicate if the negotiation is an SSN - Self Service Negotiation. It it also known by data team as BOSSN (boletão)"
   has_been_renegotiated:
     lineage:
