@@ -387,7 +387,7 @@ bietlejuice.enrich_growth_manual_daily_costs:
 bietlejuice.enrich_growth_costs_sharing_rules:
   override: []
 bietlejuice.enrich_consolidated_growth_metrics:
-  override: []  
+  override: []
 bietlejuice.enrich_supply_conversion:
   add:
     - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
@@ -844,8 +844,6 @@ bietlejuice.reverse_listings_report_access:
 bietlejuice.reverse_sale_unavailable_listings_access:
   add:
     - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
-bietlejuice.reverse_navent_bigquery:
-  override: []
 bietlejuice.reverse_nps_reversion:
   override: []
 bietlejuice.enrich_atlas_pricing_report:

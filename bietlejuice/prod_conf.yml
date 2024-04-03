@@ -98,7 +98,6 @@ dags_out_of_pattern:
         "reverse_inside_sales_whitelist",
         "reverse_listings_report_access",
         "reverse_listings_report_load",
-        "reverse_navent_bigquery",
         "reverse_nazare",
         "reverse_nexxera",
         "reverse_regions_polygon",
