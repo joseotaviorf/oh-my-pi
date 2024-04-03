@@ -24,7 +24,7 @@ workflow:
       date_filter_column: dttm
     sql_metrics:
       date_filter_column: changed_on
-    sqlatable_user:
+    sqltable_user:
       extraction_type: full
       partitions: []
     table_columns:
