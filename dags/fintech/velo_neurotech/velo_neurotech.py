@@ -21,7 +21,7 @@ ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "velo_neurotech"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2022, 8, 29, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 config_service = ConfigurationService(SOURCE)
 artifacts_bucket = config_service.get_config("artifacts_bucket")
