@@ -169,7 +169,7 @@ WITH consolidated_sources AS (
         AND id_date >= 20220912        
 )
 
-SELECT
+SELECT DISTINCT
     cs.id_date,
     'BR' AS country_code,
     cs.origin,
@@ -232,3 +232,5 @@ ON
   AND COALESCE(cs.report_type,"") = COALESCE(ctd.report_type,"")
   AND COALESCE(cs.ad_type,"") = COALESCE(ctd.ad_type,"")
   AND COALESCE(cs.origin,"") = COALESCE(ctd.origin,"")
+WHERE 
+    cs.id_date IS NOT NULL  
