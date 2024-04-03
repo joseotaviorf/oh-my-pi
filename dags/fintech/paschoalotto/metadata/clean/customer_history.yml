@@ -13,12 +13,12 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbsituacaocontrato.id_geusuario_int
-  code:
-    description: ""
+  contract_status:
+    description: "Contract status code"
     lineage:
       - datalake_paschoalotto_raw.cbsituacaocontrato.codigo_str
   description:
-    description: ""
+    description: "Description referring to the id and code of the contract status"
     lineage:
       - datalake_paschoalotto_raw.cbsituacaocontrato.descricao_str
   action:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsituacaocontrato.acao_str
   with_password:
-    description: ""
+    description: "If the contract situation requires a password"
     lineage:
       - datalake_paschoalotto_raw.cbsituacaocontrato.com_senha_str
   ts_load:

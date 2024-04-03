@@ -26,87 +26,87 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.id_cbetapa_int
   contract:
-    description: ""
+    description: "Contract number/code"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.contrato_str
   name:
-    description: ""
+    description: "Customer/debtor name"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.nome_str
   cpf:
-    description: ""
+    description: "Customer/debtor CPF"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.cpf_str
   address:
-    description: ""
+    description: "Customer address"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.endereco_str
   additional_address:
-    description: ""
+    description: "Address complement"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.complemento_str
   neighborhood:
-    description: ""
+    description: "Name of the neighborhood of the addressh"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.bairro_str
   zip_code:
-    description: ""
+    description: "ZIP code"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.cep_str
   city:
-    description: ""
+    description: "Customer address city name"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.cidade_str
   state:
-    description: ""
+    description: "Customer city state"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.estado_str
   telephone:
-    description: ""
+    description: "Telephone number"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.telefone_str
   marital_status:
-    description: ""
+    description: "Customer's marital status"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.estado_civil_str
   observation:
-    description: ""
+    description: "General observations"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.observacao_str
   email:
-    description: ""
+    description: "Customer email"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.email_str
   is_customer_located:
-    description: ""
+    description: "If the customer was located"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.cliente_localizado_bit
   dt_stand_by:
-    description: ""
+    description: "Date on which the contract is on standby"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.data_stand_by_dat
   dt_contact:
-    description: ""
+    description: "Contract date"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.data_contato_dat
   dt_first_distribution:
-    description: ""
+    description: "Date of first distribution imported into the system"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.data_primeira_distrib_dat
   dt_last_distribution:
-    description: ""
+    description: "Date of last distribution imported into the system"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.data_ultima_distrib_dat
   dt_request:
-    description: ""
+    description: "Date the document was requested"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.data_solicitacao_dat
   dt_located:
-    description: ""
+    description: "Date the customer was located"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.data_localizado_dat
   ts_timestamp:
-    description: ""
+    description: "Time the row was added/changed"
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.tstamp
   ts_load:

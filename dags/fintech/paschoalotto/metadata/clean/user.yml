@@ -10,10 +10,10 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geusuario.id_geusuario_int
   login_name:
-    description: ""
+    description: "Login code"
     lineage:
       - datalake_paschoalotto_raw.geusuario.nomelogin_str
   full_name:
-    description: ""
+    description: "User's Full Name"
     lineage:
       - datalake_paschoalotto_raw.geusuario.nomecompleto_str

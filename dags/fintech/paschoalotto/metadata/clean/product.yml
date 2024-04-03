@@ -10,71 +10,85 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.id_cbtiponegocio_int
   code:
-    description: ""
+    description: "Code for the type of business"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.codigo_str
   description:
-    description: ""
+    description: "Description of the code for the type of business"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.descricao_str
   settlement:
-    description: ""
+    description: "If the contract has been paid"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.quitacao_str
   expense_inclusion:
-    description: ""
+    description: "Indicates whether the contract includes extra expenses"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.inclusao_despesa_str
   description_npjur:
     description: ""
+    categories:
+      "0": "Consórcio"
+      "1": "Crédito Pessoal"
+      "2": "Financiamento"
+      "3": "Fomento"
+      "4": "Leasing"
+      "5": "Crédito Imobiliário"
+      "6": "Alienação Fiduciária - Imóveis"
+      "7": "Cessão de Crédito"
+      "8": "Civel"
+      "9": "Cobrança Condomínio"
+      "10": "Crédito Rural"
+      "11": "Hipoteca"
+      "12": "CDC SOLAR"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.descricao_npjur_str
-  mostra_installment:
-    description: ""
+  installment_shown:
+    description: "Parcel is shown in the window"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.mostra_parcela_str
-  cgc:
-    description: ""
+  company_cnpj:
+    description: "CGC / CNPJ of the client/company"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.cgc_str
   zip_code:
-    description: ""
+    description: "Customer zip code"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.cep_str
-  address_1:
-    description: ""
+  address_complement:
+    description: "Address complement"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.endereco1_str
-  address_2:
-    description: ""
+  address:
+    description: "Address"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.endereco2_str
-  negotiation_state:
-    description: ""
+  state:
+    description: "State of the City"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.neg_uf_str
-  negotiation_neighborhood:
-    description: ""
+  neighborhood:
+    description: "Neighborhood"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.neg_bairro_str
   npjur_id_jupessoa:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.npjur_id_jupessoa
-  year_rate:
-    description: ""
+  annual_interest_rate:
+    description: "Annual interest rate"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.taxa_ano_str
-  settlement_days:
-    description: ""
+  days_for_payment:
+    description: "Number of days for payment"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.dias_quitacao_num
-  installments:
-    description: ""
+  installments_number:
+    description: "Number of installments of the contract"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.parcelas_num
-  default_amount:
-    description: ""
+  fine_amount:
+    description: "Fine amount"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.valor_mora_num
   amount_cp:
@@ -82,7 +96,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.valor_cp_num
   ts_timestamp:
-    description: ""
+    description: "Timestamp the record was added/changed"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.tstamp
   ts_load:

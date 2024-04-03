@@ -14,51 +14,51 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.id_geqlcliente_int
   address:
-    description: ""
+    description: "Address description"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.endereco_str
   additional_address:
-    description: ""
+    description: "Address complement"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.complemento_str
   neighborhood:
-    description: ""
+    description: "Neighborhood"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.bairro_str
   zip_code:
-    description: ""
+    description: "Zip Code"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.cep_str
   city:
-    description: ""
+    description: "City"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.cidade_str
   state:
-    description: ""
+    description: "State"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.estado_str
   classification:
-    description: ""
+    description: "Address quality"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.classificacao_str
   is_deleted:
-    description: ""
+    description: "Activate/Deactivate the address"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.excluido_bit
   ts_inclusion:
-    description: ""
+    description: "Datetime of address inclusion"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.tstamp_inclusao
   ts_insert:
-    description: ""
+    description: "Datetime the record was added"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.tstamp_mdm_inclusao
   ts_update:
-    description: ""
+    description: "Datetime the record was updated"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.tstamp_mdm_alteracao
   ts_timestamp:
-    description: ""
+    description: "Timestamp the line was added/updated"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.tstamp
   ts_load:

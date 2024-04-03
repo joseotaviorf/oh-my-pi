@@ -18,15 +18,15 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbetapa.id_gecliente_int
   code:
-    description: ""
+    description: "Step code"
     lineage:
       - datalake_paschoalotto_raw.cbetapa.codigo_str
   description:
-    description: ""
+    description: "Step description"
     lineage:
       - datalake_paschoalotto_raw.cbetapa.descricao_str
   ts_timestamp:
-    description: ""
+    description: "Timestamp the records was added/updated"
     lineage:
       - datalake_paschoalotto_raw.cbetapa.tstamp
   ts_load:

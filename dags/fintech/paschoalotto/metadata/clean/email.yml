@@ -14,27 +14,27 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlemail.id_geqlcliente_int
   email:
-    description: ""
+    description: "Email"
     lineage:
       - datalake_paschoalotto_raw.geqlemail.email_str
   classification:
-    description: ""
+    description: "Email quality"
     lineage:
       - datalake_paschoalotto_raw.geqlemail.classificacao_str
   is_deleted:
-    description: ""
+    description: "Whether email should be used or not"
     lineage:
       - datalake_paschoalotto_raw.geqlemail.excluido_bit
   ts_insert:
-    description: ""
+    description: "Datetime the record was added"
     lineage:
       - datalake_paschoalotto_raw.geqlemail.tstamp_mdm_inclusao
   ts_update:
-    description: ""
+    description: "Datetime the record was updated"
     lineage:
       - datalake_paschoalotto_raw.geqlemail.tstamp_mdm_alteracao
   ts_timestamp:
-    description: ""
+    description: "Time the record was added/updated"
     lineage:
       - datalake_paschoalotto_raw.geqlemail.tstamp
   ts_load:
