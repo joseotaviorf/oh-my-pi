@@ -109,6 +109,7 @@ business_context_history AS (
       bch.business_context,
       LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_state_status,
       LAG(bch.status_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_reason,
+      LAG(bch.status_reason, 2) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_to_previous_status_reason,
       LAG(bch.suspension_reason) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_suspension_reason,
       LAG(
           CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
@@ -358,6 +359,18 @@ trigger AS (
                   bch.status = 'SUSPENDED' 
                   AND 
                   bch.status_reason = 'RENTED'
+                )
+            )
+            OR --Early demand
+            ( --This covers the new scenario where the admin suspends the listing before publishing it as early demand
+                bch.next_status = 'PUBLISHED'
+                AND bch.next_status_reason LIKE 'RELISTING_%'
+                AND (
+                  bch.status = 'SUSPENDED'
+                  AND 
+                  bch.status_reason = 'Admin'
+                  AND
+                  (bch.previous_status_reason = 'RENTED' OR bch.previous_to_previous_status_reason = 'RENTED')
                 )
             )
           )
