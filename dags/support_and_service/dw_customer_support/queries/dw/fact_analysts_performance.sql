@@ -1,7 +1,21 @@
-WITH without_agg_infos AS (
+WITH recontact_data AS (
     SELECT
         ut.id_ticket,
-        MD5(a.email) AS id_agent,
+        IF(tf.ts_updated > ut.ts_solved, TRUE, FALSE) AS is_recontact_ticket
+    FROM
+        datalake_customer_support.unified_tickets AS ut
+    LEFT JOIN
+        datalake_zendesk_ticket_funnels.ticket_funnel AS tf
+            ON ut.id_ticket = tf.id_ticket
+    WHERE
+        DATE(ut.ts_solved) = MAKE_DATE({year}, {month}, {day})
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY ut.id_ticket ORDER BY tf.ts_updated DESC) = 1
+),
+without_agg_infos AS (
+    SELECT
+        ut.id_ticket,
+        id_last_agent AS id_agent,
         dc.team,
         rd.status,
         ut.resolution_survey,
@@ -9,6 +23,9 @@ WITH without_agg_infos AS (
         ut.replies AS replied_tickets,
         ut.first_csat_score AS first_csat_score,
         DATEDIFF(ut.ts_solved, ut.ts_started) AS attendance_time,
+        r.is_recontact_ticket,
+        IF(DATE(ut.ts_solved) = MAKE_DATE({year}, {month}, {day}) OR DATE(ut.ts_closed) = MAKE_DATE({year}, {month}, {day}), TRUE, FALSE) AS is_received_demand,
+        IF(DATE(ut.ts_solved) = MAKE_DATE({year}, {month}, {day}), TRUE, FALSE) AS is_productive_ticket,
         CASE
             WHEN ROW_NUMBER() OVER(PARTITION BY MD5(
               COALESCE(CONCAT(rd.id_call, 'call'), 
@@ -37,8 +54,8 @@ WITH without_agg_infos AS (
         datalake_gsheets_clean.department_control AS dc
             ON ut.id_main_department = MD5(dc.department)
     LEFT JOIN
-        datalake_zendesk_users.agents AS a
-            ON ut.id_last_agent = MD5(a.email)
+        recontact_data AS r
+            ON ut.id_ticket = r.id_ticket
     WHERE
         ut.front_or_back <> "undefined"
         AND dc.team IS NOT NULL
@@ -54,6 +71,9 @@ SELECT
     SUM(wa.reopened_tickets) AS ticket_reopenings,
     SUM(wa.replied_tickets) AS ticket_responses,
     SUM(wa.attendance_time) AS total_attendance_time,
+    COUNT_IF(wa.is_recontact_ticket = TRUE) AS total_tickets_recontact,
+    COUNT_IF(wa.is_received_demand = TRUE) AS total_received_demand,
+    COUNT_IF(wa.is_productive_ticket = TRUE) AS total_productivity,
     COUNT(
         CASE 
             WHEN 

@@ -14,7 +14,7 @@ columns:
     description: Unique snapshot identifier (a concatenation of id_agent + date).
   sk_agent:
     lineage:
-      - datalake_zendesk_users.agents.email
+      - datalake_customer_support.unified_tickets.id_last_agent
     description: Analyst identification key.
   sk_last_ticket_updated_date:
     lineage:
@@ -28,6 +28,12 @@ columns:
     description: Information of integer type that indicates the number of responses linked to the analyst on the day.
   total_attendance_time:
     description: Information of integer type that indicates the service time (in minutes) linked to the analyst on the day.
+  total_tickets_recontact:
+    description: Integer type information that indicates how many tickets were recontacted.
+  total_received_demand:
+    description: Integer type information that indicates the amount of demand received by the analyst.
+  total_productivity:
+    description: Integer type data that indicates how many tickets the analyst solved.
   tickets_with_csat_score:
     description: Information of integer type that indicates the number of tickets with the csat score sent on the day.
   tickets_csat_satisfied:
