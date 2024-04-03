@@ -33,6 +33,13 @@ WITH tickets AS (
             ),
             (k, v) -> v IS NOT NULL AND v != "" AND v != " "
         ) AS cf_map,
+        REGEXP_REPLACE(
+            REGEXP_REPLACE(
+                custom_fields,
+                '^\\\[|\\\{{([^\\\n\\\{{\\\}}\\\[\\\]](?!value":(?!null)))*\\\}}(,|)|\\\]$', ""
+            ),
+        ',$|\\\{{|\\\}}|"id":|,"value"|"', ""
+        ) AS cf_string,
         priority,
         recipient,
         tags,
@@ -50,9 +57,9 @@ WITH tickets AS (
             raw_subject != "scrubbed"
             AND via_channel IS NOT NULL
         )
-        AND year IN (YEAR(CAST('{year}-{month}-{day}' AS DATE)), YEAR(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
-        AND month IN (MONTH(CAST('{year}-{month}-{day}' AS DATE)), MONTH(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
-        AND day IN (DAY(CAST('{year}-{month}-{day}' AS DATE)), DAY(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
+        AND year = {year}
+        AND month = {month}
+        AND day = {day}
 ),
 custom_field_values AS (
     SELECT
@@ -180,10 +187,52 @@ custom_field_values AS (
         ts_updated
     FROM
         tickets
+),
+exploded_cf AS (
+    SELECT
+        id_ticket,
+        ts_updated,
+        EXPLODE(SPLIT(cf_string, ",")) AS cf
+    FROM
+        tickets
+),
+splitted_cf AS (
+    SELECT
+        id_ticket,
+        ts_updated,
+        SPLIT(cf, ":")[0] AS key,
+        SPLIT(cf, ":")[1] AS value
+    FROM
+        exploded_cf
+),
+parsed_cf AS (
+    SELECT
+        cf.id_ticket,
+        cf.ts_updated,
+        tf.title AS cf_title,
+        cf.value AS cf_value
+    FROM
+        splitted_cf AS cf
+    INNER JOIN
+        datalake_zendesk_clean.ticket_fields AS tf
+            ON tf.id_ticket_field = cf.key
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY cf.id_ticket, cf.ts_updated, tf.title ORDER BY tf.ts_updated DESC) = 1
+),
+custom_fields_with_title AS (
+    SELECT
+        id_ticket,
+        ts_updated,
+        MAP_FROM_ARRAYS(COLLECT_LIST(cf_title), COLLECT_LIST(cf_value)) AS custom_fields
+    FROM
+        parsed_cf
+    GROUP BY 1, 2
 )
 SELECT
     t.id_ticket,
     t.id_assignee,
+    t.id_requester,
+    t.id_submitter,
     t.id_group,
     cfv.id_problem_ticket,
     cfv.id_house,
@@ -193,7 +242,7 @@ SELECT
     cfv.id_job,
     cfv.id_house_so,
     cfv.id_house_aq,
-    cfv.custom_fields,
+    cfwt.custom_fields,
     cfv.task_sid_twilio,
     cfv.contact_ticket,
     cfv.analyst_email,
@@ -258,19 +307,22 @@ SELECT
     cfv.dt_install,
     cfv.dt_first_fup,
     cfv.dt_first_reply,
-    t.dt_extracted,
     t.ts_created,
     t.ts_updated,
     NOW() AS ts_load,
-    YEAR(t.dt_extracted) AS year,
-    MONTH(t.dt_extracted) AS month,
-    DAY(t.dt_extracted) AS day
+    {year} AS year,
+    {month} AS month,
+    {day} AS day
 FROM
     tickets AS t
 INNER JOIN
     custom_field_values AS cfv
         ON cfv.id_ticket = t.id_ticket
         AND cfv.ts_updated = t.ts_updated
+INNER JOIN
+    custom_fields_with_title AS cfwt
+        ON cfwt.id_ticket = t.id_ticket
+        AND cfwt.ts_updated = t.ts_updated
 WHERE
     t.via_channel != "api"
     OR (

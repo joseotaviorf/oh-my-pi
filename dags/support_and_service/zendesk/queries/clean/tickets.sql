@@ -33,6 +33,8 @@ SELECT DISTINCT
 FROM
     datalake_zendesk_raw.tickets
 WHERE
-    dt IN ('{year}-{month}-{day}', CAST((CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY) AS STRING))
+    dt IN (CAST("{year}-{month}-{day}" AS DATE), CAST("{year}-{month}-{day}" AS DATE) + INTERVAL 1 DAY)
+    AND updated_at >= TIMESTAMP(CAST("{year}-{month}-{day}" AS DATE)) + INTERVAL 3 HOUR
+    AND updated_at < TIMESTAMP(CAST("{year}-{month}-{day}" AS DATE) + INTERVAL 1 DAY) + INTERVAL 3 HOUR
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_ticket, ts_updated ORDER BY dt_extracted DESC) = 1
