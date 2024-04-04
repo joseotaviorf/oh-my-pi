@@ -20,6 +20,8 @@ SELECT DISTINCT
     ts_initially_assigned,
     ts_solved,
     ts_latest_comment_added,
+    ts_created,
+    ts_updated,
     NOW() AS ts_load,
     {year} AS year,
     {month} AS month,

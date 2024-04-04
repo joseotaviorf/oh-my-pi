@@ -88,6 +88,14 @@ columns:
     lineage:
       - datalake_zendesk_clean.ticket_metrics.ts_solved
     description: Timestamp of when the ticket was solved
+  ts_created:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.ts_created
+    description: Timestamp of when the ticket metric was created
+  ts_updated:
+    lineage:
+      - datalake_zendesk_clean.ticket_metrics.ts_updated
+    description: Timestamp of when the ticket metric was updated
   ts_load:
     description: Timestamp of when data was loaded
   year:
