@@ -66,11 +66,13 @@ median_price_by_region AS (
   GROUP BY 
     1, 2
 )
-  SELECT 
-    dt_quarter,
-    sk_region,
-    concat(neighborhood, '/', city_name, '/', short_region_name) AS region_name,
-    median_price_per_m2
+  SELECT
+    NOW() AS ts_event,
+    MONOTONICALLY_INCREASING_ID() AS id, 
+    dt_quarter::DATE,
+    sk_region::BIGINT AS id_region,
+    concat(neighborhood, '/', city_name, '/', short_region_name)::STRING AS region_name,
+    median_price_per_m2::FLOAT
   FROM 
     median_price_by_region AS p
   INNER JOIN 

@@ -1,15 +1,17 @@
 SELECT DISTINCT
-    lbc.id_house,
-    UPPER(lbc.business_context) AS business_context,
-    COALESCE(pre.views_quantity, 0) AS views_quantity,
-    COALESCE(pre.lpv_temperature_region_context, 'NO VIEWS') AS demand_level,
-    hm.condominium_price_median,
-    hm.urban_property_tax_median,
-    hm.on_market_price_median,
-    hm.on_market_price_by_square_meter,
-    hm.off_market_price_median,
-    hm.off_market_price_by_square_meter,
-    hm.median_days_to_contract_sign
+    NOW() AS ts_event,
+    MONOTONICALLY_INCREASING_ID() AS id,
+    lbc.id_house::BIGINT,
+    UPPER(lbc.business_context)::STRING AS business_context,
+    COALESCE(pre.views_quantity, 0)::BIGINT AS views_quantity,
+    COALESCE(pre.lpv_temperature_region_context, 'NO_VIEWS')::STRING AS demand_level,
+    hm.condominium_price_median::BIGINT,
+    hm.urban_property_tax_median::BIGINT,
+    hm.on_market_price_median::BIGINT,
+    hm.on_market_price_by_square_meter::FLOAT,
+    hm.off_market_price_median::BIGINT,
+    hm.off_market_price_by_square_meter::FLOAT,
+    hm.median_days_to_contract_sign::BIGINT
 FROM datalake_ebdb_clean.listing_business_context lbc
 JOIN dw_public.dim_house_listing dhl
     ON lbc.id_house = dhl.id_house

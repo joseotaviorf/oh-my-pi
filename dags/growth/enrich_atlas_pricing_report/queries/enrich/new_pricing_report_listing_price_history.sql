@@ -1,37 +1,45 @@
 SELECT
-    id_house,
-    business_context,
-    dt_price_updated,
-    price,
-    status
+    NOW() AS ts_event,
+    MONOTONICALLY_INCREASING_ID() AS id,
+    id_house::BIGINT,
+    business_context::STRING,
+    dt_price_updated::DATE,
+    price::FLOAT,
+    status::STRING
 FROM datalake_atlas_pricing_report.status_history_house_listing
 
 UNION
 
 SELECT
-    id_house,
-    business_context,
-    dt_price_updated,
-    price,
-    status
+    NOW() AS ts_event,
+    MONOTONICALLY_INCREASING_ID() AS id,
+    id_house::BIGINT,
+    business_context::STRING,
+    dt_price_updated::DATE,
+    price::FLOAT,
+    status::STRING
 FROM datalake_atlas_pricing_report.status_history_house_negotiation
 
 UNION 
 
 SELECT
-    id_house,
-    business_context,
-    dt_price_updated,
-    price,
-    status
+    NOW() AS ts_event,
+    MONOTONICALLY_INCREASING_ID() AS id,
+    id_house::BIGINT,
+    business_context::STRING,
+    dt_price_updated::DATE,
+    price::FLOAT,
+    status::STRING
 FROM datalake_atlas_pricing_report.status_history_house_price_change
 
 UNION 
 
 SELECT
-    id_house,
-    business_context,
-    dt_price_updated,
-    price,
-    status
+    NOW() AS ts_event,
+    MONOTONICALLY_INCREASING_ID() AS id,
+    id_house::BIGINT,
+    business_context::STRING,
+    dt_price_updated::DATE,
+    price::FLOAT,
+    status::STRING
 FROM datalake_atlas_pricing_report.status_history_house_unpublished

@@ -41,11 +41,13 @@ house_views AS (
 )
 
 SELECT DISTINCT
-    m.sk_region AS id_region,
-    m.neighborhood,
-    UPPER(m.business_context) AS business_context,
-    APPROX_PERCENTILE(m.views_quantity, 0.50) OVER(PARTITION BY m.business_context, m.sk_region) AS lpv_p_50,
-    a.mdape_city
+    NOW() AS ts_event,
+    MONOTONICALLY_INCREASING_ID() AS id, 
+    m.sk_region::BIGINT AS id_region,
+    m.neighborhood::STRING,
+    UPPER(m.business_context)::STRING AS business_context,
+    APPROX_PERCENTILE(m.views_quantity, 0.50) OVER(PARTITION BY m.business_context, m.sk_region)::BIGINT AS lpv_p_50,
+    a.mdape_city::FLOAT
 FROM house_views m
 LEFT JOIN datalake_atlas_pricing_report.region_metrics AS a
     ON m.sk_region = a.id_region
