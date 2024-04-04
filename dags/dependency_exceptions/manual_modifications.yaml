@@ -400,6 +400,8 @@ bietlejuice.enrich_supply_taxonomy:
   add:
     - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
     - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
+bietlejuice.enrich_static_files_ss:
+  override: []
 bietlejuice.enrich_growth_taxonomy:
   remove:
     - bietlejuice.ebdb:load-clean-visit-origin

@@ -1,0 +1,12 @@
+dag:
+    name: enrich_static_files_ss
+    schedule_start_date: 2024, 3, 26
+    owner: Data SS
+    documentation:
+        dag_purpose: |
+            Static dag with the objective of loading any type of information that will be updated only when the data changes.
+workflow:
+    type: query
+    layer: enrich
+cluster:
+    type: databricks_10_4_med_general_cluster
