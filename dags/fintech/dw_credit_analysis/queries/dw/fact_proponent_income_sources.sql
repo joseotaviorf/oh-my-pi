@@ -138,7 +138,7 @@ get_calculated_income AS (
   SELECT
     id_proposal,
     IF(
-      max_presumed_income_per_bureau > sum_scr_income,
+      COALESCE(max_presumed_income_per_bureau,0) > COALESCE(sum_scr_income,0),
       max_presumed_income_per_bureau,
       sum_scr_income
     ) AS calculated_income
@@ -176,7 +176,7 @@ income_sources AS (
     pis.proponent_verified_income,
     pis.presumed_income_neoway AS proponent_presumed_income_neoway,
     pis.presumed_income_transunion AS proponent_presumed_income_transunion,
-    IF(ei.ratio_calculated_income >= 0.8, ei.sum_proponent_gross_income, ei.max_calculated_income) AS proposal_elected_income,
+    IF(ei.ratio_calculated_income >= 0.8, ei.sum_proponent_gross_income, ei.calculated_income) AS proposal_elected_income,
     pis.resident AS is_resident,
     pis.total_credit_evaluations,
     pis.is_main_user,
