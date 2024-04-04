@@ -9,6 +9,7 @@ bietlejuice.convenia_inactive_employee_salary_history:
   - bietlejuice.convenia_employee_salary_history:load-clean-employee-salary-history
 bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-invoice-issuance
+  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood:load-enrich-affiliate-costs
   - bietlejuice.robin_hood:load-clean-tax

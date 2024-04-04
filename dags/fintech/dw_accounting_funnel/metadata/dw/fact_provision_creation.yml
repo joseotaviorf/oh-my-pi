@@ -1,0 +1,55 @@
+---
+database_name: dw_accounting_funnel
+table_name: fact_provision_creation
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table brings all retsuko's bills that suppose to create an provisions and revertions in SAP's and check if it was created"
+columns:
+  sk_provision_creation:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.id_retsuko_provision_creation
+    description: "IN is from Invoice + ID Finance Entity from the source + ID to identify source + ID to identify revenue line"
+  id_business_entity:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.id_business_entity
+    description: "ID to identify Business Entity from the source"
+  id_finance_entity:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.id_finance_entity
+    description: "ID to identify Finance Entity from the source"
+  source_name:
+    description: "Product's name that is responsible to send Invoice's information"
+  revenue_name:
+    description: "What kind of revenue it refers to"
+  accrual_year_month:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.accrual_year_month
+    description: "Accrual year month from Retsuko's invoice"
+  source_provision_amount:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.source_provision_amount
+    description: "Provision that suppose to be create analyzing retsuko's bill"
+  sap_provision_amount:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.sap_provision_amount
+    description: "Provision that was created in SAP"
+  source_reversion_amount:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.source_reversion_amount
+    description: "Reversion that suppose to be create analyzing retsuko's bill"
+  sap_reversion_amount:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.sap_reversion_amount
+    description: "Reversion that was created in SAP"
+  is_provision_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_provision_compliance
+    description: "Boolean that indicated if the correct amount from provision arrived in the correct destination in SAP"
+  is_reversion_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_reversion_compliance
+    description: "Boolean that indicated if the correct amount from reversion arrived in the correct destination in SAP"
+  dt_created:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.dt_created
+    description: "Date that finance entity was created in source"

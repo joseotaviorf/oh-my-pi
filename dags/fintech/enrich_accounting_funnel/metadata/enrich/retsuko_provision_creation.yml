@@ -1,0 +1,57 @@
+---
+database_name: datalake_accounting_funnel
+table_name: retsuko_provision_creation
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table brings all retsuko bills that suppose to create an LCM provision and reversion in SAP's and check if it was created"
+columns:
+  id_retsuko_provision_creation:
+    lineage:
+      - datalake_retsuko.invoice_info.id_external
+    description: "IN is from Invoice + ID external from Retsuko's Invoice + 1 is a virtual ID to identify Seu Barriga + ID to identify revenue line"
+  id_business_entity:
+    lineage:
+      - datalake_retsuko_clean.contract.id
+    description: "ID to identify contract. It's de the external one in Main Database"
+  id_finance_entity:
+    lineage:
+      - datalake_retsuko.invoice_info.id_external
+    description: "External ID from Retusko's Invoice Table"
+  source_name:
+    description: "Product's name that is responsible to send Invoice's information"
+  revenue_name:
+    description: "What kind of revenue it refers to"
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+    description: "Accrual year month from Retsuko's invoice"
+  source_provision_amount:
+    lineage:
+      - datalake_retsuko.invoice.amount
+    description: "Provision that suppose to be create analyzing retsuko's bill"
+  sap_provision_amount:
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+    description: "Provision that was created in SAP"
+  source_reversion_amount:
+    lineage:
+      - datalake_retsuko.invoice.amount
+    description: "Reversion that suppose to be create analyzing retsuko's bill"
+  sap_reversion_amount:
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+    description: "Reversion that was created in SAP"
+  is_provision_compliance:
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+      - datalake_retsuko.invoice.amount
+    description: "Boolean that indicated if the correct amount from provision arrived in the correct destination in SAP"
+  is_reversion_compliance:
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+      - datalake_retsuko.invoice.amount
+    description: "Boolean that indicated if the correct amount from reversion arrived in the correct destination in SAP"
+  dt_created:
+    lineage:
+      - datalake_retsuko.invoice.ts_created
+    description: "Date that the invoice was created in Retusko"
