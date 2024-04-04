@@ -342,5 +342,10 @@ columns:
     lineage:
     - datalake_ebdb_contract.contract.ts_analyst_annulment_input
     description: Timestamp of the analyst's annulment input.
+  dt_ended_rental_confirmed:
+    lineage:
+    - datalake_ebdb_contract.contract.ts_analyst_annulment_input
+    - datalake_ebdb_contract.contract.dt_termination
+    description: Date when the ended rental was confirmed.
   ts_load:
     description: Timestamp of when this data row was last loaded.

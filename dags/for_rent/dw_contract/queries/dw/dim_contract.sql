@@ -54,6 +54,7 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
   CAST(c.ts_canceled AS TIMESTAMP) AS ts_canceled,
   c.ts_tenant_service_fee_opt_out,
   CAST(c.ts_analyst_annulment_input AS TIMESTAMP) AS ts_analyst_annulment_input,
+  DATE(COALESCE(c.ts_analyst_annulment_input,c.dt_termination)) AS dt_ended_rental_confirmed,
   NOW() AS ts_load
 FROM
     datalake_ebdb_contract.contract c
