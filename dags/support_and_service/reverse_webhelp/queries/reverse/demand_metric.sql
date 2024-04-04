@@ -29,6 +29,7 @@ SELECT DISTINCT
     dmt.ts_started,
     dmt.ts_solved,
     dmt.ts_closed,
+    dti.ticket_via,
     YEAR(CURRENT_DATE - 1) AS year,
     MONTH(CURRENT_DATE - 1) AS month,
     DAY(CURRENT_DATE - 1) AS day,
@@ -47,6 +48,9 @@ LEFT JOIN
 LEFT JOIN
     dw_customer_support.dim_agent AS da
         ON dmt.sk_agent = da.sk_agent
+LEFT JOIN 
+    dw_tickets.dim_ticket AS dti
+        ON dti.sk_ticket = dmt.sk_task
 WHERE
     DATE(dmt.ts_started) >= '2022-07-19'
     AND dd.is_partner IS TRUE
