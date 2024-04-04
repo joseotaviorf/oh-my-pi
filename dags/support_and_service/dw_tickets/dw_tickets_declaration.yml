@@ -11,6 +11,10 @@ workflow:
   type: query
   layer: dw
   custom_schema: tickets
+  tables_customization:
+    fact_ticket_events:
+      partitions: [year, month, day]
+      extraction_type: incremental
 cluster:
   type: databricks_10_4_med_general_photon_cluster
   access_control_list:
