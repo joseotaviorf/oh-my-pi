@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
 
-    proxy_path = "s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s-prod-02/{}/{}/{}/{}/kong-proxy.internal.kong-ingress*/*/*.gz"
+    proxy_path = "s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s-prod-*/{}/{}/{}/{}/kong-proxy.internal.kong-ingress*/*/*.gz"
 
     max_cores = int(multiprocessing.cpu_count() * 0.6)
 
