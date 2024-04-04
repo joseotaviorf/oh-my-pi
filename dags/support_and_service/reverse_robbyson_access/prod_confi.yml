@@ -1,0 +1,10 @@
+---
+dag_documentation:
+  dag_purpose:
+    "This dag aims to send analyst productivity data to the Robbyson tool. The dag proposes to send data from more than one line."
+api_url: https://integration-api.robbyson.com/v1
+endpoint: results
+configurations:
+  support_and_services:
+    results_table_path: dw_customer_support.fact_analysts_performance
+    analyst_key_column: sk_agent

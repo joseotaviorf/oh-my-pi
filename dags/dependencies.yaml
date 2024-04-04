@@ -3188,6 +3188,8 @@ bietlejuice.reverse_nexxera:
 bietlejuice.reverse_regions_polygon:
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.enrich_region:load-enrich-region
+bietlejuice.reverse_robbyson_access:
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance
 bietlejuice.reverse_sale_unavailable_listings_access:
   - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
 bietlejuice.reverse_sale_unavailable_listings_load:

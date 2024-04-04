@@ -853,6 +853,9 @@ bietlejuice.reverse_atlas_pricing_report_access:
   add:
     - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-engagement
     - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-listing-price-history
+bietlejuice.reverse_robbyson_access:
+  add:
+    - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance
 bietlejuice.reverse_tracksale:
   remove:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
