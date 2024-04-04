@@ -56,6 +56,22 @@ columns:
     description: Another custom field that holds a Twilio ID
     lineage:
       - datalake_zendesk_clean.tickets.custom_fields
+  group_name:
+    lineage:
+      - datalake_zendesk_clean.groups.name
+    description: Ticket group - department associated with the ticket
+  analyst_name:
+    lineage:
+      - datalake_support_users.analysts.name
+    description: Analyst name.
+  analyst_phone:
+    lineage:
+      - datalake_support_users.analysts.phone
+    description: Phone with which the analyst is registered.
+  analyst_organization:
+    lineage:
+      - datalake_support_users.analysts.organization
+    description: Name of the company where the analyst works.
   analyst_email:
     description: Email of the support analyst associated with the ticket
     lineage:
@@ -308,10 +324,10 @@ columns:
     description: If the ticket has public comments
     lineage:
       - datalake_zendesk_clean.tickets.is_public
-  dt_extracted:
+  ts_analysts_started:
     lineage:
-      - datalake_zendesk_clean.tickets.dt_extracted
-    description: Extraction date of the data
+      - datalake_support_users.analysts.ts_created
+    description: Timestamp that indicates when the analyst was first registered.
   ts_created:
     description: Timestamp of ticket creation
     lineage:

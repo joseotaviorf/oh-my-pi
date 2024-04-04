@@ -2837,6 +2837,7 @@ bietlejuice.enrich_wordpress_baroes:
   - bietlejuice.wordpress_baroes:load-clean-conteudos-data
   - bietlejuice.wordpress_baroes:load-clean-meulugar-data
 bietlejuice.enrich_zendesk:
+  - bietlejuice.zendesk:load-clean-groups
   - bietlejuice.zendesk:load-clean-ticket-fields
   - bietlejuice.zendesk:load-clean-ticket-metrics
   - bietlejuice.zendesk:load-clean-tickets
