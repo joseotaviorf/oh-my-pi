@@ -13,18 +13,13 @@ ssn_original_payment AS (
 ssn_boletao AS (
     SELECT DISTINCT
         d.id_external AS id_invoice,
-        i.id_external AS id_invoice_extra,
-        i.id_contract_external AS id_contract
-    FROM datalake_retsuko.invoice AS i
-    LEFT JOIN datalake_trato_feito_clean.accounting_installment AS ai
-        ON ai.id_external = i.id_external
-    LEFT JOIN datalake_debt_recovery.installment AS ii
-        ON ii.id = ai.id_installment
-    LEFT JOIN datalake_debt_recovery.negotiation AS n
-        ON ii.id_negotiation = n.id_negotiation
-    LEFT JOIN datalake_trato_feito_clean.debt AS d
-        ON ii.id_negotiation = d.id_negotiation
-    WHERE i.purpose = 'extra' and i.reason = 'negotiation-5A'
+        n.id_contract
+    FROM
+        datalake_trato_feito_clean.debt AS d
+    LEFT JOIN
+        datalake_debt_recovery.negotiation AS n
+            ON d.id_negotiation = n.id_negotiation
+    WHERE n.collector = "5A-collector"
 )
 SELECT
     CONCAT(o.id_invoice, "-", DATE_FORMAT(dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
