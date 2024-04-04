@@ -92,6 +92,7 @@ for table in TABLES:
         table_name=raw_table_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=extraction_spark_job_file,
+        has_hive_sync=False,
         raw_spark_job_extra_args=[
             SOURCE,
             AZURE_CONTAINER_NAME,

@@ -93,12 +93,13 @@ if __name__ == "__main__":
         f"""m=__main__, msg=File name to be processed: {blob_storage_path}"""
     )
 
+    azure_table_name = table_name.upper()
     try:
-        df = s3_consumer.get_data_from_file(path=f"{blob_storage_path}/{table_name}/", format=format)
+        df = s3_consumer.get_data_from_file(path=f"{blob_storage_path}/{azure_table_name}/", format=format)
     except AnalysisException as error:
         logger.warning(
             f"""
-            m=__main__, msg=No data found for {blob_storage_path}, table_name={table_name}.
+            m=__main__, msg=No data found for {blob_storage_path}, table_name={azure_table_name}.
 
             Exception: {error}
             """
