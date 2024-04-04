@@ -17,10 +17,8 @@ WITH json_select AS(
         day
     FROM
         datalake_crawlers_listings_clean.viva_real
-    WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+    WHERE
+        MAKE_DATE(year, month, day) = DATE('{load_date}')
 )
     SELECT
         id_house_platform,

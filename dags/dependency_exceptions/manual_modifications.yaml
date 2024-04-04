@@ -505,6 +505,9 @@ bietlejuice.enrich_offer:
 bietlejuice.enrich_olos_dialer:
   remove:
     - bietlejuice.olos_dialer:load-clean-mailing
+bietlejuice.enrich_olx_crawler_listings:
+  remove:
+    - bietlejuice.listings.olx:load-clean-olx
 bietlejuice.enrich_online_attribution:
   remove:
     - bietlejuice.amplitude:load-clean-170698-user-merge
@@ -548,11 +551,6 @@ bietlejuice.enrich_rede_company_event:
 bietlejuice.enrich_rede_supply:
   remove:
     - bietlejuice.ebdb:load-clean-user
-bietlejuice.enrich_rental_crawlers_listings:
-  remove:
-    - bietlejuice.listings.olx:load-clean-olx
-    - bietlejuice.listings.viva_real:load-clean-viva-real
-    - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
 bietlejuice.enrich_rental_historical_follow_up:
   add:
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
@@ -771,6 +769,12 @@ bietlejuice.enrich_vespucio_pipeline:
     - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
     - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
     - bietlejuice.sindico_net:load-clean-condominium
+bietlejuice.enrich_viva_real_crawler_listings:
+  remove:
+    - bietlejuice.listings.viva_real:load-clean-viva-real
+bietlejuice.enrich_zap_imoveis_crawler_listings:
+  remove:
+    - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
 bietlejuice.enrich_zendesk_ticket_funnels:
   remove:
     - bietlejuice.zendesk_tickets:load-clean-groups

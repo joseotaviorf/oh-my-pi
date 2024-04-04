@@ -1,0 +1,30 @@
+---
+dag:
+  name: enrich_zap_imoveis_crawler_listings
+  schedule_start_date: 2021, 7, 20
+  owner: Data ForRent
+  schedule_interval: 0 6 * * 2
+  documentation: 
+    dag_purpose: |
+      Creates enriched table for the context `Crawlers Listings` from Zap Imoveis.
+      The `datalake_crawlers_listings` schema has tables that extract data from OLX, VivaReal and Zap Imoveis  websites.
+      The ingestion is incremental, partitioned on city, year, month and day columns.
+      This DAG runs once a week (Tuesday) and it's triggered by Airflow.
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: crawlers_listings
+  default_extraction_type: incremental
+  default_partitions:
+    - address_city
+    - year
+    - month
+    - day
+  extra_query_template_params:
+    load_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_date') }}"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5.xlarge
+    node_type_id: c5d.4xlarge
+    num_workers: 2
