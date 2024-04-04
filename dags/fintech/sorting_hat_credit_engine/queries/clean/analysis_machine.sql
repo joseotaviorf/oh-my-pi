@@ -6,6 +6,7 @@ SELECT
   subject_type,
   type,
   is_current_machine,
+  machine_version,
   TIMESTAMP(created_at) AS ts_created,
   TIMESTAMP(updated_at) AS ts_updated
 FROM

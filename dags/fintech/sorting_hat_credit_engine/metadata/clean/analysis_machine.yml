@@ -22,6 +22,9 @@ columns:
   is_current_machine:
     lineage:
       - datalake_sorting_hat_raw.analysismachine.is_current_machine
+  machine_version:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.machine_version
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.analysismachine.created_at
