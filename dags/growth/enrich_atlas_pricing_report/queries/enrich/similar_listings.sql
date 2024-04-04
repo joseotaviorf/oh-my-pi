@@ -26,7 +26,7 @@ WITH listings AS (
         CASE
             WHEN lbc.business_context = 'RENT' AND fhl.days_listing_to_contract_signed >= 0 THEN days_listing_to_contract_signed
             WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL AND dd.date <= ff.ts_sale_agreement_signed
-                THEN DATEDIFF(dd.date, ff.ts_sale_agreement_signed)
+                THEN DATEDIFF(ff.ts_sale_agreement_signed,dd.date)
         END AS days_to_contract_sign,
         dhl.house_condo,
         dhl.house_iptu,
