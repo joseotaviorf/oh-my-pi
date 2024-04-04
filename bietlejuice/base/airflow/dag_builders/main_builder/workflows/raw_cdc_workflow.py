@@ -190,23 +190,26 @@ class RawCDCWorkflow(BaseWorkflow):
         raw_table_attributes_lower_case = TableAttributes.from_attributes(
             raw_table_attributes, table_name=raw_table_attributes.table_name.lower()
         )
-        register_delta_table_raw_task = self.register_delta_table_task_creator.create_task(
-            raw_table_attributes_lower_case
-        )
+        load_raw_task >> optimize_raw_task
 
-        load_raw_task >> (register_delta_table_raw_task, optimize_raw_task)
-
-        if self._check_include_propagate_metadata_task(raw_table_attributes_lower_case):
-            propagate_table_lineage_raw_task = self.propagate_metadata_task_creator.create_task(
+        if self._check_include_sync_hive_tasks(raw_table_attributes_lower_case):
+            register_delta_table_raw_task = self.register_delta_table_task_creator.create_task(
                 raw_table_attributes_lower_case
             )
-            (
-                register_delta_table_raw_task
-                >> propagate_table_lineage_raw_task
-                >> dummy_terminate_job_cluster_task
-            )
-        else:
-            register_delta_table_raw_task >> dummy_terminate_job_cluster_task
+            load_raw_task >> register_delta_table_raw_task
+            if self._check_include_propagate_metadata_task(
+                raw_table_attributes_lower_case
+            ):
+                propagate_table_lineage_raw_task = self.propagate_metadata_task_creator.create_task(
+                    raw_table_attributes_lower_case
+                )
+                (
+                    register_delta_table_raw_task
+                    >> propagate_table_lineage_raw_task
+                    >> dummy_terminate_job_cluster_task
+                )
+            else:
+                register_delta_table_raw_task >> dummy_terminate_job_cluster_task
 
         if self._check_include_data_quality_task(raw_table_attributes_lower_case):
             data_quality_tests_raw_task = self.data_quality_task_creator.create_task(
@@ -234,21 +237,24 @@ class RawCDCWorkflow(BaseWorkflow):
         load_clean_task = self.load_cdc_clean_task_creator.create_task(
             clean_table_attributes
         )
-
-        register_delta_table_clean_task = self.register_delta_table_task_creator.create_task(
-            clean_table_attributes
-        )
-
-        propagate_table_metadata_clean_task = self.propagate_metadata_task_creator.create_task(
-            clean_table_attributes
-        )
-
-        (
-            load_clean_task
-            >> register_delta_table_clean_task
-            >> propagate_table_metadata_clean_task
-        )
         load_clean_task >> optimize_clean_task
+        last_clean_task = load_clean_task
+
+        if self._check_include_sync_hive_tasks(clean_table_attributes):
+            register_delta_table_clean_task = self.register_delta_table_task_creator.create_task(
+                clean_table_attributes
+            )
+
+            propagate_table_metadata_clean_task = self.propagate_metadata_task_creator.create_task(
+                clean_table_attributes
+            )
+            last_clean_task = propagate_table_metadata_clean_task
+
+            (
+                load_clean_task
+                >> register_delta_table_clean_task
+                >> propagate_table_metadata_clean_task
+            )
 
         if self._check_include_data_quality_task(clean_table_attributes):
             data_quality_tests_clean_task = self.data_quality_task_creator.create_task(
@@ -260,4 +266,4 @@ class RawCDCWorkflow(BaseWorkflow):
                 >> dummy_terminate_job_cluster_task
             )
 
-        return load_clean_task, propagate_table_metadata_clean_task
+        return load_clean_task, last_clean_task

@@ -99,31 +99,32 @@ class RawDatabasePullWorkflow(BaseWorkflow):
             )
         )
 
-        sync_metastore_structure_raw_task = self.sync_hive_structure_task_creator.create_task(
-            raw_table_attributes
-        )
-
-        sync_metastore_partitions_raw_task = self.sync_hive_partitions_task_creator.create_task(
-            raw_table_attributes
-        )
-
-        (
-            load_raw_task
-            >> sync_metastore_structure_raw_task
-            >> sync_metastore_partitions_raw_task
-        )
-
-        if self._check_include_propagate_metadata_task(raw_table_attributes):
-            propagate_table_lineage_raw_task = self.propagate_metadata_task_creator.create_task(
+        if self._check_include_sync_hive_tasks(raw_table_attributes):
+            sync_metastore_structure_raw_task = self.sync_hive_structure_task_creator.create_task(
                 raw_table_attributes
             )
-            (
-                sync_metastore_partitions_raw_task
-                >> propagate_table_lineage_raw_task
-                >> last_task
+
+            sync_metastore_partitions_raw_task = self.sync_hive_partitions_task_creator.create_task(
+                raw_table_attributes
             )
-        else:
-            sync_metastore_partitions_raw_task >> last_task
+
+            (
+                load_raw_task
+                >> sync_metastore_structure_raw_task
+                >> sync_metastore_partitions_raw_task
+            )
+
+            if self._check_include_propagate_metadata_task(raw_table_attributes):
+                propagate_table_lineage_raw_task = self.propagate_metadata_task_creator.create_task(
+                    raw_table_attributes
+                )
+                (
+                    sync_metastore_partitions_raw_task
+                    >> propagate_table_lineage_raw_task
+                    >> last_task
+                )
+            else:
+                sync_metastore_partitions_raw_task >> last_task
 
         if self._check_include_data_quality_task(raw_table_attributes):
             data_quality_tests_raw_task = self.data_quality_task_creator.create_task(
@@ -151,26 +152,29 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         load_clean_task = self.load_query_clean_task_creator.create_task(
             clean_table_attributes
         )
+        last_clean_task = load_clean_task
 
-        sync_metastore_structure_clean_task = self.sync_hive_structure_task_creator.create_task(
-            clean_table_attributes
-        )
+        if self._check_include_sync_hive_tasks(clean_table_attributes):
+            sync_metastore_structure_clean_task = self.sync_hive_structure_task_creator.create_task(
+                clean_table_attributes
+            )
 
-        sync_metastore_partitions_clean_task = self.sync_hive_partitions_task_creator.create_task(
-            clean_table_attributes
-        )
+            sync_metastore_partitions_clean_task = self.sync_hive_partitions_task_creator.create_task(
+                clean_table_attributes
+            )
 
-        propagate_table_metadata_clean_task = self.propagate_metadata_task_creator.create_task(
-            clean_table_attributes
-        )
+            propagate_table_metadata_clean_task = self.propagate_metadata_task_creator.create_task(
+                clean_table_attributes
+            )
+            last_clean_task = propagate_table_metadata_clean_task
 
-        (
-            load_clean_task
-            >> sync_metastore_structure_clean_task
-            >> sync_metastore_partitions_clean_task
-            >> propagate_table_metadata_clean_task
-            >> last_task
-        )
+            (
+                load_clean_task
+                >> sync_metastore_structure_clean_task
+                >> sync_metastore_partitions_clean_task
+                >> propagate_table_metadata_clean_task
+                >> last_task
+            )
 
         if self._check_include_data_quality_task(clean_table_attributes):
             data_quality_tests_clean_task = self.data_quality_task_creator.create_task(
@@ -178,7 +182,7 @@ class RawDatabasePullWorkflow(BaseWorkflow):
             )
             (load_clean_task >> data_quality_tests_clean_task >> last_task)
 
-        return load_clean_task, propagate_table_metadata_clean_task
+        return load_clean_task, last_clean_task
 
     def _should_add_get_table_metrics(self, tables_customization: dict) -> bool:
         if self.workflow_args["database_type"] != "postgres":
