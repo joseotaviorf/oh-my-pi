@@ -18,6 +18,6 @@ SELECT DISTINCT
 FROM
   datalake_zendesk_raw.satisfaction_ratings
 WHERE
-  dt IN (CAST('{year}-{month}-{day}' AS DATE), CAST((CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY) AS STRING))
+  dt IN (MAKE_DATE({year}, {month}, {day}), MAKE_DATE({year}, {month}, {day}) + INTERVAL 1 DAY)
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_satisfaction_rating, ts_updated ORDER BY dt_extracted DESC) = 1

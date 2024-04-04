@@ -27,14 +27,14 @@ SELECT DISTINCT
     CAST(created_at AS TIMESTAMP) AS ts_created,
     CAST(updated_at AS TIMESTAMP) AS ts_updated,
     NOW() AS ts_load,
-    YEAR(CAST(dt AS DATE)) AS year,
-    MONTH(CAST(dt AS DATE)) AS month,
-    DAY(CAST(dt AS DATE)) AS day
+    {year} AS year,
+    {month} AS month,
+    {day} AS day
 FROM
     datalake_zendesk_raw.tickets
 WHERE
-    dt IN (CAST("{year}-{month}-{day}" AS DATE), CAST("{year}-{month}-{day}" AS DATE) + INTERVAL 1 DAY)
-    AND updated_at >= TIMESTAMP(CAST("{year}-{month}-{day}" AS DATE)) + INTERVAL 3 HOUR
-    AND updated_at < TIMESTAMP(CAST("{year}-{month}-{day}" AS DATE) + INTERVAL 1 DAY) + INTERVAL 3 HOUR
+    dt IN (MAKE_DATE({year}, {month}, {day}), MAKE_DATE({year}, {month}, {day}) + INTERVAL 1 DAY)
+    AND updated_at >= TIMESTAMP(MAKE_DATE({year}, {month}, {day})) + INTERVAL 3 HOUR
+    AND updated_at < TIMESTAMP(MAKE_DATE({year}, {month}, {day}) + INTERVAL 1 DAY) + INTERVAL 3 HOUR
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_ticket, ts_updated ORDER BY dt_extracted DESC) = 1
