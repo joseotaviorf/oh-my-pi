@@ -1,7 +1,7 @@
 ---
 dag_documentation:
-  dag_purpose:
-    "This dag aims to send analyst productivity data to the Robbyson tool. The dag proposes to send data from more than one line."
+  dag_purpose: |
+    This dag aims to send analyst productivity data to the Robbyson tool. The dag proposes to send data from more than one line.
 api_url: https://integration-api.robbyson.com/v1
 endpoint: results
 configurations:
