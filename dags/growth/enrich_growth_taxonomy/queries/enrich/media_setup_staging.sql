@@ -103,3 +103,12 @@ LEFT JOIN
       AND nc.medium = ms.medium
       AND nc.source = ms.source
       AND nc.funnel_side = ms.funnel_side
+LEFT ANTI JOIN 
+    datalake_growth_taxonomy.ad_hoc_rules AS ad_hoc
+    ON nc.campaign_business_context = ad_hoc.campaign_business_context
+      AND nc.campaign_strategy_intent = ad_hoc.campaign_strategy_intent
+      AND nc.campaign_landing_page = ad_hoc.campaign_landing_page
+      AND nc.behavior_type = ad_hoc.behavior_type
+      AND nc.medium = ad_hoc.medium
+      AND nc.source = ad_hoc.source
+      AND nc.funnel_side = ad_hoc.funnel_side
