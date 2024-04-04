@@ -1,38 +1,19 @@
 WITH 
 house_listing_contracts AS (
-  WITH 
-  latest_contract AS (
-    SELECT
-      id_house_listing,
-      MAX(id_contract) AS id_contract,
-      MAX(id_previous_contract) AS id_previous_contract,
-      DENSE_RANK() OVER (PARTITION BY id_house ORDER BY id_house_listing) AS order_renting
-    FROM
-      datalake_listing_contracts.listing_contracts
-    WHERE
-      contract_status IN ('Ativo', 'Finalizado')
-    GROUP BY 
-      id_house_listing, id_house
-  )
   SELECT
     hl.id_house_listing,
     c.id AS id_contract,
     hl.id_house,
-    lc.id_previous_contract,
     hl.version AS house_version,
-    lc.order_renting,
-    COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
     c.ts_signed AS ts_contract_signed,
-    c.dt_termination AS dt_contract_annulment,
-    LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed
+    c.dt_termination AS dt_contract_annulment
   FROM
     datalake_ebdb_listing.house_listing AS hl
   LEFT JOIN
-    latest_contract AS lc
-        ON hl.id_house_listing = lc.id_house_listing
-  LEFT JOIN
     datalake_ebdb_contract.contract AS c
-        ON c.id = lc.id_contract
+      ON hl.id_house = c.id_house
+        AND c.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, CURRENT_DATE)
+        AND c.status IN ('Ativo', 'Finalizado')
 ),
 ended_rentals_confirmed AS (
   SELECT 
