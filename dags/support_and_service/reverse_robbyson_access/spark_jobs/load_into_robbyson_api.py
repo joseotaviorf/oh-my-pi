@@ -34,7 +34,7 @@ def create_results_payload(configurations: dict, execution_date: str, context: s
 
         for row in results_df.collect():
             results_json = {
-                "collaboratorIdentification": row[{configurations["analyst_key_column"]}],
+                "collaboratorIdentification": row[configurations["analyst_key_column"]],
                 "indicadorId": int(key),
                 "resultado": 0,
                 "date": row['date'],
