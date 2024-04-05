@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import reduce
 import json
 import logging
@@ -99,6 +99,7 @@ if __name__ == "__main__":
     consumer_extra_args = json.loads(args.consumer_extra_args)
     partition_cols = ["year", "month", "day"]
     datetime_to_ingest = datetime.strptime(date_to_ingest, "%Y-%m-%d")
+    datetime_to_ingest = datetime_to_ingest if 'recupera' not in source_root_path else datetime_to_ingest + timedelta(days=1)
     format = args.format if args.format != "None" else None
     col_names = json.loads(args.col_names) if args.col_names != "None" else None
 
