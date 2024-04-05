@@ -21,7 +21,7 @@ def create_results_payload(configurations: dict, execution_date: str, context: s
     results_df = spark.sql(f"""
         SELECT 
             *, 
-            MAKE_DATE(year, month, day) AS date 
+            STRING(MAKE_DATE(year, month, day)) AS date 
         FROM 
             {configurations["results_table_path"]}
         WHERE 
