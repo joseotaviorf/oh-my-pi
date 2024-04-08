@@ -35,7 +35,7 @@ collection_base AS (
     INNER JOIN datalake_recupera_clean.complementary_records AS cr
         ON opr.id_creditor = cr.id_creditor
             AND opr.id_customer = cr.id_customer
-    INNER JOIN datalake_recupera_clean.records AS r
+    LEFT JOIN datalake_recupera_clean.records AS r
         ON r.id_customer = opr.id_customer
     LEFT JOIN datalake_recupera_clean.status AS s
         ON opr.collesction_customer_situation = s.id_status
