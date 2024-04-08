@@ -16,6 +16,18 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.status
     description: Status of the contract termination.
+  send_utility_bills_receipt:
+    lineage:
+      - datalake_offboarding.contract_termination.send_utility_bills_receipt
+    description: Status of the bills receipt.
+  attachment_type_list:
+    lineage:
+      - datalake_offboarding.contract_termination.attachment_type_list
+    description: List of the attachment's type associated to the termination.
+  dt_ended_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_ended_termination
+    description: End date of the contract's termination.
   ts_created:
     lineage:
       - datalake_offboarding.contract_termination.ts_created
