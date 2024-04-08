@@ -139,6 +139,8 @@ columns:
     lineage:
       - datalake_insider_clean.review_feature.rating_selected
     description: The reason why the reservation was transferred.
+  country_code:
+    description: Identifies the country
   sla_achieved:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.seconds_wait_time

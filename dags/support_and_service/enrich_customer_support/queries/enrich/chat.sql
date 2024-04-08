@@ -193,6 +193,10 @@ quinto_messenger_tasks AS (
     t.seconds_to_first_response AS seconds_first_reply,
     t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
     t.department,
+    CASE
+        WHEN t.department LIKE "%MX%" THEN "MX"
+        ELSE "BR"
+    END AS country_code,
     to.task_completion_reason AS completion_reason,
     t.transferred_from_dept,
     t.transferred_to_dept,
@@ -256,6 +260,10 @@ quinto_messenger_tasks AS (
     t.seconds_to_first_response AS seconds_first_reply,
     t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
     t.department,
+    CASE
+        WHEN t.department LIKE "%MX%" THEN "MX"
+        ELSE "BR"
+    END AS country_code,
     t.completion_reason,
     t.transferred_from_dept,
     t.transferred_to_dept,
@@ -533,6 +541,7 @@ SELECT DISTINCT
   qmt.origin AS ticket_origin,
   qmt.agent_email,
   qmt.department,
+  qmt.country_code,
   zti.zendesk_ticket_department AS zendesk_department,
   ldep.first_department,
   ldep.last_department,

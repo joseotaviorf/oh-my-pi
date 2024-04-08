@@ -70,6 +70,10 @@ segment AS (
         THEN 'external'
     END AS transference_type,
     tr.transference_reason,
+    CASE
+        WHEN queue_name LIKE "%MX%" THEN "MX"
+        ELSE "BR"
+    END AS country_code,
     seconds_wait_time,
     seconds_duration,
     seconds_talk_time,
@@ -390,6 +394,7 @@ conversation_and_segment AS (
     t.transferred_to_dept,
     t.transference_type,
     t.transference_reason,
+    t.country_code,
     seconds_total_wait_time,
     c.total_minutes_reception_time,
     t.seconds_duration/60.0 AS segment_minutes_duration,
@@ -465,6 +470,7 @@ SELECT DISTINCT
   c.transferred_to_dept,
   c.transference_type,
   c.transference_reason,
+  c.country_code,
   CASE
     WHEN c.seconds_total_wait_time <= 60 AND c.is_answered THEN TRUE
     WHEN c.seconds_total_wait_time > 60 AND c.is_answered THEN FALSE

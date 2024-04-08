@@ -94,6 +94,8 @@ columns:
     lineage:
       - datalake_quinto_messenger.task_event.task_queue_name
     description: The department name of the Twilio task, defined in Twilio as the queue name.
+  country_code:
+    description: Identifies the country
   zendesk_department:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
