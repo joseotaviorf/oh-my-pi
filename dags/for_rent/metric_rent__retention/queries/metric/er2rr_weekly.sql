@@ -50,7 +50,7 @@ contract_signed AS (
 metric_calculations AS (
   SELECT
     DATE_TRUNC('WEEK',erc.dt_ended_rental_confirmed) AS week_ref,
-    erc.value_segment,
+    erc.value_segment AS category,
     COUNT(DISTINCT erc.sk_house_listing) AS qtd_ended_rental,
     COUNT(DISTINCT cs.sk_contract) AS qtd_rerental,
     COUNT(DISTINCT 
