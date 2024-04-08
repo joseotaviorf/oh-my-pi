@@ -307,6 +307,21 @@ table_block_list:
   - Portability
   - Portability_AUD
   - WorkContract
+  - processedmessage
+  - categoriestagscale
+  - categoriestagscale_aud
+  - categoryimovel_aud
+  - categorytag
+  - categorytag_aud
+  - category_aud
+  - categoriesscore_aud
+  - categoriestag_aud
+  - categoriestagimovel
+  - categoriestagimovel_aud
+  - listingownerrelationmigrationexecutiontable
+  - mudancastatusimovel
+  - administrationplan
+  - administrationplan_aud
 
 view_allow_list:
   - MapRegiao
