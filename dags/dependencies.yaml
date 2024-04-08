@@ -2025,6 +2025,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.gsheets_support_and_service:done-clean-inspection-analysis-forms
   - bietlejuice.terminator:load-clean-application-user
+  - bietlejuice.terminator:load-clean-attachment
   - bietlejuice.terminator:load-clean-negotiation
   - bietlejuice.terminator:load-clean-rev-info
   - bietlejuice.terminator:load-clean-termination

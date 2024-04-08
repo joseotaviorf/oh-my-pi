@@ -388,6 +388,14 @@ house_region AS (
     LEFT JOIN
         datalake_ebdb_clean.house
             ON ctrt.id_house = house.id
+),
+termination_attachments AS (
+  SELECT
+    id_termination,
+    COLLECT_SET(type) AS attachment_type_list
+  FROM
+    datalake_terminator_clean.attachment
+  GROUP BY 1
 )
 SELECT
     term.id AS id_termination,
@@ -428,6 +436,7 @@ SELECT
         ELSE 'Automatic'
     END AS type,
     GET_JSON_OBJECT(term.tenant_keys_location, '$.location') AS tenant_key_location,
+    GET_JSON_OBJECT(term.tenant_pending_tasks, '$.sendUtilityBillsReceipt') AS send_utility_bills_receipt,
     term.tenant_keys_location AS tenant_key_detail,
     term.owner_keys_location AS owner_key_detail,
     term.utility_bill_info,
@@ -435,6 +444,7 @@ SELECT
     aui.email AS application_user_email,
     ci.b2b_type,
     ci.b2b_prime_type,
+    at.attachment_type_list,
     neg.repair_resolution,
     ln.fee_payment_option,
     ln.fee_negotiation_status,
@@ -471,6 +481,7 @@ SELECT
     ci.is_exit_inspection_opted_out,
     tw.has_automatically_closed_task,
     term.dt_vacancy AS dt_termination,
+    term.dt_ended_termination,
     tm.dt_last_updated AS dt_last_rescheduled,
     TO_DATE(lis.dt_last_inspection_synch) AS dt_last_inspection_synched,
     ci.dt_start AS dt_contract_started,
@@ -544,3 +555,6 @@ LEFT JOIN
 LEFT JOIN
     campaign AS cmp
         ON cc.id_campaign = cmp.id
+LEFT JOIN
+    termination_attachments AS at
+        ON term.id = at.id_termination

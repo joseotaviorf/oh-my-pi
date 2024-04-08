@@ -177,6 +177,10 @@ columns:
     description: Property key delivery information by the tenant
     lineage:
       - datalake_terminator_clean.termination.tenant_keys_location
+  send_utility_bills_receipt:
+    description: Status of the bills receipt.
+    lineage:
+      - datalake_terminator_clean.termination.tenant_pending_tasks
   owner_key_detail:
     description: Property key delivery information by the owner
     lineage:
@@ -201,6 +205,10 @@ columns:
     description: Type of B2B client prime from which comes the contract.
     lineage:
       - datalake_ebdb_contract.contract_b2b.b2b_prime_type
+  attachment_type_list:
+    description: List of the attachment's type associated to the termination.
+    lineage:
+      - datalake_terminator_clean.attachment.type
   repair_resolution:
     description: Classifies type of repair when there is one in the Offboarding process
     lineage:
@@ -309,6 +317,10 @@ columns:
     description: Date of the contract's termination.
     lineage:
       - datalake_terminator_clean.termination.dt_vacancy
+  dt_ended_termination:
+    description: End date of the contract's termination.
+    lineage:
+      - datalake_terminator_clean.termination.dt_ended_termination
   dt_last_rescheduled:
     description: Last scheduled date
     lineage:
