@@ -10,4 +10,4 @@ SELECT
 FROM
     datalake_hefesto_raw.worker_portfolio_event
 WHERE
-    year >= 2024
+    created_at >= '2024-03-01'
