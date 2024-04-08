@@ -12,6 +12,10 @@ columns:
         description: "Identification number of the propose related to the ticket"
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
+    id_delinquency:
+        description: "Identification number of the delinquency related to the ticket"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
     request_error:
         description: "Description of the request error"
         lineage:
@@ -46,6 +50,10 @@ columns:
             - datalake_velo_zendesk_clean.tickets.custom_fields
     overdue_amount:
         description: "Overdue amount (paid to the broker)"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    has_payment_forwarded:
+        description: "Flag indicating if the ticket has payment forwarded. Filled in the moment when the ticket is closed"
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
     dt_request_return:

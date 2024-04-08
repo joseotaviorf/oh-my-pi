@@ -29,6 +29,7 @@ GROUP BY 1
     SELECT
         base.id_ticket,
         COALESCE(base.custom_fields['ID da proposta do inquilino'], base.custom_fields['ID da Proposta']) AS id_propose,
+        base.custom_fields['ID da Delinquency'] AS id_delinquency,
         base.custom_fields['Erros de Solicitação '] AS request_error,
         COALESCE(base.custom_fields['Tipo de Solicitação'], base.custom_fields['Prazo de recebimento']) AS request_type,
         base.custom_fields['Motivo do cancelamento '] AS cancellation_reason,
@@ -36,8 +37,9 @@ GROUP BY 1
         base.custom_fields['Motivo de Contato'] AS contact_reason,
         base.custom_fields['Nome do inquilino'] AS tenant_name,
         base.custom_fields['Solicitação do Cliente'] AS client_request,
-        base.custom_fields['Valor inadimplente (pago à imob)'] AS overdue_amount,
+        COALESCE(base.custom_fields['Valor inadimplente (pago à imob)'], base.custom_fields['Overdue amount']) AS overdue_amount,
         base.custom_fields['Acionamento de garantia'] AS guarantee_activation,
+        base.custom_fields['Encaminhado para Pagamento'] AS has_payment_forwarded,
         CAST(base.custom_fields['Retorno a Acionamento'] AS DATE) AS dt_request_return,
         CAST(base.custom_fields['Pré tombamento'] AS DATE) AS dt_submission,
         CAST(base.custom_fields['Data de vencimento original'] AS DATE) AS dt_due_original,

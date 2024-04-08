@@ -24,6 +24,10 @@ columns:
     description: "Identification number of the submitter"
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_submitter
+  id_delinquency:
+    description: "Identification number of the delinquency related to the ticket"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.id_delinquency
   request_error:
     description: "Request error description"
     lineage:
@@ -112,6 +116,10 @@ columns:
     description: "Flag indicating if the ticket has incidents related"
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.has_incidents
+  has_payment_forwarded:
+    description: "Flag indicating if the ticket has payment forwarded. Filled in the moment when the ticket is closed"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.has_payment_forwarded
   is_public:
     description: "Flag indicating if the ticket is public"
     lineage:

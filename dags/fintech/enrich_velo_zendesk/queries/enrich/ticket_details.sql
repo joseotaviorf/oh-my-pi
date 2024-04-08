@@ -22,6 +22,7 @@ last_register AS (
     SELECT
         th.id_ticket,
         SUBSTRING(REGEXP_EXTRACT(th.description, 'Este é um acompanhamento da sua solicitação anterior #([0-9]+)',0),55,6) as id_main_ticket,
+        cf.id_delinquency,
         th.id_assignee,
         th.id_group,
         th.id_requester,
@@ -59,6 +60,11 @@ last_register AS (
         th.has_incidents,
         th.is_public,
         lr.ts_updated = th.ts_updated AS is_last_register,
+        CASE
+            WHEN cf.has_payment_forwarded = 'não_inad' THEN FALSE
+            WHEN cf.has_payment_forwarded = 'sim_inad' THEN TRUE
+            ELSE NULL
+        END AS has_payment_forwarded,
         th.dt_extracted,
         th.ts_created,
         th.ts_created_local,
