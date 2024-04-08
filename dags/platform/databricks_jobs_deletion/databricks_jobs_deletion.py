@@ -54,6 +54,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME),
 )
 
+previous_task = None
 for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
     delete_jobs_task = PythonOperator(
         task_id=f"delete-{project}-databricks-jobs",
@@ -64,3 +65,7 @@ for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
             "job_name_regex": job_name_regex,
         },
     )
+    # We're making them all sequential instead of parallel due to the Databricks API rate limit
+    if previous_task:
+        previous_task >> delete_jobs_task
+    previous_task = delete_jobs_task
