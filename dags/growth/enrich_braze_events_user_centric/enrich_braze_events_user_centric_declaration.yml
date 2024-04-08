@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_braze_events_user_centric
+  schedule_start_date: 2020, 11, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: This DAG creates the incremental enriched table for Braze user centric events with every campaign/canvas groupped daily.
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: braze_user_centric
+  default_extraction_type: incremental
+  default_partitions:
+  - year
+  - month
+  - day
+cluster:
+  type: databricks_10_4_med_general_photon_cluster
