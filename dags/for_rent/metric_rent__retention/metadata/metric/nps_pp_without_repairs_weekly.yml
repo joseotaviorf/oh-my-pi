@@ -1,0 +1,66 @@
+---
+database_name: metric_rent
+table_name: nps_pp_without_repairs_weekly
+description: Weekly NPS of owners with contract termination without repair needed.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  week_answers:
+    lineage:
+      - dw_retention.dim_nps_answer.ts_answered
+    description: "Week of the answers."
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Category of rent value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+    dimension: True
+  promoters_no_repairs_need:
+    description: "Volume of promoters among owners that answered the NPS survey after a contract termination without the need of repairs."
+    metric:
+      name: Total Promoters Among Owners Without Repair
+      description: "Volume of promoters among owners that answered the NPS survey after a contract termination without the need of repairs."
+      acronym: TPAOWOR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  detractors_no_repairs_need:
+    description: "Volume of detractors among owners that answered the NPS survey after a contract termination without the need of repairs."
+    metric:
+      name: Total Detractors Among Owners Without Repair
+      description: "Volume of detractors among owners that answered the NPS survey after a contract termination without the need of repairs."
+      acronym: TDAOWOR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  total_answers_no_repairs_need:
+    description: "Volume of NPS answers of owners after a contract termination without the need of repairs."
+    metric:
+      name: Total Answers Of Owners Without Repair
+      description: "Volume of NPS answers of owners after a contract termination without the need of repairs."
+      acronym: TAOOWOR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  nps_no_repairs_needs:
+    description: "NPS of owners with contract terminations without repair needed."
+    metric:
+      name: NPS Of Owners Without Repair
+      description: "NPS of owners with contract terminations without repair needed."
+      acronym: NPSOOWOR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""  

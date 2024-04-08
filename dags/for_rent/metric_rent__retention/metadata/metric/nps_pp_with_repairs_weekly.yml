@@ -1,0 +1,66 @@
+---
+database_name: metric_rent
+table_name: nps_pp_with_repairs_weekly
+description: Weekly NPS of owners with contract termination with repair needed.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  week_answers:
+    lineage:
+      - dw_retention.dim_nps_answer.ts_answered
+    description: "Week of the answers."
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Category of rent value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+    dimension: True
+  promoters_repairs_need:
+    description: "Volume of promoters among owners that answered the NPS survey after a contract termination with the need of repairs."
+    metric:
+      name: Total Promoters Among Owners With Repair
+      description: "Volume of promoters among owners that answered the NPS survey after a contract termination with the need of repairs."
+      acronym: TPAOWR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  detractors_repairs_need:
+    description: "Volume of detractors among owners that answered the NPS survey after a contract termination with the need of repairs."
+    metric:
+      name: Total Detractors Among Owners With Repair
+      description: "Volume of detractors among owners that answered the NPS survey after a contract termination with the need of repairs."
+      acronym: TDAOWR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  total_answers_repairs_need:
+    description: "Volume of NPS answers of owners after a contract termination with the need of repairs."
+    metric:
+      name: Total Answers Of Owners With Repair
+      description: "Volume of NPS answers of owners after a contract termination with the need of repairs."
+      acronym: TAOOWR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  nps_repairs_needs:
+    description: "NPS of owners with contract terminations with repair needed."
+    metric:
+      name: NPS Of Owners With Repair
+      description: "NPS of owners with contract terminations with repair needed."
+      acronym: NPSOOWR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""  
