@@ -4,7 +4,7 @@ SELECT
     queue_friendly_name,
     queue_attributes,
     event_type,
-    author
+    author,
     TIMESTAMP(created_at) AS ts_created,
     year,
     month,

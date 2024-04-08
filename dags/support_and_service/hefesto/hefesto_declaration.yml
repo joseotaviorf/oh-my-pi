@@ -13,26 +13,33 @@ workflow:
   lineage_product_database_name: hefesto
   dbutils_secret_key: HEFESTO_DB
   default_extraction_type: incremental
-  default_partitions: [year, month, day]
   tables_customization:
     worker:
       date_filter_column: updated_at
+      partitions: [year, month, day]
     worker_portfolio:
       date_filter_column: updated_at
+      partitions: [year, month, day]
     worker_portfolio_event:
       date_filter_column: created_at
+      partitions: [year, month, day]
     worker_channel:
       date_filter_column: updated_at
+      partitions: [year, month, day]
     queue:
       date_filter_column: updated_at
+      partitions: [year, month, day]
     queue_type:
       extraction_type: full
     queue_event:
       date_filter_column: created_at
+      partitions: [year, month, day]
     idled_channel:
       date_filter_column: updated_at
+      partitions: [year, month, day]
     idled_channel_event:
       date_filter_column: created_at
+      partitions: [year, month, day]
     account:
       extraction_type: full
 

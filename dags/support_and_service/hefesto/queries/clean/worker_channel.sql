@@ -16,6 +16,4 @@ SELECT
 FROM
     datalake_hefesto_raw.worker_channel
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    year >= 2024

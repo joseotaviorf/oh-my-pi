@@ -15,6 +15,4 @@ SELECT
 FROM
     datalake_hefesto_raw.worker_portfolio
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    year >= 2024
