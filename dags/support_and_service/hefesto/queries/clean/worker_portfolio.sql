@@ -8,9 +8,6 @@ SELECT
     entity_origin_name,
     entity_origin_persona,
     TIMESTAMP(created_at) AS ts_created,
-    TIMESTAMP(updated_at) AS ts_updated,
-    year,
-    month,
-    day
+    TIMESTAMP(updated_at) AS ts_updated
 FROM
     datalake_hefesto_raw.worker_portfolio
