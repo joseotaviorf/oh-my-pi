@@ -14,5 +14,3 @@ SELECT
     day
 FROM
     datalake_hefesto_raw.worker_portfolio
-WHERE
-    created_at >= '2024-03-01'
