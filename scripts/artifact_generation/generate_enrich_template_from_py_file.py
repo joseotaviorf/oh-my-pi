@@ -47,6 +47,16 @@ def read_prod_conf_file(dag_name: str) -> dict:
     with open(conf_path, "r") as f:
         return yaml.safe_load(f)
     
+def read_markdown_file(dag_name: str) -> str:
+    md_paths = list(
+        glob.iglob(f"{DAG_PACKAGES_ROOT}/**/{dag_name}/*.md", recursive=True)
+    )
+    if len(md_paths) == 0:
+        return None
+    md_path = md_paths[0]
+    with open(md_path, "r") as f:
+        return f.read()
+    
 def generate_dag_declaration(dag_name: str, dag_file: str, conf_file: dict) -> dict:
     """Generates the content of the DAG declaration file"""
 
@@ -86,8 +96,24 @@ def extract_dag_key_content_for_declaration(dag_name: str, dag_file: str, conf_f
 
     if conf_file and "dag_documentation" in conf_file:
         content["documentation"] = conf_file["dag_documentation"]
+    else:
+        content_from_md = extract_dag_documentation_from_md(dag_name)
+        if content_from_md:
+            content["documentation"] = {"dag_purpose": content_from_md} 
 
     return content
+
+
+def extract_dag_documentation_from_md(dag_name: str) -> str:
+    md_content = read_markdown_file(dag_name)
+    if not md_content:
+        return None
+    # Anything between the ### Purpose and <details> tags
+    documentation_match = re.search(r"### Purpose\s*([^<]*)<details>", md_content, flags=re.IGNORECASE)
+    if not documentation_match:
+        return None
+    return documentation_match.group(1).replace("\u200B", "").strip() # Some documentation files have zero width spaces
+
 
 def extract_workflow_key_content_for_declaration(dag_file: str, conf_file: dict) -> dict:
     """Extracts the content of the workflow key for the declaration file, using regexes in the python file and the config file"""
