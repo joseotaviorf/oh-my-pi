@@ -3,7 +3,7 @@ SELECT DISTINCT
     title,
     description,
     agent_description,
-    url
+    url,
     raw_title,
     raw_title_in_portal,
     raw_description,

@@ -4,6 +4,8 @@ WITH groups AS (
         name
     FROM
         datalake_zendesk_clean.groups
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_group ORDER BY ts_updated DESC) = 1
 ),
 tickets AS (
     SELECT
@@ -92,7 +94,7 @@ parsed_cf AS (
     SELECT
         cf.id_ticket,
         cf.ts_updated,
-        tf.title AS cf_title,
+        tf.raw_title AS cf_title,
         cf.value AS cf_value
     FROM
         splitted_cf AS cf
@@ -301,7 +303,7 @@ analyst_assignment AS (
         NULL AS phone,
         NULL AS organization,
         NULL AS ts_created,
-        NULL AS ts_updated
+        ts_updated
     FROM
         tickets_with_fields
     WHERE
@@ -405,3 +407,4 @@ LEFT JOIN
 LEFT JOIN
     analyst_assignment AS aa
         ON t.id_ticket = aa.id_ticket
+        AND t.ts_updated = aa.ts_updated

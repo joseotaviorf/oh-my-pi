@@ -6,7 +6,7 @@ SELECT DISTINCT
   assignee_id AS id_assignee,
   requester_id AS id_requester,
   score,
-  url
+  url,
   reason,
   CAST(dt AS DATE) AS dt_extracted,
   CAST(created_at AS TIMESTAMP) AS ts_created,
