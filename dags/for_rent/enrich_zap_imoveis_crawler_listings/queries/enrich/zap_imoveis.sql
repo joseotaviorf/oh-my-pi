@@ -18,7 +18,9 @@ WITH json_select AS(
     FROM
         datalake_crawlers_listings_clean.zap_imoveis
     WHERE
-        MAKE_DATE(year, month, day) = DATE('{load_date}')
+        year = {year}
+        AND month = {month}
+        AND day = {day}
 )
     SELECT
         id_house_platform,

@@ -20,8 +20,6 @@ workflow:
     - year
     - month
     - day
-  extra_query_template_params:
-    load_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_date') }}"
 cluster:
   type: custom_cluster
   custom_configurations:
