@@ -1,0 +1,44 @@
+dag:
+  name: hefesto
+  schedule_start_date: 2024, 4, 7
+  schedule_interval: 0 1 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: This DAG imports tables from [Hefesto](https://github.com/quintoandar/hefesto)
+
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: hefesto
+  dbutils_secret_key: HEFESTO_DB
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    worker:
+      date_filter_column: updated_at
+    worker_portfolio:
+      date_filter_column: updated_at
+    worker_portfolio_event:
+      date_filter_column: created_at
+    worker_channel:
+      date_filter_column: updated_at
+    queue:
+      date_filter_column: updated_at
+    queue_type:
+      extraction_type: full
+    queue_event:
+      date_filter_column: created_at
+    idled_channel:
+      date_filter_column: updated_at
+    idled_channel_event:
+      date_filter_column: created_at
+    account:
+      extraction_type: full
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.4xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 3

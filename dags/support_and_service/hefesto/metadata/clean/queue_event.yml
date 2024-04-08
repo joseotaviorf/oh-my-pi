@@ -1,0 +1,33 @@
+database_name: datalake_hefesto_clean
+table_name: queue_event
+columns:
+  id_queue_event:
+    lineage:
+      - datalake_hefesto_raw.queue_event.id
+  id_queue:
+    lineage:
+      - datalake_hefesto_raw.queue_event.queue_id
+  queue_friendly_name:
+    lineage:
+      - datalake_hefesto_raw.queue_event.queue_friendly_name
+  queue_attributes:
+    lineage:
+      - datalake_hefesto_raw.queue_event.queue_attributes
+  event_type:
+    lineage:
+      - datalake_hefesto_raw.queue_event.event_type
+  author:
+    lineage:
+      - datalake_hefesto_raw.queue_event.author
+  ts_created:
+    lineage:
+      - datalake_hefesto_raw.queue_event.created_at
+  year:
+    lineage:
+      - datalake_hefesto_raw.queue_event.year
+  month:
+    lineage:
+      - datalake_hefesto_raw.queue_event.month
+  day:
+    lineage:
+      - datalake_hefesto_raw.queue_event.day
