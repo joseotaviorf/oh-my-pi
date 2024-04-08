@@ -124,6 +124,7 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
+  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
   - bietlejuice.enrich_recupera:load-enrich-changes-debts-distribution
   - bietlejuice.enrich_recupera:load-enrich-collection
   - bietlejuice.enrich_recupera:load-enrich-installment
