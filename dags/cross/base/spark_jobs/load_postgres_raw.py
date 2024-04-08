@@ -38,6 +38,8 @@ def parse_arguments() -> Namespace:
         help="S3 load options for spark dataframe, in JSON format",
     )
     parser.add_argument("read_from_sql")
+    parser.add_argument("load_start_date")
+    parser.add_argument("load_end_date")
 
     return parser.parse_args()
 
@@ -71,13 +73,15 @@ def main():
     db_schema = args.db_schema
     load_options = json.loads(args.load_options) if args.load_options else {}
     read_from_sql = True if args.read_from_sql.lower() == "true" else False
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
 
     logger.info(
         f"""
         m=__main__, environment={environment}, dbutils_secret_key={dbutils_secret_key}, datalake_bucket={datalake_bucket},
         schema={schema}, table_name={table_name}, unixtime_measure={unixtime_measure}, extraction_type={extraction_type},
         date_filter_column={date_filter_column}, partition_cols={partition_cols}, execution_date={execution_date},
-        db_schema={db_schema}, load_options={load_options}
+        db_schema={db_schema}, load_options={load_options}, load_start_date={load_start_date}, load_end_date={load_end_date}
         msg=Starting spark job...
         """
     )
@@ -109,10 +113,11 @@ def main():
                 query.format(execution_date=execution_date)
             )
         else:
-            df = postgres_consumer.get_incremental_data_from_table(
+            df = postgres_consumer.get_incremental_data_by_processing_window(
                 table_name=table_name,
                 date_filter_column=date_filter_column,
-                date_filter_value=execution_date,
+                load_start_date=load_start_date,
+                load_end_date=load_end_date,
                 unixtime_measure=unixtime_measure,
             )
 

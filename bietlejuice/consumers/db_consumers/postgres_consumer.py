@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import textwrap
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -337,4 +338,49 @@ class PostgresConsumer(DBConsumer):
                 {filter_condition}
         """
 
+        return self.get_data_from_query(query)
+
+    @logger
+    def get_incremental_data_by_processing_window(
+        self,
+        table_name,
+        date_filter_column,
+        load_start_date,
+        load_end_date,
+        unixtime_measure=None,
+    ):
+        """
+        Gets incremental data from table in a Postgres database considering
+        a time window for processing.
+        The method expects a table and a date/timestamp or unix timestamp
+        column to make the filter.
+        :param table_name: Name of the table
+        :param date_filter_column: Name of the column to make the filter
+        :param load_start_date: Start date from which query will fetch data
+        :param load_end_date: End date from which query will fetch data
+        :param unixtime_measure: unix time measure to be seted as milliseconds or seconds
+
+        :return: A Spark DataFrame with the table data
+        """
+        schema = self.conn_config["schema"]
+
+        if unixtime_measure == "milliseconds":
+            date_filter_column = f"TO_TIMESTAMP({date_filter_column}/1000)"
+        elif unixtime_measure == "seconds":
+            date_filter_column = f"TO_TIMESTAMP({date_filter_column})"
+
+        query = f"""
+        SELECT
+            *,
+            CAST(EXTRACT(YEAR FROM {date_filter_column}) as INT) AS year,
+            CAST(EXTRACT(MONTH FROM {date_filter_column}) as INT) AS month,
+            CAST(EXTRACT(DAY FROM {date_filter_column}) as INT) AS day
+        FROM
+            "{schema}"."{table_name}"
+        WHERE
+            {date_filter_column} >= DATE('{load_start_date}')
+            AND {date_filter_column} < DATE(DATE('{load_end_date}') + INTERVAL '1 DAY')
+        """
+
+        query = textwrap.dedent(query)
         return self.get_data_from_query(query)

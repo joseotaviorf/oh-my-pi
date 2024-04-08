@@ -21,7 +21,27 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         dag = super().dag_instance()
 
         bucket = self.config_service.get_config("datalake_bucket")
-        dag_execution_context = self._get_dag_execution_context(dag, bucket)
+
+        if "extra_query_template_params" not in self.workflow_args:
+            self.workflow_args["extra_query_template_params"] = {}
+
+        load_start_date = self.workflow_args["extra_query_template_params"].get(
+            "load_start_date", "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+        )
+        load_end_date = self.workflow_args["extra_query_template_params"].get(
+            "load_end_date", "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+        )
+
+        self.workflow_args["extra_query_template_params"][
+            "load_start_date"
+        ] = load_start_date
+        self.workflow_args["extra_query_template_params"][
+            "load_end_date"
+        ] = load_end_date
+
+        dag_execution_context = self._get_dag_execution_context(
+            dag, bucket, start_date=load_start_date, end_date=load_end_date
+        )
         self._initialize_task_creators(dag_execution_context)
 
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
