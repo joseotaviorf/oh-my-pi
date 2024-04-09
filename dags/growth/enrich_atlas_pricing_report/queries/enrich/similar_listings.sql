@@ -28,6 +28,16 @@ WITH listings AS (
             WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL AND dd.date <= ff.ts_sale_agreement_signed
                 THEN DATEDIFF(ff.ts_sale_agreement_signed,dd.date)
         END AS days_to_contract_sign,
+        CASE
+            WHEN lbc.business_context = 'RENT' AND fhl.days_listing_to_contract_signed >= 0 THEN dc.rent
+            WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL AND dd.date <= ff.ts_sale_agreement_signed
+                THEN sale_price_agreed
+        END AS negotiated_price,
+        CASE
+            WHEN lbc.business_context = 'RENT' AND fhl.days_listing_to_contract_signed >= 0 THEN (dc.rent / NULLIF(dhl.house_total_area,0))
+            WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL AND dd.date <= ff.ts_sale_agreement_signed
+                THEN (ff.sale_price_agreed / NULLIF(dhl.house_total_area,0))
+        END AS negotiated_price_m2,
         dhl.house_condo,
         dhl.house_iptu,
         lbc.status
@@ -49,6 +59,8 @@ WITH listings AS (
         ON dr_fr.sk_region = fhl.sk_region
     LEFT JOIN dw_public.dim_region dr_fs
         ON dr_fs.sk_region = fl.sk_region
+    LEFT JOIN dw_public.dim_contract dc
+        ON fhl.sk_contract = dc.sk_contract
     WHERE
         DATEDIFF(dhl.ts_house_update, CURRENT_DATE) <= 365
 )
@@ -67,6 +79,8 @@ SELECT DISTINCT
     s.house_price AS similar_house_price,
     s.price_m2 AS similar_price_m2,
     s.days_to_contract_sign AS similar_days_to_contract_sign,
+    s.negotiated_price AS similar_negotiated_price,
+    s.negotiated_price_m2 AS similar_negotiated_price_m2,
     s.neighborhood AS similar_neighborhood,
     s.house_bedrooms AS similar_house_bedrooms,
     s.house_total_area AS similar_house_total_area,
@@ -75,7 +89,7 @@ FROM listings AS lr
 JOIN listings AS s
     ON s.sk_region = lr.sk_region
     AND s.house_type = lr.house_type
-    AND s.house_bedrooms >= lr.house_bedrooms
+    AND s.house_bedrooms BETWEEN lr.house_bedrooms - 1 AND lr.house_bedrooms + 1
     AND s.id_house != lr.id_house
     AND s.house_total_area BETWEEN lr.house_total_area * 0.7 AND lr.house_total_area * 1.3
     AND s.business_context = lr.business_context
