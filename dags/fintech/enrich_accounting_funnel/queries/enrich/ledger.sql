@@ -216,6 +216,7 @@ SELECT
     db.location_profit_code,
     db.cost_center_code,
     dh.uuid AS hash,
+    dh.dt_created,
     dh.dt_reference,
     dh.dt_due,
     dh.dt_tax,

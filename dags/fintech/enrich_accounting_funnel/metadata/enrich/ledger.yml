@@ -134,6 +134,11 @@ columns:
     lineage:
       - datalake_pas.journal_entries.uuid
       - datalake_pas.invoices.uuid
+  dt_created:
+    description: "Created date"
+    lineage:
+      - datalake_pas.journal_entries.dt_created
+      - datalake_pas.invoices.dt_created
   dt_reference:
     description: "Reference date"
     lineage:
