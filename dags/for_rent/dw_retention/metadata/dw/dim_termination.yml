@@ -16,6 +16,10 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.status
     description: Status of the contract termination.
+  category:
+    description: Termination category, which will be depreciated in favor of the characteristics.
+    lineage:
+      - datalake_offboarding.contract_termination.category
   send_utility_bills_receipt:
     lineage:
       - datalake_offboarding.contract_termination.send_utility_bills_receipt
