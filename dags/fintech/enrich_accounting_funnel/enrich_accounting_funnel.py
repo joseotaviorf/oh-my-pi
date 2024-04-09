@@ -33,7 +33,7 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("databricks_10_4_max_io-memory_photon_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
