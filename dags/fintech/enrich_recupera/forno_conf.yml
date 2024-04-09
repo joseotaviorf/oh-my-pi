@@ -13,3 +13,6 @@ tables:
     is_incremental: false
   - table_name: changes_debts_distribution
     is_incremental: false
+inner_dependencies:
+  changes_debts_distribution:
+    - snapshot_daily_debts
