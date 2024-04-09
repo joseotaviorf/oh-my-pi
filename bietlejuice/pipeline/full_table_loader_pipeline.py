@@ -1,3 +1,4 @@
+from bietlejuice.base.spark import BaseSparkContext
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -13,11 +14,17 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
         spark_metastore_service = SparkMetastoreService(spark_client)
         s3_loader = S3Loader()
 
+        if "optimize_dataframe" in load_options:
+            optimize_dataframe = load_options.pop("optimize_dataframe")
+        else:
+            optimize_dataframe = self._should_optimize_dataframe()
+
         s3_loader.load_df(
             df=df,
             format_options=format_options,
             s3_path=self.target_database_location + self.table_name,
             partitions=self.partitions,
+            optimize_dataframe=optimize_dataframe,
             **load_options,
         )
 
@@ -34,3 +41,19 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name
         )
+
+    def _should_optimize_dataframe(self) -> bool:
+        """
+        This determines whether S3Loader should run the logic to optimize the number of files in the dataframe before saving or not.
+        The optimization heavily affects performance, but reduces the problem with small files.
+
+        However, a study was made indicating that the optimization is not necessary for newer versions of Databricks (12 >), with the exception of
+        partitioned tables.
+        """
+        major, minor = [int(v) for v in BaseSparkContext.spark.version.split(".")[:2]]
+        if major < 3 or (major == 3 and minor < 3):
+            return True
+        if self.partitions:
+            return True
+
+        return False
