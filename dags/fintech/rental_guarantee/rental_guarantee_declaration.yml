@@ -32,5 +32,8 @@ workflow:
       partitions: [year, month, day]
     risk_category_aud: {}
     risk_category: {}
+    sap: {}
+    message: {}
+    processed_message: {}
 cluster:
   type: databricks_10_4_med_general_cluster

@@ -1,0 +1,15 @@
+---
+database_name: datalake_rental_guarantee_clean
+table_name: processed_message
+owner: ae-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_subscriber:
+    lineage:
+    - datalake_rental_guarantee_raw.processed_message.subscriber_id
+  id_message:
+    lineage:
+    - datalake_rental_guarantee_raw.processed_message.message_id
+  ts_created:
+    lineage:
+    - datalake_rental_guarantee_raw.processed_message.created_at

@@ -1,0 +1,39 @@
+---
+database_name: datalake_rental_guarantee_clean
+table_name: sap
+owner: ae-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.id
+  id_business_entity:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.business_entity_id
+  id_finance_entity:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.finance_entity_id
+  id_feature:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.feature_id
+  transaction_name:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.transaction_name
+  sap_status:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.status
+  request:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+  response:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.response
+  trigger:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.trigger
+  ts_created:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.created_at
+  ts_updated:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.updated_at
