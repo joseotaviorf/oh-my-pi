@@ -19,7 +19,8 @@ columns:
     lineage:
       - datalake_composer_clean.dag_run.id_run
     description: Run id of the DAG, which indicates the trigger type (scheduled, manual, Mediator)
-      and the execution date (which is usually D-1).
+      and the execution date (which is usually D-1). If null, it might indicate a manual DAG run that was created
+      without following the regular name of a run. 
   state:
     lineage:
       - datalake_composer_clean.dag_run.state
