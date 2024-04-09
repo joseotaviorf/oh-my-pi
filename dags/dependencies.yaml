@@ -2726,6 +2726,7 @@ bietlejuice.enrich_velo:
   - bietlejuice.person:load-clean-person
   - bietlejuice.rental_guarantee_platform:load-clean-address
   - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-bussines-type
   - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-company
