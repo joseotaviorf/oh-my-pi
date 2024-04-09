@@ -17,9 +17,8 @@ spec:
 
   ownership:
     line: tech_platform
-    tribe: data_platform_engineering_and_governance
-    squad: data_ingestion
     owner: mario.abreu@quintoandar.com.br
+    team: data_ingestion
 
   libraries:
     - name: bi-etl-ejuice
