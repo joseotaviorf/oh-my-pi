@@ -46,7 +46,7 @@ WITH payment AS (
     ),
     migrated_ids AS (
         SELECT
-            id AS id_payment
+            DISTINCT unicid AS id_unicid
         FROM
             datalake_rental_guarantee_platform_clean.payment
     ),
@@ -54,15 +54,11 @@ WITH payment AS (
         SELECT *
         FROM
         VALUES
-            (0,'SUCCESS'),
-            (1,'PROCESSING'),
+            (0,'NULL'),
             (2,'SUCCESS'),
-            (3,'SUCCESS'),
-            (4,'PROCESSING'),
-            (5,'REVERSED'),
-            (6,'SUCCESS'),
-            (7,'SCHEDULED_REVERSAL'),
-            (8,'ERROR') AS t (old_id, new_status)
+            (3,'PROCESSING'),
+            (4,'REFUSED'),
+            (5,'REFUNDED') AS t (old_id, new_status)
     )
     SELECT
         p.id_payment,
@@ -151,7 +147,22 @@ WITH payment AS (
             AND jk5.desc_master_type = 'Payment Category'
     LEFT JOIN
         migrated_ids AS mi
-            ON mi.id_payment = p.id_payment
+            ON mi.id_unicid = p.unicid
     WHERE
         p.rn = 1
-        AND mi.id_payment IS NULL
+        AND mi.id_unicid IS NULL
+        AND p.id_status IN (0, 2, 3, 4, 5)
+        AND CONCAT(p.id_propose,UNIX_TIMESTAMP(p.dt_due, 'yyyy-MM-dd')) NOT IN (SELECT
+                                                                        CONCAT(np.id_propose,UNIX_TIMESTAMP(np.dt_due, 'yyyy-MM-dd'))
+                                                                    FROM
+                                                                        datalake_velo.payment np
+                                                                    WHERE
+                                                                        CONCAT(np.id_propose,UNIX_TIMESTAMP(np.dt_due, 'yyyy-MM-dd')) = CONCAT(p.id_propose,UNIX_TIMESTAMP(p.dt_due, 'yyyy-MM-dd')))
+        AND CONCAT(p.id_propose,UNIX_TIMESTAMP(p.dt_due, 'yyyy-MM-dd')) NOT IN (SELECT
+                                                                        CONCAT(ap.id_propose,UNIX_TIMESTAMP(ap.dt_due, 'yyyy-MM-dd'))
+                                                                    FROM
+                                                                        datalake_rental_guarantee_platform_clean.agreement_payment_legacy ap
+                                                                    WHERE
+                                                                        CONCAT(ap.id_propose,UNIX_TIMESTAMP(ap.dt_due, 'yyyy-MM-dd')) = CONCAT(p.id_propose,UNIX_TIMESTAMP(p.dt_due, 'yyyy-MM-dd')))
+
+        AND p.dt_due < DATE('2023-07-01')
