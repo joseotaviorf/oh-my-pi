@@ -1,0 +1,68 @@
+---
+database_name: datalake_pipeline
+table_name: dag_run
+description:
+  This table consolidates metrics and information about each run of a bietlejuice DAG,
+  identified by the unique key id_dag_run.
+domain: Cross
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_dag_run:
+    lineage:
+      - datalake_composer_clean.dag_run.id
+    description: Unique DAG run id, identifying each DAG run.
+  id_dag:
+    lineage:
+      - datalake_composer_clean.dag_run.id_dag
+    description: DAG id, which is also the DAG name on Airflow.
+  id_run:
+    lineage:
+      - datalake_composer_clean.dag_run.id_run
+    description: Run id of the DAG, which indicates the trigger type (scheduled, manual, Mediator)
+      and the execution date (which is usually D-1).
+  state:
+    lineage:
+      - datalake_composer_clean.dag_run.state
+    description: Current state of the DAG run.
+  duration:
+    description: Total duration of the DAG run, in minutes.
+  had_external_trigger:
+    lineage:
+      - datalake_composer_clean.dag_run.had_external_trigger
+    description: Boolean flag indicating if the DAG run had an external trigger.
+  is_triggered_by_mediator:
+    description: Boolean flag indicating if the DAG run was triggered by Mediator.
+  is_first_run_ever:
+    description: Boolean flag indicating if the DAG run is the DAG's first ever.
+      This may be useful to consolidate SLA information.
+  is_run_successful:
+    description: Boolean flag indicating if the current state of the DAG run is successful,
+      which means that all tasks of the DAG are marked as successful.
+  is_first_execution_inside_sla:
+    description: Boolean flag indicating if the DAG's first execution of the day was successful
+      and also inside of our Data SLA. Each layer has its own SLA.
+  has_been_cleared:
+    description: Boolean flag indicating if the DAG run suffered any clear, which means that it ran
+      at least one more time.
+  ts_execution:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_executed
+    description: The timestamp of the DAG execution, which usually is D-1.
+  ts_started:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_started
+    description: The timestamp of when the DAG execution has been started.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_ended:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_ended
+    description: The timestamp of when the DAG execution has ended.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_first_execution_success:
+    lineage:
+      - datalake_composer_clean.log.ts_event
+    description: The timestamp of when the DAG execution has first received a successful state.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
+      successful timestamp will be shown.
