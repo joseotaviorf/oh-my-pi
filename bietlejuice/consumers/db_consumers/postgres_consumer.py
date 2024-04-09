@@ -163,22 +163,45 @@ class PostgresConsumer(DBConsumer):
         :param table_name: Name of a table
         :return: A Spark DataFrame with the table schema
         """
-        extended_table_name = self.conn_config["schema"] + "." + table_name
-        query = """
-                SELECT
-                    column_name as col_name,
-                    data_type as col_type
-                FROM
-                    information_schema.columns
-                WHERE
-                    table_name = '{table}'
-            """.format(
-            table=extended_table_name
-        )
+        query = f"""
+            SELECT
+                column_name AS col_name,
+                data_type AS col_type,
+                COALESCE(character_maximum_length, numeric_precision) AS col_length,
+                numeric_scale AS col_scale
+            FROM
+                information_schema.columns
+            WHERE
+                table_schema = '{self.conn_config["schema"]}'
+                AND table_name = '{table_name}'
+        """
 
-        df = self.get_data_from_query(query)
+        df = self.get_data_from_query(textwrap.dedent(query))
 
         return df
+
+    @logger
+    def get_table_primary_keys(self, table_name):
+        """
+        Gets the primary keys of a table in a PostgreSql database.
+        :param table_name: Name of a table
+        :return: A list with the primary keys of the table
+        """
+        query = f"""
+            SELECT
+                a.attname as col_name
+            FROM
+                pg_index i
+            JOIN
+                pg_attribute a ON a.attrelid = i.indrelid
+                AND a.attnum = ANY(i.indkey)
+            WHERE
+                i.indrelid = '{self.conn_config["schema"]}.{table_name}'::regclass
+                AND i.indisprimary
+        """
+
+        df = self.get_data_from_query(textwrap.dedent(query))
+        return [row.col_name for row in df.collect()]
 
     @logger
     def _get_partition_column_from_table(self, table_name):

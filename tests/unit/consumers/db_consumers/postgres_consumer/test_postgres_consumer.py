@@ -89,3 +89,59 @@ class TestPostgresConsumer:
             unixtime_measure=input_values["unixtime_measure"],
         )
         mocked_get_data_from_query.assert_called_once_with(output_value)
+
+    @mock.patch(
+        "bietlejuice.consumers.db_consumers.postgres_consumer.PostgresConsumer.get_data_from_query"
+    )
+    def test_get_table_schema(self, mocked_get_data_from_query, postgres_consumer):
+        table_name = "tabela_dummy"
+        postgres_consumer.get_table_schema(table_name)
+        mocked_get_data_from_query.assert_called_once_with(
+            textwrap.dedent(
+                """
+            SELECT
+                column_name AS col_name,
+                data_type AS col_type,
+                COALESCE(character_maximum_length, numeric_precision) AS col_length,
+                numeric_scale AS col_scale
+            FROM
+                information_schema.columns
+            WHERE
+                table_schema = 'public'
+                AND table_name = 'tabela_dummy'
+            """
+            )
+        )
+
+    @mock.patch(
+        "bietlejuice.consumers.db_consumers.postgres_consumer.PostgresConsumer.get_data_from_query"
+    )
+    def test_get_table_primary_keys(
+        self, mocked_get_data_from_query, postgres_consumer
+    ):
+        table_name = "tabela_dummy"
+        df_mock = mock.MagicMock()
+        row_mock = mock.MagicMock()
+        row_mock.col_name = "id"
+        df_mock.collect.return_value = [row_mock]
+        mocked_get_data_from_query.return_value = df_mock
+
+        primary_keys = postgres_consumer.get_table_primary_keys(table_name)
+        mocked_get_data_from_query.assert_called_once_with(
+            textwrap.dedent(
+                """
+            SELECT
+                a.attname as col_name
+            FROM
+                pg_index i
+            JOIN
+                pg_attribute a ON a.attrelid = i.indrelid
+                AND a.attnum = ANY(i.indkey)
+            WHERE
+                i.indrelid = 'public.tabela_dummy'::regclass
+                AND i.indisprimary
+        """
+            )
+        )
+
+        assert primary_keys == ["id"]

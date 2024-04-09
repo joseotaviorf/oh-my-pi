@@ -34,9 +34,9 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         self.datalake_table_schema = datalake_table_schema
 
     def treat_dataframe(
-        self, schema: str, table_name: str, transactional_dataframe: DataFrame
+        self, table_name: str, transactional_dataframe: DataFrame
     ) -> DataFrame:
-        latest_table_change = self._try_find_latest_table_definition(schema, table_name)
+        latest_table_change = self._try_find_latest_table_definition(table_name)
         if latest_table_change:
             transactional_dataframe = self._treat_columns_from_latest_table_change(
                 latest_table_change, transactional_dataframe
@@ -52,12 +52,10 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
 
         return transactional_dataframe
 
-    def _try_find_latest_table_definition(
-        self, schema: str, table_name: str
-    ) -> Optional[dict]:
+    def _try_find_latest_table_definition(self, table_name: str) -> Optional[dict]:
         """Try to find the latest table definition, if it exists."""
         try:
-            return self.schema_finder.find_latest_table_definition(schema, table_name)
+            return self.schema_finder.find_latest_table_definition(table_name)
         except ValueError:
             return None
 

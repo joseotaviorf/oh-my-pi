@@ -206,11 +206,12 @@ def main():
             f"s3://{incoming_bucket}/{source_schema}/{environment}_{source_schema}.data/",
             start_date=start_date,
             end_date=end_date,
+            schema=source_schema,
         ),
         datalake_table_schema=f"datalake_{schema}_transactional",
     )
     transactional_df = pre_treatment.treat_dataframe(
-        source_schema, table_name, transactional_df
+        table_name, transactional_df
     )
 
     SchemaChangesNotifier.alert_schema_changes(

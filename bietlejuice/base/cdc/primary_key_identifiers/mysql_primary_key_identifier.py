@@ -18,7 +18,7 @@ class MySqlPrimaryKeyIdentifier(PrimaryKeyIdentifier):
         self.schema_finder = schema_finder
         self.datalake_table_schema = datalake_table_schema
 
-    def find_primary_keys(self, schema: str, table_name: str) -> List[str]:
+    def find_primary_keys(self, table_name: str) -> List[str]:
         primary_keys = self._try_find_existing_delta_table_pks(
             self.datalake_table_schema, table_name
         )
@@ -26,12 +26,12 @@ class MySqlPrimaryKeyIdentifier(PrimaryKeyIdentifier):
             return primary_keys
 
         try:
-            return self.schema_finder.find_latest_table_definition(schema, table_name)[
+            return self.schema_finder.find_latest_table_definition(table_name)[
                 "primaryKeyColumnNames"
             ]
         except ValueError:
             raise ValueError(
-                f"The primary keys of the table {schema}.{table_name} could not be automatically identified,"
+                f"The primary keys of the table {table_name} could not be automatically identified,"
                 "because it was not found in the schema changes topic. Please, provide the primary keys manually in DAG Declaration file."
             )
 

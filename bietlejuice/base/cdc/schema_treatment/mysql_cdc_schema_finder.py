@@ -5,7 +5,7 @@ from pyspark.sql.functions import explode, col, make_date
 
 class MySqlCdcSchemaFinder(CdcSchemaFinder):
     def __init__(
-        self, schema_changes_path: str, start_date: str, end_date: str
+        self, schema_changes_path: str, schema: str, start_date: str, end_date: str
     ) -> None:
         """
         This class identifies the schema of the table based on the topic that registers schema changes. The path to the topic
@@ -13,10 +13,11 @@ class MySqlCdcSchemaFinder(CdcSchemaFinder):
         """
 
         self.schema_changes_path = schema_changes_path
+        self.schema = schema
         self.start_date = start_date
         self.end_date = end_date
 
-    def find_latest_table_definition(self, schema: str, table_name: str) -> dict:
+    def find_latest_table_definition(self, table_name: str) -> dict:
         """
         Returns a dictionary with the latest schema definition of a table.
         The structure of the dictionary is the following
@@ -44,7 +45,7 @@ class MySqlCdcSchemaFinder(CdcSchemaFinder):
                     self.start_date, self.end_date
                 )
             )
-            .filter(f'id = \'"{schema}"."{table_name}"\'')
+            .filter(f'id = \'"{self.schema}"."{table_name}"\'')
         )
         try:
             return (
@@ -55,6 +56,6 @@ class MySqlCdcSchemaFinder(CdcSchemaFinder):
             )
         except IndexError:
             raise ValueError(
-                f"The schema of the table {schema}.{table_name} could not be automatically identified, "
+                f"The schema of the table {self.schema}.{table_name} could not be automatically identified, "
                 "because it was not found in the schema changes topic."
             )
