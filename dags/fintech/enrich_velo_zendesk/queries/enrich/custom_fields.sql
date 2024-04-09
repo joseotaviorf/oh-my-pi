@@ -10,7 +10,12 @@ WITH base AS (WITH filtered_custom_fields AS (
         id_ticket,
         SPLIT(custom_field, ':')[0] AS id_custom_field,
         SPLIT(custom_field, ':')[1] AS custom_field_value,
-        tf.raw_title AS custom_field_title
+        CASE
+            WHEN SPLIT(custom_field, ':')[0] = 25411571630100 THEN 'Valor inadimplente (pago à imob)'
+            WHEN SPLIT(custom_field, ':')[0] = 25339446197780 THEN 'Valor inadimplente (pago à imob) 1'
+            WHEN SPLIT(custom_field, ':')[0] = 7259632296468 THEN 'Valor inadimplente (pago à imob) 2'
+            ELSE tf.raw_title
+        END AS custom_field_title
     FROM
         filtered_custom_fields AS tcf
     JOIN
@@ -37,7 +42,7 @@ GROUP BY 1
         base.custom_fields['Motivo de Contato'] AS contact_reason,
         base.custom_fields['Nome do inquilino'] AS tenant_name,
         base.custom_fields['Solicitação do Cliente'] AS client_request,
-        COALESCE(base.custom_fields['Valor inadimplente (pago à imob)'], base.custom_fields['Overdue amount']) AS overdue_amount,
+        COALESCE(base.custom_fields['Valor inadimplente (pago à imob)'],base.custom_fields['Valor inadimplente (pago à imob) 1'],base.custom_fields['Valor inadimplente (pago à imob) 2'], base.custom_fields['Overdue amount']) AS overdue_amount,
         base.custom_fields['Acionamento de garantia'] AS guarantee_activation,
         base.custom_fields['Encaminhado para Pagamento'] AS has_payment_forwarded,
         CAST(base.custom_fields['Retorno a Acionamento'] AS DATE) AS dt_request_return,
