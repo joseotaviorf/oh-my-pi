@@ -12,7 +12,7 @@ WITH first_run_ever AS (
     ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_event ASC) = 1
 ),
 success_run AS (
-  -- Checking the first time that the DAG run was marked as successful
+  -- Checking the first time that the DAG run was marked as successful, which will be used to understand if it's inside or not the SLA
   SELECT
     id_dag,
     ts_event AS ts_success_event,
@@ -43,40 +43,52 @@ SELECT
   dr.id_run,
   dr.state,
   ROUND((UNIX_TIMESTAMP(dr.ts_ended) - UNIX_TIMESTAMP(dr.ts_started))/60, 0) AS duration,
+  IF(ds.dag IS NOT NULL, TRUE, FALSE) AS is_in_exclusion_list,
   dr.had_external_trigger,
   IF(dr.id_run LIKE 'mediator%', TRUE, FALSE) AS is_triggered_by_mediator,
   IF(fre.id_dag IS NOT NULL, TRUE, FALSE) AS is_first_run_ever,
   IF(dr.state = 'failed', FALSE, TRUE) AS is_run_successful,
   CASE
-    WHEN fre.id_dag IS NULL THEN 
-        (
-          CASE
-            WHEN dr.id_dag LIKE '%.enrich_%'
-              OR dr.id_dag LIKE '%.metric_%'
-              OR (dr.id_dag LIKE '%.dw_%'
-                AND dr.id_dag NOT LIKE '%datamarts%') THEN
-            (
-              CASE
-                WHEN s.ts_success_event <= TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 11 HOUR THEN TRUE
-                ELSE FALSE
-              END
-            )
-        ELSE
-            (
-              CASE
-                WHEN dr.id_dag LIKE '%datamarts%' AND s.ts_success_event <= TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN TRUE
-                ELSE FALSE
-              END
-            )
-          END
-        )
-    ELSE NULL
+    WHEN fre.id_dag IS NULL THEN -- If the DAG isn't in its first run, we can consider it
+      (
+        CASE
+          WHEN ds.dag IS NULL THEN  -- Checking if the DAG isn't in the list to be ignored
+          (
+            CASE  -- Layers raw/clean, enrich, dw (except for datamarts) and metric has 8h AM BRT as SLA
+              WHEN dr.id_dag NOT LIKE '%datamarts%'
+                AND dr.id_dag NOT LIKE '%reverse%' THEN
+              (
+                CASE
+                  WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 11 HOUR THEN TRUE
+                  WHEN s.ts_success_event IS NULL AND NOW() > TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 11 HOUR THEN FALSE
+                  ELSE NULL
+                END
+              )
+              WHEN dr.id_dag LIKE '%datamarts%' THEN
+                  (
+                    CASE
+                      WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN TRUE
+                      WHEN s.ts_success_event IS NULL AND NOW() > TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN FALSE
+                      ELSE NULL
+                    END
+                  )
+              ELSE NULL
+            END
+          )
+          ELSE NULL
+        END
+      )
+    ELSE NULL -- If the DAG is in its first run, it doesn't have a SLA
   END AS is_first_execution_inside_sla,
   IF(c.id_dag IS NOT NULL, TRUE, FALSE) AS has_been_cleared,
   dr.ts_executed AS ts_execution,
+  FROM_UTC_TIMESTAMP(dr.ts_executed, 'America/Sao_Paulo') AS ts_execution_brt,
   dr.ts_started,
+  FROM_UTC_TIMESTAMP(dr.ts_started, 'America/Sao_Paulo') AS ts_started_brt,
   dr.ts_ended,
-  s.ts_success_event AS ts_first_execution_success
+  FROM_UTC_TIMESTAMP(dr.ts_ended, 'America/Sao_Paulo') AS ts_ended_brt,
+  s.ts_success_event AS ts_first_execution_success,
+  FROM_UTC_TIMESTAMP(s.ts_success_event, 'America/Sao_Paulo') AS ts_first_execution_success_brt
 FROM
   datalake_composer_clean.dag_run AS dr
 JOIN
@@ -95,3 +107,6 @@ LEFT JOIN
   dag_clear AS c
     ON c.id_dag = dr.id_dag
     AND c.ts_executed = dr.ts_executed
+LEFT JOIN
+    datalake_gsheets_clean.dags_sla_exclusion_list AS ds
+        ON ds.dag = dr.id_dag

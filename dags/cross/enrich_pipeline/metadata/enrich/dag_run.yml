@@ -26,6 +26,8 @@ columns:
     description: Current state of the DAG run.
   duration:
     description: Total duration of the DAG run, in minutes.
+  is_in_exclusion_list:
+    description: Boolean flag indicating if the DAG is present in the SLA exclusion list gsheet.
   had_external_trigger:
     lineage:
       - datalake_composer_clean.dag_run.had_external_trigger
@@ -47,22 +49,45 @@ columns:
   ts_execution:
     lineage:
       - datalake_composer_clean.dag_run.ts_executed
-    description: The timestamp of the DAG execution, which usually is D-1.
+    description: The UTC timestamp of the DAG execution, which usually is D-1.
+  ts_execution_brt:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_executed
+    description: The timestamp of the DAG execution, which usually is D-1, in Brasilia (BR) timezone.
   ts_started:
     lineage:
       - datalake_composer_clean.dag_run.ts_started
-    description: The timestamp of when the DAG execution has been started.
+    description: The UTC timestamp of when the DAG execution has been started.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_started_brt:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_started
+    description: The timestamp of when the DAG execution has been started, in Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
   ts_ended:
     lineage:
       - datalake_composer_clean.dag_run.ts_ended
-    description: The timestamp of when the DAG execution has ended.
+    description: The UTC timestamp of when the DAG execution has ended.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_ended_brt:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_ended
+    description: The timestamp of when the DAG execution has ended, in Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
   ts_first_execution_success:
     lineage:
       - datalake_composer_clean.log.ts_event
-    description: The timestamp of when the DAG execution has first received a successful state.
+    description: The UTC timestamp of when the DAG execution has first received a successful state.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
+      successful timestamp will be shown.
+  ts_first_execution_success_brt:
+    lineage:
+      - datalake_composer_clean.log.ts_event
+    description: The timestamp of when the DAG execution has first received a successful state, in
+      Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
       successful timestamp will be shown.
