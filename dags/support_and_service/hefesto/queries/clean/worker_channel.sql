@@ -16,4 +16,6 @@ SELECT
 FROM
     datalake_hefesto_raw.worker_channel
 WHERE
-    created_at >= '2024-03-01'
+    year = {year}
+    AND month = {month}
+    AND day = {day}

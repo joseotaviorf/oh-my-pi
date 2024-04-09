@@ -11,3 +11,7 @@ SELECT
     TIMESTAMP(updated_at) AS ts_updated
 FROM
     datalake_hefesto_raw.worker_portfolio
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

@@ -18,7 +18,8 @@ workflow:
       date_filter_column: updated_at
       partitions: [year, month, day]
     worker_portfolio:
-      extraction_type: full
+      date_filter_column: updated_at
+      partitions: [year, month, day]
     worker_portfolio_event:
       date_filter_column: created_at
       partitions: [year, month, day]
