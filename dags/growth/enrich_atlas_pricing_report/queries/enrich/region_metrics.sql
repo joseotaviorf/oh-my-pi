@@ -40,7 +40,7 @@ sale_mdape AS (
     SELECT
         p.city_name,
         p.business_context,
-        APPROX_PERCENTILE(percentual_error, 0.5) AS mdape
+        MEDIAN(percentual_error) AS mdape
     FROM sale_prices_errors p
     GROUP BY 1, 2
 ),
@@ -49,7 +49,7 @@ rent_mdape AS (
     SELECT
         dr.city_name,
         business_context,
-        APPROX_PERCENTILE(ABS(100.0*dc.rent / p_50 - 100), 0.5) AS mdape
+        MEDIAN(ABS(100.0*dc.rent / p_50 - 100)) AS mdape
     FROM dw_rent.fact_listing_rent_flows rf
     JOIN dw_public.dim_contract dc
         ON rf.sk_contract = dc.sk_contract

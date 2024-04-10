@@ -4,8 +4,8 @@ WITH house_on_market_median_prices AS (
         business_context,
         neighborhood,
         similar_house_status,
-        APPROX_PERCENTILE(similar_house_price, 0.5) AS on_market_price_median,
-        APPROX_PERCENTILE(similar_price_m2, 0.5) AS on_market_price_by_square_meter
+        MEDIAN(similar_house_price) AS on_market_price_median,
+        MEDIAN(similar_price_m2) AS on_market_price_by_square_meter
     FROM datalake_atlas_pricing_report.similar_listings
     WHERE similar_status = 'PUBLISHED'
     GROUP BY 1,2,3,4
@@ -17,8 +17,8 @@ house_off_market_median_prices AS (
         business_context,
         neighborhood,
         similar_house_status,
-        APPROX_PERCENTILE(similar_house_price, 0.5) AS off_market_price_median,
-        APPROX_PERCENTILE(similar_price_m2, 0.5) AS off_market_price_by_square_meter
+        MEDIAN(similar_house_price) AS off_market_price_median,
+        MEDIAN(similar_price_m2) AS off_market_price_by_square_meter
     FROM datalake_atlas_pricing_report.similar_listings
     WHERE
         similar_status != 'PUBLISHED'
@@ -31,7 +31,7 @@ house_negotiated_median_days_to_contract_sign AS (
         id_house,
         business_context,
         neighborhood,
-        APPROX_PERCENTILE(similar_days_to_contract_sign, 0.5) AS median_days_to_contract_sign
+        MEDIAN(similar_days_to_contract_sign) AS median_days_to_contract_sign
     FROM datalake_atlas_pricing_report.similar_listings
     WHERE
         similar_status != 'PUBLISHED'
@@ -45,8 +45,8 @@ house_negotiated_median_price AS (
         business_context,
         neighborhood,
         similar_house_status,
-        APPROX_PERCENTILE(similar_negotiated_price, 0.5) AS negotiated_price_median,
-        APPROX_PERCENTILE(similar_negotiated_price_m2, 0.5) AS negotiated_price_by_square_meter
+        MEDIAN(similar_negotiated_price) AS negotiated_price_median,
+        MEDIAN(similar_negotiated_price_m2) AS negotiated_price_by_square_meter
     FROM datalake_atlas_pricing_report.similar_listings
     WHERE
         similar_status != 'PUBLISHED'

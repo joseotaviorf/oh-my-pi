@@ -41,9 +41,9 @@ metrics AS (
         id_house,
         business_context,
         views_quantity,
-        APPROX_PERCENTILE(views_quantity, .25) OVER(PARTITION BY sk_region, business_context) AS lpv_p_25,
-        APPROX_PERCENTILE(views_quantity, .50) OVER(PARTITION BY sk_region, business_context) AS lpv_p_50,
-        APPROX_PERCENTILE(views_quantity, .75) OVER(PARTITION BY sk_region, business_context) AS lpv_p_75
+        PERCENTILE(views_quantity, .25) OVER(PARTITION BY sk_region, business_context) AS lpv_p_25,
+        PERCENTILE(views_quantity, .50) OVER(PARTITION BY sk_region, business_context) AS lpv_p_50,
+        PERCENTILE(views_quantity, .75) OVER(PARTITION BY sk_region, business_context) AS lpv_p_75
     FROM aux
     )
 

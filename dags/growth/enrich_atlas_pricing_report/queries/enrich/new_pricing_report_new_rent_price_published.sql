@@ -57,7 +57,7 @@ median_price_by_region AS (
   SELECT 
     sk_region,
     dt_quarter,
-    ROUND(APPROX_PERCENTILE(price_per_m2, 0.50), 0) AS median_price_per_m2
+    MEDIAN(price_per_m2)::BIGINT AS median_price_per_m2
   FROM
     all_transactions
   WHERE
@@ -67,12 +67,12 @@ median_price_by_region AS (
     1, 2
 )
   SELECT
-    NOW() AS ts_event,
+    UNIX_TIMESTAMP(NOW()) AS ts_event,
     MONOTONICALLY_INCREASING_ID() AS id, 
-    dt_quarter::DATE,
+    DATE_FORMAT(dt_quarter::DATE, 'yyyy-MM-dd')::STRING AS dt_quarter,
     sk_region::BIGINT AS id_region,
-    concat(neighborhood, '/', city_name, '/', short_region_name)::STRING AS region_name,
-    median_price_per_m2::FLOAT
+    CONCAT(neighborhood, '/', city_name, '/', short_region_name)::STRING AS region_name,
+    ROUND(median_price_per_m2::FLOAT,2) AS median_price_per_m2
   FROM 
     median_price_by_region AS p
   INNER JOIN 
@@ -80,4 +80,4 @@ median_price_by_region AS (
       USING(sk_region)
   WHERE
     sk_region != -1
-    AND p.dt_quarter + interval '2' month <= DATE_TRUNC('MONTH', CURRENT_DATE)
+    AND p.dt_quarter + INTERVAL '2' month <= DATE_TRUNC('MONTH', CURRENT_DATE)

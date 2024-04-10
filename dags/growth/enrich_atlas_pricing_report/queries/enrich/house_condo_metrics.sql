@@ -49,7 +49,7 @@ similar_listings AS (
 SELECT
     id_house,
     neighborhood,
-    APPROX_PERCENTILE(house_condo, 0.5) as condominium_price_median,
-    APPROX_PERCENTILE(house_iptu, 0.5) as urban_property_tax_median
+    MEDIAN(house_condo) AS condominium_price_median,
+    MEDIAN(house_iptu) AS urban_property_tax_median
 FROM similar_listings
 GROUP BY 1,2

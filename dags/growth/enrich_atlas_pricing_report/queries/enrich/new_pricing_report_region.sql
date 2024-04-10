@@ -45,11 +45,11 @@ house_views AS (
 ),
 lpv_data AS (
     SELECT DISTINCT
-        NOW() AS ts_event,
+        UNIX_TIMESTAMP(NOW()) AS ts_event,
         m.sk_region::BIGINT AS id_region,
         m.neighborhood::STRING,
         UPPER(m.business_context)::STRING AS business_context,
-        APPROX_PERCENTILE(m.views_quantity, 0.50) OVER(PARTITION BY m.business_context, m.sk_region)::BIGINT AS lpv_p_50,
+        MEDIAN(m.views_quantity) OVER(PARTITION BY m.business_context, m.sk_region)::BIGINT AS lpv_p_50,
         a.mdape_city::FLOAT
     FROM
         datalake_atlas_pricing_report.region_metrics AS a

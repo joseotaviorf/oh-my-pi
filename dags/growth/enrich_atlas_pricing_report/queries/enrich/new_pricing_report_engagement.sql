@@ -1,6 +1,6 @@
 WITH house_engagement AS (
     SELECT DISTINCT
-        NOW() AS ts_event,
+        UNIX_TIMESTAMP(NOW()) AS ts_event,
         lbc.id_house::BIGINT,
         UPPER(lbc.business_context)::STRING AS business_context,
         COALESCE(pre.views_quantity, 0)::BIGINT AS views_quantity,
@@ -8,11 +8,11 @@ WITH house_engagement AS (
         hm.condominium_price_median::BIGINT,
         hm.urban_property_tax_median::BIGINT,
         hm.on_market_price_median::BIGINT,
-        hm.on_market_price_by_square_meter::FLOAT,
+        ROUND(hm.on_market_price_by_square_meter::FLOAT,2) AS on_market_price_by_square_meter,
         hm.off_market_price_median::BIGINT,
-        hm.off_market_price_by_square_meter::FLOAT,
+        ROUND(hm.off_market_price_by_square_meter::FLOAT,2) AS off_market_price_by_square_meter,
         hm.negotiated_price_median::BIGINT,
-        hm.negotiated_price_by_square_meter::FLOAT,
+        ROUND(hm.negotiated_price_by_square_meter::FLOAT,2) AS negotiated_price_by_square_meter,
         hm.median_days_to_contract_sign::BIGINT
     FROM datalake_ebdb_clean.listing_business_context lbc
     JOIN dw_public.dim_house_listing dhl
@@ -29,7 +29,7 @@ WITH house_engagement AS (
         AND dhl.country_code != 'MX'
 )
 SELECT
-    ts_event,
+    ts_event AS ts_event,
     MONOTONICALLY_INCREASING_ID() AS id,
     id_house,
     business_context,
