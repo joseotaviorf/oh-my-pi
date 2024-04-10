@@ -10,7 +10,7 @@ WITH base_crm_analyst_info AS (
     datalake_ebdb_user.user AS du
       ON du.id = turf.id_assignee
   INNER JOIN
-    datalake_zendesk_users.agents AS a
+    datalake_support_users.analysts AS a
       ON a.email = du.email
 ),
 crm_tasks AS (

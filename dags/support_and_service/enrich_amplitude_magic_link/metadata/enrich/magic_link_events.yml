@@ -1,8 +1,9 @@
 ---
 database_name: datalake_amplitude_magic_link
 table_name: magic_link_events
-description: Enrichment table with the aim of unifying information about magic link
- events and assigned analysts. Each row in this table represents an event.
+description:
+  Enrichment table with the aim of unifying information about magic link
+  events and assigned analysts. Each row in this table represents an event.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -41,7 +42,7 @@ columns:
   id_agent:
     description: Analyst identification key linked to the magic link event.
     lineage:
-      - datalake_zendesk_users.agents.id_agent
+      - datalake_support_users.analysts.id_agent
   uuid:
     description: Unique identifier (UUID) generated in the Product Database.
     lineage:
@@ -73,11 +74,11 @@ columns:
   agent_name:
     description: Name of the analyst assigned to the amplitude event.
     lineage:
-      - datalake_zendesk_users.agents.name
+      - datalake_support_users.analysts.name
   agent_company:
     description: Organization in which the analyst assigned to the amplitude event works.
     lineage:
-      - datalake_zendesk_users.agents.organization
+      - datalake_support_users.analysts.organization
   agent_department:
     description: Department in which the analyst assigned to the amplitude event works.
     lineage:

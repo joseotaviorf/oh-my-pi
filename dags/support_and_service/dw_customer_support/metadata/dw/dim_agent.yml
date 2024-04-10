@@ -8,27 +8,27 @@ columns:
     description: Unique agent identifier.
   sk_agent_twilio:
     lineage:
-      - datalake_zendesk_users.agents.id_agent_twilio
+      - datalake_support_users.analysts.id_agent_twilio
     description: Temporary field for analyst identification in twilio.
   full_name:
     lineage:
-      - datalake_zendesk_users.agents.name
+      - datalake_support_users.analysts.name
     description: Agent name.
   email:
     lineage:
-      - datalake_zendesk_users.agents.email
+      - datalake_support_users.analysts.email
     description: Agent email.
   phone:
     lineage:
-      - datalake_zendesk_users.agents.phone
+      - datalake_support_users.analysts.phone
     description: Agent phone.
   agent_organization:
     lineage:
-      - datalake_zendesk_users.agents.organization
+      - datalake_support_users.analysts.organization
     description: Name of the company where the analyst works.
   agent_company:
     lineage:
-      - datalake_zendesk_users.agents.organization
+      - datalake_support_users.analysts.organization
     description: Temporary field.
   agent_manager:
     lineage:
@@ -36,7 +36,7 @@ columns:
     description: Analyst Manager.
   dt_agent_start:
     lineage:
-      - datalake_zendesk_users.agents.ts_created
+      - datalake_support_users.analysts.ts_created
     description: Date agent start working for QuintoAndar.
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_customer_support.

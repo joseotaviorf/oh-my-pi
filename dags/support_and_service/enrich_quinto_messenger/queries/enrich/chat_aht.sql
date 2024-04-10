@@ -50,7 +50,7 @@ chat_tasks_structure AS (
     SELECT
         ta.id_external AS id_task,
         ta.id_channel_external AS id_conversation,
-        ta.department_name,     
+        ta.department_name,
         ta.id_agent,
         ta.agent_email,
         to_date(ta.ts_task_created_local) AS dt_task_created_local,
@@ -178,6 +178,6 @@ JOIN
         AND cd.id_agent = em.id_agent
         AND cd.department_name = em.department_name
 LEFT JOIN
-    datalake_zendesk_users.agents AS a
+    datalake_support_users.analysts AS a
         ON cd.agent_email = a.email
 ORDER BY 1,2

@@ -10,11 +10,11 @@ columns:
     description: Date the task was created in the fifth messenger, in the BR timezone format.
   agent_email:
     lineage:
-      - datalake_zendesk_users.agents.email
+      - datalake_support_users.analysts.email
     description: Email of the analyst who signed the task.
   agent_organization:
     lineage:
-      - datalake_zendesk_users.agents.organization
+      - datalake_support_users.analysts.organization
     description: Name of the company where the analyst works.
   department_name:
     lineage:

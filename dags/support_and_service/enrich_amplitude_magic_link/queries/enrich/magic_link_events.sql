@@ -1,12 +1,12 @@
 WITH agent_department AS (
     SELECT DISTINCT
-        us.email,
-        FIRST(g.name) OVER (PARTITION BY us.email ORDER BY us.ts_updated DESC) AS main_department
+        u.email,
+        FIRST(g.name) OVER (PARTITION BY u.email ORDER BY u.ts_updated DESC) AS main_department
     FROM
-        datalake_zendesk_tickets_clean.users AS us
+        datalake_zendesk_clean.users AS u
     JOIN
-        datalake_zendesk_tickets_clean.groups AS g
-            ON us.id_default_group = g.id_group
+        datalake_zendesk_clean.groups AS g
+            ON u.id_default_group = g.id_group
 )
 SELECT DISTINCT
     e.id_amplitude,
@@ -17,7 +17,7 @@ SELECT DISTINCT
     e.id_schema,
     e.id_inserted,
     e.id_user,
-    ac.id_agent,
+    a.id_agent,
     e.uuid,
     e.ids_amplitude_attributed,
     e.adid,
@@ -25,8 +25,8 @@ SELECT DISTINCT
     e.user_properties,
     GET_JSON_OBJECT(e.user_properties, '$.country') AS country_code,
     GET_JSON_OBJECT(e.user_properties, '$.email') AS agent_email,
-    ac.name AS agent_name,
-    ac.organization AS agent_company,
+    a.name AS agent_name,
+    a.organization AS agent_company,
     dc.department AS agent_department,
     dc.team AS department_team,
     dc.journey_step AS department_journey_step,
@@ -72,8 +72,8 @@ SELECT DISTINCT
 FROM
     datalake_amplitude_clean.events e
 LEFT JOIN
-    datalake_zendesk_users.agents ac
-        ON GET_JSON_OBJECT(e.user_properties, '$.email') = ac.email
+    datalake_support_users.analysts a
+        ON GET_JSON_OBJECT(e.user_properties, '$.email') = a.email
 LEFT JOIN
     agent_department ad
         ON GET_JSON_OBJECT(e.user_properties, '$.email') = ad.email

@@ -1,4 +1,4 @@
-SELECT DISTINCT 
+SELECT DISTINCT
     bc.id_source_unique,
     bc.caller_phone_number,
     bc.destination_phone_number,
@@ -12,14 +12,14 @@ SELECT DISTINCT
     MONTH(CURRENT_DATE) AS month,
     DAY(CURRENT_DATE) AS day,
     NOW() AS ts_load
-FROM 
+FROM
     datalake_bigfone_clean.call AS bc
 LEFT JOIN
     datalake_customer_support.call AS c
         ON bc.id_source_unique = c.sk_call
 LEFT JOIN
-    datalake_zendesk_users.agents AS a
+    datalake_support_users.analysts AS a
         ON c.agent_email = a.email
-WHERE 
+WHERE
     a.organization IN ('atento', 'atn')
     AND DATE(bc.ts_started) = CURRENT_DATE() - 1

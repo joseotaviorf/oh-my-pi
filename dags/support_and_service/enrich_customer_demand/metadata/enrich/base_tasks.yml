@@ -19,10 +19,9 @@ columns:
     description: The task ID, which can be the CRM task ID or the Zendesk email ticket ID.
   id_agent:
     lineage:
-      - datalake_zendesk_users.agents.email
+      - datalake_support_users.analysts.email
       - datalake_customer_support.email.agent_email
-    description: 
-      The agent responsible for the task. This data is 
+    description: The agent responsible for the task. This data is
       generated through an MD5 based on the analyst's email.
   id_user:
     lineage:
@@ -76,7 +75,7 @@ columns:
       the "unique_theme_sla_target", and finally the "unique_journey_sla_target".
   agent_email:
     lineage:
-      - datalake_zendesk_users.agents.email
+      - datalake_support_users.analysts.email
       - datalake_customer_support.email.agent_email
     description: Email of the agent assigned to the stask
   origin:

@@ -30,32 +30,38 @@ WITH tickets AS (
         DATE(GET_JSON_OBJECT(e.custom_fields, '$.[Data] Intermediação com as partes')) AS dt_intermediate,
         DATE(GET_JSON_OBJECT(e.custom_fields, '$.[Data] Execução do acordo')) AS dt_agreement_executed,
         DATE(GET_JSON_OBJECT(e.custom_fields, '$.[Data] Finalização')) AS dt_finished,
-        DATE(GET_JSON_OBJECT(e.custom_fields, '$.Data para retorno')) AS dt_return, 
+        DATE(GET_JSON_OBJECT(e.custom_fields, '$.Data para retorno')) AS dt_return,
         DATE(GET_JSON_OBJECT(e.custom_fields, '$.[Data] Orçamentação realizada ')) AS dt_budgeted,
         DATE(GET_JSON_OBJECT(e.custom_fields, '$.[Data] Reparos enviados ao PP')) AS dt_analysis,
         DATE(GET_JSON_OBJECT(e.custom_fields, '$.[Data] Reanalise de Reparos')) AS dt_reanalysis,
         DATE(e.ts_ticket_started) AS dt_started,
         DATE(e.ts_ticket_ended) AS dt_closed
-    FROM 
+    FROM
         datalake_customer_support.email e
     LEFT JOIN
-        datalake_zendesk_users.agents AS a
+        datalake_support_users.analysts AS a
             ON LOWER(e.agent_email) = a.email
-    WHERE 
-        e.department IN ('Offboarding Reparos [OFF] [POS] [BACK]','Offboarding [OFF] [POS] [BACK]','B2B [POS] [OFF] [BACK]','Rescisão Prime [Casa Mineira]','B2B Prime [OFF] [POS] [BACK]')
+    WHERE
+        e.department IN (
+            'Offboarding Reparos [OFF] [POS] [BACK]',
+            'Offboarding [OFF] [POS] [BACK]',
+            'B2B [POS] [OFF] [BACK]',
+            'Rescisão Prime [Casa Mineira]',
+            'B2B Prime [OFF] [POS] [BACK]'
+        )
 ),
 last_ticket_in_contract AS (
-    SELECT 
+    SELECT
         MAX(id_ticket) OVER (PARTITION BY id_contract ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_ticket
-    FROM 
+    FROM
         tickets t
-    WHERE 
+    WHERE
         t.client_type IN ('proprietário','imobiliária_b2b')
         AND t.process_type = 'reparos'
 )
-SELECT 
+SELECT
     t.*
-FROM 
+FROM
     tickets t
 INNER JOIN
     last_ticket_in_contract ltic

@@ -1,7 +1,8 @@
 ---
 database_name: datalake_offboarding
 table_name: budgeting_window
-description: Enrichment table that sought to consolidate budget information related to the 
+description:
+  Enrichment table that sought to consolidate budget information related to the
   post-contract context (offboarding). Each row in this table represents an offboarding ticket.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
@@ -31,11 +32,11 @@ columns:
   agent_name:
     description: Name of the analyst who handled the ticket.
     lineage:
-      - datalake_zendesk_users.agents.name
+      - datalake_support_users.analysts.name
   agent_company:
     description: Organization of the analyst who handled the ticket.
     lineage:
-      - datalake_zendesk_users.agents.organization
+      - datalake_support_users.analysts.organization
   department:
     description: Descriptive data that indicates which department the ticket is linked to.
     lineage:

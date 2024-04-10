@@ -10,7 +10,7 @@ WITH agents AS(
     MAX(ac.manager) AS agent_manager,
     MAX(DATE(a.ts_created)) AS dt_agent_start
   FROM
-    datalake_zendesk_users.agents AS a
+    datalake_support_users.analysts AS a
   LEFT JOIN
     datalake_gsheets_clean.agents_control AS ac
       ON a.email = LOWER(ac.email)
