@@ -1,4 +1,4 @@
-database_name: datalake_zendesk_users
+database_name: datalake_support_users
 table_name: zendesk_users
 description: Contains data from all Zendesk users
 domain: Support and Service

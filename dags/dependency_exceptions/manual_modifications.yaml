@@ -528,13 +528,6 @@ bietlejuice.enrich_open_external_data_addresses:
     - bietlejuice.iptu:load-clean-iptu-sp
     - bietlejuice.itbi:load-clean-itbi-bh
     - bietlejuice.itbi:load-clean-itbi-sp
-bietlejuice.enrich_pipeline:
-  # We need to remove these dependencies because the Composer DAG runs several times during the day, and it's not
-  # our intention to run this DAG the same amount of times.
-  remove:
-    - bietlejuice.composer:load-clean-dag
-    - bietlejuice.composer:load-clean-dag-run
-    - bietlejuice.composer:load-clean-log
 bietlejuice.enrich_proponent:
   override: []
 bietlejuice.enrich_recommendations:

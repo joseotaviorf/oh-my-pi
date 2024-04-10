@@ -1,4 +1,4 @@
-database_name: datalake_zendesk_users
+database_name: datalake_support_users
 table_name: analysts
 description:
   This table is intended to gather user information segmented by the analyst entity.

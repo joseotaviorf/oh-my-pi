@@ -223,8 +223,8 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_customer_support:load-enrich-received-demand
   - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
+  - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
-  - bietlejuice.enrich_zendesk_users:load-enrich-agents
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.dw_datamarts_spark.cross:
@@ -1003,6 +1003,7 @@ bietlejuice.enrich_amplitude_lead:
   - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.zendesk:load-clean-groups
   - bietlejuice.zendesk:load-clean-users
@@ -1296,6 +1297,7 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
   - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
@@ -2012,6 +2014,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
+  - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_tracksale:load-enrich-answer
   - bietlejuice.enrich_tracksale:load-enrich-campaign
   - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
@@ -2083,6 +2086,10 @@ bietlejuice.enrich_open_external_data:
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
+bietlejuice.enrich_pipeline:
+  - bietlejuice.composer:load-clean-dag
+  - bietlejuice.composer:load-clean-dag-run
+  - bietlejuice.composer:load-clean-log
 bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-account
   - bietlejuice.pixar:load-clean-charge
@@ -2119,6 +2126,7 @@ bietlejuice.enrich_public_date:
   - bietlejuice.google_calendar:load-clean-brazillian-holidays
   - bietlejuice.google_calendar:load-clean-mexican-holidays
 bietlejuice.enrich_quinto_messenger:
+  - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.internal_chat:load-clean-internal-chat-messages
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
@@ -2835,6 +2843,8 @@ bietlejuice.enrich_wordpress_baroes:
   - bietlejuice.wordpress_baroes:load-clean-conteudos-data
   - bietlejuice.wordpress_baroes:load-clean-meulugar-data
 bietlejuice.enrich_zendesk:
+  - bietlejuice.enrich_support_users:load-enrich-analysts
+  - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.zendesk:load-clean-groups
   - bietlejuice.zendesk:load-clean-ticket-fields
   - bietlejuice.zendesk:load-clean-ticket-metrics
@@ -3085,6 +3095,7 @@ bietlejuice.reverse_atento:
   - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
+  - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.quinto_messenger:load-clean-channel
@@ -3257,6 +3268,7 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
+  - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
