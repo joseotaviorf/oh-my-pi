@@ -88,7 +88,7 @@ events_by_month AS (
     LEFT JOIN
         datalake_mexico_cib_events.cib_events AS ce
             ON ce.id_cib = bmsr.id_user
-            AND DATE_TRUNC('month', ce.dt_event) = bmsr.dt_started
+            AND DATE_TRUNC('month', ce.dt_event) = DATE_TRUNC('month', bmsr.dt_started)
     GROUP BY
         1, 4
 ),
@@ -125,7 +125,7 @@ segmentation_rule_calculation AS (
         bmsr.months_registered,
         IF(months_registered <= bmsr.longer_months_calculation, bmsr.shorter_months_calculation, bmsr.longer_months_calculation) AS months_calculation,
         bmsr.dt_month_started_segmentation,
-        IF(months_registered <= bmsr.longer_months_calculation, bmsr.dt_started, GREATEST(ADD_MONTHS(bmsr.dt_started, -((bmsr.longer_months_calculation)-1)), bmsr.dt_registered)) AS dt_started,
+        IF(months_registered <= bmsr.longer_months_calculation, GREATEST(ADD_MONTHS(bmsr.dt_started, -((bmsr.shorter_months_calculation)-1)), bmsr.dt_registered), GREATEST(ADD_MONTHS(bmsr.dt_started, -((bmsr.longer_months_calculation)-1)), bmsr.dt_registered)) AS dt_started,
         bmsr.dt_ended,
         YEAR(dt_month_started_segmentation) AS year,
         MONTH(dt_month_started_segmentation) AS month

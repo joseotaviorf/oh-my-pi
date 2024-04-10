@@ -37,10 +37,13 @@ columns:
       - datalake_big_agent.agent.details
     description: Number of months that the CIB has been registered.
   months_calculation:
+    lineage:
+      - datalake_gsheets_clean.mexico_cib_segmentation_rules_global_variables.shorter_months_calculation
+      - datalake_gsheets_clean.mexico_cib_segmentation_rules_global_variables.longer_months_calculation
     description: Number of months used in segmentation calculation.
   dt_month_started_segmentation:
     lineage:
-      - datalake_quintoandar.aux_date.month_start
+      - datalake_quintoandar.aux_date.month_end
     description: Start date of the month in which the CIB will be classified with the calculated segmentation.
   dt_started:
     lineage:
@@ -53,9 +56,9 @@ columns:
     description: End date of the period in which the events made by the CIB will be analyzed
   year:
     lineage:
-      - datalake_quintoandar.aux_date.month_start
+      - datalake_quintoandar.aux_date.month_end
     description: Year in which the CIB will be classified with the calculated segmentation. Also, it's a partition of this table.
   month:
     lineage:
-      - datalake_quintoandar.aux_date.month_start
+      - datalake_quintoandar.aux_date.month_end
     description: Month in which the CIB will be classified with the calculated segmentation. Also, it's a partition of this table.
