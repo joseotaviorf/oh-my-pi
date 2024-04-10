@@ -108,8 +108,8 @@ if __name__ == "__main__":
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-                source_root_path={source_root_path}, date_to_ingest={date_to_ingest}, table_name={table_name},
-                format={format},col_names={col_names}, consumer_extra_args={consumer_extra_args}, msg=Starting spark job...
+                source_root_path={source_root_path}, date_to_ingest={date_to_ingest}, datetime_to_ingest={datetime_to_ingest},
+                table_name={table_name}, format={format},col_names={col_names}, consumer_extra_args={consumer_extra_args}, msg=Starting spark job...
         """
     )
 
