@@ -10,7 +10,22 @@ columns:
   sk_media_setup:
     description: 'Unique id for the combination of (campaign_strategy_intent & campaign_business_context & campaign_landing_page & behavior_type & medium & source). Used as input in the campaigns UTM parameters.'
     lineage:
-      - atalake_growth_taxonomy.media_setup.id_media_setup
+      - datalake_growth_taxonomy.media_setup.id_media_setup
+  naming_convention_sufix:
+    description: 'Acronym generated from the values of the taxonomy levels, used as input in the campaigns UTM parameters.'
+    lineage:
+      - datalake_gsheets_clean.dict_taxonomy_supply.campaign_strategy_intent
+      - datalake_gsheets_clean.dict_taxonomy_supply.behavior_type
+      - datalake_gsheets_clean.dict_taxonomy_supply.campaign_landing_page
+      - datalake_gsheets_clean.dict_taxonomy_supply.campaign_business_context
+      - datalake_gsheets_clean.dict_taxonomy_supply.medium
+      - datalake_gsheets_clean.dict_taxonomy_supply.source
+      - datalake_growth_taxonomy.demand_taxonomy_dictionary.campaign_strategy_intent
+      - datalake_growth_taxonomy.demand_taxonomy_dictionary.behavior_type
+      - datalake_growth_taxonomy.demand_taxonomy_dictionary.campaign_landing_page
+      - datalake_growth_taxonomy.demand_taxonomy_dictionary.campaign_business_context
+      - datalake_growth_taxonomy.demand_taxonomy_dictionary.medium
+      - datalake_growth_taxonomy.demand_taxonomy_dictionary.source
   utm_campaign:
     description: The extracted field from raw utm_campaign in the UTM parameters.
     lineage:
