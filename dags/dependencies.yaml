@@ -3042,6 +3042,7 @@ bietlejuice.metric_rent__retention:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_retention:load-dw-retention-dim-nps-answer
+  - bietlejuice.dw_retention:load-dw-retention-dim-termination
   - bietlejuice.dw_retention:load-dw-retention-fact-contract-termination
   - bietlejuice.dw_retention:load-dw-retention-fact-owner-retention
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination

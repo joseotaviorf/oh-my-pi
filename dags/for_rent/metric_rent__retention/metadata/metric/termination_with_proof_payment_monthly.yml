@@ -1,0 +1,45 @@
+---
+database_name: metric_rent
+table_name: termination_with_proof_payment_monthly
+description: Monthly percentage of terminations with proof of termination payment and the number of terminations (total and paid) excluding the category BEFORE_RENTAL.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  dt_ended_termination_month:
+    lineage:
+      - dw_rent.dw_retention.dt_ended_termination
+    description: "Month of the termination ended."
+    dimension: True
+  terminations:
+    description: "Total volume of contracts that were in termination in a month"
+    metric:
+      name: Total Contract Termination Excluding Before Rental Category
+      description: "Total volume of contracts in termination excluding the category = BEFORE_RENTAL in a month"
+      acronym: CTEBR
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  terminations_paid:
+    description: "Total volume of paid contracts termination during a month, i.e send_utility_bills_receipt = 'COMPLETED' and type of the attachment = CONDO_VOUCHER or PAYMENT_VOUCHER."
+    metric:
+      name: Total Contract Termination Paid
+      description: "Total volume of paid contracts termination during a month, i.e send_utility_bills_receipt = 'COMPLETED' and type of the attachment = CONDO_VOUCHER or PAYMENT_VOUCHER."
+      acronym: CTP
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  percentage_terminations_paid:
+    description: "Percentage of terminations paid."
+    metric:
+      name: Percentage Of Relistings In Less Than 3 Days After Contract Termination
+      description: "Percentage of termination paid of a month. The calculation is terminations/terminations_paid"
+      acronym: PCTP
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
