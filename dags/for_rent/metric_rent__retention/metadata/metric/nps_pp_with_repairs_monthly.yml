@@ -59,7 +59,7 @@ columns:
       name: NPS Of Owners With Repair
       description: "NPS of owners with contract terminations with repair needed."
       acronym: NPSOOWR
-      is_additive: True
+      is_additive: False
       business_stage: Offboarding
       hierarchy: User analysis
       approved_by: camila.simoes@quintoandar.com.br

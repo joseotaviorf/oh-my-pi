@@ -22,3 +22,5 @@ Currently, there is the following output tables in the metric layer:
 - `nps_pp_without_repairs_weekly`
 - `relisting_before_tr_3_days_monthly`
 - `relisting_before_tr_3_days_weekly`
+- `termination_with_proof_payment_monthly`
+- `termination_with_proof_payment_weekly`

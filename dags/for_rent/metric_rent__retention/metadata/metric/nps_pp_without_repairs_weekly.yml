@@ -59,7 +59,7 @@ columns:
       name: NPS Of Owners Without Repair
       description: "NPS of owners with contract terminations without repair needed."
       acronym: NPSOOWOR
-      is_additive: True
+      is_additive: False
       business_stage: Offboarding
       hierarchy: User analysis
       approved_by: camila.simoes@quintoandar.com.br

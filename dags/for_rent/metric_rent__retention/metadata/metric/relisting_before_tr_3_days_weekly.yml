@@ -48,7 +48,7 @@ columns:
       name: Percentage Of Relistings Before The Third Day After Contract Termination
       description: "Percentage of relistings happened before the third day after the house's rent contract termination."
       acronym: PCTRLATR3D
-      is_additive: True
+      is_additive: False
       business_stage: Demand
       hierarchy: User analysis
       approved_by: camila.simoes@quintoandar.com.br
