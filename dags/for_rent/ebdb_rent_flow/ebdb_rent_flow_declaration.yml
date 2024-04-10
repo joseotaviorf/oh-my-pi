@@ -1,23 +1,23 @@
 dag:
-  name: ebdb_rent_flow_test
+  name: ebdb_rent_flow
   schedule_start_date: 2021, 2, 20
   schedule_interval: 10 21 * * *
-  owner: Data Engineering
+  owner: Data ForRent
   documentation:
-    dag_purpose: Retrieves data from incoming CDC replication from EBDB and load it on datalake.
+    dag_purpose: Extraction of EBDB tables related to Rent Flow into data lake. EBDB is the main database for QuintoAndar.
 workflow:
   type: cdc
   layer: raw
-  custom_schema: ebdb_test
+  custom_schema: ebdb
   source_schema: ebdb
   tables_customization:
+    FluxoLocacao:
+      clean_table_name: rent_flow
+    FluxoLocacao_AUD:
+      clean_table_name: rent_flow_aud
     FluxoLocacao_DadosAgente:
       clean_table_name: agent_rent_flow
     Onboarding:
       clean_table_name: onboarding
-    FluxoLocacao_AUD:
-      clean_table_name: rent_flow_aud
-    FluxoLocacao:
-      clean_table_name: rent_flow
 cluster:
   type: databricks_12_2_med_general_cluster
