@@ -1,4 +1,13 @@
-WITH cte_pay AS (
+WITH
+deduplicate_payment AS (
+    SELECT
+        ts_updated,
+        type,
+        id_installment
+    FROM datalake_trato_feito_clean.payment
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_created DESC) = 1
+),
+cte_pay AS (
     SELECT
         i.*,
         p.ts_updated AS ts_payment_updated,
@@ -7,7 +16,7 @@ WITH cte_pay AS (
     FROM
         datalake_trato_feito_clean.installment AS i
     LEFT JOIN
-        datalake_trato_feito_clean.payment AS p
+        deduplicate_payment AS p
             ON p.id_installment = i.id
 )
 SELECT

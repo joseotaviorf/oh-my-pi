@@ -59,11 +59,13 @@ SELECT
         WHEN LOWER(i.installment_situation) = "parcela paga" THEN i.id_customer
         ELSE NULL
     END AS id_paid_customer_document,
+    i.receipt_code AS id_receipt,
     CASE
-        WHEN i.id_creditor = 1 THEN 'QuintoAndar'
-        WHEN i.id_creditor IN (3,5) THEN 'Velo'
-        ELSE 'PP'
+      WHEN i.id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
+      WHEN i.id_creditor IN (3,5) THEN "IQ QuintoCred"
+      WHEN i.id_creditor IN (2,6) THEN "PP QuintoAndar"
     END AS creditor,
+    i.is_special_installment,
     ci.indicator_content AS contract_status,
     CASE
         WHEN LOWER(i.installment_situation) = "parcela em aberta" THEN 'Em aberto'
@@ -84,6 +86,12 @@ SELECT
     i.main_amount,
     i.transfer_amount AS updated_balance,
     ROUND(dm.paid_amount,2) AS paid_amount,
+    i.amount_to_pay,
+    i.amount_fine,
+    i.interest_fee_amount,
+    i.default_interest_amount,
+    i.adm_fee_amount,
+    i.discount_amount,
     ROUND(i.transfer_amount - i.main_amount,2) AS charges,
     i.dt_installment AS dt_formalization,
     i.dt_due,

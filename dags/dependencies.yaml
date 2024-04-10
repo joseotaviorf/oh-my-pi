@@ -144,7 +144,6 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.recupera:load-clean-contracts
   - bietlejuice.recupera:load-clean-creditor-pending
   - bietlejuice.recupera:load-clean-historical
-  - bietlejuice.recupera:load-clean-installment
   - bietlejuice.recupera:load-clean-operational-records
   - bietlejuice.recupera:load-clean-operators
   - bietlejuice.recupera:load-clean-records

@@ -157,6 +157,7 @@ union_sources AS (
     STRING(COALESCE(tfn.id_negotiation_recupera, rn.id_negotiation)) AS sk_negotiation,
     rn.customer_document AS sk_debtor,
     tfn.id_negotiation AS id_negotiation_trato_feito,
+    rn.id_negotiation AS id_negotiation_recupera,
     COALESCE(tfn.id_contract, invn.id_contract) AS id_contract,
     UPPER(rn.id_operator) AS id_operator,
     COALESCE(tfn.creditor,
