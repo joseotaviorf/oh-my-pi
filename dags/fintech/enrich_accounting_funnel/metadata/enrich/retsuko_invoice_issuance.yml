@@ -38,7 +38,19 @@ columns:
       - datalake_accounting_funnel.ledger.debit_credit
       - datalake_retsuko.invoice.amount
     description: "Boolean that indicated if the correct amount from Retsuko's valid invoice, arrived in the correct destination in SAP"
-  dt_created:
+  dt_source_created:
     lineage:
       - datalake_retsuko.invoice.ts_created
     description: "Date that the invoice was created in Retusko"
+  dt_source_paid:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+    description: "Date that the invoice was paid in Retusko"
+  dt_sap_created:
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_created
+    description: "Date that the entry was created in SAP"
+  dt_sap_reference:
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_reference
+    description: "Date that the entry was referenced in SAP"

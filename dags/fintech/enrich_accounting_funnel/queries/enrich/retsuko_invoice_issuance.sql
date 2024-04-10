@@ -31,7 +31,8 @@ retsuko AS (
       WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee', 'entry.bill-item/brokerage-quinto-andar') THEN 'brokerage'
     END AS revenue_name,
     i.accrual_year_month,
-    DATE(i.ts_created) AS dt_created,
+    DATE(i.ts_created) AS dt_source_created,
+    DATE(i.ts_paid) AS dt_source_paid,
     CAST(SUM(amount) AS DECIMAL(12,2)) AS product_amount
   FROM 
     treated_entry e
@@ -78,7 +79,7 @@ retsuko AS (
   AND ii.invoice_frequency != 'extra'
   AND DATE(i.ts_created) >= '2024-01-01'
   GROUP BY
-      1, 2, 3, 4, 5, 6
+      1, 2, 3, 4, 5, 6, 7
   HAVING 
     SUM(amount) != 0
 ),
@@ -91,6 +92,8 @@ sap AS (
       WHEN account_number = '31101.02.01' THEN 'adm fee'
       WHEN account_number = '31101.01.01' THEN 'brokerage'
     END AS revenue_account,
+    DATE(dt_created) AS dt_sap_created,
+    DATE(dt_reference) AS dt_sap_reference,
     CAST(sum(debit_credit) AS DECIMAL(12,2)) AS sap_amount
   FROM 
     datalake_accounting_funnel.ledger
@@ -99,7 +102,7 @@ sap AS (
   AND document_number LIKE 'IN %'
   AND dt_reference >= '2024-01-01'
   GROUP BY 
-    1,2
+    1, 2, 3, 4
 )
 
 SELECT 
@@ -116,7 +119,10 @@ SELECT
   ABS(product_amount) AS source_amount,
   ABS(sap_amount) AS sap_amount,
   IF((ABS(product_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(product_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_compliance, 
-  dt_created
+  dt_source_created,
+  dt_source_paid,
+  dt_sap_created,
+  dt_sap_reference
 FROM 
   retsuko r
 LEFT JOIN 

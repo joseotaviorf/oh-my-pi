@@ -37,7 +37,19 @@ columns:
     lineage:
       - datalake_accounting_funnel.retsuko_invoice_issuance.is_compliance
     description: "Boolean that indicated if the correct amount from source, arrived in the correct destination in SAP"
-  dt_created:
+  dt_source_created:
     lineage:
-      - datalake_accounting_funnel.retsuko_invoice_issuance.dt_created
+      - datalake_accounting_funnel.retsuko_invoice_issuance.dt_source_created
     description: "Date that finance entity was created in source"
+  dt_source_paid:
+    lineage:
+      - datalake_accounting_funnel.retsuko_invoice_issuance.dt_source_paid
+    description: "Date that finance entity was paid in source"
+  dt_sap_created:
+    lineage:
+      - datalake_accounting_funnel.retsuko_invoice_issuance.dt_sap_created
+    description: "Date that the entry was created in SAP"
+  dt_sap_reference:
+    lineage:
+      - datalake_accounting_funnel.retsuko_invoice_issuance.dt_sap_reference
+    description: "Date that the entry was referenced in SAP"

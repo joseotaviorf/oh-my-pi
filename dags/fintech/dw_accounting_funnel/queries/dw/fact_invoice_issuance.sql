@@ -8,6 +8,9 @@ SELECT
   source_amount,
   sap_amount,
   is_compliance, 
-  dt_created
+  dt_source_created,
+  dt_source_paid,
+  dt_sap_created,
+  dt_sap_reference
 FROM 
   datalake_accounting_funnel.retsuko_invoice_issuance
