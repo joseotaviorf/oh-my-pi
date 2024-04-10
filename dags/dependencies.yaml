@@ -2086,10 +2086,6 @@ bietlejuice.enrich_open_external_data:
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
-bietlejuice.enrich_pipeline:
-  - bietlejuice.composer:load-clean-dag
-  - bietlejuice.composer:load-clean-dag-run
-  - bietlejuice.composer:load-clean-log
 bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-account
   - bietlejuice.pixar:load-clean-charge
