@@ -256,8 +256,20 @@ columns:
     description: Descriptive data that indicates the condition of the house.
     lineage:
       - datalake_zendesk_clean.tickets.custom_fields
-  house_classification_reason:
-    description: Data in array format with the reasons why the house was classified with the data in the house_classification column.
+  house_classification_reason1:
+    description: Reason 1 why the house was classified with the data in the house_classification column.
+    lineage:
+      - datalake_zendesk_clean.tickets.custom_fields
+  house_classification_reason2:
+    description: Reason 2 why the house was classified with the data in the house_classification column.
+    lineage:
+      - datalake_zendesk_clean.tickets.custom_fields
+  house_classification_reason3:
+    description: Reason 3 why the house was classified with the data in the house_classification column.
+    lineage:
+      - datalake_zendesk_clean.tickets.custom_fields
+  house_classification_reason4:
+    description: Reason 4 why the house was classified with the data in the house_classification column.
     lineage:
       - datalake_zendesk_clean.tickets.custom_fields
   signboard_location:

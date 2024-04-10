@@ -101,6 +101,10 @@ parsed_cf AS (
     INNER JOIN
         datalake_zendesk_clean.ticket_fields AS tf
             ON tf.id_ticket_field = cf.key
+    WHERE
+        cf.value IS NOT NULL
+        AND cf.value != ""
+        AND cf.value != " "
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY cf.id_ticket, cf.ts_updated, tf.title ORDER BY tf.ts_updated DESC) = 1
 ),
@@ -241,12 +245,10 @@ tickets_with_fields AS (
         t.cf_map["7401994966285"] AS id_house_aq, -- custom_field '[AQ] ID do imóvel'
         t.cf_map["7118963058317"] AS user_sender, -- custom_field '[AQ] User_sender'
         t.cf_map["6698471914509"] AS house_classification, -- custom_field '[AQ] Classificação do Imóvel'
-        COALESCE(
-            t.cf_map["7229025215373"], -- custom_field '[AQ] Motivo da Classificação do Imóvel 1'
-            t.cf_map["7229073331213"], -- custom_field '[AQ] Motivo da Classificação do Imóvel 2'
-            t.cf_map["7229085538189"], -- custom_field '[AQ] Motivo da Classificação do Imóvel 3'
-            t.cf_map["7229047296013"]  -- custom_field '[AQ] Motivo da Classificação do Imóvel 4'
-        ) AS house_classification_reason,
+        t.cf_map["7229025215373"] AS house_classification_reason1, -- custom_field '[AQ] Motivo da Classificação do Imóvel 1'
+        t.cf_map["7229073331213"] AS house_classification_reason2, -- custom_field '[AQ] Motivo da Classificação do Imóvel 2'
+        t.cf_map["7229085538189"] AS house_classification_reason3, -- custom_field '[AQ] Motivo da Classificação do Imóvel 3'
+        t.cf_map["7229047296013"] AS house_classification_reason4, -- custom_field '[AQ] Motivo da Classificação do Imóvel 4'
         t.cf_map["7119017157901"] AS signboard_location, -- custom_field '[AQ] Tem plaquinha'
         t.cf_map["7647210235917"] AS video_comments, -- custom_field '[AQ] Comentários do Vídeo'
         t.cf_map["14216500749837"] AS dt_first_fup,  -- custom_field '[Data] Data Primeiro FUP Manual Realizado'

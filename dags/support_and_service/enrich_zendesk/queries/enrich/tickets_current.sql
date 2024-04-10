@@ -231,9 +231,9 @@ SELECT
   t.ts_analyst_started,
   t.ts_created,
   t.ts_updated,
-  YEAR(ts_created) AS year,
-  MONTH(ts_created) AS month,
-  DAY(ts_created) AS day
+  YEAR(t.ts_created) AS year,
+  MONTH(t.ts_created) AS month,
+  DAY(t.ts_created) AS day
 FROM
   tickets AS t
 LEFT JOIN
