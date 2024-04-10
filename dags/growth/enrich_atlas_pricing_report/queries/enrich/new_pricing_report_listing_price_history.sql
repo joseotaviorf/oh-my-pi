@@ -43,7 +43,7 @@ SELECT
     UNIX_TIMESTAMP(NOW()) AS ts_event,
     MONOTONICALLY_INCREASING_ID() AS id,
     id_house,
-    business_context:STRING,
+    business_context::STRING,
     UNIX_TIMESTAMP(dt_price_updated, 'yyyy-MM-dd') AS dt_price_updated,
     price,
     status
