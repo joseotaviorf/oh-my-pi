@@ -1,76 +1,76 @@
-/*
-Imóveis FL com dt_price_updated e price nulos, são casos de imóveis com versão 000, 
-até estao na fact_listing_price_changes, mas tem a versão 0 e não vem na query
-*/
+WITH sale AS (
+    WITH aux_fs AS (
+        SELECT
+            sk_sale_listing,
+            MIN(ts_load) AS min_load
+        FROM dw_sale.fact_listings
+        GROUP BY 1
+        ),
 
-WITH listings AS (
-    SELECT DISTINCT
-        lbc.id_house,
-        lbc.business_context,
-        CASE
-            WHEN lbc.business_context = 'RENT' THEN p_rent.ts_price_started
-            WHEN lbc.business_context = 'SALE' THEN dd.date
-        END AS dt_price_updated,
-        CASE
-            WHEN lbc.business_context = 'RENT' THEN p_rent.rent
-            WHEN lbc.business_context = 'SALE' THEN p_sale.price
-        END AS price,
-        'FIRST_LISTING' AS status        
-    FROM datalake_ebdb_clean.listing_business_context lbc
-    LEFT JOIN dw_quintoandar.fact_listing_price_changes p_rent
-        ON (p_rent.sk_house_listing / 1000)::BIGINT = lbc.id_house 
-    LEFT JOIN dw_sale.fact_listing_price_changes p_sale
-        ON p_sale.sk_house = lbc.id_house
-    LEFT JOIN dw_public.dim_date dd
-        ON p_sale.sk_price_started_date = dd.sk_date
-    WHERE
-        SUBSTRING(p_rent.sk_house_listing::STRING, 10) > '000' -- Excluir casos de imóveis em edição
-),
+    first_load AS (
+        SELECT
+            SUBSTRING(fl.sk_sale_listing,0,9) AS id_house,
+            fl.sk_sale_listing AS sk_house_listing,
+            'FS' AS listing_category,
+            fl.price
+        FROM dw_sale.fact_listings fl
+        INNER JOIN aux_fs afs
+            ON fl.sk_sale_listing = afs.sk_sale_listing
+            AND afs.min_load = fl.ts_load
+        )
 
-first_listing AS (
     SELECT
-        id_house,
-        UPPER(business_context) AS business_context,
-        dt_price_updated,
-        price,
-        status    
-    FROM listings
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY dt_price_updated ASC) = 1
+        fl.id_house,
+        'SALE' AS business_context,
+        COALESCE(CONCAT(fls.status_history,' - ',fls.status_change_reason),fls.status_history) AS status,
+        fls.ts_status_started,
+        fl.price
+    FROM dw_sale.fact_listing_status fls
+    INNER JOIN first_load fl
+        ON fls.sk_sale_listing = fl.sk_house_listing
 ),
 
-relisting AS (
-    SELECT 
-        dhl.id_house,
+rent AS (
+    WITH aux_fr AS (
+        SELECT
+            id_house_listing,
+            min(dt_day) AS min_day
+        FROM datalake_rental_historical_follow_up.house_listings_daily_info
+        GROUP BY 1
+        ),
+
+    daily_info AS (
+        SELECT
+            di.dt_day,
+            di.id_house,
+            di.id_house_listing,
+            di.listing_category,
+            di.rent
+        FROM datalake_rental_historical_follow_up.house_listings_daily_info di
+        INNER JOIN aux_fr a
+            ON a.id_house_listing = di.id_house_listing
+            AND a.min_day = di.dt_day
+        WHERE
+            country_code = 'BR'
+        )
+
+    SELECT
+        SUBSTRING(sk_house_listing,0,9) AS id_house,
         'RENT' AS business_context,
-        ts_status_start AS dt_price_updated,
-        dhl.house_rent AS price,
-        'RELISTING' AS status
-    FROM listings bl
-    JOIN dw_public.fact_house_listing_status fhl
-        ON bl.id_house = (fhl.sk_house_listing / 1000)::BIGINT
-    JOIN dw_public.dim_house_listing dhl
-        ON fhl.sk_house_listing = dhl.sk_house_listing
-    WHERE
-        dhl.version > 1
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY dhl.sk_house_listing ORDER BY ts_status_start ASC) = 1        
+        COALESCE(CONCAT(fhls.status_history,' - ', fhls.status_change_reason),fhls.status_history) AS status,
+        fhls.ts_status_start AS ts_status_started,
+        di.rent AS price
+    FROM dw_public.fact_house_listing_status fhls
+    LEFT JOIN daily_info di
+        ON fhls.sk_house_listing = di.id_house_listing
 )
-    
-SELECT 
-    id_house,
-    business_context,
-    dt_price_updated,
-    price,
-    status
-FROM first_listing
-    
+
+SELECT
+    *
+FROM sale
+
 UNION
-    
-SELECT 
-    id_house,
-    business_context,
-    dt_price_updated,
-    price,
-    status
-FROM relisting
+
+SELECT
+    *
+FROM rent

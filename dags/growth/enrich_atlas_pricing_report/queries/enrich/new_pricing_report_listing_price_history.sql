@@ -3,7 +3,7 @@ WITH listing_price_history AS (
         NOW() AS ts_event,
         id_house::BIGINT,
         business_context::STRING,
-        dt_price_updated::DATE,
+        ts_status_started::DATE,
         price::FLOAT,
         status::STRING
     FROM
@@ -13,7 +13,7 @@ WITH listing_price_history AS (
         NOW() AS ts_event,
         id_house::BIGINT,
         business_context::STRING,
-        dt_price_updated::DATE,
+        ts_status_started::DATE,
         price::FLOAT,
         status::STRING
     FROM
@@ -23,28 +23,18 @@ WITH listing_price_history AS (
         NOW() AS ts_event,
         id_house::BIGINT,
         business_context::STRING,
-        dt_price_updated::DATE,
+        ts_status_started::DATE,
         price::FLOAT,
         status::STRING
     FROM
       datalake_atlas_pricing_report.status_history_house_price_change
-    UNION
-    SELECT
-        NOW() AS ts_event,
-        id_house::BIGINT,
-        business_context::STRING,
-        dt_price_updated::DATE,
-        price::FLOAT,
-        status::STRING
-    FROM
-      datalake_atlas_pricing_report.status_history_house_unpublished
 )
 SELECT
     UNIX_TIMESTAMP(NOW()) AS ts_event,
     MONOTONICALLY_INCREASING_ID() AS id,
     id_house,
     business_context::STRING,
-    UNIX_TIMESTAMP(dt_price_updated, 'yyyy-MM-dd') AS dt_price_updated,
+    UNIX_TIMESTAMP(ts_status_started, 'yyyy-MM-dd') AS ts_status_started,
     price,
     status
 FROM
