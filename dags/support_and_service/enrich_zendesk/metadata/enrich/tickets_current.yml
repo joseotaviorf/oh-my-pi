@@ -1,0 +1,434 @@
+database_name: datalake_zendesk
+table_name: tickets_current
+description: Table containing tickets and ticket metrics data
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_ticket:
+    description: Ticket ID from Zendesk
+    lineage:
+      - datalake_zendesk.tickets.id_ticket
+  id_assignee:
+    description: ID of the user assigned to the ticket
+    lineage:
+      - datalake_zendesk.tickets.id_assignee
+  id_group:
+    description: ID of the group of the ticket
+    lineage:
+      - datalake_zendesk.tickets.id_group
+  id_problem_ticket:
+    description: Problem ticket linked with the current ticket, if exists. If this is filled, then the ticket is of 'incident' type
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  id_house:
+    description: House ID associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  id_contract:
+    description: Contract ID associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  id_session:
+    description: Session ID from Sauron
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  id_call:
+    description: Call ID from Twilio
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  id_job:
+    description: Job ID
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  id_house_so:
+    description: House ID from a specific custom_fields related to SO
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  id_house_aq:
+    description: House ID from a specific custom_fields related to AQ
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  task_sid_twilio:
+    description: Twilio Task ID from an interaction that generated the ticket. Tipilcally exists for FrontOffice tickets
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  contact_ticket:
+    description: Another custom field that holds a Twilio ID
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  group_name:
+    lineage:
+      - datalake_zendesk.groups.name
+    description: Ticket group - department associated with the ticket
+  analyst_name:
+    lineage:
+      - datalake_support_users.analysts.name
+    description: Analyst name.
+  analyst_phone:
+    lineage:
+      - datalake_support_users.analysts.phone
+    description: Phone with which the analyst is registered.
+  analyst_organization:
+    lineage:
+      - datalake_support_users.analysts.organization
+    description: Name of the company where the analyst works.
+  analyst_email:
+    description: Email of the support analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  offer_ids:
+    description: All Offer IDs present in the ticket custom fields.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  taxonomy_tags:
+    description: The complete taxonomy tag
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  status:
+    description: Status of the ticket
+    lineage:
+      - datalake_zendesk.tickets.status
+  channel:
+    description: The source where the ticket was created from the company perspective
+    lineage:
+      - datalake_zendesk.tickets.channel
+  subject:
+    description: Ticket subject, filled by the creator of the ticket. Tickets created via API or email do not have a required subject and will have the same value as description in this column
+    lineage:
+      - datalake_zendesk.tickets.subject
+  description:
+    description: The first comment on the ticket.
+    lineage:
+      - datalake_zendesk.tickets.description
+  type:
+    description: Type of the ticket
+    lineage:
+      - datalake_zendesk.tickets.type
+  via:
+    description: The Zendesk's default source where the ticket was created
+    lineage:
+      - datalake_zendesk.tickets.via
+  via_channel:
+    description: Part of the Via object
+    lineage:
+      - datalake_zendesk.tickets.via
+  priority:
+    description: Ticket priority
+    lineage:
+      - datalake_zendesk.tickets.priority
+  recipient:
+    description: Ticket recipient
+    lineage:
+      - datalake_zendesk.tickets.recipient
+  tags:
+    description: Tags added to the ticket
+    lineage:
+      - datalake_zendesk.tickets.tags
+  satisfaction_rating:
+    description: Customer satisfaction data
+    lineage:
+      - datalake_zendesk.tickets.satisfaction_rating
+  client_type:
+    description: Type of client, from custom_fields like 'Tipo de Cliente'
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  step_tag:
+    description: Journey step of the client, from custom_fields
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  customer_type_tag:
+    description: Tag attached to the customer that requested the ticket, also from specific custom_fields
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  contact_theme_tag:
+    description: Specific custom_fields associated with ticket taxonomy
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  contact_motivation_tag:
+    description: Tag attached to the reason the customer opened a ticket, also from specific custom_fields
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  contact_theme_detail_tag:
+    description: Specific custom_fields associated with ticket taxonomy
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  protection_agreement:
+    description: The protection agreement between interested parties and 5A
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  repair_class:
+    description: Broad category associated with the repair type.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  repair_type:
+    description: More specific subgroup within the repair category.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  repair_detailed:
+    description: Even more specific details about the repair type, further narrowing down the category and subgroup.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  new_criticality:
+    description: Priority level of the repair request, indicating its urgency.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  criticality:
+    description: Priority level of the repair request, indicating its urgency.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  repair_execution_flow:
+    description: Categorization of how the repair execution flow was carried out.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  demand_type:
+    description: Descriptive information from the custom field, which indicates the type of demand generated by the ticket.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  process_type:
+    description: Descriptive information from the custom field, which indicates the type of process generated by the ticket.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  client_description:
+    description: Customer description related to service.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  repair_reanalysis:
+    description:
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  repairs_sent_to_ll:
+    description: Boolean indicating if the repair was sent to the owner
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  interaction_ll:
+    description: Boolean indicating if there was interaction with the owner.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  budgeting_performed:
+    description: Boolean data that indicates whether a budget was created.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  intermediation_with_parties:
+    description: Boolean data that indicates whether there was intermediation between the parties in the process.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  agreement_execution:
+    description: Boolean data that indicates whether the agreement was executed.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  finishing:
+    description: Boolean data that indicates whether the process has already completed.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  budget_value:
+    description: Numerical information about the budget amount.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  budget_range:
+    description: Descriptive data with information about the value range in which the budget fits.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  repair_reanalysis_tags:
+    description: Tags related to service.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  agreement_between_parties:
+    description: Descriptive information about the agreement between the parties.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  listing_type:
+    description: Type of the listing
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  install_reason:
+    description: Reason for installing plaquinhas
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  install_agent:
+    description: Agent responsible for installing plaquinhas
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  user_sender:
+    description: Type of user who sent the demand.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  house_classification:
+    description: Descriptive data that indicates the condition of the house.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  house_classification_reason:
+    description: Data in array format with the reasons why the house was classified with the data in the house_classification column.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  signboard_location:
+    description: Classification of the region where the house is located.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  video_comments:
+    description: Comments on the video of the listing
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_communicated_tt:
+    description: Date when the repair communication was sent to the tenant
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_intermediate:
+    description: Date on which the intermediation between the negotiating parties took place.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_agreement_executed:
+    description: Date the agreement was accepted.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_finished:
+    description: Process completion date.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_return:
+    description: Date defined as the return of the process.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_budgeted:
+    description: Date on which the budget was made.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_analysis:
+    description: Date the repair was sent to the owner.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_reanalysis:
+    description: Date on which the repair reanalysis occurred.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_install:
+    description: New Installs Session - This column indicates the proxy date or timestamp when a plaquinha was installed specifically in a house.
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_first_fup:
+    description: Date of the first follow up
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  dt_first_reply:
+    description: Date of the first reply
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  has_plaquinha:
+    description: Cover & New Installs Session - This column specifies whether a house or property specifically has a plaquinha
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  custom_fields:
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+    description: Map with all custom fields of the ticket
+  is_public:
+    description: If the ticket has public comments
+    lineage:
+      - datalake_zendesk.tickets.is_public
+  group_stations:
+    lineage:
+      - datalake_zendesk.ticket_metrics.group_stations
+    description: Number of groups the ticket passed through
+  assignee_stations:
+    lineage:
+      - datalake_zendesk.ticket_metrics.assignee_stations
+    description: Number of agents assigned to the ticket
+  reopens:
+    lineage:
+      - datalake_zendesk.ticket_metrics.reopens
+    description: Number of times the ticket was reopened
+  replies:
+    lineage:
+      - datalake_zendesk.ticket_metrics.replies
+    description: Number of public replies the agent added to the ticket
+  reply_time_min_calendar:
+    lineage:
+      - datalake_zendesk.ticket_metrics.reply_time_min
+    description: Number of minutes to the first reply during calendar hours
+  reply_time_min_business:
+    lineage:
+      - datalake_zendesk.ticket_metrics.reply_time_min
+    description: Number of minutes to the first reply during business hours
+  first_resolution_time_min_business:
+    lineage:
+      - datalake_zendesk.ticket_metrics.first_resolution_time_min
+    description: Number of minutes to the first resolution time during business hours
+  first_resolution_time_min_calendar:
+    lineage:
+      - datalake_zendesk.ticket_metrics.first_resolution_time_min
+    description: Number of minutes to the first resolution time during calendar hours
+  full_resolution_time_min_business:
+    lineage:
+      - datalake_zendesk.ticket_metrics.full_resolution_time_min
+    description: Number of minutes to the full resolution during business hours
+  full_resolution_time_min_calendar:
+    lineage:
+      - datalake_zendesk.ticket_metrics.full_resolution_time_min
+    description: Number of minutes to the full resolution during calendar hours
+  requester_wait_time_min_business:
+    lineage:
+      - datalake_zendesk.ticket_metrics.requester_wait_time_min
+    description: Number of minutes the requester spent waiting during business hours
+  requester_wait_time_min_calendar:
+    lineage:
+      - datalake_zendesk.ticket_metrics.requester_wait_time_min
+    description: Number of minutes the requester spent waiting during calendar hours
+  agent_wait_time_min_business:
+    lineage:
+      - datalake_zendesk.ticket_metrics.agent_wait_time_min
+    description: Number of minutes the agent spent waiting during business hours
+  agent_wait_time_min_calendar:
+    lineage:
+      - datalake_zendesk.ticket_metrics.agent_wait_time_min
+    description: Number of minutes the agent spent waiting during calendar hours
+  on_hold_time_min_business:
+    lineage:
+      - datalake_zendesk.ticket_metrics.on_hold_time_min
+    description: Number of minutes on hold during business hours
+  on_hold_time_min_calendar:
+    lineage:
+      - datalake_zendesk.ticket_metrics.on_hold_time_min
+    description: Number of minutes on hold during calendar hours
+  ts_assigned:
+    lineage:
+      - datalake_zendesk.ticket_metrics.ts_initially_assigned
+    description: Timestamp of when the ticket was last assigned
+  ts_initially_assigned:
+    lineage:
+      - datalake_zendesk.ticket_metrics.ts_initially_assigned
+    description: Timestamp of when the ticket was initially assigned
+  ts_latest_comment_added:
+    lineage:
+      - datalake_zendesk.ticket_metrics.ts_latest_comment_added
+    description: Timestamp of the latest comment added to the ticket
+  ts_solved:
+    lineage:
+      - datalake_zendesk.ticket_metrics.ts_solved
+    description: Timestamp of when the ticket was solved
+  ts_analysts_started:
+    lineage:
+      - datalake_support_users.analysts.ts_created
+    description: Timestamp that indicates when the analyst was first registered.
+  ts_created:
+    description: Timestamp of ticket creation
+    lineage:
+      - datalake_zendesk.tickets.ts_created
+  ts_updated:
+    description: Timestamp of ticket update
+    lineage:
+      - datalake_zendesk.tickets.ts_updated
+  ts_load:
+    description: Timestamp of when data was loaded
+    lineage:
+      - datalake_zendesk.tickets.ts_load
+  year:
+    description: Partition column
+    lineage:
+      - datalake_zendesk.tickets.year
+  month:
+    description: Partition column
+    lineage:
+      - datalake_zendesk.tickets.month
+  day:
+    description: Partition column
+    lineage:
+      - datalake_zendesk.tickets.day

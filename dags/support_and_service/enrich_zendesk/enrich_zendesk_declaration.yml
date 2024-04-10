@@ -7,8 +7,15 @@ dag:
 workflow:
     type: query
     layer: enrich
+    inner_dependencies:
+        tickets_curent:
+            - ticket_metrics
+            - tickets
     default_extraction_type: incremental
     default_partitions: ["year", "month", "day"]
+    tables_customization:
+        tickets_curent:
+            extraction_type: full
 cluster:
     type: databricks_10_4_max_io-memory_photon_cluster
     custom_configurations:

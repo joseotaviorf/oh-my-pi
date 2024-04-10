@@ -283,7 +283,7 @@ analyst_assignment AS (
       COALESCE(a2.phone, a.phone) AS phone,
       COALESCE(a2.organization, a.organization) AS organization,
       COALESCE(a2.ts_created, a.ts_created) AS ts_created,
-      COALESCE(a2.ts_updated, a.ts_updated) AS ts_updated
+      t.ts_updated
     FROM
         tickets_with_fields AS t
     LEFT JOIN
