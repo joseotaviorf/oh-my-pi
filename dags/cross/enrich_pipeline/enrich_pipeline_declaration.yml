@@ -9,5 +9,9 @@ dag:
 workflow:
   type: query
   layer: enrich
+  inner_dependencies:
+    dag:
+      - dag_run
+      - line
 cluster:
   type: databricks_10_4_med_general_photon_cluster

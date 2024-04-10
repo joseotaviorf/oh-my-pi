@@ -1,0 +1,18 @@
+---
+table_name: datalake_pipeline.line
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 10
+    severity_level: Error
+column_level_validations:
+  id_line:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  line_name:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
