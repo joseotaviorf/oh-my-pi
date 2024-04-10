@@ -3,17 +3,15 @@ from typing import List, Optional
 from bietlejuice.base.cdc.primary_key_identifiers.primary_key_identifier import (
     PrimaryKeyIdentifier,
 )
-from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
-    MySqlCdcSchemaFinder,
-)
+from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder import CdcSchemaFinder
 from bietlejuice.base.spark.base_spark import BaseSparkContext
 from delta.tables import DeltaTable
 from pyspark.sql.utils import AnalysisException
 
 
-class MySqlPrimaryKeyIdentifier(PrimaryKeyIdentifier):
+class RawPrimaryKeyIdentifier(PrimaryKeyIdentifier):
     def __init__(
-        self, schema_finder: MySqlCdcSchemaFinder, datalake_table_schema: str
+        self, schema_finder: CdcSchemaFinder, datalake_table_schema: str
     ) -> None:
         self.schema_finder = schema_finder
         self.datalake_table_schema = datalake_table_schema

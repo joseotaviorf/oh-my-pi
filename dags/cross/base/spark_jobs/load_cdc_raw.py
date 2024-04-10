@@ -1,11 +1,10 @@
 from argparse import ArgumentParser
 
-from bietlejuice.base.cdc.primary_key_identifiers.mysql_primary_key_identifier import (
-    MySqlPrimaryKeyIdentifier,
+from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
+from bietlejuice.base.cdc.primary_key_identifiers.raw_primary_key_identifier import (
+    RawPrimaryKeyIdentifier,
 )
-from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
-    MySqlCdcSchemaFinder,
-)
+from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import CdcSchemaFinderFactory
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from quintoandar_logger import QuintoAndarLogger
@@ -96,14 +95,17 @@ def main():
         primary_keys = [key.strip() for key in args.primary_keys.split(",")]
     else:
         # Hardcoded for now, while we don't have other sources such as Postgres
-        pk_identifier = MySqlPrimaryKeyIdentifier(
-            MySqlCdcSchemaFinder(
-                f"s3://{incoming_bucket}/{source_schema}/{environment}_{source_schema}.data/",
+        pk_identifier = RawPrimaryKeyIdentifier(
+            CdcSchemaFinderFactory(
+                incoming_bucket=incoming_bucket,
+                source_database=source_schema,
+                source_schema=source_schema,
+                environment=environment,
                 start_date=start_date,
                 end_date=end_date,
-                schema=source_schema
-            ),
-            datalake_table_schema=f"datalake_{schema}_raw",
+                dbutils_secret_key=None
+            ).get_cdc_schema_finder(DatabaseTypeEnum.MYSQL),
+            datalake_table_schema=f"datalake_{schema}_raw"
         )
         primary_keys = pk_identifier.find_primary_keys(args.table_name) # We don't use the table name in lowercase, because this is case sensitive
 
