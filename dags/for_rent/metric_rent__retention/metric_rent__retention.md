@@ -18,5 +18,5 @@ Currently, there is the following output tables in the metric layer:
 - `nps_pp_with_repairs_weekly`
 - `nps_pp_without_repairs_monthly`
 - `nps_pp_without_repairs_weekly`
-- `relisting_after_tr_3_days_monthly`
-- `relisting_after_tr_3_days_weekly`
+- `relisting_before_tr_3_days_monthly`
+- `relisting_before_tr_3_days_weekly`
