@@ -129,7 +129,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
         done_tasks = self._set_done_tasks(tables_customization)
 
         terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-            dag=self.dag, task_id="terminate-cluster"
+            dag=self.dag, task_id="terminate-cluster", trigger_rule="all_done"
         )
 
         self.set_dependencies(
