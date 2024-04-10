@@ -1,0 +1,20 @@
+---
+dag:
+  name: enrich_nexxera
+  schedule_start_date: 2020, 7, 1
+  owner: Data Fintech
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    nexxera_base:
+      - adjustments
+      - financial
+      - financial_extracts_050e
+    nexxera_final:
+      - financial_extracts_050e
+      - nexxera_base
+    dtw_filter:
+      - nexxera_final
+cluster:
+  type: databricks_12_2_med_general_cluster
