@@ -52,17 +52,14 @@ def format_sns_message(message: dict):
     """
     return {'Id': message['id'], 'Message': json.dumps(message, default=json_serial)}
 
-def publish_batch_to_sns(region: str, sns_topic_arn: str,batch: list):
+def publish_message_to_sns(region: str, sns_topic_arn: str, message: dict):
     """
     Send a message to SNS.
     """
-
     sns_client = boto3.client("sns", region_name=region)
-    response = sns_client.publish_batch(
-        TopicArn=sns_topic_arn, PublishBatchRequestEntries=batch
-    )
-
-    return response
+    sns_client.publish(
+        TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial)
+    )  
 
 def split_in_chunks(list_of_elements: list, chunk_size: int):
     """
@@ -88,22 +85,21 @@ def load_table_into_sns(
     
     message_contents = df.collect()
     messages = [
-        format_sns_message(
-            {
-                "id": str(uuid4()),
-                "ts_event": str(datetime.now(timezone.utc).timestamp()),
-                "event_type": event_type, 
-                "payload": row.asDict()
-            }) for row in message_contents
+      {
+          "id": str(uuid4()),
+          "ts_event": str(datetime.now(timezone.utc).timestamp()),
+          "event_type": event_type, 
+          "payload": row.asDict()
+      } for row in message_contents
     ]
     
-    messages_batches = split_in_chunks(messages, 10)
+    messages_batches = split_in_chunks(messages, 100)
     messages_batches_rdd = spark_client.conn.sparkContext.parallelize(
         messages_batches
     )
 
     responses = messages_batches_rdd.map(
-        lambda batch: publish_batch_to_sns(
+        lambda batch: publish_message_to_sns(
             region, sns_topic_arn, batch
         )
     ).collect()

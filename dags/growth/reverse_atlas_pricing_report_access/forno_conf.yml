@@ -1,11 +1,15 @@
 ---
 sns_topic_arn: arn:aws:sns:us-east-1:569412621543:forno-reports-business-events
-database_name: reverse_atlas_pricing_report
+database_name: datalake_atlas_pricing_report
 tables:
-  pricing_report_engagement:
-    event_type: PRICING_REPORT_ENGAGEMENT
-  pricing_report_listing_price_history:
-    event_type: PRICING_REPORT_LISTING_PRICE_HISTORY
+  new_pricing_report_region:
+    event_type: NEW_PRICING_REPORT_REGION
+  new_pricing_report_listing_price_history:
+    event_type: NEW_PRICING_REPORT_LISTING_PRICE_HISTORY
+  new_pricing_report_new_rent_price_published:
+    event_type: NEW_PRICING_REPORT_NEW_RENT_PRICE_PUBLISHED
+  new_pricing_report_engagement:
+    event_type: NEW_PRICING_REPORT_ENGAGEMENT    
     
 custom_cluster:
   driver_node_type_id: r5n.2xlarge
