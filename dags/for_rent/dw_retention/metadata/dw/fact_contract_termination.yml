@@ -20,5 +20,9 @@ columns:
     lineage:
       - dw_retention.dim_nps_answer.sk_nps_answer
     description: ID of the tenant's NPS answer.
+  country_code:
+    lineage:
+      - datalake_ebdb_contract.contract.country_code
+    description: Country code of the contract.
   ts_load:
     description: Timestamp of when this data was loaded.

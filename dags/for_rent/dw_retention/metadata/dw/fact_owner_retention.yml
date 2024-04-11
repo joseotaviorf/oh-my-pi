@@ -20,6 +20,10 @@ columns:
       lineage:
         - datalake_ebdb_contract.contract.id
       description: ID of the contract.
+    country_code:
+      lineage:
+        - datalake_ebdb_listing.house_listing.country_code
+      description: Country code of the house.
     days_until_next_rental:
       description: Number of days after the contract termination until re-rental.
     days_until_next_listing:

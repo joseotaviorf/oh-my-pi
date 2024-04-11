@@ -10,6 +10,7 @@ workflow:
   type: query
   layer: dw
   custom_schema: retention
+  default_partitions: [country_code]
   inner_dependencies:
     fact_contract_termination:
       - dim_termination

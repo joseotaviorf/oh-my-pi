@@ -115,6 +115,7 @@ SELECT
     hl.id_house AS sk_house,
     h.id_user AS sk_owner,
     dc.id AS sk_contract,
+    hl.country_code,
     rl.leadtime_tr_rl AS days_until_next_listing,
     DATEDIFF(cs.contract_signed_date, erc.dt_ended_rental_confirmed) AS days_until_next_rental,
     NOW() AS ts_load
