@@ -22,4 +22,4 @@ workflow:
     Onboarding:
       clean_table_name: onboarding
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_2xlarge_general_cluster
