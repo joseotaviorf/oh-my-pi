@@ -78,6 +78,51 @@ columns:
     description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
     lineage:
       - datalake_demand_flows.top_of_funnel_results.branded
+  campaign_business_context:
+    description: 'Intention of the actions/campaigns adopted in relation to the business context.'
+    categories: 
+      rent: 'Campaign/Action aims to generate results in Rent'
+      sale: 'Campaign/Action aims to generate results in Sale'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.campaign_business_context
+  campaign_strategy_intent:
+    description: 'Intention of the actions/campaigns adopted in relation to the growth strategy.'
+    categories: 
+      Brand Awareness: 'One of these objectives is to get people to know QuintoAndar and consider the company as an option at some point: Reach people, drive traffic to the website regardless of the page or generate brand recognition.'
+      Acquisition: 'It aims to bring people to QuintoAndar who are already in the consideration phase'
+      Activation: 'Its objective is to make people perform their 1st flow at QuintoAndar.'
+      Engagement: 'Its objective is to keep people engaged through flows on QuintoAndar.'
+      Recovery: 'Its objective is to make people who have become churned users carry out new flows.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.campaign_strategy_intent
+  behavior_type:
+    description: 'Type of user behavior in relation to their search decision and entry into the QuintoAndar environment.'
+    categories: 
+      Organic: 'Conversions in which the decision to search for and enter the QuintoAndar environment was made by the user.'
+      Non Organic: 'Conversions in which entry into the QuintoAndar environment was forced by QuintoAndar.'    
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.behavior_type
+  campaign_landing_page:
+    description: 'Landing page/domain of QuintoAndar to which the campaign directs.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.campaign_landing_page
+  funnel_side:
+    description: 'Side of the funnel to which that campaign was directed.'
+    categories:
+      demand: 'Campaign made to bring potential buyers or tenants to our platform.'
+      supply: 'Campaign made to bring potential house owners to our platform.'
+      affiliates: 'Campaign made to bring affiliates to our platform.'
+      branding: 'Campaign created by the Branding team.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.funnel_side
+  medium:
+    description: 'Combination of platform intent, media package, branded and recovery audience status dimensions. Where the average package size is mandatory and the others are applied when convenient. More information in the Doc indicated in the table description.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.medium
+  source:
+    description: 'QuintoAndar s external platform/operation responsible for generating the result.'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.source    
   is_rede_demand:
     description: 'Flag indicating if this house came from a rede partner'
     lineage:

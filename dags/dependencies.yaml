@@ -1377,6 +1377,7 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_region:load-enrich-region

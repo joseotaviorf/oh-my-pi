@@ -9,12 +9,12 @@ WITH adhoc_rules AS (
         AND utm_source IS NULL
         AND utm_medium IS NULL
         AND app_type IS NULL
-      THEN "losttracking.-2."
+      THEN "lost.los.lostra.lostra.l.losttracking.losttracking"
       WHEN utm_campaign IS NULL
         AND utm_source IS NULL
         AND utm_medium IS NULL
         AND app_type IS NOT NULL
-      THEN "direct.1." 
+      THEN "na.acq.org.na.d.direct.na"
     END AS utm_adhoc_rule,
     'SelfServiceWeb' AS origin,
     'SelfService' AS operation_channel, 
@@ -45,7 +45,7 @@ WITH adhoc_rules AS (
   FROM
     datalake_top_of_funnel_demand.user_interactions AS ui
   WHERE
-    ui.dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')    
+    ui.dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 media_setup_ids AS (
   SELECT
@@ -53,10 +53,10 @@ media_setup_ids AS (
     tof.id_tof_user,
     tof.id_house,
     tof.sk_region,
-    INT(SPLIT(tof.utm_adhoc_rule, "[.]")[1]) AS id_media_setup_from_adhoc,
+    tof.utm_adhoc_rule AS id_media_setup_from_adhoc,
     INT(SPLIT(tof.utm_campaign, "[.]")[1]) AS id_media_setup_from_naming_convention,
     INT(SPLIT(ef.correct_utm_campaign, "[.]")[1]) AS id_media_setup_from_exception_flow,
-    dict.sk_media_setup AS id_media_setup_from_dictionary,
+    dict.naming_convention_sufix AS id_media_setup_from_dictionary,
     tof.utm_adhoc_rule,
     tof.utm_campaign, 
     tof.utm_medium,
@@ -89,7 +89,8 @@ media_setup_ids AS (
         ON LOWER(tof.utm_campaign) = LOWER(ef.utm_campaign)
         AND LOWER(tof.utm_source) = LOWER(ef.utm_source)
         AND LOWER(tof.utm_medium) = LOWER(ef.utm_medium)
-)
+),
+final_media_setup as (
 SELECT
   id_top_of_funnel_event,
   id_tof_user,
@@ -133,3 +134,43 @@ SELECT
   day
 FROM
   media_setup_ids
+)
+SELECT
+  fms.id_top_of_funnel_event,
+  fms.id_tof_user,
+  fms.id_house,
+  fms.sk_region,
+  fms.final_id_media_setup,
+  fms.final_media_setup_id_origin,
+  fms.utm_adhoc_rule,
+  fms.utm_campaign,
+  fms.utm_medium,
+  fms.utm_source,
+  fms.utm_content,
+  fms.utm_term,
+  fms.app_type,
+  fms.content_page,
+  fms.origin,
+  fms.operation_channel,
+  fms.platform,
+  fms.business_context,
+  fms.entrance_uri,
+  fms.referrer,
+  fms.branded,
+  ms.behavior_type,
+  ms.campaign_business_context,
+  ms.campaign_strategy_intent,
+  ms.campaign_landing_page,
+  ms.funnel_side,
+  ms.medium,
+  ms.source,
+  fms.dt_event,
+  fms.ts_event,
+  fms.year,
+  fms.month,
+  fms.day
+FROM 
+  final_media_setup fms 
+    LEFT JOIN 
+      datalake_growth_taxonomy.media_setup ms
+      ON fms.final_id_media_setup = ms.naming_convention_sufix  
