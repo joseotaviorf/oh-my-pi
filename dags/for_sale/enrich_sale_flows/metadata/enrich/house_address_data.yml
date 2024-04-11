@@ -1,0 +1,93 @@
+---
+database_name: datalake_sale_flows
+table_name: house_address_data
+description: Historical data about the property address
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_sales_flow_clean.house.id
+    description: Unique identifier of the house
+  id_address_data:
+    lineage:
+      - datalake_sales_flow_clean.house.id_address_data
+    description: Unique identifier of the house address
+  house_registration_status:
+    lineage:
+      - datalake_sales_flow_clean.house.house_registration_status
+    description: House Diligence status
+  land_tenure:
+    lineage:
+      - datalake_sales_flow_clean.house.land_tenure
+    description: Land tenure
+  street:
+    lineage:
+      - datalake_sales_flow_clean.address_data.street
+    description: House address street
+  number:
+    lineage:
+      - datalake_sales_flow_clean.address_data.number
+    description: House address number
+  complement:
+    lineage:
+      - datalake_sales_flow_clean.address_data.complement
+    description: House address complement
+  neighborhood:
+    lineage:
+      - datalake_sales_flow_clean.address_data.neighborhood
+    description: House address neighborhood
+  city:
+    lineage:
+      - datalake_sales_flow_clean.address_data.city
+    description: House address city 
+  state:
+    lineage:
+      - datalake_sales_flow_clean.address_data.state
+    description: House address state
+  zip_code:
+    lineage:
+      - datalake_sales_flow_clean.address_data.zip_code
+    description: House address zip code
+  address:
+    lineage:
+      - datalake_sales_flow_clean.address_data.street
+      - datalake_sales_flow_clean.address_data.number
+      - datalake_sales_flow_clean.address_data.complement
+      - datalake_sales_flow_clean.address_data.neighborhood
+      - datalake_sales_flow_clean.address_data.city
+      - datalake_sales_flow_clean.address_data.state
+      - datalake_sales_flow_clean.address_data.zip_code
+    description: House address
+  has_seller_debt_payments:
+    lineage:
+      - datalake_sales_flow_clean.house.has_seller_debt_payments
+    description: Has debt payments from the seller
+  ts_house_created:
+    lineage:
+      - datalake_sales_flow_clean.house.ts_house_created
+    description: House creation date
+  ts_last_house_updated:
+    lineage:
+      - datalake_sales_flow_clean.house.ts_last_house_updated
+    description: Date of last house update
+  ts_created:
+    lineage:
+      - datalake_sales_flow_clean.address_data.ts_created
+    description: Address creation date
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_clean.address_data.ts_updated
+    description: Address update date
+  year:
+    lineage:
+      - datalake_sales_flow_clean.address_data.year
+    description: Year of update date
+  day:
+    lineage:
+      - datalake_sales_flow_clean.address_data.day
+    description: Month of update date
+  month:
+    lineage:
+      - datalake_sales_flow_clean.address_data.month
+    description: Day of update date

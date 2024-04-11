@@ -1,0 +1,43 @@
+---
+database_name: datalake_sale_flows
+table_name: house_offers
+description: This table lists houses with offers, sellers, buyers and sale flow
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_sales_flow_clean.house_aud.id
+    description: Unique identifier of the house
+  id_address_data:
+    lineage:
+      - datalake_sales_flow_clean.house_aud.id_address_data
+    description: Unique identifier of the house address
+  id_offer:
+    lineage:
+      - datalake_sales_flow_clean.offer.id
+    description: Unique identifier of the offer
+  id_firestore:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_firestore
+    description: Unique identifier of the firestore
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_sales_flow
+    description: Unique identifier of the sales flow
+  id_buyer:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_aud.id_buyer
+    description: Unique identifier of the buyer
+  id_seller:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_aud.id_seller
+    description: Unique identifier of the seller
+  dt_load:
+    description: Data loading date
+  year:
+    description: Year of data loading date
+  month:
+    description: Month of data loading date
+  day:
+    description: Day of data loading date

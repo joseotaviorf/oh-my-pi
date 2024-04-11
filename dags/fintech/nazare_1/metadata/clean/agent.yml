@@ -11,6 +11,9 @@ columns:
   name:
     lineage:
       - datalake_nazare_raw.agent.name
+  email:
+    lineage:
+      - datalake_nazare_raw.agent.email
   document_number:
     lineage:
       - datalake_nazare_raw.agent.document_number

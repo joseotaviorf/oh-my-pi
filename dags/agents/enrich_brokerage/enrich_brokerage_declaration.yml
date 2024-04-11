@@ -1,0 +1,19 @@
+dag:
+  name: enrich_brokerage
+  schedule_start_date: 2024, 4, 9
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      This DAG brings data from the brokerage flow to offers
+
+workflow:
+  type: query
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+
+cluster:
+  type: databricks_10_4_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

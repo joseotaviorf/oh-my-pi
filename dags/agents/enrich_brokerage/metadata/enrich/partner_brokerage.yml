@@ -1,0 +1,64 @@
+---
+database_name: datalake_brokerage
+table_name: partner_brokerage
+description: Relates broker data, brokerage value and offers
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_offer:
+    lineage:
+      - datalake_nazare_clean.offer.id_external
+    description: Unique identifier of the offer
+  id_user_agent:
+    lineage:
+      - datalake_nazare_clean.agent.id_external
+    description: Unique identifier of the agent
+  id_offer_agent:
+    lineage:
+      - datalake_nazare_clean.offer_agent.id_offer_agent
+    description: Unique identifier of the offer agent
+  name:
+    lineage:
+      - datalake_nazare_clean.agent.name
+    description: Agent name
+  email:
+    lineage:
+      - datalake_nazare_clean.agent.email
+    description: Agent email
+  agent_role:
+    lineage:
+      - datalake_nazare_clean.offer_agent.agent_role
+    description: Agent role
+  partner_brokerage_fee:
+    lineage:
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: Partner brokerage fee amount
+  json_output:
+    lineage:
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: Json with data on revenue share per participant
+  dt_cancellation:
+    lineage:
+      - datalake_nazare_clean.offer.dt_cancellation
+    description: Offer cancellation date
+  ts_created:
+    lineage:
+      - datalake_nazare_clean.offer.ts_created
+    description: Offer creation date
+  ts_updated:
+    lineage:
+      - datalake_nazare_clean.offer.ts_updated
+    description: Offer update date
+  year:
+    lineage:
+      - datalake_nazare_clean.offer.ts_updated
+    description: Year of Offer update date
+  month:
+    lineage:
+      - datalake_nazare_clean.offer.ts_updated
+    description: Month of Offer updated date
+  day:
+    lineage:
+      - datalake_nazare_clean.offer.ts_updated
+    description: Day of Offer updated date
+  

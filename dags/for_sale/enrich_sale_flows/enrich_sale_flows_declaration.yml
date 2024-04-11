@@ -8,5 +8,13 @@ dag:
 workflow:
   type: query
   layer: enrich
+  tables_customization:
+    house_address_data:
+      partitions: [year, month, day]
+      extraction_type: incremental
+    house_offers:
+      partitions: [year, month, day]
+      extraction_type: incremental
+    sale_flow: {}
 cluster:
   type: databricks_10_4_med_general_photon_cluster

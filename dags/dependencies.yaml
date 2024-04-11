@@ -1178,6 +1178,11 @@ bietlejuice.enrich_braze_webhook_notification:
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-affiliates-events
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-owners-events
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-tenants-events
+bietlejuice.enrich_brokerage:
+  - bietlejuice.nazare_1:load-clean-agent
+  - bietlejuice.nazare_2:load-clean-offer
+  - bietlejuice.nazare_2:load-clean-offer-agent
+  - bietlejuice.nazare_2:load-clean-revenue-share-by-participant
 bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail
   - bietlejuice.brokers_supply_processor:load-clean-file
@@ -2375,6 +2380,11 @@ bietlejuice.enrich_sale_flows:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
+  - bietlejuice.sales_flow:load-clean-address-data
+  - bietlejuice.sales_flow:load-clean-house
+  - bietlejuice.sales_flow:load-clean-house-aud
+  - bietlejuice.sales_flow:load-clean-offer
+  - bietlejuice.sales_flow:load-clean-sales-flow-aud
 bietlejuice.enrich_sale_journey:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.ebdb:load-clean-user-aud
