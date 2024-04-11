@@ -2634,6 +2634,12 @@ bietlejuice.enrich_supply_taxonomy:
   - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
   - bietlejuice.wololo:load-clean-context-discard
   - bietlejuice.wololo:load-clean-prospect
+bietlejuice.enrich_supply_tracking:
+  - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
+  - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
+  - bietlejuice.enrich_supply_taxonomy:load-enrich-conversion-taxonomy
 bietlejuice.enrich_support_and_service_kpis_targets:
   - bietlejuice.gsheets_support_and_service:done-clean-target-service-kpis
   - bietlejuice.gsheets_support_and_service:done-clean-target-support-kpis

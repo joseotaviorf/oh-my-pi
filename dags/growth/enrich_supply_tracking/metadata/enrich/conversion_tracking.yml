@@ -1,0 +1,150 @@
+database_name: datalake_supply_flows
+table_name: conversion_tracking
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: |
+  This table is responsible for storing the taxonomy and conversion events in the supply flows, i.e., 
+  the taxonomy joined with manually reprocessed events and direct flows.
+columns:
+  id_lead_ebdb:
+    description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
+    lineage:
+      - datalake_supply_flows.conversion_events.id_lead
+      - datalake_supply_flows.conversion_taxonomy.id_lead
+  id_entity:
+    description: The identifier for each entity. Can be a id_prospect or id_house.
+    lineage:
+      - datalake_supply_flows.conversion_events.id_entity
+  id_house:
+    description: The identifier for each house.
+    lineage:
+      - datalake_supply_flows.conversion_events.id_entity
+      - datalake_supply_flows.conversion_lookup.id_house
+  id_prospect:
+    description: The identifier for each prospect.
+    lineage:
+      - datalake_supply_flows.conversion_events.id_entity
+  id_region:
+    description: The identifier for region
+    lineage:
+      - datalake_supply_flows.conversion_events.id_region
+      - datalake_supply_flows.conversion_taxonomy.id_region
+      - datalake_ebdb_clean.house.id_region
+  id_user_registrant:
+    description: Identifier of the user that registered the conversion event.
+    lineage:
+      - datalake_supply_flows.conversion_events.id_user_registrant
+      - datalake_supply_flows.conversion_taxonomy.id_user_registrant
+  id_user_conversion:
+    description: Identifier of the user that converted the lead.
+    lineage:
+      - datalake_supply_flows.conversion_events.id_user_registrant
+      - datalake_supply_flows.conversion_taxonomy.id_user_registrant
+  business_context:
+    description: Business context of the conversion event.
+    categories:
+      RENT: 'For rent lead or house'
+      SALE: 'For sale lead or house'
+    lineage:
+      - datalake_supply_flows.conversion_events.business_context
+  supply_source:
+    description: Source of the supply. Can be 1P, 3P, or CIQ.
+    lineage:
+      - datalake_supply_flows.conversion_events.supply_source
+      - datalake_ebdb_listing.listing_business_context.ownership
+  funnel_step:
+    description: The funnel step of the taxonomy, referring to the funnel step in the supply funnel.
+    lineage:
+      - datalake_supply_flows.conversion_events.step
+  business_event:
+    description: Type of business event.
+    lineage:
+      - datalake_supply_flows.conversion_events.business_event
+  application:
+    description: Origin of conversion in the PWAs.
+    lineage:
+      - datalake_supply_flows.conversion_taxonomy.application
+  reason:
+    description: Reason for the drop event.
+    lineage:
+      - datalake_supply_flows.conversion_events.reason
+  ops_agent:
+    description: Agent that reprocessed the lead. For this scenario, it is always the outbound team.
+    lineage:
+      - datalake_supply_flows.conversion_taxonomy.ops_agent
+      - datalake_supply_flows.manual_reprocessing.ops_agent
+  ops_approach:
+    description: Approach of the conversion event.
+    lineage:
+      - datalake_supply_flows.conversion_taxonomy.ops_approach
+      - datalake_supply_flows.manual_reprocessing.ops_approach
+  ops_contact_medium:
+    description: Medium of the conversion event.
+    lineage:
+      - datalake_supply_flows.conversion_taxonomy.ops_contact_medium
+      - datalake_supply_flows.manual_reprocessing.ops_contact_medium
+  ops_objective:
+    description: Objective of the conversion event.
+    lineage:
+      - datalake_supply_flows.conversion_taxonomy.ops_objective
+      - datalake_supply_flows.manual_reprocessing.ops_objective
+  ops_partner:
+    description: The name of the company that registered the lead.
+    lineage:
+      - datalake_supply_flows.conversion_events.ops_partner
+      - datalake_supply_flows.manual_reprocessing.ops_partner
+  reprocessed:
+    description: Indicates if the event has been reprocessed manually.
+    lineage:
+      - datalake_supply_flows.conversion_events.reprocessed
+      - datalake_supply_flows.manual_reprocessing.reprocessed
+  reprocessing_entity_type:
+    description: Type of entity that was reprocessed.
+    lineage:
+      - datalake_supply_flows.manual_reprocessing.reprocessing_entity_type
+  reprocessing_table_name:
+    description: Name of the table where reprocessing occurred.
+    lineage:
+      - datalake_supply_flows.manual_reprocessing.reprocessing_table_name
+  ts_event_original:
+    description: Timestamp of the original event.
+    lineage:
+      - datalake_supply_flows.conversion_events.ts_event_original
+  ts_event_adjusted:
+    description: Timestamp of the adjusted event.
+    lineage:
+      - datalake_supply_flows.conversion_events.ts_event_adjusted
+  ts_first_discard:
+    description: Timestamp of the first discard event.
+    lineage:
+      - datalake_supply_flows.conversion_events.ts_first_discard
+  ts_last_discard:
+    description: Timestamp of the last discard event.
+    lineage:
+      - datalake_supply_flows.conversion_events.ts_last_discard
+  ts_reprocessing_event:
+    description: Timestamp of the reprocessing event.
+    lineage:
+      - datalake_supply_flows.manual_reprocessing.ts_created
+  ts_load:
+    description: Timestamp of when the data was loaded into the table.
+  aux_group:
+    description: Auxiliary group information.
+    lineage:
+      - datalake_supply_flows.conversion_events.aux_group
+  aux_data_event:
+    description: Auxiliary data event information.
+    lineage:
+      - datalake_supply_flows.conversion_events.aux_data_event
+  year:
+    description: Year of the event.
+    lineage:
+      - datalake_supply_flows.conversion_events.ts_event_adjusted
+  month:
+    description: Month of the event.
+    lineage:
+      - datalake_supply_flows.conversion_events.ts_event_adjusted
+  day:
+    description: Day of the event.
+    lineage:
+      - datalake_supply_flows.conversion_events.ts_event_adjusted

@@ -176,12 +176,12 @@ columns:
     lineage: 
       - datalake_supply_flows.acquisition_backfill.medium
       - datalake_supply_flows.lead_origin.medium
-    description: The utm_source that brings the lead.
+    description: The utm_medium that brings the lead.
   source:
     lineage: 
       - datalake_supply_flows.acquisition_backfill.source
       - datalake_supply_flows.lead_origin.source
-    description: The utm_medium that brings the lead.
+    description: The utm_source that brings the lead.
   ops_agent:
     lineage: 
       - datalake_supply_flows.acquisition_backfill.ops_agent

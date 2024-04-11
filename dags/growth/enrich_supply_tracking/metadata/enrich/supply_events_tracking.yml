@@ -1,0 +1,253 @@
+database_name: datalake_supply_flows
+table_name: supply_events_tracking
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table is a result of joined data from acquisition and conversion steps from the supply flows.
+columns:
+  bk_supply:
+    description: The unique identifier for each supply event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.funnel_step
+      - datalake_supply_flows.conversion_tracking.business_context
+      - datalake_supply_flows.conversion_tracking.supply_source
+      - datalake_supply_flows.conversion_tracking.id_lead_ebdb
+      - datalake_supply_flows.conversion_tracking.id_entity
+      - datalake_supply_flows.conversion_tracking.business_event
+      - datalake_supply_flows.acquisition_tracking.funnel_step
+      - datalake_supply_flows.acquisition_tracking.business_context
+      - datalake_supply_flows.acquisition_tracking.supply_source
+      - datalake_supply_flows.acquisition_tracking.id_lead_ebdb
+      - datalake_supply_flows.acquisition_tracking.id_house
+      - datalake_supply_flows.acquisition_tracking.business_event
+      - datalake_supply_flows.conversion_lookup.id_house
+  sk_supply_lead:
+    description: The unique identifier for each supply lead.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.sk_supply_lead
+  business_context:
+    description: Business context of the conversion event.
+    categories:
+      RENT: 'For rent lead or house'
+      SALE: 'For sale lead or house'
+    lineage:
+      - datalake_supply_flows.conversion_tracking.business_context
+      - datalake_supply_flows.acquisition_tracking.business_context
+  id_lead_ebdb:
+    description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.id_lead_ebdb
+      - datalake_supply_flows.acquisition_tracking.id_lead_ebdb
+  id_house:
+    description: The identifier for each house.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.id_house
+      - datalake_supply_flows.acquisition_tracking.id_house
+      - datalake_supply_flows.conversion_lookup.id_house
+  id_lead:
+    description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.id_lead
+  id_prospect:
+    description: The identifier for each prospect.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.id_prospect
+      - datalake_supply_flows.acquisition_tracking.id_prospect
+  id_entity:
+    description: The identifier for each entity. Can be a id_prospect or id_house.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.id_entity
+      - datalake_supply_flows.acquisition_tracking.id_lead
+  id_referred_by:
+    description: The identifier of the user that referred the current lead.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.id_referred_by
+      - datalake_supply_flows.acquisition_tracking.id_referred_by
+  id_region:
+    description: The identifier for region
+    lineage:
+      - datalake_supply_flows.conversion_tracking.id_region
+      - datalake_supply_flows.acquisition_tracking.id_region
+  id_user_registrant:
+    description: Identifier of the user that registered the conversion event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.id_user_registrant
+      - datalake_supply_flows.acquisition_tracking.id_user_registrant
+  id_user_conversion:
+    description: Identifier of the user that converted the lead.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.id_user_conversion
+  supply_source:
+    description: Source of the supply. Can be 1P, 3P, or CIQ.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.supply_source
+      - datalake_supply_flows.acquisition_tracking.supply_source
+  business_event:
+    description: Type of business event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.business_event
+      - datalake_supply_flows.acquisition_tracking.business_event
+  funnel_step:
+    description: The funnel step of the taxonomy, referring to the funnel step in the supply funnel.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.funnel_step
+      - datalake_supply_flows.acquisition_tracking.funnel_step
+  drop_step_reason:
+    description: Reason for the drop event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.drop_step_reason
+      - datalake_supply_flows.acquisition_tracking.drop_step_reason
+  affiliate_type:
+    description: The type of the affiliate.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.affiliate_type
+  application:
+    description: Origin of conversion in the PWAs.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.application
+      - datalake_supply_flows.acquisition_tracking.application
+  landing_page:
+    description: The landing page the lead went to to register.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.landing_page
+  lead_type:
+    description: The type of the lead, that could be related with application.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.lead_type
+  lead_application:
+    description: Origin of acquisition in the PWAs.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.application
+  medium:
+    description: The utm_medium that brings the lead.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.medium
+  source:
+    description: The utm_source that brings the lead.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.source
+  platform:
+    description: The name of platform that register the lead, as IoS, Android or Web.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.platform
+  campaign:
+    description: The utm_campaign that brings the lead.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.campaign
+  ops_agent:
+    description: Agent that reprocessed the lead. For this scenario, it is always the outbound team.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ops_agent
+      - datalake_supply_flows.acquisition_tracking.ops_agent
+  ops_approach:
+    description: Approach of the conversion event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ops_approach
+      - datalake_supply_flows.acquisition_tracking.ops_approach
+  ops_contact_medium:
+    description: Medium of the conversion event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ops_contact_medium
+      - datalake_supply_flows.acquisition_tracking.ops_contact_medium
+  ops_objective:
+    description: Objective of the conversion event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ops_objective
+      - datalake_supply_flows.acquisition_tracking.ops_objective
+  ops_partner:
+    description: The name of the company that registered the lead.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ops_partner
+      - datalake_supply_flows.acquisition_tracking.ops_partner
+  ops_assigned:
+    description: The name of the company that will be receive the lead for Wololo or Olos Dialer.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ops_assigned
+      - datalake_supply_flows.acquisition_tracking.ops_assigned
+  original_lead:
+    description: In cases of reprocessed leads, the id of original lead.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.original_lead
+  reprocessed:
+    description: Indicates if the event has been reprocessed manually.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.reprocessed
+      - datalake_supply_flows.acquisition_tracking.reprocessed
+  reprocessing_entity_type:
+    description: Type of entity that was reprocessed.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.reprocessing_entity_type
+      - datalake_supply_flows.acquisition_tracking.reprocessed
+  reprocessing_table_name:
+    description: Name of the table where reprocessing occurred.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.reprocessing_table_name
+      - datalake_supply_flows.acquisition_tracking.reprocessed
+  aux_database_tracking_campaign:
+    description: The source of utm_campaign, can be Amplitude or Rene Descartes.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.database_tracking_campaign
+  aux_database_tracking_medium:
+    description: The source of utm_medium, can be Amplitude or Rene Descartes.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.database_tracking_medium
+  aux_database_tracking_source:
+    description: The source of utm_source, can be Amplitude or Rene Descartes.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.database_tracking_source
+  aux_data_event:
+    description: Auxiliary data event information.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.aux_data_event
+  aux_group:
+    description: Auxiliary group information.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.aux_group
+  aux_product_status:
+    description: Status of lead or prospect in the product databases.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.aux_product_status
+      - datalake_supply_flows.acquisition_tracking.aux_product_status
+  aux_origin_table:
+    description: The origin of data, can be acquisition or conversion.
+  ts_event_adjusted:
+    description: Timestamp of the event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_event_adjusted
+      - datalake_supply_flows.acquisition_tracking.ts_event
+  ts_event_original:
+    description: Timestamp of the original event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_event_original
+      - datalake_supply_flows.acquisition_tracking.ts_event
+  ts_first_discard:
+    description: Timestamp of the first discard event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_first_discard
+  ts_last_discard:
+    description: Timestamp of the last discard event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_last_discard
+  ts_reprocessing_event:
+    description: Timestamp of the reprocessing event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_reprocessing_event
+  ts_load:
+    description: Timestamp of when the data was loaded into the table.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_load
+      - datalake_supply_flows.acquisition_tracking.ts_load
+  year:
+    description: Year of the event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_event_adjusted
+      - datalake_supply_flows.acquisition_tracking.ts_event
+  month:
+    description: Month of the event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_event_adjusted
+      - datalake_supply_flows.acquisition_tracking.ts_event
+  day:
+    description: Day of the event.
+    lineage:
+      - datalake_supply_flows.conversion_tracking.ts_event_adjusted
+      - datalake_supply_flows.acquisition_tracking.ts_event
