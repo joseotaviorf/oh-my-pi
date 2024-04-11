@@ -1,5 +1,5 @@
 dag:
-  name: superset_second
+  name: superset_entities
   schedule_start_date: 2024, 3, 1
   schedule_interval: 0 0 * * *
   owner: Data Governance
@@ -7,6 +7,7 @@ workflow:
   type: database_pull
   layer: raw
   custom_schema: superset
+  has_hive_sync: true
   database_type: postgres
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
@@ -24,6 +25,17 @@ workflow:
       extraction_type: full
       partitions: []
     slices:
+      date_filter_column: changed_on
+    sql_metrics:
+      date_filter_column: changed_on
+    sqlatable_user:
+      extraction_type: full
+      partitions: []
+    table_columns:
+      date_filter_column: changed_on
+    table_schema:
+      date_filter_column: changed_on
+    tables:
       date_filter_column: changed_on
     tag:
       date_filter_column: changed_on
