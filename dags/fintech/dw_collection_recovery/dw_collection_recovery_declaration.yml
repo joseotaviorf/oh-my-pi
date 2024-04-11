@@ -19,7 +19,7 @@ workflow:
       - fact_negotiation_installment
       - fact_negotiation
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_12_2_med_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
