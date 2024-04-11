@@ -20,7 +20,7 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
-VESPUCIO_PACKAGE_VERSION = "0.2.9"
+VESPUCIO_PACKAGE_VERSION = "0.2.11"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
@@ -133,6 +133,7 @@ source_tasks = [
         entry_point="sources_sql_job",
         parameters=[
             f"--script=ebdb_condo.sql",
+            f"--output_table={Tables.source_ebdb_condo}",
         ],
         task_id="ebdb_condo",
     ),
@@ -140,6 +141,7 @@ source_tasks = [
         entry_point="sources_sql_job",
         parameters=[
             f"--script=kodak_metadata_condo.sql",
+            f"--output_table={Tables.source_kodak_metadata_condo}",
         ],
         task_id="kodak_metadata_condo",
     ),
@@ -147,6 +149,7 @@ source_tasks = [
         entry_point="sources_sql_job",
         parameters=[
             f"--script=sindiconet_condo.sql",
+            f"--output_table={Tables.source_sindiconet_condo}",
         ],
         task_id="sindiconet_condo",
     ),
@@ -154,6 +157,7 @@ source_tasks = [
         entry_point="sources_sql_job",
         parameters=[
             f"--script=ebdb_house.sql",
+            f"--output_table={Tables.source_ebdb_house}",
         ],
         task_id="ebdb_house",
     ),
@@ -161,6 +165,7 @@ source_tasks = [
         entry_point="sources_sql_job",
         parameters=[
             f"--script=union_house.sql",
+            f"--output_table={Tables.source_navent_houses}",
         ],
         task_id="union_house",
     ),
