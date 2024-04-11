@@ -10,6 +10,17 @@ columns:
       - dw_rent.dw_retention.dt_ended_termination
     description: "Week of the termination ended."
     dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Rent value segment."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
   terminations:
     description: "Total volume of contracts that were in termination in a week"
     metric:
