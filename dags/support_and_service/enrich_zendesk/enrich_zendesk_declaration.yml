@@ -8,7 +8,7 @@ workflow:
     type: query
     layer: enrich
     inner_dependencies:
-        tickets_curent:
+        tickets_current:
             - ticket_metrics
             - tickets
     default_extraction_type: incremental
