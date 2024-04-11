@@ -47,7 +47,9 @@ columns:
         For datamart tables (which are in dw layer), the SLA hour is 10h AM BRT.
         The reverse layer doesn't have a SLA.
   number_of_tasks:
-    description: Amount of tasks that the DAG has.
+    description: Amount of tasks that the DAG has. We're using the DAG's last run that successfully that had 
+      a cluster/job termination to count all the existing tasks, due to tasks that might use short-circuit operator 
+      (and wouldn't have a cluster/job creation or termination).
   is_active:
     lineage:
       - datalake_composer_clean.dag.is_active

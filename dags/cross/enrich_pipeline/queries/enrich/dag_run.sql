@@ -7,7 +7,8 @@ WITH first_run_ever AS (
     datalake_composer_clean.log
   WHERE
     id_dag LIKE 'bietlejuice%'
-    AND id_task IN ('create-cluster', 'execute-job-cluster')
+    AND (id_task IN ('create-cluster', 'execute-job-cluster')
+      OR id_task LIKE '%-skip-execution%')  -- Some DAGs may have as the first task a short-circuit that skips the cluster/job creation
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_event ASC) = 1
 ),
@@ -22,7 +23,8 @@ success_run AS (
   WHERE
     id_dag LIKE 'bietlejuice%'
     AND event = 'success'
-    AND id_task IN ('terminate-cluster', 'job-cluster-finished')
+    AND (id_task IN ('terminate-cluster', 'job-cluster-finished')
+      OR id_task LIKE '%-skip-execution%') -- Some DAGs may have as the first task a short-circuit that skips the cluster/job creation
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_dag, ts_executed ORDER BY ts_event ASC) = 1
 ),

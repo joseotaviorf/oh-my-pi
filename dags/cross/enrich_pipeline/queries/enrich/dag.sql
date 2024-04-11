@@ -2,9 +2,8 @@ WITH most_recent_run AS (
     SELECT
         id_dag,
         state,
-        is_first_run_ever,
         is_in_exclusion_list,
-        is_first_execution_inside_sla,
+        is_first_execution_inside_sla AS is_inside_sla,
         DATE(ts_execution) AS dt_execution,
         ts_started AS ts_last_run_started,
         ts_started_brt AS ts_last_run_started_brt,
@@ -17,19 +16,32 @@ WITH most_recent_run AS (
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_execution DESC) = 1
 ),
-amount_of_tasks AS (
+base_amount_of_tasks AS (
+    -- As some DAGs won't execute all its tasks everyday, like DAGs using short-circuit operators, we're assuming that the last run
+    -- that had a cluster/job terminated is the one that we'll use to count the amount of tasks
     SELECT
         id_dag,
-        COUNT(DISTINCT id_task) AS number_of_tasks,
-        ts_executed
+        MAX(ts_executed) AS ts_last_execution
     FROM
         datalake_composer_clean.log
     WHERE
-        year = YEAR(CURRENT_DATE)
-        AND month = MONTH(CURRENT_DATE)
-        AND day = DAY(CURRENT_DATE)
+        id_dag LIKE 'bietlejuice%'
+        AND id_task IN ('terminate-cluster', 'job-cluster-finished')
+        AND event = 'success'
         AND ts_executed IS NOT NULL
-        AND id_dag LIKE 'bietlejuice%'
+    GROUP BY 1
+),
+amount_of_tasks AS (
+    SELECT
+        l.id_dag,
+        COUNT(DISTINCT l.id_task) AS number_of_tasks,
+        l.ts_executed
+    FROM
+        datalake_composer_clean.log AS l
+    JOIN
+        base_amount_of_tasks AS b
+            ON b.id_dag = l.id_dag
+            AND b.ts_last_execution = l.ts_executed
     GROUP BY 1, 3
 ),
 dag_info AS (
@@ -69,8 +81,7 @@ sla_base AS (
         d.is_paused,
         mc.is_in_exclusion_list,
         d.is_datamart,
-        mc.is_first_run_ever,
-        mc.is_first_execution_inside_sla,
+        mc.is_inside_sla,
         mc.dt_execution,
         mc.ts_last_run_started,
         mc.ts_last_run_started_brt,
@@ -104,7 +115,7 @@ SELECT
     s.is_active,
     s.is_paused,
     s.is_in_exclusion_list,
-    s.is_first_execution_inside_sla AS is_inside_sla,
+    s.is_inside_sla,
     s.is_datamart,
     IF(DATE(s.ts_last_run_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
     s.dt_execution AS dt_last_execution,
