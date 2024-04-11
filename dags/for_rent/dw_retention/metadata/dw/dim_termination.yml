@@ -28,6 +28,14 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.attachment_type_list
     description: List of the attachment's type associated to the termination.
+  requested_by:
+    lineage:
+      - datalake_offboarding.contract_termination.requested_by
+    description: Identifies who requested to leave the property.
+    categories:
+      TENANT: Requested by the tenant.
+      QUINTOANDAR: Requested by Quinto Andar.
+      LANDLORD: Requested by the landlord.
   dt_ended_termination:
     lineage:
       - datalake_offboarding.contract_termination.dt_ended_termination
