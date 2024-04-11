@@ -286,10 +286,10 @@ table_block_list:
   - LeadCampaign_targetPropertyTypes_AUD
   - MensagemSMS
   - RestrictionType
-  - fluxolocacao_dadosagente
-  - onboarding
-  - fluxolocacao
-  - fluxolocacao_aud
+  - FluxoLocacao_DadosAgente
+  - Onboarding
+  - FluxoLocacao
+  - FluxoLocacao_AUD
   - SaleOperationManagement
   - SaleOperationManagement_AUD
   - ShopWindow_AUD
@@ -307,21 +307,19 @@ table_block_list:
   - Portability
   - Portability_AUD
   - WorkContract
-  - processedmessage
-  - categoriestagscale
-  - categoriestagscale_aud
-  - categoryimovel_aud
-  - categorytag
-  - categorytag_aud
-  - category_aud
-  - categoriesscore_aud
-  - categoriestag_aud
-  - categoriestagimovel
-  - categoriestagimovel_aud
-  - listingownerrelationmigrationexecutiontable
-  - mudancastatusimovel
-  - administrationplan
-  - administrationplan_aud
+  - ProcessedMessage
+  - CategoryImovel_AUD
+  - CategoriesTag
+  - CategoriesTag_AUD
+  - Category_AUD
+  - CategoriesScore_AUD
+  - CategoriesTag_AUD
+  - CategoriesTagImovel
+  - CategoriesTagImovel_AUD
+  - ListingOwnerRelationMigrationExecutionTable
+  - MudancaStatusImovel
+  - AdministrationPlan
+  - AdministrationPlan_AUD
 
 view_allow_list:
   - vteste_utf8mb3
