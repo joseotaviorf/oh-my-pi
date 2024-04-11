@@ -1,6 +1,6 @@
 database_name: dw_repairs
 table_name: fact_repair_ongoing
-description: 
+description:
   Table stores data on ongoing repair requests. This data includes information about the customer,
   the repair, the responsible analyst, and the repair status. The table is used to analyze the performance of the repair process,
   including response time, resolution time, costs, delay reasons, and success factors.
@@ -26,7 +26,7 @@ columns:
   sk_user:
     description: User unique identifier.
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+      - datalake_zendesk.tickets_current.id_user_main
   sk_agent:
     description: Unique agent identifier.
     lineage:
@@ -52,7 +52,7 @@ columns:
     lineage:
       - datalake_repairs.repair_tickets.ts_request_created
   sk_created_chat:
-    description:  Foreign key referring to the date and time when the first chat conversation for the repair request was started. Can be joined with dw_public.dim_date.
+    description: Foreign key referring to the date and time when the first chat conversation for the repair request was started. Can be joined with dw_public.dim_date.
     lineage:
       - datalake_repairs_clean.repair_request_chat.ts_started
   sk_updated_local:
@@ -63,7 +63,7 @@ columns:
     description: Foreign key referring to that indicates when the first analyst to answer the ticket signed it. Can be joined with dw_public.dim_date.
     lineage:
       - datalake_repairs.repair_tickets.ts_initially_assigned_local
-  sk_last_assigned_local: 
+  sk_last_assigned_local:
     description: Foreign key referring to that indicates when the last analyst to answer the ticket signed it. Can be joined with dw_public.dim_date.
     lineage:
       - datalake_repairs.repair_tickets.ts_last_assigned_local
@@ -72,18 +72,19 @@ columns:
     lineage:
       - datalake_repairs.repair_tickets.ts_closed_local
   sk_measurement:
-    description:  Foreign key referring to the date and time of the first measurement taken for the repair (if applicable). Can be joined with dw_public.dim_date.
+    description: Foreign key referring to the date and time of the first measurement taken for the repair (if applicable). Can be joined with dw_public.dim_date.
     lineage:
       - datalake_repairs.repair_tickets.custom_fields
   sk_first_reply_milestone:
-    description:  Foreign key referring to the date and time the ticket reached the "First Reply" milestone (as defined in the Zendesk ticket funnel metrics). Can be joined with dw_public.dim_date.
+    description: Foreign key referring to the date and time the ticket reached the "First Reply" milestone (as defined in the Zendesk ticket funnel metrics). Can be joined with dw_public.dim_date.
     lineage:
       - datalake_repairs.repair_tickets.custom_fields
-  sk_first_public_comment: 
-    description: Foreign key referring to estimated date on which the first public comment was added to the ticket based on the ticket creation date 
+  sk_first_public_comment:
+    description:
+      Foreign key referring to estimated date on which the first public comment was added to the ticket based on the ticket creation date
       and the average reply time in calendar minutes (from Zendesk ticket funnel metrics). Can be joined with dw_public.dim_date.
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_reply_calendar
+      - datalake_zendesk.tickets_currentreply_time_min_calendar
       - datalake_repairs.repair_tickets.ts_created_local
   reopens:
     description: The number of times the ticket was reopened after it was first marked as solved.
@@ -122,12 +123,12 @@ columns:
   days_to_firs_reply:
     description: Number of days it took for the ticket to receive its first reply after creation.
     lineage:
-      -  datalake_repairs.repair_tickets.ts_created_local
-      -  datalake_repairs.repair_tickets.ts_first_reply_milestone
+      - datalake_repairs.repair_tickets.ts_created_local
+      - datalake_repairs.repair_tickets.ts_first_reply_milestone
   ldt_fr_minutes:
     description: Amount of calendar minutes the ticket took to be replied
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_reply_calendar
+      - datalake_zendesk.tickets_currentreply_time_min_calendar
   year:
     description: Partition data, referring to the year of the ticket update date.
     lineage:

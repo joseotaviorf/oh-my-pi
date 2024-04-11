@@ -10,7 +10,7 @@ WITH relisting_db AS (
     LEFT JOIN
         datalake_ebdb_listing.house AS h
             ON rf.id_house = h.id
-    WHERE 
+    WHERE
         DATE_TRUNC('month',hl.ts_listing_version_start) >= ADD_MONTHS(DATE_TRUNC('month',CURRENT_DATE),-47)
         AND DATE_TRUNC('month',hl.ts_listing_version_start) <= DATE_ADD(CURRENT_DATE, -1)
         AND (hl.listing_category = 'Re-Listing')
@@ -36,7 +36,7 @@ repairs_interaction AS (
         (STRING(GET_JSON_OBJECT(rr.owner_approval, '$.approved')) IS NOT NULL)
         AND CAST(rr.ts_created AS DATE) >= DATE('2023-01-01')
         AND rr.id_third_party_crm_ticket_external IS NOT NULL
-    GROUP BY 
+    GROUP BY
         rr.id
 ),
 service_provider AS (
@@ -45,7 +45,7 @@ service_provider AS (
         rr.id AS id_repair_request,
         rr.service_provider,
         rr.ts_created
-    FROM 
+    FROM
         datalake_repairs_clean.repair_request AS rr
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated DESC) = 1
@@ -60,26 +60,26 @@ first_interaction AS(
     LEFT JOIN
         datalake_repairs_clean.repair_request_chat AS rc
         ON rr.id = rc.id_repair_request
-    LEFT JOIN 
+    LEFT JOIN
         repairs_interaction AS ri
         ON ri.id_request = rr.id
     GROUP BY rc.ts_started, ri.ts_updated, rr.id_third_party_crm_ticket_external
 )
 
-SELECT 
-    tf.id_ticket,
+SELECT
+    tc.id_ticket,
     rr.id_repair_request AS id_request,
-    tfm.id_contract,
-    tf.group_name,
-    tf.client_type,
-    tf.status,
-    tf.custom_fields,
-    tf.tags,
-    tf.ticket_via,
-    tf.channel,
-    tf.agent_name,
-    tf.agent_email,
-    tf.agent_organization,
+    tc.id_contract,
+    tc.group_name,
+    tc.client_type,
+    tc.status,
+    tc.custom_fields,
+    tc.tags,
+    tc.via_channel AS ticket_via,
+    tc.channel,
+    tc.analyst_name AS agent_name,
+    tc.analyst_email AS agent_email,
+    tc.analyst_email AS agent_organization,
     th.contestation_task_origin,
     rr.service_provider,
     COALESCE(chat.contact_theme_tag, call.contact_theme_tag, email.contact_theme_tag) AS theme,
@@ -96,69 +96,73 @@ SELECT
     th.is_contestation_backlog,
     th.is_ticket_followup,
     fi.has_chat_negociation,
-    tfm.reopens,
-    tfm.replies,
+    tc.reopens,
+    tc.replies,
     rd.relisting,
-    tfm.minutes_reply_calendar AS minutes_first_reply_time_calendar,
+    tc.reply_time_min_calendar AS minutes_first_reply_time_calendar,
     c.dt_entered AS entrance_date,
     th.ts_contestation,
     th.ts_resolution_contestation,
     fi.ts_first_interaction,
-    tf.ts_created_local,
-    tf.ts_updated_local,
-    tfm.ts_closed_local,
-    tfm.ts_solved_local,
-    rr.ts_created AS ts_request_created,
+    tc.ts_created - INTERVAL 3 HOUR AS ts_created_local,
+    tc.ts_updated - INTERVAL 3 HOUR AS ts_updated_local,
+    CASE
+      WHEN tc.status = 'closed' THEN tc.ts_updated - INTERVAL 3 HOUR
+      ELSE NULL
+    END AS ts_closed_local,
+    tc.ts_solved - INTERVAL 3 HOUR AS ts_solved_local,
+    rr.ts_created - INTERVAL 3 HOUR AS ts_request_created,
     CAST(csat.ts_submitted AS DATE) AS ts_csat_response_submitted,
-    tfm.ts_initially_assigned_local,
-    tfm.ts_last_assigned_local,
-    YEAR(tf.ts_updated_local) AS year,
-    MONTH(tf.ts_updated_local) AS month,
-    DAY(tf.ts_updated_local) AS day
-FROM 
-    datalake_zendesk_ticket_funnels.ticket_funnel AS tf
-LEFT JOIN 
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm 
-        ON tf.id_ticket = tfm.id_ticket
-LEFT JOIN 
+    tc.ts_initially_assigned  - INTERVAL 3 HOUR AS ts_initially_assigned_local,
+    tc.ts_assigned - INTERVAL 3 HOUR AS ts_last_assigned_local,
+    YEAR(tc.ts_updated - INTERVAL 3 HOUR ) AS year,
+    MONTH(tc.ts_updated - INTERVAL 3 HOUR ) AS month,
+    DAY(tc.ts_updated - INTERVAL 3 HOUR ) AS day
+FROM
+    datalake_zendesk.tickets_current AS tc
+LEFT JOIN
     datalake_customer_support.chat AS chat
-        ON tf.id_ticket = chat.id_ticket
-LEFT JOIN 
+        ON tc.id_ticket = chat.id_ticket
+LEFT JOIN
     datalake_customer_support.call AS call
-        ON tf.id_ticket = call.id_ticket
-LEFT JOIN 
+        ON tc.id_ticket = call.id_ticket
+LEFT JOIN
     datalake_customer_support.email AS email
-        ON tf.id_ticket = email.id_ticket
-LEFT JOIN 
+        ON tc.id_ticket = email.id_ticket
+LEFT JOIN
     datalake_ebdb_contract.contract AS c
-        ON tfm.id_contract = c.id
-LEFT JOIN 
+        ON tc.id_contract = c.id
+LEFT JOIN
     service_provider AS rr
-        ON tf.id_ticket = rr.sk_ticket
-LEFT JOIN 
+        ON tc.id_ticket = rr.sk_ticket
+LEFT JOIN
     repairs_interaction AS ri
         ON ri.id_request = rr.id_repair_request
 LEFT JOIN
     relisting_distinct AS rd
-        ON rd.id_contract = tfm.id_contract
+        ON rd.id_contract = tc.id_contract
 LEFT JOIN
     datalake_survicate.repairs_surveys AS csat
-        ON csat.id_ticket = tf.id_ticket
-LEFT JOIN 
+        ON csat.id_ticket = tc.id_ticket
+LEFT JOIN
     datalake_repairs_clean.repair_request AS rr_first_interaction
-        ON tf.id_ticket = rr_first_interaction.id_third_party_crm_ticket_external
+        ON tc.id_ticket = rr_first_interaction.id_third_party_crm_ticket_external
         AND rr_first_interaction.id_third_party_crm_ticket_external IS NOT NULL
-LEFT JOIN 
+LEFT JOIN
     first_interaction fi
-        ON fi.id_third_party_crm_ticket_external = tf.id_ticket
+        ON fi.id_third_party_crm_ticket_external = tc.id_ticket
 LEFT JOIN
     datalake_zendesk_history.ticket_history AS th
-        ON tf.id_ticket = th.id_ticket
-WHERE 
-    tf.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]') 
-    AND (tf.ts_created >= DATE_ADD(CURRENT_DATE,-20*7) OR tfm.ts_solved >= date('2023-01-01') OR tfm.ts_solved IS NULL)
-    AND tf.channel NOT IN ('call')
-    AND tf.status NOT IN ('deleted')
-    AND tf.tags NOT LIKE '%caso_ticket_agregador%'
+        ON tc.id_ticket = th.id_ticket
+WHERE
+    tc.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]')
+    AND (
+        tc.ts_created >= DATE_ADD(CURRENT_DATE, -20*7)
+        OR tc.ts_solved >= DATE('2023-01-01')
+        OR tc.ts_solved IS NULL
+    )
+    AND tc.channel NOT IN ('call')
+    AND tc.status NOT IN ('deleted')
+    AND tc.tags NOT LIKE '%caso_ticket_agregador%'
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY tf.id_ticket ORDER BY tf.ts_updated_local DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY tc.id_ticket ORDER BY tc.ts_updated DESC) = 1

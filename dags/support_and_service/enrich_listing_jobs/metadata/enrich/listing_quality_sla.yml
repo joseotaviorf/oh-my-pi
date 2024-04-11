@@ -12,7 +12,7 @@ columns:
     description: The unique identifier of the Listing Quality SLA.
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.id_house
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
       - datalake_ebdb_photo_jobs.photo_job.dt_uploaded
   business_key:
     description:
@@ -20,12 +20,12 @@ columns:
       in this case we concatenate it as "id_house || id_ticket || dt_uploaded".
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.id_house
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
       - datalake_ebdb_photo_jobs.photo_job.dt_uploaded
   id_ticket:
     description: Identification key of the service ticket related to listing quality.
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
   id_house:
     description: Identification key of the analyzed house.
     lineage:
@@ -33,7 +33,7 @@ columns:
   agent_organization:
     description: Name of the company where the analyst works.
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.agent_organization
+      - datalake_zendesk.tickets_current.analyst_organization
   has_demand:
     description: Boolean information that indicates whether the service generated demand.
   has_task_done:
@@ -51,8 +51,8 @@ columns:
   dt_ticket_created:
     description: Date (local) on which the service ticket was created.
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created_local
+      - datalake_zendesk.tickets_current.ts_created
   dt_ticket_solved:
     description: Date (local) on which the service ticket was resolved.
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+      - datalake_zendesk.tickets_current.ts_solved

@@ -22,20 +22,17 @@ remove_duplicates AS (
 ),
 listing_quality_tasks AS (
     SELECT
-        tf.id_ticket,
-        REGEXP_EXTRACT(tf.subject, '(\\d+)', 0) AS id_house,
-        tf.agent_organization,
-        tf.ts_created_local,
-        tfm.ts_solved_local,
-        RANK() OVER (PARTITION BY REGEXP_EXTRACT(tf.subject, '(\\d+)', 0) ORDER BY tfm.ts_solved_local ASC) AS rk2
+        tc.id_ticket,
+        REGEXP_EXTRACT(tc.subject, '(\\d+)', 0) AS id_house,
+        tc.analyst_organization AS agent_organization,
+        tc.ts_created - INTERVAL 3 HOUR AS ts_created_local,
+        tc.ts_solved - INTERVAL 3 HOUR AS ts_solved_local,
+        RANK() OVER (PARTITION BY REGEXP_EXTRACT(tc.subject, '(\\d+)', 0) ORDER BY tc.ts_solved ASC) AS rk2
     FROM
-        datalake_zendesk_ticket_funnels.ticket_funnel AS tf
-    LEFT JOIN
-        datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
-            ON tf.id_ticket = tfm.id_ticket
+        datalake_zendesk.tickets_current AS tc
     WHERE
-        tf.group_name = 'Listing Quality [FOTOS] [SO]'
-        AND tf.status IN ('solved', 'closed')
+        tc.group_name = 'Listing Quality [FOTOS] [SO]'
+        AND tc.status IN ('solved', 'closed')
 ),
 general_base AS (
     SELECT
