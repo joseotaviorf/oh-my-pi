@@ -1,7 +1,7 @@
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
-from bietlejuice.base.airflow.database_type_enum import DatabaseTypeEnum
+from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
 
 
 class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
