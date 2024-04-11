@@ -25,12 +25,15 @@ def parse_arguments():
     parser.add_argument("env", type=str, help="forno/prod environment")
     parser.add_argument("incoming_bucket")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("database_type")
+    parser.add_argument("source_database")
     parser.add_argument("source_schema")
     parser.add_argument("schema")
     parser.add_argument("table_name")
     parser.add_argument("start_date")
     parser.add_argument("end_date")
     parser.add_argument("primary_keys", help="Comma separated list of primary keys")
+    parser.add_argument("dbutils_secret_key")
 
     return parser.parse_args()
 
@@ -86,11 +89,14 @@ def main():
     environment = args.env
     incoming_bucket = args.incoming_bucket
     datalake_bucket = args.datalake_bucket
+    database_type = args.database_type
+    source_database = args.source_database
     source_schema = args.source_schema
     schema = args.schema
     table_name = args.table_name.lower()
     start_date = args.start_date
     end_date = args.end_date
+    dbutils_secret_key = args.dbutils_secret_key
     if args.primary_keys:
         primary_keys = [key.strip() for key in args.primary_keys.split(",")]
     else:
@@ -103,8 +109,8 @@ def main():
                 environment=environment,
                 start_date=start_date,
                 end_date=end_date,
-                dbutils_secret_key=None
-            ).get_cdc_schema_finder(DatabaseTypeEnum.MYSQL),
+                dbutils_secret_key=dbutils_secret_key
+            ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
             datalake_table_schema=f"datalake_{schema}_raw"
         )
         primary_keys = pk_identifier.find_primary_keys(args.table_name) # We don't use the table name in lowercase, because this is case sensitive
@@ -112,8 +118,8 @@ def main():
     logger.info(
         f"""
         m=__main__, environment={environment},  incoming_bucket={incoming_bucket}, datalake_bucket={datalake_bucket},
-        schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date},
-        primary_keys={primary_keys},
+        database_type={database_type}, source_database={source_database}, source_schema={source_schema},
+        schema={schema}, table_name={table_name}, start_date={start_date}, end_date={end_date}, primary_keys={primary_keys},
         msg=Starting spark job...
         """
     )

@@ -8,8 +8,10 @@ dag:
 workflow:
   type: cdc
   layer: raw
-  custom_schema: ebdb_test
+  database_type: mysql
+  source_database: ebdb
   source_schema: ebdb
+  custom_schema: ebdb_test
   tables_customization:
     Contrato_AUD:
       clean_table_name: contract_aud

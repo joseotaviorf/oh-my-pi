@@ -8,8 +8,10 @@ dag:
 workflow:
   type: cdc
   layer: raw
-  custom_schema: ebdb
+  database_type: mysql
+  source_database: ebdb
   source_schema: ebdb
+  custom_schema: ebdb
   tables_customization:
     FluxoLocacao:
       clean_table_name: rent_flow

@@ -2,9 +2,8 @@ import logging
 import json
 from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
-    MySqlCdcSchemaFinder,
-)
+from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
+from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import CdcSchemaFinderFactory
 from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_treatment import (
     MySqlCdcSchemaTreatment,
 )
@@ -29,12 +28,15 @@ def parse_arguments():
     parser.add_argument("env", type=str, help="forno/prod environment")
     parser.add_argument("incoming_bucket")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("database_type")
+    parser.add_argument("source_database")
     parser.add_argument("source_schema")
     parser.add_argument("schema")
     parser.add_argument("table_name")
     parser.add_argument("start_date")
     parser.add_argument("end_date")
     parser.add_argument("partitions")
+    parser.add_argument("dbutils_secret_key")
 
     return parser.parse_args()
 
@@ -63,13 +65,14 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
 
 
 def get_incoming_data(
-    incoming_bucket, environment, schema, table_name, start_date, end_date
+    incoming_bucket, environment, source_database, schema, table_name, start_date, end_date
 ):
     """
     Reads incoming data as a DataFrame
 
     :param datalake_bucket: S3 Bucket.
     :param environment: forno / prod env.
+    :param source_database: Database name.
     :param schema: Database schema.
     :param table_name: Table name.
     :param start_date: Airflow DAG start date.
@@ -77,7 +80,7 @@ def get_incoming_data(
     :return df:
     """
     path = (
-        f"s3://{incoming_bucket}/{schema}/{environment}_{schema}.data.{schema}.{table_name}/"
+        f"s3://{incoming_bucket}/{source_database}/{environment}_{source_database}.data.{schema}.{table_name}/"
     )
 
     logger.info(
@@ -153,25 +156,28 @@ def main():
     environment = args.env
     incoming_bucket = args.incoming_bucket
     datalake_bucket = args.datalake_bucket
+    database_type = args.database_type
+    source_database = args.source_database
     source_schema = args.source_schema
     schema = args.schema
     table_name = args.table_name
     start_date = args.start_date
     end_date = args.end_date
     partitions = json.loads(args.partitions.replace("'", '"'))
+    dbutils_secret_key = args.dbutils_secret_key
     full_table_name = f"datalake_{schema}_transactional.{table_name}"
 
     logger.info(
         f"""
-        m=__main__, environment={environment},  datalake_bucket={datalake_bucket},
-        incoming_bucket={incoming_bucket}, schema={schema}, table_name={table_name},
-        start_date={start_date}, end_date={end_date}, partitions={partitions}
+        m=__main__, environment={environment},  datalake_bucket={datalake_bucket}, database_type={database_type},
+        source_database={source_database}, source_schema={source_schema}, incoming_bucket={incoming_bucket}, schema={schema},
+        table_name={table_name}, start_date={start_date}, end_date={end_date}, partitions={partitions}, dbutils_secret_key={dbutils_secret_key},
         msg=Starting spark job...
         """
     )
 
     df = get_incoming_data(
-        incoming_bucket, environment, source_schema, table_name, start_date, end_date
+        incoming_bucket, environment, source_database, source_schema, table_name, start_date, end_date
     )
 
     if df is None:
@@ -202,12 +208,15 @@ def main():
 
     # Hardcoded for now, while we don't have other sources such as Postgres.
     pre_treatment = MySqlCdcSchemaTreatment(
-        MySqlCdcSchemaFinder(
-            f"s3://{incoming_bucket}/{source_schema}/{environment}_{source_schema}.data/",
+        CdcSchemaFinderFactory(
+            incoming_bucket=incoming_bucket,
+            source_database=source_database,
+            source_schema=source_schema,
+            environment=environment,
             start_date=start_date,
             end_date=end_date,
-            schema=source_schema,
-        ),
+            dbutils_secret_key=dbutils_secret_key
+        ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
         datalake_table_schema=f"datalake_{schema}_transactional",
     )
     transactional_df = pre_treatment.treat_dataframe(
