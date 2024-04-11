@@ -84,8 +84,6 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     s3_loader = S3Loader()
 
-    spark.sql("MSCK REPAIR TABLE datalake_amplitude_clean.events")
-
     for key in keys:
         logger.info(
             "msg=starting events requests, app_id={}, app_name={}".format(
