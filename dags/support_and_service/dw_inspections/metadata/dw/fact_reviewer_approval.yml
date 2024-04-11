@@ -40,6 +40,7 @@ columns:
   ts_approved:
     lineage:
       - datalake_inspections.reviewer.ts_approved
+      - datalake_inspections.reviewer.ts_updated
     description: Timestamp of when it was approved
   ts_load:
     description: Date and time when the data was loaded.
