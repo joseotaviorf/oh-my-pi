@@ -1,12 +1,19 @@
 ---
-sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
-database_name: reverse_atlas_pricing_report
+database_name: datalake_atlas_pricing_report
 tables:
-  pricing_report_engagement:
-    event_type: PRICING_REPORT_ENGAGEMENT
-  pricing_report_listing_price_history:
-    event_type: PRICING_REPORT_LISTING_PRICE_HISTORY
-    
+  new_pricing_report_region:
+    event_type: NEW_PRICING_REPORT_REGION
+    sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
+  new_pricing_report_listing_price_history:
+    event_type: NEW_PRICING_REPORT_LISTING_PRICE_HISTORY
+    sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
+  new_pricing_report_new_rent_price_published:
+    event_type: NEW_PRICING_REPORT_NEW_RENT_PRICE_PUBLISHED
+    sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
+  new_pricing_report_engagement:
+    event_type: NEW_PRICING_REPORT_ENGAGEMENT
+    sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
+
 custom_cluster:
   driver_node_type_id: r5n.2xlarge
   node_type_id: c5n.2xlarge
@@ -15,5 +22,5 @@ custom_cluster:
   spark_conf:
     spark.driver.memory: "30g"
   aws_attributes:
-      ebs_volume_size: 200
-      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
+    ebs_volume_size: 200
+    instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"

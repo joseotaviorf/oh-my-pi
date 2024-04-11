@@ -45,7 +45,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 default_libraries = config_service.get_config("default_libraries")
 tables = config_service.get_config("tables")
 database_name = config_service.get_config("database_name")
-sns_topic_arn = config_service.get_config("sns_topic_arn")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -86,7 +85,7 @@ for table_name, table_config in tables.items():
                         database_name,
                         table_name,
                         table_config["event_type"],
-                        sns_topic_arn,
+                        table_config["sns_topic_arn"],
                     ],
                 }
             },
