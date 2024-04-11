@@ -41,13 +41,7 @@ EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/
 RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"
 CLEAN_SPARK_JOB_PATH = EBDB_SPARK_JOBS_PATH + "load_ebdb_clean.py"
 
-CUSTOM_LIBRARIES = [
-    {
-        "maven": {
-            "coordinates": "mysql:mysql-connector-java:8.0.30"
-        }
-    }
-]
+CUSTOM_LIBRARIES = [{"maven": {"coordinates": "mysql:mysql-connector-java:8.0.30"}}]
 
 RAW_EXECUTION_TIMEOUT_HOURS = 3.5
 
@@ -246,7 +240,7 @@ sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"sync-hive-metastore-raw-structure",
     json={
         "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/sync_metastore_tables_structure.py",
+            "python_file": f"{EBDB_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
             "parameters": [
                 datalake_bucket,
                 LayerEnum.RAW.value,
