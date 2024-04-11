@@ -1,0 +1,37 @@
+---
+database_name: datalake_databricks
+table_name: daily_clusters
+description: Provides daily metrics about databricks Clusters using Overwatch data.
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_cluster:
+    description: Databricks cluster id
+  cluster_name:
+    description: Databricks cluster name
+  dag_name:
+    description: Dag name
+  driver_node_type:
+    description: Driver's machine type, e.g. m5a.xlarge
+  node_type:
+    description: Workers's machine type, e.g. m5a.xlarge
+  sku:
+    description: Type of cluster (job cluster or all purpose) e.g automated, interactive, jobsLight, sqlCompute
+  runtime_engine:
+    description: One of STANDARD or PHOTON. When PHOTON, pricing is adjusted when deriving the dbu_costs
+  spark_version:
+    description: DBR version - scala version
+  total_dbu_cost:
+    description: All dbu costs for Driver and Workers
+  total_ec2_cost:
+    description: All compute costs for Driver and Workers
+  total_cost:
+    description: Total cost from Compute and DBUs for all nodes (including Driver)
+  is_last_of_day_for_dag:
+    description: True if the cluster represents the last execution of the day for the dag
+  ts_cluster_started:
+    description: Timestamp of when the cluster started
+  ts_cluster_ended:
+    description: Timestamp of when the cluster ended
+  dt_cluster_run:
+    description: Date of when the cluster started, used for partitioning

@@ -29,7 +29,7 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
     def generate_task_id(self, tables_attributes: list = None) -> str:
         layer = tables_attributes[0].layer.value
         table_name = (
-            tables_attributes.table_name if len(tables_attributes) == 1 else "all"
+            tables_attributes[0].table_name if len(tables_attributes) == 1 else "all"
         )
         return StringFormatter.slugify(f"optimize-{layer}-{table_name}")
 

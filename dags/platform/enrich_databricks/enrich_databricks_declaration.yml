@@ -1,0 +1,19 @@
+dag:
+  name: enrich_databricks
+  owner: Data Engineering
+  schedule_interval: 0 18 * * *
+  documentation: 
+    dag_purpose: |
+      Generate metrics about databricks Clusters using Overwatch data.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  tables_customization:
+    daily_clusters:
+      partitions: [ dt_cluster_run ]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, tomorrow_ds, 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_med_general_cluster
