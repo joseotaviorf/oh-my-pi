@@ -15,4 +15,4 @@ cluster:
   custom_configurations:
     driver_node_type_id: r5a.xlarge
     node_type_id: m5a.4xlarge
-    num_workers: 1
+    num_workers: 2
