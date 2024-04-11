@@ -38,6 +38,23 @@ dag_clear AS (
   WHERE
     id_dag LIKE 'bietlejuice%'
     AND event = 'dagrun_clear'
+),
+composer_run AS (
+  /** Finding the most recent run of the Composer DAG for each execution date.
+    Composer is a DAG that runs D0 and several times a day, which means that if today is 2024-04-10, the execution date will also be 2024-04-10.
+    On the next day (2024-04-11) in its first Composer extraction, it will extract the data related to the end of the day of the 2024-04-10.
+    So in this case, the execution date 2024-04-10 will have as it last run marked as the date of 2024-04-11
+  ***/ 
+  SELECT
+    DATE(ts_executed) AS dt_execution,
+    MAX(ts_started) AS ts_last_execution_started,
+    MAX(ts_ended) AS ts_last_execution_ended
+  FROM
+    datalake_composer_clean.dag_run
+  WHERE
+    id_dag = 'bietlejuice.composer'
+    AND DATE(ts_executed) = DATE(ts_ended)  -- Making sure that for every DAG execution date, we'll have the last extraction of the same day
+  GROUP BY 1
 )
 SELECT
   dr.id AS id_dag_run,
@@ -61,7 +78,8 @@ SELECT
                 AND dr.id_dag NOT LIKE '%reverse%' THEN
               (
                 CASE
-                  WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 11 HOUR THEN TRUE
+                  WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 11 HOUR THEN TRUE
+                  WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event > TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 11 HOUR THEN FALSE
                   WHEN s.ts_success_event IS NULL AND NOW() > TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 11 HOUR THEN FALSE
                   ELSE NULL
                 END
@@ -69,7 +87,8 @@ SELECT
               WHEN dr.id_dag LIKE '%datamarts%' THEN
                   (
                     CASE
-                      WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN TRUE
+                      WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN TRUE
+                      WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event > TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN TRUE
                       WHEN s.ts_success_event IS NULL AND NOW() > TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN FALSE
                       ELSE NULL
                     END
@@ -90,10 +109,14 @@ SELECT
   dr.ts_ended,
   FROM_UTC_TIMESTAMP(dr.ts_ended, 'America/Sao_Paulo') AS ts_ended_brt,
   s.ts_success_event AS ts_first_execution_success,
-  FROM_UTC_TIMESTAMP(s.ts_success_event, 'America/Sao_Paulo') AS ts_first_execution_success_brt
+  FROM_UTC_TIMESTAMP(s.ts_success_event, 'America/Sao_Paulo') AS ts_first_execution_success_brt,
+  cr.ts_last_execution_ended AS ts_last_composer_run,
+  FROM_UTC_TIMESTAMP(cr.ts_last_execution_ended, 'America/Sao_Paulo') AS ts_last_composer_run_brt,
+  NOW() AS ts_load,
+  FROM_UTC_TIMESTAMP(NOW(), 'America/Sao_Paulo') AS ts_load_brt
 FROM
   datalake_composer_clean.dag_run AS dr
-JOIN
+INNER JOIN
   datalake_composer_clean.dag AS d
     ON d.id_dag = dr.id_dag
     AND d.id_dag LIKE 'bietlejuice%'
@@ -109,6 +132,9 @@ LEFT JOIN
   dag_clear AS c
     ON c.id_dag = dr.id_dag
     AND c.ts_executed = dr.ts_executed
+INNER JOIN
+  composer_run AS cr
+    ON cr.dt_execution = DATE(dr.ts_ended)
 LEFT JOIN
     datalake_gsheets_clean.dags_sla_exclusion_list AS ds
         ON ds.dag = dr.id_dag

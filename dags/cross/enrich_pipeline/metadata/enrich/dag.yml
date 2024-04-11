@@ -107,3 +107,7 @@ columns:
     lineage:
       - datalake_pipeline.dag_run.ts_first_execution_success
     description: The BRT timestamp of when the DAG's first run of the execution date has received a success status.
+  ts_load:
+    description: UTC timestamp of when the data was written in our data lake.
+  ts_load_brt:
+    description: BRT timestamp of when the data was written in our data lake.

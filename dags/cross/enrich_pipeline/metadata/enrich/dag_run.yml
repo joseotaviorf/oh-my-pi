@@ -92,3 +92,15 @@ columns:
       Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
       successful timestamp will be shown.
+  ts_last_composer_run:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_ended
+    description: The UTC timestamp of when the last Composer extraction happened related to the execution date.
+  ts_last_composer_run_brt:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_ended
+    description: The BRT timestamp of when the last Composer extraction happened related to the execution date.
+  ts_load:
+    description: UTC timestamp of when the data was written in our data lake.
+  ts_load_brt:
+    description: BRT timestamp of when the data was written in our data lake.

@@ -124,7 +124,9 @@ SELECT
     s.ts_last_run_ended,
     s.ts_last_run_ended_brt,
     s.ts_last_run_first_success,
-    s.ts_last_run_first_success_brt
+    s.ts_last_run_first_success_brt,
+    NOW() AS ts_load,
+    FROM_UTC_TIMESTAMP(NOW(), 'America/Sao_Paulo') AS ts_load_brt
 FROM
     sla_base AS s
 LEFT JOIN
