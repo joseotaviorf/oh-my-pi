@@ -59,7 +59,7 @@ def publish_message_to_sns(region: str, sns_topic_arn: str, message: dict):
     sns_client = boto3.client("sns", region_name=region)
     sns_client.publish(
         TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial)
-    )  
+    )
 
 def split_in_chunks(list_of_elements: list, chunk_size: int):
     """
@@ -82,17 +82,17 @@ def load_table_into_sns(
     spark_client = SparkClient()
 
     df = spark.table(f"{database_name}.{table_name}")
-    
+
     message_contents = df.collect()
     messages = [
       {
-          "id": str(uuid4()),
-          "ts_event": str(datetime.now(timezone.utc).timestamp()),
-          "event_type": event_type, 
+          "id_message": str(uuid4()),
+          "ts_message": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S'),
+          "event_type": event_type,
           "payload": row.asDict()
       } for row in message_contents
     ]
-    
+
     messages_batches = split_in_chunks(messages, 100)
     messages_batches_rdd = spark_client.conn.sparkContext.parallelize(
         messages_batches
