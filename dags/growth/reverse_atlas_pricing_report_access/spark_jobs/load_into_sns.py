@@ -58,7 +58,7 @@ def publish_message_to_sns(region: str, sns_topic_arn: str, message: dict):
     """
     sns_client = boto3.client("sns", region_name=region)
     sns_client.publish(
-        TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial)
+        TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial, ensure_ascii=False)
     )
 
 def split_in_chunks(list_of_elements: list, chunk_size: int):
