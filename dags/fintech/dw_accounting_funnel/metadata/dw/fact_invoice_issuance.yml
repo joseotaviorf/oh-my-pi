@@ -48,8 +48,8 @@ columns:
   dt_sap_created:
     lineage:
       - datalake_accounting_funnel.retsuko_invoice_issuance.dt_sap_created
-    description: "Date that the entry was created in SAP"
+    description: "Date that the entry was created in SAP. If more than one entry, it's considered the most recent date."
   dt_sap_reference:
     lineage:
       - datalake_accounting_funnel.retsuko_invoice_issuance.dt_sap_reference
-    description: "Date that the entry was referenced in SAP"
+    description: "Date that the entry was referenced in SAP. If more than one entry, it's considered the most recent date."

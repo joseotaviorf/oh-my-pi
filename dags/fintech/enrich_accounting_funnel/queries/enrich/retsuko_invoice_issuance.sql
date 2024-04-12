@@ -92,8 +92,8 @@ sap AS (
       WHEN account_number = '31101.02.01' THEN 'adm fee'
       WHEN account_number = '31101.01.01' THEN 'brokerage'
     END AS revenue_account,
-    DATE(dt_created) AS dt_sap_created,
-    DATE(dt_reference) AS dt_sap_reference,
+    MAX(DATE(dt_created)) AS dt_sap_created,
+    MAX(DATE(dt_reference)) AS dt_sap_reference,
     CAST(sum(debit_credit) AS DECIMAL(12,2)) AS sap_amount
   FROM 
     datalake_accounting_funnel.ledger
@@ -102,7 +102,7 @@ sap AS (
   AND document_number LIKE 'IN %'
   AND dt_reference >= '2024-01-01'
   GROUP BY 
-    1, 2, 3, 4
+    1, 2
 )
 
 SELECT 
