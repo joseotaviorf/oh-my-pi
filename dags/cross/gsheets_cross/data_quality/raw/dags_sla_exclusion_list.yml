@@ -1,0 +1,19 @@
+---
+table_name: datalake_gsheets_raw.dags_sla_exclusion_list
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  context:
+    is_complete:
+      severity_level: Error
+  dag:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  dt_dag_added:
+    is_complete:
+      severity_level: Error

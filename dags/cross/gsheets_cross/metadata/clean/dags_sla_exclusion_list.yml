@@ -1,0 +1,23 @@
+---
+database_name: datalake_gsheets_clean
+table_name: dags_sla_exclusion_list
+owner: isadora.gallerani@quintoandar.com.br
+domain: Cross
+description: This gsheet contains all the bi-etl-ejuice Airflow DAGs that shouldn't be considered in our Data SLA.
+  If a DAG was renamed, make sure to keep both old and new names, for historical DAG run data.
+  When adding a new DAG to it, make sure it's not duplicated.
+columns:
+  context:
+    lineage:
+      - datalake_gsheets_raw.dags_sla_exclusion_list.context
+    description: Line context of the DAG.
+  dag:
+    lineage:
+      - datalake_gsheets_raw.dags_sla_exclusion_list.dag
+    description: DAG name (DAG id of the Airflow).
+  dt_dag_added:
+    lineage:
+      - datalake_gsheets_raw.dags_sla_exclusion_list.dt_dag_added
+    description: Date of when the DAG was added to the exclusion list.
+  ts_load:
+    description: Timestamp of when the data was loaded into our systems.

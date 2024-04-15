@@ -11,6 +11,12 @@ sheets_info:
     clean_table_name: tracking_catalog_events_aud
     sheet_context: cross
 
+  dags_sla_exclusion_list:
+    sheet_id: 1SvZD4v4GC81IOVrALn5jr31pNOajp2Nxtqn-5Isvtvg
+    sheet_name: dags_sla_exclusion_list
+    clean_table_name: dags_sla_exclusion_list
+    sheet_context: cross
+
   data_analytics_training_01_introduction_data_analytics:
     sheet_id: 15JqMtaHMRhDmUJ-Vq8EMGuZHf9uqSN6wX9Q2X3xQIxk
     sheet_name: 01_introduction_data_analytics

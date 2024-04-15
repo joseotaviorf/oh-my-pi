@@ -540,6 +540,7 @@ bietlejuice.enrich_pipeline:
     - bietlejuice.composer:load-clean-dag
     - bietlejuice.composer:load-clean-dag-run
     - bietlejuice.composer:load-clean-log
+    - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list
 bietlejuice.enrich_recommendations:
   add:
     - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
