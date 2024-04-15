@@ -78,8 +78,10 @@ class EnrichQueryDeltaWorkflow(BaseWorkflow):
         load = self.load_enrich_task_creator.create_task(table)
         if self._check_include_sync_hive_tasks(table):
             register_table = self.register_delta_table_task_creator.create_task(table)
-            propagate_metadata = self.propagate_metadata_task_creator.create_task(table)
-            (load >> register_table >> propagate_metadata >> last_task)
+            sync_metadata = self.sync_metadata_task_creator.create_task(
+                table, "--bypass-hive"
+            )
+            (load >> register_table >> sync_metadata >> last_task)
         if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
             load >> data_quality >> last_task
@@ -136,8 +138,8 @@ class EnrichQueryDeltaWorkflow(BaseWorkflow):
         self.data_quality_tests_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
-        self.propagate_metadata_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.PROPAGATE_METADATA
+        self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.SYNC_METADATA
         )
         self.skip_run_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SKIP_RUN
