@@ -6,6 +6,12 @@ description: Fact table containing information about the segmentation of CIBs (B
 domain: International
 owner: bruna.prates@quintoandar.com.br
 columns:
+  pk_cib_segmentation:
+    lineage:
+      - datalake_mexico_cib_segmentation.cib_segmentation.id_cib
+      - datalake_mexico_cib_segmentation.cib_segmentation.year
+      - datalake_mexico_cib_segmentation.cib_segmentation.month
+    description: Id of the CIB segmentation (generated on the query using id_cib and the start date of the month in which the CIB will be classified, separated by a dot).
   sk_cib:
     lineage:
       - datalake_mexico_cib_segmentation.cib_segmentation.id_cib

@@ -1,4 +1,5 @@
 SELECT
+    id_cib || '.' || year || month || '01' AS pk_cib_segmentation,
     id_cib AS sk_cib,
     id_segmentation AS sk_segmentation,
     type_calculation,
