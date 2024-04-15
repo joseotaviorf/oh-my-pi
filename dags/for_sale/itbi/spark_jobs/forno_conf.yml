@@ -7,7 +7,7 @@ tables:
       format: ".xlsx"
       blacklist_urls: [
           "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2006.xlsx",
-          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2007.xlsx", 
+          "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2007.xlsx",
           "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2008.xlsx",
           "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2009.xlsx",
           "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2010.xlsx",
@@ -49,13 +49,13 @@ tables:
       ACC (IPTU).1:
         ACC (IPTU): "descricao_padrao_iptu"
         ACC (IPTU).1: "acc_iptu"
-    
+
   itbi_bh:
     is_incremental: false
     source:
       site_download_page_url: "https://dados.pbh.gov.br/dataset/relatorio-itbi"
       headers: "{'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}"
-      format: ".csv" 
+      format: ".csv"
       blacklist_urls: [
                 'https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/c98e75c0-fe00-4b0c-98c9-a30e45ee76dd/download/relatorioitbi2009_julho2021.csv',
                 'https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/e4c455ea-86ae-40ea-932c-fbf914a0e286/download/relatorioitbi.csv',
@@ -76,7 +76,7 @@ tables:
                 'https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/34e4dc51-6190-42a5-8132-2796e7e7f6a7/download/itbi_2023_fevereiro.csv'
             ]
     columns_to_rename:
-      Endereco Completo: endereco_completo 
+      Endereco Completo: endereco_completo
       Endereco: endereco_completo
       Bairro: bairro
       Ano de Construcao (Unidade): ano_construcao_unidade
@@ -90,11 +90,12 @@ tables:
       Descrição Tipo Ocupacao (Unidade): descricao_tipo_ocupacao_unidade
       Descricao Tipo Ocupacao (Unidade): descricao_tipo_ocupacao_unidade
       Valor Base Calculo: valor_base_calculo
-      " Valor Base Calculo ": valor_base_calculo
       Zona Uso ITBI: zona_uso_itbi
       Data Inclusao Transacao: data_inclusao_transacao
       Data Quitação Transacao: data_inclusao_transacao
       Data Quitacao Transacao: data_inclusao_transacao
       Data_quitacao: data_inclusao_transacao
       Data quitacao: data_inclusao_transacao
+      Data quitação Transação: data_inclusao_transacao
+      Data Quitacao: data_inclusao_transacao
       Valor Imposto Cobrado (sumarizado): valor_imposto_cobrado_sumarizado

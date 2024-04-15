@@ -102,7 +102,8 @@ def get_data(
         )
 
         response = requests.get(url, headers=source_headers)
-        csv_content = StringIO(unidecode.unidecode(response.text.encode('latin1').decode('latin1')))
+
+        csv_content = StringIO(unidecode.unidecode(response.text.encode('utf-8').decode('utf-8')))
 
         df = pd.read_csv(csv_content, encoding='utf-8', sep = ';', thousands = '.', decimal=',', skip_blank_lines=True)
         df.columns = df.columns.str.strip()
