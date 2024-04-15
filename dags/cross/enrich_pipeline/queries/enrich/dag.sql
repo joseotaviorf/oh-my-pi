@@ -16,6 +16,7 @@ WITH most_recent_run AS (
 most_recent_events AS (
     SELECT
         id_dag,
+        duration,
         ts_started AS ts_last_run_started,
         ts_started_brt AS ts_last_run_started_brt,
         ts_ended AS ts_last_run_ended,
@@ -88,6 +89,7 @@ sla_base AS (
             WHEN d.is_datamart = TRUE THEN 13
             ELSE NULL   -- Reverse layer doesn't have a SLA
         END AS utc_sla_hour,
+        me.duration,
         d.is_active,
         d.is_paused,
         mc.is_in_exclusion_list,
@@ -126,6 +128,7 @@ SELECT
         ELSE NULL
     END AS brt_sla_hour,
     ao.number_of_tasks,
+    s.duration,
     s.is_active,
     s.is_paused,
     s.is_in_exclusion_list,

@@ -50,6 +50,10 @@ columns:
     description: Amount of tasks that the DAG has. We're using the DAG's last run that successfully that had 
       a cluster/job termination to count all the existing tasks, due to tasks that might use short-circuit operator 
       (and wouldn't have a cluster/job creation or termination).
+  duration:
+    lineage:
+      - datalake_pipeline.dag_run.duration
+    description: Total duration of the DAG run, in minutes.
   is_active:
     lineage:
       - datalake_composer_clean.dag.is_active
