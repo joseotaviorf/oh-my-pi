@@ -1,0 +1,30 @@
+---
+database_name: dw_pipeline
+table_name: dim_line
+description: This dimension table has all the lines responsible for bi-etl-ejuice's Airflow DAGs.
+  Each line is an unique line/DAG owner, identified by the sk_line key.
+  In order to create this key, we looked for the first DAG event of each line. As an example,
+  if it was just created a new DAG with a new owner (Data Agents), the first event of the DAG would
+  be the cluster/job creation, and then we would assign this timestamp as the first DAG event of the
+  Data Agents line.
+domain: Cross
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  sk_line:
+    lineage:
+      - datalake_pipeline.line.id_line
+    description: Unique key that identifies the line.
+  line_name:
+    lineage:
+      - datalake_pipeline.line.line_name
+    description: Name of the line.
+  is_data_line:
+    lineage:
+      - datalake_pipeline.line.is_data_line
+    description: Boolean flag indicating if the line is from the Data area.
+  ts_line_first_event:
+    lineage:
+      - datalake_pipeline.line.ts_line_first_event
+    description: Timestamp of when the line's first DAG event happened.
+  ts_load:
+    description: Timestamp of when the data was loaded into our systems.

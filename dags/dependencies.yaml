@@ -580,6 +580,8 @@ bietlejuice.dw_offer_temp:
 bietlejuice.dw_photo_jobs:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_photo_jobs:load-enrich-photo-job
+bietlejuice.dw_pipeline:
+  - bietlejuice.enrich_pipeline:load-enrich-line
 bietlejuice.dw_proposal:
   - bietlejuice.ebdb:load-clean-proposal
   - bietlejuice.ebdb:load-clean-user
