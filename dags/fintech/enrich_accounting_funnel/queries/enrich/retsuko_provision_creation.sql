@@ -239,12 +239,13 @@ sap AS (
       WHEN account_number = '31101.02.02' THEN 'adm fee'
       WHEN account_number = '31101.01.04' THEN 'brokerage'
     END AS account_name,
-    debit_credit
+    SUM(debit_credit) AS debit_credit
   FROM 
     datalake_accounting_funnel.ledger
   WHERE 
     account_number like '31101%'
     AND document_number like 'JE %'
+  GROUP BY 1,2,3
 ),
 
 df_final AS (
@@ -254,10 +255,10 @@ SELECT
   source_name,
   revenue_name,
   accrual_year_month,
-  ABS(CAST(SUM(source_provision_amount) AS DECIMAL(12,2))) AS source_provision_amount,
-  ABS(CAST(SUM(CASE WHEN event = 'new-accounting-entries' THEN debit_credit END) AS DECIMAL(12,2))) AS sap_provision_amount,
-  ABS(CAST(SUM(source_reversion_amount) AS DECIMAL(12,2))) AS source_reversion_amount,
-  ABS(CAST(SUM(CASE WHEN event = 'clearing-accounting-entries' THEN debit_credit END) AS DECIMAL(12,2))) AS sap_reversion_amount,
+  CAST(SUM(source_provision_amount) AS DECIMAL(12,2)) AS source_provision_amount,
+  CAST(SUM(CASE WHEN event = 'new-accounting-entries' THEN debit_credit END) AS DECIMAL(12,2)) AS sap_provision_amount,
+  CAST(SUM(source_reversion_amount) AS DECIMAL(12,2)) AS source_reversion_amount,
+  CAST(SUM(CASE WHEN event = 'clearing-accounting-entries' THEN debit_credit END) AS DECIMAL(12,2)) AS sap_reversion_amount,
   dt_created
 FROM 
   df
@@ -289,7 +290,7 @@ SELECT
   sap_provision_amount,
   source_reversion_amount,
   sap_reversion_amount,
-  IF(source_provision_amount - sap_provision_amount = 0 OR (source_provision_amount = 0 AND sap_provision_amount IS NULL), true, false) AS is_provision_compliance,
+  IF(source_provision_amount + sap_provision_amount = 0 OR (source_provision_amount = 0 AND sap_provision_amount IS NULL), true, false) AS is_provision_compliance,
   IF(source_reversion_amount - sap_reversion_amount = 0 OR (source_reversion_amount = 0 AND sap_reversion_amount IS NULL), true, false) AS is_reversion_compliance,
   dt_created
 FROM 
