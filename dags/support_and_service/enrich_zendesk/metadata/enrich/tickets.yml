@@ -128,6 +128,10 @@ columns:
     description: Customer satisfaction data
     lineage:
       - datalake_zendesk_clean.tickets.satisfaction_rating
+  request_type:
+    description: Type of request related to the customer, from custom_field 'Tipo de Solicitação'
+    lineage:
+      - datalake_zendesk_clean.tickets.custom_fields
   client_type:
     description: Type of client, from custom_fields like 'Tipo de Cliente'
     lineage:

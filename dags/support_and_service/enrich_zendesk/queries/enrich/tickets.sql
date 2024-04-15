@@ -346,6 +346,7 @@ SELECT
     t.recipient,
     t.tags,
     t.satisfaction_rating,
+    t.request_type,
     REGEXP_REPLACE(t.client_type, "_so", "") AS client_type,
     t.step_tag,
     t.customer_type_tag,
