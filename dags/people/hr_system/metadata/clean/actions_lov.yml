@@ -1,0 +1,52 @@
+---
+database_name: datalake_hr_system_clean
+table_name: actions_lov
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: null
+columns:
+  id_action:
+    description: 'Surrogate identifier for the action'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.ActionId
+  id_action_type:
+    description: 'Surrogate identifier for the action type'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.ActionTypeId
+  action_code:
+    description: 'Code for the action'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.ActionCode
+  action_name:
+    description: 'Name of the action'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.ActionName
+  description:
+    description: 'Description of the action'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.Description
+  action_type_code:
+    description: ''
+    lineage:
+    - datalake_hr_system_raw.actions_lov.ActionTypeCode
+  termination_type:
+    description: 'Type of termination'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.TerminationType
+  is_used_in_contract:
+    description: 'Indicates whether an action is used in employment contracts'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.CASE WHEN UsedInContract = 'Y' THEN TRUE
+      WHEN UsedInContract = 'N' THEN FALSE END
+  dt_start:
+    description: 'Date from when the action reason is valid'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.DATE(StartDate)
+  dt_end:
+    description: 'Date until when the action reason is valid'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.DATE(EndDate)
+  ts_load:
+    description: 'Timestamp of the load in the data lake.'
+    lineage:
+    - datalake_hr_system_raw.actions_lov.ts_load

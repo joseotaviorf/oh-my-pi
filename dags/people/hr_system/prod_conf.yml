@@ -25,6 +25,14 @@ endpoints:
         - "absenceMaternity"
         - "absenceRecordingDFF"
         - "absenceRecordingsDDF"
+  actions_lov:
+    deduplication_key: "ActionId"
+    has_partitions: false
+    has_columns_to_delete: false
+    params:
+      onlyData: true
+      orderBy: "ActionId:asc"
+      limit: 100
   action_reasons_lov:
     deduplication_key: "ActionReasonId"
     has_partitions: false
