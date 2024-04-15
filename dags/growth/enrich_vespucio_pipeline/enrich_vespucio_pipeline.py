@@ -238,18 +238,18 @@ yesterday = "{{ ds }}"
 today = "{{ macros.ds_add(ds, 1)  }}"
 
 plugin_tasks = [
-    # create_task(
-    #     entry_point="plugins_compound_indexer",
-    #     parameters=[
-    #         f"--elasticsearch_url=https://vpc-vespucio-prod-us-east-1-o56l6pbmnwaphvb7rqxzsapso4.us-east-1.es.amazonaws.com/",
-    #         f"--update_alias",
-    #         f"--delete_old_indices",
-    #         f"--input_condo_compounds={Tables.condo_compounds}",
-    #         f"--input_house_compounds={Tables.house_compounds}",
-    #         f"--input_geocode_cache={Tables.step2_geocode_cache}",
-    #         f"--output_index_prefix=vespucio_prod",
-    #     ],
-    # ),
+    create_task(
+        entry_point="plugins_compound_indexer",
+        parameters=[
+            f"--elasticsearch_url=https://vpc-vespucio-prod-us-east-1-o56l6pbmnwaphvb7rqxzsapso4.us-east-1.es.amazonaws.com/",
+            f"--update_alias",
+            f"--delete_old_indices",
+            f"--input_condo_compounds={Tables.condo_compounds}",
+            f"--input_house_compounds={Tables.house_compounds}",
+            f"--input_geocode_cache={Tables.step2_geocode_cache}",
+            f"--output_index_prefix=vespucio_prod",
+        ],
+    ),
     create_task(
         entry_point="plugins_rede_house_enrichment_consolidate",
         parameters=[
