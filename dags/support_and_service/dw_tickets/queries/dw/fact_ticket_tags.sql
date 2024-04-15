@@ -1,15 +1,9 @@
 SELECT
-    CAST(tf.id_ticket AS BIGINT) AS sk_ticket,
+    CAST(id_ticket AS BIGINT) AS sk_ticket,
     REPLACE(REPLACE(REPLACE(tf_tag, '[', ''), ']', ''), '"', '') AS ticket_tag,
-    tf.ts_updated,
+    ts_updated,
     NOW() AS ts_load
 FROM
-    datalake_zendesk_tickets_clean.tickets tf
+    datalake_zendesk.tickets_current
 LATERAL VIEW
-    EXPLODE(SPLIT(tf.tags,',')) AS tf_tag
-WHERE
-    tf.ticket_via <> 'api'
-    OR (
-        tf.ticket_via = 'api'
-        AND tf.tags NOT LIKE '%hsm%'
-    )
+    EXPLODE(SPLIT(tags,',')) AS tf_tag

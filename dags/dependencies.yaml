@@ -851,11 +851,9 @@ bietlejuice.dw_tenant_documentation:
   - bietlejuice.ebdb:load-clean-user-revision-entity
 bietlejuice.dw_tickets:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
+  - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_zendesk:load-enrich-tickets
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.zendesk_tickets:load-clean-tickets
-  - bietlejuice.zendesk_tickets:load-clean-users
+  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
 bietlejuice.dw_tracksale:
   - bietlejuice.ebdb:load-clean-user
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification

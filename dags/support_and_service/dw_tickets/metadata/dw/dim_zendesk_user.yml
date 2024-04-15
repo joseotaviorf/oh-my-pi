@@ -8,23 +8,23 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_zendesk_user:
     lineage:
-      - datalake_zendesk_tickets_clean.users.id_user
+      - datalake_support_users.zendesk_users.id_user
     description: Key of user that corresponds to the Zendesk user's ID
   url_user:
     lineage:
-      - datalake_zendesk_tickets_clean.users.url_user
+      - datalake_support_users.zendesk_users.url_user
     description: The user's Zendesk API URL
   name:
     lineage:
-      - datalake_zendesk_tickets_clean.users.name
+      - datalake_support_users.zendesk_users.name
     description: The name of the user registered in Zendesk
   alias:
     lineage:
-      - datalake_zendesk_tickets_clean.users.alias
+      - datalake_support_users.zendesk_users.alias
     description: The alias displayed to end users
   email:
     lineage:
-      - datalake_zendesk_tickets_clean.users.email
+      - datalake_support_users.zendesk_users.email
     description:
       The user's primary email address registered in Zendesk. For agents
       and admins, this should be the business email address (@quintoandar.com.br domain).
@@ -33,57 +33,57 @@ columns:
       QA user's email or not)
   phone:
     lineage:
-      - datalake_zendesk_tickets_clean.users.phone
+      - datalake_support_users.zendesk_users.phone
     description:
       The primary phone number of the user (that may be either the QA user's
       email or not)
   time_zone:
     lineage:
-      - datalake_zendesk_tickets_clean.users.time_zone
+      - datalake_support_users.zendesk_users.time_zone
     description: The user's time zone
   locale:
     lineage:
-      - datalake_zendesk_tickets_clean.users.locale
+      - datalake_support_users.zendesk_users.locale
     description:
       A BCP-47 compliant tag for the user's locale that indicates the primary
       language and region subtags
   tags:
     lineage:
-      - datalake_zendesk_tickets_clean.users.tags
+      - datalake_support_users.zendesk_users.tags
     description: The user's tags if the account has user tagging is enabled
   role:
     lineage:
-      - datalake_zendesk_tickets_clean.users.role
+      - datalake_support_users.zendesk_users.role
     description:
       The role of the user at Zendesk. It could be agent for our customer
       support analysts or end-user if they are our customers or partners
   cost_center:
     lineage:
-      - datalake_zendesk_tickets_clean.organizations.name
+      - datalake_support_users.zendesk_users.organization
     description: User cost center
   is_active:
     lineage:
-      - datalake_zendesk_tickets_clean.users.is_active
+      - datalake_support_users.zendesk_users.is_active
     description: It is not active if the user has been deleted at Zendesk
   is_shared_phone_number:
     lineage:
-      - datalake_zendesk_tickets_clean.users.is_shared_phone_number
+      - datalake_support_users.zendesk_users.is_shared_phone_number
     description: Flag that indicates whether the phone number is shared or not
   ts_last_login:
     lineage:
-      - datalake_zendesk_tickets_clean.users.ts_last_login
+      - datalake_support_users.zendesk_users.ts_last_login
     description: Timestamp of latest admin or agent's login event (UTC timezone)
   ts_created:
     lineage:
-      - datalake_zendesk_tickets_clean.users.ts_created
+      - datalake_support_users.zendesk_users.ts_created
     description: Timestamp of the user register's creation event (UTC timezone)
   ts_created_local:
     lineage:
-      - datalake_zendesk_tickets_clean.users.ts_created_local
+      - datalake_support_users.zendesk_users.ts_created
     description: Timestamp of the user register's creation event (UTC-3/Brasilia timezone)
   ts_updated:
     lineage:
-      - datalake_zendesk_tickets_clean.users.ts_updated
+      - datalake_support_users.zendesk_users.ts_updated
     description: Timestamp of the user register's update event (UTC timezone)
   ts_load:
     description: Timestamp of data load from database source (UTC timezone)

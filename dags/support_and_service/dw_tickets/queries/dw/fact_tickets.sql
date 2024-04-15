@@ -6,7 +6,7 @@ WITH tenant AS (
             WHEN tmc_t.client_type = 'inquilino' THEN ch_t.id_client
         END AS id_client
     FROM
-        datalake_zendesk_tickets.ticket_measurements tmc_t
+        datalake_zendesk.tickets_current AS tmc_t
     LEFT JOIN
         datalake_ebdb_contract.contract_house ch_t
             ON tmc_t.id_contract = ch_t.id_contract
@@ -16,10 +16,10 @@ house_owner AS (
         tmc_o.id_ticket,
         MAX(ch_o.id_house_listing) AS id_house_listing,
         CASE
-            WHEN tmc_o.client_type IN ('proprietário','imobiliária_b2b') THEN ch_o.id_owner -- COALESCE(dc.id_owner, dhl.id_owner)
+            WHEN REGEXP_REPLACE(tmc_o.client_type, "_so$", "") IN ('proprietário', 'imobiliária_b2b') THEN ch_o.id_owner -- COALESCE(dc.id_owner, dhl.id_owner)
         END AS id_owner
     FROM
-        datalake_zendesk_tickets.ticket_measurements tmc_o
+        datalake_zendesk.tickets_current tmc_o
     LEFT JOIN
         datalake_ebdb_contract.contract_house ch_o
             ON tmc_o.id_house = ch_o.id_house
@@ -30,64 +30,71 @@ house_owner AS (
 SELECT
     CAST(t.id_ticket AS BIGINT) AS sk_ticket,
     COALESCE(own.id_house_listing, -1) AS sk_house_listing,
-    COALESCE(t.id_contract, -1)  AS sk_contract,
-    COALESCE(tf.id_sale_offer, -1) AS sk_sale_offer,
-    CAST(COALESCE(tf.id_job, -1) AS BIGINT) AS sk_job,
-    COALESCE(t.id_user, -1) AS sk_user,
-    t.id_personal_document AS sk_personal_document,
+    COALESCE(CAST(t.id_contract AS BIGINT), -1)  AS sk_contract,
+    COALESCE(t.offer_ids[0], -1) AS sk_sale_offer,
+    CAST(COALESCE(t.id_job, -1) AS BIGINT) AS sk_job,
+    COALESCE(t.id_user_main, -1) AS sk_user,
     COALESCE(ten.id_client, -1) AS sk_client,
     COALESCE(own.id_owner, -1) AS sk_owner,
-    t.id_zendesk_requester_user AS sk_zendesk_requester_user,
-    t.id_zendesk_submitter_user AS sk_zendesk_submitter_user,
-    t.id_zendesk_assignee_user AS sk_zendesk_assignee_user,
-    MD5(tf.agent_email) AS sk_agent,
+    COALESCE(CAST(t.id_requester AS BIGINT), -1) AS sk_zendesk_requester_user,
+    COALESCE(CAST(t.id_submitter AS BIGINT), -1) AS sk_zendesk_submitter_user,
+    COALESCE(CAST(t.id_assignee AS BIGINT), -1) AS sk_zendesk_assignee_user,
+    MD5(t.analyst_email) AS sk_agent,
     CAST(COALESCE(t.id_session, -1) AS BIGINT) AS sk_session,
     COALESCE(t.id_call, '-1') AS sk_call,
     COALESCE(CAST(DATE_FORMAT(t.ts_created, 'yMMdd') AS INTEGER), -1) AS sk_created_date,
-    COALESCE(CAST(DATE_FORMAT(t.ts_created_local, 'yMMdd') AS INTEGER), -1) AS sk_created_date_local,
+    COALESCE(CAST(DATE_FORMAT(t.ts_created - INTERVAL 3 HOUR, 'yMMdd') AS INTEGER), -1) AS sk_created_date_local,
     COALESCE(CAST(DATE_FORMAT(t.ts_solved, 'yMMdd') AS INTEGER), -1) AS sk_solved_date,
-    COALESCE(CAST(DATE_FORMAT(t.ts_solved_local, 'yMMdd') AS INTEGER), -1) AS sk_solved_date_local,
-    COALESCE(CAST(DATE_FORMAT(t.ts_closed, 'yMMdd') AS INTEGER), -1) AS sk_closed_date,
-    COALESCE(CAST(DATE_FORMAT(t.ts_closed_local, 'yMMdd') AS INTEGER), -1) AS sk_closed_date_local,
+    COALESCE(CAST(DATE_FORMAT(t.ts_solved - INTERVAL 3 HOUR, 'yMMdd') AS INTEGER), -1) AS sk_solved_date_local,
+    CASE
+      WHEN t.status = 'closed' THEN COALESCE(CAST(DATE_FORMAT(t.ts_updated, 'yMMdd') AS INTEGER), -1)
+      ELSE NULL
+    END AS sk_closed_date,
+    CASE
+      WHEN t.status = 'closed' THEN COALESCE(CAST(DATE_FORMAT(t.ts_updated - INTERVAL 3 HOUR, 'yMMdd') AS INTEGER), -1)
+      ELSE NULL
+    END AS sk_closed_date_local,
     COALESCE(CAST(DATE_FORMAT(t.ts_initially_assigned, 'yMMdd') AS INTEGER), -1) AS sk_initially_assigned,
-    COALESCE(CAST(DATE_FORMAT(t.ts_initially_assigned_local, 'yMMdd') AS INTEGER), -1) AS sk_initially_assigned_local,
-    COALESCE(CAST(DATE_FORMAT(t.ts_last_assigned, 'yMMdd') AS INTEGER), -1) AS sk_last_assigned,
-    COALESCE(CAST(DATE_FORMAT(t.ts_last_assigned_local, 'yMMdd') AS INTEGER), -1) AS sk_last_assigned_local,
-    t.total_group_stations,
-    t.total_assignee_stations,
-    t.minutes_reply_calendar AS minutes_first_reply_time_calendar,
-    t.minutes_reply_business AS minutes_first_reply_time_business,
-    t.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
-    t.minutes_first_resolution_business AS minutes_first_resolution_time_business,
-    t.minutes_requester_wait_calendar AS minutes_requester_wait_time_calendar,
-    t.minutes_requester_wait_business AS minutes_requester_wait_time_business,
-    t.minutes_agent_wait_calendar AS minutes_agent_wait_time_calendar,
-    t.minutes_agent_wait_business AS minutes_agent_wait_time_business,
-    t.minutes_on_hold_calendar AS minutes_on_hold_time_calendar,
-    t.minutes_on_hold_business AS minutes_on_hold_time_business,
-    t.minutes_full_resolution_calendar AS minutes_full_resolution_time_calendar,
-    t.minutes_full_resolution_business AS minutes_full_resolution_time_business,
+    COALESCE(CAST(DATE_FORMAT(t.ts_initially_assigned - INTERVAL 3 HOUR, 'yMMdd') AS INTEGER), -1) AS sk_initially_assigned_local,
+    COALESCE(CAST(DATE_FORMAT(t.ts_assigned, 'yMMdd') AS INTEGER), -1) AS sk_last_assigned,
+    COALESCE(CAST(DATE_FORMAT(t.ts_assigned - INTERVAL 3 HOUR, 'yMMdd') AS INTEGER), -1) AS sk_last_assigned_local,
+    t.group_stations AS total_group_stations,
+    t.assignee_stations AS total_assignee_stations,
+    t.reply_time_min_calendar AS minutes_first_reply_time_calendar,
+    t.reply_time_min_business AS minutes_first_reply_time_business,
+    t.first_resolution_time_min_calendar AS minutes_first_resolution_time_calendar,
+    t.first_resolution_time_min_business AS minutes_first_resolution_time_business,
+    t.requester_wait_time_min_calendar AS minutes_requester_wait_time_calendar,
+    t.requester_wait_time_min_business AS minutes_requester_wait_time_business,
+    t.agent_wait_time_min_calendar AS minutes_agent_wait_time_calendar,
+    t.agent_wait_time_min_business AS minutes_agent_wait_time_business,
+    t.on_hold_time_min_calendar AS minutes_on_hold_time_calendar,
+    t.on_hold_time_min_business AS minutes_on_hold_time_business,
+    t.full_resolution_time_min_calendar AS minutes_full_resolution_time_calendar,
+    t.full_resolution_time_min_business AS minutes_full_resolution_time_business,
     t.reopens,
     t.replies,
     t.ts_initially_assigned,
-    t.ts_initially_assigned_local,
-    t.ts_last_assigned,
-    t.ts_last_assigned_local,
+    t.ts_initially_assigned - INTERVAL 3 HOUR AS ts_initially_assigned_local,
+    t.ts_assigned AS ts_last_assigned,
+    t.ts_assigned - INTERVAL 3 HOUR AS ts_last_assigned_local,
     t.ts_solved,
-    t.ts_solved_local,
+    t.ts_solved - INTERVAL 3 HOUR AS ts_solved_local,
+    CASE
+      WHEN t.status = 'closed' THEN t.ts_updated
+      ELSE NULL
+    END AS ts_closed,
+    CASE
+      WHEN t.status = 'closed' THEN t.ts_updated - INTERVAL 3 HOUR
+      ELSE NULL
+    END AS ts_closed_local,
     t.ts_updated,
-    t.ts_updated_local,
-    t.ts_closed,
-    t.ts_closed_local,
-    NOW() AS ts_load
+    t.ts_updated - INTERVAL 3 HOUR AS ts_updated_local
 FROM
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS t
+    datalake_zendesk.tickets_current AS t
 LEFT JOIN
     tenant ten
         ON t.id_ticket = ten.id_ticket
 LEFT JOIN
     house_owner own
         ON t.id_ticket = own.id_ticket
-LEFT JOIN
-    datalake_zendesk_ticket_funnels.ticket_funnel AS tf
-        ON t.id_ticket = tf.id_ticket

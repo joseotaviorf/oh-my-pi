@@ -6,18 +6,18 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
-      - datalake_zendesk_tickets_clean.tickets.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: Key of ticket that corresponds to the Zendesk ticket number
   ticket_tag:
     lineage:
-      - datalake_zendesk_tickets_clean.tickets.tags
+      - datalake_zendesk.tickets_current.tags
     description:
       Corresponds to a ticket classification, such as chatbot action, request
       transfer to another team, automated ticket workflows and so on.  One single
       ticket can have more than one tag
   ts_updated:
     lineage:
-      - datalake_zendesk_tickets_clean.tickets.ts_updated
+      - datalake_zendesk.tickets_current.ts_updated
     description: Timestamp of latest ticket's update event (UTC timezone)
   ts_load:
     description: Timestamp of data load from database source (UTC timezone)

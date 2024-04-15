@@ -14,6 +14,7 @@ SELECT DISTINCT
     role,
     role_type,
     signature,
+    url,
     tags,
     ticket_restriction,
     time_zone,

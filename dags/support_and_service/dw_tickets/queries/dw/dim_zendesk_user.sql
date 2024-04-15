@@ -1,24 +1,21 @@
 SELECT
-    CAST(usr.id_user AS BIGINT) AS sk_zendesk_user,
-    usr.url_user,
-    usr.name,
-    usr.alias,
-    usr.email,
-    usr.phone,
-    usr.time_zone,
-    usr.locale,
-    usr.tags,
-    usr.role,
-    org.name AS cost_center,
-    CAST(usr.is_active AS BOOLEAN) AS is_active,
-    CAST(usr.is_shared_phone_number AS BOOLEAN) AS is_shared_phone_number,
-    usr.ts_last_login,
-    usr.ts_created,
-    usr.ts_created_local,
-    usr.ts_updated,
+    CAST(id_user_zendesk AS BIGINT) AS sk_zendesk_user,
+    url_user,
+    name,
+    alias,
+    email,
+    phone,
+    time_zone,
+    locale,
+    tags,
+    role,
+    organization AS cost_center,
+    CAST(is_active AS BOOLEAN) AS is_active,
+    CAST(is_shared_phone_number AS BOOLEAN) AS is_shared_phone_number,
+    ts_last_login,
+    ts_created,
+    ts_created - INTERVAL 3 HOUR AS ts_created_local,
+    ts_updated,
     NOW() AS ts_load
 FROM
-    datalake_zendesk_tickets_clean.users usr
-LEFT JOIN
-    datalake_zendesk_tickets_clean.organizations org
-        ON org.id = usr.id_organization
+    datalake_support_users.zendesk_users
