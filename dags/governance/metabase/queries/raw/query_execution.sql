@@ -15,4 +15,4 @@ SELECT
     database_id,
     cache_hit
 FROM
-    `public`.query_execution
+    public.query_execution
