@@ -15,4 +15,4 @@ SELECT
     database_id,
     cache_hit
 FROM
-    metabase.query_execution
+    `public`.query_execution
