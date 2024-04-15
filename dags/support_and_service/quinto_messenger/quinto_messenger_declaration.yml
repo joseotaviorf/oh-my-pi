@@ -18,19 +18,24 @@ workflow:
   dbutils_secret_key: QUINTO_MESSENGER_DB
   default_extraction_type: incremental
   tables_customization:
-    channel:
+    Channel:
+      clean_table_name: channel
       date_filter_column: updated_at
       partitions: [year, month, day]
-    channel_event:
+    ChannelEvent:
+      clean_table_name: channel_event
       date_filter_column: updated_at
       partitions: [year, month, day]
-    task:
+    Task:
+      clean_table_name: task
       date_filter_column: updated_at
       partitions: [year, month, day]
-    task_event:
+    TaskEvent:
+      clean_table_name: task_event
       date_filter_column: updated_at
       partitions: [year, month, day]
-    chat:
+    Chat:
+      clean_table_name: chat
       date_filter_column: updated_at
       partitions: [year, month, day]
 

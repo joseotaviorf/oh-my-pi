@@ -21,9 +21,6 @@ workflow:
   dbutils_secret_key: SARUMAN_DB
   default_extraction_type: incremental
   tables_customization:
-    task:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
     session:
       date_filter_column: updated_at
       partitions: [year, month, day]
