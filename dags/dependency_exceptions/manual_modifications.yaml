@@ -497,8 +497,6 @@ bietlejuice.enrich_nps_answer_drivers:
     - bietlejuice.enrich_tracksale:load-enrich-answer
   remove:
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
-bietlejuice.enrich_nps_reversion:
-  override: []
 bietlejuice.enrich_offboarding:
   add:
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
@@ -862,8 +860,6 @@ bietlejuice.reverse_listings_report_access:
 bietlejuice.reverse_sale_unavailable_listings_access:
   add:
     - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
-bietlejuice.reverse_nps_reversion:
-  override: []
 bietlejuice.enrich_atlas_pricing_report:
   remove:
     - bietlejuice.dw_smart_price:load-dw-quintoandar-fact-listing-price-changes
