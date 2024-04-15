@@ -1,0 +1,61 @@
+---
+database_name: metric_rent
+table_name: house_not_relisted_weekly
+description: Weekly calculated metrics of houses not relisted.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_week_tr:
+    lineage:
+      - dw_retention.dim_termination.ts_created
+    description: "Week of the contract termination."
+    dimension: True
+  country_code:
+    lineage:
+      - dw_retention.fact_contract_termination.country_code
+    description: "Country code of the house."
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Rent value category based on its value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  qtd_tr:
+    description: "Volume of contract terminations that happended in the week being referenced."
+    metric:
+      name: Weekly Terminations
+      description: "Volume of contract terminations that happended in the week being referenced."
+      acronym: WT
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_tr_requested_by_pp:
+    description: "Volume of contract terminations that happended by the landlord request in the week being referenced."
+    metric:
+      name: Weekly Terminations Requested by Landlord
+      description: "Volume of contract terminations that happended by the landlord request in the week being referenced."
+      acronym: WTRL
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_tr_requested_by_pp:
+    description: "Percentage of contract terminations that happended by the landlord request in the week being referenced."
+    metric:
+      name: Weekly Percentage of Terminations Requested by Landlord
+      description: "Percentage of contract terminations that happended by the landlord request in the week being referenced."
+      acronym: WPTRL
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""

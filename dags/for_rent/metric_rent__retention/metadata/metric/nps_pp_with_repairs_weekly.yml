@@ -19,6 +19,7 @@ columns:
       MEDIUM: Rent between R$1500,01 and R$2499,99.
       HIGH: Rent higher than R$2500,00.
       UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
     dimension: True
   promoters_repairs_need:
     description: "Volume of promoters among owners that answered the NPS survey after a contract termination with the need of repairs."
