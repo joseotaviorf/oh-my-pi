@@ -1,0 +1,38 @@
+dag:
+  name: quinto_messenger
+  schedule_start_date: 2020, 7, 27
+  schedule_interval: 0 0 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose:
+      Retrieve data from Quinto Messenger database (postgresql). [Quinto Messenger](https://github.com/quintoandar/quinto-messenger)
+      is the service built to be the connection between Twilio and QuintoAdar's system.
+
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: quintomessenger
+  load_options:
+    max_records_per_file: 250000
+  dbutils_secret_key: QUINTO_MESSENGER_DB
+  default_extraction_type: incremental
+  tables_customization:
+    channel:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+    channel_event:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+    task:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+    task_event:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+    chat:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+
+cluster:
+  type: databricks_10_4_med_general_cluster

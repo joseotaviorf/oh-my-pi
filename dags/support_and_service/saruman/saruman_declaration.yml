@@ -1,0 +1,40 @@
+dag:
+  name: saruman
+  schedule_start_date: 2022, 7, 27
+  schedule_interval: 0 3 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Retrieves data from the Saruman database (PostgreSQL).
+
+      [Saruman](https://github.com/quintoandar/saruman) is a service that concentrates events from multiple sources
+      and builds a timeline used to provide context for support sessions. Some of these events are tagging, routing,
+      creation, ending, comment events about a session and about workflows.
+
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: saruman
+  load_options:
+    max_records_per_file: 250000
+  dbutils_secret_key: SARUMAN_DB
+  default_extraction_type: incremental
+  tables_customization:
+    task:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+    session:
+      date_filter_column: updated_at
+      partitions: [year, month, day]
+    session_history:
+      date_filter_column: created_at
+      partitions: [year, month, day]
+    support_case:
+      extraction_type: full
+    pendency:
+      date_filter_column: created_at
+      partitions: [year, month, day]
+
+cluster:
+  type: databricks_10_4_med_general_cluster
