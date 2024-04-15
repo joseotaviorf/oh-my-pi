@@ -11,4 +11,4 @@ workflow:
   has_hive_sync: false
   bucket_config_name: people_bucket
 cluster:
-  type: databricks_10_4_min_people_cluster
+  type: databricks_12_2_min_people_cluster

@@ -3,7 +3,7 @@ dag:
   schedule_interval: 0 2 * * *
   owner: Data People
 cluster:
-  type: databricks_10_4_med_people_cluster
+  type: databricks_12_2_med_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE

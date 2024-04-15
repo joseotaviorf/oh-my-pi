@@ -45,7 +45,7 @@ raw_spark_job_path = (
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-cluster_description = config_service.get_config("databricks_10_4_med_people_cluster")
+cluster_description = config_service.get_config("databricks_12_2_med_people_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 partition_cols = config_service.get_config("partition_cols")
