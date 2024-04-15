@@ -1,14 +1,12 @@
 from typing import Optional
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, to_timestamp, to_date
-from pyspark.sql.utils import AnalysisException
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_treatment import (
     CdcSchemaTreatment,
 )
 from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
     MySqlCdcSchemaFinder,
 )
-from bietlejuice.base.spark import BaseSparkContext
 
 
 class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
@@ -57,15 +55,6 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         try:
             return self.schema_finder.find_latest_table_definition(table_name)
         except ValueError:
-            return None
-
-    def _try_find_existing_datalake_table(
-        self, datalake_table_schema: str, table_name: str
-    ) -> Optional[DataFrame]:
-        """Try to find a saved datalake table, if it exists."""
-        try:
-            return BaseSparkContext.spark.table(f"{datalake_table_schema}.{table_name}")
-        except AnalysisException:
             return None
 
     def _treat_columns_from_latest_table_change(
@@ -207,31 +196,5 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
             else:
                 transactional_dataframe = transactional_dataframe.withColumn(
                     column["name"], col(column["name"]).cast("int")
-                )
-        return transactional_dataframe
-
-    def _treat_decimal_columns(
-        self, transactional_dataframe: DataFrame, latest_table_change: dict
-    ) -> DataFrame:
-        for column in latest_table_change["columns"]:
-            if column["name"] not in transactional_dataframe.columns:
-                continue
-            if column["typeName"] in ("DECIMAL", "NUMERIC"):
-                type = f"decimal({column['length']}, {column['scale']})"
-                transactional_dataframe = transactional_dataframe.withColumn(
-                    column["name"], col(column["name"]).cast(type)
-                )
-        return transactional_dataframe
-
-    def _map_column_types(
-        self, transactional_dataframe: DataFrame, latest_table_change: dict
-    ) -> DataFrame:
-        for column in latest_table_change["columns"]:
-            if column["name"] not in transactional_dataframe.columns:
-                continue
-            if column["typeName"] in self.TYPE_MAPPING:
-                transactional_dataframe = transactional_dataframe.withColumn(
-                    column["name"],
-                    col(column["name"]).cast(self.TYPE_MAPPING[column["typeName"]]),
                 )
         return transactional_dataframe
