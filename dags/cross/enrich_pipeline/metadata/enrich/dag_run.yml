@@ -35,6 +35,8 @@ columns:
     description: Boolean flag indicating if the DAG run had an external trigger.
   is_triggered_by_mediator:
     description: Boolean flag indicating if the DAG run was triggered by Mediator.
+  is_manual_run:
+    description: Boolean flag indicating if the DAG run was manually created.
   is_first_run_ever:
     description: Boolean flag indicating if the DAG run is the DAG's first ever.
       This may be useful to consolidate SLA information.

@@ -65,13 +65,15 @@ SELECT
   IF(ds.dag IS NOT NULL, TRUE, FALSE) AS is_in_exclusion_list,
   dr.had_external_trigger,
   IF(dr.id_run LIKE 'mediator%', TRUE, FALSE) AS is_triggered_by_mediator,
+  IF(dr.id_run LIKE 'manual%', TRUE, FALSE) AS is_manual_run,
   IF(fre.id_dag IS NOT NULL, TRUE, FALSE) AS is_first_run_ever,
   IF(dr.state = 'failed', FALSE, TRUE) AS is_run_successful,
   CASE
     WHEN fre.id_dag IS NULL THEN -- If the DAG isn't in its first run, we can consider it
       (
         CASE
-          WHEN ds.dag IS NULL THEN  -- Checking if the DAG isn't in the list to be ignored
+          WHEN ds.dag IS NULL 
+            AND dr.id_run NOT LIKE 'manual%' THEN  -- Checking if the DAG isn't in the list to be ignored and if it's not a manual run
           (
             CASE  -- Layers raw/clean, enrich, dw (except for datamarts) and metric has 8h AM BRT as SLA
               WHEN dr.id_dag NOT LIKE '%datamarts%'
