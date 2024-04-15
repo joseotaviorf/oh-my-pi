@@ -16,6 +16,9 @@ columns:
   id_entity_origin:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.entity_origin_id
+  id_chat:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio.chat_uuid,
   status:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.status
