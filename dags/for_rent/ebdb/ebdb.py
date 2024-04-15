@@ -99,7 +99,7 @@ def clean_tasks(table_name):
         task_id=f"sync-hive-metastore-clean-{slugged_table_name}-structure",
         json={
             "spark_python_task": {
-                "python_file": f"{base_spark_jobs_path}/sync_metastore_tables_structure.py",
+                "python_file": f"{EBDB_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
                 "parameters": [
                     datalake_bucket,
                     LayerEnum.CLEAN.value,
@@ -120,7 +120,7 @@ def clean_tasks(table_name):
             task_id=f"propagate-table-metadata-clean-{slugged_table_name}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{base_spark_jobs_path}/propagate_table_metadata.py",
+                    "python_file": f"{EBDB_SPARK_JOBS_PATH}/propagate_table_metadata.py",
                     "parameters": [
                         LayerEnum.CLEAN.value,
                         MetadataTypeEnum.LINEAGE.value,
@@ -256,7 +256,7 @@ propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"propagate-table-metadata-raw",
     json={
         "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/propagate_raw_tables_metadata.py",
+            "python_file": f"{EBDB_SPARK_JOBS_PATH}/propagate_raw_tables_metadata.py",
             "parameters": [
                 LayerEnum.RAW.value,
                 MetadataTypeEnum.FULL_CONTENT_LINEAGE.value,

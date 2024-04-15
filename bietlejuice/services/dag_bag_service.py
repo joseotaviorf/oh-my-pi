@@ -101,7 +101,7 @@ class DagBagService:
             if not DagBagService._is_task_with_python_spark_job(task):
                 continue
             if not task.json["spark_python_task"]["python_file"].endswith(
-                "sync_metastore_tables_structure.py"
+                "sync_metadata.py"
             ):
                 continue
             DagBagService._add_table_in_sync_hive_task_to_mapping(mapping, task, dag)
@@ -248,7 +248,7 @@ class DagBagService:
 
     @staticmethod
     def _extract_query_path_from_datalake_task_parameters(
-        task_parameters: list
+        task_parameters: list,
     ) -> dict:
         """Given the list of parameters passed to a datalake load task, returns the formatted query path"""
         relative_query_path = task_parameters[5]
@@ -263,7 +263,7 @@ class DagBagService:
 
     @staticmethod
     def _extract_query_path_from_full_dw_staging_task_parameters(
-        task_parameters: list
+        task_parameters: list,
     ) -> dict:
         """Given the list of parameters passed to a dw staging full load task, returns the formatted query path"""
         relative_query_path = task_parameters[3]
@@ -276,7 +276,7 @@ class DagBagService:
 
     @staticmethod
     def _extract_query_path_from_incremental_dw_staging_task_parameters(
-        task_parameters: list
+        task_parameters: list,
     ) -> dict:
         """Given the list of parameters passed to a dw staging incremental load task, returns the formatted query path"""
         relative_query_path = task_parameters[3]

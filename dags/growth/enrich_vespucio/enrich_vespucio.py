@@ -175,58 +175,13 @@ calculate_dejavu_id_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_dejavu_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=addresses_s2_geometry_mapping_table,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.ENRICH.value,
-                CONTEXT,
-                "--table-name",
-                addresses_s2_geometry_mapping_table,
-            ],
-        }
-    },
-)
-
-propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=addresses_s2_geometry_mapping_table,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
-            "parameters": [
-                LayerEnum.ENRICH.value,
-                MetadataTypeEnum.LINEAGE.value,
-                CONTEXT,
-                addresses_s2_geometry_mapping_table,
-            ],
-        }
-    },
-)
-
-bypass_task = DummyOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.PROPAGATION_BYPASS_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=addresses_s2_geometry_mapping_table,
-    ),
-    trigger_rule="all_done",
+sync_metadata_dejavu_task = datalake_task_group._build_metadata_sync_task(
+    source=CONTEXT,
+    sync_mode=datalake_task_group.SINGLE_TABLE,
+    layer=LayerEnum.ENRICH.value,
+    database_name=CONTEXT,
+    table_name=addresses_s2_geometry_mapping_table,
+    metadata_file_type=MetadataTypeEnum.LINEAGE.value,
 )
 
 condo_enrich_task_group = enrich_task_groups.pop('condo')
@@ -258,13 +213,11 @@ chain(
     )
     + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
     calculate_dejavu_id_task,
-    sync_metastore_dejavu_table_structure_task,
-    propagate_table_metadata_task,
-    bypass_task,
+    sync_metadata_dejavu_task,
     datalake_task_group.first_tasks(condo_enrich_task_group),
 )
 
-sync_metastore_dejavu_table_structure_task.set_downstream(
+sync_metadata_dejavu_task.set_downstream(
     datalake_task_group.first_tasks(condo_enrich_task_group)
 )
 

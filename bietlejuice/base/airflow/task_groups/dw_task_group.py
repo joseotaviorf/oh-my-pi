@@ -93,128 +93,49 @@ class DWTaskGroup(BaseTaskGroup):
 
         return load_table_task
 
-    def _set_hive_structure_tasks(
-        self, layer: str, schema: str, table_name: str, sync_mode: str
-    ) -> list:
-        """
-        Creates a task that sends a synchronous request to our Hive Metastore, in order
-        to create the table or update its DDL (add or remove columns), synchronizing
-        it to the table already available at Databricks Metastore.
-        """
-        hive_sync_tasks = []
-
-        if layer == LayerEnum.DW.value:
-            sync_metastore_structure_task = QuintoAndarDatabricksCheckJobTaskOperator(
-                databricks_conn_id="databricks_job_cluster",
-                dag=self.dag,
-                task_id=self.generate_default_task_id(
-                    task_prefix=self.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
-                    layer=LayerEnum(layer),
-                    schema=schema,
-                    table_name=table_name,
-                ),
-                json={
-                    "spark_python_task": {
-                        "python_file": path.join(
-                            self.spark_jobs_path, "sync_metastore_tables_structure.py"
-                        ),
-                        "parameters": [self.dw_bucket, layer, schema, sync_mode]
-                        + ([table_name] if table_name else []),
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-            hive_sync_tasks.append(sync_metastore_structure_task)
-        return hive_sync_tasks
-
-    def _set_hive_partitions_tasks(
+    def _build_metadata_sync_task(
         self,
-        layer: str,
         schema: str,
-        table_name: str,
         sync_mode: str,
-        partitions: str = None,
-    ) -> list:
-        """
-        Creates a task that sends a synchronous request to our Hive Metastore to
-        update table partitions, synchronizing them to the partitions of the table
-        already available at Databricks Metastore.
-        """
-        hive_sync_tasks = []
-
-        if layer == LayerEnum.DW.value and (
-            sync_mode == self.ALL_TABLES
-            or (partitions and sync_mode == self.SINGLE_TABLE)
-        ):
-            sync_metastore_partitions_task = QuintoAndarDatabricksCheckJobTaskOperator(
-                databricks_conn_id="databricks_job_cluster",
-                dag=self.dag,
-                task_id=self.generate_default_task_id(
-                    task_prefix=self.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
-                    layer=LayerEnum(layer),
-                    schema=schema,
-                    table_name=table_name,
-                ),
-                json={
-                    "spark_python_task": {
-                        "python_file": path.join(
-                            self.spark_jobs_path, "sync_metastore_tables_partitions.py"
-                        ),
-                        "parameters": [self.dw_bucket, layer, schema, sync_mode]
-                        + ([table_name] if table_name else []),
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-            hive_sync_tasks.append(sync_metastore_partitions_task)
-        return hive_sync_tasks
-
-    def _set_metadata_propagator_tasks(
-        self,
         layer: str,
-        schema: str,
         table_name: str,
-        metadata_type: str,
-        tree_path: str = "",
-    ) -> list:
+        metadata_file_type: str = None,
+    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         """
-        Creates a task that sends an asynchronous POST request to the Metadata
-        Propagator API in order to propagate lineage and tags metadata of the table.
-        The lineage and tagging metadata are exclusive for each table, and are expected
-        to be predefined in a metadata YAML file named after the very same table.
+        Creates the task that does 3 things:
+            - Sync table structure metadata to Hive
+            - Sync table partitions to Hive
+            - Sync table lineage and metadata to metadata propagator.
         """
-        metadata_propagator_tasks = []
+        if layer != LayerEnum.DW.value:
+            return
+        sync_metadata_task = QuintoAndarDatabricksCheckJobTaskOperator(
+            databricks_conn_id="databricks_job_cluster",
+            task_id=self.generate_default_task_id(
+                task_prefix=self.SYNC_METADATA_TASK_PREFIX,
+                layer=LayerEnum(layer),
+                schema=schema,
+                table_name=table_name,
+            ),
+            dag=self.dag,
+            json={
+                "spark_python_task": {
+                    "python_file": path.join(self.spark_jobs_path, "sync_metadata.py"),
+                    "parameters": [
+                        self.dw_bucket,
+                        layer,
+                        schema,
+                        sync_mode,
+                        table_name,
+                        metadata_file_type,
+                        self.relative_query_path,
+                    ],
+                }
+            },
+            execution_timeout=timedelta(minutes=30),
+        )
 
-        if DAGPackagesPathService.artifact_file_exists(
-            artifact_type="metadata",
-            dag_name=self.relative_query_path,
-            layer=layer,
-            table_name=path.join(tree_path, table_name),
-        ):
-            propagate_table_metadata_task = QuintoAndarDatabricksCheckJobTaskOperator(
-                databricks_conn_id="databricks_job_cluster",
-                dag=self.dag,
-                task_id=self.generate_default_task_id(
-                    task_prefix=self.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
-                    layer=LayerEnum(layer),
-                    schema=schema,
-                    table_name=table_name,
-                ),
-                json={
-                    "spark_python_task": {
-                        "python_file": path.join(
-                            self.spark_jobs_path,
-                            self.LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING[layer],
-                        ),
-                        "parameters": [layer, metadata_type, schema, table_name],
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-
-            metadata_propagator_tasks.append(propagate_table_metadata_task)
-
-        return metadata_propagator_tasks
+        return sync_metadata_task
 
     def _set_data_quality_tasks(
         self,
@@ -366,28 +287,12 @@ class DWTaskGroup(BaseTaskGroup):
             + incremental_args
             + staging_args,
         )
-
-        hive_structure_tasks = self._set_hive_structure_tasks(
-            layer=layer,
+        sync_metadata_task = self._build_metadata_sync_task(
             schema=schema,
-            table_name=table_name,
             sync_mode=self.SINGLE_TABLE,
-        )
-
-        hive_partitions_tasks = self._set_hive_partitions_tasks(
             layer=layer,
-            schema=schema,
             table_name=table_name,
-            sync_mode=self.SINGLE_TABLE,
-            partitions=partitions,
-        )
-
-        metadata_propagator_tasks = self._set_metadata_propagator_tasks(
-            layer=layer,
-            schema=schema,
-            table_name=table_name,
-            metadata_type=MetadataTypeEnum.LINEAGE.value,
-            tree_path=tree_path,
+            metadata_file_type=MetadataTypeEnum.LINEAGE.value,
         )
 
         data_quality_tasks = self._set_data_quality_tasks(
@@ -405,16 +310,14 @@ class DWTaskGroup(BaseTaskGroup):
             extraction_type=extraction_type,
         )
 
-        chain(
-            load_table_task,
-            *hive_structure_tasks,
-            *hive_partitions_tasks,
-            *metadata_propagator_tasks,
-        )
+        if sync_metadata_task:
+            chain(load_table_task, sync_metadata_task)
         chain(load_table_task, *default_dim_row_tasks, *data_quality_tasks)
 
         final_tasks = (
-            default_dim_row_tasks or metadata_propagator_tasks or [load_table_task]
+            default_dim_row_tasks or [sync_metadata_task]
+            if sync_metadata_task
+            else [] or [load_table_task]
         )
 
         return self.format_tasks_boundaries(

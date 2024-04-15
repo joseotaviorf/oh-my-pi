@@ -4,7 +4,6 @@ from typing import Dict
 from os import path
 
 from airflow.utils.helpers import chain
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
@@ -82,148 +81,65 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return load_table_task
 
-    def _build_hive_sync_tasks(
+    def _build_metadata_sync_task(
         self,
         source: str,
         sync_mode: str,
         layer: str,
         database_name: str,
         table_name: str,
-    ) -> list:
-        sync_metastore_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=self.generate_default_task_id(
-                task_prefix=self.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
-                layer=LayerEnum(layer),
-                schema=source,
-                table_name=table_name,
-            ),
-            dag=self.dag,
-            json={
-                "spark_python_task": {
-                    "python_file": path.join(
-                        self.spark_jobs_path, "sync_metastore_tables_structure.py"
-                    ),
-                    "parameters": [
-                        self.datalake_bucket,
-                        layer,
-                        database_name,
-                        sync_mode,
-                    ]
-                    + ([table_name] if table_name else []),
-                }
-            },
-            execution_timeout=timedelta(minutes=30),
-            polling_period_seconds=10,
-        )
-
-        sync_metastore_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=self.generate_default_task_id(
-                task_prefix=self.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
-                layer=LayerEnum(layer),
-                schema=source,
-                table_name=table_name,
-            ),
-            dag=self.dag,
-            json={
-                "spark_python_task": {
-                    "python_file": path.join(
-                        self.spark_jobs_path, "sync_metastore_tables_partitions.py"
-                    ),
-                    "parameters": [
-                        self.datalake_bucket,
-                        layer,
-                        database_name,
-                        sync_mode,
-                    ]
-                    + ([table_name] if table_name else []),
-                }
-            },
-            execution_timeout=timedelta(minutes=30),
-            polling_period_seconds=10,
-        )
-
-        return [sync_metastore_structure_task, sync_metastore_partitions_task]
-
-    # TODO: This method requires a refactor ASAP due to the quantity of conditions
-    def _build_metadata_propagator_tasks(
-        self,
-        layer: str,
-        database_name: str,
-        table_name: str,
-        sync_mode: str = None,
-        source: str = None,
-        metadata_type: str = None,
-    ) -> list:
+        metadata_file_type: str = None,
+    ) -> QuintoAndarDatabricksSubmitRunOperator:
         config_service = ConfigurationService(source)
 
-        metadata_propagator_tasks = []
-
-        try:
+        product_db_name = ""
+        if "lineage_product_database_name" in config_service.configs:
             product_db_name = config_service.get_config("lineage_product_database_name")
-        except IndexError:
-            # TODO: DIN-336 Review this try/except block after this deployment
-            product_db_name = ""
 
-        if not metadata_type:
+        if not metadata_file_type:
             if DAGMetadataService.metadata_file_exists(
                 relative_file_path=self.relative_query_path,
                 layer=layer,
                 table_name=table_name,
                 check_all_tables=sync_mode == self.ALL_TABLES,
             ):
-                metadata_type = MetadataTypeEnum.TAGS.value
+                metadata_file_type = MetadataTypeEnum.TAGS.value
             elif product_db_name:
-                metadata_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
+                metadata_file_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
+            else:
+                metadata_file_type = "--bypass-propagate"
+        raw_params = (
+            ["--product-database-name", product_db_name]
+            if layer == LayerEnum.RAW.value and product_db_name
+            else []
+        )
+        sync_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+            task_id=self.generate_default_task_id(
+                task_prefix=self.SYNC_METADATA_TASK_PREFIX,
+                layer=LayerEnum(layer),
+                schema=source,
+                table_name=table_name,
+            ),
+            dag=self.dag,
+            json={
+                "spark_python_task": {
+                    "python_file": path.join(self.spark_jobs_path, "sync_metadata.py"),
+                    "parameters": [
+                        self.datalake_bucket,
+                        layer,
+                        database_name,
+                        sync_mode,
+                        table_name,
+                        metadata_file_type,
+                        self.relative_query_path,
+                    ]
+                    + raw_params,
+                }
+            },
+            execution_timeout=timedelta(minutes=30),
+        )
 
-        if metadata_type:
-            raw_params = (
-                [
-                    self.relative_query_path,
-                    "--product-database-name",
-                    product_db_name,
-                    sync_mode,
-                ]
-                if layer == LayerEnum.RAW.value
-                else []
-            )
-            propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-                dag=self.dag,
-                task_id=self.generate_default_task_id(
-                    task_prefix=self.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
-                    layer=LayerEnum(layer),
-                    schema=source,
-                    table_name=table_name,
-                ),
-                json={
-                    "spark_python_task": {
-                        "python_file": path.join(
-                            self.spark_jobs_path,
-                            self.LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING[layer],
-                        ),
-                        "parameters": [layer, metadata_type, database_name]
-                        + raw_params
-                        + ([table_name] if table_name else []),
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-
-            bypass_task = DummyOperator(
-                dag=self.dag,
-                task_id=self.generate_default_task_id(
-                    task_prefix=self.PROPAGATION_BYPASS_TASK_PREFIX,
-                    layer=LayerEnum(layer),
-                    schema=source,
-                    table_name=table_name,
-                ),
-                trigger_rule="all_done",
-            )
-
-            metadata_propagator_tasks.extend(
-                [propagate_table_metadata_task, bypass_task]
-            )
-
-        return metadata_propagator_tasks
+        return sync_metadata_task
 
     def _build_data_quality_tasks(
         self,
@@ -344,7 +260,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         )
 
         if has_hive_sync:
-            hive_sync_tasks = self._build_hive_sync_tasks(
+            sync_metadata_task = self._build_metadata_sync_task(
                 source=source,
                 sync_mode=sync_mode,
                 layer=layer,
@@ -352,20 +268,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 table_name=table_name,
             )
 
-            propagate_table_metadata_tasks = self._build_metadata_propagator_tasks(
-                layer=layer,
-                database_name=database_name,
-                table_name=table_name,
-                sync_mode=sync_mode,
-                source=source,
-            )
-
-            chain(load_table_task, *hive_sync_tasks, *propagate_table_metadata_tasks)
-            final_tasks = [hive_sync_tasks[1]] + (
-                [propagate_table_metadata_tasks[1]]
-                if propagate_table_metadata_tasks
-                else []
-            )
+            chain(load_table_task, sync_metadata_task)
+            final_tasks = [sync_metadata_task]
         else:
             final_tasks = [load_table_task]
 
@@ -407,10 +311,11 @@ class DatalakeTaskGroup(BaseTaskGroup):
         do_output_xcom_push=False,
     ):
         """
-        Create a task group containing 4 tasks:
+        Create a task group containing 2 tasks:
         1. load table to metastore database using a sql query
-        2. sync table from spark metastore to hive metastore
-        3. propagate the table metadata to metadata-propagator service
+        2. sync table metadata from spark metastore to hive metastore + propagate to metadata-propagator service
+        Extra optional tasks:
+        3. data-quality tests to validate from YAML definition
         :param layer: layer Enum
         :type layer: bietlejuice.base.pipeline.LayerEnum member
         :param source_database_base_name: database base name for the source
@@ -478,28 +383,17 @@ class DatalakeTaskGroup(BaseTaskGroup):
         )
 
         if has_hive_sync:
-            hive_sync_tasks = self._build_hive_sync_tasks(
+            metadata_sync_task = self._build_metadata_sync_task(
                 source=source_database_base_name,
                 sync_mode=self.SINGLE_TABLE,
                 layer=layer,
                 database_name=target_database_base_name,
                 table_name=table_name,
+                metadata_file_type=MetadataTypeEnum.LINEAGE.value,
             )
 
-            propagate_table_metadata_tasks = self._build_metadata_propagator_tasks(
-                layer=layer,
-                database_name=target_database_base_name,
-                table_name=table_name,
-                source=source_database_base_name,
-                metadata_type=MetadataTypeEnum.LINEAGE.value,
-            )
-
-            chain(load_table_task, *hive_sync_tasks, *propagate_table_metadata_tasks)
-            final_tasks = [hive_sync_tasks[1]] + (
-                [propagate_table_metadata_tasks[1]]
-                if propagate_table_metadata_tasks
-                else []
-            )
+            chain(load_table_task, metadata_sync_task)
+            final_tasks = [metadata_sync_task]
         else:
             final_tasks = [load_table_task]
 
@@ -534,7 +428,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
-        has_hive_sync=True,
+        has_hive_sync=False,
         tree_path="",
         do_output_xcom_push=False,
     ):
@@ -580,7 +474,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
-        has_hive_sync=True,
+        has_hive_sync=False,
     ):
         """
         Build a task group for raw layer to extract all tables from source

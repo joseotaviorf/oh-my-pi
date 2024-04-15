@@ -28,20 +28,7 @@ class BaseTaskGroup(object):
     DATA_QUALITY_TESTS_TASK_PREFIX = "data-quality-tests"
     DONE_TASK_PREFIX = "done"
     LOAD_TASK_PREFIX = "load"
-    PROPAGATE_TABLE_METADATA_TASK_PREFIX = "propagate-table-metadata"
-    PROPAGATION_BYPASS_TASK_PREFIX = "propagation-bypass"
-    SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX = "sync-hive-metastore-partitions"
-    SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX = "sync-hive-metastore-structure"
-
-    LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING = {
-        LayerEnum.CLEAN.value: "propagate_table_metadata.py",
-        LayerEnum.DW.value: "propagate_table_metadata.py",
-        LayerEnum.DW_STAGING.value: "propagate_table_metadata.py",
-        LayerEnum.ENRICH.value: "propagate_table_metadata.py",
-        LayerEnum.METRIC.value: "propagate_table_metadata.py",
-        LayerEnum.RAW.value: "propagate_raw_tables_metadata.py",
-        LayerEnum.REVERSE.value: "propagate_table_metadata.py",
-    }
+    SYNC_METADATA_TASK_PREFIX = "sync-metadata"
 
     def __init__(
         self,

@@ -3,19 +3,16 @@ import json
 from datetime import datetime
 from pendulum import timezone
 
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import DAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
-from airflow.utils.helpers import chain
+from airflow.utils.helpers import chain, cross_downstream
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
@@ -101,119 +98,20 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
     raw_spark_job_extra_args=[SOURCE, json.dumps(partition_cols), "{{ ds }}"],
 )
 
-load_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
-        layer=LayerEnum.CLEAN,
-        schema=SOURCE,
-        table_name=TABLE_NAME,
-    ),
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": f"{RAW_SPARK_JOB_PATH}load_table_incremental.py",
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                datalake_bucket,
-                SOURCE,
-                TABLE_NAME,
-                json.dumps(clean_partition_cols),
-            ],
-        }
-    },
+clean_task_group = task_group.build_clean_task_group(
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+    table_name=TABLE_NAME,
+    partitions=clean_partition_cols,
+    is_incremental=True
 )
 
-sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
-        layer=LayerEnum.CLEAN,
-        schema=SOURCE,
-        table_name=TABLE_NAME,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.CLEAN.value,
-                SOURCE,
-                "--table-name",
-                TABLE_NAME,
-            ],
-        }
-    },
-)
-
-sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
-        layer=LayerEnum.CLEAN,
-        schema=SOURCE,
-        table_name=TABLE_NAME,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_partitions.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.CLEAN.value,
-                SOURCE,
-                "--table-name",
-                TABLE_NAME,
-            ],
-        }
-    },
-)
-
-propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
-        layer=LayerEnum.CLEAN,
-        schema=SOURCE,
-        table_name=TABLE_NAME,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
-            "parameters": [
-                LayerEnum.CLEAN.value,
-                MetadataTypeEnum.LINEAGE.value,
-                SOURCE,
-                TABLE_NAME,
-            ],
-        }
-    },
-)
-
-bypass_task = DummyOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.PROPAGATION_BYPASS_TASK_PREFIX,
-        layer=LayerEnum.CLEAN,
-        schema=SOURCE,
-        table_name=TABLE_NAME,
-    ),
-    trigger_rule="all_done",
-)
-
-sync_metastore_table_structure_task.set_downstream(sync_metastore_table_partitions_task)
-
-# metadata branch has a bypass to terminate the Dag even if the metadata propagation fails.
-propagate_table_metadata_task.set_downstream(bypass_task)
-
-chain(sync_metastore_table_partitions_task, propagate_table_metadata_task)
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
-chain(
+cross_downstream(
     DatalakeTaskGroup.last_tasks(raw_task_group),
-    load_clean_table_task,
-    sync_metastore_table_structure_task,
+    DatalakeTaskGroup.first_tasks(clean_task_group),
 )
 
-chain(sync_metastore_table_partitions_task, terminate_cluster_task)
-chain(bypass_task, terminate_cluster_task)
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

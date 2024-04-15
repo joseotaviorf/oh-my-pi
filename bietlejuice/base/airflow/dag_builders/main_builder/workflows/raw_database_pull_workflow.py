@@ -81,17 +81,11 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         self.load_query_clean_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_QUERY
         )
-        self.sync_hive_structure_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.SYNC_HIVE_STRUCTURE
-        )
-        self.sync_hive_partitions_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.SYNC_HIVE_PARTITIONS
+        self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.SYNC_METADATA
         )
         self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
-        )
-        self.propagate_metadata_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.PROPAGATE_METADATA
         )
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
@@ -120,31 +114,17 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         )
 
         if self._check_include_sync_hive_tasks(raw_table_attributes):
-            sync_metastore_structure_raw_task = self.sync_hive_structure_task_creator.create_task(
-                raw_table_attributes
-            )
-
-            sync_metastore_partitions_raw_task = self.sync_hive_partitions_task_creator.create_task(
-                raw_table_attributes
-            )
-
-            (
-                load_raw_task
-                >> sync_metastore_structure_raw_task
-                >> sync_metastore_partitions_raw_task
-            )
 
             if self._check_include_propagate_metadata_task(raw_table_attributes):
-                propagate_table_lineage_raw_task = self.propagate_metadata_task_creator.create_task(
+                sync_metadata = self.sync_metadata_task_creator.create_task(
                     raw_table_attributes
                 )
-                (
-                    sync_metastore_partitions_raw_task
-                    >> propagate_table_lineage_raw_task
-                    >> last_task
-                )
             else:
-                sync_metastore_partitions_raw_task >> last_task
+                sync_metadata = self.sync_metadata_task_creator.create_task(
+                    raw_table_attributes, "--bypass-propagate"
+                )
+
+            (load_raw_task >> sync_metadata >> last_task)
 
         if self._check_include_data_quality_task(raw_table_attributes):
             data_quality_tests_raw_task = self.data_quality_task_creator.create_task(
@@ -175,26 +155,13 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         last_clean_task = load_clean_task
 
         if self._check_include_sync_hive_tasks(clean_table_attributes):
-            sync_metastore_structure_clean_task = self.sync_hive_structure_task_creator.create_task(
+            sync_metadata = self.sync_metadata_task_creator.create_task(
                 clean_table_attributes
             )
 
-            sync_metastore_partitions_clean_task = self.sync_hive_partitions_task_creator.create_task(
-                clean_table_attributes
-            )
+            last_clean_task = sync_metadata
 
-            propagate_table_metadata_clean_task = self.propagate_metadata_task_creator.create_task(
-                clean_table_attributes
-            )
-            last_clean_task = propagate_table_metadata_clean_task
-
-            (
-                load_clean_task
-                >> sync_metastore_structure_clean_task
-                >> sync_metastore_partitions_clean_task
-                >> propagate_table_metadata_clean_task
-                >> last_task
-            )
+            (load_clean_task >> sync_metadata >> last_task)
 
         if self._check_include_data_quality_task(clean_table_attributes):
             data_quality_tests_clean_task = self.data_quality_task_creator.create_task(
@@ -228,11 +195,7 @@ class RawDatabasePullWorkflow(BaseWorkflow):
                 table_customization={"custom_schema": "data_quality_ingestion_metrics"},
             )
 
-            sync_hive_structure_task = self.sync_hive_structure_task_creator.create_task(
-                clean_metrics_table_attributes
-            )
-
-            sync_hive_partitions_task = self.sync_hive_partitions_task_creator.create_task(
+            sync_metadata = self.sync_metadata_task_creator.create_task(
                 clean_metrics_table_attributes
             )
 
@@ -240,7 +203,7 @@ class RawDatabasePullWorkflow(BaseWorkflow):
                 clean_metrics_table_attributes
             )
 
-            get_table_metrics_task >> sync_hive_structure_task >> sync_hive_partitions_task >> dummy_terminate_job_cluster_task
+            get_table_metrics_task >> sync_metadata >> dummy_terminate_job_cluster_task
 
             metrics_task = get_table_metrics_task
         else:

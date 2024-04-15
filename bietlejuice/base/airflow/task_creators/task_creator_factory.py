@@ -34,22 +34,15 @@ from bietlejuice.base.airflow.task_creators.load_delta_table_task_creator import
 from bietlejuice.base.airflow.task_creators.optimize_delta_table_task_creator import (
     OptimizeDeltaTableTaskCreator,
 )
-from bietlejuice.base.airflow.task_creators.propagate_metadata_task_creator import (
-    PropagateMetadataTaskCreator,
-)
 from bietlejuice.base.airflow.task_creators.register_delta_table_task_creator import (
     RegisterDeltaTableTaskCreator,
 )
 from bietlejuice.base.airflow.task_creators.skip_run_task_creator import (
     SkipRunTaskCreator,
 )
-from bietlejuice.base.airflow.task_creators.sync_hive_partitions_task_creator import (
-    SyncHivePartitionsTaskCreator,
+from bietlejuice.base.airflow.task_creators.sync_metadata_task_creator import (
+    SyncMetadataTaskCreator,
 )
-from bietlejuice.base.airflow.task_creators.sync_hive_structure_task_creator import (
-    SyncHiveStructureTaskCreator,
-)
-
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -72,11 +65,9 @@ class TaskCreatorFactory:
         TaskEnum.LOAD_QUERY: LoadQueryTaskCreator,
         TaskEnum.LOAD_DELTA: LoadDeltaTableTaskCreator,
         TaskEnum.OPTIMIZE_DELTA_TABLE: OptimizeDeltaTableTaskCreator,
-        TaskEnum.PROPAGATE_METADATA: PropagateMetadataTaskCreator,
         TaskEnum.REGISTER_DELTA_TABLE: RegisterDeltaTableTaskCreator,
         TaskEnum.SKIP_RUN: SkipRunTaskCreator,
-        TaskEnum.SYNC_HIVE_PARTITIONS: SyncHivePartitionsTaskCreator,
-        TaskEnum.SYNC_HIVE_STRUCTURE: SyncHiveStructureTaskCreator,
+        TaskEnum.SYNC_METADATA: SyncMetadataTaskCreator,
     }
 
     def __init__(self, dag_execution_context: DagExecutionContext) -> None:

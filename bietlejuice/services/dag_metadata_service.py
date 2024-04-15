@@ -43,10 +43,10 @@ class DAGMetadataService:
 
         # extract dag layers
         self._RAW_LAYER_MATCH_REGEX = re.compile(
-            "build_raw_task_group_for_all_tables|build_raw_task_group_for_single_table|sync-hive-metastore-raw"
+            "build_raw_task_group_for_all_tables|build_raw_task_group_for_single_table|sync-hive-metastore-raw|sync-metadata-raw"
         )
         self._CLEAN_LAYER_MATCH_REGEX = re.compile(
-            "sync-hive-metastore-clean|build_clean_task_group"
+            "sync-hive-metastore-clean|build_clean_task_group|sync-metadata-clean"
         )
         self._BUILD_TASK_GROUP_LAYER_REGEX = re.compile(
             r"build_task_group_from_sql_files.*?layer ?= ?LayerEnum\.(\w+)",
@@ -61,7 +61,7 @@ class DAGMetadataService:
             r"DWTaskGroup.*?dw_schema ?= ?(\w*)", flags=re.DOTALL
         )
         self._SYNC_METASTORE_PARAMETERS = re.compile(
-            r"sync_metastore_tables_structure\.py.*?\"parameters\": ?\[(.*?)]",
+            r"sync_metadata\.py.*?\"parameters\": ?\[(.*?)]|sync_metastore_tables_structure\.py.*?\"parameters\": ?\[(.*?)]",
             flags=re.DOTALL,
         )
 

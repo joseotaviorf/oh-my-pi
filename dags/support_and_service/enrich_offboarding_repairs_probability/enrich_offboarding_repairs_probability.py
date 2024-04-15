@@ -120,61 +120,18 @@ load_model_output_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_model_output_table_structure = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=f"sync-hive-metastore-{LayerEnum.ENRICH.value}-{slugged_table_name}-structure",
-    json={
-        "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/sync_metastore_tables_structure.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.ENRICH.value,
-                CONTEXT,
-                "--table-name",
-                output_table_name,
-            ],
-        }
-    },
-)
-
-sync_model_output_partitions = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=f"sync-hive-metastore-{LayerEnum.ENRICH.value}-{slugged_table_name}-partitions",
-    json={
-        "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/sync_metastore_tables_partitions.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.ENRICH.value,
-                CONTEXT,
-                "--table-name",
-                output_table_name,
-            ],
-        }
-    },
-)
-
-propagate_model_output_metadata = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=f"propagate-table-metadata-{LayerEnum.ENRICH.value}-{slugged_table_name}",
-    json={
-        "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/propagate_table_metadata.py",
-            "parameters": [
-                LayerEnum.ENRICH.value,
-                MetadataTypeEnum.LINEAGE.value,
-                CONTEXT,
-                output_table_name,
-            ],
-        }
-    },
+sync_metadata_model_output = task_group._build_metadata_sync_task(
+    source=CONTEXT,
+    sync_mode=task_group.SINGLE_TABLE,
+    layer=LayerEnum.ENRICH.value,
+    database_name=CONTEXT,
+    table_name=output_table_name,
+    metadata_file_type=MetadataTypeEnum.LINEAGE.value,
 )
 
 chain(
     load_model_output_task,
-    sync_model_output_table_structure,
-    sync_model_output_partitions,
-    propagate_model_output_metadata,
+    sync_metadata_model_output,
     terminate_cluster_task,
 )
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))

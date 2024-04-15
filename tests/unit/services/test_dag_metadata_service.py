@@ -27,17 +27,17 @@ class TestDAGMetadataService:
         )
         assert service._DAG_OWNER_REGEX == re.compile('"owner": ([\w.]*)[,|\n]?')
         assert service._RAW_LAYER_MATCH_REGEX == re.compile(
-            "build_raw_task_group_for_all_tables|build_raw_task_group_for_single_table|sync-hive-metastore-raw"
+            "build_raw_task_group_for_all_tables|build_raw_task_group_for_single_table|sync-hive-metastore-raw|sync-metadata-raw"
         )
         assert service._CLEAN_LAYER_MATCH_REGEX == re.compile(
-            "sync-hive-metastore-clean|build_clean_task_group"
+            "sync-hive-metastore-clean|build_clean_task_group|sync-metadata-clean"
         )
         assert service._BUILD_TASK_GROUP_LAYER_REGEX == re.compile(
             r"build_task_group_from_sql_files.*?layer ?= ?LayerEnum\.(\w+)",
             flags=re.DOTALL,
         )
         assert service._SYNC_METASTORE_PARAMETERS == re.compile(
-            r"sync_metastore_tables_structure\.py.*?\"parameters\": ?\[(.*?)]",
+            r"sync_metadata\.py.*?\"parameters\": ?\[(.*?)]|sync_metastore_tables_structure\.py.*?\"parameters\": ?\[(.*?)]",
             flags=re.DOTALL,
         )
         assert service._GENERIC_TARGET_DATABASE_NAME == re.compile(

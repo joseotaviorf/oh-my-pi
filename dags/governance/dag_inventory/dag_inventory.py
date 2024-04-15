@@ -128,6 +128,8 @@ def find_tables_generated_by_dag(dag_bag: DagBag) -> dict:
             if "spark_python_task" not in task.json:
                 continue
             if not task.json["spark_python_task"]["python_file"].endswith(
+                "sync_metadata.py"
+            ) and not task.json["spark_python_task"]["python_file"].endswith(
                 "sync_metastore_tables_structure.py"
             ):
                 continue

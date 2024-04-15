@@ -74,21 +74,11 @@ class EnrichQueryWorkflow(BaseWorkflow):
         """Returns a tuple with the first (Load) and last (Load) tasks of the table."""
 
         load = self.load_enrich_task_creator.create_task(table)
+
         if self._check_include_sync_hive_tasks(table):
-            sync_metastore_structure = self.sync_hive_structure_task_creator.create_task(
-                table
-            )
-            sync_metastore_partitions = self.sync_hive_partitions_task_creator.create_task(
-                table
-            )
-            propagate_metadata = self.propagate_metadata_task_creator.create_task(table)
-            (
-                load
-                >> sync_metastore_structure
-                >> sync_metastore_partitions
-                >> propagate_metadata
-                >> job_cluster_finished_task
-            )
+            sync_metadata = self.sync_metadata_task_creator.create_task(table)
+            (load >> sync_metadata >> job_cluster_finished_task)
+
         if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
             load >> data_quality >> job_cluster_finished_task
@@ -141,17 +131,11 @@ class EnrichQueryWorkflow(BaseWorkflow):
         self.data_quality_tests_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
-        self.propagate_metadata_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.PROPAGATE_METADATA
-        )
         self.skip_run_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SKIP_RUN
         )
-        self.sync_hive_structure_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.SYNC_HIVE_STRUCTURE
-        )
-        self.sync_hive_partitions_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.SYNC_HIVE_PARTITIONS
+        self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.SYNC_METADATA
         )
         self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DUMMY_JOB_CLUSTER_FINISHED

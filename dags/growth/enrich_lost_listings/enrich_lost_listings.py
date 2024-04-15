@@ -101,76 +101,26 @@ load_table_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+datalake_task_group = DatalakeTaskGroup(
     dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=TABLE_NAME,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/sync_metastore_tables_structure.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.ENRICH.value,
-                CONTEXT,
-                "--table-name",
-                TABLE_NAME,
-            ],
-        }
-    },
+    env=ENV,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=DAG_NAME,
+    spark_jobs_path=base_spark_jobs_path,
 )
 
-sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=TABLE_NAME,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/sync_metastore_tables_partitions.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.ENRICH.value,
-                CONTEXT,
-                "--table-name",
-                TABLE_NAME,
-            ],
-        }
-    },
-)
-
-propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=TABLE_NAME,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{base_spark_jobs_path}/propagate_table_metadata.py",
-            "parameters": [
-                LayerEnum.ENRICH.value,
-                MetadataTypeEnum.LINEAGE.value,
-                CONTEXT,
-                TABLE_NAME,
-            ],
-        }
-    },
+sync_metadata_task = datalake_task_group._build_metadata_sync_task(
+    source=CONTEXT,
+    sync_mode=datalake_task_group.SINGLE_TABLE,
+    layer=LayerEnum.ENRICH.value,
+    database_name=CONTEXT,
+    table_name=TABLE_NAME,
+    metadata_file_type=MetadataTypeEnum.LINEAGE.value,
 )
 
 chain(
     create_cluster_task,
     load_table_task,
-    sync_metastore_table_structure_task,
-    sync_metastore_table_partitions_task,
-    propagate_table_metadata_task,
+    sync_metadata_task,
     terminate_cluster_task,
 )

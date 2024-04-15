@@ -72,9 +72,12 @@ class FileDependencyGenerator(DependencyGenerator):
         mapping = defaultdict(list)
         metadata_files = self._get_metadata_files()
         for path in metadata_files:
-            dag, layer, database_name, table_name = self._get_dag_and_table_from_metadata_path(
-                path
-            )
+            (
+                dag,
+                layer,
+                database_name,
+                table_name,
+            ) = self._get_dag_and_table_from_metadata_path(path)
             task_name = self._get_task_name_from_table_name(
                 dag, database_name, table_name, layer
             )

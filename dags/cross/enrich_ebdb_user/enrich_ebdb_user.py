@@ -8,7 +8,6 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.operators.dummy_operator import DummyOperator
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
@@ -99,6 +98,7 @@ datalake_task_group = DatalakeTaskGroup(
 partition_cols = config_service.get_config("partition_cols")
 inner_dependencies = config_service.get_config("inner_dependencies")
 
+
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
@@ -128,80 +128,13 @@ user_merge_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_user_merge_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=user_merge_table_name,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.ENRICH.value,
-                CONTEXT,
-                "--table-name",
-                user_merge_table_name,
-            ],
-        }
-    },
-)
-
-sync_metastore_user_merge_table_partition_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=user_merge_table_name,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_partitions.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.ENRICH.value,
-                CONTEXT,
-                "--table-name",
-                user_merge_table_name,
-            ],
-        }
-    },
-)
-
-propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.PROPAGATE_TABLE_METADATA_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=user_merge_table_name,
-    ),
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
-            "parameters": [
-                LayerEnum.ENRICH.value,
-                MetadataTypeEnum.LINEAGE.value,
-                CONTEXT,
-                user_merge_table_name,
-            ],
-        }
-    },
-)
-
-bypass_task = DummyOperator(
-    dag=dag,
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=DatalakeTaskGroup.PROPAGATION_BYPASS_TASK_PREFIX,
-        layer=LayerEnum.ENRICH,
-        schema=CONTEXT,
-        table_name=user_merge_table_name,
-    ),
-    trigger_rule="all_done",
+sync_metadata_user_merge_task = datalake_task_group._build_metadata_sync_task(
+    source=CONTEXT,
+    sync_mode=datalake_task_group.SINGLE_TABLE,
+    layer=LayerEnum.ENRICH.value,
+    database_name=CONTEXT,
+    table_name=user_merge_table_name,
+    metadata_file_type=MetadataTypeEnum.LINEAGE.value,
 )
 
 (
@@ -224,22 +157,14 @@ chain(
 chain(
     create_cluster_task,
     user_merge_task,
-    sync_metastore_user_merge_table_structure_task,
-    sync_metastore_user_merge_table_partition_task,
+    sync_metadata_user_merge_task,
 )
 
 chain(
-    sync_metastore_user_merge_table_partition_task,
+    sync_metadata_user_merge_task,
     terminate_cluster_task,
 )
 
-chain(
-    sync_metastore_user_merge_table_partition_task,
-    propagate_table_metadata_task,
-    bypass_task,
-    terminate_cluster_task,
-)
-    
 chain(
     datalake_task_group.all_last_tasks(
         task_groups_boundaries_without_inner_dependencies

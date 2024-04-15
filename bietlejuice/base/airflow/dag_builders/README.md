@@ -39,9 +39,7 @@ There are main modules - in which almost every new development or maintenance th
       LoadMongoRawTaskCreator <|-- BaseTaskCreator
       LoadPostgresRawTaskCreator <|-- BaseTaskCreator
       LoadQueryTaskCreator <|-- BaseTaskCreator
-      PropagateMetadataTaskCreator <|-- BaseTaskCreator
-      SyncHivePartitionsTaskCreator <|-- BaseTaskCreator
-      SyncHiveStructureTaskCreator <|-- BaseTaskCreator
+      SyncMetadataTaskCreator <|-- BaseTaskCreator
       TaskCreatorFactory <|-- DataQualityTestsTaskCreator
       TaskCreatorFactory <|-- DummyJobClusterFinishedTaskCreator
       TaskCreatorFactory <|-- ExecuteJobClusterTaskCreator
@@ -51,9 +49,7 @@ There are main modules - in which almost every new development or maintenance th
       TaskCreatorFactory <|-- LoadMongoRawTaskCreator
       TaskCreatorFactory <|-- LoadPostgresRawTaskCreator
       TaskCreatorFactory <|-- LoadQueryTaskCreator
-      TaskCreatorFactory <|-- PropagateMetadataTaskCreator
-      TaskCreatorFactory <|-- SyncHivePartitionsTaskCreator
-      TaskCreatorFactory <|-- SyncHiveStructureTaskCreator
+      TaskCreatorFactory <|-- SyncMetadataTaskCreator
       TaskCreatorFactory <|-- TaskEnum
      class BaseTaskCreator{
          Integer _DEFAULT_EXECUTION_TIMEOUT_HOURS
@@ -110,25 +106,10 @@ There are main modules - in which almost every new development or maintenance th
          String _TASK_ID_TEMPLATE
          create_task()
       }
-     class PropagateMetadataTaskCreator{
+     class SyncMetadataTaskCreator{
          String _TASK_ID_TEMPLATE
-         String DEFAULT_SPARK_JOB_NAME
-         Dict LAYER_TO_PROPAGATOR_SPARK_JOB_MAPPING
+         String SPARK_JOB_NAME
          _get_metadata_type()
-         _get_parameters()
-         _get_raw_params()
-         _get_product_database_name()
-         _get_spark_job_name()
-         create_task()
-      }
-     class SyncHivePartitionsTaskCreator{
-         String _TASK_ID_TEMPLATE
-         String SPARK_JOB_NAME
-         create_task()
-      }
-     class SyncHiveStructureTaskCreator{
-         String _TASK_ID_TEMPLATE
-         String SPARK_JOB_NAME
          create_task()
       }
      class TaskCreatorFactory{
