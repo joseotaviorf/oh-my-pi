@@ -1,7 +1,7 @@
 ---
 custom_cluster:
   driver_node_type_id: c5.4xlarge
-  node_type_id: m5.2xlarge
+  node_type_id: m5.4xlarge
   num_workers: 6
   aws_attributes:
     availability: ON_DEMAND
