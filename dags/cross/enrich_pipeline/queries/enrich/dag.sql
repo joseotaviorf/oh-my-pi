@@ -1,10 +1,21 @@
 WITH most_recent_run AS (
+  SELECT
+  -- The last run date of a DAG. A reminder that usually our DAGs are D-1.
+    id_dag,
+    state,
+    is_in_exclusion_list,
+    is_first_execution_inside_sla AS is_inside_sla,
+    DATE(ts_execution) AS dt_execution
+  FROM 
+    datalake_pipeline.dag_run
+  WHERE
+    id_run NOT LIKE 'manual%'   -- Excluding manual DAG runs, because it's created as D0.
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_execution DESC) = 1
+),
+most_recent_events AS (
     SELECT
         id_dag,
-        state,
-        is_in_exclusion_list,
-        is_first_execution_inside_sla AS is_inside_sla,
-        DATE(ts_execution) AS dt_execution,
         ts_started AS ts_last_run_started,
         ts_started_brt AS ts_last_run_started_brt,
         ts_ended AS ts_last_run_ended,
@@ -14,7 +25,7 @@ WITH most_recent_run AS (
     FROM
         datalake_pipeline.dag_run
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_execution DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_started DESC) = 1
 ),
 base_amount_of_tasks AS (
     -- As some DAGs won't execute all its tasks everyday, like DAGs using short-circuit operators, we're assuming that the last run
@@ -83,17 +94,20 @@ sla_base AS (
         d.is_datamart,
         mc.is_inside_sla,
         mc.dt_execution,
-        mc.ts_last_run_started,
-        mc.ts_last_run_started_brt,
-        mc.ts_last_run_ended,
-        mc.ts_last_run_ended_brt,
-        mc.ts_last_run_first_success,
-        mc.ts_last_run_first_success_brt
+        me.ts_last_run_started,
+        me.ts_last_run_started_brt,
+        me.ts_last_run_ended,
+        me.ts_last_run_ended_brt,
+        me.ts_last_run_first_success,
+        me.ts_last_run_first_success_brt
     FROM
         dag_info AS d
     JOIN
         most_recent_run AS mc
             ON mc.id_dag = d.id_dag
+    JOIN
+        most_recent_events AS me
+            ON me.id_dag = d.id_dag
     JOIN
         datalake_pipeline.line AS l
             ON l.line_name = d.line_name
