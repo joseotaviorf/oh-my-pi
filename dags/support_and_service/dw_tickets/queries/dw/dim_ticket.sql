@@ -11,7 +11,7 @@ SELECT
     tags,
     status,
     type AS ticket_type,
-    custom_fields,
+    TO_JSON(custom_fields) AS custom_fields,
     CAST(GET_JSON_OBJECT(satisfaction_rating,'$.score') AS STRING) AS score,
     CAST(GET_JSON_OBJECT(satisfaction_rating,'$.reason') AS STRING) AS reason,
     CAST(GET_JSON_OBJECT(satisfaction_rating,'$.comment') AS STRING) AS comment,
