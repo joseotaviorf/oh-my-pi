@@ -9,8 +9,6 @@ WITH partner_brokerage_fee AS (
         ts_created
     FROM
         datalake_nazare_clean.revenue_share_by_participant AS nrev
-    WHERE
-        DATE(nrev.ts_created) <= DATE('{year}-{month}-{day}')
     QUALIFY
         1 = ROW_NUMBER() OVER(PARTITION BY id_offer_agent ORDER BY ts_created DESC)
 )
