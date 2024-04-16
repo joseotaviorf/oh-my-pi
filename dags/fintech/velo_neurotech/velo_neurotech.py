@@ -105,6 +105,7 @@ for report in reports:
         source=SOURCE,
         table_name=table_name,
         target_database_base_name=SOURCE,
+        has_hive_sync=True,
         extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}/load_incremental_data_into_datalake_raw.py",
         raw_spark_job_extra_args=[
             SOURCE,

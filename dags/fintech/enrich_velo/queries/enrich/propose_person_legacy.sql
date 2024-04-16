@@ -17,7 +17,7 @@ WITH main_client AS (
     cp.email,
     cp.phone,
     CAST(NULL AS STRING) AS bureau_name,
-    IF(cp.document IS NULL, 0, cp.document) AS document,
+    IF(cp.document IS NULL, '0', cp.document) AS document,
     CAST(NULL AS INT) AS serasa_score,
     CAST(NULL AS INT) AS risk_score,
     CAST(NULL AS INT) AS risk_classification,
