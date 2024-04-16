@@ -3,7 +3,7 @@ WITH carta_campanha AS (
     id_creditor,
     id_customer,
     REGEXP_EXTRACT(LOWER(occurence_description), r"acordo:\s*(\d+)") id_installment,
-    CAST(REGEXP_EXTRACT(LOWER(occurence_description), r"carta campanha:\s*(\d+)") AS INT) campaign_code
+    REGEXP_EXTRACT(LOWER(occurence_description), r"carta campanha:\s*(\d+)") campaign_code
   FROM
     datalake_recupera_clean.historical_records
   WHERE

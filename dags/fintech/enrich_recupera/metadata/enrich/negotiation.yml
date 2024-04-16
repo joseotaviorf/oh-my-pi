@@ -3,7 +3,7 @@ database_name: datalake_recupera
 table_name: negotiation
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "This table represents the Recupera report called NEGOCIAC and contains information about the negotiation. It stores daily snapshots to capture changes in the negotiation (example: number of installment, advisory..). The first snapshot started on 2024-03-04"
+description: "This table represents the Recupera report called NEGOCIAC and contains information about the negotiation. It stores daily snapshots to capture changes in the negotiation (example: number of installment, advisory..)"
 columns:
   id_creditor:
     description: Creditor ID

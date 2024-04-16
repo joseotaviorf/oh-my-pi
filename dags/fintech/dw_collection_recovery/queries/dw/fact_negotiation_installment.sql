@@ -64,14 +64,14 @@ nexxera_confirmation AS (
       ROW_NUMBER() OVER(PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) = 1
 )
 SELECT DISTINCT
-    CONCAT(COALESCE(tfi.id_negotiation_recupera,i.id_negotiation),"-",INT(COALESCE(tfi.installment_number, i.installment_number))) AS sk_negotiation_installment,
-    STRING(COALESCE(tfi.id_negotiation_recupera,i.id_negotiation)) AS sk_negotiation,
+    CONCAT(COALESCE(i.id_negotiation, tfi.id_negotiation_recupera),"-",INT(COALESCE(i.installment_number, tfi.installment_number))) AS sk_negotiation_installment,
+    STRING(COALESCE(i.id_negotiation, tfi.id_negotiation_recupera)) AS sk_negotiation,
     i.customer_document AS sk_debtor,
     tfi.id_installment,
     tfi.id_invoice_extra,
-    COALESCE(tfi.id_receipt, i.id_receipt) AS id_receipt,
-    COALESCE(tfi.installment_number, i.installment_number) AS installment_number,
-    COALESCE(tfi.creditor, i.creditor) AS creditor,
+    COALESCE(i.id_receipt, tfi.id_receipt) AS id_receipt,
+    COALESCE(i.installment_number, tfi.installment_number) AS installment_number,
+    COALESCE(i.creditor, tfi.creditor) AS creditor,
     i.is_special_installment,
     CASE
       WHEN tfi.installment_status = 'paid' OR i.installment_status = 'Pago' THEN 'paid'
@@ -86,18 +86,18 @@ SELECT DISTINCT
     i.amount_fine,
     i.interest_fee_amount,
     i.default_interest_amount,
-    COALESCE(tfi.adm_fee_amount, i.adm_fee_amount) AS adm_fee_amount,
-    COALESCE(tfi.discount_amount, i.discount_amount) AS discount_amount,
-    COALESCE(tfi.total_amount, i.amount_to_pay) AS amount_to_pay,
+    COALESCE(i.adm_fee_amount, tfi.adm_fee_amount) AS adm_fee_amount,
+    COALESCE(i.discount_amount, tfi.discount_amount) AS discount_amount,
+    COALESCE(i.amount_to_pay, tfi.total_amount) AS amount_to_pay,
     CASE
       WHEN (tfi.installment_status IN ('pending', 'registered') OR i.installment_status = 'Em aberto') AND nx.paid_amount IS NOT NULL THEN nx.paid_amount -- Order of checks here matters!!!! Only use nexxera if others call it 'registered'
-      ELSE COALESCE(tfi.paid_amount, i.paid_amount)
+      ELSE COALESCE(i.paid_amount, tfi.paid_amount)
     END AS paid_amount,
-    COALESCE(tfi.dt_created, i.dt_formalization) AS dt_creation,
-    COALESCE(tfi.dt_due, i.dt_due) AS dt_due,
+    COALESCE(i.dt_formalization, tfi.dt_created) AS dt_creation,
+    COALESCE(i.dt_due, tfi.dt_due) AS dt_due,
     CASE
           WHEN (tfi.installment_status IN ('pending', 'registered') OR i.installment_status = 'Em aberto') AND nx.paid_amount IS NOT NULL THEN nx.dt_paid -- Order of checks here matters!!!! Only use nexxera if others call it 'registered'
-          ELSE COALESCE(tfi.dt_paid, i.dt_paid)
+          ELSE COALESCE(i.dt_paid, tfi.dt_paid)
       END AS dt_paid,
     COALESCE(i.dt_canceled, tfi.dt_canceled) AS dt_canceled,
     NOW() AS ts_load
