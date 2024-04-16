@@ -29,6 +29,7 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     parser.add_argument("table_name", help="Name of the table to be loaded")
     parser.add_argument("event_type", help="Type of event to be sent to SNS")
     parser.add_argument("sns_topic_arn", help="ARN of the SNS topic")
+    parser.add_argument("chunk_size", help="Chunk Size used for each table message")
 
     args = parser.parse_args()
 
@@ -36,8 +37,9 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     table_name = args.table_name
     event_type = args.event_type
     sns_topic_arn = args.sns_topic_arn
+    chunk_size = args.chunk_size
 
-    return database_name, table_name, event_type, sns_topic_arn
+    return database_name, table_name, event_type, sns_topic_arn, chunk_size
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
@@ -73,6 +75,7 @@ def load_table_into_sns(
     table_name: str,
     event_type: str,
     sns_topic_arn: str,
+    chunk_size: int,
 ):
     """
     Load the table into SNS.
@@ -83,19 +86,20 @@ def load_table_into_sns(
 
     df = spark.table(f"{database_name}.{table_name}")
 
-    message_contents = df.collect()
+    message_contents = [row.asDict() for row in df.collect()]
+    message_chunks = split_in_chunks(message_contents, chunk_size)
+
     messages = [
       {
           "id_message": str(uuid4()),
           "ts_message": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S'),
           "event_type": event_type,
-          "payload": row.asDict()
-      } for row in message_contents
+          "payload": chunk
+      } for chunk in message_chunks
     ]
 
-    messages_batches = split_in_chunks(messages, 100)
     messages_batches_rdd = spark_client.conn.sparkContext.parallelize(
-        messages_batches
+        messages
     )
 
     responses = messages_batches_rdd.map(
@@ -112,7 +116,7 @@ def main():
     """
     Start the pipeline.
     """
-    database_name, table_name, event_type, sns_topic_arn = (
+    database_name, table_name, event_type, sns_topic_arn, chunk_size = (
         parse_arguments()
     )
     logger.info(
@@ -121,7 +125,7 @@ def main():
     )
 
     load_table_into_sns(
-        database_name, table_name, event_type, sns_topic_arn,
+        database_name, table_name, event_type, sns_topic_arn, chunk_size
     )
 
 if __name__ == "__main__":

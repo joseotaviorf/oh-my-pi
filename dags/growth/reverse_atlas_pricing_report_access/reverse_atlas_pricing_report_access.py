@@ -86,6 +86,7 @@ for table_name, table_config in tables.items():
                         table_name,
                         table_config["event_type"],
                         table_config["sns_topic_arn"],
+                        table_config["chunk_size"]
                     ],
                 }
             },
