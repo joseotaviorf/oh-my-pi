@@ -45,7 +45,7 @@ listing_base AS (
     erc.rn = 1
     AND (erc.country_code = 'BR' OR erc.country_code IS NULL)
     AND DATE(dhl_2.ts_publication) >= ADD_MONTHS(DATE_TRUNC('MONTH', CURRENT_DATE), -13)
-    AND DATE(dhl_2.ts_publication) <= DATE_TRUNC('MONTH', CURRENT_DATE)
+    AND DATE_TRUNC('MONTH', dhl_2.ts_publication) <= DATE_TRUNC('MONTH', CURRENT_DATE)
 ) 
 SELECT  
   DATE_TRUNC('MONTH',dt_publication_nxt) AS relisting_month, 

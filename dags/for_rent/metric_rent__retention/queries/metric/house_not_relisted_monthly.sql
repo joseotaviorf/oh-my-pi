@@ -17,7 +17,7 @@ JOIN
         ON fct.sk_contract = dc.sk_contract
 WHERE 
     dt.status <> 'CANCELED'
-    AND DATE(dt.ts_created) < DATE_TRUNC('MONTH', CURRENT_DATE)
+    AND DATE_TRUNC('MONTH', dt.ts_created) <= DATE_TRUNC('MONTH', CURRENT_DATE)
 GROUP BY 
     1 , 2, 3
 
@@ -42,6 +42,6 @@ JOIN
         ON fct.sk_contract = dc.sk_contract
 WHERE 
     dt.status <> 'CANCELED'
-    AND DATE(dt.ts_created) < DATE_TRUNC('MONTH', CURRENT_DATE)
+    AND DATE_TRUNC('MONTH', dt.ts_created) <= DATE_TRUNC('MONTH', CURRENT_DATE)
 GROUP BY 
     1 , 2, 3
