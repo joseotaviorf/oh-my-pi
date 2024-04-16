@@ -1,6 +1,6 @@
 SELECT
     CAST(id_user_zendesk AS BIGINT) AS sk_zendesk_user,
-    url_user,
+    url AS url_user,
     name,
     alias,
     email,

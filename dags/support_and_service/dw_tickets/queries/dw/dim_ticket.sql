@@ -23,7 +23,7 @@ SELECT
     contact_motivation_tag,
     contact_theme_tag,
     contact_theme_detail_tag,
-    is_public AS has_public_comments,
+    BOOLEAN(is_public) AS has_public_comments,
     ts_created,
     ts_created - INTERVAL 3 HOUR AS ts_created_local,
     ts_updated,
