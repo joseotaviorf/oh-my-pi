@@ -12,10 +12,12 @@ column_level_validations:
     is_unique:
       severity_level: Error
   line_name:
-    is_complete:
+    has_completeness:
+      greater_than: 0.95
       severity_level: Error
     is_unique:
       severity_level: Error
   ts_line_first_event:
-    is_complete:
+    has_completeness:
+      greater_than: 0.95
       severity_level: Error
