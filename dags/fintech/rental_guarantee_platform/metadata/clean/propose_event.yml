@@ -1,0 +1,28 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: propose_event
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_event.id
+  id_entity:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_event.entity_id
+  event_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_event.event_type
+  payload:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_event.payload
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_event.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_event.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_event.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.propose_event.day

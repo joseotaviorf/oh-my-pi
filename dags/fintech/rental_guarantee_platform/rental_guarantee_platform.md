@@ -60,6 +60,7 @@ Velo 3.0 tables:
     - `agreement`
     - `agreement_payment`
     - `delinquency_entry`
+    - `propose_event`
 
 
 
@@ -129,6 +130,7 @@ Velo 3.0 tables:
     - `agreement`
     - `agreement_payment`
     - `delinquency_entry`
+    - `propose_event`
 
 Via **full load**:
 
