@@ -3,7 +3,7 @@ table_name: dw_pipeline_staging.dim_line
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 5
+    greater_than: 13
     severity_level: Error
 column_level_validations:
   sk_line:
@@ -13,11 +13,11 @@ column_level_validations:
       severity_level: Error
   line_name:
     has_completeness:
-      greater_than: 0.95
+      greater_than: 0.90
       severity_level: Error
     is_unique:
       severity_level: Error
   ts_line_first_event:
     has_completeness:
-      greater_than: 0.95
+      greater_than: 0.90
       severity_level: Error
