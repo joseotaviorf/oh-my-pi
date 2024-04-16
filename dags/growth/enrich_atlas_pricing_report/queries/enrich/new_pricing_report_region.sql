@@ -68,3 +68,5 @@ SELECT
   mdape_city
 FROM
   lpv_data
+WHERE
+  id_region IS NOT NULL
