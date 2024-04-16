@@ -103,10 +103,13 @@ def get_data(
 
         response = requests.get(url, headers=source_headers)
 
-        csv_content = StringIO(unidecode.unidecode(response.text.encode('utf-8').decode('utf-8')))
+        response.encoding = 'utf-8'  # Set encoding to handle special characters
+        csv_content = StringIO(response.text)
 
-        df = pd.read_csv(csv_content, encoding='utf-8', sep = ';', thousands = '.', decimal=',', skip_blank_lines=True)
-        df.columns = df.columns.str.strip()
+        df = pd.read_csv(csv_content, sep=';', thousands='.', decimal=',', skip_blank_lines=True)
+        df.columns = df.columns.str.strip()  # Strip whitespace from column names
+        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # Strip whitespace from data cells
+
         df = spark_client.conn.createDataFrame(df.astype(str))
 
         df = df.replace("nan", None)
