@@ -92,6 +92,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
     ) -> QuintoAndarDatabricksSubmitRunOperator:
         config_service = ConfigurationService(source)
 
+        bypass = ""
         product_db_name = ""
         if "lineage_product_database_name" in config_service.configs:
             product_db_name = config_service.get_config("lineage_product_database_name")
@@ -107,7 +108,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
             elif product_db_name:
                 metadata_file_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
             else:
-                metadata_file_type = "--bypass-propagate"
+                metadata_file_type = ""
+                bypass = "--bypass-propagate"
         raw_params = (
             ["--product-database-name", product_db_name]
             if layer == LayerEnum.RAW.value and product_db_name
@@ -133,7 +135,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         metadata_file_type,
                         self.relative_query_path,
                     ]
-                    + raw_params,
+                    + raw_params
+                    + ([bypass] if bypass else []),
                 }
             },
             execution_timeout=timedelta(minutes=30),
