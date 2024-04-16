@@ -138,14 +138,23 @@ deduped_amenities AS (
         LAG(has_feature) OVER (PARTITION BY id_house, id_amenity, is_condo_amenity ORDER BY rev NULLS LAST, rev_type DESC) IS DISTINCT FROM has_feature
 )
 SELECT
-    id_house,
-    id_user,
-    id_amenity,
-    rev,
-    rev_type,
-    has_feature,
-    is_condo_amenity,
-    ts_change,
-    LEAD(ts_change) OVER (PARTITION BY id_house, id_amenity, is_condo_amenity ORDER BY rev NULLS LAST, rev_type DESC) AS ts_next_change
+    da.id_house,
+    da.id_user,
+    da.id_amenity,
+    da.rev,
+    da.rev_type,
+    da.has_feature,
+    da.is_condo_amenity,
+    CASE 
+      WHEN da.rev IS NOT NULL 
+        OR ur.id_user = 293046 THEN TRUE 
+      ELSE FALSE
+    END AS is_atlas_update,
+    da.ts_change,
+    LEAD(da.ts_change) OVER (PARTITION BY da.id_house, da.id_amenity, da.is_condo_amenity ORDER BY da.rev NULLS LAST, da.rev_type DESC) AS ts_next_change
 FROM
-    deduped_amenities
+    deduped_amenities da
+
+LEFT JOIN 
+  datalake_ebdb_clean.user_revision_entity ur
+    ON da.rev = ur.id

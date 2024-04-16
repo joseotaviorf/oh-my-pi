@@ -30,6 +30,7 @@ SELECT
     COALESCE(h.sk_company, -1) AS sk_company,
     COALESCE(BIGINT(DATE_FORMAT(ah.ts_change, 'yyyyMMdd')), -1) AS sk_revision_date,
     COALESCE(BIGINT(DATE_FORMAT(ah.ts_next_change, 'yyyyMMdd')), -1) AS sk_next_revision_date,
+    ah.is_atlas_update,
     ah.ts_change AS ts_revision,
     ah.ts_next_change AS ts_next_revision,
     NOW() AS ts_load

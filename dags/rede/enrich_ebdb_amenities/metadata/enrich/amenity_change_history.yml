@@ -50,6 +50,13 @@ columns:
     description: Whether the house has the amenity or not.
   is_condo_amenity:
     description: Whether the amenity is a condo amenity or not.
+  is_atlas_update:
+    lineage:
+      - datalake_ebdb_clean.info_amenities_aud.rev
+      - datalake_ebdb_clean.info_condo_amenities_aud.rev
+      - datalake_ebdb_clean.house_aud.rev
+      - datalake_ebdb_clean.user_revision_entity.id_user
+    description: Whether the amenity was updated by Atlas or not
   ts_change:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
