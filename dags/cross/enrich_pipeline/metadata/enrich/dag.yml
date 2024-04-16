@@ -75,29 +75,29 @@ columns:
   has_todays_run_happened:
     description: Boolean flag indicating if the DAG has run on the present day, which would indicate that
       its data is already available.
-  ts_last_execution:
+  dt_last_run:
     lineage:
-      - datalake_pipeline.dag_run.ts_execution
-    description: Timestamp of the DAG's last execution, which usually is D-1.
-  ts_last_run_started:
+      - datalake_pipeline.dag_run.ts_run
+    description: Date of the DAG's last run, which usually is D-1.
+  ts_last_execution_started:
     lineage:
       - datalake_pipeline.dag_run.ts_started
     description: The UTC timestamp of when the DAG execution has been started.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
-  ts_last_run_started_brt:
+  ts_last_execution_started_brt:
     lineage:
       - datalake_pipeline.dag_run.ts_started
     description: The BRT timestamp of when the DAG execution has been started.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
-  ts_last_run_ended:
+  ts_last_execution_ended:
     lineage:
       - datalake_pipeline.dag_run.ts_ended
     description: The UTC timestamp of when the DAG execution has ended.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
-  ts_last_run_ended_brt:
+  ts_last_execution_ended_brt:
     lineage:
       - datalake_pipeline.dag_run.ts_ended_brt
     description: The BRT timestamp of when the DAG execution has ended.
@@ -106,11 +106,11 @@ columns:
   ts_last_run_first_success:
     lineage:
       - datalake_pipeline.dag_run.ts_first_execution_success
-    description: The UTC timestamp of when the DAG's first run of the execution date has received a success status.
+    description: The UTC timestamp of when the DAG's first execution of the run date has received a success status.
   ts_last_run_first_success_brt:
     lineage:
       - datalake_pipeline.dag_run.ts_first_execution_success
-    description: The BRT timestamp of when the DAG's first run of the execution date has received a success status.
+    description: The BRT timestamp of when the DAG's first execution of the run date has received a success status.
   ts_load:
     description: UTC timestamp of when the data was written in our data lake.
   ts_load_brt:

@@ -5,22 +5,22 @@ WITH most_recent_run AS (
     state,
     is_in_exclusion_list,
     is_first_execution_inside_sla AS is_inside_sla,
-    DATE(ts_execution) AS dt_execution
+    DATE(ts_run) AS dt_run
   FROM 
     datalake_pipeline.dag_run
   WHERE
     id_run NOT LIKE 'manual%'   -- Excluding manual DAG runs, because it's created as D0.
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_execution DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_run DESC) = 1
 ),
 most_recent_events AS (
     SELECT
         id_dag,
         duration,
-        ts_started AS ts_last_run_started,
-        ts_started_brt AS ts_last_run_started_brt,
-        ts_ended AS ts_last_run_ended,
-        ts_ended_brt AS ts_last_run_ended_brt,
+        ts_started AS ts_last_execution_started,
+        ts_started_brt AS ts_last_execution_started_brt,
+        ts_ended AS ts_last_execution_ended,
+        ts_ended_brt AS ts_last_execution_ended_brt,
         ts_first_execution_success AS ts_last_run_first_success,
         ts_first_execution_success_brt AS ts_last_run_first_success_brt
     FROM
@@ -33,7 +33,7 @@ base_amount_of_tasks AS (
     -- that had a cluster/job terminated is the one that we'll use to count the amount of tasks
     SELECT
         id_dag,
-        MAX(ts_executed) AS ts_last_execution
+        MAX(ts_executed) AS ts_last_run
     FROM
         datalake_composer_clean.log
     WHERE
@@ -47,13 +47,13 @@ amount_of_tasks AS (
     SELECT
         l.id_dag,
         COUNT(DISTINCT l.id_task) AS number_of_tasks,
-        l.ts_executed
+        l.ts_executed AS ts_run
     FROM
         datalake_composer_clean.log AS l
     JOIN
         base_amount_of_tasks AS b
             ON b.id_dag = l.id_dag
-            AND b.ts_last_execution = l.ts_executed
+            AND b.ts_last_run = l.ts_executed
     GROUP BY 1, 3
 ),
 dag_info AS (
@@ -95,11 +95,11 @@ sla_base AS (
         mc.is_in_exclusion_list,
         d.is_datamart,
         mc.is_inside_sla,
-        mc.dt_execution,
-        me.ts_last_run_started,
-        me.ts_last_run_started_brt,
-        me.ts_last_run_ended,
-        me.ts_last_run_ended_brt,
+        mc.dt_run,
+        me.ts_last_execution_started,
+        me.ts_last_execution_started_brt,
+        me.ts_last_execution_ended,
+        me.ts_last_execution_ended_brt,
         me.ts_last_run_first_success,
         me.ts_last_run_first_success_brt
     FROM
@@ -134,12 +134,12 @@ SELECT
     s.is_in_exclusion_list,
     s.is_inside_sla,
     s.is_datamart,
-    IF(DATE(s.ts_last_run_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
-    s.dt_execution AS dt_last_execution,
-    s.ts_last_run_started,
-    s.ts_last_run_started_brt,
-    s.ts_last_run_ended,
-    s.ts_last_run_ended_brt,
+    IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
+    s.dt_run AS dt_last_run,
+    s.ts_last_execution_started,
+    s.ts_last_execution_started_brt,
+    s.ts_last_execution_ended,
+    s.ts_last_execution_ended_brt,
     s.ts_last_run_first_success,
     s.ts_last_run_first_success_brt,
     NOW() AS ts_load,

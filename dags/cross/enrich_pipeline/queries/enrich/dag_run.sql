@@ -104,8 +104,8 @@ SELECT
     ELSE NULL -- If the DAG is in its first run, it doesn't have a SLA
   END AS is_first_execution_inside_sla,
   IF(c.id_dag IS NOT NULL, TRUE, FALSE) AS has_been_cleared,
-  dr.ts_executed AS ts_execution,
-  FROM_UTC_TIMESTAMP(dr.ts_executed, 'America/Sao_Paulo') AS ts_execution_brt,
+  dr.ts_executed AS ts_run,
+  FROM_UTC_TIMESTAMP(dr.ts_executed, 'America/Sao_Paulo') AS ts_run_brt,
   dr.ts_started,
   FROM_UTC_TIMESTAMP(dr.ts_started, 'America/Sao_Paulo') AS ts_started_brt,
   dr.ts_ended,

@@ -49,14 +49,14 @@ columns:
   has_been_cleared:
     description: Boolean flag indicating if the DAG run suffered any clear, which means that it ran
       at least one more time.
-  ts_execution:
+  ts_run:
     lineage:
       - datalake_composer_clean.dag_run.ts_executed
-    description: The UTC timestamp of the DAG execution, which usually is D-1.
-  ts_execution_brt:
+    description: The UTC timestamp of the DAG run, which usually is D-1.
+  ts_run_brt:
     lineage:
       - datalake_composer_clean.dag_run.ts_executed
-    description: The timestamp of the DAG execution, which usually is D-1, in Brasilia (BR) timezone.
+    description: The timestamp of the DAG run, which usually is D-1, in Brasilia (BR) timezone.
   ts_started:
     lineage:
       - datalake_composer_clean.dag_run.ts_started

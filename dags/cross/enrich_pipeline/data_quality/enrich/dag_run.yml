@@ -14,6 +14,6 @@ column_level_validations:
   id_dag:
     is_complete:
       severity_level: Error
-  ts_execution:
+  ts_run:
     is_complete:
       severity_level: Error
