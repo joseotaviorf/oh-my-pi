@@ -46,6 +46,8 @@ columns:
     description: "Status reason of the house in that specific time period."
   trigger_new_version:
     description: "Number indicating if this state should trigger a new version (1 if it should and 0 if not)."
+  is_last_state_of_day:
+    description: Boolean indicating if this is the last state of the day for this house.
   ts_first_publication:
     lineage:
       - datalake_ebdb_listing.business_context_history.ts_state_started

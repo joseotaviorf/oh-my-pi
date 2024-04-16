@@ -508,7 +508,14 @@ SELECT
   ) AS is_extended_rental,
   m.lbc_state_order,
   m.state_order,
-  MAX(m.max_state_order) OVER(PARTITION BY m.id_house) AS max_state_order
+  MAX(m.max_state_order) OVER(PARTITION BY m.id_house) AS max_state_order,
+  IF(
+    MAX(m.state_order) OVER(
+        PARTITION BY m.id_house, CAST(m.ts_state_started AS DATE)
+    ) = m.state_order,
+    TRUE,
+    FALSE
+  ) AS is_last_state_of_day
 FROM 
   merge_version AS m
 LEFT JOIN 
