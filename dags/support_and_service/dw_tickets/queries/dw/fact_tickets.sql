@@ -89,7 +89,8 @@ SELECT
       ELSE NULL
     END AS ts_closed_local,
     t.ts_updated,
-    t.ts_updated - INTERVAL 3 HOUR AS ts_updated_local
+    t.ts_updated - INTERVAL 3 HOUR AS ts_updated_local,
+    NOW() AS ts_load
 FROM
     datalake_zendesk.tickets_current AS t
 LEFT JOIN
