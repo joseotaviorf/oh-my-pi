@@ -3,7 +3,7 @@ dag:
   name: enrich_atlas_pricing_report
   schedule_start_date: 2024, 3, 1
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG generates pricing report information from houses, regions and business contexts.
       These tables will be used in the DAG reverse_atlas_pricing_report_access to be sent via SNS,
@@ -14,18 +14,17 @@ workflow:
   default_extraction_type: full
   inner_dependencies:
     house_pricing_metrics:
-    - similar_listings
-    - house_condo_metrics
+      - similar_listings
+      - house_condo_metrics
     new_pricing_report_listing_price_history:
-    - status_history_house_listing
-    - status_history_house_negotiation
-    - status_history_house_price_change
-    - status_history_house_unpublished
+      - status_history_house_listing
+      - status_history_house_negotiation
+      - status_history_house_price_change
     new_pricing_report_engagement:
-    - house_pricing_metrics
-    - house_listing_views_metrics
+      - house_pricing_metrics
+      - house_listing_views_metrics
     new_pricing_report_region:
-    - region_metrics
+      - region_metrics
 cluster:
   type: custom_cluster
   custom_configurations:
