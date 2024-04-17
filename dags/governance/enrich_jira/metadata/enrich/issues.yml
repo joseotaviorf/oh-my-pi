@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: ""
+  project_key:
+    lineage:
+      - datalake_jira_clean.project.key
+    description: "Project key from Jira, the root digits, used to identify the project"
   summary:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -89,6 +93,38 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: ""
+  tech_debt_category:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "DPE Tech Debt custom field, used to identify the tech debt category"
+  tech_debt_size:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "DPE Tech Debt custom field, used to identify the tech debt size"
+  tech_debt_urgency:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "DPE Tech Debt custom field, used to identify the tech debt urgency"
+  tech_debt_user_impact:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "DPE Tech Debt custom field, used to identify the tech debt user impact"
+  tech_debt_blockage:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "DPE Tech Debt custom field, used to identify the tech debt blockage"
+  tech_debt_uncertainty:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "DPE Tech Debt custom field, used to identify the tech debt uncertainty"
+  tech_debt_cumulativeness:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "DPE Tech Debt custom field, used to identify the tech debt cumulativeness"
+  tech_debt_complexity:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: "DPE Tech Debt custom field, used to identify the tech debt complexity"
   story_points:
     lineage:
       - datalake_jira_clean.issues.fields

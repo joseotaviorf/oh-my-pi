@@ -3,6 +3,7 @@ WITH record_selection AS (
         key AS id_issue,
         GET_JSON_OBJECT(fields,'$.parent.key') AS id_parent_issue,
         GET_JSON_OBJECT(fields, '$.project.id') AS id_project,
+        GET_JSON_OBJECT(fields,'$.project.key') AS project_key,
         GET_JSON_OBJECT(fields,'$.summary') AS summary,
         GET_JSON_OBJECT(fields,'$.description') AS issue_description,
         GET_JSON_OBJECT(fields, '$.project.name') AS project_name,
@@ -41,6 +42,40 @@ WITH record_selection AS (
                 completeDate:timestamp
             >>'
         ) AS cycles,
+        -- Tech Debt columns for DPE
+        COALESCE(
+            GET_JSON_OBJECT(fields, '$.customfield_16889.value'), 
+            GET_JSON_OBJECT(fields, '$.customfield_18010.value'), 
+            GET_JSON_OBJECT(fields, '$.customfield_18039.value')) AS tech_debt_category,
+        COALESCE(
+            GET_JSON_OBJECT(fields, '$.customfield_16890.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18011.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18040.value')) AS tech_debt_size,
+        COALESCE(
+            GET_JSON_OBJECT(fields, '$.customfield_18004.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18013.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18034.value')) AS tech_debt_urgency,
+        COALESCE(
+            GET_JSON_OBJECT(fields, '$.customfield_18005.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18014.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18035.value')) AS tech_debt_user_impact,
+        COALESCE(
+            GET_JSON_OBJECT(fields, '$.customfield_18006.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18015.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18036.value')) AS tech_debt_blockage,
+        COALESCE(
+            GET_JSON_OBJECT(fields, '$.customfield_18007.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18012.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18033.value')) AS tech_debt_uncertainty,        
+        COALESCE(
+            GET_JSON_OBJECT(fields, '$.customfield_18008.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18016.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18037.value')) AS tech_debt_cumulativeness,
+        COALESCE(
+            GET_JSON_OBJECT(fields, '$.customfield_18009.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18017.value'),
+            GET_JSON_OBJECT(fields, '$.customfield_18038.value')) AS tech_debt_complexity,
+        -- End Tech Debt columns for DPE
         CAST(GET_JSON_OBJECT(fields, '$.customfield_10117') AS DOUBLE) AS story_points,
         CAST(GET_JSON_OBJECT(fields,'$.customfield_10508') AS DOUBLE) AS story_points_estimate,
         GET_JSON_OBJECT(fields, '$.customfield_10400[0].value') IS NOT NULL AS is_flagged,
@@ -85,6 +120,14 @@ SELECT
     FILTER(cycles, c -> c.id = ARRAY_MAX(cycles.id))[0] AS last_cycle,
     labels,
     cycles,
+    tech_debt_category,
+    tech_debt_size,
+    tech_debt_urgency,
+    tech_debt_user_impact,
+    tech_debt_blockage,
+    tech_debt_uncertainty,
+    tech_debt_cumulativeness,
+    tech_debt_complexity,
     story_points,
     story_points_estimate,
     is_flagged,
