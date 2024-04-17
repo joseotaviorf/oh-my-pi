@@ -70,8 +70,19 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
 
     def __get_libraries(self) -> list:
         default_libraries = self.config_service.get_config("default_libraries")
-        # TODO: add custom_libraries feature
-        return default_libraries
+        custom_libraries = [
+            {
+                lib_type: lib_name.format(
+                    artifacts_bucket=self.config_service.get_config("artifacts_bucket")
+                )
+            }
+            if isinstance(lib_name, str)
+            else {lib_type: lib_name}
+            for custom_libraries in self.cluster_args.get("custom_libraries", [])
+            for lib_type, lib_name in custom_libraries.items()
+        ]
+        libraries = default_libraries + custom_libraries
+        return libraries
 
     def create_task(self) -> QuintoAndarDatabricksExecuteJobClusterOperator:
         """
