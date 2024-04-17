@@ -94,7 +94,7 @@ parsed_cf AS (
     SELECT
         cf.id_ticket,
         cf.ts_updated,
-        tf.raw_title AS cf_title,
+        tf.title AS cf_title,
         cf.value AS cf_value
     FROM
         splitted_cf AS cf

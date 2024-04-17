@@ -239,6 +239,10 @@ SELECT
   t.ts_analyst_started,
   t.ts_created,
   t.ts_updated,
+  CASE
+    WHEN t.status = 'closed' THEN t.ts_updated
+    ELSE NULL
+  END AS ts_closed,
   YEAR(t.ts_created) AS year,
   MONTH(t.ts_created) AS month,
   DAY(t.ts_created) AS day

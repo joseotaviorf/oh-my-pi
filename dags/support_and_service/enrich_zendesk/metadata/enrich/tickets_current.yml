@@ -428,6 +428,10 @@ columns:
     description: Timestamp of ticket update
     lineage:
       - datalake_zendesk.tickets.ts_updated
+  ts_closed:
+    description: Date in timestamp format that indicates when the ticket was closed.
+    lineage:
+      - datalake_zendesk.tickets.ts_updated
   ts_load:
     description: Timestamp of when data was loaded
     lineage:
