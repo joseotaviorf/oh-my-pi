@@ -42,7 +42,9 @@ workflow:
     tagged_object:
       date_filter_column: changed_on
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_12_2_min_general_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.xlarge
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
