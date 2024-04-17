@@ -1,17 +1,17 @@
 dag:
-  name: ebdb_contract_test
+  name: ebdb_contract
   schedule_start_date: 2021, 2, 20
   schedule_interval: 10 21 * * *
-  owner: Data Engineering
+  owner: Data ForRent
   documentation:
-    dag_purpose: Retrieves data from incoming CDC replication from EBDB and load it on datalake.
+    dag_purpose: Extraction of EBDB tables related to Contract into data lake. EBDB is the main database for QuintoAndar.
 workflow:
   type: cdc
   layer: raw
+  custom_schema: ebdb
   database_type: mysql
   source_database: ebdb
   source_schema: ebdb
-  custom_schema: ebdb_test
   tables_customization:
     Contrato_AUD:
       clean_table_name: contract_aud
