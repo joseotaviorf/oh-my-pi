@@ -1,0 +1,121 @@
+---
+database_name: dw_pipeline
+table_name: dim_dag
+description: This dimension table has all the bi-etl-ejuice's Airflow DAGs with information
+  about its most recent update.
+  Each line is an unique DAG, identified by the sk_dag.
+domain: Cross
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  sk_dag:
+    lineage:
+      - datalake_pipeline.dag.id_dag
+    description: Key of the DAG, also its DAG id on Airflow.
+  layer:
+    lineage:
+      - datalake_pipeline.dag.layer
+    description: Data lake layer of which the DAG writes data into.
+    categories:
+      dw: 'DW layer'
+      enrich: 'Enrich layer'
+      metric: 'Metric layer'
+      raw/clean: 'Raw/clean layers'
+      reverse: 'Reverse layer'
+  schedule_interval:
+    lineage:
+      - datalake_pipeline.dag.schedule_interval
+    description: Schedule interval of the Airflow in which the DAG runs.
+      If none, this DAG has no schedule interval or is triggered by Mediator.
+  state:
+    lineage:
+      - datalake_pipeline.dag.state
+    description: State of the most recent DAG run of the DAG.
+  utc_sla_hour:
+    lineage:
+      - datalake_pipeline.dag.utc_sla_hour
+    description: SLA UTC hour of the DAG, where each layer has a different SLA.
+        For raw/clean, enrich, dw (except for datamart tables) and metric layers, the SLA hour is 11h AM UTC.
+        For datamart tables (which are in dw layer), the SLA hour is 13h AM UTC.
+        The reverse layer doesn't have a SLA.
+  brt_sla_hour:
+    lineage:
+      - datalake_pipeline.dag.brt_sla_hour
+    description: SLA hour of the DAG in Brasilia (BR) timezone, where each layer has a different SLA.
+        For raw/clean, enrich, dw (except for datamart tables) and metric layers, the SLA hour is 8h AM BRT.
+        For datamart tables (which are in dw layer), the SLA hour is 10h AM BRT.
+        The reverse layer doesn't have a SLA.
+  number_of_tasks:
+    lineage:
+      - datalake_pipeline.dag.number_of_tasks
+    description: Amount of tasks that the DAG has. We're using the DAG's last run that successfully that had 
+      a cluster/job termination to count all the existing tasks, due to tasks that might use short-circuit operator 
+      (and wouldn't have a cluster/job creation or termination).
+  duration:
+    lineage:
+      - datalake_pipeline.dag.duration
+    description: Total duration of the most recent DAG run, in minutes.
+  is_active:
+    lineage:
+      - datalake_pipeline.dag.is_active
+    description: Boolean flag indicating if the DAG is currently active on Airflow, which means that it exists there.
+  is_paused:
+    lineage:
+      - datalake_pipeline.dag.is_paused
+    description: Boolean flag indicating if the DAG is currently paused on Airflow, which means that it is turned off.
+  is_in_exclusion_list:
+    lineage:
+      - datalake_pipeline.dag.is_in_exclusion_list
+    description: Boolean flag indicating if the DAG is present in the SLA exclusion list gsheet.
+  is_inside_sla:
+    lineage:
+      - datalake_pipeline.dag.is_inside_sla
+    description: Boolean flag indicating if the DAG is currently inside its SLA.
+      If it's null, it could be because the DAG is in our SLA exclusion list or because the DAG is
+        in its first run ever, which is not counted for SLA metrics.
+  is_datamart:
+    lineage:
+      - datalake_pipeline.dag.is_datamart
+    description: Boolean flag indicating if the DAG is related to datamarts.
+  has_todays_run_happened:
+    lineage:
+      - datalake_pipeline.dag.has_todays_run_happened
+    description: Boolean flag indicating if the DAG has run on the present day, which would indicate that
+      its data is already available.
+  dt_last_run:
+    lineage:
+      - datalake_pipeline.dag.ts_last_execution
+    description: Timestamp of the DAG's last run, which usually is D-1.
+  ts_last_execution_started:
+    lineage:
+      - datalake_pipeline.dag.ts_last_execution_started
+    description: The UTC timestamp of when the DAG's last run execution has been started.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_last_execution_started_brt:
+    lineage:
+      - datalake_pipeline.dag.ts_last_run_started_brt
+    description: The BRT timestamp of when the DAG's last execution has been started.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_last_execution_ended:
+    lineage:
+      -datalake_pipeline.dag.ts_last_run_ended
+    description: The UTC timestamp of when the DAG's last execution has ended.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_last_execution_ended_brt:
+    lineage:
+      - datalake_pipeline.dag.ts_last_run_ended_brt
+    description: The BRT timestamp of when the DAG's last execution has ended.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_last_run_first_success:
+    lineage:
+      - datalake_pipeline.dag.ts_last_run_first_success
+    description: The UTC timestamp of when the DAG's first execution of the last run date has received a success status.
+  ts_last_run_first_success_brt:
+    lineage:
+      - datalake_pipeline.dag.ts_last_run_first_success_brt
+    description: The BRT timestamp of when the DAG's first execution of the last run date has received a success status.
+  ts_load:
+    description: UTC timestamp of when the data was loaded into our systems.

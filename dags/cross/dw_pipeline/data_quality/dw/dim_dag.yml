@@ -1,0 +1,17 @@
+---
+table_name: dw_pipeline_staging.dim_dag
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_dag:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  dt_last_execution:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error

@@ -1,0 +1,25 @@
+SELECT
+    d.id_dag AS sk_dag,
+    d.layer,
+    d.schedule_interval,
+    d.state,
+    d.utc_sla_hour,
+    d.brt_sla_hour,
+    d.number_of_tasks,
+    d.duration,
+    d.is_active,
+    d.is_paused,
+    d.is_in_exclusion_list,
+    d.is_inside_sla,
+    d.is_datamart,
+    d.has_todays_run_happened,
+    d.dt_last_run,
+    d.ts_last_execution_started,
+    d.ts_last_execution_started_brt,
+    d.ts_last_execution_ended,
+    d.ts_last_execution_ended_brt,
+    d.ts_last_run_first_success,
+    d.ts_last_run_first_success_brt,
+    NOW() AS ts_load
+FROM
+    datalake_pipeline.dag AS d
