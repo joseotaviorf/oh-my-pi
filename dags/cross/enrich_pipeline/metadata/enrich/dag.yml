@@ -68,8 +68,8 @@ columns:
     lineage:
       - datalake_pipeline.dag_run.is_first_execution_inside_sla
     description: Boolean flag indicating if the DAG is currently inside its SLA.
-      If it's null, it could be because the DAG is in our SLA exclusion list or because the DAG is
-        in its first run ever, which is not counted for SLA metrics.
+      If it's null, it could be because the DAG is in our SLA exclusion list, it's a reverse DAG,
+      it's not active or it's paused.
   is_datamart:
     description: Boolean flag indicating if the DAG is related to datamarts.
   has_todays_run_happened:

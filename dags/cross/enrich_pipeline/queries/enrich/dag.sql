@@ -93,6 +93,7 @@ sla_base AS (
         d.is_active,
         d.is_paused,
         mc.is_in_exclusion_list,
+        IF(d.is_active = FALSE OR d.is_paused = TRUE OR mc.is_in_exclusion_list = TRUE OR d.layer = 'reverse', TRUE, FALSE) AS is_ignored,
         d.is_datamart,
         mc.is_inside_sla,
         mc.dt_run,
@@ -132,7 +133,7 @@ SELECT
     s.is_active,
     s.is_paused,
     s.is_in_exclusion_list,
-    s.is_inside_sla,
+    IF(s.is_ignored = TRUE, NULL, s.is_inside_sla) AS is_inside_sla,
     s.is_datamart,
     IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
     s.dt_run AS dt_last_run,
