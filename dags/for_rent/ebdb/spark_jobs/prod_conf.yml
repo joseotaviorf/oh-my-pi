@@ -302,6 +302,7 @@ table_block_list:
   - ContractVersion
   - Contrato
   - Contrato_AUD
+  - ContratoFull
   - ContratoPessoa
   - ContratoPessoa_AUD
   - Portability
