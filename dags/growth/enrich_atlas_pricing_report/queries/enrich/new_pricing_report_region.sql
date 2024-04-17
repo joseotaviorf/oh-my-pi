@@ -12,7 +12,6 @@ WITH amplitude_events AS (
 houses AS (
   SELECT
     llf.sk_house AS id_house,
-    llf.sk_region,
     LOWER(llf.origin_table) AS business_context,
     MIN(dd.date) AS dt_first_listing
   FROM
@@ -22,7 +21,7 @@ houses AS (
       ON llf.sk_first_listing_date = dd.sk_date
   WHERE
     llf.sk_first_listing_date > 0
-  GROUP BY 1, 2, 3
+  GROUP BY 1, 2
 ),
 house_views AS (
   SELECT
@@ -38,8 +37,14 @@ house_views AS (
       ON e.id_house::BIGINT = h.id_house
       AND e.business_context = h.business_context
   INNER JOIN
+    dw_public.dim_house_listing AS dhl
+      ON dhl.id_house = h.id_house
+  INNER JOIN
+    dw_public.fact_house_listings AS fhl
+        ON dhl.sk_house_listing = fhl.sk_house_listing
+  INNER JOIN
     dw_public.dim_region AS dr
-      ON h.sk_region = dr.sk_region
+      ON fhl.sk_region = dr.sk_region
       AND dr.country_code != 'MX'
   GROUP BY 1, 2, 3, 4
 ),
