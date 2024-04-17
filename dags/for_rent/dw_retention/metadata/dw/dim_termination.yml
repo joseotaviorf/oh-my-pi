@@ -40,6 +40,10 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.dt_ended_termination
     description: End date of the contract's termination.
+  dt_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_termination
+    description: Date of the contract's termination. It's the agreed date to the tenant to leave the house.
   ts_created:
     lineage:
       - datalake_offboarding.contract_termination.ts_created

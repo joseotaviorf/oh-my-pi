@@ -7,6 +7,7 @@ SELECT
     attachment_type_list,
     requested_by,
     dt_ended_termination,
+    dt_termination,
     ts_created,
     NOW() AS ts_load
 FROM

@@ -314,7 +314,7 @@ columns:
     lineage:
       - datalake_terminator_clean.termination_workflow.has_automatically_closed_task
   dt_termination:
-    description: Date of the contract's termination.
+    description: Date of the contract's termination. It's the agreed date to the tenant to leave the house.
     lineage:
       - datalake_terminator_clean.termination.dt_vacancy
   dt_ended_termination:
