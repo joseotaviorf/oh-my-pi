@@ -1,10 +1,7 @@
 ---
-tables_exclusion_list:
-  - certificate_aud
-  - certificate_request_aud
-  - change_owner_control
-  - flyway_schema_history
-  - insurance_aud
-  - revinfo
+tables_list:
+  - certificate_request
+  - certificate
+  - insurance
 partition_cols: ["year", "month", "day"]
 lineage_product_database_name: betopera

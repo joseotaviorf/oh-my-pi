@@ -24,21 +24,21 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("partition_cols")
-    parser.add_argument("block_list")
+    parser.add_argument("tables_list")
     parser.add_argument("execution_date")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
     partition_cols = ast.literal_eval(args.partition_cols)
-    block_list = ast.literal_eval(args.block_list)
+    tables_list = ast.literal_eval(args.tables_list)
     execution_date = args.execution_date
     DATE_FILTER_COLUMN = "updated_at"
 
     logger.info(
         f"""
                 m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
-                partition_cols={partition_cols}, block_list={block_list}, execution_date={execution_date}, msg=Starting spark job...
+                partition_cols={partition_cols}, tables_list={tables_list}, execution_date={execution_date}, msg=Starting spark job...
         """
     )
 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
 
     for table in tables:
-        if table.table_name not in block_list:
+        if table.table_name in tables_list:
             df = postgres_consumer.get_incremental_data_from_table(
                 table_name=table.table_name,
                 date_filter_column=DATE_FILTER_COLUMN,

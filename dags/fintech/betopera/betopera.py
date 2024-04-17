@@ -46,7 +46,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 
-table_block_list = config_service.get_config("tables_exclusion_list")
+tables_list = config_service.get_config("tables_list")
 partition_cols = config_service.get_config("partition_cols")
 # dag params
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
@@ -104,7 +104,7 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
     raw_spark_job_extra_args=[
         SOURCE,
         str(partition_cols),
-        str(table_block_list),
+        str(tables_list),
         "{{ get_date_param(dag_run, ds, 'execution_date') }}",
     ],
 )
