@@ -33,7 +33,14 @@ WITH received_contact AS (
         customer_email,
         agent_email,
         average_reply_time,
+        total_talk_time,
+        total_queue_time,
+        total_wrap_up_time,
+        total_waiting_time,
+        first_reply_time,
+        total_handling_time,
         is_answered,
+        is_per_team_task,
         ts_reservation_created,
         ts_created
     FROM
@@ -58,9 +65,16 @@ SELECT
     customer_email,
     agent_email,
     average_reply_time,
+    total_talk_time,
+    total_queue_time,
+    total_wrap_up_time,
+    total_waiting_time,
+    first_reply_time,
+    total_handling_time,
     LAG(department) OVER(PARTITION BY sk_contact ORDER BY ts_created) AS transferred_from,
     LEAD(department) OVER(PARTITION BY sk_contact ORDER BY ts_created) AS transferred_to,
     is_answered,
+    is_per_team_task,
     CASE
         WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_created) = 1 THEN TRUE
         ELSE FALSE
