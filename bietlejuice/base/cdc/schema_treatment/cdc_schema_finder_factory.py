@@ -54,10 +54,7 @@ class CdcSchemaFinderFactory:
 
     def _get_conn_config(self):
         base_dbutils = BaseDBUtils()
-        if base_dbutils.get_dbutils() is not None:
-            global dbutils
-            dbutils = base_dbutils.get_dbutils()
-
+        dbutils = base_dbutils.get_dbutils()
         conn_config_json = dbutils.secrets.get(
             scope="quintoandar", key=self.dbutils_secret_key
         )

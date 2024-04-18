@@ -27,7 +27,7 @@ class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
                 latest_table_change, transactional_dataframe
             )
 
-        datalake_dataframe = self._try_finding_existing_datalake_table(
+        datalake_dataframe = self._try_find_existing_datalake_table(
             self.datalake_table_schema, table_name
         )
         if datalake_dataframe:
@@ -106,22 +106,21 @@ class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
         apply the necessary transformation.
         """
         for column in datalake_dataframe.columns:
-            if column["name"] not in transactional_dataframe.columns:
+            if column not in transactional_dataframe.columns:
                 continue
             if (
                 datalake_dataframe.schema[column].dataType.typeName() == "timestamp"
                 and transactional_dataframe.schema[column].dataType.typeName == "string"
             ):
                 transactional_dataframe = transactional_dataframe.withColumn(
-                    column["name"], to_timestamp(col(column["name"]))
+                    column, to_timestamp(col(column["name"]))
                 )
             elif (
                 datalake_dataframe.schema[column].dataType.typeName() == "date"
                 and transactional_dataframe.schema[column].dataType.typeName == "string"
             ):
                 transactional_dataframe = transactional_dataframe.withColumn(
-                    column["name"],
-                    to_date(to_timestamp(col(column["name"]) * 24 * 60 * 60)),
+                    column, to_date(to_timestamp(col(column["name"]) * 24 * 60 * 60))
                 )
 
         return transactional_dataframe

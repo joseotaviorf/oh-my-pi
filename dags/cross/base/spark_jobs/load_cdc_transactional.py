@@ -3,9 +3,11 @@ import json
 from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
-from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import CdcSchemaFinderFactory
-from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_treatment import (
-    MySqlCdcSchemaTreatment,
+from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
+    CdcSchemaFinderFactory,
+)
+from bietlejuice.base.cdc.schema_treatment.cdc_schema_treatment_factory import (
+    CdcSchemaTreatmentFactory,
 )
 from bietlejuice.base.cdc.schema_treatment.schema_changes_notifier import (
     SchemaChangesNotifier,
@@ -60,12 +62,18 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
         f"datalake_{schema}_transactional.{table_name}",
         path=f"s3://{datalake_bucket}/transactional/{schema}/{table_name}/",
         source_df=df,
-        partition_by=partitions
+        partition_by=partitions,
     )
 
 
 def get_incoming_data(
-    incoming_bucket, environment, source_database, schema, table_name, start_date, end_date
+    incoming_bucket,
+    environment,
+    source_database,
+    schema,
+    table_name,
+    start_date,
+    end_date,
 ):
     """
     Reads incoming data as a DataFrame
@@ -79,9 +87,7 @@ def get_incoming_data(
     :param end_date: Airflow DAG end date.
     :return df:
     """
-    path = (
-        f"s3://{incoming_bucket}/{source_database}/{environment}_{source_database}.data.{schema}.{table_name}/"
-    )
+    path = f"s3://{incoming_bucket}/{source_database}/{environment}_{source_database}.data.{schema}.{table_name}/"
 
     logger.info(
         f"m=get_incoming_data, start_date={start_date}, end_date={end_date}, path={path}, msg=reading Incoming data..."
@@ -107,7 +113,7 @@ def get_incoming_data(
     return df
 
 
-def format_and_deduplicate_df(df, partitions):
+def format_and_deduplicate_df(df, partitions, database_type):
     """
     Extract and format informations from Debezium payload
     and Deduplicate
@@ -136,13 +142,20 @@ def format_and_deduplicate_df(df, partitions):
             df_deletes, allowMissingColumns=True
         )
 
+    if database_type == "mysql":
+        cdc_binlog_position_column = "source.pos"
+    elif database_type == "postgres":
+        cdc_binlog_position_column = "source.lsn"
+    else:
+        raise ValueError(
+            f"m=format_and_deduplicate_df, database_type={database_type}, msg=Database not supported."
+        )
+
     transactional_df = incoming_df.select(
         col("data.*"),
         col("op").alias("op_cdc"),
-        to_timestamp(col("ts_ms") / 1000).alias(
-            "ts_cdc_transaction"
-        ),
-        col("source.pos").alias("cdc_binlog_position"),
+        to_timestamp(col("ts_ms") / 1000).alias("ts_cdc_transaction"),
+        col(cdc_binlog_position_column).alias("cdc_binlog_position"),
         *partitions,
     )
 
@@ -177,13 +190,17 @@ def main():
     )
 
     df = get_incoming_data(
-        incoming_bucket, environment, source_database, source_schema, table_name, start_date, end_date
+        incoming_bucket,
+        environment,
+        source_database,
+        source_schema,
+        table_name,
+        start_date,
+        end_date,
     )
 
     if df is None:
-        if not spark.catalog.tableExists(
-            full_table_name
-        ):
+        if not spark.catalog.tableExists(full_table_name):
             raise FileNotFoundError(
                 "No data was found in the incoming bucket, and the table does not exist in the datalake. Since this is the first execution, "
                 "please make sure to trigger a snapshot of the table in the source database."
@@ -202,31 +219,30 @@ def main():
         )
         return
 
-    transactional_df = format_and_deduplicate_df(df, partitions)
+    transactional_df = format_and_deduplicate_df(df, partitions, database_type)
 
     logger.info("m=__main__, msg=Applying schema pre treatment...")
 
-    # Hardcoded for now, while we don't have other sources such as Postgres.
-    pre_treatment = MySqlCdcSchemaTreatment(
-        CdcSchemaFinderFactory(
+    pre_treatment = CdcSchemaTreatmentFactory(
+        schema_finder=CdcSchemaFinderFactory(
             incoming_bucket=incoming_bucket,
             source_database=source_database,
             source_schema=source_schema,
             environment=environment,
             start_date=start_date,
             end_date=end_date,
-            dbutils_secret_key=dbutils_secret_key
+            dbutils_secret_key=dbutils_secret_key,
         ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
         datalake_table_schema=f"datalake_{schema}_transactional",
-    )
-    transactional_df = pre_treatment.treat_dataframe(
-        table_name, transactional_df
-    )
+    ).get_cdc_schema_treatment(DatabaseTypeEnum(database_type))
+    transactional_df = pre_treatment.treat_dataframe(table_name, transactional_df)
 
     SchemaChangesNotifier.alert_schema_changes(
         full_table_name,
         transactional_df,
-        dbutils.secrets.get(scope="quintoandar", key=GchatWebhooksEnum.GCHAT_SCHEMA_CHANGES)
+        dbutils.secrets.get(
+            scope="quintoandar", key=GchatWebhooksEnum.GCHAT_SCHEMA_CHANGES
+        ),
     )
 
     logger.info("m=__main__, msg=Load table into transactional layer...")
