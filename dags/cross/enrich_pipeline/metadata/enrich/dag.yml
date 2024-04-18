@@ -75,6 +75,14 @@ columns:
   has_todays_run_happened:
     description: Boolean flag indicating if the DAG has run on the present day, which would indicate that
       its data is already available.
+  ts_first_event:
+    lineage:
+      - datalake_pipeline.log.ts_event
+    description: UTC timestamp of when the DAG had its first event.
+  ts_first_event_brt:
+    lineage:
+      - datalake_pipeline.log.ts_event
+    description: BRT timestamp of when the DAG had its first event.
   dt_last_run:
     lineage:
       - datalake_pipeline.dag_run.ts_run

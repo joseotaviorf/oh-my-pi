@@ -28,6 +28,16 @@ most_recent_events AS (
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_started DESC) = 1
 ),
+first_execution AS (
+    SELECT
+        id_dag,
+        MIN(ts_event) AS ts_first_event
+    FROM
+        datalake_composer_clean.log
+    WHERE
+        id_dag LIKE 'bietlejuice%'
+    GROUP BY 1
+),
 base_amount_of_tasks AS (
     -- As some DAGs won't execute all its tasks everyday, like DAGs using short-circuit operators, we're assuming that the last run
     -- that had a cluster/job terminated is the one that we'll use to count the amount of tasks
@@ -136,6 +146,8 @@ SELECT
     IF(s.is_ignored = TRUE, NULL, s.is_inside_sla) AS is_inside_sla,
     s.is_datamart,
     IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
+    fe.ts_first_event,
+    FROM_UTC_TIMESTAMP(fe.ts_first_event, 'America/Sao_Paulo') AS ts_first_event_brt,
     s.dt_run AS dt_last_run,
     s.ts_last_execution_started,
     s.ts_last_execution_started_brt,
@@ -147,6 +159,9 @@ SELECT
     FROM_UTC_TIMESTAMP(NOW(), 'America/Sao_Paulo') AS ts_load_brt
 FROM
     sla_base AS s
+JOIN
+    first_execution AS fe
+        ON fe.id_dag = s.id_dag
 LEFT JOIN
     amount_of_tasks AS ao
         ON ao.id_dag = s.id_dag
