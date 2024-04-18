@@ -89,10 +89,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         database_name: str,
         table_name: str,
         metadata_file_type: str = None,
+        bypass: str = "",
     ) -> QuintoAndarDatabricksSubmitRunOperator:
         config_service = ConfigurationService(source)
-
-        bypass = ""
         product_db_name = ""
         if "lineage_product_database_name" in config_service.configs:
             product_db_name = config_service.get_config("lineage_product_database_name")
@@ -109,7 +108,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 metadata_file_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
             else:
                 metadata_file_type = ""
-                bypass = "--bypass-propagate"
+                bypass += "--bypass-propagate"
         raw_params = (
             ["--product-database-name", product_db_name]
             if layer == LayerEnum.RAW.value and product_db_name
@@ -262,19 +261,16 @@ class DatalakeTaskGroup(BaseTaskGroup):
             do_output_xcom_push=do_output_xcom_push,
         )
 
-        if has_hive_sync:
-            sync_metadata_task = self._build_metadata_sync_task(
-                source=source,
-                sync_mode=sync_mode,
-                layer=layer,
-                database_name=database_name,
-                table_name=table_name,
-            )
+        sync_metadata_task = self._build_metadata_sync_task(
+            source=source,
+            sync_mode=sync_mode,
+            layer=layer,
+            database_name=database_name,
+            table_name=table_name,
+            bypass=None if has_hive_sync else "--bypass-hive",
+        )
 
-            chain(load_table_task, sync_metadata_task)
-            final_tasks = [sync_metadata_task]
-        else:
-            final_tasks = [load_table_task]
+        chain(load_table_task, sync_metadata_task)
 
         quality_tasks = self._build_data_quality_tasks(
             layer=layer,
@@ -289,8 +285,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
-            final_tasks=final_tasks,
-            independent_tasks=quality_tasks,
+            final_tasks=[load_table_task],
+            independent_tasks=quality_tasks + [sync_metadata_task],
         )
 
     def _build_task_group(
@@ -385,20 +381,17 @@ class DatalakeTaskGroup(BaseTaskGroup):
             ],
         )
 
-        if has_hive_sync:
-            metadata_sync_task = self._build_metadata_sync_task(
-                source=source_database_base_name,
-                sync_mode=self.SINGLE_TABLE,
-                layer=layer,
-                database_name=target_database_base_name,
-                table_name=table_name,
-                metadata_file_type=MetadataTypeEnum.LINEAGE.value,
-            )
+        metadata_sync_task = self._build_metadata_sync_task(
+            source=source_database_base_name,
+            sync_mode=self.SINGLE_TABLE,
+            layer=layer,
+            database_name=target_database_base_name,
+            table_name=table_name,
+            metadata_file_type=MetadataTypeEnum.LINEAGE.value,
+            bypass=None if has_hive_sync else "--bypass-hive",
+        )
 
-            chain(load_table_task, metadata_sync_task)
-            final_tasks = [metadata_sync_task]
-        else:
-            final_tasks = [load_table_task]
+        chain(load_table_task, metadata_sync_task)
 
         quality_tasks = []
         if DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
@@ -419,8 +412,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
-            final_tasks=final_tasks,
-            independent_tasks=quality_tasks,
+            final_tasks=[load_table_task],
+            independent_tasks=quality_tasks + [metadata_sync_task],
         )
 
     def build_raw_task_group_for_single_table(
@@ -431,7 +424,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
-        has_hive_sync=False,
+        has_hive_sync=True,
         tree_path="",
         do_output_xcom_push=False,
     ):
@@ -477,7 +470,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
-        has_hive_sync=False,
+        has_hive_sync=True,
     ):
         """
         Build a task group for raw layer to extract all tables from source
