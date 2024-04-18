@@ -13,15 +13,16 @@ logger = QuintoAndarLogger("base_spark")
 class BaseDBUtils:
     @logger(exclude_return=True)
     def get_dbutils(self):
-        spark = SparkContext.getOrCreate()
-        setting = spark.getConf().get("spark.master")
-        if "local" in setting:
-            from pyspark.dbutils import DBUtils
+        try:
+            from pyspark.dbutils import DBUtils  # type: ignore
 
-            logger.info("m=get_db_utils, msg=returning local dbutils reference")
-            return DBUtils(spark.sparkContext)
+            spark = BaseSparkContext.spark
+            dbutils = DBUtils(spark)
+        except ImportError:
+            import IPython  # type: ignore
 
-        logger.info("m=get_db_utils, msg=dbutils already available")
+            dbutils = IPython.get_ipython().user_ns["dbutils"]
+        return dbutils
 
     @logger(exclude_return=True)
     def discover_partition_values_in_path(self, path, dbutils):
