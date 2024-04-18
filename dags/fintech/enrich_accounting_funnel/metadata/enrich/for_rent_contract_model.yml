@@ -1,0 +1,66 @@
+---
+database_name: datalake_accounting_funnel
+table_name: for_rent_contract_brokerage
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table calculates brokerage by type to all For Rent's contracts"
+columns:
+ id_contract:
+   lineage:
+     - datalake_ebdb_clean.contract.id
+   description: "ID contract from Main"
+ rent:
+   lineage:
+     - datalake_ebdb_clean.contract_aud.rent
+   description: "Indicates the first rent amount - used to calculate brokerage"
+ first_rent_commission_fee:
+   lineage:
+     - datalake_ebdb_clean.contract.fist_rent_comission_fee
+   description: "First rent percentage from brokerage. Not all contracts are 100 perc"
+ 5A_brokerage_share:
+   description: "Indicates 5A brokerage split share in percentage"
+ agent_brokerage_share:
+   lineage:
+     - datalake_ebdb_clean.contract.agent_brokerage_share
+   description: "Indicates AGENT brokerage split share in percentage"
+ ciq_brokerage_share:
+   lineage:
+     - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+   description: "Indicates CIQ brokerage split share in percentage"
+ select_brokerage_share:
+   lineage:
+     - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+   description: "Indicates SELECT brokerage split share in percentage"
+ 3p_brokerage_share:
+   description: "Indicates 3P brokerage split share in percentage. At the moment it was created, it was always 50 perc of the rent"
+ 5A_brokerage_amount:
+   lineage:
+     - datalake_ebdb_clean.contract_aud.rent
+     - datalake_ebdb_clean.contract.fist_rent_comission_fee
+   description: "Indicates 5A brokerage split share in percentage in amount of cash"
+ agent_brokerage_amount:
+   lineage:
+     - datalake_ebdb_clean.contract.agent_brokerage_share
+     - datalake_ebdb_clean.contract_aud.rent
+   description: "Indicates AGENT brokerage split share in percentage in amount of cash"
+ ciq_brokerage_amount:
+   lineage:
+     - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+     - datalake_ebdb_clean.contract_aud.rent
+     - datalake_ebdb_clean.contract.fist_rent_comission_fee
+   description: "Indicates CIQ brokerage split share in percentage in amount of cash"
+ select_brokerage_amount:
+   lineage:
+     - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
+     - datalake_ebdb_clean.contract_aud.rent
+     - datalake_ebdb_clean.contract.fist_rent_comission_fee
+   description: "Indicates SELECT brokerage split share in percentage in amount of cash"
+ 3p_brokerage_amount:
+   lineage:
+     - datalake_ebdb_clean.contract_aud.rent
+     - datalake_ebdb_clean.contract.fist_rent_comission_fee
+   description: "Indicates 3P brokerage split share in percentage in amount of cash"
+ dt_contract_started:
+   lineage:
+     - datalake_ebdb_clean.contract.dt_started
+   description: "Indicates when the contract started"
