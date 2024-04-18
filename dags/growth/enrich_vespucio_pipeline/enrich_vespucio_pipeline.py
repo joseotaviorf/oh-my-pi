@@ -104,6 +104,7 @@ class Tables:
     source_sindiconet_condo = "vespucio_sources_delta.source_sindiconet_condo"
     source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
     source_navent_houses = "vespucio_sources_delta.source_navent_houses"
+    source_union_houses = "vespucio_sources_delta.source_union_house"
 
     step1_staged_condos = "vespucio_pipeline_delta.step1_staged_condos"
     step1_staged_houses = "vespucio_pipeline_delta.step1_staged_houses"
@@ -165,7 +166,7 @@ source_tasks = [
         entry_point="sources_sql_job",
         parameters=[
             f"--script=union_house.sql",
-            f"--output_table={Tables.source_navent_houses}",
+            f"--output_table={Tables.source_union_houses}",
         ],
         task_id="union_house",
     ),
