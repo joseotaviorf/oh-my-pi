@@ -267,7 +267,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             layer=layer,
             database_name=database_name,
             table_name=table_name,
-            bypass=None if has_hive_sync else "--bypass-hive",
+            bypass="" if has_hive_sync else "--bypass-hive",
         )
 
         chain(load_table_task, sync_metadata_task)
@@ -285,8 +285,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
-            final_tasks=[load_table_task],
-            independent_tasks=quality_tasks + [sync_metadata_task],
+            final_tasks=[load_table_task, sync_metadata_task],
+            independent_tasks=quality_tasks,
         )
 
     def _build_task_group(
@@ -388,7 +388,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             database_name=target_database_base_name,
             table_name=table_name,
             metadata_file_type=MetadataTypeEnum.LINEAGE.value,
-            bypass=None if has_hive_sync else "--bypass-hive",
+            bypass="" if has_hive_sync else "--bypass-hive",
         )
 
         chain(load_table_task, metadata_sync_task)
@@ -412,8 +412,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
-            final_tasks=[load_table_task],
-            independent_tasks=quality_tasks + [metadata_sync_task],
+            final_tasks=[load_table_task, metadata_sync_task],
+            independent_tasks=quality_tasks,
         )
 
     def build_raw_task_group_for_single_table(
