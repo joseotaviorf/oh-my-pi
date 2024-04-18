@@ -1,0 +1,59 @@
+---
+database_name: metric_rent
+table_name: er2unp_susp_weekly
+description: Weekly calculated metrics of Ended Rental (ER) to UNPUBLISHED or SUSPENDED (except rented).
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_reference_week:
+    lineage:
+      - dw_rent.dim_contract.ts_analyst_annulment_input
+      - dw_rent.dim_contract.dt_annulment
+    description: "Week of the ended rental."
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_contract.country_code
+    description: "Country code of the house."
+    dimension: True
+  rent_segment:
+    description: "Rent value segmentation."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      OVERALL: All rent value. LOW, MEDIUM and HIGH included in OVERALL segment.
+    dimension: True
+  unp_susp_1w:
+    description: "Volume of listings UNPUBLISHED or SUSPENDED (except rented) after 1 week of the ended rental confirmed."
+    metric:
+      name: Weekly Unpublished or Suspended - 1 Week
+      description: "Volume of listings UNPUBLISHED or SUSPENDED (except rented) after 1 week of the ended rental confirmed."
+      acronym: MUS1W
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ended_rentals:
+    description: "Volume of ended rentals that happended in the week being referenced."
+    metric:
+      name: Weekly Ended Rentals
+      description: "Volume of ended rentals that happended in the week being referenced."
+      acronym: ER
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  erc2unp_susp_1w:
+    description: "Percentage of listings being UNPUBLISHED or SUSPENDED (except rented) after ended rental confirmed in the week being referenced."
+    metric:
+      name: Weekly Percentage of Unpublished or Suspended - 1 Week
+      description: "Percentage of listings being UNPUBLISHED or SUSPENDED (except rented) after ended rental confirmed in the week being referenced."
+      acronym: MPUS1W
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""

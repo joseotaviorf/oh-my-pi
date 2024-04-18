@@ -1,5 +1,5 @@
 SELECT 
-    CAST(DATE_TRUNC('WEEK',DATE(dt.ts_created)) AS DATE) AS dt_week_tr,
+    CAST(DATE_TRUNC('WEEK', DATE(dt.ts_created)) AS DATE) AS dt_week_tr,
     fct.country_code,
     'OVERALL' AS category,
     COUNT(DISTINCT fct.sk_contract) AS qtd_tr,
@@ -24,7 +24,7 @@ GROUP BY
 UNION ALL
 
 SELECT 
-    CAST(DATE_TRUNC('WEEK',DATE(dt.ts_created)) AS DATE) AS dt_week_tr,
+    CAST(DATE_TRUNC('WEEK', DATE(dt.ts_created)) AS DATE) AS dt_week_tr,
     fct.country_code,
     dc.value_segment AS category,
     COUNT(DISTINCT fct.sk_contract) AS qtd_tr,

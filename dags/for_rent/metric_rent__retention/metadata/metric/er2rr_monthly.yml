@@ -8,7 +8,7 @@ columns:
   month_ref:
     lineage:
       - dw_rent.dim_contract.ts_analyst_annulment_input
-      - dw_rent.dim_contract.dc.dt_annulment
+      - dw_rent.dim_contract.dt_annulment
     description: "Month of the ended rental."
     dimension: True
   category:

@@ -14,6 +14,8 @@ Currently, there is the following output tables in the metric layer:
 
 - `er2rr_monthly`
 - `er2rr_weekly`
+- `er2unp_susp_monthly`
+- `er2unp_susp_weekly`
 - `house_not_relisted_monthly`
 - `house_not_relisted_weekly`
 - `nps_pp_monthly`
