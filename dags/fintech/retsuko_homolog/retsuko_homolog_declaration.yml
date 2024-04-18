@@ -12,6 +12,9 @@ workflow:
   database_type: postgres
   custom_schema: retsuko_homolog
   dbutils_secret_key: RETSUKO_DB
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   tables_customization:
     account:
       extraction_type: full
@@ -21,7 +24,6 @@ workflow:
       date_filter_column: retsuko_updated_at
       extraction_type: incremental
       partitions: ["year", "month", "day"]
-      read_from_sql: True
       get_table_metrics:
         count: external_id
         max: retsuko_updated_at
@@ -37,7 +39,6 @@ workflow:
       date_filter_column: retsuko_updated_at
       extraction_type: incremental
       partitions: ["year", "month", "day"]
-      read_from_sql: True
       get_table_metrics:
         count: external_id
         max: retsuko_updated_at
@@ -47,7 +48,6 @@ workflow:
       date_filter_column: retsuko_updated_at
       extraction_type: incremental
       partitions: ["year", "month", "day"]
-      read_from_sql: True
       get_table_metrics:
         count: external_id
         max: retsuko_updated_at
