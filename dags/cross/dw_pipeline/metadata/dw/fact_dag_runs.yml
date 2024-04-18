@@ -1,0 +1,160 @@
+---
+database_name: dw_pipeline
+table_name: fact_dag_runs
+description: This fact table has all the DAG runs of bi-etl-ejuice's Airflow DAGs, with information 
+  related to time duration, if the first execution of the run is inside our Data SLA, etc.
+  Each line is an unique DAG run, identified by the key sk_dag_run.
+domain: Cross
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  sk_dag_run:
+    lineage:
+      - datalake_pipeline.dag_run.id_dag_run
+    description: The id of the DAG run, which should be unique.
+  sk_dag:
+    lineage:
+      - datalake_pipeline.dag_run.id_dag
+    description: DAG id, which is also the DAG name on Airflow.
+      Joins with dw_pipeline.dim_dag.
+  sk_run:
+    lineage:
+      - datalake_pipeline.dag_run.id_run
+    description: Run id of the DAG, which also indicates the trigger type (scheduled, manual, Mediator)
+      and the run date (which is usually D-1). If null, it might indicate a manual DAG run that was created
+      without following the regular name of a run. 
+  sk_line:
+    lineage:
+      - datalake_pipeline.dag.id_line
+    description: Id of the line that is also the "owner" of the DAG.
+      Joins with dw_pipeline.dim_line.
+  sk_run_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_run
+    description: Key of the DAG run date. Joins with dw_public.dim_date.
+  sk_started_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_started
+    description: Key of the UTC run start date. Joins with dw_public.dim_date.
+  sk_started_brt_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_started_brt
+    description: Key of the BRT run start date. Joins with dw_public.dim_date.
+  sk_ended_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_ended
+    description: Key of the UTC run end date. Joins with dw_public.dim_date.
+  sk_ended_brt_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_ended_brt
+    description: Key of the BRT run end date. Joins with dw_public.dim_date.
+  sk_first_execution_success_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_first_execution_success
+    description: Key of the UTC DAG run's first successful execution. Joins with dw_public.dim_date.
+  sk_first_execution_success_brt_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_first_execution_success_brt
+    description: Key of the BRT DAG run's first successful execution. Joins with dw_public.dim_date.
+  sk_last_composer_run_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_last_composer_run
+    description: Key of the UTC last composer run date. Joins with dw_public.dim_date.
+  sk_last_composer_run_brt_date:
+    lineage:
+      - datalake_pipeline.dag_run.ts_last_composer_run_brt
+    description: Key of the BRT last composer run date. Joins with dw_public.dim_date.
+  state:
+    lineage:
+      - datalake_pipeline.dag_run.state
+    description: Current state of the DAG run.
+  duration:
+    lineage:
+      - datalake_pipeline.dag_run.duration
+    description: Total duration of the DAG run last execution, in minutes.
+  had_external_trigger:
+    lineage:
+      - datalake_pipeline.dag_run.had_external_trigger
+    description: Boolean flag indicating if the DAG run had an external trigger.
+  is_triggered_by_mediator:
+    lineage:
+      - datalake_pipeline.dag_run.is_triggered_by_mediator
+    description: Boolean flag indicating if the DAG run was triggered by Mediator.
+  is_manual_run:
+    lineage:
+      - datalake_pipeline.dag_run.is_manual_run
+    description: Boolean flag indicating if the DAG run was manually created.
+  is_first_run_ever:
+    lineage:
+      - datalake_pipeline.dag_run.is_first_run_ever
+    description: Boolean flag indicating if the DAG run is the DAG's first ever.
+      This may be useful to consolidate SLA information, since it's usually created during the day and after our SLAs.
+  is_run_successful:
+    lineage:
+      - datalake_pipeline.dag_run.is_run_successful
+    description: Boolean flag indicating if the current state of the DAG run is successful,
+      which means that all tasks of the DAG are marked as successful.
+  is_in_exclusion_list:
+    lineage:
+      - datalake_pipeline.dag_run.is_in_exclusion_list
+    description: Boolean flag indicating if the DAG is present in the SLA exclusion list gsheet.
+  is_first_execution_inside_sla:
+    lineage:
+      - datalake_pipeline.dag_run.is_first_execution_inside_sla
+    description: Boolean flag indicating if the DAG run first execution of the day was successful
+      and also inside of our Data SLA. More information about it can be found on the dw_pipeline.dim_dag table.
+  has_been_cleared:
+    lineage:
+      - datalake_pipeline.dag_run.has_been_cleared
+    description: Boolean flag indicating if the DAG run suffered any clear, which means that it executed
+      at least one more time.
+  dt_run:
+    lineage:
+      - datalake_pipeline.dag_run.dt_run
+    description: Date of the DAG run, which usually is D-1.
+  ts_started:
+    lineage:
+      - datalake_pipeline.dag_run.ts_started
+    description: The UTC timestamp of when the DAG execution has been started.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_started_brt:
+    lineage:
+      - datalake_pipeline.dag_run.ts_started_brt
+    description: The timestamp of when the DAG execution has been started, in Brasilia (BR) timezone.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_ended:
+    lineage:
+      - datalake_pipeline.dag_run.ts_ended
+    description: The UTC timestamp of when the DAG execution has ended.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_ended_brt:
+    lineage:
+      - datalake_pipeline.dag_run.ts_ended_brt
+    description: The timestamp of when the DAG execution has ended, in Brasilia (BR) timezone.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
+      recent timestamp will be shown.
+  ts_first_execution_success:
+    lineage:
+      - datalake_pipeline.dag_run.ts_first_execution_success
+    description: The UTC timestamp of when the DAG execution has first received a successful state.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
+      successful timestamp will be shown.
+  ts_first_execution_success_brt:
+    lineage:
+      - datalake_pipeline.dag_run.ts_first_execution_success_brt
+    description: The timestamp of when the DAG execution has first received a successful state, in
+      Brasilia (BR) timezone.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
+      successful timestamp will be shown.
+  ts_last_composer_run:
+    lineage:
+      - datalake_pipeline.dag_run.ts_last_composer_run
+    description: The UTC timestamp of when the last Composer extraction happened related to the execution date.
+  ts_last_composer_run_brt:
+    lineage:
+      - datalake_pipeline.dag_run.ts_last_composer_run_brt
+    description: The BRT timestamp of when the last Composer extraction happened related to the execution date.
+  ts_load:
+    description: UTC timestamp of when the data was loaded into our systems.
