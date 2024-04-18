@@ -42,6 +42,7 @@ WITH received_contact AS (
         is_answered,
         is_per_team_task,
         ts_reservation_created,
+        ts_task_created,
         ts_created
     FROM
         datalake_customer_support.received_demand
@@ -88,6 +89,7 @@ SELECT
         ELSE FALSE
     END AS is_first_department_interaction,
     ts_reservation_created,
+    ts_task_created,
     ts_created
 FROM
     received_contact

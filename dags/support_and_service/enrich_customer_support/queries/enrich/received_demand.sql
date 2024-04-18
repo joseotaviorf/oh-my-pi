@@ -97,7 +97,8 @@ call AS (
       rts.task_queue_name,
       r.agent_email,
       rts.customer_phone,
-      rts.ts_created
+      rts.ts_created,
+      r.ts_created AS ts_reservation_created
     FROM
       reservations_ts_ended AS rts
     LEFT JOIN
@@ -119,7 +120,8 @@ call AS (
       crd.agent_email,
       crd.customer_phone,
       crd.task_queue_name AS department,
-      crd.ts_created
+      crd.ts_created,
+      crd.ts_reservation_created
     FROM
       call_received_demand AS crd
     LEFT JOIN
@@ -177,7 +179,8 @@ call AS (
     END AS status,
     cfr.is_answered,
     NULL AS is_per_team_task,
-    NULL AS ts_reservation_created,
+    cs.ts_reservation_created,
+    cs.ts_created AS ts_task_created,
     cs.ts_created
   FROM
     call_sessions AS cs
@@ -249,7 +252,8 @@ chat AS (
       END AS is_answered,
       pta.is_per_team_task,
       rce.ts_reservation_created,
-      COALESCE(rce.ts_reservation_created, t.ts_created) AS ts_created
+      COALESCE(rce.ts_reservation_created, t.ts_created) AS ts_created,
+      t.ts_created AS ts_task_created
     FROM
       task AS t
     LEFT JOIN
@@ -289,6 +293,7 @@ chat AS (
       tr.is_answered,
       tr.is_per_team_task,
       tr.ts_reservation_created,
+      tr.ts_task_created,
       tr.ts_created
     FROM
       task_reservations AS tr
@@ -329,6 +334,7 @@ chat AS (
     is_answered,
     is_per_team_task,
     ts_reservation_created,
+    ts_task_created,
     ts_created
   FROM
     ticket_assignment AS ta
@@ -369,6 +375,7 @@ email AS (
     TRUE AS is_answered,
     NULL AS is_per_team_task,
     NULL AS ts_reservation_created,
+    NULL AS ts_task_created,
     ts_ticket_started AS ts_created
   FROM
     datalake_customer_support.email AS e
@@ -457,6 +464,7 @@ SELECT
   COALESCE(rd.is_answered, FALSE) AS is_answered,
   rd.is_per_team_task,
   rd.ts_reservation_created,
+  rd.ts_task_created,
   rd.ts_created
 FROM
   received_demand AS rd

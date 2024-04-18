@@ -190,3 +190,8 @@ columns:
       For Twilio Events, the creation timestamp represents the date and time when the
       event was created. For Zendesk E-mail Tickets, the creation timestamp corresponds
       to the ticket creation date in UTC-3.
+  ts_task_created:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalake_quinto_messenger_clean.task_event.ts_created
+    description: For Twilio Events, the creation timestamp of every task
