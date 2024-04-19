@@ -108,7 +108,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 metadata_file_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
             else:
                 metadata_file_type = ""
-                bypass += "--bypass-propagate"
+                bypass += " --bypass-propagate"
         raw_params = (
             ["--product-database-name", product_db_name]
             if layer == LayerEnum.RAW.value and product_db_name
@@ -130,12 +130,11 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         layer,
                         database_name,
                         sync_mode,
-                        table_name,
-                        metadata_file_type,
-                        self.relative_query_path,
                     ]
+                    + ([table_name] if table_name else [True])
+                    + [metadata_file_type, self.relative_query_path]
                     + raw_params
-                    + ([bypass] if bypass else []),
+                    + bypass.split(),
                 }
             },
             execution_timeout=timedelta(minutes=30),
