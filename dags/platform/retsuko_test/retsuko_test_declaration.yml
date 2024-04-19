@@ -1,0 +1,32 @@
+dag:
+  name: retsuko_test
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 10 21 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Process data from Retsuko database (postgresql), retrieved using the CDC process. [Retsuko](https://github.com/quintoandar/retsuko) is responsible
+      for Extracting financial data, Transforming and Loading it (ETL) into Databricks and Trino to be able to generate financial reports.
+      It does not create or own any information and it is not its purpose to do that. All the data it has comes from other financial
+      services (today is only [SeuBarriga](https://github.com/quintoandar/seubarriga)).
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: retsuko
+  source_schema: public
+  custom_schema: retsuko_test
+  dbutils_secret_key: RETSUKO_DB
+  tables_customization:
+    account: {}
+    boleto: {}
+    contract: {}
+    credit_card_payment: {}
+    entry: {}
+    file: {}
+    invoice: {}
+    manual_entry: {}
+    monthly_closing_checks: {}
+    recurrent_credit_card: {}
+    sap_entity: {}
+cluster:
+  type: databricks_12_2_med_general_cluster

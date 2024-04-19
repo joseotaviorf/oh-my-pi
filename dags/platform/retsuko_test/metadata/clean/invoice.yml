@@ -1,0 +1,103 @@
+---
+database_name: datalake_retsuko_test_clean
+table_name: invoice
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.id
+  id_external:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.external_id
+  id_account:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.account_id
+  id_contract:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.contract_id
+  id_checkout_order:
+    description: "External ID that indicates the Order in Checkout product"
+    lineage:
+      - datalake_retsuko_test_raw.invoice.checkout_order_id
+  id_checkout_charge:
+    description: "External ID that indicates the Charge in Checkout product"
+    lineage:
+      - datalake_retsuko_test_raw.invoice.checkout_charge_id
+  status:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.status
+  substatus:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.sub_status
+  paid_via:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.paid_via
+  purpose:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.purpose
+  closing_mode:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.closing_mode
+  reason:
+    description: "Invoices that have the purpose field filled in with the value extras must have the reason field filled in to identify what that invoice is about."
+    categories:
+      condominium-nonpayment: ""
+      damages-bills: ""
+      wrong-charges: ""
+      negotiation-recupera: ""
+      agreement: ""
+      pending-balance-correction: ""
+      non-specified: "reason not specified"
+    lineage:
+      - datalake_retsuko_test_raw.invoice.reason
+  due_amount:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.due_amount
+  paid_amount:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.paid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.accrual_year_month
+  sispag_file:
+    description: "File that Seu Barriga created with Vans to communicate with bank"
+    lineage:
+      - datalake_retsuko_test_raw.invoice.sispag_file
+  ts_paid:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.paid_date
+  ts_canceled:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.canceled_at
+  ts_sent:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.sent_at
+  ts_due:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.due_date
+  ts_created:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.created_at
+  ts_nf_requested:
+    description: "Indicates when Seu Barriga requested erp solution to issue the NFe"
+    lineage:
+      - datalake_retsuko_test_raw.invoice.nf_requested_at
+  ts_retsuko_created:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.retsuko_created_at
+  ts_retsuko_updated:
+    lineage:
+      - datalake_retsuko_test_raw.invoice.retsuko_updated_at
+  year:
+    description: Year information
+    lineage:
+      - datalake_retsuko_test_raw.invoice.year
+  month:
+    description: Month information
+    lineage:
+      - datalake_retsuko_test_raw.invoice.month
+  day:
+    description: Day information
+    lineage:
+      - datalake_retsuko_test_raw.invoice.day

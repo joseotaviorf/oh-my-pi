@@ -1,0 +1,50 @@
+database_name: datalake_retsuko_test_clean
+table_name: credit_card_payment
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.id
+  id_external:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.external_id
+  id_invoice:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.invoice_id
+  id_acquirer_transaction:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.acquirer_transaction_id
+  id_recurrent_credit_card:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.recurrent_credit_card_id
+  acquirer_auth_code:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.acquirer_auth_code
+  acquirer_nsu:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.acquirer_nsu
+  brand_name:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.brand_name
+  status:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.status
+  installments:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.installments
+  acquirer_fee_amount:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.acquirer_fee_amount
+  advance_fee_amount:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.advance_fee_amount
+  charged_amount:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.charged_amount
+  is_recurrent:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.is_recurrent
+  ts_created:
+    lineage:
+      - datalake_retsuko_test_raw.credit_card_payment.created_at

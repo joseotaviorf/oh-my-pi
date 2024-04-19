@@ -1,0 +1,20 @@
+database_name: datalake_retsuko_test_clean
+table_name: file
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_test_raw.file.id
+  name:
+    lineage:
+      - datalake_retsuko_test_raw.file.name
+  path:
+    lineage:
+      - datalake_retsuko_test_raw.file.path
+  ts_created:
+    lineage:
+      - datalake_retsuko_test_raw.file.created_at
+  type:
+    lineage:
+      - datalake_retsuko_test_raw.file.type
