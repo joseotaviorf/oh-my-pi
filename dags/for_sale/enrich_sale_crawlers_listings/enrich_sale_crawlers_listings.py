@@ -54,7 +54,7 @@ custom_libraries = config_service.get_config("custom_libraries")
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_RENT,
+        "owner": DAGOwnerEnum.DATA_FOR_SALE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
