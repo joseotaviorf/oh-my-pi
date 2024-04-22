@@ -97,13 +97,13 @@ sla_base AS (
         CASE
             WHEN d.is_datamart = FALSE AND d.layer IN ('raw/clean', 'enrich', 'dw', 'metric') THEN 11 -- UTC hour
             WHEN d.is_datamart = TRUE THEN 13
-            ELSE NULL   -- Reverse layer doesn't have a SLA
+            WHEN d.layer = 'reverse' THEN 15
         END AS utc_sla_hour,
         me.duration,
         d.is_active,
         d.is_paused,
         mc.is_in_exclusion_list,
-        IF(d.is_active = FALSE OR d.is_paused = TRUE OR mc.is_in_exclusion_list = TRUE OR d.layer = 'reverse', TRUE, FALSE) AS is_ignored,
+        IF(d.is_active = FALSE OR d.is_paused = TRUE OR mc.is_in_exclusion_list = TRUE, TRUE, FALSE) AS is_ignored,
         d.is_datamart,
         mc.is_inside_sla,
         mc.dt_run,
@@ -136,6 +136,7 @@ SELECT
     CASE
         WHEN s.utc_sla_hour = 11 THEN 8
         WHEN s.utc_sla_hour = 13 THEN 10
+        WHEN s.utc_sla_hour = 15 THEN 12
         ELSE NULL
     END AS brt_sla_hour,
     ao.number_of_tasks,

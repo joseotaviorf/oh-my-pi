@@ -40,12 +40,12 @@ columns:
       description: SLA UTC hour of the DAG, where each layer has a different SLA.
         For raw/clean, enrich, dw (except for datamart tables) and metric layers, the SLA hour is 11h AM UTC.
         For datamart tables (which are in dw layer), the SLA hour is 13h AM UTC.
-        The reverse layer doesn't have a SLA.
+        For reverse layer, the SLA hour is 15h UTC.
   brt_sla_hour:
       description: SLA hour of the DAG in Brasilia (BR) timezone, where each layer has a different SLA.
         For raw/clean, enrich, dw (except for datamart tables) and metric layers, the SLA hour is 8h AM BRT.
         For datamart tables (which are in dw layer), the SLA hour is 10h AM BRT.
-        The reverse layer doesn't have a SLA.
+        For reverse layer, the SLA hour is 12h PM BRT.
   number_of_tasks:
     description: Amount of tasks that the DAG has. We're using the DAG's last run that successfully that had 
       a cluster/job termination to count all the existing tasks, due to tasks that might use short-circuit operator 
@@ -68,8 +68,7 @@ columns:
     lineage:
       - datalake_pipeline.dag_run.is_first_execution_inside_sla
     description: Boolean flag indicating if the DAG is currently inside its SLA.
-      If it's null, it could be because the DAG is in our SLA exclusion list, it's a reverse DAG,
-      it's not active or it's paused.
+      If it's null, it could be because the DAG is in our SLA exclusion list, it's not active or it's paused.
   is_datamart:
     description: Boolean flag indicating if the DAG is related to datamarts.
   has_todays_run_happened:

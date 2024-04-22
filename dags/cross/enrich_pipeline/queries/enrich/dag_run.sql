@@ -76,8 +76,8 @@ SELECT
             AND dr.id_run NOT LIKE 'manual%' THEN  -- Checking if the DAG isn't in the list to be ignored and if it's not a manual run
           (
             CASE  -- Layers raw/clean, enrich, dw (except for datamarts) and metric has 8h AM BRT as SLA
-              WHEN dr.id_dag NOT LIKE '%datamarts%'
-                AND dr.id_dag NOT LIKE '%reverse%' THEN
+              WHEN dr.id_dag NOT LIKE '%.datamarts%'
+                AND dr.id_dag NOT LIKE '%.reverse%' THEN
               (
                 CASE
                   WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 11 HOUR THEN TRUE
@@ -86,12 +86,21 @@ SELECT
                   ELSE NULL
                 END
               )
-              WHEN dr.id_dag LIKE '%datamarts%' THEN
+              WHEN dr.id_dag LIKE '%.datamarts%' THEN
                   (
                     CASE
                       WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN TRUE
-                      WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event > TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN TRUE
+                      WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event > TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN FALSE
                       WHEN s.ts_success_event IS NULL AND NOW() > TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 13 HOUR THEN FALSE
+                      ELSE NULL
+                    END
+                  )
+              WHEN dr.id_dag LIKE '%.reverse%' THEN
+                (
+                    CASE
+                      WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event <= TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 15 HOUR THEN TRUE
+                      WHEN s.ts_success_event IS NOT NULL AND s.ts_success_event > TO_TIMESTAMP(DATE(s.ts_success_event), 'yyyy-MM-dd HH:mm:ss') + INTERVAL 15 HOUR THEN FALSE
+                      WHEN s.ts_success_event IS NULL AND NOW() > TO_TIMESTAMP(CURRENT_DATE, 'yyyy-MM-dd HH:mm:ss') + INTERVAL 15 HOUR THEN FALSE
                       ELSE NULL
                     END
                   )
