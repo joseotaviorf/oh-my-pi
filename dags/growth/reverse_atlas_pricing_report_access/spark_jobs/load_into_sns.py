@@ -29,7 +29,7 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     parser.add_argument("table_name", help="Name of the table to be loaded")
     parser.add_argument("event_type", help="Type of event to be sent to SNS")
     parser.add_argument("sns_topic_arn", help="ARN of the SNS topic")
-    parser.add_argument("chunk_size", help="Chunk Size used for each table message")
+    parser.add_argument("chunk_size", type=int, help="Chunk Size used for each table message")
 
     args = parser.parse_args()
 

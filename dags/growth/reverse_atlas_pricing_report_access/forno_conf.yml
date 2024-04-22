@@ -5,14 +5,14 @@ tables:
     event_type: NEW_PRICING_REPORT_REGION
     sns_topic_arn: arn:aws:sns:us-east-1:569412621543:forno-reports-business-events
     chunk_size: 1000
-  new_pricing_report_listing_price_history:
-    event_type: NEW_PRICING_REPORT_LISTING_PRICE_HISTORY
-    sns_topic_arn: arn:aws:sns:us-east-1:569412621543:forno-reports-listing-events
-    chunk_size: 1000
-  new_pricing_report_new_rent_price_published:
-    event_type: NEW_PRICING_REPORT_NEW_RENT_PRICE_PUBLISHED
-    sns_topic_arn: arn:aws:sns:us-east-1:569412621543:forno-reports-business-events
-    chunk_size: 1000
+  # new_pricing_report_listing_price_history:
+  #   event_type: NEW_PRICING_REPORT_LISTING_PRICE_HISTORY
+  #   sns_topic_arn: arn:aws:sns:us-east-1:569412621543:forno-reports-listing-events
+  #   chunk_size: 1000
+  # new_pricing_report_new_rent_price_published:
+  #   event_type: NEW_PRICING_REPORT_NEW_RENT_PRICE_PUBLISHED
+  #   sns_topic_arn: arn:aws:sns:us-east-1:569412621543:forno-reports-business-events
+  #   chunk_size: 1000
   new_pricing_report_engagement:
     event_type: NEW_PRICING_REPORT_ENGAGEMENT
     sns_topic_arn: arn:aws:sns:us-east-1:569412621543:forno-reports-business-events
