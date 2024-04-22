@@ -3,7 +3,7 @@ SELECT
   id_tof_user AS sk_tof_user,
   id_house AS sk_house,
   CAST(sk_region AS INTEGER) AS sk_region,
-  final_id_media_setup AS sk_media_setup,
+  naming_convention_sufix,
   business_context,
   entrance_uri,
   referrer,

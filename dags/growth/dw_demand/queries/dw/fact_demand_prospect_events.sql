@@ -2,7 +2,6 @@ WITH prospect_results AS (
 SELECT
   id_prospect_event AS sk_prospect_event,
   id_prospect AS sk_prospect,
-  id_media_setup AS sk_media_setup,
   id_rent_flow AS sk_rent_flow,
   id_sale_flow AS sk_sale_flow,
   COALESCE(id_rent_flow, id_sale_flow) AS sk_flow,
@@ -13,6 +12,7 @@ SELECT
   id_region AS sk_region,
   id_owner AS sk_owner,
   id_agent AS sk_agent,
+  naming_convention_sufix,
   business_context,
   event_type,
   event_name,

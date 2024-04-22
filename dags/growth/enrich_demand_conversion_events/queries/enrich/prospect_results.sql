@@ -7,17 +7,17 @@ WITH adhoc_rules AS (
     dpce.event_name,
     CASE 
       WHEN dpce.product_origin = 'Corretores'
-      THEN "referral.2."
+      THEN "na.acq.org.na.d.direct.na"
       WHEN utm_campaign IS NULL
         AND utm_source IS NULL
         AND utm_medium IS NULL
         AND app_type IS NULL
-      THEN "losttracking.-2."
+      THEN "lost.los.lostra.lostra.l.losttracking.losttracking"
       WHEN utm_campaign IS NULL
         AND utm_source IS NULL
         AND utm_medium IS NULL
         AND app_type IS NOT NULL
-      THEN "direct.1." 
+      THEN "na.acq.org.na.d.direct.na" 
     END AS utm_adhoc_rule,
     dpce.id_rent_flow,
     dpce.id_sale_flow, 
@@ -78,10 +78,10 @@ media_setup_ids AS (
     dpce.business_context,
     dpce.id_event_type,
     dpce.event_name,
-    INT(SPLIT(dpce.utm_adhoc_rule, "[.]")[1]) AS id_media_setup_from_adhoc,
-    INT(SPLIT(dpce.utm_campaign, "[.]")[1]) AS id_media_setup_from_naming_convention,
-    INT(SPLIT(ef.correct_utm_campaign, "[.]")[1]) AS id_media_setup_from_exception_flow,
-    dict.sk_media_setup AS id_media_setup_from_dictionary,
+    dpce.utm_adhoc_rule AS media_setup_from_adhoc,
+    concat_ws('.', slice(split(dpce.utm_campaign, '[.]'), 2, 7)) AS media_setup_from_naming_convention,
+    concat_ws('.', slice(split(ef.correct_utm_campaign, '[.]'), 2, 7)) AS media_setup_from_exception_flow,
+    dict.naming_convention_sufix AS media_setup_from_dictionary,
     dpce.id_rent_flow,
     dpce.id_sale_flow, 
     dpce.id_booking,
@@ -129,22 +129,22 @@ SELECT
   business_context,
   id_event_type,
   event_name,
-  id_media_setup_from_adhoc,
-  id_media_setup_from_dictionary,
-  id_media_setup_from_exception_flow,
-  id_media_setup_from_naming_convention,
+  media_setup_from_adhoc,
+  media_setup_from_dictionary,
+  media_setup_from_exception_flow,
+  media_setup_from_naming_convention,
   CASE
-    WHEN id_media_setup_from_adhoc IS NOT NULL THEN id_media_setup_from_adhoc
-    WHEN id_media_setup_from_dictionary IS NOT NULL THEN id_media_setup_from_dictionary
-    WHEN id_media_setup_from_exception_flow IS NOT NULL THEN id_media_setup_from_exception_flow
-    WHEN id_media_setup_from_naming_convention IS NOT NULL THEN id_media_setup_from_naming_convention
-  END AS final_id_media_setup,
+    WHEN media_setup_from_adhoc IS NOT NULL THEN media_setup_from_adhoc
+    WHEN media_setup_from_dictionary IS NOT NULL THEN media_setup_from_dictionary
+    WHEN media_setup_from_exception_flow IS NOT NULL THEN media_setup_from_exception_flow
+    WHEN media_setup_from_naming_convention IS NOT NULL THEN media_setup_from_naming_convention
+  END AS naming_convention_sufix,
   CASE
-    WHEN id_media_setup_from_adhoc IS NOT NULL THEN "adhoc rule"
-    WHEN id_media_setup_from_dictionary IS NOT NULL THEN "dictionary"
-    WHEN id_media_setup_from_exception_flow IS NOT NULL THEN "exception flow"
-    WHEN id_media_setup_from_naming_convention IS NOT NULL THEN "naming convention"
-  END AS final_media_setup_id_origin,
+    WHEN media_setup_from_adhoc IS NOT NULL THEN "adhoc rule"
+    WHEN media_setup_from_dictionary IS NOT NULL THEN "dictionary"
+    WHEN media_setup_from_exception_flow IS NOT NULL THEN "exception flow"
+    WHEN media_setup_from_naming_convention IS NOT NULL THEN "naming convention"
+  END AS naming_convention_sufix_origin,
   id_rent_flow,
   id_sale_flow, 
   id_booking,
