@@ -12,6 +12,6 @@ column_level_validations:
   dag_owner:
     is_complete:
       severity_level: Error
-  dt_dag_added:
+  dt_added:
     is_complete:
       severity_level: Error
