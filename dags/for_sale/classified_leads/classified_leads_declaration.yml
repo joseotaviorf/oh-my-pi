@@ -17,4 +17,4 @@ workflow:
     lead_reply_whatsapp: {}
     lead_reply: {}
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_12_2_med_general_cluster
