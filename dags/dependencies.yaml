@@ -2045,19 +2045,6 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.terminator:load-clean-termination-fee-negotiation
   - bietlejuice.terminator:load-clean-termination-workflow
   - bietlejuice.terminator:load-clean-utility-bill
-bietlejuice.enrich_offboarding_repairs_probability:
-  - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract
-  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
-  - bietlejuice.dw_datamarts_spark.for_sale:load-dw-datamarts-dim-house-listing-amenities
-  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
-  - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
-  - bietlejuice.enrich_inspections:load-enrich-inspection-booking
-  - bietlejuice.enrich_inspections:load-enrich-item-review
-  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-  - bietlejuice.repairs:load-clean-repair-request
-  - bietlejuice.sorting_hat:load-clean-proponent
 bietlejuice.enrich_offer:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-offer

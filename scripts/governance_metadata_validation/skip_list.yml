@@ -13,7 +13,6 @@ metadata_files_out_of_pattern:
   - agents/enrich_ebdb_agents/metadata/enrich/slots_base_time.yml
   - for_rent/enrich_pro_owners/metadata/enrich/tracking_weekly_changes.yml
   - governance/looker/metadata/clean/dashboards.yml
-  - support_and_service/enrich_offboarding_repairs_probability/metadata/enrich/contracts.yml
   - support_and_service/dw_chattermill/metadata/dw/dim_answer_category.yml
   - support_and_service/dw_chattermill/metadata/dw/fact_answer_category.yml
   - support_and_service/enrich_chattermill/metadata/enrich/responses.yml

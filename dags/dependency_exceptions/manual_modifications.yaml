@@ -500,9 +500,6 @@ bietlejuice.enrich_nps_answer_drivers:
 bietlejuice.enrich_offboarding:
   add:
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
-bietlejuice.enrich_offboarding_repairs_probability:
-  remove:
-    - bietlejuice.enrich_inspections:load-enrich-item
 bietlejuice.enrich_offer:
   remove:
     - bietlejuice.enrich_sale_firestore:load-enrich-monday
