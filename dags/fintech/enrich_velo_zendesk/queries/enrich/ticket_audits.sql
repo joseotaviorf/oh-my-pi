@@ -1,37 +1,42 @@
-WITH
-filtered_events AS (
+WITH base_ticket_audits AS (
     SELECT
         id_ticket_audit,
-        EXPLODE(SPLIT(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REGEXP_REPLACE(events, '(?!)', ''), 'id:', ''), ',value', ''), '[', ''), ']', ''), '{{', ''), '}},')) AS events
-    FROM
-        datalake_velo_zendesk_clean.ticket_audits),
-filtered_body AS (
-    SELECT DISTINCT
-        id_ticket_audit,
-        SPLIT(events, '":')[0] AS id_events,
-        SPLIT(events, '":')[1] AS events_value
-    FROM
-        filtered_events AS
-    WHERE SPLIT(events, '":')[0] = '"body')
+        id_ticket,
+        id_author,
+        event_via,
+        EXPLODE(FROM_JSON(events, 'array<struct<id: string, type: string, field_name: string, previous_value: string, value: string>>')) AS parsed_events,
+        sequence_number,
+        table_version,
+        dt_extracted,
+        ts_batched,
+        ts_received,
+        ts_created,
+        ts_load,
+        year,
+        month,
+        day
+    FROM datalake_velo_zendesk_clean.ticket_audits
+)
 
 SELECT
-    ta.id_ticket_audit,
-    ta.id_ticket,
-    ta.id_author,
-    ta.event_via,
-    REPLACE(SPLIT(fb.events_value, '","')[0],'"','') AS event_body,
-    ta.sequence_number,
-    ta.table_version,
-    ta.dt_extracted,
-    ta.ts_batched,
-    ta.ts_received,
-    ta.ts_created,
-    ta.ts_load,
-    year,
-    month,
-    day
+  ta.id_ticket_audit,
+  ta.id_ticket,
+  ta.id_author,
+  ta.event_via,
+  ta.sequence_number,
+  ta.table_version,
+  ta.parsed_events.id AS id_event,
+  ta.parsed_events.type AS type,
+  ta.parsed_events.field_name AS field_name,
+  ta.parsed_events.previous_value AS previous_value,
+  ta.parsed_events.value AS value,
+  ta.dt_extracted,
+  ta.ts_batched,
+  ta.ts_received,
+  ta.ts_created,
+  ta.ts_load,
+  ta.year,
+  ta.month,
+  ta.day
 FROM
-    datalake_velo_zendesk_clean.ticket_audits ta
-LEFT JOIN
-    filtered_body fb
-        ON fb.id_ticket_audit = ta.id_ticket_audit
+   base_ticket_audits ta

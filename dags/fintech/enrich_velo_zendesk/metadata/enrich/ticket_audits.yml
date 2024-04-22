@@ -20,10 +20,6 @@ columns:
     description: "Via of the event"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.via
-  event_body:
-    description: "Body of the event"
-    lineage:
-      - datalake_velo_zendesk_clean.ticket_audits.event
   sequence_number:
     description: "Sequence number of the event"
     lineage:
@@ -32,6 +28,26 @@ columns:
     description: "Number of table version"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits._sdc_table_version
+  id_event:
+    description: "ID of the event"
+    lineage:
+      - datalake_velo_zendesk_raw.ticket_audits.event
+  type:
+    description: "Type of the event"
+    lineage:
+      - datalake_velo_zendesk_raw.ticket_audits.event
+  field_name:
+    description: "Name of the field the event was applied"
+    lineage:
+      - datalake_velo_zendesk_raw.ticket_audits.event
+  previous_value:
+    description: "Value before the event"
+    lineage:
+      - datalake_velo_zendesk_raw.ticket_audits.event
+  value:
+    description: "Value after the event"
+    lineage:
+      - datalake_velo_zendesk_raw.ticket_audits.event
   dt_extracted:
     description: "Date when the event was extracted"
     lineage:
