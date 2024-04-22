@@ -167,10 +167,10 @@ sheets_info:
     clean_table_name: experiments_catalog
     sheet_context: cross
 
-  special_dags:
+  dags_special_scheduler:
     sheet_id: 1SvZD4v4GC81IOVrALn5jr31pNOajp2Nxtqn-5Isvtvg
-    sheet_name: special_dags
-    clean_table_name: special_dags
+    sheet_name: dags_special_scheduler
+    clean_table_name: dags_special_scheduler
     sheet_context: cross
 
   test_data_analytics_training_quiz_1:
