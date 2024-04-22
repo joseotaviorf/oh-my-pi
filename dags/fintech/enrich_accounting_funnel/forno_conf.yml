@@ -1,5 +1,8 @@
 ---
 inner_dependencies:
+  for_rent_brokerage_transfer:
+    - invoice_all
+    - for_rent_contract_brokerage
   retsuko_invoice_issuance:
     - ledger
   retsuko_provision_creation:

@@ -1,0 +1,58 @@
+---
+database_name: datalake_accounting_funnel
+table_name: for_rent_brokerage_transfer
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table calculates brokerage transfer compliance by type to all For Rent's contracts"
+columns:
+ id_for_rent_brokerage_transfer:
+   lineage:
+     - datalake_accounting_funnel.for_rent_contract_transfer.id_contract
+     - datalake_accounting_funnel.invoice_all.id_invoice
+   description: "Concat of: Partner Type + ID Contract + ID Invoice - if id invoice is null, there isn't an invoice created with brokerage fee"
+ id_contract:
+   lineage:
+     - datalake_accounting_funnel.for_rent_contract_transfer.id_contract
+   description: "ID contract from Main"
+ id_invoice:
+   lineage:
+     - datalake_accounting_funnel.invoice_all.id_invoice
+   description: "ID external invoice from Retsuko"
+ accrual_year_month:
+   lineage:
+     - datalake_accounting_funnel.invoice_all.accrual_year_month
+   description: "Invoice's accrual from Retsuko"
+ partner_type:
+   lineage:
+     - datalake_accounting_funnel.for_rent_contract_transfer.partner_type
+   description: "Partners Type that the brokerage refers to, it could be: quintoandar, ciq, select, 3p or estate agent"
+ contract_amount:
+   lineage:
+     - datalake_accounting_funnel.for_rent_contract_transfer.brokerage_amount
+   description: "Indicates the amount of brokerage that suppose to be transfer in base of what it is in Main"
+ source_due_amount:
+   lineage:
+     - datalake_accounting_funnel.invoice_all.due_amount
+   description: "Indicates the amount of brokerage created on the invoice (Retsuko)"
+ payment_due_amount:
+   lineage:
+     - datalake_robin_hood.accounting_entry.due_amount
+   description: "Indicates the amount of brokerage transfered by Robin Hood"
+ source_due_amount_accumulated:
+   lineage:
+     - datalake_accounting_funnel.invoice_all.due_amount
+   description: "Indicates the amount of brokerage created on the invoice (Retsuko) accumulated (sum over) by contract and partner type"
+ payment_due_amount_accumulated:
+   lineage:
+     - datalake_robin_hood.accounting_entry.due_amount
+   description: "Indicates the amount of brokerage transfered by Robin Hood accumulated (sum over) by contract and partner type"
+ has_postponed_brokerage:
+   lineage:
+     - datalake_accounting_funnel.invoice_all.bill_item
+   description: "Indicates if an invoice has a entry to postponed reasons"
+ is_compliance:
+   description: "Indicates if brokerage transfer (retsuko/robin hood) is in compliance with what is in contract (main)"
+ dt_contract_started:
+   lineage:
+     - datalake_accounting_funnel.for_rent_contract_transfer.dt_contract_started
+   description: "Date when the contract started (main)"

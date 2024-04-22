@@ -1,12 +1,23 @@
-WITH contract_partnership_data AS (
+WITH pre_contract_partnership_data AS (
     SELECT
         id_contract,
         partner_type,
-        brokerage_split_percentage
+        brokerage_split_percentage,
+        ROW_NUMBER() OVER (PARTITION BY id_contract, partner_type ORDER BY id DESC) as rn
     FROM 
         datalake_ebdb_clean.contract_partnership_data
-    QUALIFY 
-        ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY id DESC) = 1
+),
+
+contract_partnership_data AS (
+    SELECT
+        id_contract,
+        partner_type,
+        SUM(brokerage_split_percentage) AS brokerage_split_percentage
+    FROM 
+        pre_contract_partnership_data
+    WHERE 
+        NOT(partner_type = 'AUTONOMOUS_AGENT' AND rn > 1)
+    GROUP BY 1,2
 ),
 
 first_rent_from_contract AS (

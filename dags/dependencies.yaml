@@ -965,6 +965,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-sap-entity
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance
+  - bietlejuice.robin_hood:load-clean-accounting-entry-source
   - bietlejuice.robin_hood:load-clean-payment-request
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-installment

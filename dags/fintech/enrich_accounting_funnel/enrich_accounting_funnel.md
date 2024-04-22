@@ -15,10 +15,15 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables, via full load:
 
-- `accounts_payable`
-- `invoice_all`
 - `accounting_entries_retsuko`
-- `payment_platforms`
+- `accounts_payable`
 - `erp_gateway_stages_status`
+- `for_rent_brokerage_transfer`
+- `for_rent_contract_brokerage`
+- `invoice_all`
+- `ledger`
+- `payment_platforms`
+- `retsuko_invoice_issuance`
+- `retsuko_provision_creation`
 
 ​</details>
