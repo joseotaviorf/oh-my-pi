@@ -5,6 +5,14 @@ site_url_list:
   - https://proprietario.quintoandar.com.br
   - https://meulugar.quintoandar.com.br
   - https://conteudos.quintoandar.com.br
+summarized:
+  aggregation_type: AUTO
+  dimensions:
+    - COUNTRY
+    - DATE
+  type_list:
+    - WEB
+  filters: []
 by_page:
   aggregation_type: AUTO
   dimensions:

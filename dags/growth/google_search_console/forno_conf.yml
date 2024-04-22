@@ -1,5 +1,6 @@
 ---
 report_type_list:
+  - summarized
   - by_page
   - by_query
   - by_page_and_query
