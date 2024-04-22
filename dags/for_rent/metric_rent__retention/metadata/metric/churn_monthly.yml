@@ -1,0 +1,106 @@
+---
+database_name: metric_rent
+table_name: churn_monthly
+description: Monthly calculated metric of churn.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_reference_month:
+    lineage:
+      - dw_rent.dim_contract.ts_analyst_annulment_input
+      - dw_rent.dim_contract.dt_annulment
+    description: "Month of the ended rental."
+    dimension: True
+  country_code:
+    lineage:
+      - dw_retention.fact_owner_retention.country_code
+    description: "Country code of the house."
+    dimension: True
+  value_segment:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Rent value category based on its value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  ended_rentals:
+    description: "Volume of ended rentals that happended in the month being referenced."
+    metric:
+      name: Monthly Ended Rentals
+      description: "Volume of ended rentals that happended in the month being referenced."
+      acronym: ER
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rerentals_4W:
+    description: "Volume of re-rentals in 4 weeks that happended in the month being referenced."
+    metric:
+      name: Monthly Re-Rentals in 4W
+      description: "Volume of re-rentals in 4 weeks that happended in the month being referenced."
+      acronym: RR_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_churn_4W:
+    description: "Volume of listings that has churned 4 weeks after ended rental in the month being referenced."
+    metric:
+      name: Monthly Churn in 4W
+      description: "Volume of listings that has churned 4 weeks after ended rental in the month being referenced."
+      acronym: C_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_churn_4W:
+    description: "Percentage of listings that has churned 4 weeks after ended rental in the month being referenced."
+    metric:
+      name: Monthly Percentage of Churn in 4W
+      description: "Percentage of listings that has churned 4 weeks after ended rental in the month being referenced."
+      acronym: PC_4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rerentals_12W:
+    description: "Volume of re-rentals in 12 weeks that happended in the month being referenced."
+    metric:
+      name: Monthly Re-Rentals in 12W
+      description: "Volume of re-rentals in 12 weeks that happended in the month being referenced."
+      acronym: RR_12W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_churn_12W:
+    description: "Volume of listings that has churned 12 weeks after ended rental in the month being referenced."
+    metric:
+      name: Monthly Churn in 12W
+      description: "Volume of listings that has churned 12 weeks after ended rental in the month being referenced."
+      acronym: C_12W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_churn_12W:
+    description: "Percentage of listings that has churned 12 weeks after ended rental in the month being referenced."
+    metric:
+      name: Monthly Percentage of Churn in 12W
+      description: "Percentage of listings that has churned 12 weeks after ended rental in the month being referenced."
+      acronym: PC_12W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""

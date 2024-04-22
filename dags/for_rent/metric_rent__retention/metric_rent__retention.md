@@ -12,6 +12,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output tables in the metric layer:
 
+- `churn_monthly`
+- `churn_weekly`
 - `er2rr_monthly`
 - `er2rr_weekly`
 - `er2unp_susp_monthly`
