@@ -171,7 +171,7 @@ SELECT
     dt_contract_started,
     brokerage_amount
 FROM 
-    contract_brokerage UNPIVOT (
+    datalake_accounting_funnel.for_rent_contract_brokerage UNPIVOT (
         brokerage_amount FOR partner_type IN (
             5A_brokerage_amount AS `quintoandar`,
             agent_brokerage_amount AS `estate agent`,
