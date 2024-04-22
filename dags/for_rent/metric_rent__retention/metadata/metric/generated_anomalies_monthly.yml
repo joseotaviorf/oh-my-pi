@@ -1,0 +1,62 @@
+---
+database_name: metric_rent
+table_name: generated_anomalies_monthly
+description: Monthly table with percentage of terminations with anomaly.
+  A contract in anomaly is when the termination was requested more than 20 days and it's not finished.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  dt_termination_expected_finish_monthly:
+    lineage:
+      - dw_retention.dim_termination.dt_termination
+    description: "Month date of when the termination should be finished, that is, 20 days ahed of dt_termination."
+    dimension: True
+  country_code:
+    lineage:
+      - dw_retention.dim_contract.country_code
+    description: "Country code of the contract."
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Category of rent value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  terminations:
+    description: "Total volume of contracts that were in termination in a month and weren't canceled."
+    metric:
+      name: Total Termination Excluding Canceled Termination Monthly
+      description: "Monthly total volume of contracts that were in termination in a month and weren't canceled."
+      acronym: TTECTM
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  terminations_with_anomalies:
+    description: "Monthly total volume of contracts that were in termination in a month and were anomalies."
+    metric:
+      name: Total Anomaly Termination Monthly
+      description: "Monthly total volume of contracts that were in termination in a month and were anomalies."
+      acronym: TATM
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  pct_generated_anomalies:
+    description: "Percentage of generated anomalies terminations."
+    metric:
+      name: Percentage Of Generated Anomalies Terminations Monthly
+      description: "Month percentage of generated anomalies terminations. The calculation is terminations/terminations_with_anomalies column"
+      acronym: PGATM
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
