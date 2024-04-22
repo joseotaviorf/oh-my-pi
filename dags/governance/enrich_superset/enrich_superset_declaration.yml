@@ -1,0 +1,29 @@
+dag:
+  name: enrich_superset
+  schedule_start_date: 2024, 4, 1
+  owner: Data Governance
+  documentation: 
+    dag_purpose: |
+        This DAG creates the full table for Superset entities.
+
+workflow:
+    type: query
+    layer: enrich
+    inner_dependencies:
+      dashboards:
+      - ab_user
+      - tag
+      - tagged_object
+      slices:
+      - ab_user
+      - tag
+      - tagged_object
+      tables:
+      - ab_user
+      - table_columns
+      - sql_metrics
+cluster:
+  type: databricks_12_2_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
