@@ -20,3 +20,4 @@ SELECT
 FROM datalake_growth_taxonomy.media_setup AS ms
 JOIN datalake_growth_taxonomy.unified_taxonomy_dictionary as utd
     ON (ms.id_media_setup = utd.sk_media_setup)
+QUALIFY ROW_NUMBER() OVER (PARTITION BY ms.id_media_setup ORDER BY ms.ts_load DESC) = 1
