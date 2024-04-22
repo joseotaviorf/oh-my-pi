@@ -1,8 +1,8 @@
-select
+SELECT
     id,
     name,
     path,
-    timestamp(created_at) as ts_created,
+    timestamp(created_at) AS ts_created,
     type
-from
+FROM
     datalake_retsuko_raw.file

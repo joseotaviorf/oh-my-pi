@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     external_id AS id_external,
     external_subscription_id AS id_external_subscription,
@@ -14,5 +14,5 @@ SELECT
     timestamp(canceled_at) AS ts_canceled,
     timestamp(event_at) AS ts_event,
     timestamp(created_at) AS ts_created
-FROM 
+FROM
     datalake_retsuko_raw.recurrent_credit_card

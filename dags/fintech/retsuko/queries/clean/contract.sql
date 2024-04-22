@@ -3,7 +3,7 @@ SELECT
     external_id AS id_external,
     UPPER(country) AS country_code,
     locale AS city,
-    version, 
+    version,
     guarantee,
     is_b2b,
     is_rental_paid_in_advance,

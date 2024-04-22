@@ -1,8 +1,7 @@
 dag:
-  name: retsuko_homolog
+  name: retsuko
   owner: Data Fintech
   schedule_interval: 0 8 * * *
-  schedule_start_date: 2020,1,25
   documentation:
     dag_purpose: |
       Retrieve data from Retsuko database (postgresql). [Retsuko](https://github.com/quintoandar/retsuko) is responsible to Extract financial data, Transform and Load it (ETL) in Metabase to be able to generate financial reports. It does not create or owns any information and it is not its purpose to do that. All the data it has comes from other financial services (today is only [SeuBarriga](https://github.com/quintoandar/seubarriga)).
@@ -10,7 +9,7 @@ workflow:
   type: database_pull
   layer: raw
   database_type: postgres
-  custom_schema: retsuko_homolog
+  custom_schema: retsuko
   dbutils_secret_key: RETSUKO_DB
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"

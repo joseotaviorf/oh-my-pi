@@ -77,7 +77,6 @@ dags_out_of_pattern:
         "gsheets.people",
         "gsheets.static",
         "gsheets.support_and_service",
-        "retsuko_homolog",
         "marketing_costs",
         "metric_rent__bookings",
         "metric_rent__contracts",

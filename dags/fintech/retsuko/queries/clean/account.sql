@@ -1,4 +1,4 @@
-select
+SELECT
     id,
     external_id AS id_external,
     contract_id AS id_contract,
@@ -7,5 +7,5 @@ select
     type,
     is_savings,
     bank_info_updated_at AS ts_bank_info_updated
-from
+FROM
     datalake_retsuko_raw.account
