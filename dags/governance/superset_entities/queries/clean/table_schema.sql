@@ -6,7 +6,7 @@ SELECT
     database_id AS id_database,
     extra_json,
     schema,
-    "table",
+    table,
     description,
     expanded,
     created_on AS ts_created,
@@ -15,4 +15,4 @@ SELECT
     month,
     day
 FROM datalake_superset_raw.table_schema
-WHERE year = {year} AND month = {month} AND day = {day}
+WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

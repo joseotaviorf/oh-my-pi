@@ -5,7 +5,7 @@ SELECT
     dashboard_title,
     position_json,
     css,
-    "description",
+    description,
     slug,
     json_metadata,
     published,
@@ -20,4 +20,4 @@ SELECT
     month,
     day
 FROM datalake_superset_raw.dashboards
-WHERE year = {year} AND month = {month} AND day = {day}
+WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

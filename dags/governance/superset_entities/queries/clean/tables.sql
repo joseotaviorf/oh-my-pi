@@ -5,13 +5,13 @@ SELECT
     changed_by_fk AS id_user_changed,
     table_name,
     main_dttm_col,
-    "offset",
-    "description",
+    offset,
+    description,
     is_featured,
     cache_timeout,
     default_endpoint,
-    "schema",
-    "sql" AS sql_code,
+    schema,
+    sql AS sql_code,
     params,
     perm,
     filter_select_enabled,
@@ -30,4 +30,4 @@ SELECT
     month,
     day
 FROM datalake_superset_raw.tables
-WHERE year = {year} AND month = {month} AND day = {day}
+WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

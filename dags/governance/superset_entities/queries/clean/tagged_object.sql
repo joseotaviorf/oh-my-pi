@@ -11,4 +11,4 @@ SELECT
     month,
     day
 FROM datalake_superset_raw.tagged_object
-WHERE year = {year} AND month = {month} AND day = {day}
+WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
