@@ -1,0 +1,28 @@
+---
+database_name: datalake_gsheets_clean
+table_name: dags_special_scheduler
+owner: isadora.gallerani@quintoandar.com.br
+domain: Cross
+description: This gsheet contains all the bi-etl-ejuice Airflow DAGs that has a special scheduler (for example, 
+  runs only on the first day of the month, runs only on Fridays, runs every day 15, etc.).
+  When adding a new DAG to the list, make sure to add the date of when it should start being considered (dt_added).
+  If the DAG should not be on the list anymore, don't remove it (for historical data), but add a date that indicates that it's removed (dt_removed).
+  If in the future the DAG is added again to the list, make sure to create a new line with a new dt_added date.
+  If a DAG is renamed, make sure to keep both old and new names, for historical DAG run data.
+columns:
+  id_dag:
+    lineage:
+      - datalake_gsheets_raw.dags_special_scheduler.id_dag
+    description: DAG name (DAG id of the Airflow).
+  dag_owner:
+    lineage:
+      - datalake_gsheets_raw.dags_special_scheduler.dag_owner
+    description: Line context of the DAG (dag owner).
+  dt_added:
+    lineage:
+      - datalake_gsheets_raw.dags_special_scheduler.dt_added
+    description: Date of when the DAG was added to the list.
+  dt_removed:
+    lineage:
+      - datalake_gsheets_raw.dags_special_scheduler.dt_removed
+    description: Date of when the DAG was removed of the list.

@@ -1,15 +1,15 @@
 ---
-table_name: datalake_gsheets_raw.dags_sla_exclusion_list
+table_name: datalake_gsheets_raw.dags_special_scheduler
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
     greater_than: 0
     severity_level: Error
 column_level_validations:
-  context:
+  id_dag:
     is_complete:
       severity_level: Error
-  dag:
+  dag_owner:
     is_complete:
       severity_level: Error
   dt_dag_added:

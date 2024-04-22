@@ -4,8 +4,10 @@ table_name: dags_sla_exclusion_list
 owner: isadora.gallerani@quintoandar.com.br
 domain: Cross
 description: This gsheet contains all the bi-etl-ejuice Airflow DAGs that shouldn't be considered in our Data SLA.
-  If a DAG was renamed, make sure to keep both old and new names, for historical DAG run data.
-  When adding a new DAG to it, make sure it's not duplicated.
+  When adding a new DAG to the list, make sure to add the date of when it should start being considered (dt_dag_added).
+  If the DAG should not be on the list anymore, don't remove it (for historical data reasons), but add a date that indicates that it's removed (dt_dag_removed).
+  If in the future the DAG is added again to the list, make sure to create a new line with a new dt_dag_added date.
+  If a DAG is renamed, make sure to keep both old and new names, for historical DAG run data.
 columns:
   context:
     lineage:
