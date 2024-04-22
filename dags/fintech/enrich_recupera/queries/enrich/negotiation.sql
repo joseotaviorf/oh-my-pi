@@ -10,34 +10,6 @@ WITH carta_campanha AS (
     historical_code = "ACORDO"
     AND regexp_like(LOWER(occurence_description), ".*carta campanha.*") IS TRUE
 ),
-all_installment AS (
-  SELECT
-    id_customer,
-    id_installment,
-    id_creditor,
-    id_operator,
-    receipt_code,
-    boleto_emission_indicator,
-    is_special_installment,
-    agreement_type,
-    advisory_code,
-    installments_amount,
-    amount_to_pay,
-    main_amount,
-    amount_fine,
-    interest_fee_amount,
-    adm_fee_amount,
-    expense_amount,
-    discount_amount,
-    installment_number,
-    installment_situation,
-    is_installment_active,
-    FIRST_VALUE(installment_situation) OVER(PARTITION BY id_customer, id_installment ORDER BY installment_number DESC) AS most_recent_installment_status,
-    dt_installment,
-    dt_due,
-    dt_paid
-  FROM datalake_recupera_clean.installment
-),
 first_installment AS (
   SELECT
     i.id_customer,
@@ -56,10 +28,11 @@ first_installment AS (
     IF(r.id_receipt IS NOT NULL, True, False) AS down_payment,
     i.amount_to_pay,
     i.expense_amount
-  FROM all_installment AS i
+  FROM datalake_recupera_clean.installment AS i
   LEFT JOIN datalake_recupera_clean.receipt AS r
     ON r.id_receipt = i.receipt_code
     AND r.type_receipt IN ("Ficha de Compensação – Boleto confirmado (pago)", "Cartão credito (recebido)","Pix pago")
+  WHERE is_installment_active IS TRUE
   QUALIFY ROW_NUMBER() OVER(PARTITION BY i.id_customer, i.id_installment ORDER BY i.installment_number) = 1 --  installment_number = "000"
 ),
 open_installment AS (
@@ -70,7 +43,7 @@ open_installment AS (
     ROUND(SUM(IF(DATE(dt_due) < CURRENT_DATE , amount_to_pay, 0)),2) AS total_negotiated_overdue_amount,
     MIN(dt_due) AS dt_next_due,
     MAX(IF(DATE(dt_due) < CURRENT_DATE , True, False)) AS agreement_in_delay
-  FROM all_installment
+  FROM datalake_recupera_clean.installment
   WHERE installment_situation = "Parcela em aberta" AND is_installment_active IS TRUE
   GROUP BY 1,2
 ),
@@ -80,9 +53,38 @@ deduplicate_advisory AS (
     id_customer,
     advisory_code AS advisory,
     agreement_type
-  FROM all_installment
+  FROM datalake_recupera_clean.installment
   WHERE is_installment_active IS TRUE
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_negotiation, id_customer ORDER BY advisory_code DESC) = 1 -- The same negotiation may have different advisors
+),
+detail_movement AS (
+    SELECT
+        id_customer,
+        receipt_code,
+        dt_paid,
+        SUM(amount_paid) AS paid_amount
+    FROM datalake_recupera_clean.detail_movement
+    GROUP BY 1, 2, 3
+),
+active_installments AS (
+  SELECT
+    id_installment,
+    id_customer,
+    receipt_code,
+    installment_number,
+    installment_situation,
+    is_special_installment,
+    FIRST_VALUE(installment_situation) OVER(PARTITION BY id_customer, id_installment ORDER BY installment_number DESC) AS most_recent_installment_status,
+    main_amount,
+    amount_fine,
+    interest_fee_amount,
+    adm_fee_amount,
+    discount_amount,
+    amount_to_pay,
+    dt_due,
+    dt_paid
+  FROM datalake_recupera_clean.installment
+  WHERE is_installment_active IS TRUE
 ),
 agreements AS (
   SELECT
@@ -104,10 +106,10 @@ agreements AS (
     o.dt_next_due,
     o.total_negotiated_to_be_due_amount,
     o.total_negotiated_overdue_amount,
-    MAX(IF(i.installment_number = "000", i.dt_paid, NULL)) AS dt_down_payment,
+    MAX(IF(i.installment_number = "000", dm.dt_paid, NULL)) AS dt_down_payment,
     MAX(i.dt_due) AS dt_negotiation_expected_end,
-    MAX(IF(i.dt_paid IS NOT NULL AND i.dt_paid <= CURRENT_DATE, i.dt_paid, NULL)) AS dt_last_payment,
-    COUNT(IF(i.dt_paid IS NOT NULL AND i.dt_paid <= CURRENT_DATE, i.id_installment, NULL)) AS paid_installments,
+    MAX(IF(dm.dt_paid IS NOT NULL AND dm.dt_paid <= CURRENT_DATE, dm.dt_paid, NULL)) AS dt_last_payment,
+    COUNT(IF(dm.dt_paid IS NOT NULL AND dm.dt_paid <= CURRENT_DATE, i.id_installment, NULL)) AS paid_installments,
     ROUND(SUM(IF(i.installment_situation = "Parcela em aberta" AND i.dt_due = o.dt_next_due, i.amount_to_pay, 0)),2) AS total_next_due,
     MAX(CASE
       WHEN i.installment_number = "000" AND i.installment_situation = "Parcela em aberta" THEN "PROMESSA"
@@ -122,7 +124,7 @@ agreements AS (
     ROUND(SUM(i.amount_to_pay),2) AS total_negotiated_amount,
     ROUND(MIN(CASE WHEN i.installment_number = "000" THEN i.amount_to_pay END),2) AS down_payment_amount,
     ROUND(SUM(CASE WHEN r.id_receipt IS NOT NULL THEN i.amount_to_pay END), 2) AS total_amount_paid
-  FROM all_installment AS i
+  FROM active_installments AS i
   INNER JOIN first_installment AS f
      ON f.id_installment = i.id_installment
       AND f.id_customer = i.id_customer
@@ -135,7 +137,10 @@ agreements AS (
   LEFT JOIN deduplicate_advisory AS da
     ON i.id_installment = da.id_negotiation
     AND i.id_customer = da.id_customer
-  WHERE i.is_installment_active IS TRUE
+  LEFT JOIN
+    detail_movement AS dm
+        ON i.receipt_code = dm.receipt_code
+        AND i.id_customer = dm.id_customer
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 deduplicated_installment_canceled AS (
