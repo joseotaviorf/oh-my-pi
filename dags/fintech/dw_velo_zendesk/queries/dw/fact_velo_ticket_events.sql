@@ -8,7 +8,6 @@ SELECT
     previous_value,
     value,
     event_via,
-    event_body,
     sequence_number,
     table_version,
     dt_extracted,

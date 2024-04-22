@@ -40,10 +40,6 @@ columns:
     description: "Via of the event"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.via
-  event_body:
-    description: "Body of the event"
-    lineage:
-      - datalake_velo_zendesk_clean.ticket_audits.event
   sequence_number:
     description: "Sequence number of the event"
     lineage:
