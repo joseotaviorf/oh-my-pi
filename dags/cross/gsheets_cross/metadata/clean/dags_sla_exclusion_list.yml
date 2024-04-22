@@ -19,5 +19,9 @@ columns:
     lineage:
       - datalake_gsheets_raw.dags_sla_exclusion_list.dt_dag_added
     description: Date of when the DAG was added to the exclusion list.
+  dt_dag_removed:
+    lineage:
+      - datalake_gsheets_raw.dags_sla_exclusion_list.dt_dag_removed
+    description: Date of when the DAG was removed from the exclusion list.
   ts_load:
     description: Timestamp of when the data was loaded into our systems.
