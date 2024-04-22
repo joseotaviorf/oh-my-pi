@@ -116,6 +116,7 @@ Produces the following output tables:
     `inspection_aud`
     `inspection_item`
     `instant_offer`
+    `instant_offer_aud`
     `key_type`
     `lead`
     `lead_aud`

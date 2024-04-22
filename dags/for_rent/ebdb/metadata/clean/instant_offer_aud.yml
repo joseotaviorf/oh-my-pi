@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: instant_offer_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.instantoffer_aud.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.instantoffer_aud.house_id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.instantoffer_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.instantoffer_aud.revtype
+  is_enabled:
+    lineage:
+      - datalake_ebdb_raw.instantoffer_aud.enabled
+  mod_is_enabled:
+    lineage:
+      - datalake_ebdb_raw.instantoffer_aud.enabled_mod
