@@ -49,7 +49,7 @@ WITH union_line_indicators AS (
     "support_and_services" AS context
 )
 SELECT
-  STRING(HASH(name)) AS id_indicator,
+  STRING(crc32(name)) AS id_indicator,
   name,
   attributes,
   context,
