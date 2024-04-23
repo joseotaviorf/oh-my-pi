@@ -56,7 +56,7 @@ if __name__ == "__main__":
         format="json",
     ).select("_airbyte_data.*").drop('metadata') # this column exists on ticket_audits and causes schema errors
 
-    df = df.withColumn("dt", lit(execution_date_str.replace('-', '_')))
+    df = df.withColumn("dt", lit(execution_date_str))
 
     s3_loader.load_df(
         df=df,
