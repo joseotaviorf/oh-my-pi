@@ -5,6 +5,7 @@ SELECT
     id_requester AS sk_requester,
     id_submitter AS sk_submitter,
     id_propose AS sk_propose,
+    request_type,
     group_stations,
     assignee_stations,
     waiting_period_creation,

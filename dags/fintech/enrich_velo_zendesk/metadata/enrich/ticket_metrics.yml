@@ -28,6 +28,10 @@ columns:
     description: "ID of the propose related to the ticket"
     lineage:
       - datalake_velo_zendesk.custom_fields.id_propose
+  request_type:
+    description: "Request type description"
+    lineage:
+      - datalake_velo_zendesk.ticket_metrics.request_type
   group_stations:
     description: "Number of group stations"
     lineage:

@@ -12,7 +12,8 @@ WITH last_extracted AS (
 last_register AS (
     SELECT
           id_ticket,
-          MAX(ts_updated) AS ts_updated
+          MAX(ts_updated) AS ts_updated,
+          MAX(ts_load) AS ts_load
       FROM
           datalake_velo_zendesk_clean.tickets_history
       GROUP BY
@@ -82,3 +83,5 @@ last_register AS (
     LEFT JOIN
         last_register lr
         ON th.id_ticket = lr.id_ticket
+        AND th.ts_updated = lr.ts_updated
+        AND th.ts_load = lr.ts_load
