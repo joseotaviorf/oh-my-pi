@@ -1,0 +1,75 @@
+---
+database_name: dw_pipeline
+table_name: fact_pipeline_metrics
+description: This incremental fact table has the pipeline metrics by each line and execution date, which we store it as a snapshot.
+  Each line is an unique line/DAG owner related to an specific snapshot date, identified by the sk_line and sk_snapshot_date. 
+domain: Cross
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  sk_line:
+    lineage:
+      - datalake_pipeline.dag.id_line
+    description: Key that identifies the line/DAG owner. Joins with dw_pipeline.dim_line.
+  sk_snapshot_date:
+    description: Key of the snapshot date. Joins with dw_public.dim_date.
+  sla:
+    description: The line SLA. It's the calculation of the amount of DAGs inside SLA divided by the total amount of active DAGs - the total
+      amount of DAGs that should be ignored (in the SLA exclusion list or in the special scheduler list) + the amount of DAGs that are in the 
+      special scheduler list but that executed today.
+  total_active_dags:
+    description: The total amount of active DAGs that the line has til the specific date.
+  total_dags_executed:
+    description: The total amount of DAGs that were executed in the specific date.
+  total_dags_special_scheduler:
+    description: The total amount of DAGs that has an special scheduler condition (e.g. DAGs that runs only on Fridays, only on the day 15th,
+      etc.) and that are listed on the gsheet.
+  total_dags_special_scheduler_executed:
+    description: The total amount of DAGs that has an special scheduler condition (e.g. DAGs that runs only on Fridays, only on the day 15th,
+      etc.) and that are listed on the gsheet and that executed on the specific date.
+  total_dags_in_sla_exclusion_list:
+    description: The total amount of active DAGs that are in the SLA exclusion list in the specific date.
+  total_dags_ignoring_list:
+    description: The total amount of active DAGs that are in the ignoring list in the specific date, which means DAGs
+      that are in the SLA exclusion list and/or in the special scheduler list.
+      Here we apply a distinct over every id_dag, so the sum of total_dags_in_sla_exclusion_list + total_dags_special_scheduler_executed 
+      may not be the same number of the total_dags_ignoring_list, since there may have DAGs added to both lists.
+  total_dags_inside_sla:
+    description: The total amount of active DAGs that the line has that are inside our SLA in the specific date.
+  total_dags_outside_sla:
+    description: The total amount of active DAGs that the line has that are outside our SLA in the specific date.
+  total_dags_null_sla:
+    description: The total amount of active DAGs that the line has that are with SLA marked as null in the specific date.
+  total_success_dags:
+    description: The total amount of active DAGs that the line has that marked as successful in the specific date.
+  total_failed_dags:
+    description: The total amount of active DAGs that the line has that are marked as failed in the specific date.
+  total_dags_with_manual_run:
+    description: The total amount of active DAGs that the line has that had manual DAG runs in the specific date.
+  total_dags_triggered_by_mediator:
+    description: The total amount of active DAGs that the line has that are triggered by Mediator in the specific date.
+  total_raw_clean_dags:
+    description: The total amount of active DAGs that the line has that are in the raw/clean layers in the specific date.
+  total_raw_clean_dags_excuted:
+    description: The total amount of active DAGs that the line has that are in the raw/clean layers and that had a run in the specific date.
+  total_enrich_dags:
+    description: The total amount of active DAGs that the line has that are in the enrich layer in the specific date.
+  total_enrich_dags_executed:
+    description: The total amount of active DAGs that the line has that are in the enrich layer and that had a run in the specific date.
+  total_dw_dags:
+    description: The total amount of active DAGs that the line has that are in the dw layer in the specific date.
+  total_dw_dags_executed:
+    description: The total amount of active DAGs that the line has that are in the DW layer and that had a run in the specific date.
+  total_metric_dags:
+    description: The total amount of active DAGs that the line has that are in the metric layer in the specific date.
+  total_metric_dags_executed:
+    description: The total amount of active DAGs that the line has that are in the metric layer and that had a run in the specific date.
+  total_reverse_dags:
+    description: The total amount of active DAGs that the line has that are in the reverse layer in the specific date.
+  total_reverse_dags_executed:
+    description: The total amount of active DAGs that the line has that are in the reverse layer and that had a run in the specific date.
+  total_datamart_dags:
+    description: The total amount of active DAGs that the line has that are loading datamarts in the specific date.
+  total_datamart_dags_executed:
+    description: The total amount of active DAGs that the line has that are loading datamarts and that had a run in the specific date.
+  ts_load:
+    description: Timestamp of when the data was loaded into our systems.

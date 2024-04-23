@@ -4,11 +4,23 @@ dag:
     schedule_start_date: 2024, 4, 1
     documentation:
       dag_purpose:
-        This DAG loads to DW our pipeline models, based in our Airflow DAGs.
+        This DAG loads to DW our pipeline models, based in our bi-etl-ejuice Airflow DAGs.
 workflow:
     type: query
     layer: dw
     custom_schema: pipeline
+    tables_customization:
+        dim_dag:
+            extraction_type: full
+        dim_line:
+            extraction_type: full
+        fact_dag_runs:
+            extraction_type: full
+        fact_pipeline_metrics:
+            extraction_type: incremental
+            default_partitions: [year, month, day]
+            extra_query_template_params:
+                "DATE(ts_load)": "DATE_ADD(DATE('{year}-{month}-{day}'), 1)"
 cluster:
     type: databricks_12_2_med_general_photon_cluster
     access_control_list:
