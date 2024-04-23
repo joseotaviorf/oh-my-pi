@@ -32,7 +32,6 @@ if __name__ == "__main__":
     environment = args.env
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name
-    partition_cols = json.loads(args.partition_cols)
     execution_date_str = args.execution_date
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
 
