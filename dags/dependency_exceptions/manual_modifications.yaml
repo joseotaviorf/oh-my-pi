@@ -815,7 +815,7 @@ bietlejuice.metric_rent_benvi__demand:
     - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
     - bietlejuice.enrich_mexico_marketing_automatic_daily_costs:load-enrich-daily-costs
     - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
-    - bietlejuice.gsheets_benvi:done-clean-mexico-demand-targets-2022
+    - bietlejuice.gsheets_benvi:done-clean-mexico-demand-targets-2022  
 bietlejuice.reports:
   # This database is ingested as a quality check for the reverse ETL process, which is why it needs to run after it.
   add:

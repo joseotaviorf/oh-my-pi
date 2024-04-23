@@ -1,0 +1,200 @@
+database_name: metric_growth
+table_name: growth_demand_performance_daily
+description: This table aggregates daily metrics related to top-of-funnel performance, prospect engagement, and associated costs within
+domain: Growth
+owner: isabela.matsumoto@quintoandar.com.br
+columns:
+  dt_event:
+    lineage:
+      - dw_public.dim_date.date
+    description: The date on which the events are recorded.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.dim_region.country_code
+    description: Country code where the event occurred.
+    dimension: True
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+    description: The city group classification for where the event took place.
+    dimension: True
+  operation_channel:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.operation_channel
+      - dw_growth.fact_demand_prospect_events.operation_channel
+    description: The channel through which the operation was conducted.
+    dimension: True
+  referral_type:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.referral_type
+      - dw_growth.fact_demand_prospect_events.referral_type
+    description: Grouping of results by type of user prospecting program/initiative.
+    dimension: True
+  platform:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.platform
+      - dw_growth.fact_demand_prospect_events.platform
+    description: Platform used for the event.
+    dimension: True
+  utm_campaign:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.utm_campaign
+      - dw_growth.fact_demand_prospect_events.utm_campaign
+      - datalake_growth_costs.daily_costs.utm_campaign
+    description: The specific campaign name derived from UTM parameters.
+    dimension: True
+  utm_term:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.utm_term
+      - dw_growth.fact_demand_prospect_events.utm_term
+      - datalake_growth_costs.daily_costs.utm_term
+    description: The UTM term associated with the event for tracking keywords or phrases.
+    dimension: True
+  business_context:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.business_context
+      - dw_growth.fact_demand_prospect_events.business_context
+      - datalake_growth_costs.daily_costs.business_context
+    description: Lowercase description of the business context surrounding the event.
+    dimension: True
+  funnel_side:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.funnel_side
+      - dw_growth.dim_media_setup.funnel_side
+      - datalake_growth_costs.daily_costs.funnel_side
+    description: Identifies which side of the marketing funnel the event impacts.
+    dimension: True
+  campaign_business_context:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.campaign_business_context
+      - dw_growth.dim_media_setup.campaign_business_context
+      - datalake_growth_costs.daily_costs.campaign_business_context
+    description: Lowercase description of the campaign's business context.
+    dimension: True
+  behavior_type:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.behavior_type
+      - dw_growth.dim_media_setup.behavior_type
+      - datalake_growth_costs.daily_costs.behavior_type
+    description: Type of behavior exhibited or encouraged by the event.
+    dimension: True
+  campaign_strategy_intent:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.campaign_strategy_intent
+      - dw_growth.dim_media_setup.campaign_strategy_intent
+      - datalake_growth_costs.daily_costs.campaign_strategy_intent
+    description: The strategic intent of the campaign associated with the event.
+    dimension: True
+  medium:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.medium
+      - dw_growth.dim_media_setup.medium
+      - datalake_growth_costs.daily_costs.medium
+    description: The medium through which the event was delivered or executed.
+    dimension: True
+  source:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.source
+      - dw_growth.dim_media_setup.source
+      - datalake_growth_costs.daily_costs.source
+    description: The source from where the event was initiated.
+    dimension: True
+  tof_users:
+    description: Count of unique top-of-funnel users.
+    metric:
+      name: TOF Users
+      description: Total count of unique users who entered the top of the funnel.
+      is_additive: True
+      business_stage: Demmand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br
+  tof_users_3p:
+    description: Count of unique top-of-funnel users from third-party sources.
+    metric:
+      name: TOF Users 3P
+      description: Total count of unique users from third-party sources who entered the top of the funnel.
+      is_additive: True
+      business_stage: Demmand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br
+  tof_events:
+    description: Count of unique top-of-funnel events.
+    metric:
+      name: TOF Events
+      description: Total count of unique events occurring at the top of the funnel.
+      is_additive: True
+      business_stage: Demmand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br
+  tof_events_3p:
+    description: Count of unique top-of-funnel events from third-party sources.
+    metric:
+      name: TOF Events 3P
+      description: Total count of unique events from third-party sources occurring at the top of the funnel.
+      is_additive: True
+      business_stage: Demmand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br
+  new_prospects:
+    description: Count of unique new prospects identified for the first time.
+    metric:
+      name: New Prospects
+      description: Total number of new prospects identified during the specified period.
+      is_additive: True
+      business_stage: Demmand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br
+  recovered_prospects:
+    description: Count of prospects who have re-engaged after a period of inactivity.
+    metric:
+      name: Recovered Prospects
+      description: Total number of prospects re-engaged after previously being inactive.
+      is_additive: True
+      business_stage: Demmand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br
+  flows:
+    description: Count of unique flow sessions initiated.
+    metric:
+      name: Flows Initiated
+      description: Total number of unique flow sessions started within the aggregation period.
+      is_additive: True
+      business_stage: Demmand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br
+  cost:
+    lineage:
+      - datalake_growth_costs.daily_costs.total_cost
+    description: Total costs associated with the marketing campaigns.
+    metric:
+      name: Marketing Cost
+      description: Aggregate cost of marketing campaigns captured daily.
+      is_additive: True
+      business_stage: Demmand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br   
+  year:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.year
+      - dw_growth.fact_demand_prospect_events.year
+      - dw_public.dim_date.year
+    description: Year of the event date.
+    dimension: False
+  month:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.month
+      - dw_growth.fact_demand_prospect_events.month
+      - dw_public.dim_date.month
+    description: Month of the event date.
+    dimension: False
+  day:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.day
+      - dw_growth.fact_demand_prospect_events.day
+      - dw_public.dim_date.day
+    description: Day of the event date.
+    dimension: False
+  ts_load:
+    description: Timestamp when the data was loaded into the table.
+    dimension: False
