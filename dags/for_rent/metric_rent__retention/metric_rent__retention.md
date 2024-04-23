@@ -20,6 +20,8 @@ Currently, there is the following output tables in the metric layer:
 - `er2unp_susp_weekly`
 - `generated_anomalies_monthly`
 - `generated_anomalies_weekly`
+- `house_early_demand_monthly`
+- `house_early_demand_weekly`
 - `house_not_relisted_monthly`
 - `house_not_relisted_weekly`
 - `nps_pp_monthly`

@@ -1,0 +1,61 @@
+---
+database_name: metric_rent
+table_name: house_early_demand_monthly
+description: Monthly calculated metric of early demand opt-in.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_month_rescission_created:
+    lineage:
+      - dw_rent.dim_contract.ts_termination_requested
+    description: "Month of the rescission request."
+    dimension: True
+  country_code:
+    lineage:
+      - dw_retention.fact_owner_retention.country_code
+    description: "Country code of the house."
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Rent value category based on its value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  qtd_houses_early_demand:
+    description: "Volume of houses in early demand in the month being referenced."
+    metric:
+      name: Monthly Early Demands
+      description: "Volume of houses in early demand in the month being referenced."
+      acronym: MED
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_terminations:
+    description: "Volume of contract terminations in the month being referenced."
+    metric:
+      name: Monthly Contract Terminations
+      description: "Volume of contract terminations in the month being referenced."
+      acronym: MTR
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_early_demand_opt_in:
+    description: "Porcentage of early demand opt-in in the month being referenced."
+    metric:
+      name: Monthly Early Demand Opt-in
+      description: "Porcentage of early demand opt-in in the month being referenced."
+      acronym: MEDOI
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
