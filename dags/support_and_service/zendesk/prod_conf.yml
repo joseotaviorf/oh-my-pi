@@ -7,20 +7,34 @@ partition_cols: ["year", "month", "day"]
 tables:
   group_memberships:
     is_incremental: true
+    source: stitch
   groups:
     is_incremental: true
+    source: stitch
   organizations:
     is_incremental: true
+    source: stitch
   satisfaction_ratings:
     is_incremental: true
+    source: stitch
   ticket_fields:
     is_incremental: true
+    source: stitch
   ticket_metrics:
     is_incremental: true
+    source: stitch
   tickets:
     is_incremental: true
+    source: stitch
   users:
     is_incremental: true
+    source: stitch
+  ticket_comments:
+    is_incremental: true
+    source: airbyte
+  ticket_audits:
+    is_incremental: true
+    source: airbyte
 
 custom_cluster:
   driver_node_type_id: r5d.4xlarge

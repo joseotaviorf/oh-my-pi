@@ -101,7 +101,7 @@ for table_name, configs in tables.items():
         source=SOURCE,
         table_name=table_name,
         target_database_base_name=SOURCE,
-        extraction_spark_job_file=raw_spark_job_path,
+        extraction_spark_job_file=s3_prefix + f"/spark_jobs/{SOURCE}/add_data_from_{configs['source']}_to_raw.py",
         raw_spark_job_extra_args=["{{ ds }}", "{{ next_ds }}", table_name],
     )
 
