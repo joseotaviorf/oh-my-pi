@@ -57,7 +57,7 @@ INIT_CLUSTER_TASKS = ["create-cluster", "execute-job-cluster"]
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_GOVERNANCE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
