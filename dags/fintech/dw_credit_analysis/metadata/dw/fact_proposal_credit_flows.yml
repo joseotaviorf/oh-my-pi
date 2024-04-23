@@ -204,6 +204,14 @@ columns:
       OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.
       QUINTOANDAR: Default rental administrator, which is QuintoAndar.
       THIRD_PARTY: The rental administrator is a third party real estate agency.
+  dt_last_credit_evaluation_init:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
+    description: "Key of date when credit evaluation last was initiated."
+  dt_tenant_first_doc_sent_date:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
+    description: "Key of date when client sent first documentation."
   dt_offer_submitted_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_offer_submitted_date
