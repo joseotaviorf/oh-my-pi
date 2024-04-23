@@ -71,5 +71,13 @@ columns:
     description: The total amount of active DAGs that the line has that are loading datamarts in the specific date.
   total_datamart_dags_executed:
     description: The total amount of active DAGs that the line has that are loading datamarts and that had a run in the specific date.
+  dt_snapshot:
+    description: Date of the snapshot.
   ts_load:
     description: Timestamp of when the data was loaded into our systems.
+  year:
+    description: Year of the snapshot. Also, a partition of the table.
+  month:
+    description: Month of the snapshot. Also, a partition of the table.
+  day:
+    description: Day of the snapshot. Also, a partition of the table.

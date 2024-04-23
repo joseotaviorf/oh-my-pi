@@ -168,6 +168,10 @@ SELECT
     tb.total_reverse_dags_executed,
     tb.total_datamart_dags,
     tb.total_datamart_dags_executed,
-    NOW() AS ts_load
+    MAKE_DATE({year}, {month}, {day}) AS dt_snapshot,
+    NOW() AS ts_load,
+    {year} AS year,
+    {month} AS month,
+    {day} AS day
 FROM
     totals_base AS tb
