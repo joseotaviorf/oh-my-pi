@@ -42,9 +42,9 @@ bietlejuice.dw_crm:
     - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
     - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.ebdb:load-clean-house
-    - bietlejuice.ebdb:load-clean-offer
     - bietlejuice.ebdb:load-clean-rent-flow
     - bietlejuice.ebdb_contract:load-clean-contract
+    - bietlejuice.ebdb_offer:load-clean-offer
     - bietlejuice.enrich_crm:load-enrich-tasks
     - bietlejuice.enrich_crm:load-enrich-workflows-transitions
     - bietlejuice.enrich_crm_tasks_history_flows:load-enrich-tasks-history-resolutions-flow
@@ -757,8 +757,8 @@ bietlejuice.enrich_tracksale:
   remove:
     - bietlejuice.ebdb:load-clean-booking
     - bietlejuice.ebdb:load-clean-house
-    - bietlejuice.ebdb:load-clean-offer
     - bietlejuice.ebdb_contract:load-clean-contract
+    - bietlejuice.ebdb_offer:load-clean-offer
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
     - bietlejuice.tracksale:load-clean-campaign
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
