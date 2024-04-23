@@ -1,55 +1,45 @@
--- TO RUN ON DATABRICKS: replace double brackets ('{{', '}}') for single ones
+-- TO RUN ON DATABRICKS: replace double brackets ('{', '}') for single ones
 WITH zendesk_email AS (
-  SELECT DISTINCT
-    t.id_ticket,
-    t.id_requester,
-    t.id_assignee AS id_agent,
-    tfm.id_user,
-    tfm.id_contract,
-    t.tags,
-    t.description,
-    t.status,
-    g.name AS department,
-    tf.agent_email,
-    tf.request_type,
-    tf.client_type,
-    tf.step_tag,
-    tf.customer_type_tag,
-    tf.contact_motivation_tag,
-    tf.contact_theme_tag,
-    tf.contact_theme_detail_tag,
-    tf.custom_fields,
-    tf.channel,
-    tf.custom_fields,
+  SELECT
+    id_ticket,
+    id_requester,
+    id_assignee AS id_agent,
+    id_user_main AS id_user,
+    id_contract,
+    tags,
+    description,
+    status,
+    group_name AS department,
+    analyst_email AS agent_email,
+    request_type,
+    client_type,
+    step_tag,
+    customer_type_tag,
+    contact_motivation_tag,
+    contact_theme_tag,
+    contact_theme_detail_tag,
+    channel,
+    custom_fields,
     CASE
-      WHEN CAST(tfm.minutes_requester_wait_business AS INT) / (60.0 * COALESCE(CAST(tfm.replies AS INT),1)) < 6 THEN TRUE
-      WHEN CAST(tfm.minutes_requester_wait_business AS INT) / (60.0 * COALESCE(CAST(tfm.replies AS INT),1)) >= 6 THEN FALSE
+      WHEN CAST(requester_wait_time_min_business AS INT) / (60.0 * COALESCE(CAST(replies AS INT),1)) < 6 THEN TRUE
+      WHEN CAST(requester_wait_time_min_business AS INT) / (60.0 * COALESCE(CAST(replies AS INT),1)) >= 6 THEN FALSE
       ELSE NULL
     END AS is_sla,
-    tfm.minutes_requester_wait_business AS minutes_first_response,
-    tfm.minutes_full_resolution_calendar AS minutes_full_resolution_time_calendar,
-    tfm.minutes_full_resolution_business AS minutes_full_resolution_time_business,
-    tfm.reopens,
-    tfm.replies,
-    tfm.ts_initially_assigned_local,
-    tfm.ts_last_assigned_local,
-    tfm.ts_created_local AS ts_ticket_started,
-    tfm.ts_solved_local AS ts_ticket_solved,
-    tfm.ts_closed_local AS ts_ticket_ended
+    requester_wait_time_min_business AS minutes_first_response,
+    full_resolution_time_min_calendar AS minutes_full_resolution_time_calendar,
+    full_resolution_time_min_business AS minutes_full_resolution_time_business,
+    reopens,
+    replies,
+    ts_initially_assigned  - INTERVAL 3 HOUR AS ts_initially_assigned_local,
+    ts_assigned - INTERVAL 3 HOUR AS ts_last_assigned_local,
+    ts_created - INTERVAL 3 HOUR AS ts_ticket_started,
+    ts_solved - INTERVAL 3 HOUR  AS ts_ticket_solved,
+    ts_closed - INTERVAL 3 HOUR  AS ts_ticket_ended
   FROM
-    datalake_zendesk_tickets_clean.tickets t
-  INNER JOIN
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
-      ON t.id_ticket = tfm.id_ticket
-  INNER JOIN
-    datalake_zendesk_ticket_funnels.ticket_funnel tf
-      ON t.id_ticket = tf.id_ticket
-  LEFT JOIN
-    datalake_zendesk_tickets_clean.groups g
-      ON g.id_group = t.id_group
+    datalake_zendesk.tickets_current
   WHERE
-    tfm.id_session IS NULL
-    AND tfm.id_call IS NULL
+    id_session IS NULL
+    AND id_call IS NULL
 ),
 csat AS (
   SELECT
@@ -68,7 +58,7 @@ csat AS (
     END AS is_solved,
     ts_updated AS ts_response
   FROM
-    datalake_zendesk_tickets_clean.tickets_history
+    datalake_zendesk_clean.tickets
   WHERE
     GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad')
   UNION ALL
@@ -128,7 +118,7 @@ back_tickets AS (
     id_ticket AS back_ticket,
     status AS back_ticket_status,
     COALESCE(
-      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),
+      NULLIF(REGEXP_EXTRACT(custom_fields['Ticket do contato'], '([0-9]{{8}})', 1), ''),
       REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)
     ) AS front_ticket,
     ts_ticket_started,
@@ -142,7 +132,7 @@ back_tickets AS (
     (tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
     AND COALESCE(
-      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),
+      NULLIF(REGEXP_EXTRACT(custom_fields['Ticket do contato'], '([0-9]{{8}})', 1), ''),
       REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)
     ) != ''
 ),
@@ -203,7 +193,7 @@ SELECT DISTINCT
   cs.first_csat_comment,
   cs.last_csat_comment,
   ze.channel,
-  ze.custom_fields,
+  TO_JSON(ze.custom_fields) AS custom_fields,
   ze.request_type,
   ze.client_type,
   ze.step_tag,

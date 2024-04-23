@@ -118,14 +118,13 @@ columns:
       ticket creation date in the America/Sao_Paulo timezone.
   ts_budget:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+      - datalake_customer_support.email.custom_fields
     description:
       This timestamp field assumes a value only for Zendesk email tickets. It is the
       budget execution date.
   ts_started:
     lineage:
       - datalake_customer_support.email.ts_ticket_started
-      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
     description:
       This timestamp indicates when the task started. For Zendesk email tickets, if a

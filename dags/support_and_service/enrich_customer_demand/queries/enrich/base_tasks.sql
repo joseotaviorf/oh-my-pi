@@ -50,49 +50,46 @@ crm_tasks AS (
 ticket_tasks AS (
   WITH ticket_started AS (
     SELECT
-      e.id_ticket,
-      MD5(e.agent_email) AS id_agent,
+      id_ticket,
+      MD5(agent_email) AS id_agent,
       MD5(
         CONCAT(
-          COALESCE(e.step_tag, ''),
-          COALESCE(e.customer_type_tag, ''),
-          COALESCE(e.client_type, ''),
-          COALESCE(e.request_type, ''),
-          COALESCE(e.contact_motivation_tag, ''),
-          COALESCE(e.contact_theme_tag, ''),
-          COALESCE(e.contact_theme_detail_tag, '')
+          COALESCE(step_tag, ''),
+          COALESCE(customer_type_tag, ''),
+          COALESCE(client_type, ''),
+          COALESCE(request_type, ''),
+          COALESCE(contact_motivation_tag, ''),
+          COALESCE(contact_theme_tag, ''),
+          COALESCE(contact_theme_detail_tag, '')
         )
       ) AS id_taxonomy,
-      MD5(e.department) AS id_main_department,
-      MAX(e.id_user) AS id_user,
-      MD5(MAX(e.tags)) AS id_tags,
-      MAX(e.tags) AS tags,
-      e.agent_email,
-      e.channel,
-      e.department,
-      e.csat_score,
-      e.status,
-      e.is_solved,
-      e.contact_theme_detail_tag,
-      e.contact_theme_tag,
-      e.ts_ticket_started AS ts_zendesk_started,
-      CAST(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP) AS ts_budget,
+      MD5(department) AS id_main_department,
+      MAX(id_user) AS id_user,
+      MD5(MAX(tags)) AS id_tags,
+      MAX(tags) AS tags,
+      agent_email,
+      channel,
+      department,
+      csat_score,
+      status,
+      is_solved,
+      contact_theme_detail_tag,
+      contact_theme_tag,
+      ts_ticket_started AS ts_zendesk_started,
+      CAST(GET_JSON_OBJECT(REPLACE(REPLACE(custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP) AS ts_budget,
       CASE
         WHEN
-          DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) IS NOT NULL
-          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) >= e.ts_ticket_started
-          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) < COALESCE(ts_ticket_solved, NOW())
-        THEN CAST(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP)
-        ELSE e.ts_ticket_started
+          DATE(GET_JSON_OBJECT(REPLACE(REPLACE(custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) IS NOT NULL
+          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) >= ts_ticket_started
+          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) < COALESCE(ts_ticket_solved, NOW())
+        THEN CAST(GET_JSON_OBJECT(REPLACE(REPLACE(custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP)
+        ELSE ts_ticket_started
       END AS ts_started,
       ts_ticket_solved AS ts_completed,
       ts_ticket_ended AS ts_closed,
       ts_csat_first_response AS ts_csat_answer
     FROM
-      datalake_customer_support.email AS e
-    LEFT JOIN
-      datalake_zendesk_ticket_funnels.ticket_funnel AS tf
-        ON e.id_ticket = tf.id_ticket
+      datalake_customer_support.email
     GROUP BY 1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21
   ),
   unique_theme_detail_sla_target AS (
