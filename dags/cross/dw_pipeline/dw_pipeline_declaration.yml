@@ -20,7 +20,7 @@ workflow:
             extraction_type: incremental
             default_partitions: [year, month, day]
             extra_query_template_params:
-                "DATE(ts_load)": "DATE_ADD(DATE('{year}-{month}-{day}'), 1)"
+                "sk_snapshot_date": "DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd')"
 cluster:
     type: databricks_12_2_med_general_photon_cluster
     access_control_list:
