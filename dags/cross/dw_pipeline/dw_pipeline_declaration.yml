@@ -18,7 +18,7 @@ workflow:
             extraction_type: full
         fact_pipeline_metrics:
             extraction_type: incremental
-            default_partitions: [year, month, day]
+            partitions: [year, month, day]
             extra_query_template_params:
                 "sk_snapshot_date": "DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd')"
 cluster:
