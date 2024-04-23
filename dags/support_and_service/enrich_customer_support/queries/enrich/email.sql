@@ -1,4 +1,4 @@
--- TO RUN ON DATABRICKS: replace double brackets ('{', '}') for single ones
+-- TO RUN ON DATABRICKS: replace double brackets ('{{', '}}') for single ones
 WITH zendesk_email AS (
   SELECT
     id_ticket,
