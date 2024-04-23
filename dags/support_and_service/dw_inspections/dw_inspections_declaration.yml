@@ -1,0 +1,36 @@
+dag:
+  name: dw_inspections
+  schedule_start_date: 2021,2,7
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG loads the DW tables for Inspection Services and PWA data (old data).
+      These data are mainly related to the entry and exit inspections carried out by QuintoAndar​.
+workflow:
+  type: query
+  layer: dw
+  custom_schema: inspections
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  has_load_to_redshift_task: False
+  tables_customization:
+    dim_inspection:
+      extraction_type: full
+      partitions: []
+    dim_inspector:
+      extraction_type: full
+      partitions: []
+    fact_inspection:
+      extraction_type: full
+      partitions: []
+    fact_repair_request:
+      extraction_type: full
+      partitions: []
+    fact_report_review:
+      extraction_type: full
+      partitions: []    
+cluster:
+  type: databricks_12_2_med_io-memory_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
