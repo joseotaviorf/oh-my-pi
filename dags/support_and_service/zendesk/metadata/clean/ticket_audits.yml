@@ -1,0 +1,33 @@
+database_name: datalake_zendesk_clean
+table_name: ticket_audits
+columns:
+  id:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.id
+  id_author:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.author_id
+  id_ticket:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.ticket_id
+  events:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.events
+  via:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.via
+  dt_extracted:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.dt
+  ts_created:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.created_at
+  year:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.dt
+  month:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.dt
+  day:
+    lineage:
+      - datalake_zendesk_raw.ticket_audits.dt

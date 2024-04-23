@@ -1,0 +1,51 @@
+database_name: datalake_zendesk_clean
+table_name: ticket_comments
+columns:
+  id:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.assignee_id
+  id_audit:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.brand_id
+  id_author:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.ids_collaborator
+  id_ticket:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.group_id
+  attachments:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.attachments
+  body:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.body
+  plain_body:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.plain_body
+  event_type:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.event_type
+  type:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.type
+  via:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.via
+  is_public:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.public
+  dt_extracted:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.dt
+  ts_created:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.created_at
+  year:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.dt
+  month:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.dt
+  day:
+    lineage:
+      - datalake_zendesk_raw.ticket_comments.dt
