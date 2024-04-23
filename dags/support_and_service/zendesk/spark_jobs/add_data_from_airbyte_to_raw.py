@@ -62,7 +62,7 @@ if __name__ == "__main__":
         df=df,
         s3_path=f"{database_location}{table_name}",
         format_options=format_options,
-        partitions=partition_cols,
+        partitions=["dt"],
         optimize_dataframe=False,
         compression="gzip",
     )
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         table_name=table_name,
         format_options=format_options,
         database_location=database_location,
-        partitions=partition_cols,
+        partitions=["dt"],
         force_recreate=False,
     )
 
@@ -81,5 +81,5 @@ if __name__ == "__main__":
         df=df,
         database_name=database_name,
         table_name=table_name,
-        partition_cols=partition_cols,
+        partition_cols=["dt"],
     )
