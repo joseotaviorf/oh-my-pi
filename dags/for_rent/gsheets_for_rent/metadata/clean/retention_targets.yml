@@ -1,0 +1,27 @@
+---
+database_name: datalake_gsheets_clean
+table_name: retention_targets
+owner: kleber.inoue@quintoandar.com.br
+domain: For Rent
+description: This gsheet contains the metric's targets of Retention Project.
+  The metric's targets are segmented by the granularity column.
+columns:
+  metric_name:
+    lineage:
+      - datalake_gsheets_raw.retention_targets.metric
+    description: Metric's target name.
+  granularity:
+    lineage:
+      - datalake_gsheets_raw.retention_targets.granularity
+    description: Granularity of the target.
+    categories:
+      monthly: The target is monthly.
+      quartely:  The target is quartely.
+  target:
+    lineage:
+      - datalake_gsheets_raw.retention_targets.target
+    description: Target value.
+  dt_target_reference:
+    lineage:
+      - datalake_gsheets_raw.retention_targets.time_ref
+    description: Target's reference date.

@@ -113,6 +113,12 @@ sheets_info:
     clean_table_name: rental_cohort_demand
     sheet_context: for_rent
 
+  retention_targets:
+    sheet_id: 1bcgutgbXuBJAfhOtZ36uawOglwU2leRrEZYE1Dn2yCI
+    sheet_name: Targets
+    clean_table_name: retention_targets
+    sheet_context: for_rent
+
   supply_targets_2022:
     sheet_id: 1rU-ptg-ZtD0WdnbXnUVpGw8Lrf-0grc2IitwEmn2yZ0
     sheet_name: supply_targets_2022
