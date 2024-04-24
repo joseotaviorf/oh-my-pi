@@ -42,16 +42,31 @@ def list_files(table_name, source_root_path, format, datetime_to_ingest):
         filtered_files = list(filter(pattern.match, files))
 
     elif format == 'txt':
+        filtered_files = []
         s3_files_path = f"{source_root_path}"
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
-        pattern = re.compile(f".*{datetime_to_ingest.strftime('%y%m%d')}.*")
-        filtered_files = list(filter(pattern.match, files))
+        for f in files:
+            if any(account in f for account in ['97477', '52081']):
+                if datetime_to_ingest.strftime('_%d%m%y') in f:
+                    filtered_files.append(f)
+            elif any(account in f for account in ['5514', '130067134']):
+                if datetime_to_ingest.strftime('_%d%m%Y_') in f:
+                    filtered_files.append(f)
+            else:
+                if datetime_to_ingest.strftime('_%y%m%d_') in f:
+                    filtered_files.append(f)
 
     elif format == 'ret_pag':
+        filtered_files = []
         s3_files_path = f"{source_root_path}"
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
-        pattern = re.compile(f".*{datetime_to_ingest.strftime('_%y%m%d_')}.*")
-        filtered_files = list(filter(pattern.match, files))
+        for f in files:
+            if any(account in f for account in ['452586', '426879', '433065']):
+                if datetime_to_ingest.strftime('_%d%m%y_') in f:
+                    filtered_files.append(f)
+            else:
+                if datetime_to_ingest.strftime('_%y%m%d_') in f:
+                    filtered_files.append(f)
 
     elif format == 'ret_cob':
         s3_files_path = f"{source_root_path}"
