@@ -149,4 +149,6 @@ INNER JOIN
 LEFT JOIN
     datalake_gsheets_clean.dags_sla_exclusion_list AS ds
         ON ds.dag = dr.id_dag
-        AND DATE(dr.ts_executed) BETWEEN DATE_ADD(ds.dt_dag_added, -1) AND DATE_ADD(COALESCE(ds.dt_dag_removed, CURRENT_DATE), -1)   -- Runs are D-1
+        AND DATE(dr.ts_executed)
+          BETWEEN IF(ds.is_d0 = FALSE, DATE_ADD(ds.dt_dag_added, -1), ds.dt_dag_added)  -- Runs usually are D-1
+            AND IF(ds.is_d0 = FALSE, DATE_ADD(COALESCE(ds.dt_dag_removed, CURRENT_DATE), -1), COALESCE(s.dt_dag_removed, CURRENT_DATE)) 

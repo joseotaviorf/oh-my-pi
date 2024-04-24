@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_gsheets_raw.dags_sla_exclusion_list.dag
     description: DAG name (DAG id of the Airflow).
+  is_d0:
+    lineage:
+      - datalake_gsheets_raw.dags_sla_exclusion_list.is_d0
+    description: Boolean flag indicating if the DAG runs as D0.
   dt_dag_added:
     lineage:
       - datalake_gsheets_raw.dags_sla_exclusion_list.dt_dag_added

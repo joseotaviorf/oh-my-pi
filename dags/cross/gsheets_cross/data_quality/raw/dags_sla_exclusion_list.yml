@@ -12,6 +12,9 @@ column_level_validations:
   dag:
     is_complete:
       severity_level: Error
+  is_d0:
+    is_complete:
+      severity_level: Error
   dt_dag_added:
     is_complete:
       severity_level: Error

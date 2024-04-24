@@ -1,6 +1,7 @@
 SELECT
     context,
     dag,
+    CAST(is_d0 AS BOOLEAN) AS is_d0,
     DATE(dt_dag_added) AS dt_dag_added,
     DATE(dt_dag_removed) AS dt_dag_removed,
     NOW() AS ts_load
