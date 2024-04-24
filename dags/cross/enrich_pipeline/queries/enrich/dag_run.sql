@@ -151,4 +151,4 @@ LEFT JOIN
         ON ds.dag = dr.id_dag
         AND DATE(dr.ts_executed)
           BETWEEN IF(ds.is_d0 = FALSE, DATE_ADD(ds.dt_dag_added, -1), ds.dt_dag_added)  -- Runs usually are D-1
-            AND IF(ds.is_d0 = FALSE, DATE_ADD(COALESCE(ds.dt_dag_removed, CURRENT_DATE), -1), COALESCE(s.dt_dag_removed, CURRENT_DATE)) 
+            AND IF(ds.is_d0 = FALSE, DATE_ADD(COALESCE(ds.dt_dag_removed, CURRENT_DATE), -1), COALESCE(ds.dt_dag_removed, CURRENT_DATE)) 
