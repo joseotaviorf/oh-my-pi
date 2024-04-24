@@ -1,13 +1,14 @@
 SELECT
-    application_name,
-    application_event,
-    version,
+    id,
+    content_id AS id_content,
+    action_id AS id_action,
+    rule_type,
+    order,
+    name,
+    journey_version,
+    test_identifier,
     status,
-    content,
-    created_by_user,
-    approved_by_user,
     created_at AS ts_created,
-    updated_at AS ts_updated,
-    approved_at AS ts_approved
+    updated_at AS ts_updated
 FROM
-    datalake_journey_flow_raw.t_rule
+    datalake_journey_flow_raw.rule
