@@ -26,12 +26,12 @@ columns:
       UNDEFINED: Undefined.
       OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
     dimension: True
-  qtd_houses_early_demand:
-    description: "Volume of houses in early demand in the month being referenced."
+  qtd_houses_early_demand_2w:
+    description: "Volume of houses in early demand within 2 weeks after termination being requested in the month being referenced."
     metric:
-      name: Monthly Early Demands
-      description: "Volume of houses in early demand in the month being referenced."
-      acronym: MED
+      name: Monthly Early Demands - 2W
+      description: "Volume of houses in early demand within 2 weeks after termination being requested in the month being referenced."
+      acronym: MED2W
       is_additive: True
       business_stage: Demand
       hierarchy: User analysis
@@ -48,12 +48,12 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  pct_early_demand_opt_in:
-    description: "Porcentage of early demand opt-in in the month being referenced."
+  pct_early_demand_opt_in_2w:
+    description: "Porcentage of early demand opt-in within 2 weeks after termination being requested in the month being referenced."
     metric:
-      name: Monthly Early Demand Opt-in
-      description: "Porcentage of early demand opt-in in the month being referenced."
-      acronym: MEDOI
+      name: Monthly Early Demand Opt-in - 2W
+      description: "Porcentage of early demand opt-in within 2 weeks after termination being requested in the month being referenced."
+      acronym: MEDOI2W
       is_additive: False
       business_stage: Demand
       hierarchy: User analysis
