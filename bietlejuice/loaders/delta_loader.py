@@ -1,6 +1,8 @@
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.spark.base_spark import BaseSparkContext
 from pyspark.sql import DataFrame
+from pyspark.sql.utils import AnalysisException
+from py4j.protocol import Py4JJavaError
 from delta.tables import DeltaTable
 
 
@@ -40,16 +42,18 @@ class DeltaLoader:
         database_name = table_name.split(".")[0].replace("`", "")
         BaseSparkContext.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
 
-        if not BaseSparkContext.spark.catalog.tableExists(table_name):
+        exists = BaseSparkContext.spark.catalog.tableExists(table_name)
+        is_delta = DeltaTable.isDeltaTable(BaseSparkContext.spark, path)
+        if exists and not is_delta:
+            logger.info(f"Path {path} is not a Delta Table. Running conversion.")
+            self._convert_to_delta_table(table_name)
+        if not exists or not is_delta:
             logger.info(
                 f"Table {table_name} does not exist. Creating a new empty table {table_name} on location."
             )
             self._create_empty_table(
-                table_name, path, source_df, partition_by, replace_if_exists=True
+                table_name, path, source_df, partition_by, replace_if_exists=False
             )
-        elif not DeltaTable.isDeltaTable(BaseSparkContext.spark, path):
-            logger.info(f"Path {path} is not a Delta Table. Running conversion.")
-            self._convert_to_delta_table(table_name)
 
         if not merge_on:
             logger.info(f"Writing to table {table_name} on path {path}.")
@@ -90,8 +94,27 @@ class DeltaLoader:
 
     def _convert_to_delta_table(self, table_name: str) -> None:
         """Convert a table to a Delta table"""
-        BaseSparkContext.spark.sql(f"CONVERT TO DELTA {table_name}")
-        logger.info(f"Table {table_name} converted to Delta format.")
+        try:
+            BaseSparkContext.spark.sql(f"CONVERT TO DELTA {table_name}")
+            logger.info(f"Table {table_name} converted to Delta format.")
+        except Py4JJavaError as e:
+            error_class = e.java_exception.getClass().getName()
+            # This error happens when the table exists in the Metastore and is parquet, but there is no data in it.
+            # In this case, we can simply drop the table.
+            if error_class != "java.io.FileNotFoundException":
+                raise e
+            logger.info(f"Table {table_name} exists, but has no data. Dropping it.")
+            BaseSparkContext.spark.sql(f"DROP TABLE {table_name}")
+        except AnalysisException as e:
+            error_class = e.getErrorClass()
+            # This error happens when the the table is a Delta table, but the Delta log was deleted.
+            # In this case, we can simply drop the table.
+            if error_class != "DELTA_TABLE_NOT_FOUND":
+                raise e
+            logger.info(
+                f"Delta log or table {table_name} was deleted. Dropping from Metastore so it can be recreated."
+            )
+            BaseSparkContext.spark.sql(f"DROP TABLE {table_name}")
 
     def _write_to_table(
         self,

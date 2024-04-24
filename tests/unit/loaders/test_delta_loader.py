@@ -1,6 +1,8 @@
 import pytest
 from unittest import mock
 from bietlejuice.loaders.delta_loader import DeltaLoader
+from py4j.protocol import Py4JJavaError
+from pyspark.sql.utils import AnalysisException
 
 
 class TestDeltaLoader:
@@ -77,7 +79,7 @@ class TestDeltaLoader:
         mock_spark_context.spark.sql.assert_called_once_with(
             "CREATE DATABASE IF NOT EXISTS `test_database`"
         )
-        mock_delta_table.createOrReplace.assert_called_once_with(
+        mock_delta_table.createIfNotExists.assert_called_once_with(
             mock_spark_context.spark
         )
         delta_table_builder_mock.tableName.assert_called_once_with(table_name)
@@ -99,6 +101,59 @@ class TestDeltaLoader:
         delta_loader.load_table(table_name, None, mock_source_df)
 
         mock_spark_context.spark.sql.assert_called_with("CONVERT TO DELTA test_table")
+
+    def test_convert_to_delta_should_drop_table_if_it_exists_in_parquet_but_is_empty(
+        self,
+        mock_spark_context,
+        mock_delta_table,
+        mock_source_df,
+        delta_table_builder_mock,
+    ):
+        table_name = "test_table"
+        mock_spark_context.spark.catalog.tableExists.return_value = True
+        mock_delta_table.isDeltaTable.return_value = False
+        expected_error = Py4JJavaError("File not found", mock.MagicMock())
+        expected_error.java_exception.getClass().getName.return_value = (
+            "java.io.FileNotFoundException"
+        )
+        mock_spark_context.spark.sql.side_effect = [
+            mock.MagicMock(),
+            expected_error,
+            mock.MagicMock(),
+        ]
+
+        delta_loader = DeltaLoader()
+        delta_loader.load_table(table_name, None, mock_source_df)
+
+        mock_spark_context.spark.sql.assert_any_call("CONVERT TO DELTA test_table")
+        mock_spark_context.spark.sql.assert_any_call("DROP TABLE test_table")
+        delta_table_builder_mock.execute.assert_called_once()
+
+    @mock.patch("bietlejuice.loaders.delta_loader.AnalysisException.getErrorClass")
+    def test_convert_to_delta_should_drop_table_if_it_exists_in_delta_but_is_empty(
+        self,
+        mock_analysis_exception_class,
+        mock_spark_context,
+        mock_delta_table,
+        mock_source_df,
+        delta_table_builder_mock,
+    ):
+        table_name = "test_table"
+        mock_spark_context.spark.catalog.tableExists.return_value = True
+        mock_delta_table.isDeltaTable.return_value = False
+        mock_analysis_exception_class.return_value = "DELTA_TABLE_NOT_FOUND"
+        mock_spark_context.spark.sql.side_effect = [
+            mock.MagicMock(),
+            AnalysisException(desc="DELTA_TABLE_NOT_FOUND", stackTrace=""),
+            mock.MagicMock(),
+        ]
+
+        delta_loader = DeltaLoader()
+        delta_loader.load_table(table_name, None, mock_source_df)
+
+        mock_spark_context.spark.sql.assert_any_call("CONVERT TO DELTA test_table")
+        mock_spark_context.spark.sql.assert_any_call("DROP TABLE test_table")
+        delta_table_builder_mock.execute.assert_called_once()
 
     def test_write_to_table(self, mock_source_df):
         table_name = "test_table"

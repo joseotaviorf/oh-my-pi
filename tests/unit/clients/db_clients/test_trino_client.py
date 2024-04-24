@@ -116,3 +116,68 @@ class TestTrinoClient:
 
         # assert
         mocked_trino_client.run.assert_called_once_with(command)
+
+    def test_drop_table(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        command = f"DROP TABLE {schema_name}.{table_name}"
+
+        mocked_trino_client.run = Mock()
+
+        # act
+        mocked_trino_client.drop_table(schema_name, table_name)
+
+        # assert
+        mocked_trino_client.run.assert_called_once_with(command)
+
+    def test_table_exists_if_show_tables_returns_nothing(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        mocked_trino_client.get_records = Mock(return_value=[])
+
+        # act
+        returned_value = mocked_trino_client.table_exists(schema_name, table_name)
+
+        # assert
+        assert not returned_value
+        mocked_trino_client.get_records.assert_called_once_with(
+            f"SHOW TABLES FROM schema LIKE 'table'"
+        )
+
+    def test_table_exists_if_show_tables_returns_something(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        mocked_trino_client.get_records = Mock(return_value=[("table",)])
+
+        # act
+        returned_value = mocked_trino_client.table_exists(schema_name, table_name)
+
+        # assert
+        assert returned_value
+        mocked_trino_client.get_records.assert_called_once_with(
+            f"SHOW TABLES FROM schema LIKE 'table'"
+        )
+
+    def test_get_table_ddl(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        expected_return = "CREATE TABLE table (id int)"
+
+        mocked_trino_client.get_records = Mock(return_value=[(expected_return,)])
+
+        # act
+        returned_value = mocked_trino_client.get_table_ddl(schema_name, table_name)
+
+        # assert
+        assert returned_value == expected_return
+        mocked_trino_client.get_records.assert_called_once_with(
+            f"SHOW CREATE TABLE schema.table"
+        )

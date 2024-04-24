@@ -143,3 +143,42 @@ class TrinoClient(DBClient):
         except TrinoUserError as e:
             if e.error_name != "NOT_FOUND" or throw_if_not_exists:
                 raise e
+
+    def drop_table(self, schema_name: str, table_name: str):
+        """
+        Drops a table from Trino.
+
+        :param schema_name: the schema name of the table
+        :type schema_name: str
+        :param table_name: the table name
+        :type table_name: str
+        """
+        self.run(f"DROP TABLE {schema_name}.{table_name}")
+
+    def table_exists(self, schema_name: str, table_name: str) -> bool:
+        """
+        Checks if a table exists in Trino.
+
+        :param schema_name: the schema name of the table
+        :type schema_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :return: True if the table exists, False otherwise
+        :rtype: bool
+        """
+        return bool(
+            self.get_records(f"SHOW TABLES FROM {schema_name} LIKE '{table_name}'")
+        )
+
+    def get_table_ddl(self, schema_name: str, table_name: str) -> str:
+        """
+        Retrieves the DDL of a table in Trino.
+
+        :param schema_name: the schema name of the table
+        :type schema_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :return: the DDL of the table
+        :rtype: str
+        """
+        return self.get_records(f"SHOW CREATE TABLE {schema_name}.{table_name}")[0][0]
