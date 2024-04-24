@@ -2,7 +2,7 @@
 table_name: metric_rent.house_early_demand_monthly
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  pct_early_demand_opt_in:
+  pct_early_demand_opt_in_2w:
     has_max_value:
       less_than_or_equal_to: 1
       severity_level: Error
