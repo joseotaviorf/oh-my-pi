@@ -1,0 +1,25 @@
+SELECT
+  id,
+  firestoreId AS id_firestore,
+  godfatherId AS id_godfather,
+  client_id AS id_client,
+  house_id AS id_house,
+  rentFlow_id AS id_rent_flow,
+  originalCondo AS original_condo,
+  originalHomeInsurance AS original_home_insurance,
+  originalIptu AS original_iptu,
+  originalRent AS original_rent,
+  rent,
+  status,
+  turn,
+  rejectionReason AS rejection_reason,
+  criadoEm AS ts_created,
+  atualizadoEm AS ts_updated,
+  iteration,  
+  expirationDate AS ts_expired,
+  type,
+  godfatherUpdatedAt AS ts_updated_godfather,
+  residentName AS resident_name,
+  firestoreId_unique AS is_id_firestore_unique
+FROM
+  datalake_ebdb_raw.offer

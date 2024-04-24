@@ -321,6 +321,10 @@ table_block_list:
   - MudancaStatusImovel
   - AdministrationPlan
   - AdministrationPlan_AUD
+  - InstantOffer
+  - InstantOffer_AUD
+  - Offer
+  - Offer_AUD
 
 view_allow_list:
   - vteste_utf8mb3
