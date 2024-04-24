@@ -1,0 +1,59 @@
+---
+database_name: datalake_trino
+table_name: query_information
+owner: isadora.gallerani@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table contains information about queries events on Trino.
+  Each line will have information about the query and tables used on it, besides information related to 
+  the user that is executing it, in which tool the query is running, etc.
+  The id_query probably won't be unique, since a query may use several tables.
+columns:
+  id_query:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.queryId
+    description: Id of the query. 
+  tool:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.resourceGroupId
+    description: Tool in which the query is running into.
+  user:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.resourceGroupId
+    description: The user that is running the query.
+  state:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.state
+    description: The state of the query.
+  execution_time:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_time
+    description: The amount of seconds that the query execution took.
+  database_name:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
+    description: The database name related to the table used in the query. The query might use one or several tables,
+      so it might also have several database names related.
+  table_name:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
+    description: The table name used in the query. The query might use one or several tables.
+  ts_execution_started:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_start_time
+    description: The timestamp of when the query execution started.
+  ts_execution_ended:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_end_time
+    description: The timestamp of when the query execution ended.
+  year:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.year
+    description: The year of the query execution. Also, a partition of the table.
+  month:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.month
+    description: The month of the query execution. Also, a partition of the table.
+  day:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.day
+    description: The day of the query execution. Also, a partition of the table.
