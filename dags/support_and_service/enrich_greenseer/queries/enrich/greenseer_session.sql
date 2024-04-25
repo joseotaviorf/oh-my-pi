@@ -10,7 +10,7 @@ WITH greenseer_uniques AS (
     datalake_greenseer_clean.session
   WHERE
     year >= 2023
-    AND ts_created >= "2023-07-01"
+    AND ts_started >= "2023-07-01"
   QUALIFY
     RANK() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
