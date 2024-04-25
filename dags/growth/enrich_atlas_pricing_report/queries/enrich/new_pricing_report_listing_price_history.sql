@@ -41,9 +41,9 @@ SELECT
   id_house,
   version,
   business_context::STRING,
-  DATE_FORMAT(ts_status_started, 'yyyy-MM-dd\'T\'HH:mm:ss') AS ts_status_started,
   price,
   status,
-  status_reason
+  status_reason,
+  DATE_FORMAT(ts_status_started, 'yyyy-MM-dd\'T\'HH:mm:ss') AS ts_status_started
 FROM
   listing_price_history

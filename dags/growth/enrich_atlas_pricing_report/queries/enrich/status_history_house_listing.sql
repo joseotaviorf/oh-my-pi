@@ -23,7 +23,7 @@ WITH sale AS (
     SUBSTRING(fls.sk_sale_listing,0,9) AS id_house,
     SUBSTRING(fls.sk_sale_listing,10,12) AS version,
     'SALE' AS business_context,
-    fls.status_history AS status,
+    COALESCE(fls.status_history, 'NA') AS status,
     COALESCE(fls.status_change_reason, 'NA') AS status_reason,
     fls.ts_status_started,
     fl.price
@@ -62,7 +62,7 @@ rent AS (
     SUBSTRING(sk_house_listing,0,9) AS id_house,
     SUBSTRING(sk_house_listing,10,12) AS version,
     'RENT' AS business_context,
-    fhls.status_history AS status,
+    COALESCE(fhls.status_history, 'NA') AS status,
     COALESCE(fhls.status_change_reason, 'NA') AS status_reason,
     fhls.ts_status_start AS ts_status_started,
     di.rent AS price
