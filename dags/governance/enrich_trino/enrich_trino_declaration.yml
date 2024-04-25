@@ -1,0 +1,22 @@
+---
+dag:
+  name: enrich_trino
+  schedule_start_date: 2022, 5, 5
+  schedule_interval: 0 5 * * *
+  owner: Data Governance
+  documentation: 
+    dag_purpose: |
+      Exports Trino usage data from data_platform_metrics table in Databricks
+workflow:
+  type: query
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  inner_dependencies:
+    table_usage_information:
+      - query_information
+cluster:
+  type: databricks_12_2_med_general_photon_cluster

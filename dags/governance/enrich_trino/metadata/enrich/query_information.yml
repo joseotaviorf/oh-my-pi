@@ -37,6 +37,12 @@ columns:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
     description: The table name used in the query. The query might use one or several tables.
+  dt_extraction:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.year
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.month
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.day
+    description: Date of when the extraction happened.
   ts_execution_started:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_start_time

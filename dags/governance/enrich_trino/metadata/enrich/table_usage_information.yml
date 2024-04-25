@@ -6,14 +6,24 @@ domain: Data Ops & Governance
 description: This table contains information about the number of visualization a table has according to Trino usage events
 columns:
   database_name:
+    lineage:
+      - datalake_trino.query_information.database_name
     description: Name of the schema
   table_name:
+    lineage:
+      - datalake_trino.query_information.table_name
     description: Name of the table
   count_visualization:
     description: Number of times this table was accessed in Trino during the day
   year:
-    description: ingestion year.
+    lineage:
+      - datalake_trino.query_information.year
+    description: Ingestion year. Also, a partition of the table.
   month:
-    description: ingestion month.
+    lineage:
+      - datalake_trino.query_information.month
+    description: Ingestion month. Also, a partition of the table.
   day:
-    description: ingestion day.
+    lineage:
+      - datalake_trino.query_information.day
+    description: Ingestion day. Also, a partition of the table.
