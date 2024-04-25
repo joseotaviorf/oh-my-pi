@@ -44,7 +44,7 @@ dag_base AS (
         d.id_line,
         d.layer,
         d.is_datamart,
-        IF(MAKE_DATE({year}, {month}, {day}) BETWEEN DATE(pc.ts_event) AND DATE(pc.ts_next_event), TRUE, FALSE) AS is_paused
+        IF(MAKE_DATE({year}, {month}, {day}) BETWEEN pc.ts_event AND pc.ts_next_event, TRUE, FALSE) AS is_paused
     FROM
         datalake_pipeline.dag AS d
     JOIN
@@ -53,6 +53,7 @@ dag_base AS (
     LEFT JOIN
         paused_cli_run AS pc
             ON pc.id_dag = d.id_dag
+            AND MAKE_DATE({year}, {month}, {day}) BETWEEN pc.ts_event AND pc.ts_next_event
     WHERE
         MAKE_DATE({year}, {month}, {day}) BETWEEN DATE(d.ts_first_event) AND DATE(dd.ts_last_scheduler_ran) -- Active DAGs only
 ),
