@@ -11,7 +11,7 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description:
       By retrieving the last ticket ID associated with each call ID, we can obtain the
       most recent ticket associated with each call, providing us with up-to-date
@@ -91,13 +91,13 @@ columns:
       department for which the task reservation is intended to be routed.
   id_user:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+      - datalake_zendesk.tickets_current.id_user
     description:
       This is the unique identifier for the user associated with a Zendesk ticket, who
       is registered in the main system (ebdb).
   id_contract:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+      - datalake_zendesk.tickets_current.id_contract
     description: The Zendesk Ticket respective contract.
   ticket_origin:
     description: It is the origin of the ticket.
@@ -115,7 +115,7 @@ columns:
     description: The Twilio task department name, defined in Twilio as queue name.
   zendesk_department:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+      - datalake_zendesk.tickets_current.group_name
     description: The Zendesk Ticket department.
   first_department:
     lineage:
@@ -252,11 +252,11 @@ columns:
     description: Column used to identify Call InApp records
   minutes_first_resolution_time_calendar:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_calendar
+      - datalake_zendesk.tickets_current.minutes_first_resolution_calendar
     description: Number of minutes to the first resolution time during calendar hours for Zendesk Ticket.
   minutes_first_resolution_time_business:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_business
+      - datalake_zendesk.tickets_current.minutes_first_resolution_business
     description: Number of minutes to the first resolution time during business hours for the Zendesk Ticket.
   replies:
     lineage:
@@ -264,51 +264,51 @@ columns:
     description: The number of public replies added to a ticket by an agent.
   reopens:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.reopens
+      - datalake_zendesk.tickets_current.reopens
     description: Total number of times the ticket was reopened.
   request_type:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+      - datalake_zendesk.tickets_current.request_type
     description: Classification of the zendeks ticket user request.
   client_type:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+      - datalake_zendesk.tickets_current.client_type
     description: The Zendesk Ticket client type obtained through the ticket custom field.
   step_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag
+      - datalake_zendesk.tickets_current.step_tag
     description: Classification of the zendesk ticket user journey step.
   customer_type_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+      - datalake_zendesk.tickets_current.customer_type_tag
     description: Classification of the zendesk ticket user.
   contact_motivation_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+      - datalake_zendesk.tickets_current.contact_motivation_tag
     description: Classification of the zendesk ticket user motivation.
   contact_theme_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+      - datalake_zendesk.tickets_current.contact_theme_tag
     description:
       The Zendesk Ticket contact theme, for example, rent_contract_termination. It is
       obtained through a custom field.
   contact_theme_detail_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
+      - datalake_zendesk.tickets_current.contact_theme_detail_tag
     description:
       The Zendesk Ticket contact them detail, for example, rental_visit_rescheduling.
       It is obtained through a custom field.
   tags:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description: String field with all ticket tags.
   status:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+      - datalake_zendesk.tickets_current.status
     description: Ticket status.
   custom_fields:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+      - datalake_zendesk.tickets_current.custom_fields
     description: The Zendesk Ticket custom field.
   journey_step:
     lineage:
@@ -332,17 +332,17 @@ columns:
     description: If the reservation is the first opened for its respective task.
   has_back_tickets:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: Boolean that indicates if this ticket have a related backoffice ticket.
   is_bot:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description:
       If the ticket has the tag "bot_end_coversation", then it is TRUE,
       otherwise is FALSE.
   is_closed_by_merge:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description:
       In Zendesk, a ticket closed by merge refers to scenario where two or more tickets
       are combined or merged into a single ticket, and the individual tickets are
@@ -350,7 +350,7 @@ columns:
   front_or_back:
     lineage:
       - datalake_gsheets_clean.department_control.front_or_back
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description:
       Given the department define if this ticket is front or back. This column have
       undefined values in case there is no definition of this value in the
@@ -362,12 +362,12 @@ columns:
     description: Boolean that indicates if the user has answered the CSAT survey.
   has_back_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: Boolean that indicates if this ticket have a related backoffice ticket.
   is_open_back_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.status
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.status
+      - datalake_zendesk.tickets_current.id_ticket
     description:
       Boolean that indicates if any of the related backoffice tickets have a status
       different than closed.
@@ -377,7 +377,7 @@ columns:
     description: True if the ticket have more than 1 segment (reservation), False otherwise.
   frt:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved
+      - datalake_zendesk.tickets_current.ts_solved
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local
     description:
@@ -386,20 +386,20 @@ columns:
       a back ticket related.
   last_back_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: Last back ticket related to this ticket.
   back_ticket_list:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: List of back tickets related to this ticket.
   total_backoffice_minutes_time:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+      - datalake_zendesk.tickets_current.ts_created_local
+      - datalake_zendesk.tickets_current.ts_solved_local
     description: Time in minutes to close all related backoffice tickets.
   total_minutes_front_to_open_back_ticket_time:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+      - datalake_zendesk.tickets_current.ts_created_local
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local
     description: Time in minutes to open the related backoffice ticket after solving the front ticket.

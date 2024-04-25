@@ -21,7 +21,7 @@ columns:
       created to assign a worker to handle a new chat conversation with a customer.
   id_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description:
       To obtain the most recent information on the status of each chat and its
       corresponding ticket, we retrieve the last ticket ID associated with each
@@ -61,13 +61,13 @@ columns:
       that task is taken into account.
   id_user:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+      - datalake_zendesk.tickets_current.id_user
     description:
       This is the unique identifier for the user associated with a Zendesk ticket,
       who is registered in the main system (ebdb).
   id_contract:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+      - datalake_zendesk.tickets_current.id_contract
     description: The respective contract associated with the Zendesk Ticket.
   ticket_origin:
     description: It is the origin of the ticket.
@@ -98,12 +98,12 @@ columns:
     description: Identifies the country
   zendesk_department:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+      - datalake_zendesk.tickets_current.group_name
     description: The department associated with the Zendesk Ticket.
   first_department:
     lineage:
       - datalake_quinto_messenger.task_event.task_queue_name
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
       - datalake_quinto_messenger.task_event.ts_created_local
     description:
       The first department in Twilio, or queue name, for the initial task created in
@@ -111,7 +111,7 @@ columns:
   last_department:
     lineage:
       - datalake_quinto_messenger.task_event.task_queue_name
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
       - datalake_quinto_messenger.task_event.ts_created_local
     description:
       The last department in Twilio, or queue name, for the final task created
@@ -137,43 +137,43 @@ columns:
     description: The type of transfer, which could be internal-same-agent.
   request_type:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+      - datalake_zendesk.tickets_current.request_type
     description: The classification of the user request in the Zendesk ticket.
   client_type:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+      - datalake_zendesk.tickets_current.client_type
     description: The Zendesk Ticket client type obtained through the ticket's custom field.
   step_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag
+      - datalake_zendesk.tickets_current.step_tag
     description: The classification of the user journey step in the Zendesk ticket.
   customer_type_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+      - datalake_zendesk.tickets_current.customer_type_tag
     description: The classification of the Zendesk ticket user.
   contact_motivation_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+      - datalake_zendesk.tickets_current.contact_motivation_tag
     description: The classification of the motivation behind the Zendesk ticket user's request.
   contact_theme_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+      - datalake_zendesk.tickets_current.contact_theme_tag
     description:
       The contact theme of the Zendesk Ticket, such as rent_contract_termination,
       which is obtained through a custom field.
   contact_theme_detail_tag:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
+      - datalake_zendesk.tickets_current.contact_theme_detail_tag
     description:
       The theme details of the Zendesk ticket contact, such as rental visit
       rescheduling, can be obtained through a custom field.
   tags:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description: A string field containing all ticket tags.
   status:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+      - datalake_zendesk.tickets_current.status
     description: Current ticket status.
   journey_step:
     lineage:
@@ -189,11 +189,11 @@ columns:
     description: Area of which the chat belongs to.
   custom_fields:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+      - datalake_zendesk.tickets_current.custom_fields
     description: The Zendesk ticket's custom field information.
   frt:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+      - datalake_zendesk.tickets_current.ts_solved_local
       - datalake_quinto_messenger.task.ts_created_local
       - datalake_sauron_clean.session.ts_created
     description:
@@ -203,11 +203,11 @@ columns:
       begins, and it ends when the back ticket is solved, or the task ends.
   last_back_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: The last back ticket related to this ticket.
   back_ticket_list:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: A list of back tickets related to this ticket.
   seconds_first_reply:
     lineage:
@@ -252,23 +252,23 @@ columns:
       or Chat 5A.
   minutes_first_resolution_time_calendar:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_calendar
+      - datalake_zendesk.tickets_current.minutes_first_resolution_calendar
     description:
       This metric measures the time, in minutes, from the creation of a Zendesk Ticket
       to its first resolution during calendar hours.
   minutes_first_resolution_time_business:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_business
+      - datalake_zendesk.tickets_current.minutes_first_resolution_business
     description:
       This metric measures the time, in minutes, from the creation of a Zendesk Ticket
       to its first resolution during business hours.
   replies:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.replies
+      - datalake_zendesk.tickets_current.replies
     description: This metric counts the number of public replies that an agent has added to a ticket.
   reopens:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.reopens
+      - datalake_zendesk.tickets_current.reopens
     description: This metric counts the total number of times that a ticket has been reopened.
   total_minutes_talk_time:
     lineage:
@@ -312,11 +312,11 @@ columns:
     description: A boolean value indicating whether the ticket has more than one segment (task).
   is_bot:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description: A boolean value indicating whether the ticket has the "bot_end_conversation" tag.
   is_closed_by_merge:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description:
       In Zendesk, a ticket closed by merge refers to a scenario where two or more
       tickets are combined or merged into a single ticket, and the individual tickets
@@ -324,35 +324,35 @@ columns:
       indicate whether the ticket was closed by merge.
   service_status:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description: Describes what was the final status of the front office service.
   front_or_back:
     lineage:
       - datalake_gsheets_clean.department_control.front_or_back
-      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+      - datalake_zendesk.tickets_current.tags
     description:
       Determine whether this ticket is a front or back ticket based on the department.
       This field contains undefined values if there is no definition of this value in
       the department_control sheet for this specific main department.
   has_back_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: A boolean value indicating whether this ticket has a related backoffice ticket.
   is_open_back_ticket:
     lineage:
-      - datalake_zendesk_ticket_funnels.ticket_funnel.status
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_zendesk.tickets_current.status
+      - datalake_zendesk.tickets_current.id_ticket
     description:
       A boolean value indicating whether any of the related backoffice tickets have a
       status other than closed.
   total_backoffice_minutes_time:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+      - datalake_zendesk.tickets_current.ts_created_local
+      - datalake_zendesk.tickets_current.ts_solved_local
     description: Time taken in minutes to close all related back-office tickets.
   total_minutes_front_to_open_back_ticket_time:
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+      - datalake_zendesk.tickets_current.ts_created_local
       - datalake_quinto_messenger.task_event.ts_created_local
     description:
       Time taken in minutes to open the related back-office ticket after solving the
@@ -380,12 +380,6 @@ columns:
       The CSAT score or rating for the respective chat. It considers the first CSAT
       score (values range from 1 to 5).
   last_csat_score:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.rating
-    description:
-      The CSAT score or rating for the respective chat. It considers the last CSAT
-      score (values range from 1 to 5).
-  csat_score:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.rating
     description:

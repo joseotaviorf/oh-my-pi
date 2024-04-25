@@ -359,33 +359,30 @@ chat_csat AS (
 ),
 zendesk_ticket_info AS (
   SELECT DISTINCT
-    tf.id_ticket,
-    ftm.id_session,
-    ftm.id_user,
-    ftm.id_contract,
-    tf.tags,
-    tf.description,
-    tf.status,
-    tf.custom_fields,
-    tf.group_name AS zendesk_ticket_department,
-    ftm.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
-    ftm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
-    ftm.reopens,
-    ftm.replies,
-    tf.request_type,
-    tf.client_type,
-    tf.step_tag,
-    tf.customer_type_tag,
-    tf.contact_motivation_tag,
-    tf.contact_theme_tag,
-    tf.contact_theme_detail_tag,
-    ftm.ts_created_local AS ts_created,
-    ftm.ts_solved_local AS ts_solved
+    id_ticket,
+    id_session,
+    id_user_main AS id_user,
+    id_contract,
+    tags,
+    description,
+    status,
+    TO_JSON(custom_fields) AS custom_fields,
+    group_name AS zendesk_ticket_department,
+    first_resolution_time_min_calendar AS minutes_first_resolution_time_calendar,
+    first_resolution_time_min_business AS minutes_first_resolution_time_business,
+    replies,
+    reopens,
+    request_type,
+    client_type,
+    step_tag,
+    customer_type_tag,
+    contact_motivation_tag,
+    contact_theme_tag,
+    contact_theme_detail_tag,
+    ts_created - INTERVAL 3 HOUR AS ts_created,
+    ts_solved - INTERVAL 3 HOUR AS ts_solved
   FROM
-    datalake_zendesk_ticket_funnels.ticket_funnel AS tf
-  INNER JOIN
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS ftm
-      ON tf.id_ticket = ftm.id_ticket
+    datalake_zendesk.tickets_current
 ),
 tickets_with_task AS (
   SELECT DISTINCT

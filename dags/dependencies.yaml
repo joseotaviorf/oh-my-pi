@@ -1341,7 +1341,6 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
@@ -2604,14 +2603,14 @@ bietlejuice.enrich_superset:
   - bietlejuice.superset_entities:load-clean-dashboards
   - bietlejuice.superset_entities:load-clean-slice-user
   - bietlejuice.superset_entities:load-clean-slices
-  - bietlejuice.superset_entities:load-clean-tag
-  - bietlejuice.superset_entities:load-clean-tagged-object
-  - bietlejuice.superset_internal:load-clean-ab-user
-  - bietlejuice.superset_internal:load-clean-logs
   - bietlejuice.superset_entities:load-clean-sql-metrics
   - bietlejuice.superset_entities:load-clean-table-columns
   - bietlejuice.superset_entities:load-clean-table-schema
   - bietlejuice.superset_entities:load-clean-tables
+  - bietlejuice.superset_entities:load-clean-tag
+  - bietlejuice.superset_entities:load-clean-tagged-object
+  - bietlejuice.superset_internal:load-clean-ab-user
+  - bietlejuice.superset_internal:load-clean-logs
 bietlejuice.enrich_supply_acquisition:
   - bietlejuice.bob:load-clean-location
   - bietlejuice.bob:load-clean-submission-progress

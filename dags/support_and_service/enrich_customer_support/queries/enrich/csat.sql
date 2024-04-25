@@ -9,7 +9,7 @@ WITH chat_total AS (
     ss.ts_created AS ts_survey,
     sa.ts_created AS ts_response
   FROM
-    datalake_zendesk_ticket_funnels.ticket_funnel AS zf
+    datalake_zendesk.tickets_current AS zf
   INNER JOIN
     datalake_chat_fup_clean.chats_chat AS cc
       ON zf.id_ticket = cc.id_ticket
@@ -23,15 +23,7 @@ WITH chat_total AS (
     COALESCE(CAST(sa.is_solved AS string), CAST(sa.rating AS string)) IS NOT NULL
 ),
 email_total AS (
-  WITH last_update_ticket AS (
-    SELECT
-      id_ticket,
-      MAX(ts_updated) AS ts_last_updated
-    FROM
-      datalake_zendesk_tickets_clean.tickets
-    GROUP BY 1
-  ),
-  csat AS (
+  WITH csat AS (
     SELECT
       t.id_ticket AS id_ticket,
       GET_JSON_OBJECT(satisfaction_rating, '$.comment') AS csat_comment,
@@ -50,13 +42,9 @@ email_total AS (
       END AS is_solved,
       MIN(sr.ts_updated) OVER(PARTITION BY t.id_ticket) AS ts_first_response
     FROM
-      datalake_zendesk_tickets_clean.tickets t
-    JOIN
-      last_update_ticket lut
-        ON t.id_ticket = lut.id_ticket
-        AND t.ts_updated = lut.ts_last_updated
+      datalake_zendesk.tickets_current t
     LEFT JOIN
-      datalake_zendesk_tickets_clean.satisfaction_ratings AS sr
+      datalake_zendesks_clean.satisfaction_ratings AS sr
         ON sr.id_ticket = lut.id_ticket
     UNION ALL
     SELECT
@@ -91,7 +79,7 @@ email_total AS (
   FROM
     csat
   JOIN
-    datalake_zendesk_ticket_funnels.ticket_funnel AS tf
+    datalake_zendesk.tickets_current AS tf
       ON tf.id_ticket = csat.id_ticket
   WHERE
     tf.channel IN ('email', 'form_faq', 'web', 'other')
@@ -126,10 +114,10 @@ call_total AS (
   zendesk_tickets_unique AS (
     --this CTE fix the error of multiple tickets openned for a single call
     SELECT
-      tfm.id_call,
-      MAX(tfm.id_ticket) AS id_ticket
+      id_call,
+      MAX(id_ticket) AS id_ticket
     FROM
-      datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
+      datalake_zendesk.tickets_current
     WHERE
       id_call IS NOT NULL
     GROUP BY 1

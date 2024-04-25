@@ -9,9 +9,9 @@ columns:
   id_ticket:
     lineage:
       - datalake_chat_fup_clean.chats_chat.id_ticket
-      - datalake_zendesk_tickets_clean.tickets.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
       - datalake_survicate.zendesk_email_surveys.id_ticket
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description:
       This unique identifier for Zendesk Tickets considers all tickets that have a chat
       survey, email survey, or call survey associated with them. In the case of call
@@ -23,7 +23,7 @@ columns:
   csat_comment:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.comment
-      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_zendesk.tickets_current.satisfaction_rating
       - datalake_survicate.zendesk_email_surveys.user_comment
     description:
       This field contains the comment provided by the customer in response to the first
@@ -41,14 +41,14 @@ columns:
   resolution_survey:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.is_solved
-      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_zendesk.tickets_current.satisfaction_rating
       - datalake_survicate.zendesk_email_surveys.is_solved
       - datalake_bigfone_twilio.call_ivr_events.csat_1
     description: This boolean value indicates whether the ticket has been solved or not.
   csat_score:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.rating
-      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_zendesk.tickets_current.satisfaction_rating
       - datalake_survicate.zendesk_email_surveys.csat_score
       - datalake_bigfone_twilio.call_ivr_events.csat_2
     description:
@@ -64,8 +64,8 @@ columns:
   ts_response:
     lineage:
       - datalake_chat_fup_clean.surveys_answer.ts_created
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.ts_updated
-      - datalake_zendesk_tickets_clean.tickets.id_ticket
+      - datalake_zendesk_clean.satisfaction_ratings.ts_updated
+      - datalake_zendesk.tickets_current.id_ticket
       - datalake_survicate.zendesk_email_surveys.ts_first_response
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
     description:
