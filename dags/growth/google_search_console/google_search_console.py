@@ -20,7 +20,7 @@ SOURCE = "google_search_console"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 8, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 10 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_med_io-general_cluster"
 CUSTOM_LIBRARIES = [{"pypi": {"package": "google-api-python-client"}}]
 
 config_service = ConfigurationService(SOURCE)

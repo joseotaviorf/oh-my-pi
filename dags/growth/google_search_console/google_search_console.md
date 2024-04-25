@@ -38,11 +38,13 @@ This pipeline produces the following output tables in each layer:
   * `datalake_google_search_console_raw.report_by_page`
   * `datalake_google_search_console_raw.report_by_query`
   * `datalake_google_search_console_raw.report_by_page_and_query`
+  * `datalake_google_search_console_raw.report_by_query_summarized`
 
 * clean:
   * `datalake_google_search_console_clean.report_by_date`
   * `datalake_google_search_console_clean.report_by_page`
   * `datalake_google_search_console_clean.report_by_query`
   * `datalake_google_search_console_clean.report_by_page_and_query`
+  * `datalake_google_search_console_clean.report_by_query_summarized`
 
 </details>
