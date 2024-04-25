@@ -7,7 +7,7 @@ dag:
     dag_purpose: This DAG creates the enriched tables of the first layer of enrichment from Cozy Metrics to Design Systems team.
       This data is enriched with rules created by product team, to measure and evolute the metrics on PWAs systems.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
-  type: databricks_10_4_min_general_photon_cluster
+  type: databricks_12_2_min_general_photon_cluster

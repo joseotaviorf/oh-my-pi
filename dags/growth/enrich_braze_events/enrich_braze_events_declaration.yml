@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the enriched tables of the first layer of enrichment from Braze Events DAG, by cleaning data and applying an event type filter.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: braze
   default_extraction_type: incremental
