@@ -6,9 +6,9 @@ monthly_tof_metrics AS (
     dr.city_group, 
     fdtof.operation_channel,
     fdtof.platform,
-    NULL AS referral_type, 
-    fdtof.utm_campaign, 
-    fdtof.utm_term, 
+    CAST(NULL AS STRING) AS referral_type, 
+    CAST(NULL AS STRING) AS utm_campaign, 
+    CAST(NULL AS STRING) AS utm_term, 
     LOWER(fdtof.business_context) AS business_context,
     fdtof.funnel_side,
     fdtof.campaign_business_context,
@@ -19,9 +19,9 @@ monthly_tof_metrics AS (
     fdtof.year,
     fdtof.month,
     COUNT(DISTINCT fdtof.sk_tof_user) AS tof_users, 
-    COUNT(DISTINCT (CASE WHEN fdtof.is_rede_demand = TRUE THEN fdtof.sk_tof_user END)) AS tof_users_3p,
+    COUNT(DISTINCT (CASE WHEN fdtof.is_rede_demand = TRUE THEN fdtof.sk_tof_user END)) AS tof_users_rede,
     COUNT(DISTINCT fdtof.sk_tof_event) AS tof_events, 
-    COUNT(DISTINCT CASE WHEN fdtof.is_rede_demand = TRUE THEN fdtof.sk_tof_event END) AS tof_events_3p 
+    COUNT(DISTINCT CASE WHEN fdtof.is_rede_demand = TRUE THEN fdtof.sk_tof_event END) AS tof_events_rede 
   FROM 
     dw_growth.fact_demand_top_of_funnel_events AS fdtof
     INNER JOIN dw_public.dim_date AS dd 
@@ -79,7 +79,7 @@ monthly_costs_metrics AS (
     dc.city_group, 
     NULL AS operation_channel, 
     NULL AS referral_type, 
-    NULL platform, 
+    NULL AS platform, 
     dc.campaign_name AS utm_campaign,
     dc.utm_term, 
     LOWER(dc.business_context) AS business_context,
@@ -118,9 +118,9 @@ SELECT
   COALESCE(t.medium, p.medium, c.medium) AS medium,
   COALESCE(t.source, p.source, c.source) AS source,
   t.tof_users,
-  t.tof_users_3p,
+  t.tof_users_rede,
   t.tof_events,
-  t.tof_events_3p,
+  t.tof_events_rede,
   p.new_prospects,
   p.recovered_prospects,
   p.flows,
