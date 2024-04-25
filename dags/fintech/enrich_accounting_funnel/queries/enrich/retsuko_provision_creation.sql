@@ -26,7 +26,7 @@ WITH retsuko_provisao AS (
         'entry.bill-item/brokerage-installment') THEN 'brokerage'
     END AS revenue_name,
     i.accrual_year_month,
-    DATE(i.ts_created) AS dt_created,
+    DATE(i.ts_created) AS dt_source_provision_created,
     CAST(SUM(amount) AS DECIMAL(12,2)) AS source_provision_amount
   FROM 
     datalake_retsuko.entry  e
@@ -106,7 +106,7 @@ retsuko_reversao AS (
         'entry.bill-item/brokerage-installment') THEN 'brokerage'
     END AS revenue_name,
     i.accrual_year_month,
-    DATE(i.ts_created) AS dt_created,
+    DATE(i.ts_paid) AS dt_source_reversion_created,
     CAST(SUM(amount) AS DECIMAL(12,2)) AS source_reversion_amount
   FROM 
     datalake_retsuko.entry  e
@@ -163,12 +163,12 @@ sap_entity AS (
     id_finance_entity,
     id_sap_gateway_feature,
     event,
-    status,
-    ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) as rn
+    status
   FROM 
     datalake_retsuko_clean.sap_entity
   WHERE 
     id_finance_entity IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
 ),
 
 df AS (
@@ -179,7 +179,8 @@ SELECT
   source_name,
   revenue_name,
   accrual_year_month,
-  dt_created,
+  dt_source_provision_created,
+  NULL AS dt_source_reversion_created,
   source_provision_amount,
   0 AS source_reversion_amount,
   id_sap_gateway_feature,
@@ -189,8 +190,7 @@ FROM
   retsuko_provisao r 
 LEFT JOIN
   sap_entity se 
-    ON r.id_entry = se.id_finance_entity and se.event = 'new-accounting-entries'
-    AND rn = 1
+    ON r.id_entry = se.id_finance_entity AND se.event = 'new-accounting-entries'
 
 UNION ALL
 
@@ -201,7 +201,8 @@ SELECT
   source_name,
   revenue_name,
   accrual_year_month,
-  dt_created,
+  NULL AS dt_source_provision_created,
+  dt_source_reversion_created,
   0 AS source_provision_amount,
   source_reversion_amount,
   id_sap_gateway_feature,
@@ -211,8 +212,7 @@ FROM
   retsuko_reversao r 
 LEFT JOIN
   sap_entity se 
-    ON r.id_invoice = se.id_finance_entity and se.event = 'clearing-accounting-entries'
-    AND rn = 1
+    ON r.id_invoice = se.id_finance_entity AND se.event = 'clearing-accounting-entries'
 ),
 
 sap_gateway AS (
@@ -239,19 +239,26 @@ sap AS (
       WHEN account_number = '31101.02.02' THEN 'adm fee'
       WHEN account_number = '31101.01.04' THEN 'brokerage'
     END AS account_name,
-    SUM(debit_credit) AS debit_credit
+    SUM(debit_credit) AS debit_credit,
+    DATE(dt_created) AS dt_sap_created,
+    DATE(dt_reference) AS dt_sap_reference
   FROM 
     datalake_accounting_funnel.ledger
   WHERE 
     account_number like '31101%'
     AND document_number like 'JE %'
-  GROUP BY 1,2,3
+  GROUP BY 1,2,3,5,6
 ),
 
 df_final AS (
 SELECT 
   id_contract,
   id_invoice,
+  MIN(CASE 
+    WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
+    WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
+    WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NULL THEN 'SB FAILURE'
+  END) AS status,
   source_name,
   revenue_name,
   accrual_year_month,
@@ -259,7 +266,10 @@ SELECT
   CAST(SUM(CASE WHEN event = 'new-accounting-entries' THEN debit_credit END) AS DECIMAL(12,2)) AS sap_provision_amount,
   CAST(SUM(source_reversion_amount) AS DECIMAL(12,2)) AS source_reversion_amount,
   CAST(SUM(CASE WHEN event = 'clearing-accounting-entries' THEN debit_credit END) AS DECIMAL(12,2)) AS sap_reversion_amount,
-  dt_created
+  MAX(dt_source_provision_created) AS dt_source_provision_created,
+  MAX(dt_source_reversion_created) AS dt_source_reversion_created,
+  MAX(CASE WHEN event = 'new-accounting-entries' THEN dt_sap_created END) AS dt_sap_provision_created,
+  MAX(CASE WHEN event = 'clearing-accounting-entries' THEN dt_sap_created END) AS dt_sap_reversion_created
 FROM 
   df
 LEFT JOIN
@@ -272,26 +282,60 @@ LEFT JOIN
 WHERE 
   TRUE
 GROUP BY 
-  1,2,3,4,5,10
+  1,2,4,5,6
+),
+
+metrics AS (
+  SELECT
+    'JE'||'-'||id_invoice||'-'||'1'||'-'|| 
+      CASE
+        WHEN revenue_name = 'adm fee' THEN '1'
+        WHEN revenue_name = 'brokerage' THEN '2' 
+        WHEN revenue_name = 'service fee' THEN '3' END AS id_retsuko_provision_creation,
+    id_contract AS id_business_entity,
+    id_invoice AS id_finance_entity,
+    status,
+    source_name,
+    revenue_name,
+    accrual_year_month,
+    source_provision_amount,
+    sap_provision_amount,
+    source_reversion_amount,
+    sap_reversion_amount,
+    IF(source_provision_amount + sap_provision_amount = 0 OR (source_provision_amount = 0 AND sap_provision_amount IS NULL), true, false) AS is_provision_correctness_compliance,
+    IF(source_reversion_amount - sap_reversion_amount = 0 OR (source_reversion_amount = 0 AND sap_reversion_amount IS NULL), true, false) AS is_reversion_correctness_compliance,
+    IF(dt_sap_provision_created <= date_add(dt_source_provision_created, 7), true, false) AS is_provision_temporality_compliance,
+    IF(dt_sap_reversion_created <= date_add(dt_source_reversion_created, 7), true, false) AS is_reversion_temporality_compliance,
+    dt_source_provision_created,
+    dt_sap_provision_created,
+    dt_source_reversion_created,
+    dt_sap_reversion_created
+  FROM 
+    df_final
 )
 
 SELECT
-  'JE'||'-'||id_invoice||'-'||'1'||'-'|| 
-    CASE
-      WHEN revenue_name = 'adm fee' THEN '1'
-      WHEN revenue_name = 'brokerage' THEN '2' 
-      WHEN revenue_name = 'service fee' THEN '3' END AS id_retsuko_provision_creation,
-  id_contract AS id_business_entity,
-  id_invoice AS id_finance_entity,
-  source_name,
-  revenue_name,
-  accrual_year_month,
-  source_provision_amount,
-  sap_provision_amount,
-  source_reversion_amount,
-  sap_reversion_amount,
-  IF(source_provision_amount + sap_provision_amount = 0 OR (source_provision_amount = 0 AND sap_provision_amount IS NULL), true, false) AS is_provision_compliance,
-  IF(source_reversion_amount - sap_reversion_amount = 0 OR (source_reversion_amount = 0 AND sap_reversion_amount IS NULL), true, false) AS is_reversion_compliance,
-  dt_created
-FROM 
-  df_final
+    id_retsuko_provision_creation,
+    id_business_entity,
+    id_finance_entity,
+    status,
+    source_name,
+    revenue_name,
+    accrual_year_month,
+    source_provision_amount,
+    sap_provision_amount,
+    source_reversion_amount,
+    sap_reversion_amount,
+    is_provision_correctness_compliance,
+    is_reversion_correctness_compliance,
+    is_provision_temporality_compliance,
+    is_reversion_temporality_compliance,
+    IF(is_provision_correctness_compliance = TRUE AND is_reversion_correctness_compliance = TRUE, TRUE, FALSE) AS is_correctness_compliance,
+    IF(is_provision_temporality_compliance = TRUE AND is_reversion_temporality_compliance = TRUE, TRUE, FALSE) AS is_temporality_compliance,
+    IF(is_provision_correctness_compliance = TRUE AND is_reversion_correctness_compliance = TRUE AND is_provision_temporality_compliance = TRUE AND is_reversion_temporality_compliance = TRUE, TRUE, FALSE) AS is_compliance,
+    dt_source_provision_created,
+    dt_sap_provision_created,
+    dt_source_reversion_created,
+    dt_sap_reversion_created
+FROM
+    metrics

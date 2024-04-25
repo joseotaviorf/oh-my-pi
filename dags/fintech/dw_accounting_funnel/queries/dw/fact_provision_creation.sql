@@ -1,16 +1,24 @@
 SELECT 
-  id_retsuko_provision_creation AS sk_provision_creation,
-  id_business_entity,
-  id_finance_entity,
-  source_name,
-  revenue_name,
-  accrual_year_month,
-  source_provision_amount,
-  sap_provision_amount,
-  source_reversion_amount,
-  sap_reversion_amount,
-  is_provision_compliance,
-  is_reversion_compliance,
-  dt_created
+    id_retsuko_provision_creation AS sk_provision_creation,
+    id_business_entity,
+    id_finance_entity,
+    source_name,
+    revenue_name,
+    accrual_year_month,
+    source_provision_amount,
+    sap_provision_amount,
+    source_reversion_amount,
+    sap_reversion_amount,
+    is_provision_correctness_compliance,
+    is_reversion_correctness_compliance,
+    is_provision_temporality_compliance,
+    is_reversion_temporality_compliance,
+    is_correctness_compliance,
+    is_temporality_compliance,
+    is_compliance,
+    dt_source_provision_created,
+    dt_sap_provision_created,
+    dt_source_reversion_created,
+    dt_sap_reversion_created
 FROM 
-  datalake_accounting_funnel.retsuko_provision_creation
+    datalake_accounting_funnel.retsuko_provision_creation

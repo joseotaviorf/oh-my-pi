@@ -41,15 +41,47 @@ columns:
     lineage:
       - datalake_accounting_funnel.retsuko_provision_creation.sap_reversion_amount
     description: "Reversion that was created in SAP"
-  is_provision_compliance:
+  is_provision_correctness_compliance:
     lineage:
-      - datalake_accounting_funnel.retsuko_provision_creation.is_provision_compliance
+      - datalake_accounting_funnel.retsuko_provision_creation.is_provision_correctness_compliance
     description: "Boolean that indicated if the correct amount from provision arrived in the correct destination in SAP"
-  is_reversion_compliance:
+  is_reversion_correctness_compliance:
     lineage:
-      - datalake_accounting_funnel.retsuko_provision_creation.is_reversion_compliance
+      - datalake_accounting_funnel.retsuko_provision_creation.is_reversion_correctness_compliance
     description: "Boolean that indicated if the correct amount from reversion arrived in the correct destination in SAP"
-  dt_created:
+  is_provision_temporality_compliance:
     lineage:
-      - datalake_accounting_funnel.retsuko_provision_creation.dt_created
-    description: "Date that finance entity was created in source"
+      - datalake_accounting_funnel.retsuko_provision_creation.is_provision_temporality_compliance
+    description: "Boolean that indicated if the provision was created in SAP at the right time"
+  is_reversion_temporality_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_reversion_temporality_compliance
+    description: "Boolean that indicated if the reversion was created in SAP at the right time"
+  is_correctness_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_correctness_compliance
+    description: "Boolean that indicated if correctness pillar is compliance"
+  is_temporality_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_temporality_compliance
+    description: "Boolean that indicated if temporality pillar is compliance"
+  is_compliance_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_compliance_compliance
+    description: "Boolean that indicated if everything is compliance"
+  dt_source_provision_created:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.dt_source_provision_created
+    description: "Date that the invoice was created in Retusko"
+  dt_sap_provision_created:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.dt_sap_provision_created
+    description: "Date that provision was created in SAP"
+  dt_source_reversion_created:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.dt_source_reversion_created
+    description: "Date that the invoice was paid in Retusko"
+  dt_sap_reversion_created:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.dt_sap_reversion_created
+    description: "Date that reversion was created in SAP"
