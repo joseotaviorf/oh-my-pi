@@ -44,8 +44,8 @@ email_total AS (
     FROM
       datalake_zendesk.tickets_current t
     LEFT JOIN
-      datalake_zendesks_clean.satisfaction_ratings AS sr
-        ON sr.id_ticket = lut.id_ticket
+      datalake_zendesk_clean.satisfaction_ratings AS sr
+        ON sr.id_ticket = t.id_ticket
     UNION ALL
     SELECT
       id_ticket,
