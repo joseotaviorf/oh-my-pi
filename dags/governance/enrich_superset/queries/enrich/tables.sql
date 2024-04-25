@@ -56,3 +56,4 @@ JOIN datalake_superset.ab_user u_changed ON u_changed.id = lt.id_user_changed
 JOIN table_owners tow ON tow.id_table = lt.id
 JOIN columns_list cl ON cl.id_table = lt.id
 LEFT JOIN metrics_list ml ON ml.id_table = lt.id
+WHERE lt.most_recent_rank = 1

@@ -54,3 +54,4 @@ JOIN datalake_superset.ab_user u_changed ON u_changed.id = ls.id_user_changed
 JOIN slice_owners sow ON sow.id_slice = ls.id 
 LEFT JOIN logs l on l.id_slice = ls.id
 LEFT JOIN tags ON tags.id_object = ls.id
+WHERE ls.most_recent_rank = 1
