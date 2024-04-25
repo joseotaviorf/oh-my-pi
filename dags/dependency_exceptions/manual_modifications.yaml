@@ -380,14 +380,6 @@ bietlejuice.enrich_ebdb_photo_jobs:
 bietlejuice.enrich_ebdb_user:
   add:
     - bietlejuice.ebdb:load-clean-user-merge
-bietlejuice.enrich_growth_automatic_daily_costs:
-  override: []
-bietlejuice.enrich_growth_manual_daily_costs:
-  override: []
-bietlejuice.enrich_growth_costs_sharing_rules:
-  override: []
-bietlejuice.enrich_consolidated_growth_metrics:
-  override: []
 bietlejuice.enrich_supply_conversion:
   add:
     - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup

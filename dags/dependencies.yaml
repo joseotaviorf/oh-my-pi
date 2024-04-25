@@ -1234,6 +1234,24 @@ bietlejuice.enrich_company:
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb:load-clean-listing-business-context
   - bietlejuice.ebdb:load-clean-state
+bietlejuice.enrich_consolidated_growth_metrics:
+  - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
+  - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes
+  - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
+  - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a028a
+  - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a033a
+  - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a034a
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.facebook_insights:load-clean-facebook-insights
+  - bietlejuice.google_ads:load-clean-ads-performance
+  - bietlejuice.google_ads:load-clean-campaigns-performance
+  - bietlejuice.google_ads:load-clean-keywords-performance
+  - bietlejuice.google_ads:load-clean-videos-performance
+  - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary
+  - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
+  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
+  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
+  - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
@@ -1635,6 +1653,25 @@ bietlejuice.enrich_greenseer:
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.journey_flow:load-clean-journey-flow
   - bietlejuice.sauron:load-clean-session
+bietlejuice.enrich_growth_automatic_daily_costs:
+  - bietlejuice.enrich_consolidated_growth_metrics:load-enrich-consolidated-media-metrics
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
+bietlejuice.enrich_growth_costs_sharing_rules:
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
+  - bietlejuice.ebdb:load-clean-partner
+  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+bietlejuice.enrich_growth_manual_daily_costs:
+  - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
+  - bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-costs
+  - bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-costs-name-convetion
 bietlejuice.enrich_growth_taxonomy:
   - bietlejuice.gsheets_growth:done-clean-dict-taxonomy-supply
   - bietlejuice.gsheets_growth:done-clean-taxonomy-levels-values
