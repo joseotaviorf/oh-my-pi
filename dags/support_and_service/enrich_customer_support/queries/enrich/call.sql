@@ -539,6 +539,7 @@ FROM
 LEFT JOIN
   call_inapp_sessions AS cs
     ON cs.id_call = c.id_call
+    OR cs.id_call = c.id_external_service
 INNER JOIN
   zendesk_aditional_ticket_info zd
     ON zd.id_call = c.sk_call

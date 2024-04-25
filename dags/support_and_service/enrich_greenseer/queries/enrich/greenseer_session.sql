@@ -8,6 +8,9 @@ WITH greenseer_uniques AS (
     ts_ended
   FROM
     datalake_greenseer_clean.session
+  WHERE
+    year >= 2023
+    AND ts_created >= "2023-07-01"
   QUALIFY
     RANK() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
@@ -142,41 +145,42 @@ sessions_and_tickets AS (
     id_session,
     id_ticket
   FROM
-    datalake_customer_support.chat
+    datalake_customer_support.unified_tickets
   WHERE
     front_or_back = 'front'
+    AND ticket_origin IN ('call inapp', 'whatsapp', 'chat5a')
 )
 SELECT
-  greenseer_sessions.id_session,
-  id_ticket,
-  greenseer_sessions.id_user,
-  id_pipeline,
-  id_content,
-  (fired_response IS NOT NULL) AS has_journey_flow_response,
-  before_reception,
-  after_reception,
-  response_key,
-  automatic_selection,
-  context_message,
-  created_by_hsm,
-  tags_added,
-  flags,
-  current_state,
-  is_menu_available,
-  more_help_required AS is_more_help_required,
-  problem_solved as is_problem_solved,
-  is_retention,
+  gs.id_session,
+  st.id_ticket,
+  gs.id_user,
+  gs.id_pipeline,
+  gs.id_content,
+  (gs.fired_response IS NOT NULL) AS has_journey_flow_response,
+  gs.before_reception,
+  gs.after_reception,
+  gs.response_key,
+  gs.automatic_selection,
+  gs.context_message,
+  gs.created_by_hsm,
+  gs.tags_added,
+  gs.flags,
+  gs.current_state,
+  gs.is_menu_available,
+  gs.more_help_required AS is_more_help_required,
+  gs.problem_solved as is_problem_solved,
+  gr.is_retention,
   CASE
-    WHEN greenseer_sessions.ts_ended > greenseer_sessions.ts_started + INTERVAL '4 hour' THEN TRUE
+    WHEN gs.ts_ended > gs.ts_started + INTERVAL '4 hour' THEN TRUE
     ELSE FALSE
   END AS has_exceeded_session_timeout,
-  greenseer_sessions.ts_started,
-  greenseer_sessions.ts_ended
+  gs.ts_started,
+  gs.ts_ended
 FROM
-  greenseer_sessions
+  greenseer_sessions AS gs
 LEFT JOIN
-  greenseer_retentions
-    USING(id_session)
+  greenseer_retentions AS gr
+    ON gr.id_session = gs.id_session
 LEFT JOIN
-  sessions_and_tickets
-    USING(id_session)
+  sessions_and_tickets AS st
+    ON st.id_session = gs.id_session
