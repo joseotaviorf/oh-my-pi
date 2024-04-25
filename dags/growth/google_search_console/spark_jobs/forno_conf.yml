@@ -5,7 +5,7 @@ site_url_list:
   - https://proprietario.quintoandar.com.br
   - https://meulugar.quintoandar.com.br
   - https://conteudos.quintoandar.com.br
-report_by_query_summarized:
+by_query_summarized:
   aggregation_type: AUTO
   dimensions:
     - QUERY
