@@ -18,7 +18,7 @@ SOURCE = "regions_polygon"
 CONTEXT = f"reverse_{SOURCE}"
 DAG_ID = f"bietlejuice.{CONTEXT}"
 MAIN_START_DATE = datetime(2020, 8, 1, tzinfo=timezone("America/Sao_Paulo"))
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CLUSTER_DESCRIPTION = "custom_cluster"
 CUSTOM_LIBRARIES = [
     {
         "maven": {
