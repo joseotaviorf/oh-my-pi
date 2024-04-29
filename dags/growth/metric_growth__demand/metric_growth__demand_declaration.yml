@@ -7,13 +7,7 @@ workflow:
   type: query
   layer: metric
   default_extraction_type: incremental
-  tables_customization:
-    growth_demand_performance_daily:
-      partition_by: [year, month, day]
-    growth_demand_performance_weekly:
-      partition_by: [year, month, day]
-    growth_demand_performance_monthly:
-      partition_by: [year, month]  
+  default_partitions: [year, month, day]
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   access_control_list:

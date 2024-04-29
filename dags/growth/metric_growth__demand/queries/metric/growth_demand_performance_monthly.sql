@@ -127,6 +127,7 @@ SELECT
   c.cost,
   COALESCE(t.year, p.year, c.year) AS year,
   COALESCE(t.month, p.month, c.month) AS month,
+  1 AS day,
   NOW() AS ts_load
 FROM 
   monthly_tof_metrics t 

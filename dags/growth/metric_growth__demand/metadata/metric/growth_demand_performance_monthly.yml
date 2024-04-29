@@ -188,6 +188,9 @@ columns:
       - dw_public.dim_date.month
     description: Month of the event date.
     dimension: False
+  day:
+    description: First Day of the month of the event date.
+    dimension: False  
   ts_load:
     description: Timestamp when the data was loaded into the table.
     dimension: False
