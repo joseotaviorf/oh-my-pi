@@ -1,0 +1,43 @@
+dag:
+  name: ebdb_user
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 20 21 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to User into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: ebdb
+  custom_schema: ebdb
+  source_schema: ebdb
+  tables_customization:
+    DadosVendedor:
+      clean_table_name: sales_rep
+    DadosVendedor_AUD:
+      clean_table_name: sales_rep_aud
+    HouseUser:
+      clean_table_name: house_user
+    UserDocument:
+      clean_table_name: user_document
+    UserInfo:
+      clean_table_name: user_info
+    UserMerge:
+      clean_table_name: user_merge
+    UserMerge_AUD:
+      clean_table_name: user_merge_aud
+    UserPreferences:
+      clean_table_name: user_preferences
+    UserProOwner:
+      clean_table_name: user_pro_owner
+    UserProOwner_AUD:
+      clean_table_name: user_pro_owner_aud
+    Usuario:
+      clean_table_name: user
+    Usuario_AUD:
+      clean_table_name: user_aud
+    UsuarioRevisionEntity:
+      clean_table_name: user_revision_entity
+cluster:
+  type: databricks_12_2_med_general_cluster

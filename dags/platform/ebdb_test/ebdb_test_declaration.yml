@@ -17,7 +17,5 @@ workflow:
       clean_table_name: house_aud
     Imovel:
       clean_table_name: house
-    UsuarioRevisionEntity:
-      clean_table_name: user_revision_entity
 cluster:
   type: databricks_12_2_med_general_cluster

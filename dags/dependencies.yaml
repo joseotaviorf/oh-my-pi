@@ -34,7 +34,7 @@ bietlejuice.dw_agents_availability:
   - bietlejuice.ebdb:load-clean-agent-data-aud
   - bietlejuice.ebdb:load-clean-booking
   - bietlejuice.ebdb:load-clean-mask-weekly-hour
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-business-context-history
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-region
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-slots-hourly
@@ -63,7 +63,7 @@ bietlejuice.dw_banking:
   - bietlejuice.ebdb:load-clean-account
   - bietlejuice.ebdb:load-clean-account-transaction
   - bietlejuice.ebdb:load-clean-bank
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
 bietlejuice.dw_banking_file_payments:
   - bietlejuice.vans:load-clean-bank
   - bietlejuice.vans:load-clean-bank-boleto
@@ -273,8 +273,8 @@ bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-visit-status-aud
   - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_contract:load-clean-full-contract
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_booking:load-enrich-house-available-hours
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.dw_datamarts_spark.for_rent_cross:
@@ -295,7 +295,7 @@ bietlejuice.dw_datamarts_spark.for_rent_cross:
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-predicted-price
   - bietlejuice.ebdb:load-clean-house-predicted-price-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_listing_temp:load-enrich-dim-house-listing-house
   - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
   - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listings-house
@@ -322,8 +322,8 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-polygon-region
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_contract:load-clean-work-contract
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
   - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
   - bietlejuice.kodak:load-clean-photo-sphere
@@ -523,7 +523,7 @@ bietlejuice.dw_lead:
   - bietlejuice.ebdb:load-clean-lead
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_crm_lead:load-enrich-lead-score-factor
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
@@ -554,7 +554,7 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
 bietlejuice.dw_listing_owners:
   - bietlejuice.ebdb:load-clean-partner-agent
-  - bietlejuice.ebdb:load-clean-user-preferences
+  - bietlejuice.ebdb_user:load-clean-user-preferences
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
@@ -589,8 +589,8 @@ bietlejuice.dw_pipeline:
   - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list
   - bietlejuice.gsheets_cross:done-clean-dags-special-scheduler
 bietlejuice.dw_proposal:
-  - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb_proposal:load-clean-proposal
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_proposal:load-enrich-proposal-person
   - bietlejuice.enrich_proposal:load-enrich-proposal
 bietlejuice.dw_proposal_temp:
@@ -674,7 +674,7 @@ bietlejuice.dw_rent_flow_temp:
 bietlejuice.dw_rent_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.ebdb:load-clean-affiliate-data
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
   - bietlejuice.enrich_lead:load-enrich-lead-city-region
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
@@ -775,7 +775,7 @@ bietlejuice.dw_sale_journey:
 bietlejuice.dw_sale_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.ebdb:load-clean-affiliate-data
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
   - bietlejuice.enrich_lead:load-enrich-lead-city-region
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
@@ -842,7 +842,7 @@ bietlejuice.dw_smart_price:
   - bietlejuice.ebdb:load-clean-dynamic-pricing-house-aud
   - bietlejuice.ebdb:load-clean-dynamic-pricing-parameters
   - bietlejuice.ebdb:load-clean-house-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_smart_price:load-enrich-smart-price-versioning
 bietlejuice.dw_supply_outbound_contacts:
   - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
@@ -851,19 +851,19 @@ bietlejuice.dw_taxonomy:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
 bietlejuice.dw_tenant_documentation:
   - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request
   - bietlejuice.ebdb_proposal:load-clean-proponent-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
   - bietlejuice.ebdb_proposal:load-clean-proposal-document
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
 bietlejuice.dw_tickets:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
 bietlejuice.dw_tracksale:
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
@@ -880,13 +880,13 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-photographer-data
-  - bietlejuice.ebdb:load-clean-sales-rep
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
+  - bietlejuice.ebdb_user:load-clean-sales-rep
   - bietlejuice.enrich_amplitude_partner_taxonomy:load-enrich-amplitude-partner-taxonomy
   - bietlejuice.enrich_big_agent:load-enrich-agent-current-program
   - bietlejuice.enrich_booking:load-enrich-booking
@@ -939,8 +939,8 @@ bietlejuice.dw_visit:
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
 bietlejuice.enrich_3p:
   - bietlejuice.ebdb:load-clean-agent-data
-  - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb_contract:load-clean-work-contract
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 bietlejuice.enrich_accounting_funnel:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
@@ -1130,14 +1130,14 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-preferred-fixed-agent
   - bietlejuice.ebdb:load-clean-preferred-fixed-agent-aud
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb:load-clean-user-visit-preferences
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb:load-clean-visit-checkin
   - bietlejuice.ebdb:load-clean-visit-origin
   - bietlejuice.ebdb:load-clean-visitor
   - bietlejuice.ebdb_contract:load-clean-work-contract
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
@@ -1326,7 +1326,7 @@ bietlejuice.enrich_crm_tasks_transitions:
   - bietlejuice.enrich_crm:load-enrich-tasks
   - bietlejuice.enrich_crm:load-enrich-workflows-transitions
 bietlejuice.enrich_customer_demand:
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_customer_support:load-enrich-email
@@ -1430,7 +1430,7 @@ bietlejuice.enrich_docx:
   - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
   - bietlejuice.docx_user_documents:load-clean-document
 bietlejuice.enrich_ebdb_affiliate:
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
   - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
 bietlejuice.enrich_ebdb_affiliates_cost:
@@ -1439,8 +1439,8 @@ bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb:load-clean-affiliate-data-aud
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-lead
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
 bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:load-clean-agent-data-aud
   - bietlejuice.ebdb:load-clean-agent-data-business-contexts-served-aud
@@ -1456,10 +1456,10 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:load-clean-rating-label
   - bietlejuice.ebdb:load-clean-real-estate-agent-rating
   - bietlejuice.ebdb:load-clean-real-estate-agent-rating-rating-label
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb_contract:load-clean-work-contract
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
@@ -1475,7 +1475,7 @@ bietlejuice.enrich_ebdb_amenities:
   - bietlejuice.ebdb:load-clean-info-condo-amenities
   - bietlejuice.ebdb:load-clean-info-condo-amenities-aud
   - bietlejuice.ebdb:load-clean-listing-business-context
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_condo:
   - bietlejuice.ebdb:load-clean-house
@@ -1491,8 +1491,6 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-photographer-job
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-contract-aud
   - bietlejuice.ebdb_contract:load-clean-contract-partnership-data
@@ -1500,6 +1498,8 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb_contract:load-clean-contract-version
   - bietlejuice.ebdb_contract:load-clean-full-contract
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -1513,15 +1513,15 @@ bietlejuice.enrich_ebdb_country:
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-region
   - bietlejuice.ebdb:load-clean-state
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
 bietlejuice.enrich_ebdb_customer_contact_identification:
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-aud
   - bietlejuice.ebdb_contract:load-clean-contract-person-aud
   - bietlejuice.ebdb_proposal:load-clean-proponent-proposal-aud
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-aud
 bietlejuice.enrich_ebdb_house:
   - bietlejuice.ebdb:load-clean-house-maintenance-condition-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_country:load-enrich-user
 bietlejuice.enrich_ebdb_listing:
   - bietlejuice.company:load-clean-company
@@ -1556,12 +1556,12 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-clean-special-condition
   - bietlejuice.ebdb:load-clean-special-condition-aud
   - bietlejuice.ebdb:load-clean-state
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-full-contract
   - bietlejuice.ebdb_contract:load-clean-portability
   - bietlejuice.ebdb_offer:load-clean-instant-offer
   - bietlejuice.ebdb_out_of_context:load-clean-restriction-type
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
@@ -1575,29 +1575,28 @@ bietlejuice.enrich_ebdb_photo_jobs:
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb:load-clean-photographer-job-aud
   - bietlejuice.ebdb:load-clean-state
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_ebdb_pricing:
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-predicted-price-aud
   - bietlejuice.ebdb:load-clean-listing-business-context
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal-aud
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal-condition
-  - bietlejuice.ebdb_proposal:load-clean-proposal-condition
   - bietlejuice.ebdb_proposal:load-clean-proponent-proposal
+  - bietlejuice.ebdb_proposal:load-clean-proposal-condition
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_rent_flow:
   - bietlejuice.ebdb:load-clean-booking
   - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb:load-clean-visit-origin
   - bietlejuice.ebdb:load-clean-visitor
@@ -1607,13 +1606,14 @@ bietlejuice.enrich_ebdb_rent_flow:
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
+  - bietlejuice.ebdb_user:load-clean-user
 bietlejuice.enrich_ebdb_rental_administration:
   - bietlejuice.ebdb:load-clean-rental-administrator-change-request-aud
   - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_ebdb_smart_price:
   - bietlejuice.ebdb:load-clean-dynamic-pricing-house-aud
   - bietlejuice.ebdb:load-clean-house-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_listing:load-enrich-lbc-status-version-order
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_user:
@@ -1625,13 +1625,13 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:load-clean-doorman-affiliate-data
   - bietlejuice.ebdb:load-clean-doorman-affiliate-occupation
   - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.ebdb:load-clean-sales-rep
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-merge
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_proposal:load-clean-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
+  - bietlejuice.ebdb_user:load-clean-sales-rep
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-merge
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_country:load-enrich-user
 bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb_contract:load-clean-work-contract
@@ -1700,9 +1700,9 @@ bietlejuice.enrich_hr_system:
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
 bietlejuice.enrich_hub_services:
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-aud
-  - bietlejuice.ebdb:load-clean-user-merge
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-aud
+  - bietlejuice.ebdb_user:load-clean-user-merge
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets_for_sale:done-clean-business-unit-region
@@ -1777,9 +1777,9 @@ bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-lead
   - bietlejuice.ebdb:load-clean-partner-agent
-  - bietlejuice.ebdb:load-clean-user
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
@@ -1810,9 +1810,9 @@ bietlejuice.enrich_kong_ss:
   - bietlejuice.kong:load-clean-kong-logs
 bietlejuice.enrich_landlord_journey:
   - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
@@ -1829,7 +1829,7 @@ bietlejuice.enrich_lead:
   - bietlejuice.ebdb:load-clean-conversion-lead
   - bietlejuice.ebdb:load-clean-lead
   - bietlejuice.ebdb:load-clean-lead-reason
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-address
@@ -1861,7 +1861,7 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-photographer-job
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_photo_jobs:load-enrich-photo-job
@@ -2006,7 +2006,7 @@ bietlejuice.enrich_mexico_mox_reports:
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
 bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.ebdb:load-clean-affiliate-data
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
   - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
@@ -2110,7 +2110,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
   - bietlejuice.hub_services:load-clean-business-unit
 bietlejuice.enrich_olos_dialer:
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.olos_dialer:load-clean-attempts-raw-data
   - bietlejuice.olos_dialer:load-clean-campaign
   - bietlejuice.olos_dialer:load-clean-campaign-customer
@@ -2140,11 +2140,11 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-partner-agent-aud
   - bietlejuice.ebdb:load-clean-pro-owner-fee-aud
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-pro-owner
-  - bietlejuice.ebdb:load-clean-user-pro-owner-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_contract:load-clean-portability
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-pro-owner
+  - bietlejuice.ebdb_user:load-clean-user-pro-owner-aud
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
@@ -2245,7 +2245,7 @@ bietlejuice.enrich_rede_supply:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-listing-business-context-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-business-context-detail
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-file
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
@@ -2315,7 +2315,7 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-key-type
   - bietlejuice.ebdb:load-clean-occupant-type
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -2408,7 +2408,7 @@ bietlejuice.enrich_sale_demand_events:
 bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-house-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_offer:load-enrich-sale-offer
@@ -2420,7 +2420,7 @@ bietlejuice.enrich_sale_flows:
   - bietlejuice.sales_flow:load-clean-sales-flow-aud
 bietlejuice.enrich_sale_journey:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.ebdb:load-clean-user-aud
+  - bietlejuice.ebdb_user:load-clean-user-aud
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_lead_flows:load-enrich-hub-services-lead-flow
@@ -2440,10 +2440,10 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.classified_leads:load-clean-lead-reply-whatsapp
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-region
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-aud
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-contract-person
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-aud
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_hub_services:load-enrich-business-unit-region
@@ -2547,7 +2547,7 @@ bietlejuice.enrich_sale_stranded_listings:
 bietlejuice.enrich_sale_visit:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-real-estate-agent-rating
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
@@ -2606,7 +2606,7 @@ bietlejuice.enrich_search_session_event:
   - bietlejuice.ebdb:load-clean-region
 bietlejuice.enrich_secretariat:
   - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_offer:load-enrich-sale-offer
@@ -2665,8 +2665,8 @@ bietlejuice.enrich_supply_conversion:
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-listing-business-context-aud
   - bietlejuice.ebdb:load-clean-photographer-job-aud
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_bob:load-enrich-house-draft-business-context
   - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-events
   - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-mailing
@@ -2714,9 +2714,9 @@ bietlejuice.enrich_survicate:
   - bietlejuice.survicate:load-clean-survey-questions
   - bietlejuice.survicate:load-clean-survey-responses
 bietlejuice.enrich_tenant_journey:
-  - bietlejuice.ebdb:load-clean-user-revision-entity
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
@@ -2756,7 +2756,7 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.casa_mineira_crm:load-clean-media-contact
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
   - bietlejuice.enrich_ebdb_user:load-enrich-user
@@ -2774,7 +2774,7 @@ bietlejuice.enrich_user:
   - bietlejuice.ebdb:load-clean-agent-data-business-contexts-served
   - bietlejuice.ebdb:load-clean-country
   - bietlejuice.ebdb:load-clean-photographer-data
-  - bietlejuice.ebdb:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
   - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
 bietlejuice.enrich_velo:
@@ -3028,7 +3028,7 @@ bietlejuice.looker_temps:
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-visit-status-aud
   - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-activations-suspensions-contracts-changes
@@ -3305,9 +3305,9 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb:load-clean-house
-  - bietlejuice.ebdb:load-clean-user
-  - bietlejuice.ebdb:load-clean-user-pro-owner
   - bietlejuice.ebdb_contract:load-clean-contract-person
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-pro-owner
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
@@ -3365,7 +3365,7 @@ wonka.house_embeddings_main:
   - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
 wonka.house_listing_business_context:
   - bietlejuice.ebdb:load-clean-listing-business-context-aud
-  - bietlejuice.ebdb:load-clean-user-revision-entity
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
 wonka.house_rent_search_page_viewed:
   - wonka.searched_house_main:load-searched_house_main
 wonka.house_sale_search_page_viewed:

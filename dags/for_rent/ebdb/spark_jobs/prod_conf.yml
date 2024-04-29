@@ -325,6 +325,19 @@ table_block_list:
   - InstantOffer_AUD
   - Offer
   - Offer_AUD
+  - DadosVendedor
+  - DadosVendedor_AUD
+  - HouseUser
+  - UserDocument
+  - UserInfo
+  - UserMerge
+  - UserMerge_AUD
+  - UserPreferences
+  - UserProOwner
+  - UserProOwner_AUD
+  - Usuario
+  - Usuario_AUD
+  - UsuarioRevisionEntity
   - PreProposta
   - PreProposta_AUD
   - PreProposta_CondicaoProposta
