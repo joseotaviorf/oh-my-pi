@@ -325,6 +325,19 @@ table_block_list:
   - InstantOffer_AUD
   - Offer
   - Offer_AUD
+  - PreProposta
+  - PreProposta_AUD
+  - PreProposta_CondicaoProposta
+  - ProponentInfoResendRequest
+  - ProponentInfoResendRequest_AUD
+  - Proposta
+  - Proposta_AUD
+  - PropostaMorador
+  - CondicaoProposta
+  - CondicaoProposta_AUD
+  - DocumentoProposta
+  - PropostaProponente
+  - PropostaProponente_AUD
 
 view_allow_list:
   - MapRegiao

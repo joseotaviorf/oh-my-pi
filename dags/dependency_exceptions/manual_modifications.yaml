@@ -92,7 +92,7 @@ bietlejuice.dw_datamarts_spark.fintech_cross:
     - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
     - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
-    - bietlejuice.ebdb:load-clean-proponent-proposal
+    - bietlejuice.ebdb_proposal:load-clean-proponent-proposal
     - bietlejuice.sorting_hat:load-clean-credit-analysis
     - bietlejuice.sorting_hat:load-clean-proponent
     - bietlejuice.sorting_hat:load-clean-proposal
@@ -242,7 +242,7 @@ bietlejuice.dw_sale_visits:
     - bietlejuice.enrich_booking:load-enrich-booking
 bietlejuice.dw_tenant_documentation:
   remove:
-    - bietlejuice.ebdb:load-clean-proponent-info-resend-request-aud
+    - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request-aud
 bietlejuice.dw_tickets:
   remove:
     - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements

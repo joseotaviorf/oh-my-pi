@@ -1,0 +1,43 @@
+dag:
+  name: ebdb_proposal
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 30 21 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to Offer into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  tables_customization:
+    PreProposta:
+      clean_table_name: pre_proposal
+    PreProposta_AUD:
+      clean_table_name: pre_proposal_aud
+    PreProposta_CondicaoProposta:
+      clean_table_name: pre_proposal_condition
+    ProponentInfoResendRequest:
+      clean_table_name: proponent_info_resend_request
+    ProponentInfoResendRequest_AUD:
+      clean_table_name: proponent_info_resend_request_aud
+    Proposta:
+      clean_table_name: proposal
+    Proposta_AUD:
+      clean_table_name: proposal_aud
+    PropostaMorador:
+      clean_table_name: proposal_resident
+    CondicaoProposta:
+      clean_table_name: proposal_condition
+    CondicaoProposta_AUD:
+      clean_table_name: proposal_condition_aud
+    DocumentoProposta:
+      clean_table_name: proposal_document
+    PropostaProponente:
+      clean_table_name: proponent_proposal
+    PropostaProponente_AUD:
+      clean_table_name: proponent_proposal_aud
+cluster:
+  type: databricks_12_2_med_general_cluster
