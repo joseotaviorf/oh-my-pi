@@ -1,0 +1,37 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: company_executive
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.id
+  uuid_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.personuuid
+  uuid_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.companyuuid
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.version
+  user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.userinsert
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.active
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_executive.day
