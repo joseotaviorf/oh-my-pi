@@ -14,6 +14,7 @@ Steps 2 and 4 are separate because some enrichments are easier to be done before
 import json
 import re
 import boto3
+import botocore
 import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
@@ -33,6 +34,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_dag_inventory_raw"
 THREAD_NUMBER = 8
@@ -45,6 +47,7 @@ LAYERS_TO_FETCH_FILES = [
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+config_service = ConfigurationService("dag_inventory")
 
 
 """
@@ -92,6 +95,7 @@ def enrich_table_dictionary_with_spark_metastore(content: dict) -> dict:
                         "files_location": f"{database_location}{table}",
                         "table": f"{database_name}.{table}",
                         "layer": row["layer"],
+                        "bucket": row["bucket"],
                     }
                 )
         except AnalysisException:
@@ -157,17 +161,23 @@ def find_recently_modified_files_by_prefix(
     objects = s3_iterator.search(
         f"Contents[?(to_string(LastModified)>='\"{formatted_date} 00:00:00+00:00\"'&&to_string(LastModified)<='\"{formatted_date} 23:59:59+00:00\"')].[Key,Size,LastModified]"
     )
-    object_tuples = [
-        (
-            sanitize_file_name(bucket, obj[0]),
-            fetch_partition_name(obj[0]),
-            obj[0],
-            obj[1],
-            obj[2],
-        )
-        for obj in objects
-        if obj is not None and obj[0].endswith((".json", ".parquet", ".txt", ".csv"))
-    ]
+    object_tuples = []
+    try: 
+        for obj in objects:
+
+            if obj is not None and obj[0].endswith((".json", ".parquet", ".txt", ".csv")):
+                object_tuples.append(
+                    (
+                        sanitize_file_name(bucket, obj[0]),
+                        fetch_partition_name(obj[0]),
+                        obj[0],
+                        obj[1],
+                        obj[2],
+                    )
+                )
+    except botocore.exceptions.ClientError as error:
+        logging.error(f"Problem with prefix {prefix} on bucket {bucket}")
+        raise error     
 
     return object_tuples
 
@@ -222,7 +232,8 @@ def find_recently_modified_files(
     for table in enriched_content_dictionary:
         if table["layer"] not in LAYERS_TO_FETCH_FILES:
             continue
-        inputs.append((table, execution_date))
+        if table["bucket"] != config_service.get_config("people_bucket"):
+            inputs.append((table, execution_date))
 
     pool = ThreadPool(processes=THREAD_NUMBER)
     outputs = pool.starmap(find_recently_modified_files_by_table, inputs)
