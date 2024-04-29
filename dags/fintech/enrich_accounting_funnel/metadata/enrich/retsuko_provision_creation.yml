@@ -25,6 +25,11 @@ columns:
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
     description: "Accrual year month from Retsuko's invoice"
+  status:
+    lineage:
+      - datalake_accounting_funnel.ledger.hash
+      - datalake_sap_gateway.id_feature
+    description: "Indicates, if broken, which source had failed: SG - SAP Gateway, SB - Seu Barriga"
   source_provision_amount:
     lineage:
       - datalake_retsuko.entry.amount
@@ -41,6 +46,11 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger.debit_credit
     description: "Reversion that was created in SAP"
+  is_completeness_compliance:
+    lineage:
+      - datalake_accounting_funnel.ledger.hash
+      - datalake_sap_gateway.id_feature
+    description: "Indicates if the funnel is complete: same ID throught all products until arrive in SAP"
   is_provision_correctness_compliance:
     lineage:
       - datalake_accounting_funnel.ledger.debit_credit

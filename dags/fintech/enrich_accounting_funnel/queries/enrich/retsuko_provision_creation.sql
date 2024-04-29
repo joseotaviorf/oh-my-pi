@@ -254,14 +254,15 @@ df_final AS (
 SELECT 
   id_contract,
   id_invoice,
+  source_name,
+  revenue_name,
+  accrual_year_month,
   MIN(CASE 
     WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
     WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
     WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NULL THEN 'SB FAILURE'
   END) AS status,
-  source_name,
-  revenue_name,
-  accrual_year_month,
+  IF(sap.hash IS NULL OR sap_gateway.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
   CAST(SUM(source_provision_amount) AS DECIMAL(12,2)) AS source_provision_amount,
   CAST(SUM(CASE WHEN event = 'new-accounting-entries' THEN debit_credit END) AS DECIMAL(12,2)) AS sap_provision_amount,
   CAST(SUM(source_reversion_amount) AS DECIMAL(12,2)) AS source_reversion_amount,
@@ -282,7 +283,7 @@ LEFT JOIN
 WHERE 
   TRUE
 GROUP BY 
-  1,2,4,5,6
+  1,2,3,4,5,7
 ),
 
 metrics AS (
@@ -294,18 +295,19 @@ metrics AS (
         WHEN revenue_name = 'service fee' THEN '3' END AS id_retsuko_provision_creation,
     id_contract AS id_business_entity,
     id_invoice AS id_finance_entity,
-    status,
     source_name,
     revenue_name,
     accrual_year_month,
+    status,
     source_provision_amount,
     sap_provision_amount,
     source_reversion_amount,
     sap_reversion_amount,
+    is_completeness_compliance,
     IF(source_provision_amount + sap_provision_amount = 0 OR (source_provision_amount = 0 AND sap_provision_amount IS NULL), true, false) AS is_provision_correctness_compliance,
-    IF(source_reversion_amount - sap_reversion_amount = 0 OR (source_reversion_amount = 0 AND sap_reversion_amount IS NULL), true, false) AS is_reversion_correctness_compliance,
+    IF((source_reversion_amount - sap_reversion_amount = 0) OR (source_reversion_amount = 0 AND sap_reversion_amount IS NULL) OR (dt_source_reversion_created IS NULL), true, false) AS is_reversion_correctness_compliance,
     IF(dt_sap_provision_created <= date_add(dt_source_provision_created, 7), true, false) AS is_provision_temporality_compliance,
-    IF(dt_sap_reversion_created <= date_add(dt_source_reversion_created, 7), true, false) AS is_reversion_temporality_compliance,
+    IF((dt_sap_reversion_created <= date_add(dt_source_reversion_created, 7)) OR (dt_source_reversion_created IS NULL), true, false) AS is_reversion_temporality_compliance,
     dt_source_provision_created,
     dt_sap_provision_created,
     dt_source_reversion_created,
@@ -318,14 +320,15 @@ SELECT
     id_retsuko_provision_creation,
     id_business_entity,
     id_finance_entity,
-    status,
     source_name,
     revenue_name,
     accrual_year_month,
+    status,
     source_provision_amount,
     sap_provision_amount,
     source_reversion_amount,
     sap_reversion_amount,
+    is_completeness_compliance,
     is_provision_correctness_compliance,
     is_reversion_correctness_compliance,
     is_provision_temporality_compliance,
@@ -339,3 +342,4 @@ SELECT
     dt_sap_reversion_created
 FROM
     metrics
+LIMIT 10
