@@ -1,0 +1,39 @@
+---
+database_name: metric_rent
+table_name: relisting_well_priced_monthly
+description: Monthly percentage of relisting well priced according with the price calculator.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_month_reference:
+    lineage:
+      - dw_rent.dim_house_listing.ts_listing_version_start
+    description: "Month of relisting."
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_house_listing.country_code
+    description: "Country code of the house."
+    dimension: True
+  pct_well_priced:
+    description: "Percentage of well priced listings after publication."
+    metric:
+      name: Relisting Well Priced
+      description: "Percentage of well priced listings after publication."
+      acronym: PWP
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_well_priced_4w:
+    description: "Percentage of well priced listings 4 weeks after publication."
+    metric:
+      name: Relisting Well Priced - 4W
+      description: "Percentage of well priced listings 4 weeks after publication."
+      acronym: PWP4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
