@@ -4,45 +4,9 @@ columns:
   id:
     lineage:
       - datalake_ebdb_raw.visita.id
-  ts_created:
-    lineage:
-      - datalake_ebdb_raw.visita.criadoem
-  ts_updated:
-    lineage:
-      - datalake_ebdb_raw.visita.atualizadoem
-  code:
-    lineage:
-      - datalake_ebdb_raw.visita.codigo
-  dt_visit:
-    lineage:
-      - datalake_ebdb_raw.visita.dia
-  slot:
-    lineage:
-      - datalake_ebdb_raw.visita.slot
-  slot_count:
-    lineage:
-      - datalake_ebdb_raw.visita.numeroslots
-  type:
-    lineage:
-      - datalake_ebdb_raw.visita.tipo
-  is_fixed_agent:
-    lineage:
-      - datalake_ebdb_raw.visita.agentefixo
   id_real_estate_agent_rating:
     lineage:
-      - datalake_ebdb_raw.visita.realestateagentrating_id
-  status:
-    lineage:
-      - datalake_ebdb_raw.visita.status
-  structured:
-    lineage:
-      - datalake_ebdb_raw.visita.structured
-  computed_status:
-    lineage:
-      - datalake_ebdb_raw.visita.computed_status
-  booking_type:
-    lineage:
-      - datalake_ebdb_raw.visita.bookingtype
+      - datalake_ebdb_raw.visita.realEstateAgentRating_id
   id_visitor:
     lineage:
       - datalake_ebdb_raw.visita.visitante_id
@@ -51,10 +15,61 @@ columns:
       - datalake_ebdb_raw.visita.agente_id
   id_creation_origin:
     lineage:
-      - datalake_ebdb_raw.visita.origemcriacao_id
+      - datalake_ebdb_raw.visita.origemCriacao_id
   id_last_update_origin:
     lineage:
-      - datalake_ebdb_raw.visita.origemultimaatualizacao_id
+      - datalake_ebdb_raw.visita.origemUltimaAtualizacao_id
   id_house_rating:
     lineage:
-      - datalake_ebdb_raw.visita.houserating_id
+      - datalake_ebdb_raw.visita.houseRating_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.visita.house_id
+  code:
+    lineage:
+      - datalake_ebdb_raw.visita.codigo
+  slot:
+    lineage:
+      - datalake_ebdb_raw.visita.slot
+  slot_count:
+    lineage:
+      - datalake_ebdb_raw.visita.numeroSlots
+  slot_request:
+    lineage:
+      - datalake_ebdb_raw.visita.request_slot
+  type:
+    lineage:
+      - datalake_ebdb_raw.visita.tipo
+  status:
+    lineage:
+      - datalake_ebdb_raw.visita.status
+  computed_status:
+    lineage:
+      - datalake_ebdb_raw.visita.computed_status
+  booking_type:
+    lineage:
+      - datalake_ebdb_raw.visita.bookingType
+  behavior:
+    lineage:
+      - datalake_ebdb_raw.visita.behavior
+  is_fixed_agent:
+    lineage:
+      - datalake_ebdb_raw.visita.agenteFixo
+  structured:
+    lineage:
+      - datalake_ebdb_raw.visita.structured
+  dt_visit:
+    lineage:
+      - datalake_ebdb_raw.visita.dia
+  dt_request:
+    lineage:
+      - datalake_ebdb_raw.visita.request_date
+  dt_confirmation_expiration:
+    lineage:
+      - datalake_ebdb_raw.visita.confirmation_expiration_date
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.visita.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.visita.atualizadoEm
