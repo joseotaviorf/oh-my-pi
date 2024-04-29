@@ -30,9 +30,10 @@ columns:
     description: The total amount of active DAGs that are in the SLA exclusion list in the specific date.
   total_dags_ignoring_list:
     description: The total amount of active DAGs that are in the ignoring list in the specific date, which means DAGs
-      that are in the SLA exclusion list and/or in the special scheduler list.
+      that are in the SLA exclusion list and/or in the special scheduler list and/or with NULL SLA, which might happen because
+      it's the first DAG run ever or a manual run.
       Here we apply a distinct over every id_dag, so the sum of total_dags_in_sla_exclusion_list + total_dags_special_scheduler_executed 
-      may not be the same number of the total_dags_ignoring_list, since there may have DAGs added to both lists.
+      + total_dags_with_null_sla may not be the same number of the total_dags_ignoring_list, since there may have DAGs added in both lists.
   total_dags_inside_sla:
     description: The total amount of active DAGs that the line has that are inside our SLA in the specific date.
   total_dags_outside_sla:

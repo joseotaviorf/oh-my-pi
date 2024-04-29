@@ -85,7 +85,7 @@ special_scheduler AS (
         MAKE_DATE({year}, {month}, {day}) BETWEEN ds.dt_added AND COALESCE(ds.dt_removed, CURRENT_DATE)
 ),
 ignoring_list AS (
-    -- Unifying all DAGs that has special scheduler + are in the SLA exclusion list
+    -- Unifying all DAGs that has special scheduler + are in the SLA exclusion list + first execution has null SLA
     SELECT
         id_dag  
     FROM
@@ -95,6 +95,13 @@ ignoring_list AS (
         id_dag
     FROM 
         sla_exclusion_list
+    UNION
+    SELECT
+        id_dag
+    FROM
+        dag_run_base
+    WHERE 
+        is_first_execution_inside_sla IS NULL
 ),
 totals_base AS (
     SELECT
