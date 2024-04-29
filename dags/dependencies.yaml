@@ -3,10 +3,6 @@ bietlejuice.amplitude:
   - bietlejuice.amplitude_supply:events-supply-to-datalake-raw
 bietlejuice.amplitude_supply:
   - bietlejuice.amplitude_demand:events-demand-to-datalake-raw
-bietlejuice.convenia_inactive_employee_details:
-  - bietlejuice.convenia_active_employee_details:load-clean-active-employee-details
-bietlejuice.convenia_inactive_employee_salary_history:
-  - bietlejuice.convenia_employee_salary_history:load-clean-employee-salary-history
 bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-invoice-issuance
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation

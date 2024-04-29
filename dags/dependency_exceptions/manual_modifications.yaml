@@ -5,12 +5,6 @@ bietlejuice.amplitude:
 bietlejuice.amplitude_supply:
   add:
     - bietlejuice.amplitude_demand:events-demand-to-datalake-raw
-bietlejuice.convenia_inactive_employee_details:
-  add:
-    - bietlejuice.convenia_active_employee_details:load-clean-active-employee-details
-bietlejuice.convenia_inactive_employee_salary_history:
-  add:
-    - bietlejuice.convenia_employee_salary_history:load-clean-employee-salary-history
 bietlejuice.dw_agent_contract:
   add:
     - bietlejuice.dw_rede_company:load-dw-rede-dim-company
