@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the incremental enriched tables for dispatch events for both tenants and owners from Braze.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: braze_dispatches
   default_extraction_type: incremental
@@ -16,6 +16,7 @@ workflow:
   - month
   - day
 cluster:
+  # TO-DO: Review this cluster to fix number of workers and resources
   type: custom_cluster
   custom_configurations:
     spark_version: 12.2.x-scala2.12

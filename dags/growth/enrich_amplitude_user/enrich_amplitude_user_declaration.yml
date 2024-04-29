@@ -1,0 +1,21 @@
+---
+dag:
+  name: enrich_amplitude_user
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: 'Enrich user context events in Amplitude and load into data lake.
+      This DAG enriches amplitude events that come from user login, user created, 
+      and home page visited. Thus, we can track the users initial journey in the app.'
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_12_2_med_io-memory_photon_cluster
+  custom_configurations:
+    spark_conf:
+      spark.executor.cores: 5
+      spark.driver.memory: 54g
+      spark.driver.memoryOverhead: 7g
+      spark.executor.memory: 54g
+      spark.executor.memoryOverhead: 7g
