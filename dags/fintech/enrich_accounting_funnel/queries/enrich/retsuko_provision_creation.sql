@@ -342,4 +342,3 @@ SELECT
     dt_sap_reversion_created
 FROM
     metrics
-LIMIT 10
