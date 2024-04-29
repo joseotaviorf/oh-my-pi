@@ -3,7 +3,7 @@ manual_costs AS (
     SELECT
     REPLACE(dt_cost, '-', '')::INT AS id_date,
     'manual' AS flow_type,
-    NULL AS origin,
+    CAST(NULL AS STRING)  AS origin,
     campaign_business_context AS business_context,
     account_name,
     campaign_name,
@@ -31,7 +31,7 @@ manual_costs_share_rules AS (
     SELECT
     REPLACE(dt_cost, '-', '')::INT AS id_date,
     'manual' AS flow_type,
-    NULL AS origin,
+    CAST(NULL AS STRING) AS origin,
     s.campaign_business_context AS business_context,
     s.account_name,
     s.campaign_name,
