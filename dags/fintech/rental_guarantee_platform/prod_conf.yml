@@ -243,8 +243,7 @@ tables:
     date_filter_column: created_at
     extraction_type: incremental
   - table_name: delinquency_aud
-    date_filter_column: created_at
-    extraction_type: incremental
+    extraction_type: full
   - table_name: delinquency_cancellation
     date_filter_column: updated_at
     extraction_type: incremental

@@ -2835,13 +2835,6 @@ bietlejuice.enrich_velo:
   - bietlejuice.velo:load-clean-fiancavelo-plans
   - bietlejuice.velo:load-clean-fiancavelo-propose
   - bietlejuice.velo_neurotech:load-clean-logs-credit-granting
-  - bietlejuice.velo_omie:load-clean-bank-account
-  - bietlejuice.velo_omie:load-clean-categories
-  - bietlejuice.velo_omie:load-clean-clients
-  - bietlejuice.velo_omie:load-clean-country
-  - bietlejuice.velo_omie:load-clean-projects
-bietlejuice.enrich_velo_omie:
-  - bietlejuice.velo_omie:load-clean-cash-flows
 bietlejuice.enrich_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-groups
   - bietlejuice.velo_zendesk:load-clean-ticket-audits

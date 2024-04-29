@@ -6,121 +6,112 @@ domain: fintech
 columns:
   id:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.id
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.id
   id_propose:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.propose
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.propose
   mod_id_propose:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.propose_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.propose_mod
   id_status:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.status
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.status
   mod_id_status:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.status_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.status_mod
   id_type:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.type
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.type
   mod_id_type:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.type_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.type_mod
   id_user_insert:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.userinsert
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.userinsert
   id_user_update:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.userupdate
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.userupdate
   rev:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.rev
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.rev
   rev_end:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.revend
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.revend
   rev_type:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.revtype
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.revtype
   subcategory:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.subcategory
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.subcategory
   mod_subcategory:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.subcategory_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.subcategory_mod
   value:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.value
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.value
   mod_value:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.value_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.value_mod
   original_value:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.original_value
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.original_value
   mod_original_value:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.original_value_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.original_value_mod
   amount_paid:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.amount_paid
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.amount_paid
   mod_amount_paid:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.amount_paid
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.amount_paid
   bill_value:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_value
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_value
   mod_bill_value:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_value_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_value_mod
   is_active:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.active
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.active
   mod_is_active:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.active_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.active_mod
   is_valid:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.valid
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.valid
   mod_is_valid:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.valid_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.valid_mod
   is_legacy_agreement:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.legacy_agreement
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.legacy_agreement
   mod_is_legacy_agreement:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.legacy_agreement_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.legacy_agreement_mod
   dt_due:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.due_date
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.due_date
   mod_dt_due:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.due_date_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.due_date_mod
   dt_bill_month:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_month
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_month
   mod_dt_bill_month:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_month_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.boleto_month_mod
   dt_paid:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.payment_date
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.payment_date
   mod_dt_paid:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.payment_date_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.payment_date_mod
   dt_payment_scheduled:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.schedule_payment_date
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.schedule_payment_date
   mod_dt_payment_scheduled:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.schedule_payment_date_mod
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.schedule_payment_date_mod
   ts_created:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.created_at
-  year:
-    lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.year
-  month:
-    lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.month
-  day:
-    lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_aud.day
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.created_at

@@ -471,16 +471,39 @@ propose_secured_date AS (
         1 -- some proposes can have multiple same status
 ),
 propose_activation_analysis_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value = 'Análise humana do contrato de locação'
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_activation_analysis
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status = 17
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_activation_analysis, a.ts_activation_analysis) AS ts_activation_analysis
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value = 'Análise humana do contrato de locação'
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 propose_secure_pending_date AS (
     SELECT

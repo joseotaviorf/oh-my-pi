@@ -35,9 +35,6 @@ SELECT
     payment_date_mod AS mod_dt_paid,
     schedule_payment_date AS dt_payment_scheduled,
     schedule_payment_date_mod AS mod_dt_payment_scheduled,
-    created_at AS ts_created,
-    year,
-    month,
-    day
+    created_at AS ts_created
 FROM
     datalake_rental_guarantee_platform_raw.delinquency_aud
