@@ -1,7 +1,7 @@
 dag:
   name: retsuko_test
   schedule_start_date: 2021, 2, 20
-  schedule_interval: 10 21 * * *
+  schedule_interval: 0 8 * * *
   owner: Data Engineering
   documentation:
     dag_purpose: Process data from Retsuko database (postgresql), retrieved using the CDC process. [Retsuko](https://github.com/quintoandar/retsuko) is responsible
@@ -16,6 +16,9 @@ workflow:
   source_schema: public
   custom_schema: retsuko_test
   dbutils_secret_key: RETSUKO_DB
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   tables_customization:
     account: {}
     boleto: {}
