@@ -40,4 +40,4 @@ workflow:
     PropostaProponente_AUD:
       clean_table_name: proponent_proposal_aud
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_2xlarge_general_cluster
