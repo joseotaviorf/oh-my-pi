@@ -5,6 +5,7 @@ from datetime import datetime
 from pyspark.sql.functions import udf, lit
 from pyspark.sql.types import StructType, StructField, StringType
 from quintoandar_logger import QuintoAndarLogger
+from py4j.protocol import Py4JJavaError
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -29,11 +30,18 @@ def get_columns_from_metastore(spark_client, schemas_skip_list):
     for database in databases:
         tables = list_metastore_tables(spark_client, database)
         for table in tables:
-            columns_df = (
-                spark_client.get_records(f"SHOW COLUMNS IN {database}.{table}")
-                .withColumn("database_name", lit(database))
-                .withColumn("table_name", lit(table))
-            )
+            logging.info(f"m={JOB_NAME}, msg=Getting columns from {database}.{table}")
+            try:
+                columns_df = (
+                    spark_client.get_records(f"SHOW COLUMNS IN {database}.{table}")
+                    .withColumn("database_name", lit(database))
+                    .withColumn("table_name", lit(table))
+                )
+            except Py4JJavaError as e:
+                logging.error(
+                    f"m={JOB_NAME}, msg=Error getting columns from {database}.{table}. Error: {e}"
+                )
+                raise e
             final_df = final_df.union(columns_df)
 
     final_df = final_df.coalesce(4)  # reducing number of partitions
@@ -57,7 +65,10 @@ def get_empty_df(spark_client):
 def list_metastore_databases(spark_client, schemas_skip_list):
     databases_df = (
         spark_client.get_records("SHOW DATABASES")
-        .where("databaseName not like '%_staging%' and databaseName not like 'temp_%' and databaseName not like 'igorgatis%'")
+        .where("""databaseName not like '%_staging%' 
+               and databaseName not like 'temp_%' 
+               and databaseName not like 'igorgatis%' 
+               """)
         .collect()
     )
     databases = [
