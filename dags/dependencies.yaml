@@ -2780,8 +2780,6 @@ bietlejuice.enrich_velo:
   - bietlejuice.ebdb:load-clean-country
   - bietlejuice.ebdb:load-clean-state
   - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
-  - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
-  - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
   - bietlejuice.person:load-clean-contact-info
   - bietlejuice.person:load-clean-identity-document
   - bietlejuice.person:load-clean-person

@@ -765,6 +765,8 @@ bietlejuice.enrich_velo:
     - bietlejuice.velo_omie:load-clean-clients
     - bietlejuice.velo_omie:load-clean-country
     - bietlejuice.velo_omie:load-clean-projects
+    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
+    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
 bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region
