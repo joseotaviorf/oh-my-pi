@@ -35,7 +35,7 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
 
     def _get_tables_parameter(self, tables_attributes: list) -> str:
         default_vacuum_retention_hours = self.dag_execution_context.workflow_args.get(
-            "vacuum_retention_hours", 48
+            "vacuum_retention_hours", 7 * 24
         )
         default_run_optimize = self.dag_execution_context.workflow_args.get(
             "run_optimize", True
