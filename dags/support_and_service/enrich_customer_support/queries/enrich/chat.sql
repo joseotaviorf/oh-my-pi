@@ -482,24 +482,24 @@ chat_back_tickets_metrics AS (
 zendesk_tickets_unique AS (
   WITH tickets_unique_whatsapp AS (
     SELECT
-      tfm.id_session,
-      MAX(tfm.id_ticket) AS id_ticket
+      tc.id_session,
+      MAX(tc.id_ticket) AS id_ticket
     FROM
-      datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
+      datalake_zendesk.tickets_current AS tc
     INNER JOIN
       datalake_quinto_messenger.channel AS c
-        ON c.id_source = tfm.id_session
+        ON c.id_source = tc.id_session
     GROUP BY 1
   ),
   tickets_unique_chat5a AS (
     SELECT
-      tfm.id_session,
-      MAX(tfm.id_ticket) AS id_ticket
+      tc.id_session,
+      MAX(tc.id_ticket) AS id_ticket
     FROM
-      datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
+      datalake_zendesk.tickets_current AS tc
     INNER JOIN
       datalake_quinto_messenger.chat AS c
-        ON c.id_session = tfm.id_session
+        ON c.id_session = tc.id_session
     GROUP BY 1
   )
   SELECT

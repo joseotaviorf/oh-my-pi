@@ -80,9 +80,6 @@ SELECT DISTINCT
 FROM
     dw_tickets.fact_tickets AS ft
 INNER JOIN
-    datalake_zendesk_custom_fields.custom_fields cf
-      ON CAST(cf.id_ticket AS BIGINT) = ft.sk_ticket
-INNER JOIN
     dw_public.dim_date AS dd
         ON ft.sk_created_date_local = dd.sk_date
 INNER JOIN

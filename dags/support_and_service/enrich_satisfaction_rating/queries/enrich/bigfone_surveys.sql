@@ -74,7 +74,7 @@ call_csat AS (
     ce.id_call,
     ftm.id_contract,
     ftm.id_ticket,
-    ftm.id_user,
+    ftm.id_user_main AS id_user,
     ce.csat_1,
     ce.csat_2,
     ce.csat_3,
@@ -95,11 +95,8 @@ call_csat AS (
       AND cs.month <= {month}
       AND cs.day <= {day}
   LEFT JOIN
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics ftm
+    datalake_zendesk.tickets_current ftm
       ON ce.id_call = ftm.id_call
-      AND ftm.year <= {year}
-      AND ftm.month <= {month}
-      AND ftm.day <= {day}
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY ce.id_call ORDER BY ce.ts_created_local DESC) = 1
 )

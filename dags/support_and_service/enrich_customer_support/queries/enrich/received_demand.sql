@@ -380,8 +380,8 @@ email AS (
   FROM
     datalake_customer_support.email AS e
   LEFT JOIN
-    datalake_zendesk_tickets_clean.users AS usr
-      ON usr.id_user = e.id_requester
+    datalake_support_users.zendesk_users AS usr
+      ON usr.id_user_zendesk = e.id_requester
   LEFT JOIN
     customer_email AS ce
       ON ce.email = usr.email

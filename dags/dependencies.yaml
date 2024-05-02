@@ -219,7 +219,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-received-demand
   - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
   - bietlejuice.enrich_support_users:load-enrich-analysts
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
+  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.dw_datamarts_spark.cross:
@@ -1353,9 +1353,9 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_quinto_messenger:load-enrich-message
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
+  - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.insider:load-clean-feature
@@ -2070,8 +2070,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
   - bietlejuice.enrich_tracksale:load-enrich-dispatch
   - bietlejuice.enrich_tracksale:load-enrich-dispatch-attributes
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.gsheets_support_and_service:done-clean-inspection-analysis-forms
   - bietlejuice.terminator:load-clean-application-user
@@ -2578,19 +2577,20 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.chat_fup:load-clean-surveys-survey
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
+  - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
   - bietlejuice.enrich_survicate:load-enrich-keys-surveys
   - bietlejuice.enrich_survicate:load-enrich-lockbox-surveys
   - bietlejuice.enrich_survicate:load-enrich-photo-surveys
   - bietlejuice.enrich_survicate:load-enrich-repairs-surveys
   - bietlejuice.enrich_survicate:load-enrich-scheduling-surveys
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_fintech:done-clean-owner-entrance-inspection-csat
   - bietlejuice.gsheets_fintech:done-clean-owner-exit-inspection-csat
   - bietlejuice.gsheets_fintech:done-clean-tenant-entrance-inspection-csat
   - bietlejuice.gsheets_support_and_service:done-clean-csat-reimbursement-true
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat
-  - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
+  - bietlejuice.zendesk:load-clean-satisfaction-ratings
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_search:
@@ -3159,7 +3159,6 @@ bietlejuice.reverse_atento:
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
   - bietlejuice.enrich_support_users:load-enrich-analysts
-  - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event

@@ -83,8 +83,5 @@ SELECT DISTINCT
 FROM
     chat_fup_surveys AS cfs
 LEFT JOIN
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
+    datalake_zendesk.tickets_current AS tfm
         ON tfm.id_ticket = cfs.id_ticket
-        AND tfm.year <= {year}
-        AND tfm.month <= {month}
-        AND tfm.day <= {day}

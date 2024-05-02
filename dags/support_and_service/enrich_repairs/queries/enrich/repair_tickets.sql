@@ -49,7 +49,7 @@ repair_tickets AS (
     th.ts_resolution_contestation
   FROM
       datalake_zendesk.tickets_current AS tc
-  LEFT JOIN
+  INNER JOIN
       ticket_history_base AS th
           ON th.id_ticket = tc.id_ticket
   LEFT JOIN

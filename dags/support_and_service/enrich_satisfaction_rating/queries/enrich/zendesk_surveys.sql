@@ -1,18 +1,18 @@
 WITH zendesk_users_contact AS (
     SELECT
-        zuc.id_zendesk_user,
-        zuc.id_user,
+        zuc.id_user_zendesk,
+        zuc.id_user_main AS id_user,
         zuc.email,
         zuc.role
     FROM
-        datalake_zendesk_tickets.zendesk_users_contact AS zuc
+        datalake_support_users.zendesk_users AS zuc
     WHERE
         DATE(zuc.ts_updated) <= DATE('{year}-{month}-{day}')
     QUALIFY
-        zuc.id_user = MAX(zuc.id_user) OVER(PARTITION BY zuc.id_zendesk_user)
+        zuc.id_user_main = MAX(zuc.id_user_main) OVER(PARTITION BY zuc.id_user_zendesk)
 )
 SELECT DISTINCT
-    sr.id AS id_answer,
+    sr.id_satisfaction_rating AS id_answer,
     tfm.id_contract,
     sr.id_ticket,
     zuc.id_user AS id_respondent,
@@ -29,22 +29,17 @@ SELECT DISTINCT
     END AS satisfaction_score,
     'satisfaction evaluation' AS score_description,
     sr.ts_created AS ts_submitted,
-    sr.year,
-    sr.month,
-    sr.day
+    {year} AS year,
+    {month} AS month,
+    {day} AS day
 FROM
-    datalake_zendesk_tickets_clean.satisfaction_ratings AS sr
+    datalake_zendesk_clean.satisfaction_ratings AS sr
 LEFT JOIN
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS tfm
+    datalake_zendesk.tickets_current AS tfm
         ON tfm.id_ticket = sr.id_ticket
-        AND tfm.year <= {year}
-        AND tfm.month <= {month}
-        AND tfm.day <= {day}
 LEFT JOIN
     zendesk_users_contact AS zuc
-        ON zuc.id_zendesk_user = tfm.id_zendesk_requester_user
+        ON zuc.id_user_zendesk = tfm.id_requester
 WHERE
-    sr.year = {year}
-    AND sr.month = {month}
-    AND sr.day = {day}
+    DATE(sr.ts_updated) = '{year}-{month}-{day}'
     AND sr.score IN ('good', 'bad')

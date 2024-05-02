@@ -1,32 +1,32 @@
 WITH tickets_funnel_metrics_adjusted AS (
     SELECT
-        tfm.id_contract,
-        tfm.id_ticket,
-        TO_DATE(tfm.ts_closed) AS dt_closed_date,
-        TO_DATE(tfm.ts_closed_local) AS dt_closed_date_local,
-        TO_DATE(tfm.ts_created_local) AS dt_created_date_local,
-        TO_DATE(tfm.ts_initially_assigned_local) AS dt_initially_assigned_local,
-        TO_DATE(tfm.ts_solved_local) AS dt_solved_date_local
+        id_contract,
+        id_ticket,
+        TO_DATE(ts_closed) AS dt_closed_date,
+        TO_DATE(ts_closed - INTERVAL 3 HOUR) AS dt_closed_date_local,
+        TO_DATE(ts_created - INTERVAL 3 HOUR) AS dt_created_date_local,
+        TO_DATE(ts_initially_assigned - INTERVAL 3 HOUR) AS dt_initially_assigned_local,
+        TO_DATE(ts_solved - INTERVAL 3 HOUR) AS dt_solved_date_local
     FROM
-        datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
+        datalake_zendesk.tickets_current
 ),
 ticket_funnel AS (
     SELECT
-        tf.id_ticket,
-        tf.group_name,
-        tf.client_type,
-        tf.tags,
-        GET_JSON_OBJECT(tf.custom_fields, '$.Acordo da Proteção') AS protection_agreement,
+        id_ticket,
+        group_name,
+        client_type,
+        tags,
+        protection_agreement,
         CASE
-            WHEN tf.group_name IN ('Rescisão - Despejo [OFF][POS][BACK]')
-                AND tf.tags NOT LIKE '%closed_by_merge%'
-                AND tf.tags NOT LIKE '%proteção_5a_cancelada%'
-                AND tf.client_type IN ('imobiliária_b2b', 'proprietário')
+            WHEN group_name IN ('Rescisão - Despejo [OFF][POS][BACK]')
+                AND tags NOT LIKE '%closed_by_merge%'
+                AND tags NOT LIKE '%proteção_5a_cancelada%'
+                AND client_type IN ('imobiliária_b2b', 'proprietário')
             THEN TRUE
             ELSE FALSE
         END AS is_property_eviction
     FROM
-        datalake_zendesk_ticket_funnels.ticket_funnel tf
+        datalake_zendesk.tickets_current
 )
 SELECT
     ong.id_contract,

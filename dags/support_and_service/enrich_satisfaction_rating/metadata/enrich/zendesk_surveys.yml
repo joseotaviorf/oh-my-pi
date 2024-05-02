@@ -8,21 +8,21 @@ columns:
   id_answer:
     description: Unique identifier of the satisfaction response.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.id
+      - datalake_zendesk_clean.satisfaction_ratings.id
   id_contract:
     description: Identifier of the contract linked to the satisfaction response.
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+      - datalake_zendesk.tickets_current.id_contract
   id_ticket:
     description:
       If the satisfaction form was requested after a service, this, in general,
       will be linked to a service identifier in Zendesk.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.id_ticket
+      - datalake_zendesk_clean.satisfaction_ratings.id_ticket
   id_respondent:
     description: Identifier of the person who answered the form.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.id_assignee
+      - datalake_zendesk_clean.satisfaction_ratings.id_assignee
   respondent_email:
     description: Email of the person who answered the form.
     lineage:
@@ -42,26 +42,26 @@ columns:
   improvement_tags:
     description: Process improvement tags, which are indicated by the respondent.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.reason
+      - datalake_zendesk_clean.satisfaction_ratings.reason
   satisfaction_score:
     description: Main satisfaction form responses.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.score
+      - datalake_zendesk_clean.satisfaction_ratings.score
   score_description:
     description: Main satisfaction score description.
   ts_submitted:
     description: Date the satisfaction response was submitted.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.ts_created
+      - datalake_zendesk_clean.satisfaction_ratings.ts_created
   year:
     description: Year referring to the data loading day.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.year
+      - datalake_zendesk_clean.satisfaction_ratings.year
   month:
     description: Month referring to the data loading day.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.month
+      - datalake_zendesk_clean.satisfaction_ratings.month
   day:
     description: Day referring to the data loading day.
     lineage:
-      - datalake_zendesk_tickets_clean.satisfaction_ratings.day
+      - datalake_zendesk_clean.satisfaction_ratings.day
