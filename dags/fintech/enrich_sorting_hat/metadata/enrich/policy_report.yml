@@ -1,0 +1,59 @@
+---
+database_name: datalake_sorting_hat
+table_name: policy_report
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: Table with information about the credit policy.
+columns:
+  id_policy_evaluation:
+    description: 'Policy report ID'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.id
+  id_external:
+    description: 'External ID. It can be either the proposal ID when the external source is PROPOSAL or the credit ID when the external source is CREDIT_EVALUATION'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.id_external
+  policy_name:
+    description: 'Type of the credit policy'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.type
+  external_source:
+    description: 'External source of the credit policy'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.external_source
+  proponent_group_class:
+    description: 'Group of the proponent'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.type
+  proponent_class_detail:
+    description: 'Subgroup of the proponent'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.subtype
+  proponent_group_class_detail:
+    description: 'Group and subgroup of the proponent'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.full_type
+  version:
+    description: 'Version of the credit policy'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.version
+  number_of_proponents:
+    description: 'Number of proponents in the credit policy'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.proponents.document_number
+  average_retenants_score:
+    description: 'Average score of all the proponents in the credit policy'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.proponents.retenant_score
+  are_all_proponents_retenants:
+    description: 'True only if all the proponents are retenants'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.proponents.is_retenant
+  ts_created:
+    description: 'Timestamp creation date of the credit policy'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.ts_created
+  ts_updated:
+    description: 'Timestamp updated date of the credit policy'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.ts_updated

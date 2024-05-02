@@ -1,0 +1,35 @@
+---
+database_name: datalake_sorting_hat
+table_name: policy_report_proponents
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: Table with information about the credit policy proponents.
+columns:
+  id_policy_evaluation:
+    description: 'Policy report ID'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.id
+  id_retenant_contract:
+    description: 'Retenant contract ID'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.retenant_contract_id
+  id_retenant_contract_proposal:
+    description: 'Retenant contract proposal ID'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.retenant_contract_proposal_id
+  id_retenant_contract_user:
+    description: 'Retenant contract user ID'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.retenant_contract_user_id
+  sk_user:
+    description: 'Unique identifier of user with the most recent creation date'
+    lineage:
+    - datalake_ebdb_user.user.id
+  retenant_score:
+    description: 'Retenant Score'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.retenant_score
+  is_retenant:
+    description: 'True if user is retenant'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.is_retenant

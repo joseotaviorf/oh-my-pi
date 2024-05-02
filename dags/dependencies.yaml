@@ -2623,7 +2623,9 @@ bietlejuice.enrich_sirena:
   - bietlejuice.sirena:load-clean-interactions
   - bietlejuice.sirena:load-clean-prospects
 bietlejuice.enrich_sorting_hat:
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
+  - bietlejuice.sorting_hat_credit_engine:load-clean-policy-report
 bietlejuice.enrich_ss_logic_model:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.chat_fup:load-clean-rating
