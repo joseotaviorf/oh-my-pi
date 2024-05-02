@@ -11,7 +11,7 @@ SELECT
   first_name,
   last_name,
   username,
-  email,
+  IF(email='giuseppe.giovanelli+metriclayerapi@quintoandar.com.br', 'superset_api@quintoandar.com.br', email) AS email,
   is_active,
   login_count,
   fail_login_count,
