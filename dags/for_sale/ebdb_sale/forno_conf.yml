@@ -4,7 +4,8 @@ partition_size: 1024
 custom_cluster:
   node_type_id: m5a.large
   driver_node_type_id: m5a.large
-  num_workers: 1
+  num_workers: 3
+  spark_version: 12.2.x-scala2.12
   spark_conf:
     "spark.sql.shuffle.partitions": "200"
   cluster_source: "API"
