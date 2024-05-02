@@ -3,6 +3,9 @@ dag:
   schedule_start_date: 2021, 8, 10
   schedule_interval: 0 0 * * *
   owner: Data Rede
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from Supply Processor, a platform responsible for bringing and processing properties from other real estate agencies in Rede QuintoAndar.
 workflow:
   type: database_pull
   layer: raw
@@ -11,6 +14,8 @@ workflow:
   default_partitions: [year, month, day]
   dbutils_secret_key: BROKERS_SUPPLY_PROCESSOR_DB
   tables_customization:
+    analytic_event:
+      date_filter_column: updated_at
     business_context_detail:
       date_filter_column: updated_at
     business_context_detail_aud:

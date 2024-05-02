@@ -1,0 +1,42 @@
+database_name: datalake_brokers_supply_processor_clean
+table_name: analytic_event
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Tracking of Union CRM events'
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.id
+  event_date:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.event_date
+  event_uuid:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.event_uuid
+  event_type:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.event_type
+  tracking_id:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.tracking_id
+  lead_uuid:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.lead_uuid
+  event_properties:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.event_properties
+  created_at:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.created_at
+  updated_at:
+    lineage:
+      - datalake_brokers_supply_processor_raw.analytic_event.updated_at
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.year
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.month
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.day
