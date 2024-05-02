@@ -23,7 +23,8 @@ WITH ticket_history_base AS (
     FROM
         datalake_zendesk.tickets
     WHERE
-        YEAR(ts_updated) >= YEAR(CURRENT_DATE()) - 1
+        year >= YEAR(CURRENT_DATE()) - 1
+        AND YEAR(ts_updated) >= YEAR(CURRENT_DATE()) - 1
     GROUP BY 1
 ),
 repair_tickets AS (

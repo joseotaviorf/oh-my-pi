@@ -1,10 +1,9 @@
 dag:
-    name: enrich_repairs
-    schedule_start_date: 2023, 11, 24
-    owner: Data SS
-    documentation:
-      dag_purpose:
-        This dag aims to execute the bases related to the repair flow.
+  name: enrich_repairs
+  schedule_start_date: 2023, 11, 24
+  owner: Data SS
+  documentation:
+    dag_purpose: This dag aims to execute the bases related to the repair flow.
 workflow:
   type: query
   layer: enrich
@@ -15,6 +14,7 @@ workflow:
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.xlarge
-    num_workers: 2
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
