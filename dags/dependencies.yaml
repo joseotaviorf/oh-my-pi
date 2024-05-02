@@ -221,7 +221,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
-  - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
@@ -2900,28 +2899,6 @@ bietlejuice.enrich_zendesk:
   - bietlejuice.zendesk:load-clean-ticket-fields
   - bietlejuice.zendesk:load-clean-ticket-metrics
   - bietlejuice.zendesk:load-clean-tickets
-bietlejuice.enrich_zendesk_custom_fields:
-  - bietlejuice.zendesk_tickets:load-clean-ticket-fields
-  - bietlejuice.zendesk_tickets:load-clean-tickets
-bietlejuice.enrich_zendesk_history:
-  - bietlejuice.enrich_date:load-enrich-workday-window
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.zendesk_tickets:load-clean-tickets-history
-bietlejuice.enrich_zendesk_ticket_funnels:
-  - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
-  - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
-  - bietlejuice.enrich_zendesk_tickets:load-enrich-ticket-measurements
-  - bietlejuice.enrich_zendesk_tickets:load-enrich-zendesk-users-contact
-  - bietlejuice.enrich_zendesk_users:load-enrich-agents
-bietlejuice.enrich_zendesk_tickets:
-  - bietlejuice.enrich_zendesk_custom_fields:load-enrich-custom-fields
-bietlejuice.enrich_zendesk_users:
-  - bietlejuice.bigfone:load-clean-event
-  - bietlejuice.quinto_messenger:load-clean-task
-  - bietlejuice.zendesk_tickets:load-clean-organizations
-  - bietlejuice.zendesk_tickets:load-clean-tickets
-  - bietlejuice.zendesk_tickets:load-clean-users
 bietlejuice.looker_temp:
   - bietlejuice.classified_leads:load-clean-lead-contact
   - bietlejuice.classified_leads:load-clean-lead-reply-email
