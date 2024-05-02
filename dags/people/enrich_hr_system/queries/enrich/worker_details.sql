@@ -48,7 +48,7 @@ WITH hr_system_workers AS (
     work_relationships['LegislationCode'] AS LegislationCode
   FROM work_rel_step1
   WHERE work_relationships['PrimaryFlag'] = 'true'
-  QUALIFY work_relationships['StartDate'] = MAX(work_relationships['StartDate']) over (PARTITION BY id_person)
+  QUALIFY work_relationships['StartDate'] = MAX(work_relationships['StartDate']) OVER (PARTITION BY id_person)
 ), assignments_step1 AS (
   SELECT 
     id_person,
@@ -78,9 +78,10 @@ WITH hr_system_workers AS (
     assignments['managers'] AS managers,
     assignments['assignmentsDFF'] AS assignmentsDFF,
     assignments['EffectiveEndDate'] AS EffectiveEndDate,
-    assignments['ManagerFlag'] AS ManagerFlag
+    assignments['ManagerFlag'] AS ManagerFlag,
+    assignments['representatives'] AS representatives
   FROM assignments_step1
-  QUALIFY assignments['EffectiveEndDate'] = MAX(assignments['EffectiveEndDate']) over (PARTITION BY id_person, PeriodOfServiceId)
+  QUALIFY assignments['EffectiveEndDate'] = MAX(assignments['EffectiveEndDate']) OVER (PARTITION BY id_person, PeriodOfServiceId)
 ), managers_step1 AS (
   SELECT 
     id_person,
@@ -99,7 +100,7 @@ WITH hr_system_workers AS (
     managers["EffectiveEndDate"] AS EffectiveEndDate
   FROM managers_step1
   WHERE managers["ManagerType"] = 'LINE_MANAGER'
-  QUALIFY managers["EffectiveEndDate"] = MAX(managers["EffectiveEndDate"]) over (PARTITION BY id_person, PeriodOfServiceId, AssignmentId)
+  QUALIFY managers["EffectiveEndDate"] = MAX(managers["EffectiveEndDate"]) OVER (PARTITION BY id_person, PeriodOfServiceId, AssignmentId)
 ), assignmentsDFF_step1 AS (
   SELECT 
     id_person,
@@ -120,8 +121,27 @@ WITH hr_system_workers AS (
     assignmentsDFF["targetPlr"] AS targetPlr,
     assignmentsDFF['marcaProduto'] AS marcaProduto
   FROM assignmentsDFF_step1
-  QUALIFY assignmentsDFF["EffectiveEndDate"] = MAX(assignmentsDFF["EffectiveEndDate"]) over (PARTITION BY id_person, PeriodOfServiceId, AssignmentId)
-), work_relationship_data AS (
+  QUALIFY assignmentsDFF["EffectiveEndDate"] = MAX(assignmentsDFF["EffectiveEndDate"]) OVER (PARTITION BY id_person, PeriodOfServiceId, AssignmentId)
+), representatives_step1 AS (
+  SELECT 
+    id_person,
+    PeriodOfServiceId,
+    AssignmentId,
+    explode(representatives) as representatives
+  FROM assignments
+), representatives AS (
+  SELECT 
+    id_person,
+    PeriodOfServiceId,
+    AssignmentId,
+    representatives['PersonId'] AS id_person_hrbp,
+    representatives['AssignmentNumber'] AS assignment_number_hrbp,
+    representatives['ResponsibilityName'] AS responsibility_name_hrbp
+  FROM representatives_step1
+  WHERE representatives['ResponsibilityType'] = 'BPs'
+  QUALIFY representatives['FromDate'] = MAX(representatives['FromDate']) OVER (PARTITION BY AssignmentId)
+)
+, work_relationship_data AS (
   SELECT 
     work_rel.id_person,
     work_rel.PeriodOfServiceId,
@@ -155,19 +175,30 @@ WITH hr_system_workers AS (
     assignmentsDFF.funcionarioMarcaPonto,
     assignmentsDFF.trilha,
     assignmentsDFF.targetPlr,
-    assignmentsDFF.marcaProduto
+    assignmentsDFF.marcaProduto,
+    representatives.id_person_hrbp,
+    representatives.assignment_number_hrbp,
+    representatives.responsibility_name_hrbp
   FROM work_rel
-  LEFT JOIN assignments
-    ON work_rel.id_person = assignments.id_person
-    AND work_rel.PeriodOfServiceId = assignments.PeriodOfServiceId
-  LEFT JOIN managers
-    ON work_rel.id_person = managers.id_person
-    AND work_rel.PeriodOfServiceId = managers.PeriodOfServiceId
-    AND assignments.AssignmentId = managers.AssignmentId
-  LEFT JOIN assignmentsDFF
-    ON work_rel.id_person = assignmentsDFF.id_person
-    AND work_rel.PeriodOfServiceId = assignmentsDFF.PeriodOfServiceId
-    AND assignments.AssignmentId = assignmentsDFF.AssignmentId
+  LEFT JOIN 
+    assignments
+      ON work_rel.id_person = assignments.id_person
+      AND work_rel.PeriodOfServiceId = assignments.PeriodOfServiceId
+  LEFT JOIN 
+    managers
+      ON work_rel.id_person = managers.id_person
+      AND work_rel.PeriodOfServiceId = managers.PeriodOfServiceId
+      AND assignments.AssignmentId = managers.AssignmentId
+  LEFT JOIN 
+    assignmentsDFF
+      ON work_rel.id_person = assignmentsDFF.id_person
+      AND work_rel.PeriodOfServiceId = assignmentsDFF.PeriodOfServiceId
+      AND assignments.AssignmentId = assignmentsDFF.AssignmentId
+  LEFT JOIN 
+    representatives
+      ON work_rel.id_person = representatives.id_person
+      AND work_rel.PeriodOfServiceId = representatives.PeriodOfServiceId
+      AND assignments.AssignmentId = representatives.AssignmentId
 ), national_identifiers_step1 AS (
   SELECT  
     id_person,
@@ -290,12 +321,14 @@ FROM legislative_info
     lidff.nacionalidade,
     lidff.desejaReceberAdiantamentoSalar
   FROM legislative_info AS li
-  LEFT JOIN legislativeInfoDDF AS liddf
-    ON li.id_person = liddf.id_person
-    AND li.PersonLegislativeId = liddf.PersonLegislativeId
-  LEFT JOIN legislativeInfoDFF as lidff
-    ON li.id_person = lidff.id_person
-    AND li.PersonLegislativeId = lidff.PersonLegislativeId
+  LEFT JOIN 
+    legislativeInfoDDF AS liddf
+      ON li.id_person = liddf.id_person
+      AND li.PersonLegislativeId = liddf.PersonLegislativeId
+  LEFT JOIN 
+    legislativeInfoDFF as lidff
+      ON li.id_person = lidff.id_person
+      AND li.PersonLegislativeId = lidff.PersonLegislativeId
 ), emails_step1 AS (
   SELECT  
     id_person,
@@ -311,8 +344,8 @@ FROM legislative_info
     emails['EmailAddress'] AS EmailAddress,
     emails['PrimaryFlag'] AS PrimaryFlag
   FROM emails_step1
-  WHERE emails['ToDate'] is null
-  QUALIFY emails['LastUpdateDate'] = MAX(emails['LastUpdateDate']) over (PARTITION BY id_person, emails['EmailType'], emails['PrimaryFlag'])
+  WHERE emails['ToDate'] IS NULL OR emails['ToDate'] = '4712-12-31'
+  QUALIFY emails['LastUpdateDate'] = MAX(emails['LastUpdateDate']) OVER (PARTITION BY id_person, emails['EmailType'])
 ), addresses_step1 AS (
   SELECT  
     id_person,
@@ -394,16 +427,20 @@ FROM legislative_info
     names.NameInformation16 AS NameInformation16Manager,
     emails.EmailAddress as EmailManager
   FROM work_relationship_data as wr
-  LEFT JOIN work_relationship_data as wr_manager
-    ON wr.ManagerAssignmentId = wr_manager.AssignmentId
-  LEFT JOIN hr_system_workers AS w
-    ON wr_manager.id_person = w.id_person
-  LEFT JOIN names
-    ON wr_manager.id_person = names.id_person
-  LEFT JOIN emails
-    ON wr_manager.id_person = emails.id_person
-    AND emails.EmailType = 'W1'
-    AND emails.PrimaryFlag = 'true'
+  LEFT JOIN 
+    work_relationship_data as wr_manager
+      ON wr.ManagerAssignmentId = wr_manager.AssignmentId
+  LEFT JOIN 
+    hr_system_workers AS w
+      ON wr_manager.id_person = w.id_person
+  LEFT JOIN 
+    names
+      ON wr_manager.id_person = names.id_person
+  LEFT JOIN 
+    emails
+      ON wr_manager.id_person = emails.id_person
+      AND emails.EmailType = 'W1'
+      AND emails.PrimaryFlag = 'true'
 ), religions_step1 AS (
   SELECT 
     id_person,
@@ -440,7 +477,7 @@ FROM legislative_info
     salary_amount,
     currency_code
   FROM datalake_hr_system_clean.salaries
-  QUALIFY dt_to = MAX(dt_to) over (PARTITION BY assignment_number)
+  QUALIFY dt_to = MAX(dt_to) OVER (PARTITION BY assignment_number)
   )
 SELECT
   --  ids
@@ -458,6 +495,7 @@ SELECT
   addresses.AddressId AS id_address,
   work_rel.ManagerAssignmentId AS id_assignment_manager,
   ethnicities.EthnicityId AS id_ethnicity,
+  work_rel.id_person_hrbp,
   workers.person_number,
   work_rel.AssignmentNumber AS assignment_number,
   -- -- non metric
@@ -499,6 +537,8 @@ SELECT
   odff.product,
   salaries.currency_code,
   work_rel.LegislationCode AS legislation_code,
+  work_rel.assignment_number_hrbp,
+  work_rel.responsibility_name_hrbp,
   -- -- -- Managers,
   work_rel.ManagerAssignmentNumber AS manager_assignment_number,
   managers_data.person_number_manager AS manager_person_number,
@@ -564,7 +604,7 @@ SELECT
     WHEN religions.Religion='ORA_HRX_CATHOLICISM' THEN 'Catolicismo'
     WHEN religions.Religion='OTHER' THEN 'Outra'
     WHEN religions.Religion='Umbanda' THEN 'Umbanda'
-    WHEN religions.Religion='CHRISTIAN' THEN lower(religions.Religion)
+    WHEN religions.Religion='CHRISTIAN' THEN LOWER(religions.Religion)
     WHEN religions.Religion='NONE' THEN NULL
     ELSE religions.Religion
   END AS religion_name,
@@ -598,7 +638,7 @@ SELECT
   phones.AreaCode AS area_code,
   phones.PhoneNumber AS phone_number,
   -- -- address,
-  concat(addresses.AddlAddressAttribute3, ' ', addresses.AddressLine1) AS address,
+  CONCAT(addresses.AddlAddressAttribute3, ' ', addresses.AddressLine1) AS address,
   addresses.AddressLine2 AS address_number,
   addresses.AddressLine3 AS address_complement,
   addresses.AddressLine4 AS address_district,
@@ -630,64 +670,83 @@ SELECT
     ELSE NULL
   END AS has_salary_advance,
   salaries.salary_amount,
-  float(work_rel.targetPlr) AS target_plr,
+  FLOAT(work_rel.targetPlr) AS target_plr,
   -- -- dates
-  date(workers.dt_birth) AS dt_birth,
-  date(work_rel.TerminationDate) AS dt_termination_work_relationship,
-  date(work_rel.StartDate) AS dt_start_work_relationship,
-  date(work_rel.NotificationDate) AS dt_notification,
-  date(work_rel.EffectiveStartDate) AS dt_assignment_effective_start,
-  date(work_rel.dataFinalDaExperiencia1) AS dt_experience_period_1,
-  date(work_rel.dataFinalDaExperiencia2) AS dt_experience_period_2,
-  now() AS ts_load
+  DATE(workers.dt_birth) AS dt_birth,
+  DATE(work_rel.TerminationDate) AS dt_termination_work_relationship,
+  DATE(work_rel.StartDate) AS dt_start_work_relationship,
+  DATE(work_rel.NotificationDate) AS dt_notification,
+  DATE(work_rel.EffectiveStartDate) AS dt_assignment_effective_start,
+  DATE(work_rel.dataFinalDaExperiencia1) AS dt_experience_period_1,
+  DATE(work_rel.dataFinalDaExperiencia2) AS dt_experience_period_2,
+  NOW() AS ts_load
 FROM hr_system_workers as workers
-JOIN work_relationship_data as work_rel
-  ON workers.id_person = work_rel.id_person
-LEFT JOIN salaries
-  ON work_rel.AssignmentId = salaries.id_assignment
-LEFT JOIN ethnicities
-  ON workers.id_person = ethnicities.id_person
-  AND work_rel.LegislationCode = ethnicities.LegislationCode
-LEFT JOIN legislative_info_data AS li
-  ON workers.id_person = li.id_person
-  AND work_rel.LegislationCode = li.LegislationCode
-LEFT JOIN emails as ew
-  ON workers.id_person = ew.id_person
-  AND ew.EmailType = 'W1'
-LEFT JOIN emails as eh
-  ON workers.id_person = eh.id_person
-  AND eh.EmailType = 'H1'
-LEFT JOIN addresses
-  ON workers.id_person = addresses.id_person
-LEFT JOIN names 
-  ON workers.id_person = names.id_person
-LEFT JOIN workers_dff AS wdff
-  ON workers.id_person = wdff.id_person
-LEFT JOIN phones
-  ON workers.id_person = phones.id_person
-LEFT JOIN managers_data
-  ON workers.id_person = managers_data.id_person
-  AND work_rel.PeriodOfServiceId = managers_data.PeriodOfServiceId
-  AND work_rel.AssignmentId = managers_data.AssignmentId
-LEFT JOIN religions 
-  ON workers.id_person = religions.id_person
-  AND work_rel.LegislationCode = religions.LegislationCode
-LEFT JOIN organization_dff odff
-  ON work_rel.DepartmentId = odff.id_organization
-LEFT JOIN datalake_hr_system_clean.action_reasons_lov arl
-  ON work_rel.ReasonCode = arl.action_reason_code
-LEFT JOIN external_identifiers ei 
-  ON workers.id_person = ei.id_person
-LEFT JOIN national_identifiers_step2  ni2_cpf
-  ON workers.id_person = ni2_cpf.id_person
-  AND ni2_cpf.NationalIdentifierType = 'CPF'
-LEFT JOIN national_identifiers_step2  ni2_rg
-  ON workers.id_person = ni2_rg.id_person
-  AND ni2_rg.NationalIdentifierType = 'RG'
-LEFT JOIN national_identifiers_step2 ni2_pis
-  ON workers.id_person = ni2_pis.id_person
-  AND ni2_pis.NationalIdentifierType = 'PIS'
-LEFT JOIN nationalIdentifiersDFF nidff
-  ON workers.id_person = nidff.id_person 
-  AND ni2_rg.NationalIdentifierId = nidff.NationalIdentifierId
+JOIN 
+  work_relationship_data as work_rel
+    ON workers.id_person = work_rel.id_person
+LEFT JOIN 
+  salaries
+    ON work_rel.AssignmentId = salaries.id_assignment
+LEFT JOIN 
+  ethnicities
+    ON workers.id_person = ethnicities.id_person
+    AND work_rel.LegislationCode = ethnicities.LegislationCode
+LEFT JOIN 
+  legislative_info_data AS li
+    ON workers.id_person = li.id_person
+    AND work_rel.LegislationCode = li.LegislationCode
+LEFT JOIN 
+  emails as ew
+    ON workers.id_person = ew.id_person
+    AND ew.EmailType = 'W1'
+LEFT JOIN 
+  emails as eh
+    ON workers.id_person = eh.id_person
+    AND eh.EmailType = 'H1'
+LEFT JOIN 
+  addresses
+    ON workers.id_person = addresses.id_person
+LEFT JOIN 
+  names 
+    ON workers.id_person = names.id_person
+LEFT JOIN 
+  workers_dff AS wdff
+    ON workers.id_person = wdff.id_person
+LEFT JOIN 
+  phones
+    ON workers.id_person = phones.id_person
+LEFT JOIN 
+  managers_data
+    ON workers.id_person = managers_data.id_person
+    AND work_rel.PeriodOfServiceId = managers_data.PeriodOfServiceId
+    AND work_rel.AssignmentId = managers_data.AssignmentId
+LEFT JOIN 
+  religions 
+    ON workers.id_person = religions.id_person
+    AND work_rel.LegislationCode = religions.LegislationCode
+LEFT JOIN 
+  organization_dff odff
+    ON work_rel.DepartmentId = odff.id_organization
+LEFT JOIN 
+  datalake_hr_system_clean.action_reasons_lov arl
+    ON work_rel.ReasonCode = arl.action_reason_code
+LEFT JOIN 
+  external_identifiers ei 
+    ON workers.id_person = ei.id_person
+LEFT JOIN 
+  national_identifiers_step2  ni2_cpf
+    ON workers.id_person = ni2_cpf.id_person
+    AND ni2_cpf.NationalIdentifierType = 'CPF'
+LEFT JOIN 
+  national_identifiers_step2  ni2_rg
+    ON workers.id_person = ni2_rg.id_person
+    AND ni2_rg.NationalIdentifierType = 'RG'
+LEFT JOIN 
+  national_identifiers_step2 ni2_pis
+    ON workers.id_person = ni2_pis.id_person
+    AND ni2_pis.NationalIdentifierType = 'PIS'
+LEFT JOIN 
+  nationalIdentifiersDFF nidff
+    ON workers.id_person = nidff.id_person 
+    AND ni2_rg.NationalIdentifierId = nidff.NationalIdentifierId
 WHERE ei.id_person is null
