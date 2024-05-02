@@ -217,6 +217,7 @@ cluster_template:
             spark.sparkmeasure.outputFilename: "/tmp/stageMetrics_flightRecorder.json"
             spark.sparkmeasure.outputFormat: "json"
             spark.sparkmeasure.printToStdout: "false"
+            spark.databricks.delta.retentionDurationCheck.enabled: "false"
         spark_env_vars:
             PYSPARK_PYTHON: "/databricks/python3/bin/python3"
             ENVIRONMENT: "{{ var.value.environment }}"
