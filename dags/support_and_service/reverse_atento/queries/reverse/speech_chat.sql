@@ -1,7 +1,6 @@
 WITH message_summary AS (
     SELECT DISTINCT
         cht.id_ticket,
-        cht.country_code,
         CAST(GET_JSON_OBJECT(evt.event_payload, '$.DateCreated') AS TIMESTAMP) AS ts_created_message,
         cht.ts_ticket_started,
         cht.ts_ticket_ended,
@@ -63,7 +62,6 @@ SELECT
         WHEN message_from LIKE '%whatsapp%' THEN 'client'
         ELSE message_from
     END AS message_from,
-    country_code,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
     DAY(CURRENT_DATE) AS day,
