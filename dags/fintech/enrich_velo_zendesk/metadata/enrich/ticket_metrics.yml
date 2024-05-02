@@ -32,6 +32,14 @@ columns:
     description: "Request type description"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.request_type
+  ticket_via:
+    description: "Ticket via description"
+    lineage:
+      - datalake_velo_zendesk.tickets.ticket_via
+  ticket_status:
+    description: "Ticket status"
+    lineage:
+      - datalake_velo_zendesk_clean.tickets.status
   group_stations:
     description: "Number of group stations"
     lineage:

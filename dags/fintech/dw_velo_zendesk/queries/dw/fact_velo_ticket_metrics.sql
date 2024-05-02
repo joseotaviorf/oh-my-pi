@@ -6,6 +6,8 @@ SELECT
     id_submitter AS sk_submitter,
     id_propose AS sk_propose,
     request_type,
+    ticket_via,
+    status,
     group_stations,
     assignee_stations,
     waiting_period_creation,

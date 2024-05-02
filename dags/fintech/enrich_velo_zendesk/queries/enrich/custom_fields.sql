@@ -36,7 +36,7 @@ GROUP BY 1
         COALESCE(base.custom_fields['ID da proposta do inquilino'], base.custom_fields['ID da Proposta']) AS id_propose,
         base.custom_fields['ID da Delinquency'] AS id_delinquency,
         base.custom_fields['Erros de Solicitação '] AS request_error,
-        COALESCE(base.custom_fields['Tipo de Solicitação'], base.custom_fields['Prazo de recebimento']) AS request_type,
+        COALESCE(COALESCE(base.custom_fields['Tipo de Solicitação'], base.custom_fields['Prazo de recebimento']), base.custom_fields['Acionamento de garantia']) AS request_type,
         base.custom_fields['Motivo do cancelamento '] AS cancellation_reason,
         base.custom_fields['Nome da imobiliária '] AS broker_name,
         base.custom_fields['Motivo de Contato'] AS contact_reason,

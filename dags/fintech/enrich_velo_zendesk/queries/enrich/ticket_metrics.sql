@@ -35,7 +35,13 @@ base_overdue_amount AS (
         t.id_requester,
         t.id_submitter,
         cf.id_propose,
-        cf.request_type,
+        CASE
+            WHEN cf.request_type = 'receber_em_2_dias' THEN 'inadimplência_2_dias_sem_juros_e_multa'
+            WHEN cf.request_type = 'receber_em_15_dias' THEN 'inadimplência_15_dias_com_juros_e_multa'
+            WHEN cf.request_type = 'com_acionamento' THEN 'cancelamento_de_contrato_com_acionamento_de_garantia'
+        ELSE cf.request_type END AS request_type,
+        t.ticket_via,
+        t.status,
         le.group_stations,
         le.assignee_stations,
         DATEDIFF(cf.dt_due_original, CAST(le.ts_created AS DATE)) AS waiting_period_creation,
@@ -82,12 +88,12 @@ base_overdue_amount AS (
         FROM_UTC_TIMESTAMP(le.ts_solved, 'Brazil/East') AS ts_solved_local,
         t.ts_load
      FROM
-        last_extracted le
+        datalake_velo_zendesk_clean.tickets t
      LEFT JOIN
         datalake_velo_zendesk.custom_fields cf
         ON le.id_ticket = cf.id_ticket
     LEFT JOIN
-        datalake_velo_zendesk_clean.tickets t
+        last_extracted le
         ON le.id_ticket = t.id_ticket
 )
 
@@ -99,6 +105,8 @@ SELECT
     id_submitter,
     id_propose,
     request_type,
+    ticket_via,
+    status,
     group_stations,
     assignee_stations,
     waiting_period_creation,
