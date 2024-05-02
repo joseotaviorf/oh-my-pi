@@ -16,4 +16,4 @@ workflow:
     - hub_services_lead_flow
     - quintoandar_lead_flow
 cluster:
-  type: databricks_10_4_med_memory_cluster
+  type: databricks_12_2_med_memory_cluster
