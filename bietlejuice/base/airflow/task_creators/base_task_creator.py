@@ -34,12 +34,27 @@ class BaseTaskCreator(ABC):
         """Returns an Airflow task."""
 
     def _create_spark_job_task(
-        self, spark_job_name: str, task_id: str, job_parameters: list
+        self,
+        spark_job_name: str,
+        task_id: str,
+        job_parameters: list,
+        spark_job_prefix: str = None,
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         """
         Returns a task that runs a Spark Job in the base spark jobs path, with the given name, task id, and parameters.
         Serves as an auxiliary function for subclasses, since most of them run in Spark Jobs.
+
+        spark_job_name: The name of the Spark Job to be run, without the path or extension.
+        task_id: The task id.
+        job_parameters: The parameters to be passed to the Spark Job.
+        spark_job_prefix: If provided, it will replace /base/ in the path of the Spark Job.
         """
+        spark_job_directory = self.dag_execution_context.base_spark_jobs_path
+        if spark_job_prefix is not None:
+            spark_job_directory = spark_job_directory.replace(
+                "/spark_jobs/base/", f"/spark_jobs/{spark_job_prefix}/"
+            )
+        spark_job_path = path.join(spark_job_directory, f"{spark_job_name}.py")
 
         return QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id="databricks_job_cluster",
@@ -47,10 +62,7 @@ class BaseTaskCreator(ABC):
             task_id=task_id,
             json={
                 "spark_python_task": {
-                    "python_file": path.join(
-                        self.dag_execution_context.base_spark_jobs_path,
-                        f"{spark_job_name}.py",
-                    ),
+                    "python_file": spark_job_path,
                     "parameters": job_parameters,
                 }
             },

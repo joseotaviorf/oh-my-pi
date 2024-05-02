@@ -9,6 +9,7 @@ class TaskEnum(Enum):
     LOAD_CDC_CLEAN = "load_cdc_clean"
     LOAD_CDC_RAW = "load_cdc_raw"
     LOAD_CDC_TRANSACTIONAL = "load_cdc_transactional"
+    LOAD_CUSTOM = "load_custom"
     LOAD_MONGO_RAW = "load_mongo_raw"
     LOAD_POSTGRES_RAW = "load_postgres_raw"
     LOAD_QUERY = "load_query"
