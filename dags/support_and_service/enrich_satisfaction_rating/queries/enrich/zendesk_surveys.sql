@@ -13,7 +13,7 @@ WITH zendesk_users_contact AS (
 )
 SELECT DISTINCT
     sr.id_satisfaction_rating AS id_answer,
-    tfm.id_contract,
+    CAST(tfm.id_contract AS BIGINT) AS id_contract,
     sr.id_ticket,
     zuc.id_user AS id_respondent,
     zuc.email AS respondent_email,
