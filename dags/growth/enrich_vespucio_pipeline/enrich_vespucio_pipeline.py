@@ -20,7 +20,7 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
-VESPUCIO_PACKAGE_VERSION = "0.2.11"
+VESPUCIO_PACKAGE_VERSION = "0.2.16"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
@@ -181,6 +181,7 @@ core_tasks = [
             f"--input_source_sindiconet_condos={Tables.source_sindiconet_condo}",
             f"--input_source_ebdb_houses={Tables.source_ebdb_house}",
             f"--input_source_navent_houses={Tables.source_navent_houses}",
+            f"--input_source_union_houses={Tables.source_union_houses}",
             f"--overwrite_schema",
             f"--output_staged_condos={Tables.step1_staged_condos}",
             f"--output_staged_houses={Tables.step1_staged_houses}",
@@ -224,13 +225,13 @@ core_tasks = [
         ],
     ),
     create_task(
-        entry_point="core_step5link",
+        entry_point="core_step6link",
         parameters=[
             f"--input_merged_condos={Tables.step4_merged_condos}",
-            f"--input_merged_houses={Tables.step4_merged_houses}",
+            f"--input_images_houses={Tables.step4_merged_houses}",  # @TODO: change to step5_images_houses
             f"--overwrite_schema",
-            f"--output_linked_condos={Tables.condo_compounds}",
-            f"--output_linked_houses={Tables.house_compounds}",
+            f"--output_linked_condos={Tables.condo_compounds}",  # @TODO: change to step6_linked_condos
+            f"--output_house_compounds={Tables.house_compounds}",
         ],
     ),
 ]
