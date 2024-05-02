@@ -16,7 +16,7 @@ SELECT
     CAST(st.id_country AS INTEGER) AS id_country,
     ct.code AS country_code,
     r.level,
-    COALESCE(r.name, ar.neighbourhood) AS name,
+    COALESCE(NULLIF(r.name, ''), ar.neighbourhood) AS name,
     mr.name AS macro_region_name,
     COALESCE(c.name, ar.city) AS city_name,
     ar.city_group,
