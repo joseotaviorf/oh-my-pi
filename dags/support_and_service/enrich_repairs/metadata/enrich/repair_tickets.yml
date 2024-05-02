@@ -60,8 +60,6 @@ columns:
       - datalake_zendesk.tickets_current.analyst_organization
   contestation_task_origin:
     description: Descriptive data that indicates where the contestation request came from.
-    lineage:
-      - datalake_zendesk_tickets.ticket_history.contestation_task_origin
   service_provider:
     description: Data in json format that indicates which company was the provider and the date on which the information was made available.
     lineage:
@@ -120,16 +118,10 @@ columns:
       - datalake_survicate.repairs_surveys.secondary_satisfaction_score
   is_closed_by_merge:
     description: Boolean type information that indicates whether the ticket was closed with a merge from another service.
-    lineage:
-      - datalake_zendesk_tickets.ticket_history.is_closed_by_merge
   is_contestation_backlog:
     description: Boolean information that indicates whether the contestation ticket is still in the backlog for the analyst to act on.
-    lineage:
-      - datalake_zendesk_tickets.ticket_history.is_contestation_backlog
   is_ticket_followup:
     description: Boolean type information that indicates whether the ticket is a follow-up ticket.
-    lineage:
-      - datalake_zendesk_tickets.ticket_history.is_ticket_followup
   has_chat_negociation:
     description: Boolean data that indicates whether the repair was negotiated via chat.
   reopens:
@@ -152,12 +144,8 @@ columns:
       - datalake_ebdb_contract.contract.dt_entered
   ts_contestation:
     description: Information such as date that indicates when the contestation was requested.
-    lineage:
-      - datalake_zendesk_tickets.ticket_history.ts_contestation
   ts_resolution_contestation:
     description: Boolean type data that indicates when the contestation demand was resolved.
-    lineage:
-      - datalake_zendesk_tickets.ticket_history.ts_resolution_contestation
   ts_first_interaction:
     description: Date in timestamp format of the first iteration of the repair request.
   ts_created_local:

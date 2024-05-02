@@ -1,4 +1,67 @@
-WITH relisting_db AS (
+WITH ticket_history_base AS (
+    SELECT
+        id_ticket,
+        MIN(CASE
+          WHEN tags LIKE ANY (
+            "%pp_autosserviço_contestou%",
+            "%iq_pp_autosserviço_contestou%",
+            "%alteração_de_responsabilidade_criticidade%",
+            "%acompanhamento_alteracao_responsabilidade_criticidade%",
+            "%check_responsabilidade_reparos%",
+            "%pp_autosserviço_contestou%"
+          ) THEN ts_updated
+        END) AS ts_contestation,
+        MIN(CASE
+          WHEN tags LIKE ANY (
+            "%macro_ro_cont_benfeitoria_pp%", "%macro_ro_cont_benfeitoria_iq%", "%macro_ro_cont_terceiros_pp%",
+            "%macro_ro_cont_terceiros_iq%", "%macro_ro_cont_aprovada_iq%", "%macro_ro_cont_aprovada_pp%",
+            "%macro_ro_cont_reprovada_pp%", "%macro_ro_cont_reprovada_iq%", "%closed_by_merge%",
+            "%reprovado_ro_%", "%aprovado_ro_%", "%opcional_ro_%", "%ação_backlog_contestação%",
+            "%alteração_reprovada%", "%alteração_aprovada%", "%alteração_benfeitoria%"
+          ) THEN ts_updated
+        END) AS ts_resolution_contestation
+    FROM
+        datalake_zendesk.tickets
+    WHERE
+        YEAR(ts_updated) >= YEAR(CURRENT_DATE()) - 1
+    GROUP BY 1
+),
+repair_tickets AS (
+  SELECT DISTINCT
+    tc.id_ticket,
+    CASE
+      WHEN (tc.tags LIKE ANY ('%iq_pp_autosserviço_contestou%', '%pp_autosserviço_contestou%')) THEN 'PWA'
+      WHEN (tc.tags LIKE ANY (
+          '%alteração_de_responsabilidade_criticidade%', '%acompanhamento_alteracao_responsabilidade_criticidade%',
+          '%check_responsabilidade_reparos%', '%pp_contestou%'
+        )
+      ) AND tc.tags NOT LIKE '%ticket_acompanhamento%' THEN 'CX'
+    END AS contestation_task_origin,
+    IF(tc.tags LIKE '%closed_by_merge%', TRUE, FALSE) AS is_closed_by_merge,
+    IF(
+      ww.dt_end_1 > (CURRENT_DATE - INTERVAL 1 DAY)
+      AND ts_resolution_contestation IS NULL
+      AND DATE(tc.ts_solved - INTERVAL 3 HOUR
+    ) IS NULL, TRUE, FALSE) AS is_contestation_backlog,
+    IF(tc.tags LIKE '%ticket_acompanhamento%', TRUE, FALSE) AS is_ticket_followup,
+    th.ts_contestation,
+    th.ts_resolution_contestation
+  FROM
+      datalake_zendesk.tickets_current AS tc
+  LEFT JOIN
+      ticket_history_base AS th
+          ON th.id_ticket = tc.id_ticket
+  LEFT JOIN
+      datalake_date.workday_window AS ww
+          ON ww.dt_Ref = DATE(th.ts_contestation) AND id_city = 39
+  WHERE
+      tc.group_name IN ('FullService [Back]','Prestadores Parceiros [SO]','Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]')
+      AND (DATE(tc.ts_solved - INTERVAL 3 HOUR) >= DATE('2023-06-01') OR tc.ts_solved - INTERVAL 3 HOUR IS NULL)
+      AND tc.channel NOT IN ('call')
+      AND tc.status NOT IN ('deleted')
+      AND tc.tags NOT LIKE '%caso_ticket_agregador%'
+),
+relisting_db AS (
     SELECT
       rf.id_contract,
       IF(hl.version >= 0, hl.id_house_listing, NULL) AS listing
@@ -152,7 +215,7 @@ LEFT JOIN
   first_interaction AS fi
     ON fi.id_third_party_crm_ticket_external = tc.id_ticket
 LEFT JOIN
-  datalake_zendesk_history.ticket_history AS th
+  repair_tickets AS th
     ON tc.id_ticket = th.id_ticket
 WHERE
   tc.group_name IN ('Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]','Autosserviço Reparos [BACK]')

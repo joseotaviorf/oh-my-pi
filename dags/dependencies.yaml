@@ -2338,13 +2338,14 @@ bietlejuice.enrich_repairs:
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_date:load-enrich-workday-window
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_survicate:load-enrich-repairs-surveys
+  - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
-  - bietlejuice.enrich_zendesk_history:load-enrich-ticket-history
   - bietlejuice.repairs:load-clean-repair-request-chat
 bietlejuice.enrich_reports_validation:
   - bietlejuice.reports:load-clean-daily-listings-summary
