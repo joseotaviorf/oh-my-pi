@@ -39,20 +39,20 @@ def _fetch_auth_token(login_url:str, credentials:dict) -> DataFrame:
             json = credentials,
         )
         token = json.loads(auth_response.text)["token"]
-      
+
         return f"Bearer {token}"
-      
+
     except Exception as exception:
         logging.error(f"Fail to fetch auth token from SindicoNet plataform. error:{exception}")
-        
+
         raise exception
 
 def _fetch_condominium_data(auth_token:str, condominium_url:str, execution_date:str) -> DataFrame:
     """
     Fetch raw data from all condominiums.
-    """        
+    """
     headers = {
-        "Accept": "application/json", 
+        "Accept": "application/json",
         "Authorization": auth_token
     }
 
@@ -65,19 +65,19 @@ def _fetch_condominium_data(auth_token:str, condominium_url:str, execution_date:
             if response.status_code == 200:
                 try:
                     data = json.loads(response.text)
-                    
+
                     if data['total'] > 0:
                         page += 1
 
                         api_page_df = spark.createDataFrame([
                         {
-                            "id": str(row['id']), 
+                            "id": str(row['id']),
                             "keyword": str(row['keyWord']),
                             "date_updated": str(row['dateUpdated']),
                             "data_construcao": str(row['dataConstrucao']),
-                            "cnpj": str(row['cnpj']), 
-                            "condominio": str(row['condominio']), 
-                            "cep": str(row['cep']), 
+                            "cnpj": str(row['cnpj']),
+                            "condominio": str(row['condominio']),
+                            "cep": str(row['cep']),
                             "rua": str(row['rua']),
                             "numero": str(row['numero']),
                             "bairro": str(row['bairro']),
@@ -129,7 +129,7 @@ def _fetch_condominium_data(auth_token:str, condominium_url:str, execution_date:
             else:
                 logging.error(f"Unsuccessful request to fetch campaign data from {condominium_url}. Status code: {response.status_code}")
                 raise Exception(f"Network error. status code response: {response.status_code}")
-            
+
         except Exception as exception:
             logging.error(f"Fail to fetch campaign data from Thribee plataform. error:{exception}")
             raise exception
@@ -167,53 +167,55 @@ if __name__ == "__main__":
 
     logger.info(
         f"""m=__main__, env={env}, source={source}, datalake_bucket={datalake_bucket},
-        execution_date={execution_date}, table_name={table_name}, 
+        execution_date={execution_date}, table_name={table_name},
         msg=Starting spark job..."""
     )
 
     """
     Fetch condominiums data.
-    """    
+    """
     auth_token = _fetch_auth_token(login_url, credentials)
     df = _fetch_condominium_data(auth_token, condominium_url, execution_date)
+    if df:
+        """
+        Adding load_date columns
+        """
+        df = df.withColumn('load_date',SF.lit(execution_date))
 
-    """
-    Adding load_date columns
-    """
-    df = df.withColumn('load_date',SF.lit(execution_date))
+        """
+        Load data to datalake.
+        """
+        spark_client = SparkClient()
+        spark_context = spark_client.conn.sparkContext
+        dataframe_service = SparkDataFrameService()
 
-    """
-    Load data to datalake.
-    """
-    spark_client = SparkClient()
-    spark_context = spark_client.conn.sparkContext
-    dataframe_service = SparkDataFrameService()
+        db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
+        database_name = db_info["db_raw_databricks"]
+        database_location = db_info["db_raw_path"]
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
-    database_name = db_info["db_raw_databricks"]
-    database_location = db_info["db_raw_path"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service.create_database(database_name)
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_service.create_database(database_name)
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        s3_loader = S3Loader()
 
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    s3_loader = S3Loader()
+        s3_loader.load_df(
+            df=df,
+            s3_path=f"{database_location}{table_name}",
+            format_options=format_options,
+            compression="gzip",
+        )
 
-    s3_loader.load_df(
-        df=df,
-        s3_path=f"{database_location}{table_name}",
-        format_options=format_options,
-        compression="gzip",
-    )
-
-    """
-    Update metastore.
-    """
-    spark_metastore_loader.update_metastore(
-        df,
-        database_name,
-        table_name,
-        format_options,
-        database_location,
-    )
+        """
+        Update metastore.
+        """
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+        )
+    else:
+        logger
