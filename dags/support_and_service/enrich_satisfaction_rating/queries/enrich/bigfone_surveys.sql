@@ -72,7 +72,7 @@ csat_events AS (
 call_csat AS (
   SELECT DISTINCT
     ce.id_call,
-    ftm.id_contract,
+    CAST(ftm.id_contract AS BIGINT) AS id_contract,
     ftm.id_ticket,
     ftm.id_user_main AS id_user,
     ce.csat_1,

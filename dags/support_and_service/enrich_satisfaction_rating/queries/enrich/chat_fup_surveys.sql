@@ -62,7 +62,7 @@ WITH chat_fup_surveys AS (
 SELECT DISTINCT
     cfs.id_answer,
     MD5(cfs.source_name) AS id_survey,
-    tfm.id_contract,
+    CAST(tfm.id_contract AS BIGINT) AS id_contract,
     cfs.id_ticket,
     cfs.id_respondent AS id_respondent,
     cfs.respondent_email AS respondent_email,
