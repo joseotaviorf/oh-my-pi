@@ -49,4 +49,4 @@ FROM
     datalake_sorting_hat_clean.policy_report AS pr
 LEFT JOIN
     proponents ON pr.id = proponents.id_policy_evaluation
-GROUP BY ALL
+GROUP BY 1,2,3,4,5,6,7,8,12,13
