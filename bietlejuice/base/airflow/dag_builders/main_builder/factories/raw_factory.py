@@ -13,6 +13,10 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_cdc_workfl
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_database_pull_workflow import (
     RawDatabasePullWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_custom_ingestion_workflow import (
+    RawCustomIngestionWorkflow,
+)
+
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
 )
@@ -27,6 +31,7 @@ class RawFactory(BaseFactory):
     _WORKFLOW_ENUM_TO_CLASS_MAPPING = {
         WorkflowEnum.GSHEETS_WORKFLOW: RawGsheetsWorkflow,
         WorkflowEnum.DATABASE_PULL_WORKFLOW: RawDatabasePullWorkflow,
+        WorkflowEnum.CUSTOM_INGESTION_WORKFLOW: RawCustomIngestionWorkflow,
         WorkflowEnum.CDC_WORKFLOW: RawCDCWorkflow,
     }
 
