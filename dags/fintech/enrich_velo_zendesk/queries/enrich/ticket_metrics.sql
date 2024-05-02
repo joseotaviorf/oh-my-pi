@@ -91,7 +91,7 @@ base_overdue_amount AS (
         datalake_velo_zendesk_clean.tickets t
      LEFT JOIN
         datalake_velo_zendesk.custom_fields cf
-        ON le.id_ticket = cf.id_ticket
+        ON t.id_ticket = cf.id_ticket
     LEFT JOIN
         last_extracted le
         ON le.id_ticket = t.id_ticket
