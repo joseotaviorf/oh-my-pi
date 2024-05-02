@@ -5,6 +5,7 @@ SELECT DISTINCT
     c.direction,
     bc.provider,
     c.agent_email,
+    c.country_code,
     bc.recording_url,
     bc.ts_started,
     bc.ts_ended,
