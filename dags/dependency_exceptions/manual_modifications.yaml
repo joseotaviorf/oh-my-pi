@@ -758,6 +758,8 @@ bietlejuice.enrich_vespucio:
   add:
     - bietlejuice.ebdb:load-clean-map-region
     - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
+  remove:
+    - bietlejuice.sindico_net:load-clean-condominium
 bietlejuice.enrich_vespucio_pipeline:
   add:
     - bietlejuice.ebdb:load-clean-amenities
@@ -770,7 +772,7 @@ bietlejuice.enrich_vespucio_pipeline:
     - bietlejuice.enrich_ebdb_condo:load-enrich-condo-amenities
     - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
     - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
-    - bietlejuice.sindico_net:load-clean-condominium
+    # - bietlejuice.sindico_net:load-clean-condominium
 bietlejuice.enrich_viva_real_crawler_listings:
   remove:
     - bietlejuice.listings.viva_real:load-clean-viva-real
