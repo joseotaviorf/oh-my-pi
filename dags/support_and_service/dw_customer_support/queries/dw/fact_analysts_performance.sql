@@ -66,7 +66,7 @@ without_agg_infos AS (
 SELECT
     wa.id_agent || dt_last_ticket_updated AS sk_snapshot,
     wa.id_agent AS sk_agent,
-    COALESCE(CAST(REPLACE(SUBSTRING(wa.dt_last_ticket_updated,1, 10),'-','') AS BIGINT), -1) AS sk_last_ticket_updated_date,
+    COALESCE(CAST(DATE_FORMAT(wa.dt_last_ticket_updated,'yyyyMMddHH') AS BIGINT), -1) AS sk_last_ticket_updated_date,
     COUNT(id_ticket) AS total_tickets,
     SUM(wa.reopened_tickets) AS ticket_reopenings,
     SUM(wa.replied_tickets) AS ticket_responses,
