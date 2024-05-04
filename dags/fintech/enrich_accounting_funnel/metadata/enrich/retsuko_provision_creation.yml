@@ -82,7 +82,7 @@ columns:
       - datalake_retsuko.invoice.ts_paid
       - datalake_retsuko.invoice.ts_created
     description: "Boolean that indicated if temporality pillar is compliance"
-  is_compliance_compliance:
+  is_compliance:
     lineage:
       - datalake_accounting_funnel.ledger.dt_created
       - datalake_retsuko.invoice.ts_paid
