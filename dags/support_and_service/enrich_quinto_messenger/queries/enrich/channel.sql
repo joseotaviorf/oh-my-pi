@@ -1,6 +1,6 @@
 WITH last_extracted_channels AS (
 	SELECT
-		id_external,
+		id_channel,
 		MAX(DATE(CONCAT(CAST(c.year AS VARCHAR(4)), '-', CAST(c.month AS VARCHAR(2)), '-', CAST(c.day AS VARCHAR(2))))) AS dt_last_extracted
 	FROM
 		datalake_quinto_messenger_clean.channel AS c
@@ -25,5 +25,5 @@ SELECT
 FROM
 	datalake_quinto_messenger_clean.channel AS c
 INNER JOIN last_extracted_channels lec
-	ON lec.id_external = c.id_external
+	ON lec.id_channel = c.id_channel
 	AND lec.dt_last_extracted = DATE(CONCAT(CAST(c.year AS VARCHAR(4)), '-', CAST(c.month AS VARCHAR(2)), '-', CAST(c.day AS VARCHAR(2))))

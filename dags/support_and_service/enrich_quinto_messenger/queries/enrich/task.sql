@@ -1,6 +1,6 @@
 WITH last_extracted_tasks AS (
 	SELECT
-		id_external,
+		id_task,
 		MAX(DATE(CONCAT(CAST(t.year AS VARCHAR(4)), '-', CAST(t.month AS VARCHAR(2)), '-', CAST(t.day AS VARCHAR(2))))) AS dt_last_extracted
 	FROM
 		datalake_quinto_messenger_clean.task AS t
@@ -36,5 +36,5 @@ SELECT
 FROM
 	datalake_quinto_messenger_clean.task AS t
 INNER JOIN last_extracted_tasks let
-	ON let.id_external = t.id_external
+	ON let.id_task = t.id_task
 	AND let.dt_last_extracted = DATE(CONCAT(CAST(t.year AS VARCHAR(4)), '-', CAST(t.month AS VARCHAR(2)), '-', CAST(t.day AS VARCHAR(2))))

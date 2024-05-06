@@ -9,7 +9,7 @@ WITH last_extracted_events AS (
 SELECT
 	ce.id AS id_channel_event,
 	GET_JSON_OBJECT(ce.event_payload,'$.MessageSid') AS id_message,
-	ce.id_channel_external AS id_channel,
+	ce.id_channel,
 	ce.event_type,
 	GET_JSON_OBJECT(ce.event_payload,'$.Source') AS source,
 	NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(ce.event_payload,'$.From'),'(\\w+:)(.+)',2),'') AS from_phone_number,

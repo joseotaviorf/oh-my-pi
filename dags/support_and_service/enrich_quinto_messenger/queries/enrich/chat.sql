@@ -9,4 +9,4 @@ SELECT
 FROM
     datalake_quinto_messenger_clean.chat
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id_chat ORDER BY ts_updated DESC) = 1

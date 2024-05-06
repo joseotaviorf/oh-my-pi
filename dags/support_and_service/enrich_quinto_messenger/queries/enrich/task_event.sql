@@ -1,6 +1,6 @@
 WITH twilio_date AS (
     SELECT
-        id_task AS id_task_external,
+        id_task,
         MAX(ts_created) AS ts_twilio_created,
         MAX(ts_updated) AS ts_twilio_updated
     FROM
@@ -10,8 +10,8 @@ WITH twilio_date AS (
     GROUP BY 1
 )
 SELECT
-	te.id_event AS id_task_event,
-	te.id_task_external AS id_task,
+	te.id AS id_task_event,
+	te.id_task,
 	GET_JSON_OBJECT(te.event_payload,'$.TaskChannelSid') AS id_channel,
 	GET_JSON_OBJECT(te.event_payload,'$.TaskQueueSid') AS id_task_queue,
 	te.event_type AS type,
@@ -36,5 +36,6 @@ FROM
 	datalake_quinto_messenger_clean.task_event AS te
 LEFT JOIN
     twilio_date AS ted
-    	ON te.id_task_external = ted.id_task_external
-QUALIFY ROW_NUMBER() OVER(PARTITION BY te.id_event ORDER BY te.year DESC, te.month DESC, te.day DESC) = 1
+    	ON te.id_task = ted.id_task
+QUALIFY
+	ROW_NUMBER() OVER(PARTITION BY te.id ORDER BY te.year DESC, te.month DESC, te.day DESC) = 1
