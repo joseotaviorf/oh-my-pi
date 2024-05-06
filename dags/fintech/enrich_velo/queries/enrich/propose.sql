@@ -350,16 +350,39 @@ ended_date AS (
         1 -- some proposes can have multiple same status
 ),
 propose_waiting_new_docs_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value IN ('Mais documentos', 'Mais proponentes')
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+    ),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_waiting_new_docs
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status IN (7, 9)
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_waiting_new_docs, a.ts_waiting_new_docs) AS ts_waiting_new_docs
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Mais documentos', 'Mais proponentes')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 propose_evaluation_started_date AS (
     WITH cte_propose_history AS (
@@ -399,76 +422,214 @@ propose_evaluation_started_date AS (
             ON ph.id_propose = a.id_propose
 ),
 propose_rejected_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value IN ('Reprovado pelo analista','Reprovado na análise humanizada')
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+    ),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_rejected
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status IN (4, 8)
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_rejected, a.ts_rejected) AS ts_rejected
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Reprovado pelo analista','Reprovado na análise humanizada')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 propose_sign_started_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value IN ('Aprovada pelo analista','Análise aprovada')
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+    ),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_sign_started
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status IN (10, 19)
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_sign_started, a.ts_sign_started) AS ts_sign_started
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Aprovada pelo analista','Análise aprovada')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 propose_signed_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_signed
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value IN ('Contrato Assinado mas não pago')
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+    ),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_signed
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status IN (11)
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_signed
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_signed, a.ts_signed) AS ts_signed
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Contrato Assinado mas não pago')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 propose_paid_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value IN ('Contrato pago mas não assinado','Contrato assinado e pago')
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+    ),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_paid
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status IN (12, 13)
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_paid, a.ts_paid) AS ts_paid
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value IN ('Contrato pago mas não assinado','Contrato assinado e pago')
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 propose_activation_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value = 'Contrato assinado e pago'
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+    ),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_activation
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status = 13
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_activation, a.ts_activation) AS ts_activation
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value = 'Contrato assinado e pago'
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 propose_secured_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value = 'Contrato aprovado'
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+    ),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_secured
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status = 14
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_secured, a.ts_secured) AS ts_secured
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value = 'Contrato aprovado'
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 propose_activation_analysis_date AS (
     WITH cte_propose_history AS (
@@ -506,16 +667,39 @@ propose_activation_analysis_date AS (
             ON ph.id_propose = a.id_propose
 ),
 propose_secure_pending_date AS (
+    WITH cte_propose_history AS (
+            SELECT
+                id_propose,
+                MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_history
+            WHERE
+                value = 'Reenviar contrato de aluguel'
+                AND id_history_type = 5 -- Status update type
+            GROUP BY
+                1 -- some proposes can have multiple same status
+    ),
+    cte_propose_aud AS (
+            SELECT
+                p.id AS id_propose,
+                MIN(r.ts_created) AS ts_secure_pending
+            FROM
+                datalake_rental_guarantee_platform_clean.propose_aud AS p
+            LEFT JOIN
+                datalake_rental_guarantee_platform_clean.rev_info AS r
+                    ON r.rev = p.rev
+            WHERE
+                p.id_propose_status = 18
+            GROUP BY 1
+    )
     SELECT
-        id_propose,
-        MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
+        COALESCE(ph.id_propose, a.id_propose) AS id_propose,
+        COALESCE(ph.ts_secure_pending, a.ts_secure_pending) AS ts_secure_pending
     FROM
-        datalake_rental_guarantee_platform_clean.propose_history
-    WHERE
-        value = 'Reenviar contrato de aluguel'
-        AND id_history_type = 5 -- Status update type
-    GROUP BY
-        1 -- some proposes can have multiple same status
+        cte_propose_aud AS a
+    FULL OUTER JOIN
+        cte_propose_history AS ph
+            ON ph.id_propose = a.id_propose
 ),
 prop_values_structure AS (
     WITH cte_values AS (

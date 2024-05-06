@@ -129,48 +129,58 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_evaluation_started:
     description: Timestamp of when the propose's evaluation has started. When 3P proposes, set to be a copy of dt_contract_started.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_rejected:
     description: Timestamp of when the propose has been rejected
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_sign_started:
     description: Timestamp of when the propose has opened to be sign. When 3P proposes, set to be a copy of dt_contract_started.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_paid:
     description: Timestamp of when the propose has been paid (to turn into a contract)
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_signed:
     description: Timestamp of when the propose has been finished signing (to turn into a contract)
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_activation:
     description: Timestamp of when the propose has been activated
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_secured:
     description: Timestamp of when the propose has been secured
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_activation_analysis:
     description: Timestamp of when the propose had been activated, but was still in analysis
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_secure_pending:
     description: Timestamp of when the propose has started waiting to be secured
     lineage:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
