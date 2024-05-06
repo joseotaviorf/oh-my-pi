@@ -7,8 +7,8 @@ WITH last_extracted_tasks AS (
 	GROUP BY 1
 )
 SELECT
-	t.id_external AS id_task,
-	t.id_channel_external AS id_channel,
+	t.id_task,
+	t.id_channel,
 	GET_JSON_OBJECT(t.task_attributes,'$.chat_id') AS id_chat,
 	GET_JSON_OBJECT(t.task_attributes,'$.conversations.conversation_id') AS id_conversation,
 	GET_JSON_OBJECT(t.assigned_to,'$.worker_sid') AS id_agent,

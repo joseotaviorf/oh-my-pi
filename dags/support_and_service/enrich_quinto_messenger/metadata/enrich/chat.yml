@@ -6,15 +6,15 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_chat:
     lineage:
-      - datalake_quinto_messenger_clean.chat.id
+      - datalake_quinto_messenger_clean.chat.id_chat
     description: ID of the chat on QuintoMessenger
   id_channel:
     lineage:
-      - datalake_quinto_messenger_clean.chat.attributes
+      - datalake_quinto_messenger_clean.chat.id_channel
     description: Twilio's channel ID
   id_session:
     lineage:
-      - datalake_quinto_messenger_clean.chat.id_source
+      - datalake_quinto_messenger_clean.chat.id_session
     description: Sauron's session ID
   source:
     lineage:
@@ -22,7 +22,7 @@ columns:
     description: Origin of the chat session
   session_status:
     lineage:
-      - datalake_quinto_messenger_clean.chat.status
+      - datalake_quinto_messenger_clean.chat.session_status
     description: Status of the chat session
     categories:
       active: "Session is still active, customer can still contact support through the same session"

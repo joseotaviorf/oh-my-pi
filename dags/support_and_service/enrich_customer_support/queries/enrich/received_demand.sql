@@ -213,7 +213,7 @@ chat AS (
   ),
   reservation_created_events AS (
     SELECT
-      id_task_external,
+      id_task AS id_task_external,
       FROM_UTC_TIMESTAMP(ts_created, 'America/Sao_Paulo') AS ts_reservation_created
     FROM
       datalake_quinto_messenger_clean.task_event

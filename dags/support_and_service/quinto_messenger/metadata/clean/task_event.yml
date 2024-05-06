@@ -4,16 +4,25 @@ columns:
   id:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.id
-  id_task_external:
+  id_task:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.task_id
   id_event:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_id
+  id_queue:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.event_payload
   event_type:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_type
   event_payload:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.event_payload
+  queue_name:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.event_payload
+  channel_name:
     lineage:
       - datalake_quinto_messenger_raw.taskevent.event_payload
   ts_created:

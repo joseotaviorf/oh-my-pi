@@ -7,16 +7,16 @@ columns:
   id_task:
     description: Unique identifier for each task.
     lineage:
-      - datalake_quinto_messenger_clean.task.id_external
+      - datalake_quinto_messenger_clean.task.id_task
   id_channel:
     description: Unique identifier for each channel.
     lineage:
-      - datalake_quinto_messenger_clean.task.id_channel_external
+      - datalake_quinto_messenger_clean.task.id_channel
   id_chat:
-    description:  Unique identifier for each chat.
+    description: Unique identifier for each chat.
     lineage:
       - datalake_quinto_messenger_clean.task.task_attributes
-  id_conversation: 
+  id_conversation:
     description: Unique identifier for each conversation.
     lineage:
       - datalake_quinto_messenger_clean.task.task_attributes
@@ -28,7 +28,7 @@ columns:
     description: email customer service agent.
     lineage:
       - datalake_quinto_messenger_clean.task.assigned_to
-  channel_type_twilio: 
+  channel_type_twilio:
     description: What was the channel used for the conversation.
     categories:
       chat: Service via chat.
@@ -44,7 +44,8 @@ columns:
     lineage:
       - datalake_quinto_messenger_clean.task.task_status
   completion_reason:
-    description: A task event completion reason is the reason why a task has been
+    description:
+      A task event completion reason is the reason why a task has been
       marked as completed. When a worker finishes a task, they must provide a
       completion reason, which is a string that describes the reason why they completed
       the task. Usually, the last task ID in the conversation will have a

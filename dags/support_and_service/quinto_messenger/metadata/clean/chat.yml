@@ -1,18 +1,24 @@
 database_name: datalake_quinto_messenger_clean
 table_name: chat
 columns:
-  id:
+  id_chat:
     lineage:
       - datalake_quinto_messenger_raw.chat.id
-  external_id:
+  id_external:
     lineage:
       - datalake_quinto_messenger_raw.chat.external_id
+  id_session:
+    lineage:
+      - datalake_quinto_messenger_raw.chat.source_id
+  id_channel:
+    lineage:
+      - datalake_quinto_messenger_raw.chat.attributes
   source:
     lineage:
       - datalake_quinto_messenger_raw.chat.source
-  source_id:
+  session_status:
     lineage:
-      - datalake_quinto_messenger_raw.chat.source_id
+      - datalake_quinto_messenger_raw.chat.status
   source_identity:
     lineage:
       - datalake_quinto_messenger_raw.chat.source_identity

@@ -6,15 +6,15 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_channel:
     lineage:
-      - datalake_quinto_messenger_clean.channel.id_external
+      - datalake_quinto_messenger_clean.channel.id_channel
     description: Twilio's channel ID
   id_source:
     lineage:
-      - datalake_quinto_messenger_clean.channel.id_source
+      - datalake_quinto_messenger_clean.channel.id_session
     description: Sauron's session ID
   id_conversation:
     lineage:
-      - datalake_quinto_messenger_clean.channel.id_source_unique
+      - datalake_quinto_messenger_clean.channel.id_session_unique
     description: Unique identifier for a session
   source:
     lineage:

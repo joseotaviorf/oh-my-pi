@@ -7,8 +7,8 @@ WITH last_extracted_channels AS (
 	GROUP BY 1
 )
 SELECT
-	c.id_external AS id_channel,
-	c.id_source,
+	c.id_channel,
+	c.id_session AS id_source,
 	c.id_source_unique AS id_conversation,
 	c.source,
 	GET_JSON_OBJECT(c.channel_attributes,'$.channel_type') AS channel_type,

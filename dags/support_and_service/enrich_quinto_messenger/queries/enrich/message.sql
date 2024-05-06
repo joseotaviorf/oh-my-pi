@@ -11,7 +11,7 @@ WITH message_events AS (
     ts_created >= "2022-01-01"
   UNION ALL
   SELECT
-    id_channel_external AS id_channel,
+    id_channel,
     GET_JSON_OBJECT(event_payload, "$.MessageSid") AS id_message,
     REPLACE(REPLACE(GET_JSON_OBJECT(event_payload, '$.From'),'_2E', '.'), '_40', '@') AS msg_sender,
     "WHATSAPP" AS origin,

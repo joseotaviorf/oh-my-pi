@@ -1,6 +1,6 @@
 WITH twilio_date AS (
     SELECT
-        id_task_external,
+        id_task AS id_task_external,
         MAX(ts_created) AS ts_twilio_created,
         MAX(ts_updated) AS ts_twilio_updated
     FROM

@@ -17,7 +17,7 @@ task_events_last_update AS (
 ),
 tasks_time_info AS (
     SELECT
-        id_task_external,
+        id_task AS id_task_external,
         MAX(CASE WHEN event_type = 'reservation.accepted' THEN (ts_created - INTERVAL '3' HOUR) END) AS ts_reservation_accepted_local,
         MAX(CASE WHEN event_type = 'reservation.completed' THEN (ts_created - INTERVAL '3' HOUR)  END) AS ts_reservation_completed_local,
         MIN(ts_created - INTERVAL '3' HOUR) AS ts_task_created_local,
@@ -32,8 +32,8 @@ tasks_time_info AS (
 ),
 tasks_attributes AS (
     SELECT
-        id_external,
-        id_channel_external,
+        id_task AS id_external,
+        id_channel AS id_channel_external,
         (ts_created - INTERVAL '3' HOUR) AS ts_task_created_local,
         get_json_object(task_resource, '$.task_queue_friendly_name') AS department_name,
         get_json_object(assigned_to, '$.worker_sid') AS id_agent,

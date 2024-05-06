@@ -10,10 +10,10 @@ WITH message_summary AS (
         datalake_customer_support.chat AS cht
     INNER JOIN
         datalake_quinto_messenger_clean.channel AS ch
-            ON cht.id_session = ch.id_source
+            ON cht.id_session = ch.id_session
     INNER JOIN
         datalake_quinto_messenger_clean.channel_event AS evt
-            ON evt.id_channel_external = ch.id_external
+            ON evt.id_channel = ch.id_channel
     LEFT JOIN
         datalake_support_users.analysts AS a
             ON cht.agent_email = a.email

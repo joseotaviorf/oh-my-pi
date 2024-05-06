@@ -10,7 +10,7 @@ columns:
     description: Twilio's event ID
   id_task:
     lineage:
-      - datalake_quinto_messenger_clean.task_event.id_task_external
+      - datalake_quinto_messenger_clean.task_event.id_task
     description: Twilio's task ID
   id_channel:
     lineage:

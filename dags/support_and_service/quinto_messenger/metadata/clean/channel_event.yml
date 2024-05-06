@@ -4,9 +4,24 @@ columns:
   id:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.id
-  id_channel_external:
+  id_channel:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.channel_id
+  id_message:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.event_payload
+  source:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.event_payload
+  from_phone_number:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.event_payload
+  message_body:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.event_payload
+  message_index:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.event_payload
   event_type:
     lineage:
       - datalake_quinto_messenger_raw.channelevent.event_type

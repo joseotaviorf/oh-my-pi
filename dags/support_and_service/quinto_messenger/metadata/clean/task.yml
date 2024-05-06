@@ -4,15 +4,57 @@ columns:
   id:
     lineage:
       - datalake_quinto_messenger_raw.task.id
-  id_external:
+  id_task:
     lineage:
       - datalake_quinto_messenger_raw.task.task_id
-  id_channel_external:
+  id_channel:
     lineage:
       - datalake_quinto_messenger_raw.task.channel_id
+  id_chat:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  id_worker:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
   task_status:
     lineage:
       - datalake_quinto_messenger_raw.task.task_status
+  customer_metadata:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  customer_contact_info:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  customer_email:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  twilio_phone_number:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  worker_email:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  channel_type:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  completion_reason:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  channel_status:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  department:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  bpo_name:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  tags:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  conversation_attributes:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
   task_attributes:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
@@ -25,6 +67,9 @@ columns:
   seconds_to_first_response:
     lineage:
       - datalake_quinto_messenger_raw.task.seconds_to_first_response
+  is_forwarded:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
   ts_created:
     lineage:
       - datalake_quinto_messenger_raw.task.created_at

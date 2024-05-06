@@ -4,10 +4,10 @@ columns:
   id:
     lineage:
       - datalake_quinto_messenger_raw.channel.id
-  id_external:
+  id_channel:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_id
-  id_source:
+  is_session:
     lineage:
       - datalake_quinto_messenger_raw.channel.source_id
   id_source_unique:
@@ -16,6 +16,21 @@ columns:
   channel_status:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_status
+  channel_type:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_attributes
+  user_phone:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.user_phone
+  twilio_phone_number:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_attributes
+  number_of_messages:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_attributes
+  number_of_members:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_attributes
   channel_attributes:
     lineage:
       - datalake_quinto_messenger_raw.channel.channel_attributes
@@ -28,9 +43,6 @@ columns:
   source:
     lineage:
       - datalake_quinto_messenger_raw.channel.source
-  user_phone:
-    lineage:
-      - datalake_quinto_messenger_raw.channel.user_phone
   ts_created:
     lineage:
       - datalake_quinto_messenger_raw.channel.created_at
