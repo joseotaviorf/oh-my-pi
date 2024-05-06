@@ -2664,7 +2664,6 @@ bietlejuice.enrich_supply_acquisition:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
-  - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
   - bietlejuice.rene_descartes:load-clean-house-lead-conversion
 bietlejuice.enrich_supply_conversion:
   - bietlejuice.ebdb:load-clean-house-aud
@@ -2683,13 +2682,6 @@ bietlejuice.enrich_supply_conversion:
 bietlejuice.enrich_supply_conversion_3p:
   - bietlejuice.enrich_supply_acquisition:load-enrich-landing-3p
   - bietlejuice.enrich_supply_acquisition:load-enrich-prospects-3p
-  - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
-bietlejuice.enrich_supply_leads:
-  - bietlejuice.bob:load-clean-house-draft
-  - bietlejuice.bob:load-clean-submission-progress
-  - bietlejuice.brokers_supply_processor:load-clean-lead-3p
-  - bietlejuice.rene_descartes:load-clean-house-lead
-  - bietlejuice.rene_descartes:load-clean-house-lead-conversion
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners

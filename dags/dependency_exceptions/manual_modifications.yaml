@@ -362,6 +362,11 @@ bietlejuice.enrich_ebdb_photo_jobs:
 bietlejuice.enrich_ebdb_user:
   add:
     - bietlejuice.ebdb_user:load-clean-user-merge
+bietlejuice.enrich_supply_leads:
+  override: []
+bietlejuice.enrich_supply_acquisition:
+  remove:
+  - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
 bietlejuice.enrich_supply_conversion:
   add:
     - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
@@ -370,6 +375,8 @@ bietlejuice.enrich_supply_conversion_3p:
   add:
     - bietlejuice.enrich_supply_acquisition:load-enrich-landing-3p
     - bietlejuice.enrich_supply_acquisition:load-enrich-prospects-3p
+  remove:
+    - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
 bietlejuice.enrich_static_files_ss:
   override: []
 bietlejuice.enrich_supply_taxonomy:
