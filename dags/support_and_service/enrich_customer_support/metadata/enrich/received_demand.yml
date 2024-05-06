@@ -128,6 +128,8 @@ columns:
     lineage:
       - datalake_quinto_messenger.task.completion_reason
     description: Reason for a given Twilio task to have been completed.
+  origin:
+    description: Describes the origin of the interaction, only valid for call interactions.
   status:
     lineage:
       - datalake_quinto_messenger_clean.task_event.event_payload

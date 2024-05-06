@@ -42,6 +42,10 @@ call AS (
       event_type,
       agent_email,
       task_queue_name,
+      CASE
+        WHEN channel_type = "call-in-app" OR direction = "outbound-api" THEN "call inapp"
+        ELSE CONCAT("call ", direction)
+      END AS origin,
       IFNULL(LAG(task_queue_name) OVER (PARTITION BY id_task ORDER BY ts_created_local), '-') AS previous_task_queue_name,
       customer_phone,
       ts_created_local AS ts_created
@@ -53,19 +57,20 @@ call AS (
   ),
   reservations_ts AS (
     SELECT
-      tcfe.id_call,
-      tcfe.id_task,
-      tcfe.id_task_queue,
-      tcfe.id_reservation,
-      tcfe.agent_email,
-      tcfe.previous_task_queue_name,
-      tcfe.task_queue_name,
-      tcfe.customer_phone,
-      tcfe.ts_created
+      id_call,
+      id_task,
+      id_task_queue,
+      id_reservation,
+      agent_email,
+      previous_task_queue_name,
+      origin,
+      task_queue_name,
+      customer_phone,
+      ts_created
     FROM
       twilio_call_flex_events AS tcfe
     WHERE
-      tcfe.task_queue_name != tcfe.previous_task_queue_name
+      task_queue_name != previous_task_queue_name
   ),
   /* To check when the reservation/department ended we're adding this CTE to get the next timestamp
   of the department, this way we can attribute the right id_reservation checking the timestamps.
@@ -95,6 +100,7 @@ call AS (
       rts.id_task,
       r.id_reservation,
       rts.task_queue_name,
+      rts.origin,
       r.agent_email,
       rts.customer_phone,
       rts.ts_created,
@@ -105,7 +111,7 @@ call AS (
       reservations AS r
         ON rts.id_task = r.id_task
         AND rts.id_task_queue = r.id_task_queue
-        and r.ts_created >= rts.ts_created
+        AND r.ts_created >= rts.ts_created
         AND r.ts_created < COALESCE(rts.ts_created_ended, CURRENT_TIMESTAMP())
     WHERE
       task_queue_name <> previous_task_queue_name
@@ -117,6 +123,7 @@ call AS (
       crd.id_task,
       COALESCE(s.id_user, cp.id_user) AS id_user,
       crd.id_reservation,
+      crd.origin,
       crd.agent_email,
       crd.customer_phone,
       crd.task_queue_name AS department,
@@ -159,6 +166,7 @@ call AS (
     cs.id_reservation,
     cs.agent_email,
     "call" AS channel,
+    cs.origin,
     cs.customer_phone,
     NULL AS customer_email,
     cs.department,
@@ -310,6 +318,7 @@ chat AS (
     NULL AS id_reservation,
     agent_email,
     'chat' AS channel,
+    NULL AS origin,
     customer_phone,
     NULL AS customer_email,
     department,
@@ -355,6 +364,7 @@ email AS (
     NULL AS id_reservation,
     agent_email,
     'email' AS channel,
+    NULL AS origin,
     NULL AS customer_phone,
     ce.email AS customer_email,
     department,
@@ -440,6 +450,7 @@ SELECT
   rd.id_reservation,
   rd.agent_email,
   rd.channel,
+  rd.origin,
   rd.customer_phone,
   rd.customer_email,
   rd.department,

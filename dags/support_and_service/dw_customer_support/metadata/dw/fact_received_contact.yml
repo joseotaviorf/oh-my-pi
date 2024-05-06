@@ -74,6 +74,8 @@ columns:
       call: channel_name receives this value when the customer get in touch via call
       chat: channel_name receives this value when the customer get in touch via chat
       email: channel_name receives this value when the customer get in touch via email
+  origin:
+    description: Describes the origin of the interaction, only valid for call interactions.
   agent_email:
     lineage:
       - datalake_customer_support.received_demand.agent_email
