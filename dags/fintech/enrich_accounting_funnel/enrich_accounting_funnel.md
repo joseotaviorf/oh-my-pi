@@ -25,5 +25,6 @@ Produces the following output tables, via full load:
 - `payment_platforms`
 - `retsuko_invoice_issuance`
 - `retsuko_provision_creation`
+- `retsuko_revenue_accounting`
 
 ​</details>
