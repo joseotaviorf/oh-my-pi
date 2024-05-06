@@ -1,5 +1,0 @@
----
-dag_documentation:
-  dag_purpose: |
-    Prepares [Sauron](github.com/quintoandar/sauron) data for business utilization. Sauron is the messageing orchestration service,
-    and controls the user session when someone contact our customer services.

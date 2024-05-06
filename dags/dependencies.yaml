@@ -821,10 +821,6 @@ bietlejuice.dw_sale_visits:
   - bietlejuice.enrich_sale_visit:load-enrich-sale-visit
 bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
-bietlejuice.dw_sauron:
-  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
-  - bietlejuice.enrich_quinto_messenger:load-enrich-channel
-  - bietlejuice.enrich_sauron:load-enrich-session
 bietlejuice.dw_search_session_event:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
@@ -1389,12 +1385,12 @@ bietlejuice.enrich_date:
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
 bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-collector
   - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.trato_feito:load-clean-debtor
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
-  - bietlejuice.trato_feito:load-clean-collector
 bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
@@ -2368,10 +2364,10 @@ bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-invoice
 bietlejuice.enrich_retsuko_test:
   - bietlejuice.retsuko_test:load-clean-account
+  - bietlejuice.retsuko_test:load-clean-boleto
   - bietlejuice.retsuko_test:load-clean-contract
   - bietlejuice.retsuko_test:load-clean-entry
   - bietlejuice.retsuko_test:load-clean-invoice
-  - bietlejuice.retsuko_test:load-clean-boleto
   - bietlejuice.retsuko_test:load-clean-monthly-closing-checks
 bietlejuice.enrich_revenue_lines:
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
@@ -2602,8 +2598,6 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.gsheets_support_and_service:done-clean-csat-reimbursement-true
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat
   - bietlejuice.zendesk:load-clean-satisfaction-ratings
-bietlejuice.enrich_sauron:
-  - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_search:
   - bietlejuice.amplitude:load-clean-170698-user-merge
   - bietlejuice.ebdb_offer:load-clean-offer
