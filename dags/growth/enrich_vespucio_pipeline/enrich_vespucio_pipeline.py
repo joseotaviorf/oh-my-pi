@@ -20,6 +20,7 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
+# TO DO: Add the package version in the config file
 VESPUCIO_PACKAGE_VERSION = "0.2.16"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
@@ -105,6 +106,7 @@ class Tables:
     source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
     source_navent_houses = "vespucio_sources_delta.source_navent_houses"
     source_union_houses = "vespucio_sources_delta.source_union_house"
+    # source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
 
     step1_staged_condos = "vespucio_pipeline_delta.step1_staged_condos"
     step1_staged_houses = "vespucio_pipeline_delta.step1_staged_houses"
@@ -170,6 +172,14 @@ source_tasks = [
         ],
         task_id="union_house",
     ),
+    # create_task(
+    #     entry_point="sources_sql_job",
+    #     parameters=[
+    #         f"--script=itbi_house.sql",
+    #         f"--output_table={Tables.source_itbi_houses}",
+    #     ],
+    #     task_id="itbi_house",
+    # ),
 ]
 
 core_tasks = [
@@ -240,18 +250,18 @@ yesterday = "{{ ds }}"
 today = "{{ macros.ds_add(ds, 1)  }}"
 
 plugin_tasks = [
-    # create_task(
-    #     entry_point="plugins_compound_indexer",
-    #     parameters=[
-    #         f"--elasticsearch_url=https://vpc-vespucio-prod-us-east-1-o56l6pbmnwaphvb7rqxzsapso4.us-east-1.es.amazonaws.com/",
-    #         f"--update_alias",
-    #         f"--delete_old_indices",
-    #         f"--input_condo_compounds={Tables.condo_compounds}",
-    #         f"--input_house_compounds={Tables.house_compounds}",
-    #         f"--input_geocode_cache={Tables.step2_geocode_cache}",
-    #         f"--output_index_prefix=vespucio_prod",
-    #     ],
-    # ),
+    create_task(
+        entry_point="plugins_compound_indexer",
+        parameters=[
+            f"--elasticsearch_url=https://vpc-vespucio-prod-us-east-1-o56l6pbmnwaphvb7rqxzsapso4.us-east-1.es.amazonaws.com/",
+            f"--update_alias",
+            f"--delete_old_indices",
+            f"--input_condo_compounds={Tables.condo_compounds}",
+            f"--input_house_compounds={Tables.house_compounds}",
+            f"--input_geocode_cache={Tables.step2_geocode_cache}",
+            f"--output_index_prefix=vespucio_prod",
+        ],
+    ),
     create_task(
         entry_point="plugins_rede_house_enrichment_consolidate",
         parameters=[
