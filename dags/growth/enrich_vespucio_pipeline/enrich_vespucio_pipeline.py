@@ -334,4 +334,6 @@ plugin_tasks = [
 execute_job_cluster_task >> source_tasks
 core_tasks[0] << source_tasks
 chain(*core_tasks)
-core_tasks[-1] >> [listing_task, linking_task] >> plugin_tasks
+core_tasks[-1] >> listing_task
+core_tasks[-1] >> linking_task
+linking_task >> plugin_tasks
