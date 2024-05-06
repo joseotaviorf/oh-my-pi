@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import re
+from typing import Tuple
 
 from airflow import DAG
 from pendulum import timezone
@@ -117,6 +118,107 @@ class BaseWorkflow(BuilderInterface):
             self.cluster_args,
             **kwargs,
         )
+
+    def _initialize_load_start_and_end_date(self) -> Tuple[str, str]:
+        """
+        Reads load start and end dates from the workflow args and sets them as template params.
+        Returns the start and end dates as strings.
+        """
+
+        if "extra_query_template_params" not in self.workflow_args:
+            self.workflow_args["extra_query_template_params"] = {}
+
+        load_start_date = self.workflow_args["extra_query_template_params"].get(
+            "load_start_date", "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+        )
+        load_end_date = self.workflow_args["extra_query_template_params"].get(
+            "load_end_date", "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+        )
+
+        self.workflow_args["extra_query_template_params"][
+            "load_start_date"
+        ] = load_start_date
+        self.workflow_args["extra_query_template_params"][
+            "load_end_date"
+        ] = load_end_date
+
+        return load_start_date, load_end_date
+
+    def _set_inner_dependencies(
+        self,
+        table_first_tasks: dict,
+        table_last_tasks: dict,
+        previous_task_if_no_dependencies=None,
+        next_task_if_no_dependents=None,
+    ) -> None:
+        """
+        Sets the inner dependencies between the tables, based on the inner_dependencies dictionary. It is not
+        case sensitive. All the dependencies (values in the list) must finish before the dependent (key of the dictionary) starts.
+        table_first_tasks: dictionary with the first task of each table. The key is the table name.
+        table_last_tasks: dictionary with the last task of each table. The key is the table name.
+        previous_task_if_no_dependencies: task that will be set as the previous task if the table\
+        has no dependencies. Usually, this will be the cluster starting task.
+        next_task_if_no_dependents: task that will be set as the next task if the table has no dependents.\
+        Usually, this will be the cluster ending task.
+        """
+        inner_dependencies = self._get_lowercase_inner_dependencies()
+        tables_with_dependents = set()
+        for table_name, dependent_first_task in table_first_tasks.items():
+            if table_name.lower() in inner_dependencies:
+                self._link_dependencies_to_dependent(
+                    table_last_tasks,
+                    inner_dependencies[table_name.lower()],
+                    dependent_first_task,
+                    tables_with_dependents,
+                )
+            elif previous_task_if_no_dependencies:
+                previous_task_if_no_dependencies >> dependent_first_task
+
+        if next_task_if_no_dependents:
+            self._link_tables_without_dependents_to_end_task(
+                table_last_tasks, tables_with_dependents, next_task_if_no_dependents
+            )
+
+    def _get_lowercase_inner_dependencies(self):
+        """Returns the inner dependencies dictionary from the workflow args, both with the key and values in lowercase"""
+
+        inner_dependencies_case_sensitive = self.workflow_args.get(
+            "inner_dependencies", {}
+        )
+        inner_dependencies_lowercase = {}
+        for table_name, dependencies_list in inner_dependencies_case_sensitive.items():
+            inner_dependencies_lowercase[table_name.lower()] = [
+                dep.lower() for dep in dependencies_list
+            ]
+        return inner_dependencies_lowercase
+
+    def _link_dependencies_to_dependent(
+        self,
+        table_last_tasks: dict,
+        dependencies: list,
+        dependent_first_task,
+        tables_with_dependents: set,
+    ) -> None:
+        """Links the last task of each dependency to the first task of the dependent. Also adds the dependency to the set of tables with dependents."""
+
+        for inner_dependency in dependencies:
+            if inner_dependency not in table_last_tasks:
+                raise ValueError(
+                    f"Error finding table '{inner_dependency}' during inner dependencies settings. "
+                    "Make sure this table is named correctly and its query exists."
+                )
+            table_last_tasks[inner_dependency] >> dependent_first_task
+            tables_with_dependents.add(inner_dependency)
+
+    def _link_tables_without_dependents_to_end_task(
+        self, table_last_tasks: dict, tables_with_dependents: set, end_task
+    ) -> None:
+        """
+        Links the tables without dependents (i.e., tables without any task after them) to the end task.
+        """
+        for table_name, table_task in table_last_tasks.items():
+            if table_name not in tables_with_dependents:
+                table_task >> end_task
 
     def _check_include_data_quality_task(
         self, table_attributes: TableAttributes

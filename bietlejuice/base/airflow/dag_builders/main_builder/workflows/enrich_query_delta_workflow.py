@@ -95,34 +95,17 @@ class EnrichQueryDeltaWorkflow(BaseWorkflow):
         optimize_delta_tables_task,
         job_cluster_finished_task,
     ) -> None:
-        inner_dependencies = self.workflow_args.get("inner_dependencies", {})
-
-        dependency_table_names = set()
-        try:
-            for table_name, table_first_task in table_first_tasks.items():
-                if table_name in inner_dependencies:
-                    for inner_dependency in inner_dependencies[table_name]:
-                        table_last_tasks[inner_dependency] >> table_first_task
-                        dependency_table_names.add(inner_dependency)
-                else:
-                    execute_job_cluster_task >> table_first_task
-        except KeyError as e:
-            raise ValueError(
-                f"Error finding table '{e.args[0]}' during inner dependencies settings. "
-                "Make sure this table is named correctly and its query exists."
-            )
+        self._set_inner_dependencies(
+            table_first_tasks,
+            table_last_tasks,
+            previous_task_if_no_dependencies=execute_job_cluster_task,
+            next_task_if_no_dependents=optimize_delta_tables_task,
+        )
 
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()
             skip_run_task >> execute_job_cluster_task
 
-        optimize_delta_tables_task.set_upstream(
-            [
-                table_task
-                for table_name, table_task in table_last_tasks.items()
-                if table_name not in dependency_table_names
-            ]
-        )
         optimize_delta_tables_task >> job_cluster_finished_task
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):

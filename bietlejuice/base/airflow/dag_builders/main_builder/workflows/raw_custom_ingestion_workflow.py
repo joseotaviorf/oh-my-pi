@@ -26,56 +26,14 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
     def build_dag(self):
         dag = super().dag_instance()
 
-        bucket = self.config_service.get_config("datalake_bucket")
-
-        if "extra_query_template_params" not in self.workflow_args:
-            self.workflow_args["extra_query_template_params"] = {}
-
-        load_start_date = self.workflow_args["extra_query_template_params"].get(
-            "load_start_date", "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-        )
-        load_end_date = self.workflow_args["extra_query_template_params"].get(
-            "load_end_date", "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-        )
-
-        self.workflow_args["extra_query_template_params"][
-            "load_start_date"
-        ] = load_start_date
-        self.workflow_args["extra_query_template_params"][
-            "load_end_date"
-        ] = load_end_date
-
+        bucket_config = self.workflow_args.get("bucket_config_name", "datalake_bucket")
+        bucket = self.config_service.get_config(bucket_config)
+        load_start_date, load_end_date = self._initialize_load_start_and_end_date()
         dag_execution_context = self._get_dag_execution_context(
             dag, bucket, start_date=load_start_date, end_date=load_end_date
         )
         self._initialize_task_creators(dag_execution_context)
-
-        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
-
-        dummy_terminate_job_cluster_task = (
-            self.dummy_job_cluster_finished_task_creator.create_task()
-        )
-        clean_delta_tables = self._get_tables()
-        optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
-            clean_delta_tables
-        )
-
-        tables_customization = self.workflow_args["tables_customization"]
-        for raw_table_name, table_parameters in tables_customization.items():
-            raw_initial_task, raw_final_task = self._create_raw_tasks(
-                table_name=raw_table_name, last_task=dummy_terminate_job_cluster_task
-            )
-            clean_initial_task, clean_final_task = self._create_clean_tasks(
-                table_name=table_parameters.get(
-                    "clean_table_name", raw_table_name
-                ).lower(),
-                table_customization=table_parameters,
-                optimize_delta_tables_task=optimize_delta_tables_task,
-            )
-
-            execute_job_cluster_task >> raw_initial_task
-            raw_final_task >> clean_initial_task
-            clean_final_task >> dummy_terminate_job_cluster_task
+        self._create_all_tasks()
 
         return dag
 
@@ -119,6 +77,47 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         )
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
+        )
+
+    def _create_all_tasks(self) -> None:
+        """
+        Creates all the tasks for the workflow, and sets their internal dependencies
+        """
+        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
+
+        dummy_terminate_job_cluster_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
+        )
+        clean_delta_tables = self._get_tables()
+        optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
+            clean_delta_tables
+        )
+        clean_first_tasks = {}
+        clean_last_tasks = {}
+
+        tables_customization = self.workflow_args["tables_customization"]
+        for raw_table_name, table_parameters in tables_customization.items():
+            clean_table_name = table_parameters.get(
+                "clean_table_name", raw_table_name
+            ).lower()
+            raw_initial_task, raw_final_task = self._create_raw_tasks(
+                table_name=raw_table_name, last_task=dummy_terminate_job_cluster_task
+            )
+            clean_initial_task, clean_final_task = self._create_clean_tasks(
+                table_name=clean_table_name,
+                table_customization=table_parameters,
+                optimize_delta_tables_task=optimize_delta_tables_task,
+            )
+
+            execute_job_cluster_task >> raw_initial_task
+            raw_final_task >> clean_initial_task
+            clean_first_tasks[clean_table_name] = clean_initial_task
+            clean_last_tasks[clean_table_name] = clean_final_task
+        optimize_delta_tables_task >> dummy_terminate_job_cluster_task
+        self._set_inner_dependencies(
+            clean_first_tasks,
+            clean_last_tasks,
+            next_task_if_no_dependents=optimize_delta_tables_task,
         )
 
     def _create_raw_tasks(self, table_name: str, last_task) -> Tuple:
@@ -198,4 +197,4 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
                 clean_table_attributes
             )
             load_clean_task >> data_quality >> optimize_delta_tables_task
-        return load_clean_task, optimize_delta_tables_task
+        return load_clean_task, load_clean_task
