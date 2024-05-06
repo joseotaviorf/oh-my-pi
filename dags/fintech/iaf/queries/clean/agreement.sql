@@ -4,6 +4,7 @@ SELECT
     idcredor AS id_creditor,
     iddevedor AS id_debtor,
     id_correcao_mon AS id_monetary_correction,
+    cod_ext AS id_recupera_installment,
     processo AS process,
     negociador AS negotiator,
     status,

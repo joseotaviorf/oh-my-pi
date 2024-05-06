@@ -19,6 +19,9 @@ columns:
   id_monetary_correction:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.id_correcao_mon
+  id_recupera_installment:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo.cod_ext
   negotiator:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.negociador
