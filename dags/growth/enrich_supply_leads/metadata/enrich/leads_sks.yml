@@ -1,0 +1,18 @@
+database_name: datalake_supply_flows
+table_name: leads_sks
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: 'WIP'
+columns:
+  sk_supply_lead:
+    description: The unique identifier for each lead in the supply tables.
+  id_lead:
+    lineage: 
+      - datalake_rene_descartes.house_lead.id
+    description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
+  ts_created:
+    description: Timestamp indicating the time of the event.
+  source:
+    description: The source of the lead. Could be 1P, 3P or CIQ.
+  is_backfill:
+    description: Indicates if the lead is from backfill process.

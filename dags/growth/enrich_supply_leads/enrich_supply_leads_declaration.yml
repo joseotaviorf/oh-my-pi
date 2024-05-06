@@ -1,0 +1,20 @@
+---
+dag:
+  name: enrich_supply_leads
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: supply_flows
+  default_extraction_type: incremental
+  tables_customization:
+    leads_sks:
+      merge_on: ["id_lead", "source"]
+  spark_session_configs:
+    udfs: [SF_NORMALIZE_STRING]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_min_io-memory_photon_cluster
