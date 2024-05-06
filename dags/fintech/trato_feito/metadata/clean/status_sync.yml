@@ -13,6 +13,10 @@ columns:
     description: "ID of the entity to which the indicator belongs"
     lineage:
       - datalake_trato_feito_raw.status_sync.entity_id
+  id_collector:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.status_sync.collector_id
   entity_type:
     description: "What type of indicator"
     lineage:
@@ -21,11 +25,11 @@ columns:
     description: "Indicates the synchronization status"
     lineage:
       - datalake_trato_feito_raw.status_sync.status
-  dt_created:
+  ts_created:
     description: "Created at"
     lineage:
       - datalake_trato_feito_raw.status_sync.created_at
-  dt_updated:
+  ts_updated:
     description: "Updated at"
     lineage:
       - datalake_trato_feito_raw.status_sync.updated_at

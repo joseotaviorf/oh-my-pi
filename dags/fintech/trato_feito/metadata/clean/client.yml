@@ -65,11 +65,15 @@ columns:
     description: "Indicates whether the person will live in the rented property"
     lineage:
       - datalake_trato_feito_raw.client.will_live_in_place
-  dt_created:
+  evictions_situation:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.client.evictions_situation
+  ts_created:
     description: "Created at"
     lineage:
       - datalake_trato_feito_raw.client.created_at
-  dt_updated:
+  ts_updated:
     description: "Updated at"
     lineage:
       - datalake_trato_feito_raw.client.updated_at

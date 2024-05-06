@@ -7,6 +7,8 @@ SELECT
     status,
     payload,
     response_payload,
-    created_at AS dt_created,
-    updated_at AS dt_updated
+    rev,
+    event_type,
+    created_at AS ts_created,
+    updated_at AS ts_updated
 FROM datalake_trato_feito_raw.collector_load

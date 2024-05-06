@@ -21,6 +21,10 @@ columns:
     description: "Status of installment"
     lineage:
       - datalake_trato_feito_raw.installment.status
+  status_reason:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment.status_reason
   adm_fee_amount:
     description: "Amount charged of Administration Fee"
     lineage:

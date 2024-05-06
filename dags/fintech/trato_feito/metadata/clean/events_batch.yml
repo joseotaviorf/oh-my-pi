@@ -37,11 +37,11 @@ columns:
     description: "Batch processing end date and time"
     lineage:
       - datalake_trato_feito_raw.tmp_blocklist.finished_at
-  dt_created:
+  ts_created:
     description: "Created at"
     lineage:
       - datalake_trato_feito_raw.tmp_blocklist.created_at
-  dt_updated:
+  ts_updated:
     description: "Updated at"
     lineage:
       - datalake_trato_feito_raw.tmp_blocklist.updated_at

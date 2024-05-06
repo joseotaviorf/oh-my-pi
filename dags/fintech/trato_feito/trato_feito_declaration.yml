@@ -39,5 +39,11 @@ workflow:
       get_table_metrics:
         count: id
     payment: {}
+    collector_load: {}
+    collector: {}
+    events_batch: {}
+    status_sync: {}
+    document_generation: {}
+    document_generation_aud: {}
 cluster:
   type: databricks_10_4_med_general_cluster

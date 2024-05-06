@@ -37,11 +37,15 @@ columns:
     description: "Collector response payload JSON"
     lineage:
       - datalake_trato_feito_raw.collector_load.response_payload
-  dt_created:
+  event_type:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.collector_load.event_type
+  ts_created:
     description: "Created at"
     lineage:
       - datalake_trato_feito_raw.collector_load.created_at
-  dt_updated:
+  ts_updated:
     description: "Updated at"
     lineage:
       - datalake_trato_feito_raw.collector_load.updated_at

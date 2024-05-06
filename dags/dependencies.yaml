@@ -1394,7 +1394,7 @@ bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
-  - bietlejuice.trato_feito_auxiliar:load-clean-collector
+  - bietlejuice.trato_feito:load-clean-collector
 bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events

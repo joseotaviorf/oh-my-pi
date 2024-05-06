@@ -1,5 +1,5 @@
 ---
-database_name: datalake_trato_feito_auxiliar_clean
+database_name: datalake_trato_feito_clean
 table_name: document_generation_aud
 owner: bianca.martins@quintoandar.com.br
 domain: fintech

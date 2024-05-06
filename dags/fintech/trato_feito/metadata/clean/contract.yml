@@ -17,10 +17,18 @@ columns:
     description: "ID of the property associated with the contract on main"
     lineage:
       - datalake_trato_feito_raw.contract.imovel_id
+  id_debtor:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.contract.debtor_id
   sync_status:
     description: "Entity synchronization status with the collector"
     lineage:
       - datalake_trato_feito_raw.contract.sync_status
+  cyber_sync_status:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.contract.cyber_sync_status
   guarantee:
     description: "Type of rental guarantee associated with the contract"
     lineage:
@@ -37,6 +45,10 @@ columns:
     description: "Contract administration model"
     lineage:
       - datalake_trato_feito_raw.contract.rental_administrator
+  consultancy:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.contract.consultancy
   rental_amount:
     description: "Rent amount"
     lineage:
@@ -65,19 +77,19 @@ columns:
     description: "Expected date for the contract to end"
     lineage:
       - datalake_trato_feito_raw.contract.expected_end_date
-  dt_created:
-    description: "Created at"
-    lineage:
-      - datalake_trato_feito_raw.contract.created_at
-  dt_updated:
-    description: "Updated at"
-    lineage:
-      - datalake_trato_feito_raw.contract.updated_at
-  dt_last_received:
-    description: "Entity last synchronized at"
-    lineage:
-      - datalake_trato_feito_raw.contract.last_received_at
   dt_start:
     description: "When the contract started"
     lineage:
       - datalake_trato_feito_raw.contract.start_date
+  ts_created:
+    description: "Created at"
+    lineage:
+      - datalake_trato_feito_raw.contract.created_at
+  ts_updated:
+    description: "Updated at"
+    lineage:
+      - datalake_trato_feito_raw.contract.updated_at
+  ts_last_received:
+    description: "Entity last synchronized at"
+    lineage:
+      - datalake_trato_feito_raw.contract.last_received_at

@@ -14,6 +14,9 @@ columns:
   type:
     lineage:
       - datalake_trato_feito_raw.debtor.type
+  company_group:
+    lineage:
+      - datalake_trato_feito_raw.debtor.company_group
   ts_created:
     lineage:
       - datalake_trato_feito_raw.debtor.created_at

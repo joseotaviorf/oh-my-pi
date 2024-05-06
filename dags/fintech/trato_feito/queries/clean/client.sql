@@ -14,6 +14,7 @@ SELECT
     client_type,
     debtor_origin,
     will_live_in_place,
-    created_at AS dt_created,
-    updated_at AS dt_updated
+    evictions_situation,
+    created_at AS ts_created,
+    updated_at AS ts_updated
 FROM datalake_trato_feito_raw.client

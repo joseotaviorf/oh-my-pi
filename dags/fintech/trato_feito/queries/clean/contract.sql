@@ -2,11 +2,14 @@ SELECT
     id,
     external_id AS id_external,
     imovel_id AS id_imovel,
+    debtor_id AS id_debtor,
     sync_status,
+    cyber_sync_status,
     guarantee,
     external_status,
     version,
     rental_administrator,
+    consultancy,
     rental_amount,
     iptu_installment,
     iptu_amount,
@@ -14,8 +17,9 @@ SELECT
     guarantee_start_date AS dt_guarantee_start,
     end_date AS dt_end,
     expected_end_date AS dt_expected_end,
-    created_at AS dt_created,
-    updated_at AS dt_updated,
-    last_received_at AS dt_last_received,
-    start_date AS dt_start
+    start_date AS dt_start,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    last_received_at AS ts_last_received,
+    consultancy_updated_at AS ts_consultancy_updated
 FROM datalake_trato_feito_raw.contract

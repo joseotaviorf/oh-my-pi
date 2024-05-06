@@ -34,6 +34,10 @@ columns:
       ELIGIBLE: ""
       PRE-EVICTION: ""
       EVICTION: ""
+  sub_status:
+    lineage:
+      - datalake_trato_feito_raw.eviction.sub_status
+    description: ""
   user_registered:
     lineage:
       - datalake_trato_feito_raw.eviction.user_registered
@@ -57,10 +61,22 @@ columns:
     lineage:
       - datalake_trato_feito_raw.eviction.snapshot
     description: JSON with a snapshot of the contract.
+  external_metadata:
+    lineage:
+      - datalake_trato_feito_raw.eviction.external_metadata
+    description: ""
+  dt_distribution:
+    lineage:
+      - datalake_trato_feito_raw.eviction.distribution_date
+    description: ""
   ts_status_updated:
     lineage:
       - datalake_trato_feito_raw.eviction.status_updated_at
     description: Timestamp of the status update.
+  ts_sub_status_updated:
+    lineage:
+      - datalake_trato_feito_raw.eviction.sub_status_updated_at
+    description: ""
   ts_created:
     lineage:
       - datalake_trato_feito_raw.eviction.created_at
