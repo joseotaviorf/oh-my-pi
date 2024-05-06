@@ -1,0 +1,28 @@
+SELECT
+    id,
+    lastIGPMAdjustment_id AS id_last_IGPM_adjustment,
+    REV,
+    admFeeChargeType AS adm_fee_charge_type,
+    homeInsuranceType AS home_insurance_type,
+    priceindextype AS price_index_type,
+    taxaAdministracaoMensal AS monthly_administration_fee,
+    promotionalAdmFee AS promotional_adm_fee,
+    promotionalPeriod AS promotional_period,
+    reservationValue AS reservation_price,
+    reservationRefundValue AS reservation_refund_value,
+    fixedValueAdjustment AS fixed_value_adjustment,
+    minimumFeeValue AS minimum_fee_value,
+    autoIgpm AS is_auto_igpm,
+    diaMesPagarProprietario AS owner_pay_day_of_month,
+    homeInsuranceType_MOD AS mod_home_insurance_type,
+    lastIGPMAdjustment_MOD AS mod_last_ipgm_adjusment,
+    vacancyDate_MOD AS mod_dt_vacancy,
+    priceindextype_MOD AS mod_price_index_type,
+    fixedValueAdjustment_MOD AS mod_fixed_value_adjustment,
+    lastChangedAt_MOD AS mod_ts_last_changed,
+    minimumFeeValue_MOD AS mod_minimum_fee_value,
+    vacancyDate AS dt_vacancy,
+    lastChangedAt AS ts_last_changed,
+    enviadoAvisoDeIGPMEm AS ts_igpm_notice_sent
+FROM
+    datalake_ebdb_raw.`contratofull_aud`

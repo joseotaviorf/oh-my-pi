@@ -1,0 +1,79 @@
+---
+database_name: datalake_ebdb_clean
+table_name: full_contract_aud
+columns:
+  id:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.id
+  id_last_IGPM_adjustment:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.lastIGPMAdjustment_id
+  rev:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.rev
+  adm_fee_charge_type:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.admFeeChargeType
+  home_insurance_type:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.homeInsuranceType
+  price_index_type:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.priceindextype
+  monthly_administration_fee:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.taxaAdministracaoMensal
+  promotional_adm_fee:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.promotionalAdmFee
+  promotional_period:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.promotionalPeriod
+  reservation_price:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.reservationValue
+  reservation_refund_value:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.reservationRefundValue
+  fixed_value_adjustment:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.fixedValueAdjustment
+  minimum_fee_value:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.minimumFeeValue
+  is_auto_igpm:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.autoIgpm
+  owner_pay_day_of_month:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.diaMesPagarProprietario
+  mod_home_insurance_type:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.homeInsuranceType_MOD
+  mod_last_ipgm_adjusment:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.lastIGPMAdjustment_MOD
+  mod_dt_vacancy:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.vacancyDate_MOD
+  mod_price_index_type:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.priceindextype_MOD
+  mod_fixed_value_adjustment:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.fixedValueAdjustment_MOD
+  mod_ts_last_changed:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.lastChangedAt_MOD
+  mod_minimum_fee_value:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.minimumFeeValue_MOD
+  dt_vacancy:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.vacancyDate
+  ts_last_changed:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.lastChangedAt
+  ts_igpm_notice_sent:
+    lineage:
+    - datalake_ebdb_raw.contratofull_aud.enviadoAvisoDeIGPMEm

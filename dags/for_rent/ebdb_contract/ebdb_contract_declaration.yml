@@ -29,6 +29,8 @@ workflow:
       clean_table_name: contract
     ContratoFull:
       clean_table_name: full_contract
+    ContratoFull_AUD:
+      clean_table_name: full_contract_aud
     Portability_AUD:
       clean_table_name: portability_aud
     Portability:
