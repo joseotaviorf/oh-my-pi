@@ -2361,6 +2361,13 @@ bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
+bietlejuice.enrich_retsuko_test:
+  - bietlejuice.retsuko_test:load-clean-account
+  - bietlejuice.retsuko_test:load-clean-contract
+  - bietlejuice.retsuko_test:load-clean-entry
+  - bietlejuice.retsuko_test:load-clean-invoice
+  - bietlejuice.retsuko_test:load-clean-boleto
+  - bietlejuice.retsuko_test:load-clean-monthly-closing-checks
 bietlejuice.enrich_revenue_lines:
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.ebdb_contract:load-clean-contract

@@ -1,0 +1,35 @@
+---
+database_name: datalake_retsuko_test
+table_name: debt_forgiveness
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+description: "Debt forgiveness data with forgiveness details"
+columns:
+  id_contract:
+    description: "ID of the contract"
+    lineage:
+      - datalake_retsuko_test.bill_items.id_contract
+  id_invoice:
+    description: "ID of the invoice"
+    lineage:
+      - datalake_retsuko_test.bill_items.id_invoice
+  amount_forgiven:
+    description: "Sum of the total forgiven amount"
+  accrual_year_month:
+    description: "Year and month related to the due date"
+    lineage:
+      - datalake_retsuko_test.invoice.accrual_year_month
+  purpose:
+    description: "Purpose information of the debt forgiveness"
+    lineage:
+      - datalake_retsuko_test.invoice.purpose
+  origin_factor:
+    description: "Origin of the data"
+  dt_created:
+    description: "Created date"
+    lineage:
+      - datalake_retsuko_test.invoice.dt_created
+  dt_due:
+    description: "Due date"
+    lineage:
+      - datalake_retsuko_test.invoice.dt_due

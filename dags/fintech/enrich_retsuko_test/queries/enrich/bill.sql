@@ -1,0 +1,19 @@
+SELECT
+    id,
+    id_external,
+    id_invoice,
+    id_checkout_boleto AS id_checkout_boleto,
+    identifier,
+    due_amount,
+    our_number,
+    our_number_digit,
+    wallet_number,
+    barcode,
+    inputtable_line,
+    external_source,
+    ts_due,
+    ts_issued,
+    ts_created,
+    ts_retsuko_updated
+FROM
+    datalake_retsuko_test_clean.boleto

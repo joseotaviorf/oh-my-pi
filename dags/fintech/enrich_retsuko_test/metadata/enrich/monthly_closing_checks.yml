@@ -1,0 +1,34 @@
+database_name: datalake_retsuko_test
+table_name: monthly_closing_checks
+owner: rodrigo.guedes@quintoandar.com.br
+domain: fintech
+description: "Seu Barriga's checks, alerts and informations about monthly closing"
+columns:
+  id:
+    description: "Unique ID Internal from the check"
+    lineage:
+      - datalake_retsuko_clean_test.monthly_closing_checks.id
+  id_external:
+    description: "Unique ID External from the check"
+    lineage:
+      - datalake_retsuko_clean_test.monthly_closing_checks.id_external
+  id_contract:
+    description: "Internal Contract ID from retsuko table"
+    lineage:
+      - datalake_retsuko_clean_test.monthly_closing_checks.id_contract
+  checks:
+    description: "Checks, alerts and information about monthly closing"
+    lineage:
+      - datalake_retsuko_clean_test.monthly_closing_checks.checks
+  accrual_year_month:
+    description: "Year/month invoice accrual"
+    lineage:
+      - datalake_retsuko_clean_test.monthly_closing_checks.accrual_year_month
+  ts_created:
+    description: "Timestamp that refers to when the monthly check was created"
+    lineage:
+      - datalake_retsuko_clean_test.monthly_closing_checks.ts_created
+  ts_updated:
+    description: "Timestamp from the last update"
+    lineage:
+      - datalake_retsuko_clean_test.monthly_closing_checks.ts_updated

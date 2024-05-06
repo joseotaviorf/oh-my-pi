@@ -1,0 +1,10 @@
+SELECT
+    id,
+    id_external,
+    id_contract,
+    checks,
+    accrual_year_month,
+    ts_created,
+    ts_updated
+FROM
+    datalake_retsuko_test_clean.monthly_closing_checks
