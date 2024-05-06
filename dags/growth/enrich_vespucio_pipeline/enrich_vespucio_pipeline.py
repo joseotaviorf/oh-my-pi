@@ -21,7 +21,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 # TO DO: Add the package version in the config file
-VESPUCIO_PACKAGE_VERSION = "0.2.16"
+VESPUCIO_PACKAGE_VERSION = "0.2.17"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
@@ -106,7 +106,7 @@ class Tables:
     source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
     source_navent_houses = "vespucio_sources_delta.source_navent_houses"
     source_union_houses = "vespucio_sources_delta.source_union_house"
-    # source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
+    source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
 
     step1_staged_condos = "vespucio_pipeline_delta.step1_staged_condos"
     step1_staged_houses = "vespucio_pipeline_delta.step1_staged_houses"
@@ -120,6 +120,7 @@ class Tables:
 
     condo_compounds = "vespucio_prod_delta.condo_compounds"
     house_compounds = "vespucio_prod_delta.house_compounds"
+    listings = "vespucio_prod_delta.listings"
 
     golden_set_condo_compounds = (
         "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
@@ -172,14 +173,14 @@ source_tasks = [
         ],
         task_id="union_house",
     ),
-    # create_task(
-    #     entry_point="sources_sql_job",
-    #     parameters=[
-    #         f"--script=itbi_house.sql",
-    #         f"--output_table={Tables.source_itbi_houses}",
-    #     ],
-    #     task_id="itbi_house",
-    # ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=itbi_house.sql",
+            f"--output_table={Tables.source_itbi_houses}",
+        ],
+        task_id="itbi_house",
+    ),
 ]
 
 core_tasks = [
@@ -234,17 +235,28 @@ core_tasks = [
             f"--output_merged_houses={Tables.step4_merged_houses}",
         ],
     ),
-    create_task(
-        entry_point="core_step6link",
-        parameters=[
-            f"--input_merged_condos={Tables.step4_merged_condos}",
-            f"--input_images_houses={Tables.step4_merged_houses}",  # @TODO: change to step5_images_houses
-            f"--overwrite_schema",
-            f"--output_linked_condos={Tables.condo_compounds}",  # @TODO: change to step6_linked_condos
-            f"--output_house_compounds={Tables.house_compounds}",
-        ],
-    ),
 ]
+
+listing_task = create_task(
+    entry_point="core_step6listing",
+    parameters=[
+        f"--input_images_houses={Tables.step4_merged_houses}",  # @TODO: change to step5_images_houses
+        f"--overwrite_schema",
+        f"--output_listings={Tables.listings}",
+    ],
+)
+
+linking_task = create_task(
+    entry_point="core_step6link",
+    parameters=[
+        f"--input_merged_condos={Tables.step4_merged_condos}",
+        f"--input_images_houses={Tables.step4_merged_houses}",  # @TODO: change to step5_images_houses
+        f"--overwrite_schema",
+        f"--output_linked_condos={Tables.condo_compounds}",  # @TODO: change to step6_linked_condos
+        f"--output_house_compounds={Tables.house_compounds}",
+    ],
+)
+
 
 yesterday = "{{ ds }}"
 today = "{{ macros.ds_add(ds, 1)  }}"
@@ -322,4 +334,4 @@ plugin_tasks = [
 execute_job_cluster_task >> source_tasks
 core_tasks[0] << source_tasks
 chain(*core_tasks)
-core_tasks[-1] >> plugin_tasks
+core_tasks[-1] >> (listing_task, linking_task) >> plugin_tasks
