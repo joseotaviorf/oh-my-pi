@@ -1,0 +1,63 @@
+---
+database_name: datalake_pro_owners
+table_name: pp_multi_assessor_history
+description: Enrich table with historical informations of all PP Multi users and their respective assessors. 
+  In this context, the assessor is the figure who is associated with the owner's property contract.
+  This historical table has records of the last 6 months of each PP Multi and which assessors were associated with it.
+domain: Agents
+owner: data-agents@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
+      - datalake_ebdb_contract.contract_person.id_user_contract_person
+      - datalake_ebdb_contract.contract_person.contract_role
+    description: ID of the user.
+  id_owner:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner 
+    description: Id of the property owner.
+  id_user_assistant:
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_user_contract_person
+      - datalake_ebdb_contract.contract_person.contract_role
+      - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
+    description: ID of the assessor.
+  user_name:
+    lineage:
+      - datalake_ebdb_user.user.name
+    description: Name of the user.
+  user_email:
+    lineage:
+      - datalake_ebdb_user.user.email
+    description: Email of the user.
+  user_role:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
+      - datalake_ebdb_contract.contract_person.id_user_contract_person
+      - datalake_ebdb_contract.contract_person.contract_role
+    description: Classification of the user.
+    categories:
+      PP: PP Multi User.
+      ASS: Assessor User.
+  cluster_pp_mult:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
+      - datalake_pro_owners.daily_owner_houses_quantity_history.ongoing_houses
+    description: Category that PP Multi belongs to, based on the number of ongoing listings it has. (Short Stay, Corporate, Amateurs, Long-tail (5-10), Investors (10-15, Investors (15+)).
+  ongoing_houses_pp_multi:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.ongoing_houses
+    description: Number of ongoing houses (status published, rented or suspended) that PP Multi has.
+  is_active_pp_multi:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.is_pp_multi_active
+    description: Informs whether PP Multi is active or not.
+  dt_last_pro_owner_started:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.ts_pro_owner_started
+    description: Most recent date PP Multi became active.
+  dt_last_pro_owner_finished:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.dt_houses_owned
+    description: Most recent date on which PP Multi has ongoing houses.
