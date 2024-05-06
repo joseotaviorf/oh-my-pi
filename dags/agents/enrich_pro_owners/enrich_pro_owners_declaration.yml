@@ -22,6 +22,9 @@ workflow:
     - house_b2b_history
     tracking_weekly_changes:
     - owner_houses_quantity_history
+    pp_multi_assessor:
+    - daily_owner_houses_quantity_history
+    - pro_owner_history
   tables_customization:
     daily_owner_category:
       partitions:
