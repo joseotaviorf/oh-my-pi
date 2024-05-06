@@ -35,6 +35,17 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
+  unp_susp_matured_1w:
+    description: "Matured volume of listings UNPUBLISHED or SUSPENDED (except rented) after 1 week of the ended rental confirmed."
+    metric:
+      name: Weekly Matured Unpublished or Suspended - 1 Week
+      description: "Matured volume of listings UNPUBLISHED or SUSPENDED (except rented) after 1 week of the ended rental confirmed."
+      acronym: MUSM1W
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
   ended_rentals:
     description: "Volume of ended rentals that happended in the week being referenced."
     metric:
@@ -52,6 +63,17 @@ columns:
       name: Weekly Percentage of Unpublished or Suspended - 1 Week
       description: "Percentage of listings being UNPUBLISHED or SUSPENDED (except rented) after ended rental confirmed in the week being referenced."
       acronym: MPUS1W
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  erc2unp_susp_matured_1w:
+    description: "Matured percentage of listings being UNPUBLISHED or SUSPENDED (except rented) after ended rental confirmed in the week being referenced."
+    metric:
+      name: Weekly Matured Percentage of Unpublished or Suspended - 1 Week
+      description: "Percentage of listings being UNPUBLISHED or SUSPENDED (except rented) after ended rental confirmed in the week being referenced."
+      acronym: MPUSM1W
       is_additive: False
       business_stage: Offboarding
       hierarchy: User analysis
