@@ -50,54 +50,54 @@ columns:
       pending-balance-correction: ""
       non-specified: "reason not specified"
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedreason
+      - datalake_retsuko_test_raw.invoice_partitioned.reason
   due_amount:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitioneddue_amount
+      - datalake_retsuko_test_raw.invoice_partitioned.due_amount
   paid_amount:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedpaid_amount
+      - datalake_retsuko_test_raw.invoice_partitioned.paid_amount
   accrual_year_month:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedaccrual_year_month
+      - datalake_retsuko_test_raw.invoice_partitioned.accrual_year_month
   sispag_file:
     description: "File that Seu Barriga created with Vans to communicate with bank"
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedsispag_file
+      - datalake_retsuko_test_raw.invoice_partitioned.sispag_file
   ts_paid:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedpaid_date
+      - datalake_retsuko_test_raw.invoice_partitioned.paid_date
   ts_canceled:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedcanceled_at
+      - datalake_retsuko_test_raw.invoice_partitioned.canceled_at
   ts_sent:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedsent_at
+      - datalake_retsuko_test_raw.invoice_partitioned.sent_at
   ts_due:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitioneddue_date
+      - datalake_retsuko_test_raw.invoice_partitioned.due_date
   ts_created:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedcreated_at
+      - datalake_retsuko_test_raw.invoice_partitioned.created_at
   ts_nf_requested:
     description: "Indicates when Seu Barriga requested erp solution to issue the NFe"
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionednf_requested_at
+      - datalake_retsuko_test_raw.invoice_partitioned.nf_requested_at
   ts_retsuko_created:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedretsuko_created_at
+      - datalake_retsuko_test_raw.invoice_partitioned.retsuko_created_at
   ts_retsuko_updated:
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedretsuko_updated_at
+      - datalake_retsuko_test_raw.invoice_partitioned.retsuko_updated_at
   year:
     description: Year information
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedyear
+      - datalake_retsuko_test_raw.invoice_partitioned.year
   month:
     description: Month information
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedmonth
+      - datalake_retsuko_test_raw.invoice_partitioned.month
   day:
     description: Day information
     lineage:
-      - datalake_retsuko_test_raw.invoice_partitionedday
+      - datalake_retsuko_test_raw.invoice_partitioned.day
