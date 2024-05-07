@@ -7,6 +7,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_workflow import (
     DWQueryWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_delta_workflow import (
+    DwQueryDeltaWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
 )
@@ -18,7 +21,10 @@ class DWFactory(BaseFactory):
     an object of a DW Workflow (DAG), based on parameters.
     """
 
-    _WORKFLOW_ENUM_TO_CLASS_MAPPING = {WorkflowEnum.QUERY_WORKFLOW: DWQueryWorkflow}
+    _WORKFLOW_ENUM_TO_CLASS_MAPPING = {
+        WorkflowEnum.QUERY_WORKFLOW: DWQueryWorkflow,
+        WorkflowEnum.QUERY_DELTA_WORKFLOW: DwQueryDeltaWorkflow,
+    }
 
     def __init__(self, dag_conf: dict, workflow_conf: dict, cluster_conf: dict):
         super().__init__()

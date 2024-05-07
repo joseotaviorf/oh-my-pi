@@ -155,6 +155,36 @@ class TestDeltaLoader:
         mock_spark_context.spark.sql.assert_any_call("DROP TABLE test_table")
         delta_table_builder_mock.execute.assert_called_once()
 
+    @mock.patch("bietlejuice.loaders.delta_loader.AnalysisException.getErrorClass")
+    def test_convert_to_delta_should_drop_table_if_it_exists_in_parquet_and_partitioned_but_is_empty(
+        self,
+        mock_analysis_exception_class,
+        mock_spark_context,
+        mock_delta_table,
+        mock_source_df,
+        delta_table_builder_mock,
+    ):
+        table_name = "test_table"
+        mock_spark_context.spark.catalog.tableExists.return_value = True
+        mock_delta_table.isDeltaTable.return_value = False
+        mock_analysis_exception_class.return_value = (
+            "DELTA_CONVERSION_NO_PARTITION_FOUND"
+        )
+        mock_spark_context.spark.sql.side_effect = [
+            mock.MagicMock(),
+            AnalysisException(
+                desc="DELTA_CONVERSION_NO_PARTITION_FOUND", stackTrace=""
+            ),
+            mock.MagicMock(),
+        ]
+
+        delta_loader = DeltaLoader()
+        delta_loader.load_table(table_name, None, mock_source_df)
+
+        mock_spark_context.spark.sql.assert_any_call("CONVERT TO DELTA test_table")
+        mock_spark_context.spark.sql.assert_any_call("DROP TABLE test_table")
+        delta_table_builder_mock.execute.assert_called_once()
+
     def test_write_to_table(self, mock_source_df):
         table_name = "test_table"
         path = "test_path"
@@ -167,7 +197,8 @@ class TestDeltaLoader:
         )
 
         mock_source_df.write.format.assert_called_once_with("delta")
-        mock_source_df.write.option.assert_called_once_with("mergeSchema", merge_schema)
+        mock_source_df.write.option.assert_any_call("mergeSchema", True)
+        mock_source_df.write.option.assert_any_call("overwriteSchema", False)
         mock_source_df.write.mode.assert_called_once_with("overwrite")
         mock_source_df.write.saveAsTable.assert_called_once_with(
             table_name, path=path, partitionBy=partition_by

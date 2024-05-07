@@ -107,9 +107,14 @@ class DeltaLoader:
             BaseSparkContext.spark.sql(f"DROP TABLE {table_name}")
         except AnalysisException as e:
             error_class = e.getErrorClass()
-            # This error happens when the the table is a Delta table, but the Delta log was deleted.
-            # In this case, we can simply drop the table.
-            if error_class != "DELTA_TABLE_NOT_FOUND":
+            # These errors happen, respectively:
+            # - When the table is Delta but the log was deleted
+            # - When the table is parquet and partitioned but is empty
+            # In these cases, we can simply drop the table for it to be recreated by the next method.
+            if error_class not in (
+                "DELTA_TABLE_NOT_FOUND",
+                "DELTA_CONVERSION_NO_PARTITION_FOUND",
+            ):
                 raise e
             logger.info(
                 f"Delta log or table {table_name} was deleted. Dropping from Metastore so it can be recreated."
@@ -125,9 +130,9 @@ class DeltaLoader:
         merge_schema: bool = True,
     ) -> None:
         """Write a DataFrame to a Delta table"""
-        source_df.write.format("delta").option("mergeSchema", merge_schema).mode(
-            "overwrite"
-        ).saveAsTable(table_name, path=path, partitionBy=partition_by)
+        source_df.write.format("delta").option("mergeSchema", merge_schema).option(
+            "overwriteSchema", not merge_schema
+        ).mode("overwrite").saveAsTable(table_name, path=path, partitionBy=partition_by)
 
     def _merge_to_table(
         self,

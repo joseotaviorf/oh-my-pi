@@ -11,6 +11,13 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
     SPARK_JOB_NAME = "load_delta_table"
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
+        default_extra_query_template_params = self.dag_execution_context.workflow_args.get(
+            "extra_query_template_params", {}
+        )
+        extra_query_template_params = table_attributes.table_customization.get(
+            "extra_query_template_params", default_extra_query_template_params
+        )
+
         return [
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
@@ -26,11 +33,7 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
                     "spark_session_configs", {}
                 )
             ),
-            json.dumps(
-                self.dag_execution_context.workflow_args.get(
-                    "extra_query_template_params", {}
-                )
-            ),
+            json.dumps(extra_query_template_params),
         ]
 
     def create_task(
