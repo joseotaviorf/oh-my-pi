@@ -38,7 +38,7 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  rerentals_4W:
+  rerentals_4w:
     description: "Volume of re-rentals in 4 weeks that happended in the month being referenced."
     metric:
       name: Monthly Re-Rentals in 4W
@@ -49,7 +49,7 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  qtd_churn_4W:
+  qtd_churn_4w:
     description: "Volume of listings that has churned 4 weeks after ended rental in the month being referenced."
     metric:
       name: Monthly Churn in 4W
@@ -60,7 +60,7 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  pct_churn_4W:
+  pct_churn_4w:
     description: "Percentage of listings that has churned 4 weeks after ended rental in the month being referenced."
     metric:
       name: Monthly Percentage of Churn in 4W
@@ -71,7 +71,7 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  rerentals_12W:
+  rerentals_12w:
     description: "Volume of re-rentals in 12 weeks that happended in the month being referenced."
     metric:
       name: Monthly Re-Rentals in 12W
@@ -82,7 +82,7 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  qtd_churn_12W:
+  qtd_churn_12w:
     description: "Volume of listings that has churned 12 weeks after ended rental in the month being referenced."
     metric:
       name: Monthly Churn in 12W
@@ -93,12 +93,78 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  pct_churn_12W:
+  pct_churn_12w:
     description: "Percentage of listings that has churned 12 weeks after ended rental in the month being referenced."
     metric:
       name: Monthly Percentage of Churn in 12W
       description: "Percentage of listings that has churned 12 weeks after ended rental in the month being referenced."
       acronym: PC_12W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rerentals_matured_4w:
+    description: "Volume of re-rentals in 4 weeks matured that happended in the month being referenced."
+    metric:
+      name: Monthly Matured Re-Rentals in 4W
+      description: "Volume of re-rentals in 4 weeks matured that happended in the month being referenced."
+      acronym: RRM_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_churn_matured_4w:
+    description: "Volume of listings that has churned 4 weeks matured after ended rental in the month being referenced."
+    metric:
+      name: Monthly Matured Churn in 4W
+      description: "Volume of listings that has churned 4 weeks matured after ended rental in the month being referenced."
+      acronym: CM_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_churn_matured_4w:
+    description: Percentage of listings that has churned 4 weeks matured after ended rental in the month being referenced."
+    metric:
+      name: Monthly Matured Percentage of Churn in 4W
+      description: "Percentage of listings that has churned 4 weeks matured after ended rental in the month being referenced."
+      acronym: PCM_4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rerentals_matured_12w:
+    description: "Volume of re-rentals in 12 weeks matured that happended in the month being referenced."
+    metric:
+      name: Monthly Matured Percentage of Churn in 12W
+      description: "Volume of re-rentals in 12 weeks matured that happended in the month being referenced."
+      acronym: RRM_12W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_churn_matured_12w:
+    description: "Volume of listings that has churned 12 weeks matured after ended rental in the month being referenced."
+    metric:
+      name: Monthly Matured Percentage of Churn in 12W
+      description: "Volume of listings that has churned 12 weeks matured after ended rental in the month being referenced."
+      acronym: CM_12W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_churn_matured_12w:
+    description: "Percentage of listings that has churned 12 weeks matured after ended rental in the month being referenced."
+    metric:
+      name: Monthly Matured Percentage of Churn in 12W Matured
+      description: "Percentage of listings that has churned 12 weeks matured after ended rental in the month being referenced."
+      acronym: PCM_12W
       is_additive: False
       business_stage: Demand
       hierarchy: User analysis

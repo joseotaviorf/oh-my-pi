@@ -158,7 +158,7 @@ listing_status AS (
         ELSE 0
       END
     ) AS status_4w,
-    MAX(IF(ld.days_since_pub = 28, ld.status_change_reason, '-')) as status_change_reason_4W,
+    MAX(IF(ld.days_since_pub = 28, ld.status_change_reason, '-')) as status_change_reason_4w,
     MAX(
       CASE
         WHEN ld.status_history IN ('despublicado','excluido','edicao') AND ld.days_since_pub = 84 THEN 3
@@ -167,7 +167,7 @@ listing_status AS (
         ELSE 0
       END
     ) AS status_12w,
-    MAX(IF(ld.days_since_pub = 84, ld.status_change_reason, '-')) AS status_change_reason_12W  
+    MAX(IF(ld.days_since_pub = 84, ld.status_change_reason, '-')) AS status_change_reason_12w  
   FROM
     listings_daily AS ld
   GROUP BY
@@ -192,8 +192,8 @@ bd_aux AS (
         WHEN lb.current_status = 'alugado' THEN 'publicado'
         ELSE lb.current_status
     END AS status_12w,
-    ls.status_change_reason_4W,
-    ls.status_change_reason_12W
+    ls.status_change_reason_4w,
+    ls.status_change_reason_12w
   FROM 
     listing_base AS lb
   LEFT JOIN
@@ -208,26 +208,48 @@ final_base AS (
     erc.value_segment,
     erc.country_code,
     COUNT(DISTINCT erc.sk_contract) AS ended_rentals,
-    COUNT_IF(bd_aux.status_4w = 'alugado') AS rerentals_4W,
-    COUNT_IF(bd_aux.status_12w = 'alugado') AS rerentals_12W,
+    COUNT_IF(bd_aux.status_4w = 'alugado') AS rerentals_4w,
+    COUNT_IF(bd_aux.status_4w = 'alugado' AND erc.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE(), -28)) rerentals_matured_4w,
+    COUNT_IF(bd_aux.status_12w = 'alugado') AS rerentals_12w,
+    COUNT_IF(bd_aux.status_12w = 'alugado' AND erc.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE(), -84)) rerentals_matured_12w,
     COUNT_IF(   
       bd_aux.status_4w IS NULL OR 
       bd_aux.status_4w = 'nao_relistado' OR
       bd_aux.status_4w = 'despublicado' OR
       (
         bd_aux.status_4w = 'suspenso' 
-        AND LOWER(bd_aux.status_change_reason_4W) NOT IN ('housereserved','contractdraft') 
+        AND LOWER(bd_aux.status_change_reason_4w) NOT IN ('housereserved','contractdraft') 
       )
-    ) AS churn_4W,
+    ) AS churn_4w,
+    COUNT_IF(   
+      (bd_aux.status_4w IS NULL OR 
+      bd_aux.status_4w = 'nao_relistado' OR
+      bd_aux.status_4w = 'despublicado' OR
+      (
+        bd_aux.status_4w = 'suspenso' 
+        AND LOWER(bd_aux.status_change_reason_4w) NOT IN ('housereserved','contractdraft') 
+      ))
+      AND erc.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE(), -28)
+    ) AS churn_matured_4w,
     COUNT_IF(   
       bd_aux.status_12w IS NULL OR 
       bd_aux.status_12w = 'nao_relistado' OR
       bd_aux.status_12w = 'despublicado' OR
       (
         bd_aux.status_12w = 'suspenso' 
-        AND LOWER(bd_aux.status_change_reason_12W) NOT IN ('housereserved','contractdraft') 
+        AND LOWER(bd_aux.status_change_reason_12w) NOT IN ('housereserved','contractdraft') 
       )
-    ) AS churn_12W
+    ) AS churn_12w,
+    COUNT_IF(   
+      (bd_aux.status_12w IS NULL OR 
+      bd_aux.status_12w = 'nao_relistado' OR
+      bd_aux.status_12w = 'despublicado' OR
+      (
+        bd_aux.status_12w = 'suspenso' 
+        AND LOWER(bd_aux.status_change_reason_12w) NOT IN ('housereserved','contractdraft') 
+      ))
+      AND erc.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE(), -84)
+    ) AS churn_matured_12w
   FROM 
     ended_rentals_confirmed AS erc
   LEFT JOIN 
@@ -244,10 +266,14 @@ final_dataset AS (
     country_code,
     value_segment,
     ended_rentals,
-    rerentals_4W,
-    rerentals_12W,
-    churn_4W,
-    churn_12W
+    rerentals_4w,
+    rerentals_12w,
+    churn_4w,
+    churn_12w,
+    rerentals_matured_4w,
+    rerentals_matured_12w,
+    churn_matured_4w,
+    churn_matured_12w
   FROM 
     final_base
 )
@@ -256,12 +282,18 @@ SELECT
   country_code,
   'OVERALL' AS value_segment,
   SUM(ended_rentals) AS ended_rentals,
-  SUM(rerentals_4W) AS rerentals_4W, 
-  SUM(churn_4W) AS qtd_churn_4W,
-  CAST(SUM(churn_4W) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_4W,
-  SUM(rerentals_12W) AS rerentals_12W,
-  SUM(churn_12W) AS qtd_churn_12W,
-  CAST(SUM(churn_12W) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_12W
+  SUM(rerentals_4w) AS rerentals_4w,
+  SUM(churn_4w) AS qtd_churn_4w,
+  CAST(SUM(churn_4w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_4w,
+  SUM(rerentals_12w) AS rerentals_12w,
+  SUM(churn_12w) AS qtd_churn_12w,
+  CAST(SUM(churn_12w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_12w,
+  SUM(rerentals_matured_4w) AS rerentals_matured_4w,
+  SUM(churn_matured_4w) AS qtd_churn_matured_4w,
+  CAST(SUM(churn_matured_4w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_matured_4w,
+  SUM(rerentals_matured_12w) AS rerentals_matured_12w,
+  SUM(churn_matured_12w) AS qtd_churn_matured_12w,
+  CAST(SUM(churn_matured_12w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_matured_12w
 FROM 
   final_dataset
 GROUP BY 
@@ -274,12 +306,18 @@ SELECT
   country_code,
   value_segment,
   SUM(ended_rentals) AS ended_rentals,
-  SUM(rerentals_4W) AS rerentals_4W,
-  SUM(churn_4W) AS qtd_churn_4W,
-  CAST(SUM(churn_4W) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_4W,
-  SUM(rerentals_12W) AS rerentals_12W,
-  SUM(churn_12W) AS qtd_churn_12W,
-  CAST(SUM(churn_12W) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_12W
+  SUM(rerentals_4w) AS rerentals_4w,
+  SUM(churn_4w) AS qtd_churn_4w,
+  CAST(SUM(churn_4w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_4w,
+  SUM(rerentals_12w) AS rerentals_12w,
+  SUM(churn_12w) AS qtd_churn_12w,
+  CAST(SUM(churn_12w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_12w,
+  SUM(rerentals_matured_4w) AS rerentals_matured_4w,
+  SUM(churn_matured_4w) AS qtd_churn_matured_4w,
+  CAST(SUM(churn_matured_4w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_matured_4w,
+  SUM(rerentals_matured_12w) AS rerentals_matured_12w,
+  SUM(churn_matured_12w) AS qtd_churn_matured_12w,
+  CAST(SUM(churn_matured_12w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_matured_12w
 FROM 
   final_dataset
 GROUP BY
