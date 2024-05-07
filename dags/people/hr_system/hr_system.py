@@ -105,6 +105,7 @@ task_group = DatalakeTaskGroup(
 )
 
 for endpoint_id, endpoint_details in endpoints.items():
+    partition_cols = endpoint_details.get("partition_cols", partition_cols)
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,

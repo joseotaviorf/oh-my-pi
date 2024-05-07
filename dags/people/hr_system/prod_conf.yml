@@ -214,6 +214,10 @@ endpoints:
     has_partitions: true
     column_to_partition: "CreationDate"
     has_columns_to_delete: false
+    has_dt_effective: true
+    future_offset: 30
+    past_offset: 65
+    partition_cols: ['dt_effective', 'year', 'month', 'day']
     params:
       onlyData: true
       limit: 100

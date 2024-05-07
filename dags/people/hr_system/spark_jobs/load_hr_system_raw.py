@@ -1,9 +1,10 @@
 import json
 import argparse
 import os
+from datetime import datetime, timedelta
 from pyspark import Row
 from pyspark.sql.types import StructType
-from pyspark.sql.functions import current_timestamp, date_format, col
+from pyspark.sql.functions import current_timestamp, date_format, col, lit
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
@@ -27,32 +28,42 @@ def create_spark_dataframe(endpoint_id, json_data, spark_client, hr_system_clien
     return spark_client.create_dataframe(json_data, schema=schema)
 
 
-def run_sync(endpoint_id, url, token, endpoint_details):
+def run_sync(endpoint_id, url, token, endpoint_details, spark_client):
     hr_system_client = HrSystemClient(api_url=url, api_token=token)
     endpoint_params = endpoint_details["params"]
     deduplication_key = endpoint_details.get("deduplication_key", None)
     endpoint_id = endpoint_id.replace("_", "").upper()
     consumer_instance = get_consumer(hr_system_client, endpoint_id)
     path = consumer_instance.path
-    json_data = consumer_instance.sync(params=endpoint_params, deduplication_key=deduplication_key)
+    json_data = consumer_instance.sync(
+        params=endpoint_params, deduplication_key=deduplication_key
+    )
     return create_spark_dataframe(path, json_data, spark_client, hr_system_client)
 
 
-def insert_columns(df, endpoint_details):
+def insert_partitions(df, endpoint_details):
     column_to_partition = endpoint_details["column_to_partition"]
-    df = df.withColumn("ts_load", current_timestamp())
     df = df.withColumn("year", date_format(col(column_to_partition), "yyyy"))
     df = df.withColumn("month", date_format(col(column_to_partition), "MM"))
     df = df.withColumn("day", date_format(col(column_to_partition), "dd"))
     return df
 
+
+def insert_columns(df, endpoint_details, has_dt_effective):
+    df = df.withColumn("ts_load", current_timestamp())
+    if has_dt_effective:
+        dt_effective = endpoint_details["params"]["effectiveDate"]
+        df = df.withColumn("dt_effective", lit(dt_effective.replace("-", "")))
+    return df
+
+
 def delete_columns(df, endpoint_details):
-  spark.conf.set('spark.sql.caseSensitive', True)
-  columns_to_delete = endpoint_details['columns_to_delete']
-  for column in columns_to_delete:
-      df = df.drop(column)
-  spark.conf.set('spark.sql.caseSensitive', False)
-  return df
+    spark.conf.set("spark.sql.caseSensitive", True)
+    columns_to_delete = endpoint_details["columns_to_delete"]
+    for column in columns_to_delete:
+        df = df.drop(column)
+    spark.conf.set("spark.sql.caseSensitive", False)
+    return df
 
 
 def load_raw(
@@ -93,7 +104,38 @@ def load_raw(
     metastore_service.refresh_table(database_name, endpoint_id)
 
 
-if __name__ == "__main__":
+def pipeline_raw(
+    spark_client,
+    endpoint_id,
+    url,
+    token,
+    endpoint_details,
+    environment,
+    source,
+    datalake_bucket,
+    partition_cols,
+    has_dt_effective,
+):
+    df = run_sync(endpoint_id, url, token, endpoint_details, spark_client)
+    if endpoint_details["has_columns_to_delete"]:
+        df = delete_columns(df, endpoint_details)
+    df = insert_columns(df, endpoint_details, has_dt_effective)
+    if endpoint_details["has_partitions"]:
+        df = insert_partitions(df, endpoint_details)
+        load_raw(
+            spark_client,
+            df,
+            environment,
+            source,
+            datalake_bucket,
+            endpoint_id,
+            partition_cols,
+        )
+    else:
+        load_raw(spark_client, df, environment, source, datalake_bucket, endpoint_id)
+
+
+def get_parser():
     parser = argparse.ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
@@ -102,14 +144,45 @@ if __name__ == "__main__":
     parser.add_argument("execution_date", help="execution date in str format")
     parser.add_argument("partition_cols")
     parser.add_argument("endpoint_details")
+    return parser
+
+
+def define_offset(endpoint_details, offset, execution_date):
+    days_offset = int(offset[0]) * offset[1]
+    offset_date = execution_date + timedelta(days=days_offset)
+    offset_date_str = offset_date.strftime("%Y-%m-%d")
+    offset_details = endpoint_details.copy()
+    offset_details["params"] = endpoint_details["params"].copy()
+    offset_details["params"]["effectiveDate"] = offset_date_str
+    return offset_date_str, offset_details
+
+
+def clear_directory(
+    datalake_bucket, source, endpoint_id, has_dt_effective, layer
+):
+    if has_dt_effective == True:
+        dbutils.fs.rm(
+            f"s3://{datalake_bucket}/{layer}/{source}/{endpoint_id}/",
+            True
+        )
+
+
+def main():
+    parser = get_parser()
     args = parser.parse_args()
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
     endpoint_id = args.endpoint_id
-    execution_date = args.execution_date
-    partition_cols = json.loads(args.partition_cols)
+    execution_date_str = args.execution_date
+    execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
     endpoint_details = json.loads(args.endpoint_details)
+    partition_cols = json.loads(args.partition_cols)
+    has_dt_effective = endpoint_details.get("has_dt_effective", False)
+    offsets = {
+        (endpoint_details.get("future_offset", None), 1),
+        (endpoint_details.get("past_offset", None), -1),
+    }
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -126,20 +199,42 @@ if __name__ == "__main__":
         f"m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
         f"table_name={endpoint_id}, msg=Starting spark job..."
     )
-    df = run_sync(endpoint_id, url, token, endpoint_details)
-    if endpoint_details['has_columns_to_delete']:
-        df = delete_columns(df, endpoint_details)
-    if endpoint_details["has_partitions"]:
-        df = insert_columns(df, endpoint_details)
-        load_raw(
+
+    if has_dt_effective == True:
+        endpoint_details["params"]["effectiveDate"] = execution_date_str
+    list_endpoint_details = {execution_date_str: endpoint_details}
+
+    for offset in offsets:
+        if offset[0] is not None:
+            offset_date_str, offset_details = define_offset(
+                endpoint_details, offset, execution_date
+            )
+            list_endpoint_details[offset_date_str] = offset_details
+
+    clear_directory(
+        datalake_bucket, source, endpoint_id, has_dt_effective, "raw"
+    )
+    for execution_date_str, endpoint_details in list_endpoint_details.items():
+        logger.info(
+            f"m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
+            f"table_name={endpoint_id}, dt_effective={execution_date_str} msg=Getting data from API..."
+        )
+        pipeline_raw(
             spark_client,
-            df,
+            endpoint_id,
+            url,
+            token,
+            endpoint_details,
             environment,
             source,
             datalake_bucket,
-            endpoint_id,
             partition_cols,
+            has_dt_effective,
         )
-    else:
-        df = df.withColumn("ts_load", current_timestamp())
-        load_raw(spark_client, df, environment, source, datalake_bucket, endpoint_id)
+    clear_directory(
+        datalake_bucket, source, endpoint_id, has_dt_effective, "clean"
+    )
+
+
+if __name__ == "__main__":
+    main()
