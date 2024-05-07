@@ -1,0 +1,103 @@
+---
+database_name: datalake_retsuko_test_clean
+table_name: invoice_partitioned
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.id
+  id_external:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.external_id
+  id_account:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.account_id
+  id_contract:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.contract_id
+  id_checkout_order:
+    description: "External ID that indicates the Order in Checkout product"
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.checkout_order_id
+  id_checkout_charge:
+    description: "External ID that indicates the Charge in Checkout product"
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.checkout_charge_id
+  status:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.status
+  substatus:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.sub_status
+  paid_via:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.paid_via
+  purpose:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.purpose
+  closing_mode:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioned.closing_mode
+  reason:
+    description: "Invoices that have the purpose field filled in with the value extras must have the reason field filled in to identify what that invoice is about."
+    categories:
+      condominium-nonpayment: ""
+      damages-bills: ""
+      wrong-charges: ""
+      negotiation-recupera: ""
+      agreement: ""
+      pending-balance-correction: ""
+      non-specified: "reason not specified"
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedreason
+  due_amount:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioneddue_amount
+  paid_amount:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedpaid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedaccrual_year_month
+  sispag_file:
+    description: "File that Seu Barriga created with Vans to communicate with bank"
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedsispag_file
+  ts_paid:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedpaid_date
+  ts_canceled:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedcanceled_at
+  ts_sent:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedsent_at
+  ts_due:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitioneddue_date
+  ts_created:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedcreated_at
+  ts_nf_requested:
+    description: "Indicates when Seu Barriga requested erp solution to issue the NFe"
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionednf_requested_at
+  ts_retsuko_created:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedretsuko_created_at
+  ts_retsuko_updated:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedretsuko_updated_at
+  year:
+    description: Year information
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedyear
+  month:
+    description: Month information
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedmonth
+  day:
+    description: Day information
+    lineage:
+      - datalake_retsuko_test_raw.invoice_partitionedday
