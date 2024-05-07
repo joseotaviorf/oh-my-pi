@@ -7,7 +7,7 @@ SELECT
     bank_branch_code,
     bank_account_number,
     installment_number,
-    CASE 
+    CASE
         WHEN type_pendency_debt = "PA" THEN "Installment"
         WHEN type_pendency_debt = "DE" THEN "Identified deposit"
         WHEN type_pendency_debt = "OP" THEN "Payment option"

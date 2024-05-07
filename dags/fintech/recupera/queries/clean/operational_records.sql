@@ -35,6 +35,13 @@ SELECT
     TIMESTAMP(ts_operator_code_update) AS ts_operator_code_update,
     TIMESTAMP(ts_last_update) AS ts_last_update,
     TIMESTAMP(ts_customer_status_last_update) AS ts_customer_status_last_update,
-    ts_load
+    ts_load,
+    year,
+    month,
+    day
 FROM
     datalake_recupera_raw.operational_records
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

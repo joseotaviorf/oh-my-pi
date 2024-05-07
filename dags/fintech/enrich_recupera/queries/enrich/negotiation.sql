@@ -167,6 +167,17 @@ deduplicate_records AS (
     id_creditor
   FROM datalake_recupera_clean.records
   QUALIFY ROW_NUMBER() OVER(PARTITION by id_customer ORDER BY dt_customer_registration DESC) = 1
+),
+operational_records AS (
+  SELECT DISTINCT
+    id_creditor,
+    id_customer,
+    collesction_customer_situation
+  FROM datalake_recupera_clean.operational_records
+  WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
 )
 SELECT DISTINCT
   a.id_creditor,
@@ -234,7 +245,7 @@ LEFT JOIN installment_detail AS pd
     ON a.id_creditor = pd.id_creditor
       AND a.id_customer = pd.id_customer
       AND a.id_negotiation = pd.id_installment
-LEFT JOIN datalake_recupera_clean.operational_records AS op
+LEFT JOIN operational_records AS op
     ON a.id_creditor = op.id_creditor
       AND r.id_customer = op.id_customer
 LEFT JOIN datalake_recupera_clean.status AS st

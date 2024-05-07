@@ -8,6 +8,19 @@ records_distributed_channels AS (
     FROM datalake_recupera_clean.records_distributed_channels
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_creditor, id_customer ORDER BY DATE(ts_current_registration) DESC) = 1
 ),
+operational_records AS (
+  SELECT
+    id_creditor,
+    id_customer,
+    id_operator,
+    advisory_code,
+    distributor_code,
+    collesction_customer_situation
+  FROM datalake_recupera_clean.operational_records
+  WHERE year = {year}
+    AND month = {month}
+    AND day = {day}
+),
 collection_base AS (
     SELECT
         opr.id_creditor,
@@ -31,7 +44,7 @@ collection_base AS (
             ELSE rdc.id_digital_channel
         END AS digital_channel
     FROM
-       datalake_recupera_clean.operational_records AS opr
+       operational_records AS opr
     INNER JOIN datalake_recupera_clean.complementary_records AS cr
         ON opr.id_creditor = cr.id_creditor
             AND opr.id_customer = cr.id_customer

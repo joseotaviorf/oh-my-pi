@@ -25,6 +25,7 @@ In datalake raw and clean, via incremental load:
 - `complementary_records_written_down`
 - `historical_records`
 - `trato_feito_payment`
+- `operational_records`
 
 In datalake raw and clean, via full load:
 
@@ -42,7 +43,6 @@ In datalake raw and clean, via full load:
 - `email_records`
 - `address_records`
 - `indicator_records`
-- `operational_records`
 - `phone_records`
 - `status`
 

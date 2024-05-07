@@ -95,6 +95,18 @@ columns:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.is_last_business_days
     description: Boolean to inform whether it is the most recent date among days with the same business day, same invoice and month. It deduplicates the calculations per business day.
+  advisory:
+    lineage:
+      - datalake_recupera_clean.operational_records.advisory_code
+    description: The advisory responsible for the contract on the reference date
+  distributor:
+    lineage:
+      - datalake_recupera_clean.operational_records.distributor_code
+    description: The advisory responsible for the contract on the reference date
+  partner:
+    lineage:
+      - datalake_recupera_clean.operational_records.partner
+    description: The partner responsible for the contract on the reference date. This field is created by the fallback (coalesce) between the advisory and the distributor
   dt_invoice_paid:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.dt_invoice_paid
