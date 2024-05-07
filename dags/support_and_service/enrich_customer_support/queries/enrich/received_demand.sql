@@ -212,7 +212,7 @@ chat AS (
   ),
   per_team_attr AS (
     SELECT
-      id_external AS id_task,
+      id_task,
       GET_JSON_OBJECT(task_attributes,'$.conversations.conversation_attribute_2') AS is_per_team_task
     FROM
       datalake_quinto_messenger_clean.task
