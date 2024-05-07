@@ -16,6 +16,8 @@ workflow:
     house_pricing_metrics:
       - similar_listings
       - house_condo_metrics
+    status_history_house_listing:
+      - status_history_house_price_change
     new_pricing_report_listing_price_history:
       - status_history_house_listing
       - status_history_house_negotiation
