@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class TaskEnum(Enum):
+    ADD_DEFAULT_ROW = "add_default_row"
     DATA_QUALITY_TESTS = "data_quality_tests"
     DUMMY_JOB_CLUSTER_FINISHED = "dummy_job_cluster_finished"
     EXECUTE_JOB_CLUSTER = "execute_job_cluster"

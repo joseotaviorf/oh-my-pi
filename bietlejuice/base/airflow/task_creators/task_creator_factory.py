@@ -1,3 +1,6 @@
+from bietlejuice.base.airflow.task_creators.add_default_row_task_creator import (
+    AddDefaultRowTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.data_quality_tests_task_creator import (
     DataQualityTestsTaskCreator,
 )
@@ -56,6 +59,7 @@ class TaskCreatorFactory:
     DATABASE_TYPES = ["postgres", "mongo"]
 
     TASK_MAPPING = {
+        TaskEnum.ADD_DEFAULT_ROW: AddDefaultRowTaskCreator,
         TaskEnum.DATA_QUALITY_TESTS: DataQualityTestsTaskCreator,
         TaskEnum.DUMMY_JOB_CLUSTER_FINISHED: DummyJobClusterFinishedTaskCreator,
         TaskEnum.EXECUTE_JOB_CLUSTER: ExecuteJobClusterTaskCreator,
