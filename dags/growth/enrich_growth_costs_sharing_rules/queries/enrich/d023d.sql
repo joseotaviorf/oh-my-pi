@@ -11,7 +11,7 @@ conversion_metrics AS (
     COUNT(DISTINCT CASE WHEN fdpe.event_name = 'USER FIRST ACTIVATION' THEN fdpe.id_prospect END) AS metric
   FROM datalake_demand_flows.prospect_daily_results AS fdpe 
   LEFT JOIN datalake_growth_taxonomy.media_setup AS dms 
-    ON fdpe.id_media_setup = dms.id_media_setup 
+    ON fdpe.naming_convention_sufix = dms.naming_convention_sufix 
   LEFT JOIN datalake_region.region AS dr
     ON fdpe.id_region = dr.id
   LEFT JOIN datalake_quintoandar.aux_date AS adt
