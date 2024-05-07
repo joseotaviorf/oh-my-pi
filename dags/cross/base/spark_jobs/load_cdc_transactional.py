@@ -1,6 +1,7 @@
 import logging
 import json
 from argparse import ArgumentParser
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
@@ -16,6 +17,7 @@ from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 
 
 from bietlejuice.loaders.delta_loader import DeltaLoader
+from datetime import datetime, timedelta
 from pyspark.sql.functions import col, to_timestamp, lit, make_date
 from pyspark.sql.utils import AnalysisException
 
@@ -74,6 +76,7 @@ def get_incoming_data(
     table_name,
     start_date,
     end_date,
+    dbutils,
 ):
     """
     Reads incoming data as a DataFrame
@@ -85,31 +88,46 @@ def get_incoming_data(
     :param table_name: Table name.
     :param start_date: Airflow DAG start date.
     :param end_date: Airflow DAG end date.
+    :param dbutils: DButils reference.
     :return df:
     """
-    path = f"s3://{incoming_bucket}/{source_database}/{environment}_{source_database}.data.{schema}.{table_name}/"
+    base_path = f"s3://{incoming_bucket}/{source_database}/{environment}_{source_database}.data.{schema}.{table_name}/"
+
+    dt_start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    dt_end_date = datetime.strptime(end_date, "%Y-%m-%d")
+    current_load_date = dt_start_date
+
+    load_date_paths = []
 
     logger.info(
-        f"m=get_incoming_data, start_date={start_date}, end_date={end_date}, path={path}, msg=reading Incoming data..."
+        f"m=get_incoming_data, start_date={start_date}, end_date={end_date}, path={base_path}, msg=reading Incoming data..."
     )
-    try:
-        df = (
-            spark.read.option("compression", "gzip")
-            .json(path)
-            .filter(
-                make_date(col("year"), col("month"), col("day")).between(
-                    start_date, end_date
-                )
-            )
+
+    while current_load_date <= dt_end_date:
+        load_path = (
+            base_path
+            + f"year={current_load_date.strftime('%Y')}/month={current_load_date.strftime('%m')}/day={current_load_date.strftime('%d')}"
         )
-    except AnalysisException as e:
-        if e.getErrorClass() != "PATH_NOT_FOUND":
-            raise e
+        try:
+            dbutils.fs.ls(load_path)
+            load_date_paths.append(load_path)
+        except Exception as e:
+            if "java.io.FileNotFoundException" not in str(e):
+                raise e
+
+        current_load_date += timedelta(days=1)
+
+    if not load_date_paths:
         logger.info(
-            f"m=get_incoming_data, msg=Path {path} not found, returning empty DataFrame."
+            f"m=get_incoming_date, start_date={start_date}, end_date={end_date}, msg=No incoming data found in the time interval. Returning empty DataFrame."
         )
         return None
 
+    df = (
+        spark.read.option("basePath", base_path)
+        .option("compression", "gzip")
+        .json(load_date_paths)
+    )
     return df
 
 
@@ -189,6 +207,9 @@ def main():
         """
     )
 
+    base_dbutils = BaseDBUtils()
+    dbutils = base_dbutils.get_dbutils()
+
     df = get_incoming_data(
         incoming_bucket,
         environment,
@@ -197,6 +218,7 @@ def main():
         table_name,
         start_date,
         end_date,
+        dbutils,
     )
 
     if df is None:
