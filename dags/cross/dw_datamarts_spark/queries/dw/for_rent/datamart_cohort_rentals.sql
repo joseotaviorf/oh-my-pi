@@ -70,7 +70,6 @@ all_first_contracts AS (
         AND sk_contract > 0
         AND dupli_contracts = 1
         AND dd.date <= CURRENT_DATE
-    ORDER BY 1 DESC
 ),
 all_next_contracts AS (
     SELECT
@@ -99,7 +98,7 @@ all_next_contracts AS (
         AND sk_contract > 0
         AND dupli_contracts = 1
         AND dd.date <= CURRENT_DATE
-    ORDER BY 1 DESC),
+),
     all_first_rentals AS (
     SELECT
         city_group,
@@ -252,4 +251,3 @@ LEFT JOIN
         ON fr.city_group = rr_af.city_group
         AND fr.contract_start_month = rr_af.contract_start_month
         AND fr.months_after_first_contract = rr_af.months_after_first_contract
-ORDER BY 1, 2 DESC, 3
