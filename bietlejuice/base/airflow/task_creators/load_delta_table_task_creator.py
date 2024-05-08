@@ -1,5 +1,6 @@
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 import json
 
@@ -39,7 +40,12 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
     def create_task(
         self, table_attributes: TableAttributes
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
-        task_id = self.generate_task_id(table_attributes)
+        if table_attributes.layer == LayerEnum.DW:
+            task_id = self.generate_task_id(
+                table_attributes, dynamic_template="load-{layer}-{schema}-{table_name}"
+            )
+        else:
+            task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters(table_attributes)
 
         return self._create_spark_job_task(self.SPARK_JOB_NAME, task_id, parameters)

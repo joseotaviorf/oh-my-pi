@@ -70,10 +70,16 @@ class BaseTaskCreator(ABC):
         )
 
     @classmethod
-    def generate_task_id(cls, table_attributes: TableAttributes):
-        """Generates the task id from the Task's default template, using attributes of a given table."""
+    def generate_task_id(
+        cls, table_attributes: TableAttributes, dynamic_template: str = None
+    ) -> str:
+        """
+        Generates the task id from the Task's default template, using attributes of a given table.
+        Optionally, you can pass a template other than the default one in _TASK_ID_TEMPLATE, using the dynamic_template argument.
+        """
 
-        task_id = cls._TASK_ID_TEMPLATE.format(
+        template = dynamic_template or cls._TASK_ID_TEMPLATE
+        task_id = template.format(
             layer=table_attributes.layer.value,
             schema=table_attributes.schema,
             table_name=table_attributes.table_name,
