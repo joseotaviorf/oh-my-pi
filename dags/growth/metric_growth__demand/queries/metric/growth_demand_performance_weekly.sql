@@ -73,7 +73,7 @@ weekly_prospect_metrics AS (
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ), 
 weekly_costs_metrics AS ( 
-  SELECT DISTINCT
+  SELECT 
     dd.week_start, 
     dc.country_code, 
     dc.city_group, 
@@ -92,7 +92,7 @@ weekly_costs_metrics AS (
     dd.year,
     dd.month,
     EXTRACT(DAY FROM DATE_TRUNC('week', dd.week_start)) AS day,
-    dc.total_cost AS cost
+    SUM(dc.total_cost) AS cost
   FROM 
     datalake_growth_costs.daily_costs AS dc
     INNER JOIN dw_public.dim_date AS dd 
@@ -100,6 +100,7 @@ weekly_costs_metrics AS (
   WHERE 
     dd.week_start = DATE_TRUNC("week", MAKE_DATE({year},{month},{day}))
     AND LOWER(funnel_side) IN ('demand', 'branding')
+  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18  
 )
 SELECT
   COALESCE(t.week_start, p.week_start, c.week_start) AS dt_week_start,

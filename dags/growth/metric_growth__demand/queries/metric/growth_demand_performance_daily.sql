@@ -77,7 +77,7 @@ daily_prospect_metrics AS (
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ), 
 daily_costs_metrics AS ( 
-  SELECT DISTINCT
+  SELECT
     dd.date, 
     dc.country_code, 
     dc.city_group, 
@@ -96,7 +96,7 @@ daily_costs_metrics AS (
     dd.year,
     dd.month,
     dd.day,
-    dc.total_cost AS cost
+    SUM(dc.total_cost) AS cost
   FROM 
     datalake_growth_costs.daily_costs AS dc
     INNER JOIN dw_public.dim_date AS dd 
@@ -106,6 +106,7 @@ daily_costs_metrics AS (
     AND dd.month = {month}
     AND dd.day = {day}
     AND LOWER(funnel_side) IN ('demand', 'branding')
+  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18  
 )
 SELECT
   COALESCE(t.date, p.date, c.date) AS dt_event,
