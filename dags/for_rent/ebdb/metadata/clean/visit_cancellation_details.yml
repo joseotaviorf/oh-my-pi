@@ -7,12 +7,18 @@ columns:
   id_visit:
     lineage:
       - datalake_ebdb_raw.VisitCancellationDetails.visita_id
+  id_visits_status_log:
+    lineage:
+      - datalake_ebdb_raw.VisitCancellationDetails.visit_status_log_id
   reason:
     lineage:
       - datalake_ebdb_raw.VisitCancellationDetails.reason
   on_behalf_of:
     lineage:
       - datalake_ebdb_raw.VisitCancellationDetails.on_behalf_of
+  channel:
+    lineage:
+      - datalake_ebdb_raw.VisitCancellationDetails.channel
   ts_created:
     lineage:
       - datalake_ebdb_raw.VisitCancellationDetails.criadoEm
