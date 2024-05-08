@@ -45,7 +45,7 @@ crm_tasks AS (
       'RescisaoPreVigencia'
     )
     AND bca.action_type = 'CREATE'
-    AND tarf.ts_started >= '2021-01-01'
+    AND tarf.ts_started >= '2023-01-01'
 ),
 ticket_tasks AS (
   WITH ticket_started AS (
@@ -191,7 +191,7 @@ ticket_tasks AS (
       ON dc.journey_step = ujst.journey_step
       AND DATE(t.ts_started) = ujst.dt_reference
   WHERE
-    t.ts_started >= '2021-01-01'
+    t.ts_started >= '2023-01-01'
     AND t.tags NOT LIKE '%robotserviceaccount02%'
     AND (
       (t.department = 'Offboarding Reparos [OFF] [POS] [BACK]' AND (t.tags LIKE '%orçamentação_realizada%'))
