@@ -409,9 +409,9 @@ bietlejuice.enrich_lead:
 bietlejuice.enrich_listing_flow:
   remove:
     - bietlejuice.ebdb:load-clean-affiliate-data
-    - bietlejuice.ebdb:load-clean-doorman-affiliate-data
     - bietlejuice.ebdb:load-clean-house-guarantees-aud
     - bietlejuice.ebdb:load-clean-photographer-job-aud
+    - bietlejuice.ebdb_administration:load-clean-doorman-affiliate-data
     - bietlejuice.rene_descartes:load-clean-lead-rejection
     - bietlejuice.wololo:load-clean-context-discard
     - bietlejuice.wololo:load-clean-conversion

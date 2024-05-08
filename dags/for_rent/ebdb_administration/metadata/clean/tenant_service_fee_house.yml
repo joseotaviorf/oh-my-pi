@@ -1,0 +1,19 @@
+---
+database_name: datalake_ebdb_clean
+table_name: tenant_service_fee_house
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.TenantServiceFeeHouse.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.TenantServiceFeeHouse.house_id
+  fee:
+    lineage:
+      - datalake_ebdb_raw.TenantServiceFeeHouse.fee
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.TenantServiceFeeHouse.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.TenantServiceFeeHouse.atualizadoEm

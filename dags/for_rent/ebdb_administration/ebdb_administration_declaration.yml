@@ -1,0 +1,42 @@
+
+dag:
+  name: ebdb_administration
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 45 21 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to Administration into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  tables_customization:
+    DoormanAffiliateData:
+      clean_table_name: doorman_affiliate_data
+    DoormanAffiliateOccupation:
+      clean_table_name: doorman_affiliate_occupation
+    ProOwnerFee:
+      clean_table_name: pro_owner_fee
+    ProOwnerFee_AUD:
+      clean_table_name: pro_owner_fee_aud
+    PropertyFee:
+      clean_table_name: property_fee
+    PropertyFee_AUD:
+      clean_table_name: property_fee_aud
+    PropertyFeeAssigned:
+      clean_table_name: property_fee_assigned
+    PropertyFeeAssigned_AUD:
+      clean_table_name: property_fee_assigned_aud
+    RentalAdministratorChangeRequest:
+      clean_table_name: rental_administrator_change_request
+    RentalAdministratorChangeRequest_AUD:
+      clean_table_name: rental_administrator_change_request_aud
+    TenantServiceFee:
+      clean_table_name: tenant_service_fee
+    TenantServiceFeeHouse:
+      clean_table_name: tenant_service_fee_house
+cluster:
+  type: databricks_12_2_med_general_cluster

@@ -351,6 +351,18 @@ table_block_list:
   - DocumentoProposta
   - PropostaProponente
   - PropostaProponente_AUD
+  - DoormanAffiliateData
+  - DoormanAffiliateOccupation
+  - ProOwnerFee
+  - ProOwnerFee_AUD
+  - PropertyFee
+  - PropertyFee_AUD
+  - PropertyFeeAssigned
+  - PropertyFeeAssigned_AUD
+  - RentalAdministratorChangeRequest
+  - RentalAdministratorChangeRequest_AUD
+  - TenantServiceFee
+  - TenantServiceFeeHouse
 
 view_allow_list:
   - vteste_utf8mb3

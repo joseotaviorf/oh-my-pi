@@ -1542,13 +1542,13 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-clean-local
   - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-occupant-type
-  - bietlejuice.ebdb:load-clean-property-fee
-  - bietlejuice.ebdb:load-clean-property-fee-assigned
-  - bietlejuice.ebdb:load-clean-property-fee-assigned-aud
-  - bietlejuice.ebdb:load-clean-property-fee-aud
   - bietlejuice.ebdb:load-clean-special-condition
   - bietlejuice.ebdb:load-clean-special-condition-aud
   - bietlejuice.ebdb:load-clean-state
+  - bietlejuice.ebdb_administration:load-clean-property-fee
+  - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
+  - bietlejuice.ebdb_administration:load-clean-property-fee-assigned-aud
+  - bietlejuice.ebdb_administration:load-clean-property-fee-aud
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-full-contract
   - bietlejuice.ebdb_contract:load-clean-portability
@@ -1601,7 +1601,7 @@ bietlejuice.enrich_ebdb_rent_flow:
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
   - bietlejuice.ebdb_user:load-clean-user
 bietlejuice.enrich_ebdb_rental_administration:
-  - bietlejuice.ebdb:load-clean-rental-administrator-change-request-aud
+  - bietlejuice.ebdb_administration:load-clean-rental-administrator-change-request-aud
   - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_ebdb_smart_price:
   - bietlejuice.ebdb:load-clean-dynamic-pricing-house-aud
@@ -1615,9 +1615,9 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:load-clean-agent-data
   - bietlejuice.ebdb:load-clean-agent-data-business-contexts-served
   - bietlejuice.ebdb:load-clean-device
-  - bietlejuice.ebdb:load-clean-doorman-affiliate-data
-  - bietlejuice.ebdb:load-clean-doorman-affiliate-occupation
   - bietlejuice.ebdb:load-clean-house
+  - bietlejuice.ebdb_administration:load-clean-doorman-affiliate-data
+  - bietlejuice.ebdb_administration:load-clean-doorman-affiliate-occupation
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_proposal:load-clean-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
@@ -2131,7 +2131,7 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-partner-agent-aud
-  - bietlejuice.ebdb:load-clean-pro-owner-fee-aud
+  - bietlejuice.ebdb_administration:load-clean-pro-owner-fee-aud
   - bietlejuice.ebdb_contract:load-clean-portability
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-pro-owner

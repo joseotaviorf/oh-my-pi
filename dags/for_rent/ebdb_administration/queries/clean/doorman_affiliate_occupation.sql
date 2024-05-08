@@ -4,6 +4,6 @@ SELECT
     criadoEm AS ts_created,
     name,
     rank,
-    active as is_active
+    active AS is_active
 FROM
     datalake_ebdb_raw.`DoormanAffiliateOccupation`
