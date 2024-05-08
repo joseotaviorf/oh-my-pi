@@ -3,20 +3,15 @@ dag:
   schedule_start_date: 2020,8,29
   owner: Data Rede
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: public
   default_extraction_type: incremental
-  has_load_to_redshift_task: False
   inner_dependencies:
     fact_search_session_event:
       - dim_search_session_event_type
   tables_customization:
     fact_search_session_event:
       partitions: [year, month, day]
-      extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
 cluster:
-  type: databricks_10_4_max_io-memory_photon_cluster
+  type: databricks_12_2_max_io-memory_photon_cluster
