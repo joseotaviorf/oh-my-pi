@@ -21,7 +21,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 # TO DO: Add the package version in the config file
-VESPUCIO_PACKAGE_VERSION = "0.2.17"
+VESPUCIO_PACKAGE_VERSION = "0.2.18"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
@@ -106,7 +106,7 @@ class Tables:
     source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
     source_navent_houses = "vespucio_sources_delta.source_navent_houses"
     source_union_houses = "vespucio_sources_delta.source_union_house"
-    # source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
+    source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
 
     step1_staged_condos = "vespucio_pipeline_delta.step1_staged_condos"
     step1_staged_houses = "vespucio_pipeline_delta.step1_staged_houses"
@@ -173,14 +173,14 @@ source_tasks = [
         ],
         task_id="union_house",
     ),
-    # create_task(
-    #     entry_point="sources_sql_job",
-    #     parameters=[
-    #         f"--script=itbi_house.sql",
-    #         f"--output_table={Tables.source_itbi_houses}",
-    #     ],
-    #     task_id="itbi_house",
-    # ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=itbi_house.sql",
+            f"--output_table={Tables.source_itbi_houses}",
+        ],
+        task_id="itbi_house",
+    ),
 ]
 
 core_tasks = [
