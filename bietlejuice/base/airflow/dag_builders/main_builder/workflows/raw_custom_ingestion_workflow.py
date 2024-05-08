@@ -92,17 +92,25 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
             clean_delta_tables
         )
+        raw_last_tasks = {}
         clean_first_tasks = {}
         clean_last_tasks = {}
 
-        tables_customization = self.workflow_args["tables_customization"]
-        for raw_table_name, table_parameters in tables_customization.items():
-            clean_table_name = table_parameters.get(
-                "clean_table_name", raw_table_name
-            ).lower()
+        tables_customization_raw_dependency, tables_customization_without_raw_dependency = self._generate_filtered_tables_customizations(
+            self.workflow_args["tables_customization"]
+        )
+
+        for (
+            raw_table_name,
+            table_parameters,
+        ) in tables_customization_without_raw_dependency.items():
             raw_initial_task, raw_final_task = self._create_raw_tasks(
                 table_name=raw_table_name, last_task=dummy_terminate_job_cluster_task
             )
+
+            clean_table_name = table_parameters.get(
+                "clean_table_name", raw_table_name
+            ).lower()
             clean_initial_task, clean_final_task = self._create_clean_tasks(
                 table_name=clean_table_name,
                 table_customization=table_parameters,
@@ -111,9 +119,34 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
 
             execute_job_cluster_task >> raw_initial_task
             raw_final_task >> clean_initial_task
+
+            raw_last_tasks[raw_table_name] = raw_final_task
             clean_first_tasks[clean_table_name] = clean_initial_task
             clean_last_tasks[clean_table_name] = clean_final_task
+
+        for (
+            table_name,
+            table_parameters,
+        ) in tables_customization_raw_dependency.items():
+            # It runs after the tables with no dependency to guarantee that the raw_dependency exists and can be referenced below
+            raw_table_dependency = table_parameters.get("raw_table_dependency")
+            clean_table_name = table_parameters.get(
+                "clean_table_name", table_name
+            ).lower()
+
+            clean_initial_task, clean_final_task = self._create_clean_tasks(
+                table_name=clean_table_name,
+                table_customization=table_parameters,
+                optimize_delta_tables_task=optimize_delta_tables_task,
+            )
+
+            raw_last_tasks[raw_table_dependency] >> clean_initial_task
+
+            clean_first_tasks[clean_table_name] = clean_initial_task
+            clean_last_tasks[clean_table_name] = clean_final_task
+
         optimize_delta_tables_task >> dummy_terminate_job_cluster_task
+
         self._set_inner_dependencies(
             clean_first_tasks,
             clean_last_tasks,
@@ -198,3 +231,33 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
             )
             load_clean_task >> data_quality >> optimize_delta_tables_task
         return load_clean_task, load_clean_task
+
+    def _generate_filtered_tables_customizations(self, tables_customization: dict):
+        """
+        Filters the tables that have the raw_table_dependency parameter in the tables_customization,
+        returning two dictionaries, one with the tables that contain the parameter and another with the remaining tables.
+        """
+        tables_customization_with_raw_dependency = {}
+        tables_customization_without_raw_dependency = tables_customization.copy()
+
+        for table_name, table_parameters in tables_customization.items():
+            raw_table_dependency = table_parameters.get("raw_table_dependency")
+            if raw_table_dependency:
+                if (
+                    raw_table_dependency
+                    not in tables_customization_without_raw_dependency
+                ):
+                    raise ValueError(
+                        f"Error finding table '{raw_table_dependency}' during raw table dependencies settings. "
+                        "Make sure this table is named correctly and its table declaration exists."
+                    )
+
+                tables_customization_with_raw_dependency[
+                    table_name
+                ] = tables_customization.get(table_name)
+                del tables_customization_without_raw_dependency[table_name]
+
+        return (
+            tables_customization_with_raw_dependency,
+            tables_customization_without_raw_dependency,
+        )
