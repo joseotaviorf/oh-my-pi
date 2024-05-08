@@ -46,8 +46,4 @@ FROM
 WHERE
     record_type = '1'
 AND
-    year = {year}
-AND
-    month = {month}
-AND
-    day = {day}
+    DATE(CONCAT(year, '-', month, '-', day)) = DATE(CURRENT_DATE)
