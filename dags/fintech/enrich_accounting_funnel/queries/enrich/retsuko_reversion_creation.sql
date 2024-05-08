@@ -1,71 +1,75 @@
 WITH invoice_entry_version AS (
     SELECT DISTINCT
-        e.id_external AS id_finance_entity,
+        i.id_external AS id_finance_entity,
         s.version
-    FROM 
-        datalake_retsuko.entry AS e
+    FROM  
+        datalake_retsuko.invoice AS i
     LEFT JOIN datalake_retsuko_clean.sap_entity AS s 
-        ON s.id_finance_entity = e.id_external
+        ON s.id_finance_entity = i.id_external
     WHERE 
         event NOT IN ('payment-accounting-entries')
         AND id_sap_gateway_feature IS NOT NULL
         AND id_finance_entity IS NOT NULL
 ),
 
-retsuko_provisao AS (
+retsuko_reversao AS (
     SELECT DISTINCT
         ct.id_external AS id_contract,
         i.id_external AS id_invoice,
-        e.id_external AS id_entry,
+        NULL AS id_entry,
         'seu barriga' AS source_name,
         CASE
             WHEN e.bill_item IN (
-                'entry.bill-item/adm-fee', 
-                'entry.bill-item/igpm-adm-fee', 
-                'entry.bill-item/ipca-adm-fee', 
-                'entry.bill-item/adjustment-agreement-adm-fee', 
-                'entry.bill-item/lockin',
-                'entry.bill-item/adm-fee-tax-pcc-adm-partner',
-                'entry.bill-item/adm-fee-tax-pcc-quintoandar',
-                'entry.bill-item/adm-fee-tax-ir-quinto-andar',
-                'entry.bill-item/adm-fee-tax-ir',
-                'entry.bill-item/adm-fee-tax-pcc',
-                'entry.bill-item/adm-fee-tax-ir-adm-partner',
-                'entry.bill-item/adm-fee-tax-pcc-quinto-andar') THEN 'adm fee'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar', 
-                'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
-                'entry.bill-item/brokerage-fee-tax-ir', 
-                'entry.bill-item/brokerage-fee-tax-ir-quinto-andar') THEN 'brokerage'
+              'entry.bill-item/adm-fee', 
+              'entry.bill-item/igpm-adm-fee', 
+              'entry.bill-item/ipca-adm-fee', 
+              'entry.bill-item/adjustment-agreement-adm-fee', 
+              'entry.bill-item/lockin',
+              'entry.bill-item/adm-fee-tax-pcc-adm-partner',
+              'entry.bill-item/adm-fee-tax-pcc-quintoandar',
+              'entry.bill-item/adm-fee-tax-ir-quinto-andar',
+              'entry.bill-item/adm-fee-tax-ir',
+              'entry.bill-item/adm-fee-tax-pcc',
+              'entry.bill-item/adm-fee-tax-ir-adm-partner',
+              'entry.bill-item/adm-fee-tax-pcc-quinto-andar') THEN 'adm fee'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar',
+              'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
+              'entry.bill-item/brokerage-fee-tax-ir', 
+              'entry.bill-item/brokerage-fee-tax-ir-quinto-andar', 
+              'entry.bill-item/brokerage-installment') THEN 'brokerage'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN 'BFI v1'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN 'BFI v2'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN 'BFI'
+            WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar-postponed' AND ie.version = 'v1' THEN 'brokerage'
         END AS revenue_name,
         CASE
             WHEN e.bill_item IN (
-                'entry.bill-item/adm-fee', 
-                'entry.bill-item/igpm-adm-fee', 
-                'entry.bill-item/ipca-adm-fee', 
-                'entry.bill-item/adjustment-agreement-adm-fee', 
-                'entry.bill-item/lockin',
-                'entry.bill-item/adm-fee-tax-pcc-adm-partner',
-                'entry.bill-item/adm-fee-tax-pcc-quintoandar',
-                'entry.bill-item/adm-fee-tax-ir-quinto-andar',
-                'entry.bill-item/adm-fee-tax-ir',
-                'entry.bill-item/adm-fee-tax-pcc',
-                'entry.bill-item/adm-fee-tax-ir-adm-partner',
-                'entry.bill-item/adm-fee-tax-pcc-quinto-andar') THEN '31101.02.02'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar', 
-                'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
-                'entry.bill-item/brokerage-fee-tax-ir', 
-                'entry.bill-item/brokerage-fee-tax-ir-quinto-andar') THEN '31101.01.04'
+              'entry.bill-item/adm-fee', 
+              'entry.bill-item/igpm-adm-fee', 
+              'entry.bill-item/ipca-adm-fee', 
+              'entry.bill-item/adjustment-agreement-adm-fee', 
+              'entry.bill-item/lockin',
+              'entry.bill-item/adm-fee-tax-pcc-adm-partner',
+              'entry.bill-item/adm-fee-tax-pcc-quintoandar',
+              'entry.bill-item/adm-fee-tax-ir-quinto-andar',
+              'entry.bill-item/adm-fee-tax-ir',
+              'entry.bill-item/adm-fee-tax-pcc',
+              'entry.bill-item/adm-fee-tax-ir-adm-partner',
+              'entry.bill-item/adm-fee-tax-pcc-quinto-andar') THEN '31101.02.02'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar',
+              'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
+              'entry.bill-item/brokerage-fee-tax-ir', 
+              'entry.bill-item/brokerage-fee-tax-ir-quinto-andar', 
+              'entry.bill-item/brokerage-installment') THEN '31101.01.04'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN '31101.01.04'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN '31101.01.13'
+            WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar-postponed' AND ie.version = 'v1' THEN '31101.01.04'
         END AS account_number,
         i.accrual_year_month,
-        DATE(e.ts_created) AS dt_source_trigger,
-        CAST(amount AS DECIMAL(12,2)) AS source_amount
+        DATE(i.ts_paid) AS dt_source_trigger,
+        CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount
     FROM 
-        datalake_retsuko.entry  e
+        datalake_retsuko.entry e
     INNER JOIN 
         datalake_retsuko.invoice i
             ON e.id_invoice = i.id
@@ -77,7 +81,7 @@ retsuko_provisao AS (
             ON ct.id = i.id_contract
     LEFT JOIN 
         invoice_entry_version ie 
-            ON e.id_external = ie.id_finance_entity
+            ON i.id_external = ie.id_finance_entity
     WHERE 
         description != 'Crédito - Parcelamento corretagem - QuintoAndar' 
         AND (
@@ -105,9 +109,12 @@ retsuko_provisao AS (
                       )
                     ) 
                 ) 
-            )
+            OR (e.bill_item = 'entry.bill-item/brokerage-quinto-andar-postponed' AND ie.version = 'v1'))
         AND ct.country_code = 'BR'
-        AND DATE(e.ts_created) >= '2024-01-01'
+        AND DATE(i.ts_paid) >= '2024-01-01'
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+        HAVING 
+            SUM(amount) != 0
 ),
 
 sap_entity AS (
@@ -139,10 +146,10 @@ df AS (
         event,
         status
     FROM 
-        retsuko_provisao r 
+        retsuko_reversao r 
     LEFT JOIN
         sap_entity se 
-            ON r.id_entry = se.id_finance_entity AND se.event = 'new-accounting-entries'
+            ON r.id_invoice = se.id_finance_entity AND se.event = 'clearing-accounting-entries'
 ),
 
 sap_gateway AS (
@@ -164,9 +171,10 @@ sap_gateway AS (
 sap AS (
     SELECT 
         hash,
+        id_finance_entity,
+        id_finance_entity_entry,
         account_number,
-        account_number,
-        debit_credit,
+        SUM(debit_credit) as debit_credit,
         DATE(dt_created) AS dt_sap_created,
         DATE(dt_reference) AS dt_sap_reference
     FROM 
@@ -174,27 +182,27 @@ sap AS (
     WHERE 
         account_number like '31101%'
         AND document_number like 'JE %'
+    GROUP BY 1,2,3,4,6,7
 ),
 
 df_final AS (
-    SELECT 
+    SELECT
         id_contract,
         id_invoice,
-        id_entry,
         source_name,
         revenue_name,
         accrual_year_month,
-        CASE 
+        MIN(CASE 
           WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
           WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
           WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NULL THEN 'SB FAILURE'
-        END AS status,
-        IF(sap.hash IS NULL OR sap_gateway.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
-        source_amount,
-        debit_credit AS sap_amount,
-        dt_source_trigger,
-        dt_sap_created,
-        dt_sap_reference
+        END) AS status,
+        MIN(IF(sap.hash IS NULL OR sap_gateway.id_feature IS NULL, FALSE, TRUE)) AS is_completeness_compliance,
+        CAST(SUM(source_amount) AS DECIMAL(12,2)) AS source_amount,
+        CAST(SUM(debit_credit) AS DECIMAL(12,2)) AS sap_amount,
+        MAX(dt_source_trigger) AS dt_source_trigger,
+        MAX(dt_sap_created) AS dt_sap_created,
+        MAX(dt_sap_reference) AS dt_sap_reference
     FROM 
         df
     LEFT JOIN
@@ -206,11 +214,12 @@ df_final AS (
             AND df.account_number = sap.account_number
     WHERE 
         TRUE
+    GROUP BY 1,2,3,4,5
 ),
 
 metrics AS (
     SELECT
-        'JE'||'-'||id_invoice||'-'||'1'||'-'||'2'||'-'|| 
+        'JE'||'-'||id_invoice||'-'||'1'||'-'||'3'||'-'||
         CASE
             WHEN revenue_name = 'adm fee' THEN '1'
             WHEN revenue_name = 'brokerage' THEN '2' 
@@ -218,10 +227,9 @@ metrics AS (
             WHEN revenue_name = 'BFI' THEN '4'
             WHEN revenue_name = 'BFI v1' THEN '4' 
             WHEN revenue_name = 'BFI v2' THEN '4'
-        END AS id_retsuko_provision_creation,
+        END AS id_retsuko_reversion_creation,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
-        id_entry AS id_finance_entity_entry,
         source_name,
         revenue_name,
         accrual_year_month,
@@ -229,8 +237,8 @@ metrics AS (
         source_amount,
         sap_amount,
         is_completeness_compliance,
-        IF(ABS(source_amount) - ABS(sap_amount) = 0 OR (source_amount = 0 AND sap_amount IS NULL), true, false) AS is_correctness_compliance,
-        IF(dt_sap_created <= date_add(dt_source_trigger, 3), true, false) AS is_temporality_compliance,
+        IF((ABS(source_amount) - ABS(sap_amount) = 0), true, false) AS is_correctness_compliance,
+        IF((dt_sap_created <= date_add(dt_source_trigger, 3)), true, false) AS is_temporality_compliance,
         dt_source_trigger,
         dt_sap_created,
         dt_sap_reference
@@ -239,10 +247,10 @@ metrics AS (
 )
 
 SELECT
-    id_retsuko_provision_creation,
+    id_retsuko_reversion_creation,
     id_business_entity,
     id_finance_entity,
-    id_finance_entity_entry,
+    NULL AS id_finance_entity_entry,
     source_name,
     revenue_name,
     accrual_year_month,

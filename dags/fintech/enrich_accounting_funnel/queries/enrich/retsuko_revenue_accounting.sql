@@ -29,8 +29,8 @@ retsuko AS (
             WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN '41103.02.01'
         END AS account_number,
         i.accrual_year_month,
-        DATE(i.ts_created) AS dt_source_created,
-        CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount
+        DATE(e.ts_created) AS dt_source_trigger,
+        CAST(amount AS DECIMAL(12,2)) AS source_amount
     FROM 
         datalake_retsuko.entry  e
     INNER JOIN 
@@ -52,18 +52,14 @@ retsuko AS (
                       'property-damage-fine'
                       )
         AND ct.country_code = 'BR'
-        AND DATE(i.ts_created) >= '2024-01-01'
-        AND i.status != 'canceled'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
-    HAVING 
-        SUM(amount) != 0
+        AND DATE(e.ts_created) >= '2024-01-01'
 ),
 
 retsuko_fine AS (
     SELECT DISTINCT
         ct.id_external AS id_contract,
         i.id_external AS id_invoice,
-        e.id_external AS id_entry,
+        NULL AS id_entry,
         se.id_sap_gateway_feature,
         'seu barriga' AS source_name,
         CASE
@@ -73,7 +69,7 @@ retsuko_fine AS (
             WHEN e.bill_item IN ('entry.bill-item/fine-and-interest') THEN '31102.01.01'
         END AS account_number,
         i.accrual_year_month,
-        DATE(i.ts_created) AS dt_source_created,
+        DATE(i.ts_paid) AS dt_source_trigger,
         CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount
     FROM 
         datalake_retsuko.entry  e
@@ -95,7 +91,7 @@ retsuko_fine AS (
                       'fine-and-interest'
                       )
         AND ct.country_code = 'BR'
-        AND i.status != 'canceled'
+        AND i.ts_paid >= '2024-01-01'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
     HAVING 
         SUM(amount) != 0
@@ -135,7 +131,6 @@ sap AS (
         id_finance_entity,
         hash,
         account_number,
-        account_number,
         SUM(debit_credit) AS debit_credit,
         DATE(dt_created) AS dt_sap_created,
         DATE(dt_reference) AS dt_sap_reference
@@ -144,13 +139,14 @@ sap AS (
     WHERE 
         account_number IN ('41102.01.06', '41103.02.01', '31102.01.01')
         AND document_number like 'JE %'
-    GROUP BY 1, 2, 3, 4, 6, 7
+    GROUP BY 1, 2, 3, 5, 6
 ),
 
-df_final AS (
+df AS (
     SELECT 
         id_contract,
         id_invoice,
+        id_entry,
         source_name,
         revenue_name,
         accrual_year_month,
@@ -162,7 +158,7 @@ df_final AS (
         MIN(IF(sap.hash IS NULL OR sap_gateway.id_feature IS NULL, FALSE, TRUE)) AS is_completeness_compliance,
         CAST(SUM(source_amount) AS DECIMAL(12,2)) AS source_amount,
         CAST(SUM(debit_credit) AS DECIMAL(12,2)) AS sap_amount,
-        MAX(dt_source_created) AS dt_source_created,
+        MAX(dt_source_trigger) AS dt_source_trigger,
         MAX(dt_sap_created) AS dt_sap_created,
         MAX(dt_sap_reference) AS dt_sap_reference
     FROM 
@@ -176,18 +172,40 @@ df_final AS (
             AND sap.account_number = r.account_number
     WHERE 
         TRUE
-    GROUP BY 1, 2, 3, 4, 5
-) 
+    GROUP BY 1, 2, 3, 4, 5, 6
+),
 
+df_final AS (
+    SELECT
+        'JE'||'-'||id_invoice||'-'||'1'||'-'||'4'||'-'||
+        CASE
+          WHEN revenue_name = 'property damage fine' THEN '5'
+          WHEN revenue_name = 'rental anticipation fee' THEN '6' 
+          WHEN revenue_name = 'fine and interest' THEN '7' 
+        END AS id_retsuko_revenue_accounting,
+        id_contract AS id_business_entity,
+        id_invoice AS id_finance_entity,
+        id_entry AS id_finance_entity_entry,
+        source_name,
+        revenue_name,
+        accrual_year_month,
+        status,
+        source_amount,
+        sap_amount,
+        is_completeness_compliance,
+        IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance, 
+        IF(dt_sap_created <= date_add(dt_source_trigger, 3), true, false) AS is_temporality_compliance,
+        dt_source_trigger,
+        dt_sap_created,
+        dt_sap_reference
+    FROM 
+        df 
+)
 SELECT
-    'JE'||'-'||id_invoice||'-'||'1'||'-'|| 
-    CASE
-      WHEN revenue_name = 'property damage fine' THEN '5'
-      WHEN revenue_name = 'rental anticipation fee' THEN '6' 
-      WHEN revenue_name = 'fine and interest' THEN '7' 
-    END AS id_retsuko_revenue_accounting,
-    id_contract AS id_business_entity,
-    id_invoice AS id_finance_entity,
+    id_retsuko_revenue_accounting,
+    id_business_entity,
+    id_finance_entity,
+    id_finance_entity_entry,
     source_name,
     revenue_name,
     accrual_year_month,
@@ -195,10 +213,11 @@ SELECT
     source_amount,
     sap_amount,
     is_completeness_compliance,
-    IF((ABS(source_amount) + ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) + ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance, 
-    IF(dt_sap_created <= date_add(dt_source_created, 7), true, false) AS is_temporality_compliance,
-    dt_source_created,
+    is_correctness_compliance, 
+    is_temporality_compliance,
+    IF(is_completeness_compliance IS TRUE AND is_correctness_compliance IS TRUE AND is_temporality_compliance IS TRUE, TRUE, FALSE) AS is_compliance,
+    dt_source_trigger,
     dt_sap_created,
     dt_sap_reference
 FROM 
-    df_final
+    df_final 

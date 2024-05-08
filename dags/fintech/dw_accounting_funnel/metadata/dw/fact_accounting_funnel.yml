@@ -1,0 +1,118 @@
+---
+database_name: dw_accounting_funnel
+table_name: fact_accounting_funnel
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table reunite all accounting funnel enrich models to unify accounting analysis"
+columns:
+  sk_accounting_funnel:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.id_retsuko_provision_creation
+      - datalake_accounting_funnel.retsuko_reversion_creation.id_retsuko_reversion_creation
+      - datalake_accounting_funnel.retsuko_revenue_accounting.id_retsuko_revenue_accounting
+      - datalake_accounting_funnel.retsuko_invoice_issuance.id_retsuko_invoice_issuance
+    description: "IN is from Invoice + ID Finance Entity from the source + ID to identify source + ID to identify accounting type + ID to identify accounting name"
+  id_business_entity:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.id_business_entity
+      - datalake_accounting_funnel.retsuko_reversion_creation.id_business_entity
+      - datalake_accounting_funnel.retsuko_revenue_accounting.id_business_entity
+      - datalake_accounting_funnel.retsuko_invoice_issuance.id_business_entity
+    description: "ID to identify Business Entity from the source"
+  id_finance_entity:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.id_finance_entity
+      - datalake_accounting_funnel.retsuko_reversion_creation.id_finance_entity
+      - datalake_accounting_funnel.retsuko_revenue_accounting.id_finance_entity
+      - datalake_accounting_funnel.retsuko_invoice_issuance.id_finance_entity
+    description: "ID to identify Finance Entity from the source"
+  id_finance_entity:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.id_finance_entity_entry
+      - datalake_accounting_funnel.retsuko_reversion_creation.id_finance_entity_entry
+      - datalake_accounting_funnel.retsuko_revenue_accounting.id_finance_entity_entry
+      - datalake_accounting_funnel.retsuko_invoice_issuance.id_finance_entity_entry
+    description: "ID to identify Finance Entity Entry from the source"
+  source_name:
+    description: "Product's name that is responsible to send accounting information"
+  accounting_type:
+    description: "What type of accounting it refers to"
+  accounting_name:
+    description: "What kind of accounting it refers to"
+  accrual_year_month:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.accrual_year_month
+      - datalake_accounting_funnel.retsuko_reversion_creation.accrual_year_month
+      - datalake_accounting_funnel.retsuko_revenue_accounting.accrual_year_month
+      - datalake_accounting_funnel.retsuko_invoice_issuance.accrual_year_month
+    description: "Accrual year month from from accounting entry"
+  status:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.status
+      - datalake_accounting_funnel.retsuko_reversion_creation.status
+      - datalake_accounting_funnel.retsuko_revenue_accounting.status
+      - datalake_accounting_funnel.retsuko_invoice_issuance.status
+    description: "Indicates, if broken, which source had failed: SG - SAP Gateway, SB - Seu Barriga"
+  source_amount:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.source_amount
+      - datalake_accounting_funnel.retsuko_reversion_creation.source_amount
+      - datalake_accounting_funnel.retsuko_revenue_accounting.source_amount
+      - datalake_accounting_funnel.retsuko_invoice_issuance.source_amount
+    description: "Amount that suppose to be create analyzing source's entry"
+  sap_amount:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.sap_amount
+      - datalake_accounting_funnel.retsuko_reversion_creation.sap_amount
+      - datalake_accounting_funnel.retsuko_revenue_accounting.sap_amount
+      - datalake_accounting_funnel.retsuko_invoice_issuance.sap_amount
+    description: "Amount that was accounted in SAP"
+  is_completeness_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_completeness_compliance
+      - datalake_accounting_funnel.retsuko_reversion_creation.is_completeness_compliance
+      - datalake_accounting_funnel.retsuko_revenue_accounting.is_completeness_compliance
+      - datalake_accounting_funnel.retsuko_invoice_issuance.is_completeness_compliance
+    description: "Indicates if the funnel is complete: same ID throught all products until arrive in SAP"
+  is_correctness_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_correctness_compliance
+      - datalake_accounting_funnel.retsuko_reversion_creation.is_correctness_compliance
+      - datalake_accounting_funnel.retsuko_revenue_accounting.is_correctness_compliance
+      - datalake_accounting_funnel.retsuko_invoice_issuance.is_correctness_compliance
+    description: "Indicates if a accounting entry create in source, arrive in SAP Gateway and SAP in the correct amount and in the right account"
+  is_temporality_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_temporality_compliance
+      - datalake_accounting_funnel.retsuko_reversion_creation.is_temporality_compliance
+      - datalake_accounting_funnel.retsuko_revenue_accounting.is_temporality_compliance
+      - datalake_accounting_funnel.retsuko_invoice_issuance.is_temporality_compliance
+    description: "Indicates if the creation in SAP was in the right time"
+  is_compliance:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.is_compliance
+      - datalake_accounting_funnel.retsuko_reversion_creation.is_compliance
+      - datalake_accounting_funnel.retsuko_revenue_accounting.is_compliance
+      - datalake_accounting_funnel.retsuko_invoice_issuance.is_compliance
+    description: "Indicates if all the metrics are TRUE (completeness, correctness, temporality)"
+  dt_source_trigger:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.dt_source_trigger
+      - datalake_accounting_funnel.retsuko_reversion_creation.dt_source_trigger
+      - datalake_accounting_funnel.retsuko_revenue_accounting.dt_source_trigger
+      - datalake_accounting_funnel.retsuko_invoice_issuance.dt_source_trigger
+    description: "Indicates the date that starts the accounting funnel"
+  dt_sap_created:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.dt_sap_created
+      - datalake_accounting_funnel.retsuko_reversion_creation.dt_sap_created
+      - datalake_accounting_funnel.retsuko_revenue_accounting.dt_sap_created
+      - datalake_accounting_funnel.retsuko_invoice_issuance.dt_sap_created
+    description: "Indicates date that was created in SAP"
+  dt_sap_reference:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.dt_sap_reference
+      - datalake_accounting_funnel.retsuko_reversion_creation.dt_sap_reference
+      - datalake_accounting_funnel.retsuko_revenue_accounting.dt_sap_reference
+      - datalake_accounting_funnel.retsuko_invoice_issuance.dt_sap_reference
+    description: "Indicates date that was referenced in SAP"

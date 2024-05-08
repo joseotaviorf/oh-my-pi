@@ -16,5 +16,7 @@ workflow:
       - ledger
     retsuko_provision_creation:
       - ledger
+    retsuko_reversion_creation:
+      - ledger
 cluster:
   type: databricks_12_2_med_io-memory_cluster

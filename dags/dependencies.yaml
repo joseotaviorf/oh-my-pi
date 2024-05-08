@@ -6,6 +6,8 @@ bietlejuice.amplitude_supply:
 bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-invoice-issuance
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
+  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-reversion-creation
+  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood:load-enrich-affiliate-costs
   - bietlejuice.robin_hood:load-clean-tax
