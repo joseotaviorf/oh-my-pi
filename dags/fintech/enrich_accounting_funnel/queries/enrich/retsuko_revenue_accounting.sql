@@ -59,7 +59,7 @@ retsuko_fine AS (
     SELECT DISTINCT
         ct.id_external AS id_contract,
         i.id_external AS id_invoice,
-        NULL AS id_entry,
+        CAST(NULL AS INT) AS id_entry,
         se.id_sap_gateway_feature,
         'seu barriga' AS source_name,
         CASE

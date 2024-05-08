@@ -250,7 +250,7 @@ SELECT
     id_retsuko_reversion_creation,
     id_business_entity,
     id_finance_entity,
-    NULL AS id_finance_entity_entry,
+    CAST(NULL AS INT) AS id_finance_entity_entry,
     source_name,
     revenue_name,
     accrual_year_month,

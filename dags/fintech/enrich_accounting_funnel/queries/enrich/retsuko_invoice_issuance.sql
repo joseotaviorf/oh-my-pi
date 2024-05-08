@@ -31,7 +31,7 @@ retsuko AS (
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee', 'entry.bill-item/brokerage-quinto-andar') THEN 'brokerage'
         END AS revenue_name,
         i.accrual_year_month,
-        IF(e.bill_item = 'entry.bill-item/service-fee', DATE(i.ts_paid), DATE(i.ts_created)) AS dt_source_trigger,
+        IF(e.bill_item = 'entry.bill-item/service-fee', DATE(i.ts_paid), DATE(i.ts_due)) AS dt_source_trigger,
         CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount
     FROM 
         treated_entry e
@@ -146,7 +146,7 @@ df AS (
             WHEN revenue_name = 'service fee' THEN '3' END AS id_retsuko_invoice_issuance,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
-        NULL AS id_finance_entity_entry,
+        CAST(NULL AS INT) AS id_finance_entity_entry,
         source_name,
         revenue_name,
         accrual_year_month,
