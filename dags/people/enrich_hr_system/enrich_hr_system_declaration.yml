@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: Enrich HR System data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: full
   has_hive_sync: false
