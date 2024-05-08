@@ -37,6 +37,17 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
+  qtd_houses_early_demand_matured_2w:
+    description: "Matured volume of houses in early demand within 2 weeks after termination being requested in the week being referenced."
+    metric:
+      name: Weekly Matured Early Demands - 2W
+      description: "Matured volume of houses in early demand within 2 weeks after termination being requested in the week being referenced."
+      acronym: WEDM2W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
   qtd_terminations:
     description: "Volume of contract terminations in the week being referenced."
     metric:
@@ -54,6 +65,17 @@ columns:
       name: Weekly Early Demand Opt-in - 2W
       description: "Porcentage of early demand opt-in within 2 weeks after termination being requested in the week being referenced."
       acronym: WEDOI2W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_early_demand_opt_in_matured_2w:
+    description: "Matured porcentage of early demand opt-in within 2 weeks after termination being requested in the week being referenced."
+    metric:
+      name: Weekly Matured Early Demand Opt-in - 2W
+      description: "Matured porcentage of early demand opt-in within 2 weeks after termination being requested in the week being referenced."
+      acronym: WEDOIM2W
       is_additive: False
       business_stage: Demand
       hierarchy: User analysis

@@ -8,6 +8,14 @@ SELECT
         AND dhl.ts_early_demand_started <= DATEADD(WEEK, 2, dc.ts_termination_requested), dhl.id_house, NULL
       )
     ) AS qtd_houses_early_relisting_2w,
+    COUNT(DISTINCT 
+      IF(
+        dhl.ts_early_demand_started IS NOT NULL 
+        AND dhl.ts_early_demand_started <= DATEADD(WEEK, 2, dc.ts_termination_requested)
+        AND dc.ts_termination_requested <= DATE_ADD(CURRENT_DATE, -14)
+        , dhl.id_house, NULL
+      )
+    ) AS qtd_houses_early_relisting_matured_2w,
     COUNT(DISTINCT fct_or.sk_house) AS qtd_terminations,
     CAST(
       COUNT(DISTINCT 
@@ -21,7 +29,22 @@ SELECT
       COUNT(DISTINCT 
         fct_or.sk_house
       ) AS DOUBLE
-    ) AS pct_early_demand_opt_in_2w
+    ) AS pct_early_demand_opt_in_2w,
+    CAST(
+      COUNT(DISTINCT 
+        IF(
+          dhl.ts_early_demand_started IS NOT NULL 
+          AND dhl.ts_early_demand_started <= DATEADD(WEEK, 2, dc.ts_termination_requested)
+          AND dc.ts_termination_requested <= DATE_ADD(CURRENT_DATE, -14)
+          , dhl.id_house, NULL
+        )
+    ) AS DOUBLE)
+    / 
+    CAST(
+      COUNT(DISTINCT 
+        fct_or.sk_house
+      ) AS DOUBLE
+    ) AS pct_early_demand_opt_in_matured_2w
 FROM 
     dw_retention.fact_owner_retention AS fct_or
 INNER JOIN
@@ -46,6 +69,14 @@ SELECT
         AND dhl.ts_early_demand_started <= DATEADD(WEEK, 2, dc.ts_termination_requested), dhl.id_house, NULL
       )
     ) AS qtd_houses_early_relisting_2w,
+    COUNT(DISTINCT 
+      IF(
+        dhl.ts_early_demand_started IS NOT NULL 
+        AND dhl.ts_early_demand_started <= DATEADD(WEEK, 2, dc.ts_termination_requested)
+        AND dc.ts_termination_requested <= DATE_ADD(CURRENT_DATE, -14)
+        , dhl.id_house, NULL
+      )
+    ) AS qtd_houses_early_relisting_matured_2w,
     COUNT(DISTINCT fct_or.sk_house) AS qtd_terminations,
     CAST(
       COUNT(DISTINCT 
@@ -59,7 +90,22 @@ SELECT
       COUNT(DISTINCT 
         fct_or.sk_house
       ) AS DOUBLE
-    ) AS pct_early_demand_opt_in_2w
+    ) AS pct_early_demand_opt_in_2w,
+    CAST(
+      COUNT(DISTINCT 
+        IF(
+          dhl.ts_early_demand_started IS NOT NULL 
+          AND dhl.ts_early_demand_started <= DATEADD(WEEK, 2, dc.ts_termination_requested)
+          AND dc.ts_termination_requested <= DATE_ADD(CURRENT_DATE, -14)
+          , dhl.id_house, NULL
+        )
+    ) AS DOUBLE)
+    / 
+    CAST(
+      COUNT(DISTINCT 
+        fct_or.sk_house
+      ) AS DOUBLE
+    ) AS pct_early_demand_opt_in_matured_2w
 FROM 
     dw_retention.fact_owner_retention AS fct_or
 INNER JOIN
