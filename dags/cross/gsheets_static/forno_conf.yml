@@ -1,4 +1,10 @@
 sheets_info:
+  affected_areas_natural_disaster_rs:
+    sheet_id: 16_hwV9qocTDQmM73dUdlmeq6zzsHu7ITRch4wibswJI/edit#gid=588965002
+    sheet_name: Neighborhood impacted
+    clean_table_name: affected_areas_natural_disaster_rs
+    sheet_context: static
+
   affiliates_acquisition_targets:
     sheet_id: 1Ln23SA7YQ-OhfZ49BEmoT_mm-kDbNC-HdMt9thTzbDM
     sheet_name: target_nau_budget_daily

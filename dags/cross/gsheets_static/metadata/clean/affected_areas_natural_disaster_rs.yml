@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_clean
+table_name: affected_areas_natural_disaster_rs
+columns:
+  city_name:
+    lineage:
+      - datalake_gsheets_raw.affected_areas_natural_disaster_rs.city_name
+  house_neighborhood:
+    lineage:
+      - datalake_gsheets_raw.affected_areas_natural_disaster_rs.house_neighborhood
+  key:
+    lineage:
+      - datalake_gsheets_raw.affected_areas_natural_disaster_rs.key
+  is_impacted:
+    lineage:
+      - datalake_gsheets_raw.affected_areas_natural_disaster_rs.impacted
