@@ -39,6 +39,13 @@ SELECT
     pr.version,
     COUNT(proponents.document_number) AS number_of_proponents,
     AVG(proponents.retenant_score) AS average_retenants_score,
+    CASE
+        WHEN GET_JSON_OBJECT(pr.result, '$.type') = 'ANY_PROPONENT' THEN TRUE
+        WHEN GET_JSON_OBJECT(pr.result, '$.type') = 'NEW_GROUP_PROPONENT' THEN TRUE
+        WHEN GET_JSON_OBJECT(pr.result, '$.type') = 'SAME_GROUP_PROPONENT' THEN TRUE
+        WHEN GET_JSON_OBJECT(pr.result, '$.type') = 'NEW_USER' THEN FALSE
+        ELSE NULL
+    END AS is_retenant,
     CASE 
         WHEN COUNT(DISTINCT proponents.is_retenant) = 1 AND MAX(proponents.is_retenant) = TRUE THEN TRUE 
         ELSE FALSE
@@ -49,4 +56,4 @@ FROM
     datalake_sorting_hat_clean.policy_report AS pr
 LEFT JOIN
     proponents ON pr.id = proponents.id_policy_evaluation
-GROUP BY 1,2,3,4,5,6,7,8,12,13
+GROUP BY 1,2,3,4,5,6,7,8,13,14

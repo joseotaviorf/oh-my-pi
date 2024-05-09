@@ -45,6 +45,10 @@ columns:
     description: 'Average score of all the proponents in the credit policy'
     lineage:
     - datalake_sorting_hat_clean.policy_report.proponents.retenant_score
+  is_retenant:
+    description: 'True for the groups: (ANY_PROPONENT, NEW_GROUP_PROPONENT, SAME_GROUP_PROPONENT), false for the group: (NEW_USER)'
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.result.type
   are_all_proponents_retenants:
     description: 'True only if all the proponents are retenants'
     lineage:
