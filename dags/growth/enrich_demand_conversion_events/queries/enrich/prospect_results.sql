@@ -7,7 +7,7 @@ WITH adhoc_rules AS (
     dpce.event_name,
     CASE 
       WHEN dpce.product_origin = 'Corretores'
-      THEN "na.acq.org.na.d.direct.na"
+      THEN "hybr.acq.nonorg.na.d.referral.agents"
       WHEN utm_campaign IS NULL
         AND utm_source IS NULL
         AND utm_medium IS NULL
