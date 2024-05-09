@@ -5,19 +5,7 @@ WITH tasks AS (
     id_channel,
     id_chat,
     id_worker,
-    NULLIF(
-      REPLACE(
-        REPLACE(
-          REPLACE(
-            customer_metadata,
-            '{"external_id":"', ""
-          ),
-          ':USER"}', ""
-        ),
-        "{}", ""
-      ),
-      ""
-    ) AS id_user,
+    REPLACE(SPLIT(customer_metadata, ":")[1], '"', "") AS id_user,
     task_status,
     REPLACE(customer_contact_info, "whatsapp:+", "") AS customer_contact_info,
     customer_email,
