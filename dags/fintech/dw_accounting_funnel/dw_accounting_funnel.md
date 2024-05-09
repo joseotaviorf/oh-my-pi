@@ -22,6 +22,6 @@ More information about run time [here]({chart_url}{dag_id}).
 ​
 This pipeline produces the following output model, in DW schema `accounting_funnel`, via full load:​​
 
-- `fact_invoice_issuance`
+- `fact_accounting_funnel`
 ​
 </details>

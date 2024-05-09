@@ -230,7 +230,7 @@ metrics AS (
         sap_amount,
         is_completeness_compliance,
         IF(ABS(source_amount) - ABS(sap_amount) = 0 OR (source_amount = 0 AND sap_amount IS NULL), true, false) AS is_correctness_compliance,
-        IF(dt_sap_created <= date_add(dt_source_trigger, 3), true, false) AS is_temporality_compliance,
+        IF(dt_sap_reference <= date_add(dt_source_trigger, 3), true, false) AS is_temporality_compliance,
         dt_source_trigger,
         dt_sap_created,
         dt_sap_reference

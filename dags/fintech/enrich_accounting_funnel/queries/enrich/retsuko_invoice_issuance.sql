@@ -156,10 +156,8 @@ df AS (
             WHEN s.hash IS NULL AND sg.id_feature IS NULL THEN 'SB FAILURE'
         END) AS status,
         source_amount,
-        sap_amount,
+        SUM(sap_amount) AS sap_amount,
         MIN(IF(s.hash IS NULL OR sg.id_feature IS NULL, FALSE, TRUE)) AS is_completeness_compliance,
-        IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance, 
-        IF(dt_sap_created <= date_add(dt_source_trigger, 30), true, false) AS is_temporality_compliance,
         dt_source_trigger,
         dt_sap_created,
         dt_sap_reference
@@ -176,7 +174,29 @@ df AS (
             ON sg.hash = s.hash
             AND r.revenue_name = s.revenue_account
     GROUP BY 
-        1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13, 14, 15, 16
+        1, 2, 3, 4, 5, 6, 7, 9, 12, 13, 14
+),
+df_final AS (
+    SELECT 
+        id_retsuko_invoice_issuance,
+        id_business_entity,
+        id_finance_entity,
+        id_finance_entity_entry,
+        source_name,
+        revenue_name,
+        accrual_year_month,
+        status,
+        source_amount,
+        sap_amount,
+        is_completeness_compliance,
+        IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance, 
+        IF(dt_sap_reference <= date_add(dt_source_trigger, 30), true, false) AS is_temporality_compliance,
+        IF(is_completeness_compliance IS TRUE AND is_correctness_compliance IS TRUE AND is_temporality_compliance IS TRUE, TRUE, FALSE) AS is_compliance,
+        dt_source_trigger,
+        dt_sap_created,
+        dt_sap_reference
+    FROM 
+        df
 )
 SELECT 
     id_retsuko_invoice_issuance,
@@ -197,4 +217,4 @@ SELECT
     dt_sap_created,
     dt_sap_reference
 FROM 
-    df
+    df_final

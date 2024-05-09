@@ -194,7 +194,7 @@ df_final AS (
         sap_amount,
         is_completeness_compliance,
         IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance, 
-        IF(dt_sap_created <= date_add(dt_source_trigger, 3), true, false) AS is_temporality_compliance,
+        IF(dt_sap_reference <= date_add(dt_source_trigger, 3), true, false) AS is_temporality_compliance,
         dt_source_trigger,
         dt_sap_created,
         dt_sap_reference
