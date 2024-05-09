@@ -13,7 +13,7 @@ dag:
             This occurs because when running on our data pipeline we read and execute these queries using pyspark and to avoid
             python syntax errors we must escape the brackets characters.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     inner_dependencies:
         received_demand:
@@ -30,6 +30,7 @@ cluster:
         driver_node_type_id: m5d.16xlarge
         node_type_id: m5d.16xlarge
         runtime_engine: PHOTON
+        spark_version: 12.2.x-scala2.12
         num_workers: 6
         aws_attributes:
             ebs_volume_size: 300
