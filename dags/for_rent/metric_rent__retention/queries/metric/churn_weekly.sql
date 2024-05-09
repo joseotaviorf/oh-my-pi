@@ -208,6 +208,20 @@ final_base AS (
     erc.value_segment,
     erc.country_code,
     COUNT(DISTINCT erc.sk_contract) AS ended_rentals,
+    COUNT(DISTINCT 
+      IF(
+          erc.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE(), -28)
+          , erc.sk_contract
+          , NULL
+      )
+    ) AS ended_rentals_matured_4w,
+    COUNT(DISTINCT 
+      IF(
+          erc.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE(), -84)
+          , erc.sk_contract
+          , NULL
+      )
+    ) AS ended_rentals_matured_12w,
     COUNT_IF(bd_aux.status_4w = 'alugado') AS rerentals_4w,
     COUNT_IF(bd_aux.status_4w = 'alugado' AND erc.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE(), -28)) rerentals_matured_4w,
     COUNT_IF(bd_aux.status_12w = 'alugado') AS rerentals_12w,
@@ -270,6 +284,8 @@ final_dataset AS (
     rerentals_12w,
     churn_4w,
     churn_12w,
+    ended_rentals_matured_4w,
+    ended_rentals_matured_12w,
     rerentals_matured_4w,
     rerentals_matured_12w,
     churn_matured_4w,
@@ -288,12 +304,14 @@ SELECT
   SUM(rerentals_12w) AS rerentals_12w,
   SUM(churn_12w) AS qtd_churn_12w,
   CAST(SUM(churn_12w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_12w,
+  SUM(ended_rentals_matured_4w) AS ended_rentals_matured_4w,
+  SUM(ended_rentals_matured_12w) AS ended_rentals_matured_12w,
   SUM(rerentals_matured_4w) AS rerentals_matured_4w,
   SUM(churn_matured_4w) AS qtd_churn_matured_4w,
-  CAST(SUM(churn_matured_4w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_matured_4w,
+  CAST(SUM(churn_matured_4w) AS DOUBLE) / SUM(ended_rentals_matured_4w)*1.0 AS pct_churn_matured_4w,
   SUM(rerentals_matured_12w) AS rerentals_matured_12w,
   SUM(churn_matured_12w) AS qtd_churn_matured_12w,
-  CAST(SUM(churn_matured_12w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_matured_12w
+  CAST(SUM(churn_matured_12w) AS DOUBLE) / SUM(ended_rentals_matured_12w)*1.0 AS pct_churn_matured_12w
 FROM 
   final_dataset
 GROUP BY 
@@ -312,12 +330,14 @@ SELECT
   SUM(rerentals_12w) AS rerentals_12w,
   SUM(churn_12w) AS qtd_churn_12w,
   CAST(SUM(churn_12w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_12w,
+  SUM(ended_rentals_matured_4w) AS ended_rentals_matured_4w,
+  SUM(ended_rentals_matured_12w) AS ended_rentals_matured_12w,
   SUM(rerentals_matured_4w) AS rerentals_matured_4w,
   SUM(churn_matured_4w) AS qtd_churn_matured_4w,
-  CAST(SUM(churn_matured_4w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_matured_4w,
+  CAST(SUM(churn_matured_4w) AS DOUBLE) / SUM(ended_rentals_matured_4w)*1.0 AS pct_churn_matured_4w,
   SUM(rerentals_matured_12w) AS rerentals_matured_12w,
   SUM(churn_matured_12w) AS qtd_churn_matured_12w,
-  CAST(SUM(churn_matured_12w) AS DOUBLE) / SUM(ended_rentals)*1.0 AS pct_churn_matured_12w
+  CAST(SUM(churn_matured_12w) AS DOUBLE) / SUM(ended_rentals_matured_12w)*1.0 AS pct_churn_matured_12w
 FROM 
   final_dataset
 GROUP BY

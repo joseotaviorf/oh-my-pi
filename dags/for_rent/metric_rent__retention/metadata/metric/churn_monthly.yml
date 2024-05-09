@@ -104,6 +104,28 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
+  ended_rentals_matured_4w:
+    description: "Matured volume of ended rentals in 4 weeks that happended in the month being referenced."
+    metric:
+      name: Weekly Ended Rentals
+      description: "Matured volume of ended rentals in 4 weeks that happended in the month being referenced."
+      acronym: ERM_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ended_rentals_matured_12w:
+    description: "Matured volume of ended rentals in 12 weeks that happended in the month being referenced."
+    metric:
+      name: Weekly Ended Rentals
+      description: "Matured volume of ended rentals in 12 weeks that happended in the month being referenced."
+      acronym: ERM_12W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
   rerentals_matured_4w:
     description: "Volume of re-rentals in 4 weeks matured that happended in the month being referenced."
     metric:
