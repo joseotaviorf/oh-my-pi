@@ -4,4 +4,4 @@ SELECT
     key,
     CAST(impacted AS BOOLEAN) AS is_impacted
 FROM
-    datalake_gsheets_raw.affiliates_acquisition_targets
+    datalake_gsheets_raw.affected_areas_natural_disaster_rs
