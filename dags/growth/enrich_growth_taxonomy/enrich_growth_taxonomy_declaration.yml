@@ -8,12 +8,13 @@ dag:
       This DAG enrich manual inputs to generate Growth Taxonomy related tables that will be used to share Media results and costs between marketing and operation channels.
       More info about Growth Taxonomy and media setup params in [this doc](https://docs.google.com/presentation/d/1BylJwYp9-yoqEqNvzcIvzHLVhZbOOomAjDH5XmIaXtY/edit?usp=sharing).
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_partitions: [funnel_side]
   default_extraction_type: full
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
+  has_hive_sync: false
   inner_dependencies:
     media_setup:
     - media_setup_staging
@@ -21,16 +22,8 @@ workflow:
     - media_setup
     unified_taxonomy_dictionary:
     - supply_taxonomy_dictionary
-  # TO-DO: Remove hive_sync once the feature is implemented
+  tables_customization:
+    media_setup:
+      has_hive_sync: true
 cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: r5d.4xlarge
-    node_type_id: m5d.4xlarge
-    runtime_engine: PHOTON
-    num_workers: 3
-    spark_version: 12.2.x-scala2.12
-    aws_attributes:
-      ebs_volume_size: 200
-    spark_conf:
-      spark.driver.maxResultSize: '0'
+  type: databricks_12_2_med_memory_cluster
