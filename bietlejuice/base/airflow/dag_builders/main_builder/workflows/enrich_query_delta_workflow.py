@@ -62,20 +62,35 @@ class EnrichQueryDeltaWorkflow(BaseWorkflow):
     def _get_tables(self) -> List[TableAttributes]:
         """Returns the table attributes for all the tables in the enrich layer."""
 
-        table_names = DAGPackagesPathService.list_queries_files_in_composer(
+        query_table_names = DAGPackagesPathService.list_queries_files_in_composer(
             dag_name=self.dag_name, layer=LayerEnum.ENRICH.value
         )
-        return [
+        tables = [
             TableAttributes(
                 self.dag_args, self.workflow_args, LayerEnum.ENRICH, table_name
             )
-            for table_name in table_names
+            for table_name in query_table_names
         ]
+        custom_table_names = self.workflow_args.get("tables_customization", {}).keys()
+        for table_name in custom_table_names:
+            if table_name in query_table_names:
+                continue
+            custom_table = TableAttributes(
+                self.dag_args, self.workflow_args, LayerEnum.ENRICH, table_name
+            )
+            # If this is false, it means that the table in tables_customization does not exist in any way
+            if custom_table.has_custom_spark_job:
+                tables.append(custom_table)
+        return tables
 
     def _create_enrich_tasks(self, table: TableAttributes, last_task) -> Tuple:
         """Returns a tuple with the first (Load) and last (Load) tasks of the table."""
 
-        load = self.load_enrich_task_creator.create_task(table)
+        if table.has_custom_spark_job:
+            load = self.load_custom_task_creator.create_task(table)
+        else:
+            load = self.load_enrich_task_creator.create_task(table)
+
         if self._check_include_sync_hive_tasks(table):
             register_table = self.register_delta_table_task_creator.create_task(table)
             sync_metadata = self.sync_metadata_task_creator.create_task(
@@ -117,6 +132,9 @@ class EnrichQueryDeltaWorkflow(BaseWorkflow):
         )
         self.load_enrich_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_DELTA
+        )
+        self.load_custom_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.LOAD_CUSTOM
         )
         self.data_quality_tests_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service

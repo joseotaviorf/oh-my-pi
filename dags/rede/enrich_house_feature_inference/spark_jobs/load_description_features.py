@@ -29,42 +29,17 @@ def parse_args() -> Namespace:
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket", type=str, help="datalake bucket")
-    parser.add_argument("layer", type=str, help="clean/enrich values to save data to")
     parser.add_argument(
         "database_base_name",
         type=str,
         help="base name for database, e.g. 'source' for raw/clean layer and 'source' and/or 'context' for enrich layer",
     )
-    parser.add_argument("target_database_base_name")
     parser.add_argument(
         "relative_query_path",
         type=str,
         help="relative query path for sql file to create table",
     )
     parser.add_argument("table_name", type=str, help="table name that will be created")
-    parser.add_argument("partitions")
-    parser.add_argument("execution_date")
-    parser.add_argument(
-        "spark_session_configs",
-        type=str,
-        help="custom config parameters to be set in spark session",
-    )
-    parser.add_argument(
-        "additional_query_template_params",
-        type=str,
-        help="additional query parameters not including date params",
-    )
-    parser.add_argument(
-        "schema",
-        type=lambda arg: None if not arg else arg,
-        help="table schema used in the query path",
-    )
-
-    parser.add_argument(
-        "tree_path",
-        type=lambda arg: None if not arg else arg,
-        help="path to reach the query place",
-    )
 
     return parser.parse_args()
 

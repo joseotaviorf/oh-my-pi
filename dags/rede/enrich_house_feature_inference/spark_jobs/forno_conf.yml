@@ -1,7 +1,4 @@
 ---
-custom_libraries:
-     - pypi:
-          package: ftfy 
 fields:
   - has_swim_pool
   - has_gym

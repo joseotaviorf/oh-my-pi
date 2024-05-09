@@ -102,6 +102,12 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "load_spark_job": {"type": "string", "empty": False, "required": False},
+                "spark_job_arguments": {
+                    "type": "list",
+                    "empty": False,
+                    "required": False,
+                },
             },
         },
         "cluster": {

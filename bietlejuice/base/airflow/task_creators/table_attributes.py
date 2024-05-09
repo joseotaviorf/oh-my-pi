@@ -20,6 +20,10 @@ class TableAttributes:
         self.schema = self._get_schema()
         self.extraction_type = self._get_extraction_type()
         self.partitions = self._get_partitions()
+        self.has_custom_spark_job = (
+            "load_spark_job" in workflow_args
+            or "load_spark_job" in self.table_customization
+        )
 
     @staticmethod
     def from_attributes(

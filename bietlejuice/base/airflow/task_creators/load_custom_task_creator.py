@@ -29,16 +29,15 @@ class LoadCustomTaskCreator(BaseTaskCreator):
         the one in table_customization, if it doesn't exist, it will use the default one in
         workflow_args. It will also replace the placeholders with the actual values.
         """
-
-        assert (
-            "load_spark_job" in self.dag_execution_context.workflow_args
-        ), "load_spark_job is required in workflow_args"
-        default_load_spark_job = self.dag_execution_context.workflow_args[
+        default_load_spark_job = self.dag_execution_context.workflow_args.get(
             "load_spark_job"
-        ]
+        )
         table_load_spark_job = table_attributes.table_customization.get(
             "load_spark_job", default_load_spark_job
         )
+        assert (
+            table_load_spark_job is not None
+        ), "load_spark_job is required in workflow_args or tables_customization"
         return table_load_spark_job.format(
             dag_name=self.dag_execution_context.dag_args["name"],
             schema=table_attributes.schema,
