@@ -115,9 +115,12 @@ columns:
   dt_emission:
     lineage:
       - datalake_checkout_raw.boleto.emission_date
-  ts_paid:
+  dt_paid:
     lineage:
       - datalake_checkout_raw.boleto.paid_at
+  dt_credit:
+    lineage:
+      - datalake_checkout_raw.boleto.credit_date
   dt_interest_start:
     lineage:
       - datalake_checkout_raw.boleto.interest_start_at
