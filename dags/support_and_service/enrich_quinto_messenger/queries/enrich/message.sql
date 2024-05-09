@@ -3,6 +3,7 @@ WITH message_events AS (
     id_channel,
     id_message,
     REPLACE(REPLACE(id_user_external,'_2E', '.'), '_40', '@') AS msg_sender,
+    message AS message_body,
     "CHAT INAPP" AS origin,
     ts_created
   FROM
@@ -14,6 +15,7 @@ WITH message_events AS (
     id_channel,
     GET_JSON_OBJECT(event_payload, "$.MessageSid") AS id_message,
     REPLACE(REPLACE(GET_JSON_OBJECT(event_payload, '$.From'),'_2E', '.'), '_40', '@') AS msg_sender,
+    message_body,
     "WHATSAPP" AS origin,
     ts_created
   FROM
@@ -26,6 +28,7 @@ message_tasks AS (
     t.id_task,
     me.id_message,
     me.msg_sender,
+    me.message_body,
     me.origin,
     LAG(me.ts_created) OVER (PARTITION BY t.id_task ORDER BY me.ts_created) AS last_ts,
     me.ts_created
@@ -39,6 +42,7 @@ SELECT
   id_task,
   id_message,
   msg_sender,
+  message_body,
   CASE
     WHEN last_ts IS NOT NULL THEN DATEDIFF(SECOND, last_ts, ts_created)
     ELSE NULL

@@ -18,6 +18,11 @@ columns:
       - datalake_internal_chat_clean.internal_chat_messages.id_user_external
       - datalake_quinto_messenger_clean.channel_event.event_payload
     description: Sender of the message, could be a system message, an agent email or a customer
+  message_body:
+    lineage:
+      - datalake_internal_chat_clean.internal_chat_messages.message
+      - datalake_quinto_messenger_clean.channel_event.message_body
+    description: Body of the message
   reply_time:
     description: Time elapsed between current and last message, in minutes
   origin:

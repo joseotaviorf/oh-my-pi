@@ -1,0 +1,131 @@
+database_name: datalake_quinto_messenger
+table_name: events
+description: Table containing all task events
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_event:
+    description: Twilio task event ID
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.id_task_event
+  id_task:
+    description: Twilio task ID
+    lineage:
+      - datalake_quinto_messenger_clean.task.id_task
+  id_channel:
+    description: Twilio channel ID
+    lineage:
+      - datalake_quinto_messenger_clean.task.id_channel
+  id_chat:
+    description: Unique identifier for each chat.
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  id_queue:
+    description: Twilio queue ID
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.id_queue
+  id_worker:
+    description: Twilio worker ID
+    lineage:
+      - datalake_quinto_messenger_clean.task.id_worker
+  id_user:
+    description: User ID from main
+    lineage:
+      - datalake_quinto_messenger_clean.task.id_user
+  id_session:
+    description: Sauron session ID
+    lineage:
+      - datalake_quinto_messenger_clean.channel.id_session
+      - datalake_quinto_messenger_clean.chat.id_session
+  queue_name:
+    description: Name of the queue the task was assigned to
+    lineage:
+      - datalake_quinto_messenger_clean.task.department
+  bpo_name:
+    description: BPO that handled the customer request
+    lineage:
+      - datalake_quinto_messenger_clean.task.bpo_name
+  worker_email:
+    description: Email of the analyst
+    lineage:
+      - datalake_quinto_messenger_clean.task.worker_email
+  task_status:
+    description: Current task status
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_status
+  task_completion_reason:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_completion_reason
+    description: Twilio's field defining the reason the task was completed
+  event_type:
+    description: Type of the event
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_type
+  customer_contact_info:
+    description: Email or phone number of the customer
+    lineage:
+      - datalake_quinto_messenger_clean.task.customer_contact_info
+  customer_email:
+    description: Email of the customer
+    lineage:
+      - datalake_quinto_messenger_clean.task.customer_email
+  twilio_phone_number:
+    description: Phone number registered on Twilio - the number that replied to the customer.
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  completion_reason:
+    description:
+      A task event completion reason is the reason why a task has been
+      marked as completed. When a worker finishes a task, they must provide a
+      completion reason, which is a string that describes the reason why they completed
+      the task. Usually, the last task ID in the conversation will have a
+      completion reason.
+    lineage:
+      - datalake_quinto_messenger_clean.task.completion_reason
+  channel_type:
+    description: What was the channel used for the conversation.
+    categories:
+      chat: Service via chat.
+      whatsapp: Service via whatsapp.
+    lineage:
+      - datalake_quinto_messenger_clean.task.channel_type
+  channel_status:
+    description: Channel Status.
+    lineage:
+      - datalake_quinto_messenger_clean.task.channel_status
+  tags:
+    description: The list of all routing tags applied to the task.
+    lineage:
+      - datalake_quinto_messenger_clean.task.tags
+  seconds_to_first_response:
+    description: Seconds taken for the first response inside a task.
+    lineage:
+      - datalake_quinto_messenger_clean.task.seconds_to_first_response
+  task_attributes:
+    description: Object with attributes of the task
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  task_resource:
+    description: Another object with attributes of the task
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_resource
+  conversation_attributes:
+    description: Object with attributes related to the 'conversation' entity from Twilio
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_resource
+  is_forwarded:
+    description: If the message has been forwarded
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  ts_event:
+    description: Timestamp of the event creation
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  ts_task_created:
+    description: Timestamp of the task creation
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+  ts_task_updated:
+    description: Timestamp of when the task was last updated
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_updated
