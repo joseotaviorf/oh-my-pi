@@ -67,7 +67,7 @@ SELECT
   DATE_FORMAT(ts_event, 'yyyy-MM-dd\'T\'HH:mm:ss') AS ts_event,
   MONOTONICALLY_INCREASING_ID() AS id,
   id_region,
-  neighborhood,
+  REGEXP_REPLACE(neighborhood, '\\n', '') AS neighborhood,
   business_context,
   lpv_p_50,
   mdape_city

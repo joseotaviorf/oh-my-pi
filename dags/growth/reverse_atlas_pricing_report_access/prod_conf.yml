@@ -13,10 +13,10 @@ tables:
   #   event_type: NEW_PRICING_REPORT_NEW_RENT_PRICE_PUBLISHED
   #   sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
   #   chunk_size: 1000
-  # new_pricing_report_engagement:
-  #   event_type: NEW_PRICING_REPORT_ENGAGEMENT
-  #   sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
-  #   chunk_size: 500
+  new_pricing_report_engagement:
+    event_type: NEW_PRICING_REPORT_ENGAGEMENT
+    sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
+    chunk_size: 500
 
 custom_cluster:
   driver_node_type_id: r5n.2xlarge
