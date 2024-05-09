@@ -1,0 +1,42 @@
+---
+database_name: datalake_superset
+table_name: lake_tables_usage
+owner: isadora.gallerani@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table contains the data lake tables used in a dataset from Superset.
+  The dataset id might be repeated because its query may use several lake tables.
+  Also, this table has an incremental load, so use the partition columns year, month and day for performance gains.
+columns:
+  id_dataset:
+    lineage:
+      - datalake_superset_clean.tables.id
+    description: Id of the dataset (called as table in Superset), but we decided to call id_dataset here so we won't
+      mix the concept with data lake tables. 
+  id_lake_table:
+    lineage:
+      - datalake_superset_clean.tables.sql_code
+    description: Id of the data lake layer, which is the table schema + table name.
+  dataset_name:
+    lineage:
+      - datalake_superset_clean.tables.table_name
+    description: Dataset name.
+  ts_created:
+    lineage:
+      - datalake_superset_clean.tables.ts_created
+    description: Timestamp of creation of the dataset.
+  ts_changed:
+    lineage:
+      - datalake_superset_clean.tables.ts_changed
+    description: Timestamp of update of the dataset.
+  year:
+    lineage:
+      - datalake_superset_clean.tables.year
+    description: The year of the query execution. Also, a partition of the table.
+  month:
+    lineage:
+      - datalake_superset_clean.tables.month
+    description: The month of the query execution. Also, a partition of the table.
+  day:
+    lineage:
+      - datalake_superset_clean.tables.day
+    description: The day of the query execution. Also, a partition of the table.

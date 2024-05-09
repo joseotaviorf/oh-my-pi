@@ -2645,6 +2645,7 @@ bietlejuice.enrich_ss_logic_model:
   - bietlejuice.enrich_user:load-enrich-persona-type
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_superset:
+  - bietlejuice.dag_inventory:load-clean-table
   - bietlejuice.superset_entities:load-clean-dashboard-slices
   - bietlejuice.superset_entities:load-clean-dashboard-user
   - bietlejuice.superset_entities:load-clean-dashboards

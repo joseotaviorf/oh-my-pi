@@ -4,8 +4,7 @@ dag:
   owner: Data Governance
   documentation: 
     dag_purpose: |
-        This DAG creates the full table for Superset entities.
-
+        This DAG creates the full tables for Superset entities, except for the lake_tables_usage table.
 workflow:
     type: query
     layer: enrich
@@ -22,6 +21,34 @@ workflow:
       - ab_user
       - table_columns
       - sql_metrics
+    tables_customization:
+      ab_user:
+        extraction_type: full
+      dashboards:
+        extraction_type: full
+      lake_tables_usage:
+        extraction_type: incremental
+        partitions:
+        - year
+        - month
+        - day
+      slices:
+        extraction_type: full
+      sql_metrics:
+        extraction_type: full
+      table_columns:
+        extraction_type: full
+      table_schema:
+        extraction_type: full
+      tables:
+        extraction_type: full
+      tag:
+        extraction_type: full
+      tagged_object:
+        extraction_type: full
+    extra_query_template_params:
+      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_12_2_min_general_cluster
   access_control_list:
