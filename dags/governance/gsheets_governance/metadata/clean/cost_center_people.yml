@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: cost_center_people
+
+columns:
+    work_email:
+        lineage:
+        - datalake_gsheets_raw.cost_center_people.work_email
+        description: Email do colaborador
+    cost_center:
+        lineage:
+        - datalake_gsheets_raw.cost_center_people.cost_center
+        description: Código do centro de custo

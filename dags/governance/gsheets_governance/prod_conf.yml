@@ -1,0 +1,18 @@
+sheets_info:
+  cost_center_person:
+    sheet_id: 1YGHjMziKwVv5qApGvDz2MZA_Mgik8mdA_mHixN7KWBg
+    sheet_name: cost_center_people
+    clean_table_name: cost_center_person
+    sheet_context: governance
+  
+  de_para_cc_diretoria:
+    sheet_id: 1YGHjMziKwVv5qApGvDz2MZA_Mgik8mdA_mHixN7KWBg
+    sheet_name: de_para_cc_diretoria
+    clean_table_name: cost_center_directory
+    sheet_context: governance
+
+  looker_users_history:
+    sheet_id: 1YGHjMziKwVv5qApGvDz2MZA_Mgik8mdA_mHixN7KWBg
+    sheet_name: looker
+    clean_table_name: looker_users_history
+    sheet_context: governance

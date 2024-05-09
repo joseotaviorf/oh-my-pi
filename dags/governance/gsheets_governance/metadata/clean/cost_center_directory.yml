@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: cost_center_directory
+
+columns:
+    cost_center:
+      lineage:
+        - datalake_gsheets_raw.de_para_cc_diretoria.cost_center
+      description: Código do centro de custo
+    line:
+      lineage:
+        - datalake_gsheets_raw.de_para_cc_diretoria.linha_normalizada
+      description: Linha quinto andar
