@@ -2,8 +2,8 @@
 partition_cols: [year, month, day]
 
 custom_cluster:
-  driver_node_type_id: r5.xlarge
-  node_type_id: r5.xlarge
+  driver_node_type_id: r5a.xlarge
+  node_type_id: r5a.xlarge
   num_workers: 2
 
 lineage_product_database_name: terminator

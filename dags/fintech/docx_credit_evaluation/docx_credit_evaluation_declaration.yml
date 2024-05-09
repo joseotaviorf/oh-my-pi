@@ -21,5 +21,5 @@ cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: m5a.xlarge
-    node_type_id: m4.2xlarge
+    node_type_id: m5a.2xlarge
     num_workers: 4

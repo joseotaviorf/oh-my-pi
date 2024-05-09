@@ -25,8 +25,8 @@ workflow:
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: m4.xlarge
-    node_type_id: m4.2xlarge
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.2xlarge
     autoscale:
       min_workers: 1
       max_workers: 3

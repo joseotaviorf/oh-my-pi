@@ -166,7 +166,7 @@
                 "value": "{{ dag.dag_id }}"
             }
         ],
-        "driver_node_type_id": "m4.xlarge",
+        "driver_node_type_id": "m5a.xlarge",
         "enable_elastic_disk": "true",
         "init_scripts": [
             {
@@ -176,7 +176,7 @@
                 }
             }
         ],
-        "node_type_id": "m4.xlarge",
+        "node_type_id": "m5a.xlarge",
         "num_workers": 1,
         "spark_conf": {
             "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
@@ -551,7 +551,7 @@
                 "value": "databricks"
             }
         ],
-        "driver_node_type_id": "m5.xlarge",
+        "driver_node_type_id": "m5a.xlarge",
         "enable_elastic_disk": true,
         "init_scripts": [
             {
@@ -561,7 +561,7 @@
                 }
             }
         ],
-        "node_type_id": "m5.xlarge",
+        "node_type_id": "m5a.xlarge",
         "num_workers": 1,
         "spark_conf": {
             "spark.executor.allowSparkContext": "true",
@@ -846,7 +846,7 @@
                 "value": "{{ dag.dag_id }}"
             }
         ],
-        "driver_node_type_id": "c5.4xlarge",
+        "driver_node_type_id": "c5a.4xlarge",
         "enable_elastic_disk": "true",
         "init_scripts": [
             {
@@ -856,7 +856,7 @@
                 }
             }
         ],
-        "node_type_id": "m5.2xlarge",
+        "node_type_id": "m5a.2xlarge",
         "num_workers": 6,
         "spark_conf": {
             "spark.cernSparkPlugin.cloudFsName": "s3a",
