@@ -1,5 +1,3 @@
-CREATE OR REPLACE TEMPORARY VIEW retsuko_invoice_issuance AS
-
 WITH grouped_adm_fee AS (
     SELECT *, 
         IF(bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'), 'adm-fee', bill_item) AS bill_item_grouped
