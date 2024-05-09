@@ -189,7 +189,11 @@ SELECT
     IF(reference_date=max_date_between_business_days, TRUE, FALSE) AS is_last_business_days,
     dt_contract_annulled,
     contract_due_date_min AS dt_contract_due_date_min,
-    dt_paid AS dt_invoice_paid,
+    CASE
+        WHEN dt_paid BETWEEN month_start AND reference_date
+            AND dt_paid > dt_due_adjusted
+        THEN dt_paid
+    END AS dt_invoice_paid,
     dt_due AS dt_invoice_due,
     dt_due_adjusted AS dt_invoice_due_adjust,
     month_start AS dt_month_start,
