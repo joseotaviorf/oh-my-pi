@@ -4,7 +4,7 @@ manual_costs AS (
     REPLACE(dt_cost, '-', '')::INT AS id_date,
     'manual' AS flow_type,
     CAST(NULL AS STRING)  AS origin,
-    campaign_business_context AS business_context,
+    CAST(NULL AS STRING) AS business_context,
     account_name,
     campaign_name,
     campaign_name AS utm_campaign,
@@ -32,7 +32,7 @@ manual_costs_share_rules AS (
     REPLACE(dt_cost, '-', '')::INT AS id_date,
     'manual' AS flow_type,
     CAST(NULL AS STRING) AS origin,
-    s.campaign_business_context AS business_context,
+    CAST(NULL AS STRING) AS business_context,
     s.account_name,
     s.campaign_name,
     s.campaign_name AS utm_campaign,
@@ -54,7 +54,7 @@ manual_costs_share_rules AS (
         datalake_growth_costs_sharing_rules.sharing_rules AS r 
             ON INT(REPLACE(dt_cost, '-', '')) = r.id_date
             AND s.id_rule = r.id_rule
-            AND s.funnel_side = r.funnel_side
+            AND LOWER(s.funnel_side) = LOWER(r.funnel_side)
     WHERE
         DATE(dt_cost) >= DATE('2021-01-01') -- manual costs from before this date are included in historical partition
         AND s.cost::FLOAT * r.share != 0

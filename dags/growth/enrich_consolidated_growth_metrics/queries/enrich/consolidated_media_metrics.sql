@@ -173,7 +173,7 @@ SELECT DISTINCT
     cs.id_date,
     'BR' AS country_code,
     cs.origin,
-    COALESCE(sr_utm.business_context, sr.business_context, ctd.campaign_business_context, SPLIT(cs.campaign_name, '[.]')[1]) AS business_context,
+    COALESCE(sr_utm.business_context, sr.business_context) AS business_context,
     cs.account_name,
     cs.campaign_name,
     COALESCE(ctd.campaign_name_convention, ARRAY_JOIN(SLICE(SPLIT(cs.campaign_name,'[.]'), 2, 7), '.')) AS campaign_name_convention_media_setup,
