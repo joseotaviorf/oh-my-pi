@@ -9,7 +9,25 @@ DATABASE_SKIP_LIST:
   - bureaus
   - data_platform_metrics
   - data_listings
+  - datalake_convenia_clean
+  - datalake_convenia_raw
+  - datalake_convenia_dependents_clean
+  - datalake_convenia_dependents_raw
+  - datalake_convenia_details_clean
+  - datalake_convenia_details_raw
+  - datalake_gsheets_people_clean
+  - datalake_gsheets_people_raw
+  - datalake_hr_system
+  - datalake_hr_system_clean
+  - datalake_hr_system_raw
+  - datalake_hr_system_custom_clean
+  - datalake_hr_system_custom_raw
+  - datalake_people
+  - datalake_people_analytics_sandbox
+  - datalake_people_temp
   - datalake_static_files_raw
+  - datalake_workable_clean
+  - datalake_workable_raw
   - default
   - diogodourado
   - ds4a
