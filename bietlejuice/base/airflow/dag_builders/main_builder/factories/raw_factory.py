@@ -4,6 +4,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.base_factory i
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_database_pull_delta_workflow import (
+    RawDatabasePullDeltaWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_gsheets_workflow import (
     RawGsheetsWorkflow,
 )
@@ -33,6 +36,7 @@ class RawFactory(BaseFactory):
         WorkflowEnum.DATABASE_PULL_WORKFLOW: RawDatabasePullWorkflow,
         WorkflowEnum.CUSTOM_INGESTION_WORKFLOW: RawCustomIngestionWorkflow,
         WorkflowEnum.CDC_WORKFLOW: RawCDCWorkflow,
+        WorkflowEnum.DATABASE_PULL_DELTA_WORKFLOW: RawDatabasePullDeltaWorkflow,
     }
 
     def __init__(self, dag_conf: dict, workflow_conf: dict, cluster_conf: dict):

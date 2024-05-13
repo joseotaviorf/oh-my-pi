@@ -39,7 +39,7 @@ class GeneratePostgresTableMetricsTaskCreator(BaseTaskCreator):
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         dbutils_secret_key = self.dag_execution_context.workflow_args.get(
             "dbutils_secret_key",
-            f"{self.dag_execution_context.workflow_args.get('custom_schema').upper()}_DB",
+            f"{self.dag_execution_context.workflow_args.get('custom_schema')}_DB".upper(),
         )
         db_schema = self.dag_execution_context.workflow_args.get("db_schema", "public")
         table_metrics = self._get_table_metrics()
