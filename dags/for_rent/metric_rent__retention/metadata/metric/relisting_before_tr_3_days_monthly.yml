@@ -5,7 +5,7 @@ description: Monthly percentage of relisting that happened before the third day 
 domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
 columns:
-  relisting_month:
+  dt_relisting_month:
     lineage:
       - dw_rent.dim_house_listing.ts_publication
     description: "Month of the relisting."
@@ -32,6 +32,17 @@ columns:
       hierarchy: User analysis
       approved_by: camila.simoes@quintoandar.com.br
       link_to_metric: ""
+  tr_with_rl_matured_3_days:
+    description: "Matured volume of relistings considering only 3 days matured after the house's rent contract termination."
+    metric:
+      name: Matured Total Relistings Before The Third Day After Contract Termination - Monthly
+      description: "Matured volume of relistings happened considering only 3 days matured after the house's rent contract termination on the month reference date."
+      acronym: MLBTR3D
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
   relistings:
     description: "Total volume of relistings after contract termination."
     metric:
@@ -43,6 +54,17 @@ columns:
       hierarchy: User analysis
       approved_by: camila.simoes@quintoandar.com.br
       link_to_metric: ""
+  relistings_matured_3d:
+    description: "Total volume of relistings considering only 3 days matured after contract termination."
+    metric:
+      name: Matured Total Relistings After Contract Termination 3 Days - Monthly
+      description: "Total volume of relistings after contract termination on the month reference date."
+      acronym: MRL_3D
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
   pct_tr_with_rl_3_days:
     description: "Percentage of relistings happened before the third day after the house's rent contract termination."
     metric:
@@ -53,4 +75,15 @@ columns:
       business_stage: Demand
       hierarchy: User analysis
       approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  pct_tr_with_rl_matured_3_days:
+    description: "Matured percentage of relistings considering only 3 days matured after the house's rent contract termination."
+    metric:
+      name: Matured Percentage Of Relistings Before The Third Day After Contract Termination - Monthly
+      description: "Percentage of relistings happened in less than 3 days after the house's rent contract termination on the month reference date."
+      acronym: MPCTRLBTR3D
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
