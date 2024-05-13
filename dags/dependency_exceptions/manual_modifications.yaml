@@ -384,10 +384,7 @@ bietlejuice.enrich_supply_taxonomy:
     - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
     - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
 bietlejuice.enrich_supply_tracking:
-  add:
-    - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
-    - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
-    - bietlejuice.enrich_supply_taxonomy:load-enrich-conversion-taxonomy
+  override: []
 bietlejuice.enrich_growth_taxonomy:
   remove:
     - bietlejuice.ebdb:load-clean-visit-origin
