@@ -52,7 +52,10 @@ columns:
   sk_agent:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_agent
-    description: Id of the agent.
+    description: Id of the user that is the agent. Notice that it's not the id_agent, but the id_user of the agent
+      (which comes from the EBDB's User table, column id), which is still the same person in our database.
+      This was necessary in order to join with the fact_listing_rent_flows model, which already uses the agent's user id on the column sk_user_agent.
+      If joining with dim_user, it's a directly join with the sk_user column.
   sk_rent_flow:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_rent_flow

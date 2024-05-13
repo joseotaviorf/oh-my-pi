@@ -60,9 +60,10 @@ columns:
     description: "Id of the property."
   id_agent:
     lineage:
-      - datalake_booking.booking.id_agent
       - datalake_ebdb_rent_flow.rent_flow.id_user_agent
-    description: "Id of the agent."
+    description: "Id of the user that is the agent. Notice that it's not the id_agent, but the id_user of the agent
+      (which comes from the EBDB's User table, column id). This was necessary in order to join with the fact_listing_rent_flows model,
+      which already uses the agent's user id."
   id_rent_flow:
     lineage:
       - datalake_booking.booking.id_rent_flow
