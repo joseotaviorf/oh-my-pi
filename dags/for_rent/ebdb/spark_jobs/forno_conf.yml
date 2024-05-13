@@ -367,8 +367,6 @@ table_block_list:
   - AccessType_AUD
   - CondicoesEntrada
   - CondoManager
-  - CondoManagerEmails
-  - CondoManagerPhones
   - Condominio
   - ContatoCondominio
   - DoormanAffiliateData
