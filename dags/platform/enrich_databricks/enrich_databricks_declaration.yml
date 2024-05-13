@@ -17,3 +17,6 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, tomorrow_ds, 'load_end_date') }}"
 cluster:
   type: databricks_12_2_med_general_cluster
+  custom_configurations:
+    driver_node_type_id: m-fleet.xlarge
+    node_type_id: m-fleet.xlarge
