@@ -128,6 +128,7 @@ sap_entity AS (
     WHERE 
         id_finance_entity IS NOT NULL
         AND id_sap_gateway_feature IS NOT NULL
+        AND event = 'clearing-accounting-entries'
     QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
 ),
 
@@ -149,7 +150,7 @@ df AS (
         retsuko_reversao r 
     LEFT JOIN
         sap_entity se 
-            ON r.id_invoice = se.id_finance_entity AND se.event = 'clearing-accounting-entries'
+            ON r.id_invoice = se.id_finance_entity 
 ),
 
 sap_gateway AS (
@@ -172,7 +173,6 @@ sap AS (
     SELECT 
         hash,
         id_finance_entity,
-        id_finance_entity_entry,
         account_number,
         SUM(debit_credit) as debit_credit,
         DATE(dt_created) AS dt_sap_created,
@@ -182,7 +182,8 @@ sap AS (
     WHERE 
         account_number like '31101%'
         AND document_number like 'JE %'
-    GROUP BY 1,2,3,4,6,7
+    GROUP BY 
+        1, 2, 3, 5, 6
 ),
 
 df_final AS (
