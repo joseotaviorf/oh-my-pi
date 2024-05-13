@@ -6,6 +6,7 @@ WITH dag_run_base AS (
         dr.is_first_run_ever,
         dr.is_triggered_by_mediator,
         dr.is_first_execution_inside_sla,
+        ROW_NUMBER() OVER(PARTITION BY id_dag ORDER BY ts_run) AS rn,
         DATE(dr.ts_run) AS dt_run
     FROM
         datalake_pipeline.dag_run AS dr
@@ -102,6 +103,7 @@ ignoring_list AS (
         dag_run_base
     WHERE 
         is_first_execution_inside_sla IS NULL
+        AND rn = 1 
 ),
 totals_base AS (
     SELECT
