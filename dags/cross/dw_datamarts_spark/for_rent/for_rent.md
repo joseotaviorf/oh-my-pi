@@ -16,8 +16,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
 - `datamart_cohort_rentals`
-- `datamart_kpi_weekly`
-- `datamart_opportunity`
 - `house_weekly_available_hours`
 - `ongoing_listed_suspended_listings`
 - `repressed_demand`

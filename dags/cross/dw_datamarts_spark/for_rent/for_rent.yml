@@ -11,7 +11,6 @@
 
 for_rent:
   datamart_cohort_rentals: {}
-  datamart_kpi_weekly: {}
   house_weekly_available_hours: {}
   ongoing_listed_suspended_listings: {}
   repressed_demand: {}
