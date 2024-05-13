@@ -4,9 +4,9 @@ dag:
     owner: Data SS
     documentation: 
         dag_purpose: |
-          Extract relevant fields from greenseer memory json and add relevant business rules to reduce the analysis.
+            Extract relevant fields from greenseer memory json and add relevant business rules to reduce the analysis.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
 cluster:
-    type: databricks_10_4_med_memory_photon_cluster
+    type: databricks_12_2_med_memory_photon_cluster
