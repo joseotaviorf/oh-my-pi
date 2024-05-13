@@ -125,7 +125,7 @@ get_last_valid_partner AS (
     partner
   FROM add_all_dimensions
   WHERE dt_reference BETWEEN DATE_ADD(max_dt_invoice_paid,-1) AND max_dt_invoice_paid
-  AND partner IS NULL OR partner != "DBAIXAS" -- ignore DBAIXAS, because it references to the paid invoices, and we want the last valid partner before the invoice payment.
+  AND partner IS NULL OR partner NOT IN ("DBAIXAS", "DCARGA") -- ignore DBAIXAS, because it references to the paid invoices, and we want the last valid partner before the invoice payment.
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) = 1
 )
 SELECT
