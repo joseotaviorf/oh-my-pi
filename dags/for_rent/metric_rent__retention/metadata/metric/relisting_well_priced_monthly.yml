@@ -15,6 +15,28 @@ columns:
       - dw_rent.dim_house_listing.country_code
     description: "Country code of the house."
     dimension: True
+  qtd_well_priced:
+    description: "Monthly volume of relistings well priced, this is, relisting that does not have rent value above p_90 from the calculator."
+    metric:
+      name: Total Relistings Well Priced
+      description: "Monthly volume of listings well priced, this is, listing that does not have rent value above p_90 from the calculator."
+      acronym: MTRLWP
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  total_listings:
+    description: "Monthly Volume of listings with certainty = MEDIUM or HIGH"
+    metric:
+      name: Monthly Total Listings Well Priced
+      description: "Monthly Volume of listings with certainty = MEDIUM or HIGH"
+      acronym: MTLWP
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
   pct_well_priced:
     description: "Percentage of well priced listings after publication."
     metric:
@@ -22,6 +44,28 @@ columns:
       description: "Percentage of well priced listings after publication."
       acronym: PWP
       is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_well_priced_4w:
+    description: "Monthly volume of relistings well priced 4 weeks after publication, this is, relisting that does not have rent value above p_90 from the calculator."
+    metric:
+      name: Monthly Total Relistings Well Priced in 4W
+      description: "Monthly volume of listings well priced 4 weeks after publication, this is, listing that does not have rent value above p_90 from the calculator."
+      acronym: MTRLWP_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  total_listings_4w:
+    description: "Monthly volume of listings 4 weeks after publicationwith certainty = MEDIUM or HIGH"
+    metric:
+      name: Monthly Total Listings Well Priced in 4W
+      description: "Monthly volume of listings 4 weeks after publication with certainty = MEDIUM or HIGH"
+      acronym: MTLWP_4W
+      is_additive: True
       business_stage: Demand
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br

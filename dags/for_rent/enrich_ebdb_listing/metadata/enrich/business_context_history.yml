@@ -10,6 +10,10 @@ columns:
     lineage:
     - datalake_ebdb_clean.listing_business_context_aud.id_house
     description: Id of the house
+  id_user_modified_by:
+    lineage:
+    - datalake_ebdb_clean.user_revision_entity.id_user
+    description: Id of the user that made the modification.
   rev:
     lineage:
     - datalake_ebdb_clean.listing_business_context_aud.rev

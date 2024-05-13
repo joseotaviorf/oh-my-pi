@@ -16,21 +16,6 @@ ed_ended_rentals AS (
         dhl.ts_early_demand_started IS NOT NULL
         AND dc.status = 'Finalizado'
 ), 
-rev_base AS (
-    SELECT
-        r.id_house,
-        r.rev,
-        FROM_UNIXTIME(ure.ts_revision/1000) AS ts_revision,
-        r.p_90,
-        r.certainty
-    FROM
-        datalake_ebdb_clean.house_predicted_price_aud AS r
-    JOIN
-        datalake_ebdb_clean.user_revision_entity AS ure
-            ON ure.id = r.rev
-    WHERE
-        r.business_context = 'RENT'
-), 
 pub_rev_base AS ( -- Last calculator revision before listing publication - Not Early Demand
     select
         dhl.sk_house_listing,
@@ -38,9 +23,9 @@ pub_rev_base AS ( -- Last calculator revision before listing publication - Not E
     FROM
         dw_rent.dim_house_listing AS dhl
     LEFT JOIN
-        rev_base AS r
+        datalake_ebdb_pricing.rent_percentile_price_changes AS r
             ON r.id_house = dhl.id_house
-              AND DATE(r.ts_revision) <= DATE(dhl.ts_listing_version_start)
+              AND DATE(r.ts_price_started) <= DATE(dhl.ts_listing_version_start)
     WHERE
         dhl.ts_early_demand_started IS NULL
     GROUP BY
@@ -53,9 +38,9 @@ four_week_rev_base AS ( -- Last calculator revision 4 weeks after listing public
     FROM
         dw_rent.dim_house_listing AS dhl
     LEFT JOIN
-        rev_base AS r
+        datalake_ebdb_pricing.rent_percentile_price_changes AS r
             ON r.id_house = dhl.id_house
-              AND DATE(r.ts_revision) <= DATEADD(WEEK, 4, dhl.ts_listing_version_start)
+              AND DATE(r.ts_price_started) <= DATEADD(WEEK, 4, dhl.ts_listing_version_start)
     WHERE
         dhl.ts_early_demand_started IS NULL
     GROUP BY
@@ -68,11 +53,21 @@ ed_four_week_rev_base AS ( -- Last calculator revision 4 weeks after ended renta
     FROM
         ed_ended_rentals AS erc
     LEFT JOIN
-        rev_base AS r
+        datalake_ebdb_pricing.rent_percentile_price_changes AS r
             ON r.id_house = erc.id_house
-              AND DATE(r.ts_revision) <= DATE(DATEADD(WEEK, 4, erc.dt_erc))
+              AND DATE(r.ts_price_started) <= DATE(DATEADD(WEEK, 4, erc.dt_erc))
     GROUP BY
       1
+),
+houses_to_exclude AS (
+  SELECT DISTINCT
+    id_house
+  FROM
+    datalake_ebdb_listing.business_context_history
+  WHERE
+    id_user_modified_by = 2879298
+    AND DATE(ts_state_started) BETWEEN DATE('2024-03-15') AND DATE('2024-03-16') 
+    AND status = 'PUBLISHED'
 ),
 db AS (
   SELECT DISTINCT
@@ -80,6 +75,11 @@ db AS (
       hl.country_code,
       hl.listing_category_start,
       aud.certainty,
+      CASE
+          WHEN hl.rent < 1500 THEN 'LOW'
+          WHEN hl.rent < 2500 THEN 'MEDIUM'
+          ELSE 'HIGH'
+      END AS value_segment,
       IF(
         hldi.rent > aud.p_90
         , TRUE
@@ -138,46 +138,34 @@ db AS (
           ON prb.sk_house_listing = hl.sk_house_listing
   LEFT JOIN
       four_week_rev_base AS fwrb
-          ON fwrb.sk_house_listing = hl.sk_house_listing        
+          ON fwrb.sk_house_listing = hl.sk_house_listing
   LEFT JOIN
-      datalake_ebdb_clean.house_predicted_price_aud AS aud
+      datalake_ebdb_pricing.rent_percentile_price_changes AS aud
           ON aud.rev = prb.rev
-            AND aud.business_context = 'RENT'
   LEFT JOIN
-      datalake_ebdb_clean.house_predicted_price_aud AS aud_fw
+      datalake_ebdb_pricing.rent_percentile_price_changes AS aud_fw
           ON aud_fw.rev = fwrb.rev
-            AND aud_fw.business_context = 'RENT'
   LEFT JOIN
       ed_four_week_rev_base AS edfwrb
           ON edfwrb.ed_sk_house_listing = hl.sk_house_listing        
   LEFT JOIN
-      datalake_ebdb_clean.house_predicted_price_aud AS aud_fw_ed
+      datalake_ebdb_pricing.rent_percentile_price_changes AS aud_fw_ed
           ON aud_fw_ed.rev = edfwrb.rev
-            AND aud_fw_ed.business_context = 'RENT'
+  LEFT JOIN
+      houses_to_exclude AS hte
+          ON hl.id_house = hte.id_house
   WHERE
-      hl.id_house NOT IN (
-        SELECT DISTINCT
-          aud.id_house
-        FROM
-          datalake_ebdb_clean.listing_business_context_aud AS aud
-        INNER JOIN
-          datalake_ebdb_user.user_revision_entity AS r
-            ON r.id = aud.rev
-              AND r.id_user = 2879298
-              AND DATE(r.ts_revision) BETWEEN DATE('2024-03-15') AND DATE('2024-03-16') 
-        WHERE
-          mod_status = '1'
-          AND status = 'PUBLISHED'
-      )
+      hte.id_house IS NULL
   GROUP BY 
-    1,2,3,4,5,6,7
-)
+    1,2,3,4,5,6,7,8
+),
 
-SELECT 
+base_calculations AS (
+  SELECT 
     dt_week_reference,
     country_code,
-    CAST(
-      SUM(
+    value_segment,
+    SUM(
         IF(
           is_mispriced_p90 = FALSE 
           AND (certainty = 'MEDIUM' OR certainty = 'HIGH') 
@@ -185,9 +173,7 @@ SELECT
           , listings
           , 0
         )
-      ) AS DOUBLE 
-    ) 
-    / 
+      ) AS qtd_well_priced,
     SUM(
       IF( 
         (certainty = 'MEDIUM' OR certainty = 'HIGH') 
@@ -195,9 +181,8 @@ SELECT
         , listings
         , 0
       )
-    ) * 1.0 AS pct_well_priced,
-    CAST(
-      SUM(
+    ) AS total_listings,
+    SUM(
         IF( 
           is_mispriced_4w_p90 = FALSE 
           AND (certainty_4w = 'MEDIUM' OR certainty_4w = 'HIGH') 
@@ -205,9 +190,7 @@ SELECT
           , listings
           , 0
         )
-      ) AS DOUBLE 
-    ) 
-    / 
+      ) AS qtd_well_priced_4w,
     SUM(
       IF( 
         (certainty_4w = 'MEDIUM' OR certainty_4w = 'HIGH') 
@@ -215,8 +198,39 @@ SELECT
         , listings
         , 0
       )
-    ) * 1.0 AS pct_well_priced_4w
+    ) AS total_listings_4w
 FROM 
     db
 GROUP BY 
-    1, 2
+    1, 2, 3
+)
+
+SELECT 
+    dt_week_reference,
+    country_code,
+    value_segment,
+    qtd_well_priced,
+    total_listings,
+    qtd_well_priced / total_listings AS pct_well_priced,
+    qtd_well_priced_4w,
+    total_listings_4w,  
+    qtd_well_priced_4w / total_listings_4w AS pct_well_priced_4w
+FROM
+    base_calculations
+
+UNION ALL
+
+SELECT 
+    dt_week_reference,
+    country_code,
+    'OVERALL' AS value_segment,
+    SUM(qtd_well_priced) AS qtd_well_priced,
+    SUM(total_listings) AS total_listings,
+    SUM(qtd_well_priced) / SUM(total_listings) AS pct_well_priced,
+    SUM(qtd_well_priced_4w) AS qtd_well_priced_4w,
+    SUM(total_listings_4w) AS total_listings_4w,
+    SUM(qtd_well_priced_4w) / SUM(total_listings_4w) AS pct_well_priced_4w
+FROM
+    base_calculations
+GROUP BY
+    1,2,3

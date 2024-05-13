@@ -10,6 +10,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.id_house
     description: Foreign key referring to the house ID.
+  rev:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.rev
+    description: Unique ID for the change. It can be joined with table datalake_ebdb_user.user_revision_entity using the column id to get more details.
   p_10: 
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_10

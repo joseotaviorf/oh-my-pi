@@ -1,6 +1,7 @@
 WITH percentile_price AS (
   SELECT
     aud.id_house,
+    aud.rev,
     aud.p_10,
     aud.p_20,
     aud.p_30,
@@ -34,6 +35,7 @@ WITH percentile_price AS (
 
 SELECT
   id_house,
+  rev,
   p_10,
   p_20,
   p_30,

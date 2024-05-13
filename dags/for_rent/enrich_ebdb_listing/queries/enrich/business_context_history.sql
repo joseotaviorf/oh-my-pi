@@ -1,6 +1,7 @@
 WITH lbc_aud AS (
     SELECT
       i.id_house,
+      rev.id_user AS id_user_modified_by,
       COALESCE(i.business_context, 'Undefined') AS business_context,
       LAG(i.status) OVER(PARTITION BY i.id_house, i.business_context ORDER BY i.rev) AS previous_status, -- previous status ordered by the datetime that happened
       i.status,
@@ -20,6 +21,7 @@ WITH lbc_aud AS (
 lbc_history AS (
     SELECT
         id_house,
+        id_user_modified_by,
         business_context,
         rev,
         revision_time,
@@ -47,6 +49,7 @@ lbc_history AS (
 )
 SELECT 
     lbch.id_house,
+    lbch.id_user_modified_by,
     lbch.rev,
     COALESCE(ch.country_code, 'Undefined') AS country_code,
     lbch.business_context,
