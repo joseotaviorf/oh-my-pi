@@ -203,7 +203,8 @@ dataset AS (
     bd.country_code,
     bd.rent_segment,
     bd_aux.status_1w,
-    SUM(bd.erc) AS erc
+    SUM(bd.erc) AS erc,
+    SUM(IF(bd.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -7), bd.erc, NULL)) AS erc_matured_1w
   FROM
     bd
   LEFT JOIN
@@ -222,11 +223,12 @@ SELECT
       AND dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -7)
       , erc, 0)) AS unp_susp_matured_1w,
   SUM(erc) AS ended_rentals,
+  SUM(erc_matured_1w) AS ended_rentals_matured_1w,
   CAST(SUM(IF(status_1w IN ('despublicado','suspenso'), erc, 0)) AS DOUBLE) / SUM(erc) AS erc2unp_susp_1w,
   CAST(SUM(IF(
       status_1w IN ('despublicado','suspenso')
       AND dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -7)
-      , erc, 0)) AS DOUBLE) / SUM(erc) AS erc2unp_susp_matured_1w
+      , erc, 0)) AS DOUBLE) / SUM(erc_matured_1w) AS erc2unp_susp_matured_1w
 FROM 
   dataset
 GROUP BY 
@@ -244,11 +246,12 @@ SELECT
       AND dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -7)
       , erc, 0)) AS unp_susp_matured_1w,
   SUM(erc) AS ended_rentals,
+  SUM(erc_matured_1w) AS ended_rentals_matured_1w,
   CAST(SUM(IF(status_1w IN ('despublicado','suspenso'), erc, 0)) AS DOUBLE) / SUM(erc) AS erc2unp_susp_1w,
   CAST(SUM(IF(
       status_1w IN ('despublicado','suspenso')
       AND dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -7)
-      , erc, 0)) AS DOUBLE) / SUM(erc) AS erc2unp_susp_matured_1w
+      , erc, 0)) AS DOUBLE) / SUM(erc_matured_1w) AS erc2unp_susp_matured_1w
 FROM 
   dataset
 GROUP BY 
