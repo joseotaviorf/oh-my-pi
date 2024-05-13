@@ -8,7 +8,10 @@ SELECT
     current_item_issue_type_id AS id_current_item_issue_type,
     item_group_status,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_inspections_raw.item_group_state
 WHERE

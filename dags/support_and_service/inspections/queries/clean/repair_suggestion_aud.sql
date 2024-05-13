@@ -14,7 +14,10 @@ SELECT
     created_at_mod AS mod_ts_created,
     updated_at_mod AS mod_ts_updated,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_inspections_raw.repair_suggestion
 WHERE

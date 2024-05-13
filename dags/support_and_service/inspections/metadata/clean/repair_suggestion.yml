@@ -45,3 +45,15 @@ columns:
       - datalake_inspections_raw.repair_suggestion.updated_at
     description: 
       Update date in timestamp format.
+  year:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.day
+    description: Day of update date.
