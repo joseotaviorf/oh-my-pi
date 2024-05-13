@@ -351,6 +351,17 @@ table_block_list:
   - DocumentoProposta
   - PropostaProponente
   - PropostaProponente_AUD
+  - DynamicPricingHouse
+  - DynamicPricingHouse_AUD
+  - DynamicPricingParameters
+  - DynamicPricingParameters_AUD
+  - ListingBusinessContext
+  - ListingBusinessContext_AUD
+  - ListingInfo
+  - ListingRentModel
+  - ListingRentModel_AUD
+  - ListingSaleModel
+  - ListingSaleModel_AUD
   - AccessAuthorizationType
   - AccessType
   - AccessType_AUD

@@ -650,16 +650,16 @@ bietlejuice.enrich_sale_listings:
   remove:
     - bietlejuice.ebdb:load-clean-house
     - bietlejuice.ebdb:load-clean-house-aud
-    - bietlejuice.ebdb:load-clean-listing-business-context
-    - bietlejuice.ebdb:load-clean-listing-business-context-aud
+    - bietlejuice.ebdb_listing:load-clean-listing-business-context
+    - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
     - bietlejuice.ebdb_user:load-clean-user-revision-entity
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract
 bietlejuice.enrich_sale_listings_lenses:
   add:
-    - bietlejuice.ebdb:load-clean-listing-sale-model
+    - bietlejuice.ebdb_listing:load-clean-listing-sale-model
   remove:
     - bietlejuice.ebdb:load-clean-house
-    - bietlejuice.ebdb:load-clean-listing-sale-model-aud
+    - bietlejuice.ebdb_listing:load-clean-listing-sale-model-aud
     - bietlejuice.ebdb_user:load-clean-user-revision-entity
     - bietlejuice.enrich_ebdb_listing:load-enrich-house
     - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
@@ -920,7 +920,7 @@ wonka.user_embeddings_main:
 
 wonka.house_listing_business_context:
   add:
-    - bietlejuice.ebdb:load-clean-listing-business-context-aud
+    - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
     - bietlejuice.ebdb_user:load-clean-user-revision-entity
 
 quintoml.recs.house_user_embeddings_quintoml.inference:

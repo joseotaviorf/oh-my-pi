@@ -1,0 +1,39 @@
+dag:
+  name: ebdb_listing
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 45 21 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to Listing into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  tables_customization:
+    DynamicPricingHouse:
+      clean_table_name: dynamic_pricing_house
+    DynamicPricingHouse_AUD:
+      clean_table_name: dynamic_pricing_house_aud
+    DynamicPricingParameters:
+      clean_table_name: dynamic_pricing_parameters
+    DynamicPricingParameters_AUD:
+      clean_table_name: dynamic_pricing_parameters_aud
+    ListingBusinessContext:
+      clean_table_name: listing_business_context
+    ListingBusinessContext_AUD:
+      clean_table_name: listing_business_context_aud
+    ListingInfo:
+      clean_table_name: listing_info
+    ListingRentModel:
+      clean_table_name: listing_rent_model
+    ListingRentModel_AUD:
+      clean_table_name: listing_rent_model_aud
+    ListingSaleModel:
+      clean_table_name: listing_sale_model
+    ListingSaleModel_AUD:
+      clean_table_name: listing_sale_model_aud
+cluster:
+  type: databricks_12_2_med_general_cluster
