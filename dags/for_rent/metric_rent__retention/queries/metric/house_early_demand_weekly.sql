@@ -75,6 +75,7 @@ SELECT
       )
     ) AS qtd_houses_early_relisting_matured_2w,
     COUNT(DISTINCT fct_or.sk_house) AS qtd_terminations,
+    COUNT(DISTINCT IF(dc.ts_termination_requested <= DATE_ADD(CURRENT_DATE, -14), fct_or.sk_house, NULL)) AS qtd_terminations_matured_2w,
     CAST(
       COUNT(DISTINCT 
         IF(
