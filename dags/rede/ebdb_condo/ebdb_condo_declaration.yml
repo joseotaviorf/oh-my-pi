@@ -1,0 +1,40 @@
+
+dag:
+  name: ebdb_condo
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 45 21 * * *
+  owner: Data Rede
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to Condo into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  tables_customization:
+    AccessAuthorizationType:
+      clean_table_name: access_authorization_type
+    AccessType:
+      clean_table_name: access_type
+    AccessType_AUD:
+      clean_table_name: access_type_aud
+    CondicoesEntrada:
+      clean_table_name: entrance_conditions
+    CondoManager:
+      clean_table_name: condo_manager
+    CondoManagerEmails:
+      clean_table_name: condo_manager_emails
+      raw_primary_keys: 
+        - id
+    CondoManagerPhones:
+      clean_table_name: condo_manager_phones
+      raw_primary_keys: 
+        - id
+    Condominio:
+      clean_table_name: condo
+    ContatoCondominio:
+      clean_table_name: condo_contact
+cluster:
+  type: databricks_12_2_med_general_cluster

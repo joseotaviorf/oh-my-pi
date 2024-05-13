@@ -770,8 +770,8 @@ bietlejuice.enrich_vespucio:
 bietlejuice.enrich_vespucio_pipeline:
   add:
     - bietlejuice.ebdb:load-clean-amenities
-    - bietlejuice.ebdb:load-clean-condo
-    - bietlejuice.ebdb:load-clean-condo-contact
+    - bietlejuice.ebdb_condo:load-clean-condo
+    - bietlejuice.ebdb_condo:load-clean-condo-contact
     - bietlejuice.ebdb:load-clean-country
     - bietlejuice.ebdb:load-clean-house
     - bietlejuice.ebdb:load-clean-info-amenities

@@ -1,0 +1,34 @@
+---
+database_name: datalake_ebdb_clean
+table_name: entrance_conditions
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.imovel_id
+  key_location:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.keyLocation
+  key_location_details:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.keyLocationDetails
+  is_key_in_concierge:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.chavesNaPortaria
+  is_visit_available:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.disponivelVistoria
+  is_landlord_monitor_inspection:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.proprietarioAcompanhaVistoria
+  is_key_with_contract:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.chavesComContrato
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.CondicoesEntrada.atualizadoEm

@@ -528,10 +528,10 @@ bietlejuice.dw_lead:
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
   - bietlejuice.enrich_wololo:load-enrich-lead-sales-company
 bietlejuice.dw_listing:
-  - bietlejuice.ebdb:load-clean-condo
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
+  - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -1523,10 +1523,6 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-company-product
   - bietlejuice.company:load-clean-product
-  - bietlejuice.ebdb:load-clean-access-authorization-type
-  - bietlejuice.ebdb:load-clean-access-type
-  - bietlejuice.ebdb:load-clean-access-type-aud
-  - bietlejuice.ebdb:load-clean-condo
   - bietlejuice.ebdb:load-clean-dynamic-pricing-house
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-house-agent-aud
@@ -1552,6 +1548,10 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned-aud
   - bietlejuice.ebdb_administration:load-clean-property-fee-aud
+  - bietlejuice.ebdb_condo:load-clean-access-authorization-type
+  - bietlejuice.ebdb_condo:load-clean-access-type
+  - bietlejuice.ebdb_condo:load-clean-access-type-aud
+  - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-full-contract
   - bietlejuice.ebdb_contract:load-clean-portability
@@ -1886,13 +1886,13 @@ bietlejuice.enrich_listing_owners:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
   - bietlejuice.enrich_offer:load-enrich-offer
 bietlejuice.enrich_listing_temp:
-  - bietlejuice.ebdb:load-clean-condo
   - bietlejuice.ebdb:load-clean-conversion-lead
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-lead
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb:load-clean-photographer-job
+  - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-portability
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
@@ -2309,13 +2309,13 @@ bietlejuice.enrich_rental_guarantee:
   - bietlejuice.rental_guarantee:load-clean-charge
   - bietlejuice.rental_guarantee:load-clean-guarantee
 bietlejuice.enrich_rental_historical_follow_up:
-  - bietlejuice.ebdb:load-clean-access-authorization-type
-  - bietlejuice.ebdb:load-clean-access-type
-  - bietlejuice.ebdb:load-clean-access-type-aud
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-key-type
   - bietlejuice.ebdb:load-clean-occupant-type
+  - bietlejuice.ebdb_condo:load-clean-access-authorization-type
+  - bietlejuice.ebdb_condo:load-clean-access-type
+  - bietlejuice.ebdb_condo:load-clean-access-type-aud
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history
@@ -2476,8 +2476,6 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
 bietlejuice.enrich_sale_listings_lenses:
-  - bietlejuice.ebdb:load-clean-access-authorization-type
-  - bietlejuice.ebdb:load-clean-access-type-aud
   - bietlejuice.ebdb:load-clean-booking
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-predicted-price
@@ -2486,6 +2484,8 @@ bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.ebdb:load-clean-listing-sale-model
   - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
   - bietlejuice.ebdb:load-clean-suspected-unavailability-listings-aud
+  - bietlejuice.ebdb_condo:load-clean-access-authorization-type
+  - bietlejuice.ebdb_condo:load-clean-access-type-aud
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation
   - bietlejuice.enrich_booking:load-enrich-booking-review
@@ -2852,22 +2852,22 @@ bietlejuice.enrich_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-tickets
   - bietlejuice.velo_zendesk:load-clean-tickets-history
 bietlejuice.enrich_vespucio:
-  - bietlejuice.ebdb:load-clean-condo
-  - bietlejuice.ebdb:load-clean-condo-contact
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-info-condo-amenities
   - bietlejuice.ebdb:load-clean-map-region
+  - bietlejuice.ebdb_condo:load-clean-condo
+  - bietlejuice.ebdb_condo:load-clean-condo-contact
   - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
 bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.ebdb:load-clean-amenities
-  - bietlejuice.ebdb:load-clean-condo
-  - bietlejuice.ebdb:load-clean-condo-contact
   - bietlejuice.ebdb:load-clean-country
   - bietlejuice.ebdb:load-clean-house
   - bietlejuice.ebdb:load-clean-info-amenities
   - bietlejuice.ebdb:load-clean-state
+  - bietlejuice.ebdb_condo:load-clean-condo
+  - bietlejuice.ebdb_condo:load-clean-condo-contact
   - bietlejuice.enrich_ebdb_condo:load-enrich-condo-amenities
   - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities

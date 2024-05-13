@@ -351,6 +351,15 @@ table_block_list:
   - DocumentoProposta
   - PropostaProponente
   - PropostaProponente_AUD
+  - AccessAuthorizationType
+  - AccessType
+  - AccessType_AUD
+  - CondicoesEntrada
+  - CondoManager
+  - CondoManagerEmails
+  - CondoManagerPhones
+  - Condominio
+  - ContatoCondominio
   - DoormanAffiliateData
   - DoormanAffiliateOccupation
   - ProOwnerFee
