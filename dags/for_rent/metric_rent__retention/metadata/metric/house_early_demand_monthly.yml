@@ -59,6 +59,17 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
+  qtd_terminations_matured_2w:
+    description: "Matured volume of contract terminations within 2 weeks in the month being referenced."
+    metric:
+      name: Matured Monthly Contract Terminations
+      description: "Matured volume of contract terminations within 2 weeks in the month being referenced."
+      acronym: MTRM_2W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
   pct_early_demand_opt_in_2w:
     description: "Porcentage of early demand opt-in within 2 weeks after termination being requested in the month being referenced."
     metric:
