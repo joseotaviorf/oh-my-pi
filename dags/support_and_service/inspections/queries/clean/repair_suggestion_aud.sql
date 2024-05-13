@@ -19,7 +19,7 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.repair_suggestion
+    datalake_inspections_raw.repair_suggestion_aud
 WHERE
     year = {year}
     AND month = {month}
