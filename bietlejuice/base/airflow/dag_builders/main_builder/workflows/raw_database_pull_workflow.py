@@ -1,3 +1,4 @@
+import math
 from typing import Tuple
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
@@ -14,6 +15,8 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
 class RawDatabasePullWorkflow(BaseWorkflow):
+    MAX_TABLES_PER_CLUSTER = 20
+
     def __init__(self, dag_args, workflow_args, cluster_args):
         super().__init__(dag_args, workflow_args, cluster_args)
 
@@ -27,8 +30,6 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         )
         self._initialize_task_creators(dag_execution_context)
 
-        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
-
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
@@ -36,7 +37,18 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         last_task = self._create_generate_metrics_task(dummy_terminate_job_cluster_task)
 
         tables_customization = self.workflow_args["tables_customization"]
+
+        n_clusters = len(tables_customization) // self.MAX_TABLES_PER_CLUSTER + 1
+        tables_per_cluster = math.ceil(len(tables_customization) / n_clusters)
+        n_tables_so_far = 0
+        execute_job_cluster_local_id = 1
+
         for raw_table_name, table_parameters in tables_customization.items():
+            if n_tables_so_far % tables_per_cluster == 0:
+                execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
+                    execute_job_cluster_local_id=execute_job_cluster_local_id
+                )
+                execute_job_cluster_local_id += 1
             raw_initial_task, raw_final_task = self._create_raw_tasks(
                 table_name=raw_table_name, last_task=last_task
             )
@@ -50,6 +62,7 @@ class RawDatabasePullWorkflow(BaseWorkflow):
             execute_job_cluster_task >> raw_initial_task
             raw_final_task >> clean_initial_task
             clean_final_task >> last_task
+            n_tables_so_far += 1
 
         return dag
 

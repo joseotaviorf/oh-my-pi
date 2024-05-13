@@ -84,17 +84,23 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
         libraries = default_libraries + custom_libraries
         return libraries
 
-    def create_task(self) -> QuintoAndarDatabricksExecuteJobClusterOperator:
+    def create_task(
+        self, execute_job_cluster_local_id=None
+    ) -> QuintoAndarDatabricksExecuteJobClusterOperator:
         """
         Creates the ExecuteJobCluster task to enable Spark Jobs to run on Databricks Job Cluster
         """
         cluster_configuration = self.__get_cluster_configuration()
         self.__validate_databricks_version(cluster_configuration)
+        if execute_job_cluster_local_id:
+            task_id = f"{self._TASK_ID}-{execute_job_cluster_local_id}"
+        else:
+            task_id = self._TASK_ID
 
         return QuintoAndarDatabricksExecuteJobClusterOperator(
             databricks_conn_id="databricks_job_cluster",
             dag=self.dag_execution_context.dag,
-            task_id=self._TASK_ID,
+            task_id=task_id,
             cluster_configuration=cluster_configuration,
             libraries=self.__get_libraries(),
             access_control_list=self.__get_access_control_list(),
