@@ -33,6 +33,11 @@ columns:
     description:
       Reviewer who assessed whether a repair was exempted. Being an owner
       or member of AN1
+  id_repair_suggestion:
+    lineage:
+      - datalake_inspections_raw.repair_request.repair_suggestion_id
+    description:
+      Repair suggestion identification key.
   uuid:
     lineage:
       - datalake_inspections_raw.repair_request.uuid
@@ -77,6 +82,16 @@ columns:
     lineage:
       - datalake_inspections_raw.repair_request.finished
     description: ""
+  has_automatically_identified:
+    lineage:
+      - datalake_inspections_raw.repair_request.automatically_identified
+    description:
+      Boalean type information that indicates whether the repair was generated automatically.
+  has_automatic_identification_accepted:
+    lineage:
+      - datalake_inspections_raw.repair_request.automatic_identification_accepted
+    description:
+      Boalean type information that indicates whether the automatically generated repair was accepted.
   ts_granted:
     lineage:
       - datalake_inspections_raw.repair_request.granted_at

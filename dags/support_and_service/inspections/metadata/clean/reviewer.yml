@@ -29,6 +29,7 @@ columns:
       OWNER: Owner of the property.
       TENANT: Tenant of the property.
       ADMIN: Team of Repair Analysis.
+      INSPECTIONS_SERVICE: Used for automatic repair suggestions.
   approval_type:
     lineage:
       - datalake_inspections_raw.reviewer.approval_type
