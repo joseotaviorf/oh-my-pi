@@ -210,7 +210,7 @@ df_final AS (
 
 metrics AS (
     SELECT
-        'JE'||'-'||id_invoice||'-'||'1'||'-'||'2'||'-'|| 
+        'JE'||'-'||id_entry||'-'||'1'||'-'||'2'||'-'|| 
         CASE
             WHEN revenue_name = 'adm fee' THEN '1'
             WHEN revenue_name = 'brokerage' THEN '2' 

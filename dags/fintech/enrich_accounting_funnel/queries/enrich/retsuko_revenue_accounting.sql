@@ -124,6 +124,7 @@ sap_gateway AS (
     WHERE 
         erp_solution = 'B1'
         AND type = 'LCM'
+        AND status = 'done'
 ),
 
 sap AS (
@@ -177,7 +178,7 @@ df AS (
 
 df_final AS (
     SELECT
-        'JE'||'-'||id_invoice||'-'||'1'||'-'||'4'||'-'||
+        'JE'||'-'||IF(id_entry IS NOT NULL, id_entry, id_invoice)||'-'||'1'||'-'||'4'||'-'||
         CASE
           WHEN revenue_name = 'property damage fine' THEN '5'
           WHEN revenue_name = 'rental anticipation fee' THEN '6' 

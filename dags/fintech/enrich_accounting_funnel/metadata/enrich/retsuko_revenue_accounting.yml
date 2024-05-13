@@ -8,7 +8,7 @@ columns:
   id_retsuko_revenue_accounting:
     lineage:
       - datalake_retsuko.invoice_info.id_external
-    description: "JE is from Journal Entry + ID external from Retsuko's Invoice + 1 is a virtual ID to identify Seu Barriga + ID to identify revenue line"
+    description: "JE is from Journal Entry + ID external from Retsuko's Entry/Invoice (Invoice if Fine-and-Interest) + 1 is a virtual ID to identify Seu Barriga + ID to identify revenue line"
   id_business_entity:
     lineage:
       - datalake_retsuko_clean.contract.id
