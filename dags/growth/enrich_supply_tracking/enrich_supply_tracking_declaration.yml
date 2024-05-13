@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       This DAG is responsible for enriching the supply flows data with the taxonomy data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: supply_flows_migrate
   default_extraction_type: full
@@ -18,6 +18,4 @@ workflow:
     supply_events_tracking:
       - conversion_tracking
 cluster:
-  type: databricks_10_4_min_io-memory_photon_cluster
-  custom_configurations:
-    spark_version: 12.2.x-scala2.12
+  type: databricks_12_2_min_io-memory_photon_cluster
