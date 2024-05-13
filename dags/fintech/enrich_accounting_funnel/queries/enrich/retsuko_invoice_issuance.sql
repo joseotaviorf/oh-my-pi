@@ -28,7 +28,7 @@ retsuko AS (
         CASE
             WHEN e.bill_item = 'entry.bill-item/service-fee' THEN 'service fee'
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee', 'entry.bill-item/brokerage-quinto-andar') THEN 'brokerage'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee', 'entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
         END AS revenue_name,
         i.accrual_year_month,
         IF(e.bill_item = 'entry.bill-item/service-fee', DATE(i.ts_paid), DATE(i.ts_due)) AS dt_source_trigger,
@@ -99,12 +99,11 @@ sap_entity AS (
 ), 
 
 sap_gateway AS (
-    SELECT 
+    SELECT DISTINCT
         f.id_finance_entity,
         f.id_feature,
-        hash,
         f.sync_sap_status, 
-        s.status as sync_sap_job_status
+        MIN(IF(s.status = 'done', 'success', 'failed')) as sync_sap_job_status
     FROM
         datalake_sap_gateway.feature f
     LEFT JOIN
@@ -113,16 +112,17 @@ sap_gateway AS (
     WHERE 
         erp_solution = 'B1'
         AND type = 'NF'
+    GROUP BY 
+        1, 2, 3 
 ),
 
 sap AS (
     SELECT 
-        hash,
         id_finance_entity,
         CASE
             WHEN account_number = '31101.05.01' THEN 'service fee'
             WHEN account_number = '31101.02.01' THEN 'adm fee'
-            WHEN account_number = '31101.01.01' THEN 'brokerage'
+            WHEN account_number = '31101.01.01' THEN 'brokerage quinto andar'
         END AS revenue_account,
         MAX(DATE(dt_created)) AS dt_sap_created,
         MAX(DATE(dt_reference)) AS dt_sap_reference,
@@ -134,30 +134,29 @@ sap AS (
         AND document_number LIKE 'IN %'
         AND dt_reference >= '2024-01-01'
     GROUP BY 
-        1, 2, 3
+        1, 2
 ),
-
 pre_df AS (
     SELECT 
         'IN'||'-'||id_invoice||'-'||'1'||'-'||'1'||'-'||
         CASE
-            WHEN revenue_name = 'adm fee' THEN '1'
-            WHEN revenue_name = 'brokerage' THEN '2' 
-            WHEN revenue_name = 'service fee' THEN '3' END AS id_retsuko_invoice_issuance,
+            WHEN r.revenue_name = 'adm fee' THEN '1'
+            WHEN r.revenue_name = 'brokerage quinto andar' THEN '2' 
+            WHEN r.revenue_name = 'service fee' THEN '3' END AS id_retsuko_invoice_issuance,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
         CAST(NULL AS INT) AS id_finance_entity_entry,
         source_name,
-        revenue_name,
+        r.revenue_name,
         accrual_year_month,
         CASE 
-            WHEN s.hash IS NOT NULL THEN 'SUCCESS'
-            WHEN s.hash IS NULL AND sg.id_feature IS NOT NULL THEN 'SG FAILURE'
-            WHEN s.hash IS NULL AND sg.id_feature IS NULL THEN 'SB FAILURE'
+            WHEN s.id_finance_entity IS NOT NULL THEN 'SUCCESS'
+            WHEN s.id_finance_entity IS NULL AND sg.id_feature IS NOT NULL THEN 'SG FAILURE'
+            WHEN s.id_finance_entity IS NULL AND sg.id_feature IS NULL THEN 'SB FAILURE'
         END AS status,
         source_amount,
         sap_amount,
-        IF(s.hash IS NULL OR sg.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
+        IF(s.id_finance_entity IS NULL OR sg.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
         dt_source_trigger,
         dt_sap_created,
         dt_sap_reference
@@ -168,10 +167,10 @@ pre_df AS (
             ON r.id_invoice = se.id_finance_entity
     LEFT JOIN 
         sap_gateway sg
-            ON se.id_finance_entity = sg.id_finance_entity
+            ON se.id_sap_gateway_feature = sg.id_feature AND sg.sync_sap_job_status = 'success'
     LEFT JOIN 
         sap s 
-            ON sg.hash = s.hash
+            ON r.id_invoice = s.id_finance_entity
             AND r.revenue_name = s.revenue_account
 ),
 df AS (
