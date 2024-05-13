@@ -397,6 +397,16 @@ bietlejuice.enrich_house_feature_inference:
     - bietlejuice.ebdb:load-clean-house
     - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
     - bietlejuice.enrich_ebdb_country:load-enrich-house
+bietlejuice.enrich_hubspot_crm:
+  remove:
+   - bietlejuice.hubspot:load-clean-company
+   - bietlejuice.hubspot:load-clean-contact
+   - bietlejuice.hubspot:load-clean-deal
+   - bietlejuice.hubspot:load-clean-deal-pipeline
+   - bietlejuice.hubspot:load-clean-ticket
+   - bietlejuice.hubspot:load-clean-ticket-pipeline
+bietlejuice.enrich_hubspot_management:
+  override: []
 bietlejuice.enrich_label_studio:
   remove:
     - bietlejuice.label_studio:load-clean-annotations
@@ -536,6 +546,7 @@ bietlejuice.enrich_rede_company_event:
     - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   remove:
     - bietlejuice.enrich_hubspot:load-enrich-company
+    - bietlejuice.hubspot:load-clean-company
 bietlejuice.enrich_rede_supply:
   remove:
     - bietlejuice.ebdb_user:load-clean-user
