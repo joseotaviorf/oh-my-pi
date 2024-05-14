@@ -9,7 +9,7 @@ SELECT
     revend AS rev_end,
     service_mod AS mod_service,
     type_mod AS mod_type,
-    responsability_mod AS mod_responsability,
+    responsibility_mod AS mod_responsibility,
     exempted_mod AS mod_is_exempted,
     created_at_mod AS mod_ts_created,
     updated_at_mod AS mod_ts_updated,

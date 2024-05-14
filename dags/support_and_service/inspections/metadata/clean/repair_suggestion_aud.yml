@@ -60,9 +60,9 @@ columns:
       - datalake_inspections_raw.repair_suggestion_aud.type_mod
     description: 
       Boolean information that indicates the modification of type data.
-  mod_responsability:
+  mod_responsibility:
     lineage:
-      - datalake_inspections_raw.repair_suggestion_aud.responsability_mod
+      - datalake_inspections_raw.repair_suggestion_aud.responsibility_mod
     description: 
       Boolean information that indicates the modification of responsability data.
   mod_is_exempted:
