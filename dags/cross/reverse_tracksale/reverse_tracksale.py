@@ -37,7 +37,7 @@ REVERSE_SPARK_JOB_PATH = (
 )
 
 
-CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_2xlarge_general_cluster")
 
 custom_libraries = [
     {
