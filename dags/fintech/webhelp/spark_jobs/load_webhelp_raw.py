@@ -2,7 +2,7 @@ import json
 import logging
 from argparse import ArgumentParser
 
-from pyspark.sql.functions import current_timestamp
+from pyspark.sql.functions import current_timestamp, lit
 from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.pipeline import LayerEnum
@@ -17,6 +17,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.pipeline import FullTableLoaderPipeline
 from bietlejuice.base.spark import BaseDBUtils
+
 
 JOB_NAME = "load_webhelp_raw"
 
@@ -87,40 +88,49 @@ if __name__ == "__main__":
     container_name = "lake-quinto-andar-sftp"
     azure_account_name, azure_account_key = get_azure_credentials()
     spark.conf.set("fs.azure.account.key." + azure_account_name + ".blob.core.windows.net", azure_account_key)
-    blob_storage_path = f"wasbs://{azure_container_name}@{azure_account_name}.blob.core.windows.net/{azure_sub_folder}"
 
-    logger.info(
-        f"""m=__main__, msg=File name to be processed: {blob_storage_path}"""
-    )
+    df_schema = spark.read.parquet(f"wasbs://{container_name}@{azure_account_name}.blob.core.windows.net/EXPORTACOES/ATENDIMENTO/{azure_table_name}/").schema
+    df_schema.add("subfolder", "string")
+    final_df = spark_client.create_dataframe([], df_schema)
 
-    azure_table_name = table_name.upper()
-    try:
-        df = s3_consumer.get_data_from_file(path=f"{blob_storage_path}/{azure_table_name}/", format=format)
-    except AnalysisException as error:
-        logger.warning(
-            f"""
-            m=__main__, msg=No data found for {blob_storage_path}, table_name={azure_table_name}.
+    for subfolder in azure_sub_folder:
 
-            Exception: {error}
-            """
+        blob_storage_path = f"wasbs://{azure_container_name}@{azure_account_name}.blob.core.windows.net/EXPORTACOES/{subfolder}"
+
+        logger.info(
+            f"""m=__main__, msg=File name to be processed: {blob_storage_path}"""
         )
-        raise error
+
+        azure_table_name = table_name.upper()
+        try:
+            df = s3_consumer.get_data_from_file(path=f"{blob_storage_path}/{azure_table_name}/", format=format)
+        except AnalysisException as error:
+            logger.warning(
+                f"""
+                m=__main__, msg=No data found for {blob_storage_path}, table_name={azure_table_name}.
+
+                Exception: {error}
+                """
+            )
+            raise error
+        final_df = final_df.union(df)
+        df = df.withColumn("subfolder", lit(subfolder))
 
     # Rename columns to lowercase
-    columns = df.columns
+    columns = final_df.columns
     for col in columns:
-        df = df.withColumnRenamed(col, col.lower())
+        final_df = final_df.withColumnRenamed(col, col.lower())
 
     # Add ts_load columns
-    df = df.withColumn("ts_load", current_timestamp())
+    final_df = final_df.withColumn("ts_load", current_timestamp())
 
-    df = (
+    final_df = (
         SparkDataFrameService()
-        .input(df)
+        .input(final_df)
         .output()
     )
     print("Dataframe sample:\n")
-    df.show(5)
+    final_df.show(5)
 
     FullTableLoaderPipeline(
         database_name=database_name,
@@ -128,4 +138,4 @@ if __name__ == "__main__":
         database_location=database_location,
         layer=LayerEnum.RAW,
         query=None
-    ).load_and_register(df, format_options)
+    ).load_and_register(final_df, format_options)

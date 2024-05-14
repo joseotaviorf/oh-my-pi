@@ -1,5 +1,7 @@
 azure_container_name: lake-quinto-andar-sftp
-azure_sub_folder: EXPORTACOES/ATENDIMENTO
+azure_sub_folder:
+  - ATENDIMENTO
+  - COBRANCA
 format: parquet
 tables:
   - table_name: historicos_clientes
