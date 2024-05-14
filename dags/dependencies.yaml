@@ -259,7 +259,6 @@ bietlejuice.dw_datamarts_spark.fintech:
 bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_region:load-dw-public-dim-region
@@ -268,7 +267,6 @@ bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.ebdb:load-clean-house-aud
   - bietlejuice.ebdb:load-clean-house-visit-status-aud
   - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
-  - bietlejuice.ebdb_contract:load-clean-full-contract
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_booking:load-enrich-house-available-hours
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity

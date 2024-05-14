@@ -10,7 +10,6 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 for_rent:
-  datamart_cohort_rentals: {}
   house_weekly_available_hours: {}
   ongoing_listed_suspended_listings: {}
   repressed_demand: {}
