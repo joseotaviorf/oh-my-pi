@@ -26,6 +26,8 @@ first_rent_from_contract AS (
         rent
     FROM 
         datalake_ebdb_clean.contract_aud
+    WHERE 
+      mod_ts_signed IS TRUE
     QUALIFY 
         ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY rev) = 1
 ),

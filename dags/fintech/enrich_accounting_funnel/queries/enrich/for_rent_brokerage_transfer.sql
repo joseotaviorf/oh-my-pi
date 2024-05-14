@@ -7,7 +7,7 @@ WITH pre_seu_barriga AS (
             WHEN bill_item IN ('brokerage adm partner', 'brokerage adm partner postponed') AND LOWER(description) LIKE '%consultor imobiliário%' THEN 'ciq'
             WHEN bill_item IN ('brokerage third party real estate', 'brokerage third party real estate postponed') THEN '3p'
             WHEN bill_item IN ('brokerage estate agent', 'brokerage estate agent postponed') THEN 'estate agent'
-            WHEN bill_item IN ('brokerage quinto andar', 'brokerage quinto andar postponed') THEN 'quintoandar'
+            WHEN bill_item IN ('brokerage quinto andar', 'brokerage quinto andar postponed', 'brokerage installment') THEN 'quintoandar'
         END AS partner_type,
         accrual_year_month,
         MAX(IF(lower(bill_item) LIKE '%postponed' AND lower(description) LIKE 'crédito%', TRUE, FALSE)) AS has_postponed_brokerage,
@@ -19,9 +19,10 @@ WITH pre_seu_barriga AS (
             (bill_item IN ('brokerage partner select', 'brokerage partner select postponed', 'brokerage third party real estate', 'brokerage third party real estate postponed')) OR 
             (bill_item IN ('brokerage adm partner', 'brokerage adm partner postponed') AND LOWER(description) LIKE '%consultor imobiliário%') OR 
             (bill_item IN ('brokerage estate agent', 'brokerage estate agent postponed')) OR 
-            (bill_item IN ('brokerage quinto andar', 'brokerage quinto andar postponed'))
+            (bill_item IN ('brokerage quinto andar', 'brokerage quinto andar postponed', 'brokerage installment'))
         )
         AND status != 'canceled'
+        AND description != 'Desconto por cadastro com link de indicação'
         AND id_invoice > 0
         AND contract_status IN ('Ativo','Finalizado')
         AND ((ended_before_started = false) OR (status IN ('divergent payment', 'paid')))
