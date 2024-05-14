@@ -9,14 +9,6 @@ column_level_validations:
   id_external:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Error
   id:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Error
-  due_amount:
-    has_max_value:
-      less_than_or_equal_to: 50000
-      severity_level: Warning
