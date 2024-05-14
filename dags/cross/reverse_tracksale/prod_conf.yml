@@ -146,3 +146,9 @@ campaigns:
     trigger_at_hour: 19
     trigger_at_minute: 0
 datalake_bucket_reverse: s3://5a-datalake-prod/reverse/tracksale/
+custom_cluster:
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.2xlarge
+  num_workers: 3
+  aws_attributes:
+    ebs_volume_size: 200
