@@ -11,5 +11,4 @@
 for_rent_cross:
   pricing_rent_categorization: {}
   rental_cohort_conversions: {}
-  rental_demand_events_funnel_flows: {}
   rental_marketplace_flows: {}

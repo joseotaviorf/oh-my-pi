@@ -17,7 +17,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 
 - `pricing_rent_categorization`
 - `rental_cohort_conversions`
-- `rental_demand_events_funnel_flows`
 - `rental_marketplace_flows`
 
 ### Additional Information
