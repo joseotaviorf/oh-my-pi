@@ -120,7 +120,7 @@ affiliates AS (
             END AS vertical,
             cc.source,
             CASE 
-                WHEN cc.cost_center_code = 'C046'
+                WHEN cc.cost_center_code IN ('C046', 'S01305', 'S02305')
                     THEN 'sale'
                 ELSE 'rent'
             END AS business_context,
