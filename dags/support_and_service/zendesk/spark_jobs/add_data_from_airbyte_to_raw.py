@@ -16,6 +16,7 @@ from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services import S3Service
 
 
 JOB_NAME = "add_data_from_airbyte_to_raw"
