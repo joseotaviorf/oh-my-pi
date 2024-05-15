@@ -37,6 +37,10 @@ owner_house_category AS(
       ON ohqh.id_owner = poh.id_owner
       AND MAKE_DATE(ohqh.year, ohqh.month, ohqh.day) >= DATE(poh.ts_pro_owner_started)
       AND MAKE_DATE(ohqh.year, ohqh.month, ohqh.day) < COALESCE(DATE(poh.ts_pro_owner_ended), CURRENT_DATE())
+  WHERE
+    ohqh.year = {year}
+    AND ohqh.month = {month}
+    AND ohqh.day = {day}
 ),
 owner_house_category_changes AS (
   SELECT
