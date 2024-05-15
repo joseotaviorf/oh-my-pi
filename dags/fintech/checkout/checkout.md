@@ -28,6 +28,7 @@ This pipeline produces the following output tables:
 2. In data lake clean:
 
       - `boleto`
+      - `boleto_webhook`
       - `webhook`
       - `payment_config`
       - `requester`

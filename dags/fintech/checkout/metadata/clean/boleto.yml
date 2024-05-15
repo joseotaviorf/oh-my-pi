@@ -34,6 +34,12 @@ columns:
   fine_amount_percentage:
     lineage:
       - datalake_checkout_raw.boleto.fine_amount_percentage
+  interest_paid_amount:
+    lineage:
+      - datalake_checkout_raw.boleto.interest_paid_amount
+  fine_paid_amount:
+    lineage:
+      - datalake_checkout_raw.boleto.fine_paid_amount
   status:
     lineage:
       - datalake_checkout_raw.boleto.status
@@ -109,6 +115,15 @@ columns:
   operation_history:
     lineage:
       - datalake_checkout_raw.boleto.operation_history
+  written_down_by:
+    lineage:
+      - datalake_checkout_raw.boleto.written_down_by
+  write_down_reason:
+    lineage:
+      - datalake_checkout_raw.boleto.write_down_reason
+  is_inferred_paid_at:
+    lineage:
+      - datalake_checkout_raw.boleto.is_inferred_paid_at
   dt_due:
     lineage:
       - datalake_checkout_raw.boleto.due_date
@@ -130,6 +145,12 @@ columns:
   dt_last_to_pay:
     lineage:
       - datalake_checkout_raw.boleto.last_date_to_pay
+  dt_written_down:
+    lineage:
+      - datalake_checkout_raw.boleto.written_down_at
+  dt_last_synced:
+    lineage:
+      - datalake_checkout_raw.boleto.last_synced_at
   ts_started_processing:
     lineage:
       - datalake_checkout_raw.boleto.started_processing_at

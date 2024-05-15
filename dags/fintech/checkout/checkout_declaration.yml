@@ -13,6 +13,8 @@ workflow:
         clean_table_name: bolecode
       boleto:
         clean_table_name: boleto
+      boleto_webhook:
+        clean_table_name: boleto_webhook
       charge_status_log:
         clean_table_name: charge_status_log
       charge:

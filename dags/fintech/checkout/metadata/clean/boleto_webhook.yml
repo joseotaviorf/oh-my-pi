@@ -1,0 +1,18 @@
+database_name: datalake_checkout_clean
+table_name: boleto_webhook
+columns:
+  id:
+    lineage:
+      - datalake_checkout_raw.boleto_webhook.id
+  payload:
+    lineage:
+      - datalake_checkout_raw.boleto_webhook.payload
+  status:
+    lineage:
+      - datalake_checkout_raw.boleto_webhook.status
+  ts_created:
+    lineage:
+      - datalake_checkout_raw.boleto_webhook.created_at
+  ts_updated:
+    lineage:
+      - datalake_checkout_raw.boleto_webhook.updated_at
