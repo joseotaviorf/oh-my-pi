@@ -501,6 +501,16 @@ databricks_12_2_min_xlarge_io-memory_photon_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_12_2_min_xlarge_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.large
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_10_4_min_io-memory_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.large
