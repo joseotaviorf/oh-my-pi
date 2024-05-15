@@ -29,9 +29,9 @@ tables:
   users:
     is_incremental: true
     source: stitch
-  # ticket_comments:
-  #   is_incremental: true
-  #   source: airbyte
+  ticket_comments:
+    is_incremental: true
+    source: airbyte
   # ticket_audits:
   #   is_incremental: true
   #   source: airbyte
