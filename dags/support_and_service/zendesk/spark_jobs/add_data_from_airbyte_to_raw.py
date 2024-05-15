@@ -59,7 +59,7 @@ if __name__ == "__main__":
     if valid_files:
 
         df = s3_consumer.get_data_from_file(
-            proxy_path,
+            valid_files,
             format="json",
         ).select("_airbyte_data.*").drop('metadata') # this column exists on ticket_audits and causes schema errors
 
