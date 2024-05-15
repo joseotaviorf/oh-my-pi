@@ -18,6 +18,14 @@ owner_house_category AS(
         OR poh.is_pro_owner) THEN FALSE
       ELSE FALSE
     END AS is_pp_multi,
+    CASE
+      WHEN ohqh.id_owner in (2982090, 4133107,7418653) THEN 'Short Stay'
+      WHEN ohqh.id_owner in (4166683,9005414,213199,6446899,1895145,9468263,7418653,4133107,416663,7109194,75535,1673646,2982090,145322,495270,3930579,70225) THEN 'Corporate'
+      WHEN ohqh.ongoing_houses > 15 THEN 'Investors (15+)'
+      WHEN ohqh.ongoing_houses >= 10 THEN 'Investors (10-15)'
+      WHEN ohqh.ongoing_houses >= 5 THEN 'Long-tail (5-10)'
+      ELSE 'Amateur'
+    END AS cluster_pp_multi,
     ohqh.dt_houses_owned,
     ohqh.year,
     ohqh.month,
@@ -73,11 +81,12 @@ SELECT
   COALESCE(oc.owner_category, 0) AS owner_category,
   ohc.has_5_or_more_ongoing_houses,
   ohc.is_pp_multi,
+  ohc.cluster_pp_multi,
   COALESCE(oc.owner_category, 0) = COALESCE(cc.last_category, 0) AS is_current_category,
   ohc.dt_houses_owned AS dt_owner_category,
-  ohc.year,
-  ohc.month,
-  ohc.day
+  {year} AS year,
+  {month} AS month,
+  {day} AS day
 FROM
   owner_house_category AS ohc
 LEFT JOIN

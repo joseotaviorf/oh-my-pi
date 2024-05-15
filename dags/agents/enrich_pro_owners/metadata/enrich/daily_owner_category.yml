@@ -28,6 +28,8 @@ columns:
     categories:
       "true": The owner is participating in PP Multi program and is active.
       "false": The owner is not participating in PP Multi program, so it's amateur.
+  cluster_pp_multi:
+    description: Classification of PP multi based on groups it can belong to and the number of ongoing houses it has.
   is_current_category:
     description: Boolean value to check if the owner's category is the most recent.
   dt_owner_category:
@@ -35,16 +37,10 @@ columns:
     - datalake_pro_owners.daily_owner_houses_quantity_history.dt_houses_owned
     description: Reference date of the table.
   year:
-    lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.year
     description: Year value of the date reference. Also, it's a partition.
   month:
-    lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.month
     description: Month value of the date reference. Also, it's a partition.
   day:
-    lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.day
     description: Day value of the date reference. Also, it's a partition.
   category:
     description: DEPRECATED.
