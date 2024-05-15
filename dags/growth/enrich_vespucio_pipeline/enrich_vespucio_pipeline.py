@@ -1,7 +1,5 @@
 import os
 from datetime import datetime, timedelta
-from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 import pendulum
 from airflow.models import DAG
@@ -17,11 +15,12 @@ from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissio
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
+# from bietlejuice.base.spark import BaseDBUtils  # @todo uncomment to enable image step.
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 # TO DO: Add the package version in the config file
-VESPUCIO_PACKAGE_VERSION = "0.2.18"
+VESPUCIO_PACKAGE_VERSION = "0.3.0"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
@@ -83,7 +82,7 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
 )
 
 
-def create_task(entry_point: str, parameters: str, task_id: str = None):
+def create_task(entry_point: str, parameters: list[str], task_id: str = None):
     return QuintoAndarDatabricksCheckJobTaskOperator(
         databricks_conn_id="databricks_job_cluster",
         dag=dag,
@@ -117,6 +116,9 @@ class Tables:
     step3_clustered_houses = "vespucio_pipeline_delta.step3_clustered_houses"
     step4_merged_condos = "vespucio_pipeline_delta.step4_merged_condos"
     step4_merged_houses = "vespucio_pipeline_delta.step4_merged_houses"
+    # @todo change step5_images_houses step table to step5_images_houses after enabling image step
+    step5_images_houses = "vespucio_pipeline_delta.step4_merged_houses"
+    step6_linked_condos = "vespucio_pipeline_delta.step6_linked_condos"
 
     condo_compounds = "vespucio_prod_delta.condo_compounds"
     house_compounds = "vespucio_prod_delta.house_compounds"
@@ -183,6 +185,13 @@ source_tasks = [
     ),
 ]
 
+# @todo uncomment to enable image step
+# dbutils = BaseDBUtils().get_dbutils()
+# if dbutils is None:
+#     raise RuntimeError("DBUtils not found")
+#
+# kodak_api_key = dbutils.secrets.get('quintoandar', APIEnum.KODAK)
+
 core_tasks = [
     create_task(
         entry_point="core_step1stage",
@@ -235,12 +244,24 @@ core_tasks = [
             f"--output_merged_houses={Tables.step4_merged_houses}",
         ],
     ),
+    # create_task(  # @todo uncomment to enable image step. Don't forget to update Tables.step5_images_houses
+    #     entry_point="core_step5images",
+    #     parameters=[
+    #         f"--input_merged_houses={Tables.step4_merged_houses}",
+    #         f"--input_images_houses={Tables.step5_images_houses}",
+    #         "--overwrite_schema",
+    #         f"--output_images_houses={Tables.step5_images_houses}",
+    #         f"--kodak_auth_token={kodak_api_key}",
+    #         "--kodak_api_url=https://kodak.quintoandar.com.br/s2s/v1",
+    #         "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
+    #     ],
+    # )
 ]
 
 listing_task = create_task(
     entry_point="core_step6listing",
     parameters=[
-        f"--input_images_houses={Tables.step4_merged_houses}",  # @TODO: change to step5_images_houses
+        f"--input_images_houses={Tables.step5_images_houses}",
         f"--overwrite_schema",
         f"--output_listings={Tables.listings}",
     ],
@@ -250,13 +271,22 @@ linking_task = create_task(
     entry_point="core_step6link",
     parameters=[
         f"--input_merged_condos={Tables.step4_merged_condos}",
-        f"--input_images_houses={Tables.step4_merged_houses}",  # @TODO: change to step5_images_houses
+        f"--input_images_houses={Tables.step5_images_houses}",
         f"--overwrite_schema",
-        f"--output_linked_condos={Tables.condo_compounds}",  # @TODO: change to step6_linked_condos
+        f"--output_linked_condos={Tables.step6_linked_condos}",
         f"--output_house_compounds={Tables.house_compounds}",
     ],
 )
 
+condo_plans_task = create_task(
+    entry_point="core_step7condo_plans",
+    parameters=[
+        f"--input_linked_condos={Tables.step6_linked_condos}",
+        f"--input_house_compounds={Tables.house_compounds}",
+        "--overwrite_schema",
+        f"--output_condo_compounds={Tables.condo_compounds}",
+    ],
+)
 
 yesterday = "{{ ds }}"
 today = "{{ macros.ds_add(ds, 1)  }}"
@@ -336,4 +366,4 @@ core_tasks[0] << source_tasks
 chain(*core_tasks)
 core_tasks[-1] >> listing_task
 core_tasks[-1] >> linking_task
-linking_task >> plugin_tasks
+linking_task >> condo_plans_task >> plugin_tasks
