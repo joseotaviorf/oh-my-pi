@@ -12,7 +12,7 @@ workflow:
     fact_listing_rent_flows:
       partitions: [country_code]
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_12_2_med_2_fixed_workers_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
