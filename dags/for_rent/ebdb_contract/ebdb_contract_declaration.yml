@@ -23,6 +23,8 @@ workflow:
       clean_table_name: contract_person_aud
     ContratoPessoa:
       clean_table_name: contract_person
+    ContractStartDateRequest:
+      clean_table_name: contract_start_date_request
     ContractVersion:
       clean_table_name: contract_version
     Contrato:

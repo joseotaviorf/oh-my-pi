@@ -1,0 +1,27 @@
+database_name: datalake_ebdb_clean
+table_name: contract_start_date_request
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.contractStartDateRequest.id
+  id_contract:
+    lineage:
+      - datalake_ebdb_raw.contractStartDateRequest.contractId
+  requester_type:
+    lineage:
+      - datalake_ebdb_raw.contractStartDateRequest.requesterType
+  status:
+    lineage:
+      - datalake_ebdb_raw.contractStartDateRequest.status
+  dt_requested_started:
+    lineage:
+      - datalake_ebdb_raw.contractStartDateRequest.requestedStartDate
+  dt_previous_started:
+    lineage:
+      - datalake_ebdb_raw.contractStartDateRequest.previousStartDate
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.contractStartDateRequest.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.contractStartDateRequest.atualizadoEm

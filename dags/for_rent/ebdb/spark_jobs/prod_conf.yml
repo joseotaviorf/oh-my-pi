@@ -13,6 +13,7 @@ table_block_list:
   - tmp_update
   - tmp_update_AUD_01
   - _UsuarioRevisionEntity_new
+  - ContractStartDateRequest
   - Device_AUD
   - DocumentoProposta_AUD
   - Visitor_AUD
