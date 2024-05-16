@@ -3,7 +3,7 @@ database_name: datalake_lifull_campaigns_clean
 table_name: mitula_campaigns
 owner: '@data-growth'
 domain: Growth
-description: Table load Criteo Performance Report from Mitula API extraction. 
+description: Table load Criteo Performance Report from Mitula API extraction.
 columns:
   id_account:
     description: The ID number of your ad account
@@ -19,6 +19,10 @@ columns:
       - datalake_lifull_campaigns_raw.campaigns_overview_report.name
   account_name:
     description: The name of the account name you're viewing in reporting
+    lineage:
+      - datalake_lifull_campaigns_raw.campaigns_overview_report.account_name
+  country_code:
+    description: Country code the account belongs to.
     lineage:
       - datalake_lifull_campaigns_raw.campaigns_overview_report.account_name
   clicks:

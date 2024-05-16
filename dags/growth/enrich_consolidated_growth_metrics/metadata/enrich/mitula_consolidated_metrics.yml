@@ -13,6 +13,10 @@ columns:
     description: Accont name at mitula platform
     lineage:
       - datalake_lifull_campaigns_clean.mitula_campaigns.account_name
+  country_code:
+    description: Country code the account belongs to.
+    lineage:
+      - datalake_lifull_campaigns_clean.mitula_campaigns.country_code
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:

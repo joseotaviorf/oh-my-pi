@@ -9,5 +9,6 @@ SELECT
     clicks
 FROM
     datalake_lifull_campaigns_clean.trovit_campaigns
-WHERE 
-    dt_attribution BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+WHERE
+    country_code <> 'MX'
+    AND dt_attribution BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -10,7 +10,6 @@ SELECT
     cmm.utm_term,
     cmm.utm_content,
     cmm.city_group,
-    cmm.country_code,
     COALESCE(msp.campaign_business_context, 'Not Mapped') AS campaign_business_context,
     COALESCE(msp.campaign_strategy_intent, 'Not Mapped') AS campaign_strategy_intent,
     COALESCE(msp.behavior_type, 'Not Mapped') AS behavior_type,

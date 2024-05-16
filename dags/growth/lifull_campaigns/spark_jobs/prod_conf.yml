@@ -8,3 +8,6 @@ accounts:
   rent:
     account_name: quintoandar_rent_homes_br
     account_id: 18263
+  rent_mx:
+    account_name: benvi_homes_mx
+    account_id: 5941945

@@ -3,7 +3,7 @@ database_name: datalake_lifull_campaigns_clean
 table_name: trovit_campaigns
 owner: '@data-growth'
 domain: Growth
-description: Table load Criteo Performance Report from Trovit API extraction. 
+description: Table load Criteo Performance Report from Trovit API extraction.
 columns:
   id_account:
     description: The ID number of your ad account
@@ -13,12 +13,16 @@ columns:
     description: The unique ID number of the ad campaign you're viewing in reporting
     lineage:
       - datalake_lifull_campaigns_raw.campaigns_overview_report.id
-  campaign_name:  
+  campaign_name:
     description: The name of the ad campaign you're viewing in reporting
     lineage:
       - datalake_lifull_campaigns_raw.campaigns_overview_report.name
   account_name:
     description: The name of the account name you're viewing in reporting
+    lineage:
+      - datalake_lifull_campaigns_raw.campaigns_overview_report.account_name
+  country_code:
+    description: Country code the account belongs to.
     lineage:
       - datalake_lifull_campaigns_raw.campaigns_overview_report.account_name
   clicks:
