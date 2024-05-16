@@ -96,7 +96,7 @@ for table in TABLES:
         raw_spark_job_extra_args=[
             SOURCE,
             AZURE_CONTAINER_NAME,
-            AZURE_SUB_FOLDER,
+            json.dumps(AZURE_SUB_FOLDER),
             "{{ ds }}",
             raw_table_name,
             json.dumps(FORMAT)

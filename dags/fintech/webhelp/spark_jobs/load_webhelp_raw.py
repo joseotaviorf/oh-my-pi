@@ -59,7 +59,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     azure_container_name = args.azure_container_name
-    azure_sub_folder = args.azure_sub_folder
+    azure_sub_folder = json.loads(args.azure_sub_folder)
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
     format = json.loads(args.format)
@@ -89,8 +89,13 @@ if __name__ == "__main__":
     azure_account_name, azure_account_key = get_azure_credentials()
     spark.conf.set("fs.azure.account.key." + azure_account_name + ".blob.core.windows.net", azure_account_key)
 
+    azure_table_name = table_name.upper()
+
     df_schema = spark.read.parquet(f"wasbs://{container_name}@{azure_account_name}.blob.core.windows.net/EXPORTACOES/ATENDIMENTO/{azure_table_name}/").schema
     df_schema.add("subfolder", "string")
+    logger.info(
+        f"""m=__main__, msg=Dataframe Schema: {df_schema}"""
+    )
     final_df = spark_client.create_dataframe([], df_schema)
 
     for subfolder in azure_sub_folder:
@@ -101,7 +106,6 @@ if __name__ == "__main__":
             f"""m=__main__, msg=File name to be processed: {blob_storage_path}"""
         )
 
-        azure_table_name = table_name.upper()
         try:
             df = s3_consumer.get_data_from_file(path=f"{blob_storage_path}/{azure_table_name}/", format=format)
         except AnalysisException as error:
@@ -113,8 +117,8 @@ if __name__ == "__main__":
                 """
             )
             raise error
-        final_df = final_df.union(df)
         df = df.withColumn("subfolder", lit(subfolder))
+        final_df = final_df.union(df)
 
     # Rename columns to lowercase
     columns = final_df.columns
