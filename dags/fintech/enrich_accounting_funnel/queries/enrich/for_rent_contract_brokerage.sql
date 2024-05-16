@@ -74,7 +74,8 @@ df AS (
         NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', NULL, f_rent.rent * c.fist_rent_comission_fee * p.brokerage_split_percentage), 0.00) AS ciq_brokerage_amount,
         NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', NULL, f_rent.rent * c.fist_rent_comission_fee * pp.brokerage_split_percentage), 0.00) AS select_brokerage_amount,
         NULLIF(f_rent.rent * c.fist_rent_comission_fee * IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', 0.5, NULL), 0) AS 3p_brokerage_amount,
-        c.dt_started AS dt_contract_started
+        c.dt_started AS dt_contract_started,
+        c.dt_termination AS dt_contract_annulment
     FROM 
         datalake_ebdb_clean.contract c
     LEFT JOIN 
@@ -91,9 +92,10 @@ df AS (
     LEFT JOIN 
         agents_by_contract a
             ON a.id_contract = c.id
-)
+),
 
-SELECT
+df_final AS (
+    SELECT
     id_contract,
     rent,
     first_rent_commission_fee,
@@ -107,6 +109,35 @@ SELECT
     ROUND(ciq_brokerage_amount,2) AS ciq_brokerage_amount,
     ROUND(select_brokerage_amount,2) AS select_brokerage_amount,
     ROUND(3p_brokerage_amount,2) AS 3p_brokerage_amount,
-    dt_contract_started
+    dt_contract_started,
+    dt_contract_annulment
+    FROM 
+        df
+)
+
+SELECT
+    id_contract,
+    rent,
+    first_rent_commission_fee,
+    CASE 
+        WHEN (agent_brokerage_share + ciq_brokerage_share >= 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0
+        WHEN (agent_brokerage_share + ciq_brokerage_share < 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0.4 - (agent_brokerage_share + ciq_brokerage_share)
+        ELSE 5A_brokerage_share
+    END AS 5A_brokerage_share,
+    agent_brokerage_share,
+    ciq_brokerage_share,
+    IF((dt_contract_started > dt_contract_annulment), 0, select_brokerage_share) AS select_brokerage_share,
+    3p_brokerage_share,
+    CASE 
+        WHEN (agent_brokerage_amount + ciq_brokerage_amount >= 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0
+        WHEN (agent_brokerage_amount + ciq_brokerage_amount < 0.4) AND (dt_contract_started > dt_contract_annulment) THEN rent * 0.4 - (agent_brokerage_amount + ciq_brokerage_amount)
+        ELSE 5A_brokerage_amount 
+    END AS 5A_brokerage_amount,
+    agent_brokerage_amount,
+    ciq_brokerage_amount,
+    IF((dt_contract_started > dt_contract_annulment), 0, select_brokerage_amount) AS select_brokerage_amount,
+    3p_brokerage_amount,
+    dt_contract_started,
+    dt_contract_annulment
 FROM 
-    df
+    df_final
