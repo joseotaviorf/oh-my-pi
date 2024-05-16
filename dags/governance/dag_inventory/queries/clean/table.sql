@@ -15,6 +15,7 @@ SELECT
     qty_smaller_than_1mb,
     qty_bigger_than_1gb,
     total_modified_files_size_in_bytes,
+    is_delta,
     year,
     month,
     day

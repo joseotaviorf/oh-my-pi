@@ -36,10 +36,10 @@ class SyncMetadataTaskCreator(BaseTaskCreator):
             self.dag_execution_context.bucket,
             table_attributes.layer.value,
             table_attributes.schema,
-            metadata_type.value,
-            self.dag_execution_context.dag_args["name"],
             "--table-name",
             table_attributes.table_name,
+            metadata_type.value,
+            self.dag_execution_context.dag_args["name"],
         ]
         if table_attributes.layer == LayerEnum.RAW:
             parameters += self._get_raw_params(product_database_name)

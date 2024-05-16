@@ -71,6 +71,10 @@ columns:
     description: The total size of all modified files
     lineage:
       - datalake_dag_inventory_raw.table.total_modified_files_size_in_bytes
+  is_delta:
+    description: If the table is a delta table
+    lineage:
+      - datalake_dag_inventory_raw.table.is_delta
   year:
     description: ingestion year 
     lineage:
