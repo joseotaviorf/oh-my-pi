@@ -32,12 +32,12 @@ total_cost_per_notification_type AS (
         context,
         ia_general,
         dt_webhook_sent,
-        CASE 
+        CASE
             WHEN ia_general = 'SMS' THEN SUM(notification_count) * 0.046
             WHEN ia_general = 'Whatsapp' THEN SUM(notification_count) * 0.007 * 5.4
-            ELSE 0.00 
+            ELSE 0.00
         END AS cost
-    FROM 
+    FROM
         notification_indica_ai
     GROUP BY 1,2,3,4,5
 ),
@@ -146,7 +146,7 @@ SELECT
     asr.id_date,
     asr.origin,
     asr.account_name,
-    CASE 
+    CASE
         WHEN abc.city_group IS NOT NULL THEN CONCAT(asr.campaign_name, '_', abc.business_context)
         ELSE CONCAT(asr.campaign_name, '_', 'rent')
     END AS campaign_name,
@@ -158,7 +158,7 @@ SELECT
     asr.utm_campaign,
     asr.utm_term,
     asr.utm_content,
-    CASE 
+    CASE
         WHEN abc.city_group IS NOT NULL THEN 0.5 * asr.cost
         ELSE asr.cost
     END AS cost

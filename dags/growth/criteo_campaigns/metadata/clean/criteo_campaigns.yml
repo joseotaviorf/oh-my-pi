@@ -3,7 +3,7 @@ database_name: datalake_criteo_campaigns_clean
 table_name: criteo_campaigns
 owner: '@data-growth'
 domain: Growth
-description: Table load Criteo Performance Report from Criteo Ads API extraction. 
+description: Table load Criteo Performance Report from Criteo Ads API extraction.
 columns:
   id_advertiser:
     description: Advertiser id of the campaign
@@ -33,6 +33,8 @@ columns:
     description: Name of the campaign
     lineage:
       - datalake_criteo_campaigns_raw.criteo_campaigns.adset
+  country_code:
+    description: Country code the campaign belongs to.
   clicks:
     description: Number of times that your Criteo ads have been clicked
     lineage:

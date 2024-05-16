@@ -25,7 +25,7 @@ columns:
     categories:
       action_based: When a canvas is sent after a user completes a certain event.
       api_triggered: When a canvas is sent after a API trigger.
-      time_based: When a canvas is sent in a scheduled time. 
+      time_based: When a canvas is sent in a scheduled time.
     lineage:
       - datalake_braze_details_raw.canvas_details_tenants.schedule_type
   steps:

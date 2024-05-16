@@ -223,7 +223,7 @@ SELECT
     om.rule_status,
     COUNT(*) AS notification_count,
     DATE(ts_webhook_sent) AS dt_webhook_sent
-FROM 
+FROM
     events ev
     JOIN organized_messages om
         ON ev.id_step_canvas = om.id_step

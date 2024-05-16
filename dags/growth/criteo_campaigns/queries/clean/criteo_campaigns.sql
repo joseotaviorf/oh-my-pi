@@ -6,6 +6,7 @@ SELECT
     Audience AS audience,
     DOUBLE(ECpc) AS cost_per_click,
     Adset AS campaign_name,
+    'BR' AS country_code,
     INT(Clicks) AS clicks,
     DOUBLE(OverallCompetitionWin) AS competition_win,
     DOUBLE(AdvertiserCost) AS cost,

@@ -18,14 +18,14 @@ columns:
     description: Informs the type of notification.
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
-    categories: 
+    categories:
       SMS: 'SMS notification'
       Whatsapp: 'Whatsapp notification'
   context:
     description: Supply operation channel belloging to Referals origin
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
-    categories: 
+    categories:
       Indica Aí - General: ''
       Doorman: ''
       Indica Aí - Agents: ''
@@ -38,22 +38,22 @@ columns:
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.notification_count
   funnel_side:
-    description: Informs the side of the funnel, in this case, the affiliates side. 
+    description: Informs the side of the funnel, in this case, the affiliates side.
   business_context:
     description: Business context.
     lineage:
       - datalake_marketing_costs_sharing_rules.a028a.business_context
       - datalake_marketing_costs_sharing_rules.a034a.business_context
       - datalake_marketing_costs_sharing_rules.a033a.business_context
-  origin: 
+  origin:
     description: Growth marketing platform
-    categories: 
+    categories:
       braze: ''
-  account_name: 
+  account_name:
     description: Accont name at braze platform
-  utm_campaign: 
+  utm_campaign:
     description: utm_campaign applied on growth marketing platform
-  utm_term: 
+  utm_term:
     description: utm_term applied on growth marketing platform
-  utm_content: 
+  utm_content:
     description: utm_content applied on growth marketing platform

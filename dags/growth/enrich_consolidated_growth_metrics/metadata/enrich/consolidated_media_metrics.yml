@@ -17,7 +17,7 @@ columns:
   origin:
     description: Marketing platform where data were extracted from
   account_name:
-    description: Accont name segmentation
+    description: Account name segmentation
     lineage:
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.account_name
       - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.account_name
@@ -34,6 +34,10 @@ columns:
       - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.campaign_name
+  country_code:
+    description: Country code the campaign belongs to.
+    lineage:
+      - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.country_code
   campaign_origin_acquisition:
     description: mkt_origin which marketing campaign was intent to destiate effort
     lineage:
@@ -43,7 +47,7 @@ columns:
       - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.campaign_name
       - datalake_consolidated_growth_metrics.trovit_consolidated_metrics.campaign_name
-    categories: 
+    categories:
       Agents: ''
       New Channels: ''
       Other: ''
@@ -57,7 +61,7 @@ columns:
     description: Type of report extracted from google ads platform
     lineage:
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.report_type
-    categories: 
+    categories:
       VIDEO_PERFORMANCE_REPORT: ''
       CAMPAIGN_PERFORMANCE_REPORT: ''
       AD_PERFORMANCE_REPORT: ''
@@ -66,7 +70,7 @@ columns:
     description: Type of ad report extracted from google ads platform. For other platforms, ad_type = other
     lineage:
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.ad_type
-    categories: 
+    categories:
       display_ad: ''
       other: ''
       dsa_ad: ''

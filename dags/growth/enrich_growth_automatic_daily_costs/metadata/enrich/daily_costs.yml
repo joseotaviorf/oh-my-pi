@@ -8,12 +8,12 @@ columns:
   id_date:
     description: Date segmentation
     lineage:
-      - datalake_consolidated_growth_metrics.consolidated_media_metrics.id_date   
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.id_date
   origin:
     description: Growth marketing platform
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.origin
-    categories: 
+    categories:
       mitula: ''
       trovit: ''
       criteo: ''
@@ -22,7 +22,7 @@ columns:
   business_context:
     description: Growth marketing platform
     lineage:
-      - datalake_consolidated_growth_metrics.consolidated_media_metrics.business_context      
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.business_context
   account_name:
     description: Accont name at braze platform
     lineage:
@@ -31,6 +31,10 @@ columns:
     description: Name of campaign segmentation
     lineage:
       - datalake_consolidated_growth_metrics.consolidated_media_metrics.campaign_name
+  country_code:
+    description: Country code the campaign belongs to
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.country_code
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:
@@ -53,7 +57,7 @@ columns:
     description: Level of growth marketing taxonomy
     lineage:
       - datalake_growth_taxonomy.media_setup.campaign_business_context
-    categories: 
+    categories:
       Rent: ''
       Sale: ''
       Hybrid: ''
