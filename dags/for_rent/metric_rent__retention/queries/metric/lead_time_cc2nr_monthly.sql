@@ -2,6 +2,7 @@ WITH leadtime_calculation AS (
   SELECT
     fct.sk_contract,
     dc.value_segment,
+    dc.country_code,
     COALESCE(dc.dt_start, dc.dt_entrance) AS dt_start,
     DATEDIFF(DATE(COALESCE(dc.dt_start, dc.dt_entrance)), DATE(dc.ts_created)) leadtime
   FROM
@@ -30,6 +31,7 @@ WITH leadtime_calculation AS (
 SELECT
     DATE(DATE_TRUNC('MONTH', dt_start)) AS dt_reference_month,
     value_segment,
+    country_code,
     APPROX_PERCENTILE(leadtime, 0.5) AS median_leadtime,
     COUNT(DISTINCT sk_contract) AS volume_contracts
 FROM
@@ -37,13 +39,14 @@ FROM
 WHERE
     dt_start < CURRENT_DATE()
 GROUP BY
-    1, 2
+    1, 2, 3
 
 UNION ALL
 
 SELECT
     DATE(DATE_TRUNC('MONTH', dt_start)) AS dt_reference_month,
     'OVERALL' AS value_segment,
+    country_code,
     APPROX_PERCENTILE(leadtime, 0.5) AS median_leadtime,
     COUNT(DISTINCT sk_contract) AS volume_contracts
 FROM
@@ -51,4 +54,4 @@ FROM
 WHERE
     dt_start < CURRENT_DATE()
 GROUP BY
-    1, 2
+    1, 2, 3

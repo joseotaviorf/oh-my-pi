@@ -22,6 +22,11 @@ columns:
       UNDEFINED: Undefined.
       OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
     dimension: True
+  country_code:
+    lineage:
+      - dw_retention.dim_contract.country_code
+    description: "Country code of the house."
+    dimension: True
   median_leadtime:
     description: Monthly median value of the days between the contract's create date and the start/entrance date.
     metric:
