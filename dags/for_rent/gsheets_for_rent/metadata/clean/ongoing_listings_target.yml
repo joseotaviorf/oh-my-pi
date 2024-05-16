@@ -14,10 +14,6 @@ columns:
     description: Rental administrator of the listing.
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets.rental_administrator
-  tier:
-    description: Tier of the city group (as found in dw_public.dim_region).
-    lineage:
-      - datalake_gsheets_raw.ongoing_listings_targets.tier
   depublications:
     description: Volume of despublciations.
     lineage:
@@ -34,11 +30,6 @@ columns:
     description: Volume of relistings (listings returning to "PUBLISHED" status after a rental).
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets.relisting
-  relistings_recovered:
-    description: Volume of relistings returning from "UNPUBLISHED" status and recovered listings (listings returning from "UNPUBLISHED" status
-      after more then 12 weeks with such status).
-    lineage:
-      - datalake_gsheets_raw.ongoing_listings_targets.relistings_recovered
   suspensions:
     description: Volume of suspended listings.
     lineage:
@@ -51,27 +42,19 @@ columns:
     description: Volume of contracts with end confirmation (ts_analyst_annulment_input) in the target date.
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets.erc
+  ongoing_rentals:
+    description: Volume of ongoing contracts in the target date (New Rental date <= Target date < Ended Rental date)
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.ongoing_rentals
+  new_rental:
+    description: Volume of contracts not canceled with term starting or entrance date in the target date.
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.new_rental
+  new_first_rental:
+    description: Volume of first property contracts not canceled with term starting or entrance date in the target date.
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.new_first_rental
   dt_created:
     description: Target date.
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets.date
-  dt_week_start:
-    description: Target week.
-    lineage:
-      - datalake_gsheets_raw.ongoing_listings_targets.week_start
-  year:
-    description: Target year.
-    lineage:
-      - datalake_gsheets_raw.ongoing_listings_targets.year
-  semester:
-    description: Target semester (halfyear).
-    lineage:
-      - datalake_gsheets_raw.ongoing_listings_targets.halfyear
-  quarter:
-    description: Target quarter.
-    lineage:
-      - datalake_gsheets_raw.ongoing_listings_targets.quarter
-  month:
-    description: Target month.
-    lineage:
-      - datalake_gsheets_raw.ongoing_listings_targets.month

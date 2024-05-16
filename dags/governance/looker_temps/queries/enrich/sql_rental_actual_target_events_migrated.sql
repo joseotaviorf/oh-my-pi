@@ -114,8 +114,8 @@ WITH supply_targets AS (
     NULL AS guarantee,
     NULL AS sales_company,
     NULL AS lead_origin,
-    SUM(CAST(REPLACE(CAST(ongoing_listings AS STRING), ',', '') AS DOUBLE)) AS ongoing_listing_target,
-    SUM(CAST(REPLACE(CAST(relistings_recovered AS STRING), ',', '') AS DOUBLE)) AS relistings_recovered_target
+    SUM(CAST(REPLACE(CAST(relisting AS STRING),',','') AS DOUBLE)) + SUM(CAST(REPLACE(CAST(recovered AS STRING),',','') AS DOUBLE)) AS relistings_recovered_target,
+    SUM(CAST(REPLACE(CAST(ongoing_listings AS STRING), ',', '') AS DOUBLE)) AS ongoing_listing_target
   FROM datalake_gsheets_clean.ongoing_listings_target AS ot
   LEFT JOIN (
     SELECT DISTINCT
