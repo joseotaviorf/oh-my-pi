@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from typing import List
 
 import pendulum
 from airflow.models import DAG
@@ -82,7 +83,7 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
 )
 
 
-def create_task(entry_point: str, parameters: list[str], task_id: str = None):
+def create_task(entry_point: str, parameters: List[str], task_id: str = None):
     return QuintoAndarDatabricksCheckJobTaskOperator(
         databricks_conn_id="databricks_job_cluster",
         dag=dag,
