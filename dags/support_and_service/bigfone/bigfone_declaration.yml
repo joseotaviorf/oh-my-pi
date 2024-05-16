@@ -13,7 +13,7 @@ workflow:
   layer: raw
   database_type: postgres
   dbutils_secret_key: BIGFONE_DB
-  default_extraction_type: full
+  default_extraction_type: incremental
   tables_customization:
     Call:
       clean_table_name: call
