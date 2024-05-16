@@ -1,6 +1,7 @@
 WITH tickets AS (
   SELECT
     id_ticket,
+    id_ticket_form,
     id_assignee,
     id_requester,
     id_submitter,
@@ -132,6 +133,7 @@ ticket_metrics AS (
 )
 SELECT
   t.id_ticket,
+  t.id_ticket_form,
   t.id_assignee,
   t.id_requester,
   zu.id_user_main,

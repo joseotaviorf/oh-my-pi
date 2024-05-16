@@ -29,6 +29,7 @@ house_owner AS (
 )
 SELECT
     CAST(t.id_ticket AS BIGINT) AS sk_ticket,
+    CAST(t.id_ticket_form AS BIGINT) AS sk_ticket_form,
     COALESCE(own.id_house_listing, -1) AS sk_house_listing,
     COALESCE(CAST(t.id_contract AS BIGINT), -1)  AS sk_contract,
     COALESCE(t.offer_ids[0], -1) AS sk_sale_offer,

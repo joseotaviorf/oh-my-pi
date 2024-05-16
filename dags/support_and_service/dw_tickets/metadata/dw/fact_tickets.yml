@@ -11,6 +11,10 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.id_ticket
     description: Key of ticket that corresponds to the Zendesk ticket number
+  sk_ticket_form:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket_form
+    description: Surrogate key corresponding to a Zendesk ticket form ID
   sk_house_listing:
     lineage:
       - datalake_ebdb_contract.contract_house.id_house_listing

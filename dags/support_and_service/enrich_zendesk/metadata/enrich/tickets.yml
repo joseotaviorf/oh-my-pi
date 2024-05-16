@@ -8,6 +8,10 @@ columns:
     description: Ticket ID from Zendesk
     lineage:
       - datalake_zendesk_clean.tickets.id_ticket
+  id_ticket_form:
+    description: Ticket form ID from Zendesk
+    lineage:
+      - datalake_zendesk_clean.tickets.id_ticket_form
   id_assignee:
     description: ID of the user assigned to the ticket
     lineage:

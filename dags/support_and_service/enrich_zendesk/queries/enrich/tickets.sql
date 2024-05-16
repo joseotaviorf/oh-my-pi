@@ -120,6 +120,7 @@ custom_fields_with_title AS (
 tickets_with_fields AS (
     SELECT
         t.id_ticket,
+        t.id_ticket_form,
         t.id_assignee,
         t.id_requester,
         t.id_submitter,
@@ -313,6 +314,7 @@ analyst_assignment AS (
 )
 SELECT
     t.id_ticket,
+    t.id_ticket_form,
     t.id_assignee,
     t.id_requester,
     t.id_submitter,
