@@ -110,7 +110,7 @@ columns:
     lineage:
     - datalake_hr_system_clean.workers.work_relationships.assignments.BusinessUnitName
   brand:
-    description: 'Brand of the worker'
+    description: 'What brand the worker is associated with.'
     lineage:
     - datalake_hr_system_clean.workers.work_relationships.assignments.assignmentsDFF.marcaProduto
   assignment_status_type:
