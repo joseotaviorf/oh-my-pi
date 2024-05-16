@@ -37,7 +37,7 @@ dags:
     cluster_name: databricks_10_4_med_cluster
   for_sale:
     owner: Data ForSale
-    cluster_name: custom_cluster
+    cluster_name: databricks_12_2_med_compute_cluster
     custom_libraries:
       - maven:
           coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.0-incubating"
@@ -59,7 +59,7 @@ dags:
       - spark.kryo.registrator: "org.apache.sedona.core.serde.SedonaKryoRegistrator"
   for_sale_cross:
     owner: Data ForSale
-    cluster_name: custom_cluster
+    cluster_name: databricks_12_2_med_compute_cluster
   fintech:
     cluster_name: databricks_10_4_med_general_cluster
     owner: Data Fintech
