@@ -97,6 +97,10 @@ columns:
     description: ''
     lineage:
     - datalake_gsheets_raw.navent_convenia_like.pais
+  employee_hbrp:
+    description: 'Business Partner responsible for the employee'
+    lineage:
+    - datalake_gsheets_raw.navent_convenia_like.hbrp
   employee_band:
     description: ''
     lineage:

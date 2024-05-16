@@ -22,6 +22,7 @@ SELECT
     marca_produto_dedicado AS employee_product_brand,
     business_navent AS employee_business_navent,
     pais AS employee_country,
+    hrbp AS employee_hrbp,
     banda AS employee_band,
     naturalidade_cidade AS employee_city_birth,
     restricciones_alimentarias AS employee_food_restrictions,
