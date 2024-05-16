@@ -19,7 +19,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `ongoing_listed_suspended_listings`
 - `repressed_demand`
 - `repressed_demand_booking_fit_in`
-- `weekly_demand_metrics`
 
 ### Additional Information
 
