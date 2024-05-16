@@ -1,0 +1,12 @@
+---
+table_name: metric_rent.lead_time_cc2nr_weekly
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  median_leadtime:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  volume_contracts:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error

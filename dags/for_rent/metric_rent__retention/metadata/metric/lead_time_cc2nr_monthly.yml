@@ -1,0 +1,46 @@
+---
+database_name: metric_rent
+table_name: lead_time_cc2nr_monthly
+description: Monthly table with median leadtime between the contract creation and the date when the contract started or the entrance date.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  dt_reference_month:
+    lineage:
+      - dw_rent.dim_contract.dt_start
+      - dw_rent.dim_contract.dt_entrance
+    description: Month date of the contract started or entrance date.
+    dimension: True
+  value_segment:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Category of rent value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  median_leadtime:
+    description: Monthly median value of the days between the contract's create date and the start/entrance date.
+    metric:
+      name: Lead Time - CC2NR
+      description: Monthly median value of the days between the contract's create date and the start/entrance date.
+      acronym: LTCC2NRM
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  volume_contracts:
+    description: Monthly volume of contracts that were terminated.
+    metric:
+      name: Monthly Total Contracts Terminated
+      description: Monthly volume of contracts that were terminated.
+      acronym: MCT
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
