@@ -201,7 +201,6 @@ SELECT DISTINCT
   BOOLEAN(a.synchronize_from_position) AS has_synchronization_in_position,
   BOOLEAN(a.band_step_eligibility) AS has_band_step_eligibility,
   BOOLEAN(a.work_at_home) AS is_working_at_home,
-  BOOLEAN(a.work_at_home) AS is_working_at_home,
   CASE
     WHEN adff.has_activity_with_extra_value = 'Y' THEN TRUE
     WHEN adff.has_activity_with_extra_value = 'N' THEN FALSE
@@ -218,8 +217,8 @@ SELECT DISTINCT
   TO_TIMESTAMP(SUBSTR(REPLACE(a.ts_last_update, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
   NOW() AS ts_load,
   -- partitions
-  DATE_FORMAT(GREATEST (DATE(a.dt_effective_start), DATE(adff.dt_effective_start)), 'yyyy') AS YEAR,
-  DATE_FORMAT(GREATEST (DATE(a.dt_effective_start), DATE(adff.dt_effective_start)), 'MM') AS MONTH
+  DATE_FORMAT(GREATEST (DATE(a.dt_effective_start), DATE(adff.dt_effective_start)), 'yyyy') AS year,
+  DATE_FORMAT(GREATEST (DATE(a.dt_effective_start), DATE(adff.dt_effective_start)), 'MM') AS month
 FROM
   assignments AS a
   LEFT JOIN 

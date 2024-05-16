@@ -77,8 +77,8 @@ SELECT DISTINCT
   ) AS ts_last_update,
   NOW() AS ts_load,
   -- partitions
-  DATE_FORMAT(DATE(managers['EffectiveStartDate']), 'yyyy') AS YEAR,
-  DATE_FORMAT(DATE(managers['EffectiveStartDate']), 'MM') AS MONTH
+  DATE_FORMAT(DATE(managers['EffectiveStartDate']), 'yyyy') AS year,
+  DATE_FORMAT(DATE(managers['EffectiveStartDate']), 'MM') AS month
 FROM
   managers_step1 managers
 WHERE
