@@ -21,7 +21,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 # TO DO: Add the package version in the config file
-VESPUCIO_PACKAGE_VERSION = "0.3.0"
+VESPUCIO_PACKAGE_VERSION = "0.3.1"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
