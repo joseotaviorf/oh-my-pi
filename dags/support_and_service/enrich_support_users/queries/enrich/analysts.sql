@@ -46,7 +46,7 @@ bigfone_analysts AS (
                 THEN LOWER(SPLIT(REPLACE(SPLIT(GET_JSON_OBJECT(metadata, '$.event_data.WorkerName'), "@")[1], ".", " "), " ")[0])
             ELSE LOWER(GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location'))
         END AS organization,
-        event_timestamp AS ts_created
+        ts_created
     FROM
         datalake_bigfone_clean.event
 ),

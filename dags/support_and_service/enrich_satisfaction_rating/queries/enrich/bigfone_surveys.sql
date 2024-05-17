@@ -7,7 +7,7 @@ WITH call_inapp_csat AS (
     CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-1") AS INT) AS csat_1,
     CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-2") AS INT) AS csat_2,
     CAST(GET_JSON_OBJECT(ev.metadata,"$.event_data.TaskAttributes.csat-3") AS INT) AS csat_3,
-    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(ev.event_timestamp, "Brazil/East"), "yyyy-MM-dd HH:mm:ss") AS ts_created_local,
+    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(ev.ts_created, "Brazil/East"), "yyyy-MM-dd HH:mm:ss") AS ts_created_local,
     year,
     month,
     day
@@ -22,7 +22,7 @@ WITH call_inapp_csat AS (
     AND ev.month = {month}
     AND ev.day = {day}
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY event_timestamp DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY ts_created DESC) = 1
 ),
 ivr_csat AS (
   SELECT

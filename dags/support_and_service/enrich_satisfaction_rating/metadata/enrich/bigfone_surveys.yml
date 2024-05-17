@@ -42,7 +42,7 @@ columns:
     description: Date the satisfaction response was submitted.
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_clean.event.event_timestamp
+      - datalake_bigfone_clean.event.ts_created
   year:
     description: Year referring to the data loading day.
     lineage:

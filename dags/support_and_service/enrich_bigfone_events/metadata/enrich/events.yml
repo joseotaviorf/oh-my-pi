@@ -29,19 +29,19 @@ columns:
   ts_created:
     description: Timestamp of the event creation.
     lineage:
-      - datalake_bigfone_clean.event.event_timestamp
+      - datalake_bigfone_clean.event.ts_created
   ts_created_local:
     description: Local timestamp of the event creation.
     lineage:
-      - datalake_bigfone_clean.event.event_timestamp
+      - datalake_bigfone_clean.event.ts_created
   ts_received:
     description: Timestamp of the event reception.
     lineage:
-      - datalake_bigfone_clean.event.received_timestamp
+      - datalake_bigfone_clean.event.ts_received
   ts_received_local:
     description: Local timestamp of the event reception.
     lineage:
-      - datalake_bigfone_clean.event.received_timestamp
+      - datalake_bigfone_clean.event.ts_received
   year:
     description: Year of the event.
     lineage:

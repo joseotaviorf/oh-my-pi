@@ -6,22 +6,22 @@ WITH lonely_events AS (
         datalake_bigfone_clean.event
     WHERE
         provider = 'teravoz'
-        AND (event = 'service.command' OR event = 'recording.available')
-        AND DATE(event_timestamp) = DATE('{year}-{month}-{day}')
+        AND (event_type = 'service.command' OR event_type = 'recording.available')
+        AND DATE(ts_created) = DATE('{year}-{month}-{day}')
     GROUP BY 2
     -- Teravoz can generate 2 events with the same wrong call_id (recording and service)
     HAVING count_call_id <= 2
 )
 SELECT
     BIGINT(events.id) AS id,
-    events.event AS event,
+    events.event_type AS event,
     GET_JSON_OBJECT(events.metadata, '$.call_id') AS id_call,
     events.metadata,
     events.provider,
-    TO_TIMESTAMP(events.event_timestamp, 'yyyy-MM-dd HH:mm:ss') AS ts_created,
-    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(events.event_timestamp, 'Brazil/East'), 'yyyy-MM-dd HH:mm:ss') AS ts_created_local,
-    TO_TIMESTAMP(events.received_timestamp, 'yyyy-MM-dd HH:mm:ss') AS ts_received,
-    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(events.received_timestamp, 'Brazil/East'), 'yyyy-MM-dd HH:mm:ss') AS ts_received_local,
+    TO_TIMESTAMP(events.ts_created, 'yyyy-MM-dd HH:mm:ss') AS ts_created,
+    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(events.ts_created, 'Brazil/East'), 'yyyy-MM-dd HH:mm:ss') AS ts_created_local,
+    TO_TIMESTAMP(events.ts_received, 'yyyy-MM-dd HH:mm:ss') AS ts_received,
+    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(events.ts_received, 'Brazil/East'), 'yyyy-MM-dd HH:mm:ss') AS ts_received_local,
     events.year AS year,
     events.month AS month,
     events.day AS day
@@ -33,4 +33,4 @@ LEFT JOIN
 WHERE
     lonely.call_id IS NULL
     AND provider IN ('teravoz','twilio')
-    AND DATE(event_timestamp) = DATE('{year}-{month}-{day}')
+    AND DATE(ts_created) = DATE('{year}-{month}-{day}')
