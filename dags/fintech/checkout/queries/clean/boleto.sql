@@ -48,7 +48,7 @@ SELECT
     DATE(fine_start_at) AS dt_fine_start, 
     DATE(last_date_to_pay) AS dt_last_to_pay, 
     DATE(written_down_at) AS dt_written_down,
-    DATE(last_synced_at) AS dt_last_synced,
+    TIMESTAMP(last_synced_at) AS ts_last_synced,
     TIMESTAMP(started_processing_at) AS ts_started_processing, 
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated

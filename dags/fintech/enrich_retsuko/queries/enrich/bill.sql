@@ -2,8 +2,9 @@ SELECT
     id,
     id_external,
     id_invoice,
-    id_checkout_boleto AS id_checkout_boleto,
+    id_checkout_boleto,
     identifier,
+    status,
     due_amount,
     our_number,
     our_number_digit,
@@ -14,6 +15,7 @@ SELECT
     ts_due,
     ts_issued,
     ts_created,
+    ts_retsuko_created,
     ts_retsuko_updated
 FROM
     datalake_retsuko_clean.boleto

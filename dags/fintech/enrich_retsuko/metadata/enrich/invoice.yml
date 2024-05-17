@@ -13,6 +13,10 @@ columns:
     description: "External ID"
     lineage:
       - datalake_retsuko_clean.invoice.id_external
+  id_original_invoice_external:
+    description: "Indicates the first invoice create to an entry. It's very important in cancel causes, to not lose track."
+    lineage:
+      - datalake_retsuko_clean.invoice.id_original_invoice_external
   id_account:
     description: "Account ID"
     lineage:
@@ -38,7 +42,7 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.id_checkout_charge
   status:
-    description: "Invoice payment status"
+    description: "Invoice's status"
     lineage:
       - datalake_retsuko_clean.invoice.status
     categories:
@@ -58,6 +62,10 @@ columns:
         The invoice was not paid and it was written down, the invoice_paid_date
         is the written down date. The process is done in general to not consider anymore
         the due amount (it's not going to be paid anymore or it has a negotiation)
+  payment_status:
+    description: "Invoice's payment status. Different from 'status' column that indicates the invoice's status, this column give you information about the payment process itself. Like, in a chargeback case, status will be 'canceled', and payment_status will be 'chargeback'."
+    lineage:
+      - datalake_retsuko_clean.invoice.payment_status
   substatus:
     description: "It's used to set negotiations/debts status"
     lineage:
@@ -129,14 +137,34 @@ columns:
     description: "Amount paid in the invoice"
     lineage:
       - datalake_retsuko_clean.invoice.paid_amount
+  payment_paid_interest_amount:
+    description: "Amount of interest after payment"
+    lineage:
+      - datalake_retusko_clean.invoice.payment_paid_interest_amount
+  payment_paid_fine_amount:
+    description: "Amount of fine after payment"
+    lineage:
+      - datalake_retusko_clean.invoice.payment_paid_fine_amount
   accrual_year_month:
     description: "Expense reference month"
     lineage:
       - datalake_retsuko_clean.invoice.accrual_year_month
+  should_request_boleto:
+    description: "Boolean field that indicates if a bill creation request should be done"
+    lineage:
+      - datalake_retusko_clean.invoice.should_request_boleto
   sispag_file:
     description: "File that Seu Barriga created with Vans to communicate with bank"
     lineage:
       - datalake_retsuko_clean.invoice.sispag_file
+  payment_company_use_number:
+    description: "Company_use works as an ID to identifies the bill created in the bank"
+    lineage:
+      - datalake_retusko_clean.invoice.payment_company_use_number
+  payment_bank_code:
+    description: "Paying Bank Code"
+    lineage:
+      - datalake_retusko_clean.invoice.payment_bank_code
   dt_due_adjusted:
     description: "Invoice due date adjusted based on the fintech (bank) holidays."
     lineage:
@@ -147,6 +175,26 @@ columns:
     description: "Timestamp in which invoice was paid, for payable invoices"
     lineage:
       - datalake_retsuko_clean.invoice.ts_paid
+  ts_payment_confirmation:
+    description: "Date that we received bank payment confirmation - In CNAB cases, it's different from ts_paid"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_payment_confirmation
+  ts_payment_event:
+    description: "It's used in payment reversal cases. This date will be the information received data - not necessary the payment reversal date"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_payment_event
+  ts_payment_divergent_fixed:
+    description: "Date that the payment divergent was fixed"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_payment_divergent_fixed
+  ts_payment_processing:
+    description: "Data that the payment was processed"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_payment_processing 
+  ts_payment_credit:
+    description: "Date that the payment was credited in our bank account, in CNAB cases, after two business day in general"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_payment_credit
   ts_canceled:
     description: "Invoice cancellation timestamp"
     lineage:

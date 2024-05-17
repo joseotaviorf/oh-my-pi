@@ -3,18 +3,18 @@ database_name: datalake_retsuko
 table_name: bill
 owner: athos.sampayo@quintoandar.com.br
 domain: fintech
-description: "TODO FINISH DESCRIPTIONS"
+description: ""
 columns:
   id:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.id
   id_external:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.id_external
   id_invoice:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.id_invoice
   id_checkout_boleto:
@@ -22,31 +22,35 @@ columns:
     lineage:
       - datalake_retsuko_clean.boleto.id_checkout_boleto
   identifier:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.identifier
+  status:
+    description: ""
+    lineage:
+      - datalake_retsuko_clean.boleto.status
   due_amount:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.due_amount
   our_number:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.our_number
   our_number_digit:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.our_number_digit
   wallet_number:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.wallet_number
   barcode:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.barcode
   inputtable_line:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.inputtable_line
   external_source:
@@ -54,18 +58,22 @@ columns:
     lineage:
       - datalake_retsuko_clean.boleto.external_source
   ts_due:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.ts_due
   ts_issued:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.ts_issued
   ts_created:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.ts_created
+  ts_retsuko_created:
+    description: ""
+    lineage:
+      - datalake_retsuko_clean.boleto.ts_retsuko_created
   ts_retsuko_updated:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.boleto.ts_retsuko_updated

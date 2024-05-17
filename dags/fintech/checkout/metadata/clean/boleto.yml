@@ -148,7 +148,7 @@ columns:
   dt_written_down:
     lineage:
       - datalake_checkout_raw.boleto.written_down_at
-  dt_last_synced:
+  ts_last_synced:
     lineage:
       - datalake_checkout_raw.boleto.last_synced_at
   ts_started_processing:

@@ -590,10 +590,6 @@ bietlejuice.enrich_webhelp_reports:
     - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
     - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
     - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
-bietlejuice.enrich_retsuko:
-  remove:
-    - bietlejuice.retsuko:load-clean-boleto
-    - bietlejuice.retsuko:load-clean-monthly-closing-checks
 bietlejuice.enrich_revenue_lines:
   add:
     - bietlejuice.owner_fees:load-clean-contract-brokerage-fee

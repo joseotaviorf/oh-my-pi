@@ -15,6 +15,10 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   tables_customization:
+    audit:
+      extraction_type: full
+      get_table_metrics:
+        count: id
     account:
       extraction_type: full
       get_table_metrics:
@@ -50,6 +54,13 @@ workflow:
       get_table_metrics:
         count: external_id
         max: retsuko_updated_at
+    invoice_entry:
+      date_filter_column: created_at
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+      get_table_metrics:
+        count: entry_id
+        max: created_at
     manual_entry:
       extraction_type: full
     monthly_closing_checks:

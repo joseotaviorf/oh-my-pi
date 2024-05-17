@@ -2360,9 +2360,11 @@ bietlejuice.enrich_reports_validation:
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-boleto
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
+  - bietlejuice.retsuko:load-clean-monthly-closing-checks
 bietlejuice.enrich_retsuko_test:
   - bietlejuice.retsuko_test:load-clean-account
   - bietlejuice.retsuko_test:load-clean-boleto

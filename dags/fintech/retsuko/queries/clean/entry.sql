@@ -15,6 +15,7 @@ SELECT
     accrual_year_month,
     due_year_month,
     timestamp(created_at) AS ts_created,
+    timestamp(synced_at) AS ts_synced,
     timestamp(retsuko_created_at) AS ts_retsuko_created,
     timestamp(retsuko_updated_at) AS ts_retsuko_updated,
     year,
