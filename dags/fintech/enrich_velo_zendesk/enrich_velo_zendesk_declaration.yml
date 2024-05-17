@@ -13,3 +13,7 @@ workflow:
     - custom_fields
 cluster:
   type: databricks_10_4_med_general_cluster
+  custom_configurations:
+    spark_conf:
+      spark.sql.mapKeyDedupPolicy: "LAST_WIN"
+
