@@ -11,7 +11,7 @@ dag:
       and opportunities. In addition, this funnel helps to prioritize the most relevant
       pages for the business.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions:

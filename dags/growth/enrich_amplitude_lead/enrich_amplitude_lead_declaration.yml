@@ -1,0 +1,13 @@
+---
+dag:
+  name: enrich_amplitude_lead
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: Creates enriched tables for the context `Lead` based on Amplitude
+      data.
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_12_2_max_io-memory_photon_cluster
