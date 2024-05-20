@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: Creates an enriched table to calculate the volume of `Braze` notifications grouped by day.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions:

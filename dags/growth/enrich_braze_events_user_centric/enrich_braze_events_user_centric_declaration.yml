@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the incremental enriched table for Braze user centric events with every campaign/canvas groupped daily.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: braze_user_centric
   default_extraction_type: incremental

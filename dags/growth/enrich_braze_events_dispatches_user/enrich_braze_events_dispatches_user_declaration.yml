@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the incremental enriched tables for dispatches for both tenants and owners users from Braze.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: braze_dispatches_user
   default_extraction_type: incremental
@@ -21,12 +21,4 @@ cluster:
     driver_node_type_id: r5d.xlarge
     node_type_id: r5d.xlarge
     runtime_engine: PHOTON
-    autoscale:
-      min_workers: 1
-      max_workers: 2
-    spark_conf:
-      spark.executor.cores: 4
-      spark.driver.memory: 22g
-      spark.driver.memoryOverhead: 3g
-      spark.executor.memory: 22g
-      spark.executor.memoryOverhead: 3g
+    num_workers: 2
