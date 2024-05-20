@@ -3,6 +3,7 @@ SELECT
     sr.id_survey,
     sr.id_respondent,
     PARSE_URL(sr.response_url, 'QUERY', 'sk_owner') AS id_owner,
+    sr.survey_name,
     'OWNER' AS respondent_type,
     'photos' AS service_type,
     'listing' AS service_context,

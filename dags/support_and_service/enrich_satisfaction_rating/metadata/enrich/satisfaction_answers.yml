@@ -112,6 +112,7 @@ columns:
     description: Name of the satisfaction form, used to identify different forms from the same source, if they have a description.
     lineage:
       - datalake_satisfaction_rating.gsheets_surveys.survey_name
+      - datalake_satisfaction_rating.survicate_surveys.survey_name
   improvement_tags:
     description: Process improvement tags, which are indicated by the respondent.
     lineage:

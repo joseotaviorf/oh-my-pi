@@ -3,7 +3,8 @@ WITH explode_parse_url AS (
     id_response,
     id_survey,
     id_respondent,
-    EXPLODE(SPLIT(PARSE_URL(sr.response_url, 'QUERY'), '&')) AS parse
+    EXPLODE(SPLIT(PARSE_URL(sr.response_url, 'QUERY'), '&')) AS parse,
+    sr.survey_name
   FROM
     datalake_survicate.survey_responses AS sr
   WHERE
@@ -16,7 +17,8 @@ zendesk_tickets AS (
     id_response,
     id_survey,
     id_respondent,
-    SPLIT(parse, '=')[1] AS id_ticket
+    SPLIT(parse, '=')[1] AS id_ticket,
+    survey_name
   FROM
     explode_parse_url
   WHERE
@@ -29,6 +31,7 @@ SELECT
   sr.id_respondent AS id_visitor,
   rc.id_response AS response_uuid,
   sr.id_respondent AS visitor_uuid,
+  sr.survey_name,
   LAST(rc.answer_content) FILTER (WHERE rc.question_type IN ("text")) AS user_comment,
   CAST(LAST(
     CASE

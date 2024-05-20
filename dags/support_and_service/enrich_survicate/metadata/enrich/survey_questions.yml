@@ -61,6 +61,10 @@ columns:
     description: Text of the question as displayed to the respondent.
     lineage:
       - datalake_survicate_clean.survey_questions.question
+  survey_name:
+    description: Descriptive information indicating the name of the submitted survey.
+    lineage:
+      - datalake_survicate_clean.surveys.survey_name
   introduction:
     description: Introduction to the question as displayed to the respondent.
     lineage:

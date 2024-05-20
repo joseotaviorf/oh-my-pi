@@ -4,6 +4,7 @@ SELECT
     sr.id_respondent,
     PARSE_URL(sr.response_url, 'QUERY', 't_id') AS id_ticket,
     PARSE_URL(sr.response_url, 'QUERY', 'email') AS respondent_email,
+    sr.survey_name,
     CASE
         WHEN sr.id_survey = '01176589bb5ad239' THEN "owner"
         WHEN sr.id_survey = 'a514a5d6fe646931' THEN "tenant"

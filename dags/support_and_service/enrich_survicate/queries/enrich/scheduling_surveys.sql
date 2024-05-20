@@ -3,6 +3,7 @@ SELECT
     sr.id_survey,
     sr.id_respondent,
     PARSE_URL(sr.response_url, 'QUERY', 'contractid') AS id_contract,
+    sr.survey_name,
     CASE
       WHEN sr.id_survey = 'b1133bc4925426d0' THEN 'owner'
       WHEN sr.id_survey = '278f21b367c2344c' THEN 'tenant'

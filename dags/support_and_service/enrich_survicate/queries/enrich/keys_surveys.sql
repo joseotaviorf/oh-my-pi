@@ -5,6 +5,7 @@ SELECT
     PARSE_URL(sr.response_url, 'QUERY', 'contractid') AS id_contract,
     PARSE_URL(sr.response_url, 'QUERY', 'ticket_id') AS id_ticket,
     PARSE_URL(sr.response_url, 'QUERY', 'email') AS email,
+    sr.survey_name,
     CASE
         WHEN sr.id_survey = '8214bf6281ffdb53' THEN 'owner'
         WHEN sr.id_survey = '0d7587def9ac6325' THEN 'tenant'
@@ -42,6 +43,7 @@ SELECT
     NULL AS id_contract,
     NULL AS id_ticket,
     NULL AS email,
+    NULL AS survey_name,
     'tenant' AS respondent_type,
     'keys' AS service_type,
     'onboarding' AS survey_type,
@@ -66,6 +68,7 @@ SELECT
     NULL AS id_contract,
     NULL AS id_ticket,
     NULL AS email,
+    NULL AS survey_name,
     'owner' AS respondent_type,
     'keys' AS service_type,
     'offboarding' AS survey_type,

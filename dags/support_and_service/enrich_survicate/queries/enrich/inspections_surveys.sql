@@ -35,6 +35,7 @@ SELECT
     PARSE_URL(sr.response_url, 'QUERY', 'inspectionId') AS id_inspection,
     c.id_user AS id_respondent,
     sr.id_respondent AS respondent_uuid,
+    rc.survey_name,
     CASE
         WHEN sr.id_survey IN ('00f46ff66c2ff389', '29d847ff4d17cc18') THEN 'owner'
         WHEN sr.id_survey IN ('9d64bf0e2f6faa48', 'ccecd6dbe925b337') THEN 'tenant'

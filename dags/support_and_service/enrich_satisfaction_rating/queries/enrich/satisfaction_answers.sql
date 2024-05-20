@@ -135,7 +135,7 @@ WITH union_surveys_answers AS (
         sss.service_type,
         sss.service_context,
         sss.source_name,
-        NULL AS survey_name,
+        sss.survey_name,
         sss.improvement_tags,
         sss.respondent_comments,
         sss.satisfaction_score,

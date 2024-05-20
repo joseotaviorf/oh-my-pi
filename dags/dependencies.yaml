@@ -2715,6 +2715,7 @@ bietlejuice.enrich_survicate:
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-onboarding-keys-csat
   - bietlejuice.survicate:load-clean-survey-questions
   - bietlejuice.survicate:load-clean-survey-responses
+  - bietlejuice.survicate:load-clean-surveys
 bietlejuice.enrich_tenant_journey:
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud

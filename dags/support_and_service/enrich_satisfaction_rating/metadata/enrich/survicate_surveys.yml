@@ -79,6 +79,15 @@ columns:
       - datalake_survicate.lockbox_surveys.respondent_type
       - datalake_survicate.scheduling_surveys.respondent_type
       - datalake_survicate.photo_surveys.respondent_type
+  survey_name:
+    description:
+      Descriptive information indicating the name of the submitted survey.
+    lineage:
+      - datalake_survicate.inspections_surveys.survey_name
+      - datalake_survicate.repairs_surveys.survey_name
+      - datalake_survicate.lockbox_surveys.survey_name
+      - datalake_survicate.scheduling_surveys.survey_name
+      - datalake_survicate.photo_surveys.survey_name
   service_type:
     description: Indicates the service that originated the satisfaction response.
     lineage:

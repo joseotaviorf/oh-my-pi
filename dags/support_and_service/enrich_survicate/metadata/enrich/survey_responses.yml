@@ -17,6 +17,10 @@ columns:
     description: A unique unchangeable identifier for the respondent who submitted the response.
     lineage:
       - datalake_survicate_clean.survey_responses.respondent
+  survey_name:
+    description: Descriptive information indicating the name of the submitted survey.
+    lineage:
+      - datalake_survicate_clean.surveys.survey_name
   response_url:
     description: The URL where the survey was displayed to the respondent.
     lineage:

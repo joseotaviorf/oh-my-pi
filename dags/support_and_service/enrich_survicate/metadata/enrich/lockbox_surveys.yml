@@ -23,6 +23,10 @@ columns:
     description:
       "Respondent role/type, for example: owner, tenant, surveyor, photographer,
       broker"
+  survey_name:
+    lineage:
+      - datalake_survicate.survey_responses.survey_name
+    description: Descriptive information indicating the name of the submitted survey.
   service_type:
     description:
       "For which flow/service we are evaluating satisfaction. For example:

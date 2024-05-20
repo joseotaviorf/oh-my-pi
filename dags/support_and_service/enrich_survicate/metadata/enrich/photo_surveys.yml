@@ -21,6 +21,10 @@ columns:
     lineage:
       - datalake_survicate.response_content.response_url
     description: User unique identifier
+  survey_name:
+    lineage:
+      - datalake_survicate.survey_responses.survey_name
+    description: Descriptive information indicating the name of the submitted survey.
   respondent_type:
     description:
       "Respondent role/type, for example: owner, tenant, surveyor, photographer,

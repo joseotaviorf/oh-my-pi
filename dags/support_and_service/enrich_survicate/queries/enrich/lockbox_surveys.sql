@@ -3,6 +3,7 @@ SELECT
     sr.id_survey,
     sr.id_respondent,
     LAST(rc.answer_content) FILTER (WHERE rc.id_question = 1639216) AS respondent_type,
+    sr.survey_name,
     'keys' AS service_type,
     'lockbox' AS service_context,
     'survicate' AS source_name,
