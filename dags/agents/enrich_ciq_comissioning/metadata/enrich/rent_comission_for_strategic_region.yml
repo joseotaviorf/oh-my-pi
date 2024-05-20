@@ -20,7 +20,7 @@ columns:
     description: Name of the city where the neighborhood is located.
   neighborhood_name:
     lineage:
-      - datalake_ebdb_listing.house.region_name
+      - datalake_ebdb_listing.house.neighborhood
     description: Name of the neighborhood to be classified.
   is_strategic_region:
     lineage:

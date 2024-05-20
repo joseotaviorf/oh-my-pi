@@ -12,7 +12,7 @@ listings AS (
   SELECT
       hl.id_house_listing,
       h.region_city_name,
-      h.region_name,
+      h.neighborhood,
       h.id_region,
       REGEXP_REPLACE(
         REGEXP_REPLACE(
@@ -24,7 +24,7 @@ listings AS (
                                 REGEXP_REPLACE(
                                     REGEXP_REPLACE(
                                         REGEXP_REPLACE(
-                                            LOWER( h.region_city_name || h.region_name),
+                                            LOWER( h.region_city_name || h.neighborhood),
                                             '[àáâäãå]', 'a'),
                                             '[èéêë]', 'e'),
                                             '[ìíîï]', 'i'),
@@ -54,7 +54,7 @@ SELECT
     l.id_house_listing,
     l.id_region,
     l.region_city_name AS city_name,
-    l.region_name AS neighborhood_name,
+    l.neighborhood AS neighborhood_name,
     COALESCE(sr.is_strategic_region, FALSE) AS is_strategic_region,
     l.year_month_publication_reference AS dt_publication_reference,
     l.ts_publication

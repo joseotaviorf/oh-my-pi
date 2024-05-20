@@ -25,7 +25,7 @@ listings_sale AS (
                               REGEXP_REPLACE(
                                   REGEXP_REPLACE(
                                       REGEXP_REPLACE(
-                                          LOWER( h.region_city_name || h.region_name),
+                                          LOWER( h.region_city_name || h.neighborhood),
                                           '[àáâäãå]', 'a'),
                                           '[èéêë]', 'e'),
                                           '[ìíîï]', 'i'),
