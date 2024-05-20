@@ -19,7 +19,8 @@ WITH parse_url_format AS (
                 )
             )
             ELSE sr.response_url
-        END AS response_url
+        END AS response_url,
+        sr.survey_name
     FROM
         datalake_survicate.survey_responses AS sr
     WHERE
@@ -35,7 +36,7 @@ SELECT
     PARSE_URL(sr.response_url, 'QUERY', 'inspectionId') AS id_inspection,
     c.id_user AS id_respondent,
     sr.id_respondent AS respondent_uuid,
-    rc.survey_name,
+    sr.survey_name,
     CASE
         WHEN sr.id_survey IN ('00f46ff66c2ff389', '29d847ff4d17cc18') THEN 'owner'
         WHEN sr.id_survey IN ('9d64bf0e2f6faa48', 'ccecd6dbe925b337') THEN 'tenant'
