@@ -15,7 +15,7 @@ from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTas
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
-SOURCE = "atta"
+SOURCE = "atta_teste_migracao"
 DAG_NAME = SOURCE
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
