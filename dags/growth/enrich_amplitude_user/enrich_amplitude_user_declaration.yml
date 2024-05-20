@@ -12,10 +12,3 @@ workflow:
   layer: enrich
 cluster:
   type: databricks_12_2_med_io-memory_photon_cluster
-  custom_configurations:
-    spark_conf:
-      spark.executor.cores: 5
-      spark.driver.memory: 54g
-      spark.driver.memoryOverhead: 7g
-      spark.executor.memory: 54g
-      spark.executor.memoryOverhead: 7g
