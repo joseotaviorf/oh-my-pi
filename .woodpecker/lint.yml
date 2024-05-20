@@ -9,6 +9,7 @@ steps:
       - apt-get install -y git > /dev/null
       - make requirements-lint
       - make check-style
+    depends_on: [] # This is for the steps to run in parallel
 
   files-validation-python:
     image: public.ecr.aws/docker/library/python:3.7.16

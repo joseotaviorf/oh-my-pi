@@ -19,6 +19,7 @@ steps:
     when:
       event: push
       branch: forno
+    depends_on: [make-package-python]
 
   prepare-release-prod:
     image: public.ecr.aws/docker/library/alpine:3.10
@@ -27,6 +28,7 @@ steps:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
+    depends_on: [make-package-python]
 
   export-releases-to-s3-prod:
     image: plugins/s3
@@ -40,6 +42,7 @@ steps:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
+    depends_on: [prepare-release-prod]
 
   export-releases-to-s3-forno:
     image: plugins/s3
@@ -53,6 +56,7 @@ steps:
     when:
       event: [push, tag]
       branch: forno
+    depends_on: [prepare-release-forno]
 
   export-init-script-to-s3-forno:
     image: plugins/s3
@@ -132,6 +136,7 @@ steps:
     when:
       event: push
       branch: [forno]
+    depends_on: [create-dag-files]
 
   upload-dag-packages-dags-gcs-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
@@ -147,6 +152,7 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
+    depends_on: [create-dag-files]
 
   upload-dag-packages-spark-jobs-s3-forno:
     image: public.ecr.aws/docker/library/python:3.7.16
