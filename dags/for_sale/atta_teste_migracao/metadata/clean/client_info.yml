@@ -1,0 +1,22 @@
+---
+database_name: datalake_atta_migracao_clean
+table_name: client_info
+columns:
+  id_client:
+    lineage:
+      - datalake_atta_migracao_raw.cliente.id_cliente
+  client_name:
+    lineage:
+      - datalake_atta_migracao_raw.cliente.nm_cliente
+  client_cpf:
+    lineage:
+      - datalake_atta_migracao_raw.cliente.nr_cpf
+  client_email:
+    lineage:
+      - datalake_atta_migracao_raw.cliente.nm_email
+  client_cellphone:
+    lineage:
+      - datalake_atta_migracao_raw.cliente.nr_celular
+  client_phone:
+    lineage:
+      - datalake_atta_migracao_raw.cliente.nr_telefone

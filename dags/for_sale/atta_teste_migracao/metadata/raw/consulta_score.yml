@@ -1,0 +1,12 @@
+---
+database_name: datalake_atta_migracao_raw
+table_name: consulta_score
+columns:
+  CPF:
+    tags:
+      - PII
+      - Confidential
+  CPF2:
+    tags:
+      - PII
+      - Confidential

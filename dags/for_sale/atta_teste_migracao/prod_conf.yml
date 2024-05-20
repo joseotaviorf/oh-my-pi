@@ -1,0 +1,23 @@
+---
+tables:
+  - table_name: consulta_score
+    extraction_type: full
+    clean_table_name: pre_analysis
+    db: atta
+  - table_name: max_usuarios
+    extraction_type: full
+    date_filter_column: data_ultima_atualizacao
+    clean_table_name: users_info
+    db: atta
+  - table_name: proposta
+    extraction_type: full
+    date_filter_column: DtUltAtu
+    clean_table_name: proposal
+    db: atta
+  - table_name: cliente
+    extraction_type: full
+    clean_table_name: client_info
+    db: atta
+
+clean_partition_columns: [year, month, day]
+lineage_product_database_name: atta
