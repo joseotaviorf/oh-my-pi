@@ -1,4 +1,3 @@
-%sql
 WITH credit_analysis AS (
   SELECT
     id_credit_analysis,
@@ -156,7 +155,7 @@ rent_flows AS (
       WHEN ca.guarantee_accepted = 'CLEAR_NO' OR ca.guarantee_accepted = 'NOT_ACCEPTED' THEN FALSE
       WHEN ca.guarantee_accepted IS NULL THEN FALSE
       ELSE TRUE
-    END AS is_guarantee_accepted --update rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
+    END AS is_guarantee_accepted --fix rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
   FROM
     dw_rent.fact_listing_rent_flows AS flrf
   LEFT JOIN
