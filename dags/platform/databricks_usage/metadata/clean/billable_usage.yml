@@ -1,0 +1,66 @@
+database_name: datalake_databricks_usage_clean
+table_name: billable_usage
+description: Table with the objective of storing cluster information and execution cost.
+domain: Data Platform 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_cluster:
+    description: Identification key of the executed cluster.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.clusterId
+  id_cluster_owner:
+    description: Identification key of the user who created the cluster.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.clusterOwnerUserId
+  id_workspace:
+    description: Identification key of the Databricks environment in question (this table only looks at the analytical environment).
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.workspaceId
+  cluster_name:
+    description: Descriptive information indicating the name of the running cluster.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.clusterName
+  cluster_node_type:
+    description: Descriptive information that indicates the configuration of the nodes of the executed cluster.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.clusterNodeType
+  cluster_custom_tags:
+    description: Set of descriptive information about the cluster grouped in a json.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.clusterCustomTags
+  cluster_owner_email:
+    description:  Email address associated to the owner of the cluster.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.clusterOwnerUserName
+  cluster_compute_type:
+    description: Descriptive information that indicates whether the cluster is all-purpose, for example.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.sku
+  tags:
+    description: Additional information related to cluster execution.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.tags
+  dbus:
+    description: Cluster cost measured by the official databricks unit.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.dbus
+  machine_hours:
+    description: Cluster runtime measured in hours.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.machineHours
+  ts_execution:
+    description: Date information in timestamp format that indicates when the execution started.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.timestamp
+  year:
+    description: Year extracted from dag execution date.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.year
+  month:
+    description: Month extracted from dag execution date.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.month
+  day:
+    description: Day extracted from dag execution date.
+    lineage:
+      - datalake_databricks_usage_raw.billable_usage.day
