@@ -58,4 +58,4 @@ WHERE
   rc.year = {year}
   AND rc.month = {month}
   AND rc.day = {day}
-GROUP BY 1, 2, 3, 4, 5, 9, 10, 11, 12, 13
+GROUP BY 1, 2, 3, 4, 5, 6, 10, 11, 12, 13, 14

@@ -65,4 +65,4 @@ JOIN
 LEFT JOIN
     datalake_ebdb_clean.contract AS c
         ON c.id = PARSE_URL(sr.response_url, 'QUERY', 'contractid')
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 17, 18, 19, 20, 21
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 17, 18, 19, 20, 21, 22
