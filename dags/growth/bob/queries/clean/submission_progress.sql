@@ -4,4 +4,5 @@ SELECT
     attempts,
     status,
     error_description
-FROM datalake_bob_raw.submission_progress
+FROM
+    datalake_bob_raw.submission_progress

@@ -10,7 +10,8 @@ SELECT
     city,
     state,
     zip_code,
-    lat, 
+    lat,
     lng,
     out_of_area AS is_out_of_area
-FROM datalake_bob_raw.location
+FROM
+    datalake_bob_raw.location

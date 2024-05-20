@@ -1,0 +1,53 @@
+dag:
+  name: bob
+  schedule_start_date: 2020, 7, 27
+  schedule_interval: 0 3 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG brings [Bob (bob-o-construtor)](https://github.com/quintoandar/bob-o-construtor) data,
+      a service developed by B2B for house registry and now it has been used by AA (Autonomous Agents).
+workflow:
+  type: database_pull_delta
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: BOB_DB
+  lineage_product_database_name: boboconstrutor
+  tables_customization:
+    attribution_progress_aud:
+      date_filter_column: created_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+    attribution_progress:
+      extraction_type: full
+    house_draft_aud:
+      date_filter_column: created_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+      z_order_by: [id_house_draft]
+    house_draft:
+      extraction_type: full
+      z_order_by: [id]
+    location:
+      extraction_type: full
+      z_order_by: [id_house_draft]
+    location_aud:
+      extraction_type: full
+    registrar:
+      extraction_type: full
+      z_order_by: [id]
+    registrar_aud:
+      extraction_type: full
+    revinfo:
+      clean_table_name: rev_info
+      date_filter_column: revtstmp
+      extraction_type: incremental
+      unixtime_measure: milliseconds
+      partitions: [year, month, day]
+    submission_progress:
+      extraction_type: full
+      z_order_by: [id_house_draft]
+    submission_progress_aud:
+      extraction_type: full
+cluster:
+  type: databricks_12_2_med_general_cluster

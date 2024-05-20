@@ -1,5 +1,5 @@
 SELECT
-    id, 
+    id,
     client_side_id AS id_client_side,
     original_lead_id AS id_original_lead,
     registrar,
@@ -15,4 +15,5 @@ SELECT
     attendance_info,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM datalake_bob_raw.house_draft
+FROM
+    datalake_bob_raw.house_draft

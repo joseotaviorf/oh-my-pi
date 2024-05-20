@@ -11,4 +11,5 @@ SELECT
     attempts_mod AS mod_attempts,
     status_mod AS mod_status,
     error_description_mod AS mod_error_description
-FROM datalake_bob_raw.submission_progress_aud
+FROM
+    datalake_bob_raw.submission_progress_aud
