@@ -1,6 +1,0 @@
----
-database_name: datalake_notify_me_raw
-table_name: user_campaing_preferences
-owner: null
-domain: growth
-description: null
