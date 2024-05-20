@@ -264,9 +264,6 @@ bietlejuice.enrich_app_installed:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
-bietlejuice.enrich_brand_tracking:
-  remove:
-    - bietlejuice.gsheets_growth:done-clean-ipsos-brandtracking-questions
 bietlejuice.enrich_braze_events:
   remove:
     - bietlejuice.braze_events:load-clean-events-indica-ai
@@ -454,22 +451,6 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
 bietlejuice.enrich_marketing_manual_daily_costs:
   remove:
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
-bietlejuice.enrich_media_plan:
-  override: []
-  remove:
-    - bietlejuice.docx:load-clean-credit-evaluation
-    - bietlejuice.docx:load-clean-document
-    - bietlejuice.docx:load-clean-document-context
-    - bietlejuice.docx:load-clean-document-type
-    - bietlejuice.docx:load-clean-folder
-    - bietlejuice.docx:load-clean-folder-reference
-    - bietlejuice.ebdb:load-clean-house
-    - bietlejuice.ebdb_user:load-clean-user
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house
-    - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-    - bietlejuice.enrich_ebdb_user:load-enrich-user
-    - bietlejuice.enrich_offer:load-enrich-sale-offer
-    - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
 bietlejuice.enrich_nps_answer_drivers:
   add:
     - bietlejuice.enrich_tracksale:load-enrich-answer

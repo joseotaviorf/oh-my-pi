@@ -1143,9 +1143,6 @@ bietlejuice.enrich_booking:
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature
-bietlejuice.enrich_brand_tracking:
-  - bietlejuice.brand_tracking:load-clean-brandtracking
-  - bietlejuice.brand_tracking:load-clean-brandtracking-unpivoted
 bietlejuice.enrich_braze_details:
   - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
   - bietlejuice.braze_details:load-clean-canvas-details-owners

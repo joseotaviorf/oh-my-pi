@@ -1,3 +1,0 @@
----
-partition_cols: ["year", "quarter"]
-tables_list: ["brandtracking", "brandtracking_unpivoted"]

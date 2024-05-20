@@ -1,6 +1,0 @@
----
-raw_partition_cols: ["year", "quarter"]
-media_plan_bucket: datalake-old.s3.forno.data.quintoandar.com.br
-file_to_ingest_base_path: raw/files/mkt_branding/media_plan/
-file_to_ingest_prefix: media_plan_raw_
-table_name: media_plan

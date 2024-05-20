@@ -10,15 +10,11 @@ bietlejuice.dw_datamarts_spark.static:
   is_static: true
 bietlejuice.dw_date:
   is_static: true
-bietlejuice.enrich_media_plan:
-  is_static: true
 bietlejuice.enrich_public_date:
   is_static: true
 bietlejuice.enrich_static_files:
   is_static: true
 bietlejuice.enrich_talk_to_agent:
-  is_static: true
-bietlejuice.media_plan:
   is_static: true
 
 bietlejuice.gsheets: &gsheets-default
