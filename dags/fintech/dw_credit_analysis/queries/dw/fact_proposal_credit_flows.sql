@@ -1,3 +1,4 @@
+%sql
 WITH credit_analysis AS (
   SELECT
     id_credit_analysis,
@@ -151,7 +152,11 @@ rent_flows AS (
     hl.rental_administrator,
     hl.version,
     ca.is_bypass,
-    IF(g.guarantee_not_accepted = 1, TRUE, FALSE) AS guarantee_not_accepted
+    CASE
+      WHEN ca.guarantee_accepted = 'CLEAR_NO' OR ca.guarantee_accepted = 'NOT_ACCEPTED' THEN FALSE
+      WHEN ca.guarantee_accepted IS NULL THEN FALSE
+      ELSE TRUE
+    END AS is_guarantee_accepted --update rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
   FROM
     dw_rent.fact_listing_rent_flows AS flrf
   LEFT JOIN
@@ -269,7 +274,7 @@ proposal_credit_flows AS (
     rf.dt_offer_submitted_date,
     rf.country_code,
     rf.rental_administrator,
-    rf.guarantee_not_accepted,
+    rf.is_guarantee_accepted,
     ROW_NUMBER() OVER (
       PARTITION BY rf.sk_client,
       rf.sk_credit_analysis,
@@ -325,11 +330,11 @@ SELECT
   END AS funnel_drop_step,
   guarantee_offered,
   guarantee_accepted,
+  is_guarantee_accepted,
   is_first_credit_evaluation,
   is_last_credit_evaluation,
   is_bypass,
   has_early_credit,
-  guarantee_not_accepted,
   country_code,
   rental_administrator,
   dt_last_credit_evaluation_init,

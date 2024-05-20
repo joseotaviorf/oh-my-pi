@@ -177,6 +177,10 @@ columns:
       THIRD_PARTY_GUARANTEE: "The accepted guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
       CLEAR_NO: "When no guarantee was accepted, as it was denied by some reason (such as income reasons)"
       NOT_ACCEPTED: "When 5A has offered a paid guarantee to the TP, but the person has not accepted it"
+  is_guarantee_accepted:
+    lineage:
+      - datalake_rental_guarantee.guarantee
+    description: "Indicates if a guarantee was accepted (TURE) or not (FALSE)"
   is_first_credit_evaluation:
     description: "Indicates if the row presents the first credit evaluation."
   is_last_credit_evaluation:
@@ -185,10 +189,6 @@ columns:
     description: "True if the analysis was bypassed."
   has_early_credit:
     description: "Indicates if the offer had an early credit analysis."
-  guarantee_not_accepted:
-    lineage:
-      - datalake_rental_guarantee.guarantee
-    description: "Indicates if a paid guarantee offered was accepted (FALSE) or not (TRUE) by the tenant."
   country_code:
     lineage:
       - dw_rent.dim_house_listing.country_code
