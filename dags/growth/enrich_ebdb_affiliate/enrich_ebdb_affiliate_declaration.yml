@@ -1,0 +1,16 @@
+---
+dag:
+  name: enrich_ebdb_affiliate
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: This DAG enriches calculate monthly summarized metrics and segmentation
+      for affiliates.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    affiliate_monthly_category_segmentation:
+    - affiliate_monthly_metrics
+cluster:
+  type: databricks_12_2_med_general_photon_cluster
