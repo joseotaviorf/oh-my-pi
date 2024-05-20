@@ -19,6 +19,6 @@ LEFT JOIN
     datalake_survicate_clean.surveys AS s
         ON sq.id_survey = s.id_survey
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    sq.year = {year}
+    AND sq.month = {month}
+    AND sq.day = {day}
