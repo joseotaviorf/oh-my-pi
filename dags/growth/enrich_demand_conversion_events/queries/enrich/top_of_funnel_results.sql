@@ -102,14 +102,14 @@ SELECT
   media_setup_from_naming_convention,
   CASE
     WHEN media_setup_from_adhoc IS NOT NULL THEN media_setup_from_adhoc
+    WHEN media_setup_from_exception_flow IS NOT NULL AND media_setup_from_exception_flow <> '' THEN media_setup_from_exception_flow
     WHEN media_setup_from_dictionary IS NOT NULL THEN media_setup_from_dictionary
-    WHEN media_setup_from_exception_flow IS NOT NULL THEN media_setup_from_exception_flow
     WHEN media_setup_from_naming_convention IS NOT NULL THEN media_setup_from_naming_convention
   END AS naming_convention_sufix,
   CASE
     WHEN media_setup_from_adhoc IS NOT NULL THEN "adhoc rule"
+    WHEN media_setup_from_exception_flow IS NOT NULL AND media_setup_from_exception_flow <> '' THEN "exception flow"
     WHEN media_setup_from_dictionary IS NOT NULL THEN "dictionary"
-    WHEN media_setup_from_exception_flow IS NOT NULL THEN "exception flow"
     WHEN media_setup_from_naming_convention IS NOT NULL THEN "naming convention"
   END AS naming_convention_sufix_origin,
   utm_adhoc_rule,
