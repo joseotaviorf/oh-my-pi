@@ -31,4 +31,5 @@ SELECT
     year AS year,
     month AS month,
     day AS day
-FROM datalake_hr_system_raw.jobs
+FROM 
+  datalake_hr_system_raw.jobs

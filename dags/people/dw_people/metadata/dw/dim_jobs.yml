@@ -1,0 +1,59 @@
+---
+database_name: dw_people
+table_name: dim_jobs
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: "Dimension table with information about jobs in QuintoAndar Group."
+columns:
+  sk_job:
+    description: "Surrogate key for the job."
+    lineage:
+    - datalake_hr_system_clean.jobs.j.id_job
+  job_code:
+    description: "Job code."
+    lineage:
+    - datalake_hr_system_clean.jobs.job_code
+  job_name:
+    description: "Job name."
+    lineage:
+    - datalake_hr_system_clean.jobs.job_name
+  band_ladder_name:
+    description: "Job's band ladder name. The band ladder is a structure that defines the career path for the employees."
+    lineage:
+    - datalake_hr_system_clean.jobs.band_ladder_name
+  set_name:
+    description: "Job's set name. The set gathers jobs that belongs to the same company structure"
+    lineage:
+    - datalake_hr_system_clean.jobs.id_set
+  job_family_name:
+    description: "Job's family name. The job family is a structure that groups jobs that have similar characteristics."
+    lineage:
+    - datalake_hr_system_clean.jobs.id_job_family
+  track:
+    description: "Indicates the track that the job belongs to. Possible values are: 'Líder', 'Contribuidor Individual', 'UNKNOWN'"
+    lineage:
+    - datalake_hr_system_clean.jobs.track
+  working_hours_regime:
+    description: "Indicates the working hours regime of the job. Possible values are: '1 - Submetido a Jornada de Trabalho', '3 - Função de Confiança', '4 - Teletrabalho (Inciso III Art 62 CLT)', 'UNKNOWN'"
+    lineage:
+    - datalake_hr_system_clean.jobs.working_hours_regime
+  workload:
+    description: "Indicates the number of hours that the job requires, and further details"
+    lineage:
+    - datalake_hr_system_clean.jobs.workload
+  is_active:
+    description: "Indicates if the job is active or not. Possible values are: TRUE, FALSE, NULL"
+    lineage:
+    - datalake_hr_system_clean.jobs.active_status
+  has_clock_in:
+    description: "Indicates if the job requires clock in. Possible values are: TRUE, FALSE, NULL"
+    lineage:
+    - datalake_hr_system_clean.jobs.has_clock_in
+  dt_effective_start:
+    description: "The date when the last change in the job was effective."
+    lineage:
+    - datalake_hr_system_clean.jobs.dt_effective_start
+  dt_effective_end:
+    description: "Date of validity of the last change in the job."
+    lineage:
+    - datalake_hr_system_clean.jobs.dt_effective_end

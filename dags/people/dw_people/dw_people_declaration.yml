@@ -1,0 +1,15 @@
+dag:
+    name: dw_people
+    owner: Data People
+    schedule_start_date: 2024, 4, 1
+    documentation:
+      dag_purpose:
+        DataWarehouse with information about QuintoAndar Group employees.
+workflow:
+    type: query_delta
+    layer: dw
+    bucket_config_name: people_bucket
+    custom_schema: people
+    has_hive_sync: false
+cluster:
+    type: databricks_12_2_min_people_cluster
