@@ -1,0 +1,19 @@
+---
+dag:
+  name: enrich_listing_flow
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: Creates enriched tables for the context `Listing_flow`.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    listing_flows_with_reprocessed_leads:
+      - listing_flow
+      - discards_reason_by_context
+    sales_listing_flows_with_reprocessed_leads:
+      - listing_flow
+      - discards_reason_by_context
+cluster:
+  type: databricks_12_2_med_memory_photon_cluster

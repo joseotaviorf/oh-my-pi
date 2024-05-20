@@ -1,7 +1,0 @@
----
-custom_cluster:
-  driver_node_type_id: r5d.4xlarge
-  node_type_id: r5d.8xlarge
-  runtime_engine: PHOTON
-  num_workers: 4
-  spark_version: 12.2.x-scala2.12
