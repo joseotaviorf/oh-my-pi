@@ -1,0 +1,23 @@
+---
+dag:
+  name: enrich_top_of_funnel_demand
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: As a derivation of Amplitude enrich layer, this DAG generates tables
+      to track demand user behaviors in the top of the funnel.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    first_user_interaction_staging:
+    - user_interactions
+    first_user_interaction:
+    - first_user_interaction_staging
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+    - day
+cluster:
+  type: databricks_12_2_med_general_photon_cluster
