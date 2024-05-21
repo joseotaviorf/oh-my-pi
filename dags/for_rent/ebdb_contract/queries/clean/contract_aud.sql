@@ -66,6 +66,7 @@ SELECT
     dataAssinado_MOD AS mod_ts_signed,
     dataContratoEletronicoEnviado_MOD AS mod_ts_electronic_contract_sent,
     dataRescisaoPrevista_MOD AS mod_ts_expected_termination,
+    relistingEnabled_MOD AS mod_is_relisting_enabled,
     comSeguroResidencial AS has_home_insurance,
     termoAditivoAdicionado AS has_contract_amendment,
     relistingenabled AS is_relisting_enabled,

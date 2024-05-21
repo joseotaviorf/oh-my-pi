@@ -199,6 +199,9 @@ columns:
   mod_ts_expected_termination:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datarescisaoprevista_mod
+  mod_is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.relistingenabled_mod
   has_home_insurance:
     lineage:
       - datalake_ebdb_raw.contrato_aud.comseguroresidencial
