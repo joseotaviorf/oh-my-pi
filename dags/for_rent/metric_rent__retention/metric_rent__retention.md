@@ -24,6 +24,8 @@ Currently, there is the following output tables in the metric layer:
 - `house_early_demand_weekly`
 - `house_not_relisted_monthly`
 - `house_not_relisted_weekly`
+- `house_republished_unpublished_monthly`
+- `house_republished_unpublished_weekly`
 - `lead_time_cc2nr_monthly`
 - `lead_time_cc2nr_weekly`
 - `nps_pp_monthly`

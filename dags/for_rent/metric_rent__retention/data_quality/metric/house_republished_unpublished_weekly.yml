@@ -1,0 +1,12 @@
+---
+table_name: metric_rent.house_republished_unpublished_weekly
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  pct_pub_30d_matured:
+    has_max_value:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  pct_pub_90d_matured:
+    has_max_value:
+      less_than_or_equal_to: 1
+      severity_level: Error
