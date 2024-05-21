@@ -25,7 +25,7 @@ def remove_nulls(row_dict:dict) -> dict:
     
     :return: dictionary without null values
     """
-    return {k: v for k, v in row_dict.items() if v}
+    return {k: v for k, v in row_dict.items() if v is not None}
 
 
 def _get_payloads_from_datalake(spark_client:SparkClient, data_asset:str) -> list:

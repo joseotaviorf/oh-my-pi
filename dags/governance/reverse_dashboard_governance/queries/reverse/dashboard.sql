@@ -41,3 +41,4 @@ SELECT
   tags
 FROM 
     datalake_superset.dashboards
+WHERE published = true
