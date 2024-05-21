@@ -1,0 +1,93 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: quintocred_pre_evictions
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_propose:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.id_proposta
+  id_broker:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.id_da_imobiliaria_
+  id_ticket_termination:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._ticket_rescisao_
+  tenant:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.inquilino
+  document:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.cpf
+  status_contract:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.status_contrato
+  status:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._status_
+  broker_name:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.imobiliaria_
+  responsible_name:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.responsavel
+  reason:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._motivo_
+  history_comment:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._historico_
+  exoneration_sent:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._enviado_exoneracao_
+  exoneration_deadline:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._prazo_exoneracao_
+  status_exoneration:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.exoneracao
+  status_power_of_attorney:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._procuracao_
+  status_adm_contract:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.contrato_adm
+  status_document_renter:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._rg_locador
+  backoffice_analyst_name:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.analista_backoffice
+  is_eviction_active:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._ativo_evic_
+  pre_eviction_comment:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._obs_pretombamento_
+  status_eviction:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.status_evic
+  status_pre_eviction:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.status_pretombamento
+  dt_suspension:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._suspensao_
+  dt_release:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.liberacao
+  dt_sent:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions._data_de_envio_
+  dt_adm_contract_received:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_contrato_de_adm
+  dt_document_renter_received:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.data_recebimento_rg_locador
+  dt_movement:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.data_de_movimentacao_
+  ts_load:
+    lineage:
+    - datalake_gsheets_raw.quintocred_pre_evictions.ts_load

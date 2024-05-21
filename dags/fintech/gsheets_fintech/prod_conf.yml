@@ -213,6 +213,12 @@ sheets_info:
     clean_table_name: quintocred_process_evictions
     sheet_context: fintech
 
+  quintocred_pre_evictions:
+    sheet_id: 1ChYP2E2qvVmn0NRHeDjFvgOa31a4SPLhuFKmjUnS2B0
+    sheet_name: Trancamento Vigentes
+    clean_table_name: quintocred_pre_evictions
+    sheet_context: fintech
+
   quintocred_targets:
     sheet_id: 1c9RYSJJtN9edc0-XRanDWiMSdEvPgcvrubq89Gnc2No
     sheet_name: quintocred_targets
