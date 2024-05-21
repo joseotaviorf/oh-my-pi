@@ -3,115 +3,110 @@ tables:
   - table_name: consulta_score
     extraction_type: full
     clean_table_name: pre_analysis
-    db: maxfinancas01
+    db: atta
   - table_name: entidade_log
     extraction_type: full
     clean_table_name: log_isolve_v2
-    db: maxfinancas01
+    db: atta
   - table_name: franquia
     extraction_type: full
     clean_table_name: franchise_info
-    db: maxfinancas01
+    db: atta
   - table_name: fornecedores
     extraction_type: full
     clean_table_name: providers_info
-    db: maxfinancas01
+    db: atta
   - table_name: log_proposta_esteira
     extraction_type: full
     clean_table_name: log_isolve_v1
-    db: maxfinancas01
+    db: atta
   - table_name: max_usuarios
     extraction_type: full
     date_filter_column: data_ultima_atualizacao
     clean_table_name: users_info
-    db: maxfinancas01
+    db: atta
   - table_name: parceiro
     extraction_type: full
     clean_table_name: partner_info
-    db: maxfinancas01
+    db: atta
   - table_name: produto
     extraction_type: full
     clean_table_name: product_info
-    db: maxfinancas01
+    db: atta
   - table_name: produto_esteira
     extraction_type: full
     clean_table_name: track_step_detail
-    db: maxfinancas01
+    db: atta
   - table_name: proposta
     extraction_type: full
     date_filter_column: DtUltAtu
     clean_table_name: proposal
-    db: maxfinancas01
+    db: atta
   - table_name: proposta_credimob_confval
     extraction_type: full
     date_filter_column: AtualizadoEm
     clean_table_name: financing_proposal_check
-    db: maxfinancas01
+    db: atta
   - table_name: proposta_itau
     extraction_type: full
     clean_table_name: financing_proposal
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_bradesco
     extraction_type: full
     clean_table_name: pre_analysis_bradesco
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_bradesco_params
     extraction_type: full
     clean_table_name: pre_analysis_bradesco_params
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_bradesco_ratings
     extraction_type: full
     clean_table_name: pre_analysis_bradesco_ratings
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_caixa
     extraction_type: full
     clean_table_name: pre_analysis_caixa
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_ctrl
     extraction_type: full
     clean_table_name: pre_analysis_ctrl
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_cliente_ctrl
     extraction_type: full
     clean_table_name: pre_analysis_client_ctrl
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_itau
     extraction_type: full
     clean_table_name: pre_analysis_itau
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_itau_ratings
     extraction_type: full
     clean_table_name: pre_analysis_itau_ratings
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_santander
     extraction_type: full
     clean_table_name: pre_analysis_santander
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_santander_matriz_decisao
     extraction_type: full
     clean_table_name: pre_analysis_santander_matrix
-    db: maxfinancas01
+    db: atta
   - table_name: consulta_score_santander_ratings
     extraction_type: full
     clean_table_name: pre_analysis_santander_ratings
-    db: maxfinancas01
+    db: atta
   - table_name: proposta_observacao
     extraction_type: full
     clean_table_name: proposal_notes
-    db: maxfinancas01
+    db: atta
   - table_name: parceiro_categoria
     extraction_type: full
     clean_table_name: partner_category
-    db: maxfinancas01
-  - table_name: systemlogs
-    extraction_type: incremental
-    date_filter_column: CreatedAt
-    clean_table_name: system_logs
-    db: guardian
+    db: atta
   - table_name: cliente
     extraction_type: full
     clean_table_name: client_info
-    db: maxfinancas01
+    db: atta
 
 clean_partition_columns: [year, month, day]
 lineage_product_database_name: atta
