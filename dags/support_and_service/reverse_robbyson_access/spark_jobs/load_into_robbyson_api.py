@@ -24,6 +24,8 @@ def create_results_payload(configurations: dict, execution_date: str, context: s
             STRING(MAKE_DATE(year, month, day)) AS date 
         FROM 
             {configurations["results_table_path"]}
+            LEFT JOIN {configurations["agent_table_path"]}
+                USING({configurations["key_join_tables"]})
         WHERE 
             MAKE_DATE(year, month, day) = DATE("{execution_date}")
     """)

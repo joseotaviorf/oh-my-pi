@@ -7,4 +7,6 @@ endpoint: results
 configurations:
   support_and_services:
     results_table_path: dw_customer_support.fact_analysts_performance
-    analyst_key_column: sk_agent
+    agent_table_path: dw_customer_support.dim_agent
+    key_join_tables: sk_agent
+    analyst_key_column: email
