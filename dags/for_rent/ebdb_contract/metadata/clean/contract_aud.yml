@@ -205,6 +205,9 @@ columns:
   has_contract_amendment:
     lineage:
       - datalake_ebdb_raw.contrato_aud.termoaditivoadicionado
+  is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.relistingenabled
   dt_entered:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dataentrada

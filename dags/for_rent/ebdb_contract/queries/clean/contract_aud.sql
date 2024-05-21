@@ -68,6 +68,7 @@ SELECT
     dataRescisaoPrevista_MOD AS mod_ts_expected_termination,
     comSeguroResidencial AS has_home_insurance,
     termoAditivoAdicionado AS has_contract_amendment,
+    relistingenabled AS is_relisting_enabled,
     dataEntrada AS dt_entered,
     dataInicio AS dt_started,
     dataFimContratoPrevisto AS ts_contract_expected_end,
