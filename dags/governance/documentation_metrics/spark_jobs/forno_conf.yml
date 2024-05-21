@@ -31,6 +31,7 @@ DATABASE_SKIP_LIST:
   - datalake_workable_raw
   - default
   - ds4a
+  - dw_people
   - credit
   - girafales
   - model_academy
@@ -43,6 +44,7 @@ DATABASE_SKIP_LIST:
   - historical_datalake_zendesk_raw
   - historical_dw_zendesk
   - listing_crawler
+  - test_people
   - testing_crm_migration
   - testing_ebdb_agents
   - testing_map_ods_from_s3
