@@ -5,7 +5,7 @@ depends_on:
 
 steps:
   make-package-python:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.9.5
     commands:
       - make package
     when:

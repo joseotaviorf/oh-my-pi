@@ -8,7 +8,7 @@ businesstimedelta==1.0.1
 Click==7.0
 deepmerge==0.3.0
 delta-spark==2.3.0
-dependency-injector==4.8.2
+dependency-injector==4.41.0
 deprecated==1.2.10
 future==0.16.0
 gitdb2==2.0.5
