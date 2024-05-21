@@ -1,4 +1,4 @@
-SELECT 
+SELECT
   id AS id_contact_submission,
   contact_type_id AS id_contact_type,
   rev,
@@ -29,6 +29,4 @@ SELECT
 FROM
   datalake_demand_contact_submission_raw.contact_submissions_aud
 WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

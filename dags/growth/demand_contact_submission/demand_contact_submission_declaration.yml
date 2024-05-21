@@ -1,0 +1,35 @@
+dag:
+  name: demand_contact_submission
+  schedule_start_date: 2022, 6, 15
+  schedule_interval: 0 0 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from Demand Contact Submission,
+      a platform responsible manage the demand lead contact submission.
+workflow:
+  type: database_pull_delta
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: DEMAND_CONTACT_SUBMISSION_DB
+  lineage_product_database_name: demand_contact_submission
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    contact_submission_types_aud:
+      date_filter_column: created_at
+    contact_submission_types:
+      date_filter_column: updated_at
+    contact_submissions_aud:
+      date_filter_column: created_at
+    contact_submissions:
+      date_filter_column: created_at
+    message:
+      date_filter_column: creation_time
+      unixtime_measure: milliseconds
+    revinfo:
+      clean_table_name: rev_info
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+cluster:
+  type: databricks_12_2_min_io-general_cluster
