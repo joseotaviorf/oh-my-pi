@@ -1,0 +1,21 @@
+SELECT 
+    ARRAY('datahub') AS vendor,
+    id AS id_dataset, 
+    dataset_type,
+    platform,
+    if(dataset_type = 'virtual', 'virtual', schema) AS schema_name,
+    table_name, 
+    company_line AS dataset_path,
+    coalesce(description,"") AS description,
+    sql_code AS query,
+    columns,
+    metrics,
+    tags,
+    business_owners,
+    technical_owner AS created_by,
+    last_owner AS changed_by,
+    certified_by,
+    date_format(ts_created, 'yyyy-MM-dd hh:mm:ss') AS created_on,
+    date_format(ts_changed, 'yyyy-MM-dd hh:mm:ss') AS changed_on,
+    company_line AS domain
+FROM datalake_superset.tables

@@ -43,7 +43,7 @@ SELECT
   ls.ts_changed,
   ls.company_line,
   "superset" AS platform,
-  IF(l.id_slice IS NOT NULL, 'Ativo', 'Deprecado') AS entity_status,
+  IF(l.id_slice IS NOT NULL, 'ACTIVE', 'DEPRECATED') AS entity_status,
   COALESCE(l.last_90d_views,0) AS last_90d_views,
   array_remove(regexp_extract_all(ls.slice_name, '\\[([^\\]]+)\\]'), ls.company_line) AS tags,
   tags.tags AS new_tags,

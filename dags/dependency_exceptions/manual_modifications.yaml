@@ -801,6 +801,9 @@ bietlejuice.reverse_bic_ss:
 bietlejuice.reverse_dashboard_governance:
   add:
     - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
+    - bietlejuice.enrich_superset:load-enrich-slices
+    - bietlejuice.enrich_superset:load-enrich-dashboards
+    - bietlejuice.enrich_superset:load-enrich-tables
 bietlejuice.reverse_inspections:
   add:
     - bietlejuice.enrich_inspections_metrics:load-enrich-inspector-performance

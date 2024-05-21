@@ -37,10 +37,16 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 reverse_spark_job_path = (
     f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_dashboard_governance_into_mp.py"
+)  ## TODO deprecate when migrating dashboards
+
+reverse_asset_spark_job_path = (
+    f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_data_assets_into_mp.py"
 )
 
+
+
 CLUSTER_DESCRIPTION = config_service.get_config(
-    "databricks_10_4_min_general_photon_cluster"
+    "databricks_12_2_min_general_photon_cluster"
 )
 default_libraries = config_service.get_config("default_libraries")
 
@@ -79,7 +85,7 @@ task_group = ReverseTaskGroup(
 )
 
 submit_metadata_propagator_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"load_dashboard_governance_into_mp",
+    task_id="load_dashboard_governance_into_mp",
     dag=dag,
     json={
         "spark_python_task": {
@@ -89,6 +95,29 @@ submit_metadata_propagator_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+datalake_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.REVERSE,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+    is_incremental=False,
+    execution_date="{{ ds }}",
+)   
+
+send_assets_to_metadata_propagator_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="load_data_assets_into_mp",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": reverse_asset_spark_job_path,
+            "parameters": [ENV, "--data_assets", "dashboard", "chart", "dataset"],
+        }
+    },
+)
 
 chain(create_cluster_task, submit_metadata_propagator_task)
+chain(create_cluster_task, ReverseTaskGroup.all_first_tasks(datalake_task_groups))
+
+chain(ReverseTaskGroup.all_first_tasks(datalake_task_groups), send_assets_to_metadata_propagator_task)
+
 chain(submit_metadata_propagator_task, terminate_cluster_task)
+chain(send_assets_to_metadata_propagator_task, terminate_cluster_task)

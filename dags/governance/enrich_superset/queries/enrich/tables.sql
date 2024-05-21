@@ -23,20 +23,21 @@ with last_table AS (
 ), columns_list AS (
   SELECT 
     id_table, 
-    collect_set(to_json(map("column_name",column_name, "column_type", type, "description", description))) columns
+    collect_set(named_struct("column_name",column_name, "column_type", type, "description", description)) columns
   FROM datalake_superset.table_columns
   GROUP BY 1
 ), metrics_list AS (
   SELECT 
     id_table,
-    collect_set(to_json(map("metric_name",metric_name, "verbose_name", verbose_name, "description", description, "metric_type", metric_type, "expression", expression))) metrics
+    collect_set(named_struct("metric_name",metric_name, "verbose_name", verbose_name, "description", description, "metric_type", metric_type, "expression", expression)) metrics
   FROM datalake_superset_clean.sql_metrics
   GROUP BY 1
 )
 SELECT 
   lt.id,
   lt.table_name,
-  if(lt.sql_code is null, "physical", "virtual") AS dataset_type,
+  if(nullif(lt.sql_code,'') is null, "physical", "virtual") AS dataset_type,
+  lt.schema,
   lt.description,
   lt.sql_code,
   cl.columns,

@@ -1,0 +1,21 @@
+SELECT
+    ARRAY('datahub') AS vendor,
+    CAST(s.id AS STRING) AS id_chart,
+    slice_name AS title,
+    s.platform,
+    COALESCE(s.description,"") AS description,
+    s.company_line AS chart_path,
+    viz_type AS chart_type,
+    chart_url,
+    ARRAY(CAST(id_datasource AS STRING)) AS id_datasource,
+    s.tags,
+    s.business_owners,
+    s.technical_owner AS created_by,
+    s.last_owner AS changed_by,
+    s.certified_by,
+    s.company_line AS domain,
+    DATE_FORMAT(s.ts_created, 'yyyy-MM-dd hh:mm:ss') AS created_on,
+    DATE_FORMAT(s.ts_changed, 'yyyy-MM-dd hh:mm:ss') AS changed_on,
+    s.entity_status AS status,
+    s.last_90d_views
+FROM datalake_superset.slices s

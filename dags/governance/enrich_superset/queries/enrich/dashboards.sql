@@ -62,7 +62,7 @@ SELECT
   ds.entity_description,
   "superset" AS platform,
   d.certified_by,
-  IF(l.id_dashboard IS NOT NULL, 'Ativo', 'Deprecado') AS entity_status,
+  IF(l.id_dashboard IS NOT NULL, 'ACTIVE', 'DEPRECATED') AS entity_status,
   d.ts_created,
   d.ts_changed, 
   COALESCE(l.last_90d_views,0) AS last_90d_views,
