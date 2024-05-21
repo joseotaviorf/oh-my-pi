@@ -4,7 +4,7 @@ import pendulum
 import os
 
 from airflow.models import DAG
-from airflow.operators.quintoandar_databricks import (
+from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )

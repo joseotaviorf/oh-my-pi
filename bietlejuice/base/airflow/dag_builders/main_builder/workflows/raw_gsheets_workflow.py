@@ -2,7 +2,7 @@ import os
 import json
 from typing import Dict, AnyStr
 
-from airflow.operators.quintoandar_databricks import (
+from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,

@@ -1,8 +1,6 @@
 import json
 from datetime import timedelta
-from airflow.operators.quintoandar_databricks import (
-    QuintoAndarDatabricksSubmitRunOperator,
-)
+from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup

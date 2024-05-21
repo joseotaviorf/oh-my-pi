@@ -3,11 +3,11 @@ from datetime import datetime
 from pendulum import timezone
 
 from airflow.models import DAG
-from airflow.operators.quintoandar_databricks import (
+from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
+from transfer_data_plugin import QuintoAndarMySqlToS3Operator
 from airflow.utils.helpers import cross_downstream
 
 from bietlejuice.base.airflow.base_dag import BaseDAG

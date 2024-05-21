@@ -4,9 +4,7 @@ from typing import Dict
 from os import path
 
 from airflow.utils.helpers import chain
-from airflow.operators.quintoandar_databricks import (
-    QuintoAndarDatabricksSubmitRunOperator,
-)
+from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum

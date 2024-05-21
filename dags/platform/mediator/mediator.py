@@ -1,7 +1,7 @@
 from datetime import datetime, date, timedelta
 
 from airflow.models import DAG, Variable
-from airflow.operators.quintoandar_dag_mediator import (
+from dag_mediator_plugin import (
     QuintoAndarShortCircuitExternalSensor,
     QuintoAndarCustomTriggerDagOperator,
 )

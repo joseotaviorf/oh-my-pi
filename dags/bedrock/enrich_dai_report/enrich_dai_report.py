@@ -5,7 +5,7 @@ import os
 
 from airflow.models import DAG, Variable
 from airflow.operators.python_operator import ShortCircuitOperator
-from airflow.operators.quintoandar_databricks import (
+from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,

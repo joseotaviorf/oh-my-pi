@@ -4,7 +4,7 @@ from datetime import datetime
 import pendulum
 from airflow.models import DAG
 from airflow.utils.helpers import chain
-from airflow.operators.quintoandar_databricks import (
+from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )

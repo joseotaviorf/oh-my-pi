@@ -6,7 +6,7 @@ import os
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
-from airflow.operators.quintoandar_databricks import (
+from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
