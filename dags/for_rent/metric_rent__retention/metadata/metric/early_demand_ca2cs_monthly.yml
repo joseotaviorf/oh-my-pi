@@ -1,0 +1,59 @@
+---
+database_name: metric_rent
+table_name: early_demand_ca2cs_monthly
+description: Weekly table with the calculation of the Contract Approved to Contract Signed (CA2CS) filtering just the early demand houses and excluding B2B houses.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  dt_reference_month:
+    lineage:
+      - dw_public.dim_date.month_start
+    description: Month date of when the event happened.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_public.dim_region.country_code
+    description: "Country code of the house."
+    dimension: True
+  value_segment:
+    description: "Category of rent value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  credit_approved:
+    description: Monthly volume of credit approved filtering the early demand houses and excluding B2B houses.
+    metric:
+      name: Monthly Credit Approved
+      description: Monthly volume of credit approved filtering the early demand houses and excluding B2B houses.
+      acronym: MCA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  contracts_signed:
+    description: Monthly volume of contracts signed filtering the early demand houses and excluding B2B houses.
+    metric:
+      name: Monthly Contracts Signed
+      description: Monthly volume of contracts signed filtering the early demand houses and excluding B2B houses.
+      acronym: MCS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ca2cs:
+    description: Monthly percentage of contracts that were approved and then signed filtering the early demand houses and excluding B2B houses.
+    metric:
+      name: Monthly CA2CS
+      description: Monthly percentage of contracts that were approved and then signed filtering the early demand houses and excluding B2B houses.
+      acronym: MCA2CS
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""

@@ -1,0 +1,8 @@
+---
+table_name: metric_rent.early_demand_ca2cs_weekly
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  ca2cs:
+    has_max_value:
+      less_than_or_equal_to: 1
+      severity_level: Error
