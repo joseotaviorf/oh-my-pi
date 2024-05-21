@@ -1,7 +1,7 @@
 database_name: datalake_customer_support
 table_name: unified_tickets
 description:
-  This table has the goal to unify all tickets from call, chat and email channels. 
+  This table has the goal to unify all tickets from call, chat and email channels.
   By centralizing all tickets metrics in a single table,
   it provides a full overview of the customer support activity.
   Also, this table is the base to build fact_ticket model.
@@ -114,6 +114,7 @@ columns:
       - datalake_customer_support.email.id_contract
       - datalake_customer_support.historical_call.id_contract
       - datalake_customer_support.historical_chat.id_contract
+      - datalake_greenseer_clean.sessions.memory
     description: Unique contract identifier.
   id_session:
     lineage:
@@ -140,7 +141,7 @@ columns:
     lineage:
       - datalake_customer_support.call.channel_type
     description: Identify the channel type for this ticket. Only available for call tickets.
-  direction: 
+  direction:
     lineage:
       - datalake_customer_support.call.direction
       - datalake_customer_support.email.direction
@@ -177,7 +178,8 @@ columns:
   context:
     description: Context of the ticket.
     categories:
-      "ForRent": Ticket is considered from the ForRent context because has subjourney 'Contract to Entrance',
+      "ForRent":
+        Ticket is considered from the ForRent context because has subjourney 'Contract to Entrance',
         'Listing & Search', 'Offboarding', 'Onboarding' or 'Visits to Offer'.
       "ForSale": Ticket is considered from the ForSale context because has subjourney 'For Sale'.
       "Partners": Ticket is considered from the Partners context because has subjourney 'Partners'.
@@ -283,9 +285,11 @@ columns:
   ticket_rate_weight:
     description: The weight applied to the ticket if it's part of the ticket rate calculation.
     categories:
-      "1": Ticket rate weight is 1 and is based on being a front ticket and in the sub journeys 'Contract to Entrance',
+      "1":
+        Ticket rate weight is 1 and is based on being a front ticket and in the sub journeys 'Contract to Entrance',
         'For Sale', 'Listing & Search', 'Offboarding', 'Onboarding', 'Partners' or 'Visits to Offer'.
-      "2": Ticket rate weight is 2 and is based on being a back ticket and in the sub journeys 'Contract to Entrance',
+      "2":
+        Ticket rate weight is 2 and is based on being a back ticket and in the sub journeys 'Contract to Entrance',
         'For Sale', 'Listing & Search', 'Offboarding', 'Onboarding', 'Partners' or 'Visits to Offer'.
       "15": Ticket rate weight is 15 and is based on being a front ticket and in the sub journey 'Ongoing'.
       "30": Ticket rate weight is 30 and is based on being a back ticket and in the sub journey 'Ongoing'.

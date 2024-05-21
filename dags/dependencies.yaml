@@ -3180,8 +3180,8 @@ bietlejuice.reverse_bpo_performance:
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
   - bietlejuice.enrich_superset:load-enrich-dashboards
-  - bietlejuice.enrich_superset:load-enrich-tables
   - bietlejuice.enrich_superset:load-enrich-slices
+  - bietlejuice.enrich_superset:load-enrich-tables
 bietlejuice.reverse_dsat_report_access:
   - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
 bietlejuice.reverse_dsat_report_load:

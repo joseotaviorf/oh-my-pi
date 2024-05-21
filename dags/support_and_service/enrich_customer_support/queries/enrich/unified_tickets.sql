@@ -534,6 +534,16 @@ base_tickets AS (
     *
   FROM
     historical_chat_tickets
+),
+session_contracts AS (
+  SELECT
+    id_session,
+    CAST(GET_JSON_OBJECT(memory, "$.basic.user.contract.deeplink.contract_id") AS BIGINT) AS id_contract
+  FROM
+    datalake_greenseer_clean.session
+  WHERE
+    year >= 2024
+    AND GET_JSON_OBJECT(memory, "$.basic.user.contract.deeplink.contract_id") IS NOT NULL
 )
 SELECT DISTINCT
     bt.id_ticket,
@@ -545,7 +555,7 @@ SELECT DISTINCT
     bt.id_first_department,
     bt.id_main_department,
     bt.id_user,
-    bt.id_contract,
+    COALESCE(sc.id_contract, bt.id_contract) AS id_contract,
     bt.id_session,
     bt.id_service_status,
     bt.channel,
@@ -581,7 +591,7 @@ SELECT DISTINCT
           WHEN bt.front_or_back = 'back' THEN 30
         END
       WHEN bt.is_ticket_rate AND tr.sub_journey IN ('Contract to Entrance', 'For Sale',
-        'Listing & Search', 'Offboarding', 'Onboarding', 'Partners', 'Visits to Offer') THEN 
+        'Listing & Search', 'Offboarding', 'Onboarding', 'Partners', 'Visits to Offer') THEN
           CASE
             WHEN bt.front_or_back = 'front' THEN 1
             WHEN bt.front_or_back = 'back' THEN 2
@@ -618,3 +628,6 @@ LEFT JOIN
   datalake_gsheets_clean.ticket_rate_classification AS tr
     ON bt.theme_detail = tr.micro_taxonomy
       AND bt.theme = tr.macro_taxonomy
+LEFT JOIN
+  session_contracts AS sc
+    ON sc.id_session = bt.id_session
