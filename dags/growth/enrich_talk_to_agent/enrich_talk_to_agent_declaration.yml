@@ -1,0 +1,17 @@
+---
+dag:
+  name: enrich_talk_to_agent
+  schedule_start_date: 2020, 7, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG brings data from Talk To Agent events.
+      This table contains events data from feature "Fale com Corretor",
+      active during the start of the Covid-19 pandemic, as an alternative
+      for blocking presential visits. Currently, all the tables related to
+      this context are static.
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_12_2_min_io-memory_photon_cluster
