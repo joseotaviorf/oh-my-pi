@@ -164,7 +164,7 @@ bietlejuice.dw_datamarts_spark.growth:
     - bietlejuice.casa_mineira_portal:load-clean-uf
     - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:load-enrich-daily-costs
     - bietlejuice.enrich_top_of_funnel_portal_cm:load-enrich-top-of-funnel-users-portal-casa-mineira
-bietlejuice.dw_datamarts_spark.growth_cross:
+bietlejuice.dw_datamarts_growth_cross:
   add:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
     - bietlejuice.dw_house:load-dw-quintoandar-dim-house
@@ -763,8 +763,8 @@ bietlejuice.enrich_zap_imoveis_crawler_listings:
 bietlejuice.metric_rent_benvi__demand:
   remove:
     - bietlejuice.enrich_mexico_marketing_manual_daily_costs:load-enrich-daily-costs # dependency not added due to be running later, should not be a block of the pipeline
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-monthly
-    - bietlejuice.dw_datamarts_spark.growth_cross:load-dw-datamarts-top-of-funnel-volumes-weekly
+    - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-top-of-funnel-volumes-monthly
+    - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-top-of-funnel-volumes-weekly
     - bietlejuice.dw_region:load-dw-public-dim-region
     - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
     - bietlejuice.enrich_mexico_marketing_automatic_daily_costs:load-enrich-daily-costs

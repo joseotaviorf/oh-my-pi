@@ -1,0 +1,48 @@
+dag:
+  name: dw_datamarts_growth_cross
+  owner: Data Growth
+  documentation: 
+    dag_purpose: |
+      Creates/updates the datamart tables that have cross squad dependencies, for the context of Growth, in data lake.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: datamarts
+  inner_dependencies:
+    efficiency_monitor_rental:
+      - marketing_demand_supply_branding_costs
+    efficiency_monitor_sale:
+      - marketing_demand_supply_branding_costs
+    marketing_demand_supply_branding_costs:
+      - performance_marketing_cluster_promotional_bonus_costs
+    performance_marketing_cluster_promotional_bonus_costs:
+      - performance_marketing_cluster_promotional_bonus 
+    performance_marketing_metrics_demand: 
+      - tenant_prospect_status 
+      - rent_flow_interactions
+    rental_performance_marketing_metrics_supply_coincident:
+      - performance_marketing_cluster_promotional_bonus_costs 
+      - daily_target_volumes_supply
+    sale_performance_marketing_metrics_supply_coincident: 
+      - performance_marketing_cluster_promotional_bonus_costs
+    tenant_prospect_status: 
+      - rent_flow_interactions
+    tenant_prospects_activations:
+      - rent_flow_interactions
+    top_of_funnel_volumes_daily:
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
+      - tenant_prospect_status
+    top_of_funnel_volumes_monthly: 
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
+      - tenant_prospect_status
+    top_of_funnel_volumes_weekly:
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
+      - tenant_prospect_status
+    unique_performance_marketing_metrics_supply_coincident:
+      - performance_marketing_cluster_promotional_bonus_costs 
+      - daily_target_volumes_supply
+cluster:
+  type: databricks_12_2_max_memory_cluster
