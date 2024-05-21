@@ -97,10 +97,11 @@ if __name__ == "__main__":
         f"""m=__main__, environment={environment}, source=dashboard_governance,
         """
     )
+    error = []
     
     for asset in data_assets:
         logger.info(f"m=__main__, asset={asset}")
-        if asset == "dasboard":
+        if asset == "dashboard":
             METADATA_PROPAGATOR_PATH = "/dashboard"
         elif asset == "chart":
             METADATA_PROPAGATOR_PATH = "/chart"
@@ -121,6 +122,13 @@ if __name__ == "__main__":
         
         spark_client = SparkClient()
         payloads = _get_payloads_from_datalake(spark_client, asset)
-        _send_requests(endpoint, payloads)
+        try:
+            _send_requests(endpoint, payloads)
+        except Exception as e:
+            error.append(e)
+            logger.error(f"m=__main__, error={e}")
+            
+    if error:
+        raise RuntimeError(f"Error sending data to Metadata Propagator: {error}")
     
     

@@ -1,6 +1,6 @@
 SELECT 
     ARRAY('datahub') AS vendor,
-    id AS id_dataset, 
+    CAST(id AS STRING) AS id_dataset, 
     dataset_type,
     platform,
     if(dataset_type = 'virtual', 'virtual', schema) AS schema_name,
