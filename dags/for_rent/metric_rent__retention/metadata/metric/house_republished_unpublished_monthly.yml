@@ -35,6 +35,17 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
+  qtd_listings_pub_7d_matured:
+    description: "Volume of matured listings being republished in the month being referenced after 7 or more days unpublished."
+    metric:
+      name: Monthly Matured Listings Republished - 7 days
+      description: "Volume of matured listings being republished in the month being referenced after 7 or more days unpublished."
+      acronym: MMLR7D
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
   qtd_listings_pub_30d_matured:
     description: "Volume of matured listings being republished in the month being referenced after 30 or more days unpublished."
     metric:
@@ -53,6 +64,17 @@ columns:
       description: "Volume of matured listings being republished in the month being referenced after 90 or more days unpublished."
       acronym: MMLR90D
       is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_pub_7d_matured:
+    description: "Percentage of matured listings being republished in the month being referenced after 7 or more days unpublished."
+    metric:
+      name: Monthly Percentage of Matured Listings Republished - 7 days
+      description: "Percentage of matured listings being republished in the month being referenced after 7 or more days unpublished."
+      acronym: MPMLR7D
+      is_additive: False
       business_stage: Demand
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
