@@ -1,0 +1,125 @@
+---
+database_name: metric_rent
+table_name: relisting_visits_without_owner_monthly
+description: Monthly percentage of relisting with easy entry, that is, the PP/owner does not go along during the visit.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  dt_reference_month:
+    lineage:
+      - dw_rent.dim_house_listing.ts_listing_version_start
+    description: Month of relisting.
+    dimension: True
+  value_segment:
+    description: Rent value segment.
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_house_listing.country_code
+    description: Country code of the house.
+    dimension: True
+  qtd_easy_entry:
+    description: Monthly volume of listings that have an easy entry, that is, the PP/Owner does not go along during the visit.
+    metric:
+      name: Monthly Easy Entry
+      description: Monthly volume of listings that have an easy entry, that is, the PP/Owner does not go along during the visit.
+      acronym: WEA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: 
+  qtd_pp_eligible:
+    description: Monthly volume of listings that the owner goes along during the visit.
+    metric:
+      name: Monthly Volume PP Not Eligible Visit
+      description: Monthly volume of listings that the owner goes along during the visit.
+      acronym: WVPPNEV
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: 
+  pct_rl_easy_entry:
+    description: Monthly percentage of relistings with easy entry during the publication.
+    metric:
+      name: Monthly Percetage Relisting Easy Entry
+      description: Monthly percentage of relistings with easy entry during the publication.
+      acronym: PWP
+      is_additive: WPREE
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_easy_entry_4w:
+    description: Monthly volume of listings that have an easy entry, that is, the PP/Owner does not go along during the visit during within 4 weeks after the publication.
+    metric:
+      name: Monthly Easy Entry - 4 Weeks
+      description: Monthly volume of listings that have an easy entry, that is, the PP/Owner does not go along during the visit.
+      acronym: WEA_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_pp_eligible_4w:
+    description: Monthly volume of listings that the owner goes along during the visit within 4 weeks after the publication.
+    metric:
+      name: Monthly Volume PP Not Eligible Visit - 4 Weeks
+      description: Monthly volume of listings that the owner goes along during the visit within 4 weeks after the publication.
+      acronym: WVPPNEV_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_rl_easy_entry_4w:
+    description: Monthly percentage of relistings with easy entry during the publication within 4 weeks after the publication.
+    metric:
+      name: Monthly Percetage Relisting Easy Entry - 4 Weeks
+      description: Monthly percentage of relistings with easy entry during the publication within 4 weeks after the publication.
+      acronym: PWP_4W
+      is_additive: WPREE_4W
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_easy_entry_matured_4w:
+    description: Matured Monthly volume of listings that have an easy entry, that is, the PP/Owner does not go along during the visit during within 4 weeks after the publication.
+    metric:
+      name: Monthly Easy Entry - 4 Weeks
+      description: Matured Monthly volume of listings that have an easy entry, that is, the PP/Owner does not go along during the visit.
+      acronym: MWEA_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_pp_eligible_matured_4w:
+    description: Matured Monthly volume of listings that the owner goes along during the visit within 4 weeks after the publication.
+    metric:
+      name: Monthly Volume PP Not Eligible Visit - 4 Weeks
+      description: Matured Monthly volume of listings that the owner goes along during the visit within 4 weeks after the publication.
+      acronym: MWVPPNEV_4W
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_rl_easy_entry_matured_4w:
+    description: Matured Monthly percentage of relistings with easy entry during the publication within 4 weeks after the publication.
+    metric:
+      name: Monthly Percetage Relisting Easy Entry - 4 Weeks
+      description: Matured Monthly percentage of relistings with easy entry during the publication within 4 weeks after the publication.
+      acronym: MPWP_4W
+      is_additive: WPREE_4W
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
