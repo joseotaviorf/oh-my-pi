@@ -30,7 +30,8 @@ workflow:
     entry_partitioned: {}
     file: {}
     invoice: {}
-    invoice_entry: {}
+    invoice_entry:
+      raw_primary_keys: [invoice_id, entry_id]
     invoice_partitioned: {}
     manual_entry: {}
     monthly_closing_checks: {}
