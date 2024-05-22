@@ -571,7 +571,9 @@ bietlejuice.dw_offer_temp:
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
 bietlejuice.dw_people:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
+  - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.hr_system:load-clean-jobs
+  - bietlejuice.hr_system:load-clean-organizations
 bietlejuice.dw_photo_jobs:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_photo_jobs:load-enrich-photo-job

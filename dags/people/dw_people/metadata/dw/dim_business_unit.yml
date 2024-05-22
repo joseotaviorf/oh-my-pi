@@ -1,0 +1,35 @@
+---
+database_name: dw_people
+table_name: dim_business_unit
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Dimension table for business unit.
+columns:
+  sk_business_unit:
+    description: Surrogate key for the business unit.'
+    lineage:
+    - datalake_hr_system.assignments.a.id_business_unit
+  business_unit_name:
+    description: 'Business unit name'
+    categories:
+     "Atta": ""
+     "Benvi PT": ""
+     "Classifieds Latam": ""
+     "Deel - QuintoAndar": 
+     "Inmuebles24 FULL": ""
+     "QuintoAndar MG": ""
+     "QuintoAndar SC": ""
+     "QuintoAndar SP": ""
+    lineage:
+    - datalake_hr_system.assignments.business_unit_name
+  legal_employer_name:
+    description: 'Legal employer name'
+    categories:
+      "ATTA FRANCHISING LTDA": ""
+      "BENVI PT": ""
+      "DRIDCO S.A.U.": ""
+      "GRPQA LTDA": ""
+    lineage:
+    - datalake_hr_system.work_relationships.legal_employer_name
+  ts_load:
+    description: 'Date and time when the record was loaded.'
