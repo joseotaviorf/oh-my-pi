@@ -1,0 +1,24 @@
+---
+dag:
+  name: enrich_hub_services_agents
+  schedule_start_date: 2024, 5, 22
+  owner: Data Agents
+  documentation:
+    dag_purpose: Enrichment of agent and secretariat data, correlation and link between the business unit, 
+      the business executor and their agents, and other information originating from Hub Services.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: hub_services
+  inner_dependencies:
+    agent_hub_alocation:
+      - member_profile
+      - users
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    member_profile:
+      extraction_type: full
+      partitions: []
+cluster:
+  type: databricks_12_2_med_general_cluster

@@ -1,0 +1,21 @@
+---
+database_name: datalake_hub_services
+table_name: profile
+description: Auxiliary table to create a single-valued index for the categorical value of profile types.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_profile:
+    description: Unique ID of the profile type.
+  profile:
+    lineage:
+      - datalake_hub_services_clean.member_profile.profile
+    description: Profile type description.
+  dt_created:
+    description: Profile date creation.
+  year:
+    description: Year of creation date.
+  month:
+    description: Month of creation date.
+  day:
+    description: Day of creation date.

@@ -1,0 +1,91 @@
+---
+database_name: datalake_hub_services
+table_name: agent_hub_alocation
+description: 
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_member_profile:
+    lineage:
+      - datalake_hub_services.member_profile.id_member_profile
+    description: Unique identifier for the Agent member profile. 
+  id_user:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: |
+      Unique Agent external user ID.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_agent:
+    lineage:
+      - datalake_hub_services.users.id_agent
+    description: |
+      Agent unique identifier.
+      Attention: This ID refers to the agent in main/admin/ebdb.
+  id_member_profile_negotiation_executive:
+    lineage:
+      - datalake_hub_services.member_profile.id_parent_member_profile
+    description: Unique identifier for the Negotiation Executive member profile.
+  id_user_negotiation_executive:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: |
+      Unique Negotiation Executive external user ID.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_business_unit:
+    lineage:
+      - datalake_hub_services.member_profile.id_business_unit
+    description: Unique ID of the business unit where the Agent is allocated.
+  hub_name:
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
+    description: Business unit name.
+  business_context:
+    lineage:
+      - datalake_hub_services_clean.business_unit.business_context
+    description: What context does the business unit operate in, which could be Sales or Rental.
+  agent_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data.agent_type
+    description: Agent type.
+  agent_name:
+    lineage:
+      - datalake_hub_services.users.name
+    description: Agent name.
+  agent_email:
+    lineage:
+      - datalake_hub_services.users.email
+    description: Agent email.
+  agent_phone_number:
+    lineage:
+      - datalake_hub_services.users.phone_number
+    description: Agent phone number.
+  negotiation_executive_name:
+    lineage:
+      - datalake_hub_services.users.name
+    description: Negotiation executive name.
+  negotiation_executive_email:
+    lineage:
+      - datalake_hub_services.users.email
+    description: Negotiation executive email.
+  negotiation_executive_phone_number:
+    lineage:
+      - datalake_hub_services.users.phone_number
+    description: Negotiation executive phone number.
+  dt_reference:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: 
+      This date refers to a day of active link between the agent, 
+      the business unit and the business executor.
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.year
+    description: Year of reference date.
+  month:
+    lineage:
+      - datalake_quintoandar.aux_date.month
+    description: Month of reference date.
+  day:
+    lineage:
+      - datalake_quintoandar.aux_date.day
+    description: Day of reference date.

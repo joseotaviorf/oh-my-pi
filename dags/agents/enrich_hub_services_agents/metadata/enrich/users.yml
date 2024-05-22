@@ -1,0 +1,67 @@
+---
+database_name: datalake_hub_services
+table_name: users
+description: |
+  Crosses user data from Hub Services and user data from main/ebdb. 
+  Attention: non-merged users are considered here, so this table does not have a connector 
+  with the ebdb user table, only with the user audit.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_hub_services_clean.users.id
+    description: |
+      User unique identifier on HubServices tables.
+      Attention: This user ID refers to Hub Services and does not correspond to the main/admin/ebdb user.
+  id_main_user:
+    lineage:
+      - datalake_hub_services_clean.users.id_external
+    description: |
+      Unique external user ID.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.user_aud.id_agent
+    description: |
+      Agent unique identifier.
+      Attention: This ID refers to the agent in main/admin/ebdb.
+  name:
+    lineage:
+      - datalake_hub_services_clean.users.name
+      - datalake_ebdb_clean.user_aud.name
+    description: User name.
+  email:
+    lineage:
+      - datalake_hub_services_clean.users.email
+      - datalake_ebdb_clean.user_aud.email
+    description: User e-mail.
+  phone_number:
+    lineage:
+      - datalake_hub_services_clean.users.phone_number
+      - datalake_ebdb_clean.user_aud.phone_number
+    description: User phone number.
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.user_aud.is_active
+    description: Indicates whether this user is active in the admin/main system.
+  ts_created:
+    lineage:
+      - datalake_hub_services_clean.users.ts_created
+    description: User data creation datetime
+  ts_updated:
+    lineage:
+      - datalake_hub_services_clean.users.ts_updated
+    description: User data update datetime.
+  year:
+    lineage:
+      - datalake_hub_services_clean.users.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_hub_services_clean.users.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_hub_services_clean.users.day
+    description: Day of update date.

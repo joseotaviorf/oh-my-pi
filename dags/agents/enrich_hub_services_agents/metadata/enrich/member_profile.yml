@@ -1,0 +1,73 @@
+---
+database_name: datalake_hub_services
+table_name: member_profile
+description: History of member profile links with business units and their parent members.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_member_relationship:
+    description: Unique identifier of the relationship between the hub member, the hub and its parent member.
+  id_member_profile:
+    lineage:
+      - datalake_hub_services_clean.member_profile_aud.id
+    description: Member profile unique identifier. 
+  id_user:
+    lineage:
+      - datalake_hub_services_clean.member_profile_aud.id_user
+    description: |
+      User unique identifier on HubServices tables.
+      Attention: this user ID refers to Hub Services and does not correspond to the main/admin/ebdb user.
+  id_parent_member_profile:
+    lineage:
+      - datalake_hub_services_clean.member_profile_aud.id_parent_member_profile
+    description: |
+      Unique ID of the parent member, i.e., the personality of the business unit to which 
+      the member profile responds. Example: If the member is an agent, his parent will be 
+      a negotiation executive.
+  id_parent_user:
+    lineage:
+      - datalake_hub_services_clean.member_profile_aud.id_user
+    description: |
+      User unique identifier to the parent member.
+      Attention: this user ID refers to Hub Services and does not correspond to the main/admin/ebdb user.
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_clean.member_profile_aud.id_business_unit
+    description: Unique ID of the business unit where the member is allocated.
+  profile:
+    lineage:
+      - datalake_hub_services_clean.member_profile_aud.profile
+    description: Describes the member's profile.
+    categories:
+      MANAGEMENT_SECRETARIAT: "" 
+      TREATMENT_SECRETARIAT: "" 
+      ADMINISTRATIVE_SECRETARIAT: "" 
+      DISTRIBUTION_SECRETARIAT: "" 
+      NEGOTIATION_EXECUTIVE: Responsible for intermediating the offer negotiation stage between buyer and seller, until this results in a CCV (signed contract).
+      AGENT: Brokers.
+      TREATMENT_SECRETARIAT_NBP: "" 
+      THIRD_PARTY_TREATMENT_SECRETARIAT: "" 
+      SELECT_EXECUTIVE: "" 
+      ASSOCIATED_EXECUTIVE: "" 
+      SUPERVISION_SECRETARIAT: "" 
+      TREATMENT_SECRETARIAT_TWILIO: "" 
+  is_active:
+    lineage:
+      - datalake_hub_services_clean.member_profile_aud.is_active
+    description: Indicates that the agent's relationship with the business unit is active.
+  ts_relationship_started:
+    lineage:
+      - datalake_hub_services_clean.member_profile_aud.dt_relationship_started
+      - datalake_hub_services_clean.member_profile_aud.ts_created
+    description: |
+      Date and time when the member's relationship with the business unit and the parent member began.
+      If there is no parent member, the date refers only to the relationship with the business unit.
+  ts_relationship_ended:
+    lineage:
+      - datalake_hub_services_clean.rev_info.ts_created
+      - datalake_hub_services_clean.member_profile_aud.ts_created
+    description: |
+      Date and time when the member's relationship with the business unit and the parent member ended.
+      If there is no parent member, the date refers only to the relationship with the business unit.
+  ts_load:
+    description: Date and time when the data was loaded.
