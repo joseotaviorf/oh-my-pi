@@ -20,7 +20,7 @@ WITH deduplicated_offer_events AS (
     FROM
         datalake_amplitude_clean.170698_offer_submitted_events
     WHERE
-        DATE(CONCAT_WS('-', year, month, day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
     UNION
     SELECT
         id_user,
@@ -43,7 +43,7 @@ WITH deduplicated_offer_events AS (
     FROM
         datalake_amplitude_clean.170135_offer_submitted_events
     WHERE
-        DATE(CONCAT_WS('-', year, month, day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
     UNION
     SELECT
         id_user,
@@ -63,10 +63,10 @@ WITH deduplicated_offer_events AS (
         year,
         month,
         day
-    FROM 
+    FROM
         datalake_amplitude_clean.183049_offer_submitted_events
     WHERE
-        DATE(CONCAT_WS('-', year, month, day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
     CAST(id_user AS BIGINT) AS id_user,

@@ -26,6 +26,6 @@ SELECT
 FROM
     datalake_amplitude_clean.170698_sale_offer_form_accepted_events
 WHERE
-    DATE(CONCAT_WS('-', year, month, day)) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY ep_id_firestore ORDER BY ts_event DESC) = 1
