@@ -91,11 +91,11 @@ calculations AS (
         value_segment,
         country_code,
         SUM(IF(eligibility = 'Entrada Facilitada', listings, 0)) AS qtd_easy_entry,
-        SUM(IF(eligibility <>'PP Acompanha - Não Elegível', listings, 0)) AS qtd_pp_not_eligible,
+        SUM(IF(eligibility <>'PP Acompanha - Não Elegível', listings, 0)) AS qtd_eligible,
         SUM(IF(eligibility_4w = 'Entrada Facilitada', listings, 0)) AS qtd_easy_entry_4w,
         SUM(IF(eligibility_4w = 'Entrada Facilitada' AND ts_listing_version_start <= DATE_ADD(CURRENT_DATE(), -28), listings, 0)) AS qtd_easy_entry_matured_4w,
-        SUM(IF(eligibility_4w <>'PP Acompanha - Não Elegível', listings, 0)) AS qtd_pp_not_eligible_4w,
-        SUM(IF(eligibility_4w <>'PP Acompanha - Não Elegível' AND ts_listing_version_start <= DATE_ADD(CURRENT_DATE(), -28), listings, 0)) AS qtd_pp_not_eligible_matured_4w,
+        SUM(IF(eligibility_4w <>'PP Acompanha - Não Elegível', listings, 0)) AS qtd_eligible_4w,
+        SUM(IF(eligibility_4w <>'PP Acompanha - Não Elegível' AND ts_listing_version_start <= DATE_ADD(CURRENT_DATE(), -28), listings, 0)) AS qtd_eligible_matured_4w,
         SUM(IF(eligibility_4w = 'Entrada Facilitada',listings, 0)) / SUM(IF(eligibility_4w <>'PP Acompanha - Não Elegível', listings, 0))*1.0 conversao_4w
     FROM
         eligibility_rules
@@ -108,14 +108,14 @@ SELECT
     value_segment,
     country_code,
     qtd_easy_entry,
-    qtd_pp_not_eligible,
-    qtd_easy_entry / qtd_pp_not_eligible AS pct_rl_easy_entry,
+    qtd_eligible,
+    qtd_easy_entry / qtd_eligible AS pct_rl_easy_entry,
     qtd_easy_entry_4w,
-    qtd_pp_not_eligible_4w,
-    qtd_easy_entry_4w / qtd_pp_not_eligible_4w AS pct_rl_easy_entry_4w,
+    qtd_eligible_4w,
+    qtd_easy_entry_4w / qtd_eligible_4w AS pct_rl_easy_entry_4w,
     qtd_easy_entry_matured_4w,
-    qtd_pp_not_eligible_matured_4w,
-    qtd_easy_entry_matured_4w / qtd_pp_not_eligible_matured_4w AS pct_rl_easy_entry_matured_4w
+    qtd_eligible_matured_4w,
+    qtd_easy_entry_matured_4w / qtd_eligible_matured_4w AS pct_rl_easy_entry_matured_4w
 FROM
     calculations
 
@@ -126,14 +126,14 @@ SELECT
     'OVERALL' AS value_segment,
     country_code,
     SUM(qtd_easy_entry) AS qtd_easy_entry,
-    SUM(qtd_pp_not_eligible) AS qtd_pp_not_eligible,
-    SUM(qtd_easy_entry) / SUM(qtd_pp_not_eligible) AS pct_rl_easy_entry,
+    SUM(qtd_eligible) AS qtd_eligible,
+    SUM(qtd_easy_entry) / SUM(qtd_eligible) AS pct_rl_easy_entry,
     SUM(qtd_easy_entry_4w) AS qtd_easy_entry_4w,
-    SUM(qtd_pp_not_eligible_4w) AS qtd_pp_not_eligible_4w,
-    SUM(qtd_easy_entry_4w) / SUM(qtd_pp_not_eligible_4w) AS pct_rl_easy_entry_4w,
+    SUM(qtd_eligible_4w) AS qtd_eligible_4w,
+    SUM(qtd_easy_entry_4w) / SUM(qtd_eligible_4w) AS pct_rl_easy_entry_4w,
     SUM(qtd_easy_entry_matured_4w) AS qtd_easy_entry_matured_4w,
-    SUM(qtd_pp_not_eligible_matured_4w) AS qtd_pp_not_eligible_matured_4w,
-    SUM(qtd_easy_entry_matured_4w) / SUM(qtd_pp_not_eligible_matured_4w) AS pct_rl_easy_entry_matured_4w
+    SUM(qtd_eligible_matured_4w) AS qtd_eligible_matured_4w,
+    SUM(qtd_easy_entry_matured_4w) / SUM(qtd_eligible_matured_4w) AS pct_rl_easy_entry_matured_4w
 FROM
     calculations
 GROUP BY

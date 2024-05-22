@@ -35,7 +35,7 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: 
-  qtd_pp_eligible:
+  qtd_eligible:
     description: Monthly volume of listings that the owner goes along during the visit.
     metric:
       name: Monthly Volume PP Not Eligible Visit
@@ -68,7 +68,7 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  qtd_pp_eligible_4w:
+  qtd_eligible_4w:
     description: Monthly volume of listings that the owner goes along during the visit within 4 weeks after the publication.
     metric:
       name: Monthly Volume PP Not Eligible Visit - 4 Weeks
@@ -101,7 +101,7 @@ columns:
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
-  qtd_pp_eligible_matured_4w:
+  qtd_eligible_matured_4w:
     description: Matured Monthly volume of listings that the owner goes along during the visit within 4 weeks after the publication.
     metric:
       name: Monthly Volume PP Not Eligible Visit - 4 Weeks
