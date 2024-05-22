@@ -16,12 +16,13 @@ from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissio
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
+
 # from bietlejuice.base.spark import BaseDBUtils  # @todo uncomment to enable image step.
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 # TO DO: Add the package version in the config file
-VESPUCIO_PACKAGE_VERSION = "0.4.0"
+VESPUCIO_PACKAGE_VERSION = "0.4.2"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
@@ -125,12 +126,12 @@ class Tables:
     house_compounds = "vespucio_prod_delta.house_compounds"
     listings = "vespucio_prod_delta.listings"
 
-    golden_set_condo_compounds = (
-        "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
-    )
-    golden_set_condo_compounds_diff = (
-        "vespucio_goldenset_delta.condo_compounds_goldenset_diff"
-    )
+    # golden_set_condo_compounds = (
+    #     "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
+    # )
+    # golden_set_condo_compounds_diff = (
+    #     "vespucio_goldenset_delta.condo_compounds_goldenset_diff"
+    # )
 
     ebdb_clean_house_enrichment = "datalake_ebdb_clean.house_enrichment"
 
@@ -317,49 +318,49 @@ plugin_tasks = [
             f"--input_house_compounds={Tables.house_compounds}",
         ],
     ),
-    create_task(
-        entry_point="plugins_diff_tables",
-        parameters=[
-            f"--overwrite_schema",
-            f"--input_left_table={Tables.condo_compounds}@{yesterday}",
-            f"--input_right_table={Tables.condo_compounds}@{today}",
-            f"--join_col=dejavuid",
-            f"--output_stats_table={Tables.condo_compounds}_daily_diff_stats",
-            f"--output_diff_table={Tables.condo_compounds}_daily_diff",
-            f"--output_label=condo_compounds_${yesterday}_vs_{today}",
-            f"--save_mode=append",
-        ],
-        task_id="plugins_diff_condo_compounds",
-    ),
-    create_task(
-        entry_point="plugins_diff_tables",
-        parameters=[
-            f"--overwrite_schema",
-            f"--input_left_table={Tables.house_compounds}@{yesterday}",
-            f"--input_right_table={Tables.house_compounds}@{today}",
-            f"--join_col=dejavuid",
-            f"--output_stats_table={Tables.house_compounds}_daily_diff_stats",
-            f"--output_diff_table={Tables.house_compounds}_daily_diff",
-            f"--output_label=house_compounds_${yesterday}_vs_{today}",
-            f"--save_mode=append",
-        ],
-        task_id="plugins_diff_house_compounds",
-    ),
-    create_task(
-        entry_point="plugins_diff_tables",
-        parameters=[
-            f"--overwrite_schema",
-            f"--input_left_table={Tables.golden_set_condo_compounds}@{today}",
-            f"--input_right_table={Tables.condo_compounds}@{today}",
-            f"--join_col=dejavuid",
-            f"--ignore_cols=sources,relations,content_md5",
-            f"--output_stats_table={Tables.golden_set_condo_compounds_diff}_stats",
-            f"--output_diff_table={Tables.golden_set_condo_compounds_diff}",
-            f"--output_label=condo_compounds_employee_sample_v1_vs_{today}",
-            f"--save_mode=append",
-        ],
-        task_id="plugins_diff_golden_set_condo_compounds",
-    ),
+    # create_task(
+    #     entry_point="plugins_diff_tables",
+    #     parameters=[
+    #         f"--overwrite_schema",
+    #         f"--input_left_table={Tables.condo_compounds}@{yesterday}",
+    #         f"--input_right_table={Tables.condo_compounds}@{today}",
+    #         f"--join_col=dejavuid",
+    #         f"--output_stats_table={Tables.condo_compounds}_daily_diff_stats",
+    #         f"--output_diff_table={Tables.condo_compounds}_daily_diff",
+    #         f"--output_label=condo_compounds_${yesterday}_vs_{today}",
+    #         f"--save_mode=append",
+    #     ],
+    #     task_id="plugins_diff_condo_compounds",
+    # ),
+    # create_task(
+    #     entry_point="plugins_diff_tables",
+    #     parameters=[
+    #         f"--overwrite_schema",
+    #         f"--input_left_table={Tables.house_compounds}@{yesterday}",
+    #         f"--input_right_table={Tables.house_compounds}@{today}",
+    #         f"--join_col=dejavuid",
+    #         f"--output_stats_table={Tables.house_compounds}_daily_diff_stats",
+    #         f"--output_diff_table={Tables.house_compounds}_daily_diff",
+    #         f"--output_label=house_compounds_${yesterday}_vs_{today}",
+    #         f"--save_mode=append",
+    #     ],
+    #     task_id="plugins_diff_house_compounds",
+    # ),
+    # create_task(
+    #     entry_point="plugins_diff_tables",
+    #     parameters=[
+    #         f"--overwrite_schema",
+    #         f"--input_left_table={Tables.golden_set_condo_compounds}@{today}",
+    #         f"--input_right_table={Tables.condo_compounds}@{today}",
+    #         f"--join_col=dejavuid",
+    #         f"--ignore_cols=sources,relations,content_md5",
+    #         f"--output_stats_table={Tables.golden_set_condo_compounds_diff}_stats",
+    #         f"--output_diff_table={Tables.golden_set_condo_compounds_diff}",
+    #         f"--output_label=condo_compounds_employee_sample_v1_vs_{today}",
+    #         f"--save_mode=append",
+    #     ],
+    #     task_id="plugins_diff_golden_set_condo_compounds",
+    # ),
 ]
 
 execute_job_cluster_task >> source_tasks
