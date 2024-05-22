@@ -1,0 +1,13 @@
+---
+dag:
+  name: enrich_rent_potential_listing
+  schedule_start_date: 2020, 7, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for the context `Potential Listing` for `Rent`.
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_12_2_med_2xlarge_general_photon_cluster
