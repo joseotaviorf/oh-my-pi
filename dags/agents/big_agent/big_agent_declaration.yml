@@ -33,4 +33,4 @@ workflow:
       date_filter_column: timestamp
       unixtime_measure: milliseconds
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_12_2_min_general_cluster

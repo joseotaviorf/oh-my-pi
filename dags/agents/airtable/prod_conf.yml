@@ -1,8 +1,9 @@
 ---
 custom_cluster:
-  driver_node_type_id: m5a.2xlarge
-  node_type_id: m5a.xlarge
+  node_type_id: m5a.large
+  driver_node_type_id: m5a.large
   num_workers: 2
+  spark_version: 12.2.x-scala2.12
 clean_partition_cols:
   - year
   - month
