@@ -4,6 +4,7 @@ SELECT
     invoice_id as id_invoice,
     checkout_boleto_id AS id_checkout_boleto,
     identifier,
+    status,
     due_amount,
     our_number,
     our_number_digit,

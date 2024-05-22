@@ -20,6 +20,9 @@ columns:
   identifier:
     lineage:
       - datalake_retsuko_test_raw.boleto.identifier
+  status:
+    lineage:
+      - datalake_retsuko_test_raw.boleto.status
   due_amount:
     lineage:
       - datalake_retsuko_test_raw.boleto.due_amount

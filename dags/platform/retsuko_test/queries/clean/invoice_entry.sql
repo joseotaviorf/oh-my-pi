@@ -7,4 +7,4 @@ SELECT
     month,
     day
 FROM
-    datalake_retsuko_raw.invoice_entry
+    datalake_retsuko_test_raw.invoice_entry

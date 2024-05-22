@@ -28,6 +28,30 @@ columns:
   is_rental_paid_in_advance:
     lineage:
       - datalake_retsuko_test_raw.contract.is_rental_paid_in_advance
+  status:
+    description: "Contract status"
+    lineage:
+      - datalake_retsuko_test_raw.contract.status
+  blocked:
+    description: "Boolean field that indicates if a contract is blocked to invoice creation"
+    lineage:
+      - datalake_retsuko_test_raw.contract.blocked
+  landlord_transfer_funds_day:
+    description: "Landlord payment day. In general is day 12, but in old contracts is day 10"
+    lineage:
+      - datalake_retsuko_test_raw.contract.landlord_transfer_funds_day
+  rental_administrator:
+    description: "Rental administrator type"
+    lineage:
+      - datalake_retsuko_test_raw.contract.rental_administrator
+  adm_fee_minimum_amount:
+    description: "In contracts with low average ticket, that is a minimum amount that is bigger than adm fee percentage"
+    lineage:
+      - datalake_retsuko_test_raw.contract.adm_fee_minimum_amount
+  administration_fee:
+    description: "Administratio fee percentage"
+    lineage:
+      - datalake_retsuko_test_raw.contract.administration_fee
   ts_signature:
     lineage:
       - datalake_retsuko_test_raw.contract.signature_date
@@ -43,3 +67,7 @@ columns:
   ts_charge_ended:
     lineage:
       - datalake_retsuko_test_raw.contract.end_charge
+  ts_expected_end_charge:
+    description: "Expected contract ended date. It's used to calculate proportional rent charge"
+    lineage:
+      - datalake_retsuko_test_raw.contract.expected_end_charge

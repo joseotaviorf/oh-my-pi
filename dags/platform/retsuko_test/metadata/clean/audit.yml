@@ -1,0 +1,17 @@
+database_name: datalake_retsuko_test_clean
+table_name: audit
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    description: "Audit ID"
+    lineage:
+      - datalake_retsuko_test_raw.audit.id
+  email:
+    description: "User email that did a action in SB"
+    lineage:
+      - datalake_retsuko_test_raw.audit.email
+  user:
+    description: "User name that did a action in SB"
+    lineage:
+      - datalake_retsuko_test_raw.audit.user

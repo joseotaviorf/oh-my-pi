@@ -22,6 +22,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   tables_customization:
     account: {}
+    audit: {}
     boleto: {}
     contract: {}
     credit_card_payment: {}
@@ -29,6 +30,7 @@ workflow:
     entry_partitioned: {}
     file: {}
     invoice: {}
+    invoice_entry: {}
     invoice_partitioned: {}
     manual_entry: {}
     monthly_closing_checks: {}

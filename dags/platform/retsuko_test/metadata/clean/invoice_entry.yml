@@ -1,0 +1,29 @@
+database_name: datalake_retsuko_test_clean
+table_name: invoice_entry
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_invoice:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_entry.invoice_id
+  id_entry:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_entry.entry_id
+  invoice_accrual_year_month:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_entry.invoice_accrual_year_month
+  ts_created:
+    lineage:
+      - datalake_retsuko_test_raw.invoice_entry.created_at
+  year:
+    description: Year information
+    lineage:
+      - datalake_retsuko_test_raw.invoice_entry.year
+  month:
+    description: Month information
+    lineage:
+      - datalake_retsuko_test_raw.invoice_entry.month
+  day:
+    description: Day information
+    lineage:
+      - datalake_retsuko_test_raw.invoice_entry.day

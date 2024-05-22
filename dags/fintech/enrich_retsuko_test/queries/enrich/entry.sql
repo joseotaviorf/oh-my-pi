@@ -19,6 +19,7 @@ SELECT
     e.accrual_year_month,
     e.due_year_month,
     e.ts_created,
+    e.ts_synced,
     e.ts_retsuko_updated
 FROM
     datalake_retsuko_test_clean.entry e
