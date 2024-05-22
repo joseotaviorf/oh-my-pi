@@ -2,7 +2,7 @@
 dag:
   name: enrich_amplitude_partner_taxonomy
   schedule_start_date: 2019, 1, 1
-  owner: Data Growth
+  owner: Data Agents
   documentation:
     dag_purpose: This DAG creates the enriched table amplitude_partner_taxonomy, which we will use to add a taxonomy to our Dim partner table. This table contains events data from the event type "register_form_completed".
 workflow:
