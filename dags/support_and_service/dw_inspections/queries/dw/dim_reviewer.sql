@@ -10,4 +10,4 @@ SELECT DISTINCT
 FROM
     datalake_inspections.reviewer r
 WHERE
-    DATE(r.ts_created) = DATE('{year}-{month}-{day}')
+    DATE(r.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

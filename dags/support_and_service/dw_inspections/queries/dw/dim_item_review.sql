@@ -12,6 +12,4 @@ SELECT DISTINCT
 FROM
     datalake_inspections.item_review AS ir
 WHERE
-    ir.year = {year}
-    AND ir.month = {month}
-    AND ir.day = {day}
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

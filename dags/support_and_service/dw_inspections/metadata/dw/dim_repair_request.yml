@@ -39,6 +39,10 @@ columns:
     lineage:
       - datalake_inspections_clean.repair_request.ts_created
     description: Creation date
+  ts_updated:
+    lineage:
+      - datalake_inspections_clean.repair_request.ts_updated
+    description: Updated date in timestamp format
   ts_load:
     description: Date and time when the data was loaded.
   year:

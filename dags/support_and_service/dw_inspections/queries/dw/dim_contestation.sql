@@ -10,6 +10,4 @@ SELECT
 FROM
     datalake_inspections_clean.contestation AS c
 WHERE
-    c.year = {year}
-    AND c.month = {month}
-    AND c.day = {day}
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

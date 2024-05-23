@@ -12,6 +12,4 @@ SELECT
 FROM
     datalake_inspections.item i
 WHERE
-    i.year = {year}
-    AND i.month = {month}
-    AND i.day = {day}
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

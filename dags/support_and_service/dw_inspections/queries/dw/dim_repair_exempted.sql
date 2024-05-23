@@ -13,6 +13,4 @@ SELECT DISTINCT
 FROM
     datalake_inspections.repair_exempted AS re
 WHERE
-    re.year = {year}
-    AND re.month = {month}
-    AND re.day = {day}
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

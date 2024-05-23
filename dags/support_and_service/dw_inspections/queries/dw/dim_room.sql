@@ -11,6 +11,4 @@ SELECT
 FROM
     datalake_inspections.room r
 WHERE
-    r.year = {year}
-    AND r.month = {month}
-    AND r.day = {day}
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

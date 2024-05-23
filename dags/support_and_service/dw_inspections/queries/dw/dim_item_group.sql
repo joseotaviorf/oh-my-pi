@@ -58,6 +58,4 @@ LEFT JOIN
     item_group_comments AS igc
         ON igc.id_item_group = ig.id_item_group
 WHERE
-    ig.year = {year}
-    AND ig.month = {month}
-    AND ig.day = {day}
+    MAKE_DATE(ig.year, ig.month, ig.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

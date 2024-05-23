@@ -12,6 +12,4 @@ SELECT DISTINCT
 FROM
     datalake_inspections.item_issue AS ii
 WHERE
-    ii.year = {year}
-    AND ii.month = {month}
-    AND ii.day = {day}
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

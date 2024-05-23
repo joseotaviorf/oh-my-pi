@@ -13,9 +13,7 @@ FROM
     datalake_inspections.item_media AS im
 WHERE
     im.id_item_media IS NOT NULL
-    AND im.year = {year}
-    AND im.month = {month}
-    AND im.day = {day}
+    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
 SELECT
     MD5(CONCAT(ir.id_review_media, "review_media")) AS sk_item_media,
@@ -32,6 +30,4 @@ FROM
     datalake_inspections.item_review AS ir
 WHERE
     ir.id_review_media IS NOT NULL
-    AND ir.year = {year}
-    AND ir.month = {month}
-    AND ir.day = {day}
+    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
