@@ -39,6 +39,8 @@ SELECT
     banda AS band,
     pcd_laudo AS pcd_report,
     marca AS brand,
+    pais AS country,
+    business_navent AS business_navent,
     l0 AS level0,
     l1 AS level1,
     l2 AS level2,

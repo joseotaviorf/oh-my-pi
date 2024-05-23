@@ -13,3 +13,6 @@ workflow:
     has_hive_sync: false
 cluster:
     type: databricks_12_2_min_people_cluster
+    access_control_list:
+      group_name: people-analytics
+      permission_level: CAN_MANAGE

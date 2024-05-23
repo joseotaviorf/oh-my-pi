@@ -1525,8 +1525,8 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-clean-house-agent-aud
   - bietlejuice.ebdb:load-clean-house-agent-key-tracking-aud
   - bietlejuice.ebdb:load-clean-house-listing-relation
-  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-house-visit-information
+  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb_administration:load-clean-property-fee
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned-aud

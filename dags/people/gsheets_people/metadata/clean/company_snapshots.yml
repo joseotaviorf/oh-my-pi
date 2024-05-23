@@ -165,6 +165,14 @@ columns:
     description: ''
     lineage:
     - datalake_gsheets_raw.company_snapshots.marca
+  country:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.company_snapshots.pais
+  business_navent:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.company_snapshots.business_navent
   level0:
     description: ''
     lineage:
