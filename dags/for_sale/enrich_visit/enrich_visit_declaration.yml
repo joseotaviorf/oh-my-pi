@@ -2,12 +2,14 @@ dag:
     name: enrich_visit
     owner: Data Engineering
     schedule_start_date: 2024, 1, 1
+    documentation:
+      dag_purpose: Full load of the context `Visit` models into Enrich with data from ebdb.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     default_partitions: [country_code, business_context]
 cluster:
-    type: databricks_10_4_med_general_photon_cluster
+    type: databricks_12_2_med_general_photon_cluster
     access_control_list:
         group_name: analytics-engineers
         permission_level: CAN_MANAGE

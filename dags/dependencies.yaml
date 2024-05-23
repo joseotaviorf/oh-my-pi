@@ -2888,6 +2888,10 @@ bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
 bietlejuice.enrich_visit:
   - bietlejuice.ebdb:load-clean-booking
+  - bietlejuice.ebdb:load-clean-country
+  - bietlejuice.ebdb:load-clean-entrance
+  - bietlejuice.ebdb:load-clean-follow-up-details
+  - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb:load-clean-visit-cancellation-details
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

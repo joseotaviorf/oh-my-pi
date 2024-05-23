@@ -2,7 +2,7 @@ database_name: datalake_visit
 table_name: visit_status_events
 description: Information about Rent and Sale visits status log events.
   Each row is an unique visit status.
-domain: Cross
+domain: Data ForSale
 owner: matheus.sampaio@quintoandar.com.br
 columns:
   id_visit_status_events:

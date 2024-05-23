@@ -1,0 +1,198 @@
+database_name: datalake_visit
+table_name: visit_status_events
+description: Information about Rent and Sale visits.
+  Each row is an unique visit with the most important information's.
+domain: Data ForSale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.id
+    description: Visit ID for connection to the Visit table
+  id_agent:
+    lineage: Agent user who is following the visit.
+      - datalake_ebdb_clean.visit.id_agent
+    description:
+  id_visitor:
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+    description: User id of the user is visiting the house.
+  id_owner:
+    lineage:
+      - datalake_ebdb_listing.house.id_user
+    description: User ID of the property owner
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.booking.id_house
+    description: Id of the house of interest
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+    description: House listing ID
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_clean.booking.id_rent_flow
+    description: Id for Rent Flow connection
+  id_sale_flow:
+    lineage:
+      - datalake_ebdb_clean.booking.id_house
+      - datalake_ebdb_clean.booking.id_visitor
+    description: Id for Sale Flow connection, junction of visitor with house
+  id_company_supply:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_company_hubspot
+    description: Id of the supply partner in HubSpot
+  uuid_company_supply:
+    lineage:
+      - datalake_ebdb_listing.house_listing.uuid_company
+    description: UUID of the supply partner in the company domain
+  id_company_demand:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
+    description: ID of the demand partner from Hubspot.
+  id_cancellation_detail:
+    lineage:
+      - datalake_ebdb_clean.visit_cancellation_details.id
+    description: Visit cancellation details ID
+  id_follow_up:
+    lineage:
+      - datalake_ebdb_clean.booking.id_fup_details
+    description: ID for visit's follow up
+  id_entrance_type:
+    lineage:
+      - datalake_ebdb_clean.entrance.id
+    description: ID to know how was the entrance.
+  code:
+    lineage:
+      - datalake_ebdb_clean.visit.code
+    description: Code for usage in the S&S.
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.house_listing.country_code
+    description: Country code.
+  partner_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house.partner_3p_supply
+    description: Supply partner name
+  partner_3p_demand:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.3p_partner
+    description: Demand partner name
+  status:
+    lineage:
+      - datalake_ebdb_clean.visit.status
+    description: Simple last status from Visit.
+  computed_status:
+    lineage:
+      - datalake_ebdb_clean.visit.computed_status
+    description: Last computed status from Visit, has to be almost the same of status
+  behavior:
+    lineage:
+      - datalake_ebdb_clean.visit.behavior
+    description: What the step of behavior is this visit.
+  first_event:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.event_type
+    description: First event computed from VSL.
+  last_event:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.event_type
+    description: Last event computed from VSL.
+  slot:
+    lineage:
+      - datalake_ebdb_clean.visit.slot
+    description: Slot is used to take the day of visit.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.booking.business_context
+    description: Which is the context of this visit.
+  default_timezone:
+    lineage:
+      - datalake_ebdb_clean.country.default_timezone
+    description: What is the default timezone for this region.
+  cancellation_reason:
+    lineage:
+      - datalake_ebdb_clean.visit_cancellation_details.reason
+    description: What the reason for the cancellation of this visit
+  cancellation_on_behalf_of:
+    lineage:
+      - datalake_ebdb_clean.visit_cancellation_details.on_behalf_of
+    description: In whose name that cancellation status.
+  nbr_reschedule:
+    description: Number of rescheduling.
+  journey_days:
+    description: Days until the actual status.
+  hours_waiting_for_answers:
+    description: Time in hours, spent waiting answers.
+  days_waiting_for_answers:
+    description: Days until receive the answers.
+  is_confirmed:
+    description: If the visit was confirmed by all.
+  is_completed:
+    description: If the visit is completed.
+  is_reschedule:
+    description: If this visit is a reschedule.
+  is_canceled:
+    description: If this visit is canceled.
+  is_unsuccessful:
+    description: If this visit return unsuccessful.
+  is_3p_demand:
+    description: If this visit is by 3p demand.
+  is_3p_supply:
+    description: If this visit is by 3p supply.
+  is_fixed_agent:
+    lineage:
+      - datalake_ebdb_clean.visit.is_fixed_agent
+    description: If this visit has a fixed agent by the visitor.
+  has_tenant_living:
+    description: If has tenant living in the property.
+  is_waiting_for_response:
+    description: If this visit is waiting for some response.
+  has_entrance_problem:
+    description: If this visit has entrance problem.
+  has_supply_answered:
+    description: If the supply answered (Property's Owner).
+  has_supply_confirmed:
+    description: If the supply confirmed (Property's Owner).
+  has_tenant_answered:
+    description: If the tenant answered (If exists).
+  has_tenant_confirmed:
+    description: If the tenant confirmed (If exists).
+  ts_visit_local_tz:
+    lineage:
+      - datalake_ebdb_clean.visit.dt_visit
+    description: Timestamp of when the visit will happen converted to local timezone.
+  ts_created:
+    description: Timestamp with the first status of this visit.
+  ts_updated:
+    description: Timestamp with the last status of this visit.
+  ts_visit_requested:
+    description: Timestamp with the requested date of this visit.
+  ts_visit_registered:
+    description: Timestamp with the registered date of this visit.
+  ts_visit_rescheduled:
+    description: Timestamp with the last rescheduled date of this visit.
+  ts_visit_supply_answer:
+    description: Timestamp with the supply (owner) answer date of this visit.
+  ts_visit_demand_answer:
+    description: Timestamp with the demand answer date of this visit.
+  ts_visit_agent_answer:
+    description: Timestamp with the agent answer date of this visit.
+  ts_visit_tenant_answer:
+    description: Timestamp with the tenant answer date of this visit.
+  ts_visit_supply_confirmed:
+    description: Timestamp with the supply (owner) confirmed date of this visit.
+  ts_visit_demand_confirmed:
+    description: Timestamp with the demand confirmed date of this visit.
+  ts_visit_agent_confirmed:
+    description: Timestamp with the agent confirmed date of this visit.
+  ts_visit_tenant_confirmed:
+    description: Timestamp with the tenant confirmed date of this visit.
+  ts_visit_fup_collected:
+    description: Timestamp with the follow up collected date of this visit.
+  ts_visit_canceled:
+    description: Timestamp with the canceled date of this visit.
+  ts_visit_done:
+    description: Timestamp with the done date of this visit.
+  ts_visit_unsuccessful:
+    description: Timestamp with the unsuccessful date of this visit.
