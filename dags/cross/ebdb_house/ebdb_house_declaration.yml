@@ -1,0 +1,41 @@
+dag:
+  name: ebdb_house
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 10 21 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to House into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: ebdb
+  custom_schema: ebdb
+  source_schema: ebdb
+  tables_customization:
+    HouseMaintenanceCondition: 
+      clean_table_name: house_maintenance_condition
+    HouseMaintenanceCondition_AUD: 
+      clean_table_name: house_maintenance_condition_aud
+    HouseMedia: 
+      clean_table_name: house_media
+    HousePredictedPrice: 
+      clean_table_name: house_predicted_price
+    HousePredictedPrice_AUD: 
+      clean_table_name: house_predicted_price_aud
+    HouseRating: 
+      clean_table_name: house_rating
+    HouseRegistrationStatus: 
+      clean_table_name: house_registration_status
+    HouseRegistrationStatus_AUD: 
+      clean_table_name: house_registration_status_aud
+    HouseRentCosts_AUD: 
+      clean_table_name: house_rent_costs_aud
+    HouseSpecialCondition: 
+      clean_table_name: house_special_condition
+    Imovel: 
+      clean_table_name: house
+    Imovel_AUD: 
+      clean_table_name: house_aud
+cluster:
+  type: databricks_12_2_med_general_cluster

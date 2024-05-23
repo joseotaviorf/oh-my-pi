@@ -3,17 +3,17 @@ table_name: restriction_type
 columns:
   id:
     lineage:
-      - datalake_temp_ebdb_raw.restrictiontype.id
+      - datalake_ebdb_raw.restrictiontype.id
     description: Id of the restriction type.
   ts_updated:
     lineage:
-      - datalake_temp_ebdb_raw.restrictiontype.atualizadoem
+      - datalake_ebdb_raw.restrictiontype.atualizadoem
     description: Timestamp of when the restriction type was updated.
   ts_created:
     lineage:
-      - datalake_temp_ebdb_raw.restrictiontype.criadoem
+      - datalake_ebdb_raw.restrictiontype.criadoem
     description: Timestamp of when the restriction type was created.
   name:
     lineage:
-      - datalake_temp_ebdb_raw.restrictiontype.name
+      - datalake_ebdb_raw.restrictiontype.name
     description: Name of the restriction type.

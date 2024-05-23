@@ -382,6 +382,31 @@ table_block_list:
   - RentalAdministratorChangeRequest_AUD
   - TenantServiceFee
   - TenantServiceFeeHouse
+  - Amenidades
+  - AmenidadesInfo
+  - AmenidadesInfo_AUD
+  - Instalacao
+  - InstalacaoInfo
+  - InstalacaoInfo_AUD
+  - HouseMaintenanceCondition
+  - HouseMaintenanceCondition_AUD
+  - HouseMedia
+  - HousePredictedPrice
+  - HousePredictedPrice_AUD
+  - HouseRating
+  - HouseRegistrationStatus
+  - HouseRegistrationStatus_AUD
+  - HouseRentCosts_AUD
+  - HouseSpecialCondition
+  - Imovel
+  - Imovel_AUD
+  - Imovel_garantias_AUD
+  - KeyType
+  - OccupantType
+  - RestrictionType
+  - RestrictionType_AUD
+  - SpecialCondition
+  - SpecialCondition_AUD
 
 view_allow_list:
   - MapRegiao

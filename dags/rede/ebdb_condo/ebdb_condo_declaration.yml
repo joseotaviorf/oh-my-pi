@@ -20,6 +20,12 @@ workflow:
       clean_table_name: access_type
     AccessType_AUD:
       clean_table_name: access_type_aud
+    Amenidades: 
+      clean_table_name: amenities
+    AmenidadesInfo: 
+      clean_table_name: info_amenities
+    AmenidadesInfo_AUD: 
+      clean_table_name: info_amenities_aud
     CondicoesEntrada:
       clean_table_name: entrance_conditions
     CondoManager:
@@ -28,5 +34,11 @@ workflow:
       clean_table_name: condo
     ContatoCondominio:
       clean_table_name: condo_contact
+    Instalacao: 
+      clean_table_name: condo_amenities
+    InstalacaoInfo: 
+      clean_table_name: info_condo_amenities
+    InstalacaoInfo_AUD: 
+      clean_table_name: info_condo_amenities_aud
 cluster:
   type: databricks_12_2_med_general_cluster
