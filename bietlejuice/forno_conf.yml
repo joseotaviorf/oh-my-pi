@@ -314,6 +314,16 @@ databricks_10_4_med_memory_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_12_2_min_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.large
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_12_2_med_memory_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5a.8xlarge
