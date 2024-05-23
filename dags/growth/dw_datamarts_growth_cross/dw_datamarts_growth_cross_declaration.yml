@@ -45,4 +45,12 @@ workflow:
       - performance_marketing_cluster_promotional_bonus_costs 
       - daily_target_volumes_supply
 cluster:
-  type: databricks_12_2_max_memory_cluster
+  type: custom_cluster
+  custom_configurations:
+    spark_version: 12.2.x-scala2.12
+    driver_node_type_id: r5d.8xlarge
+    node_type_id: r5d.12xlarge
+    runtime_engine: PHOTON
+    num_workers: 4
+    aws_attributes:
+      ebs_volume_size: 200
