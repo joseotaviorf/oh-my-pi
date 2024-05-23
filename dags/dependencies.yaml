@@ -382,6 +382,7 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb:load-clean-amenities
   - bietlejuice.ebdb:load-clean-house-visit-status-aud
   - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
+  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_condo:load-clean-info-amenities
@@ -390,7 +391,6 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb_house:load-clean-house-maintenance-condition
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
-  - bietlejuice.ebdb_location:load-clean-map-region
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
   - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
@@ -1525,6 +1525,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-clean-house-agent-aud
   - bietlejuice.ebdb:load-clean-house-agent-key-tracking-aud
   - bietlejuice.ebdb:load-clean-house-listing-relation
+  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-house-visit-information
   - bietlejuice.ebdb_administration:load-clean-property-fee
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
@@ -1553,7 +1554,6 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_listing:load-clean-listing-rent-model-aud
   - bietlejuice.ebdb_listing:load-clean-listing-sale-model
   - bietlejuice.ebdb_location:load-clean-local
-  - bietlejuice.ebdb_location:load-clean-map-region
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.ebdb_offer:load-clean-instant-offer
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
@@ -1562,13 +1562,13 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
 bietlejuice.enrich_ebdb_photo_jobs:
+  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-photographer-data
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb:load-clean-photographer-job-aud
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-registration-status-aud
   - bietlejuice.ebdb_location:load-clean-country
-  - bietlejuice.ebdb_location:load-clean-map-region
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
@@ -2868,11 +2868,11 @@ bietlejuice.enrich_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-tickets
   - bietlejuice.velo_zendesk:load-clean-tickets-history
 bietlejuice.enrich_vespucio:
+  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.ebdb_condo:load-clean-condo-contact
   - bietlejuice.ebdb_condo:load-clean-info-condo-amenities
   - bietlejuice.ebdb_house:load-clean-house
-  - bietlejuice.ebdb_location:load-clean-map-region
   - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set

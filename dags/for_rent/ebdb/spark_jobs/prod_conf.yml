@@ -387,7 +387,6 @@ table_block_list:
   - Estado
   - Estado_AUD
   - Local
-  - MapRegiao
   - Municipio
   - Regiao
   - Regiao_AUD

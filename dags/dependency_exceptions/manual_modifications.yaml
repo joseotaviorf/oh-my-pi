@@ -92,9 +92,9 @@ bietlejuice.dw_datamarts_spark.for_sale:
   add:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
     - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+    - bietlejuice.ebdb:load-clean-map-region
     - bietlejuice.ebdb:load-clean-partner
     - bietlejuice.ebdb:load-clean-polygon-region
-    - bietlejuice.ebdb_location:load-clean-map-region
   remove:
     - bietlejuice.dw_agents_availability:load-dw-agent-fact-agent-daily-allocations
     - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
@@ -348,8 +348,8 @@ bietlejuice.enrich_ebdb_affiliates_cost:
     - bietlejuice.ebdb:load-clean-conversion-lead
 bietlejuice.enrich_ebdb_photo_jobs:
   add:
+    - bietlejuice.ebdb:load-clean-map-region
     - bietlejuice.ebdb_location:load-clean-country
-    - bietlejuice.ebdb_location:load-clean-map-region
     - bietlejuice.ebdb_location:load-clean-state
     - bietlejuice.ebdb_house:load-clean-house
     - bietlejuice.enrich_region:load-enrich-region
@@ -603,8 +603,8 @@ bietlejuice.enrich_sale_closing_flows:
     - bietlejuice.enrich_sale_firestore:load-enrich-monday
 bietlejuice.enrich_sale_crawlers_listings:
   remove:
+    - bietlejuice.ebdb:load-clean-map-region
     - bietlejuice.ebdb:load-clean-polygon-region
-    - bietlejuice.ebdb_location:load-clean-map-region
     - bietlejuice.enrich_region:load-enrich-region
     - bietlejuice.listings.em_casa:load-clean-em-casa
     - bietlejuice.listings.loft:load-clean-loft
@@ -737,7 +737,7 @@ bietlejuice.enrich_velo:
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
 bietlejuice.enrich_vespucio:
   add:
-    - bietlejuice.ebdb_location:load-clean-map-region
+    - bietlejuice.ebdb:load-clean-map-region
     - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
   remove:
     - bietlejuice.sindico_net:load-clean-condominium
