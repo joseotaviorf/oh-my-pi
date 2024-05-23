@@ -24,12 +24,8 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
         )
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
-        raw_primary_keys = ",".join(
-            table_attributes.table_customization.get("raw_primary_keys", [])
-        )
-        clean_primary_keys = (
-            ",".join(table_attributes.table_customization.get("clean_primary_keys", []))
-            or raw_primary_keys
+        clean_primary_keys = ",".join(
+            table_attributes.table_customization.get("clean_primary_keys", [])
         )
 
         return [
