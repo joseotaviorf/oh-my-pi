@@ -23,4 +23,4 @@ JOIN
     survey_first_seen AS sfs
       ON sfs.id_survey = sa.id_survey
 WHERE
-    DATE(sfs.ts_first_submitted) = DATE('{year}-{month}-{day}')
+    DATE(sfs.ts_first_submitted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

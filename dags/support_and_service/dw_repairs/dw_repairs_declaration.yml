@@ -6,12 +6,9 @@ dag:
     dag_purpose: |
       This modeling aims to provide operational information related to ongoing repair tickets.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: repairs
   default_extraction_type: full
 cluster:
-  type: databricks_10_4_med_io-memory_photon_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
+  type: databricks_12_2_med_io-memory_photon_cluster

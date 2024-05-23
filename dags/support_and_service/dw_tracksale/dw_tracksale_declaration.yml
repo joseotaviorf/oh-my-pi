@@ -5,11 +5,8 @@ dag:
     dag_purpose: |
       This DAG loads the DW tables with [Tracksale](https://www.tracksale.co/) data. This data is related to NPS.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: tracksale
 cluster:
-  type: databricks_10_4_med_general_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
+  type: databricks_12_2_med_general_cluster
