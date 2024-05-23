@@ -1,0 +1,39 @@
+dag:
+  name: ebdb_location
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 50 21 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to Location into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: ebdb
+  custom_schema: ebdb
+  source_schema: ebdb
+  tables_customization:  
+    Cep:
+      clean_table_name: cep
+    Country:
+      clean_table_name: country
+    Estado:
+      clean_table_name: state
+    Estado_AUD:
+      clean_table_name: state_aud
+    Local:
+      clean_table_name: local
+    MapRegiao:
+      clean_table_name: map_region
+    Municipio:
+      clean_table_name: city
+    Regiao:
+      clean_table_name: region
+    Regiao_AUD:
+      clean_table_name: region_aud
+    Regiao_businessContextsServed:
+      clean_table_name: region_business_contexts_served
+    Regiao_businessContextsServed_AUD:
+      clean_table_name: region_business_contexts_served_aud
+cluster:
+  type: databricks_12_2_med_general_cluster

@@ -382,6 +382,17 @@ table_block_list:
   - RentalAdministratorChangeRequest_AUD
   - TenantServiceFee
   - TenantServiceFeeHouse
+  - Cep
+  - Country
+  - Estado
+  - Estado_AUD
+  - Local
+  - MapRegiao
+  - Municipio
+  - Regiao
+  - Regiao_AUD
+  - Regiao_businessContextsServed
+  - Regiao_businessContextsServed_AUD
   - Amenidades
   - AmenidadesInfo
   - AmenidadesInfo_AUD

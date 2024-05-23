@@ -1,0 +1,46 @@
+---
+database_name: datalake_ebdb_clean
+table_name: region_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.REV
+  id_state:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.state_id
+  id_salesforce:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.salesforceId
+  id_manager:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.gerente_id
+  id_parent_region:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.regiaoPai_id
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.REVTYPE
+  level:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.nivel
+  name:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.nome
+  slug:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.slug
+  priority:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.prioridade
+  lat:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.lat
+  lng:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.lng
+  mod_state:
+    lineage:
+      - datalake_ebdb_raw.Regiao_AUD.state_MOD
