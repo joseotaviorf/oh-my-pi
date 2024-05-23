@@ -1,0 +1,89 @@
+---
+partition_cols: [year, month, day]
+
+custom_cluster:
+  driver_node_type_id: r5a.xlarge
+  node_type_id: r5a.xlarge
+  num_workers: 2
+
+lineage_product_database_name: terminator
+
+dag_documentation:
+  dag_purpose:
+    "This DAG imports the tables from [Terminator](https://github.com/quintoandar/terminator), \n
+    our service to orchestrate the offboard contract process."
+
+tables:
+  # <raw_table_name>:
+  #   clean_table_name: <clean_table_name> #optional
+  #   is_incremental: <is_incremental> #optional
+  #   date_column: <date_column> #optional
+  #   unixtime_measure: <unixtime_measure> #optional
+  application_user: {}
+  application_user_aud:
+    is_incremental: True
+    date_column: updated_at
+  attachment: {}
+  attachment_aud:
+    is_incremental: True
+    date_column: updated_at
+  checklist_item:
+    is_incremental: True
+    date_column: updated_at
+  contract: {}
+  # contract_aud:
+  #   is_incremental: True
+  #   date_column: updated_at
+  inspection: {}
+  inspection_aud:
+    is_incremental: True
+    date_column: updated_at
+  # inspection_opted_out: {}
+  # inspection_opted_out_aud:
+  #   is_incremental: True
+  #   date_column: updated_at
+  member: {}
+  # member_aud:
+  #   is_incremental: True
+  #   date_column: updated_at
+  negotiation: {}
+  negotiation_aud:
+    is_incremental: True
+    date_column: updated_at
+  revinfo:
+    clean_table_name: rev_info
+  termination: {}
+  termination_aud:
+    is_incremental: True
+    date_column: updated_at
+  termination_characteristics:
+    is_incremental: True
+    date_column: updated_at
+  termination_fee: {}
+  termination_fee_aud:
+    is_incremental: True
+    date_column: updated_at
+  termination_fee_negotiation: {}
+  termination_fee_negotiation_aud:
+    is_incremental: True
+    date_column: updated_at
+  # termination_history: {}
+  termination_step:
+    is_incremental: True
+    date_column: updated_at
+  termination_task: {}
+  # termination_task_aud:
+  #   is_incremental: True
+  #   date_column: updated_at
+  termination_workflow: {}
+  termination_workflow_aud:
+    is_incremental: True
+    date_column: updated_at
+  # termination_workflow_trigger: {}
+  # termination_workflow_trigger_aud:
+  #   is_incremental: True
+  #   date_column: updated_at
+  utility_bill: {}
+  utility_bill_aud:
+    is_incremental: True
+    date_column: updated_at
