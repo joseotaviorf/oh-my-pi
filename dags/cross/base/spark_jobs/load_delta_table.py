@@ -21,8 +21,12 @@ def main():
     logger.info(
         f"m={JOB_NAME}, env={args.env}, bucket={args.bucket}, layer={args.layer}, "
         + f"database_base_name={args.database_base_name}, relative_query_path={args.relative_query_path}, "
-        + f"table_name={args.table_name}, extraction_type={args.extraction_type}, msg=Job execution started"
+        + f"table_name={args.table_name}, extraction_type={args.extraction_type}, merge_on={args.merge_on}, "
+        + f"when_not_matched_insert_condition={args.when_not_matched_insert_condition}, "
+        + f"when_matched_update_condition={args.when_matched_update_condition}, when_matched_delete_condition={args.when_matched_delete_condition}, msg=Job execution started"
     )
+
+    merge_on = json.loads(args.merge_on)
 
     query_template_params = get_query_template_params(
         execution_date=args.execution_date,
@@ -48,7 +52,11 @@ def main():
         partitions=json.loads(args.partitions),
         query_template_params=query_template_params,
         spark_session_configs=json.loads(args.spark_session_configs),
-        merge_schema=(args.extraction_type == "incremental")
+        merge_schema=(args.extraction_type == "incremental"),
+        merge_on=merge_on,
+        when_not_matched_insert_condition=json.loads(args.when_not_matched_insert_condition),
+        when_matched_update_condition=json.loads(args.when_matched_update_condition),
+        when_matched_delete_condition=json.loads(args.when_matched_delete_condition)
     )
     table_loader_pipeline.run()
 
@@ -80,6 +88,26 @@ def parse_arguments() -> Namespace:
         "additional_query_template_params",
         type=str,
         help="additional query parameters not including date params",
+    )
+    parser.add_argument(
+        "merge_on",
+        type=str,
+        help="Column name to be used for merge operation",
+    )
+    parser.add_argument(
+        "when_not_matched_insert_condition",
+        type=str,
+        help="Condition to be used for insert operation",
+    )
+    parser.add_argument(
+        "when_matched_update_condition",
+        type=str,
+        help="Condition to be used for update operation",
+    )
+    parser.add_argument(
+        "when_matched_delete_condition",
+        type=str,
+        help="Condition to be used for delete operation",
     )
 
     return parser.parse_args()

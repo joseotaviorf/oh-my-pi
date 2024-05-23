@@ -19,6 +19,17 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
             "extra_query_template_params", default_extra_query_template_params
         )
 
+        merge_on = table_attributes.table_customization.get("merge_on", None)
+        when_not_matched_insert_condition = table_attributes.table_customization.get(
+            "when_not_matched_insert_condition", None
+        )
+        when_matched_update_condition = table_attributes.table_customization.get(
+            "when_matched_update_condition", None
+        )
+        when_matched_delete_condition = table_attributes.table_customization.get(
+            "when_matched_delete_condition", None
+        )
+
         return [
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
@@ -35,6 +46,10 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
                 )
             ),
             json.dumps(extra_query_template_params),
+            json.dumps(merge_on),
+            json.dumps(when_not_matched_insert_condition),
+            json.dumps(when_matched_update_condition),
+            json.dumps(when_matched_delete_condition),
         ]
 
     def create_task(
