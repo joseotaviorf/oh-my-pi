@@ -1,8 +1,7 @@
-
 WITH delinquency_end AS (
     SELECT DISTINCT
         id_delinquency,
-        dt_updated
+        COALESCE(dt_paid, dt_updated) AS dt_updated
     FROM
         datalake_velo.delinquency_timeline
     WHERE
@@ -11,6 +10,7 @@ WITH delinquency_end AS (
 timeline_base AS (
     SELECT
         t.*,
+        COALESCE(t.dt_paid, t.dt_updated) AS dt_updated_paid,
         de.dt_updated AS dt_delinquency_last_register
     FROM
         datalake_velo.delinquency_timeline t
@@ -23,12 +23,12 @@ cte_timeline_daily AS (
         d.`date`,
         d.month_start,
         t.id_delinquency,
-        MAX(t.dt_updated) AS dt_updated
+        MAX(t.dt_updated_paid) AS dt_updated
     FROM
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         timeline_base AS t
-            ON IF(t.is_finished, d.`date` >= t.dt_updated AND d.`date` <= LAST_DAY(t.dt_updated), d.`date` >= t.dt_updated AND d.`date` < t.dt_delinquency_last_register)
+            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), d.`date` >= t.dt_updated_paid AND d.`date` < t.dt_delinquency_last_register)
     WHERE
         d.`date` > DATE('2020-01-01')
         AND d.`date` < CURRENT_DATE()
@@ -46,13 +46,13 @@ timeline AS (
             ELSE INT(months_between(td.month_start, t.dt_created))
         END AS mob_delinquency,
         t.*,
-        IF(td.`date` <> t.dt_updated, 0.00, t.amount_paid_added) AS amount_paid_added_fixed
+        IF(td.`date` <> COALESCE(t.dt_paid, t.dt_updated), 0.00, t.amount_paid_added) AS amount_paid_added_fixed
     FROM
         cte_timeline_daily AS td
     LEFT JOIN
         datalake_velo.delinquency_timeline AS t
             ON td.id_delinquency = t.id_delinquency
-            AND td.dt_updated = t.dt_updated
+            AND td.dt_updated = COALESCE(t.dt_paid, t.dt_updated)
     LEFT JOIN
         datalake_velo.propose AS p
             ON t.id_propose = p.id_propose

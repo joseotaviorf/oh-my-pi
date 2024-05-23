@@ -14,7 +14,7 @@ WITH cte_base AS (
         del.original_value,
         d.amount_paid,
         d.value - d.amount_paid AS open_amount,
-        IF( d.amount_paid > 0 AND (LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY r.ts_created) <> d.amount_paid) , d.amount_paid - LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY r.ts_created) , 0) AS amount_paid_added,
+        IF( d.amount_paid > 0 AND (LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)) <> d.amount_paid) , d.amount_paid - LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)) , 0) AS amount_paid_added,
         d.value <= d.amount_paid AS is_finished,
         del.is_legacy_agreement,
         del.id_propose < 5000000 AS is_legacy_propose,
@@ -28,7 +28,7 @@ WITH cte_base AS (
             ELSE d.dt_paid
         END AS dt_paid,
         p.dt_ended AS dt_ended_propose,
-        DATE(r.ts_created) AS dt_updated,
+        DATE(COALESCE(r.ts_created, d.dt_paid)) AS dt_updated,
         DATE(del.ts_created) AS dt_created
     FROM
         datalake_rental_guarantee_platform_clean.delinquency_aud AS d
