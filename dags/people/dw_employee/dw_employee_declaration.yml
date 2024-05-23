@@ -1,5 +1,5 @@
 dag:
-    name: dw_people
+    name: dw_employee
     owner: Data People
     schedule_start_date: 2024, 4, 1
     documentation:
@@ -9,7 +9,7 @@ workflow:
     type: query_delta
     layer: dw
     bucket_config_name: people_bucket
-    custom_schema: people
+    custom_schema: employee
     has_hive_sync: false
 cluster:
     type: databricks_12_2_min_people_cluster

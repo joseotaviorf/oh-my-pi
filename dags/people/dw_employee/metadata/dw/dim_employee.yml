@@ -1,209 +1,209 @@
 ---
-database_name: dw_people
-table_name: dim_worker
+database_name: dw_employee
+table_name: dim_employee
 owner: leonardo.soares@quintoandar.com.br
 domain: people
 description: Dimension table with information about workers
 columns:
-  sk_worker:
-    description: 'Surrogate key for the worker'
+  sk_employee:
+    description: 'Surrogate key for the employee'
     lineage:
     - datalake_hr_system_clean.workers.workers.id_person
   first_name:
-    description: 'First name of the worker, if has social name it is not the same as the first social name'
+    description: 'First name of the employee, if has social name it is not the same as the first social name'
     lineage:
     - datalake_hr_system_clean.workers.first_name
   last_name:
-    description: 'Last name of the worker, if has social name it is not the same as the last social name'
+    description: 'Last name of the employee, if has social name it is not the same as the last social name'
     lineage:
     - datalake_hr_system_clean.workers.last_name
   full_name:
-    description: 'Full name of the worker, if has social name it is the same'
+    description: 'Full name of the employee, if has social name it is the same'
     lineage:
     - datalake_hr_system_clean.workers.full_name
   first_social_name:
-    description: 'First social name of the worker'
+    description: 'First social name of the employee'
     lineage:
     - datalake_hr_system_clean.workers.names.name_information_15
   last_social_name:
-    description: 'Last social name of the worker'
+    description: 'Last social name of the employee'
     lineage:
     - datalake_hr_system_clean.workers.names.name_information_16
   birth_town:
-    description: 'Birth town of the worker'
+    description: 'Birth town of the employee'
     lineage:
     - datalake_hr_system_clean.workers.birth_town
   birth_region:
-    description: 'Birth region of the worker'
+    description: 'Birth region of the employee'
     lineage:
     - datalake_hr_system_clean.workers.birth_region
   birth_country:
-    description: 'Birth country of the worker'
+    description: 'Birth country of the employee'
     lineage:
     - datalake_hr_system_clean.workers.birth_country
   cpf:
-    description: 'Number of the CPF of the worker'
+    description: 'Number of the CPF of the employee'
     lineage:
     - datalake_hr_system_clean.workers.ni2_cpf.national_identifier_number
   rg:
-    description: 'Number of the RG of the worker'
+    description: 'Number of the RG of the employee'
     lineage:
     - datalake_hr_system_clean.workers.ni2_rg.national_identifier_number
   pis:
-    description: 'Number of the PIS of the worker'
+    description: 'Number of the PIS of the employee'
     lineage:
     - datalake_hr_system_clean.workers.ni2_pis.national_identifier_number
   issuing_state_rg:
-    description: 'Issuing state of the RG of the worker'
+    description: 'Issuing state of the RG of the employee'
     lineage:
     - datalake_hr_system_clean.workers.nidff.issuing_state
   issuing_authority_rg:
-    description: 'Issuing authority of the RG of the worker'
+    description: 'Issuing authority of the RG of the employee'
     lineage:
     - datalake_hr_system_clean.workers.nidff.issuing_authority
   ctps_number:
-    description: 'Number of the CTPS (work card) of the worker'
+    description: 'Number of the CTPS (work card) of the employee'
     lineage:
     - datalake_hr_system_clean.workers.ctps_number
   ctps_series:
-    description: 'Series number of the CTPS (work card) of the worker'
+    description: 'Series number of the CTPS (work card) of the employee'
     lineage:
     - datalake_hr_system_clean.workers.ctps_series
   issuing_state_ctps:
-    description: 'Issuing state of the CTPS (work card) of the worker'
+    description: 'Issuing state of the CTPS (work card) of the employee'
     lineage:
     - datalake_hr_system_clean.workers.issuing_state_ctps
   vote_registration_number:
-    description: 'Number of the vote registration of the worker'
+    description: 'Number of the vote registration of the employee'
     lineage:
     - datalake_hr_system_clean.workers.vote_registration_number
   electoral_zone:
-    description: 'Electoral zone of the vote registration of the worker'
+    description: 'Electoral zone of the vote registration of the employee'
     lineage:
     - datalake_hr_system_clean.workers.electoral_zone
   polling_station:
-    description: 'Polling station of the vote registration of the worker'
+    description: 'Polling station of the vote registration of the employee'
     lineage:
     - datalake_hr_system_clean.workers.polling_station
   mother_name:
-    description: 'Mother name of the worker'
+    description: 'Mother name of the employee'
     lineage:
     - datalake_hr_system_clean.workers.mother_name
   father_name:
-    description: 'Father name of the worker'
+    description: 'Father name of the employee'
     lineage:
     - datalake_hr_system_clean.workers.father_name
   ethnicity_code:
-    description: 'Ethnicity of the worker'
+    description: 'Ethnicity of the employee'
     lineage:
     - datalake_hr_system_clean.workers.ethnicity
   ethnicity_description:
-    description: 'Ethnicity description of the worker'
+    description: 'Ethnicity description of the employee'
     lineage:
     - "datalake_hr_system_clean.workers.ethnicity"
   marital_status_code:
-    description: 'Marital status of the worker'
+    description: 'Marital status of the employee'
     lineage:
     - datalake_hr_system_clean.workers.marital_status
   marital_status_description:
-    description: 'Marital status description of the worker'
+    description: 'Marital status description of the employee'
     lineage:
     - "datalake_hr_system_clean.workers.marital_status"
   gender:
-    description: 'Gender of the worker'
+    description: 'Gender of the employee'
     lineage:
     - datalake_hr_system_clean.workers.gender
   sexual_orientation:
-    description: 'Sexual orientation of the worker'
+    description: 'Sexual orientation of the employee'
     lineage:
     - datalake_hr_system_clean.workers.sexual_orientation
   gender_identity:
-    description: 'Gender identity of the worker'
+    description: 'Gender identity of the employee'
     lineage:
     - datalake_hr_system_clean.workers.genero
   neurodiversity:
-    description: 'Neurodiversity of the worker'
+    description: 'Neurodiversity of the employee'
     lineage:
     - datalake_hr_system_clean.workers.neurodiversidade
   religion_code:
-    description: 'Religion of the worker'
+    description: 'Religion of the employee'
     lineage:
     - datalake_hr_system_clean.workers.religion
   religion_description:
-    description: 'Religion name of the worker'
+    description: 'Religion name of the employee'
     lineage:
     - "datalake_hr_system_clean.workers.religion"
   highest_education_level_code:
-    description: 'Code for the highest education level of the worker'
+    description: 'Code for the highest education level of the employee'
     lineage:
     - datalake_hr_system_clean.workers.highest_education_level
   highest_education_level_description:
-    description: 'Name for the highest education level of the worker'
+    description: 'Name for the highest education level of the employee'
     lineage:
     - "datalake_hr_system_clean.workers.highest_education_level"
   age_range:
-    description: 'Age range of the worker'
+    description: 'Age range of the employee'
     lineage:
     - "datalake_hr_system_clean.workers.workers.dt_birth"
   work_email:
-    description: 'Work email of the worker'
+    description: 'Work email of the employee'
     lineage:
     - datalake_hr_system_clean.workers.ew.email_address
   personal_email:
-    description: 'Personal email of the worker'
+    description: 'Personal email of the employee'
     lineage:
     - datalake_hr_system_clean.workers.eh.email_address
   country_code_number:
-    description: 'Country code of the phone of the worker'
+    description: 'Country code of the phone of the employee'
     lineage:
     - datalake_hr_system_clean.workers.country_code_number
   area_code:
-    description: 'Area code of the phone of the worker'
+    description: 'Area code of the phone of the employee'
     lineage:
     - datalake_hr_system_clean.workers.area_code
   phone_number:
-    description: 'Phone number of the worker'
+    description: 'Phone number of the employee'
     lineage:
     - datalake_hr_system_clean.workers.phone_number
   address:
-    description: 'Address of the worker'
+    description: 'Address of the employee'
     lineage:
     - datalake_hr_system_clean.workers.addresses.addl_address_attribute_3
     - datalake_hr_system_clean.workers.addresses.addresses.address_line_1
   address_number:
-    description: 'Address number of the worker'
+    description: 'Address number of the employee'
     lineage:
     - datalake_hr_system_clean.workers.addresses.address_line_2
   address_complement:
-    description: 'Address complement of the worker'
+    description: 'Address complement of the employee'
     lineage:
     - datalake_hr_system_clean.workers.addresses.address_line_3
   address_district:
-    description: 'Address district of the worker'
+    description: 'Address district of the employee'
     lineage:
     - datalake_hr_system_clean.workers.addresses.address_line_4
   address_zip_code:
-    description: 'Address zip code of the worker'
+    description: 'Address zip code of the employee'
     lineage:
     - datalake_hr_system_clean.workers.addresses.postal_code
   address_city:
-    description: 'Address city of the worker'
+    description: 'Address city of the employee'
     lineage:
     - datalake_hr_system_clean.workers.addresses.town_or_city
   address_state:
-    description: 'Address state of the worker'
+    description: 'Address state of the employee'
     lineage:
     - datalake_hr_system_clean.workers.addresses.region_2
   address_country:
-    description: 'Address country of the worker'
+    description: 'Address country of the employee'
     lineage:
     - datalake_hr_system_clean.workers.addresses.country
   has_disability:
-    description: 'Flag indicating if the worker has any disability'
+    description: 'Flag indicating if the employee has any disability'
     lineage:
     - "datalake_hr_system_clean.workers.has_disability"
   dt_birth:
-    description: 'Date of birth of the worker'
+    description: 'Date of birth of the employee'
     lineage:
     - datalake_hr_system_clean.workers.DATE(workers.dt_birth)
   ts_load:

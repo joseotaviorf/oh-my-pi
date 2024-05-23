@@ -1,5 +1,5 @@
 ---
-database_name: dw_people
+database_name: dw_employee
 table_name: dim_cost_center
 owner: leonardo.soares@quintoandar.com.br
 domain: people
