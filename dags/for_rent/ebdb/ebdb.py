@@ -291,7 +291,6 @@ chain(
 polygon_region_raw_task >> task_list_first_task(clean_task_list["polygon_region"])
 
 contract_model_dependencies = []
-contract_model_dependencies.extend(task_list_last_tasks(clean_task_list.pop("house")))
 contract_model_dependencies.extend(
     task_list_last_tasks(clean_task_list.pop("partner_agent"))
 )
