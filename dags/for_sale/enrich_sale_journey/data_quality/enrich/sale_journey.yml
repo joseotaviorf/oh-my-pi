@@ -24,6 +24,8 @@ column_level_validations:
         - Offer Submitted
         - Offer Accepted
         - Offer Rejected
+        - Active Search
+        - Booking Secretary
   journey:
     is_complete:
       severity_level: Error

@@ -100,7 +100,7 @@ base_visit AS (
       WHEN status = 'Realizado'
         THEN DATE(ts_booking_local_tz)
       WHEN status = 'Cancelado'
-        THEN DATE(ts_first_canceled_unevaluated)
+        THEN DATE(ts_updated)
     END AS dt_event,
     CASE
       WHEN status = 'Realizado'

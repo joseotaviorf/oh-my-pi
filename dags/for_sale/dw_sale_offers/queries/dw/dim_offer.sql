@@ -77,6 +77,8 @@ sale_offer AS(
 		LEFT JOIN datalake_tracked_events.attribution_cross_channel acc
         	ON sor.id_offer = acc.id_firestore
 			AND acc.event_name = 'sale_offer_form_accepted'
+	QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_offer ORDER BY id_offer) = 1
 ),
 offer_taxonomy AS (
 	SELECT

@@ -1,11 +1,11 @@
 WITH listing_depublication AS (
-  SELECT 
+  SELECT
     lbc_aud.id_house,
     rev.id,
     lbc_aud.status,
     lbc_aud.mod_status,
     rev.ts_revision AS depublication_time
-  FROM 
+  FROM
     datalake_ebdb_clean.listing_business_context_aud lbc_aud
   LEFT JOIN
     datalake_ebdb_user.user_revision_entity rev
@@ -15,34 +15,34 @@ WITH listing_depublication AS (
   WHERE lbc_aud.business_context = 'SALE'
 ),
 not_published AS (
-  SELECT 
-    ssvo.id_house, 
-    SUM(DATEDIFF(ssvo.ts_status_changed_next, ssvo.ts_status_changed_new)) AS days_not_published 
-  FROM 
+  SELECT
+    ssvo.id_house,
+    SUM(DATEDIFF(ssvo.ts_status_changed_next, ssvo.ts_status_changed_new)) AS days_not_published
+  FROM
     datalake_sale_listings.sale_status_version_order AS ssvo
-  JOIN 
+  JOIN
     datalake_ebdb_clean.listing_business_context AS lbc
-    ON ssvo.id_house = lbc.id_house 
+    ON ssvo.id_house = lbc.id_house
     AND lbc.business_context = 'SALE'
-  WHERE 
+  WHERE
     ssvo.status_history_new IN ('SUSPENDED', 'UNPUBLISHED')
   GROUP BY ssvo.id_house
 ),
 listing_columns AS (
-  SELECT 
+  SELECT
     lbc.id_house,
-    lbc.ts_first_listing AS ts_first_publication,
-    lbc.ts_last_listing AS ts_last_publication,
+    MIN(lbc.ts_first_listing) AS ts_first_publication,
+    MAX(lbc.ts_last_listing) AS ts_last_publication,
     MIN(ld.depublication_time) AS ts_first_depublication,
     MAX(ld.depublication_time) AS ts_last_depublication,
     COUNT(ld.id) AS unpublications
-  FROM 
+  FROM
     datalake_ebdb_listing.listing_business_context lbc
   LEFT JOIN
     listing_depublication ld
       ON lbc.id_house = ld.id_house
   WHERE lbc.business_context = 'SALE'
-  GROUP BY 1, 2, 3
+  GROUP BY 1
 ),
 sale_status_version_order AS (
 SELECT
@@ -53,7 +53,7 @@ SELECT
         PARTITION BY id_house
       ) = ts_status_changed_new,
     FALSE) AS is_last_status
-FROM 
+FROM
     datalake_sale_listings.sale_status_version_order
 )
 -- Get information about rent context to build flags about the house

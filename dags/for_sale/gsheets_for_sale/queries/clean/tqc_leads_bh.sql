@@ -9,5 +9,7 @@ SELECT
     lead_email,
     CAST(is_valid_lead AS BOOLEAN) AS is_valid_lead,
     CAST(appointment_date AS TIMESTAMP) AS ts_appointment
-FROM 
+FROM
     datalake_gsheets_raw.tqc_leads_bh
+WHERE
+    group_name <> ""
