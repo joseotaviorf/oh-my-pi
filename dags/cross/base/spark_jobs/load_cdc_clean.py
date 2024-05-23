@@ -92,7 +92,7 @@ def main():
         table_name=table_name,
     )
 
-    cdc_columns = ["op_cdc", "ts_cdc_transaction"]
+    cdc_columns = ["op_cdc", "ts_cdc_transaction", "ts_database_transaction"]
 
     query_with_cdc_columns = insert_columns_into_query(clean_query, cdc_columns)
     clean_updates_df = spark.sql(query_with_cdc_columns).filter(col("ts_cdc_transaction").cast("date").between(start_date, end_date))
@@ -105,7 +105,7 @@ def main():
         source_df=clean_updates_df,
         merge_on=clean_primary_keys,
         when_not_matched_insert_condition="source.op_cdc != 'd'",
-        when_matched_update_condition="source.ts_cdc_transaction >= target.ts_cdc_transaction",
+        when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction",
         when_matched_delete_condition="source.op_cdc = 'd'",
     )
 

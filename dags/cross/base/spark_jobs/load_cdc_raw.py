@@ -72,7 +72,7 @@ def dml_processor(transactional_df, primary_keys):
         "m=dml_processor, msg=Applying deduplication and preserving the lasest operation on Transactional layer..."
     )
     window_spec = Window.partitionBy(*primary_keys).orderBy(
-        transactional_df["ts_cdc_transaction"].desc(), transactional_df["cdc_binlog_position"].desc()
+        transactional_df["ts_database_transaction"].desc(), transactional_df["cdc_binlog_position"].desc()
     )
     transactional_df = transactional_df.withColumn(
         "row_number", row_number().over(window_spec)
@@ -146,7 +146,7 @@ def main():
         path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
         source_df=transactional_df,
         merge_on=primary_keys,
-        when_matched_update_condition="source.ts_cdc_transaction >= target.ts_cdc_transaction"
+        when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction"
     )
     SparkTablePropertyHelper.set_property(full_raw_table_name, "primary_keys", ",".join(primary_keys))
 

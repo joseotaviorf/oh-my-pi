@@ -175,6 +175,7 @@ def format_and_deduplicate_df(df, partitions, database_type):
         to_timestamp(col("ts_ms") / 1000).alias("ts_cdc_transaction"),
         col(cdc_binlog_position_column).alias("cdc_binlog_position"),
         *partitions,
+        to_timestamp(col("source.ts_ms") / 1000).alias("ts_database_transaction"),
     )
 
     transactional_df = transactional_df.dropDuplicates()
