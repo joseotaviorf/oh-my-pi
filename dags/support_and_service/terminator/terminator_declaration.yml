@@ -14,58 +14,69 @@ workflow:
   lineage_product_database_name: terminator
   dbutils_secret_key: TERMINATOR_DB
   default_extraction_type: full
-  default_partitions: [year, month, day]
   tables_customization:
     application_user: {}
     application_user_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     attachment: {}
     attachment_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     checklist_item:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     contract: {}
     inspection: {}
     inspection_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     member: {}
     negotiation: {}
     negotiation_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     revinfo:
       clean_table_name: rev_info
     termination: {}
     termination_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     termination_characteristics:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     termination_fee: {}
     termination_fee_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     termination_fee_negotiation: {}
     termination_fee_negotiation_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     termination_step:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     termination_task: {}
     termination_workflow: {}
     termination_workflow_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
     utility_bill: {}
     utility_bill_aud:
       extraction_type: incremental
       date_filter_column: updated_at
+      partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
