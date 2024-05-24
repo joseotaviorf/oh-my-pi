@@ -180,16 +180,16 @@ tables:
     clean_table_name: bill
     date_filter_column: updated_at
     extraction_type: incremental
-  - table_name: entry_aud
-    extraction_type: full
-  - table_name: entry
-    date_filter_column: updated_at
-    extraction_type: incremental
-  - table_name: invoice_aud
-    extraction_type: full
-  - table_name: invoice
-    date_filter_column: updated_at
-    extraction_type: incremental
+  # - table_name: entry_aud
+  #   extraction_type: full
+  # - table_name: entry
+  #   date_filter_column: updated_at
+  #   extraction_type: incremental
+  # - table_name: invoice_aud
+  #   extraction_type: full
+  # - table_name: invoice
+  #   date_filter_column: updated_at
+  #   extraction_type: incremental
   - table_name: renewal_aud
     extraction_type: full
   - table_name: renewal
