@@ -1,0 +1,74 @@
+dag:
+  name: terminator
+  schedule_start_date: 2020, 1, 1
+  schedule_interval: 30 0 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: This DAG imports the tables from [Terminator](https://github.com/quintoandar/terminator),
+        our service to orchestrate the offboard contract process.
+
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  lineage_product_database_name: terminator
+  dbutils_secret_key: TERMINATOR_DB
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  tables_customization:
+    application_user: {}
+    application_user_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    attachment: {}
+    attachment_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    checklist_item:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    contract: {}
+    inspection: {}
+    inspection_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    member: {}
+    negotiation: {}
+    negotiation_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    revinfo:
+      clean_table_name: rev_info
+    termination: {}
+    termination_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    termination_characteristics:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    termination_fee: {}
+    termination_fee_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    termination_fee_negotiation: {}
+    termination_fee_negotiation_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    termination_step:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    termination_task: {}
+    termination_workflow: {}
+    termination_workflow_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+    utility_bill: {}
+    utility_bill_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+
+cluster:
+  type: databricks_12_2_min_general_photon_cluster
