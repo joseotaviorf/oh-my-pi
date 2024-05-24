@@ -31,6 +31,7 @@ DATABASE_SKIP_LIST:
   - datalake_workable_raw
   - default
   - ds4a
+  - dw_employee
   - dw_people
   - credit
   - girafales
