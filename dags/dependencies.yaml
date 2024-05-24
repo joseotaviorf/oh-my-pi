@@ -379,7 +379,6 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.ebdb:load-clean-amenities
   - bietlejuice.ebdb:load-clean-house-visit-status-aud
   - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
   - bietlejuice.ebdb:load-clean-map-region
@@ -1460,7 +1459,6 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region
 bietlejuice.enrich_ebdb_amenities:
-  - bietlejuice.ebdb:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-condo-amenities
   - bietlejuice.ebdb_condo:load-clean-info-amenities
