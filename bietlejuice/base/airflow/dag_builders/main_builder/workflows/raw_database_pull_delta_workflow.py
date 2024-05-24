@@ -184,7 +184,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
                 clean_table_attributes
             )
             sync_metadata = self.sync_metadata_task_creator.create_task(
-                clean_table_attributes
+                clean_table_attributes, "--bypass-hive"
             )
 
             last_clean_task = sync_metadata
