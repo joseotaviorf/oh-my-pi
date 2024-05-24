@@ -71,4 +71,4 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 
 cluster:
-  type: databricks_12_2_min_general_photon_cluster
+  type: databricks_12_2_med_general_photon_cluster
