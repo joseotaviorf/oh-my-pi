@@ -14,6 +14,9 @@ columns:
   supply_mkt_origin:
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
+  supply_mkt_source:
+    lineage:
+      - dw_datamarts.lead_listing_flows.mkt_source
   supply_mkt_origin_detailed:
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_channel
