@@ -34,7 +34,11 @@ SELECT
   CASE 
     WHEN GET_JSON_OBJECT(s.memory, '$.business_rules.journey_flow.retention_emma.fallback') = 'true' THEN true
     ELSE false
-  END AS experimentAB_fallback
+  END AS experimentAB_fallback,
+  s.year,
+  s.month,
+  s.day,
+  NOW() AS ts_load
 FROM datalake_greenseer.sessions AS s
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY s.id_session ORDER BY s.ts_updated DESC) = 1

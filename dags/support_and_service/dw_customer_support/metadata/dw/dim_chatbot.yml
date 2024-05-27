@@ -66,3 +66,11 @@ columns:
     lineage:
       - datalake_greenseer.sessions.memory
     description: Experiment A/B fallback used in the session.
+  year:
+    description: Partition year.
+  month:
+    description: Partition month.
+  day:
+    description: Partition day.
+  ts_load:
+    description: Timestamp date that indicates when the query was last executed.
