@@ -10,6 +10,25 @@ WITH users AS (
         datalake_hub_services.users AS u
     QUALIFY 
         u.ts_updated = MAX(u.ts_updated) OVER(PARTITION BY u.id_user)
+),
+member_profile AS (
+    SELECT
+        mp.id_member_relationship,
+        mp.id_member_profile,
+        mp.id_user,
+        mp.id_parent_member_profile,
+        mp.id_parent_user,
+        mp.id_business_unit,
+        mp.ts_relationship_started,
+        CASE
+            WHEN ROW_NUMBER() OVER (PARTITION BY mp.id_member_profile ORDER BY mp.ts_relationship_started DESC) = 1 
+                THEN COALESCE(mp.ts_relationship_ended, mp.ts_load)
+            ELSE mp.ts_relationship_ended - INTERVAL 1 DAY 
+        END AS ts_relationship_ended
+    FROM
+        datalake_hub_services.member_profile AS mp
+    WHERE
+        mp.profile = 'AGENT'
 )
 SELECT
     mp.id_member_profile,
@@ -32,11 +51,10 @@ SELECT
     aux_date.month,
     aux_date.day
 FROM
-    datalake_hub_services.member_profile AS mp
+    member_profile AS mp
 JOIN
     datalake_quintoandar.aux_date
-        ON aux_date.date BETWEEN DATE(mp.ts_relationship_started) 
-        AND DATE(COALESCE(mp.ts_relationship_ended, mp.ts_load))
+        ON aux_date.date BETWEEN DATE(mp.ts_relationship_started) AND DATE(mp.ts_relationship_ended)
 LEFT JOIN
     users AS u
         ON u.id_user = mp.id_user
@@ -50,5 +68,6 @@ LEFT JOIN
     datalake_ebdb_clean.agent_data AS ad
         ON ad.id = u.id_agent
 WHERE
-    mp.profile = 'AGENT'
-    AND aux_date.date = MAKE_DATE({year}, {month}, {day})
+    aux_date.year = {year}
+    AND aux_date.month = {month}
+    AND aux_date.day = {day}
