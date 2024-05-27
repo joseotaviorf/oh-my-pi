@@ -2318,13 +2318,11 @@ bietlejuice.enrich_rental_guarantee:
   - bietlejuice.rental_guarantee:load-clean-guarantee
 bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.ebdb_condo:load-clean-access-authorization-type
-  - bietlejuice.ebdb_condo:load-clean-access-type
   - bietlejuice.ebdb_condo:load-clean-access-type-aud
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_house_properties:load-clean-key-type
   - bietlejuice.ebdb_house_properties:load-clean-occupant-type
-  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -2338,6 +2336,7 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
   - bietlejuice.enrich_ebdb_pricing:load-enrich-rent-listing-price-changes
   - bietlejuice.enrich_ebdb_pricing:load-enrich-rent-percentile-price-changes
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
 bietlejuice.enrich_rental_listing_metrics:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract

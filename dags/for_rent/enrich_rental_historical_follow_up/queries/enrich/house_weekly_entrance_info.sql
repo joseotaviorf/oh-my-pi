@@ -6,7 +6,7 @@ WITH date_series AS (
     datalake_quintoandar.aux_date AS dd
   WHERE 
     DATE(week_start) < DATE_TRUNC('WEEK', CURRENT_DATE())
-    AND "date" != ''
+    AND date >= '2021-01-01'
 ),
 house_date_series AS (
   SELECT DISTINCT
@@ -15,9 +15,6 @@ house_date_series AS (
     dd.week_end
   FROM 
     datalake_ebdb_clean.house AS h
-  JOIN 
-    datalake_ebdb_clean.access_type AS at
-      ON at.id_house = h.id
   CROSS JOIN 
     date_series AS dd
   WHERE 
@@ -28,12 +25,12 @@ key_type_base AS (
     SELECT
       id_house,
       kt.name AS key_type_history,
-      FROM_UNIXTIME(ure.ts_revision/1000) AS ts_event,
-      DATE_ADD(CAST(DATE_TRUNC('WEEK', FROM_UNIXTIME(ure.ts_revision/1000)) AS DATE), 6) AS week_end
+      ure.ts_revision AS ts_event,
+      DATE_ADD(CAST(DATE_TRUNC('WEEK', ure.ts_revision) AS DATE), 6) AS week_end
     FROM 
       datalake_ebdb_clean.access_type_aud AS aud
-    LEFT JOIN 
-      datalake_ebdb_clean.user_revision_entity AS ure
+    JOIN 
+      datalake_ebdb_user.user_revision_entity AS ure
         ON aud.rev = ure.id
     LEFT JOIN 
       datalake_ebdb_clean.key_type AS kt
@@ -46,10 +43,11 @@ key_type_base AS (
       id_house,
       key_type_history,
       week_end AS week_end_key_type_start,
-      COALESCE(LEAD(week_end) OVER (PARTITION BY id_house ORDER BY ts_event), DATE_ADD(DATE_TRUNC('week', CURRENT_DATE()), 6)) AS week_end_key_type_end,
-      ROW_NUMBER() OVER (PARTITION BY id_house, week_end ORDER BY ts_event DESC) AS order_key_type
+      COALESCE(LEAD(week_end) OVER (PARTITION BY id_house ORDER BY ts_event), DATE_ADD(DATE_TRUNC('week', CURRENT_DATE()), 6)) AS week_end_key_type_end
     FROM 
       key_type_aud
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_house, week_end ORDER BY ts_event DESC) = 1
   )
   SELECT
     id_house,
@@ -62,20 +60,18 @@ key_type_base AS (
     date_series AS dd
       ON dd.week_end >= week_end_key_type_start 
       AND dd.week_end < week_end_key_type_end
-  WHERE 
-    order_key_type = 1
  ),
 key_location_base AS (
   WITH key_location_aud AS (
     SELECT
       id_house,
       at.name AS key_location_history,
-      FROM_UNIXTIME(ure.ts_revision/1000) AS ts_event,
-      DATE_ADD(CAST(DATE_TRUNC('WEEK', FROM_UNIXTIME(ure.ts_revision/1000)) AS DATE), 6) AS week_end
+      ts_revision AS ts_event,
+      DATE_ADD(CAST(DATE_TRUNC('WEEK', ure.ts_revision) AS DATE), 6) AS week_end
     FROM 
       datalake_ebdb_clean.access_type_aud AS aud
-    LEFT JOIN 
-      datalake_ebdb_clean.user_revision_entity AS ure
+    JOIN 
+      datalake_ebdb_user.user_revision_entity AS ure
         ON aud.rev = ure.id
     LEFT JOIN 
       datalake_ebdb_clean.access_authorization_type AS at
@@ -88,10 +84,11 @@ key_location_base AS (
       id_house,
       key_location_history,
       week_end AS week_end_key_location_start,
-      COALESCE(LEAD(week_end) OVER (PARTITION BY id_house ORDER BY ts_event), DATE_ADD(DATE_TRUNC('WEEK', CURRENT_DATE()), 6)) AS week_end_key_location_end,
-      ROW_NUMBER() OVER (PARTITION BY id_house, week_end ORDER BY ts_event DESC) AS order_key_location
-    FROM 
+      COALESCE(LEAD(week_end) OVER (PARTITION BY id_house ORDER BY ts_event), DATE_ADD(DATE_TRUNC('WEEK', CURRENT_DATE()), 6)) AS week_end_key_location_end
+    FROM
       key_location_aud
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_house, week_end ORDER BY ts_event DESC) = 1
   )
   SELECT
     id_house,
@@ -104,20 +101,18 @@ key_location_base AS (
     date_series AS dd
       ON dd.week_end >= week_end_key_location_start 
       AND dd.week_end < week_end_key_location_end
-  WHERE 
-    order_key_location = 1
 ),
 who_is_living_base AS (
   WITH who_is_living_aud AS (
     SELECT
       id_house,
       ot.name AS who_is_living_history,
-      FROM_UNIXTIME(ure.ts_revision/1000) AS ts_event,
-      DATE_ADD(CAST(DATE_TRUNC('WEEK', FROM_UNIXTIME(ure.ts_revision/1000)) AS DATE), 6) AS week_end
+      ure.ts_revision AS ts_event,
+      DATE_ADD(CAST(DATE_TRUNC('WEEK', ure.ts_revision) AS DATE), 6) AS week_end
     FROM 
       datalake_ebdb_clean.access_type_aud AS aud
-    LEFT JOIN 
-      datalake_ebdb_clean.user_revision_entity AS ure
+    JOIN 
+      datalake_ebdb_user.user_revision_entity AS ure
         ON aud.rev = ure.id
     LEFT JOIN 
       datalake_ebdb_clean.occupant_type AS ot
@@ -130,10 +125,11 @@ who_is_living_base AS (
       id_house,
       who_is_living_history,
       week_end AS week_end_who_is_living_start,
-      COALESCE(LEAD(week_end) OVER (PARTITION BY id_house ORDER BY ts_event), DATE_ADD(DATE_TRUNC('WEEK', CURRENT_DATE()), 6)) AS week_end_who_is_living_end,
-      ROW_NUMBER() OVER (PARTITION BY id_house, week_end ORDER BY ts_event DESC) AS order_who_is_living
-    FROM 
+      COALESCE(LEAD(week_end) OVER (PARTITION BY id_house ORDER BY ts_event), DATE_ADD(DATE_TRUNC('WEEK', CURRENT_DATE()), 6)) AS week_end_who_is_living_end
+    FROM
       who_is_living_aud
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_house, week_end ORDER BY ts_event DESC) = 1
   )
   SELECT
     id_house,
@@ -146,20 +142,18 @@ who_is_living_base AS (
     date_series AS dd
       ON dd.week_end >= week_end_who_is_living_start 
       AND dd.week_end < week_end_who_is_living_end
-  WHERE 
-    order_who_is_living = 1
 ),
 house_entrance_base AS (
   WITH house_entrance_aud AS (
     SELECT
       id_house,
       doorman_type,
-      FROM_UNIXTIME(ure.ts_revision/1000) AS ts_event,
-      DATE_ADD(CAST(DATE_TRUNC('WEEK', FROM_UNIXTIME(ure.ts_revision/1000)) AS DATE), 6) AS week_end
+      ure.ts_revision AS ts_event,
+      DATE_ADD(CAST(DATE_TRUNC('WEEK', ure.ts_revision) AS DATE), 6) AS week_end
     FROM 
       datalake_ebdb_clean.house_aud AS aud
-    LEFT JOIN 
-      datalake_ebdb_clean.user_revision_entity AS ure
+    JOIN 
+      datalake_ebdb_user.user_revision_entity AS ure
         ON ure.id = aud.rev
   ),
   house_entrance_ordered AS (
@@ -191,22 +185,21 @@ SELECT
   wlb.who_is_living_history,
   hds.week_start AS dt_week_started,
   hds.week_end AS dt_week_ended
-FROM 
+FROM
   house_date_series AS hds
-LEFT JOIN 
+JOIN
   key_location_base AS klb
     ON hds.id_house = klb.id_house
     AND hds.week_end = klb.week_end
-LEFT JOIN 
+JOIN
   key_type_base AS ktb
     ON hds.id_house = ktb.id_house
     AND hds.week_end = ktb.week_end
-LEFT JOIN 
+JOIN
   who_is_living_base AS wlb
     ON hds.id_house = wlb.id_house
     AND hds.week_end = wlb.week_end
-LEFT JOIN house_entrance_base AS heb
+JOIN
+  house_entrance_base AS heb
     ON hds.id_house = heb.id_house
     AND hds.week_end = heb.week_end
-WHERE 
-  klb.id_house IS NOT NULL
