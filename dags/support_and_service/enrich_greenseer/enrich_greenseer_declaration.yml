@@ -9,7 +9,7 @@ workflow:
     type: query_delta
     layer: enrich
     tables_customization:
-        session:
+        sessions:
             partitions: [year, month, day]
             extraction_type: incremental
     extra_query_template_params:
