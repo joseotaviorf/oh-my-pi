@@ -1,0 +1,167 @@
+database_name: dw_customer_support
+table_name: fact_sessions_chatbot
+description: This table presents session data from the chatbots along with retention attempt data
+  from the JourneyFlow service and customer support data from the Sauron service.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_session:
+    lineage:
+      - datalake_greenseer.sessions.id_session
+    description: Session unique identifier.
+  sk_ticket:
+    lineage:
+      - datalake_greenseer.sessions.id_ticket
+    description: Ticket (ticket refers to a session that has been attended to by a human) unique identifier.
+  sk_user:
+    lineage:
+      - datalake_greenseer.sessions.id_user
+    description: User unique identifier.
+  sk_pipeline:
+    lineage:
+      - datalake_greenseer.sessions.id_pipeline
+    description: Dialog script identifier.
+  sk_content:
+    lineage:
+      - datalake_greenseer.sessions.id_content
+    description: Content unique identifier.
+  sk_contract:
+    lineage:
+      - datalake_greenseer.sessions.id_contract
+    description: Contract unique identifier.
+  sk_survey:
+    lineage:
+      - datalake_satisfaction_rating.chat_fup_surveys.id_survey
+    description: Survey unique identifier.
+  sk_answer:
+    lineage:
+      - datalake_satisfaction_rating.chat_fup_surveys.id_answer
+    description: Answer unique identifier.
+  sk_started_chat:
+    lineage:
+      - datalake_greenseer.sessions.ts_started
+    description: Chat start timestamp.
+  sk_ended_chat:
+    lineage:
+      - datalake_greenseer.sessions.ts_ended
+    description: Chat end timestamp.
+  is_menu_available:
+    lineage:
+      - datalake_greenseer.sessions.is_menu_available
+    description: Boolean value that indicates whether a menu is available.
+  is_more_help_required:
+    lineage:
+      - datalake_greenseer.sessions.is_more_help_required
+    description: Boolean value that indicates whether more help is required.
+  is_problem_solved:
+    lineage:
+      - datalake_greenseer.sessions.is_problem_solved
+    description: Boolean value that indicates whether the problem was solved.
+  is_retention:
+    lineage:
+      - datalake_greenseer.sessions.is_retention
+    description: Boolean value that indicates whether the session is retention. 
+      The concept of a session is retained when the user receives a retention response (either Emma's response or citadel's response) 
+      and did that response helped OR abandons the session after the response;
+  is_abandonmet:
+    lineage:
+      - datalake_greenseer.sessions.is_retention
+      - datalake_greenseer.sessions.id_ticket
+    description: Boolean value that indicates whether the session is abandonment. A session is abandoned when':'
+      1 - User opens the session and does not interact;
+      2 - User is asked to send more information (requested more context) and does not interact;
+      3 - User receives a Citadel menu and does not interact;
+  is_recontact:
+    lineage:
+      - datalake_greenseer.sessions.is_recontact
+    description: indicates whether the session was recontacted via call or chat within 96 hours after the user was retained in the bot.
+      A session is no longer considered a retention and becomes a recontact when':'
+      1 - User is retained, but contacts via call within 96 hours;
+      2 - User is retained, but contacts via chat to talk about the same topic OR another topic 96 hours later.
+  is_retained_session_with_fallback:
+    lineage:
+      - datalake_greenseer.sessions.is_retention
+      - datalake_greenseer.sessions.has_fallback
+    description: Boolean value that indicates whether the session is retention with fallback.
+  is_churn_chat:
+    lineage:
+      - datalake_greenseer.sessions.channel
+      - datalake_greenseer.sessions.id_user
+      - datalake_greenseer.sessions.ts_started
+    description: Boolean value that indicates whether the session is churn chat. It is a transfer when the user generates a ticket for human contact (either via call in app or via normal chat)
+  is_call_in_app_session:
+    lineage:
+      - datalake_greenseer.sessions.ticket_origin
+    description: Boolean value that indicates whether the session is call in app.
+  has_exceeded_session_timeout:
+    lineage:
+      - datalake_greenseer.sessions.has_exceeded_session_timeout
+    description: Boolean value that indicates whether the session has exceeded the timeout.
+  has_journey_flow_response:
+    lineage:
+      - datalake_greenseer.sessions.has_journey_flow_response
+    description: Boolean value that indicates whether the session has a journey flow response.
+  has_fallback:
+    lineage:
+      - datalake_greenseer.sessions.has_fallback
+    description: Boolean value that indicates whether the session has fallback. Marked by the flag business_rules.journey_flow.retention_emma.fallback
+  number_chat_interactions:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Number of interactions the user had during the chatbot flow (how many times they clicked to talk about another topic).
+  model_with_context:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Model with context.
+  model_no_context:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Model without context.
+  model_greeting:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Model greeting.
+  model_no_answer_needed:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Model no answer needed.
+  before_reception:
+    lineage:
+      - datalake_greenseer.sessions.before_reception
+    description: DialogFlow intent identifier of the active support flow.
+  after_reception:
+    lineage:
+      - datalake_greenseer.sessions.after_reception
+    description: DialogFlow intent identifier of the after reception flow.
+  last_hsm_type:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Last HSM type.
+  secs_since_last_hsm:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Seconds since last HSM.
+  automatic_selection:
+    lineage:
+      - datalake_greenseer.sessions.automatic_selection
+    description: Boolean value that indicates whether the contact reason taxonomy was added automatically by machine learning models.
+  has_questionnaire_sent:
+    lineage:
+      - datalake_greenseer.sessions.current_state
+    description: Boolean value that indicates whether the questionnaire was sent.
+  context_identification_tentatives:
+    lineage:
+      - datalake_greenseer.sessions.context_detection_attempts
+    description: size of (memory.business_rules.context_detection_attempts). Def':'' Number of times context was requested for the user
+  has_same_previous_theme:
+    lineage:
+      - datalake_greenseer.sessions.has_same_previous_theme
+    description: Boolean value that indicates whether the session has the same previous theme.
+  year:
+    description: Partition year.
+  month:
+    description: Partition month.
+  day:
+    description: Partition day.
+  ts_load:
+    description: Timestamp date that indicates when the query was last executed.

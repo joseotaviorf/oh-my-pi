@@ -1,0 +1,68 @@
+database_name: dw_customer_support
+table_name: dim_chatbot
+description: Dimension containing chatbot attributes. Values obtained from Greenseer base.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_session:
+    lineage:
+      - datalake_greenseer.sessions.id_session
+    description: Session unique identifier.  
+  app_version:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Version of the chatbot application.
+  tags:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Tags that were added to the session.
+  strategy:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Strategy used in the session.
+  selected_taxonomy:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Taxonomy selected throughout the chatbot session
+  context_message:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Context message of the session.
+  flags:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Flags that were added to the session.
+  current_state:
+    lineage:
+      - datalake_greenseer.sessions.current_satate
+    description: Current state of the session.
+  session_type:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: indicates whether the session is before_bot (did not go through the bot - the questions say before reception) 
+      or BOT (went through the bot) (there are the rules in the question)
+  taxonomy:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Taxonomy selected throughout the chatbot session.
+  theme:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Theme of the session.
+  channel:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Channel used in the session.
+    categories:
+      Whatsapp: Indicates that the session was made through WhatsApp.
+      Chat In-App: Indicates that the session was made through chat.
+      Empty: Indicates that the session was made through an empty channel.
+      Others: Indicates that the session was made through other channels.
+  experimentAB:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Experiment A/B used in the session.
+  experimentAB_fallback:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Experiment A/B fallback used in the session.

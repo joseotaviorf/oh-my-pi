@@ -109,6 +109,25 @@ columns:
       - datalake_greenseer_clean.session.memory
   has_exceeded_session_timeout:
     description: Boolean that indicates that a service has exceeded the response time, the time for a service response is 4 hours.
+    lineage:
+      - datalake_greenseer_clean.session.ts_ended
+      - datalake_greenseer_clean.session.ts_started
+  has_fallback:
+    description: Boolean that indicates whether the session has a fallback.
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  context_detection_attempts:
+    description: Number of attempts to detect the context of the session.
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  ticket_origin:
+    description: Origin of the ticket.
+    lineage:
+      - datalake_customer_support.unified_tickets.ticket_origin
+  ts_updated:
+    description: Timestamp date that indicates when the session was last executed.
+    lineage:
+      - datalake_greenseer_clean.session.ts_updated
   ts_started:
     description: Session start timestamp.
     lineage:
@@ -117,3 +136,11 @@ columns:
     description: Session end timestamp.
     lineage:
       - datalake_greenseer_clean.session.ts_ended
+  year:
+    description: Partition year.
+  month:
+    description: Partition month.
+  day:
+    description: Partition day.
+  ts_load:
+    description: Timestamp date that indicates when the query was last executed.

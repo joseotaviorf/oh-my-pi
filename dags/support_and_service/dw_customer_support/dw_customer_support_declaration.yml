@@ -20,6 +20,9 @@ workflow:
     fact_analysts_performance:
       partitions: [year, month, day]
       extraction_type: incremental
+    fact_sessions_chatbot:
+      partitions: [year, month, day]
+      extraction_type: incremental
 cluster:
   type: custom_cluster
   custom_configurations:

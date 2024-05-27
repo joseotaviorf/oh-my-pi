@@ -4,13 +4,13 @@ WITH greenseer_uniques AS (
     id_pipeline,
     memory,
     current_state,
+    ts_updated,
     ts_started,
     ts_ended
   FROM
     datalake_greenseer_clean.session
   WHERE
-    YEAR >= 2023
-    AND ts_started >= "2023-07-01"
+    MAKE_DATE(sa.year, sa.month, sa.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
@@ -95,8 +95,12 @@ greenseer_sessions AS (
       WHEN CONTAINS(g.current_state, 'RETENTION_EMMA') THEN 'has_emma_flow'
       ELSE NULL
     END AS has_emma_flow,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.fallback') AS has_fallback,
     g.memory,
+    -- GET_JSON_OBJECT(g.memory, '$.business_rules.context_detection_attempts') AS context_detection_attempts,
+    EXPLODE(CAST(from_json(GET_JSON_OBJECT(g.memory, '$.business_rules.context_detection_attempts'), 'ARRAY<MAP<STRING, MAP<STRING, FLOAT>>>') AS ARRAY<MAP<STRING, MAP<STRING, FLOAT>>>) ) AS context_detection_attempts,
     g.current_state,
+    g.ts_updated,
     g.ts_started,
     g.ts_ended
   FROM
@@ -104,6 +108,7 @@ greenseer_sessions AS (
   LEFT JOIN
     journeys_uniques AS j
       ON j.id_correlation = g.id_session
+
 ),
 greenseer_tried_retention AS (
   SELECT
@@ -155,7 +160,8 @@ greenseer_retentions AS (
 sessions_and_tickets AS (
   SELECT DISTINCT
     id_session,
-    id_ticket
+    id_ticket,
+    ticket_origin
   FROM
     datalake_customer_support.unified_tickets
   WHERE
@@ -209,8 +215,16 @@ SELECT
     WHEN gs.ts_ended > gs.ts_started + INTERVAL '4 hour' THEN True
     ELSE False
   END AS has_exceeded_session_timeout,
+  gs.has_fallback,
+  context_detection_attempts,
+  st.ticket_origin,
   gs.ts_started,
-  gs.ts_ended
+  gs.ts_ended,
+  gs.ts_updated,
+  YEAR(gs.ts_started) AS year,
+  MONTH(gs.ts_started) AS month,
+  DAY(gs.ts_started) AS day,
+  NOW() AS ts_load
 FROM
   greenseer_sessions AS gs
 LEFT JOIN
