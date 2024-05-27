@@ -8,7 +8,7 @@ WITH member_profile_aud AS (
         mpa.profile,
         ROW_NUMBER() OVER(PARTITION BY mpa.id ORDER BY mpa.ts_updated DESC) = 1 AS is_last_update,
         mpa.is_active,
-        COALESCE(mpa.dt_relationship_started, mpa.ts_created) AS ts_relationship_started,
+        mpa.ts_created AS ts_relationship_started,
         COALESCE(rev.ts_created, LEAD(mpa.ts_created) OVER(PARTITION BY mpa.id ORDER BY mpa.ts_updated)) AS ts_relationship_ended,
         mpa.ts_created,
         mpa.ts_updated,
