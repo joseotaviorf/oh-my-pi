@@ -1,0 +1,60 @@
+database_name: datalake_search
+table_name: item_interaction_sale
+owner: alice.ferreira@quintoandar.com.br
+domain: primitives
+description: |
+  User interaction data. Required for calculating recommendation
+  metrics such as precision and recall. Granularity: one user-item pair per row
+columns:
+  id_user:
+    description: Identifier of the user
+    lineage:
+      - datalake_sale_flows.id_buyer
+  id_item:
+    description: Identifier of the interacted item
+    lineage:
+    - datalake_sale_flows.id_house
+  interaction_type:
+    description: |
+      Type of interaction between user and item. Could be Values:
+        - sale_flow
+  id_search:
+    description:  Identifier of a search related to a specific house and user
+    lineage:
+      - datalake_search_session_event.search_session_event.id_search
+  search_rendering_type:
+    description:  Identifier the type of a search associated with id_search
+    lineage:
+      - datalake_search_session_event.search_session_event.search_rendering_type
+  type_item:
+    description: |
+      The type of item that was interacted. Currently we
+      only recommend houses, so we only have house-related
+      interactions.
+  ts_interaction:
+    description: Timestamp at which the user interaction happened
+    lineage:
+      - datalake_sale_flows.ts_first_event
+  ts_search:
+    description: Timestamp at which the search was performed
+    lineage:
+      - datalake_search_session_event.search_session_event.ts_event
+  dt_interaction:
+    description: Date of the user interaction
+    lineage:
+      - datalake_sale_flows.ts_first_event
+  business_context:
+    description: |
+      Business context: sale
+  year:
+    description: Year of the user interaction
+    lineage:
+      - datalake_sale_flows.ts_first_event
+  month:
+    description: Month of the user interaction
+    lineage:
+      - datalake_sale_flows.ts_first_event
+  day:
+    description: Day of the user interaction
+    lineage:
+      - datalake_sale_flows.ts_first_event

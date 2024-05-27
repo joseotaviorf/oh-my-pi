@@ -16,6 +16,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on enrich layer:
 - `amplitude_user_device`
 - `item_interaction`
+- `item_interaction_sale`
 
 ### Responsible Data Team
 ​

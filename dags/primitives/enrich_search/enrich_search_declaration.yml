@@ -11,8 +11,16 @@ workflow:
   inner_dependencies:
     item_interaction:
       - amplitude_user_device
+    item_interaction_sale:
+      - amplitude_user_device
   tables_customization:
     item_interaction:
+      partitions:
+      - year
+      - month
+      - day
+      - interaction_type
+    item_interaction_sale:
       partitions:
       - year
       - month

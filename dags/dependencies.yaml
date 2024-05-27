@@ -2616,6 +2616,7 @@ bietlejuice.enrich_search:
   - bietlejuice.amplitude:load-clean-170698-user-merge
   - bietlejuice.ebdb_offer:load-clean-offer
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
 bietlejuice.enrich_search_session_event:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
