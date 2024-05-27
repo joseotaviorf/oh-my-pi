@@ -10,7 +10,7 @@ WITH greenseer_uniques AS (
   FROM
     datalake_greenseer_clean.session
   WHERE
-    MAKE_DATE(sa.year, sa.month, sa.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
