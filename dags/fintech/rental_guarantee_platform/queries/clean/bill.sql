@@ -11,6 +11,7 @@ SELECT
     version,
     due_date            AS dt_due,
     paid_at             AS ts_paid,
+    credit_at           AS ts_credit,
     created_at          AS ts_created,
     updated_at          AS ts_updated,
     year,

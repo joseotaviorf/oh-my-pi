@@ -42,6 +42,9 @@ columns:
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.created_at
+  ts_credit:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.boleto.credit_at
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.boleto.updated_at
