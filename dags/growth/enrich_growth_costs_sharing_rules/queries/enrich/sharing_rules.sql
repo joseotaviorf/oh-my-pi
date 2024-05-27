@@ -92,6 +92,18 @@ SELECT
     business_context,
     NULL::STRING AS utm_campaign
 FROM 
+    datalake_growth_costs_sharing_rules.a036a
+UNION ALL 
+SELECT
+    id_date,
+    id_rule,
+    'BR' AS country_code, 
+    city_group,
+    share,
+    funnel_side,
+    business_context,
+    NULL::STRING AS utm_campaign
+FROM 
     datalake_growth_costs_sharing_rules.b016b
 UNION ALL 
 SELECT
@@ -441,3 +453,39 @@ SELECT
     NULL::STRING AS utm_campaign
 FROM 
     datalake_growth_costs_sharing_rules.s032s
+UNION ALL 
+SELECT
+    id_date,
+    id_rule,
+    country_code, 
+    city_group,
+    share,
+    funnel_side,
+    business_context,
+    utm_campaign
+FROM 
+    datalake_growth_costs_sharing_rules.s048s
+UNION ALL 
+SELECT
+    id_date,
+    id_rule,
+    country_code, 
+    city_group,
+    share,
+    funnel_side,
+    business_context,
+    utm_campaign
+FROM 
+    datalake_growth_costs_sharing_rules.s049s
+UNION ALL 
+SELECT
+    id_date,
+    id_rule,
+    country_code, 
+    city_group,
+    share,
+    funnel_side,
+    business_context,
+    utm_campaign
+FROM 
+    datalake_growth_costs_sharing_rules.s050s
