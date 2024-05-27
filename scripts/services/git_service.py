@@ -36,3 +36,15 @@ class GitService:
             result[filename] = status
 
         return result
+    
+    def fetch(
+        self, branch: str,
+    ) -> None:
+        """
+        Fetches the latest changes from the remote repository
+
+        :param branch: The branch to fetch changes from
+        """
+        bash_command = f"git fetch origin {branch}"
+        process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+        process.communicate()

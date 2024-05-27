@@ -47,6 +47,8 @@ def get_metadata_files(all_files, branch):
             from_branch = "HEAD~1"
         else:
             from_branch = "origin/master"
+            git_service.fetch("master") # We need to do this because Woodpecker will only fetch from the current branch.
+        
         changed_files = [
             (file, status)
             for file, status in git_service.get_modified_files_from_diff(

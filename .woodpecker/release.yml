@@ -3,6 +3,12 @@ depends_on:
   - tests
   - validations
 
+clone:
+  - name: clone
+    image: woodpeckerci/plugin-git
+    settings:
+      partial: false # We need to clone the entire history to find the changed files
+
 steps:
   make-package-python:
     image: public.ecr.aws/docker/library/python:3.9.5
