@@ -40,3 +40,4 @@ LEFT JOIN
         ON pbf.id_offer_agent = noa.id_offer_agent
 WHERE
     DATE(no.ts_updated) = DATE('{year}-{month}-{day}')
+    OR DATE(noa.ts_created) = DATE('{year}-{month}-{day}')
