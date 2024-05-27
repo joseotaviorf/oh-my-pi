@@ -6,55 +6,53 @@ owner: E ForRent@quintoandar.com.br
 columns:
   id_house:
     lineage:
-    - datalake_ebdb_clean.house.id
+      - datalake_ebdb_clean.house.id
     description: House ID.
   house_entrance_history:
     lineage:
-    - datalake_ebdb_clean.house_aud.doorman_type
+      - datalake_ebdb_clean.house_aud.doorman_type
     description: What type of operation related to the doorman activity.
     categories:
-      Diurno: ''
-      horas24: ''
-      NaoHaPorteiro: ''
-      None: ''
-      Noturno: ''
+      Diurno: Doorman present only during the day.
+      horas24: Doorman present 24 hours a day.
+      NaoHaPorteiro: No doorman.
+      None: Unknown.
+      Noturno: Doorman present only at night.
   key_location_history:
     lineage:
-    - datalake_ebdb_clean.access_authorization_type.name
+      - datalake_ebdb_clean.access_authorization_type.name
     description: Where the key is located in a certain week.
     categories:
-      KeysWithAgent: ''
-      Password: ''
-      OwnerPresent: ''
-      KeysLocker: ''
-      None: ''
-      FrontDoor: ''
-      LockBox: ''
+      FrontDoor: Key is located at front door.
+      KeysLocker: Keys Locker.
+      KeysWithAgent: Keys is located with agent.
+      LockBox: Key is located at Lockbox.
+      None: Unknown.
+      OwnerPresent: The key is located with the Owner.
+      Password: Password.
   key_type_history:
     lineage:
-    - datalake_ebdb_clean.key_type.name
+      - datalake_ebdb_clean.key_type.name
     description: What type of key is necessary to access the house in a certain week.
     categories:
-      Password: ''
-      None: ''
-      Common: ''
-      Biometry: ''
+      Biometry: Biometry
+      Common: Regular key
+      None: Unknown
+      Password: Password
   who_is_living_history:
     lineage:
-    - datalake_ebdb_clean.occupant_type.name
+      - datalake_ebdb_clean.occupant_type.name
     description: Who is living in this house listing in a certain week.
     categories:
-      Tenant: ''
-      Empty: ''
-      Owner: ''
+      Tenant: 'The tenant is living in the house'
+      Empty: 'The house is empty'
+      Owner: 'The owner is living in the house'
       None: ''
-  dt_week_start:
-    lineage:
-    - datalake_quintoandar.aux_date.week_start
-  dt_week_end:
-    lineage:
-    - datalake_quintoandar.aux_date.week_end
   dt_week_ended:
     description: Week end date (always a sunday).
+    lineage:
+      - datalake_quintoandar.aux_date.week_end
   dt_week_started:
     description: Week start date (always a monday).
+    lineage:
+    - datalake_quintoandar.aux_date.week_start
