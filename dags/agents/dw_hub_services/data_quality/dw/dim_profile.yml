@@ -1,0 +1,12 @@
+---
+table_name: dw_hub_services.dim_profile
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_profile:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  member_profile:
+    is_complete:
+      severity_level: Error

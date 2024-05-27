@@ -1,0 +1,36 @@
+---
+database_name: dw_hub_services
+table_name: dim_profile
+description: 
+  This dimension brings data from all types of business unit member profiles. 
+  Each line is unique per profile, being represented by sk_profile.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_profile:
+    lineage:
+      - datalake_hub_services.profile.id_profile
+    description: Unique ID of the profile type.
+  member_profile:
+    lineage:
+      - datalake_hub_services.profile.profile
+    description: Profile type description
+  dt_created:
+    lineage:
+      - datalake_hub_services.profile.dt_created
+    description: Profile date creation.
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    lineage:
+      - datalake_hub_services.profile.year
+    description: Year of creation date
+  month:
+    lineage:
+      - datalake_hub_services.profile.month
+    description: Month of creation date
+  day:
+    lineage:
+      - datalake_hub_services.profile.day
+    description: Day of creation date
+  

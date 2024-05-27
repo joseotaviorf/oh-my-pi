@@ -486,6 +486,13 @@ bietlejuice.dw_house_amenities:
   - bietlejuice.enrich_ebdb_amenities:load-enrich-pivotted-amenities
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
+bietlejuice.dw_hub_services:
+  - bietlejuice.enrich_hub_services_agents:load-enrich-member-profile
+  - bietlejuice.enrich_hub_services_agents:load-enrich-profile
+  - bietlejuice.enrich_hub_services_agents:load-enrich-users
+  - bietlejuice.hub_services:load-clean-business-unit
+  - bietlejuice.hub_services:load-clean-business-unit-region-aud
+  - bietlejuice.hub_services:load-clean-rev-info
 bietlejuice.dw_inspections:
   - bietlejuice.enrich_amplitude_inspections:load-enrich-inspection-review-access
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking

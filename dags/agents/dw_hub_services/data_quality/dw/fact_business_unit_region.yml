@@ -1,0 +1,15 @@
+---
+table_name: dw_hub_services.fact_business_unit_region
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_business_unit_region:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_business_unit:
+    is_complete:
+      severity_level: Error
+  sk_region:
+    is_complete:
+      severity_level: Error

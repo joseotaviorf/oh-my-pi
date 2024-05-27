@@ -1,0 +1,77 @@
+---
+database_name: dw_hub_services
+table_name: fact_member_profile
+description: 
+  This fact brings up the relationship between the members of the hub, which business 
+  unit it is linked to and who is its direct supervisor (parent member). 
+  It also provides information whether this link is active, when it started and ended.
+
+  Each line is unique due to the relationship between the hub member, the hub and its 
+  parent member, this relationship being represented by sk_member_relationship.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_member_profile:
+    lineage:
+      - datalake_hub_services.member_profile.id_member_profile
+    description: Member profile unique identifier. 
+  sk_member_relationship:
+    lineage:
+      - datalake_hub_services.member_profile.id_member_relationship
+    description: Unique identifier of the relationship between the hub member, the hub and its parent member.
+  sk_user:
+    lineage:
+      - datalake_hub_services.member_profile.id_user
+    description: |
+      User unique identifier on HubServices tables.
+      Attention: this user ID refers to Hub Services and does not correspond to the main/admin/ebdb user.
+  sk_agent:
+    lineage:
+      - datalake_hub_services.users.id_agent
+    description: Agent unique identifier.
+  sk_member_parent:
+    lineage:
+      - datalake_hub_services.member_profile.id_parent_member_profile
+    description: |
+      Agent unique identifier.
+      Attention: This ID refers to the agent in main/admin/ebdb.
+  sk_user_parent:
+    lineage:
+      - datalake_hub_services.member_profile.id_parent_user
+    description: |
+      User unique identifier to the parent member.
+      Attention: this user ID refers to Hub Services and does not correspond to the main/admin/ebdb user.
+  sk_profile:
+    lineage:
+      - datalake_hub_services.profile.id_profile
+    description: Unique ID of the profile type.
+  sk_business_unit:
+    lineage:
+      - datalake_hub_services.member_profile.id_business_unit
+    description: Unique ID of the business unit where the member is allocated.
+  is_active:
+    lineage:
+      - datalake_hub_services.member_profile.is_active
+    description: Indicates that the relationship between member, business unit and parent member is active.
+  is_agent:
+    description: Indicates that the member is an agent/broker.
+  is_negotiation_executive:
+    description: 
+      Indicates that the member is a business executor of the business unit. 
+      This member can be the parent to several other agent profile members.
+  is_secretariat_member:
+    description: Indicates that this is a member of the secretariat.
+  ts_relationship_started:
+    lineage:
+      - datalake_hub_services.member_profile.ts_relationship_started
+    description: 
+      Date and time when the member's relationship with the business unit and the parent member began.
+      If there is no parent member, the date refers only to the relationship with the business unit
+  ts_relationship_ended:
+    lineage:
+      - datalake_hub_services.member_profile.ts_relationship_ended
+    description:
+      Date and time when the member's relationship with the business unit and the parent member ended.
+      If there is no parent member, the date refers only to the relationship with the business unit
+  ts_load:
+    description: Date and time when the data was loaded.

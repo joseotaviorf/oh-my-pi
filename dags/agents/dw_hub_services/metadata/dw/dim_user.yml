@@ -1,0 +1,52 @@
+---
+database_name: dw_hub_services
+table_name: dim_user
+description: |
+  This dimension brings data from all users generated in the operation of the business unit. 
+  Here we will have data such as name, email and telephone number.
+
+  Each line is unique per user, being represented by sk_user.
+
+  Attention: non-merged users are considered here, so this table does not have a connector 
+  with the ebdb user table, only with the user audit.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_user:
+    lineage:
+      - datalake_hub_services.users.id_user
+    description: |
+      User unique identifier on HubServices tables.
+      Attention: This user ID refers to Hub Services and does not correspond to the main/admin/ebdb user.
+  sk_main_user:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: |
+      Unique external user ID.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  name:
+    lineage:
+      - datalake_hub_services.users.name
+    description:
+  email:
+    lineage:
+      - datalake_hub_services.users.email
+    description: User name.
+  phone_number:
+    lineage:
+      - datalake_hub_services.users.phone_number
+    description: User phone number.
+  is_active:
+    lineage:
+      - datalake_hub_services.users.is_active
+    description:
+  ts_created:
+    lineage:
+      - datalake_hub_services.users.ts_created
+    description: User data creation datetime
+  ts_updated:
+    lineage:
+      - datalake_hub_services.users.ts_updated
+    description: User data update datetime
+  ts_load:
+    description: Date and time when the data was loaded.

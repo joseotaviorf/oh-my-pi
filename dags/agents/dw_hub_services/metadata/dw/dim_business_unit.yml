@@ -1,0 +1,39 @@
+---
+database_name: dw_hub_services
+table_name: dim_business_unit
+description: 
+  This dimension brings the data inherent to the Business Unit, such as name, type and business context, etc.
+  Each line is unique per Business Unit, represented by sk_business_unit.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_business_unit:
+    lineage:
+      - datalake_hub_services_clean.business_unit.id
+    description: Business Unit unique identifier.
+  hub_name:
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
+    description: Business unit name
+  business_context:
+    lineage:
+      - datalake_hub_services_clean.business_unit.business_context
+    description: What context does the business unit operate in, which could be Sales or Rental.
+  sdr_type:
+    lineage:
+      - datalake_hub_services_clean.business_unit.sdr_type
+    description: Business model
+  negotiation_type:
+    lineage:
+      - datalake_hub_services_clean.business_unit.negotiation_type
+    description: Business unit negotiation type
+  ts_created:
+    lineage:
+      - datalake_hub_services_clean.business_unit.ts_created
+    description: Business unit data creation datetime.
+  ts_updated:
+    lineage:
+      - datalake_hub_services_clean.business_unit.ts_updated
+    description: Business unit data update datetime.
+  ts_load:
+    description: Date and time when the data was loaded.
