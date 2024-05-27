@@ -272,17 +272,23 @@ email_tickets AS (
     back_ticket_list AS back_tickets,
     is_solved AS resolution_survey,
     IF(
-      front_or_back IN ('back', 'front')
-      AND DATE(ts_ticket_solved) >= DATE('2022-01-01')
-      AND contact_theme_detail_tag IS NOT NULL
-      AND team <> 'Ong Back'
-      AND area = 'CX'
-      AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
-        'Offboarding Reparos [OFF] [POS] [BACK]',
-        'Offboarding pré saída [OFF] [POS] [BACK]',
-        'Proteção QuintoAndar [OFF] [POS] [BACK]',
-        'Rescisão - Despejo [OFF][POS][BACK]',
-        'Rescisão 1 [OFF] [POS] [BACK]'
+      (
+        front_or_back IN ('back', 'front')
+        AND DATE(ts_ticket_solved) >= DATE('2022-01-01')
+        AND contact_theme_detail_tag IS NOT NULL
+        AND team <> 'Ong Back'
+        AND area = 'CX'
+        AND department NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+          'Offboarding Reparos [OFF] [POS] [BACK]',
+          'Offboarding pré saída [OFF] [POS] [BACK]',
+          'Proteção QuintoAndar [OFF] [POS] [BACK]',
+          'Rescisão - Despejo [OFF][POS][BACK]',
+          'Rescisão 1 [OFF] [POS] [BACK]'
+        )
+      )
+      AND (
+        department != 'ReclameAqui [CE] [POS] [BACK]' 
+        AND ticket_type != 'problem'
       ),
       TRUE,
       FALSE
