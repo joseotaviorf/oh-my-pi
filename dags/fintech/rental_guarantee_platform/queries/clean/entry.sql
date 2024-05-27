@@ -1,7 +1,7 @@
 SELECT
     id,
     type,
-    invoice,
+    billing_report AS id_billing_report,
     propose,
     amount,
     created_at  AS ts_created,

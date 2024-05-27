@@ -5,12 +5,12 @@ columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.id
+  id_billing_report:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.billing_report
   type:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.type
-  invoice:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.entry.invoice
   propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.propose

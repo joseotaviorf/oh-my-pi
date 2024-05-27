@@ -1,0 +1,46 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: billing_report
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.id
+  id_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.company
+  id_bill:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.boleto
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.status
+  total_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.total_amount
+  accrual_year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.accrual_year
+  accrual_month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.accrual_month
+  version_report:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.version_report
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.due_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report.day

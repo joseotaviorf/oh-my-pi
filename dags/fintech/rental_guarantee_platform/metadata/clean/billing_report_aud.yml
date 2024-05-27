@@ -1,0 +1,73 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: billing_report_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.id
+  id_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.company
+  id_bill:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.boleto
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.status
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.revtype
+  accrual_year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.accrual_year
+  accrual_month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.accrual_month
+  total_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.total_amount
+  mod_created_at:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.created_at_mod
+  mod_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.company_mod
+  mod_accural_year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.accrual_year_mod
+  mod_accrual_month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.accrual_month_mod
+  mod_total_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.total_amount_mod
+  mod_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.status_mod
+  mod_bill:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.boleto_mod
+  mod_due_date:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.due_date_mod
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.due_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.billing_report_aud.day

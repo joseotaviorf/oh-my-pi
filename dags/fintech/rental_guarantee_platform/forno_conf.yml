@@ -186,9 +186,9 @@ tables:
   - table_name: entry
     date_filter_column: updated_at
     extraction_type: incremental
-  - table_name: invoice_aud
+  - table_name: billing_report_aud
     extraction_type: full
-  - table_name: invoice
+  - table_name: billing_report
     date_filter_column: updated_at
     extraction_type: incremental
   - table_name: renewal_aud

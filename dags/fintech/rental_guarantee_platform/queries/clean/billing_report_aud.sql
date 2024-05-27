@@ -20,4 +20,4 @@ SELECT
     due_date            AS dt_due,
     created_at          AS ts_created
 FROM
-    datalake_rental_guarantee_platform_raw.invoice_aud
+    datalake_rental_guarantee_platform_raw.billing_report_aud
