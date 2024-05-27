@@ -1,39 +1,43 @@
 database_name: dw_collection_recovery
 table_name: fact_debt
 description: |
-  It contains information about the debt, in granularity of invoice per debtor and contract, i.e, which invoices have been negotiated, even if the invoice has not yet expired, and which invoices have not yet been negotiated.
-  An invoice can have 1 or more negotiations. 1 negotiation can include 1 or more invoices (from seu barriga).
-  Also an invoice can be negotiated to more than one debtor, usually in case of a broken first negotation.
-  If an extra invoice (installment of a negotiation created in SeuBarriga) is due, it will also be registered in this table.
+  It contains information about the debts negotiated, in granularity of invoice per contract, i.e, which invoices have been negotiated, even if the invoice has not yet expired.
+  An invoice can have 1 or more negotiations, in case of a broken negotiation (i.e a promisse not paid). 1 negotiation can include 1 or more invoices (from seu barriga).
+  If an extra invoice (installment of a negotiation) is overdue, it will also be registered in this table.
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
 columns:
   sk_debt:
     lineage:
-      - datalake_recupera_clean.creditor_pending.id_creditor
-      - datalake_recupera_clean.complementary_records.id_creditor
-      - datalake_recupera_clean.creditor_pending.id_installment
-      - datalake_recupera_clean.complementary_records.id_installment
-    description: Surrogate key of table. It is a sequencial number based on the id_creditor and id_installment.
-  sk_debtor:
-    lineage:
-      - datalake_recupera_clean.complementary_records.id_customer
-      - datalake_recupera_clean.creditor_pending.id_customer
-    description: Customer ID (CPF). It's the FK of table dim_debtor
-  id_contract:
-    lineage:
+      - datalake_debt_recovery.negotiation.id_contract
       - datalake_recupera_clean.creditor_pending.id_contract
       - datalake_recupera_clean.complementary_records.id_contract
+      - datalake_recupera_clean.complementary_records_written_down.id_contract
+      - datalake_trato_feito_clean.debt.id_external
+      - datalake_recupera_clean.creditor_pending.id_installment
+      - datalake_recupera_clean.complementary_records.id_installment
+      - datalake_recupera_clean.complementary_records_written_down.id_installment
+    description: Surrogate key of table. It is a sequencial number based on the id_creditor and id_installment.
+  id_contract:
+    lineage:
+      - datalake_debt_recovery.negotiation.id_contract
+      - datalake_recupera_clean.creditor_pending.id_contract
+      - datalake_recupera_clean.complementary_records.id_contract
+      - datalake_recupera_clean.complementary_records_written_down.id_contract
     description: Contract ID (Propose ID on QuintoCred)
   id_invoice:
     lineage:
+      - datalake_trato_feito_clean.debt.id_external
       - datalake_recupera_clean.creditor_pending.id_installment
       - datalake_recupera_clean.complementary_records.id_installment
+      - datalake_recupera_clean.complementary_records_written_down.id_installment
     description: When on QuintoAndar, SeuBarriga original invoice ID. When on QuintoCred, Rental Guarantee Platform delinquency ID.
   creditor:
     lineage:
+      - datalake_debt_recovery.negotiation.debtor
       - datalake_recupera_clean.creditor_pending.id_creditor
       - datalake_recupera_clean.complementary_records.id_creditor
+      - datalake_recupera_clean.complementary_records_written_down.id_creditor
     description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
   invoice_payment_status:
     lineage:
@@ -74,17 +78,14 @@ columns:
   interest_fee_amount:
     lineage:
       - datalake_trato_feito_clean.debt.interest_fee_amount
-      - datalake_recupera_clean.creditor_pending.interest_fee_amount
     description: Interest fee amount (juros)
   fine_fee_amount:
     lineage:
       - datalake_trato_feito_clean.debt.fine_fee_amount
-      - datalake_recupera_clean.creditor_pending.amount_fine
     description: Fine fee amount(multa)
   discount_amount:
     lineage:
       - datalake_trato_feito_clean.debt.discount_amount
-      - datalake_recupera_clean.creditor_pending.discount_amount
     description: Discount amount
   debt_amount:
     lineage:
@@ -92,7 +93,6 @@ columns:
       - datalake_trato_feito_clean.debt.interest_fee_amount
       - datalake_trato_feito_clean.debt.fine_fee_amount
       - datalake_trato_feito_clean.debt.discount_amount
-      - datalake_recupera_clean.creditor_pending.transfer_amount
     description: Total debt amount. It is invoice_due_amount + interest_fee_amount + fine_fee_amount - discount_amount
   dt_invoice_due:
     lineage:

@@ -1,72 +1,92 @@
-WITH deduplicate_creditor_pending AS (
+WITH
+deduplicate_creditor_pending AS (
   SELECT DISTINCT
-    CASE
-      WHEN id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
-      WHEN id_creditor IN (3,5) THEN "IQ QuintoCred"
-      WHEN id_creditor IN (2,6) THEN "PP QuintoAndar"
-    END AS creditor,
-    CASE
-      WHEN id_creditor IN (1,4,7,8,9) THEN 1
-      WHEN id_creditor IN (2,6) THEN 2
-      ELSE id_creditor
-    END AS id_creditor,
-    id_customer,
-    id_installment,
-    interest_fee_amount,
-    amount_fine AS fine_fee_amount,
-    discount_amount,
-    transfer_amount AS debt_amount
+    id_creditor,
+    id_contract,
+    id_installment AS id_invoice,
+    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
   FROM datalake_recupera_clean.creditor_pending
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
+  WHERE installment_code IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
 ),
 deduplicate_complementary_records AS (
   SELECT DISTINCT
-    CASE
-      WHEN id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
-      WHEN id_creditor IN (3,5) THEN "IQ QuintoCred"
-      WHEN id_creditor IN (2,6) THEN "PP QuintoAndar"
-    END AS creditor,
-    CASE
-      WHEN id_creditor IN (1,4,7,8,9) THEN 1
-      WHEN id_creditor IN (2,6) THEN 2
-      ELSE id_creditor
-    END AS id_creditor,
-    id_customer,
-    id_installment
+    id_creditor,
+    id_contract,
+    id_installment AS id_invoice,
+    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
   FROM datalake_recupera_clean.complementary_records
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
+  WHERE installment_code IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY ts_last_debt_update DESC) = 1
+),
+deduplicate_complementary_records_written_down AS (
+  SELECT DISTINCT
+    id_creditor,
+    id_contract,
+    id_installment AS id_invoice,
+    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
+  FROM datalake_recupera_clean.complementary_records_written_down
+  WHERE installment_code IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY ts_last_debt_update DESC) = 1
 ),
 trato_feito_debts AS (
-  SELECT
-    id_external AS id_invoice,
-    interest_fee_amount,
-    fine_fee_amount,
-    discount_amount,
-    original_amount + interest_fee_amount + fine_fee_amount - discount_amount AS debt_amount
-  FROM datalake_trato_feito_clean.debt
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_external ORDER BY ts_created DESC) = 1
+  SELECT DISTINCT
+    d.id_external AS id_invoice,
+    n.id_contract,
+    CASE
+      WHEN n.debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
+      WHEN n.debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
+      WHEN n.debtor = "velo_delinquency_tenant" THEN "IQ QuintoCred"
+    END AS creditor,
+    d.interest_fee_amount,
+    d.fine_fee_amount,
+    d.discount_amount,
+    d.original_amount + d.interest_fee_amount + d.fine_fee_amount - d.discount_amount AS debt_amount
+  FROM datalake_trato_feito_clean.debt AS d
+  LEFT JOIN datalake_debt_recovery.negotiation AS n
+    ON d.id_negotiation = n.id_negotiation
+  WHERE d.id_negotiation IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY  n.id_contract, d.id_external ORDER BY  d.ts_created DESC) = 1
 ),
-debts AS (
-  SELECT
-    COALESCE(cp.creditor, cr.creditor) AS creditor,
-    COALESCE(cp.id_creditor, cr.id_creditor) AS id_creditor,
-    COALESCE(cp.id_customer, cr.id_customer) AS id_customer,
-    COALESCE(cp.id_installment, cr.id_installment) AS id_invoice,
-    COALESCE(tfd.interest_fee_amount, cp.interest_fee_amount) AS interest_fee_amount,
-    tfd.fine_fee_amount,
-    COALESCE(tfd.discount_amount, cp.discount_amount) AS discount_amount,
-    COALESCE(tfd.debt_amount, cp.debt_amount) AS debt_amount
+recupera_debts AS (
+  SELECT DISTINCT
+    COALESCE(cp.id_invoice, cr.id_invoice, crwd.id_invoice) AS id_invoice,
+    CASE
+      WHEN COALESCE(cp.id_creditor, cr.id_creditor, crwd.id_creditor) IN (1,4,7,8,9) THEN "IQ QuintoAndar"
+      WHEN COALESCE(cp.id_creditor, cr.id_creditor, crwd.id_creditor) IN (3,5) THEN "IQ QuintoCred"
+      WHEN COALESCE(cp.id_creditor, cr.id_creditor, crwd.id_creditor) IN (2,6) THEN "PP QuintoAndar"
+    END AS creditor,
+    COALESCE(cp.id_contract, cr.id_contract, crwd.id_contract) AS id_contract
   FROM deduplicate_creditor_pending AS cp
   FULL OUTER JOIN deduplicate_complementary_records AS cr
-    ON cp.id_installment  = cr.id_installment
-  LEFT JOIN trato_feito_debts AS tfd
-    ON cp.id_installment = tfd.id_invoice
+      ON cp.id_contract = cr.id_contract
+      AND cp.id_invoice  = cr.id_invoice
+      AND cp.id_negotiation = cr.id_negotiation
+  FULL OUTER JOIN deduplicate_complementary_records_written_down AS crwd
+      ON cp.id_contract = crwd.id_contract
+      AND cp.id_invoice  = crwd.id_invoice
+      AND cp.id_negotiation = crwd.id_negotiation
+  WHERE COALESCE(cp.id_negotiation, cr.id_negotiation, crwd.id_negotiation) IS NOT NULL
+),
+debts AS (
+ SELECT
+    COALESCE(tfd.creditor, rd.creditor) AS creditor,
+    COALESCE(tfd.id_contract, rd.id_contract) AS id_contract,
+    COALESCE(tfd.id_invoice, rd.id_invoice) AS id_invoice,
+    tfd.interest_fee_amount,
+    tfd.fine_fee_amount,
+    tfd.discount_amount,
+    tfd.debt_amount
+  FROM trato_feito_debts AS tfd
+  FULL OUTER JOIN recupera_debts AS rd
+    ON rd.id_contract = tfd.id_contract
+        AND rd.id_invoice  = tfd.id_invoice
 ),
 union_quintoandar_quintocred AS (
   SELECT
     i.id_contract_external AS id_contract,
     i.id_external AS id_invoice,
-    IF(ii.invoice_user = "landlord", 2, 1) AS id_creditor,
+    IF(ii.invoice_user = "landlord", "PP QuintoAndar", "IQ QuintoAndar") AS creditor,
     i.status AS invoice_payment_status,
     i.substatus AS invoice_status,
     ABS(i.due_amount) AS invoice_due_amount,
@@ -82,7 +102,7 @@ union_quintoandar_quintocred AS (
   SELECT
     o.id_propose AS id_contract,
     o.id_occurrence AS id_invoice,
-    IF(INT(o.id_propose) < 5000000, 3 , 5) AS id_creditor,
+    "IQ QuintoCred" AS creditor,
     j.desc_lvl_1 AS invoice_payment_status,
     NULL AS invoice_status,
     o.due_amount AS invoice_due_amount,
@@ -93,13 +113,11 @@ union_quintoandar_quintocred AS (
   LEFT JOIN datalake_velo.junk AS j
     ON o.id_occurrence_status = j.id_junk
 )
-
 SELECT DISTINCT
-  CONCAT(d.id_creditor, "-", u.id_contract, "-", u.id_invoice) AS sk_debt,
-  d.id_customer AS sk_debtor,
-  u.id_contract,
-  u.id_invoice,
-  d.creditor AS creditor,
+  CONCAT(d.id_contract, "-", d.id_invoice) AS sk_debt,
+  d.id_contract,
+  d.id_invoice,
+  d.creditor,
   u.invoice_payment_status,
   u.invoice_status,
   u.invoice_due_amount,
@@ -112,6 +130,6 @@ SELECT DISTINCT
   u.dt_invoice_paid,
   NOW() AS ts_load
 FROM debts AS d
-INNER JOIN union_quintoandar_quintocred AS u
+LEFT JOIN union_quintoandar_quintocred AS u
   ON d.id_invoice = u.id_invoice
-   AND d.id_creditor = u.id_creditor
+   AND d.creditor = u.creditor
