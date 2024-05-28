@@ -1,0 +1,36 @@
+database_name: dw_rede
+table_name: dim_company_cluster
+description: Dimension that shows the period during which a Rede partner company belonged to a certain cluster (Decola, Tier, etc.), according to the classification criteria defined by the Operations team on HubSpot
+domain: Rede
+owner: ae-rede@quintoandar.com.br
+columns:
+  sk_company_cluster:
+    lineage: 
+    - datalake_hubspot.company_history.id_company
+    - datalake_hubspot.company_history.company_cluster
+    - datalake_hubspot.company_history.ts_updated
+    description: Primary key of the table, composed of the combination of sk_company, company_cluster and ts_cluster_start
+  sk_company:
+    lineage: 
+    - datalake_hubspot.company_history.id_company
+    description: Identification of a company registered on HubSpot
+  company_name: 
+    lineage:
+    - datalake_hubspot.company_history.name
+    description: Name of Rede partner company registered with HubSpot
+  company_cluster:
+    lineage:
+    - datalake_hubspot.company_history.company_cluster
+    description: Classification assigned by the Operations team to the Rede partner company
+  ts_cluster_start:
+    lineage:
+    - datalake_hubspot.company_history.id_company
+    - datalake_hubspot.company_history.company_cluster
+    - datalake_hubspot.company_history.ts_updated
+    description: Effective date of the cluster assigned to the company
+  ts_cluster_end:
+    lineage:
+    - datalake_hubspot.company_history.id_company
+    - datalake_hubspot.company_history.company_cluster
+    - datalake_hubspot.company_history.ts_updated
+    description: End date of the cluster assigned to the company (if this field is null, it means that this is the current company cluster)
