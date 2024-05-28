@@ -1,0 +1,73 @@
+---
+database_name: datalake_data_quality
+table_name: validations
+description: This table consolidates the data quality validations applied to bietlejuice DAGs.
+domain: Cross
+owner: bruna.prates@quintoandar.com.br
+columns:
+  id_dag:
+    description: DAG id, which is also the DAG name on Airflow.
+    lineage:
+      - datalake_dag_inventory_clean.table.dag
+  database:
+    description: Database name.
+    lineage:
+      - datalake_inmetro_clean.data_validations.database
+  table:
+    description: Table name.
+    lineage:
+      - datalake_inmetro_clean.data_validations.table
+  validation_level:
+    description: The level of validation.
+    categories:
+      table: Validation is applied at table level.
+      column: Validation is applied at column level.
+    lineage:
+      - datalake_inmetro_clean.data_validations.validations
+  column:
+    description: Name of the column to which validation will be applied. If it's applied at table level, this field will be "N/A".
+    lineage:
+      - datalake_inmetro_clean.data_validations.validations
+  validation_type:
+    description: Type of validation applied.
+    lineage:
+      - datalake_inmetro_clean.data_validations.validations
+  validation_result:
+    description: Value returned by validation.
+    lineage:
+      - datalake_inmetro_clean.data_validations.validations
+  validation_status:
+    description: Status of the validation.
+    categories:
+      success: The data meets the determined validation.
+      failure: The data does not meet the determined validation.
+    lineage:
+      - datalake_inmetro_clean.data_validations.validations
+  table_status:
+    description: Table status for all validations applied. It depends on the severity level determined for each validation.
+    categories:
+      success: The data meets all table validations.
+      error: The data does not meet all table validations and some validation(s) have an error severity level.
+      warning: The data does not meet all table validations and some validation(s) have a warning severity level or do not have it at all.
+    lineage:
+      - datalake_inmetro_clean.data_validations.suite_result
+  ts_execution_utc:
+    description: Timestamp in UTC of when data quality was executed.
+    lineage:
+      - datalake_inmetro_clean.data_validations.ts_execution_utc
+  ts_execution_brt:
+    description: Timestamp in BRT of when data quality was executed.
+    lineage:
+      - datalake_inmetro_clean.data_validations.ts_execution_local
+  year:
+    description: Year of when data quality was executed.
+    lineage:
+      - datalake_inmetro_clean.data_validations.year
+  month:
+    description: Month of when data quality was executed.
+    lineage:
+      - datalake_inmetro_clean.data_validations.month
+  day:
+    description: Day of when data quality was executed.
+    lineage:
+      - datalake_inmetro_clean.data_validations.day

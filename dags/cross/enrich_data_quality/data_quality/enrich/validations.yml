@@ -1,0 +1,17 @@
+---
+table_name: datalake_data_quality.validations
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 200
+    severity_level: Error
+column_level_validations:
+  id_dag:
+    is_complete:
+      severity_level: Error
+  database:
+    is_complete:
+      severity_level: Error
+  table:
+    is_complete:
+      severity_level: Error

@@ -1389,6 +1389,9 @@ bietlejuice.enrich_dashboard_governance:
   - bietlejuice.metabase:load-clean-report-dashboard
   - bietlejuice.metabase:load-clean-report-dashboard-card
   - bietlejuice.metabase:load-clean-view-log
+bietlejuice.enrich_data_quality:
+  - bietlejuice.dag_inventory:load-clean-table
+  - bietlejuice.inmetro:load-clean-data-validations
 bietlejuice.enrich_date:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
