@@ -26,6 +26,6 @@ column_level_validations:
   business_context:
     is_complete:
       severity_level: Error
-  ts_first_event:
+  ts_created:
     is_complete:
       severity_level: Error
