@@ -21,6 +21,10 @@ columns:
     description: "Description referring to the id and code of the contract status"
     lineage:
       - datalake_paschoalotto_raw.cbsituacaocontrato.descricao_str
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbsituacaocontrato.context
   action:
     description: ""
     lineage:

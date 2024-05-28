@@ -19,6 +19,7 @@ SELECT
     call_key_str AS call_key,
     instancia_str AS instance,
     tempo_ligacao_tim AS call_duration,
+    context,
     IF(coloca_stand_str = "S", TRUE, FALSE) AS is_stand,
     IF(alterado_str = "S", TRUE, FALSE) AS is_updated,
     TO_DATE(data_evento_dat, 'dd/MM/yyyy HH:mm:ss') AS dt_event,

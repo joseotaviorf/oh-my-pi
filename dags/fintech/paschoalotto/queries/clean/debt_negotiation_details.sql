@@ -3,6 +3,7 @@ SELECT
     BIGINT(id_geusuario_int) AS id_user,
     BIGINT(id_cbitembordero_int) AS id_agreement_detail,
     BIGINT(id_cbparcela_int) AS id_debt,
+    context,
     IF(INT(selecionado_int) = 1, TRUE, FALSE) AS is_selected,
     IF(notificacao_num = "1", TRUE, FALSE) AS has_notification,
     IF(despesa_banco_num = "1", TRUE, FALSE) AS has_bank_expense,

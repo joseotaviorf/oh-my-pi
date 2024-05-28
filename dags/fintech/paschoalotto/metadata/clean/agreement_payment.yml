@@ -21,6 +21,10 @@ columns:
     description: "User ID. FK of table user"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_geusuario_int
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbpagamento.context
   creditor:
     description: "Creditor extract from table gecliente"
     lineage:

@@ -8,6 +8,7 @@ SELECT
     cidade_str AS city,
     estado_str AS state,
     classificacao_str AS classification,
+    context,
     BOOLEAN(excluido_bit) AS is_deleted,
     TO_TIMESTAMP(tstamp_inclusao, 'dd/MM/yyyy HH:mm:ss') AS ts_inclusion,
     TO_TIMESTAMP(tstamp_mdm_inclusao, 'dd/MM/yyyy HH:mm:ss') AS ts_insert,

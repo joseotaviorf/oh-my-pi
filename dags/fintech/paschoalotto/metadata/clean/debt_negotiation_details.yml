@@ -21,6 +21,10 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbparcela_int
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelaitembordero.context
   is_selected:
     description: ""
     lineage:

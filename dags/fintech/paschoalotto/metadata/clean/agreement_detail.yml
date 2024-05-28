@@ -49,6 +49,10 @@ columns:
     description: "Agreement number"
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.acordo_int
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbitembordero.context
   our_number:
     description: "Our bank slip (bill) number"
     lineage:

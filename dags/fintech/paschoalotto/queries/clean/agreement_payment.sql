@@ -42,6 +42,7 @@ SELECT
     CAST(REPLACE(principal_num, ',', '.') AS DECIMAL(10, 2)) AS main_amount,
     CAST(REPLACE(cp_num, ',', '.') AS DECIMAL(10, 2)) AS cp,
     CAST(REPLACE(multa_num, ',', '.') AS DECIMAL(10, 2)) AS fine_amount,
+    context,
     IF(notificacao_num = "1", TRUE, FALSE) AS has_notification,
     IF(despesa_banco_num = "1", TRUE, FALSE) AS has_bank_expense,
     IF(abatimento_num = "1", TRUE, FALSE) AS is_write_off,

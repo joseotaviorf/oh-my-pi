@@ -51,6 +51,7 @@ SELECT
         WHEN velo_pf_str = "PJ" THEN "PESSOA JURÍDICA"
         ELSE NULL
     END AS velo_person_type,
+    context,
     INT(dias_atraso_int) AS delay_days,
     CAST(REPLACE(es_valor_corrigido_num, ',', '.') AS DECIMAL(10, 2)) AS corrected_amount,
     CAST(REPLACE(es_valor_encargos_num, ',', '.') AS DECIMAL(10, 2)) AS charges_amount,

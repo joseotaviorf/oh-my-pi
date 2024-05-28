@@ -17,6 +17,10 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbetapa.id_gecliente_int
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbetapa.context
   code:
     description: "Step code"
     lineage:

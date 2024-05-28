@@ -1,4 +1,4 @@
-source_root_path: s3://5a-paschoalotto
+source_root_path: 5a-paschoalotto
 format: parquet
 tables:
   - table_name: cbfollowup

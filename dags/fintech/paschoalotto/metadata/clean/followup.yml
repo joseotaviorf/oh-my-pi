@@ -33,6 +33,10 @@ columns:
     description: "Deliquency reason ID"
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_gemotivoinadimplencia_int
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbfollowup.context
   followup_description:
     description: "Description of the follow-up"
     lineage:

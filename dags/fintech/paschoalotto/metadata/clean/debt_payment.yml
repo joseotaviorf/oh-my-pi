@@ -25,6 +25,10 @@ columns:
     description: "Main amount"
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.principal_num
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbparcelapagamento.context
   cp:
     description: ""
     lineage:

@@ -47,6 +47,10 @@ columns:
     description: "Parcel is shown in the window"
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.mostra_parcela_str
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbtiponegocio.context
   company_cnpj:
     description: "CGC / CNPJ of the client/company"
     lineage:

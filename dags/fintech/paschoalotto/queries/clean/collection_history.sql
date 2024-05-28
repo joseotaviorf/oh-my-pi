@@ -36,6 +36,7 @@ SELECT
         WHEN classificacao_str = "9" THEN "Indefinido"
         ELSE NULLIF(classificacao_str, "")
     END AS contact_classification,
+    context,
     IF(positivo_str = "P", TRUE, FALSE) AS is_positive_call,
     IF(telefone_str = "S", TRUE, FALSE) AS has_telephone,
     IF(painel_classificacao_str = "S", TRUE, FALSE) AS has_reclassified_phone,

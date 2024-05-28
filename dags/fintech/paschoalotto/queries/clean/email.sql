@@ -3,6 +3,7 @@ SELECT
     BIGINT(id_geqlcliente_int) AS id_customer,
     email_str AS email,
     classificacao_str AS classification,
+    context,
     BOOLEAN(excluido_bit) AS is_deleted,
     TO_TIMESTAMP(tstamp_mdm_inclusao, 'dd/MM/yyyy HH:mm:ss') AS ts_insert,
     TO_TIMESTAMP(tstamp_mdm_alteracao, 'dd/MM/yyyy HH:mm:ss') AS ts_update,

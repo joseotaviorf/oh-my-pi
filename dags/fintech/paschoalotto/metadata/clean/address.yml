@@ -37,6 +37,10 @@ columns:
     description: "State"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.estado_str
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.geqlendereco.context
   classification:
     description: "Address quality"
     lineage:

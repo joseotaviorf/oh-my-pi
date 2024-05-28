@@ -21,6 +21,10 @@ columns:
     description: "Email quality"
     lineage:
       - datalake_paschoalotto_raw.geqlemail.classificacao_str
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.geqlemail.context
   is_deleted:
     description: "Whether email should be used or not"
     lineage:

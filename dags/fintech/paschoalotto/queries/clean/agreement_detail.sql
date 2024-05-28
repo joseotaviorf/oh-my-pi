@@ -76,6 +76,7 @@ SELECT
     CAST(REPLACE(desconto_original_num, ',', '.') AS DECIMAL(10, 2)) AS discount_original,
     CAST(REPLACE(pc_ho_num, ',', '.') AS DECIMAL(10, 2)) AS pc_ho,
     CAST(REPLACE(pc_comissionamento_num, ',', '.') AS DECIMAL(10, 2)) AS pc_commissioning,
+    context,
     hora_boleto_tim AS hour_bank_skip,
     TO_DATE(data_envio_dat, 'dd/MM/yyyy HH:mm:ss') AS dt_shipping,
     TO_DATE(data_reenvio_dat, 'dd/MM/yyyy HH:mm:ss') AS dt_resend,

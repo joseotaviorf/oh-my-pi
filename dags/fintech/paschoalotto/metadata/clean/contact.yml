@@ -37,6 +37,10 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geusuario_inclusao_int
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.geqlcontato.context
   contact:
     description: "Phone number"
     lineage:

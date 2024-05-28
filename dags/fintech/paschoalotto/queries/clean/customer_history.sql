@@ -11,6 +11,7 @@ SELECT
         WHEN acao_str = "4" THEN "Jurídico"
         ELSE acao_str
     END AS action,
+    context,
     com_senha_str AS with_password,
     NOW() AS ts_load
 FROM datalake_paschoalotto_raw.cbsituacaocontrato

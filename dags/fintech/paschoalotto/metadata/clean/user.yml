@@ -17,3 +17,11 @@ columns:
     description: "User's Full Name"
     lineage:
       - datalake_paschoalotto_raw.geusuario.nomecompleto_str
+  email:
+    description: "User's E-mail"
+    lineage:
+      - datalake_paschoalotto_raw.geusuario.email_str
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.geusuario.context

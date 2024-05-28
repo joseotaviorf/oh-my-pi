@@ -25,6 +25,10 @@ columns:
     description: ""
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.id_cbetapa_int
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbcontrato.context
   contract:
     description: "Contract number/code"
     lineage:

@@ -13,6 +13,7 @@ SELECT
     endereco2_str AS address,
     neg_uf_str AS state,
     neg_bairro_str AS neighborhood,
+    context,
     taxa_ano_str AS annual_interest_rate,
     CAST(REPLACE(dias_quitacao_num, ',', '.') AS DECIMAL(10, 2)) AS days_for_payment,
     CAST(REPLACE(parcelas_num, ',', '.') AS DECIMAL(10, 2)) AS installments_number,

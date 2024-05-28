@@ -56,6 +56,7 @@ SELECT
     BIGINT(seq_calculo) AS calculation,
     COALESCE(BIGINT(numero_acordo_ws_int), BIGINT(numero_acordo_ws_str)) AS agreement_number_ws,
     CAST(REPLACE(total_num, ',', '.') AS DECIMAL(10, 2)) AS total_amount,
+    context,
     TO_DATE(data_dat, 'dd/MM/yyyy HH:mm:ss') AS dt_bordereau,
     TO_TIMESTAMP(tstamp, 'dd/MM/yyyy HH:mm:ss') AS ts_tstamp,
     TO_TIMESTAMP(timestamp, 'dd/MM/yyyy HH:mm:ss') AS ts_timestamp,

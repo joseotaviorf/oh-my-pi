@@ -34,6 +34,10 @@ columns:
     description: "bordereau number"
     lineage:
       - datalake_paschoalotto_raw.cbbordero.bordero_int
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbbordero.context
   creditor:
     description: "Customer extract from gecliente table ID"
     lineage:

@@ -60,6 +60,10 @@ columns:
     description: "Type of legal control"
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_jutipocontrole
+  context:
+    description: "Business context of origin table (QuintoCred or QuintoAndar)"
+    lineage:
+      - datalake_paschoalotto_raw.cbsitcontato.context
   delinquency_reason:
     description: "Deliquency reason"
     lineage:

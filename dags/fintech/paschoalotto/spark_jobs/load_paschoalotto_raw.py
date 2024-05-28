@@ -3,6 +3,7 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime
 from ast import literal_eval
+import boto3
 
 from pyspark.sql.functions import current_timestamp, lit
 from pyspark.sql.utils import AnalysisException
@@ -12,6 +13,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (SparkDataFrameService,
                                     SparkTableStorageFormat)
+from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -19,12 +21,34 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.pipeline import (FullTableLoaderPipeline,
                                   IncrementalTableLoaderPipeline)
+
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.services.messaging_services.gchat_service import GChatService
+from bietlejuice.services.messaging_services.message import Message
+
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import (expr, when)
+from functools import reduce
+
 JOB_NAME = "load_paschoalotto_raw"
 
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+def __build_warning_messages(environment, s3_path_prefix, table_list, date):
+
+    messages = []
+    for table_name in table_list:
+        messages.append(
+            f"⚠️\n"
+            f"Environment: *{environment}*\n"
+            f"Table: `{s3_path_prefix}/{table_name}`\n"
+            f"Status: *FAILED*\n"
+            f"*Existence validation failed for `{date}`\n"
+        )
+
+    return messages
 
 if __name__ == "__main__":
 
@@ -73,50 +97,91 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    file_name = f"{table_name}_{date_to_ingest}.{format}"
-    s3_path = f"{source_root_path}/{file_name}"
+    s3_client = boto3.resource('s3')
+    my_bucket = s3_client.Bucket(source_root_path)
 
-    logger.info(
-        f"""m=__main__, msg=File name to be processed: {s3_path}"""
-    )
-    try:
-        df = s3_consumer.get_data_from_file(path=s3_path, format=format)
-    except AnalysisException as error:
-        logger.warning(
-            f"""
-            m=__main__, msg=No data found for {s3_path}, table_name={table_name}.
 
-            Exception: {error}
-            """
-        )
-        raise error
+    tables_to_send_warning = []
+    filtered_files = []
+    prefix = f'{table_name}'
+    files_list = [object_summary.key for object_summary in my_bucket.objects.filter(Prefix=prefix)]
 
-    df = df.withColumn("s3_file_name", lit(file_name))
-    df = df.withColumn("ts_load", current_timestamp())
-    datetime_file = datetime.strptime(date_to_ingest, "%Y-%m-%d")
 
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_date(datetime_file)
-        .output()
-    )
-    df.show(3)
+    for file in files_list:
+      if 'quintocred' not in file:
+        dt_pattern = f"{table_name}_{date_to_ingest}.{format}"
+        if file == dt_pattern:
+          filtered_files.append(file)
+      else:
+        dt_pattern = f"{table_name}_quintocred_{date_to_ingest}.{format}"
+        if file == dt_pattern:
+          filtered_files.append(file)
 
-    if load_incremental:
-        IncrementalTableLoaderPipeline(
-            database_name=database_name,
-            table_name=table_name,
-            database_location=database_location,
-            layer=LayerEnum.RAW,
-            query=None,
-            partitions=partition_cols,
-        ).load_and_register(df, format_options)
+    dfs = []
+    if len(filtered_files) > 0:
+
+        for path in filtered_files:
+            df = spark.read.parquet(f"s3://{source_root_path}/{path}")
+            df = df.withColumn("s3_file_name", lit(path))
+            df = df.withColumn("context", when(expr("s3_file_name NOT LIKE '%quintocred%'"), lit('quintoandar')).otherwise(lit('quintocred')))
+            df = df.withColumn("ts_load", current_timestamp())
+            datetime_file = datetime.strptime(date_to_ingest, "%Y-%m-%d")
+
+            df = (
+                SparkDataFrameService()
+                .input(df)
+                .create_year_month_day_columns_from_date(datetime_file)
+                .output()
+            )
+            dfs.append(df)
+
+        df = reduce(DataFrame.unionAll, dfs)
+
+        if load_incremental:
+            IncrementalTableLoaderPipeline(
+                database_name=database_name,
+                table_name=table_name,
+                database_location=database_location,
+                layer=LayerEnum.RAW,
+                query=None,
+                partitions=partition_cols,
+            ).load_and_register(df, format_options)
+        else:
+            FullTableLoaderPipeline(
+                database_name=database_name,
+                table_name=table_name,
+                database_location=database_location,
+                layer=LayerEnum.RAW,
+                query=None
+            ).load_and_register(df, format_options)
     else:
-        FullTableLoaderPipeline(
-            database_name=database_name,
-            table_name=table_name,
-            database_location=database_location,
-            layer=LayerEnum.RAW,
-            query=None
-        ).load_and_register(df, format_options)
+        logger.warning(
+            "m=__main__, msg= No files were found on S3 bucket. Ending process without loading anything."
+        )
+        tables_to_send_warning.append(table_name)
+
+    if tables_to_send_warning:
+        base_dbutils = BaseDBUtils()
+        if base_dbutils.get_dbutils() is not None:
+            dbutils = base_dbutils.get_dbutils()
+
+        if environment == 'prod':
+            key = GchatWebhooksEnum.FINTECH_ALERTS_PROD
+        else:
+            key = GchatWebhooksEnum.AE_ALERTS_FORNO
+
+        gchat_webhook = dbutils.secrets.get(
+            scope="quintoandar", key=key
+        )
+
+        messages = __build_warning_messages(
+            environment,
+            f"s3://{source_root_path}",
+            tables_to_send_warning,
+            date_to_ingest,
+        )
+
+        for message_content in messages:
+            message = Message(content=message_content, destination=gchat_webhook)
+            logger.info(f"m=__main__, message=sending slack message: {message}")
+            GChatService.send_message(message)

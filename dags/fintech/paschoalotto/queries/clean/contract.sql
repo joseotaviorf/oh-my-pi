@@ -17,6 +17,7 @@ SELECT
     estado_civil_str AS marital_status,
     observacao_str AS observation,
     email_str AS email,
+    context,
     cliente_localizado_bit AS is_customer_located,
     TO_DATE(data_stand_by_dat, 'dd/MM/yyyy HH:mm:ss') AS dt_stand_by,
     TO_DATE(data_contato_dat, 'dd/MM/yyyy HH:mm:ss') AS dt_contact,

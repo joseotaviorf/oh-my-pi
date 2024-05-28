@@ -29,6 +29,7 @@ SELECT
     IF(whatsapp_str = "S", TRUE, FALSE) AS has_whatsapp,
     trava_feriado_str AS holiday_lock,
     motivo_str AS reason,
+    context,
     BOOLEAN(contatopagoufacil_bit) is_pagoufacil,
     INT(ranking_lemit_int) AS ranking_lemit,
     obs_inibicao_tel_suspeito_str AS inhibition_suspicious_phone_note,
