@@ -286,9 +286,9 @@ email_tickets AS (
           'Rescisão 1 [OFF] [POS] [BACK]'
         )
       )
-      AND (
-        department != 'ReclameAqui [CE] [POS] [BACK]' 
-        AND ticket_type != 'problem'
+      AND NOT (
+        department = 'ReclameAqui [CE] [POS] [BACK]' 
+        AND ticket_type = 'problem'
       ),
       TRUE,
       FALSE
