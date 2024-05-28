@@ -39,9 +39,9 @@ WITH adhoc_rules AS (
     ui.branded,
     ui.dt_event,
     ui.ts_event,
-    ui.year,
-    ui.month,
-    ui.day
+    YEAR(ui.dt_event) AS year,
+    MONTH(ui.dt_event) AS month,
+    DAY(ui.dt_event) AS day
   FROM
     datalake_top_of_funnel_demand.user_interactions AS ui
   WHERE
