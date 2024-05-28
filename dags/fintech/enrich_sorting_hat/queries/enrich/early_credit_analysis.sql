@@ -54,6 +54,8 @@ SELECT
     range_end,
     range_start,
     rejection_reason,
+    ROW_NUMBER() OVER ( PARTITION BY id_user, id_house ORDER BY ts_created DESC ) AS early_credit_number,
+    IF(early_credit_number = 1, TRUE, FALSE) as is_last_early_credit,
     ts_created,
     ts_expired
 FROM

@@ -61,6 +61,14 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
     description: "Value range end"
+  early_credit_number:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_user
+    description: "The number of early credits that the user made for each house, 1 refers to the last"
+  is_last_early_credit:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_user
+    description: "True olnly if the early credit is the last for that user on that house"
   rejection_reason:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
