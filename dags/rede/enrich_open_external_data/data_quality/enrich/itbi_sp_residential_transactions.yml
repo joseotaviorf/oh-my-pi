@@ -9,6 +9,6 @@ column_level_validations:
   iptu_sql_registration_number:
     is_complete:
       severity_level: Error
-  address_zipcode:
+  id_address_transaction:
     is_complete:
       severity_level: Error

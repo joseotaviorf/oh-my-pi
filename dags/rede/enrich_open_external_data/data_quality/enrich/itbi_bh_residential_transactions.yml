@@ -6,6 +6,6 @@ table_level_validations:
     greater_than: 70000
     severity_level: Error
 column_level_validations:
-  zipcode:
+  id_address_transaction:
     is_complete:
       severity_level: Error

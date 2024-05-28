@@ -6,18 +6,11 @@ table_level_validations:
     greater_than: 330000
     severity_level: Error
 column_level_validations:
-  id_itbi_transaction:
+  id_address_transaction:
     is_complete:
       severity_level: Error
     is_unique:
       severity_level: Error
-  id_region:
-    is_complete:
-      severity_level: Error
   itbi_region:
     is_complete:
       severity_level: Error
-  zipcode:
-    is_complete:
-      severity_level: Error
-  

@@ -2,121 +2,96 @@
 database_name: datalake_open_external_data
 table_name: iptu_sp_residential_properties
 description: |
-  Table enriched with IPTU data from SP. In this table, we applied some business rules, such as normalizing the address, filtering for residential properties only and adding the id_region.
+  Table enriched with IPTU data from SP.
 domain: Rede
-owner: guilherme.ventura@quintoandar.com.br
+owner: ae-rede@quintoandar.com.br
 columns:
   taxpayer_number:
     lineage:
-      - datalake_iptu_clean.iptu_sp.numero_do_contribuinte
-    description: | 
-      Each property will correspond to a registration number in the Tax Real Estate Registry, with the following being understood as a property: I - the area of land, built or not, defined in the registration of the competent Real Estate Registry Service or in transcripts that are still in force.
-  id_region:
-    lineage:
-      - datalake_vespucio.dejavu.id_region
-    description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region.
-      For IPTU, we retrieve it in 2 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign an id_region based on its latitude and longitude.
-      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which region that zipcode is predominantly in."  
+      - datalake_iptu_clean.iptu_sp.taxpayer_number
+    description: |
+      Each property will correspond to a registration number in the Tax Real Estate Registry,
+      with the following being understood as a property: I - the area of land, built or not,
+      defined in the registration of the competent Real Estate Registry Service or in transcripts
+      that are still in force.
   condo_number:
     lineage:
-      - datalake_iptu_clean.iptu_sp.numero_do_condominio
-    description: | 
+      - datalake_iptu_clean.iptu_sp.condo_number
+    description: |
       Condominium number (if any).
   release_notification_number:
     lineage:
-      - datalake_iptu_clean.iptu_sp.numero_da_nl
-    description: | 
+      - datalake_iptu_clean.iptu_sp.release_notification_number
+    description: |
       Release Notification Number.
   taxpayer_phase:
     lineage:
-      - datalake_iptu_clean.iptu_sp.fase_do_contribuinte
-    description: | 
+      - datalake_iptu_clean.iptu_sp.taxpayer_phase
+    description: |
       Taxpayer phase.
   street_code:
     lineage:
-      - datalake_iptu_clean.iptu_sp.codlog_do_imovel
-    description: | 
+      - datalake_iptu_clean.iptu_sp.street_code
+    description: |
       Street code of the property according to the "Cadastro de Logradouro".
-  address:
+  address_street_name:
     lineage:
-      - datalake_iptu_clean.iptu_sp.nome_de_logradouro_do_imovel
-      - datalake_vespucio.dejavu.address
-    description: "Most likely address for that listing
-      For ITBI, we retrieve it in 3 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign the output of the address to this field (with API standardization).
-      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which street that zipcode is predominantly on.
-      3 - Lastly, we use what comes directly from ITBI."
-  number:
+      - datalake_iptu_clean.iptu_sp.address
+    description: |
+      Most likely address for that listing.
+  address_number:
     lineage:
-      - datalake_iptu_clean.iptu_sp.numero_do_imovel
-      - datalake_vespucio.dejavu.number
-    description: "Unit number of the property.
-      For ITBI, we retrieve in 2 different ways: 
-      1 - If we have looked up the transaction address in the Google Geocoding API, we use the API number.
-      2 - If not, we use the one that comes directly from ITBI."
-  zipcode:
+      - datalake_iptu_clean.iptu_sp.number
+    description: |
+      Unit number of the property.
+  address_zipcode:
     lineage:
-      - datalake_iptu_clean.iptu_sp.cep_do_imovel
-      -  datalake_vespucio.dejavu.zip_code
-    description: "Zip code of the property address.
-      For ITBI, we retrieve in 2 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we use the ZIP code that returned in the API.
-      2 - If not, we use the one that comes directly from ITBI."
-  complement:
+      - datalake_iptu_clean.iptu_sp.zipcode
+    description: |
+      Zip code of the property address.
+  address_complement:
     lineage:
-      - datalake_iptu_clean.iptu_sp.complemento_do_imovel
-    description: | 
+      - datalake_iptu_clean.iptu_sp.complement
+    description: |
       Property complement. Composes the property's address.
-  reference:
+  address_reference:
     lineage:
-      - datalake_iptu_clean.iptu_sp.referencia_do_imovel
-    description: | 
+      - datalake_iptu_clean.iptu_sp.reference
+    description: |
       Property reference. Composes the property's address.
-  neighborhood:
+  address_neighborhood:
     lineage:
-      - datalake_iptu_clean.iptu_sp.bairro_do_imovel
-      - datalake_vespucio.dejavu.neighborhood
-    description: "Most likely neighborhood for that listing
-      For ITBI, we retrieve it in 4 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, and the latitude and longitude fall within a QuintoAndar area of operation, we use the neighborhood of the id_region.
-      2 - If we do not yet operate in the place, we use the neighborhood from the API.
-      3 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which id_region that zip code is predominantly in.
-      4 - Lastly, we use what comes directly from ITBI."
-  state:
-    description: | 
+      - datalake_iptu_clean.iptu_sp.neighborhood
+    description: |
+      Most likely neighborhood for that listing.
+  address_state:
+    description: |
       State of the property.
-  city: 
+  address_city:
     description: |
       IPTU city.
-  country:
+  address_country:
     description: |
       IPTU country.
-  latitude:
-    lineage:
-      - datalake_vespucio.dejavu.latitude
-    description: "Latitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
-  longitude:
-    lineage:
-      - datalake_vespucio.dejavu.longitude
-    description: "Longitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
   property_use_type:
     lineage:
-      - datalake_iptu_clean.iptu_sp.tipo_de_uso_do_imovel
-    description: | 
+      - datalake_iptu_clean.iptu_sp.property_use_type
+    description: |
       The IPTU use code is the code that represents the type of use of the property.
   building_standard_type:
     lineage:
-      - datalake_iptu_clean.iptu_sp.tipo_de_padrao_da_construcao
-    description: | 
+      - datalake_iptu_clean.iptu_sp.building_standard_type
+    description: |
       The IPTU standard code is the code that represents the type of property.
   building_standard_type_tier:
-    description: | 
+    lineage:
+      - datalake_iptu_clean.iptu_sp.building_standard_type
+    description: |
       The tier of the building standard type.
   land_type:
     lineage:
-      - datalake_iptu_clean.iptu_sp.tipo_de_terreno
-    description: | 
+      - datalake_iptu_clean.iptu_sp.land_type
+    description: |
       Land position.
     categories:
       "De duas ou mais frentes": "Two or more fronts"
@@ -128,81 +103,81 @@ columns:
       "Terreno interno": "Internal land"
   land_area_m2:
     lineage:
-      - datalake_iptu_clean.iptu_sp.area_do_terreno
-    description: | 
+      - datalake_iptu_clean.iptu_sp.land_area_m2
+    description: |
       The land area is the area of the property in square meters.
   built_area_m2:
     lineage:
-      - datalake_iptu_clean.iptu_sp.area_construida
-    description: | 
+      - datalake_iptu_clean.iptu_sp.built_area_m2
+    description: |
       The built area is This is the area that has buildings on the land in square meters.
   occupied_area_m2:
     lineage:
-      - datalake_iptu_clean.iptu_sp.area_ocupada
-    description: | 
+      - datalake_iptu_clean.iptu_sp.occupied_area_m2
+    description: |
       The occupied area is the area of the property that is occupied in square meters.
   land_price_m2:
     lineage:
-      - datalake_iptu_clean.iptu_sp.valor_do_m2_de_construcao
-    description: | 
+      - datalake_iptu_clean.iptu_sp.land_price_m2
+    description: |
       The land price per square meter is the value of the property divided by the land area in R$.
   building_price_m2:
     lineage:
-      - datalake_iptu_clean.iptu_sp.valor_do_m2_de_construcao
-    description: | 
+      - datalake_iptu_clean.iptu_sp.building_price_m2
+    description: |
       The building price per square meter is the value of the property divided by the built area in R$.
   frontage:
     lineage:
-      - datalake_iptu_clean.iptu_sp.testada_para_calculo
-    description: | 
+      - datalake_iptu_clean.iptu_sp.frontage
+    description: |
       The frontage is the width of the property (including the side walls, if there are any). If your property is on a corner, you should add up the front (main) and side (secondary) frontages.
   ideal_fraction:
     lineage:
-      - datalake_iptu_clean.iptu_sp.fracao_ideal
-    description: | 
+      - datalake_iptu_clean.iptu_sp.ideal_fraction
+    description: |
       Incidence of the acquisition percentage over the ideal fraction original.
   depreciation_factor:
     lineage:
-      - datalake_iptu_clean.iptu_sp.fator_de_obsolescencia
-    description: | 
+      - datalake_iptu_clean.iptu_sp.depreciation_factor
+    description: |
       Depreciation coefficients for the value of buildings, by age.
   qty_street_corners_or_fronts:
     lineage:
-      - datalake_iptu_clean.iptu_sp.quantidade_de_esquinas_frentes
-    description: | 
+      - datalake_iptu_clean.iptu_sp.qty_street_corners_or_fronts
+    description: |
       Number of corners or fronts of the property.
   qty_floors:
     lineage:
-      - datalake_iptu_clean.iptu_sp.quantidade_de_pavimentos
-    description: | 
+      - datalake_iptu_clean.iptu_sp.qty_floors
+    description: |
       Number of floors of the property.
   built_year:
     lineage:
-      - datalake_iptu_clean.iptu_sp.ano_da_construcao_corrigido
-    description: | 
+      - datalake_iptu_clean.iptu_sp.built_year
+    description: |
       Year that the construction of the property was finished.
   iptu_year:
     lineage:
-      - datalake_iptu_clean.iptu_sp.ano_do_exercicio
-    description: | 
+      - datalake_iptu_clean.iptu_sp.iptu_year
+    description: |
       Year of the IPTU exercise.
   first_year_of_taxpayer_life:
     lineage:
-      - datalake_iptu_clean.iptu_sp.ano_de_inicio_da_vida_do_contribuinte
-    description: | 
+      - datalake_iptu_clean.iptu_sp.first_year_of_taxpayer_life
+    description: |
       Year of the first IPTU of the taxpayer.
   first_month_of_taxpayer_life:
     lineage:
-      - datalake_iptu_clean.iptu_sp.ano_de_inicio_da_vida_do_contribuinte
-    description: | 
+      - datalake_iptu_clean.iptu_sp.first_month_of_taxpayer_life
+    description: |
       Month of the first IPTU of the taxpayer.
-  dt_registration:
+  ts_registration:
     lineage:
-      - datalake_iptu_clean.iptu_sp.data_do_cadastramento
-    description: | 
-      Date of registration of the property.
-  dt_load: 
+      - datalake_iptu_clean.iptu_sp.dt_registration
+    description: |
+      Timestamp of registration of the property.
+  ts_load:
     lineage:
-      - datalake_iptu_clean.iptu_sp.data_da_loa
-    description: | 
-      Date of the table was loaded.
+      - datalake_iptu_clean.iptu_sp.dt_load
+    description: |
+      Timestamp of when the table was loaded.

@@ -1,9 +1,14 @@
-dag: 
+---
+dag:
   name: enrich_open_external_data
   owner: Data Rede
   schedule_start_date: 2020, 8, 29
+  documentation:
+    dag_purpose: |
+      This DAG is intended to handle tables retrieved from public data
+      (eg. taxes, interest rate, inflation rate etc).
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     itbi_all_residential_transactions:
@@ -11,4 +16,4 @@ workflow:
       - itbi_bh_residential_transactions
   default_extraction_type: full
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_12_2_med_general_photon_cluster

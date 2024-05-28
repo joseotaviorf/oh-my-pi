@@ -1,146 +1,177 @@
 database_name: datalake_open_external_data
 table_name: itbi_all_residential_transactions
-description: "Table with the sum of all ITBI transactions available at QuintoAndar. The source is indicated in the column itbi_region."
+description: |
+  Table with all ITBI transactions available at QuintoAndar. The source is indicated in the column itbi_region.
+  The id_address_transaction represents each transaction that happenned for a single house (by its address).
+  This id_address_transaction is deduplicated in this table, to avoid cases where the same transaction appears
+  into more than one source file.
+  This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
 domain: Data Rede
-owner: guilherme.ventura@quintoandar.com.br
+owner: ae-rede@quintoandar.com.br
 columns:
-  id_itbi_transaction:
+  id_address_transaction:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.id_itbi_transaction
-      - datalake_open_external_data.itbi_bh_residential_transactions.id_itbi_transaction
-    description: 'Unique identifier for each transaction. The way the ID is created changes from source to source (consult the ITBI of the desired region).'
-  id_region:
-    lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.id_region
-      - datalake_open_external_data.itbi_bh_residential_transactions.id_region
-    description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region.
-      For ITBI, we retrieve it in 2 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign an id_region based on its latitude and longitude.
-      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which region that zipcode is predominantly in."
+      - datalake_open_external_data.itbi_sp_residential_transactions.id_address_transaction
+      - datalake_open_external_data.itbi_bh_residential_transactions.id_address_transaction
+    description: |
+      Unique identifier for each transaction.
+      The way the ID is created changes from each address and transaction date.
   itbi_region:
-    description: ITBI identification column. Represents which municipality the data comes from.
-  address:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.address_street_name
-      - datalake_open_external_data.itbi_bh_residential_transactions.address
-    description: "Most likely address for that listing
-      For ITBI, we retrieve it in 3 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign the output of the address to this field (with API standardization).
-      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which street that zipcode is predominantly on.
-      3 - Lastly, we use what comes directly from ITBI."
-  number:
+      - datalake_open_external_data.itbi_sp_residential_transactions.itbi_region
+      - datalake_open_external_data.itbi_bh_residential_transactions.itbi_region
+    description: |
+      ITBI identification column. Represents which municipality the data comes from.
+    categories:
+      ITBI_SP: transactions that come from the SP source.
+      ITBI_BH: transaction that come from the BH source.
+  address_country:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.address_number
-      - datalake_open_external_data.itbi_bh_residential_transactions.number
-    description: "Unit number of the property.
-      For ITBI, we retrieve in 2 different ways: 
-      1 - If we have looked up the transaction address in the Google Geocoding API, we use the API number.
-      2 - If not, we use the one that comes directly from ITBI."
-  complement:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_country
+      - datalake_open_external_data.itbi_bh_residential_transactions.address_country
+    description: |
+      Address Country regarding the transaction record.
+    categories:
+      BR: currently, assumes only the BR value, standing for Brazil.
+  address_state:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.address_complement
-      - datalake_open_external_data.itbi_bh_residential_transactions.complement
-    description: 'Completion of the property address.'
-  reference:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_state
+      - datalake_open_external_data.itbi_bh_residential_transactions.address_state
+    description: |
+      Address State regarding the transaction record.
+    categories:
+      SP: regarding all the transactions from the SP source.
+      MG: regarding all the transactions from the BH source.
+  address_city:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.address_reference
-    description: 'Reference of the property address.'
-  condo_name:
-    lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.address_condo_name
-      - datalake_open_external_data.itbi_bh_residential_transactions.condo_name
-    description: 'Condo name of the property address.'
-  zipcode:
-    lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.address_zipcode
-      - datalake_open_external_data.itbi_bh_residential_transactions.zipcode
-    description: "Zip code of the property address.
-      For ITBI, we retrieve in 2 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we use the ZIP code that returned in the API.
-      2 - If not, we use the one that comes directly from ITBI."
-  neighborhood:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_city
+      - datalake_open_external_data.itbi_bh_residential_transactions.address_city
+    description: |
+      Address City regarding the transaction record.
+    categories:
+      São Paulo: regarding all the transactions from the SP source.
+      Belo Horizonte: regarding all the transactions from the BH source.
+  address_neighborhood:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.address_neighborhood
-      - datalake_open_external_data.itbi_bh_residential_transactions.neighborhood
-    description: "Most likely neighborhood for that listing
-      For ITBI, we retrieve it in 4 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, and the latitude and longitude fall within a QuintoAndar area of operation, we use the neighborhood of the id_region.
-      2 - If we do not yet operate in the place, we use the neighborhood from the API.
-      3 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which id_region that zip code is predominantly in.
-      4 - Lastly, we use what comes directly from ITBI."
-  city:
+      - datalake_open_external_data.itbi_bh_residential_transactions.address_neighborhood
+    description: |
+      Address Neighborhood regarding the transaction record.
+  address_street_name:
     lineage:
-      - datalake_open_external_data.itbi_bh_residential_transactions.city
-    description: 'City of the property.'
-  state:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_street_name
+      - datalake_open_external_data.itbi_bh_residential_transactions.address_street_name
+    description: |
+      Address Street Name regarding the transaction record.
+  address_number:
     lineage:
-      - datalake_open_external_data.itbi_bh_residential_transactions.state
-    description: 'State of the property.'
-  latitude:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_number
+      - datalake_open_external_data.itbi_bh_residential_transactions.address_number
+    description: |
+      Address Number regarding the transaction record.
+  address_complement:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.latitude
-      - datalake_open_external_data.itbi_bh_residential_transactions.latitude
-    description: "Latitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
-  longitude:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_complement
+      - datalake_open_external_data.itbi_bh_residential_transactions.address_complement
+    description: |
+      Address Complement regarding the transaction record.
+  address_reference:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.longitude
-      - datalake_open_external_data.itbi_bh_residential_transactions.longitude
-    description: "Longitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_reference
+    description: |
+      Address Reference regarding the transaction record.
+      It assumes value only for SP source.
+  address_zipcode:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.address_zipcode
+      - datalake_open_external_data.itbi_bh_residential_transactions.address_zipcode
+    description: |
+      Addess Zipcode regarding the transaction record.
+      It assumes the pattern XXXXX-XXX.
+  iptu_use_description:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.iptu_use_description
+    description: |
+      It's the description use for iptu, such as,
+      'Residência', 'Flat residencial em condomínio (exige fração ideal)', among others.
+      It assumes value only for SP source.
   property_type:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.iptu_standard_description
       - datalake_open_external_data.itbi_bh_residential_transactions.property_type
-    description: It represents the type of property and what use is addressed to that property.
+    description: |
+      It's the property type regardig the transaction.
     categories:
-      Residencial Horizontal: If the property is a residential apartment.
-      Residencial Vertical: If it is a residential house.
-      Comercial Vertical: If the property is one for commercial use in a vertical building.
-      Comercial Horizontal: If the property is one for commercial use in a horizontal building.
-  raw_source_address:
-    lineage:
-      - datalake_open_external_data.itbi_bh_residential_transactions.raw_source_address
-      - datalake_open_external_data.itbi_sp_residential_transactions.raw_source_address
-      - datalake_open_external_data.itbi_sp_residential_transactions.raw_source_reference
-      - datalake_open_external_data.itbi_sp_residential_transactions.raw_source_complement
-      - datalake_open_external_data.itbi_sp_residential_transactions.address_number
-    description: 'Address as it was in the source file.'
-  source_file:
-    lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.source_file
-      - datalake_open_external_data.itbi_bh_residential_transactions.source_file
-    description: 'URL of the CSV downloaded for ingesting the data from the municipality.'
+      Residencial Horizontal: ""
+      Residencial Vertical: ""
+      Comercial Vertical: ""
+      Comercial Horizontal: ""
   land_area_m2:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.land_area_m2
       - datalake_open_external_data.itbi_bh_residential_transactions.land_area_m2
-    description: 'Land area in square meters'
+    description: |
+      Total land area in square meters.
   built_area_m2:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.built_area_m2
       - datalake_open_external_data.itbi_bh_residential_transactions.built_area_m2
-    description: 'Result of the application of the percentage acquired by the unit construction area.'
+    description: |
+      Total built area in square meters.
   ideal_fraction:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.ideal_fraction
       - datalake_open_external_data.itbi_bh_residential_transactions.ideal_fraction
-    description: Incidence of the acquisition percentage over the ideal fraction original.
+    description: |
+      Incidence of the acquisition percentage acquired by the unit construction area.
   declared_transaction_value:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.declared_transaction_value
-    description: 'Value declared by the taxpayer.'
+    description: |
+      Value declared by the taxpayer.
+      It assumes value only for SP source.
+  reference_appraisal_value:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.reference_appraisal_value
+    description: |
+      It's the value of the property used by the municipality to calculate the property tax.
+      It assumes value only for SP source.
+  transmitted_proportion:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.transmitted_proportion
+    description: |
+      It's the proportion of the property that was sold.
+      It assumes value only for SP source.
+  proportional_reference_appraisal_value:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.proportional_reference_appraisal_value
+    description: |
+      It's the reference appraisal value multiplied by the transmitted proportion.
+      It assumes value only for SP source.
   adopted_calculation_basis:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.adopted_calculation_basis
       - datalake_open_external_data.itbi_bh_residential_transactions.adopted_calculation_basis
-    description: 'Value determined by the tax administration through an appraisal based on the elements contained in the
-      Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher'
+    description: |
+      It's the value used to calculate the ITBI.
+      For BH source, it's the value determined by the tax administration through an appraisal based on the elements
+      contained in the Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher.
+      For SP source, if the adopted calculation basis is null, it assumes then the declared transaction value.
   year_built:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.iptu_registration_year
+      - datalake_open_external_data.itbi_sp_residential_transactions.year_built
       - datalake_open_external_data.itbi_bh_residential_transactions.year_built
-    description: 'Year that the construction of the property was finished.'
-  dt_transaction:
+    description: |
+      Year that the construction of the property was finished.
+  ts_transaction:
     lineage:
-      - datalake_open_external_data.itbi_sp_residential_transactions.dt_transaction
-      - datalake_open_external_data.itbi_bh_residential_transactions.dt_transaction
-    description: 'Date the transaction was created.'
+      - datalake_open_external_data.itbi_sp_residential_transactions.ts_transaction
+      - datalake_open_external_data.itbi_bh_residential_transactions.ts_transaction
+    description: |
+      Timestamp indicating when the transaction was created.
+  ts_load:
+    lineage:
+      - datalake_open_external_data.itbi_sp_residential_transactions.ts_load
+      - datalake_open_external_data.itbi_bh_residential_transactions.ts_load
+    description: |
+      Timestamp indicating when the data was last ingested in the datalake (considering the raw/clean layer).

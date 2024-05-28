@@ -1,194 +1,246 @@
 ---
 database_name: datalake_open_external_data
 table_name: itbi_sp_residential_transactions
-description: "Table enriched with ITBI data from SP. In this table, we applied some business rules, such as normalizing the address,
-  filtering for residential properties only and adding the id_region."
+description: |
+  Table enriched with ITBI data from SP.
+  Only transaction nature of Compra e venda are considered, along with four different iptu standard description:
+  COMERCIAL HORIZONTAL, COMERCIAL VERTICAL, RESIDENCIAL HORIZONTAL and RESIDENCIAL VERTICAL.
+  This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
 domain: Data Rede
-owner: guilherme.ventura@quintoandar.com.br
+owner: ae-rede@quintoandar.com.br
 columns:
-  id_itbi_transaction:
+  id_itbi_transaction_source:
     description: Unique table key, created from the transaction extract file and the IPTU number.
+  id_address_transaction:
+    lineage:
+      - datalake_itbi_clean.itbi_sp.dt_load
+      - datalake_itbi_clean.itbi_sp.address_neighborhood
+      - datalake_itbi_clean.itbi_sp.address_street_name
+      - datalake_itbi_clean.itbi_sp.address_number
+      - datalake_itbi_clean.itbi_sp.address_complement
+      - datalake_itbi_clean.itbi_sp.address_reference,
+      - datalake_itbi_clean.itbi_sp.address_zipcode
+    description: |
+      Unique identifier for each transaction.
+      The way the ID is created changes from each address and transaction date.
+      Since some transactions may appear on more than one extraction file, this id can be
+      duplicated for these cases.
+      It applies a MD5 hash in the fields ts_transaction, address_contry, address_state,
+      address_city, address_neighborhood, address_street_name, address_number, address_complement,
+      address_reference and address_zipcode.
   iptu_sql_registration_number:
     lineage:
       - datalake_itbi_clean.itbi_sp.iptu_sql_registration_number
-    description: 'The property registration number (SETOR QUADRA LOTE) represents the identification of the lots in the Cadastro Imobiliário
-       Fiscal of the Municipality of São Paulo, also used by the IPTU (Imposto Predial e Territorial Urbano).'
+    description: |
+      The property registration number (SETOR QUADRA LOTE) represents the identification of the lots
+      in the Cadastro Imobiliário Fiscal of the Municipality of São Paulo, also used by
+      the IPTU (Imposto Predial e Territorial Urbano).
   house_registry_number:
     lineage:
       - datalake_itbi_clean.itbi_sp.house_registry_number
-    description: 'The property registration number is the registration number of that property in a specific house notary.'
-  id_region:
-    lineage:
-      - datalake_vespucio.dejavu.id_region
-    description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region.
-      For ITBI, we retrieve it in 2 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign an id_region based on its latitude and longitude.
-      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which region that zipcode is predominantly in."
+    description: |
+      The property registration number is the registration number of that property in a specific house notary.
+  itbi_region:
+    description: |
+      ITBI identification column. Represents which municipality the data comes from.
+    categories:
+      ITBI_SP: transactions that come from the SP source.
+  address_country:
+    description: |
+      Address Country regarding the transaction record.
+    categories:
+      BR: currently, assumes only the BR value, standing for Brazil.
+  address_state:
+    description: |
+      Address State regarding the transaction record.
+    categories:
+      SP: regarding all the transactions from the SP source.
+  address_city:
+    description: |
+      Address City regarding the transaction record.
+    categories:
+      São Paulo: regarding all the transactions from the SP source.
   address_neighborhood:
     lineage:
-      - datalake_vespucio.dejavu.neighborhood
       - datalake_itbi_clean.itbi_sp.address_neighborhood
-    description: "Most likely neighborhood for that listing
-      For ITBI, we retrieve it in 4 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, and the latitude and longitude fall within a QuintoAndar area of operation, we use the neighborhood of the id_region.
-      2 - If we do not yet operate in the place, we use the neighborhood from the API.
-      3 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which id_region that zip code is predominantly in.
-      4 - Lastly, we use what comes directly from ITBI."
+    description: |
+      Address Neighborhood regarding the transaction record.
   address_street_name:
-    lineage: 
-      - datalake_vespucio.dejavu.address
-    description: "Most likely address for that listing
-      For ITBI, we retrieve it in 3 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign the output of the address to this field (with API standardization).
-      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which street that zipcode is predominantly on.
-      3 - Lastly, we use what comes directly from ITBI."
+    lineage:
+      - datalake_itbi_clean.itbi_sp.address_street_name
+    description: |
+      Address Street Name regarding the transaction record.
   address_number:
-    lineage: 
-      - datalake_vespucio.dejavu.number
-    description: "Unit number of the property.
-      For ITBI, we retrieve in 2 different ways: 
-      1 - If we have looked up the transaction address in the Google Geocoding API, we use the API number.
-      2 - If not, we use the one that comes directly from ITBI."
+    lineage:
+      - datalake_itbi_clean.itbi_sp.address_number
+    description: |
+      Address Number regarding the transaction record.
   address_complement:
     lineage:
-      - datalake_itbi_clean.itbi_sp.complement
-    description: 'Complement of the property address.'
+      - datalake_itbi_clean.itbi_sp.address_complement
+    description: |
+      Complement of the property address.
   address_reference:
-    description: 'Reference of the property address.'
-  address_condo_name:
     lineage:
-      - datalake_vespucio.dejavu.condo_name
-    description: 'Condo name of the property address.'
+      - datalake_itbi_clean.itbi_sp.address_reference
+    description: |
+      Reference of the property address.
   address_zipcode:
     lineage:
-      -  datalake_vespucio.dejavu.zip_code
       - datalake_itbi_clean.itbi_sp.address_zipcode
-    description: "Zip code of the property address.
-      For ITBI, we retrieve in 2 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we use the ZIP code that returned in the API.
-      2 - If not, we use the one that comes directly from ITBI."
-  address_city:
-    lineage:
-      - datalake_vespucio.dejavu.city
-    description: "City of the property address."
-  address_state: 
-    lineage:
-      - datalake_vespucio.dejavu.state
-    description: "State of the property address."
-  address_country:
-    lineage:
-      - datalake_vespucio.dejavu.country
-    description: "Country of the property address."
-  latitude:
-    lineage:
-      - datalake_vespucio.dejavu.latitude
-    description: "Latitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
-  longitude:
-    lineage:
-      - datalake_vespucio.dejavu.longitude
-    description: "Longitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
+    description: |
+      Addess Zipcode regarding the transaction record.
+      It assumes the pattern XXXXX-XXX.
   financing_type:
-    description: The financing system used to purchase the property.
+    lineage:
+      - datalake_itbi_clean.itbi_sp.financing_type
+    description: |
+      The financing system used to purchase the property.
   house_registry_office:
-    description: 'The house registry office is the notary office where the property was registered.'
+    lineage:
+      - datalake_itbi_clean.itbi_sp.house_registry_office
+    description: |
+      The house registry office is the notary office where the property was registered.
   real_estate_registry_office:
-    description: "Column referring to the notary's acronym used in the registration of the property."
+    lineage:
+      - datalake_itbi_clean.itbi_sp.real_estate_registry_office
+    description: |
+      Column referring to the notary's acronym used in the registration of the property.
   iptu_sql_status:
-    description: 'The IPTU status is the status of the property in the IPTU (Imposto Predial e Territorial Urbano) system.'
+    lineage:
+      - datalake_itbi_clean.itbi_sp.iptu_sql_status
+    description: |
+      The IPTU status is the status of the property in the IPTU (Imposto Predial e Territorial Urbano) system.
   iptu_use_description:
-    description: 'The IPTU use description is the description of the type of use of the property.'
+    lineage:
+      - datalake_itbi_clean.itbi_sp.iptu_use_description
+    description: |
+      The IPTU use description is the description of the type of use of the property.
   iptu_standard_description:
-    description: 'The IPTU standard description is the description of the type of property.'
+    lineage:
+      - datalake_itbi_clean.itbi_sp.iptu_standard_description
+    description: |
+      The IPTU standard description is the description of the type of property.
   declared_transaction_value:
-    description: 'The declared transaction value is the value declared by the buyer and seller of the property.'
+    lineage:
+      - datalake_itbi_clean.itbi_sp.declared_transaction_value
+    description: |
+      The declared transaction value is the value declared by the buyer and seller of the property.
   reference_appraisal_value:
     lineage:
       - datalake_itbi_clean.itbi_sp.reference_appraisal_value
-    description: 'The reference appraisal value is the value of the property used by the municipality to calculate the property tax (IPTU).'
+    description: |
+      The reference appraisal value is the value of the property used by the municipality to calculate
+      the property tax (IPTU).
   transmitted_proportion:
     lineage:
       - datalake_itbi_clean.itbi_sp.transmitted_proportion
-    description: 'The transmitted proportion is the proportion of the property that was sold.'
+    description: |
+      The transmitted proportion is the proportion of the property that was sold.
   proportional_reference_appraisal_value:
     lineage:
       - datalake_itbi_clean.itbi_sp.proportional_reference_appraisal_value
-    description: 'The proportional reference appraisal value is the reference appraisal value multiplied by the transmitted proportion.'
+    description: |
+      The proportional reference appraisal value is the reference appraisal value multiplied
+      by the transmitted proportion.
   adopted_calculation_basis:
     lineage:
       - datalake_itbi_clean.itbi_sp.adopted_calculation_basis
-    description: 'The adopted calculation basis is the value used to calculate the ITBI.'
+    description: |
+      The adopted calculation basis is the value used to calculate the ITBI.
+      If the adopted calculation basis is null, it assumes the declared transaction value.
   financed_value:
     lineage:
       - datalake_itbi_clean.itbi_sp.financed_value
-    description: 'The financed value is the value of the property that was financed.'
+    description: |
+      The financed value is the value of the property that was financed.
   land_area_m2:
     lineage:
       - datalake_itbi_clean.itbi_sp.land_area_m2
-    description: 'The land area is the area of the property in square meters.'
+    description: "The land area is the area of the property in square meters."
   built_area_m2:
     lineage:
       - datalake_itbi_clean.itbi_sp.built_area_m2
-    description: 'Result of the application of the percentage acquired by the unit construction area.'
+    description: |
+      Result of the application of the percentage acquired by the unit construction area.
   portion_public_road_land_m:
     lineage:
       - datalake_itbi_clean.itbi_sp.portion_public_road_land_m
-    description: 'The portion of the property that is on the public road.'
+    description: |
+      The portion of the property that is on the public road.
   ideal_fraction:
     lineage:
       - datalake_itbi_clean.itbi_sp.ideal_fraction
-    description: Incidence of the acquisition percentage over the ideal fraction original.
+    description: |
+      Incidence of the acquisition percentage over the ideal fraction original.
   iptu_use_code:
     lineage:
       - datalake_itbi_clean.itbi_sp.iptu_use_code
-    description: 'The IPTU use code is the code that represents the type of use of the property.'
+    description: |
+      The IPTU use code is the code that represents the type of use of the property.
   iptu_standard_code:
     lineage:
       - datalake_itbi_clean.itbi_sp.iptu_standard_code
-    description: 'The IPTU standard code is the code that represents the type of property.'
-  iptu_registration_year:
+    description: |
+      The IPTU standard code is the code that represents the type of property.
+  year_built:
     lineage:
       - datalake_itbi_clean.itbi_sp.iptu_registration_year
-    description: 'Year that the construction of the property was finished.'
+    description: |
+      Year that the construction of the property was finished.
   numbers_complement:
-    description: Numbers extracted from the complement column of the property. It is used to facilitate the match of transactions.
+    lineage:
+      - datalake_itbi_clean.itbi_sp.address_complement
+    description: |
+      Numbers extracted from the complement column of the property.
+      It is used to facilitate the match of transactions.
   raw_source_neighborhood:
     lineage:
-      - datalake_itbi_clean.itbi_sp.raw_source_neighborhood
-    description: Column with the original data of the property neighborhood coming from the extracted Excel, before the transformations and cleansing done in the pipeline.
+      - datalake_itbi_clean.itbi_sp.address_neighborhood
+    description: |
+      Column with the original data of the property neighborhood coming from the extracted Excel, before the transformations and cleansing done in the pipeline.
   raw_source_address:
     lineage:
-      - datalake_itbi_clean.itbi_sp.raw_source_address
-    description: Column with the original data of the property address coming from the extracted Excel, before the transformations and cleansing done in the pipeline.
+      - datalake_itbi_clean.itbi_sp.address_street_name
+    description: |
+      Column with the original data of the property address coming from the extracted Excel,
+      before the transformations and cleansing done in the pipeline.
   raw_source_complement:
     lineage:
-      - datalake_itbi_clean.itbi_sp.raw_source_complement
-    description: Column with the original data of the property complement coming from the extracted Excel, before the transformations and cleansing done in the pipeline.
+      - datalake_itbi_clean.itbi_sp.address_complement
+    description: |
+      Column with the original data of the property complement coming from the extracted Excel,
+      before the transformations and cleansing done in the pipeline.
   raw_source_reference:
     lineage:
-      - datalake_itbi_clean.itbi_sp.raw_source_reference
-    description: Column with the original data of the property reference coming from the extracted Excel, before the transformations and cleansing done in the pipeline.
+      - datalake_itbi_clean.itbi_sp.address_reference
+    description: |
+      Column with the original data of the property reference coming from the extracted Excel, before the transformations and cleansing done in the pipeline.
   source_file:
     lineage:
       - datalake_itbi_clean.itbi_sp.source_file
-    description: URL of the Excel file made available by the São Paulo City Hall.
+    description: |
+      URL of the Excel file made available by the São Paulo City Hall.
   source_tab:
     lineage:
       - datalake_itbi_clean.itbi_sp.source_tab
-    description: It refers to which tab of the Excel file the data is extracted. This Excel file is made available by the city hall.
+    description: |
+      It refers to which tab of the Excel file the data is extracted. This Excel file is made available by the city hall.
   month:
     lineage:
       - datalake_itbi_clean.itbi_sp.month
-    description: Month referring to the date the data was extracted. Used for partitioning.
+    description: |
+      Month referring to the date the data was extracted. Used for partitioning.
   year:
     lineage:
       - datalake_itbi_clean.itbi_sp.year
-    description: Year referring to the date the data was extracted. Used for partitioning.
-  dt_transaction:
+    description: |
+      Year referring to the date the data was extracted. Used for partitioning.
+  ts_transaction:
     lineage:
       - datalake_itbi_clean.itbi_sp.dt_transaction
-    description: 'Date the ITBI transaction was registered by the municipality.'
-  dt_load:
+    description: Timestamp when the ITBI transaction was registered by the municipality.
+  ts_load:
     lineage:
       - datalake_itbi_clean.itbi_sp.dt_load
-    description: 'Date we updated the ITBI SP data.'
-
+    description: Timestamp when we updated the ITBI SP data.

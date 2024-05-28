@@ -1,32 +1,34 @@
 WITH iptu_enriched AS (
-  SELECT 
+  SELECT
     taxpayer_number,
     condo_number,
     release_notification_number,
-    taxpayer_phase, 
+    taxpayer_phase,
     street_code,
-    address,
+    'BR' AS address_country,
+    'SP' AS address_state,
+    'São Paulo' AS address_city,
+    INITCAP(neighborhood) AS address_neighborhood,
+    INITCAP(address) AS address_street_name,
     CASE
       WHEN number IS NULL THEN 'N/A'
       WHEN CAST(number AS BIGINT) = 99999 THEN 'N/A'
       ELSE CAST(number AS STRING)
-    END AS number,
-    zipcode,
-    complement,
-    INITCAP(reference) AS reference,
-    INITCAP(neighborhood) AS neighborhood,
-    'São Paulo' AS city, 
+    END AS address_number,
+    zipcode AS address_zipcode,
+    complement AS address_complement,
+    INITCAP(reference) AS address_reference,
     property_use_type,
-    CASE 
+    CASE
       WHEN building_standard_type LIKE "%vertical%" THEN SPLIT(building_standard_type, " - ")[0]
       WHEN building_standard_type LIKE "%horizontal%" THEN SPLIT(building_standard_type, " - ")[0]
       ELSE building_standard_type
     END AS building_standard_type,
-    CASE 
+    CASE
       WHEN building_standard_type LIKE "%vertical%" THEN INITCAP(SPLIT(building_standard_type, " - ")[1])
       WHEN building_standard_type LIKE "%horizontal%" THEN INITCAP(SPLIT(building_standard_type, " - ")[1])
       ELSE building_standard_type
-    END AS building_standard_type_tier, 
+    END AS building_standard_type_tier,
     IF(land_type = "Lote de esquina em ZER", "Lote de esquina em zero", land_type) AS land_type,
     land_area_m2,
     built_area_m2,
@@ -42,7 +44,8 @@ WITH iptu_enriched AS (
     iptu_year,
     first_year_of_taxpayer_life,
     first_month_of_taxpayer_life,
-    dt_registration
+    TIMESTAMP(dt_registration) AS ts_registration,
+    TIMESTAMP(dt_load) AS ts_load
   FROM
     datalake_iptu_clean.iptu_sp
   WHERE
@@ -53,23 +56,19 @@ WITH iptu_enriched AS (
 )
 SELECT
   i.taxpayer_number,
-  d.id_region,
   i.condo_number,
   i.release_notification_number,
-  i.taxpayer_phase, 
+  i.taxpayer_phase,
   i.street_code,
-  COALESCE(d.address, i.address) AS address,
-  COALESCE(d.number, i.number) AS number,
-  COALESCE(d.zip_code, i.zipcode) AS address_zipcode,
-  i.complement,
-  i.reference,
-  d.condo_name AS condo_name,
-  COALESCE(r.name, d.neighborhood, i.neighborhood) AS neighborhood,
-  i.city AS state,
-  i.city,
-  d.country,
-  d.latitude,
-  d.longitude,
+  i.address_street_name,
+  i.address_number,
+  i.address_zipcode,
+  i.address_complement,
+  i.address_reference,
+  i.address_neighborhood,
+  i.address_state,
+  i.address_city,
+  i.address_country,
   i.property_use_type,
   i.building_standard_type,
   i.building_standard_type_tier,
@@ -88,13 +87,7 @@ SELECT
   i.iptu_year,
   i.first_year_of_taxpayer_life,
   i.first_month_of_taxpayer_life,
-  i.dt_registration,
-  CURRENT_DATE() AS dt_load
+  i.ts_registration,
+  i.ts_load
 FROM
   iptu_enriched AS i
-LEFT JOIN 
-  datalake_vespucio.dejavu AS d 
-    ON MD5(CONCAT(i.address, i.number, i.city)) = d.id_address
-LEFT JOIN 
-  datalake_region.region AS r 
-    ON d.id_region = r.id

@@ -363,7 +363,7 @@ bietlejuice.enrich_supply_leads:
   override: []
 bietlejuice.enrich_supply_acquisition:
   remove:
-  - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
+    - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
 bietlejuice.enrich_supply_conversion:
   add:
     - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
@@ -473,13 +473,6 @@ bietlejuice.enrich_online_attribution:
   remove:
     - bietlejuice.amplitude:load-clean-170698-user-merge
     - bietlejuice.amplitude:load-clean-events
-bietlejuice.enrich_open_external_data:
-  # We need to remove these dependencies because our IPTU/ITBI extraction routines run on the 15th and 30th of the month.
-  # Therefore, if we keep these dependencies, this DAG would not update with the data from the other tables used.
-  remove:
-    - bietlejuice.iptu:load-clean-iptu-sp
-    - bietlejuice.itbi:load-clean-itbi-bh
-    - bietlejuice.itbi:load-clean-itbi-sp
 bietlejuice.enrich_open_external_data_addresses:
   # We need to remove these dependencies because our IPTU/ITBI extraction routines run on the 15th and 30th of the month.
   # Therefore, if we keep these dependencies, this DAG would not update with the data from the other tables used.

@@ -1,72 +1,69 @@
-WITH sao_paulo AS (
-  SELECT 
-    id_itbi_transaction,
-    id_region,
-    'ITBI_SP' AS itbi_region,
-    address_street_name AS address,
-    address_number AS number,
-    address_complement AS complement,
-    address_reference AS reference,
-    address_condo_name AS condo_name,
-    address_zipcode AS zipcode,
-    address_neighborhood AS neighborhood,
-    address_city AS city,
-    address_state AS state,
-    latitude,
-    longitude,
-    iptu_standard_description AS property_type,
-    CASE 
-      WHEN raw_source_complement IS NOT NULL AND raw_source_reference IS NOT NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''), ' - ', REPLACE(raw_source_complement, '-', ' '), ' - ', REPLACE(raw_source_reference, '-', ' ')) 
-      WHEN raw_source_complement IS NULL AND raw_source_reference IS NOT NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''), ' - ', REPLACE(raw_source_reference, '-', ' '))
-      WHEN raw_source_complement IS NOT NULL AND raw_source_reference IS NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''), ' - ', REPLACE(raw_source_complement, '-', ' '))
-      WHEN raw_source_complement IS NULL AND raw_source_reference IS NULL THEN CONCAT(REPLACE(raw_source_address, '-', ' '), ' ', IFNULL(address_number, ''))
-    END AS raw_source_address,
-    source_file,
-    land_area_m2,
-    built_area_m2,
-    ideal_fraction,
-    declared_transaction_value,
-    adopted_calculation_basis,
-    iptu_registration_year AS year_built,
-    dt_transaction
+WITH itbi_sp AS (
+  SELECT
+    id_address_transaction,
+    MAX(itbi_region) AS itbi_region,
+    MAX(address_country) AS address_country,
+    MAX(address_state) AS address_state,
+    MAX(address_city) AS address_city,
+    MAX(address_neighborhood) AS address_neighborhood,
+    MAX(address_street_name) AS address_street_name,
+    MAX(address_number) AS address_number,
+    MAX(address_complement) AS address_complement,
+    MAX(address_reference) AS address_reference,
+    MAX(address_zipcode) AS address_zipcode,
+    MAX(iptu_use_description) AS iptu_use_description,
+    MAX(iptu_standard_description) AS property_type,
+    MAX(land_area_m2) AS land_area_m2,
+    MAX(built_area_m2) AS built_area_m2,
+    MAX(ideal_fraction) AS ideal_fraction,
+    MAX(declared_transaction_value) AS declared_transaction_value,
+    MAX(reference_appraisal_value) AS reference_appraisal_value,
+    MAX(transmitted_proportion) AS transmitted_proportion,
+    MAX(proportional_reference_appraisal_value) AS proportional_reference_appraisal_value,
+    MAX(adopted_calculation_basis) AS adopted_calculation_basis,
+    MAX(year_built) AS year_built,
+    MAX(ts_transaction) AS ts_transaction,
+    MAX(ts_load) AS ts_load
   FROM
     datalake_open_external_data.itbi_sp_residential_transactions
+  GROUP BY ALL
 ),
-belo_horizonte AS (
-  SELECT 
-    id_itbi_transaction,
-    id_region,
-    'ITBI_BH' AS itbi_region,
-    address,
-    number,
-    complement,
-    NULL AS reference,
-    condo_name,
-    zipcode,
-    neighborhood,
-    city,
-    state,
-    latitude,
-    longitude,
-    property_type,
-    raw_source_address,
-    source_file,
-    land_area_m2,
-    built_area_m2,
-    ideal_fraction,
+itbi_bh AS (
+  SELECT
+    id_address_transaction,
+    MAX(itbi_region) AS itbi_region,
+    MAX(address_country) AS address_country,
+    MAX(address_state) AS address_state,
+    MAX(address_city) AS address_city,
+    MAX(address_neighborhood) AS address_neighborhood,
+    MAX(address_street_name) AS address_street_name,
+    MAX(address_number) AS address_number,
+    MAX(address_complement) AS address_complement,
+    'NA' AS address_reference,
+    MAX(address_zipcode) AS address_zipcode,
+    'NA' AS iptu_use_description,
+    MAX(property_type) AS property_type,
+    MAX(land_area_m2) AS land_area_m2,
+    MAX(built_area_m2) AS built_area_m2,
+    MAX(ideal_fraction) AS ideal_fraction,
     NULL AS declared_transaction_value,
-    adopted_calculation_basis,
-    year_built,
-    dt_transaction
+    NULL AS reference_appraisal_value,
+    NULL AS transmitted_proportion,
+    NULL AS proportional_reference_appraisal_value,
+    MAX(adopted_calculation_basis) AS adopted_calculation_basis,
+    MAX(year_built) AS year_built,
+    MAX(ts_transaction) AS ts_transaction,
+    MAX(ts_load) AS ts_load
   FROM
     datalake_open_external_data.itbi_bh_residential_transactions
+  GROUP BY ALL
 )
-SELECT 
+SELECT
   *
 FROM
-  sao_paulo
-UNION ALL 
-SELECT 
+  itbi_sp
+UNION ALL
+SELECT
   *
-FROM 
-  belo_horizonte
+FROM
+  itbi_bh

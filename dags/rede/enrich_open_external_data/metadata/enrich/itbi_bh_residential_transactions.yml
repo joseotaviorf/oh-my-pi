@@ -1,154 +1,167 @@
 database_name: datalake_open_external_data
 table_name: itbi_bh_residential_transactions
-description: "Table enriched with ITBI data from BH. In this table, we applied some business rules, such as normalizing the address, 
-  filtering for residential properties only and adding the id_region."
+description: |
+  Table enriched with ITBI data from BH.
+  Only Residencial transactions, starting from 2019 are considered.
+  This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
 domain: Data Rede
-owner: guilherme.ventura@quintoandar.com.br
+owner: ae-rede@quintoandar.com.br
 columns:
-  id_itbi_transaction:
-    description: Unique table key, created from the transaction extract file and the IPTU number.
-  id_region:
+  id_itbi_transaction_source:
+    description: |
+      Unique table key, created from the transaction extract file and the IPTU number.
+  id_address_transaction:
     lineage:
-      - datalake_vespucio.dejavu
-    description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region.
-      For ITBI, we retrieve it in 2 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign an id_region based on its latitude and longitude.
-      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which region that zipcode is predominantly in."
-  address:
-    lineage:
-      - datalake_vespucio.dejavu.address
+      - datalake_itbi_clean.itbi_bh.dt_load
       - datalake_itbi_clean.itbi_bh.address
-    description: "Most likely address for that listing
-      For ITBI, we retrieve it in 3 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we assign the output of the address to this field (with API standardization).
-      2 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which street that zipcode is predominantly on.
-      3 - Lastly, we use what comes directly from ITBI."
-  number:
-    lineage:
-      - datalake_vespucio.dejavu.number
-      - datalake_itbi_clean.itbi_bh.address
-    description: "Unit number of the property.
-      For ITBI, we retrieve in 2 different ways: 
-      1 - If we have looked up the transaction address in the Google Geocoding API, we use the API number.
-      2 - If not, we use the one that comes directly from ITBI."
-  complement:
-    lineage:
-      - datalake_itbi_clean.itbi_bh.address
-    description: 'Completion of the property address.'
-  condo_name:
-    lineage:
-      - datalake_vespucio.dejavu.condo_name
-    description: 'Name of the condominium.'
-  zipcode:
-    lineage:
-      - datalake_vespucio.dejavu.zip_code
-      - datalake_itbi_clean.itbi_bh.address
-    description: "Zip code of the property address.
-      For ITBI, we retrieve in 2 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, we use the ZIP code that returned in the API.
-      2 - If not, we use the one that comes directly from ITBI."
-  latitude:
-    lineage:
-      - datalake_vespucio.dejavu.latitude
-    description: "Latitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
-  longitude:
-    lineage:
-      - datalake_vespucio.dejavu.longitude
-    description: "Longitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
-  neighborhood:
+    description: |
+      Unique identifier for each transaction.
+      The way the ID is created changes from each address and transaction date.
+      Since some transactions may appear on more than one extraction file, this id can be
+      duplicated for these cases.
+      It applies a MD5 hash in the fields ts_transaction, address_contry, address_state,
+      address_city, address_neighborhood, address_street_name, address_number, address_complement,
+      and address_zipcode.
+  itbi_region:
+    description: |
+      ITBI identification column. Represents which municipality the data comes from.
+    categories:
+      ITBI_BH: transaction that come from the BH source.
+  address_country:
+    description: |
+      Address Country regarding the transaction record.
+    categories:
+      BR: currently, assumes only the BR value, standing for Brazil.
+  address_state:
     lineage:
       - datalake_itbi_clean.itbi_bh.address
-    description: "Most likely neighborhood for that listing
-      For ITBI, we retrieve it in 4 different ways: 
-      1 - If we have queried the address of the transaction in the Google Geocoding API, and the latitude and longitude fall within a QuintoAndar area of operation, we use the neighborhood of the id_region.
-      2 - If we do not yet operate in the place, we use the neighborhood from the API.
-      3 - If we have not consulted the API, we use the knowledge within QuintoAndar, looking at which id_region that zip code is predominantly in.
-      4 - Lastly, we use what comes directly from ITBI."
-  city:
+    description: |
+      Address State regarding the transaction record.
+    categories:
+      MG: regarding all the transactions from the BH source.
+  address_city:
+    description: |
+      Address City regarding the transaction record.
+    categories:
+      Belo Horizonte: regarding all the transactions from the BH source.
+  address_neighborhood:
     lineage:
       - datalake_itbi_clean.itbi_bh.address
-    description: 'City of the property, where in the case of this table, it is Belo Horizonte.'
-  state:
+    description: |
+      Address Neighborhood regarding the transaction record.
+  address_street_name:
     lineage:
-      - datalake_vespucio.dejavu.state
-    description: 'State of the property, where in the case of this table, it is Minas Gerais.'
-  country:
-    lineage: 
-      - datalake_vespucio.dejavu.country
-    description: 'Country of the property, where in the case of this table, it is Brazil.'
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Address Street Name regarding the transaction record.
+  address_number:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Address Number regarding the transaction record.
+  address_complement:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Address Complement regarding the transaction record.
+  address_zipcode:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Addess Zipcode regarding the transaction record.
+      It assumes the pattern XXXXX-XXX.
   occupation_description:
     lineage:
-      - datalake_itbi_clean.itbi_bh.ocupation_description
-    description: 'Whether the occupancy type is residential, non-residential or territorial.'
+      - datalake_itbi_clean.itbi_bh.occupation_description
+    description: |
+      Whether the occupancy type is residential, non-residential or territorial.
     categories:
-      RESIDENCIAL: 'If the occupation is residential (used for living).'
-      NAO RESIDENCIAL: 'If the occupation is non-residential (not used for living).'
-      TERRITORIAL: 'It is only a piece of land, it does not have the property built.'
-      VALOR NULO: 'No information.'
+      RESIDENCIAL: If the occupation is residential (used for living).
+      NAO RESIDENCIAL: If the occupation is non-residential (not used for living).
+      TERRITORIAL: It's only a piece of land, it doesn't have the property built.
+      VALOR NULO: No information.
   standard_finish:
     lineage:
       - datalake_itbi_clean.itbi_bh.standard_finish
-    description: 'Finishing Standard of the unit according to the score received from the constructive characteristics.'
+    description: |
+      Finishing Standard of the unit according to the score received from the constructive characteristics.
   urban_zoning_code:
     lineage:
       - datalake_itbi_clean.itbi_bh.urban_zoning_code
-    description: 'Urban zoning coding for the property, assigned by the Use and Occupancy Law in effect at the time of the transaction.'
+    description: |
+      Urban zoning coding for the property, assigned by the Use and Occupancy Law in effect at the time of
+      the transaction.
   property_type:
-    description: 'Type of property ownership, which can be residential or commercial.'
+    description: |
+      Type of property ownership, which can be residential or commercial.
     categories:
-      Residencial Vertical: If the property is a residential apartment.
-      Residencial Horizontal: If it is a residential house.
+      Residencial Vertical: If the propoerty is a residential apartment.
+      Residencial Horizontal: If it's a residential house.
   raw_source_address:
     lineage:
-      - datalake_itbi_clean.itbi_bh.address
-    description: 'Address as it was in the source file.'
+      - datalake_itbi_clean.itbi_bh.source_file
+    description: |
+      Address as it was in the source file.
   source_file:
     lineage:
       - datalake_itbi_clean.itbi_bh.source_file
-    description: 'URL of the CSV downloaded for ingesting the data from the BH municipality.'
+    description: |
+      URL of the CSV downloaded for ingesting the data from the BH municipality.
   land_area_m2:
     lineage:
       - datalake_itbi_clean.itbi_bh.land_area_m2
-    description: 'Land area in square meters'
+    description: |
+      Land area in square meters.
   built_area_m2:
     lineage:
       - datalake_itbi_clean.itbi_bh.built_area_m2
-    description: 'Result of the application of the percentage acquired by the unit construction area.'
+    description: |
+      Result of the application of the percentage acquired by the unit construction area.
   all_units_area_m2:
     lineage:
       - datalake_itbi_clean.itbi_bh.all_units_area_m2
-    description: "Sum of the units in cases where we have several building types. 
-      It occurs when the units represent distinct blocks because they are not contiguous or because they constitute different savings."
+    description: |
+      Sum of the units in cases where we have severam building types.
+      It occurs when the units represent distinct blocks because they aren't contiguous or because they
+      constitute different savings.
   ideal_fraction:
     lineage:
       - datalake_itbi_clean.itbi_bh.ideal_fraction
-    description: Incidence of the acquisition percentage over the ideal fraction original.
+    description: |
+      Incidence of the acquisition percentage over the ideal fraction original.
   adopted_calculation_basis:
     lineage:
       - datalake_itbi_clean.itbi_bh.adopted_calculation_basis
-    description: 'Value determined by the tax administration through an appraisal based on the elements contained in the
-      Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher'
+    description: |
+      Value determined by the tax administration through an appraisal based on the elements contained
+      in the Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher.
   amount_tax_paid_summarized:
     lineage:
       - datalake_itbi_clean.itbi_bh.amount_tax_paid_summarized
-    description: 'Total amount of tax collected and summarized (only available for the year 2021).'
+    description: |
+      Total amount of tax collected and summarized (only available for the year 2021).
   year_built:
     lineage:
       - datalake_itbi_clean.itbi_bh.year_built
-    description: 'Year that the construction of the property was finished.'
-  dt_transaction:
-    lineage:
-      - datalake_itbi_clean.itbi_bh.dt_transaction
-    description: 'Date the transaction was created.'
-  dt_load:
-    lineage:
-      - datalake_itbi_clean.itbi_bh.dt_load
-    description: Date when ITBI BH data was updated for the last time.
+    description: |
+      Year that the construction of the property was finished.
   month:
     lineage:
       - datalake_itbi_clean.itbi_bh.month
-    description: Month referring to the date the data was extracted. Used for partitioning.
+    description: |
+      Month referring to the date when the data was extracted.
   year:
     lineage:
       - datalake_itbi_clean.itbi_bh.year
-    description: Year referring to the date the data was extracted. Used for partitioning.
+    description: |
+      Year referring to the date when the data was extracted.
+  ts_transaction:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.dt_transaction
+    description: |
+      Timestamp when the transaction was created.
+  ts_load:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.dt_load
+    description: |
+      Timestamp when the ITBI BH was updated for the last time.
