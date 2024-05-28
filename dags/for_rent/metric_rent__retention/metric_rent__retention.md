@@ -38,6 +38,8 @@ Currently, there is the following output tables in the metric layer:
 - `nps_pp_without_repairs_weekly`
 - `relisting_before_tr_3_days_monthly`
 - `relisting_before_tr_3_days_weekly`
+- `relisting_early_demand_total_monthly`
+- `relisting_early_demand_total_weekly`
 - `relisting_visits_without_owner_monthly`
 - `relisting_visits_without_owner_weekly`
 - `relisting_well_priced_monthly`
