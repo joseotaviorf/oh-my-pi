@@ -1,0 +1,40 @@
+---
+database_name: datalake_ebdb_clean
+table_name: house_agent
+columns:
+  id:
+    lineage:
+    - datalake_ebdb_raw.houseagent.id
+  id_agent:
+    lineage:
+    - datalake_ebdb_raw.houseagent.agent_id
+  id_house:
+    lineage:
+    - datalake_ebdb_raw.houseagent.house_id
+  business_context:
+    lineage:
+    - datalake_ebdb_raw.houseagent.business_context
+  relation_type:
+    lineage:
+    - datalake_ebdb_raw.houseagent.relation_type
+  when_agent_got_key:
+    lineage:
+    - datalake_ebdb_raw.houseagent.when_agent_got_key
+  has_house_keys:
+    lineage:
+    - datalake_ebdb_raw.houseagent.agent_has_keys
+  ts_key_returned:
+    lineage:
+    - datalake_ebdb_raw.houseagent.returnkeyuntil
+  ts_started:
+    lineage:
+    - datalake_ebdb_raw.houseagent.start_at
+  ts_ended:
+    lineage:
+    - datalake_ebdb_raw.houseagent.end_at
+  ts_created:
+    lineage:
+    - datalake_ebdb_raw.houseagent.created_at
+  ts_updated:
+    lineage:
+    - datalake_ebdb_raw.houseagent.updated_at

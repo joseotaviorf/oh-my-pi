@@ -82,6 +82,7 @@ Produces the following output tables:
     `follow_up_details`
     `follow_up_details_feedback_tag`
     `house`
+    `house_agent`
     `house_agent_aud`
     `house_aud`
     `house_enrichment`
