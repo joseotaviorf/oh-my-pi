@@ -59,11 +59,12 @@ func = partial(upload_one_file, s3_bucket, client)
 files_to_upload = []
 
 for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
-    if artifact not in root:
+    if f"/{artifact}" not in root:
         continue
 
     for file_name in files:
-        dag_path, artifact_path = re.split(f"{artifact}", root)
+        dag_path, artifact_path = re.split(f"/{artifact}", root)
+        dag_path = f"{dag_path}/"
         dag_name = "/".join(
             list(filter(None, dag_path.replace(DAG_PACKAGES_ROOT, "").split("/")))[1:]
         )
