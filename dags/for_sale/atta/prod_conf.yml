@@ -107,6 +107,10 @@ tables:
     extraction_type: full
     clean_table_name: client_info
     db: atta
+  - table_name: storagedocumentos
+    extraction_type: full
+    clean_table_name: storage_documents
+    db: atta
 
 clean_partition_columns: [year, month, day]
 lineage_product_database_name: atta

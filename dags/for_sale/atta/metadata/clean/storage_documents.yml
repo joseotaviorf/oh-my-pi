@@ -1,0 +1,72 @@
+---
+database_name: datalake_atta_clean
+table_name: storage_documents
+columns:
+  id_storage_document:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.Id
+    description: Unique key of the storage documents table (Only at Atta systems).
+  id_document:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.DocumentId
+    description: Is the unique key of the document if exists (Only at Atta systems).
+  id_entity:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.EntidadeId
+    description: Is the unique key of the entity if exists (Only at Atta systems).
+  id_user:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.UsuarioId
+    description: Is the unique key of the user if exists (Only at Atta systems).
+  document_type:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.TipoDocumento
+    description: Document type id if exists.
+  content_type:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.ContentType
+    description: File type uploaded.
+  storage_key:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.key
+    description: File's path.
+  bucket:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.bucket
+    description: In which bucket is the file.
+  topic:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.Topico
+    description: In which topic is the file.
+  status:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.status
+    description: File's status.
+  cpf:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.cpf
+    description: User's CPF.
+  extension:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.Extensao
+    description: Extension type of the file.
+  file_size:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.Tamanho
+    description: File's size in KB.
+  file_name:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.NomeArquivo
+    description: File's name if have one.
+  extracted_data:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.`_OCR`
+    description: Extract data by optical character recognition.
+  ts_sent:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.EnviadoEm
+    description: Sending timestamp.
+  ts_updated:
+    lineage:
+      - datalake_atta_raw.storagedocumentos.AtualizadoEm
+    description: Update timestamp.
