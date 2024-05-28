@@ -25,20 +25,15 @@ SELECT
     WHEN s.id_pipeline IS NULL THEN 'Vazio'
     ELSE 'Outros'
   END AS channel,
-  CASE 
-    WHEN
-      GET_JSON_OBJECT(s.memory, '$.business_rules.journey_flow.retention_emma.has_retention_response') IS NOT NULL
-      OR GET_JSON_OBJECT(s.memory, '$.business_rules.journey_flow.retention_emma.emma_pipeline')= 'true' THEN 'experiment'
-      ELSE 'control'
-    END AS experimentAB,
-  CASE 
-    WHEN GET_JSON_OBJECT(s.memory, '$.business_rules.journey_flow.retention_emma.fallback') = 'true' THEN true
-    ELSE false
-  END AS experimentAB_fallback,
+  GET_JSON_OBJECT(s.memory, '$.experiments') AS experiments,
   s.year,
   s.month,
   s.day,
   NOW() AS ts_load
 FROM datalake_greenseer.sessions AS s
+WHERE 
+  s.year = {year}
+  AND s.month = {month}
+  AND s.day = {day}
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY s.id_session ORDER BY s.ts_updated DESC) = 1

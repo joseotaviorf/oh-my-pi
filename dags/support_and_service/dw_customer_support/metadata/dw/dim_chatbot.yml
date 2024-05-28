@@ -58,14 +58,10 @@ columns:
       Chat In-App: Indicates that the session was made through chat.
       Empty: Indicates that the session was made through an empty channel.
       Others: Indicates that the session was made through other channels.
-  experimentAB:
+  experiments:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: Experiment A/B used in the session.
-  experimentAB_fallback:
-    lineage:
-      - datalake_greenseer.sessions.memory
-    description: Experiment A/B fallback used in the session.
+    description: Experiments that were added to the session.
   year:
     description: Partition year.
   month:

@@ -95,10 +95,6 @@ SELECT
   GET_JSON_OBJECT(gs.memory, '$.basic.session.last_hsm.type') AS last_hsm_type,
   GET_JSON_OBJECT(memory, '$.basic.session.last_hsm.secs_since') AS secs_since_last_hsm,
   gs.automatic_selection,
-  NOW() AS ts_load,
-  YEAR(gs.ts_started) AS year,
-  MONTH(gs.ts_started) AS month,
-  DAY(gs.ts_started) AS day,
   CASE
     WHEN gs.current_state LIKE '%CSAT%' THEN 1 ELSE 0
   END AS has_questionnaire_sent,
@@ -115,5 +111,9 @@ FROM
     LEFT JOIN churn_to_call AS cc
       ON  gs.id_user = cc.id_user 
       AND cc.previews_contact_date = gs.ts_started
+WHERE
+    gs.year = {year}
+    AND gs.month = {month}
+    AND gs.day = {day}
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY gs.id_session ORDER BY gs.ts_updated DESC) = 1
