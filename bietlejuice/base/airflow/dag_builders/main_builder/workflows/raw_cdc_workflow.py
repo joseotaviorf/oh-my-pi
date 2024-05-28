@@ -126,10 +126,12 @@ class RawCDCWorkflow(BaseWorkflow):
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
         optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
-            transactional_tables
+            transactional_tables,
+            parallelism=2,  # Lower because we don't want to overload the cluster while the next layers are being loaded
         )
         optimize_raw_task = self.optimize_delta_table_task_creator.create_task(
-            raw_tables
+            raw_tables,
+            parallelism=2,  # Lower because we don't want to overload the cluster while the next layer is being loaded
         )
         optimize_clean_task = self.optimize_delta_table_task_creator.create_task(
             clean_tables
