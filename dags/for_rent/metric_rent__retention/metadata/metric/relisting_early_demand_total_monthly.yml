@@ -1,0 +1,45 @@
+---
+database_name: metric_rent
+table_name: relisting_early_demand_total_monthly
+description: Monthly percentage of early demand relisting over total relistings.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_month_publication:
+    lineage:
+      - dw_rent.dim_house_listing.ts_publication
+    description: "Month of the publication."
+    dimension: True
+  qtd_ed_rl:
+    description: "Monthly total volume of relistings for Early Demand houses."
+    metric:
+      name: Monthly Total Early Demand Relistings
+      description: "Monthly total volume of relistings for Early Demand houses."
+      acronym: MTEDRL
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_rl:
+    description: "Monthly total volume of relistings."
+    metric:
+      name: Monthly Total Relistings
+      description: "Monthly total volume of relistings."
+      acronym: MTRL
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_ed_rl:
+    description: "Monthly percentage of Early Demand relistings."
+    metric:
+      name: Monthly Percentage of Early Demand Relistings
+      description: "Monthly percentage of Early Demand relistings."
+      acronym: MPEDRL
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""

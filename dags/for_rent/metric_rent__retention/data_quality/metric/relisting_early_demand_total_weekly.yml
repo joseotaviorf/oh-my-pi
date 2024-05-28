@@ -1,0 +1,8 @@
+---
+table_name: metric_rent.relisting_early_demand_total_weekly
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  pct_ed_rl:
+    has_max_value:
+      less_than_or_equal_to: 1
+      severity_level: Error

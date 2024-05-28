@@ -1,0 +1,45 @@
+---
+database_name: metric_rent
+table_name: relisting_early_demand_total_weekly
+description: Weekly percentage of early demand relisting over total relistings.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_week_publication:
+    lineage:
+      - dw_rent.dim_house_listing.ts_publication
+    description: "Week of the publication."
+    dimension: True
+  qtd_ed_rl:
+    description: "Weekly total volume of relistings for Early Demand houses."
+    metric:
+      name: Weekly Total Early Demand Relistings
+      description: "Weekly total volume of relistings for Early Demand houses."
+      acronym: WTEDRL
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  qtd_rl:
+    description: "Weekly total volume of relistings."
+    metric:
+      name: Weekly Total Relistings
+      description: "Weekly total volume of relistings."
+      acronym: WTRL
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_ed_rl:
+    description: "Weekly percentage of Early Demand relistings."
+    metric:
+      name: Weekly Percentage of Early Demand Relistings
+      description: "Weekly percentage of Early Demand relistings."
+      acronym: WPEDRL
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
