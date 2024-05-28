@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
+from bietlejuice.base.cdc.reader.date_range_partition_reader import DateRangePartitionReader
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
     CdcSchemaFinderFactory,
 )
@@ -17,9 +18,8 @@ from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 
 
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from datetime import datetime, timedelta
-from pyspark.sql.functions import col, to_timestamp, lit, make_date
-from pyspark.sql.utils import AnalysisException
+from datetime import datetime
+from pyspark.sql.functions import col, to_timestamp, lit
 
 JOB_NAME = "load_cdc_transactional"
 
@@ -92,43 +92,22 @@ def get_incoming_data(
     :return df:
     """
     base_path = f"s3://{incoming_bucket}/{source_database}/{environment}_{source_database}.data.{schema}.{table_name}/"
-
-    dt_start_date = datetime.strptime(start_date, "%Y-%m-%d")
-    dt_end_date = datetime.strptime(end_date, "%Y-%m-%d")
-    current_load_date = dt_start_date
-
-    load_date_paths = []
-
-    logger.info(
-        f"m=get_incoming_data, start_date={start_date}, end_date={end_date}, path={base_path}, msg=reading Incoming data..."
-    )
-
-    while current_load_date <= dt_end_date:
-        load_path = (
-            base_path
-            + f"year={current_load_date.strftime('%Y')}/month={current_load_date.strftime('%m')}/day={current_load_date.strftime('%d')}"
+    reader = DateRangePartitionReader(spark.read.option("compression", "gzip"), dbutils)
+    try:
+        logger.info(
+            f"m=get_incoming_data, start_date={start_date}, end_date={end_date}, path={base_path}, msg=reading Incoming data..."
         )
-        try:
-            dbutils.fs.ls(load_path)
-            load_date_paths.append(load_path)
-        except Exception as e:
-            if "java.io.FileNotFoundException" not in str(e):
-                raise e
-
-        current_load_date += timedelta(days=1)
-
-    if not load_date_paths:
+        return reader.load(
+            base_path,
+            datetime.strptime(start_date, "%Y-%m-%d"),
+            datetime.strptime(end_date, "%Y-%m-%d"),
+            "json",
+        )
+    except FileNotFoundError:
         logger.info(
             f"m=get_incoming_date, start_date={start_date}, end_date={end_date}, msg=No incoming data found in the time interval. Returning empty DataFrame."
         )
         return None
-
-    df = (
-        spark.read.option("basePath", base_path)
-        .option("compression", "gzip")
-        .json(load_date_paths)
-    )
-    return df
 
 
 def format_and_deduplicate_df(df, partitions, database_type):
