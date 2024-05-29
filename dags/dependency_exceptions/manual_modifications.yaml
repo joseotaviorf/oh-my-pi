@@ -473,6 +473,8 @@ bietlejuice.enrich_online_attribution:
   remove:
     - bietlejuice.amplitude:load-clean-170698-user-merge
     - bietlejuice.amplitude:load-clean-events
+bietlejuice.enrich_open_external_data:
+  override: []
 bietlejuice.enrich_open_external_data_addresses:
   # We need to remove these dependencies because our IPTU/ITBI extraction routines run on the 15th and 30th of the month.
   # Therefore, if we keep these dependencies, this DAG would not update with the data from the other tables used.

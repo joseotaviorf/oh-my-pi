@@ -3,6 +3,7 @@ dag:
   name: enrich_open_external_data
   owner: Data Rede
   schedule_start_date: 2020, 8, 29
+  schedule_interval: 0 13 15,30 * *
   documentation:
     dag_purpose: |
       This DAG is intended to handle tables retrieved from public data
