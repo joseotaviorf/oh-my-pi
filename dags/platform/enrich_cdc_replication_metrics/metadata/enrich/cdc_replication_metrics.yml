@@ -1,0 +1,18 @@
+---
+database_name: datalake_dataplatform
+table_name: cdc_replication_metrics
+description: Provides daily metrics about CDC transactions, such as number of deletes and delays in the replication.
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  database_name:
+    description: Datalake's transactional database where the metrics were extracted
+  table_name:
+    description: Transactional table name where the metrics were extracted
+  timestamp_diff_in_seconds:
+    description: Difference in seconds between the ts_cdc_transaction and ts_database_transaction. Represents the delay on the debezium replication compared to the database operation
+  count_of_hard_deletes:
+    description: Number of hard delete operations that the table had suffered
+  
+
+
