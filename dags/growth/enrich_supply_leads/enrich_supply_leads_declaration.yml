@@ -3,6 +3,8 @@ dag:
   name: enrich_supply_leads
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
+  documentation:
+    dag_purpose: This DAG is responsible for generate SKs and recovery region of leads.
 workflow:
   type: query_delta
   layer: enrich
@@ -11,6 +13,10 @@ workflow:
   tables_customization:
     leads_sks:
       merge_on: ["id_lead", "source"]
+      z_order_by: ["id_lead", "source"]
+    recovered_region_leads:
+      merge_on: ["id_lead"]
+      z_order_by: ["id_lead"]
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:

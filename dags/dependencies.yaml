@@ -2704,6 +2704,15 @@ bietlejuice.enrich_supply_conversion:
 bietlejuice.enrich_supply_conversion_3p:
   - bietlejuice.enrich_supply_acquisition:load-enrich-landing-3p
   - bietlejuice.enrich_supply_acquisition:load-enrich-prospects-3p
+bietlejuice.enrich_supply_leads:
+  - bietlejuice.bob:load-clean-house-draft
+  - bietlejuice.bob:load-clean-submission-progress
+  - bietlejuice.brokers_supply_processor:load-clean-lead-3p
+  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb:load-clean-polygon-region
+  - bietlejuice.rene_descartes:load-clean-address
+  - bietlejuice.rene_descartes:load-clean-house-lead
+  - bietlejuice.rene_descartes:load-clean-house-lead-conversion
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners

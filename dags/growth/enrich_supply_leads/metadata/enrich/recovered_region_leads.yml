@@ -1,0 +1,35 @@
+database_name: datalake_supply_flows
+table_name: recovered_region_leads
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: 'Table with the leads that were recovered from the region enrichment process, only for 1P leads'
+columns:
+  id_lead:
+    description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
+    lineage:
+      - datalake_rene_descartes_clean.house_lead.id
+  id_lead_ebdb:
+    description: The unique identifier for each lead in the EBDB Lead table.
+    lineage:
+      - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
+  id_region:
+    description: The unique identifier for each region in the region table
+    lineage:
+      - datalake_region.region.id
+  cell:
+    description: The cell of h3 that represent polygon region
+    lineage:
+      - datalake_ebdb_clean.polygon_region.polygon
+  lng:
+    description: The longitude of the lead
+    lineage:
+      - datalake_rene_descartes_clean.address.lng
+      - datalake_ebdb_clean.lead.lng
+  lat:
+    description: The latitude of the lead
+    lineage:
+      - datalake_rene_descartes_clean.address.lat
+      - datalake_ebdb_clean.lead.lat
+
+  ts_updated:
+    description: The timestamp when the lead data about region was updated in the table
