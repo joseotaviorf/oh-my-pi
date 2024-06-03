@@ -35,6 +35,10 @@ columns:
     description: Identification key of the user responsible for the workflow.
     lineage:
         - datalake_terminator_clean.termination_workflow.id_current_assignee
+  id_zendesk_task:
+    description: Ticket identification key generated in Zendesk.
+    lineage:
+        - datalake_terminator_clean.termination_task.id_external
   cancellation_info:
     description: Data with json structure that indicates detailed information about canceling termination.
     lineage:
@@ -55,6 +59,10 @@ columns:
     description: Information in json format that indicates the home's output feedback.
     lineage:
         - datalake_terminator_clean.termination.feedback
+  rescheduling_history:
+    description: Json type data that indicates the termination rescheduling history.
+    lineage:
+        - datalake_terminator_clean.termination.rescheduling_history
   workflow_current_step:
     description: Termination workflow step.
     lineage:
@@ -67,6 +75,10 @@ columns:
     description: Option to pay the termination fee.
     lineage:
         - datalake_terminator_clean.termination_fee.tenant_payment_method
+  checklist_item:
+    description: Descriptive information that indicates which checklist item the record is in the termination process.
+    lineage:
+        - datalake_terminator_clean.checklist_item.checklist_item
   is_relisting:
     description: Boolean information that indicates whether the house is already being relisting.
     lineage:
@@ -83,6 +95,14 @@ columns:
     description: Boolean information that indicates whether the termination occurred before the contract began.
   has_been_rescheduled:
     description: Boolean information that indicates whether the termination was rescheduled.
+  is_checklist_active:
+    description: Boolean information that indicates if de checklit is active.
+    lineage:
+        - datalake_terminator_clean.checklist_item.is_active
+  is_checklist_done:
+    description: Boolean information that indicates if de checklit is done.
+    lineage:
+        - datalake_terminator_clean.checklist_item.is_done
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
@@ -104,6 +124,10 @@ columns:
     description: Numerical information that indicates the number of installments for the termination fee.
     lineage:
         - datalake_terminator_clean.termination_fee.tenant_payment_method
+  dt_termination:
+    description: Date when the property became or will become vacant.
+    lineage:
+        - datalake_terminator_clean.termination.dt_termination
   dt_last_rescheduled:
     description: Date of last rescheduling of termination.
     lineage:

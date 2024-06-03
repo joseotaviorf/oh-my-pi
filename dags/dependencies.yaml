@@ -858,6 +858,8 @@ bietlejuice.dw_tenant_documentation:
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
   - bietlejuice.ebdb_proposal:load-clean-proposal-document
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
+bietlejuice.dw_terminator:
+  - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_tickets:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
@@ -2776,10 +2778,12 @@ bietlejuice.enrich_terminator:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
+  - bietlejuice.terminator:load-clean-checklist-item
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud
   - bietlejuice.terminator:load-clean-termination-fee
   - bietlejuice.terminator:load-clean-termination-fee-negotiation
+  - bietlejuice.terminator:load-clean-termination-task
   - bietlejuice.terminator:load-clean-termination-workflow
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification

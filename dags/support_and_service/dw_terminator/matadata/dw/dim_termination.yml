@@ -1,0 +1,66 @@
+
+---
+database_name: dw_terminator
+table_name: fact_termination
+description: This table aims to store termination information, each line must contain the termination record in its most current state.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_termination:
+    description: Unique termination identification key.
+    lineage:
+      - datalake_terminator.termination.id_termination
+  cancellation_info:
+    description: Data with json structure that indicates detailed information about canceling termination.
+    lineage:
+      - datalake_terminator.termination.cancellation_info
+  category:
+    description: Descriptive information about the termination category.
+    lineage:
+      - datalake_terminator.termination.category
+  requested_by:
+    description: Descriptive information that indicates the type of user who made the termination request.
+    lineage:
+      - datalake_terminator.termination.requested_by
+  status:
+    description: Current termination status.
+    lineage:
+      - datalake_terminator.termination.status
+  feedback:
+    description: Information in json format that indicates the home's output feedback.
+    lineage:
+      - datalake_terminator.termination.feedback
+  rescheduling_history:
+    description: Json type data that indicates the termination rescheduling history.
+    lineage:
+      - datalake_terminator.termination.rescheduling_history
+  workflow_current_step:
+    description: Termination workflow step.
+    lineage:
+      - datalake_terminator.termination.workflow_current_step
+  fee_negotiation_status:
+    description: Termination fee negotiation status.
+    lineage:
+      - datalake_terminator.termination.fee_negotiation_status
+  fee_payment_option:
+    description: Option to pay the termination fee.
+    lineage:
+      - datalake_terminator.termination.fee_payment_option
+  checklist_item:
+    description: Descriptive information that indicates which checklist item the record is in the termination process.
+    lineage:
+      - datalake_terminator.termination.checklist_item
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_terminator.
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.year
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.month
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.day

@@ -1,0 +1,135 @@
+---
+database_name: dw_terminator
+table_name: fact_termination
+description: This table aims to store termination information, each line must contain the termination record in its most current state.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_termination:
+    description: Unique termination identification key.
+    lineage:
+      - datalake_terminator.termination.id_termination
+  sk_contract:
+    description: Contract identification key.
+    lineage:
+      - datalake_terminator.termination.id_contract
+  sk_exit_inspection:
+    description: Identification key for the exit inspection (offboarding).
+    lineage:
+      - datalake_terminator.termination.id_exit_inspection
+  sk_house:
+    description: House identification key.
+    lineage:
+      - datalake_terminator.termination.id_house
+  sk_house_listing:
+    lineage:
+      - datalake_terminator.termination.id_house_listing
+    description: |
+      House listing identification key.
+  sk_region:
+    lineage:
+      - datalake_terminator.termination.id_region
+    description: |
+      Region identification key.
+  sk_workflow_assignee:
+    description: Identification key of the user responsible for the workflow.
+    lineage:
+      - datalake_terminator.termination.id_workflow_assignee
+  sk_zendesk_task:
+    description: Ticket identification key generated in Zendesk.
+    lineage:
+      - datalake_terminator.termination.id_zendesk_task
+  sk_termination_date:
+    description: Date when the property became or will become vacant in sk format.
+    lineage:
+      - datalake_terminator.termination.dt_termination
+  sk_last_rescheduled_date:
+    description: Date of last rescheduling of termination in sk format.
+    lineage:
+      - datalake_terminator.termination.dt_last_rescheduled
+  leadtime_request_to_vacancy:
+    description: Numerical information that indicates the number of days between the request and the vacancy for termination.
+    lineage:
+      - datalake_terminator.termination.leadtime_request_to_vacancy
+  fee_discount_percentage:
+    description: Numerical information that indicates the discount percentage for the termination fee.
+    lineage:
+      - datalake_terminator.termination.fee_discount_percentage
+  fee_discount_value:
+    description: Numerical information that indicates the discount value for the termination fee.
+    lineage:
+      - datalake_terminator.termination.fee_discount_value
+  fee_final_amount:
+    description: Numerical information that indicates the final value of the termination fee.
+    lineage:
+      - datalake_terminator.termination.fee_final_amount
+  fee_number_of_installments:
+    description:  Numerical information that indicates the number of installments for the termination fee.
+    lineage:
+      - datalake_terminator.termination.fee_number_of_installments
+  is_relisting:
+    description: Boolean information that indicates whether the house is already being relisting.
+    lineage:
+      - datalake_terminator.termination.is_relisting
+  has_automatically_closed_task:
+    description: Boolean information that indicates whether the termination task was closed automatically.
+    lineage:
+      - datalake_terminator.termination.has_automatically_closed_task
+  is_contract_b2b:
+    description: Boolean information that indicates whether the contract is b2b.
+    lineage:
+      - datalake_terminator.termination.is_contract_b2b
+  is_before_contract_start:
+    description: Boolean information that indicates whether the termination occurred before the contract began.
+    lineage:
+      - datalake_terminator.termination.is_before_contract_start
+  has_been_rescheduled:
+    description: Boolean information that indicates whether the termination was rescheduled.
+    lineage:
+      - datalake_terminator.termination.has_been_rescheduled
+  is_checklist_active:
+    description: Boolean information that indicates if de checklit is active.
+    lineage:
+      - datalake_terminator.termination.is_checklist_active
+  is_checklist_done:
+    description: Boolean information that indicates if de checklit is done.
+    lineage:
+      - datalake_terminator.termination.is_checklist_done
+  ts_termination_request:
+    description: Date in timestamp format that indicates when the termination request occurred.
+    lineage:
+      - datalake_terminator.termination.ts_termination_request
+  ts_termination_updated:
+    description: Date in timestamp format that indicates when the termination request was updated.
+    lineage:
+      - datalake_terminator.termination.ts_termination_updated
+  ts_termination_canceled:
+    description: Date in timestamp format that indicates when the cancellation of the termination occurred.
+    lineage:
+      - datalake_terminator.termination.ts_termination_canceled
+  ts_termination_finished:
+    description: Date in timestamp format that indicates when termination was completed.
+    lineage:
+      - datalake_terminator.termination.ts_termination_finished
+  ts_fee_negotiation_created:
+    description: Date in timestamp format that indicates when the trade opening for the termination fee was created.
+    lineage:
+      - datalake_terminator.termination.ts_fee_negotiation_created
+  ts_fee_negotiation_updated:
+    description: Date in timestamp format that indicates when the trade opening for the termination fee was updated.
+    lineage:
+      - datalake_terminator.termination.ts_fee_negotiation_updated
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_terminator.
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.year
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.month
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.day

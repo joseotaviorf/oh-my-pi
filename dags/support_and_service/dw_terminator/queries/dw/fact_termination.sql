@@ -1,0 +1,37 @@
+SELECT
+    id_termination AS sk_termination,
+    id_contract AS sk_contract,
+    id_exit_inspection AS sk_exit_inspection,
+    id_house AS sk_house,
+    id_house_listing AS sk_house_listing,
+    id_region AS sk_region,
+    id_workflow_assignee AS sk_workflow_assignee,
+    BIGINT(id_zendesk_task) AS sk_zendesk_task,
+    BIGINT(DATE_FORMAT(dt_termination, 'yyyyMMdd')) AS sk_termination_date,
+    BIGINT(DATE_FORMAT(dt_last_rescheduled, 'yyyyMMdd')) AS sk_last_rescheduled_date,
+    leadtime_request_to_vacancy,
+    fee_discount_percentage,
+    fee_discount_value,
+    fee_final_amount,
+    fee_number_of_installments,
+    is_relisting,
+    has_automatically_closed_task,
+    is_contract_b2b,
+    is_before_contract_start,
+    has_been_rescheduled,
+    is_checklist_active,
+    is_checklist_done,
+    ts_termination_request,
+    ts_termination_updated,
+    ts_termination_canceled,
+    ts_termination_finished,
+    ts_fee_negotiation_created,
+    ts_fee_negotiation_updated,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_terminator.termination
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
