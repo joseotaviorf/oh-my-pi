@@ -1,5 +1,6 @@
 SELECT
   h.id AS sk_house,
+  h.id_region AS sk_region,
   h.id % 892700000 AS id_short_house,
   h.condo,
   h.land_area,

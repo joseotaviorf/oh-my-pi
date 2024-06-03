@@ -148,6 +148,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.id
     description: Id of the house.
+  sk_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+    description: Id of the region.
   suites:
     lineage:
       - datalake_ebdb_listing.house.suites
