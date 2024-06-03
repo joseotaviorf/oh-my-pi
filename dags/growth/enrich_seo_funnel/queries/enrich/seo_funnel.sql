@@ -224,6 +224,7 @@ SELECT
             entrance_uri LIKE '%/regioes-atendidas%'
             OR entrance_uri LIKE '%br/condominio%'
             OR entrance_uri LIKE '%br/morar%'
+            OR entrance_uri LIKE '%/guias/%'
         THEN 'Informacional'
         WHEN 
             entrance_uri LIKE 'https://www.quintoandar.com.br/' 
@@ -251,6 +252,9 @@ SELECT
         WHEN 
             entrance_uri LIKE '%br/morar/%' 
         THEN 'Regiões atendidas'
+        WHEN 
+            entrance_uri LIKE '%/guias/%'
+        THEN 'Guias'
         WHEN 
             entrance_uri LIKE 'https://www.quintoandar.com.br/' 
             OR entrance_uri LIKE 'https://www.quintoandar.com.br'
@@ -306,6 +310,7 @@ SELECT
             entrance_uri LIKE '%/regioes-atendidas%'
             OR entrance_uri LIKE '%br/condominio%'
             OR entrance_uri LIKE '%br/morar%'
+            OR entrance_uri LIKE '%/guias/%'
             OR entrance_uri LIKE '%.com.br/imovel/%'
         THEN 'n/a'
         WHEN
@@ -336,6 +341,7 @@ SELECT
             OR entrance_uri LIKE '%/regioes-atendidas%'
             OR entrance_uri LIKE '%br/condominio%'
             OR entrance_uri LIKE '%br/morar%'
+            OR entrance_uri LIKE '%/guias/%'
             OR entrance_uri LIKE '%.com.br/apartamento/%'
         THEN 'n/a'
         WHEN 
@@ -385,6 +391,7 @@ SELECT
             OR entrance_uri LIKE '%/regioes-atendidas%'
             OR entrance_uri LIKE '%br/condominio%'
             OR entrance_uri LIKE '%br/morar%'
+            OR entrance_uri LIKE '%/guias/%'
             OR entrance_uri LIKE '%.com.br/apartamento/%'
         THEN 'n/a'
         WHEN CONTAINS(entrance_uri,'/apartamento') THEN 'Apartamento'

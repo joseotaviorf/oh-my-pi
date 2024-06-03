@@ -205,6 +205,7 @@ layer1 AS (
             WHEN page LIKE '%br/comprar/%' THEN 'Busca compra'
             WHEN page LIKE '%br/imovel/%' OR page LIKE '%br/apartamento/%' THEN 'Listing'
             WHEN page LIKE '%br/regioes-atendidas/%' OR page LIKE '%br/morar/%' THEN 'Regiões atendidas'
+            WHEN page LIKE '%/guias/%' THEN 'MeuLugar'
             WHEN page LIKE '%br/condominio/%' THEN 'Condomínio'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br' THEN 'Home'
             ELSE 'Other'
@@ -251,7 +252,7 @@ layer1 AS (
             WHEN page like '%meulugar.quintoandar%' OR page like '%conteudos.quintoandar%' THEN 'Content'
             WHEN page like '%help.quintoandar%' THEN 'Help'
             WHEN page LIKE '%br/alugar/%' OR page LIKE '%br/comprar/%' OR page LIKE '%br/imovel/%' OR page LIKE '%br/apartamento/%' THEN 'Transacional'
-            WHEN page LIKE '%br/regioes-atendidas%' OR page LIKE '%br/condominio/%' OR page LIKE '%br/morar/%' THEN 'Informacional'
+            WHEN page LIKE '%br/regioes-atendidas%' OR page LIKE '%br/condominio/%' OR page LIKE '%br/morar/%' OR page LIKE '%/guias/%' THEN 'Informacional'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br' THEN 'Home'
             ELSE 'Other'
         END AS estruturas,
@@ -339,7 +340,7 @@ layer2 AS (
         impressions,
         posimp,
         CASE
-            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
+            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN page LIKE '%/regioes-atendidas%' OR page LIKE '%br/condominio%' OR page LIKE '%br/morar%' THEN 'n/a' 
@@ -373,7 +374,7 @@ layer2 AS (
             ELSE 'Other'
         END AS combinacao_de_filtros,
         CASE
-            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
+            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN REGEXP_LIKE(caminho_da_pagina, '/imovel/[0-9]/') THEN 'n/a'
@@ -388,7 +389,7 @@ layer2 AS (
             ELSE 'n/a'
         END AS filtro,
         CASE
-            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
+            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN estruturas = 'Informacional' THEN 'n/a'
@@ -401,7 +402,7 @@ layer2 AS (
         ELSE 'n/a'
         END AS filtro_condo,
         CASE
-            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
+            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN estruturas = 'Informacional' THEN 'n/a'
@@ -424,7 +425,7 @@ layer2 AS (
             ELSE 'n/a'
         END AS filtro_house_char,
         CASE
-            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
+            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN estruturas = 'Informacional' THEN 'n/a'
@@ -437,7 +438,7 @@ layer2 AS (
             ELSE 'n/a'
         END AS filtro_house_type,
         CASE
-            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
+            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN page LIKE '%/regioes-atendidas%' OR page LIKE '%br/condominio%' OR page LIKE '%br/morar%' THEN 'n/a' 
@@ -464,7 +465,7 @@ layer2 AS (
             ELSE 'Other'   
         END AS filtro_1,
         CASE
-            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
+            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN page
             WHEN REGEXP_LIKE(page, 'com.br/imovel/') THEN page
@@ -481,7 +482,7 @@ layer2 AS (
             ELSE page
         END AS lp_sem_filtro,
         CASE
-            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
+            WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
             WHEN page LIKE '%/regioes-atendidas%' OR page LIKE '%br/condominio%' OR page LIKE '%br/morar%' THEN 'n/a' 
