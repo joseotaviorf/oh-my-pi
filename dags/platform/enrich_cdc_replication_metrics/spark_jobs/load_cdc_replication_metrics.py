@@ -2,7 +2,6 @@ import logging
 import json
 from argparse import ArgumentParser
 from pyspark.sql.functions import col
-from bietlejuice.clients.db_clients import SparkClient
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.messaging_services.gchat_service import GChatService
@@ -104,7 +103,6 @@ def get_metrics_df(start_date, end_date):
     logger.info(
         "m=get_metrics_df, msg=Generating the df_metrics for all tables..."
     )
-    spark_client = SparkClient()
     is_first_iteration = True 
     database_names = [database.name for database in spark.catalog.listDatabases() if database.name.endswith("_transactional") and not database.name.endswith("test_transactional")]
 

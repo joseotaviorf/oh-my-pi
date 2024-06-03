@@ -21,4 +21,4 @@ workflow:
   tables_customization:
     cdc_replication_metrics: {}
 cluster:
-  type: databricks_12_2_min_io-memory_cluster
+  type: databricks_12_2_med_general_cluster
