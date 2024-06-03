@@ -270,3 +270,38 @@ class BaseWorkflow(BuilderInterface):
         """
 
         return "short_circuit_customization" in self.workflow_args
+
+    def _check_include_get_table_metrics_task(self, tables_customization: dict) -> bool:
+        if self.workflow_args["database_type"] != "postgres":
+            return False
+        for table_parameters in tables_customization.values():
+            if "get_table_metrics" in table_parameters:
+                return True
+        return False
+
+    # TODO: Rethink our abstractions. This method is only here because it's used in multiple workflows, but it's a little strange to have it here.
+    def _create_generate_metrics_task_group(
+        self, generate_table_metrics_task_creator, sync_metadata_task_creator
+    ) -> Tuple:
+        """
+        Creates the generate table metrics task, sets the dependencies between the tasks and returns the first and last task of the group.
+        """
+        clean_metrics_table_attributes = TableAttributes(
+            self.dag_args,
+            self.workflow_args,
+            LayerEnum.CLEAN,
+            "table_ingestion_metrics",
+            table_customization={"custom_schema": "data_quality_ingestion_metrics"},
+        )
+
+        sync_metadata = sync_metadata_task_creator.create_task(
+            clean_metrics_table_attributes
+        )
+
+        get_table_metrics_task = generate_table_metrics_task_creator.create_task(
+            clean_metrics_table_attributes
+        )
+
+        get_table_metrics_task >> sync_metadata
+
+        return get_table_metrics_task, sync_metadata

@@ -77,6 +77,9 @@ class RawCDCWorkflow(BaseWorkflow):
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
+        self.generate_postgres_table_metrics_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.GENERATE_POSTGRES_TABLE_METRICS
+        )
 
     def _get_transactional_tables(self) -> List[TableAttributes]:
         """Returns the table attributes for all the tables in the transactional layer."""
@@ -122,9 +125,7 @@ class RawCDCWorkflow(BaseWorkflow):
         """Creates all the tasks for the workflow and sets their dependencies."""
 
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
-        dummy_terminate_job_cluster_task = (
-            self.dummy_job_cluster_finished_task_creator.create_task()
-        )
+        dag_final_tasks = self._set_dag_final_tasks()
         optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
             transactional_tables,
             parallelism=2,  # Lower because we don't want to overload the cluster while the next layers are being loaded
@@ -144,23 +145,19 @@ class RawCDCWorkflow(BaseWorkflow):
                 transactional_table, optimize_transactional_task
             )
             raw_initial_task, raw_final_task = self._create_raw_tasks(
-                raw_table,
-                optimize_raw_task,
-                dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
+                raw_table, optimize_raw_task, dag_final_tasks=dag_final_tasks
             )
             clean_initial_task, clean_final_task = self._create_clean_tasks(
-                clean_table,
-                optimize_clean_task,
-                dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
+                clean_table, optimize_clean_task, dag_final_tasks=dag_final_tasks
             )
             execute_job_cluster_task >> transactional_initial_task
             transactional_final_task >> raw_initial_task
             raw_final_task >> clean_initial_task
-            clean_final_task >> dummy_terminate_job_cluster_task
+            clean_final_task >> dag_final_tasks
 
-        optimize_transactional_task >> dummy_terminate_job_cluster_task
-        optimize_raw_task >> dummy_terminate_job_cluster_task
-        optimize_clean_task >> dummy_terminate_job_cluster_task
+        optimize_transactional_task >> dag_final_tasks
+        optimize_raw_task >> dag_final_tasks
+        optimize_clean_task >> dag_final_tasks
 
     def _create_transactional_tasks(
         self,
@@ -180,10 +177,7 @@ class RawCDCWorkflow(BaseWorkflow):
         return load_cdc_transactional_task, load_cdc_transactional_task
 
     def _create_raw_tasks(
-        self,
-        raw_table_attributes: TableAttributes,
-        optimize_raw_task,
-        dummy_terminate_job_cluster_task,
+        self, raw_table_attributes: TableAttributes, optimize_raw_task, dag_final_tasks
     ) -> Tuple:
         """
         Creates raw tasks, sets their internal dependencies and returns the first
@@ -211,20 +205,16 @@ class RawCDCWorkflow(BaseWorkflow):
                 (
                     register_delta_table_raw_task
                     >> propagate_table_lineage_raw_task
-                    >> dummy_terminate_job_cluster_task
+                    >> dag_final_tasks
                 )
             else:
-                register_delta_table_raw_task >> dummy_terminate_job_cluster_task
+                register_delta_table_raw_task >> dag_final_tasks
 
         if self._check_include_data_quality_task(raw_table_attributes_lower_case):
             data_quality_tests_raw_task = self.data_quality_task_creator.create_task(
                 raw_table_attributes_lower_case
             )
-            (
-                load_raw_task
-                >> data_quality_tests_raw_task
-                >> dummy_terminate_job_cluster_task
-            )
+            (load_raw_task >> data_quality_tests_raw_task >> dag_final_tasks)
 
         return load_raw_task, load_raw_task
 
@@ -232,7 +222,7 @@ class RawCDCWorkflow(BaseWorkflow):
         self,
         clean_table_attributes: TableAttributes,
         optimize_clean_task,
-        dummy_terminate_job_cluster_task,
+        dag_final_tasks,
     ) -> Tuple:
         """
         Creates clean tasks, sets their internal dependencies and returns the first
@@ -265,10 +255,28 @@ class RawCDCWorkflow(BaseWorkflow):
             data_quality_tests_clean_task = self.data_quality_task_creator.create_task(
                 clean_table_attributes
             )
-            (
-                load_clean_task
-                >> data_quality_tests_clean_task
-                >> dummy_terminate_job_cluster_task
-            )
+            (load_clean_task >> data_quality_tests_clean_task >> dag_final_tasks)
 
         return load_clean_task, last_clean_task
+
+    def _set_dag_final_tasks(self):
+        """
+        The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
+        This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
+        it simply returns the dummy_terminate_job_cluster_task.
+        """
+        dummy_terminate_job_cluster_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
+        )
+
+        if self._check_include_get_table_metrics_task(
+            self.workflow_args["tables_customization"]
+        ):
+            first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
+                self.generate_postgres_table_metrics_task_creator,
+                self.sync_metadata_task_creator,
+            )
+            last_metrics_task >> dummy_terminate_job_cluster_task
+            return first_metrics_task
+        else:
+            return dummy_terminate_job_cluster_task

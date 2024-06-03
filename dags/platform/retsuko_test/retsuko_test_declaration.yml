@@ -21,21 +21,45 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   tables_customization:
-    account: {}
-    audit: {}
-    boleto: {}
-    contract: {}
-    credit_card_payment: {}
-    entry: {}
+    account:
+      get_table_metrics:
+        count: external_id
+    audit:
+      get_table_metrics:
+        count: id
+    boleto:
+      get_table_metrics:
+        count: external_id
+        max: retsuko_updated_at
+    contract:
+      get_table_metrics:
+        count: external_id
+    credit_card_payment:
+      get_table_metrics:
+        count: external_id
+    entry:
+      get_table_metrics:
+        count: external_id
+        max: retsuko_updated_at
     entry_partitioned: {}
     file: {}
-    invoice: {}
+    invoice:
+      get_table_metrics:
+        count: external_id
+        max: retsuko_updated_at
     invoice_entry:
       raw_primary_keys: [invoice_id, entry_id]
+      get_table_metrics:
+        count: entry_id
+        max: created_at
     invoice_partitioned: {}
     manual_entry: {}
-    monthly_closing_checks: {}
+    monthly_closing_checks:
+      get_table_metrics:
+        count: id
     recurrent_credit_card: {}
-    sap_entity: {}
+    sap_entity:
+      get_table_metrics:
+        count: id
 cluster:
   type: databricks_12_2_med_general_cluster

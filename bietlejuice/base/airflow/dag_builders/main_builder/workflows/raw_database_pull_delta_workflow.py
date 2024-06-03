@@ -100,29 +100,23 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         optimize_clean_task = self.optimize_delta_table_task_creator.create_task(
             clean_tables
         )
-        dummy_terminate_job_cluster_task = (
-            self.dummy_job_cluster_finished_task_creator.create_task()
-        )
-        last_task = self._create_generate_metrics_task(dummy_terminate_job_cluster_task)
+        dag_final_tasks = self._set_dag_final_tasks()
 
         for raw_table, clean_table in zip(raw_tables, clean_tables):
             raw_initial_task, raw_final_task = self._create_raw_tasks(
-                raw_table,
-                dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
+                raw_table, dag_final_tasks=dag_final_tasks
             )
             clean_initial_task, clean_final_task = self._create_clean_tasks(
-                clean_table,
-                optimize_clean_task,
-                dummy_terminate_job_cluster_task=dummy_terminate_job_cluster_task,
+                clean_table, optimize_clean_task, dag_final_tasks=dag_final_tasks
             )
             execute_job_cluster_task >> raw_initial_task
             raw_final_task >> clean_initial_task
-            clean_final_task >> dummy_terminate_job_cluster_task
+            clean_final_task >> dag_final_tasks
 
-        optimize_clean_task >> last_task
+        optimize_clean_task >> dag_final_tasks
 
     def _create_raw_tasks(
-        self, raw_table_attributes: TableAttributes, dummy_terminate_job_cluster_task
+        self, raw_table_attributes: TableAttributes, dag_final_tasks
     ) -> Tuple:
         """
         Creates raw tasks, sets their internal dependencies and returns the first
@@ -149,17 +143,13 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
                     raw_table_attributes, "--bypass-propagate"
                 )
 
-            (load_raw_task >> sync_metadata >> dummy_terminate_job_cluster_task)
+            (load_raw_task >> sync_metadata >> dag_final_tasks)
 
         if self._check_include_data_quality_task(raw_table_attributes):
             data_quality_tests_raw_task = self.data_quality_task_creator.create_task(
                 raw_table_attributes
             )
-            (
-                load_raw_task
-                >> data_quality_tests_raw_task
-                >> dummy_terminate_job_cluster_task
-            )
+            (load_raw_task >> data_quality_tests_raw_task >> dag_final_tasks)
 
         return load_raw_task, load_raw_task
 
@@ -167,7 +157,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         self,
         clean_table_attributes: TableAttributes,
         optimize_clean_task: dict,
-        dummy_terminate_job_cluster_task,
+        dag_final_tasks,
     ) -> Tuple:
         """
         Creates clean tasks, sets their internal dependencies and returns the first
@@ -195,52 +185,28 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             data_quality_tests_clean_task = self.data_quality_task_creator.create_task(
                 clean_table_attributes
             )
-            (
-                load_clean_task
-                >> data_quality_tests_clean_task
-                >> dummy_terminate_job_cluster_task
-            )
+            (load_clean_task >> data_quality_tests_clean_task >> dag_final_tasks)
 
         return load_clean_task, last_clean_task
 
-    def _should_add_get_table_metrics(self, tables_customization: dict) -> bool:
-        if self.workflow_args["database_type"] != "postgres":
-            return False
-        for table_parameters in tables_customization.values():
-            if "get_table_metrics" in table_parameters:
-                return True
-        return False
-
-    def _create_generate_metrics_task(self, dummy_terminate_job_cluster_task) -> Tuple:
+    def _set_dag_final_tasks(self):
         """
-        Creates the generate table metrics task when requested, sets the dependencies between the tasks and returns the last task of the dependency flow.
+        The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
+        This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
+        it simply returns the dummy_terminate_job_cluster_task.
         """
+        dummy_terminate_job_cluster_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
+        )
 
-        if self._should_add_get_table_metrics(
+        if self._check_include_get_table_metrics_task(
             self.workflow_args["tables_customization"]
         ):
-            clean_metrics_table_attributes = TableAttributes(
-                self.dag_args,
-                self.workflow_args,
-                LayerEnum.CLEAN,
-                "table_ingestion_metrics",
-                table_customization={"custom_schema": "data_quality_ingestion_metrics"},
+            first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
+                self.generate_postgres_table_metrics_task_creator,
+                self.sync_metadata_task_creator,
             )
-
-            sync_metadata = self.sync_metadata_task_creator.create_task(
-                clean_metrics_table_attributes
-            )
-
-            get_table_metrics_task = self.generate_postgres_table_metrics_task_creator.create_task(
-                clean_metrics_table_attributes
-            )
-
-            get_table_metrics_task >> sync_metadata >> dummy_terminate_job_cluster_task
-
-            metrics_task = get_table_metrics_task
+            last_metrics_task >> dummy_terminate_job_cluster_task
+            return first_metrics_task
         else:
-            metrics_task = (
-                dummy_terminate_job_cluster_task
-            )  # If the metrics task should not be included in the workflow, the terminate job cluster task is returned
-
-        return metrics_task
+            return dummy_terminate_job_cluster_task
