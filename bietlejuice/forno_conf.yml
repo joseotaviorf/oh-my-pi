@@ -790,6 +790,17 @@ databricks_12_2_med_people_cluster:
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
+databricks_12_2_min_analytical_costs_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_analytical_environment_costs }}"
+
 databricks_10_4_med_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5d.xlarge
