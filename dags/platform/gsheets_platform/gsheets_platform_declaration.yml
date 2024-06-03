@@ -1,0 +1,30 @@
+dag:
+  name: gsheets_platform
+  schedule_interval: 0 2 * * *
+  owner: Data Platform
+workflow:
+  type: gsheets
+  layer: raw
+  custom_schema: gsheets
+  has_hive_sync: False
+  bucket_config_name: analytical_environment_costs_bucket
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        ebs_volume_size: 200
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_analytical_environment_costs }}"
+  access_control_list:
+    group_name: analytical-environment-costs
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
+    - pypi:
+        package: "google-auth==2.13.0"
+    - pypi:
+        package: "google-api-python-client==2.55.0"

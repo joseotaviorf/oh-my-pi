@@ -1,0 +1,7 @@
+---
+database_name: datalake_gsheets_raw
+table_name: databricks_contract_details
+columns:
+  dbu_price:
+    tags:
+      - Confidential

@@ -1,0 +1,6 @@
+sheets_info:
+  databricks_contract_details:
+    sheet_id: 1x9IL5LMQFQu-6Xl-G1dqW6uvQQgpoNgKLvL_XYrUeuQ
+    sheet_name: databricks_contract_details
+    clean_table_name: databricks_contract_details
+    sheet_context: platform

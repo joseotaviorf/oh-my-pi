@@ -1,0 +1,23 @@
+---
+database_name: datalake_gsheets_clean
+table_name: databricks_contract_details
+description: Table based on a gsheet that aims to store databricks contract information.
+domain: Data Platform
+owner: data-platform-team@quintoandar.com.br
+columns:
+  cluster_compute_type:
+    description: Descriptive information that indicates whether the cluster is all-purpose, for example.
+    lineage:
+      - datalake_gsheets_raw.databricks_contract_details.sku
+  dbu_price:
+    description: Numerical information that indicates the dbu cost per type of processing. This is sensitive data.
+    lineage:
+      - datalake_gsheets_raw.databricks_contract_details.dbu_price
+  dt_contract_started:
+    description: Information in date format that indicates when the contract began.
+    lineage:
+      - datalake_gsheets_raw.databricks_contract_details.dt_contract_started
+  dt_contract_ended:
+    description: Information in date format that indicates when the contract was terminated.
+    lineage:
+      - datalake_gsheets_raw.databricks_contract_details.dt_contract_ended

@@ -134,6 +134,7 @@ incoming_bucket: 5a-datalake-incoming-prod
 doc_md_chart_url: https://n2065e18540524a1cp-tp.appspot.com/admin/airflow/chart?chart_id=11&iteration_no=22&dag_id=
 dw_bucket: 5a-dw-prod
 people_bucket: people-s3-data-quintoandar-com-br
+analytical_environment_costs_bucket: 5a-analytical-environment-costs-prod
 inmetro_bucket: s3://inmetro-s3-data-quintoandar-com-br
 metrics_bucket: 5a-business-metrics-com-br-prod
 minority_report_endpoint: https://minority-report-api.quintoandar.com.br/profile/batch
