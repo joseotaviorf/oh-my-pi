@@ -13,5 +13,7 @@ workflow:
     dag:
       - dag_run
       - line
+    table:
+      - dag
 cluster:
   type: databricks_12_2_med_general_photon_cluster

@@ -1,0 +1,44 @@
+---
+database_name: datalake_pipeline
+table_name: table
+description: This table has all the tables created in Airflow (except for Reverse layer),
+  identified by the id_table.
+domain: Cross
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_table:
+    lineage:
+      - datalake_dag_inventory_clean.table.table
+    description: Table id, which is the table schema + table name. It must be unique.
+  id_dag:
+    lineage:
+      - datalake_pipeline.dag.id_dag
+    description: DAG id, which is also the DAG name on Airflow related to the table.
+  id_task:
+    lineage:
+      - datalake_dag_inventory_clean.table.task
+    description: Task id, which is the task name of the DAG on Airflow that creates the table.
+  id_line:
+    lineage:
+      - datalake_pipeline.dag.id_line
+    description: Unique id that identifies the line that is the owner of the table.
+  table_name:
+    lineage:
+      - datalake_dag_inventory_clean.table.table
+    description: Table name.
+  schema:
+    lineage:
+      - datalake_dag_inventory_clean.table.table
+    description: Schema of the table.
+  layer:
+    lineage:
+      - datalake_dag_inventory_clean.table.layer
+    description: Layer of the table.
+  avg_file_size_in_bytes:
+    lineage:
+      - datalake_dag_inventory_clean.table.avg_file_size_in_bytes
+    description: Table's average file zie in bytes.
+  is_delta:
+    lineage:
+      - datalake_dag_inventory_clean.table.is_delta
+    description: Boolean flag indicating if the table is in Delta.

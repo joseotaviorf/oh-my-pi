@@ -492,6 +492,7 @@ bietlejuice.enrich_pipeline:
     - bietlejuice.composer:load-clean-dag
     - bietlejuice.composer:load-clean-dag-run
     - bietlejuice.composer:load-clean-log
+    - bietlejuice.dag_inventory:load-clean-table
     - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list
 bietlejuice.enrich_recommendations:
   add:
