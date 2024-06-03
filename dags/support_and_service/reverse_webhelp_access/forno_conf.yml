@@ -1,4 +1,4 @@
-database_name: reverse_webhelp
+database_name: datalake_reverse_webhelp
 azure_container_name: lake-quinto-andar-hml
 
 tables:
