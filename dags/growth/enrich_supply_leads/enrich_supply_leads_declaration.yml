@@ -17,6 +17,9 @@ workflow:
     recovered_region_leads:
       merge_on: ["id_lead"]
       z_order_by: ["id_lead"]
+    lead_origin:
+      merge_on: ["id_lead"]
+      z_order_by: ["id_lead"]
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:

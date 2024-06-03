@@ -2690,6 +2690,8 @@ bietlejuice.enrich_supply_acquisition:
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-mailing
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
+  - bietlejuice.enrich_supply_leads:load-enrich-lead-origin
+  - bietlejuice.enrich_supply_leads:load-enrich-recovered-region-leads
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-address
   - bietlejuice.rene_descartes:load-clean-house-lead
@@ -2721,6 +2723,8 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
   - bietlejuice.ebdb:load-clean-lead
   - bietlejuice.ebdb:load-clean-polygon-region
+  - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
+  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-address
   - bietlejuice.rene_descartes:load-clean-house-lead
   - bietlejuice.rene_descartes:load-clean-house-lead-conversion

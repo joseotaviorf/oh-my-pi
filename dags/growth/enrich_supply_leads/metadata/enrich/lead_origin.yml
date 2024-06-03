@@ -1,0 +1,87 @@
+database_name: datalake_supply_flows
+table_name: lead_origin
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table contains acquisition data extracted from the René Descartes and Amplitude service that will be used to track our leads in the supply domain.
+columns:
+  id_lead:
+    description: The unique identifier for each lead in the dataset.
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead.id
+      - datalake_amplitude_lead.lead_origin.formfield_lead_uuid
+      - datalake_amplitude_lead.lead_origin.id_firestore
+  id_lead_ebdb:
+    description: The lead's identifier in the EBDB/Monolith.
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
+  id_firestore:
+    description: The lead's identifier in the Firestore database.
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead.id_external_reference
+  affiliate_type:
+    description: The type of affiliate associated with the lead's acquisition campaign.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  campaign:
+    description: The campaign of the lead, referring to utm_campaign where the lead originated.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_campaign
+  medium:
+    description: The medium of the lead, referring to utm_medium where the lead originated.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_medium
+  source:
+    description: The source of the lead, referring to utm_source where the lead originated.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_source
+  ops_agent:
+    description: The operational agent responsible for handling the lead.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ops_partner:
+    description: The operational partner associated with the lead.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  application:
+    description: The origin or application from which the lead originated.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  city:
+    description: The city associated with the lead's acquisition.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.city
+  landing_page:
+    description: The landing page URL where the lead first arrived.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ops_approach:
+    description: The approach used by operational teams to engage with the lead.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ops_contact_medium:
+    description: The medium through which operational teams contacted the lead.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  platform:
+    description: The platform where the lead was acquired.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.platform
+  lead_type:
+    description: The type of lead
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  original_lead:
+    description: The identifier of the original lead if the current lead is a result of reprocessing process.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ts_event:
+    description: The timestamp of the lead creation event.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
+  ts_load:
+    description: The timestamp of the data load.
