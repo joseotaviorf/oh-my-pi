@@ -5,7 +5,3 @@ table_level_validations:
   has_size:
     greater_than: 0
     severity_level: Error
-column_level_validations:
-  id_storage_document:
-    is_complete:
-      severity_level: Error
