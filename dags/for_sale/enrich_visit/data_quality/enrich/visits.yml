@@ -1,5 +1,5 @@
 ---
-table_name: datalake_visit.visit_status_events
+table_name: datalake_visit.visits
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

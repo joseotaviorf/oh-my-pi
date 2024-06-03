@@ -1,5 +1,5 @@
 database_name: datalake_visit
-table_name: visit_status_events
+table_name: visits
 description: Information about Rent and Sale visits.
   Each row is an unique visit with the most important information's.
 domain: Data ForSale
