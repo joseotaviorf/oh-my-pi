@@ -1,0 +1,119 @@
+---
+database_name: datalake_brokers_supply_processor
+table_name: analytic_event
+owner: ae-rede@quintoandar.com.br
+domain: Rede
+description: 'Each row represents an event recorded by the CRM associated with a lead 3p.'
+columns:
+  id:
+    description: 'Unique identifier of the event, table primary key.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.id
+  id_tracking:
+    description: 'Identifier of the tracking.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.id_tracking
+  uuid_event:
+    description: 'Identifier of the event, in uuid format.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.uuid_event
+  uuid_lead:
+    description: 'Identifier of the lead, in uuid format. Can be joined with datalake_ebdb_clean.house.id_external.' 
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.uuid_lead
+  event_properties_user:
+    description: 'Identifier of the user who updated the event properties.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_rent_price:
+    description: 'The lead rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_10:
+    description: '10th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_20:
+    description: '20th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_30:
+    description: '30th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_40:
+    description: '40th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_50:
+    description: '50th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_60:
+    description: '60th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_70:
+    description: '70th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_80:
+    description: '80th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_rent_90:
+    description: '90th percentile of rent price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_details_description:
+    description: 'Detailed description of the lead from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_city:
+    description: 'Lead city from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_address:
+    description: 'Lead address from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_zipcode:
+    description: 'Lead zipcode from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_bedrooms:
+    description: 'Number of lead bedrooms from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  enrichment_features:
+    description: 'Lead Amenities List from enrichment forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  completeness_score:
+    description: 'Completeness score associated with the lead.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  ts_event:
+    description: 'Timestamp of when the event was captured.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.ts_event
+  ts_created:
+    description: 'Timestamp of when the event was created.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.ts_created
+  ts_updated:
+    description: 'Timestamp of when the event was updated.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.ts_updated
+  year:
+    description: 'Year of when the event was updated.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.year
+  month:
+    description: 'Month of when the event was updated.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.month
+  day:
+    description: 'Day of when the event was updated.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.day

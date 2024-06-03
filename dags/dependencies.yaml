@@ -1196,6 +1196,7 @@ bietlejuice.enrich_brokerage:
   - bietlejuice.nazare_2:load-clean-offer-agent
   - bietlejuice.nazare_2:load-clean-revenue-share-by-participant
 bietlejuice.enrich_brokers_supply_processor:
+  - bietlejuice.brokers_supply_processor:load-clean-analytic-event
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail
   - bietlejuice.brokers_supply_processor:load-clean-file
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
