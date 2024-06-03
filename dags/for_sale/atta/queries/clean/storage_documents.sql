@@ -14,7 +14,10 @@ SELECT
   Tamanho AS file_size,
   NomeArquivo AS file_name,
   `_OCR` AS extracted_data,
-  TIMESTAMP(EnviadoEm) AS ts_sent,
-  TIMESTAMP(AtualizadoEm) AS ts_updated
+  EnviadoEm AS ts_sent,
+  CASE 
+      WHEN AtualizadoEm = "0001-01-01T00:00:00.000+00:00" THEN TIMESTAMP("1970-01-01T00:00:00.000+00:00")
+      ELSE AtualizadoEm
+  END ts_updated
 FROM
   datalake_atta_raw.storagedocumentos
