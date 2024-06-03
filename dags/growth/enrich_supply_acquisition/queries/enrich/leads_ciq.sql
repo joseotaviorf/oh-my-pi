@@ -12,10 +12,7 @@ SELECT
     hd.status AS aux_product_status,
     hd.city, 
     hd.ts_created AS ts_event,
-    CURRENT_TIMESTAMP() AS ts_load,
-    YEAR(hd.ts_created) AS year,
-    MONTH(hd.ts_created) AS month,
-    DAY(hd.ts_created) AS day
+    CURRENT_TIMESTAMP() AS ts_load
 FROM datalake_supply_flows.leads_sks AS ls
 JOIN datalake_bob.house_draft_business_context AS hd
   ON (ls.id_lead = hd.id_draft)

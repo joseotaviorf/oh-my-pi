@@ -8,8 +8,7 @@ WITH lead_acquisition AS (
         l3p.aux_hash,
         l3p.ts_event
     FROM datalake_supply_flows.leads_sks AS ls
-    -- TO-DO: changing to supply_flows schema
-    JOIN datalake_supply_flows_migrate.landing_3p AS l3p 
+    JOIN datalake_supply_flows.landing_3p AS l3p 
         ON ls.id_lead = l3p.id_lead_3p
             AND l3p.growth_status = 'LEAD'
     WHERE ls.source = '3P' 
@@ -29,9 +28,6 @@ SELECT
     status AS aux_product_status,
     aux_hash,
     ts_event,
-    CURRENT_TIMESTAMP() AS ts_load,
-    YEAR(ts_event) AS year,
-    MONTH(ts_event) AS month,
-    DAY(ts_event) AS day
+    CURRENT_TIMESTAMP() AS ts_load
 FROM lead_acquisition
 WHERE DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

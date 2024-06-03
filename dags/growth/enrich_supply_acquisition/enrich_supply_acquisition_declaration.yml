@@ -9,30 +9,34 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  custom_schema: supply_flows_migrate
-  default_partitions: ["year", "month", "day"]
+  custom_schema: supply_flows
   default_extraction_type: incremental
   tables_customization:
-    leads_1p:
-      merge_on: ["sk_supply_lead", "business_context"]
-      custom_schema: supply_flows
-      partitions: []
-    prospects_1p:
-      # This table must be revisited so that the load is incremental
-      extraction_type: full
-      merge_on: ["sk_supply_lead", "business_context"]
-      custom_schema: supply_flows
-      partitions: []
     conversion_lookup:
       merge_on: ["id_house", "business_context"]
       zorder_by: ["id_house", "business_context", "id_lead"]
-      custom_schema: supply_flows
-      partitions: []
     landing_3p:
       extraction_type: full
-      zorder_by: ["id_lead_3p", "business_context", "id_house"]  
-      custom_schema: supply_flows
-      partitions: []
+      zorder_by: ["id_lead_3p", "business_context", "id_house"]
+    leads_1p:
+      merge_on: ["sk_supply_lead", "business_context"]
+      zorder_by: ["sk_supply_lead", "business_context", "id_lead"]
+    leads_3p:
+      merge_on: ["sk_supply_lead", "business_context"]
+      zorder_by: ["sk_supply_lead", "business_context", "id_lead"]
+    leads_ciq:
+      merge_on: ["sk_supply_lead", "business_context"]
+      zorder_by: ["sk_supply_lead", "business_context", "id_lead"]
+    prospects_1p: # This table must be revisited so that the load is incremental
+      extraction_type: full
+      merge_on: ["sk_supply_lead", "business_context"]
+      zorder_by: ["sk_supply_lead", "business_context", "id_lead"]
+    prospects_3p:
+      merge_on: ["sk_supply_lead", "business_context"]
+      zorder_by: ["sk_supply_lead", "business_context", "id_lead"]
+    prospects_ciq:
+      merge_on: ["sk_supply_lead", "business_context"]
+      zorder_by: ["sk_supply_lead", "business_context", "id_lead"]
     acquisition_tracking:
       extraction_type: full
       partitions: []
@@ -60,4 +64,4 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
-  type: databricks_12_2_min_io-memory_photon_cluster
+  type: databricks_12_2_med_io-memory_photon_cluster

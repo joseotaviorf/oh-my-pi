@@ -17,7 +17,7 @@ WITH conversion_l2p AS (
         l3p.aux_hash,
         l3p.ts_event
     FROM datalake_supply_flows.leads_sks AS ls
-    LEFT JOIN datalake_supply_flows_migrate.landing_3p AS l3p
+    LEFT JOIN datalake_supply_flows.landing_3p AS l3p
         ON ls.id_lead = l3p.id_lead_3p
             AND l3p.growth_status = 'PROSPECT'
     WHERE ls.source = '3P' 
@@ -27,7 +27,7 @@ WITH conversion_l2p AS (
 drop_l2p AS (
     -- Here we are going to remove all leads that converted
     SELECT l.aux_hash
-    FROM datalake_supply_flows_migrate.leads_3p AS l
+    FROM datalake_supply_flows.leads_3p AS l
     LEFT ANTI JOIN conversion_l2p
         USING (aux_hash) 
     GROUP BY ALL
@@ -35,7 +35,7 @@ drop_l2p AS (
 discards_events AS (
     -- Here we are going to bring all the leads that were discarded based in hash
     SELECT *
-    FROM datalake_supply_flows_migrate.landing_3p
+    FROM datalake_supply_flows.landing_3p
     WHERE aux_round_number = 1
         AND aux_hash IN (SELECT * FROM drop_l2p)
         AND DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
@@ -79,10 +79,7 @@ SELECT
     aux_product_status,
     aux_hash,
     ts_event,
-    CURRENT_TIMESTAMP() AS ts_load,
-    YEAR(ts_event) AS year,
-    MONTH(ts_event) AS month,
-    DAY(ts_event) AS day
+    CURRENT_TIMESTAMP() AS ts_load
 FROM discards_l2p
 UNION ALL
 SELECT 
@@ -100,8 +97,5 @@ SELECT
     aux_product_status,
     aux_hash,
     ts_event,
-    CURRENT_TIMESTAMP() AS ts_load,
-    YEAR(ts_event) AS year,
-    MONTH(ts_event) AS month,
-    DAY(ts_event) AS day
+    CURRENT_TIMESTAMP() AS ts_load
 FROM conversion_l2p

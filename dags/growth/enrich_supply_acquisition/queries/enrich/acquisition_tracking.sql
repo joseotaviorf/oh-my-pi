@@ -59,7 +59,7 @@ WITH 1p_union AS
         funnel_level,
         ts_event,
         ts_load
-    FROM datalake_supply_flows_migrate.leads_3p
+    FROM datalake_supply_flows.leads_3p
     UNION
     SELECT 
         sk_supply_lead,
@@ -77,7 +77,7 @@ WITH 1p_union AS
         funnel_level,
         ts_event,
         ts_load
-    FROM datalake_supply_flows_migrate.prospects_3p
+    FROM datalake_supply_flows.prospects_3p
 ),
 
 ciq_union AS (
@@ -98,7 +98,7 @@ ciq_union AS (
         funnel_level,
         ts_event,
         ts_load
-    FROM datalake_supply_flows_migrate.leads_ciq
+    FROM datalake_supply_flows.leads_ciq
     UNION 
     SELECT 
         sk_supply_lead,
@@ -116,7 +116,7 @@ ciq_union AS (
         funnel_level,
         ts_event,
         ts_load
-    FROM datalake_supply_flows_migrate.prospects_ciq
+    FROM datalake_supply_flows.prospects_ciq
 ),
 event_tracking_1p AS (
     SELECT
