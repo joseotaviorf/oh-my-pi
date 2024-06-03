@@ -7,7 +7,7 @@ workflow:
   type: query
   layer: metric
 cluster:
-  type: databricks_10_4_med_general_photon_cluster
+  type: databricks_12_2_med_2xlarge_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
