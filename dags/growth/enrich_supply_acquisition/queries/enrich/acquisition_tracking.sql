@@ -10,7 +10,6 @@ WITH 1p_union AS
         id_referred_by,
         CAST(NULL AS INTEGER) AS id_wololo,
         CAST(NULL AS INTEGER) AS id_house,
-        id_user_registrant,
         business_event,
         funnel_step,
         supply_source,
@@ -19,7 +18,7 @@ WITH 1p_union AS
         CAST(NULL AS STRING) AS ops_assigned,
         funnel_level,
         ts_event,
-        ts_updated AS ts_load -- TO-DO: Change to ts_load in leads_1p
+        ts_load
     FROM datalake_supply_flows.leads_1p
     UNION
     SELECT
@@ -31,7 +30,6 @@ WITH 1p_union AS
         id_referred_by,
         id_wololo,
         id_house,
-        id_user_registrant,
         business_event,
         funnel_step,
         supply_source,
@@ -130,7 +128,6 @@ event_tracking_1p AS (
         et.id_referred_by,
         et.id_wololo,
         et.id_house,
-        et.id_user_registrant,
         et.business_event,
         et.funnel_step,
         et.supply_source,
@@ -172,7 +169,6 @@ event_tracking_3p AS (
     et.id_referred_by,
     CAST(NULL AS BIGINT) AS id_wololo,
     CAST(NULL AS BIGINT) AS id_house,
-    CAST(NULL AS BIGINT) AS id_user_registrant,
     et.business_event,
     et.funnel_step,
     et.supply_source,
@@ -212,7 +208,6 @@ event_tracking_ciq AS (
         et.id_referred_by,
         CAST(NULL AS BIGINT) AS id_wololo,
         CAST(NULL AS BIGINT) AS id_house,
-        CAST(NULL AS BIGINT) AS id_user_registrant,
         et.business_event,
         et.funnel_step,
         et.supply_source,
@@ -263,7 +258,6 @@ SELECT
   id_referred_by,
   id_wololo,
   id_house,
-  id_user_registrant,
   business_event,
   funnel_step,
   supply_source,
@@ -290,10 +284,7 @@ SELECT
   database_tracking_medium,
   database_tracking_source,
   ts_event,
-  ts_load,
-  YEAR(ts_event) AS year,
-  MONTH(ts_event) AS month,
-  DAY(ts_event) AS day
+  ts_load
 FROM
   all_tracking
 UNION ALL
@@ -307,7 +298,6 @@ SELECT
   id_referred_by,
   id_wololo,
   id_house,
-  id_user_registrant,
   business_event,
   funnel_step,
   supply_source,
@@ -334,10 +324,7 @@ SELECT
   database_tracking_medium,
   database_tracking_source,
   ts_event,
-  ts_load,
-  YEAR(ts_event) AS year,
-  MONTH(ts_event) AS month,
-  DAY(ts_event) AS day
+  ts_load
 FROM
   datalake_supply_flows.acquisition_backfill AS ab
 LEFT ANTI JOIN all_tracking AS at

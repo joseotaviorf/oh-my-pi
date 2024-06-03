@@ -13,26 +13,47 @@ workflow:
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
   tables_customization:
-    conversion_lookup:
+    leads_1p:
+      merge_on: ["sk_supply_lead", "business_context"]
+      custom_schema: supply_flows
+      partitions: []
+    prospects_1p:
+      # This table must be revisited so that the load is incremental
       extraction_type: full
+      merge_on: ["sk_supply_lead", "business_context"]
+      custom_schema: supply_flows
+      partitions: []
+    conversion_lookup:
+      merge_on: ["id_house", "business_context"]
+      zorder_by: ["id_house", "business_context", "id_lead"]
+      custom_schema: supply_flows
+      partitions: []
     landing_3p:
       extraction_type: full
+      zorder_by: ["id_lead_3p", "business_context", "id_house"]  
+      custom_schema: supply_flows
+      partitions: []
     acquisition_tracking:
       extraction_type: full
+      partitions: []
   inner_dependencies:
     leads_3p:
       - landing_3p
     prospects_3p:
       - leads_3p
       - landing_3p
+    prospects_1p:
+      - conversion_lookup
+      - leads_1p
+    prospects_ciq:
+      - leads_ciq
     acquisition_tracking:
       - leads_3p
       - prospects_3p
       - leads_ciq
       - prospects_ciq
-      # TO-DO: Migrate after delta tables are available
-      # - leads_1p
-      # - prospects_1p
+      - leads_1p
+      - prospects_1p
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:

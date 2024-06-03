@@ -88,10 +88,7 @@ SELECT
   discards.reason_type,
   ROW_NUMBER() OVER (PARTITION BY id_lead_3p, business_context, growth_status ORDER BY ts_event) AS aux_round_number,
   MD5(CONCAT_WS('_', id_lead_3p, business_context)) AS aux_hash,
-  denorm_table.ts_event,
-  YEAR(denorm_table.ts_event) AS year,
-  MONTH(denorm_table.ts_event) AS month,
-  DAY(denorm_table.ts_event) AS day
+  denorm_table.ts_event
 FROM denorm_table
 LEFT JOIN discards
   USING (id_lead_3p, business_context, growth_status, status)

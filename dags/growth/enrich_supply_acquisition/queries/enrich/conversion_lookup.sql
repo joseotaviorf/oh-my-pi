@@ -5,10 +5,14 @@ WITH bob_houses AS (
     hd.business_context,
     'BOB' AS source,
     '1P' AS supply_source
-  FROM datalake_bob.house_draft_business_context AS hd
-  JOIN datalake_bob_clean.submission_progress AS sp 
-    ON (hd.id_draft = sp.id_house_draft) 
-      AND (sp.id_external IS NOT NULL)
+  FROM
+    datalake_bob.house_draft_business_context AS hd
+  JOIN
+    datalake_bob_clean.submission_progress AS sp 
+      ON (hd.id_draft = sp.id_house_draft) 
+        AND (sp.id_external IS NOT NULL)
+  WHERE 
+    DATE(ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 lbc_houses AS (
   SELECT 
@@ -19,11 +23,15 @@ lbc_houses AS (
       WHEN lbc.ownership = 'THIRD_PARTY' THEN '3P'
       ELSE '1P'
     END AS supply_source
-  FROM datalake_ebdb_clean.listing_business_context_aud AS aud
-  LEFT JOIN datalake_ebdb_clean.listing_business_context AS lbc
-    ON (aud.business_context = lbc.business_context)
-      AND (aud.id_house = lbc.id_house)
-  WHERE aud.status IN ('EDITING', 'PUBLISHED')
+  FROM
+    datalake_ebdb_clean.listing_business_context_aud AS aud
+  JOIN
+    datalake_ebdb_clean.listing_business_context AS lbc
+      ON (aud.business_context = lbc.business_context)
+        AND (aud.id_house = lbc.id_house)
+  WHERE
+    aud.status IN ('EDITING', 'PUBLISHED')
+      AND lbc.ts_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   QUALIFY ROW_NUMBER() OVER (PARTITION BY aud.id_house, aud.business_context ORDER BY aud.rev) = 1
 ),
 joined_tb AS (
@@ -40,7 +48,8 @@ houses_with_context AS (
     supply_source,
     MAX(source = 'LBC') AS has_listing, 
     MAX(source = 'BOB') AS has_draft
-  FROM joined_tb
+  FROM 
+    joined_tb
   GROUP BY 1, 2, 3
 ),
 lead_conversion_1p AS (
@@ -61,9 +70,13 @@ lead_conversion_1p AS (
         hlc.ts_created AS ts_conversion, 
         1 AS db_source, 
         COALESCE(hw.supply_source, '1P') AS supply_source
-    FROM datalake_rene_descartes_clean.house_lead_conversion AS hlc
-    LEFT JOIN houses_with_context AS hw
+    FROM 
+      datalake_rene_descartes_clean.house_lead_conversion AS hlc
+    LEFT JOIN 
+      houses_with_context AS hw
         ON (hlc.id_house = hw.id_house)
+    WHERE 
+      DATE(hlc.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     -- EBDB is a source of historic information
     SELECT 
@@ -82,10 +95,14 @@ lead_conversion_1p AS (
         from_utc_timestamp(cl.ts_conversion, 'GMT+3') AS ts_conversion, 
         2 AS db_source, 
         COALESCE(hw.supply_source, '1P') AS supply_source
-    FROM datalake_ebdb_clean.conversion_lead AS cl
-    LEFT JOIN houses_with_context AS hw
+    FROM 
+      datalake_ebdb_clean.conversion_lead AS cl
+    LEFT JOIN 
+      houses_with_context AS hw
         ON (cl.id_house = hw.id_house)
-    WHERE id_converted_lead IS NOT NULL
+    WHERE 
+      id_converted_lead IS NOT NULL
+        AND DATE(cl.ts_conversion) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 lead_conversion_3p AS (
     SELECT 
@@ -104,6 +121,8 @@ lead_conversion_3p AS (
         ON h.id_external = l.uuid_lead
     JOIN datalake_ebdb_clean.listing_business_context_aud AS lbca
         ON lbca.id_house = h.id
+    WHERE 
+      DATE(l.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY ROW_NUMBER() OVER (PARTITION BY l.id, lbca.id_house, lbca.business_context ORDER BY l.ts_created) = 1
 ),
 lead_conversion_ciq AS (
@@ -114,15 +133,20 @@ lead_conversion_ciq AS (
         hd.business_context,
         (s.id_external IS NOT NULL) AS has_listing,
         (hd.id_draft IS NOT NULL) AS has_draft,
-        ts_created AS ts_conversion, 
+        hd.ts_created AS ts_conversion, 
         3 AS db_source,  
         'CIQ' AS supply_source
-    FROM datalake_bob.house_draft_business_context AS hd
-    JOIN datalake_bob_clean.submission_progress AS s 
+    FROM 
+      datalake_bob.house_draft_business_context AS hd
+    JOIN 
+      datalake_bob_clean.submission_progress AS s 
         ON (hd.id_draft = s.id_house_draft) 
-            AND (s.id_external IS NOT NULL)
-    WHERE (hd.type = 'ADMIN_CONFIRMATION')
+          AND (s.id_external IS NOT NULL)
+    WHERE 
+      (hd.type = 'ADMIN_CONFIRMATION')
+        AND DATE(hd.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
+
 all_conversions AS (
   SELECT *
   FROM lead_conversion_ciq
@@ -135,9 +159,6 @@ all_conversions AS (
 )
 
 SELECT 
-  *,
-  YEAR(ts_conversion) AS year,
-  MONTH(ts_conversion) AS month,
-  DAY(ts_conversion) AS day
+  *
 FROM all_conversions
 QUALIFY ROW_NUMBER() OVER (PARTITION BY id_house, business_context ORDER BY db_source, ts_conversion) = 1

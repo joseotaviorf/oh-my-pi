@@ -1,0 +1,53 @@
+database_name: datalake_supply_flows
+table_name: leads_1p
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table contains transformed data from the 1P tables that will be used to track the status of leads in Supply pipeline.
+columns:
+  sk_supply_lead:
+    description: The unique identifier for each lead in the supply tables. Its unique between CIQ, 3P and 1P tables.
+    lineage: 
+      - datalake_supply_flows.leads_sks.sk_supply_lead
+  business_context:
+    description: The business context of the lead, referring to the business context where the lead originated.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.house_info
+    category: 
+      - SALE: The 1P lead is for sale.
+      - RENT: The 1P lead is for rent.
+  id_lead:
+    description: The unique identifier for each lead in the 1P tables.
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead.id
+  id_lead_ebdb:
+    description: The unique identifier for each lead in the 1P tables. Its legacy id from EBDB
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
+  id_referred_by:
+    description: The identifier of affiliate that referred the lead.
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead.id_referred_by
+  id_region:
+    description: The identifier for region in the 1P tables.
+    lineage: 
+      - datalake_rene_descartes_clean.address.region
+      - datalake_ebdb_clean.lead.id_region
+      - datalake_supply_flows.recovered_region_leads.id_region
+  business_event:
+    description: The business event of the lead, referring to the business event in supply funnel. In this table is always acquisition_tof2l.
+  funnel_step:
+    description: The funnel step of the lead, referring to the funnel step in supply funnel. In this table is always lead.
+  supply_source:
+    description: The source of the lead, referring to the source where the lead originated. For this table is always 1P.
+  funnel_level:
+    description: The funnel level of the lead, referring to the funnel level in supply funnel. In this table is always 1.
+  aux_product_status:
+    description: The product status of the lead, referring to the product status in Broker Processor.
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead_aud.status
+  ts_event:
+    description: The timestamp of the event.
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead.ts_event
+  ts_load:
+    description: The timestamp of the load.
