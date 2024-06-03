@@ -22,6 +22,7 @@ workflow:
   type: query_delta
   layer: enrich
   load_spark_job: load_lost_listings_enrich
+  custom_schema: marketing_segmentations
   spark_job_arguments:
     - '{environment}'
     - '{bucket}'
