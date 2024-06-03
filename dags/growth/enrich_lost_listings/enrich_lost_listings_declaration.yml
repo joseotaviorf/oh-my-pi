@@ -31,9 +31,9 @@ workflow:
   tables_customization:
     lost_listings: {}
   default_partitions:
-  - year
-  - month
-  - day
+    - year
+    - month
+    - day
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   custom_libraries:

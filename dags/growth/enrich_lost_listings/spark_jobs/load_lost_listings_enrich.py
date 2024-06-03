@@ -5,10 +5,8 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -73,28 +71,22 @@ if __name__ == "__main__":
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_service.create_database(database_name)
 
-    s3_loader = S3Loader()
-    s3_loader.load_df(
-        df=df,
-        format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
-        s3_path=f"{database_location}{table_name}",
-        partitions=enrich_partition_cols,
+    delta_loader = DeltaLoader()
+
+    s3_path = database_location + table_name
+    full_table_name = f"{database_name}.{table_name}"
+
+    logger.info(
+        f"Table {full_table_name} will be loaded as Delta."
     )
 
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    spark_metastore_loader.update_metastore(
-        df=df,
-        database_name=database_name,
-        table_name=table_name,
-        format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
-        database_location=database_location,
-        partitions=enrich_partition_cols,
-        force_recreate=False,
+    delta_loader.load_table(
+        table_name=full_table_name,
+        path=s3_path,
+        source_df=df,
+        partition_by=enrich_partition_cols,
     )
 
-    spark_metastore_service.create_new_partitions_from_df(
-        df=df,
-        database_name=database_name,
-        table_name=table_name,
-        partition_cols=enrich_partition_cols,
+    spark_metastore_service.refresh_table(
+        database_name, table_name
     )
