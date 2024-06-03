@@ -182,6 +182,7 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
+  - bietlejuice.enrich_sorting_hat:load-enrich-early-credit-analysis
   - bietlejuice.rental_guarantee:load-clean-risk-category
   - bietlejuice.sorting_hat:load-clean-credit-analysis
   - bietlejuice.sorting_hat:load-clean-experiment

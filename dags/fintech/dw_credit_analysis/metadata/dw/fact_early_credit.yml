@@ -1,0 +1,74 @@
+database_name: dw_credit_analysis
+table_name: fact_early_credit
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: "Table with the LAST early credit analysis information of the tenant"
+columns:
+  sk_early_credit:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id
+    description: "ID of the credit analysis"
+  sk_credit_evaluation:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_credit_evaluation
+    description: "ID of the credit evaluation"
+  sk_user:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_user
+    description: "ID of the user"
+  sk_house:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_house
+    description: "ID of the house"
+  id_variant:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_variant
+    description: "ID of the variant"
+  id_policy_report:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "ID of the policy report"
+  city:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.city
+    description: "City of the tenant" 
+  version:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.version
+    description: "Version of the analysis"
+  risk_category_canon:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.risk_category_canon
+    description: "Risk score given by the model result plus the credit policy. Useful, but deprecated in favor to risk_category_canon"
+  bypass:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Bypass of the early credit"
+  guarantee_offered:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Guarantee offered of the early credit"
+  category:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Analysis category"
+  range_start:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Value range start"
+  range_end:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Value range end"
+  rejection_reason:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: "Reason of the analysis rejection."
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.ts_created
+    description: "Creation timestamp"
+  ts_expired:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
+    description: "Expiration timestamp"
