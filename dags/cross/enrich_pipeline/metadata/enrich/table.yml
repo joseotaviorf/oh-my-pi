@@ -9,7 +9,8 @@ columns:
   id_table:
     lineage:
       - datalake_dag_inventory_clean.table.table
-    description: Table id, which is the table schema + table name. It must be unique.
+    description: Table id, which is the table schema + table name. It may not be unique, since a table
+      ca be executed by different DAGs.
   id_dag:
     lineage:
       - datalake_pipeline.dag.id_dag
