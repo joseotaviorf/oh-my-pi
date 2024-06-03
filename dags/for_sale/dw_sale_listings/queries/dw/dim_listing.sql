@@ -5,10 +5,12 @@ SELECT
   hslc.first_consultant_type,
   lbc.status AS status,
   NULLIF(h.sale_price, 0) AS price,
+  hpp.p_30 AS predicted_price_30,
+  hpp.p_70 AS predicted_price_70,
   hpp.p_50 AS predicted_price,
   hpp.certainty AS predicted_price_certainty,
   lbc.status_closing AS closing_status,
-  COALESCE(ssl.stranded_status, 'NA') AS stranded_status, 
+  COALESCE(ssl.stranded_status, 'NA') AS stranded_status,
   hrs.registration_abandoned_reason,
   lbc.status_reason AS unpublished_reason,
   lbc.short_url,
@@ -41,7 +43,7 @@ SELECT
   h.has_sale_great_price_tag AS has_great_price_tag,
   h.has_sale_smart_price_activated AS has_smart_price_activated,
   pc.is_smart_price_change AS has_price_by_smart_price_feature,
-  hslc.dt_consultant_started, 
+  hslc.dt_consultant_started,
   hslc.ts_consultant_deleted,
   lbc.ts_created,
   lbc.ts_first_listing AS ts_first_publication,
@@ -66,7 +68,7 @@ JOIN
 JOIN
   datalake_sale_listing_demand.sale_listing_demand AS sld
     ON lbc.id_house = sld.id_house
-LEFT JOIN 
+LEFT JOIN
   datalake_sale_listings.sale_listing_price_changes AS pc
     ON lbc.id_house = pc.id_house
     AND pc.is_last_price IS TRUE
@@ -77,7 +79,7 @@ LEFT JOIN
   datalake_big_agent.house_sale_listing_consultant AS hslc
     ON hslc.id_sale_listing = sl.id_sale_listing
     AND hslc.is_last_ciq_on_listing = True
-LEFT JOIN 
+LEFT JOIN
     datalake_ebdb_clean.house_predicted_price AS hpp
       ON hpp.id_house = lbc.id_house
       AND hpp.business_context = 'SALE'
@@ -85,8 +87,8 @@ LEFT JOIN
   datalake_sale_stranded_listings.stranded_status AS ssl
     ON ssl.id_sale_listing = sl.id_sale_listing
     AND ssl.is_last_status = True
-LEFT JOIN 
+LEFT JOIN
   datalake_sale_listings_lenses.listing_lenses AS ll
-    ON ll.id_house = lbc.id_house 
-WHERE 
+    ON ll.id_house = lbc.id_house
+WHERE
   lbc.business_context = 'SALE'

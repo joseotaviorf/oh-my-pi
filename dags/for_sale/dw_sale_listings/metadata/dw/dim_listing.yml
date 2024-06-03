@@ -1,6 +1,6 @@
 database_name: dw_sale
 table_name: dim_listing
-description: This table contains the information of all the listings we have had in QuintoAndar ForSale. It shows the current information of features such as price, status, consultant type, etc. 
+description: This table contains the information of all the listings we have had in QuintoAndar ForSale. It shows the current information of features such as price, status, consultant type, etc.
   It also shows whether the listing is a primary market listing, or a migration listing. Each row represents a different listing.
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
@@ -13,7 +13,7 @@ columns:
   sk_house:
     lineage:
     - datalake_ebdb_listing.listing_business_context.id_house
-    description: > 
+    description: >
       Foreign key referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
   consultant_type:
     lineage:
@@ -21,9 +21,9 @@ columns:
     description:
       Shows which is the consultant type assigned to the listing.
     categories:
-      ASP: > 
+      ASP: >
         Assessor de Proprietário (ASP) type. Responsible for providing support to the owner. They are responsible for following up and handling ads that have not been visited for a long time, revisiting photos, price and contacting the owner to follow up on it.
-      CIQ_MANAGER: > 
+      CIQ_MANAGER: >
         Corretor Imobiliário do QuintoAndar (CIQ) type manager. They are a broker who was not responsible for the capture, but QuintoAndar assigns the property to them to be an Account Manager
       CIQ_FULL: >
         Corretor Imobiliário do QuintoAndar (CIQ) type full. They are a broker who was responsible for the capture and is responsible for the entire process of selling the property.
@@ -37,7 +37,7 @@ columns:
   status:
     lineage:
     - datalake_ebdb_listing.listing_business_context.status
-    description: > 
+    description: >
       Current status of listing.
     categories:
       EDITING: >
@@ -55,6 +55,16 @@ columns:
     - datalake_ebdb_clean.house.sale_price
     description: >
       Current publication price of the listing.
+  predicted_price_30:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_30
+    description: >
+      Price that was suggested from the official calculator used in the context of ForSale using only 30%, developed by QuintoAndar.
+  predicted_price_70:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_70
+    description: >
+      Price that was suggested from the official calculator used in the context of ForSale using 70%, developed by QuintoAndar.
   predicted_price:
     lineage:
     - datalake_ebdb_clean.house_predicted_price.p_50
@@ -107,7 +117,7 @@ columns:
   registration_abandoned_reason:
     lineage:
     - datalake_ebdb_clean.house_registration_status.registration_abandoned_reason
-    description: > 
+    description: >
       Reason why the owner did not complete the listing registration.
     categories:
       HOUSE_ALREADY_PUBLISHED: >
@@ -116,33 +126,33 @@ columns:
         Outside the price range served by QuintoAndar (between R$150,000 and R$20,000,000).
       HOUSE_WAS_A_BUSINESS_REAL_ESTATE: >
         If the listing is intended for commercial use.
-      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: 
+      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS:
         If the listing is outside the sale area of QuintoAndar.
-      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: > 
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: >
         Owner was outside the QuintoAndar Sale area.
-      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: > 
+      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: >
         Owner was outside the QuintoAndar Sale area.
       HOUSE_WAS_SOLD: >
         If the listing has already been sold inside or outside the Fifth Floor.
       ISSUES_WITH_HOUSE_DOCUMENTATION: >
         The listing has documentation problems and it was decided not to proceed with the publication.
       OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: >
-        Owner discontinued listing because administration fee was too high. 
+        Owner discontinued listing because administration fee was too high.
       OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: >
         Owner discontinued listing because brokerage fee was too high.
       OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: >
         Owner did not accept the online process.
       OWNER_DIDNT_ANSWER_PHONE: >
         Owner did not answer the phone.
-      OWNER_DIDNT_WANT_ADMINISTRATION: > 
+      OWNER_DIDNT_WANT_ADMINISTRATION: >
         Owner does not want to publish the administration of the QuintoAndar.
-      OWNER_DIDNT_WANT_TO_LIST_ON_QUINTOANDAR: > 
+      OWNER_DIDNT_WANT_TO_LIST_ON_QUINTOANDAR: >
         Owner does not want to publish on the QuintoAndar.
       OWNER_DISAGREE_CHARGES_PAYMENTS: >
         Owner does not agree with the fees employed by QuintoAndar.
       OWNER_GAVE_UP_RENTING:
         Owner has given up publishing the property for rent.
-      OWNER_HAD_NEGATIVE_PHOTOGRAPHER_EXPERIENCE: > 
+      OWNER_HAD_NEGATIVE_PHOTOGRAPHER_EXPERIENCE: >
         Owner gave up on publishing because he had a bad experience with the photography stage of the property.
       OWNER_RENTED_EXTERNALLY: >
         Owner rented the property externally.
@@ -154,7 +164,7 @@ columns:
   short_url:
     lineage:
     - datalake_ebdb_listing.listing_business_context.short_url
-    description: > 
+    description: >
       Shortened link of the listing on the QuintoAndar platform/website.
   price_bin:
     lineage:
@@ -164,20 +174,20 @@ columns:
   price_m2_bin:
     lineage:
       - datalake_sale_listings_lenses.listing_lenses.price_m2_bin
-    description: > 
+    description: >
         Descriptive tag for each bin. The listing price m2 is considered to allocate to a bin. That is, if the listing is 8k it will have a tag for the price m2 bin `R$ 7k-8k/m²`.
   total_area_bin:
     lineage:
       - datalake_sale_listings_lenses.listing_lenses.total_area_bin
-    description: > 
+    description: >
         Descriptive tag for each bin. The listing total area is considered to allocate to a bin. That is, if the listing is 90m2 it will have a tag for the total area bin `80m²-120m²`.
   pricing_lens_tier:
     lineage:
       - datalake_sale_listings_lenses.listing_lenses.pricing_full_name
     description: >
-      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its level. 
-      We use two components to define this tier: the difference from the published price to the calculator price, and the degree of certainty of the prediction. 
-      With this, we were able to understand the pricing tier of a listing by its seller and how this would affect demand. 
+      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its level.
+      We use two components to define this tier: the difference from the published price to the calculator price, and the degree of certainty of the prediction.
+      With this, we were able to understand the pricing tier of a listing by its seller and how this would affect demand.
       Example: A listing with the publication price exactly equal to the calculator price and with a high degree of prediction will be classified as P5 - Great Price.'
     categories:
       'P5: Great Price': >
@@ -199,36 +209,36 @@ columns:
      'Demand tier created to abstract some information from the listing demand. In other words, we use two components to define the tier, the number of days published and the number of visits scheduled, visits completed, offers received and offers accepted. With this, based on 4 different time windows (last 15, 30, 60 and 90 days) we assign a demand tier for each listing.'
     categories:
       'D5: High Demand': >
-        "Represent High Demand Listings. To be considered D5, the listing must have: 
+        "Represent High Demand Listings. To be considered D5, the listing must have:
           Either +3 Visits Booked in the last 15 days if it has more than 90 days published.
-          Or +2 Visits Completed within the past 15 days if it has more than 90 days published. 
+          Or +2 Visits Completed within the past 15 days if it has more than 90 days published.
           Or +1 Offers Submitted within the past 15 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 15 days if you have more than 90 days published.
           Or any event within the past 30 days if you have less than 90 days published."
-      'D4: Good Demand': > 
+      'D4: Good Demand': >
         "Represents Good Demand Listings. To be considered D4, the listing must have:
           Either 2 Visits Booked in the last 15 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 30 days if it has more than 90 days published.
-          Or +2 Visits Completed within the past 30 days if more than 90 days old. 
+          Or +2 Visits Completed within the past 30 days if more than 90 days old.
           Or +1 Offers Submitted within the past 30 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 30 days if you have more than 90 days published.
           Or +1 Visits Booked within the past 30 days if you have less than 90 days posted.
           Or any event within the last 60 days if you have less than 90 days posted."
-      'D3: Some Demand': > 
+      'D3: Some Demand': >
         "Represents Some Demand Listings. To be considered D3, the listing must have:
           Either 2 Visits Booked in the last 30 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 60 days if it has more than 90 days published.
-          Or +2 Visits Completed within the past 60 days if more than 90 days old. 
+          Or +2 Visits Completed within the past 60 days if more than 90 days old.
           Or +1 Offers Submitted within the past 60 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 60 days if you have more than 90 days published.
           Or +1 Visits Booked within the past 60 days if you have less than 90 days posted.
           Or any event within the last 90 days if you have less than 90 days posted.
           Or if you have less than 45 days posted."
-      'D2: Low Demand': > 
+      'D2: Low Demand': >
         "Represents Low Demand Listings. To be considered D2, the listing must have:
           Either 2 Visits Booked in the last 60 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 90 days if it has more than 90 days published.
-          Or +2 Visits Completed within the past 90 days if more than 90 days old. 
+          Or +2 Visits Completed within the past 90 days if more than 90 days old.
           Or +1 Offers Submitted within the past 90 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 90 days if you have more than 90 days published.
           Or +1 Visits Booked within the past 90 days if you have less than 90 days posted.
@@ -242,10 +252,10 @@ columns:
       - datalake_sale_listings_lenses.listing_lenses.availability_full_name
     description: >
       'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". This score is based on all the elements that can alter the availability of a listing on the visit. That is, it takes into account factors such as key location, seller behavior, canceled visits, hours available for visits, and rental status.
-    categories: 
+    categories:
       'A5: Great Availability': >
         Listings that have the Availability Score between -1500 and 0. Meaning that they have little or no penalties, indicating good availability for visits.
-      'A4: Good Availability': > 
+      'A4: Good Availability': >
         Listings that have the Availability Score between -2500 and -1500. Meaning that they have some penalties, indicating good availability for visits.
       'A3: Standard Availability': >
         Listings that have the Availability Score between -4000 and -2500. Meaning some limitations on the visit.
@@ -253,38 +263,38 @@ columns:
         Listings that have the Availability Score between -100000 and -4000. Meaning that possibly this listing is very difficult to make a visit to, but still available.
       'A1: Possibly Unavailable': >
         Listings that have the Availability Score less than -100000. Meaning that this listing is possibly not even available for the visit.
-      'A-: Undefined': > 
+      'A-: Undefined': >
         Listings that we can't identify your tier. This could be because they don't have enough days in publication or another reason.
   sellability_lens_tier:
     lineage:
       - datalake_sale_listings_lenses.listing_lenses.sellability_full_name
     description: >
       'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level".
-       We used the entire history of listings that have been published and signed CCVs, with some cuts such as the number of bathrooms, region cluster, price bins, total area bins and m2 price bins. We then defined a `factor' value for each listing in relation to its characteristics. 
+       We used the entire history of listings that have been published and signed CCVs, with some cuts such as the number of bathrooms, region cluster, price bins, total area bins and m2 price bins. We then defined a `factor' value for each listing in relation to its characteristics.
        In other words, we compare it with QuintoAndar's history and classify whether that listing is similar to listings that have already been sold'
     categories:
-      'S5: Very Similar': > 
-        It represents listings with a very high degree of sellability, i.e. it is a listing that is very similar to most of the listings that have already been sold. 
+      'S5: Very Similar': >
+        It represents listings with a very high degree of sellability, i.e. it is a listing that is very similar to most of the listings that have already been sold.
         To be considered S5, the listing must have a sellability factor greater than 3.
-      'S4: Quite Similar': > 
+      'S4: Quite Similar': >
         It represents listings with a high degree of sellability, i.e. it is a listing that is quite similar to most of the listings that have already been sold.
         To be considered S4, the listing must have a sellability factor greater than 2 and less than or equal to 3.
-      'S3: Moderately Similar': > 
+      'S3: Moderately Similar': >
         It represents listings with a moderate degree of sellability, i.e. it is a listing that is moderately similar to most of the listings that have already been sold.
         To be considered S3, the listing must have a sellability factor greater than 1 and less than or equal to 2.
-      'S2: Somewhat Similar': > 
+      'S2: Somewhat Similar': >
         It represents listings with a low degree of sellability, i.e. it is a listing that is slightly similar to most of the listings that have already been sold.
         To be considered S2, the listing must have a sellability factor greater than 0.3 and less than or equal to 1.
-      'S1: Not Very Similar': > 
+      'S1: Not Very Similar': >
         It represents listings with a very low degree of sellability, i.e. is a listing typology that is totally different from the listings sold on QuintoAndar.
         To be considered S1, the listing must have a sellability factor less than or equal to 0.3.
-  listing_quality_tier: 
-    lineage: 
+  listing_quality_tier:
+    lineage:
       - datalake_sale_listings_lenses.listing_lenses.listing_quality_full_name
-    description: > 
+    description: >
       We use the entire history of changes to a property's features and condominiums to create a tier that tracks the level of completeness of a house's information.
       We believe that a house with complete information performs much better on the platform. With this in mind, we used several variables and created a completeness score.
-    categories: 
+    categories:
       'Q5: Great Accuracy': >
         Represents listings with full information on amenities and features. There is no penalty, i.e. all the information we considered was filled in.
       'Q4: Good Accuracy': >
@@ -327,7 +337,7 @@ columns:
     lineage:
       - datalake_sale_listings_lenses.listing_lenses.listing_quality_drill_down
     description: >
-      Drill down of the tier_disclaimer column, where we can see the factors/scores that make up the listing's tier.  
+      Drill down of the tier_disclaimer column, where we can see the factors/scores that make up the listing's tier.
   partner_3p_supply:
     lineage:
     - datalake_ebdb_listing.house.partner_3p_supply
@@ -336,18 +346,18 @@ columns:
   is_3p_supply:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply
-    description: > 
+    description: >
       Boolean column that identifies whether the listing is from a real estate partner (Rede Supply). Regardless if it is from QuintoAndar or CasaMineira.
   is_3p_supply_5a:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: > 
+    description: >
       Boolean column that identifies if the listing is from a real estate partner (Rede Supply) of QuintoAndar.
   is_3p_supply_bh:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: > 
-      Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte. 
+    description: >
+      Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte.
   is_casa_mineira_migration:
     lineage:
     - datalake_ebdb_listing.house.is_casa_mineira_migration
@@ -356,7 +366,7 @@ columns:
   is_primary_market:
     lineage:
     - datalake_ebdb_listing.house.is_sale_primary_market
-    description: > 
+    description: >
       Boolean column describing whether the listing is of the primary market type. The primary market is the market of new properties, that is, properties that have never been inhabited.
   is_offer_and_visit_stranded:
     description: >
@@ -366,7 +376,7 @@ columns:
   is_for_rent:
     lineage:
     - datalake_sale_listings.sale_listing.is_for_rent
-    description: > 
+    description: >
       Boolean column that describes whether the listing is also or has belonged to the rental funnel.
   has_active_rental_contract:
     lineage:
@@ -376,32 +386,32 @@ columns:
   has_house_been_rented:
     lineage:
     - datalake_sale_listings.sale_listing.has_house_been_rented
-    description: > 
+    description: >
       Boolean column that shows if the listing has had at least one rental contract with QuintoAndar.
   has_great_price_tag:
     lineage:
     - datalake_ebdb_listing.house.has_great_sale_price_tag
-    description: > 
+    description: >
       Boolean column that shows whether the listing currently has the great price tag. The great price tag is an ornament attached to the listing's image on our platform if it is priced below what we think it is worth (using calculator prices and similar properties).
   has_smart_price_activated:
     lineage:
     - datalake_ebdb_listing.house.has_sale_smart_price_activated
-    description: > 
+    description: >
       Boolean column that shows whether the listing currently has the smart price feature activated. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand.
   has_price_by_smart_price_feature:
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.is_smart_price_change
-    description: > 
+    description: >
       Boolean that tells if the current sale price is determined by the Smart Price feature. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
   dt_consultant_started:
     lineage:
     - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
-    description: > 
+    description: >
       Date when the listing was assigned to a consultant.
   ts_consultant_deleted:
     lineage:
     - datalake_big_agent.house_sale_listing_consultant.ts_consultant_deleted
-    description: > 
+    description: >
       Timestamp when the listing was unassigned from a consultant.
   ts_created:
     lineage:
@@ -441,7 +451,7 @@ columns:
   ts_first_offer_submitted:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.ts_first_offer_submitted
-    description: > 
+    description: >
       Timestamp of first offer received (OS) by listing, if any.
   dt_first_offer_accepted:
     lineage:
@@ -451,7 +461,7 @@ columns:
   dt_first_sale_agreement_signed:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.dt_first_sale_agreement_signed
-    description: > 
+    description: >
       Date of first sale agreement (CCV) signed by listing, if any.
   ts_updated:
     lineage:
