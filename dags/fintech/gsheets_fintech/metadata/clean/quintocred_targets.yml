@@ -133,3 +133,33 @@ columns:
   dt_week:
     lineage:
       - datalake_gsheets_raw.quintocred_targets.week_start
+  evictions_new_cases:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.evictions_new_cases
+  evictions_ongoing_cases:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.evictions_ongoing_cases
+  monthly_brokers_with_proposal:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.monthly_brokers_with_proposal
+  monthly_brokers_w_proposal_day:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.monthly_brokers_w_proposal_day
+  weekday:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.weekday
+  workdays:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.workdays
+  collections_ops:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.collections_ops
+  is_holiday:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.holiday
+  is_work_day:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.work_day
+  is_true:
+    lineage:
+      - datalake_gsheets_raw.quintocred_targets.true
