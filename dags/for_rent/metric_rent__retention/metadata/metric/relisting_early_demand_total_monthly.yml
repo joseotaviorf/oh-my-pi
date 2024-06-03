@@ -10,6 +10,11 @@ columns:
       - dw_rent.dim_house_listing.ts_publication
     description: "Month of the publication."
     dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_house_listing.country_code
+    description: Country code of the house.
+    dimension: True
   qtd_ed_rl:
     description: "Monthly total volume of relistings for Early Demand houses."
     metric:

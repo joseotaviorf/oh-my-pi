@@ -1,6 +1,7 @@
 
 SELECT 
     CAST(DATE_TRUNC('WEEK', ts_publication) AS DATE) AS dt_week_publication,
+    country_code,
     COUNT(DISTINCT 
       IF(
         listing_category_start = 'Re-Listing' 
@@ -37,4 +38,4 @@ SELECT
 FROM 
     dw_rent.dim_house_listing
 GROUP BY 
-    1
+    1, 2
