@@ -36,4 +36,4 @@ FROM
 LEFT JOIN datalake_ebdb_clean.house AS h 
     ON h.id = tofr.id_house
 WHERE 
-    DATE(ts_event) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 7) AND DATE(MAKE_DATE({year},{month},{day}))
+    DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}') 

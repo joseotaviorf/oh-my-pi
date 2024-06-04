@@ -6,25 +6,16 @@ dag:
     dag_purpose: |
       This DAG dw tables related to the process of demand conversion in Growth context.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: growth
-  default_extraction_type: incremental 
-  tables_customization:
-    fact_demand_prospect_events:
-      partitions: ["year", "month", "day"]
-      extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
-    fact_demand_top_of_funnel_events:
-      partitions: ["year", "month", "day"]
-      extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -14), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}" 
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_12_2_med_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

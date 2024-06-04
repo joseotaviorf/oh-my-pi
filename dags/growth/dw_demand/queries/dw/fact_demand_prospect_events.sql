@@ -42,5 +42,5 @@ SELECT
   *
 FROM prospect_results
 WHERE
-    DATE(ts_event) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
+    DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND DATE(ts_event) <= CURRENT_DATE()
