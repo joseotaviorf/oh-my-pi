@@ -108,7 +108,6 @@ greenseer_sessions AS (
   LEFT JOIN
     journeys_uniques AS j
       ON j.id_correlation = g.id_session
-
 ),
 greenseer_tried_retention AS (
   SELECT
@@ -174,15 +173,13 @@ sessions_with_recontact AS (
     IF(response_key = LAG(response_key, 1) OVER(PARTITION BY id_user ORDER BY ts_started), True, False) AS has_same_previous_theme,
     CASE
         WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) <= 12 THEN '<12h'
-        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) > 12 
+        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) > 12
           AND ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) <= 96 THEN '12-96h'
         WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) > 96 THEN '>96h'
         ELSE 'NR'
     END AS recontact_time
   FROM greenseer_sessions AS gs
-
 )
-
 SELECT
   gs.id_session,
   st.id_ticket,
@@ -207,9 +204,10 @@ SELECT
   gs.problem_solved as is_problem_solved,
   gr.is_retention,
   IF(
-    sr.has_same_previous_theme = True 
-    AND sr.recontact_time in ('12-96h') 
-    AND gr.is_retention = True, True, False) AS is_recontact,
+    sr.has_same_previous_theme = True
+    AND sr.recontact_time in ('12-96h')
+    AND gr.is_retention = True, True, False
+  ) AS is_recontact,
   sr.has_same_previous_theme,
   CASE
     WHEN gs.ts_ended > gs.ts_started + INTERVAL '4 hour' THEN True

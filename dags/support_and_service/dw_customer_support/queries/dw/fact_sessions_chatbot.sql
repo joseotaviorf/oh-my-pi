@@ -1,38 +1,36 @@
 WITH surveys_fup AS (
   SELECT
-    GET_JSON_OBJECT(cfu.custom_attributes, '$.id_origin') AS id_session,
-    cfu.id_survey,
-    cfu.id_answer
-  FROM 
-    datalake_satisfaction_rating.chat_fup_surveys  AS cfu
-  WHERE GET_JSON_OBJECT(custom_attributes, '$.id_origin') IS NOT NULL
-
-)
-, base_churn AS (
+    GET_JSON_OBJECT(custom_attributes, '$.id_origin') AS id_session,
+    id_survey,
+    id_answer
+  FROM
+    datalake_satisfaction_rating.chat_fup_surveys
+  WHERE
+    GET_JSON_OBJECT(custom_attributes, '$.id_origin') IS NOT NULL
+),
+base_churn AS (
   SELECT DISTINCT
     gs.id_user,
     gs.ts_started,
     CASE
-      WHEN 
-          (gs.id_user IS NOT NULL 
-          AND gs.ts_started IS NOT NULL)
-          OR gs.id_user IS NULL
-        THEN 'chat'
-      WHEN call.id_user IS NOT NULL 
-        AND call.ts_ticket_started IS NOT NULL THEN 'call'
-      ELSE 'chat' 
+      WHEN (
+        gs.id_user IS NOT NULL
+        AND gs.ts_started IS NOT NULL
+      ) OR gs.id_user IS NULL THEN 'chat'
+      WHEN call.id_user IS NOT NULL  AND call.ts_ticket_started IS NOT NULL THEN 'call'
+      ELSE 'chat'
     END AS channel
-  FROM 
+  FROM
     datalake_greenseer.sessions AS gs
-      LEFT JOIN 
-        datalake_customer_support.call AS call
-          ON gs.id_user = CAST(call.id_user AS STRING)
-          AND gs.ts_started < call.ts_ticket_started
-  WHERE gs.is_retention = true
+  LEFT JOIN
+    datalake_customer_support.call AS call
+      ON gs.id_user = CAST(call.id_user AS STRING)
+      AND gs.ts_started < call.ts_ticket_started
+  WHERE
+    gs.is_retention IS TRUE
     AND YEAR(gs.ts_started) >= 2024
-
-)
-, churn_to_call AS (
+),
+churn_to_call AS (
   SELECT
     id_user,
     channel,
@@ -40,15 +38,15 @@ WITH surveys_fup AS (
     LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) AS previews_channel,
     LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started) AS previews_contact_date,
     CASE
-      WHEN channel = 'chat' 
-        AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat' 
+      WHEN channel = 'chat'
+        AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat'
         AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN 0
-      WHEN channel = 'call' 
-        AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat' 
+      WHEN channel = 'call'
+        AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat'
         AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN 1 -- considerando que o cliente churnou se abriu uma sessão por call em até 96h após ser retido no chat
     END AS is_churn_chat
-  FROM base_churn
-
+  FROM
+    base_churn
 )
 SELECT
   gs.id_session AS sk_session,
@@ -66,17 +64,14 @@ SELECT
   gs.is_problem_solved,
   gs.is_retention,
   CASE
-    WHEN 
-      gs.is_retention <> true 
-      AND gs.id_ticket IS NULL THEN 1
+    WHEN gs.is_retention <> true AND gs.id_ticket IS NULL THEN 1
     ELSE 0
   END AS is_abandonmet,
   gs.is_recontact,
-  CASE 
-    WHEN gs.is_retention = true 
-      AND gs.has_fallback = true THEN 1
+  CASE
+    WHEN gs.is_retention = true AND gs.has_fallback = true THEN 1
     ELSE 0
-  END  is_retained_session_with_fallback,
+  END AS is_retained_session_with_fallback,
   cc.is_churn_chat,
   IF(gs.ticket_origin = 'call inapp', 1, 0) AS is_call_in_app_session,
   gs.has_exceeded_session_timeout,
@@ -104,13 +99,15 @@ SELECT
   gs.month,
   gs.day,
   NOW() AS ts_load
-FROM 
+FROM
   datalake_greenseer.sessions AS gs
-    LEFT JOIN surveys_fup AS sf
-      ON gs.id_session = sf.id_session
-    LEFT JOIN churn_to_call AS cc
-      ON  gs.id_user = cc.id_user 
-      AND cc.previews_contact_date = gs.ts_started
+LEFT JOIN
+  surveys_fup AS sf
+    ON gs.id_session = sf.id_session
+LEFT JOIN
+  churn_to_call AS cc
+    ON  gs.id_user = cc.id_user
+    AND cc.previews_contact_date = gs.ts_started
 WHERE
     gs.year = {year}
     AND gs.month = {month}
