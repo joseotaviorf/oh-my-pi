@@ -287,6 +287,12 @@ sheets_info:
     clean_table_name: secretariat_hierarchy
     sheet_context: static
 
+  supply_listing_historical_reprocessing_2023:
+    sheet_id: 1TYimUpDVCdbOOxbwpVlqiaVqpK9RiBEIMo18Vj7wQu0
+    sheet_name: reprocessamentos_historico
+    clean_table_name: supply_listing_historical_reprocessing_2023
+    sheet_context: static
+
   supply_processor_status_reasons:
     sheet_id: 1Yud6fXc1ugqAKrUAD4Mw5i7tbR3q9oP3BVxCSbZdffs
     sheet_name: reasons

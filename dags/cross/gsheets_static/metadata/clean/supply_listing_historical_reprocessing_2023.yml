@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: supply_listing_historical_reprocessing_2023
+columns:
+  id_lead:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.sk_lead
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.id_house
+  base:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.base
+  base_type:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.tipo_de_base
+  dt_mailing:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.data_mailing
+  dt_prospect:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_prospect
+  dt_qualified:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_qualified
+  dt_availalable_qualified:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_availalable_qualified
+  dt_opportunity:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_opp
+  dt_first_listing:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.dt_first_listing
+  main_phone:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.telefone_principal
+  reprocessing_channel:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.canal_reprocessamento
+  reprocessing_version:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.versao_do_reprocessamento
+  sales_company:
+    lineage:
+      - datalake_gsheets_raw.supply_listing_historical_reprocessing_2023.sales_company
