@@ -1,0 +1,12 @@
+---
+database_name: datalake_gsheets_clean
+table_name: broker_score_by_quartiles
+columns:
+  id_user_agent:
+    tags:
+      - Confidential
+      - PII
+  id_agent:
+    tags:
+      - Confidential
+      - PII

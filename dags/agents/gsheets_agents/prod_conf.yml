@@ -1,4 +1,9 @@
 sheets_info:
+  broker_score_by_quartiles:
+    sheet_id: 16GyMIRBWwvhkcbTAPatLEWLHkdIibybmiot3vXlTzmY
+    sheet_name: Resumo Quartis
+    clean_table_name: broker_score_by_quartiles
+    sheet_context: agents
   rent_comission_for_strategic_region:
     sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE
     sheet_name: for_rent

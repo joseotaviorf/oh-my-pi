@@ -1,0 +1,47 @@
+---
+database_name: datalake_gsheets_clean
+table_name: broker_score_by_quartiles
+description: 
+  Contains broker score by quartiles.
+  The source spreadsheet is generated with data from the datalake, 
+  therefore, it should not be used as a dependency for other tables.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_user_agent:
+    description: User unique identifier
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.sk_user_agent
+  id_agent:
+    description: Agent unique identifier
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.sk_agent
+  month_description:
+    description: Month description
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.mes_descritivo
+  square:
+    description: Hub region or location
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.praca
+  hub:
+    description: Hub name
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.hub
+  quartile:
+    description: Indicates which quartile refers to the broker's score
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.quartil
+  score_gp:
+    description: Broker's performance score
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.score_gp
+  month:
+    description: Month of the quartile
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.mes
+  year:
+    description: Year of the quartile
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.ano
+  
