@@ -113,8 +113,8 @@ tables:
     db: atta
 
 custom_cluster:
-  driver_node_type_id: m5a.4xlarge
-  node_type_id: r5a.2xlarge
+  driver_node_type_id: r5a.2xlarge
+  node_type_id: m5a.4xlarge
   num_workers: 3
   spark_version: 12.2.x-scala2.12
 
