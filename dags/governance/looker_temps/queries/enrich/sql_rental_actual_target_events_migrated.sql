@@ -313,7 +313,7 @@ WITH supply_targets AS (
     ON ref.sk_rent_flow = frf.sk_rent_flow
   LEFT JOIN dw_rent.dim_rent_flow_type AS drf
     ON frf.sk_rent_flow_type = drf.sk_rent_flow_type
-  LEFT JOIN dw_public.dim_proposal AS dp
+  LEFT JOIN dw_rent.dim_proposal AS dp
     ON ref.sk_proposal = dp.sk_proposal
   WHERE
     COALESCE(dr.country_code, 'BR') = 'BR'

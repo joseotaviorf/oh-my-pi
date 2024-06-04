@@ -3040,7 +3040,7 @@ bietlejuice.looker_temps:
   - bietlejuice.dw_datamarts_spark.for_sale_cross:load-dw-datamarts-temp-supply-flows
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
-  - bietlejuice.dw_proposal_temp:load-dw-public-dim-proposal
+  - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-quinto-messenger-agent
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-task
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-fact-chats
