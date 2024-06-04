@@ -5,6 +5,7 @@ ended_rentals_confirmed AS (
     (fct_or.sk_house_listing + 1) AS nxt_sk_house_listing,
     dc.sk_contract, 
     dc.country_code,
+    dc.value_segment,
     DATE(COALESCE(dc.ts_analyst_annulment_input,dc.dt_annulment)) AS dt_ended_rental_confirmed
   FROM 
     dw_retention.fact_owner_retention AS fct_or 
@@ -118,7 +119,7 @@ listing_base AS (
     DATE(erc.dt_ended_rental_confirmed) AS listing_start_dt,
     erc.nxt_sk_house_listing AS sk_house_listing,
     erc.country_code,
-    dhl.is_early_demand,
+    erc.value_segment,
     CASE
       WHEN dhl.status IS NULL THEN 'nao_relistado'
       WHEN dhl.status IN ('despublicado','UNPUBLISHED') THEN 'despublicado'
@@ -186,11 +187,7 @@ bd AS (
         WHEN dhl.status IS NULL THEN 'aguardando_publicacao'
         ELSE dhl.status
     END AS current_status,
-    CASE
-        WHEN dhl.rent < 1500 THEN 'LOW'
-        WHEN dhl.rent < 2500 THEN 'MEDIUM'
-        ELSE 'HIGH'
-    END AS rent_segment
+    erc.value_segment
   FROM
     ended_rentals_confirmed AS erc
   LEFT JOIN
@@ -202,7 +199,7 @@ dataset AS (
     DATE_TRUNC('WEEK',bd.dt_ended_rental_confirmed) AS dt_reference_week,
     bd.dt_ended_rental_confirmed,
     bd.country_code,
-    bd.rent_segment,
+    bd.value_segment,
     bd_aux.status_1w,
     SUM(bd.erc) AS erc,
     SUM(IF(bd.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -7), bd.erc, NULL)) AS erc_matured_1w
@@ -213,11 +210,11 @@ dataset AS (
       ON bd_aux.sk_house_listing = bd.nxt_sk_house_listing
   GROUP BY
     1,2,3,4,5
-)  
+)
 SELECT 
   dt_reference_week,
   country_code,
-  'OVERALL' AS rent_segment,
+  'OVERALL' AS category,
   SUM(IF(status_1w IN ('despublicado','suspenso'), erc, 0)) AS unp_susp_1w,
   SUM(IF(
       status_1w IN ('despublicado','suspenso')
@@ -240,7 +237,7 @@ UNION ALL
 SELECT 
   dt_reference_week,
   country_code,
-  rent_segment,
+  value_segment AS category,
   SUM(IF(status_1w IN ('despublicado','suspenso'), erc, 0)) AS unp_susp_1w,
   SUM(IF(
       status_1w IN ('despublicado','suspenso')

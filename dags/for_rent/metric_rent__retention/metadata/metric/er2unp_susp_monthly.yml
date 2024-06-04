@@ -16,13 +16,16 @@ columns:
       - dw_rent.dim_contract.country_code
     description: "Country code of the house."
     dimension: True
-  rent_segment:
-    description: "Rent value segmentation."
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Rent value segment."
     categories:
       LOW: Rent lower than R$1500,00.
       MEDIUM: Rent between R$1500,01 and R$2499,99.
       HIGH: Rent higher than R$2500,00.
-      OVERALL: All rent value. LOW, MEDIUM and HIGH included in OVERALL segment.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
     dimension: True
   unp_susp_1w:
     description: "Volume of listings UNPUBLISHED or SUSPENDED (except rented) after 1 week of the ended rental confirmed."
