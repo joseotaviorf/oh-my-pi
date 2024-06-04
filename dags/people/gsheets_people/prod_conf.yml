@@ -101,6 +101,12 @@ sheets_info:
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: targets_turnover
 
+  team_formation_product_tech:
+    clean_table_name: team_formation_product_tech
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: team_formation_tech_active
+
   transgender_people_list:
     clean_table_name: transgender_people_list
     sheet_context: people

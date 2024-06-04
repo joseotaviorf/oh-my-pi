@@ -1,0 +1,39 @@
+---
+database_name: datalake_gsheets_people_clean
+table_name: team_formation_product_tech
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: information about product and tech's structure
+columns:
+  employees_name:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.employee_s_name
+  email:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.email
+  sub_directorate:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.sub_directorate
+  team_1:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.team_1___primary
+  team_2:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.team_2
+  team_3:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.team_3
+  team_4:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.team_4
+  team_5:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.team_5
