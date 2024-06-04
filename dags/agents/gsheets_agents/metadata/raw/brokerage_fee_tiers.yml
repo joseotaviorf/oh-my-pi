@@ -1,0 +1,12 @@
+---
+database_name: datalake_gsheets_clean
+table_name: brokerage_fee_tiers
+columns:
+  id_user:
+    tags:
+      - Confidential
+      - PII
+  id_agent:
+    tags:
+      - Confidential
+      - PII

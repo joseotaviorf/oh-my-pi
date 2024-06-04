@@ -1,0 +1,42 @@
+---
+database_name: datalake_gsheets_clean
+table_name: brokerage_fee_tiers
+description: 
+  Contains broker classifications by levels and their brokerage values.
+  The source spreadsheet is generated with data from the datalake, 
+  therefore, it should not be used as a dependency for other tables.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_user:
+    description: User unique identifier
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.sk_user
+  id_agent:
+    description: Agent unique identifier
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.sk_agent
+  kind:
+    description: Agent profile
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.kind
+  tier:
+    description: Agent classification according to its performance
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.tier
+  comission_percentage:
+    description: Agent comission percentage
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.comission_percentage
+  additional_comission_percentage:
+    description: Agent additional comission percentage
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.additional_comission_percentage
+  dt_tier_started:
+    description: Classification/tier start date
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.dt_tier_start
+  dt_tier_ended:
+    description: Classification/tier end date
+    lineage:
+      - datalake_gsheets_raw.brokerage_fee_tiers.dt_tier_end

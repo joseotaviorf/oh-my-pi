@@ -1,4 +1,9 @@
 sheets_info:
+  brokerage_fee_tiers:
+    sheet_id: 1TF99ftLp13tFxtoNZAv4ieb9400G30RiOihv5iYRY3k
+    sheet_name: Tiers
+    clean_table_name: brokerage_fee_tiers
+    sheet_context: agents
   broker_score_by_quartiles:
     sheet_id: 16GyMIRBWwvhkcbTAPatLEWLHkdIibybmiot3vXlTzmY
     sheet_name: Resumo Quartis
