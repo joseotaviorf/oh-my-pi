@@ -15,9 +15,9 @@ active_for_rent_city_groups AS (
     r.city_group,
     COUNT(DISTINCT id_house) AS listings_publisheds
   FROM
-    dw_public.fact_house_listings AS f
+    dw_rent.fact_house_listings AS f
   INNER JOIN
-    dw_public.dim_house_listing AS d
+    dw_rent.dim_house_listing AS d
       USING(sk_house_listing)
   INNER JOIN
     dw_public.dim_region AS r
@@ -34,9 +34,9 @@ all_transactions AS (
     hl.house_rent / NULLIF(hl.house_total_area, 0) AS price_per_m2,
     DATE(DATE_TRUNC('quarter', dc.ts_signature)) AS dt_quarter
   FROM
-    dw_public.dim_house_listing AS hl
+    dw_rent.dim_house_listing AS hl
   INNER JOIN
-    dw_public.fact_house_listings AS fhl
+    dw_rent.fact_house_listings AS fhl
       USING(sk_house_listing)
   INNER JOIN
     dw_public.dim_contract AS dc

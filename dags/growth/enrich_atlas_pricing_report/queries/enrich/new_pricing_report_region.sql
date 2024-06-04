@@ -37,10 +37,10 @@ house_views AS (
       ON e.id_house::BIGINT = h.id_house
       AND e.business_context = h.business_context
   INNER JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON dhl.id_house = h.id_house
   INNER JOIN
-    dw_public.fact_house_listings AS fhl
+    dw_rent.fact_house_listings AS fhl
         ON dhl.sk_house_listing = fhl.sk_house_listing
   INNER JOIN
     dw_public.dim_region AS dr

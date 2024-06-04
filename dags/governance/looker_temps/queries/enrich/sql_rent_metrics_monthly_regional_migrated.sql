@@ -38,8 +38,8 @@ WITH ongoing_listings AS (
     CAST(NULL AS INT) AS new_contracts_signed,
     CAST(NULL AS INT) AS ongoing_rentals,
     COUNT(DISTINCT hl.sk_house_listing) AS new_listings
-  FROM dw_public.dim_house_listing AS hl
-  LEFT JOIN dw_public.fact_house_listings AS fh
+  FROM dw_rent.dim_house_listing AS hl
+  LEFT JOIN dw_rent.fact_house_listings AS fh
     ON fh.sk_house_listing = hl.sk_house_listing
   WHERE
     NOT ts_listing_version_start IS NULL

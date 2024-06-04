@@ -9,7 +9,7 @@ SELECT
   olsl.weeks_since_publication,
   olsl.status_change_reason
 FROM dw_datamarts.ongoing_listed_suspended_listings AS olsl
-LEFT JOIN dw_public.fact_house_listings AS fhl
+LEFT JOIN dw_rent.fact_house_listings AS fhl
   ON fhl.sk_house_listing = olsl.sk_house_listing
 WHERE
   olsl.week_start > DATE_ADD(CURRENT_DATE, -180)

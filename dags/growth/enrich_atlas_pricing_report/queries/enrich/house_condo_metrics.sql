@@ -17,9 +17,9 @@ WITH listings AS (
         dhl.house_condo,
         dhl.house_iptu
     FROM datalake_ebdb_clean.listing_business_context lbc
-    JOIN dw_public.dim_house_listing dhl
+    JOIN dw_rent.dim_house_listing dhl
         ON lbc.id_house = dhl.id_house
-    LEFT JOIN dw_public.fact_house_listings fhl
+    LEFT JOIN dw_rent.fact_house_listings fhl
         ON dhl.sk_house_listing = fhl.sk_house_listing
     LEFT JOIN dw_sale.fact_listings fl
         ON lbc.id_house = fl.sk_house

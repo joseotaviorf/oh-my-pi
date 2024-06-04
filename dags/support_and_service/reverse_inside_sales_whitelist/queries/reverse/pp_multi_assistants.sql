@@ -5,7 +5,7 @@ WITH pp_multi AS (
   FROM
     datalake_pro_owners.daily_owner_houses_quantity_history AS doh
   INNER JOIN
-    dw_public.fact_house_listings AS fhl
+    dw_rent.fact_house_listings AS fhl
       ON fhl.sk_owner = doh.id_owner
   WHERe
     is_pp_multi_active IS TRUE
@@ -23,9 +23,9 @@ contracts AS (
   FROM
     dw_public.dim_contract AS dc
   INNER JOIN
-    dw_public.fact_house_listings AS fhl
+    dw_rent.fact_house_listings AS fhl
       ON fhl.sk_contract = dc.sk_contract
-  INNER JOIN dw_public.dim_house_listing dhl
+  INNER JOIN dw_rent.dim_house_listing dhl
     ON dhl.sk_house_listing = fhl.sk_house_listing
   LEFT JOIN dw_quintoandar.fact_contract_people fcp
     ON dc.sk_contract = fcp.sk_contract

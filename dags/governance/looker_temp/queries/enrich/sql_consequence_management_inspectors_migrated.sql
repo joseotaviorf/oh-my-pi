@@ -294,9 +294,9 @@ WITH base AS (
   LEFT JOIN dw_public.dim_booking AS booking_info
     ON inspection_dates.sk_booking = booking_info.sk_booking
     AND booking_info.type IN ('Vistoria', 'VistoriaQuarteirizada')
-  LEFT JOIN dw_public.dim_house_listing AS listing_info
+  LEFT JOIN dw_rent.dim_house_listing AS listing_info
     ON inspection_dates.sk_house_listing = listing_info.sk_house_listing
-  LEFT JOIN dw_public.fact_house_listings AS fact_house_listings
+  LEFT JOIN dw_rent.fact_house_listings AS fact_house_listings
     ON listing_info.sk_house_listing = fact_house_listings.sk_house_listing
   LEFT JOIN dw_public.dim_user AS inspector_info
     ON inspector_info.sk_user = inspection_dates.sk_inspector

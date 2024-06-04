@@ -164,7 +164,7 @@ LEFT JOIN all_inspection_sync AS ais
   ON ais.id_inspection = fib.sk_inspection
 LEFT JOIN comments AS c
   ON fib.sk_inspection = c.id_inspection
-LEFT JOIN dw_public.dim_house_listing AS dhl
+LEFT JOIN dw_rent.dim_house_listing AS dhl
   ON ais.id_house = dhl.id_house
 LEFT JOIN crm_info AS ci
   ON fib.sk_inspection = ci.sk_inspection
@@ -181,7 +181,7 @@ LEFT JOIN (
   ON u.sk_user = nps.sk_user AND u.sk_contract = nps.sk_contract
 LEFT JOIN dw_public.dim_user AS du
   ON du.sk_user = fib.sk_inspector
-LEFT JOIN dw_public.fact_house_listings AS fact_house_listings
+LEFT JOIN dw_rent.fact_house_listings AS fact_house_listings
   ON dhl.sk_house_listing = fact_house_listings.sk_house_listing
 LEFT JOIN dw_public.dim_region AS region_info
   ON fact_house_listings.sk_region = CAST(region_info.sk_region AS BIGINT)

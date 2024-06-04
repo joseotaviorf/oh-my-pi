@@ -54,7 +54,7 @@ WITH sold_or_rented AS (
   FROM dw_sale.fact_visits AS fv
   JOIN dw_public.dim_booking AS db
     USING (sk_booking)
-  JOIN dw_public.dim_house_listing AS hl
+  JOIN dw_rent.dim_house_listing AS hl
     ON fv.sk_house = hl.id_house
   JOIN dw_public.dim_user AS dub
     ON fv.sk_buyer = dub.sk_user

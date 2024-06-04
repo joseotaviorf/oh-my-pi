@@ -59,7 +59,7 @@ rent AS (
     di.rent AS price,
     fhls.ts_status_start AS ts_status_started
   FROM
-    dw_public.fact_house_listing_status AS fhls
+    dw_rent.fact_house_listing_status AS fhls
   LEFT JOIN
     daily_info AS di
       ON fhls.sk_house_listing = di.id_house_listing

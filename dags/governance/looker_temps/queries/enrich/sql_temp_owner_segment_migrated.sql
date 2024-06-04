@@ -32,7 +32,7 @@ SELECT DISTINCT
 FROM dw_public.fact_house_listing_flows AS fhlf
 INNER JOIN dw_public.dim_date AS dd
   ON dd.sk_date = fhlf.sk_first_listing_date
-LEFT JOIN dw_public.fact_house_listings AS fhl
+LEFT JOIN dw_rent.fact_house_listings AS fhl
   ON CAST(fhlf.sk_house_listing / 1000 AS INT) = CAST(fhl.sk_house_listing / 1000 AS INT)
 LEFT JOIN base_pro_owners AS bpo
   ON bpo.id_owner = fhl.sk_owner AND dd.date = bpo.date

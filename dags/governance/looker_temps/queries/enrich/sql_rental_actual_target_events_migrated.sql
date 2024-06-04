@@ -200,8 +200,8 @@ WITH supply_targets AS (
     NULL AS sales_company,
     NULL AS lead_origin,
     COUNT(DISTINCT dhl.sk_house_listing) AS total_listings
-  FROM dw_public.dim_house_listing AS dhl
-  LEFT JOIN dw_public.fact_house_listings AS fhl
+  FROM dw_rent.dim_house_listing AS dhl
+  LEFT JOIN dw_rent.fact_house_listings AS fhl
     ON fhl.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN dw_public.dim_region AS dr
     ON fhl.sk_region = dr.sk_region
@@ -307,7 +307,7 @@ WITH supply_targets AS (
     ON (
       dr.sk_region = ref.sk_region
     )
-  LEFT JOIN dw_public.dim_house_listing AS dhl /* listings info */
+  LEFT JOIN dw_rent.dim_house_listing AS dhl /* listings info */
     ON ref.sk_house_listing = dhl.sk_house_listing
   LEFT JOIN dw_rent.fact_rent_flows AS frf
     ON ref.sk_rent_flow = frf.sk_rent_flow

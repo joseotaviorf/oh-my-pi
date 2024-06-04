@@ -1052,9 +1052,9 @@ bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_contract_temp:load-dw-public-dim-contract
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listing-status
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_sale_flow:load-dw-sale-fact-listing-sale-flows
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
@@ -2993,8 +2993,8 @@ bietlejuice.looker_temp:
   - bietlejuice.dw_datamarts_spark.growth:load-dw-datamarts-datamart-opportunity
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_photo_jobs:load-dw-public-fact-photo-job
   - bietlejuice.dw_region:load-dw-public-dim-region
@@ -3038,8 +3038,8 @@ bietlejuice.looker_temps:
   - bietlejuice.dw_datamarts_spark.for_sale_cross:load-dw-datamarts-sale-cohort-conversions
   - bietlejuice.dw_datamarts_spark.for_sale_cross:load-dw-datamarts-sale-events-funnel
   - bietlejuice.dw_datamarts_spark.for_sale_cross:load-dw-datamarts-temp-supply-flows
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_proposal_temp:load-dw-public-dim-proposal
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-quinto-messenger-agent
   - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-task
@@ -3250,8 +3250,8 @@ bietlejuice.reverse_dsat_report_load:
 bietlejuice.reverse_inside_sales_whitelist:
   - bietlejuice.dw_contract_temp:load-dw-public-dim-contract
   - bietlejuice.dw_contract_temp:load-dw-quintoandar-fact-contract-people
-  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
-  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step

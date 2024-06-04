@@ -19,7 +19,7 @@ WITH negotiation_status AS (
   FROM
     datalake_ebdb_clean.listing_business_context AS lbc
   LEFT JOIN
-    dw_public.fact_house_listings AS f
+    dw_rent.fact_house_listings AS f
       ON lbc.id_house = SUBSTRING(f.sk_house_listing,0,9)
   LEFT JOIN
     dw_public.dim_contract AS dc

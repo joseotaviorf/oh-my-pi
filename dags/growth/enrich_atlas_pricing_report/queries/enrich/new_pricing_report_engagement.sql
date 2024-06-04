@@ -17,7 +17,7 @@ WITH house_engagement AS (
   FROM
     datalake_ebdb_clean.listing_business_context AS lbc
   INNER JOIN
-    dw_public.dim_house_listing AS dhl
+    dw_rent.dim_house_listing AS dhl
       ON lbc.id_house = dhl.id_house
   LEFT JOIN
     datalake_atlas_pricing_report.house_pricing_metrics AS hm

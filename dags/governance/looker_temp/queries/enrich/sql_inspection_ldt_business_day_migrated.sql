@@ -13,9 +13,9 @@ WITH inspections AS (
   FROM dw_public.dim_inspection AS inspections
   LEFT JOIN dw_public.fact_inspection_bookings AS inspection_dates
     ON inspection_dates.sk_inspection = inspections.sk_inspection
-  LEFT JOIN dw_public.dim_house_listing AS listing_info
+  LEFT JOIN dw_rent.dim_house_listing AS listing_info
     ON inspection_dates.sk_house_listing = listing_info.sk_house_listing
-  LEFT JOIN dw_public.fact_house_listings AS fact_house_listings
+  LEFT JOIN dw_rent.fact_house_listings AS fact_house_listings
     ON listing_info.sk_house_listing = fact_house_listings.sk_house_listing
   LEFT JOIN dw_public.dim_contract AS public_dim_contract
     ON public_dim_contract.sk_contract = inspection_dates.sk_contract
