@@ -31,5 +31,5 @@ WHERE
     type != 'PN' OR 
     type IS NULL
   )
-AND 
-  f.ts_created >= '2023-01-01'
+AND erp_solution = 'B1'
+AND f.ts_created >= '2023-01-01'
