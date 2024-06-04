@@ -91,7 +91,7 @@ BASE_CLOSING_DRAFT AS (
                   ELSE FALSE
             END AS flag_canceled_in_dead_time,
             CASE
-                  WHEN (payment_status = 'written down') AND (m.dt_paid > closing_day) AND (m.dt_paid <= ts_snapshot ) THEN TRUE
+                  WHEN (m.payment_status = 'written down') AND (m.dt_paid > closing_day) AND (m.dt_paid <= ts_snapshot ) THEN TRUE
                   ELSE FALSE
             END AS flag_writtendown_in_dead_time,
             CASE
