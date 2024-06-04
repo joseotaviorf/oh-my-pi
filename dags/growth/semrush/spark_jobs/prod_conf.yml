@@ -1,172 +1,193 @@
----
+s3://artifacts.s3.data.quintoandar.com.br/bi-etl-ejuice/init_script.sh---
 raw_table_name: searches
 raw_partition_cols: ["domain", "year", "month", "day"]
 report_list:
   123i_organic_search_kw:
     configs:
-      type: domain_organic
       domain: 123i.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 153600
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 110000 # expected number of results * 1,25
   ape11_organic_search_kw:
     configs:
-      type: domain_organic
       domain: ape11.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 55200
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 45000 # expected number of results * 1,25
   arboimoveis_organic_search_kw:
     configs:
-      type: domain_organic
       domain: arboimoveis.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 114000
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 150000 # expected number of results * 1,25
   auxiliadorapredial_organic_search_kw:
     configs:
-      type: domain_organic
       domain: auxiliadorapredial.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 14400
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 11000 # expected number of results * 1,25
   casamineira_organic_search_kw:
     configs:
-      type: domain_organic
       domain: casamineira.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 247200
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 165000 # expected number of results * 1,25
   chavesnamao_organic_search_kw:
     configs:
-      type: domain_organic
       domain: chavesnamao.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 576000
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 800000 # expected number of results * 1,25
   direcional_organic_search_kw:
     configs:
-      type: domain_organic
       domain: direcional.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 21600
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 30000 # expected number of results * 1,25
   emcasa_organic_search_kw:
     configs:
-      type: domain_organic
       domain: emcasa.com
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 21600
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 15000 # expected number of results * 1,25
   imoveisestadao_organic_search_kw:
     configs:
+      domain: imoveis.estadao.com.br
       type: domain_organic
-      domain: imoveis.estadao.com.br&display_filter=%2B%7CPo%7CLt%7C3%7C%2B%7CUr%7CCo%7Cimoveis.estadao.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 26400
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 25000 # expected number of results * 1,25
   imoveismercadolivre_organic_search_kw:
     configs:
+      domain: imoveis.mercadolivre.com.br
       type: domain_organic
-      domain: imoveis.mercadolivre.com.br&display_filter=%2B%7CPo%7CLt%7C100%7C%2B%7CUr%7CCo%7Cimoveis.mercadolivre.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 68400
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 20000 # expected number of results * 1,25
   imovelguide_organic_search_kw:
     configs:
-      type: domain_organic
       domain: imovelguide.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 123600
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 70000 # expected number of results * 1,25
   imovelweb_organic_search_kw:
     configs:
-      type: domain_organic
       domain: imovelweb.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 298800
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 300000 # expected number of results * 1,25
   loft_organic_search_kw:
     configs:
-      type: domain_organic
       domain: loft.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 192000
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 200000 # expected number of results * 1,25
   lopes_organic_search_kw:
     configs:
-      type: domain_organic
       domain: lopes.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 232800
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 250000 # expected number of results * 1,25
   quintoandar_organic_search_kw:
     configs:
-      type: domain_organic
       domain: quintoandar.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 315600
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 450000 # expected number of results * 1,25
   secovi_organic_search_kw:
     configs:
-      type: domain_organic
       domain: secovi.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 8400
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 4000 # expected number of results * 1,25
   trisul_organic_search_kw:
     configs:
-      type: domain_organic
       domain: trisul-sa.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 7200
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 5000 # expected number of results * 1,25
   vivareal_organic_search_kw:
     configs:
-      type: domain_organic
       domain: vivareal.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 708000
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 800000 # expected number of results * 1,25
   wimoveis_organic_search_kw:
     configs:
-      type: domain_organic
       domain: wimoveis.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 202800
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 250000 # expected number of results * 1,25
   zapimoveis_organic_search_kw:
     configs:
-      type: domain_organic
       domain: zapimoveis.com.br
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
+      type: domain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 628800
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 700000 # expected number of results * 1,25
   olximoveis_organic_search_kw:
     configs:
+      domain: olx.com.br%2Fimoveis
       type: domain_organic
-      domain: olx.com.br%2Fimoveis&display_filter=%2B%7CPo%7CLt%7C100%7C%2B%7CUr%7CCo%7Colx.com.br%2Fimoveis
-      database: br
-      display_sort: po_asc,tg_desc,nr_desc,kd_desc
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-    display_limit: 207600
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 300000 # expected number of results * 1,25

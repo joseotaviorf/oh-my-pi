@@ -10,7 +10,6 @@ import requests
 
 import time
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 import logging
 from quintoandar_logger import QuintoAndarLogger
@@ -166,8 +165,8 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
-    # adding 1 month to run the actual month, otherwise the execution date will be the previus month
-    display_date = execution_date.replace(day=15) + relativedelta(months=1)
+
+    display_date = execution_date.replace(day=15)
     display_date = display_date.strftime('%Y%m%d')
 
     overwrite_enabled = args.overwrite_enabled
