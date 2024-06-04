@@ -21,13 +21,13 @@ contracts AS (
       ELSE NULL
     END AS contract_user
   FROM
-    dw_public.dim_contract AS dc
+    dw_rent.dim_contract AS dc
   INNER JOIN
     dw_rent.fact_house_listings AS fhl
       ON fhl.sk_contract = dc.sk_contract
   INNER JOIN dw_rent.dim_house_listing dhl
     ON dhl.sk_house_listing = fhl.sk_house_listing
-  LEFT JOIN dw_quintoandar.fact_contract_people fcp
+  LEFT JOIN dw_rent.fact_contract_people fcp
     ON dc.sk_contract = fcp.sk_contract
   WHERE
     dc.sk_contract != -1
@@ -66,7 +66,7 @@ pp_multi_assistants AS (
     dw_public.dim_user du
       ON dc.contract_user = du.sk_user
   LEFT JOIN
-    dw_quintoandar.fact_contract_people fcp
+    dw_rent.fact_contract_people fcp
       ON dc.sk_contract = fcp.sk_contract
       AND fcp.sk_user = dc.contract_user
   LEFT JOIN

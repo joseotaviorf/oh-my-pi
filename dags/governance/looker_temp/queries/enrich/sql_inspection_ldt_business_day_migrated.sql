@@ -17,7 +17,7 @@ WITH inspections AS (
     ON inspection_dates.sk_house_listing = listing_info.sk_house_listing
   LEFT JOIN dw_rent.fact_house_listings AS fact_house_listings
     ON listing_info.sk_house_listing = fact_house_listings.sk_house_listing
-  LEFT JOIN dw_public.dim_contract AS public_dim_contract
+  LEFT JOIN dw_rent.dim_contract AS public_dim_contract
     ON public_dim_contract.sk_contract = inspection_dates.sk_contract
   LEFT JOIN sql_inspections_contract_termination AS contract_termination
     ON contract_termination.id_contract = public_dim_contract.sk_contract

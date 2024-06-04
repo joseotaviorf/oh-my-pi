@@ -39,7 +39,7 @@ all_transactions AS (
     dw_rent.fact_house_listings AS fhl
       USING(sk_house_listing)
   INNER JOIN
-    dw_public.dim_contract AS dc
+    dw_rent.dim_contract AS dc
       USING(sk_contract)
   INNER JOIN
     dim_region AS r

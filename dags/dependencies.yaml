@@ -1050,7 +1050,7 @@ bietlejuice.enrich_atento_reports:
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.dw_contract_temp:load-dw-public-dim-contract
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
@@ -2983,9 +2983,9 @@ bietlejuice.looker_temp:
   - bietlejuice.dw_call:load-dw-call-dim-call-task
   - bietlejuice.dw_call:load-dw-call-fact-call-tasks
   - bietlejuice.dw_call:load-dw-call-fact-calls
-  - bietlejuice.dw_contract_temp:load-dw-public-dim-contract
-  - bietlejuice.dw_contract_temp:load-dw-quintoandar-dim-contract-person
-  - bietlejuice.dw_contract_temp:load-dw-quintoandar-fact-contract-people
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract-person
+  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
   - bietlejuice.dw_crm:load-dw-crm-dim-closing-task
   - bietlejuice.dw_crm:load-dw-crm-dim-inspection-task
   - bietlejuice.dw_crm:load-dw-crm-fact-closing-tasks
@@ -3248,8 +3248,8 @@ bietlejuice.reverse_dsat_report_load:
   - bietlejuice.enrich_survicate:load-enrich-survey-questions
   - bietlejuice.enrich_survicate:load-enrich-survey-responses
 bietlejuice.reverse_inside_sales_whitelist:
-  - bietlejuice.dw_contract_temp:load-dw-public-dim-contract
-  - bietlejuice.dw_contract_temp:load-dw-quintoandar-fact-contract-people
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_user:load-dw-public-dim-user

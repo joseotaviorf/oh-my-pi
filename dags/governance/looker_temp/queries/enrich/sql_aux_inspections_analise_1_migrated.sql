@@ -71,7 +71,7 @@ WITH all_inspection_sync AS (
     p.is_last_contract,
     u.email,
     COALESCE(u.sk_user, p.sk_user) AS sk_user
-  FROM dw_quintoandar.fact_contract_people AS p
+  FROM dw_rent.fact_contract_people AS p
   LEFT JOIN dw_public.dim_user AS u
     ON p.sk_personal_document = u.cpf
   WHERE
@@ -113,7 +113,7 @@ WITH all_inspection_sync AS (
     ON dp.sk_nps_campaign = camp.sk_nps_campaign
   LEFT JOIN users AS u
     ON dp.sk_user = u.sk_user
-  LEFT JOIN dw_public.dim_contract AS c
+  LEFT JOIN dw_rent.dim_contract AS c
     ON u.sk_contract = c.sk_contract
     AND CASE
       WHEN dp.sk_answered_date < 0 OR dp.sk_answered_date IS NULL
@@ -154,7 +154,7 @@ SELECT
 FROM dw_public.fact_inspection_bookings AS fib
 LEFT JOIN dw_public.dim_inspection AS di
   ON fib.sk_inspection = di.sk_inspection
-LEFT JOIN dw_public.dim_contract AS dc
+LEFT JOIN dw_rent.dim_contract AS dc
   ON fib.sk_contract = dc.sk_contract
 LEFT JOIN datalake_terminator_clean.termination AS t
   ON t.id_contract = dc.sk_contract

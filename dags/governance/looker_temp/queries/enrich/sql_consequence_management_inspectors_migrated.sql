@@ -751,7 +751,7 @@ WITH base AS (
   LEFT JOIN dw_public.dim_booking AS booking_info
     ON inspection_dates.sk_booking = booking_info.sk_booking
     AND booking_info.type IN ('Vistoria', 'VistoriaQuarteirizada')
-  LEFT JOIN dw_public.dim_contract AS public_dim_contract
+  LEFT JOIN dw_rent.dim_contract AS public_dim_contract
     ON public_dim_contract.sk_contract = inspection_dates.sk_contract
   LEFT JOIN first_termination AS first_termination
     ON first_termination.id_contract = public_dim_contract.sk_contract

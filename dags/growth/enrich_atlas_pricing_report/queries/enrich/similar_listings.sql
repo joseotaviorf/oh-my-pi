@@ -59,7 +59,7 @@ WITH listings AS (
         ON dr_fr.sk_region = fhl.sk_region
     LEFT JOIN dw_public.dim_region dr_fs
         ON dr_fs.sk_region = fl.sk_region
-    LEFT JOIN dw_public.dim_contract dc
+    LEFT JOIN dw_rent.dim_contract dc
         ON fhl.sk_contract = dc.sk_contract
     WHERE
         DATEDIFF(dhl.ts_house_update, CURRENT_DATE) <= 365

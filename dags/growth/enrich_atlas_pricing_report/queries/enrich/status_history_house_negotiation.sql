@@ -22,7 +22,7 @@ WITH negotiation_status AS (
     dw_rent.fact_house_listings AS f
       ON lbc.id_house = SUBSTRING(f.sk_house_listing,0,9)
   LEFT JOIN
-    dw_public.dim_contract AS dc
+    dw_rent.dim_contract AS dc
       ON f.sk_contract = dc.sk_contract
       AND dc.ts_signature IS NOT NULL
   LEFT JOIN

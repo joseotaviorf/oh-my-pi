@@ -19,8 +19,8 @@ WITH users AS (
     dc.full_name AS name,
     dc.email,
     fc.sk_personal_document
-  FROM dw_quintoandar.fact_contract_people AS fc
-  LEFT JOIN dw_quintoandar.dim_contract_person AS dc
+  FROM dw_rent.fact_contract_people AS fc
+  LEFT JOIN dw_rent.dim_contract_person AS dc
     ON dc.sk_contract_person = fc.sk_contract_person
   WHERE
     sk_user = -1 AND (
@@ -44,7 +44,7 @@ WITH users AS (
   SELECT
     sk_personal_document,
     MAX(sk_contract_person) AS sk_max_contract_person
-  FROM dw_quintoandar.fact_contract_people
+  FROM dw_rent.fact_contract_people
   WHERE
     (
       is_valid_cpf = TRUE OR is_valid_cnpj = TRUE
@@ -55,7 +55,7 @@ WITH users AS (
   SELECT
     sk_user,
     MAX(sk_contract_person) AS sk_max_contract_person
-  FROM dw_quintoandar.fact_contract_people
+  FROM dw_rent.fact_contract_people
   WHERE
     sk_user > 0 AND is_last_contract = TRUE
   GROUP BY
@@ -64,7 +64,7 @@ WITH users AS (
   SELECT
     sk_personal_document,
     COUNT(DISTINCT sk_contract) AS contracts_created
-  FROM dw_quintoandar.fact_contract_people
+  FROM dw_rent.fact_contract_people
   WHERE
     NOT sk_personal_document IS NULL
   GROUP BY
@@ -73,7 +73,7 @@ WITH users AS (
   SELECT
     sk_user,
     COUNT(sk_contract) AS contracts_created
-  FROM dw_quintoandar.fact_contract_people
+  FROM dw_rent.fact_contract_people
   WHERE
     sk_user > 0
   GROUP BY
@@ -91,9 +91,9 @@ WITH users AS (
     fcp.is_living,
     ac.contracts_created
   FROM clean_contract_people AS ccp
-  INNER JOIN dw_quintoandar.fact_contract_people AS fcp
+  INNER JOIN dw_rent.fact_contract_people AS fcp
     ON fcp.sk_contract_person = ccp.sk_max_contract_person
-  INNER JOIN dw_quintoandar.dim_contract_person AS dcp
+  INNER JOIN dw_rent.dim_contract_person AS dcp
     ON dcp.sk_contract_person = fcp.sk_contract_person
   INNER JOIN agg_cpf AS ac
     ON ac.sk_personal_document = fcp.sk_personal_document
@@ -123,9 +123,9 @@ WITH users AS (
     fcp.is_living,
     au.contracts_created
   FROM clean_contract_users AS ccu
-  INNER JOIN dw_quintoandar.fact_contract_people AS fcp
+  INNER JOIN dw_rent.fact_contract_people AS fcp
     ON fcp.sk_contract_person = ccu.sk_max_contract_person
-  INNER JOIN dw_quintoandar.dim_contract_person AS dcp
+  INNER JOIN dw_rent.dim_contract_person AS dcp
     ON dcp.sk_contract_person = fcp.sk_contract_person
   INNER JOIN agg_user AS au
     ON au.sk_user = fcp.sk_user
