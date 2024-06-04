@@ -101,6 +101,12 @@ sheets_info:
     clean_table_name: sale_demand_targets_2024
     sheet_context: for_sale
 
+  sale_demand_budget_2024:
+    sheet_id: 1V0Yh82m6OWpotEaWLU7qp0nq7tOTf9GEWsGymRWONoA
+    sheet_name: sale_demand_budget_2024
+    clean_table_name: sale_demand_budget_2024
+    sheet_context: for_sale
+
   sale_demand_targets_bps_2024:
     sheet_id: 1OQOYnQ1cYnfShiAgOPdJ0NRu3afAq1zHCElEHVekvs8
     sheet_name: sale_demand_targets_bps_2024
@@ -111,6 +117,12 @@ sheets_info:
     sheet_id: 1enCFfw9bhLMqoVzzlP64Up8usIBLX2nLqnd9I9I7tTg
     sheet_name: sale_demand_targets_cohort_2024
     clean_table_name: sale_demand_targets_cohort_2024
+    sheet_context: for_sale
+
+  sale_demand_cohort_budget_2024:
+    sheet_id: 1A-IeN3nzXDrL27FwuFJHOyzaAV6elBKChPts6Dgu2mo
+    sheet_name: sale_demand_targets_cohort_2024
+    clean_table_name: sale_demand_cohort_budget_2024
     sheet_context: for_sale
 
   sale_ongoing_listings_targets:
@@ -141,6 +153,12 @@ sheets_info:
     sheet_id: 1x2kuGYZwtTVBBsprOf7e8V_q0gYWgcDhB_U0TMey7I4
     sheet_name: sale_supply_targets_2024
     clean_table_name: sale_supply_targets_2024
+    sheet_context: for_sale
+
+  sale_supply_budget_2024:
+    sheet_id: 1mfFaaBtlIe1yvLZZ6vahk8-mOFjsTpLmwao_Ft1jN-I
+    sheet_name: sale_supply_targets_2024
+    clean_table_name: sale_supply_budget_2024
     sheet_context: for_sale
 
   sale_supply_targets_cohort_2024:

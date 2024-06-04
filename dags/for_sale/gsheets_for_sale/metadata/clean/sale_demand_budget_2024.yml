@@ -1,0 +1,51 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_demand_budget_2024
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Sale
+description: Transformed table created from a Google Sheets file in order to input sale demand funnel budgets into datalake
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.city_group
+  hub_offer:
+    description: Informs which associated hub the offer came from.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.hub_offer
+  visits_booked:
+    description: Budget volume of visits booked.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.visits_booked
+  visits_completed:
+    description: Budget volume of visits completed.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.visits_completed
+  offers_submitted:
+    description: Budget volume of offers submitted.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.offers_submitted
+  offers_accepted:
+    description: Budget volume of offers accepted.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.offers_accepted
+  ccv_signed:
+    description: Budget volume of contracts signed.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.ccv_signed
+  new_buyer_prospect:
+    description: Budget volume of new buyers prospects.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.new_buyer_prospect
+  recovered_buyer_prospect:
+    description: Budget volume of recovered buyers prospect.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.recovered_buyer_prospect
+  is_rede:
+    description: If it comes from rede.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.is_rede
+  dt_budget:
+    description: Date of the budget.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_budget_2024.date

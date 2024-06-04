@@ -1,0 +1,63 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_supply_budget_2024
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Sale
+description: Transformed table created from a Google Sheets file in order to input sale supply funnel budgets into datalake
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.city_group
+  lead_processing_operation:
+    description: Operation that processed the listing lead.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.lead_processing_operation
+  supply_mkt_origin_detailed:
+    description: Market origin of the lead.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.supply_mkt_origin_detailed
+  planning_taxonomy:
+    description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.planning_taxonomy
+  planning_conversion:
+    description: Field that identifies what kind of conversion detailed. Distinguishing the Inside Sales Operation with Inbound, Outbound and IS Expert.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.planning_conversion
+  planning_operation:
+    description: Identifies the conversion operation type.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.planning_operation
+  planning_cluster:
+    description: Field used to segmenting the channel in the Cluster for affiliates and Medium for Owners PWA and Price Calculator FR/FS.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.planning_cluster
+  company_report_origin:
+    description: Identifies the acquisition channel for operation (IS and FSS) and the conversion fonts for every else, like CIQ, Rede, PP Multi and Captaí.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.company_report_origin
+  prospects:
+    description: Budget volume of prospects.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.prospects
+  qualifieds:
+    description: Budget volume of qualifieds.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.qualifieds
+  opportunities:
+    description: Budget volume of opportunities.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.opportunities
+  available_qualifieds:
+    description: Budget volume of available qualifieds.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.available_qualifieds
+  first_listings:
+    description: Budget volume of first listings.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.first_listings
+  dt_budget:
+    description: Date of the budget.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2024.date

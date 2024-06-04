@@ -473,6 +473,12 @@ sheets_info:
     clean_table_name: sale_rbp_targets
     sheet_context: growth
 
+  sale_buyer_prospects_budget_2024:
+    sheet_id: 10fnWFzOQacP4TafxRWS3oGi6KIhP_6B1AhPO9YDetJU
+    sheet_name: sale_demand_targets_bps_2024
+    clean_table_name: sale_buyer_prospects_budget_2024
+    sheet_context: growth
+
   supply_listing_cross_historical:
     sheet_id: 1qmr2_MBz86YmvAxHzTs_oAktnbPBBqRaA9SOPsrj8NE
     sheet_name: listing_cruzado_historico

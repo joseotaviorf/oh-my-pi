@@ -1,0 +1,51 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_demand_cohort_budget_2024
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Sale
+description: Transformed table created from a Google Sheets file in order to input sale demand funnel cohort budgets into datalake
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.city_group
+  hub_offer:
+    description: Informs which associated hub the offer came from.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.hub_offer
+  weeks_conversion:
+    description: Indicator of the cohort. Represents by the number of weeks between the events. 'W0' stands for Week 0, 'W1' stands for Week 1 and so on.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.weeks_conversion
+  vb2vc:
+    description: Budget volume of visits booked that converted into visits completed.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.vb2vc
+  vc2os:
+    description: Budget volume of visits completed that converted into offers submitted.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.vc2os
+  os2oa:
+    description: Budget volume of offers submitted that converted into offers approved.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.os2oa
+  oa2ccv:
+    description: Budget volume of offers approved that converted into contracts.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.oa2ccv
+  ccv_signed:
+    description: Budget volume of contracts signed.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.ccv_signed
+  os2ccv:
+    description: Budget volume of offers submitted that converted into contracts.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.os2ccv
+  is_rede:
+    description: If it comes from rede.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.is_rede
+  dt_week_started:
+    description: Week of the budget.
+    lineage:
+      - datalake_gsheets_raw.sale_demand_cohort_budget_2024.week_start

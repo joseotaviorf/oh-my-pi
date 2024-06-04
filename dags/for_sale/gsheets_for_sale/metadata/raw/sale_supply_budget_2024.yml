@@ -1,0 +1,3 @@
+---
+database_name: datalake_gsheets_raw
+table_name: sale_supply_budget_2024
