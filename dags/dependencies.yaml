@@ -2998,7 +2998,7 @@ bietlejuice.looker_temp:
   - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_photo_jobs:load-dw-public-fact-photo-job
   - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_rent_flow_temp:load-dw-public-fact-listing-rent-flows
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
   - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
   - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-campaign

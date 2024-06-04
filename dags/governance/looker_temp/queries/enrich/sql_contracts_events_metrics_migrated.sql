@@ -5,6 +5,6 @@ SELECT
   COUNT(DISTINCT CASE WHEN sk_booking > 0 THEN sk_booking END) AS bookings,
   COUNT(DISTINCT CASE WHEN sk_offer > 0 THEN sk_offer END) AS offers,
   COUNT(DISTINCT CASE WHEN sk_client > 0 THEN sk_client END) AS users
-FROM dw_public.fact_listing_rent_flows
+FROM dw_rent.fact_listing_rent_flows
 GROUP BY
   1

@@ -14,11 +14,11 @@ columns:
     lineage:
       - datalake_ebdb_clean.portability.id_house
   id_flow:
-    description: Rent Flow identification. Each line should be an unique rent flow. Joins with dw_public.fact_listing_rent_flows.
+    description: Rent Flow identification. Each line should be an unique rent flow. Joins with dw_rent.fact_listing_rent_flows.
     lineage:
       - datalake_ebdb_clean.portability.id_flow
   id_tenant:
-    description: Tenant identification. Equivalent to sk_client from dw_public.fact_listing_rent_flows or sk_user from dw_public.dim_user.
+    description: Tenant identification. Equivalent to sk_client from dw_rent.fact_listing_rent_flows or sk_user from dw_public.dim_user.
     lineage:
       - datalake_ebdb_clean.portability.id_tenant
   id_house_state:
