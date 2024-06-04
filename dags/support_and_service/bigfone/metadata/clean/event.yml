@@ -7,6 +7,9 @@ columns:
   id_task:
     lineage:
       - datalake_bigfone_raw.event.metadata
+  id_call:
+    lineage:
+      - datalake_bigfone_raw.event.metadata
   id_reservation:
     lineage:
       - datalake_bigfone_raw.event.metadata
@@ -28,10 +31,13 @@ columns:
   workflow_name:
     lineage:
       - datalake_bigfone_raw.event.metadata
-  from_number:
+  from_phone_number:
     lineage:
       - datalake_bigfone_raw.event.metadata
-  to_number:
+  to_phone_number:
+    lineage:
+      - datalake_bigfone_raw.event.metadata
+  outbound_to_phone_number:
     lineage:
       - datalake_bigfone_raw.event.metadata
   direction:

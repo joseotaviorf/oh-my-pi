@@ -1,0 +1,60 @@
+database_name: datalake_bigfone
+table_name: reservations
+description:
+  Table that consolidates every reservation event that happened for every Call. A reservation
+  is an assignment of a support analyst to a call from a customer.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_task:
+    lineage:
+      - datalake_bigfone_clean.event.id_task
+    description: Task ID from Twilio
+  id_reservation:
+    lineage:
+      - datalake_bigfone_clean.event.id_reservation
+    description: Reservation ID from Twilio
+  id_worker:
+    lineage:
+      - datalake_bigfone_clean.event.id_worker
+    description: Worker ID from Twilio
+  id_user:
+    lineage:
+      - datalake_bigfone_clean.event.id_user
+    description: User ID from main
+  id_session:
+    lineage:
+      - datalake_bigfone_clean.event.id_session
+    description: Session ID from greenseer/sauron
+  user_phone:
+    lineage:
+      - datalake_bigfone_clean.event.user_phone
+    description: Phone number of the user
+  user_email:
+    lineage:
+      - datalake_bigfone_clean.event.user_email
+    description: Email of the user
+  communication_channel:
+    lineage:
+      - datalake_bigfone_clean.event.communication_channel
+    description: Call channel
+  bpo_name:
+    lineage:
+      - datalake_bigfone_clean.event.bpo_name
+    description: BPO responsible for handling the call
+  queue_name:
+    lineage:
+      - datalake_bigfone_clean.event.queue_name
+    description: Name of the queue assigned to the call
+  task_attributes:
+    lineage:
+      - datalake_bigfone_clean.event.task_attributes
+    description: JSON with call metadata
+  ts_created:
+    lineage:
+      - datalake_bigfone_clean.event.ts_created
+    description: Timestamp of when the call was created
+  ts_updated:
+    lineage:
+      - datalake_bigfone_clean.event.ts_updated
+    description: Timestamp of when the call was last updated
