@@ -30,7 +30,7 @@ weekly_tof_metrics AS (
     LEFT JOIN dw_public.dim_region AS dr
         ON dr.sk_region = fdtof.sk_region
   WHERE 
-    DATE(fdtof.dt_event) BETWEEN DATE_TRUNC('week', DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
+    DATE(fdtof.dt_event) BETWEEN DATE_TRUNC('week', DATE_SUB(MAKE_DATE({year},{month},{day}), 14)) AND DATE(MAKE_DATE({year},{month},{day}))
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 
 ), 
@@ -69,7 +69,7 @@ weekly_prospect_metrics AS (
     LEFT JOIN dw_public.dim_region AS dr
       ON fdpe.sk_region = dr.sk_region
   WHERE 
-    DATE(fdpe.ts_event) BETWEEN DATE_TRUNC('week', DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
+    DATE(fdpe.ts_event) BETWEEN DATE_TRUNC('week', DATE_SUB(MAKE_DATE({year},{month},{day}), 14)) AND DATE(MAKE_DATE({year},{month},{day}))
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ), 
 weekly_costs_metrics AS ( 
@@ -98,7 +98,7 @@ weekly_costs_metrics AS (
     INNER JOIN dw_public.dim_date AS dd 
       ON dd.sk_date = dc.id_date
   WHERE 
-    DATE(dd.date) BETWEEN DATE_TRUNC('week', DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
+    DATE(dd.date) BETWEEN DATE_TRUNC('week', DATE_SUB(MAKE_DATE({year},{month},{day}), 14)) AND DATE(MAKE_DATE({year},{month},{day}))
     AND LOWER(funnel_side) IN ('demand', 'branding')
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18  
 )
