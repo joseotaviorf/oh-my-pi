@@ -65,6 +65,8 @@ SELECT DISTINCT
     ir2.reviewer_type = "OWNER" AS is_exempted_by_owner,
     ir.reviewer_type = "OWNER" AS is_requested_by_owner,
     rr.is_finished,
+    rr.has_automatically_identified,
+    rr.has_automatic_identification_accepted,
     rr.ts_granted,
     rr.ts_created,
     rr.ts_updated,
