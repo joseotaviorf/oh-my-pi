@@ -25,6 +25,12 @@ columns:
   paid_amount:
     lineage:
       - datalake_checkout_raw.bolecode.paid_amount
+  interest_paid_amount:
+    lineage:
+      - datalake_checkout_raw.bolecode.interest_paid_amount
+  fine_paid_amount:
+    lineage:
+      - datalake_checkout_raw.bolecode.fine_paid_amount
   interest_amount_percentage:
     lineage:
       - datalake_checkout_raw.bolecode.interest_amount_percentage
@@ -91,6 +97,21 @@ columns:
   charge_messages:
     lineage:
       - datalake_checkout_raw.bolecode.charge_messages
+  bank_dac:
+    lineage:
+      - datalake_checkout_raw.bolecode.bank_dac
+  bank_name:
+    lineage:
+      - datalake_checkout_raw.bolecode.bank_name
+  bank_code:
+    lineage:
+      - datalake_checkout_raw.bolecode.bank_code
+  dac_agency:
+    lineage:
+      - datalake_checkout_raw.bolecode.dac_agency
+  payment_location:
+    lineage:
+      - datalake_checkout_raw.bolecode.payment_location
   typeable_line:
     lineage:
       - datalake_checkout_raw.bolecode.typeable_line
@@ -112,13 +133,22 @@ columns:
   operation_history:
     lineage:
       - datalake_checkout_raw.bolecode.operation_history
+  written_down_by:
+    lineage:
+      - datalake_checkout_raw.bolecode.written_down_by
+  write_down_reason:
+    lineage:
+      - datalake_checkout_raw.bolecode.write_down_reason
+  raw_response:
+    lineage:
+      - datalake_checkout_raw.bolecode.raw_response
   dt_due:
     lineage:
       - datalake_checkout_raw.bolecode.due_date
   dt_emission:
     lineage:
       - datalake_checkout_raw.bolecode.emission_date
-  dt_paid:
+  ts_paid:
     lineage:
       - datalake_checkout_raw.bolecode.paid_at
   dt_credit:
@@ -133,6 +163,9 @@ columns:
   dt_last_to_pay:
     lineage:
       - datalake_checkout_raw.bolecode.last_date_to_pay
+  ts_written_down:
+    lineage:
+      - datalake_checkout_raw.bolecode.written_down_at
   ts_started_processing:
     lineage:
       - datalake_checkout_raw.bolecode.started_processing_at

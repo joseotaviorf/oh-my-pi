@@ -124,13 +124,16 @@ columns:
   is_inferred_paid_at:
     lineage:
       - datalake_checkout_raw.boleto.is_inferred_paid_at
+  raw_response:
+    lineage:
+      - datalake_checkout_raw.boleto.raw_response
   dt_due:
     lineage:
       - datalake_checkout_raw.boleto.due_date
   dt_emission:
     lineage:
       - datalake_checkout_raw.boleto.emission_date
-  dt_paid:
+  ts_paid:
     lineage:
       - datalake_checkout_raw.boleto.paid_at
   dt_credit:
@@ -145,7 +148,7 @@ columns:
   dt_last_to_pay:
     lineage:
       - datalake_checkout_raw.boleto.last_date_to_pay
-  dt_written_down:
+  ts_written_down:
     lineage:
       - datalake_checkout_raw.boleto.written_down_at
   ts_last_synced:
