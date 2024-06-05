@@ -1,0 +1,63 @@
+---
+database_name: datalake_gsheets_clean
+table_name: rent_ongoing_listings_budget_2024
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Rent
+description: Transformed table created from a Google Sheets file in order to input ongoing listings budget into datalake
+columns:
+  business_context:
+    description: Business context of the listing.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.business_context
+  city_group:
+    description: City group of the listing.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.city_group
+  rental_administrator:
+    description: Rental administrator of the listing.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.rental_administrator
+  depublications:
+    description: Budget volume of despublciations.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.depublications
+  ongoing_listings:
+    description: Budget volume of ongoing listings (listings with "PUBLISHED" status).
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.ongoing_listings
+  recovered:
+    description: Budget volume of recovered listings (listings returning from "UNPUBLISHED" status after more then 12 weeks with such status).
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.recovered
+  relisting:
+    description: Budget volume of relistings (listings returning to "PUBLISHED" status after a rental).
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.relisting
+  suspensions:
+    description: Budget volume of suspended listings.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.suspensions
+  ended_rentals:
+    description: Budget volume of contracts with end date (dt_annulment) in the budget date.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.ended_rentals
+  erc:
+    description: Budget volume of contracts with end confirmation (ts_analyst_annulment_input) in the budget date.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.erc
+  ongoing_rentals:
+    description: Budget volume of ongoing contracts in the budget date (New Rental date <= budget date < Ended Rental date)
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.ongoing_rentals
+  new_rental:
+    description: Budget volume of contracts not canceled with term starting or entrance date in the budget date.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.new_rental
+  new_first_rental:
+    description: Budget volume of first property contracts not canceled with term starting or entrance date in the budget date.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.new_first_rental
+  dt_created:
+    description: Budget date.
+    lineage:
+      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.date

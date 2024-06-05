@@ -47,6 +47,12 @@ sheets_info:
     clean_table_name: demand_targets_2024_cohort
     sheet_context: for_rent
 
+  rent_demand_budget_2024:
+    sheet_id: 15kh4lhTAwUr3RQktAkInDo7hHLwlQIP3z6vvzNaNi0U
+    sheet_name: demand_targets_2024
+    clean_table_name: rent_demand_budget_2024
+    sheet_context: for_rent
+
   estrutura_gerente_corretor:
     sheet_id: 1ytcDCgwYO0hs2vEexqx8XlJe8etbg7yhLi44z2ja1zw
     sheet_name: Base
@@ -95,6 +101,12 @@ sheets_info:
     clean_table_name: ongoing_listings_target
     sheet_context: for_rent
 
+  rent_ongoing_listings_budget_2024:
+    sheet_id: 1gMQoDaH8LY3rHCqIr5SCNBxLdSeVmMP9hMI2JCtttqU
+    sheet_name: ongoing_listings_target
+    clean_table_name: rent_ongoing_listings_budget_2024
+    sheet_context: for_rent
+
   ppmulti_goals_am:
     sheet_id: 1QrDKA4PAohi-5olyUcnQBtJvweAdO-gJ59KcjOlLjdI
     sheet_name: ppmulti_goals_am
@@ -135,6 +147,12 @@ sheets_info:
     sheet_id: 1V5HQxP9pI9pm7P4si59P40TJvGxGS1doVUTX-R3h0iY
     sheet_name: supply_targets_2024_cohort
     clean_table_name: supply_targets_2024_cohort
+    sheet_context: for_rent
+
+  rent_supply_budget_2024:
+    sheet_id: 1KKsISTNvrwmP-XTZvBg06TRl4tdtFj2DuqtoK29tM_U
+    sheet_name: supply_targets_2024
+    clean_table_name: rent_supply_budget_2024
     sheet_context: for_rent
 
   tratativas_actionline_ciq_full_responses:

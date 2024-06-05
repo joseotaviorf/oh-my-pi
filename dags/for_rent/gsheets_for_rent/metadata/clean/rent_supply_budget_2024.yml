@@ -1,0 +1,67 @@
+---
+database_name: datalake_gsheets_clean
+table_name: rent_supply_budget_2024
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Rent
+description: Transformed table created from a Google Sheets file in order to input supply funnel budgets into datalake
+columns:
+  dt_budget:
+    description: Date of the budget.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.date
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.city_group
+  lead_processing_operation:
+    description: Operation that processed the listing lead.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.lead_processing_operation
+  supply_mkt_origin_detailed:
+    description: Market origin of the lead.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.supply_mkt_origin_detailed
+  planning_taxonomy:
+    description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.planning_taxonomy
+  rental_administrator:
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.rental_administrator
+  planning_conversion:
+    description: Detailed conversion operation type. Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.planning_conversion
+  planning_operation:
+    description: Identifies the conversion operation type.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.planning_operation
+  planning_cluster:
+    description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.planning_cluster
+  company_report_origin:
+    description: Acquisition channel for IS and FSS operations and conversion source for the others (CIQ, Rede, PP Multi, Captaí).
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.company_report_origin
+  first_listings:
+    description: Budget volume of first listings.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.first_listings
+  opportunities:
+    description: Budget volume of opportunities.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.opportunities
+  prospects:
+    description: Budget volume of prospects.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.prospects
+  qualifieds:
+    description: Budget volume of qualifieds.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.qualifieds
+  available_qualifieds:
+    description: Budget volume of available qualifieds.
+    lineage:
+      - datalake_gsheets_raw.rent_supply_budget_2024.available_qualifieds

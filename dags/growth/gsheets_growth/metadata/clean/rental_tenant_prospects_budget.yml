@@ -1,0 +1,38 @@
+database_name: datalake_gsheets_clean
+table_name: rental_tenant_prospects_budget_2024
+owner: '@data-growth'
+domain: Growth
+description: Transformed table created from a Google Sheets file in order to input new tenant prospects and recovered tenant prospects budget into datalake
+columns:
+  tier:
+    description: Group of city groups
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.tier
+  city_group:
+    description: City group of the budget
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.city_group
+  mkt_channel:
+    description: Marketing channel. Level of the Growth Marketing Taxonomy
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_channel
+  mkt_medium:
+    description: Marketing medium. Level of the Growth Marketing Taxonomy
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_medium
+  mkt_source:
+    description: Marketing source. Level of the Growth Marketing Taxonomy
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_source
+  ntp_target:
+    description: nTP budget
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.ntp_target
+  rtp_target:
+    description: rTP budget
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.rtp_target
+  dt_budget:
+    description: Date of the budget
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.date

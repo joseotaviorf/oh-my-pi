@@ -1,0 +1,63 @@
+---
+database_name: datalake_gsheets_clean
+table_name: rent_demand_budget_2024
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Rent
+description: Transformed table created from a Google Sheets file in order to input demand funnel budgets into datalake
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.city_group
+  dt_budget:
+    description: Date of the budget.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.date
+  business_type:
+    description: Business type of the listing related to the event (ASP, CIQ, B2B or Core).
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.business_type
+  rent_flow_origin:
+    description: Origin (first touchpoint) of the rent flow related to the event.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.rent_flow_origin
+  rental_administrator:
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.rental_administrator
+  visits_booked:
+    description: Budget volume of visits booked.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.visits_booked  
+  visits_completed:
+    description: Budget volume of visits completed.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.visits_completed
+  offers_submitted:
+    description: Budget volume of offers submitted.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.offers_submitted
+  offers_accepted:
+    description: Budget volume of offers accepted.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.offers_accepted
+  evaluation_started:
+    description: Budget volume of evaluations started.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.evaluation_started
+  evaluation_positive:
+    description: Budget volume of evaluations positive.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.evaluation_positive
+  documentation_sent:
+    description: Budget volume of documentations sent.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.documentation_sent
+  credit_approved:
+    description: Budget volume of credit analysis approved.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.credit_approved
+  contracts_signed:
+    description: Budget volume of contracts signed.
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2024.contracts_signed
