@@ -13,13 +13,16 @@ deduplicate_trato_feito_negotiation AS (
       datalake_debt_recovery.negotiation
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_recupera ORDER BY ts_created_at DESC) = 1
 ),
-deduplicate_accounting_installment AS (
+deduplicate_invoice_extra AS (
   SELECT
-    id_external,
-    id_installment
+    a.id_external AS id_invoice,
+    a.id_installment
   FROM
-      datalake_trato_feito_clean.accounting_installment
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_updated DESC) = 1
+      datalake_trato_feito_clean.accounting_installment AS a
+  LEFT JOIN datalake_retsuko.invoice AS i
+    ON i.id_external = a.id_external
+  WHERE i.status != "canceled"
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY a.id_installment ORDER BY COALESCE(i.ts_paid, i.ts_created) ASC) = 1
 ),
 trato_feito_installment AS (
   SELECT
@@ -28,8 +31,8 @@ trato_feito_installment AS (
     n.id_negotiation_recupera,
     n.creditor,
     i.id AS id_installment,
-    ai.id_external AS id_invoice_extra,
-    DENSE_RANK() OVER(PARTITION BY n.id_contract, i.id_negotiation ORDER BY i.ts_created, i.id_external) AS installment_number,
+    ai.id_invoice AS id_invoice_extra,
+    i.installment_number,
     i.status AS installment_status,
     i.id_external AS id_receipt,
     i.adm_fee_amount,
@@ -46,7 +49,7 @@ trato_feito_installment AS (
       deduplicate_trato_feito_negotiation AS n
           ON i.id_negotiation = n.id_negotiation
   LEFT JOIN
-      deduplicate_accounting_installment AS ai
+      deduplicate_invoice_extra AS ai
         ON ai.id_installment = i.id
 ),
 nexxera_confirmation AS (
@@ -68,9 +71,9 @@ SELECT DISTINCT
     STRING(COALESCE(i.id_negotiation, tfi.id_negotiation_recupera)) AS sk_negotiation,
     i.customer_document AS sk_debtor,
     tfi.id_installment,
-    tfi.id_invoice_extra,
+    CAST(tfi.id_invoice_extra AS BIGINT) AS id_invoice_extra,
     COALESCE(i.id_receipt, tfi.id_receipt) AS id_receipt,
-    COALESCE(i.installment_number, tfi.installment_number) AS installment_number,
+    CAST(COALESCE(i.installment_number, tfi.installment_number) AS INT) AS installment_number,
     COALESCE(i.creditor, tfi.creditor) AS creditor,
     i.is_special_installment,
     CASE

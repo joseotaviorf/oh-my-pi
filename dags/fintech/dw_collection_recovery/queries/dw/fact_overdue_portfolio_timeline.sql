@@ -150,6 +150,7 @@ SELECT
     IF(a.dt_reference >= a.dt_invoice_paid, g.advisory, a.advisory) AS advisory,
     IF(a.dt_reference >= a.dt_invoice_paid, g.distributor, a.distributor) AS distributor,
     IF(a.dt_reference >= a.dt_invoice_paid, g.partner, a.partner) AS partner,
+    IF(ROW_NUMBER() OVER(PARTITION BY a.id_contract, a.id_invoice, a.dt_month_start ORDER BY a.dt_reference DESC) = 1, TRUE, FALSE) AS is_most_recent_record_month,
     a.dt_invoice_paid,
     a.dt_invoice_due,
     a.dt_invoice_due_adjust,

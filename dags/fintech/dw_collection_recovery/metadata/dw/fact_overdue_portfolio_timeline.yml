@@ -107,6 +107,13 @@ columns:
     lineage:
       - datalake_recupera_clean.operational_records.partner
     description: The partner responsible for the contract on the reference date. This field is created by the fallback (coalesce) between the advisory and the distributor
+  is_most_recent_record_month:
+    lineage:
+      - datalake_recupera_clean.operational_records.id_contract
+      - datalake_recupera_clean.operational_records.id_invoice
+      - datalake_recupera_clean.operational_records.dt_month_start
+      - datalake_recupera_clean.operational_records.dt_reference
+    description: Boolean to indicate if the invoice record is the most recent in that month.
   dt_invoice_paid:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.dt_invoice_paid

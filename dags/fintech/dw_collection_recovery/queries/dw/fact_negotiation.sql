@@ -13,6 +13,7 @@ trato_feito_negotiation AS (
     status,
     has_renegotiated AS is_renegotiation,
     IF(collector = "5A-collector", TRUE, FALSE) AS is_ssn, --SSN boletão (BOSSN)
+    IF(ts_first_payment IS NOT NULL, TRUE, FALSE) AS is_down_payment_paid,
     qt_installments,
     negotiation_original_amount,
     interest_fee_amount,
@@ -23,6 +24,7 @@ trato_feito_negotiation AS (
     negotiation_discount_amount AS total_discount_amount, -- Total debt (total_debt_amount = original + fine + fee + credit card) - Negotiated amount (total_expected_amount)
     GREATEST(ROUND((negotiation_original_amount + fine_fee_amount + interest_fee_amount) - total_expected_amount, 2), 0) AS discount_amount_without_adm_fee, -- Total debt without credit card fee (debt_amount_without_adm_fee = original + fine + fee) - Negotiated amount (total_expected_amount)
     total_expected_amount AS negotiated_amount,
+    down_payment_amount,
     paid_amount,
     INT(qt_installments_paid) AS qt_installments_paid,
     breached_installment,
@@ -186,7 +188,7 @@ union_sources AS (
     rn.promisse_payment_method,
     COALESCE(tfn.is_ssn, FALSE) AS is_ssn,
     rn.agreement_in_delay,
-    rn.down_payment AS is_down_payment_paid,
+    COALESCE(tfn.is_down_payment_paid, rn.down_payment) AS is_down_payment_paid,
     tfn.is_renegotiation,
     r.has_been_renegotiated,
     oi.total_invoices_negotiated,
@@ -204,7 +206,7 @@ union_sources AS (
     COALESCE(tfn.negotiated_amount, rn.negotiated_amount) AS negotiated_amount,
     rn.negotiated_to_be_due_amount,
     rn.negotiated_overdue_amount,
-    rn.down_payment_amount,
+    COALESCE(tfn.down_payment_amount, rn.down_payment_amount) AS down_payment_amount,
     COALESCE(tfn.paid_amount, rn.total_amount_paid, 0) AS paid_amount,
     rn.total_next_due,
     oi.dt_due_invoice_anchor,
@@ -234,6 +236,7 @@ SELECT
   u.sk_negotiation,
   sk_debtor,
   id_negotiation_trato_feito,
+  id_negotiation_recupera,
   u.id_contract,
   COALESCE(po.operator_name, u.id_operator) AS id_operator,
   creditor,

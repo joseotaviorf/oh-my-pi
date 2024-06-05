@@ -23,6 +23,7 @@ SELECT
     cp.id,
     cp.id_external,
     cp.id_negotiation,
+    DENSE_RANK() OVER(PARTITION BY cp.id_negotiation ORDER BY cp.ts_created, cp.id_external) AS installment_number,
     cp.status,
     cp.adm_fee_amount,
     cp.installment_fee_amount,
