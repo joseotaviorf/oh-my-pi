@@ -45,18 +45,6 @@ columns:
     description: Budget volume of contracts with end confirmation (ts_analyst_annulment_input) in the budget date.
     lineage:
       - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.erc
-  ongoing_rentals:
-    description: Budget volume of ongoing contracts in the budget date (New Rental date <= budget date < Ended Rental date)
-    lineage:
-      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.ongoing_rentals
-  new_rental:
-    description: Budget volume of contracts not canceled with term starting or entrance date in the budget date.
-    lineage:
-      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.new_rental
-  new_first_rental:
-    description: Budget volume of first property contracts not canceled with term starting or entrance date in the budget date.
-    lineage:
-      - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.new_first_rental
   dt_created:
     description: Budget date.
     lineage:
