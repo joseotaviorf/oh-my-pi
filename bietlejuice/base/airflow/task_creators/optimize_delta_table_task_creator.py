@@ -15,7 +15,10 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
     """
 
     def create_task(
-        self, table_attributes: list, parallelism: int = 16
+        self,
+        table_attributes: list,
+        parallelism: int = 16,
+        optimize_delta_table_local_id: int = None,
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         """
         Returns the task that optimizes all the Delta tables in the list.
@@ -23,6 +26,8 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
 
         spark_job_name = f"optimize_delta_table"
         task_id = self.generate_task_id(table_attributes)
+        if optimize_delta_table_local_id:
+            task_id = f"{task_id}-{optimize_delta_table_local_id}"
         parameters = [
             table_attributes[0].layer.value,
             self._get_tables_parameter(table_attributes),
