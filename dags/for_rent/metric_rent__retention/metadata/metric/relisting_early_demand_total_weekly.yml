@@ -10,6 +10,17 @@ columns:
       - dw_rent.dim_house_listing.ts_publication
     description: "Week of the publication."
     dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Rent value segment."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
   country_code:
     lineage:
       - dw_rent.dim_house_listing.country_code
