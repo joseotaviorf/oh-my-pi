@@ -163,10 +163,12 @@ def find_recently_modified_files_by_prefix(
         f"Contents[?(to_string(LastModified)>='\"{formatted_date} 00:00:00+00:00\"'&&to_string(LastModified)<='\"{formatted_date} 23:59:59+00:00\"')].[Key,Size,LastModified]"
     )
     object_tuples = []
-    try: 
+    try:
         for obj in objects:
 
-            if obj is not None and obj[0].endswith((".json", ".parquet", ".txt", ".csv")):
+            if obj is not None and obj[0].endswith(
+                (".json", ".parquet", ".txt", ".csv")
+            ):
                 object_tuples.append(
                     (
                         sanitize_file_name(bucket, obj[0]),
@@ -178,7 +180,10 @@ def find_recently_modified_files_by_prefix(
                 )
     except botocore.exceptions.ClientError as error:
         logging.error(f"Problem with prefix {prefix} on bucket {bucket}")
-        raise error     
+        if error.response["Error"]["Code"] == "AccessDenied":
+            logging.error("Permission error. Skipping table.")
+            return []
+        raise error
 
     return object_tuples
 
@@ -295,8 +300,7 @@ def create_dag_dataframe(content, execution_date):
     schema = "dag:string, dag_location:string, cluster_configuration:string"
 
     df = spark.createDataFrame(
-        (Row(**row_content) for row_content in content),
-        schema=schema,
+        (Row(**row_content) for row_content in content), schema=schema
     )
 
     return (
@@ -350,10 +354,7 @@ Given the dictionary with the DagBag content and the table name, enriches it app
 def transform_dictionaries_to_dataframe(
     content: dict, execution_date: datetime, table_name: str
 ) -> DataFrame:
-    enrichments = {
-        "table": enrich_table,
-        "dag": create_dag_dataframe,
-    }
+    enrichments = {"table": enrich_table, "dag": create_dag_dataframe}
     return enrichments.get(table_name)(content, execution_date)
 
 

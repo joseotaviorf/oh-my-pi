@@ -62,7 +62,7 @@ INIT_CLUSTER_REGEX = r"^(?:create|execute-job)-cluster(?:-\d+)?$"
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_GOVERNANCE,
+        "owner": DAGOwnerEnum.DATA_PLATFORM,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
