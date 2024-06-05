@@ -30,9 +30,7 @@ daily_tof_metrics AS (
     LEFT JOIN dw_public.dim_region AS dr
         ON dr.sk_region = fdtof.sk_region
   WHERE 
-    fdtof.year = {year}
-    AND fdtof.month = {month}
-    AND fdtof.day = {day}
+    DATE(fdtof.dt_event) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 
 ), 
@@ -71,9 +69,7 @@ daily_prospect_metrics AS (
     LEFT JOIN dw_public.dim_region AS dr
       ON fdpe.sk_region = dr.sk_region
   WHERE 
-    fdpe.year = {year}
-    AND fdpe.month = {month}
-    AND fdpe.day = {day}
+    DATE(fdpe.ts_event) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ), 
 daily_costs_metrics AS ( 
@@ -102,9 +98,7 @@ daily_costs_metrics AS (
     INNER JOIN dw_public.dim_date AS dd 
       ON dd.sk_date = dc.id_date
   WHERE 
-    dd.year = {year}
-    AND dd.month = {month}
-    AND dd.day = {day}
+    DATE(dd.date) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
     AND LOWER(funnel_side) IN ('demand', 'branding')
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18  
 )

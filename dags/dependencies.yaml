@@ -3112,7 +3112,6 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_growth_automatic_daily_costs:load-enrich-daily-costs
-  - bietlejuice.enrich_growth_manual_daily_costs:load-enrich-daily-costs
 bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_region:load-dw-public-dim-region
