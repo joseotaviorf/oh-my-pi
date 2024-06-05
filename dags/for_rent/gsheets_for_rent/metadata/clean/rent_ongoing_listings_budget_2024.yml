@@ -45,7 +45,7 @@ columns:
     description: Budget volume of contracts with end confirmation (ts_analyst_annulment_input) in the budget date.
     lineage:
       - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.erc
-  dt_created:
+  dt_budget:
     description: Budget date.
     lineage:
       - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.date
