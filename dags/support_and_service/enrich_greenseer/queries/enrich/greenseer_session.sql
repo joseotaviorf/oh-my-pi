@@ -136,7 +136,7 @@ greenseer_retentions AS (
   WHERE
     g.id_pipeline IN ('whatsapp', 'whatsapp_main', 'whatsapp_main_legacy', 'in_app_main')
     AND s.source IN ('whatsapp', 'internal_chat')
-    AND s.source_environment IN ('default', 'QuintoandarSupport')
+    AND s.source_environment IN ('default', 'QuintoandarSupport', 'QuintoandarSupport:DEFAULT')
     AND s.status = 'expired'
     AND g.tried_retention
 ),
