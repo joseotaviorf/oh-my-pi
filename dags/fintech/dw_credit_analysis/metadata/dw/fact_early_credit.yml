@@ -4,7 +4,7 @@ owner: guilherme.sacramento@quintoandar.com.br
 domain: fintech
 description: "Table with the LAST early credit analysis information of the tenant"
 columns:
-  sk_early_credit:
+  sk_early_credit_analysis:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id
     description: "ID of the credit analysis"
@@ -64,11 +64,11 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
     description: "Reason of the analysis rejection."
-  ts_created:
+  dt_early_credit_created:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_created
     description: "Creation timestamp"
-  ts_expired:
+  dt_early_credit_expired:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
     description: "Expiration timestamp"

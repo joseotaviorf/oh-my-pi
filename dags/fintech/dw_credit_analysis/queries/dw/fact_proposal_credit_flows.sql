@@ -13,15 +13,13 @@ WITH credit_analysis AS (
 ),
 early_credit_analysis AS (
   SELECT
-    id_user,
-    id_house,
-    MIN(DATE(ts_early_credit_analysis_created)) AS dt_created,
-    DATE_ADD(MAX(DATE(ts_early_credit_analysis_created)), 30) AS dt_expired
+    sk_early_credit_analysis,
+    sk_user,
+    sk_house,
+    dt_early_credit_created,
+    dt_early_credit_expired
   FROM
-    datalake_credit_analysis.early_credit_analysis
-  GROUP BY
-    id_user,
-    id_house
+    dw_credit.fact_early_credit
 ),
 guarantees AS (
   SELECT
@@ -211,6 +209,7 @@ proposal_credit_flows AS (
     rf.sk_region,
     rf.sk_tenant_doc_complete_date,
     rf.sk_tenant_first_doc_sent_date,
+    COALESCE(eca.sk_early_credit_analysis, -1) AS sk_early_credit_analysis,
     TO_DATE(rf.sk_tenant_first_doc_sent_date::STRING, 'yyyyMMdd') AS dt_tenant_first_doc_sent_date,
     rf.sk_guarantee_accepted_date,
     rf.sk_drop_reason,
@@ -241,26 +240,23 @@ proposal_credit_flows AS (
     END AS funnel_drop_step,
     CAST(
       COALESCE(
-        REGEXP_REPLACE(CAST(eca.dt_created AS VARCHAR(8)), '-', ''),
+        REGEXP_REPLACE(CAST(eca.dt_early_credit_created AS VARCHAR(8)), '-', ''),
         -1
       ) AS INTEGER
-    ) AS sk_ec_created_date,
+    ) AS sk_early_credit_created,
     CAST(
       COALESCE(
-        REGEXP_REPLACE(CAST(eca.dt_expired AS VARCHAR(8)), '-', ''),
+        REGEXP_REPLACE(CAST(eca.dt_early_credit_expired AS VARCHAR(8)), '-', ''),
         -1
       ) AS INTEGER
-    ) AS sk_ec_expired_date,
+    ) AS sk_early_credit_expired,
     rf.is_first_credit_evaluation,
     rf.is_last_credit_evaluation,
     rf.is_bypass,
     CASE
-      WHEN rf.dt_offer_submitted_date
-        BETWEEN eca.dt_created
-        AND eca.dt_expired
-      THEN TRUE
-      ELSE FALSE
-    END AS has_early_credit,
+      WHEN eca.sk_early_credit_analysis IS NULL THEN FALSE 
+      ELSE TRUE
+    END AS is_early_credit,
     rf.dt_tenant_doc_complete_date,
     rf.dt_credit_analysis_approved_date,
     rf.dt_offer_approved_date,
@@ -268,8 +264,8 @@ proposal_credit_flows AS (
     rf.dt_guarantee_paid_date,
     rf.dt_contract_created_date,
     rf.dt_contract_signed_date,
-    eca.dt_created AS dt_ec_created,
-    eca.dt_expired AS dt_ec_expired,
+    eca.dt_early_credit_created,
+    eca.dt_early_credit_expired,
     rf.dt_offer_submitted_date,
     rf.country_code,
     rf.rental_administrator,
@@ -286,8 +282,11 @@ proposal_credit_flows AS (
     rent_flows AS rf
   LEFT JOIN
     early_credit_analysis AS eca
-      ON rf.sk_client = eca.id_user
-      AND rf.sk_house = eca.id_house
+      ON  rf.sk_client = eca.sk_user
+      AND rf.sk_house  = eca.sk_house
+      AND eca.dt_early_credit_created 
+        BETWEEN rf.dt_offer_submitted_date - interval '1' MONTH
+        AND     rf.dt_offer_submitted_date
 )
 SELECT
   sk_client,
@@ -297,6 +296,7 @@ SELECT
   sk_contract_created_date,
   sk_contract_signed_date,
   sk_credit_analysis,
+  sk_early_credit_analysis,
   sk_analysis_request,
   sk_checklist,
   sk_credit_analysis_approved_date,
@@ -319,8 +319,8 @@ SELECT
   sk_tenant_doc_complete_date,
   sk_tenant_first_doc_sent_date,
   sk_drop_reason,
-  sk_ec_created_date,
-  sk_ec_expired_date,
+  sk_early_credit_created,
+  sk_early_credit_expired,
   funnel_step,
   -- This rule is necessary to guarantee that the drop step is correct when the guarantee is not accepted
   CASE
@@ -333,7 +333,9 @@ SELECT
   is_first_credit_evaluation,
   is_last_credit_evaluation,
   is_bypass,
-  has_early_credit,
+  is_early_credit,
+  dt_early_credit_created,
+  dt_early_credit_expired,
   country_code,
   rental_administrator,
   dt_last_credit_evaluation_init,

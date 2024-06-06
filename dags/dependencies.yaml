@@ -174,7 +174,6 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-analysis-request
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-checklist
-  - bietlejuice.enrich_credit_analysis:load-enrich-early-credit-analysis
   - bietlejuice.enrich_docx:load-enrich-income-documentation
   - bietlejuice.enrich_docx:load-enrich-personal-documentation
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
