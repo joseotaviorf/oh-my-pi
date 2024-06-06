@@ -16,6 +16,10 @@ columns:
   tags:
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.tags
+  journey_step:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.tags
+    description: The journey step associated with the campaign.
   channels:
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.channels

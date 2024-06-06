@@ -40,6 +40,10 @@ columns:
     description: The tag names associated with the canvas.
     lineage:
       - datalake_braze_details_raw.canvas_details_tenants.tags
+  journey_step:
+    description: The journey step associated with the canvas.
+    lineage:
+      - datalake_braze_details_raw.canvas_details_tenants.tags
   archived:
     description: Whether the Canvas is archived.
     lineage:

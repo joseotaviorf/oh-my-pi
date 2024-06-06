@@ -4,6 +4,7 @@ SELECT
     description AS campaign_description,
     schedule_type,
     FROM_JSON(tags, 'array<string>') AS tags,
+    REGEXP_EXTRACT(tags, 'journeyStep=(\\w+)') AS journey_step,
     FROM_JSON(channels, 'array<string>') AS channels,
     FROM_JSON(REPLACE(conversion_behaviors, 'None', '\'\''), 'array<map<string,string>>') AS conversion_behaviors,
     messages,

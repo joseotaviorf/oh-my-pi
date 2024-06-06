@@ -7,6 +7,7 @@ SELECT
     FROM_JSON(steps, 'array<map<string,string>>') AS steps,
     FROM_JSON(channels, 'array<string>') AS channels,
     FROM_JSON(tags, 'array<string>') AS tags,
+    REGEXP_EXTRACT(tags, 'journeyStep=(\\w+)') AS journey_step,
     archived,
     draft,
     TO_TIMESTAMP(first_entry) AS ts_first_entry,

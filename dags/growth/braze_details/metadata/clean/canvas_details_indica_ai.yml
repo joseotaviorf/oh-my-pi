@@ -25,6 +25,10 @@ columns:
   tags:
     lineage:
       - datalake_braze_details_raw.canvas_details_indica_ai.tags
+  journey_step:
+    description: The journey step associated with the canvas.
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.tags
   archived:
     lineage:
       - datalake_braze_details_raw.canvas_details_indica_ai.archived
