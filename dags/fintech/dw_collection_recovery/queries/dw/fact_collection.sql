@@ -1,12 +1,8 @@
-WITH historical_code_description AS (
-    SELECT DISTINCT
-        id_historical,
-        historical_description
-    FROM datalake_recupera_clean.historical
-),
+WITH
 collection_calculation AS (
     SELECT
         c.id_customer AS sk_debtor,
+        c.id_contract,
         CASE
         WHEN c.id_creditor IN (1,4,7,8,9) THEN "IQ QuintoAndar"
         WHEN c.id_creditor IN (3,5) THEN "IQ QuintoCred"
@@ -14,8 +10,8 @@ collection_calculation AS (
         END AS creditor,
         UPPER(c.operator_name) AS id_operator,
         o.id_operator_registration,
-        UPPER(c.occurrence) AS id_occurrence,
-        UPPER(h.historical_description) AS occurrence,
+        UPPER(c.id_occurrence) AS id_occurrence,
+        UPPER(COALESCE(c.occurrence, c.status_occurrence)) AS occurrence,
         DATE(c.ts_occurrence) AS dt_occurrence,
         INT(SUM(c.esforco)) AS total_esforco,
         INT(SUM(c.alo)) AS total_alo,
@@ -26,17 +22,16 @@ collection_calculation AS (
     FROM datalake_recupera.collection AS c
     LEFT JOIN datalake_recupera_clean.operators AS o
         ON UPPER(c.operator_name) = UPPER(o.id_operator)
-    LEFT JOIN historical_code_description AS h
-        ON c.occurrence = h.id_historical
     GROUP BY 1, 2, 3, 4, 5, 6, 7
 )
 SELECT
     md5(CONCAT(sk_debtor, creditor, id_operator, id_occurrence, dt_occurrence)) AS sk_collection,
     sk_debtor,
-    creditor,
+    id_contract,
     id_operator,
     id_operator_registration,
     id_occurrence,
+    creditor,
     occurrence,
     total_esforco,
     total_alo,
