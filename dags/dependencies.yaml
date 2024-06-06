@@ -674,7 +674,6 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_rent_flow_temp:
-  - bietlejuice.dw_rent_flow:load-dw-rent-dim-rent-flow-taxonomy
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
 bietlejuice.dw_rent_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region

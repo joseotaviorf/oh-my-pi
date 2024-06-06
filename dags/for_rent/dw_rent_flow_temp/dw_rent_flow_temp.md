@@ -14,5 +14,4 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 This pipeline produces the following output table in DW:
 
-- `dw_public.dim_rent_flow_taxonomy`
 - `dw_public.fact_listing_rent_flows`
