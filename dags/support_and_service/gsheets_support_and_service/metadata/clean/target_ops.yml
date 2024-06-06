@@ -1,0 +1,39 @@
+database_name: datalake_gsheets_clean
+table_name: target_ops
+columns:
+  date_type:
+    lineage:
+      - datalake_gsheets_raw.target_ops.date_type
+  description:
+    lineage:
+      - datalake_gsheets_raw.target_ops.descricao
+  index:
+    lineage:
+      - datalake_gsheets_raw.target_ops.indice_setor
+  level:
+    lineage:
+      - datalake_gsheets_raw.target_ops.level
+  journey:
+    lineage:
+      - datalake_gsheets_raw.target_ops.journey
+  sub_journey:
+    lineage:
+      - datalake_gsheets_raw.target_ops.subjorney
+  channel:
+    lineage:
+      - datalake_gsheets_raw.target_ops.channel
+  team:
+    lineage:
+      - datalake_gsheets_raw.target_ops.team
+  company:
+    lineage:
+      - datalake_gsheets_raw.target_ops.empresa
+  metric_name:
+    lineage:
+      - datalake_gsheets_raw.target_ops.indicador
+  target:
+    lineage:
+      - datalake_gsheets_raw.target_ops.valor
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.target_ops.date

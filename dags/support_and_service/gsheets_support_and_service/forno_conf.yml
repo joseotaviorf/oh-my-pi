@@ -123,6 +123,12 @@ sheets_info:
     clean_table_name: tag_sla_target
     sheet_context: support_and_service
 
+  target_ops:
+    sheet_id: 15VVj5Wm2IkFzvGFRrAec4jg_DXgPxC5tXpR5FXGCPMU
+    sheet_name: Base de Targets
+    clean_table_name: target_ops
+    sheet_context: support_and_service
+
   target_service_kpis:
     sheet_id: 1G6O5w3Ue5K2cyutyOUZM3_ToqU1xnFCz2ORwCvuYPaY
     sheet_name: Export
@@ -146,7 +152,7 @@ sheets_info:
     sheet_name: AE - Data Ingestion
     clean_table_name: tool_access_mapping
     sheet_context: support_and_service
-  
+
   target_share_nps:
     sheet_id: 1CeePKuTu8eDoXHjJsX0NAh8rhu-6tjjagTxOb_wJzdw
     sheet_name: DB Target Share
