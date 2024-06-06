@@ -49,10 +49,45 @@ WITH iptu_enriched AS (
   FROM
     datalake_iptu_clean.iptu_sp
   WHERE
-    (building_standard_type LIKE "Comercial horizontal%" AND property_use_type IN ("Residência", "Residência coletiva, exclusive cortiço (mais de uma residência no lote)", "Residência e outro uso (predominância residencial)"))
-    OR (building_standard_type LIKE "Comercial vertical%" AND property_use_type IN ("Flat de uso comercial (semelhante a hotel)", "Flat residencial em condomínio",  "Residência", "Residência e outro uso (predominância residencial)"))
-    OR (building_standard_type LIKE "Residencial horizontal%" AND property_use_type IN ("Apartamento em condomínio", "Residência", "Residência coletiva, exclusive cortiço (mais de uma residência no lote)", "Residência e outro uso (predominância residencial)"))
-    OR (building_standard_type LIKE "Residencial horizontal%" AND property_use_type IN ("Apartamento em condomínio", "Flat de uso comercial (semelhante a hotel)", "Flat residencial em condomínio", "Residência", "Residência coletiva, exclusive cortiço (mais de uma residência no lote)", "Residência e outro uso (predominância residencial)"))
+    (
+      building_standard_type LIKE "Comercial horizontal%"
+      AND property_use_type IN (
+        "Residência",
+        "Residência coletiva, exclusive cortiço (mais de uma residência no lote)",
+        "Residência e outro uso (predominância residencial)"
+      )
+    )
+    OR (
+        building_standard_type LIKE "Comercial vertical%"
+        AND property_use_type IN (
+          "Flat de uso comercial (semelhante a hotel)",
+          "Flat residencial em condomínio",
+          "Residência",
+          "Residência e outro uso (predominância residencial)"
+        )
+    )
+    OR (
+        building_standard_type LIKE "Residencial horizontal%"
+        AND property_use_type IN (
+          "Apartamento em condomínio",
+          "Prédio de apartamento, não em condomínio, de uso misto (apartamentos e escritórios e/ou consultórios), com ou sem loja (predominância residencial)",
+          "Residência",
+          "Residência coletiva, exclusive cortiço (mais de uma residência no lote)",
+          "Residência e outro uso (predominância residencial)"
+        )
+    )
+    OR (
+        building_standard_type LIKE "Residencial vertical%"
+        AND property_use_type IN (
+          "Apartamento em condomínio",
+          "Flat de uso comercial (semelhante a hotel)",
+          "Flat residencial em condomínio",
+          "Prédio de apartamento, não em condomínio, de uso exclusivamente residencial",
+          "Residência",
+          "Residência coletiva, exclusive cortiço (mais de uma residência no lote)",
+          "Residência e outro uso (predominância residencial)"
+        )
+    )
 )
 SELECT
   i.taxpayer_number,
