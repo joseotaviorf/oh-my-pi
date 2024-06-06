@@ -31,6 +31,8 @@ SELECT DISTINCT
     o.id > 15 AND o.id < 5000000 AS is_legacy,
     IF(o.id > 15 AND o.id < 5000000, o.dt_due, CAST(NULL AS DATE)) AS dt_due_legacy,
     IF(o.id > 5000000, o.dt_due, CAST(NULL AS DATE)) AS dt_due,
+    dt_bill_month,
+    dt_payment_scheduled,
     timestamp(o.dt_paid) AS ts_paid,
     o.ts_created
 FROM
@@ -88,6 +90,8 @@ SELECT DISTINCT
     True AS is_legacy,
     ol.ts_due AS dt_due_legacy,
     CAST(NULL AS DATE) AS dt_due,
+    CAST(NULL AS DATE) AS dt_bill_month,
+    CAST(NULL AS DATE) AS dt_payment_scheduled,
     CAST(NULL AS TIMESTAMP) AS ts_paid,
     CAST(NULL AS TIMESTAMP) AS ts_created
 FROM

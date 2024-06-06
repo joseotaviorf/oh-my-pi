@@ -14,6 +14,8 @@ SELECT
     is_valid,
     dt_due,
     dt_due_legacy,
+    dt_bill_month,
+    dt_payment_scheduled,
     ts_paid,
     ts_created,
     is_legacy,

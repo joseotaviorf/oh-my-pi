@@ -66,6 +66,14 @@ columns:
     description: Date that occurrence is/was due, according to 2.0 rules.
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.dt_due
+  dt_bill_month:
+    description: Reference month for the bill.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_bill_month
+  dt_payment_scheduled:
+    description: Date that the payment was scheduled.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_payment_scheduled
   ts_paid:
     description: Timestamp that the occurrence was completed paid.
       - datalake_rental_guarantee_platform_clean.delinquency.dt_paid

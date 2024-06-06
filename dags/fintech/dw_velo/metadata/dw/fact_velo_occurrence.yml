@@ -69,6 +69,14 @@ columns:
     description: Date that occurrence is/was due, according to 2.0 rules.
     lineage:
       - datalake_velo.occurrence.dt_due_legacy
+  dt_bill_month:
+    description: Reference month for the bill.
+    lineage:
+      - datalake_velo.occurrence.dt_bill_month
+  dt_payment_scheduled:
+    description: Date that the payment was scheduled.
+    lineage:
+      - datalake_velo.occurrence.dt_payment_scheduled
   ts_paid:
     description: Timestamp that occurrence invoice was paid, if existent.
     lineage:
