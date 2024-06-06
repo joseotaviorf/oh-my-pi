@@ -157,4 +157,4 @@ LEFT JOIN get_contract_end_date AS gced
 WHERE
     operator_name <> 'SISTEMA'
     AND historical_code <> 'WSATUAL'
-QUALIFY ROW_NUMBER() OVER(PARTITION BY id_creditor, id_customer, operator_name, historical_code, ts_occurrence ORDER BY ts_occurrence DESC) = 1
+QUALIFY ROW_NUMBER() OVER(PARTITION BY id_creditor, glc.id_customer, operator_name, historical_code, ts_occurrence ORDER BY ts_occurrence DESC) = 1
