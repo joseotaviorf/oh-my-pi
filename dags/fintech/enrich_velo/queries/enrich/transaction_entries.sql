@@ -203,7 +203,7 @@ cash_flow_propose AS (
             AND COALESCE(cf.dt_due BETWEEN pc_doc.dt_contract_started AND DATE_ADD(pc_doc.dt_ended, 31), 1=1)
     LEFT JOIN
         propose_company AS pc_doc_fallback
-            ON pc_doc.cnpj = ccnpj.document_number
+            ON pc_doc_fallback.cnpj = ccnpj.document_number
     WHERE
         COALESCE(pp_doc.id_propose, pp_doc_fallback.id_propose, pc_doc.id_propose, pc_doc_fallback.id_propose) IS NOT NULL
 )
