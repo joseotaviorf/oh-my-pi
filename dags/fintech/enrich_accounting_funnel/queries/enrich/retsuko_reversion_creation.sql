@@ -196,7 +196,7 @@ df_final AS (
         source_name,
         revenue_name,
         accrual_year_month,
-        account_number,
+        sap.account_number,
         MIN(CASE 
           WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
           WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
@@ -219,7 +219,7 @@ df_final AS (
             AND df.account_number = sap.account_number
     WHERE 
         TRUE
-    GROUP BY 1,2,3,4,5, 6
+    GROUP BY 1,2,3,4,5,6,7
 ),
 
 metrics AS (
