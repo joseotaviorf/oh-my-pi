@@ -10,6 +10,7 @@ SELECT
 	tags,
 	destination,
 	template,
+	country AS country_code,
 	ccost AS cost_center,
 	scope,
 	CAST(sent_at AS TIMESTAMP) AS ts_sent,

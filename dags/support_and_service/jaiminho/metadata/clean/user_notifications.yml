@@ -35,6 +35,9 @@ columns:
   template:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.template
+  country_code:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.country
   cost_center:
     lineage:
       - datalake_jaiminho_raw.user_notifications_view.ccost
