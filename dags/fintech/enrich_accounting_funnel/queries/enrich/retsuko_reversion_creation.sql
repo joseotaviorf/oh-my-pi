@@ -121,6 +121,7 @@ sap_entity AS (
     SELECT
         id_finance_entity,
         id_sap_gateway_feature,
+        version,
         event,
         status
     FROM 
@@ -137,6 +138,7 @@ df AS (
         id_contract,
         id_invoice,
         id_entry,
+        version,
         source_name,
         revenue_name,
         account_number,
@@ -190,9 +192,11 @@ df_final AS (
     SELECT
         id_contract,
         id_invoice,
+        version,
         source_name,
         revenue_name,
         accrual_year_month,
+        account_number,
         MIN(CASE 
           WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
           WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
@@ -215,7 +219,7 @@ df_final AS (
             AND df.account_number = sap.account_number
     WHERE 
         TRUE
-    GROUP BY 1,2,3,4,5
+    GROUP BY 1,2,3,4,5, 6
 ),
 
 metrics AS (
@@ -231,12 +235,14 @@ metrics AS (
         END AS id_retsuko_reversion_creation,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
+        version,
         source_name,
         revenue_name,
         accrual_year_month,
         status,
         source_amount,
         sap_amount,
+        account_number,
         is_completeness_compliance,
         IF((ABS(source_amount) - ABS(sap_amount) = 0), true, false) AS is_correctness_compliance,
         IF((dt_sap_reference <= date_add(dt_source_trigger, 3)), true, false) AS is_temporality_compliance,
@@ -252,12 +258,14 @@ SELECT
     id_business_entity,
     id_finance_entity,
     CAST(NULL AS INT) AS id_finance_entity_entry,
+    version,
     source_name,
     revenue_name,
     accrual_year_month,
     status,
     source_amount,
     sap_amount,
+    account_number,
     is_completeness_compliance,
     is_correctness_compliance,
     is_temporality_compliance,

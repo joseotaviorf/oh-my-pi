@@ -87,6 +87,7 @@ sap_entity AS (
     SELECT
         id_finance_entity,
         id_sap_gateway_feature,
+        version,
         event,
         status
     FROM 
@@ -124,6 +125,7 @@ sap AS (
             WHEN account_number = '31101.02.01' THEN 'adm fee'
             WHEN account_number = '31101.01.01' THEN 'brokerage quinto andar'
         END AS revenue_account,
+        account_number,
         MAX(DATE(dt_created)) AS dt_sap_created,
         MAX(DATE(dt_reference)) AS dt_sap_reference,
         CAST(sum(debit_credit) AS DECIMAL(12,2)) AS sap_amount
@@ -134,7 +136,7 @@ sap AS (
         AND document_number LIKE 'IN %'
         AND dt_reference >= '2024-01-01'
     GROUP BY 
-        1, 2
+        1, 2, 3
 ),
 pre_df AS (
     SELECT 
@@ -146,6 +148,8 @@ pre_df AS (
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
         CAST(NULL AS INT) AS id_finance_entity_entry,
+        se.version,
+        s.account_number,
         source_name,
         r.revenue_name,
         accrual_year_month,
@@ -188,11 +192,13 @@ df AS (
         MIN(is_completeness_compliance) AS is_completeness_compliance,
         dt_source_trigger,
         MAX(dt_sap_created) AS dt_sap_created,
-        MAX(dt_sap_reference) AS dt_sap_reference
+        MAX(dt_sap_reference) AS dt_sap_reference,
+        account_number,
+        version
     FROM 
         pre_df
     GROUP BY 
-        1, 2, 3, 4, 5, 6, 7, 9, 12
+        1, 2, 3, 4, 5, 6, 7, 9, 12, 15, 16
 ),
 df_final AS (
     SELECT 
@@ -200,12 +206,14 @@ df_final AS (
         id_business_entity,
         id_finance_entity,
         id_finance_entity_entry,
+        version,
         source_name,
         revenue_name,
         accrual_year_month,
         status,
         source_amount,
         sap_amount,
+        account_number,
         is_completeness_compliance,
         IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance,
         IF(dt_sap_reference <= date_add(dt_source_trigger, 30), true, false) AS is_temporality_compliance,
@@ -221,12 +229,14 @@ SELECT
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
+    version,
     source_name,
     revenue_name,
     accrual_year_month,
     status,
     source_amount,
     sap_amount,
+    account_number,
     is_completeness_compliance,
     is_correctness_compliance, 
     is_temporality_compliance,

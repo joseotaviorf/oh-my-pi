@@ -2,6 +2,7 @@ WITH sap_entity AS (
     SELECT
         id_finance_entity,
         id_sap_gateway_feature,
+        version,
         event,
         status
     FROM 
@@ -18,16 +19,13 @@ retsuko AS (
         ct.id_external AS id_contract,
         i.id_external AS id_invoice,
         e.id_external AS id_entry,
+        se.version,
         se.id_sap_gateway_feature,
         'seu barriga' AS source_name,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN 'rental anticipation fee'
             WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN 'property damage fine'
         END AS revenue_name,
-        CASE
-            WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN '41102.01.06'
-            WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN '41103.02.01'
-        END AS account_number,
         i.accrual_year_month,
         DATE(e.ts_created) AS dt_source_trigger,
         CAST(amount AS DECIMAL(12,2)) AS source_amount
@@ -60,14 +58,14 @@ retsuko_fine AS (
         ct.id_external AS id_contract,
         i.id_external AS id_invoice,
         CAST(NULL AS INT) AS id_entry,
+        se.version,
         se.id_sap_gateway_feature,
         'seu barriga' AS source_name,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/fine-and-interest') THEN 'fine and interest'
+            WHEN e.bill_item IN ('entry.bill-item/negotiation-fine-and-interest') THEN 'negotiation fine and interest'
+            WHEN e.bill_item IN ('entry.bill-item/credit-card-revenue') THEN 'credit card revenue'            
         END AS revenue_name,
-        CASE
-            WHEN e.bill_item IN ('entry.bill-item/fine-and-interest') THEN '31102.01.01'
-        END AS account_number,
         i.accrual_year_month,
         DATE(i.ts_paid) AS dt_source_trigger,
         CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount
@@ -88,7 +86,9 @@ retsuko_fine AS (
     WHERE 
         TRUE
         AND SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
-                      'fine-and-interest'
+                      'fine-and-interest',
+                      'negotiation-fine-and-interest',
+                      'credit-card-revenue'
                       )
         AND ct.country_code = 'BR'
         AND i.ts_paid >= '2024-01-01'
@@ -138,7 +138,7 @@ sap AS (
     FROM 
         datalake_accounting_funnel.ledger
     WHERE 
-        account_number IN ('41102.01.06', '41103.02.01', '31102.01.01')
+        account_number IN ('41102.01.06', '41103.02.01', '41102.01.16', '41102.01.05', '31102.01.01')
         AND document_number like 'JE %'
     GROUP BY 1, 2, 3, 5, 6
 ),
@@ -148,9 +148,45 @@ df AS (
         id_contract,
         id_invoice,
         id_entry,
+        version,
         source_name,
         revenue_name,
         accrual_year_month,
+        sap.account_number,
+        MIN(CASE 
+          WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
+          WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
+          WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NULL THEN 'SB FAILURE'
+        END) AS status,
+        MIN(IF(sap.hash IS NULL OR sap_gateway.id_feature IS NULL, FALSE, TRUE)) AS is_completeness_compliance,
+        CAST(SUM(source_amount) AS DECIMAL(12,2)) AS source_amount,
+        CAST(SUM(debit_credit) AS DECIMAL(12,2)) AS sap_amount,
+        MAX(dt_source_trigger) AS dt_source_trigger,
+        MAX(dt_sap_created) AS dt_sap_created,
+        MAX(dt_sap_reference) AS dt_sap_reference
+    FROM 
+        retsuko_final r
+    LEFT JOIN
+        sap_gateway
+            ON r.id_invoice = sap_gateway.id_finance_entity
+    LEFT JOIN
+        sap 
+            ON sap.id_finance_entity = r.id_invoice
+    WHERE 
+        revenue_name = 'credit card revenue'
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+
+    UNION ALL 
+
+    SELECT 
+        id_contract,
+        id_invoice,
+        id_entry,
+        version,
+        source_name,
+        revenue_name,
+        accrual_year_month,
+        sap.account_number,
         MIN(CASE 
           WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
           WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
@@ -170,10 +206,9 @@ df AS (
     LEFT JOIN
         sap 
             ON sap.hash = sap_gateway.hash
-            AND sap.account_number = r.account_number
     WHERE 
-        TRUE
-    GROUP BY 1, 2, 3, 4, 5, 6
+        revenue_name != 'credit card revenue'
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
 ),
 
 df_final AS (
@@ -183,16 +218,20 @@ df_final AS (
           WHEN revenue_name = 'property damage fine' THEN '5'
           WHEN revenue_name = 'rental anticipation fee' THEN '6' 
           WHEN revenue_name = 'fine and interest' THEN '7' 
+          WHEN revenue_name = 'negotiation fine and interest' THEN '8'
+          WHEN revenue_name = 'credit card revenue' THEN '9'
         END AS id_retsuko_revenue_accounting,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
         id_entry AS id_finance_entity_entry,
+        version,
         source_name,
         revenue_name,
         accrual_year_month,
         status,
         source_amount,
         sap_amount,
+        account_number,
         is_completeness_compliance,
         IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance, 
         IF(dt_sap_reference <= date_add(dt_source_trigger, 3), true, false) AS is_temporality_compliance,
@@ -207,12 +246,14 @@ SELECT
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
+    version,
     source_name,
     revenue_name,
     accrual_year_month,
     status,
     source_amount,
     sap_amount,
+    account_number,
     is_completeness_compliance,
     is_correctness_compliance, 
     is_temporality_compliance,
@@ -222,3 +263,5 @@ SELECT
     dt_sap_reference
 FROM 
     df_final 
+WHERE 
+    TRUE

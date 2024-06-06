@@ -19,6 +19,10 @@ columns:
     description: "External ID from Retusko's Invoice Table"
   id_finance_entity_entry:
     description: "Always NULL, it was created to match accounting funnel columns"
+  version:
+    lineage:
+      - datalake_retsuko_clean.sap_entity.version
+    description: "Accounting Version"
   source_name:
     description: "Product's name that is responsible to send Invoice's information"
   revenue_name:
@@ -35,6 +39,10 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger.debit_credit
     description: "Amount that was credited in the respective revenue account"
+  account_number:
+    lineage:
+      - datalake_accounting_funnel.ledger.account_number
+    description: "Account Number from SAP"
   is_completeness_compliance:
     lineage:
       - datalake_accounting_funnel.ledger.hash

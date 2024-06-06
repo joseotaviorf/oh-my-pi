@@ -26,13 +26,20 @@ columns:
       - datalake_accounting_funnel.retsuko_revenue_accounting.id_finance_entity
       - datalake_accounting_funnel.retsuko_invoice_issuance.id_finance_entity
     description: "ID to identify Finance Entity from the source"
-  id_finance_entity:
+  id_finance_entity_entry:
     lineage:
       - datalake_accounting_funnel.retsuko_provision_creation.id_finance_entity_entry
       - datalake_accounting_funnel.retsuko_reversion_creation.id_finance_entity_entry
       - datalake_accounting_funnel.retsuko_revenue_accounting.id_finance_entity_entry
       - datalake_accounting_funnel.retsuko_invoice_issuance.id_finance_entity_entry
     description: "ID to identify Finance Entity Entry from the source"
+  version:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.version
+      - datalake_accounting_funnel.retsuko_reversion_creation.version
+      - datalake_accounting_funnel.retsuko_revenue_accounting.version
+      - datalake_accounting_funnel.retsuko_invoice_issuance.version
+    description: "Accounting Version"
   source_name:
     description: "Product's name that is responsible to send accounting information"
   accounting_type:
@@ -67,6 +74,13 @@ columns:
       - datalake_accounting_funnel.retsuko_revenue_accounting.sap_amount
       - datalake_accounting_funnel.retsuko_invoice_issuance.sap_amount
     description: "Amount that was accounted in SAP"
+  account_number:
+    lineage:
+      - datalake_accounting_funnel.retsuko_provision_creation.account_number
+      - datalake_accounting_funnel.retsuko_reversion_creation.account_number
+      - datalake_accounting_funnel.retsuko_revenue_accounting.account_number
+      - datalake_accounting_funnel.retsuko_invoice_issuance.account_number
+    description: "Account Number from SAP"
   is_completeness_compliance:
     lineage:
       - datalake_accounting_funnel.retsuko_provision_creation.is_completeness_compliance
