@@ -22,7 +22,7 @@ collection_calculation AS (
     FROM datalake_recupera.collection AS c
     LEFT JOIN datalake_recupera_clean.operators AS o
         ON UPPER(c.operator_name) = UPPER(o.id_operator)
-    GROUP BY 1, 2, 3, 4, 5, 6, 7
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
 )
 SELECT
     md5(CONCAT(sk_debtor, creditor, id_operator, id_occurrence, dt_occurrence)) AS sk_collection,
