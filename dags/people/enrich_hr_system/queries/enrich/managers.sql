@@ -2,9 +2,27 @@ WITH
 hr_system_workers AS (
   SELECT
     id_person,
-    work_relationships
+    work_relationships,
+    external_identifiers,
+    dt_effective
   FROM
     datalake_hr_system_clean.workers
+),
+external_identifiers_step1 AS (
+  SELECT
+    id_person,
+    EXPLODE (external_identifiers) external_identifiers
+  FROM
+    hr_system_workers
+  QUALIFY dt_effective = MAX(dt_effective) OVER (PARTITION BY id_person)
+),
+external_identifiers AS (
+  SELECT
+    id_person
+  FROM
+    external_identifiers_step1
+  WHERE
+    external_identifiers['ExternalIdentifierType'] = 'ID_ONDA1'
 ),
 work_rel_step1 AS (
   SELECT
@@ -52,7 +70,7 @@ SELECT DISTINCT
   managers['ManagerAssignmentId'] AS id_manager_assignment,
   id_assignment,
   -- non-ids
-  id_person,
+  managers.id_person,
   id_period_of_service,
   managers['AssignmentSupervisorId'] AS id_assignment_supervisor,
   -- non-metrics
@@ -80,6 +98,10 @@ SELECT DISTINCT
   DATE_FORMAT(DATE(managers['EffectiveStartDate']), 'yyyy') AS year,
   DATE_FORMAT(DATE(managers['EffectiveStartDate']), 'MM') AS month
 FROM
-  managers_step1 managers
+  managers_step1 AS managers
+LEFT JOIN
+  external_identifiers AS ei
+    ON managers.id_person = ei.id_person
 WHERE
-  DATE_TRUNC('MONTH', DATE(managers['EffectiveStartDate'])) > DATE_TRUNC('MONTH', DATE('{load_start_date}'))
+  DATE_TRUNC('MONTH', DATE(managers['EffectiveStartDate'])) >= DATE_TRUNC('MONTH', DATE('{load_start_date}'))
+    AND ei.id_person IS NULL

@@ -31,5 +31,9 @@ columns:
       "GRPQA LTDA": ""
     lineage:
     - datalake_hr_system.work_relationships.legal_employer_name
+  legislation_code:
+    description: 'Indicates the legislation code of the business unit.'
+    lineage:
+    - datalake_hr_system.work_relationships.legislation_code
   ts_load:
     description: 'Date and time when the record was loaded.'

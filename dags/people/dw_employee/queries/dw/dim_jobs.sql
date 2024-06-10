@@ -88,7 +88,8 @@ SELECT DISTINCT
     END has_clock_in,
     -- dates
     j.dt_effective_start,
-    j.dt_effective_end
+    j.dt_effective_end,
+    NOW() AS ts_load
 FROM
     jobs AS j
 LEFT JOIN 

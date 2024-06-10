@@ -1,0 +1,53 @@
+---
+database_name: dw_employee
+table_name: dim_assignment
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table with data about the assignments of the employees.
+columns:
+  sk_assignment:
+    description: 'Surrogate key for the assignment. Just the id_period_of_service'
+    lineage:
+    - datalake_hr_system.work_relationships.id_period_of_service
+  worker_type:
+    description: 'Worker type'
+    categories:
+      'E': 'Employee'
+      'P': 'Pending Worker'
+      'C': 'Contingent Worker'
+      'N': 'Nonworker'
+    lineage:
+    - datalake_hr_system.work_relationships.worker_type
+  assignment_number:
+    description: 'Unique identifier for the assignment.' 
+    lineage:
+    - datalake_hr_system.assignments.assignment_number
+  assignment_status_type_code:
+    description: 'Column that indicates the status of the assignment.'
+    lineage:
+    - datalake_hr_system.assignments.assignment_status_type_code
+  assignment_status_type:
+    description: 'Column that indicates the status of the assignment.'
+    lineage:
+    - datalake_hr_system.assignment.assignment_status_type
+  union_name:
+    description: 'Name of the union that the employee is associated with.'
+    lineage:
+    - datalake_hr_system.assignments.union_name,
+      '-1')
+  dismissal_type:
+    description: 'Type of dismissal.'
+    categories:
+      'Voluntário': 'Voluntary'
+      'Involuntário': 'Involuntary'
+    lineage:
+    - datalake_hr_system.work_relationships.dt_termination
+    - datalake_hr_system.work_relationships.worker_type
+    - datalake_hr_system.assignment.action_description
+    - datalake_hr_system_clean.actions_lov.description
+  salary_currency:
+    description: 'Currency of the salary.'
+    lineage:
+    - datalake_hr_system_clean.salaries.currency_code
+  ts_load:
+    description: 'Timestamp of the load.'

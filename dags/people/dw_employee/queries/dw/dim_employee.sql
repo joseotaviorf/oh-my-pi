@@ -301,6 +301,7 @@ SELECT
     --  ids
     workers.id_person AS sk_worker,
     -- -- non metric
+    workers.person_number,
     -- -- name information,
     names.first_name,
     names.last_name,
@@ -482,3 +483,4 @@ LEFT JOIN
     national_identifiers_dff nidff 
         ON workers.id_person = nidff.id_person
         AND ni2_rg.id_national_identifier = nidff.id_national_identifier
+WHERE ei.id_person IS NULL

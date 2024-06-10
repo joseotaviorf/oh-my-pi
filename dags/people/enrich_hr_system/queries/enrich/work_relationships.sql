@@ -1,24 +1,27 @@
-WITH
+WITH 
 hr_system_workers AS (
   SELECT
     id_person,
     work_relationships,
-    CASE
-      WHEN DENSE_RANK() OVER (
-        ORDER BY
-          dt_effective
-      ) = 1 THEN 'past'
-      WHEN DENSE_RANK() OVER (
-        ORDER BY
-          dt_effective
-      ) = 2 THEN 'present'
-      WHEN DENSE_RANK() OVER (
-        ORDER BY
-          dt_effective
-      ) = 3 THEN 'future'
-    END AS data_moment
+    external_identifiers
   FROM
-    datalake_hr_system_clean.workers
+    datalake_hr_system_clean.workers 
+  QUALIFY dt_effective = MAX(dt_effective) OVER (PARTITION BY id_person)
+),
+external_identifiers_step1 AS (
+  SELECT
+    id_person,
+    EXPLODE (external_identifiers) external_identifiers
+  FROM
+    hr_system_workers
+),
+external_identifiers AS (
+  SELECT
+    id_person
+  FROM
+    external_identifiers_step1
+  WHERE
+    external_identifiers['ExternalIdentifierType'] = 'ID_ONDA1'
 ),
 work_rel_step1 AS (
   SELECT
@@ -26,26 +29,24 @@ work_rel_step1 AS (
     EXPLODE (work_relationships) AS work_relationships
   FROM
     hr_system_workers
-  WHERE
-    data_moment = 'future'
 ),
 work_rel AS (
   SELECT
     id_person,
-    work_relationships['PeriodOfServiceId']     AS id_period_of_service,
-    work_relationships['LegalEntityId']         AS id_legal_entity,
-    work_relationships['LegislationCode']       AS legislation_code,
-    work_relationships['LegalEmployerName']     AS legal_employer_name,
-    work_relationships['WorkerType']            AS worker_type,
-    work_relationships['PrimaryFlag']           AS primary_flag,
-    work_relationships['StartDate']             AS dt_start,
+    work_relationships['PeriodOfServiceId'] AS id_period_of_service,
+    work_relationships['LegalEntityId'] AS id_legal_entity,
+    work_relationships['LegislationCode'] AS legislation_code,
+    work_relationships['LegalEmployerName'] AS legal_employer_name,
+    work_relationships['WorkerType'] AS worker_type,
+    work_relationships['PrimaryFlag'] AS primary_flag,
+    work_relationships['StartDate'] AS dt_start,
     work_relationships['OnMilitaryServiceFlag'] AS is_on_military_service,
-    work_relationships['ReadyToConvertFlag']    AS is_ready_to_convert,
-    work_relationships['TerminationDate']       AS dt_termination,
-    work_relationships['NotificationDate']      AS dt_notification,
-    work_relationships['RevokeUserAccess']      AS revoke_user_access,
-    work_relationships['RecommendedForRehire']  AS recommended_for_rehire,
-    work_relationships['CreatedBy']             AS created_by,
+    work_relationships['ReadyToConvertFlag'] AS is_ready_to_convert,
+    work_relationships['TerminationDate'] AS dt_termination,
+    work_relationships['NotificationDate'] AS dt_notification,
+    work_relationships['RevokeUserAccess'] AS revoke_user_access,
+    work_relationships['RecommendedForRehire'] AS recommended_for_rehire,
+    work_relationships['CreatedBy'] AS created_by,
     TO_TIMESTAMP(
       SUBSTR(REPLACE(work_relationships['CreationDate'], 'T', ' '), 0, 19),
       'yyyy-MM-dd HH:mm:ss'
@@ -72,11 +73,11 @@ work_relationships_ddf AS (
   SELECT
     id_person,
     id_period_of_service,
-    work_relationships_ddf['_FIRST_EMPLOYMENT']         AS first_employment,
-    work_relationships_ddf['_HIRING_TYPE']              AS hiring_type,
-    work_relationships_ddf['_HIRING_TYPE_Display']      AS hiring_type_display,
-    work_relationships_ddf['__FLEX_Context']            AS flex_content_ddf,
-    work_relationships_ddf['_HIRING_INDICATOR']         AS hiring_indicator,
+    work_relationships_ddf['_FIRST_EMPLOYMENT'] AS first_employment,
+    work_relationships_ddf['_HIRING_TYPE'] AS hiring_type,
+    work_relationships_ddf['_HIRING_TYPE_Display'] AS hiring_type_display,
+    work_relationships_ddf['__FLEX_Context'] AS flex_content_ddf,
+    work_relationships_ddf['_HIRING_INDICATOR'] AS hiring_indicator,
     work_relationships_ddf['_HIRING_INDICATOR_Display'] AS hiring_indicator_display
   FROM
     work_relationships_ddf_step1
@@ -93,7 +94,7 @@ work_relationships_dff AS (
   SELECT
     id_person,
     id_period_of_service,
-    work_relationships_dff['recrutador']                     AS recrutador,
+    work_relationships_dff['recrutador'] AS recrutador,
     work_relationships_dff['dataPrevistaParaTerminoDoEstag'] AS dataPrevistaParaTerminoDoEstag
   FROM
     work_relationships_dff_step1
@@ -142,3 +143,8 @@ FROM
     work_relationships_dff AS wr_dff 
       ON wr.id_person = wr_dff.id_person
       AND wr.id_period_of_service = wr_dff.id_period_of_service
+  LEFT JOIN 
+    external_identifiers AS ei 
+      ON wr.id_person = ei.id_person
+WHERE
+  ei.id_person IS NULL

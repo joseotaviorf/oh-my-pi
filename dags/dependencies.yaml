@@ -465,9 +465,12 @@ bietlejuice.dw_demand:
   - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results
 bietlejuice.dw_employee:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
+  - bietlejuice.enrich_hr_system:load-enrich-managers
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
+  - bietlejuice.hr_system:load-clean-actions-lov
   - bietlejuice.hr_system:load-clean-jobs
   - bietlejuice.hr_system:load-clean-organizations
+  - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
 bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract

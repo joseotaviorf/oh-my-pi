@@ -3,9 +3,26 @@ hr_system_workers AS (
   SELECT
     id_person,
     work_relationships,
+    external_identifiers,
     dt_effective
   FROM
     datalake_hr_system_clean.workers
+),
+external_identifiers_step1 AS (
+  SELECT
+    id_person,
+    EXPLODE (external_identifiers) external_identifiers
+  FROM
+    hr_system_workers
+  QUALIFY dt_effective = MAX(dt_effective) OVER (PARTITION BY id_person)
+),
+external_identifiers AS (
+  SELECT
+    id_person
+  FROM
+    external_identifiers_step1
+  WHERE
+    external_identifiers['ExternalIdentifierType'] = 'ID_ONDA1'
 ),
 work_rel_step1 AS (
   SELECT
@@ -227,5 +244,9 @@ FROM
       AND a.id_period_of_service = adff.id_period_of_service
       AND a.id_assignment = adff.id_assignment
       AND a.dt_effective = adff.dt_effective
+  LEFT JOIN 
+    external_identifiers AS ei 
+      ON a.id_person = ei.id_person
 WHERE
-  DATE_TRUNC('MONTH', GREATEST (DATE(a.dt_effective_start), DATE(adff.dt_effective_start))) > DATE_TRUNC('MONTH', DATE('{load_start_date}'))
+  DATE_TRUNC('MONTH', GREATEST (DATE(a.dt_effective_start), DATE(adff.dt_effective_start))) >= DATE_TRUNC('MONTH', DATE('{load_start_date}'))
+  AND ei.id_person IS NULL
