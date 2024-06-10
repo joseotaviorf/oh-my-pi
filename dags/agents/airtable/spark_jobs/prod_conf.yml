@@ -5,6 +5,16 @@ tables:
     table_id: tblXIVyaK8QFpjLdy
     params:
       view: viwWbSdPz8p3TEow6
+  brokers_accreditation:
+    base_id: appgKZQCSVwzoloYh
+    table_id: tble5DCCppB5WQzeJ
+    params:
+      view: viwNAUHGZlrBma6A7
+  brokers_indication:
+    base_id: appgKZQCSVwzoloYh
+    table_id: tbl5vup4GEab4jEj4
+    params:
+      view: viw1PecGNTWXvJGuZ
   jira_tickets:
     table_id: tblZl2bbgWIJpvhA3
     params:

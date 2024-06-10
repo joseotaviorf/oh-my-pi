@@ -20,6 +20,8 @@ SOURCE = "airtable"
 CONTEXT = SOURCE
 ENV = os.environ.get("ENVIRONMENT")
 
+DAG_OWNER = DAGOwnerEnum.DATA_AGENTS
+
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -30,6 +32,7 @@ artifacts_default_bucket = config_service.get_config("artifacts_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 clean_partition_cols = config_service.get_config("clean_partition_cols")
+dag_documentation = config_service.get_config("dag_documentation")
 
 cluster_description = config_service.get_config("custom_cluster")
 default_libraries = config_service.get_config("default_libraries")
@@ -59,14 +62,18 @@ CUSTOM_LIBRARIES = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_AGENTS,
+        "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
-        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    doc_md=BaseDAG.generate_doc_md_str(
+        dag_name=SOURCE,
+        doc_md_chart_url=doc_md_chart_url,
+        dag_documentation=dag_documentation,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        dag_owner=DAG_OWNER,
     ),
 )
 
