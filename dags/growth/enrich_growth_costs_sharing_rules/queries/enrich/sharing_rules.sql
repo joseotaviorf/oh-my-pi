@@ -282,7 +282,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified
+    utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.d046d
 UNION ALL 
@@ -294,7 +294,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified
+    utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.d047d
 UNION ALL 
@@ -306,7 +306,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified
+    utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.d048d
 UNION ALL 
@@ -318,7 +318,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified
+    utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.d049d
 UNION ALL 
@@ -462,7 +462,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified
+    utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.s048s
 UNION ALL 
@@ -474,7 +474,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified
+    utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.s049s
 UNION ALL 
@@ -486,6 +486,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified
+    utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.s050s
+ 
