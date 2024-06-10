@@ -11,7 +11,7 @@ SELECT
     dd.id_date,
     dr.country_code,
     dr.city_group,
-    dal.nm_campaign as utm_campaign,
+    SUBSTRING(dal.nm_campaign, INSTR(dal.nm_campaign, '.') + 1) AS utm_campaign_modified,
     fse.nm_business_context as business_context,
     IF(fse.sk_date=fse1.sk_date,COUNT(DISTINCT fse.sk_supply)/2,0) + IF(fse.sk_date<>fse1.sk_date OR fse1.sk_date IS NULL,COUNT(DISTINCT fse.sk_supply),0) AS metric
 FROM dw_growth.fact_supply_events AS fse 
@@ -28,6 +28,8 @@ LEFT JOIN datalake_region.region AS dr
 WHERE fse.sk_funnel_step = 5
     AND dr.has_rent_operation
     AND fse.nm_business_context = 'RENT'
+    AND (dal.nm_campaign LIKE 's050s%'
+      OR dal.nm_campaign LIKE 'ZEBRA%')
 GROUP BY 1,2,3,4,5,6, fse.sk_date, fse1.sk_date 
 UNION ALL
 SELECT
@@ -35,7 +37,7 @@ SELECT
     dd.id_date,
     dr.country_code,
     dr.city_group,
-    dal.nm_campaign as utm_campaign,
+    dal.nm_campaign as utm_campaign_modified,
     fse.nm_business_context as business_context,
     IF(fse.sk_date=fse1.sk_date,COUNT(DISTINCT fse.sk_supply)/2,0) + IF(fse.sk_date<>fse1.sk_date OR fse1.sk_date IS NULL,COUNT(DISTINCT fse.sk_supply),0) AS metric
 FROM dw_growth.fact_supply_events AS fse 
@@ -52,6 +54,8 @@ LEFT JOIN datalake_region.region AS dr
 WHERE fse.sk_funnel_step = 5
     AND dr.has_sale_operation
     AND fse.nm_business_context = 'SALE'
+    AND (dal.nm_campaign LIKE 's050s%'
+      OR dal.nm_campaign LIKE 'ZEBRA%')
 GROUP BY 1,2,3,4,5,6, fse.sk_date, fse1.sk_date
 ),
 -------------------------------------------------------------------------------------------
@@ -63,7 +67,7 @@ conversion_metrics AS (
     id_date,
     country_code,
     city_group,
-    utm_campaign,
+    utm_campaign_modified,
     business_context,
     SUM(metric) AS metric
   FROM fact_supply_hybrid_events
@@ -78,7 +82,7 @@ moving_average AS (
     adt.id_date,   
     cm.country_code,
     cm.city_group, 
-    cm.utm_campaign,
+    cm.utm_campaign_modified,
     cm.business_context,
     SUM(cm.metric) AS metric
   FROM conversion_metrics AS cm 
@@ -95,9 +99,9 @@ fall_back AS (
       mm.id_date,
       mm.country_code,
       mm.city_group,
-      mm.utm_campaign, 
+      mm.utm_campaign_modified, 
       mm.business_context,
-      FLOAT(SUM(mm.metric))/NULLIF(SUM(SUM(mm.metric)) OVER(PARTITION BY mm.id_date, mm.utm_campaign), 0) AS share
+      FLOAT(SUM(mm.metric))/NULLIF(SUM(SUM(mm.metric)) OVER(PARTITION BY mm.id_date, mm.utm_campaign_modified), 0) AS share
   FROM moving_average AS mm
   WHERE TRUE 
   GROUP BY 1,2,3,4,5
@@ -110,9 +114,9 @@ actual AS (
       cm.id_date,
       cm.country_code,
       cm.city_group,
-      cm.utm_campaign, 
+      cm.utm_campaign_modified, 
       cm.business_context,
-      FLOAT(SUM(cm.metric))/NULLIF(SUM(SUM(cm.metric)) OVER(PARTITION BY cm.id_date, cm.utm_campaign), 0) AS share
+      FLOAT(SUM(cm.metric))/NULLIF(SUM(SUM(cm.metric)) OVER(PARTITION BY cm.id_date, cm.utm_campaign_modified), 0) AS share
   FROM conversion_metrics AS cm
   GROUP BY 1,2,3,4,5
 ), 
@@ -124,11 +128,13 @@ actual AS (
 validacao AS (
 SELECT
 	adt.id_date,
-  cm.utm_campaign, 
+  cm.utm_campaign_modified, 
 	SUM(cm.metric) AS validador
 FROM datalake_quintoandar.aux_date AS adt
 LEFT JOIN conversion_metrics AS cm
   ON cm.id_date = adt.id_date
+WHERE TRUE 
+  AND adt.YEAR >= 2023
 GROUP BY 1,2
 )
 -------------------------------------------------------------------------------------------------------
@@ -140,13 +146,13 @@ SELECT DISTINCT
   'supply' AS funnel_side, 
   IF(validador > 0, a.country_code, fb.country_code) AS country_code,
   IF(validador > 0, a.city_group, fb.city_group) AS city_group, 
-  IF(validador > 0, a.utm_campaign, fb.utm_campaign) AS utm_campaign, 
+  IF(validador > 0, a.utm_campaign_modified, fb.utm_campaign_modified) AS utm_campaign_modified, 
   IF(validador > 0, a.business_context, fb.business_context) AS business_context, 
   IF(validador > 0, a.share, fb.share) AS share
 FROM validacao v
 LEFT JOIN actual AS a
 	ON a.id_date = v.id_date
-  AND a.utm_campaign = v.utm_campaign
+  AND a.utm_campaign_modified = v.utm_campaign_modified
 LEFT JOIN fall_back AS fb
 	ON fb.id_date = v.id_date
-  AND fb.utm_campaign = v.utm_campaign
+  AND fb.utm_campaign_modified = v.utm_campaign_modified

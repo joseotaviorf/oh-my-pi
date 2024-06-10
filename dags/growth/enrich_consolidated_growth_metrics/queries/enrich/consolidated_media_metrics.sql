@@ -204,12 +204,12 @@ SELECT DISTINCT
     cs.utm_campaign,
     cs.utm_term,
     cs.utm_content,
-    cs.desktop_cost * COALESCE(sr.share, 1) AS desktop_cost,
-    cs.mobile_cost * COALESCE(sr.share, 1) AS mobile_cost,
-    cs.other_cost * COALESCE(sr.share, 1) AS other_cost,
-    cs.total_cost * COALESCE(sr.share, 1) AS total_cost,
-    cs.impressions * COALESCE(sr.share, 1) AS impressions,
-    cs.clicks * COALESCE(sr.share, 1) AS clicks
+    cs.desktop_cost * COALESCE(sr_utm.share, sr.share, 1) AS desktop_cost,
+    cs.mobile_cost * COALESCE(sr_utm.share, sr.share, 1) AS mobile_cost,
+    cs.other_cost * COALESCE(sr_utm.share, sr.share, 1) AS other_cost,
+    cs.total_cost * COALESCE(sr_utm.share, sr.share, 1) AS total_cost,
+    cs.impressions * COALESCE(sr_utm.share, sr.share, 1) AS impressions,
+    cs.clicks * COALESCE(sr_utm.share, sr.share, 1) AS clicks
 FROM
     consolidated_sources cs
 LEFT JOIN
@@ -217,12 +217,14 @@ LEFT JOIN
 ON
     SPLIT(cs.campaign_name, '[.]')[0] = sr.id_rule
     AND cs.id_date = sr.id_date
+    AND sr.utm_campaign_modified IS NULL
 LEFT JOIN
     datalake_growth_costs_sharing_rules.sharing_rules sr_utm
 ON
     SPLIT(cs.campaign_name, '[.]')[0] = sr_utm.id_rule
     AND cs.id_date = sr_utm.id_date
-    AND SUBSTRING(cs.utm_campaign, INSTR(cs.utm_campaign, '.') + 1) = sr_utm.utm_campaign
+    AND SUBSTRING(cs.utm_campaign, INSTR(cs.utm_campaign, '.') + 1) = sr_utm.utm_campaign_modified
+    AND sr_utm.utm_campaign_modified IS NOT NULL
 LEFT JOIN
     datalake_consolidated_marketing_costs.city_group_old_campaigns_historic ch
 ON

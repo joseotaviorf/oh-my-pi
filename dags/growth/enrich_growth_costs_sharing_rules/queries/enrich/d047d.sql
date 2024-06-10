@@ -8,7 +8,7 @@ conversion_metrics AS (
     adt.id_date,
     dr.country_code, 
     dr.city_group, 
-    fdpe.utm_campaign,
+    SUBSTRING(fdpe.utm_campaign, INSTR(fdpe.utm_campaign, '.') + 1) AS utm_campaign_modified,
     LOWER(fdpe.business_context) AS business_context,
     COUNT(DISTINCT 
       CASE WHEN fdpe.event_name = 'USER FIRST ACTIVATION' THEN fdpe.id_prospect 
@@ -24,6 +24,8 @@ conversion_metrics AS (
   WHERE TRUE 
     AND LOWER(fdpe.business_context) = 'sale'
     AND dr.country_code = 'BR'
+    AND (fdpe.utm_campaign LIKE 'd047d%'
+      OR fdpe.utm_campaign LIKE 'ZEBRA%')
   GROUP BY 1,2,3,4,5,6
 ),
 -----------------------------------------------------------------------------------------------
@@ -35,7 +37,7 @@ moving_average AS (
     adt.id_date,   
     cm.country_code,
     cm.city_group, 
-    cm.utm_campaign,
+    cm.utm_campaign_modified,
     cm.business_context,
     SUM(cm.metric) AS metric
   FROM conversion_metrics AS cm 
@@ -52,9 +54,9 @@ fall_back AS (
       mm.id_date,
       mm.country_code,
       mm.city_group,
-      mm.utm_campaign, 
+      mm.utm_campaign_modified, 
       mm.business_context,
-      FLOAT(SUM(mm.metric))/NULLIF(SUM(SUM(mm.metric)) OVER(PARTITION BY mm.id_date, mm.utm_campaign), 0) AS share
+      FLOAT(SUM(mm.metric))/NULLIF(SUM(SUM(mm.metric)) OVER(PARTITION BY mm.id_date, mm.utm_campaign_modified), 0) AS share
   FROM moving_average AS mm
   WHERE TRUE 
   GROUP BY 1,2,3,4,5
@@ -67,9 +69,9 @@ actual AS (
       cm.id_date,
       cm.country_code,
       cm.city_group,
-      cm.utm_campaign, 
+      cm.utm_campaign_modified, 
       cm.business_context,
-      FLOAT(SUM(cm.metric))/NULLIF(SUM(SUM(cm.metric)) OVER(PARTITION BY cm.id_date, cm.utm_campaign), 0) AS share
+      FLOAT(SUM(cm.metric))/NULLIF(SUM(SUM(cm.metric)) OVER(PARTITION BY cm.id_date, cm.utm_campaign_modified), 0) AS share
   FROM conversion_metrics AS cm
   GROUP BY 1,2,3,4,5
 ), 
@@ -81,11 +83,13 @@ actual AS (
 validacao AS (
 SELECT
 	adt.id_date,
-  cm.utm_campaign, 
+  cm.utm_campaign_modified, 
 	SUM(cm.metric) AS validador
 FROM datalake_quintoandar.aux_date AS adt
 LEFT JOIN conversion_metrics AS cm
   ON cm.id_date = adt.id_date
+WHERE TRUE 
+  AND adt.YEAR >= 2023
 GROUP BY 1,2
 )
 -------------------------------------------------------------------------------------------------------
@@ -97,13 +101,13 @@ SELECT DISTINCT
   'demand' AS funnel_side, 
   IF(validador > 0, a.country_code, fb.country_code) AS country_code,
   IF(validador > 0, a.city_group, fb.city_group) AS city_group, 
-  IF(validador > 0, a.utm_campaign, fb.utm_campaign) AS utm_campaign, 
+  IF(validador > 0, a.utm_campaign_modified, fb.utm_campaign_modified) AS utm_campaign_modified, 
   IF(validador > 0, a.business_context, fb.business_context) AS business_context, 
   IF(validador > 0, a.share, fb.share) AS share
 FROM validacao v
 LEFT JOIN actual AS a
 	ON a.id_date = v.id_date
-  AND a.utm_campaign = v.utm_campaign
+  AND a.utm_campaign_modified = v.utm_campaign_modified
 LEFT JOIN fall_back AS fb
 	ON fb.id_date = v.id_date
-  AND fb.utm_campaign = v.utm_campaign
+  AND fb.utm_campaign_modified = v.utm_campaign_modified
