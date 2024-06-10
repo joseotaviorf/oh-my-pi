@@ -159,6 +159,20 @@ if __name__ == "__main__":
                 .create_year_month_day_columns_from_date(dt_execution)
                 .output()
             )
+
+            df_cols = df.columns
+            duplicate_col_index = [
+                idx for idx, val in enumerate(df_cols) if val in df_cols[:idx]
+            ]
+
+            # Create a new list by renaming duplicate
+            # columns by adding prefix '_duplicate_'+index
+            for i in duplicate_col_index:
+                df_cols[i] = df_cols[i] + "_duplicate_" + str(i)
+
+            # Rename the duplicate columns in data frame
+            df = df.toDF(*df_cols)
+
             s3_loader.load_df(
                 df=df,
                 s3_path=f"{database_location}{table_name}",
