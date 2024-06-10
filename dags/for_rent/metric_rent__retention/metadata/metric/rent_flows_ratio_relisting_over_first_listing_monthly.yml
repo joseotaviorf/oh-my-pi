@@ -1,0 +1,105 @@
+---
+database_name: metric_rent
+table_name: rent_flows_ratio_relisting_over_first_listing_monthly
+description: Monthly ratio of relisting rent flows over first listing rent flows.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_month_start:
+    lineage:
+      - dw_rent.dim_house_listing.ts_publication
+    description: "Month of the publication."
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Rent value segment."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_house_listing.country_code
+    description: Country code of the house.
+    dimension: True
+  published_first_listings:
+    description: "Monthly total volume of published first listings."
+    metric:
+      name: Monthly Total Published First Listings
+      description: "Monthly total volume of published first listings."
+      acronym: MTPFL
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  first_listings_total_rent_flows:
+    description: "Monthly total volume of first listing's rent flows."
+    metric:
+      name: Monthly Total First Listings Rent Flows
+      description: "Monthly total volume of first listing's rent flows."
+      acronym: MTFLRF
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  first_listings_ratio:
+    description: "Monthly ratio of rent flows per first listing."
+    metric:
+      name: Monthly Ratio Of Rent Flows Per First Listing
+      description: "Monthly ratio of rent flows per first listing."
+      acronym: MRRFPFL
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  published_relistings:
+    description: "Monthly total volume of published relistings."
+    metric:
+      name: Monthly Total Published Relistings
+      description: "Monthly total volume of published relistings."
+      acronym: MTPRL
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  relistings_total_rent_flows:
+    description: "Monthly total volume of relisting's rent flows."
+    metric:
+      name: Monthly Total Relistings Rent Flows
+      description: "Monthly total volume of relisting's rent flows."
+      acronym: MTRLRF
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  relistings_ratio:
+    description: "Monthly ratio of rent flows per relisting."
+    metric:
+      name: Monthly Ratio Of Rent Flows Per Relisting
+      description: "Monthly ratio of rent flows per relisting."
+      acronym: MRRFPRL
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rent_flows_per_listing_rl_vs_fl_ratio:
+    description: "Monthly ratio of relisting's demand over first listing's demand."
+    metric:
+      name: Monthly Ratio Of Relisting's Over First Listing's Demand
+      description: "Monthly ratio of relisting's demand over first listing's demand."
+      acronym: MRRLOFLD
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
