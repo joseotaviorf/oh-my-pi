@@ -22,7 +22,7 @@ deduplicate_invoice_extra AS (
   LEFT JOIN datalake_retsuko.invoice AS i
     ON i.id_external = a.id_external
   WHERE i.status != "canceled"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY a.id_installment ORDER BY COALESCE(i.ts_paid, i.ts_created) ASC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY a.id_installment ORDER BY COALESCE(i.ts_payment_confirmation, i.ts_paid) DESC, i.ts_created ASC) = 1
 ),
 trato_feito_installment AS (
   SELECT
