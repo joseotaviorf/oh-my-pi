@@ -1,4 +1,0 @@
----
-dag_documentation:
-  dag_purpose: |
-    Enrichment and application of rules for data labeling results, done in the LabelStudio tool.

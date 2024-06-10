@@ -139,12 +139,12 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.paschoalotto:load-clean-user
   - bietlejuice.recupera:load-clean-complementary-records
   - bietlejuice.recupera:load-clean-complementary-records-written-down
+  - bietlejuice.recupera:load-clean-contracts
   - bietlejuice.recupera:load-clean-creditor-pending
   - bietlejuice.recupera:load-clean-operational-records
   - bietlejuice.recupera:load-clean-operators
   - bietlejuice.recupera:load-clean-records
   - bietlejuice.recupera:load-clean-status
-  - bietlejuice.recupera:load-clean-contracts
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.trato_feito:load-clean-eviction
@@ -2203,8 +2203,10 @@ bietlejuice.enrich_recommendations:
   - wonka.house_main:load-house_main
 bietlejuice.enrich_recupera:
   - bietlejuice.recupera:load-clean-complementary-records
+  - bietlejuice.recupera:load-clean-contracts
   - bietlejuice.recupera:load-clean-creditor-pending
   - bietlejuice.recupera:load-clean-detail-movement
+  - bietlejuice.recupera:load-clean-historical
   - bietlejuice.recupera:load-clean-historical-records
   - bietlejuice.recupera:load-clean-indicator-contracts
   - bietlejuice.recupera:load-clean-installment
@@ -2217,8 +2219,6 @@ bietlejuice.enrich_recupera:
   - bietlejuice.recupera:load-clean-records
   - bietlejuice.recupera:load-clean-records-distributed-channels
   - bietlejuice.recupera:load-clean-status
-  - bietlejuice.recupera:load-clean-contracts
-  - bietlejuice.recupera:load-clean-historical
   - bietlejuice.trato_feito:load-clean-client
   - bietlejuice.trato_feito:load-clean-contract
 bietlejuice.enrich_rede_company:
