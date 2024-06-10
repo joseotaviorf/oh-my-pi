@@ -287,6 +287,72 @@ proposal_credit_flows AS (
       AND eca.dt_early_credit_created 
         BETWEEN rf.dt_offer_submitted_date - interval '1' MONTH
         AND     rf.dt_offer_submitted_date
+),
+early_credit_full (
+  SELECT
+    eca.sk_user AS sk_client,
+    -1 AS sk_house_listing,
+    eca.sk_house,
+    -1 AS sk_contract,
+    -1 AS sk_contract_created_date,
+    -1 AS sk_contract_signed_date,
+    -1 AS sk_credit_analysis,
+    eca.sk_early_credit_analysis,
+    -1 AS sk_analysis_request,
+    -1 AS sk_checklist,
+    -1 AS sk_credit_analysis_approved_date,
+    -1 AS sk_credit_evaluation_approved_date,
+    -1 AS sk_first_credit_analysis,
+    -1 AS sk_first_variant,
+    -1 AS sk_last_variant_not_null,
+    -1 AS sk_guarantee_category,
+    -1 AS sk_guarantee_paid_date,
+    -1 AS sk_guarantee_accepted_date,
+    -1 AS sk_last_credit_analysis,
+    -1 AS sk_last_credit_evaluation_init,
+    -1 AS sk_last_credit_evaluation_negative,
+    -1 AS sk_last_credit_evaluation_positive,
+    -1 AS sk_offer,
+    -1 AS sk_offer_approved_date,
+    -1 AS sk_offer_submitted_date,
+    -1 AS sk_proposal,
+    -1 AS sk_region,
+    -1 AS sk_tenant_doc_complete_date,
+    -1 AS sk_tenant_first_doc_sent_date,
+    -1 AS sk_drop_reason,
+    REGEXP_REPLACE(CAST(eca.dt_early_credit_created AS VARCHAR(8)), '-', '') AS sk_early_credit_created,
+    REGEXP_REPLACE(CAST(eca.dt_early_credit_expired AS VARCHAR(8)), '-', '') AS sk_early_credit_expired,
+    'early_credit' AS funnel_step,
+    'EC2OS' AS funnel_drop_step,
+    CAST(NULL AS STRING) AS guarantee_offered,
+    CAST(NULL AS STRING) AS guarantee_accepted,
+    CAST(NULL AS STRING) AS country_code,
+    CAST(NULL AS STRING) AS rental_administrator,
+    CAST(NULL AS BOOLEAN) AS is_guarantee_accepted,
+    CAST(NULL AS BOOLEAN) AS is_first_credit_evaluation,
+    CAST(NULL AS BOOLEAN) AS is_last_credit_evaluation,
+    CAST(NULL AS BOOLEAN) AS is_bypass,
+    TRUE AS is_early_credit,
+    eca.dt_early_credit_created,
+    eca.dt_early_credit_expired,
+    CAST(NULL AS DATE) AS dt_last_credit_evaluation_init,
+    CAST(NULL AS DATE) AS dt_tenant_first_doc_sent_date,
+    CAST(NULL AS DATE) AS dt_offer_submitted_date,
+    CAST(NULL AS DATE) AS dt_offer_approved_date,
+    CAST(NULL AS DATE) AS dt_tenant_doc_complete_date,
+    CAST(NULL AS DATE) AS dt_credit_evaluation_approved_date,
+    CAST(NULL AS DATE) AS dt_credit_analysis_approved_date,
+    CAST(NULL AS DATE) AS dt_guarantee_accepted_date,
+    CAST(NULL AS DATE) AS dt_guarantee_paid_date,
+    CAST(NULL AS DATE) AS dt_contract_created_date,
+    CAST(NULL AS DATE) AS dt_contract_signed_date,
+    NOW() AS ts_load
+  FROM
+    early_credit_analysis AS eca
+  LEFT JOIN
+    proposal_credit_flows AS pcf
+      ON  pcf.sk_early_credit_analysis = eca.sk_early_credit_analysis
+  WHERE pcf.sk_early_credit_analysis IS NULL
 )
 SELECT
   sk_client,
@@ -329,6 +395,8 @@ SELECT
   END AS funnel_drop_step,
   guarantee_offered,
   guarantee_accepted,
+  country_code,
+  rental_administrator,
   is_guarantee_accepted,
   is_first_credit_evaluation,
   is_last_credit_evaluation,
@@ -336,8 +404,6 @@ SELECT
   is_early_credit,
   dt_early_credit_created,
   dt_early_credit_expired,
-  country_code,
-  rental_administrator,
   dt_last_credit_evaluation_init,
   dt_tenant_first_doc_sent_date,
   dt_offer_submitted_date,
@@ -356,3 +422,8 @@ WHERE
   sk_offer_submitted_date > 0
   AND sk_proposal > 0
   AND linsting_rank = 1
+UNION
+SELECT 
+  * 
+FROM 
+  early_credit_full
