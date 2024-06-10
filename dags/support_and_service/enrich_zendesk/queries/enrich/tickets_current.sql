@@ -93,8 +93,8 @@ WITH tickets AS (
   FROM
     datalake_zendesk.tickets
   WHERE
-    year >= 2023
-    AND ts_created >= "2023-01-01"
+    year >= 2022
+    AND ts_created >= "2022-01-01"
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
 ),
@@ -126,8 +126,8 @@ ticket_metrics AS (
   FROM
     datalake_zendesk.ticket_metrics
   WHERE
-    year >= 2023
-    AND ts_created >= "2023-01-01"
+    year >= 2022
+    AND ts_created >= "2022-01-01"
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
 )
