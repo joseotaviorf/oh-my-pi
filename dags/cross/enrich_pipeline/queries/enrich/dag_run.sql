@@ -119,7 +119,7 @@ SELECT
   FROM_UTC_TIMESTAMP(dr.ts_started, 'America/Sao_Paulo') AS ts_started_brt,
   dr.ts_ended,
   FROM_UTC_TIMESTAMP(dr.ts_ended, 'America/Sao_Paulo') AS ts_ended_brt,
-  s.ts_success_event AS ts_first_execution_success,
+  TIMESTAMP(s.ts_success_event) AS ts_first_execution_success,
   FROM_UTC_TIMESTAMP(s.ts_success_event, 'America/Sao_Paulo') AS ts_first_execution_success_brt,
   cr.ts_last_execution_ended AS ts_last_composer_run,
   FROM_UTC_TIMESTAMP(cr.ts_last_execution_ended, 'America/Sao_Paulo') AS ts_last_composer_run_brt,
