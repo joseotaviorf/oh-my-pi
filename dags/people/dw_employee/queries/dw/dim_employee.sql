@@ -1,6 +1,7 @@
 WITH hr_system_workers AS (
     SELECT
         id_person,
+        person_number,
         birth_town,
         birth_region,
         birth_country,
