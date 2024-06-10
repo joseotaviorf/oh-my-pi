@@ -174,8 +174,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified,
-    CAST(FALSE AS BOOLEAN) AS is_utm_campaign_function
+    NULL::STRING AS utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.d005d
 UNION ALL 
@@ -271,8 +270,7 @@ SELECT
     share,
     funnel_side,
     business_context,
-    NULL::STRING AS utm_campaign_modified,
-    CAST(FALSE AS BOOLEAN) AS is_utm_campaign_function
+    NULL::STRING AS utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.d023d    
 UNION ALL
