@@ -2,7 +2,7 @@
 database_name: datalake_amplitude_visit
 table_name: amplitude_visit
 description: Table with information regarding visits events on Amplitude.
-domain: For Rent
+domain: For Sale
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_app:
