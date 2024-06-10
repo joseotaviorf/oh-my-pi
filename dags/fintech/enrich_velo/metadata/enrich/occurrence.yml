@@ -52,6 +52,8 @@ columns:
     description: Amount that was paid.
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.amount_paid
+  discount_amount:
+    description: Discount amount, obtained by substracting the paid amount from the due amount.
   is_valid:
     description: Boolean flag for when this occurrence is valid to be used on any business process. Usually a visible register but that does not follows a specific business flow yet.
     lineage:

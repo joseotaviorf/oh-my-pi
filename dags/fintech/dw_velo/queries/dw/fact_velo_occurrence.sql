@@ -11,6 +11,7 @@ SELECT
     due_amount,
     due_amount_original,
     paid_amount,
+    discount_amount,
     is_valid,
     dt_due,
     dt_due_legacy,
