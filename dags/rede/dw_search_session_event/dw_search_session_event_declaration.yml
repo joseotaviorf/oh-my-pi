@@ -14,4 +14,9 @@ workflow:
     fact_search_session_event:
       partitions: [year, month, day]
 cluster:
-  type: databricks_12_2_max_io-memory_photon_cluster
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5n.8xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
