@@ -20,5 +20,8 @@ workflow:
     - house_consultant_history
     house_sale_listing_consultant:
     - house_consultant_history
+    ciq_users:
+    - agent
+
 cluster:
   type: databricks_12_2_med_general_cluster

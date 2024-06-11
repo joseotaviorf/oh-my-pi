@@ -1,0 +1,71 @@
+database_name: datalake_big_agent
+table_name: ciq_users
+description: Table with information from CIQs (Corretor Imobiliário QuintoAndar). Each row represents a CIQ and its keys for relationships with other tables in other contexts (BigAgent / Main / Hub Services).
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_big_agent.agent.id
+    description: Agent ID (BigAgent)
+  id_partner:
+    lineage:
+      - datalake_big_agent.agent.details
+    description: Partner ID (Main)
+  id_main_user:
+    lineage:
+      - datalake_ebdb_user.user.id
+    description: User ID (Main)
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_user.user.id_agent
+    description:  Agent ID (Main)
+  id_hub_services_user:
+    lineage:
+      - datalake_hub_services.users.id_user
+    description: Agent ID (Hub Services)
+  name:
+    lineage:
+      - datalake_ebdb_user.user.name
+    description: Full name of user.
+  email:
+    lineage:
+      - datalake_ebdb_user.user.email
+    description: Email of user.
+  phone:
+    lineage:
+      - datalake_ebdb_user.user.main_phone
+    description: Phone of user.
+  creci_number:
+    lineage:
+      - datalake_ebdb_user.agent_data.creci_number
+    description: Creci Number of user.
+  cpf:
+    lineage:
+      - datalake_ebdb_user.user.cpf
+    description: CPF of user.
+  city:
+    lineage:
+      - datalake_ebdb_user.user.city
+    description: City of user.
+  status:
+    lineage:
+      - datalake_ebdb_clean.partner.id 
+      - datalake_ebdb_clean.partner_agent.status
+    description: Status to identify wheter the agent is active or not.
+  ts_agent_created:
+    lineage:
+      - datalake_big_agent.agent.ts_created
+    description: Timestamp of when the agent was created
+  ts_agent_updated:
+    lineage:
+      - datalake_big_agent.agent.ts_updated
+    description: Timestamp of when the agent was updated
+  ts_user_created: 
+    lineage:
+      - datalake_ebdb_user.user.ts_created
+    description: Timestamp of when the user was created
+  ts_user_updated:
+    lineage:
+      - datalake_ebdb_user.user.ts_updated
+    description: Timestamp of when the user was updated
