@@ -1,0 +1,69 @@
+table_name: dw_customer_support_staging.fact_sessions_chatbot
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_session:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_started_chat:
+    is_complete:
+      severity_level: Error
+  sk_ticket:
+    is_complete:
+      severity_level: Error
+  sk_user:
+    is_complete:
+      severity_level: Error
+  sk_content:
+    is_complete:
+      severity_level: Error
+  sk_contract:
+    is_complete:
+      severity_level: Error
+  sk_survey:
+    is_complete:
+      severity_level: Error
+  sk_answer:
+    is_complete:
+      severity_level: Error
+  is_menu_available:
+    is_complete:
+      severity_level: Error
+  is_call_in_app_session:
+    is_complete:
+      severity_level: Error
+  has_questionnaire_sent:
+    is_complete:
+      severity_level: Error
+  is_retained_session_with_fallback:
+    is_complete:
+      severity_level: Error
+  is_abandonmet:
+    is_complete:
+      severity_level: Error
+  sk_ended_chat:
+    is_complete:
+      severity_level: Error
+  is_recontact:
+    is_complete:
+      severity_level: Error
+  has_exceeded_session_timeout:
+    is_complete:
+      severity_level: Error
+  has_journey_flow_response:
+    is_complete:
+      severity_level: Error
+  context_identification_tentatives:
+    is_complete:
+      severity_level: Error
+  has_same_previous_theme:
+    is_complete:
+      severity_level: Error
+  number_chat_interactions:
+    has_min_value:
+      greater_than_or_equal_to: 0

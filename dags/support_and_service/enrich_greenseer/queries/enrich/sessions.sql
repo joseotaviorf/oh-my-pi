@@ -150,9 +150,9 @@ greenseer_retentions AS (
     sauron_uniques AS s
       ON s.id = g.id_session
   WHERE
-    g.id_pipeline IN ('whatsapp', 'whatsapp_main', 'whatsapp_main_legacy', 'in_app_main')
-    AND s.source IN ('whatsapp', 'internal_chat')
-    AND s.source_environment IN ('default', 'QuintoandarSupport')
+    g.id_pipeline IN ('whatsapp', 'whatsapp_main', 'whatsapp_main_legacy', 'in_app_main','mx_whatsapp_main')
+    AND s.source IN ('whatsapp', 'internal_chat','call_in_app')
+    AND s.source_environment IN ('default', 'QuintoandarSupport', 'QuintoandarSupport:DEFAULT')
     AND s.status = 'expired'
     AND g.tried_retention
 ),

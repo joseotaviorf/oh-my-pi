@@ -43,7 +43,7 @@ churn_to_call AS (
         AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN 0
       WHEN channel = 'call'
         AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat'
-        AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN 1 -- considerando que o cliente churnou se abriu uma sessão por call em até 96h após ser retido no chat
+        AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN True -- considerando que o cliente churnou se abriu uma sessão por call em até 96h após ser retido no chat
     END AS is_churn_chat
   FROM
     base_churn
@@ -64,21 +64,21 @@ SELECT
   gs.is_problem_solved,
   gs.is_retention,
   CASE
-    WHEN gs.is_retention <> true AND gs.id_ticket IS NULL THEN 1
-    ELSE 0
+    WHEN gs.is_retention <> true AND gs.id_ticket IS NULL THEN True
+    ELSE False
   END AS is_abandonmet,
   gs.is_recontact,
   CASE
-    WHEN gs.is_retention = true AND gs.has_fallback = true THEN 1
-    ELSE 0
+    WHEN gs.is_retention = true AND gs.has_fallback = true THEN True
+    ELSE False
   END AS is_retained_session_with_fallback,
   cc.is_churn_chat,
-  IF(gs.ticket_origin = 'call inapp', 1, 0) AS is_call_in_app_session,
+  IF(gs.ticket_origin = 'call inapp', True, False) AS is_call_in_app_session,
   gs.has_exceeded_session_timeout,
   gs.has_journey_flow_response,
   gs.has_fallback,
   CASE
-    WHEN GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions') IS NULL THEN 1
+    WHEN GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions') IS NULL THEN True
     ELSE GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions')
   END AS number_chat_interactions,
   GET_JSON_OBJECT(gs.memory,'$.predictions.with_context') AS model_with_context,
@@ -91,7 +91,7 @@ SELECT
   GET_JSON_OBJECT(memory, '$.basic.session.last_hsm.secs_since') AS secs_since_last_hsm,
   gs.automatic_selection,
   CASE
-    WHEN gs.current_state LIKE '%CSAT%' THEN 1 ELSE 0
+    WHEN gs.current_state LIKE '%CSAT%' THEN True ELSE False
   END AS has_questionnaire_sent,
   gs.context_detection_attempts AS context_identification_tentatives,
   gs.has_same_previous_theme,
