@@ -43,3 +43,5 @@ columns:
     lineage:
       - datalake_dag_inventory_clean.table.is_delta
     description: Boolean flag indicating if the table is in Delta.
+  is_certified_layer:
+    description: Boolean flag indicating if the table layer is certified, which means that the tables is from a DW or Metric layer.

@@ -13,7 +13,8 @@ SELECT
   REGEXP_EXTRACT(t.table, '(^\\w+)') AS schema,
   t.layer,
   t.avg_file_size_in_bytes,
-  t.is_delta
+  t.is_delta,
+  IF(t.layer IN ('dw', 'metric'), TRUE, FALSE) AS is_certified_layer
 FROM
   datalake_dag_inventory_clean.table AS t
 JOIN
