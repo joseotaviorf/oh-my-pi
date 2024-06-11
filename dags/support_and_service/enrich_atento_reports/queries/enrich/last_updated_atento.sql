@@ -64,6 +64,12 @@ WITH atento_tables AS (
         ts_load
     FROM
         reverse_atento.twilio_chat_aht
+    UNION ALL
+    SELECT
+        'recontact_mx' AS table_name,
+        ts_load
+    FROM
+        reverse_atento.recontac_mx
 )
 SELECT DISTINCT
     'Atento' AS bpo,
