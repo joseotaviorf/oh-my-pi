@@ -18,8 +18,3 @@ column_level_validations:
   has_journey_flow_response:
     is_complete:
       severity_level: Error
-    is_contained_in:
-      values:
-        - true
-        - false
-      severity_level: Error
