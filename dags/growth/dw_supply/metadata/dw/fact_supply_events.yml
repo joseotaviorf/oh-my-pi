@@ -1,0 +1,96 @@
+---
+database_name: dw_growth
+table_name: fact_supply_events
+owner: arthur.gonzaga@quintoandar.com.br
+domain: growth
+description: This table contains the events related to the supply flow, each row is an event in the funnel step for one business context in Supply Flow.
+columns:
+  sk_supply:
+    lineage:
+        - datalake_supply_flows.supply_events_tracking.sk_supply_lead
+        - datalake_supply_flows.supply_events_tracking.id_house
+    description: Unique primary key that identifies each supply event.
+  nm_business_context:
+    lineage: datalake_supply_flows.supply_events_tracking.business_context
+    description: Business context associated with the supply event.
+  nm_supply_source:
+    lineage: datalake_supply_flows.supply_events_tracking.supply_source
+    description: Supply source associated with the event.
+  sk_supply_lead:
+    lineage: datalake_supply_flows.supply_events_tracking.sk_supply_lead
+    description: Key from the dw_growth.dim_lead dimension associated with the supply.
+  sk_lead:
+    lineage: datalake_supply_flows.supply_events_tracking.id_lead_ebdb
+    description: Key from the dw_growth.dim_lead dimension associated with the supply event.
+  sk_region:
+    lineage: datalake_supply_flows.supply_events_tracking.id_region
+    description: Key from the dw_growth.dim_region dimension associated with the supply event.
+  sk_house:
+    lineage: datalake_supply_flows.supply_events_tracking.id_house
+    description: Key from the dw_growth.dim_house dimension associated with the supply event.
+  sk_user_registrant:
+    lineage: datalake_supply_flows.supply_events_tracking.id_user_registrant
+    description: Key from the dw_growth.dim_user dimension associated with the user who registered the supply event.
+  sk_user_conversion:
+    lineage: datalake_supply_flows.supply_events_tracking.id_user_conversion
+    description: Key from the dw_growth.dim_user dimension associated with the conversion user of the supply event.
+  sk_lead_3p:
+    lineage: datalake_supply_flows.supply_events_tracking.id_lead
+    description: Key from the dw_growth.dim_lead dimension associated with third-party supply (if `supply_source` is '3P').
+  sk_funnel_step:
+    lineage:
+        - datalake_supply_flows.supply_events_tracking.funnel_step
+        - datalake_supply_flows.supply_events_tracking.business_event
+    description: Concatenation of `funnel_step` and `business_event` in lowercase.
+  sk_discard:
+    lineage:
+        - datalake_supply_flows.supply_events_tracking.funnel_step
+        - datalake_supply_flows.supply_events_tracking.drop_step_reason
+    description: Concatenation of `funnel_step` and `drop_step_reason` in lowercase.
+  sk_ops:
+    lineage:
+        - datalake_supply_flows.supply_events_tracking.ops_objective
+        - datalake_supply_flows.supply_events_tracking.ops_agent
+        - datalake_supply_flows.supply_events_tracking.ops_partner
+        - datalake_supply_flows.supply_events_tracking.ops_contact_medium
+        - datalake_supply_flows.supply_events_tracking.ops_approach
+        - datalake_supply_flows.supply_events_tracking.ops_assigned
+    description: Concatenation of various columns related to operations.
+  sk_recovery:
+    lineage:
+        - datalake_supply_flows.supply_events_tracking.reprocessed
+        - datalake_supply_flows.supply_events_tracking.reprocessing_entity_type
+        - datalake_supply_flows.supply_events_tracking.reprocessing_table_name
+    description: Concatenation of various columns related to recovery.
+  sk_conversion_path:
+    lineage:
+        - datalake_supply_flows.supply_events_tracking.application
+        - datalake_supply_flows.supply_events_tracking.lead_application
+        - datalake_supply_flows.supply_events_tracking.platform
+    description: Concatenation of various columns related to the conversion path.
+  sk_acquisition_path:
+    lineage:
+        - datalake_supply_flows.supply_events_tracking.lead_application
+        - datalake_supply_flows.supply_events_tracking.platform
+    description: Concatenation of various columns related to the acquisition path.
+  sk_user_affiliate:
+    lineage: datalake_supply_flows.supply_events_tracking.id_referred_by
+    description: Key from the dw_growth.dim_user dimension associated with the affiliate user of the supply event.
+  sk_acquisition_lead:
+    lineage:
+        - datalake_supply_flows.supply_events_tracking.sk_supply_lead
+        - datalake_supply_flows.supply_events_tracking.supply_source
+        - datalake_supply_flows.supply_events_tracking.business_context
+    description: Concatenation of various columns related to the acquisition of the supply event lead.
+  sk_date:
+    lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+    description: Key from the dw_growth.dim_date dimension associated with the event date.
+  ts_event_original:
+    lineage: datalake_supply_flows.supply_events_tracking.ts_event_original
+    description: Original timestamp of the supply event.
+  ts_event:
+    lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+    description: Adjusted timestamp of the supply event.
+  sk_media_setup:
+    lineage: datalake_supply_flows.dict_taxonomy.id_media_setup
+    description: Key from the dw_growth.dim_media_setup dimension associated with the media setup.

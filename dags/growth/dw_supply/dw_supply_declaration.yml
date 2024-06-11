@@ -1,0 +1,46 @@
+dag:
+  name: dw_supply
+  schedule_start_date: 2024,5,23
+  owner: Data Growth
+  documentation: 
+    dag_purpose: |
+      This DAG is responsible for extracting and loading the supply data into the DW layer.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: growth
+  default_extraction_type: full
+  tables_customization:
+    dim_acquisition_lead:
+      merge_on: ['bk_acq_lead']
+      z_order_by: ['bk_acq_lead']
+    dim_affiliate_tracking:
+      z_order_by: ['sk_user_affiliate']
+    dim_funnel_step:
+      merge_on: ['bk_funnel_step']
+      z_order_by: ['bk_funnel_step']
+    dim_supply_discards:
+      merge_on: ['bk_discard']
+      z_order_by: ['bk_discard']
+    dim_supply_operation_flow:
+      merge_on: ['bk_ops']
+      z_order_by: ['bk_ops']
+    dim_supply_recovery_flow:
+      merge_on: ['bk_recovery']
+      z_order_by: ['bk_recovery']
+    dim_supply_user_path:
+      merge_on: ['bk_user_path']
+      z_order_by: ['bk_user_path']
+    fact_supply_events:
+      z_order_by: ['sk_supply', 'nm_business_context']
+  inner_dependencies:
+    fact_supply_events:
+      - dim_acquisition_lead
+      - dim_affiliate_tracking
+      - dim_funnel_step
+      - dim_supply_discards
+      - dim_supply_operation_flow
+      - dim_supply_recovery_flow
+      - dim_supply_user_path
+cluster:
+  type: databricks_12_2_med_general_cluster

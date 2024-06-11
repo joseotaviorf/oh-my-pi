@@ -231,6 +231,8 @@ bietlejuice.dw_sale_visits:
   remove:
     - bietlejuice.ebdb_user:load-clean-user
     - bietlejuice.enrich_booking:load-enrich-booking
+bietlejuice.dw_supply:
+  override: []
 bietlejuice.dw_tenant_documentation:
   remove:
     - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request-aud
@@ -377,6 +379,11 @@ bietlejuice.enrich_supply_conversion_3p:
     - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
 bietlejuice.enrich_static_files_ss:
   override: []
+bietlejuice.enrich_growth_costs_sharing_rules:
+  remove:
+    - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead
+    - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking
+    - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
 bietlejuice.enrich_supply_taxonomy:
   add:
     - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
@@ -388,6 +395,7 @@ bietlejuice.enrich_growth_taxonomy:
     - bietlejuice.ebdb:load-clean-visit-origin
     - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
     - bietlejuice.enrich_booking:load-enrich-booking
+
 bietlejuice.enrich_health_metrics:
   override: []
 bietlejuice.enrich_house_feature_inference:

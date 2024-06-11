@@ -1,0 +1,28 @@
+---
+database_name: dw_growth
+table_name: dim_supply_user_path
+owner: arthur.gonzaga@quintoandar.com.br
+domain: growth
+description: Dimensional table containing information about the user path in the supply funnel.
+columns:
+  id_level:
+    - description: Identifier for the level of the user path.
+  ds_level:
+    - lineage: datalake_supply_flows.supply_events_tracking.aux_origin_table
+    - description: Description of the level of the user path.
+  tp_origin:
+    - lineage: datalake_supply_flows.supply_events_tracking.application
+    - description: Type of origin associated with the user path.
+  tp_platform:
+    - lineage: datalake_supply_flows.supply_events_tracking.platform
+    - description: Type of platform associated with the user path.
+  nm_content_page:
+    - lineage: Constant 'n/a'
+    - description: Name of the content page associated with the user path.
+  bk_user_path:
+    - lineage:
+        - datalake_supply_flows.supply_events_tracking.application
+        - datalake_supply_flows.supply_events_tracking.platform
+    - description: Concatenation of `tp_origin`, `tp_platform`, and `nm_content_page` in a specific format.
+  ts_updated:
+    - description: Timestamp indicating when the user path information was last updated.

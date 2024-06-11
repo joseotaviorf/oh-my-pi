@@ -1,0 +1,60 @@
+---
+database_name: dw_growth
+table_name: dim_acquisition_lead
+owner: arthur.gonzaga@quintoandar.com.br
+domain: growth
+description: Table with information about acquisition leads, such as the lead type, source, and campaign.
+columns:
+  sk_supply_lead:
+    - description: Unique identifier for the supply lead associated with the acquisition.
+    - lineage: datalake_supply_flows.supply_events_tracking.sk_supply_lead
+  cd_supply_source:
+    - description: Code representing the supply source associated with the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.supply_source
+  nm_business_context:
+    - description: Business context associated with the supply lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.business_context
+  id_lead:
+    - description: Identifier for the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.id_lead
+  id_lead_ebdb:
+    - description: Identifier for the lead in the EBDB system.
+    - lineage: datalake_supply_flows.supply_events_tracking.id_lead_ebdb
+  id_original_lead:
+    - description: Identifier for the original lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.original_lead
+  id_prospect:
+    - description: Identifier for the prospect.
+    - lineage: datalake_supply_flows.supply_events_tracking.id_prospect
+  id_house:
+    - description: Identifier for the house associated with the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.id_house
+  tp_track_campaign:
+    - description: Type of tracking campaign for the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.aux_database_tracking_campaign
+  tp_track_medium:
+    - description: Type of tracking medium for the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.aux_database_tracking_medium
+  tp_track_source:
+    - description: Type of tracking source for the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.aux_database_tracking_source
+  nm_medium:
+    - description: Name of the medium associated with the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.medium
+  nm_source:
+    - description: Name of the source associated with the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.source
+  nm_campaign:
+    - description: Name of the campaign associated with the lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.campaign
+  tp_lead:
+    - description: Type of lead.
+    - lineage: datalake_supply_flows.supply_events_tracking.lead_type
+  ts_updated:
+    - description: Timestamp indicating when the acquisition lead information was last updated.
+  bk_acq_lead:
+    - description: Concatenation of `sk_supply_lead`, `cd_supply_source`, and `nm_business_context`.
+    - lineage:
+        - datalake_supply_flows.supply_events_tracking.sk_supply_lead
+        - datalake_supply_flows.supply_events_tracking.supply_source
+        - datalake_supply_flows.supply_events_tracking.business_context

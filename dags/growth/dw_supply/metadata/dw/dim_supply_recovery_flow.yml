@@ -1,0 +1,29 @@
+---
+database_name: dw_growth
+table_name: dim_supply_recovery_flow
+owner: arthur.gonzaga@quintoandar.com.br
+domain: growth
+description: Table with information about the recovery flows related to supply events, such as the type of reprocessing, reprocessing entity, mailing table.
+columns:
+  id_level:
+    - description: Identifier for the level of the recovery flow.
+  ds_level:
+    - description: Description of the level of the recovery flow.
+  tp_reprocessing:
+    - lineage: datalake_supply_flows.supply_events_tracking.reprocessed
+    - description: Type of reprocessing associated with the recovery flow.
+  tp_reprocessing_entity:
+    - lineage: datalake_supply_flows.supply_events_tracking.reprocessing_entity_type
+    - description: Type of reprocessing entity associated with the recovery flow.
+  nm_mailing_table:
+    - lineage: datalake_supply_flows.supply_events_tracking.reprocessing_table_name
+    - description: Name of the mailing table associated with the recovery flow.
+  ts_updated:
+    - lineage: NOW()
+    - description: Timestamp indicating when the supply recovery flow information was last updated.
+  bk_recovery:
+    - lineage:
+        - datalake_supply_flows.supply_events_tracking.reprocessed
+        - datalake_supply_flows.supply_events_tracking.reprocessing_entity_type
+        - datalake_supply_flows.supply_events_tracking.reprocessing_table_name
+    - description: Concatenation of `tp_reprocessing`, `tp_reprocessing_entity`, and `nm_mailing_table`.

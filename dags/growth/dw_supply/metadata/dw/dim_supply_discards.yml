@@ -1,0 +1,23 @@
+---
+database_name: dw_growth
+table_name: dim_supply_discards
+owner: arthur.gonzaga@quintoandar.com.br
+domain: growth
+description: Table with information about the discard reasons for supply events. 
+sk_discard:
+  - description: Autoincremental surrogate key for the dim_supply_discards dimension.
+bk_discard:
+  - lineage:
+      - datalake_supply_flows.supply_events_tracking.funnel_step
+      - datalake_supply_flows.supply_events_tracking.drop_step_reason
+  - description: Concatenation of `funnel_step` and `drop_step_reason` in lowercase.
+cd_funnel_step:
+  - lineage: datalake_supply_flows.supply_events_tracking.funnel_step
+  - description: Code for the funnel step.
+cd_discard_reason:
+  - lineage: datalake_supply_flows.supply_events_tracking.drop_step_reason
+  - description: Code for the discard reason.
+ds_discard_reason:
+  - description: Descriptive label for the discard reason.
+ts_updated:
+  - description: Timestamp indicating when the record was last updated.
