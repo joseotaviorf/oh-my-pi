@@ -14,7 +14,8 @@ WITH base AS (
 SELECT
     id_line,
     line_name,
-    IF(line_name LIKE 'Data%', TRUE, FALSE) AS is_data_line,
+    IF(line_name IN ('Data ForRent', 'Data Growth', 'Data Fintech', 'Data Rede', 'Data ForSale', 'Data SS',
+        'Data Engineering', 'Data Agents', 'Data Bedrock', 'Data International', 'Data People'), TRUE, FALSE) AS is_data_line,
     TIMESTAMP(ts_line_first_event) AS ts_line_first_event
 FROM
     base
