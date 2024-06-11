@@ -38,6 +38,10 @@ def get_columns_from_metastore(spark_client, schemas_skip_list):
                     .withColumn("table_name", lit(table))
                 )
             except Py4JJavaError as e:
+                if "AccessDeniedException" in str(e):
+                    logging.error(f"Permission error. Skiping table {table}")
+                    continue
+
                 logging.error(
                     f"m={JOB_NAME}, msg=Error getting columns from {database}.{table}. Error: {e}"
                 )
@@ -65,10 +69,12 @@ def get_empty_df(spark_client):
 def list_metastore_databases(spark_client, schemas_skip_list):
     databases_df = (
         spark_client.get_records("SHOW DATABASES")
-        .where("""databaseName not like '%_staging%' 
-               and databaseName not like 'temp_%' 
-               and databaseName not like 'igorgatis%' 
-               """)
+        .where(
+            """databaseName not like '%_staging%'
+               and databaseName not like 'temp_%'
+               and databaseName not like 'igorgatis%'
+               """
+        )
         .collect()
     )
     databases = [
