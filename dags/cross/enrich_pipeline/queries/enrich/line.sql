@@ -15,6 +15,6 @@ SELECT
     id_line,
     line_name,
     IF(line_name LIKE 'Data%', TRUE, FALSE) AS is_data_line,
-    ts_line_first_event
+    TIMESTAMP(ts_line_first_event) AS ts_line_first_event
 FROM
     base
