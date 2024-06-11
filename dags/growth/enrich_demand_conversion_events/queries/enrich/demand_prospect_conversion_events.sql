@@ -241,17 +241,17 @@ rent_offer_attribution AS (
     conversion_events AS roce
   LEFT JOIN
     datalake_offer.offer AS off
-      ON roce.id_offer = off.id_offer_context
+      ON (roce.id_offer = off.id_offer_context)
   LEFT JOIN
     rent_offer_from_amplitude AS aos
-      ON off.id_firestore = aos.id_firestore
-      AND (roce.id_prospect = aos.id_user OR roce.id_house = aos.id_house)
-      AND aos.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      ON (off.id_firestore = aos.id_firestore)
+      AND ((roce.id_prospect = aos.id_user) OR (roce.id_house = aos.id_house))
+      AND (CAST(aos.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
   LEFT JOIN 
     datalake_tracked_events.attribution_cross_channel AS acc
-      ON off.id_firestore = acc.id_firestore
-        AND acc.event_name = 'offer_submitted'
-        AND acc.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      ON (off.id_firestore = acc.id_firestore)
+        AND (acc.event_name = 'offer_submitted')
+        AND (CAST(acc.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
   WHERE
     roce.id_event_type = 3
     AND roce.business_context = 'rent'

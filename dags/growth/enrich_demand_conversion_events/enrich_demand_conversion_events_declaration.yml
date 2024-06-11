@@ -29,4 +29,4 @@ workflow:
     - tenant_prospect_status
     - buyer_prospect_status 
 cluster:
-  type: databricks_10_4_min_io-memory_photon_cluster
+  type: databricks_12_2_med_io-memory_photon_cluster
