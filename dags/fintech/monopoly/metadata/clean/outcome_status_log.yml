@@ -7,6 +7,9 @@ columns:
   id_outcome:
     lineage:
       - datalake_monopoly_raw.outcome_status_log.outcome_id
+  id_external_payment_i:
+    lineage:
+      - datalake_monopoly_raw.outcome_status_log.external_payment_id
   status:
     lineage:
       - datalake_monopoly_raw.outcome_status_log.status

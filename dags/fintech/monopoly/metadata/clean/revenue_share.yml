@@ -1,0 +1,24 @@
+database_name: datalake_monopoly_clean
+table_name: revenue_share
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.revenue_share.id
+  id_person_sale:
+    lineage:
+      - datalake_monopoly_raw.revenue_share.person_sale_id
+  revision:
+    lineage:
+      - datalake_monopoly_raw.revenue_share.revision
+  amount:
+    lineage:
+      - datalake_monopoly_raw.revenue_share.amount
+  type:
+    lineage:
+      - datalake_monopoly_raw.revenue_share.type
+  active:
+    lineage:
+      - datalake_monopoly_raw.revenue_share.active
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.revenue_share.created_at

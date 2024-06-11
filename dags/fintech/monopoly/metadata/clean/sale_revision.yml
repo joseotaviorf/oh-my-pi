@@ -7,12 +7,54 @@ columns:
   id_external_offer:
     lineage:
       - datalake_monopoly_raw.sale_revision.external_offer_id
+  id_state_external:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.state_external_id
+  id_house:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.house_id
   revision:
     lineage:
       - datalake_monopoly_raw.sale_revision.revision
   ledger_rule:
     lineage:
       - datalake_monopoly_raw.sale_revision.ledger_rule
+  category:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.category
+  payment_method:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.payment_method
+  payment_model:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.payment_model
+  address:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.address
+  house_number:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.house_number
+  complement:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.complement
+  postal_code:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.postal_code
+  status:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.status
+  drive_folder:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.drive_folder
+  updated_by:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.updated_by
+  cancellation_reason:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.cancellation_reason
+  errors:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.errors
   down_payment_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.down_payment_amount
@@ -22,6 +64,12 @@ columns:
   financed_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.financed_amount
+  fgts_amount:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.fgts_amount
+  cash_payment_amount:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.cash_payment_amount
   total_payment_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.total_payment_amount
@@ -31,12 +79,33 @@ columns:
   brokerage_fee:
     lineage:
       - datalake_monopoly_raw.sale_revision.brokerage_fee
-  ts_payment_allowed:
+  brokerage_quintoandar_fee:
     lineage:
-      - datalake_monopoly_raw.sale_revision.payment_allowed_at
+      - datalake_monopoly_raw.sale_revision.brokerage_quintoandar_fee
+  brokerage_estate_agent_fee:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.brokerage_estate_agent_fee
   ts_event:
     lineage:
       - datalake_monopoly_raw.sale_revision.event_date_time
+  dt_notary_start:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.notary_start_date
+  ts_payment_allowed:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.payment_allowed_at
+  dt_revenue_share_calculated:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.revenue_share_calculated_at
+  dt_nf_scheduled_to:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.nf_scheduled_to
+  dt_signature:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.signature_date
   ts_created:
     lineage:
       - datalake_monopoly_raw.sale_revision.created_at
+  ts_cancelled:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.cancelled_at

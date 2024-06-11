@@ -7,6 +7,9 @@ columns:
   id_person_sale:
     lineage:
       - datalake_monopoly_raw.outcome.person_sale_id
+  id_revenue_share:
+    lineage:
+      - datalake_monopoly_raw.outcome.revenue_share_id
   event:
     lineage:
       - datalake_monopoly_raw.outcome.event
@@ -16,6 +19,12 @@ columns:
   outcome_status:
     lineage:
       - datalake_monopoly_raw.outcome.status
+  observations:
+    lineage:
+      - datalake_monopoly_raw.outcome.observations
+  dt_due:
+    lineage:
+      - datalake_monopoly_raw.outcome.due_date
   ts_created:
     lineage:
       - datalake_monopoly_raw.outcome.created_at

@@ -1,0 +1,24 @@
+database_name: datalake_monopoly_clean
+table_name: nota_fiscal_emission_error
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.nota_fiscal_emission_error.id
+  id_sale:
+    lineage:
+      - datalake_monopoly_raw.nota_fiscal_emission_error.sale_id
+  error_type:
+    lineage:
+      - datalake_monopoly_raw.nota_fiscal_emission_error.error_type
+  incorrect_value:
+    lineage:
+      - datalake_monopoly_raw.nota_fiscal_emission_error.incorrect_value
+  ts_solved:
+    lineage:
+      - datalake_monopoly_raw.nota_fiscal_emission_error.ts_solved
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.nota_fiscal_emission_error.ts_created
+  ts_updated:
+    lineage:
+      - datalake_monopoly_raw.nota_fiscal_emission_error.ts_updated

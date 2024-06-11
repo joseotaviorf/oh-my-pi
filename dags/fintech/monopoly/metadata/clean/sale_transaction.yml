@@ -13,6 +13,9 @@ columns:
   id_outcome_reference:
     lineage:
       - datalake_monopoly_raw.sale_transaction.outcome_reference_id
+  id_external_sync:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.external_sync_id
   event:
     lineage:
       - datalake_monopoly_raw.sale_transaction.event
@@ -28,6 +31,9 @@ columns:
   dt_accounting:
     lineage:
       - datalake_monopoly_raw.sale_transaction.accounting_date
+  ts_synced:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.synced_at
   ts_reversed:
     lineage:
       - datalake_monopoly_raw.sale_transaction.reversed_at

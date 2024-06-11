@@ -22,11 +22,13 @@ This pipeline produces the following tables into the datalake, via full load:
    - income
    - income_reference
    - income_status_log
+   - nota_fiscal_emission_error
    - outcome
    - outcome_reference
    - outcome_status_log
    - person
    - person_sale
+   - revenue_share
    - sale
    - sale_revision
    - sale_transactions
@@ -38,11 +40,13 @@ This pipeline produces the following tables into the datalake, via full load:
    - income
    - income_reference
    - income_status_log
+   - nota_fiscal_emission_error
    - outcome
    - outcome_reference
    - outcome_status_log
    - person
    - person_sale
+   - revenue_share
    - sale
    - sale_revision
    - sale_transactions
