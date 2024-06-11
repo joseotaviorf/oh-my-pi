@@ -1,13 +1,10 @@
 WITH latest_audit AS (
   SELECT
     id_invoice,
-    id_audit,
-    MAX(ts_retsuko_updated)
+    id_audit
   FROM
     datalake_retsuko_test.entry
-  GROUP BY
-    id_invoice,
-    id_audit
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice ORDER BY ts_database_transaction DESC) = 1
 )
 SELECT
     in.id,

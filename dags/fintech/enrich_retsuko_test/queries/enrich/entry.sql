@@ -20,7 +20,8 @@ SELECT
     e.due_year_month,
     e.ts_created,
     e.ts_synced,
-    e.ts_retsuko_updated
+    e.ts_retsuko_updated,
+    e.ts_database_transaction
 FROM
     datalake_retsuko_test_clean.entry e
 LEFT JOIN
