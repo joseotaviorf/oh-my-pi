@@ -40,7 +40,7 @@ churn_to_call AS (
     CASE
       WHEN channel = 'chat'
         AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat'
-        AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN 0
+        AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN False
       WHEN channel = 'call'
         AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat'
         AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN True -- considerando que o cliente churnou se abriu uma sessão por call em até 96h após ser retido no chat
@@ -78,7 +78,7 @@ SELECT
   gs.has_journey_flow_response,
   gs.has_fallback,
   CASE
-    WHEN GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions') IS NULL THEN True
+    WHEN GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions') IS NULL THEN 0
     ELSE GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions')
   END AS number_chat_interactions,
   GET_JSON_OBJECT(gs.memory,'$.predictions.with_context') AS model_with_context,
