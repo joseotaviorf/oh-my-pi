@@ -1,7 +1,10 @@
 SELECT
     id,
     GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
-    GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
+    COALESCE(
+        GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid'),
+        GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.callSid')
+    ) AS id_call,
     GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') AS id_reservation,
     GET_JSON_OBJECT(metadata,'$.event_data.Sid') AS id_event,
     GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueSid') AS id_queue,
@@ -17,6 +20,8 @@ SELECT
     GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.BPO') AS bpo_name,
     GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueName') AS queue_name,
     GET_JSON_OBJECT(metadata,'$.event_data.WorkerAttributes.email') AS worker_email,
+    GET_JSON_OBJECT(metadata,'$.event_data.TaskCanceledReason') AS task_cancelation_reason,
+    GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.steps') AS ivr_steps,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-1') AS INT) AS csat_1,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-2') AS INT) AS csat_2,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-3') AS INT) AS csat_3,

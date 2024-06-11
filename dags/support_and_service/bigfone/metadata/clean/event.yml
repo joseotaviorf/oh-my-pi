@@ -55,6 +55,12 @@ columns:
   worker_email:
     lineage:
       - datalake_bigfone_raw.event.metadata
+  task_cancelation_reason:
+    lineage:
+      - datalake_bigfone_raw.event.metadata
+  ivr_steps:
+    lineage:
+      - datalake_bigfone_raw.event.metadata
   csat_1:
     lineage:
       - datalake_bigfone_raw.event.metadata
