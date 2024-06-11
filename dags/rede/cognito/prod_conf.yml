@@ -8,7 +8,7 @@ tables:
   - table_name: rede_user_pool
     user_pool_id: us-east-1_YGGKO9kNZ
 custom_cluster:
-  driver_node_type_id: r5a.xlarge
+  driver_node_type_id: r5a.2xlarge
   node_type_id: m5a.xlarge
   num_workers: 3
   spark_version: 12.2.x-scala2.12
