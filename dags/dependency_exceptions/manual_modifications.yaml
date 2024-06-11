@@ -368,18 +368,11 @@ bietlejuice.enrich_supply_leads:
   remove:
     - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_supply_acquisition:
-  remove:
-    - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
+  override: []
 bietlejuice.enrich_supply_conversion:
-  add:
-    - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
-    - bietlejuice.enrich_supply_conversion_3p:load-enrich-conversion-events-3p
+  override: []
 bietlejuice.enrich_supply_conversion_3p:
-  add:
-    - bietlejuice.enrich_supply_acquisition:load-enrich-landing-3p
-    - bietlejuice.enrich_supply_acquisition:load-enrich-prospects-3p
-  remove:
-    - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
+  override: []
 bietlejuice.enrich_static_files_ss:
   override: []
 bietlejuice.enrich_growth_costs_sharing_rules:
@@ -388,9 +381,7 @@ bietlejuice.enrich_growth_costs_sharing_rules:
     - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking
     - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
 bietlejuice.enrich_supply_taxonomy:
-  add:
-    - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
-    - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
+  override: []
 bietlejuice.enrich_supply_tracking:
   override: []
 bietlejuice.enrich_growth_taxonomy:

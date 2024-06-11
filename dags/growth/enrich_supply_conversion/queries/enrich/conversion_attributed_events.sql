@@ -10,10 +10,10 @@ WITH fl_events AS(
     ts_event,
     rev
   FROM
-    datalake_supply_flows_migrate.conversion_staging
+    datalake_supply_flows.conversion_staging
   WHERE
     step = 'FIRST_LISTING' 
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entity, business_context ORDER BY rev, ts_event) = 1 -- PEGANDO PRIMEIRO EVENTO DE FL
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entity, business_context ORDER BY rev, ts_event) = 1 -- First Listing Event
 ),
 opp_events AS (
   SELECT
@@ -27,52 +27,38 @@ opp_events AS (
     ts_event,
     rev
   FROM
-    datalake_supply_flows_migrate.conversion_staging
+    datalake_supply_flows.conversion_staging
   WHERE
-    step = 'OPPORTUNITY' -- FILTRO POR TODOS OS EVENTOS DE OPPORTUNITY
-    QUALIFY ROW_NUMBER() OVER (
-      PARTITION BY id_entity,
-      business_context
-      ORDER BY
-        rev,
-        ts_event
-    ) = 1 -- PRIMEIRO EVENTO DE OPP
+    step = 'OPPORTUNITY'
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entity, business_context ORDER BY rev, ts_event) = 1 -- First Opp Event
 ),
 bob_events AS (
-  -- PEGO TODOS OS EVENTOS DE QUALIFIED / AV. QUALIFIED
   SELECT
     id_lead,
     id_entity,
     business_context,
     ts_event AS ts_event_qualified
   FROM
-    datalake_supply_flows_migrate.conversion_staging
+    datalake_supply_flows.conversion_staging
   WHERE
-    step = 'QUALIFIED' -- USO SÓ QUALIFIED PORQUE SÃO OS MESMOS EVENTOS DE AVQ
-    QUALIFY ROW_NUMBER() OVER (
-      PARTITION BY id_entity,
-      business_context
-      ORDER BY
-        rev,
-        ts_event
-    ) = 1 -- PRIMEIRO EVENTO DE QUALI
+    step = 'QUALIFIED'
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entity, business_context ORDER BY rev, ts_event) = 1
+
 ),
 lbc_editing_events AS (
+  -- Some events are not being captured by the conversion_staging table, so we need to get them from the listing_business_context_aud table
   SELECT
     lbca.id_house AS id_entity,
     lbca.business_context,
     FROM_UNIXTIME(ure.ts_revision / 1000) AS ts_event
   FROM
     datalake_ebdb_clean.listing_business_context_aud as lbca
-    INNER JOIN datalake_ebdb_clean.user_revision_entity AS ure ON lbca.rev = ure.id
+  JOIN 
+    datalake_ebdb_clean.user_revision_entity AS ure 
+      ON lbca.rev = ure.id
   WHERE
     lbca.status = 'EDITING' 
-  QUALIFY ROW_NUMBER() OVER (
-      PARTITION BY lbca.id_house,
-      lbca.business_context
-      ORDER BY
-        ure.ts_revision
-    ) = 1
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY lbca.id_house, lbca.business_context ORDER BY ure.ts_revision) = 1
 ),
 3p_events AS (
   SELECT 
@@ -91,14 +77,13 @@ discards_events_aq2o AS (
     rev,
     reason,
     ts_event,
-    MIN(ts_event) OVER (PARTITION BY id_entity, business_context) AS ts_first_discard, -- PEGANDO DATAS DE PRIMEIRO E ÚLTIMO DESCARTE
+    MIN(ts_event) OVER (PARTITION BY id_entity, business_context) AS ts_first_discard,
     MAX(ts_event) OVER (PARTITION BY id_entity, business_context) AS ts_last_discard
   FROM
-    datalake_supply_flows_migrate.conversion_staging
+    datalake_supply_flows.conversion_staging
   WHERE 
-    step = 'PROSPECT' 
-    AND (drop_step = 'AQ2O') -- SOMENTE EVENTOS DA NATUREZA AQ2O
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entity, business_context ORDER BY rev, ts_event DESC) = 1 -- ÚLTIMO DROP AQ2O
+    step = 'PROSPECT' AND (drop_step = 'AQ2O') -- Only AQ20 events
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entity, business_context ORDER BY rev, ts_event DESC) = 1 -- The last drop AQ2O
 ),
 -- FIRST LISTING EVENTS
 t1 AS (
@@ -131,18 +116,21 @@ opp_ongoing AS (
     opp.step,
     opp.weight,
     opp.ts_event AS ts_event_original,
-    TIMESTAMPADD(DAY, scs.ongoing_window, opp.ts_event) AS ts_ongoing, -- FAÇO A SOMA DE 30 DIAS NA DATA DO EVENTO DE OPP
-    opp.ts_event AS ts_event_adjusted, -- LOGICA USADA É PEGAR A MENOR DATA
+    TIMESTAMPADD(DAY, scs.ongoing_window, opp.ts_event) AS ts_ongoing, -- This window was setup in config table
+    opp.ts_event AS ts_event_adjusted, -- The minor data between the event and the first listing
     opp.rev,
     scs.ongoing_window
   FROM
     opp_events AS opp
-  JOIN bob_events AS qual -- PEGO TODOS QUE TEM EVENTOS NO QUALIFIED
-    USING (id_entity, business_context)
-  LEFT ANTI JOIN fl_events AS fl -- FILTRO SOMENTE OS QUE NÃO TEM EVENTOS DE FIRST LISTING 
-    USING (id_entity, business_context)
-  LEFT JOIN datalake_supply_flows.supply_conversion_settings AS scs
-    USING (step)
+  JOIN 
+    bob_events AS qual -- PEGO TODOS QUE TEM EVENTOS NO QUALIFIED
+      USING (id_entity, business_context)
+  LEFT ANTI JOIN 
+    fl_events AS fl -- FILTRO SOMENTE OS QUE NÃO TEM EVENTOS DE FIRST LISTING 
+      USING (id_entity, business_context)
+  LEFT JOIN 
+    datalake_supply_flows.supply_conversion_settings AS scs
+      USING (step)
 ),
 t2_0 AS (
     SELECT
@@ -162,9 +150,10 @@ t2_0 AS (
       FALSE AS aux_data_event
     FROM
       opp_events AS cs
-    JOIN fl_events AS fl -- CASOS QUE TIVERAM FIRST LISTING
-      USING (id_entity, business_context) -- TEMOS ALGUNS CASOS QUE NÃO POSSUEM LEADS, ENTÃO TROUXE PELO ID_HOUSE + CONTEXT
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entity, business_context ORDER BY cs.rev, cs.ts_event) = 1 -- PEGANDO PRIMEIRO EVENTO DE OPP | UTILIZAR O REV É MAIS SEGURO DO QUE O TIMESTAMP
+    JOIN 
+      fl_events AS fl -- Cases with listing
+        USING (id_entity, business_context) -- We had some cases that don't have leads, so I brought by id_house + context
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY id_entity, business_context ORDER BY cs.rev, cs.ts_event) = 1
 ),
 t2_1 AS (
   SELECT 
@@ -182,8 +171,10 @@ t2_1 AS (
       CONCAT('MORE_THAN_', ongoing_window, '_DAYS_ON_STATUS') AS reason,
       'T2.1' AS aux_group,
       TRUE AS aux_data_event
-  FROM opp_ongoing
-  WHERE ts_ongoing <= CURRENT_TIMESTAMP() -- TODOS OS EVENTOS QUE JÁ EXPIRARAM OS 30 DIAS
+  FROM 
+    opp_ongoing
+  WHERE
+    ts_ongoing <= CURRENT_TIMESTAMP() -- Expired events based on window
 ),
 t2_2 AS (
   SELECT 
@@ -201,8 +192,10 @@ t2_2 AS (
       CAST(NULL AS STRING) AS reason,
       'T2.2' AS aux_group,
       TRUE AS aux_data_event
-  FROM opp_ongoing
-  WHERE ts_ongoing > CURRENT_TIMESTAMP() -- TODOS OS EVENTOS QUE AINDA NÃO EXPIRARAM OS 30 DIAS
+  FROM 
+    opp_ongoing
+  WHERE 
+    ts_ongoing > CURRENT_TIMESTAMP() -- Events that are still ongoing
 ),
 t2_3 AS (
   SELECT
@@ -222,12 +215,12 @@ t2_3 AS (
     FALSE AS aux_data_event
   FROM
     opp_events AS cs
-  INNER JOIN lbc_editing_events AS ee -- CASOS QUE TEM EVENTOS DE EDICAO NA LBC
+  INNER JOIN lbc_editing_events AS ee -- Edited house into LBC
     USING (id_entity, business_context)
-  LEFT ANTI JOIN fl_events AS fl -- RETIRO CASOS QUE TIVERAM FIRST LISTING
-    USING (id_entity, business_context) -- TEMOS ALGUNS CASOS QUE NÃO POSSUEM LEADS, ENTÃO TROUXE PELO ID_HOUSE + CONTEXT
-  LEFT ANTI JOIN bob_events AS fl -- RETIRO CASOS QUE TIVERAM EVENTO NO BOB
-    USING (id_entity, business_context) -- TEMOS ALGUNS CASOS QUE NÃO POSSUEM LEADS, ENTÃO TROUXE PELO ID_HOUSE + CONTEXT
+  LEFT ANTI JOIN fl_events AS fl -- Removing listed houses
+    USING (id_entity, business_context)
+  LEFT ANTI JOIN bob_events AS fl -- Removing bob houses
+    USING (id_entity, business_context)
 ),
 t2 AS (
   SELECT *
@@ -260,16 +253,20 @@ ongoing_aq2o AS (
     d.ts_last_discard,
     scs.ongoing_window
   FROM
-    datalake_supply_flows_migrate.conversion_staging AS qual
-  LEFT ANTI JOIN opp_events AS opp
-    USING (id_entity, business_context)
-  LEFT ANTI JOIN fl_events AS fl
-    USING (id_entity, business_context)
-  LEFT JOIN datalake_supply_flows.supply_conversion_settings AS scs
-    USING (step)
-  LEFT JOIN discards_events_aq2o AS d
-    USING (id_lead, business_context)
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY qual.id_entity, qual.business_context, qual.step ORDER BY qual.rev, qual.ts_event) = 1 -- PRIMEIRA CONVERSÃO Q/AQ
+    datalake_supply_flows.conversion_staging AS qual
+  LEFT ANTI JOIN
+    opp_events AS opp
+      USING (id_entity, business_context)
+  LEFT ANTI JOIN 
+    fl_events AS fl
+      USING (id_entity, business_context)
+  LEFT JOIN 
+    datalake_supply_flows.supply_conversion_settings AS scs
+      USING (step)
+  LEFT JOIN 
+    discards_events_aq2o AS d
+      USING (id_lead, business_context)
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY qual.id_entity, qual.business_context, qual.step ORDER BY qual.rev, qual.ts_event) = 1
 ),
 -- QUALIFIED EVENTS
 t3_0 AS (
@@ -291,9 +288,10 @@ t3_0 AS (
     'T3.0' AS aux_group,
     FALSE AS aux_data_event
   FROM
-    datalake_supply_flows_migrate.conversion_staging AS qual
-  LEFT JOIN opp_events AS opp
-    USING (id_entity, business_context)
+    datalake_supply_flows.conversion_staging AS qual
+  LEFT JOIN 
+    opp_events AS opp
+      USING (id_entity, business_context)
   WHERE
     qual.step = 'AV_QUALIFIED'
   QUALIFY ROW_NUMBER() OVER (PARTITION BY qual.id_entity, qual.business_context ORDER BY qual.rev, qual.ts_event) = 1 -- PRIMEIRA CONVERSÃO Q/AQ
@@ -316,9 +314,10 @@ t3_0 AS (
     'T3.0' AS aux_group,
     FALSE AS aux_data_event
   FROM
-    datalake_supply_flows_migrate.conversion_staging AS qual
-  LEFT JOIN opp_events AS opp
-    USING (id_entity, business_context)
+    datalake_supply_flows.conversion_staging AS qual
+  LEFT JOIN 
+    opp_events AS opp
+      USING (id_entity, business_context)
   WHERE
     qual.step = 'QUALIFIED'
   QUALIFY ROW_NUMBER() OVER (PARTITION BY qual.id_entity, qual.business_context ORDER BY qual.rev, qual.ts_event) = 1 -- PRIMEIRA CONVERSÃO Q/AQ
@@ -342,10 +341,12 @@ t3_1 AS (
       CONCAT('MORE_THAN_', ongoing_window, '_DAYS_ON_STATUS') AS reason,
       'T3.1' AS aux_group,
       TRUE AS aux_data_event
-  FROM ongoing_aq2o
-  WHERE ts_event_discard IS NULL
-    AND ts_ongoing <= CURRENT_TIMESTAMP() 
-    AND step = 'AV_QUALIFIED'
+  FROM 
+    ongoing_aq2o
+  WHERE 
+    ts_event_discard IS NULL
+      AND ts_ongoing <= CURRENT_TIMESTAMP() 
+      AND step = 'AV_QUALIFIED'
 ),
 t3_2 AS (
   SELECT
@@ -365,10 +366,12 @@ t3_2 AS (
     NULL AS reason,
     'T3.2' AS aux_group,
     TRUE AS aux_data_event
-  FROM ongoing_aq2o
-  WHERE ts_event_discard IS NULL
-    AND ts_ongoing > CURRENT_TIMESTAMP() 
-    AND step = 'AV_QUALIFIED'
+  FROM 
+    ongoing_aq2o
+  WHERE
+    ts_event_discard IS NULL
+      AND ts_ongoing > CURRENT_TIMESTAMP() 
+      AND step = 'AV_QUALIFIED'
 ),
 t3_3 AS (
   SELECT 
@@ -388,8 +391,10 @@ t3_3 AS (
     reason,
     'T3.3' AS aux_group,
     FALSE AS aux_data_event
-  FROM ongoing_aq2o
-  WHERE ts_event_discard IS NOT NULL
+  FROM 
+    ongoing_aq2o
+  WHERE 
+    ts_event_discard IS NOT NULL
   UNION
   SELECT 
     id_lead,
@@ -408,8 +413,10 @@ t3_3 AS (
     NULL AS reason,
     'T3.3' AS aux_group,
     FALSE AS aux_data_event
-  FROM ongoing_aq2o
-  WHERE ts_event_discard IS NOT NULL
+  FROM 
+    ongoing_aq2o
+  WHERE 
+    ts_event_discard IS NOT NULL
   UNION
   SELECT 
     id_lead,
@@ -428,8 +435,10 @@ t3_3 AS (
     NULL AS reason,
     'T3.3' AS aux_group,
     FALSE AS aux_data_event
-  FROM ongoing_aq2o
-  WHERE ts_event_discard IS NOT NULL
+  FROM 
+    ongoing_aq2o
+  WHERE 
+    ts_event_discard IS NOT NULL
 ),
 t3 AS (
   SELECT *
@@ -454,21 +463,25 @@ discards_events_q2aq AS (
     supply_source,
     rev,
     step,
-    IF(drop_step = 'Q2AQ', 4, 5) AS weight, -- SE EVENTO Q2AQ, VEM ANTES (ETAPA 4)
+    IF(drop_step = 'Q2AQ', 4, 5) AS weight,
     reason,
     drop_step,
     ts_event,
-    MIN(ts_event) OVER (PARTITION BY id_entity, business_context) AS ts_first_discard, -- PEGANDO DATAS DE PRIMEIRO E ÚLTIMO DESCARTE
+    MIN(ts_event) OVER (PARTITION BY id_entity, business_context) AS ts_first_discard,
     MAX(ts_event) OVER (PARTITION BY id_entity, business_context) AS ts_last_discard
-  FROM datalake_supply_flows_migrate.conversion_staging
-  LEFT ANTI JOIN fl_events AS fl
+  FROM 
+    datalake_supply_flows.conversion_staging
+  LEFT ANTI JOIN 
+    fl_events AS fl
       USING (id_lead, business_context)
-  LEFT ANTI JOIN bob_events AS qual
+  LEFT ANTI JOIN 
+    bob_events AS qual
       USING (id_lead, business_context)
-  LEFT ANTI JOIN t3 
+  LEFT ANTI JOIN 
+    t3 
       USING (id_lead, business_context)
-  WHERE step = 'PROSPECT'
-    AND drop_step = ('Q2AQ') -- AQUI ESTOU PEGANDO QUEM VAI SER QUALIFIED E VAI DROPAR PARA AQ
+  WHERE 
+    step = 'PROSPECT' AND drop_step = ('Q2AQ')
 ),
 last_discards_q2aq AS (
   SELECT 
@@ -487,7 +500,8 @@ last_discards_q2aq AS (
     FALSE AS aux_data_event,
     ts_first_discard,
     ts_last_discard
-  FROM discards_events_q2aq
+  FROM 
+    discards_events_q2aq
   QUALIFY RANK() OVER (PARTITION BY id_lead, business_context ORDER BY rev, ts_event DESC) = 1 -- ÚLTIMO EVENTO DE DESCARTE
   UNION ALL
   SELECT 
@@ -506,7 +520,8 @@ last_discards_q2aq AS (
     TRUE AS aux_data_event,
     NULL AS ts_first_discard,
     NULL AS ts_last_discard
-  FROM discards_events_q2aq
+  FROM 
+    discards_events_q2aq
   QUALIFY RANK() OVER (PARTITION BY id_lead, business_context ORDER BY rev, ts_event DESC) = 1 -- ÚLTIMO EVENTO DE DESCARTE
 ),
 t4 AS (
@@ -527,11 +542,13 @@ t4 AS (
     d.aux_data_event,
     d.ts_first_discard,
     d.ts_last_discard
-  FROM datalake_supply_flows.acquisition_tracking AS p
-  JOIN last_discards_q2aq AS d
-    ON (p.id_lead_ebdb = d.id_lead)
-    AND (p.business_context = d.business_context)
-    AND (p.funnel_step = 'PROSPECT')
+  FROM 
+    datalake_supply_flows.acquisition_tracking AS p
+  JOIN 
+    last_discards_q2aq AS d
+      ON (p.id_lead_ebdb = d.id_lead)
+      AND (p.business_context = d.business_context)
+      AND (p.funnel_step = 'PROSPECT')
 ),
 discards_events_p2q AS (
   SELECT 
@@ -548,15 +565,19 @@ discards_events_p2q AS (
     ts_event,
     MIN(ts_event) OVER (PARTITION BY id_entity, business_context) AS ts_first_discard, -- PEGANDO DATAS DE PRIMEIRO E ÚLTIMO DESCARTE
     MAX(ts_event) OVER (PARTITION BY id_entity, business_context) AS ts_last_discard
-  FROM datalake_supply_flows_migrate.conversion_staging
-  LEFT ANTI JOIN fl_events AS fl
+  FROM 
+    datalake_supply_flows.conversion_staging
+  LEFT ANTI JOIN 
+    fl_events AS fl
       USING (id_lead, business_context)
-  LEFT ANTI JOIN bob_events AS qual
+  LEFT ANTI JOIN 
+    bob_events AS qual
       USING (id_lead, business_context)
-  LEFT ANTI JOIN t4 AS discards_q2aq   -- COLOCAR AQUI PARA REMOVER O DESCARTE Q2AQ
+  LEFT ANTI JOIN 
+    t4 AS discards_q2aq 
       USING (id_lead, business_context)
-  WHERE step = 'PROSPECT'
-    AND drop_step = ('P2Q')
+  WHERE 
+    step = 'PROSPECT' AND drop_step = ('P2Q')
   QUALIFY ROW_NUMBER() OVER (PARTITION BY id_lead, business_context ORDER BY rev, ts_event DESC) = 1 -- ÚLTIMO EVENTO DE DESCARTE
 ),
 ongoing_p2q AS (
@@ -574,31 +595,40 @@ ongoing_p2q AS (
     TIMESTAMPADD(DAY, scs.ongoing_window, p.ts_event) AS ts_last_discard,
     ongoing_window
   FROM datalake_supply_flows.acquisition_tracking AS p
-  LEFT ANTI JOIN discards_events_p2q AS d
-    ON (p.id_lead_ebdb = d.id_lead)
+  LEFT ANTI JOIN 
+    discards_events_p2q AS d
+      ON (p.id_lead_ebdb = d.id_lead)
       AND (p.business_context = d.business_context)
-  LEFT ANTI JOIN fl_events AS fl
+  LEFT ANTI JOIN 
+    fl_events AS fl
       ON (fl.id_lead = p.id_lead_ebdb)
       AND (fl.business_context = p.business_context)
-  LEFT ANTI JOIN bob_events AS qual
+  LEFT ANTI JOIN 
+    bob_events AS qual
       ON (qual.id_lead = p.id_lead_ebdb)
       AND (qual.business_context = p.business_context)
-  LEFT ANTI JOIN t2 AS opp -- REMOVENDO CASOS DE OPP QUE NAO TEM Q/AQ
+  LEFT ANTI JOIN 
+    t2 AS opp -- Removing opportunities
       ON (opp.id_lead = p.id_lead_ebdb)
         AND (opp.business_context = p.business_context)
-  LEFT ANTI JOIN t4 AS discards_q2aq   -- COLOCO AQUI PARA REMOVER O DESCARTE Q2AQ
+  LEFT ANTI JOIN 
+    t4 AS discards_q2aq   -- Removing discards Q2AQ
       ON (discards_q2aq.id_lead = p.id_lead_ebdb)
       AND (discards_q2aq.business_context = p.business_context)
-  LEFT ANTI JOIN t3 AS discards_aq2o -- COLOCO AQUI PARA REMOVER O DESCARTE AQ2O
+  LEFT ANTI JOIN 
+    t3 AS discards_aq2o -- Removing discards AQ2O
       ON (discards_aq2o.id_lead = p.id_lead_ebdb)
         AND (discards_aq2o.business_context = p.business_context)
-  LEFT ANTI JOIN 3p_events AS 3pe -- REMOVENDO CONVERSÕES DE 3P
-    ON (3pe.id_lead = p.id_lead_ebdb)
-      AND (3pe.business_context = p.business_context)
-      AND (3pe.supply_source = p.supply_source)
-  LEFT JOIN datalake_supply_flows.supply_conversion_settings AS scs
-    ON (scs.step = p.funnel_step)
-  WHERE p.funnel_step = 'PROSPECT'
+  LEFT ANTI JOIN 
+    3p_events AS 3pe -- Removing 3P events
+      ON (3pe.id_lead = p.id_lead_ebdb)
+        AND (3pe.business_context = p.business_context)
+        AND (3pe.supply_source = p.supply_source)
+  LEFT JOIN 
+    datalake_supply_flows.supply_conversion_settings AS scs
+      ON (scs.step = p.funnel_step)
+  WHERE 
+    p.funnel_step = 'PROSPECT'
 ),
 t5_1 AS (
   SELECT 
@@ -618,8 +648,10 @@ t5_1 AS (
     CONCAT('MORE_THAN_', ongoing_window, '_DAYS_ON_STATUS') AS reason,
     'T5.1' AS aux_group,
     TRUE AS aux_data_event
-  FROM ongoing_p2q
-  WHERE ts_ongoing <= CURRENT_TIMESTAMP()
+  FROM 
+    ongoing_p2q
+  WHERE 
+    ts_ongoing <= CURRENT_TIMESTAMP()
 ),
 t5_2 AS (
   SELECT 
@@ -639,8 +671,10 @@ t5_2 AS (
     NULL AS reason,
     'T5.2' AS aux_group,
     TRUE AS aux_data_event
-  FROM ongoing_p2q
-  WHERE ts_ongoing > CURRENT_TIMESTAMP()
+  FROM 
+    ongoing_p2q
+  WHERE 
+    ts_ongoing > CURRENT_TIMESTAMP()
 ),
 t5_3 AS (
   SELECT 
@@ -652,7 +686,7 @@ t5_3 AS (
     step,
     weight,
     ts_event AS ts_event_original,
-    ts_last_discard AS ts_event_adjusted, -- DATA DO ÚLTIMO DESCARTE
+    ts_last_discard AS ts_event_adjusted,
     ts_first_discard,
     ts_last_discard,
     rev,
@@ -660,7 +694,8 @@ t5_3 AS (
     reason,
     'T5.3' AS aux_group,
     FALSE AS aux_data_event
-  FROM discards_events_p2q
+  FROM 
+    discards_events_p2q
 ),
 t5 AS (
   SELECT * 
@@ -690,7 +725,8 @@ original_events_reorg AS (
     reason,
     aux_group,
     aux_data_event
-  FROM t1
+  FROM 
+    t1
   UNION ALL
   SELECT
     id_lead,
@@ -709,7 +745,8 @@ original_events_reorg AS (
     reason,
     aux_group,
     aux_data_event
-  FROM t2
+  FROM 
+    t2
   UNION ALL
   SELECT     
     id_lead,
@@ -728,7 +765,8 @@ original_events_reorg AS (
     reason,
     aux_group,
     aux_data_event
-  FROM t3
+  FROM 
+    t3
   UNION ALL
   SELECT     
     id_lead,
@@ -747,7 +785,8 @@ original_events_reorg AS (
     reason,
     aux_group,
     aux_data_event
-  FROM t4
+  FROM 
+    t4
   UNION ALL
   SELECT     
     id_lead,
@@ -766,12 +805,10 @@ original_events_reorg AS (
     reason,
     aux_group,
     aux_data_event
-  FROM t5
+  FROM 
+    t5
 )
 
 SELECT 
-  *,
-  YEAR(ts_event_adjusted) AS year,
-  MONTH(ts_event_adjusted) AS month,
-  DAY(ts_event_adjusted) AS day
+  *
 FROM original_events_reorg

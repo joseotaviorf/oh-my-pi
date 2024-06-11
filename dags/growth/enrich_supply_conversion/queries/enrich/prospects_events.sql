@@ -67,10 +67,7 @@ SELECT
   4 AS weight,
   cd.reason,
   sds.drop_step,
-  cd.ts_created AS ts_event,
-  YEAR(cd.ts_created) AS year,
-  MONTH(cd.ts_created) AS month,
-  DAY(cd.ts_created) AS day
+  cd.ts_created AS ts_event
 FROM
   extract_wololo AS p
 JOIN datalake_wololo_clean.context_discard AS cd

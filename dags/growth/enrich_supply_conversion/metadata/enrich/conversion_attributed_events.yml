@@ -1,5 +1,5 @@
 database_name: datalake_supply_flows
-table_name: conversion_original_events
+table_name: conversion_attributed_events
 domain: Growth
 owner: arthur.gonzaga@quintoandar.com.br
 description: This table is responsible to consolidate all conversion and drop events, applying rules to identify |

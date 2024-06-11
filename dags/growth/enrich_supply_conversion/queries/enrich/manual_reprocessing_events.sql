@@ -1,12 +1,22 @@
  WITH all_entities AS (
-  SELECT 'house' AS entity_type, id_entity, business_context
-  FROM datalake_supply_flows_migrate.conversion_staging
-  WHERE source != 'WOLOLO'
+  SELECT 
+    'house' AS entity_type, 
+    id_entity, 
+    business_context
+  FROM 
+    datalake_supply_flows.conversion_staging
+  WHERE 
+    source != 'WOLOLO'
   GROUP BY 1, 2, 3
   UNION ALL
-  SELECT 'lead' AS entity_type, id_lead, business_context
-  FROM datalake_supply_flows_migrate.conversion_events
-  WHERE id_lead IS NOT NULL
+  SELECT 
+    'lead' AS entity_type, 
+    id_lead, 
+    business_context
+  FROM 
+    datalake_supply_flows.conversion_events
+  WHERE 
+    id_lead IS NOT NULL
   GROUP BY 1, 2, 3
 ),
 join_mailing AS (
@@ -50,14 +60,33 @@ join_mailing AS (
       AND funnel_step = 'LEAD'
 ),
 mailing AS (
-  SELECT *
-  FROM join_mailing
+  SELECT 
+    id_lead,
+    business_context,
+    type,
+    id_campaign,
+    table_name,
+    description,
+    ops_partner, 
+    ops_agent, 
+    ops_objective,
+    ops_approach, 
+    ops_contact_medium, 
+    application,
+    ts_created
+  FROM 
+    join_mailing
   QUALIFY ROW_NUMBER() OVER (PARTITION BY id_lead, business_context ORDER BY weight ASC, ts_created DESC) = 1 -- Getting the last reprocessing event from
 
 ),
 events AS (
-  SELECT *
-  FROM datalake_olos_dialer.reprocessing_events
+  SELECT 
+    id_lead,
+    business_context,
+    id_user_registrant,
+    ts_event
+  FROM 
+    datalake_olos_dialer.reprocessing_events
   QUALIFY ROW_NUMBER() OVER (PARTITION BY id_lead, business_context ORDER BY ts_event DESC) = 1 -- Getting the last event for each lead and business context
 )
 

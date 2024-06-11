@@ -9,18 +9,29 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  custom_schema: supply_flows_migrate
-  default_partitions: ["year", "month", "day"]
+  custom_schema: supply_flows
   default_extraction_type: full
+  tables_customization:
+    prospects_events:
+      z_order_by: ["id_entity", "business_context"]
+    conversion_staging:
+      z_order_by: ["id_entity", "business_context"]
+    conversion_attributed_events:
+      z_order_by: ["id_entity", "business_context"]
+    conversion_events:
+      z_order_by: ["id_entity", "business_context"]
+    manual_reprocessing_events:
+      z_order_by: ["id_entity", "business_context"]
+      partitions: ["year", "month", "day"]
   inner_dependencies:
     conversion_staging:
       - prospects_events
     last_pj_attribution:
       - conversion_staging
-    conversion_original_events:
+    conversion_attributed_events:
       - conversion_staging
     conversion_events:
-      - conversion_original_events
+      - conversion_attributed_events
     manual_reprocessing_events:
       - conversion_events
       - conversion_staging

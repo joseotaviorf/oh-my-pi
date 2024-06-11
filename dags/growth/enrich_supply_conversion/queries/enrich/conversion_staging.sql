@@ -90,7 +90,7 @@ conversion_lookup AS (
     id_house, 
     supply_source, 
     business_context
-  FROM datalake_supply_flows_migrate.conversion_lookup
+  FROM datalake_supply_flows.conversion_lookup
   GROUP BY ALL
 ),
 events_and_discards AS (
@@ -108,10 +108,7 @@ events_and_discards AS (
     al.weight,
     CAST(NULL AS STRING) as reason, 
     CAST(NULL AS STRING) as drop_step, 
-    al.ts_event,
-    YEAR(al.ts_event) AS year,
-    MONTH(al.ts_event) AS month,
-    DAY(al.ts_event) AS day
+    al.ts_event
   FROM all_events AS al
   LEFT JOIN conversion_lookup AS cl
     ON (al.id_entity = cl.id_house)
@@ -131,11 +128,8 @@ events_and_discards AS (
     weight,
     reason,
     drop_step,
-    ts_event,
-    year,
-    month,
-    day
-  FROM datalake_supply_flows_migrate.prospects_events
+    ts_event
+  FROM datalake_supply_flows.prospects_events
 )
 
 SELECT *
