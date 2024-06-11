@@ -6,6 +6,7 @@ SELECT
   naming_convention_sufix,
   business_context,
   entrance_uri,
+  content_page,
   referrer,
   app_type,
   origin,

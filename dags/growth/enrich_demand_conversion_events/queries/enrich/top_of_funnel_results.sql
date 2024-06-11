@@ -27,7 +27,7 @@ WITH adhoc_rules AS (
       ELSE "Other"
     END AS platform,
     ui.app_type,
-    '' AS content_page,
+    CASE WHEN ui.entrance_uri LIKE '%/guias/%' THEN "guias" END AS content_page,
     ui.utm_campaign,
     ui.utm_source,
     ui.utm_medium,
