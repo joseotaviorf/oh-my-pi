@@ -50,7 +50,6 @@ SELECT
 FROM
     datalake_repairs.repair_tickets
 WHERE
-    agent_organization IN ('webhelp', 'webhelpbr')
-    AND {year} = year
+    {year} = year
     AND {month} = month
     AND {day} = day
