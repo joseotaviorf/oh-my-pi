@@ -69,6 +69,7 @@ dags_out_of_pattern:
         "enrich_marketing_costs_offline",
         "enrich_nps_reversion",
         "enrich_vespucio",
+        "enrich_vespucio_pipeline",
         "gsheets.fintech",
         "gsheets.for_rent",
         "gsheets.for_sale",
@@ -122,6 +123,7 @@ dags_out_of_pattern:
         "wonka.user_most_viewed_city",
         "wonka.house_embeddings_main",
         "wonka.user_embeddings_main",
+        "zordominium_vespucio_plugin",
         "quintoml.recs.house_user_embeddings_quintoml.inference",
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
