@@ -658,8 +658,6 @@ bietlejuice.dw_rent_demand_events_snapshot:
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.dw_rent_flow:load-dw-rent-dim-rent-flow-type
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-rent-flows
-bietlejuice.dw_rent_fact_listing_owners:
-  - bietlejuice.enrich_listing_owners:load-enrich-rental-metrics
 bietlejuice.dw_rent_flow:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
@@ -1899,15 +1897,6 @@ bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_ebdb_photo_jobs:load-enrich-photo-job
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.kodak:load-clean-video
-bietlejuice.enrich_listing_owners:
-  - bietlejuice.ebdb_proposal:load-clean-proposal
-  - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
-  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-  - bietlejuice.enrich_kill_queue:load-enrich-reservation
-  - bietlejuice.enrich_offer:load-enrich-offer
 bietlejuice.enrich_listing_temp:
   - bietlejuice.ebdb:load-clean-conversion-lead
   - bietlejuice.ebdb:load-clean-lead
