@@ -8,6 +8,7 @@ dag:
 workflow:
   type: query_delta
   layer: dw
+  custom_schema: terminator
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   extra_query_template_params:
