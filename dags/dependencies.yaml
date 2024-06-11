@@ -1054,7 +1054,6 @@ bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_sale_flow:load-dw-sale-fact-listing-sale-flows
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement

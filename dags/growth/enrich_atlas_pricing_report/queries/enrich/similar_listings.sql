@@ -1,95 +1,222 @@
-WITH listings AS (
-    SELECT DISTINCT
-        lbc.id_house,
-        lbc.business_context,
-        COALESCE(fhl.sk_region, fl.sk_region) AS sk_region,
-        CASE
-            WHEN lbc.status = 'PUBLISHED' THEN 'on-market'
-            WHEN lbc.status != 'PUBLISHED' THEN 'off-market'
-            ELSE NULL
-        END AS house_status,
-        dhl.house_total_area,
-        dhl.house_bedrooms,
-        COALESCE(dr_fr.name,dr_fs.name) AS neighborhood,
-        CASE
-            WHEN LOWER(dhl.house_type) IN ('apartamento', 'studiooukitchenette') THEN 'apartamento'
-            WHEN LOWER(dhl.house_type) IN ('casa', 'casacondominio') THEN 'casa'
-        END AS house_type,
-        CASE
-            WHEN lbc.business_context = 'RENT' THEN dhl.house_rent
-            WHEN lbc.business_context = 'SALE' THEN fl.price
-        END AS house_price,
-        CASE
-            WHEN lbc.business_context = 'RENT' THEN (dhl.house_rent / NULLIF(dhl.house_total_area,0))
-            WHEN lbc.business_context = 'SALE' THEN fl.price_m2
-        END AS price_m2,
-        CASE
-            WHEN lbc.business_context = 'RENT' AND fhl.days_listing_to_contract_signed >= 0 THEN days_listing_to_contract_signed
-            WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL AND dd.date <= ff.ts_sale_agreement_signed
-                THEN DATEDIFF(ff.ts_sale_agreement_signed,dd.date)
-        END AS days_to_contract_sign,
-        CASE
-            WHEN lbc.business_context = 'RENT' AND fhl.days_listing_to_contract_signed >= 0 THEN dc.rent
-            WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL AND dd.date <= ff.ts_sale_agreement_signed
-                THEN sale_price_agreed
-        END AS negotiated_price,
-        CASE
-            WHEN lbc.business_context = 'RENT' AND fhl.days_listing_to_contract_signed >= 0 THEN (dc.rent / NULLIF(dhl.house_total_area,0))
-            WHEN lbc.business_context = 'SALE' AND ff.ts_sale_agreement_signed IS NOT NULL AND dd.date <= ff.ts_sale_agreement_signed
-                THEN (ff.sale_price_agreed / NULLIF(dhl.house_total_area,0))
-        END AS negotiated_price_m2,
-        dhl.house_condo,
-        dhl.house_iptu,
-        lbc.status
-    FROM datalake_ebdb_clean.listing_business_context lbc
-    JOIN dw_rent.dim_house_listing dhl
-        ON lbc.id_house = dhl.id_house
-    LEFT JOIN dw_rent.fact_house_listings fhl
-        ON dhl.sk_house_listing = fhl.sk_house_listing
-    LEFT JOIN dw_sale.fact_listings fl
-        ON lbc.id_house = fl.sk_house
-    LEFT JOIN dw_sale.fact_offers ff
-        ON ff.sk_house = lbc.id_house
-        AND ff.ts_sale_agreement_signed IS NOT NULL
-    LEFT JOIN dw_sale.fact_listing_sale_flows sf
-        ON SUBSTRING(sf.sk_house_listing,0,9) = fl.sk_house
-    LEFT JOIN dw_public.dim_date dd
-        ON dd.sk_date = sf.sk_house_listing_date
-    LEFT JOIN dw_public.dim_region dr_fr
-        ON dr_fr.sk_region = fhl.sk_region
-    LEFT JOIN dw_public.dim_region dr_fs
-        ON dr_fs.sk_region = fl.sk_region
-    LEFT JOIN dw_rent.dim_contract dc
-        ON fhl.sk_contract = dc.sk_contract
-    WHERE
-        DATEDIFF(dhl.ts_house_update, CURRENT_DATE) <= 365
+WITH all_listings AS (
+  SELECT
+    id_house,
+    id_region,
+    region_code,
+    city,
+    neighborhood,
+    business_context,
+    house_status,
+    house_type,
+    rent_total_value,
+    price,
+    sale_price_m2,
+    calculator_min_price,
+    calculator_max_price,
+    days_in_the_market,
+    lat,
+    lng,
+    total_area,
+    bedrooms
+  FROM
+    datalake_atlas_pricing_report.on_market_house_listings
+  UNION ALL
+  SELECT
+    id_house,
+    id_region,
+    region_code,
+    city,
+    neighborhood,
+    business_context,
+    house_status,
+    house_type,
+    rent_total_value,
+    price,
+    sale_price_m2,
+    NULL AS calculator_min_price,
+    NULL AS calculator_max_price,
+    days_in_the_market,
+    lat,
+    lng,
+    total_area,
+    bedrooms
+  FROM
+    datalake_atlas_pricing_report.status_history_house_negotiation
+  WHERE
+    (business_context = 'RENT' AND days_in_the_market <= 365)
+    OR
+    (business_context = 'SALE' AND days_in_the_market <= 730)
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY ts_status_started DESC) = 1
+),
+neighborhood_similar_houses AS (
+  SELECT
+    ref.id_house,
+    sim.id_house AS similar_id_house,
+    ref.business_context,
+    sim.house_status,
+    ref.rent_total_value AS reference_rent_total_value,
+    sim.rent_total_value AS similar_rent_total_value,
+    ref.price AS reference_price,
+    sim.price AS similar_price,
+    ref.sale_price_m2 AS reference_sale_price_m2,
+    sim.sale_price_m2 AS similar_sale_price_m2,
+    ref.days_in_the_market AS reference_days_in_the_market,
+    sim.days_in_the_market AS similar_days_in_the_market,
+    6371 * 2 * ASIN(
+                SQRT(
+                  POWER(SIN(RADIANS(sim.lat - ref.lat)/2),2) +
+                  COS(RADIANS(ref.lat)) * COS(RADIANS(sim.lat)) *
+                  POWER(SIN(RADIANS(sim.lng - ref.lng) / 2), 2)
+                )
+    ) AS distance_km
+  FROM
+    datalake_atlas_pricing_report.on_market_house_listings AS ref
+  LEFT JOIN
+    all_listings AS sim
+      ON ref.business_context = sim.business_context
+        AND ref.house_type = sim.house_type
+        AND sim.bedrooms BETWEEN ref.bedrooms - 1 AND ref.bedrooms + 1
+        AND sim.total_area BETWEEN ref.total_area * 0.7 AND ref.total_area * 1.3
+        AND ref.id_house <> sim.id_house
+        AND ref.id_region = sim.id_region
+        AND sim.price BETWEEN ref.calculator_min_price AND ref.calculator_max_price
+),
+nearest_houses AS (
+  SELECT
+    *
+  FROM
+    neighborhood_similar_houses
+  WHERE
+    distance_km <= 2
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_house, business_context, house_status ORDER BY distance_km) <= 30
+),
+similar_houses_recovery AS (
+  SELECT
+    id_house,
+    business_context,
+    house_status,
+    COUNT(similar_id_house) AS total_similar_houses
+  FROM
+    nearest_houses
+  GROUP BY ALL
+  HAVING
+    COUNT(similar_id_house) < 5
+),
+region_similar_houses AS (
+  SELECT
+    ref.id_house,
+    sim.id_house AS similar_id_house,
+    ref.business_context,
+    sim.house_status,
+    ref.rent_total_value AS reference_rent_total_value,
+    sim.rent_total_value AS similar_rent_total_value,
+    ref.price AS reference_price,
+    sim.price AS similar_price,
+    ref.sale_price_m2 AS reference_sale_price_m2,
+    sim.sale_price_m2 AS similar_sale_price_m2,
+    ref.days_in_the_market AS reference_days_in_the_market,
+    sim.days_in_the_market AS similar_days_in_the_market,
+    6371 * 2 * ASIN(
+                SQRT(
+                  POWER(SIN(RADIANS(sim.lat - ref.lat)/2),2) +
+                  COS(RADIANS(ref.lat)) * COS(RADIANS(sim.lat)) *
+                  POWER(SIN(RADIANS(sim.lng - ref.lng) / 2), 2)
+                )
+    ) AS distance_km
+  FROM
+    similar_houses_recovery AS rec
+  INNER JOIN
+    datalake_atlas_pricing_report.on_market_house_listings AS ref
+      ON rec.id_house = ref.id_house
+        AND rec.business_context = ref.business_context
+  LEFT JOIN
+    all_listings AS sim
+      ON ref.business_context = sim.business_context
+        AND ref.house_type = sim.house_type
+        AND rec.house_status = sim.house_status
+        AND sim.bedrooms BETWEEN ref.bedrooms - 1 AND ref.bedrooms + 1
+        AND sim.total_area BETWEEN ref.total_area * 0.7 AND ref.total_area * 1.3
+        AND ref.id_house <> sim.id_house
+        AND ref.region_code = sim.region_code
+        AND sim.price BETWEEN ref.calculator_min_price AND ref.calculator_max_price
+),
+nearest_recovered_houses AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER(PARTITION BY id_house, business_context, house_status ORDER BY distance_km) AS similar_order
+  FROM
+    region_similar_houses
+  WHERE
+    distance_km <= 2
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_house, business_context, house_status ORDER BY distance_km) <= 30
+),
+nearest_recovered_houses_fix AS (
+  SELECT
+    *
+  FROM
+    nearest_recovered_houses
+  QUALIFY
+    MAX(similar_order) OVER(PARTITION BY id_house, business_context, house_status) >= 5
+),
+all_similar_houses AS (
+  SELECT
+    nh.*
+  FROM
+    nearest_houses As nh
+  QUALIFY
+    COUNT(nh.similar_id_house) OVER(PARTITION BY id_house, business_context, house_status) >= 5
+  UNION ALL
+  SELECT
+    id_house,
+    similar_id_house,
+    business_context,
+    house_status,
+    reference_rent_total_value,
+    similar_rent_total_value,
+    reference_price,
+    similar_price,
+    reference_sale_price_m2,
+    similar_sale_price_m2,
+    reference_days_in_the_market,
+    similar_days_in_the_market,
+    distance_km
+  FROM
+    nearest_recovered_houses_fix
 )
-
-SELECT DISTINCT
-    lr.id_house,
-    lr.business_context,
-    lr.sk_region,
-    lr.neighborhood,
-    lr.house_bedrooms,
-    lr.house_total_area,
-    lr.house_type,
-    s.id_house AS similar_id_house,
-    s.status AS similar_status,
-    s.house_status AS similar_house_status,
-    s.house_price AS similar_house_price,
-    s.price_m2 AS similar_price_m2,
-    s.days_to_contract_sign AS similar_days_to_contract_sign,
-    s.negotiated_price AS similar_negotiated_price,
-    s.negotiated_price_m2 AS similar_negotiated_price_m2,
-    s.neighborhood AS similar_neighborhood,
-    s.house_bedrooms AS similar_house_bedrooms,
-    s.house_total_area AS similar_house_total_area,
-    s.house_type AS similar_house_type
-FROM listings AS lr
-JOIN listings AS s
-    ON s.sk_region = lr.sk_region
-    AND s.house_type = lr.house_type
-    AND s.house_bedrooms BETWEEN lr.house_bedrooms - 1 AND lr.house_bedrooms + 1
-    AND s.id_house != lr.id_house
-    AND s.house_total_area BETWEEN lr.house_total_area * 0.7 AND lr.house_total_area * 1.3
-    AND s.business_context = lr.business_context
+SELECT
+  result.id_house,
+  result.similar_id_house,
+  reference.id_region AS reference_id_region,
+  similar.id_region AS similar_id_region,
+  reference.region_code AS reference_region_code,
+  similar.region_code AS similar_region_code,
+  result.business_context,
+  reference.house_type,
+  reference.city,
+  reference.neighborhood AS reference_neighborhood,
+  similar.neighborhood AS similar_neighborhood,
+  reference.house_status AS reference_house_status,
+  result.house_status AS similar_house_status,
+  result.distance_km,
+  result.reference_rent_total_value,
+  result.similar_rent_total_value,
+  result.reference_price,
+  result.similar_price,
+  result.reference_sale_price_m2,
+  result.similar_sale_price_m2,
+  result.reference_days_in_the_market,
+  result.similar_days_in_the_market
+FROM
+  all_similar_houses AS result
+INNER JOIN
+  datalake_atlas_pricing_report.on_market_house_listings AS reference
+    ON reference.id_house = result.id_house
+      AND reference.business_context = result.business_context
+INNER JOIN
+  all_listings AS similar
+    ON similar.id_house = result.similar_id_house
+      AND similar.business_context = result.business_context
+      AND similar.house_status = result.house_status

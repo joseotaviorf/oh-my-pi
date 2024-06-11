@@ -1,6 +1,0 @@
----
-database_name: datalake_atlas_pricing_report
-table_name: status_history_house_unpublished
-owner: '@data-growth'
-domain: Growth
-description: WIP

@@ -1,6 +1,0 @@
----
-database_name: datalake_atlas_pricing_report
-table_name: house_pricing_metrics
-owner: '@data-growth'
-domain: Growth
-description: WIP

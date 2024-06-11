@@ -1,52 +1,51 @@
-WITH house_engagement AS (
-  SELECT DISTINCT
-    NOW() AS ts_event,
-    lbc.id_house::BIGINT,
-    UPPER(lbc.business_context)::STRING AS business_context,
-    COALESCE(pre.views_quantity, 0)::BIGINT AS views_quantity,
-    COALESCE(pre.lpv_temperature_region_context, 'NO_VIEWS')::STRING AS demand_level,
-    hm.condominium_price_median::BIGINT,
-    hm.urban_property_tax_median::BIGINT,
-    hm.on_market_price_median::BIGINT,
-    ROUND(hm.on_market_price_by_square_meter::FLOAT,2) AS on_market_price_by_square_meter,
-    hm.off_market_price_median::BIGINT,
-    ROUND(hm.off_market_price_by_square_meter::FLOAT,2) AS off_market_price_by_square_meter,
-    hm.negotiated_price_median::BIGINT,
-    ROUND(hm.negotiated_price_by_square_meter::FLOAT,2) AS negotiated_price_by_square_meter,
-    hm.median_days_to_contract_sign::BIGINT
+WITH house_metrics AS (
+  SELECT
+    id_house,
+    business_context,
+    MEDIAN(CASE WHEN similar_house_status = 'on-market' THEN similar_price END) AS on_market_price_median,
+    MEDIAN(CASE WHEN similar_house_status = 'off-market' THEN similar_price END) AS off_market_price_median,
+    MEDIAN(CASE WHEN similar_house_status = 'on-market' THEN similar_rent_total_value END) AS on_market_total_value_median,
+    MEDIAN(CASE WHEN similar_house_status = 'off-market' THEN similar_rent_total_value END) AS off_market_total_value_median,
+    MEDIAN(CASE WHEN similar_house_status = 'on-market' THEN similar_sale_price_m2 END) AS on_market_price_by_square_meter,
+    MEDIAN(CASE WHEN similar_house_status = 'off-market' THEN similar_sale_price_m2 END) AS off_market_price_by_square_meter,
+    MEDIAN(CASE WHEN similar_house_status = 'on-market' THEN similar_days_in_the_market END) AS on_market_days_in_the_market,
+    MEDIAN(CASE WHEN similar_house_status = 'off-market' THEN similar_days_in_the_market END) AS off_market_days_to_contract_sign
   FROM
-    datalake_ebdb_clean.listing_business_context AS lbc
-  INNER JOIN
-    dw_rent.dim_house_listing AS dhl
-      ON lbc.id_house = dhl.id_house
-  LEFT JOIN
-    datalake_atlas_pricing_report.house_pricing_metrics AS hm
-      ON lbc.id_house = hm.id_house
-      AND LOWER(lbc.business_context) = LOWER(hm.business_context)
-  LEFT JOIN
-    datalake_atlas_pricing_report.house_listing_views_metrics AS pre
-      ON lbc.id_house = pre.id_house::BIGINT
-      AND LOWER(lbc.business_context) = LOWER(pre.business_context)
-  WHERE
-    DATEDIFF(dhl.ts_house_update, CURRENT_DATE) <= 365
-    AND lbc.status IN ('PUBLISHED','SUSPENDED','UNPUBLISHED','OPTED_OUT') -- Tirar os casos de imóveis que ainda estão em edição e não fizeram FL
-    AND dhl.country_code != 'MX'
+    datalake_atlas_pricing_report.similar_listings
+  GROUP BY ALL
+),
+condo_metrics AS (
+  SELECT
+    id_house,
+    MEDIAN(similar_condo) AS condominium_price_median,
+    MEDIAN(similar_iptu) AS urban_property_tax_median
+  FROM
+    datalake_atlas_pricing_report.house_condo_metrics
+  GROUP BY ALL
 )
 SELECT
-  DATE_FORMAT(ts_event, 'yyyy-MM-dd\'T\'HH:mm:ss') AS ts_event,
+  DATE_FORMAT(NOW(), 'yyyy-MM-dd\'T\'HH:mm:ss') AS ts_event,
   MONOTONICALLY_INCREASING_ID() AS id,
-  id_house,
-  business_context,
-  views_quantity,
-  demand_level,
-  condominium_price_median,
-  urban_property_tax_median,
-  on_market_price_median,
-  on_market_price_by_square_meter,
-  off_market_price_median,
-  off_market_price_by_square_meter,
-  negotiated_price_median,
-  negotiated_price_by_square_meter,
-  median_days_to_contract_sign
+  house_metrics.id_house::BIGINT,
+  house_metrics.business_context::STRING,
+  hlvm.views_quantity::BIGINT,
+  hlvm.demand_level::STRING,
+  condo_metrics.condominium_price_median::BIGINT,
+  condo_metrics.urban_property_tax_median::BIGINT,
+  house_metrics.on_market_price_median::BIGINT,
+  house_metrics.on_market_price_by_square_meter::BIGINT,
+  house_metrics.off_market_price_median::BIGINT,
+  house_metrics.off_market_price_by_square_meter::BIGINT,
+  house_metrics.on_market_total_value_median::BIGINT,
+  house_metrics.off_market_total_value_median::BIGINT,
+  house_metrics.on_market_days_in_the_market::BIGINT,
+  house_metrics.off_market_days_to_contract_sign::BIGINT
 FROM
-  house_engagement
+  house_metrics
+LEFT JOIN
+  condo_metrics
+    ON house_metrics.id_house = condo_metrics.id_house
+LEFT JOIN
+  datalake_atlas_pricing_report.house_listing_views_metrics AS hlvm
+    ON house_metrics.id_house = hlvm.id_house
+      AND house_metrics.business_context = hlvm.business_context

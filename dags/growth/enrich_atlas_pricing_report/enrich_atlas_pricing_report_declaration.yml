@@ -9,24 +9,29 @@ dag:
       These tables will be used in the DAG reverse_atlas_pricing_report_access to be sent via SNS,
       where they will be displayed as an analytical report for Atlas.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: full
   inner_dependencies:
-    house_pricing_metrics:
+    house_condo_metrics:
+      - on_market_house_listings
+    house_listing_views_metrics:
       - similar_listings
+    new_pricing_report_engagement:
       - house_condo_metrics
-    status_history_house_listing:
-      - status_history_house_price_change
+      - house_listing_views_metrics
+      - similar_listings
     new_pricing_report_listing_price_history:
       - status_history_house_listing
       - status_history_house_negotiation
       - status_history_house_price_change
-    new_pricing_report_engagement:
-      - house_pricing_metrics
-      - house_listing_views_metrics
     new_pricing_report_region:
       - region_metrics
+    similar_listings:
+      - on_market_house_listings
+      - status_history_house_negotiation
+    status_history_house_listing:
+      - status_history_house_price_change
 cluster:
   type: custom_cluster
   custom_configurations:

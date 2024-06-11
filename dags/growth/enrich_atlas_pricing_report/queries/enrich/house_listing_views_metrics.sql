@@ -1,74 +1,42 @@
 WITH amplitude_events AS (
-    SELECT
-        ep_house_id AS id_house,
-        id_amplitude,
-        LOWER(business_context) AS business_context
-    FROM
-        datalake_amplitude_clean.170698_listing_page_viewed_events
-    WHERE
-        DATE(year::STRING || month::STRING || day::STRING) >= (CURRENT_DATE - INTERVAL '30' DAY)
-        AND ts_event >= (CURRENT_DATE - INTERVAL '7' DAY)
+  SELECT
+    lpve.ep_house_id AS id_house,
+    UPPER(lpve.business_context) AS business_context,
+    COUNT(DISTINCT lpve.id_amplitude) AS views_quantity
+  FROM
+    datalake_amplitude_clean.170698_listing_page_viewed_events AS lpve
+  WHERE
+    DATE(lpve.year::STRING || lpve.month::STRING || lpve.day::STRING) >= (CURRENT_DATE - INTERVAL '30' DAY)
+    AND lpve.ts_event >= (CURRENT_DATE - INTERVAL '7' DAY)
+  GROUP BY ALL
 ),
-houses AS (
-    SELECT
-        llf.sk_house AS id_house,
-        LOWER(llf.origin_table) AS business_context,
-        MIN(dd.date) AS dt_first_listing
-    FROM
-        dw_datamarts.lead_listing_flows AS llf
-    INNER JOIN
-        dw_public.dim_date AS dd
-            ON llf.sk_first_listing_date = dd.sk_date
-    WHERE
-        llf.sk_first_listing_date > 0
-    GROUP BY 1,2
-),
-aux AS (
-    SELECT
-        e.id_house,
-        e.business_context,
-        CASE
-            WHEN LOWER(dhl.house_type) IN ('apartamento', 'studiooukitchenette') THEN 'apartamento'
-            WHEN LOWER(dhl.house_type) IN ('casa', 'casacondominio') THEN 'casa'
-        END AS house_type,
-        fhl.sk_region,
-        COUNT(DISTINCT e.id_amplitude) AS views_quantity
-    FROM
-        amplitude_events AS e
-    INNER JOIN
-        houses AS h
-            ON e.id_house::BIGINT = h.id_house
-            AND e.business_context = h.business_context
-    INNER JOIN
-        dw_rent.dim_house_listing AS dhl
-            ON dhl.id_house = h.id_house
-    INNER JOIN
-        dw_rent.fact_house_listings AS fhl
-            ON dhl.sk_house_listing = fhl.sk_house_listing
-    GROUP BY 1,2,3,4
-),
-metrics AS (
-    SELECT
-        id_house,
-        business_context,
-        views_quantity,
-        PERCENTILE(views_quantity, .25) OVER(PARTITION BY sk_region, business_context) AS lpv_p_25,
-        PERCENTILE(views_quantity, .50) OVER(PARTITION BY sk_region, business_context) AS lpv_p_50,
-        PERCENTILE(views_quantity, .75) OVER(PARTITION BY sk_region, business_context) AS lpv_p_75
-    FROM
-        aux
+similar_views AS (
+  SELECT
+    sl.id_house,
+    sl.business_context,
+    ae.views_quantity,
+    PERCENTILE(e_similar.views_quantity, .25) AS similar_views_p25,
+    PERCENTILE(e_similar.views_quantity, .75) AS similar_views_p75
+  FROM
+    datalake_atlas_pricing_report.similar_listings AS sl
+  INNER JOIN
+    amplitude_events AS ae
+      ON sl.id_house = ae.id_house
+      AND sl.business_context = ae.business_context
+  INNER JOIN
+    amplitude_events AS e_similar
+      ON sl.similar_id_house = e_similar.id_house
+      AND sl.business_context = e_similar.business_context
+  GROUP BY ALL
 )
 SELECT
-    id_house,
-    business_context,
-    views_quantity,
-    lpv_p_25,
-    lpv_p_50,
-    lpv_p_75,
-    CASE
-        WHEN views_quantity < lpv_p_25 THEN 'LOW'
-        WHEN views_quantity > lpv_p_75 THEN 'HIGH'
-        WHEN views_quantity >= lpv_p_25 AND views_quantity <= lpv_p_75 THEN 'MEDIUM'
-    END AS lpv_temperature_region_context -- Considera os quartiles do business_context e da regiao
+  id_house,
+  business_context,
+  CASE
+    WHEN views_quantity < similar_views_p25 THEN 'LOW'
+    WHEN views_quantity > similar_views_p75 THEN 'HIGH'
+    WHEN views_quantity >= similar_views_p25 AND views_quantity <= similar_views_p75 THEN 'MEDIUM'
+  END AS demand_level,
+  views_quantity
 FROM
-    metrics
+  similar_views

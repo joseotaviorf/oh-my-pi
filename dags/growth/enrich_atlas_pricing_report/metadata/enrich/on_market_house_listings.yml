@@ -1,0 +1,6 @@
+---
+database_name: datalake_atlas_pricing_report
+table_name: on_market_house_listings
+owner: "@data-growth"
+domain: Growth
+description: WIP
