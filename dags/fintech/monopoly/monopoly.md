@@ -17,7 +17,6 @@ This pipeline produces the following tables into the datalake, via full load:
 
 1. In datalake raw:
 
-   - account
    - accounting_entry
    - income
    - income_reference
@@ -34,8 +33,7 @@ This pipeline produces the following tables into the datalake, via full load:
    - sale_transactions
 
 2. In datalake clean
-
-   - account
+   
    - accounting_entry
    - income
    - income_reference

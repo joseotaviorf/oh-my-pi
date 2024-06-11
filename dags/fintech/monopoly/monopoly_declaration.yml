@@ -7,8 +7,6 @@ workflow:
     layer: raw
     database_type: postgres
     tables_customization:
-      account:
-        clean_table_name: account
       accounting_entry:
         clean_table_name: accounting_entry
       income_reference:
