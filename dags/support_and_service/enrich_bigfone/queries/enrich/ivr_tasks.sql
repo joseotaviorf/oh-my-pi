@@ -4,9 +4,9 @@ SELECT
     from_phone_number,
     to_phone_number,
     STR_TO_MAP(
-        REGEXP_REPLACE(REPLACE(ivr_steps, '"', ''), '^\\{|\\}\\}$', ""),
-        '\\},',
-        ':\\{'
+        REGEXP_REPLACE(REPLACE(ivr_steps, '"', ''), '^\\{{|\\}}\\}}$', ""),
+        '\\}},',
+        ':\\{{'
     ) AS ivr_steps,
     ts_created
 FROM
