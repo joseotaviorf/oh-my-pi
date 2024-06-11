@@ -361,6 +361,9 @@ bietlejuice.enrich_ebdb_photo_jobs:
 bietlejuice.enrich_ebdb_user:
   add:
     - bietlejuice.ebdb_user:load-clean-user-merge
+bietlejuice.enrich_golden_set:
+  remove:
+    - bietlejuice.enrich_vespucio:load-enrich-dejavu
 bietlejuice.enrich_supply_leads:
   remove:
     - bietlejuice.enrich_region:load-enrich-region
@@ -741,11 +744,7 @@ bietlejuice.enrich_velo:
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
 bietlejuice.enrich_vespucio:
-  add:
-    - bietlejuice.ebdb:load-clean-map-region
-    - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
-  remove:
-    - bietlejuice.sindico_net:load-clean-condominium
+  override: []
 bietlejuice.enrich_vespucio_pipeline:
   add:
     - bietlejuice.ebdb_condo:load-clean-amenities

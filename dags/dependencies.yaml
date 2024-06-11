@@ -1651,7 +1651,6 @@ bietlejuice.enrich_fintech_snapshot:
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-rent-offer
 bietlejuice.enrich_golden_set:
-  - bietlejuice.enrich_vespucio:load-enrich-dejavu
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
 bietlejuice.enrich_google_search_console:
   - bietlejuice.google_search_console:load-clean-report-by-page-and-query
@@ -2896,15 +2895,6 @@ bietlejuice.enrich_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-ticket-metrics
   - bietlejuice.velo_zendesk:load-clean-tickets
   - bietlejuice.velo_zendesk:load-clean-tickets-history
-bietlejuice.enrich_vespucio:
-  - bietlejuice.ebdb:load-clean-map-region
-  - bietlejuice.ebdb_condo:load-clean-condo
-  - bietlejuice.ebdb_condo:load-clean-condo-contact
-  - bietlejuice.ebdb_condo:load-clean-info-condo-amenities
-  - bietlejuice.ebdb_house:load-clean-house
-  - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
-  - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
-  - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
 bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.ebdb_condo:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-condo
