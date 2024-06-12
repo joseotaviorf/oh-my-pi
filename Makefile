@@ -42,20 +42,41 @@ branch ?= forno
 .PHONY: run-local-environment
 ## runs a local Airflow environment containing both bi-etl-ejuice DAGs and QuintoAndar's custom Airflow Plugins.
 ## May receive an optional `branch={branch}` argument to clone a specified branch of Airflow Plugins repo. Defaults to `forno`.
+## May receive an optional `database={database}` argument to set up a specified database. Defaults to `postgres`.
 run-local-environment:
 	@make clone-local-airflow-plugins branch=$(branch)
 	@echo "Recreating local Airflow environment"
 	@echo "=========="
 	@echo ""
-	@docker-compose -f local/docker/docker-compose.yml up -d --build --force-recreate
+	@if [ "${database}" = "mysql" ]; then\
+		echo "Running local environment with MySQL database";\
+        docker-compose -f local/docker/docker-compose-mysql.yml up -d --build --force-recreate;\
+	else\
+		echo "Running local environment with Postgres database";\
+		docker-compose -f local/docker/docker-compose.yml up -d --build --force-recreate;\
+    fi
 
 .PHONY: restart-local-environment
+## May receive an optional `database={database}` argument to set up a specified database. Defaults to `postgres`.
 restart-local-environment:
-	@docker-compose -f local/docker/docker-compose.yml up -d --build
+	@if [ "${database}" = "mysql" ]; then\
+		echo "Restarting local environment with MySQL database";\
+        docker-compose -f local/docker/docker-compose-mysql.yml up -d --build;\
+	else\
+		echo "Restarting local environment with Postgres database";\
+		docker-compose -f local/docker/docker-compose.yml up -d --build;\
+    fi
 
 .PHONY: stop-local-environment
+## May receive an optional `database={database}` argument to set up a specified database. Defaults to `postgres`.
 stop-local-environment:
-	@docker-compose -f local/docker/docker-compose.yml down
+	@if [ "${database}" = "mysql" ]; then\
+		echo "Stopping local environment with MySQL database";\
+		docker-compose -f local/docker/docker-compose-mysql.yml down;\
+	else\
+		echo "Stopping local environment with Postgres database";\
+		docker-compose -f local/docker/docker-compose.yml down;\
+	fi
 
 ###############################################################################
 ###################### Local Tests Docker environment #########################
