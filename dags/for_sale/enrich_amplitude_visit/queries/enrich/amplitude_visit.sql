@@ -24,6 +24,7 @@ cross_platform AS (
     up_utm_campaign AS utm_campaign,
     up_utm_content AS utm_content,
     up_utm_term AS utm_term,
+    up_entrance_uri AS entrance_uri,
     up_adjust_network AS adjust_network,
     COALESCE(
       NULLIF(
@@ -55,6 +56,7 @@ cross_platform AS (
     up_utm_campaign AS utm_campaign,
     up_utm_content AS utm_content,
     up_utm_term AS utm_term,
+    up_entrance_uri AS entrance_uri,
     up_adjust_network AS adjust_network,
     COALESCE(
       NULLIF(
@@ -84,6 +86,7 @@ SELECT
   utm_medium,
   utm_content,
   utm_term,
+  entrance_uri,
   COALESCE(
     (
       (

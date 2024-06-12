@@ -51,6 +51,11 @@ columns:
     lineage:
       - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
     description: User property that identifies the utm term.
+  entrance_uri:
+    lineage:
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events 
+    description: The URL of the first page a user visits in a session
   is_branded:
     lineage:
       - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
