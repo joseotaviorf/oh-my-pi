@@ -35,6 +35,7 @@ workflow:
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: m5a.2xlarge
-    node_type_id: r5a.2xlarge
+    driver_node_type_id: m5a.xlarge
+    node_type_id: r5a.xlarge
     num_workers: 2
+    spark_version: 12.2.x-scala2.12
