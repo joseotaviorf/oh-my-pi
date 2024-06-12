@@ -30,7 +30,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 reverse_spark_job_path = f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_{DAG_NAME}.py"
 
 cluster_description = config_service.get_config(
-    "databricks_10_4_min_general_photon_cluster"
+    "databricks_12_2_min_general_photon_cluster"
 )
 default_libraries = config_service.get_config("default_libraries")
 dag_documentation = config_service.get_config("dag_documentation")

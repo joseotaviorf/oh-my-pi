@@ -29,7 +29,7 @@ config_service = ConfigurationService(DAG_NAME)
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 reverse_spark_job_path = f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_into_robbyson_api.py"
 
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("databricks_12_2_med_general_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
