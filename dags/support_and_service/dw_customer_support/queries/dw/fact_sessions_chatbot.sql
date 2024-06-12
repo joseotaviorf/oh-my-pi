@@ -79,7 +79,7 @@ SELECT
   gs.has_fallback,
   CASE
     WHEN GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions') IS NULL THEN 0
-    ELSE GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions')
+    ELSE CAST(GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions') AS DECIMAL)
   END AS number_chat_interactions,
   GET_JSON_OBJECT(gs.memory,'$.predictions.with_context') AS model_with_context,
   GET_JSON_OBJECT(gs.memory,'$.predictions.no_context') AS model_no_context,
