@@ -58,9 +58,6 @@ column_level_validations:
   has_journey_flow_response:
     is_complete:
       severity_level: Error
-  context_identification_tentatives:
-    is_complete:
-      severity_level: Error
   has_same_previous_theme:
     is_complete:
       severity_level: Error
