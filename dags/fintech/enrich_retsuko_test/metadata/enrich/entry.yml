@@ -93,3 +93,7 @@ columns:
     description: "Entry update timestamp"
     lineage:
       - datalake_retsuko_clean_test.entry.ts_retsuko_updated
+  ts_database_transaction:
+    description: "Retsuko's Transaction Timestamp"
+    lineage:
+      - datalake_retsuko_clean_test.entry.ts_database_transaction
