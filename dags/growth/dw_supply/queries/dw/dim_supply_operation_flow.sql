@@ -26,3 +26,4 @@ SELECT
   ops_approach AS cd_approach,
   NOW() AS ts_updated
 FROM events
+GROUP BY ALL
