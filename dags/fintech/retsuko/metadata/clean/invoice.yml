@@ -107,7 +107,7 @@ columns:
   ts_payment_processing:
     description: "Data that the payment was processed"
     lineage:
-      - datalake_retsuko_raw.invoice.payment_processing_at 
+      - datalake_retsuko_raw.invoice.payment_processing_at
   ts_payment_credit:
     description: "Date that the payment was credited in our bank account, in CNAB cases, after two business day in general"
     lineage:

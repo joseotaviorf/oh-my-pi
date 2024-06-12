@@ -3,14 +3,14 @@ database_name: datalake_retsuko
 table_name: invoice_entry
 owner: athos.sampayo@quintoandar.com.br
 domain: fintech
-description: "TODO FINISH DESCRIPTIONS"
+description: ""
 columns:
   id:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Entry external ID"
     lineage:
       - datalake_retsuko.entry.id_external
   id_invoice:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice ID"
     lineage:
       - datalake_retsuko.entry.id_invoice
   id_external_reversed_entry:
@@ -22,42 +22,86 @@ columns:
     lineage:
       - datalake_retsuko.entry.accounting_transaction_identifier
   id_contract:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Contract ID"
     lineage:
       - datalake_retsuko_clean.contract.id_external
   bill_item:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Name of the bill item, that is, what the item of invoice refers to"
     lineage:
       - datalake_retsuko.entry.bill_item
   entry_type:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Bill Item type"
     lineage:
-      - datalake_retsuko.entry.entry_type
+      - datalake_retsuko.entry.bill_item
   from_account_type:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Who needs to pay the invoice"
+    categories:
+      adm partner: ""
+      contract: ""
+      contract estate agent: ""
+      contract expenses: ""
+      contract iptu: ""
+      landlord: ""
+      missing account: ""
+      personal estate agent: ""
+      quinto andar: ""
+      reservation: ""
+      select: ""
+      tenant: ""
+      third party partner: ""
     lineage:
       - datalake_retsuko_clean.account.type
   to_account_type:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Who will receive the invoice amount"
+    categories:
+      adm partner: ""
+      contract: ""
+      contract estate agent: ""
+      contract expenses: ""
+      contract iptu: ""
+      landlord: ""
+      missing account: ""
+      personal estate agent: ""
+      quinto andar: ""
+      reservation: ""
+      select: ""
+      tenant: ""
+      third party partner: ""
     lineage:
       - datalake_retsuko_clean.account.type
   accounting_account:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "clusterize the bill items"
     lineage:
       - datalake_retsuko.entry.bill_item
   is_rental_paid_in_advance:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: ""
     lineage:
       - datalake_retsuko_clean.contract.is_rental_paid_in_advance
   producer:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Routine that created the entry"
+    categories:
+      brokerage-estate-agent-postponed: ""
+      early-termination: ""
+      early-termination-v2: ""
+      estate-agent: ""
+      extra: ""
+      fine-and-interest: ""
+      manual: ""
+      manual-pos-rental: ""
+      monthly-routine: ""
+      non-specified: ""
+      onboarding-routine: ""
+      onboarding-routine-delayed: ""
+      payment-adjustment: ""
+      postponement: ""
+      sporadic-routine: ""
     lineage:
       - datalake_retsuko.entry.producer
   description:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice entry title as shown in invoice"
     lineage:
       - datalake_retsuko.entry.description
   accrual_year_month:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Expense reference month"
     lineage:
       - datalake_retsuko.entry.accrual_year_month

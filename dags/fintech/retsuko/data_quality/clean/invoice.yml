@@ -7,8 +7,12 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_external:
+    is_unique:
+      severity_level: Error
     is_complete:
       severity_level: Error
   id:
+    is_unique:
+      severity_level: Error
     is_complete:
       severity_level: Error

@@ -1,13 +1,10 @@
 WITH latest_audit AS (
   SELECT
     id_invoice,
-    id_audit,
-    MAX(ts_retsuko_updated)
+    id_audit
   FROM
     datalake_retsuko.entry
-  GROUP BY
-    id_invoice,
-    id_audit
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice ORDER BY ts_database_transaction DESC) = 1
 )
 SELECT
     in.id,
@@ -55,11 +52,9 @@ FROM
     datalake_retsuko_clean.invoice AS in
 LEFT JOIN
   latest_audit AS la
-ON in.id = la.id_invoice
+    ON in.id = la.id_invoice
 LEFT JOIN
   datalake_retsuko_clean.contract AS c
       ON c.id = in.id_contract
 LEFT JOIN datalake_quintoandar.aux_date AS dd
   ON dd.date = DATE(in.ts_due)
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY in.id ORDER BY in.ts_retsuko_updated DESC) = 1

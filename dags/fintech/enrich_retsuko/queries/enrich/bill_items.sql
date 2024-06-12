@@ -36,7 +36,7 @@ SELECT
     CAST(rci.ts_paid AS DATE) AS dt_paid,
     CAST(rci.ts_canceled AS DATE) AS dt_canceled
 FROM
-    datalake_retsuko.invoice AS rci 
+    datalake_retsuko.invoice AS rci
     LEFT JOIN cte_split_bill_item AS bi
       ON bi.id_invoice = rci.id
     LEFT JOIN datalake_retsuko.entry AS rce

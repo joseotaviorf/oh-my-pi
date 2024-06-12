@@ -19,5 +19,3 @@ SELECT
     ts_retsuko_updated
 FROM
     datalake_retsuko_clean.boleto
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_retsuko_updated DESC) = 1

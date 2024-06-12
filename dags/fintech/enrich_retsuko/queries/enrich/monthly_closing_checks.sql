@@ -8,4 +8,3 @@ SELECT
     ts_updated
 FROM
     datalake_retsuko_clean.monthly_closing_checks
-

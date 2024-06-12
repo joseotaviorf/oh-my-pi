@@ -7,36 +7,36 @@ WITH base_cte AS (
         AND to_account_type <> 'contract') THEN (-1.0) * value_sign_bill_item
       ELSE 1.0 * value_sign_bill_item
     END AS value_sign_bill_item_fixed
-  FROM 
+  FROM
     datalake_retsuko.bill_items AS m
-  WHERE 
+  WHERE
     m.due_amount <=0 AND m.bill_item IN ('EVICTIONS-DEBT-RELIEF', 'EVICTIONS-DEBT-RELIEF-NEGOTIATION')
 ),
 forgiven_value_table AS (
-  SELECT 
+  SELECT
     id_contract,
     id_invoice,
     sum(value_sign_bill_item_fixed)*(-1) AS amount_forgiven
-  FROM 
+  FROM
     base_cte
   GROUP BY 1,2
 )
-SELECT 
+SELECT
   m.*,
   f.accrual_year_month,
   f.purpose,
   'ONLINE' AS origin_factor,
   cast(f.ts_created AS date) AS dt_created,
   cast(f.ts_due AS date) AS dt_due
-FROM 
+FROM
   forgiven_value_table AS m
-LEFT JOIN 
+LEFT JOIN
   datalake_retsuko.invoice AS f ON m.id_invoice = f.id_external
 UNION
-SELECT 
+SELECT
   id_contract,
   id_invoice,
-  due_amount AS amount_forgiven,  
+  due_amount AS amount_forgiven,
   accrual_year_month,
   purpose,
   origin_factor,

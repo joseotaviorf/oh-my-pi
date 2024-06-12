@@ -3,53 +3,101 @@ database_name: datalake_retsuko
 table_name: invoice_info
 owner: athos.sampayo@quintoandar.com.br
 domain: fintech
-description: "TODO FINISH DESCRIPTIONS"
+description: ""
 columns:
   id_invoice:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice ID"
     lineage:
       - datalake_retsuko.invoice.id_external
   invoice_frequency:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice Frequency (purpose)"
+    categories:
+      early-termination: ""
+      extra: ""
+      monthly: ""
+      onboarding: ""
+      pos-rental: ""
+      estate-agent-services: ""
     lineage:
       - datalake_retsuko.invoice.purpose
   payment_status:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice status"
+    categories:
+      canceled: The invoice is canceled, and there's no more values to be paid
+      divergent-payment:
+        The invoice was paid with a different value than the due
+        amount in an invoice_paid_date
+      not-payable:
+        The net invoice value of all the entries is zero, therefore the
+        invoice can not be paid. Yet the invoice has an invoice_due_date. In onboarding
+        and monthly invoices, this status can appear when a postponed value is created
+        in order to the tenant invoice not to become a payable or to the landlord
+        invoice not to become a receivable
+      open: The invoice is not paid yet
+      paid: The invoice was paid
+      written-down:
+        The invoice was not paid and it was written down, the invoice_paid_date
+        is the written down date. The process is done in general to not consider anymore
+        the due amount (it's not going to be paid anymore or it has a negotiation)
     lineage:
       - datalake_retsuko.invoice.status
   substatus:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice subtatus. It's used to set negotiations/debts status"
+    categories:
+      none: ""
+      debt: ""
+      ongoing-negotiation: ""
     lineage:
       - datalake_retsuko.invoice.substatus
   negotiation_status:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Description of negotiation status"
     lineage:
       - datalake_retsuko.invoice.negotiation_status
   closing_mode:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Description that shows if closing is automatic or manual"
     lineage:
       - datalake_retsuko.invoice.closing_mode
   paid_via:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice payment method categories"
+    categories:
+      bank-transfer: ""
+      cardif: ""
+      checkout-boleto: ""
+      cnab: ""
+      credit-card: ""
+      internet-banking: ""
+      mercado-pago: ""
+      non-specified: ""
+      paypal: ""
+      recupera: ""
+      recupera-credit-card: ""
+      recupera-pix: ""
+      robin-hood: ""
+      unknown: ""
     lineage:
       - datalake_retsuko.invoice.paid_via
   invoice_user:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice user"
+    categories:
+      landlord: ""
+      tenant: ""
+      personal estate agent: ""
+      quinto andar: ""
     lineage:
       - datalake_retsuko_clean.account.type
   ts_sent:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Timestamp when the invoice was sent"
     lineage:
       - datalake_retsuko.invoice.ts_sent
   ts_due:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice due (timestamp)"
     lineage:
       - datalake_retsuko.invoice.ts_due
   ts_paid:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Timestamp in which invoice was paid"
     lineage:
       - datalake_retsuko.invoice.ts_paid
   ts_canceled:
-    description: "TODO FINISH DESCRIPTIONS"
+    description: "Invoice cancellation timestamp"
     lineage:
       - datalake_retsuko.invoice.ts_canceled

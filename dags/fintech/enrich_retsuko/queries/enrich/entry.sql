@@ -20,7 +20,8 @@ SELECT
     e.due_year_month,
     e.ts_created,
     e.ts_synced,
-    e.ts_retsuko_updated
+    e.ts_retsuko_updated,
+    e.ts_database_transaction
 FROM
     datalake_retsuko_clean.entry e
 LEFT JOIN
@@ -32,5 +33,3 @@ LEFT JOIN
 LEFT JOIN
     datalake_retsuko_clean.contract c
         ON c.id = e.id_contract
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY e.id ORDER BY ts_retsuko_updated DESC) = 1

@@ -85,6 +85,7 @@ columns:
     categories:
       bank-transfer: ""
       cardif: ""
+      checkout-boleto: ""
       cnab: ""
       credit-card: ""
       internet-banking: ""
@@ -92,6 +93,8 @@ columns:
       non-specified: ""
       paypal: ""
       recupera: ""
+      recupera-credit-card: ""
+      recupera-pix: ""
       robin-hood: ""
       unknown: ""
   purpose:
@@ -190,7 +193,7 @@ columns:
   ts_payment_processing:
     description: "Data that the payment was processed"
     lineage:
-      - datalake_retsuko_clean.invoice.ts_payment_processing 
+      - datalake_retsuko_clean.invoice.ts_payment_processing
   ts_payment_credit:
     description: "Date that the payment was credited in our bank account, in CNAB cases, after two business day in general"
     lineage:

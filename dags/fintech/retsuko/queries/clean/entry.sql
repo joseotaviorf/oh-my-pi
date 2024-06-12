@@ -23,4 +23,3 @@ SELECT
     day
 FROM
     datalake_retsuko_raw.entry
-WHERE MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
