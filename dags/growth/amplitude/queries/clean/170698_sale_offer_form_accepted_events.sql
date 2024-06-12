@@ -49,6 +49,7 @@ SELECT
     GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS up_utm_campaign,
     GET_JSON_OBJECT(user_properties, '$.utm_content') AS up_utm_content,
     GET_JSON_OBJECT(user_properties, '$.utm_term') AS up_utm_term,
+    GET_JSON_OBJECT(user_properties, '$.entrance_uri') as up_entrance_uri,
     user_properties,
     ts_event,
     ts_server_uploaded,

@@ -176,6 +176,9 @@ columns:
   up_utm_term:
     lineage:
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  up_entrance_uri:
+    lineage:
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties    
   dt_event:
     lineage:
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.ts_event
