@@ -69,7 +69,7 @@ WITH atento_tables AS (
         'recontact_mx' AS table_name,
         ts_load
     FROM
-        reverse_atento.recontac_mx
+        reverse_atento.recontact_mx
 )
 SELECT DISTINCT
     'Atento' AS bpo,
