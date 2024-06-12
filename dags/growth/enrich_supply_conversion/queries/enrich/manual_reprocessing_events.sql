@@ -107,10 +107,7 @@ SELECT
     rm.application,
     re.ts_event AS ts_conversion_event,
     rm.ts_created,
-    NOW() AS ts_load,
-    YEAR(rm.ts_created) AS year,
-    MONTH(rm.ts_created) AS month,
-    DAY(rm.ts_created) AS day
+    NOW() AS ts_load
 FROM
   all_entities AS ae
 JOIN mailing AS rm 

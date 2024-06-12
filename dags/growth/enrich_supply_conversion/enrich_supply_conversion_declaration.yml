@@ -22,14 +22,19 @@ workflow:
       z_order_by: ["id_entity", "business_context"]
     manual_reprocessing_events:
       z_order_by: ["id_entity", "business_context"]
-      partitions: ["year", "month", "day"]
+    conversion_events_3p:
+      z_order_by: ["id_house", "business_context"]
+    operations_agents:
+      z_order_by: ["id_user"]
   inner_dependencies:
     conversion_staging:
       - prospects_events
     last_pj_attribution:
       - conversion_staging
+      - operations_agents
     conversion_attributed_events:
       - conversion_staging
+      - conversion_events_3p
     conversion_events:
       - conversion_attributed_events
     manual_reprocessing_events:

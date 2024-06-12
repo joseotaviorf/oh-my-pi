@@ -1,0 +1,53 @@
+database_name: datalake_supply_flows
+table_name: operations_agents
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
+description: This table is responsible to store the operations agents involved in the operational process related to the event.
+columns:
+  id_user:
+    description: This column represents the unique identifier for each user
+    lineage:
+     - datalake_ebdb_clean.user.id
+     - datalake_wololo_clean.context_discard.id_user
+     - datalake_bob_clean.registrar.id_main
+  application: 
+    description: This column represents the application that the user is using for last attribution
+  source:
+    description: This column represents the source of the information (Bob, Wololo or Olos)
+  journey:
+    description: This column represents the journey that the conversion is related to
+  has_ops_info:
+    description: This column represents if the user has ops information from Lead Registration
+    lineage:
+      - datalake_wololo_clean.context_discard.attendance_info
+  ops_agent:
+    description: The team responsible for the operation
+    lineage:
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_bob.house_draft.ops_agent
+  ops_partner:
+    description: The partner or company responsible for the operation
+    lineage:
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_bob.house_draft.ops_partner
+  ops_approach:
+    description: The approach used by the team to convert the lead
+    lineage:
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_bob.house_draft.ops_approach
+  ops_contact_medium:
+    description: The medium used to contact the lead
+    lineage:
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_bob.house_draft.ops_contact_medium
+  ops_objective:
+    description: The objective of the operation (conversion or acquisition)
+    lineage:
+      - datalake_wololo_clean.context_discard.attendance_info
+      - datalake_bob.house_draft.ops_objective
+  ts_register:
+    description: The timestamp of the registration for operation agent
+    lineage:
+      - datalake_ebdb_clean.user.ts_created
+      - datalake_wololo_clean.context_discard.ts_created
+      - datalake_bob.house_draft.ts_created
