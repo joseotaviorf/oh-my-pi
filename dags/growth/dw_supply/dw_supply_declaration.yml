@@ -9,7 +9,7 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: growth
-  default_extraction_type: full
+  default_extraction_type: incremental
   tables_customization:
     dim_acquisition_lead:
       merge_on: ['bk_acq_lead']
