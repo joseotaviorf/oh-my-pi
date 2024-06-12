@@ -1,6 +1,6 @@
 WITH last_dag_inventory_update AS (
   SELECT
-    MAX(MAKE_DATE(t.year, t.month, t.day)) AS dt_last_update
+    MAX(MAKE_DATE(t.year, t.month, t.day)) AS dt_last_updated
   FROM
     datalake_dag_inventory_clean.table AS t
 )
@@ -14,17 +14,16 @@ SELECT
   t.layer,
   t.avg_file_size_in_bytes,
   t.is_delta,
-  IF(t.layer IN ('dw', 'metric'), TRUE, FALSE) AS is_certified_layer
+  IF(l.dt_last_updated IS NOT NULL, TRUE, FALSE) AS is_active,
+  IF(t.layer IN ('dw', 'metric'), TRUE, FALSE) AS is_certified_layer,
+  MAKE_DATE(t.year, t.month, t.day) AS dt_last_updated
 FROM
   datalake_dag_inventory_clean.table AS t
 JOIN
-  last_dag_inventory_update AS l
-    ON l.dt_last_update = MAKE_DATE(t.year, t.month, t.day)
-JOIN
   datalake_pipeline.dag AS d
     ON d.id_dag = t.dag
-JOIN
-  datalake_composer_clean.dag AS dd
-    ON dd.id_dag = d.id_dag
-WHERE
-  DATE(dd.ts_last_scheduler_ran) = CURRENT_DATE -- Assuring only active DAGs on Airflow, due to interface bugs which can make it still appear on dag_inventory
+LEFT JOIN
+  last_dag_inventory_update AS l
+    ON l.dt_last_updated = MAKE_DATE(t.year, t.month, t.day)
+QUALIFY 
+  ROW_NUMBER() OVER (PARTITION BY t.table ORDER BY MAKE_DATE(t.year, t.month, t.day) DESC) = 1

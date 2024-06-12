@@ -2,7 +2,7 @@
 database_name: datalake_pipeline
 table_name: table
 description: This table has all the tables created in Airflow (except for Reverse layer),
-  identified by the id_table.
+  identified by the id_table. The table might be active (still being loaded) or not.
 domain: Cross
 owner: isadora.gallerani@quintoandar.com.br
 columns:
@@ -43,5 +43,13 @@ columns:
     lineage:
       - datalake_dag_inventory_clean.table.is_delta
     description: Boolean flag indicating if the table is in Delta.
+  is_active:
+    description: Boolean flag indicating if the table is still being loaded or not.
   is_certified_layer:
     description: Boolean flag indicating if the table layer is certified, which means that the tables is from a DW or Metric layer.
+  dt_last_updated:
+    description: Date of when the table was loaded to the last time. It might be D-1, if the table is still active.
+    lineage:
+      - datalake_dag_inventory_clean.table.year
+      - datalake_dag_inventory_clean.table.month
+      - datalake_dag_inventory_clean.table.day
