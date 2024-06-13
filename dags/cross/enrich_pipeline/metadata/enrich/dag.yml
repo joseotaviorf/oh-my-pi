@@ -54,6 +54,10 @@ columns:
     lineage:
       - datalake_pipeline.dag_run.duration
     description: Total duration of the DAG run, in minutes.
+  median_duration:
+    lineage:
+      - datalake_pipeline.dag_run.duration
+    description: The median duration of the DAG, in minutes.
   is_active:
     lineage:
       - datalake_composer_clean.dag.is_active
@@ -98,6 +102,10 @@ columns:
     description: The BRT timestamp of when the DAG execution has been started.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
+  ts_median_execution_started:
+    lineage:
+      - datalake_pipeline.dag_run.ts_started
+    description: The DAG's median timestamp of start.
   ts_last_execution_ended:
     lineage:
       - datalake_pipeline.dag_run.ts_ended
@@ -110,6 +118,10 @@ columns:
     description: The BRT timestamp of when the DAG execution has ended.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
+  ts_median_execution_ended:
+    lineage:
+      - datalake_pipeline.dag_run.ts_ended
+    description: The DAG's median timestamp of end.
   ts_last_run_first_success:
     lineage:
       - datalake_pipeline.dag_run.ts_first_execution_success

@@ -13,6 +13,18 @@ WITH most_recent_run AS (
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_run DESC) = 1
 ),
+medians (
+    SELECT
+        id_dag,
+        MEDIAN(duration) AS median_duration,
+        TIMESTAMP(MEDIAN(BIGINT(TIMESTAMP(DATE_FORMAT(ts_started,'HH:mm:ss'))))) AS ts_median_execution_started,
+        TIMESTAMP(MEDIAN(BIGINT(TIMESTAMP(DATE_FORMAT(ts_started,'HH:mm:ss'))))) AS ts_median_execution_ended
+    FROM
+        datalake_pipeline.dag_run
+    WHERE
+        id_run NOT LIKE 'manual%'
+    GROUP BY 1
+),
 most_recent_events AS (
     SELECT
         id_dag,
@@ -141,6 +153,7 @@ SELECT
     END AS brt_sla_hour,
     ao.number_of_tasks,
     s.duration,
+    m.median_duration,
     s.is_active,
     s.is_paused,
     s.is_in_exclusion_list,
@@ -152,8 +165,10 @@ SELECT
     s.dt_run AS dt_last_run,
     s.ts_last_execution_started,
     s.ts_last_execution_started_brt,
+    m.ts_median_execution_started,
     s.ts_last_execution_ended,
     s.ts_last_execution_ended_brt,
+    m.ts_median_execution_ended,
     s.ts_last_run_first_success,
     s.ts_last_run_first_success_brt,
     NOW() AS ts_load,
@@ -163,6 +178,9 @@ FROM
 JOIN
     first_execution AS fe
         ON fe.id_dag = s.id_dag
+JOIN
+    medians AS m
+        ON m.id_dag = s.id_dag
 LEFT JOIN
     amount_of_tasks AS ao
         ON ao.id_dag = s.id_dag
