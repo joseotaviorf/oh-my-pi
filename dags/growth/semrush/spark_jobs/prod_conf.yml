@@ -1,4 +1,4 @@
-s3://artifacts.s3.data.quintoandar.com.br/bi-etl-ejuice/init_script.sh---
+---
 raw_table_name: searches
 raw_partition_cols: ["domain", "year", "month", "day"]
 report_list:
