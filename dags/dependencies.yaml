@@ -1395,9 +1395,6 @@ bietlejuice.enrich_dashboard_governance:
   - bietlejuice.metabase:load-clean-report-dashboard
   - bietlejuice.metabase:load-clean-report-dashboard-card
   - bietlejuice.metabase:load-clean-view-log
-bietlejuice.enrich_data_quality:
-  - bietlejuice.dag_inventory:load-clean-table
-  - bietlejuice.inmetro:load-clean-data-validations
 bietlejuice.enrich_databricks_usage_costs:
   - bietlejuice.databricks_usage:load-clean-billable-usage
   - bietlejuice.enrich_databricks:load-enrich-daily-clusters

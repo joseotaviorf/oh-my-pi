@@ -556,6 +556,10 @@ bietlejuice.enrich_databricks_usage_costs:
     - bietlejuice.gsheets_platform:done-clean-databricks-contract-details
   remove:
     - bietlejuice.gsheets_platform:load-clean-databricks-contract-details
+bietlejuice.enrich_data_quality:
+  remove:
+    - bietlejuice.dag_inventory:load-clean-table
+    - bietlejuice.inmetro:load-clean-data-validations
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   add:
     - bietlejuice.gsheets_static:load-clean-ticket-rate-classification
