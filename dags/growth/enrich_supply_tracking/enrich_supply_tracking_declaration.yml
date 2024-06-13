@@ -9,10 +9,16 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  custom_schema: supply_flows_migrate
+  custom_schema: supply_flows
   default_extraction_type: full
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
+  tables_customization:
+    conversion_tracking:
+      z_order_by: ['id_lead_ebdb', 'id_house', 'business_context']
+    supply_events_tracking:
+      z_order_by: ['sk_supply_lead', 'id_lead_ebdb', 'id_house', 'business_context']
+      partitions: ['aux_origin_table', 'year', 'month', 'day']
   inner_dependencies:
     supply_events_tracking:
       - conversion_tracking
