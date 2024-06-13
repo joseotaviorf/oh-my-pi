@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: sale_ciq_target
+columns:
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.sale_ciq_target.week_start
+  month_start:
+    lineage:
+      - datalake_gsheets_raw.sale_ciq_target.month_start
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_ciq_target.city_group
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_ciq_target.date
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.sale_ciq_target.ciq_type
+  nm_business_context:
+    lineage:
+      - datalake_gsheets_raw.sale_ciq_target.nm_business_context
+  first_listings:
+    lineage:
+      - datalake_gsheets_raw.sale_ciq_target.fl

@@ -6,6 +6,12 @@ sheets_info:
     clean_table_name: mkt_cost_target
     sheet_context: growth
   
+  rental_ciq_target:
+    sheet_id: 1euvSgRryIdnfrWJMW-TcJf6MnzQjR2ZzlU7FbNku-Ck
+    sheet_name: Targets Supply per CIQ Type[For Rent] [CIQ]
+    clean_table_name: rental_ciq_target
+    sheet_context: growth
+
   rental_prospect_target:
     sheet_id: 1taBS_WX9zDX5Qsn6PHlAT-yise-EJsLADrrZg6-yztc
     sheet_name: targets
@@ -28,6 +34,12 @@ sheets_info:
     sheet_id: 1TfiFaINTa3BEy9d73tR3uW1A3FhLMSLKW7cjDW0Jjgw
     sheet_name: targets
     clean_table_name: rental_tof_weekly_target
+    sheet_context: growth
+
+  sale_ciq_target:
+    sheet_id: 1euvSgRryIdnfrWJMW-TcJf6MnzQjR2ZzlU7FbNku-Ck
+    sheet_name: Targets Supply per CIQ Type[For Sale] [CIQ]
+    clean_table_name: sale_ciq_target
     sheet_context: growth
 
   sale_prospect_target:
