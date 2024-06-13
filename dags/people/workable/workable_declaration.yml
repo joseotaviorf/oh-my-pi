@@ -1,0 +1,47 @@
+dag:
+  name: workable
+  schedule_interval: 0 3 * * *
+  owner: Data People
+cluster:
+  type: databricks_12_2_min_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - whl: "{artifacts_bucket}/workable-api-client-python/quintoandar_workable_api_client-0.1.0-py2.py3-none-any.whl"
+workflow:
+  layer: raw
+  type: custom_ingestion
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  load_spark_job: load_workable_into_datalake
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "{extraction_type}"
+    - "{partitions}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  tables_customization:
+    candidates:
+      extraction_type: incremental
+      partitions: ['year', 'month', 'day']
+      extra_spark_job_arguments:
+        - extra_config:
+          partition_by: updated_at
+          params:
+            limit: 1000
+    jobs:
+      extra_spark_job_arguments:
+        - extra_config:
+          params:
+            limit: 500
+    requisitions:
+      extra_spark_job_arguments:
+        - extra_config:
+          params:
+            limit: 500

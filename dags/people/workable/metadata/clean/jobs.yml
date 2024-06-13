@@ -1,0 +1,112 @@
+---
+database_name: datalake_workable_clean
+table_name: jobs
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: "This table contains information about jobs in Workable"
+columns:
+  id:
+    description: "The job identifier"
+    lineage:
+    - datalake_workable_raw.jobs.id
+  shortcode:
+    description: "System generated job code"
+    lineage:
+    - datalake_workable_raw.jobs.shortcode
+  code:
+    description: "Job code as defined in editor"
+    lineage:
+    - datalake_workable_raw.jobs.code
+  title:
+    description: "The short title of the job"
+    lineage:
+    - datalake_workable_raw.jobs.title
+  full_title:
+    description: "The full title of the job"
+    lineage:
+    - datalake_workable_raw.jobs.full_title
+  state:
+    description: "The job state."
+    lineage:
+    - datalake_workable_raw.jobs.state
+  department:
+    description: "The job department as defined in editor"
+    lineage:
+    - datalake_workable_raw.jobs.department
+  location_str:
+    description: "The location string translated into the language of the job. 
+      The location string consists of city, region, and country separated by comma 
+      (some of these elements might be missing)."
+    lineage:
+    - datalake_workable_raw.jobs.location.location_str
+  location_country:
+    description: "The country name as defined in job editor"
+    lineage:
+    - datalake_workable_raw.jobs.location.country
+  location_country_code:
+    description: "The two digit country code"
+    lineage:
+    - datalake_workable_raw.jobs.location.country_code
+  location_region:
+    description: "The region as defined in job editor"
+    lineage:
+    - datalake_workable_raw.jobs.location.region
+  location_region_code:
+    description: "The two digit region code"
+    lineage:
+    - datalake_workable_raw.jobs.location.region_code
+  location_city:
+    description: "The city as defined in job editor"
+    lineage:
+    - datalake_workable_raw.jobs.location.city
+  location_zip_code:
+    description: "he zip code as defined in job editor"
+    lineage:
+    - datalake_workable_raw.jobs.location.zip_code
+  location_telecommuting:
+    description: "Indicates if this is a remote/telecommute job"
+    lineage:
+    - datalake_workable_raw.jobs.location.telecommuting
+  location_workplace_type:
+    description: "The workplace type."
+    lineage:
+    - datalake_workable_raw.jobs.location.workplace_type
+  salary_currency:
+    description: "The ISO code of the salary currency"
+    lineage:
+    - datalake_workable_raw.jobs.salary.salary_currency
+  url:
+    description: "URL to the job page"
+    lineage:
+    - datalake_workable_raw.jobs.url
+  application_url:
+    description: "URL to the job application form"
+    lineage:
+    - datalake_workable_raw.jobs.application_url
+  shortlink:
+    description: "short URL to the job page"
+    lineage:
+    - datalake_workable_raw.jobs.shortlink
+  department_hierarchy:
+    description: "A collection with the ancestor departments of the job department including that"
+    lineage:
+    - datalake_workable_raw.jobs.department_hierarchy
+  locations:
+    description: "All locations of the job as defined in job editor. First entry matches the primary 
+      location of the job, as defined in job editor"
+    lineage:
+    - datalake_workable_raw.jobs.locations
+  salary_from:
+    description: "The lower bound of the salary"
+    lineage:
+    - datalake_workable_raw.jobs.salary.salary_from
+  salary_to:
+    description: "The upper bound of the salary"
+    lineage:
+    - datalake_workable_raw.jobs.salary.salary_to
+  ts_created:
+    description: "The timestamp the job created"
+    lineage:
+    - datalake_workable_raw.jobs.created_at
+  ts_load:
+    description: "Timestamp when the record was loaded"
