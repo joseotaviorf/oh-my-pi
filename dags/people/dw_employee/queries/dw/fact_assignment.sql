@@ -8,7 +8,7 @@ WITH assignment AS (
     a.id_cost_center,
     a.id_job,
     a.id_cost_center,
-    a.trail,
+    a.career_track,
     a.target_plr,
     COALESCE(
       a.band,
@@ -39,7 +39,7 @@ assignments_present AS (
     a.id_business_unit,
     a.id_cost_center,
     a.id_job,
-    a.trail,
+    a.career_track,
     a.target_plr,
     SUM(
       CASE
@@ -65,7 +65,7 @@ assignments_present AS (
     assignment a
   WHERE
     a.dt_effective_start <= DATE('{load_start_date}') 
-  QUALIFY CONCAT(a.year, a.month) = MAX(CONCAT(a.year, a.month)) over (PARTITION BY a.id_assignment)
+  QUALIFY dt_effective_start = MAX(dt_effective_start) over (PARTITION BY a.id_assignment)
 ),
 assignments_future AS (
   SELECT
@@ -76,7 +76,7 @@ assignments_future AS (
     a.id_business_unit,
     a.id_cost_center,
     a.id_job,
-    a.trail,
+    a.career_track,
     a.target_plr,
     SUM(
       CASE
@@ -102,7 +102,7 @@ assignments_future AS (
     assignment a
   WHERE
     a.dt_effective_start > DATE('{load_start_date}') 
-  QUALIFY CONCAT(a.year, a.month) = MAX(CONCAT(a.year, a.month)) over (PARTITION BY a.id_assignment)
+  QUALIFY dt_effective_start = MAX(dt_effective_start) over (PARTITION BY a.id_assignment)
 ),
 managers_present AS (
   SELECT
@@ -114,7 +114,7 @@ managers_present AS (
   WHERE
     dt_effective_start <= DATE('{load_start_date}')
     AND manager_type = 'LINE_MANAGER' 
-  QUALIFY CONCAT(year, month) = MAX(CONCAT(year, month)) over (PARTITION BY id_assignment)
+  QUALIFY dt_effective_start = MAX(dt_effective_start) over (PARTITION BY id_assignment)
 ),
 managers_future AS (
   SELECT
@@ -126,7 +126,7 @@ managers_future AS (
   WHERE
     dt_effective_start > DATE('{load_start_date}')
     AND manager_type = 'LINE_MANAGER' 
-  QUALIFY CONCAT(year, month) = MAX(CONCAT(year, month)) over (PARTITION BY id_assignment)
+  QUALIFY dt_effective_start = MAX(dt_effective_start) over (PARTITION BY id_assignment)
 ),
 hr_system_workers AS (
   SELECT
@@ -289,7 +289,7 @@ SELECT
     ELSE FALSE
   END AS is_pending_worker,
   CASE
-    WHEN ap.trail = 'L'
+    WHEN ap.career_track = 'L'
     OR mdl.qnt_directly_led > 0 
       THEN TRUE
     ELSE FALSE

@@ -33,7 +33,7 @@ columns:
     description: 'Birth town of the employee'
     lineage:
     - datalake_hr_system_clean.workers.birth_town
-  birth_region:
+  birth_state:
     description: 'Birth region of the employee'
     lineage:
     - datalake_hr_system_clean.workers.birth_region

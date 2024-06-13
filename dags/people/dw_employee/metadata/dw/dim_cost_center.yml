@@ -59,14 +59,14 @@ columns:
       "Não se Aplica": ""
     lineage:
     - "datalake_hr_system_clean.organizations.vice_presidency"
-  directory:
-    description: 'Directory name'
+  directorate:
+    description: 'Directorate name'
     lineage:
-    - "datalake_hr_system_clean.organizations.directory"
-  sub_directory:
-    description: 'Sub directory name'
+    - "datalake_hr_system_clean.organizations.directorate"
+  subdirectorate:
+    description: 'Sub directorate name'
     lineage:
-    - "datalake_hr_system_clean.organizations.sub_directory"
+    - "datalake_hr_system_clean.organizations.subdirectorate"
   status:
     description: 'Status of the cost center'
     categories:

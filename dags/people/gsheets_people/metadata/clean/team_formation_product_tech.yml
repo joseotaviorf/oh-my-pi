@@ -13,10 +13,10 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.team_formation_product_tech.email
-  sub_directorate:
+  subdirectorate:
     description: ""
     lineage:
-      - datalake_gsheets_raw.team_formation_product_tech.sub_directorate
+      - datalake_gsheets_raw.team_formation_product_tech.subdirectorate
   team_1:
     description: ""
     lineage:

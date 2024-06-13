@@ -24,7 +24,7 @@ WITH jobs AS (
         id_job,
         DATE(job_customer_flex['EffectiveStartDate'])   AS dt_effective_start_jcf,
         DATE(job_customer_flex['EffectiveEndDate'])     AS dt_effective_end_jcf,
-        job_customer_flex['trilha']                     AS track,
+        job_customer_flex['trilha']                     AS career_track,
         job_customer_flex['marcaPonto']                 AS has_clock_in,
         job_customer_flex['regimeDeJornadaDoEmpregado'] AS working_hours_regime,
         job_customer_flex['cargaHoraria']               AS workload,
@@ -36,7 +36,7 @@ WITH jobs AS (
 ), band_ladder AS (
     SELECT DISTINCT
         id_band_ladder,
-        band_ladder_name
+        comp_ladder_directorate
     FROM
         datalake_hr_system.assignments
 )
@@ -46,7 +46,7 @@ SELECT DISTINCT
     -- non-metrics
     j.job_code,
     j.job_name,
-    COALESCE(bl.band_ladder_name, 'UNKNOWN') AS band_ladder_name,
+    COALESCE(bl.comp_ladder_directorate, 'UNKNOWN') AS comp_ladder_directorate,
     CASE
         WHEN j.id_set = 300000004799082 THEN 'Benvi MX'
         WHEN j.id_set = 300000004799081 THEN 'Benvi PT'
@@ -58,7 +58,7 @@ SELECT DISTINCT
         WHEN j.id_set = 300000004799079 THEN 'QuintoAndar SC'
         WHEN j.id_set = 300000004799077 THEN 'QuintoAndar SP'
         ELSE 'UNKNOWN'
-    END AS set_name,
+    END AS comp_ladder_business_unit,
     CASE
         WHEN j.id_job_family = 300000004860261 THEN 'C-Level'
         WHEN j.id_job_family = 300000004860279 THEN 'Gerentes'
@@ -73,8 +73,8 @@ SELECT DISTINCT
         WHEN j.id_job_family = 300000004860309 THEN 'Assistentes'
         WHEN j.id_job_family = 300000004860315 THEN 'Auxiliares'
         ELSE 'UNKNOWN'
-    END AS job_family_name,
-    COALESCE(jcf.track, 'UNKNOWN') AS track,
+    END AS job_ctegory,
+    COALESCE(jcf.career_track, 'UNKNOWN') AS career_track,
     COALESCE(jcf.working_hours_regime, 'UNKNOWN') AS working_hours_regime,
     jcf.workload,
     -- metrics

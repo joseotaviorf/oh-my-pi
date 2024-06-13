@@ -300,7 +300,7 @@ religions AS (
 )
 SELECT
     --  ids
-    workers.id_person AS sk_worker,
+    workers.id_person AS sk_employee,
     -- -- non metric
     workers.person_number,
     -- -- name information,
@@ -311,7 +311,7 @@ SELECT
     names.name_information_16 AS last_social_name,
     -- -- birth info,
     workers.birth_town,
-    workers.birth_region,
+    workers.birth_region AS birth_state,
     workers.birth_country,
     -- -- docs info,
     ni2_cpf.national_identifier_number AS cpf,

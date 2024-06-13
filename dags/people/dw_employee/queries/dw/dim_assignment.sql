@@ -19,6 +19,7 @@ assignments AS (
     a.assignment_status_type,
     a.union_name,
     a.brand,
+    a.band,
     a.is_primary_assignment,
     a.dt_effective_start,
     a.dt_effective_end,
@@ -37,6 +38,7 @@ assignments_present AS (
     a.assignment_type,
     a.assignment_status_type_code,
     a.assignment_status_type,
+    a.band,
     a.union_name,
     a.is_primary_assignment,
     a.dt_effective_start,
@@ -50,7 +52,7 @@ assignments_present AS (
         ON a.action_code = al.action_code
   WHERE
     dt_effective_start < DATE('{load_start_date}') 
-  QUALIFY concat(year, month) = MAX(concat(year, month)) over (PARTITION BY id_assignment)
+  QUALIFY dt_effective_start = MAX(dt_effective_start) over (PARTITION BY id_assignment)
 ),
 assignment_future AS (
   SELECT
@@ -61,6 +63,7 @@ assignment_future AS (
     a.assignment_status_type_code,
     a.assignment_status_type,
     a.union_name,
+    a.band,
     a.is_primary_assignment,
     a.dt_effective_start,
     a.dt_projected_start,
@@ -73,13 +76,14 @@ assignment_future AS (
         ON a.action_code = al.action_code
   WHERE
     dt_effective_start >= DATE('{load_start_date}') 
-  QUALIFY concat(a.year, a.month) = MAX(concat(a.year, a.month)) over (PARTITION BY a.id_assignment)
+  QUALIFY dt_effective_start = MAX(dt_effective_start) over (PARTITION BY a.id_assignment)
 )
 SELECT
   wr.id_period_of_service AS sk_assignment,
   wr.legislation_code,
   wr.worker_type,
   COALESCE(ap.assignment_number, af.assignment_number) AS assignment_number,
+  COALESCE(ap.band, af.band) AS band,
   COALESCE(
     ap.assignment_status_type_code,
     af.assignment_status_type_code

@@ -18,8 +18,8 @@ WITH organizations AS (
     organization_dff['product'] AS product,
     organization_dff['vertical'] AS vertical,
     organization_dff['vicePresidencia'] AS vice_presidency,
-    organization_dff['diretoria'] AS directory,
-    organization_dff['subDiretoria'] AS sub_directory
+    organization_dff['diretoria'] AS directorate,
+    organization_dff['subDiretoria'] AS subdirectorate
   FROM organization_dff_step1
 )
 SELECT 
@@ -42,8 +42,8 @@ SELECT
     odff.product,
     odff.vertical,
     odff.vice_presidency,
-    odff.directory,
-    odff.sub_directory,
+    odff.directorate,
+    odff.subdirectorate,
     -- Nested Fields
     o.OrganizationDFF AS organization_dff,
     o.extraInformation AS extra_information,

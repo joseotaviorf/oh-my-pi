@@ -1,7 +1,7 @@
 SELECT
     employees_name,
     email,
-    subdirectorate as sub_directorate,
+    subdirectorate as subdirectorate,
     team_1_primary as team_1,
     team_2,
     team_3,

@@ -73,7 +73,7 @@ columns:
   is_manager:
     description: 'Indicates if the employee is a manager.'
     lineage:
-    - datalake_hr_system.assignments.trail
+    - datalake_hr_system.assignments.career_track
     - datalake_hr_system.managers.id_manager_assignment
   assignment_age_months:
     description: 'Age of the assignment in months.'

@@ -105,10 +105,10 @@ columns:
     description: "Code of the assignment grade."
     lineage:
     - datalake_hr_system_clean.workers.work_relationships.assignments.band
-  band_ladder_name:
+  comp_ladder_directorate:
     description: "Name of the grade ladder used for benefits."
     lineage:
-    - datalake_hr_system_clean.workers.work_relationships.assignments.band_ladder_name
+    - datalake_hr_system_clean.workers.work_relationships.assignments.grade_ladder_name
   cost_center_name:
     description: "Name of the cost center for the worker assignment."
     lineage:
@@ -193,10 +193,10 @@ columns:
     description: "WIP"
     lineage:
     - datalake_hr_system_clean.workers.work_relationships.assignments.assignments_dff.employment_relationship
-  track:
-    description: "Track of the worker, CI (Contribuidor Individual) or L (Liderança)"
+  career_track:
+    description: "career_track of the worker, CI (Contribuidor Individual) or L (Liderança)"
     lineage:
-    - datalake_hr_system_clean.workers.work_relationships.assignments.assignments_dff.trail
+    - datalake_hr_system_clean.workers.work_relationships.assignments.assignments_dff.career_track
   insurance_company:
     description: "Insurance company for the worker."
     lineage:
