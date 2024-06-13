@@ -1,0 +1,22 @@
+---
+table_name: dw_collection_recovery.fact_collection
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_collection:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_debtor:
+    is_complete:
+      severity_level: Error
+  id_operator:
+    is_complete:
+      severity_level: Error
+  id_occurrence:
+    is_complete:
+      severity_level: Error

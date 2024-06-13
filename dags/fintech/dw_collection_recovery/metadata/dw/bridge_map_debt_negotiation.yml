@@ -8,23 +8,21 @@ owner: ae-finance-fintech@quintoandar.com.br
 columns:
   sk_debt:
     lineage:
-      - datalake_recupera_clean.creditor_pending.id_creditor
-      - datalake_recupera_clean.complementary_records.id_creditor
-      - datalake_recupera_clean.complementary_records_written_down.id_creditor
-      - datalake_trato_feito_clean.debtor.origin
-      - datalake_trato_feito_clean.debtor.type
-      - datalake_recupera_clean.creditor_pending.id_installment
-      - datalake_recupera_clean.complementary_records.id_installment
-      - datalake_recupera_clean.complementary_records_written_down.id_installment
-      - datalake_trato_feito_clean.debt.id_external
+      - datalake_debt_recovery.negotiation.id_contract
       - datalake_recupera_clean.creditor_pending.id_contract
       - datalake_recupera_clean.complementary_records.id_contract
       - datalake_recupera_clean.complementary_records_written_down.id_contract
-      - datalake_trato_feito_clean.negotiation.id_debtor_external
+      - datalake_trato_feito_clean.debt.id_external
+      - datalake_recupera_clean.creditor_pending.id_installment
+      - datalake_recupera_clean.complementary_records.id_installment
+      - datalake_recupera_clean.complementary_records_written_down.id_installment
     description: Surrogate key of table. It is a sequencial number based on the id_creditor, id_contract and id_installment.
   sk_negotiation:
     lineage:
+      - datalake_debt_recovery.negotiation.id_negotiation_recupera
       - datalake_recupera_clean.creditor_pending.installment_code
+      - datalake_recupera_clean.complementary_records.installment_code
+      - datalake_recupera_clean.complementary_records_written_down.installment_code
     description: Negotiation ID. Foreign key of table fact_negotiation.
   ts_load:
     description: Timestamp of when the data was inserted into the table
