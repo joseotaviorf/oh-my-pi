@@ -21,8 +21,7 @@ member_profile AS (
         mp.id_business_unit,
         mp.ts_relationship_started,
         CASE
-            WHEN ROW_NUMBER() OVER (PARTITION BY mp.id_member_profile ORDER BY mp.ts_relationship_started DESC) = 1 
-                THEN COALESCE(mp.ts_relationship_ended, mp.ts_load)
+            WHEN mp.ts_relationship_ended IS NULL THEN mp.ts_load
             ELSE mp.ts_relationship_ended - INTERVAL 1 DAY 
         END AS ts_relationship_ended
     FROM
