@@ -1,0 +1,44 @@
+---
+database_name: metric_rent
+table_name: termination_monthly
+description: Monthly contract termination metrics.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_month_termination_finished:
+    lineage:
+      - dw_retention.dim_termination.ts_termination_finished
+    description: Month when the contract termination was finished.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_contract.country_code
+    description: Country code of the house.
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: Rent value segment.
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  repair_resolution_class:
+    description: Repair resolution class.
+    categories:
+      with_repair: Some house repair was necessary.
+      without_repair: None house repair was necessary.
+  total_terminations:
+    description: Total volume of contract terminations.
+    metric:
+      name: Monthly Total Volume Of Terminations
+      description: Total volume of contract terminations.
+      acronym: MTVT
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""

@@ -46,5 +46,7 @@ Currently, there is the following output tables in the metric layer:
 - `relisting_well_priced_weekly`
 - `rent_flows_ratio_relisting_over_first_listing_monthly`
 - `rent_flows_ratio_relisting_over_first_listing_weekly`
+- `termination_monthly`
+- `termination_weekly`
 - `termination_with_proof_payment_monthly`
 - `termination_with_proof_payment_weekly`

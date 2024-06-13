@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.repair_cost
     description: Cost of repairs.
+  repair_resolution:
+    lineage:
+      - datalake_offboarding.contract_termination.repair_resolution
+    description: Classifies the type of repair when there is one in the Offboarding process.
   status:
     lineage:
       - datalake_offboarding.contract_termination.status
@@ -44,6 +48,10 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.dt_termination
     description: Date of the contract's termination. It's the agreed date to the tenant to leave the house.
+  ts_termination_finished:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_termination_finished
+    description: Offboarding process completion timestamp.
   ts_created:
     lineage:
       - datalake_offboarding.contract_termination.ts_created
