@@ -108,6 +108,7 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "mysql_version": {"type": "string", "empty": False, "required": False},
             },
         },
         "cluster": {

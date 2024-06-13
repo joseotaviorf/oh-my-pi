@@ -272,7 +272,7 @@ class BaseWorkflow(BuilderInterface):
         return "short_circuit_customization" in self.workflow_args
 
     def _check_include_get_table_metrics_task(self, tables_customization: dict) -> bool:
-        if self.workflow_args["database_type"] != "postgres":
+        if self.workflow_args["database_type"] not in ("postgres", "mysql"):
             return False
         for table_parameters in tables_customization.values():
             if "get_table_metrics" in table_parameters:

@@ -6,7 +6,7 @@ class TaskEnum(Enum):
     DATA_QUALITY_TESTS = "data_quality_tests"
     DUMMY_JOB_CLUSTER_FINISHED = "dummy_job_cluster_finished"
     EXECUTE_JOB_CLUSTER = "execute_job_cluster"
-    GENERATE_POSTGRES_TABLE_METRICS = "generate_postgres_table_metrics"
+    GENERATE_DATABASE_TABLE_METRICS = "generate_database_table_metrics"
     LOAD_CDC_CLEAN = "load_cdc_clean"
     LOAD_CDC_RAW = "load_cdc_raw"
     LOAD_CDC_TRANSACTIONAL = "load_cdc_transactional"

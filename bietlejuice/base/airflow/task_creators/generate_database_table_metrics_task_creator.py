@@ -4,10 +4,10 @@ from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 import json
 
 
-class GeneratePostgresTableMetricsTaskCreator(BaseTaskCreator):
-    """Creates the task that extracts data from a Postgres database, calculates its simple metrics (count, count_distinct, avg, max, min) and load into our clean layer."""
+class GenerateDatabaseTableMetricsTaskCreator(BaseTaskCreator):
+    """Creates the task that extracts data from a Postgres or MySQL database, calculates its simple metrics (count, count_distinct, avg, max, min) and load into our clean layer."""
 
-    SPARK_JOB_NAME = "generate_postgres_table_metrics"
+    SPARK_JOB_NAME = "generate_database_table_metrics"
 
     def create_task(
         self, table_attributes: TableAttributes
@@ -43,6 +43,7 @@ class GeneratePostgresTableMetricsTaskCreator(BaseTaskCreator):
         )
         db_schema = self.dag_execution_context.workflow_args.get("db_schema", "public")
         table_metrics = self._get_table_metrics()
+        database_type = self.dag_execution_context.workflow_args["database_type"]
 
         return [
             self.dag_execution_context.environment,
@@ -54,4 +55,5 @@ class GeneratePostgresTableMetricsTaskCreator(BaseTaskCreator):
             db_schema,
             json.dumps(table_metrics),
             self.dag_execution_context.dag.dag_id,
+            database_type,
         ]

@@ -15,27 +15,51 @@ workflow:
   tables_customization:
     HouseMaintenanceCondition: 
       clean_table_name: house_maintenance_condition
+      get_table_metrics:
+        count: '*'
     HouseMaintenanceCondition_AUD: 
       clean_table_name: house_maintenance_condition_aud
+      get_table_metrics:
+        count: '*'
     HouseMedia: 
       clean_table_name: house_media
+      get_table_metrics:
+        count: '*'
     HousePredictedPrice: 
       clean_table_name: house_predicted_price
+      get_table_metrics:
+        count: '*'
     HousePredictedPrice_AUD: 
       clean_table_name: house_predicted_price_aud
+      get_table_metrics:
+        count: '*'
     HouseRating: 
       clean_table_name: house_rating
+      get_table_metrics:
+        count: '*'
     HouseRegistrationStatus: 
       clean_table_name: house_registration_status
+      get_table_metrics:
+        count: '*'
     HouseRegistrationStatus_AUD: 
       clean_table_name: house_registration_status_aud
+      get_table_metrics:
+        count: '*'
     HouseRentCosts_AUD: 
       clean_table_name: house_rent_costs_aud
+      get_table_metrics:
+        count: '*'
     HouseSpecialCondition: 
       clean_table_name: house_special_condition
+      get_table_metrics:
+        count: '*'
     Imovel: 
       clean_table_name: house
+      get_table_metrics:
+        count: '*'
     Imovel_AUD: 
       clean_table_name: house_aud
+      get_table_metrics:
+        count: '*'
 cluster:
   type: databricks_12_2_med_general_cluster

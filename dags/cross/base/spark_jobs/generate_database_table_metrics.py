@@ -8,11 +8,11 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.consumers.db_consumers import PostgresConsumer
+from bietlejuice.consumers.db_consumers import MySqlConsumer, PostgresConsumer
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-JOB_NAME = "generate_postgres_table_metrics"
+JOB_NAME = "generate_database_table_metrics"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -29,6 +29,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument("db_schema")
     parser.add_argument("get_table_metrics")
     parser.add_argument("dag_id")
+    parser.add_argument("db_type", type=str, help="mysql/postgres")
     return parser.parse_args()
 
 
@@ -57,6 +58,7 @@ def main():
     db_schema = args.db_schema
     get_table_metrics = json.loads(args.get_table_metrics)
     dag_id = args.dag_id
+    db_type = args.db_type
 
     logger.info(
         f"""
@@ -71,7 +73,10 @@ def main():
     conn_config = get_conn_config(dbutils_secret_key)
     conn_config["schema"] = db_schema
     spark_client = SparkClient()
-    postgres_consumer = PostgresConsumer(conn_config, spark_client)
+    if db_type == "postgres":
+        consumer = PostgresConsumer(conn_config, spark_client)
+    else:
+        consumer = MySqlConsumer(conn_config, spark_client)
 
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
 
@@ -86,22 +91,39 @@ def main():
 
     db_name = dbutils_secret_key
 
-    query_template = """
-    SELECT
-        '{dag_id}' AS dag_id,
-        '{db_name}' AS db_name,
-        '{product_table_name}' AS db_table_name,
-        '{clean_table_name}' AS clean_table_name,
-        CAST({metric_value} AS VARCHAR) AS metric_value,
-        '{metric_name}' AS metric_name,
-        PG_TYPEOF({metric_value}) AS metric_data_type,
-        '{execution_date}' AS dt_execution,
-        CAST(EXTRACT(YEAR FROM DATE('{execution_date}')) AS INT) AS year,
-        CAST(EXTRACT(MONTH FROM DATE('{execution_date}')) AS INT) AS month,
-        CAST(EXTRACT(DAY FROM DATE('{execution_date}')) AS INT) AS day
-    FROM
-        "{product_table_name}"
-    """
+    if db_type == "postgres":
+        query_template = """
+        SELECT
+            '{dag_id}' AS dag_id,
+            '{db_name}' AS db_name,
+            '{product_table_name}' AS db_table_name,
+            '{clean_table_name}' AS clean_table_name,
+            CAST({metric_value} AS VARCHAR) AS metric_value,
+            '{metric_name}' AS metric_name,
+            PG_TYPEOF({metric_value}) AS metric_data_type,
+            '{execution_date}' AS dt_execution,
+            CAST(EXTRACT(YEAR FROM DATE('{execution_date}')) AS INT) AS year,
+            CAST(EXTRACT(MONTH FROM DATE('{execution_date}')) AS INT) AS month,
+            CAST(EXTRACT(DAY FROM DATE('{execution_date}')) AS INT) AS day
+        FROM
+            "{product_table_name}"
+        """
+    else:
+        query_template = """
+        SELECT
+            '{dag_id}' AS dag_id,
+            '{db_name}' AS db_name,
+            '{product_table_name}' AS db_table_name,
+            '{clean_table_name}' AS clean_table_name,
+            CAST({metric_value} AS CHAR) AS metric_value,
+            '{metric_value}' AS metric_name,
+            '{execution_date}' AS dt_execution,
+            YEAR('{execution_date}') AS year,
+            MONTH('{execution_date}') AS month,
+            DAY('{execution_date}') AS day
+        FROM
+            `{product_table_name}`
+        """
 
     query = []
     for db_table_name, table_information in get_table_metrics.items():
@@ -110,7 +132,7 @@ def main():
             query.append(query_template.format(execution_date=execution_date, db_name=db_name, product_table_name=db_table_name, clean_table_name=clean_table_name, metric_value=f'{metric_name}({metric_value})', metric_name=f'{metric_name}_{metric_value}', dag_id=dag_id))
 
     union_all_query = '\nUNION ALL\n'.join(query)
-    df_metrics = postgres_consumer.get_data_from_query(union_all_query)
+    df_metrics = consumer.get_data_from_query(union_all_query)
 
     IncrementalTableLoaderPipeline(
         database_name,

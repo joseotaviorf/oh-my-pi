@@ -36,6 +36,7 @@ class RawCDCWorkflow(BaseWorkflow):
             end_date=load_end_date,
             incoming_bucket=incoming_bucket,
         )
+        self._add_mandatory_libraries(dag_execution_context)
         self._initialize_task_creators(dag_execution_context)
 
         transactional_tables = self._get_transactional_tables()
@@ -45,6 +46,25 @@ class RawCDCWorkflow(BaseWorkflow):
         self._create_all_tasks(transactional_tables, raw_tables, clean_tables)
 
         return dag
+
+    def _add_mandatory_libraries(
+        self, dag_execution_context: DagExecutionContext
+    ) -> None:
+        """"Adds mandatory libraries to cluster_args. For example, for MySQL we need the MySQL connector library."""
+
+        if dag_execution_context.workflow_args["database_type"] == "mysql":
+            mysql_version = dag_execution_context.workflow_args.get(
+                "mysql_version", "8.0.30"
+            )
+            dag_execution_context.cluster_args["custom_libraries"] = (
+                dag_execution_context.cluster_args.get("custom_libraries", [])
+            ) + [
+                {
+                    "maven": {
+                        "coordinates": f"mysql:mysql-connector-java:{mysql_version}"
+                    }
+                }
+            ]
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         task_creator_factory = TaskCreatorFactory(dag_execution_context)
@@ -77,8 +97,8 @@ class RawCDCWorkflow(BaseWorkflow):
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
-        self.generate_postgres_table_metrics_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.GENERATE_POSTGRES_TABLE_METRICS
+        self.generate_database_table_metrics_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.GENERATE_DATABASE_TABLE_METRICS
         )
 
     def _get_transactional_tables(self) -> List[TableAttributes]:
@@ -273,7 +293,7 @@ class RawCDCWorkflow(BaseWorkflow):
             self.workflow_args["tables_customization"]
         ):
             first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
-                self.generate_postgres_table_metrics_task_creator,
+                self.generate_database_table_metrics_task_creator,
                 self.sync_metadata_task_creator,
             )
             last_metrics_task >> dummy_terminate_job_cluster_task

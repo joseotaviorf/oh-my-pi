@@ -82,8 +82,8 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
-        self.generate_postgres_table_metrics_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.GENERATE_POSTGRES_TABLE_METRICS
+        self.generate_database_table_metrics_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.GENERATE_DATABASE_TABLE_METRICS
         )
 
     def _create_raw_tasks(self, table_name: str, dag_final_tasks) -> Tuple:
@@ -177,7 +177,7 @@ class RawDatabasePullWorkflow(BaseWorkflow):
             self.workflow_args["tables_customization"]
         ):
             first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
-                self.generate_postgres_table_metrics_task_creator,
+                self.generate_database_table_metrics_task_creator,
                 self.sync_metadata_task_creator,
             )
             last_metrics_task >> dummy_terminate_job_cluster_task
