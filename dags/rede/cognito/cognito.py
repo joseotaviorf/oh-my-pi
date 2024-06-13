@@ -105,6 +105,7 @@ task_group = DatalakeTaskGroup(
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    execution_timeout_hours=3,
 )
 
 tables = config_service.get_config("tables")
