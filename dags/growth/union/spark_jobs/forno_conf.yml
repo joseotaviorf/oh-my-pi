@@ -1,6 +1,0 @@
----
-raw_partition_cols:
-  - year
-  - month
-  - day
-s3_source_bucket: ingestao-dados-union

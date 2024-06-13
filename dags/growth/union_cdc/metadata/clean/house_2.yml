@@ -1,0 +1,195 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: house_2
+owner: "@data-growth"
+domain: Data Growth
+description: This table contains information about houses2 from the UnionDB.
+columns:
+  id_house_2:
+    description: House 2 primary key.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.pkimovel2
+  id_house:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.fkimovel
+  inf_bloco:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_bloco
+  inf_apartamento:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_apartamento
+  inf_andar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_andar
+  inf_segurofianca:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_segurofianca
+  inf_fiador:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_fiador
+  inf_depgarantia:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_depgarantia
+  inf_caucao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_caucao
+  codigo_importacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.codigo_importacao
+  cap_tipolocalchaves:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_tipolocalchaves
+  cap_fkcorretorchaves:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_fkcorretorchaves
+  int_pubtv:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.int_pubtv
+  inf_valnegociavel:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valnegociavel
+  inf_aceitaveiculo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_aceitaveiculo
+  inf_valveiculo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valveiculo
+  inf_reserva_fkcliente:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_reserva_fkcliente
+  inf_reserva_fkcorretor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_reserva_fkcorretor
+  det_distanciamar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_distanciamar
+  det_demisuite:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_demisuite
+  inf_tipoiptu:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_tipoiptu
+  inf_titulocap:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_titulocap
+  inf_cartaocredito:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_cartaocredito
+  cap_capcomissao_valor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_capcomissao_valor
+  cap_indcomissao_valor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_indcomissao_valor
+  cap_parcomissao_valor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_parcomissao_valor
+  cap_viscomissao_valor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_viscomissao_valor
+  cap_corcomissao_valor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_corcomissao_valor
+  cnf_gas:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cnf_gas
+  cnf_gas_emp:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cnf_gas_emp
+  cnf_eletricidade_emp:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cnf_eletricidade_emp
+  cnf_agua_emp:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cnf_agua_emp
+  cap_iptu_pag:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_iptu_pag
+  inf_condo_adm:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_condo_adm
+  inf_leilao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_leilao
+  inf_valleilao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valleilao
+  inf_leilaodata1:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_leilaodata1
+  inf_leilaodata2:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_leilaodata2
+  inf_valvendapromo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valvendapromo
+  inf_valsegincendio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valsegincendio
+  det_armlavanderia:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_armlavanderia
+  inf_segurofianca_parc:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_segurofianca_parc
+  textocor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.textocor
+  inf_cartafianca:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_cartafianca
+  inf_valleilao2:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valleilao2
+  det_solmanha:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_solmanha
+  det_aceitapet:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_aceitapet

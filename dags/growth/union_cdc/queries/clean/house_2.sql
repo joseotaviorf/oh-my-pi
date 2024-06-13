@@ -44,14 +44,6 @@ SELECT
     inf_cartafianca,
     inf_valleilao2,
     det_solmanha,
-    det_aceitapet,
-    paratime,
-    year,
-    month,
-    day
+    det_aceitapet
 FROM
-    datalake_union_raw.imovel2
-WHERE
-    year <> 1900
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY pkimovel2 ORDER BY paratime DESC) = 1
+    datalake_union_cdc_raw.imovel2

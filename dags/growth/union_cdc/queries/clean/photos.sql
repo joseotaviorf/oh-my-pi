@@ -13,4 +13,4 @@ SELECT
     paratime AS dt_paratime,
     codigo_importacao
 FROM
-    datalake_test_union_cdc_raw.fotos
+    datalake_union_cdc_raw.fotos

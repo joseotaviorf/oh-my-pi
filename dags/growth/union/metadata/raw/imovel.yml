@@ -1,5 +1,0 @@
----
-database_name: datalake_union_raw
-table_name: imovel
-owner: henrique.miamoto@quintoandar.com.br
-domain: Growth

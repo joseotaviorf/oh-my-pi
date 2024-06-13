@@ -1,5 +1,5 @@
 ---
-database_name: datalake_temp_union_cdc_clean
+database_name: datalake_union_cdc_clean
 table_name: photos
 owner: "@data-growth"
 domain: Data Growth
@@ -8,52 +8,52 @@ columns:
   id_photo:
     description: Primary key identifying each photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.codigo
+      - datalake_union_cdc_raw.fotos.codigo
   id_company:
     description: Primary key identifying the company associated with the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.fkEmpresa
+      - datalake_union_cdc_raw.fotos.fkEmpresa
   id_house:
     description: Primary key identifying the house associated with the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.fkimovel
+      - datalake_union_cdc_raw.fotos.fkimovel
   referencia_imovel:
     description: Reference code for the property associated with the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.referencia_imovel
+      - datalake_union_cdc_raw.fotos.referencia_imovel
   descricao:
     description: Description of the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.descricao
+      - datalake_union_cdc_raw.fotos.descricao
   arqfoto:
     description: File name of the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.arqfoto
+      - datalake_union_cdc_raw.fotos.arqfoto
   fotosel:
     description: Flag indicating whether the photo is selected.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.fotosel
+      - datalake_union_cdc_raw.fotos.fotosel
   ordem:
     description: Order of the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.ordem
+      - datalake_union_cdc_raw.fotos.ordem
   minia:
     description: File name of the thumbnail of the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.minia
+      - datalake_union_cdc_raw.fotos.minia
   tipo:
     description: Type of the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.tipo
+      - datalake_union_cdc_raw.fotos.tipo
   flagdesk:
     description: Flag indicating whether the photo is for desktop use.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.flagdesk
+      - datalake_union_cdc_raw.fotos.flagdesk
   dt_paratime:
     description: Date and time when the photo was taken or uploaded.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.dt_paratime
+      - datalake_union_cdc_raw.fotos.dt_paratime
   codigo_importacao:
     description: Import code associated with the photo.
     lineage:
-      - datalake_temp_union_cdc_raw.fotos.codigo_importacao
+      - datalake_union_cdc_raw.fotos.codigo_importacao

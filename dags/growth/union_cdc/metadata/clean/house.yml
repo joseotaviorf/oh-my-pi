@@ -1,0 +1,1339 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: house
+owner: "@data-growth"
+domain: Data Growth
+description: This table contains information about houses from the UnionDB.
+columns:
+  id_house:
+    description: House Primary Key.
+    lineage:
+      - datalake_union_cdc_raw.imovel.pkImovel
+  id_company:
+    description: Company Foreign Key.
+    lineage:
+      - datalake_union_cdc_raw.imovel.fkEmpresa
+  id_codcli:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.fk_codcli
+  id_captador:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.fkcaptador
+  id_increase_group:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.fkgrupo_aumento
+  id_currency:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.fkmoeda
+  bloquear_pubrede:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.bloquear_pubrede
+  Cap_AnoConstru:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_AnoConstru
+  Cap_AtuaPor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_AtuaPor
+  Cap_CadPor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CadPor
+  Cap_CapComissao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CapComissao
+  Cap_Captador:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Captador
+  Cap_CondComercial:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CondComercial
+  Cap_ContExclu:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_ContExclu
+  Cap_CorComissao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CorComissao
+  Cap_Corretor:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Corretor
+  Cap_Dias:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Dias
+  Cap_IndComissao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_IndComissao
+  Cap_Indicador:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Indicador
+  Cap_LocalChaves:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_LocalChaves
+  Cap_NumOcupantes:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_NumOcupantes
+  Cap_Parceria:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Parceria
+  Cap_ParComissao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_ParComissao
+  Cap_UltimaReforma:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_UltimaReforma
+  Cap_ValCondominio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_ValCondominio
+  Cap_ValIptu:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_ValIptu
+  cap_valtlu:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.cap_valtlu
+  Cap_VisComissao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_VisComissao
+  Cap_Vistoria:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Vistoria
+  cnf_Agua:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_Agua
+  cnf_CadPref:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_CadPref
+  cnf_CartorioImoveis:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_CartorioImoveis
+  cnf_Documentacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_Documentacao
+  cnf_Eletricidade:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_Eletricidade
+  cnf_Saneamento:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_Saneamento
+  codempre:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.codempre
+  codigo_importacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.codigo_importacao
+  Conf_aut_dias:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Conf_aut_dias
+  Conf_Aut_Pub:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Conf_Aut_Pub
+  dest_eptv:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_eptv
+  dest_imo1:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imo1
+  dest_imo2:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imo2
+  dest_imo3:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imo3
+  dest_imo4:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imo4
+  dest_imvweb:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imvweb
+  dest_portal:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_portal
+  dest_vivareal:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_vivareal
+  det_Acesso:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Acesso
+  det_adega:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_adega
+  det_Agua:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Agua
+  det_aguaquente:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_aguaquente
+  det_alarme:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_alarme
+  det_altatensao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_altatensao
+  det_Andares:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Andares
+  det_AptoAndar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AptoAndar
+  det_aquececentral:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_aquececentral
+  det_aquesolar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_aquesolar
+  det_arcondicionado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_arcondicionado
+  det_AreaComum:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaComum
+  det_AreaConst:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaConst
+  det_arealazer:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_arealazer
+  det_areaprivativa:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_areaprivativa
+  det_AreaServ:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaServ
+  det_AreaTerreno:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaTerreno
+  det_AreaTotal:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaTotal
+  det_AreaUtil:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaUtil
+  det_armariosala:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_armariosala
+  det_ArmBanheiro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ArmBanheiro
+  det_ArmCloset:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ArmCloset
+  det_ArmCozinha:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ArmCozinha
+  det_ArmDormitorio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ArmDormitorio
+  det_assoalho:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_assoalho
+  det_automatizado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_automatizado
+  det_banauxiliar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_banauxiliar
+  det_BanEmp:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_BanEmp
+  det_banheiro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_banheiro
+  det_Banheiros:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Banheiros
+  det_bar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_bar
+  det_beiralago:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_beiralago
+  det_bicicletario:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_bicicletario
+  det_boxgaragemcob:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_boxgaragemcob
+  det_boxgaragemdesc:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_boxgaragemdesc
+  det_brinquedoteca:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_brinquedoteca
+  det_cachoeira:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cachoeira
+  det_calefacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_calefacao
+  det_camarafria:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_camarafria
+  det_camfria:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_camfria
+  det_campfutebol:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_campfutebol
+  det_Carpete:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Carpete
+  det_CarpMadeira:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_CarpMadeira
+  det_CasaCaseiro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_CasaCaseiro
+  det_celeiro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_CasaCaseiro
+  det_cerca:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cerca
+  det_Churrasqueira:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Churrasqueira
+  det_circuitotv:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_circuitotv
+  det_closet:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_closet
+  det_cobcoletiva:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cobcoletiva
+  det_contra_piso:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_contra_piso
+  det_copa:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_copa
+  det_cozamericana:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cozamericana
+  det_cozindependente:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cozindependente
+  det_Cozinha:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Cozinha
+  det_CozPlan:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_CozPlan
+  det_curral:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_curral
+  det_deck:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_deck
+  det_decorado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_decorado
+  det_deposito:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_deposito
+  det_depprivsubsolo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_depprivsubsolo
+  det_Despensa:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Despensa
+  det_DimTerreno:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_DimTerreno
+  det_divisoria:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_divisoria
+  det_docpen:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_docpen
+  det_dormemp:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_dormemp
+  det_Dormitorios:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Dormitorios
+  det_edicula:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_edicula
+  det_Elevador:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Elevador
+  det_elevadorcarga:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_elevadorcarga
+  det_elevadorservico:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_elevadorservico
+  det_Energia:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Energia
+  det_EntCaminhoes:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_EntCaminhoes
+  det_entlateral:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_entlateral
+  det_entradaservico:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_entradaservico
+  det_entservico:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_entservico
+  det_Escritorio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Escritorio
+  det_Esgoto:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Esgoto
+  det_espauto:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_espauto
+  det_esperasplit:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_esperasplit
+  det_Estacionamento:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Estacionamento
+  det_estarintimo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estarintimo
+  det_estcoberto:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estcoberto
+  det_estrebaria:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estrebaria
+  det_estrutparede:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estrutparede
+  det_estvisitante:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estvisitante
+  det_face:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_face
+  det_fornopp:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_fornopp
+  det_frenteclube:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_frenteclube
+  det_FrenteMar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_FrenteMar
+  det_frentepraca:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_frentepraca
+  det_gabinete:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gabinete
+  det_garagembarco:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagembarco
+  det_Garagens:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Garagens
+  det_garagenscob:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagenscob
+  det_garagenscond:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagenscond
+  det_garagensdescob:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagensdescob
+  det_garagensfechada:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagensfechada
+  det_garagenstipo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagenstipo
+  det_gas:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gas
+  det_GasNatural:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_GasNatural
+  det_gerador:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gerador
+  det_gourmet:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gourmet
+  det_gradeado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gradeado
+  det_granito:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_granito
+  det_guarita:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_guarita
+  det_hall:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_hall
+  det_hidro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_hidro
+  det_hidrometro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_hidrometro
+  det_interfone:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_interfone
+  det_isolamento:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_isolamento
+  det_jardim:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_jardim
+  det_juntomuro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_juntomuro
+  det_lago:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_lago
+  det_laminado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_laminado
+  det_lareira:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_lareira
+  det_Lavabo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Lavabo
+  det_Lavanderia:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Lavanderia
+  det_living:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_living
+  det_luminaria:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_luminaria
+  det_Mais1:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Mais1
+  det_marina:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_marina
+  det_marmore:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_marmore
+  det_medida:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_medida
+  det_mezanino:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_mezanino
+  det_mobiliado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_mobiliado
+  det_moveisplanej:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_moveisplanej
+  det_murado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_murado
+  det_ofuro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ofuro
+  det_pasto:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_pasto
+  det_Patio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Patio
+  det_Pavimentacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Pavimentacao
+  det_PeDireito:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_PeDireito
+  det_persianaelet:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_persianaelet
+  det_pilotis:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_pilotis
+  det_piscaquecida:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_piscaquecida
+  det_Piscina:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Piscina
+  det_piscinapriv:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_piscinapriv
+  det_piscinfantil:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_piscinfantil
+  det_piso_ceramica:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_piso_ceramica
+  det_pisoelevado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_pisoelevado
+  det_PisoFrio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_PisoFrio
+  det_playground:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_playground
+  det_poco:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_poco
+  det_ponterolante:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ponterolante
+  det_porcelanato:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_porcelanato
+  det_PortaoEletronico:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_PortaoEletronico
+  det_Portaria24h:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Portaria24h
+  det_posicao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_posicao
+  det_QuadraPoli:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_QuadraPoli
+  det_quadrasquash:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_quadrasquash
+  det_quintal:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_quintal
+  det_Recepcao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Recepcao
+  det_RedeTensao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_RedeTensao
+  det_refeitorio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_refeitorio
+  det_reformado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_reformado
+  det_resagua:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_resagua
+  det_rio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_rio
+  det_roupeiro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_roupeiro
+  det_Sacada:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Sacada
+  det_sacadafundo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_sacadafundo
+  det_sacadalat:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_sacadalat
+  det_Sala:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Sala
+  det_salacinema:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_salacinema
+  det_SalaEstar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_SalaEstar
+  det_salafesta:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_salafesta
+  det_salaginastica:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_salaginastica
+  det_SalaJantar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_SalaJantar
+  det_salajogo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_salajogo
+  det_SalaTV:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_SalaTV
+  det_sauna:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_sauna
+  det_saunaprivat:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_saunaprivat
+  det_semimobiliado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_semimobiliado
+  det_sisincendio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_sisincendio
+  det_skate:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_skate
+  det_spa:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_spa
+  det_split:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_split
+  det_Suite:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Suite
+  det_SuiteClo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_SuiteClo
+  det_suitemaster:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_suitemaster
+  det_taco:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_taco
+  det_telefone:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_telefone
+  det_terraco:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_terraco
+  det_transformador:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_transformador
+  det_tvacabo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_tvacabo
+  det_ValorMetro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ValorMetro
+  det_Varanda:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Varanda
+  det_varanda_gourmet:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_varanda_gourmet
+  det_vent_teto:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vent_teto
+  det_vestiario:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vestiario
+  det_vistacidade:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistacidade
+  det_vistalagoa:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistalagoa
+  det_vistamar:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistamar
+  det_vistapano:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistapano
+  det_vistaserra:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistaserra
+  det_wireless:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_wireless
+  det_zelador:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_zelador
+  flagdesk:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.flagdesk
+  idprevisite:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.idprevisite
+  inf_aceitaf:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_aceitaf
+  inf_aut_pub:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_aut_pub
+  inf_Bairro:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Bairro
+  inf_bairrores:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_bairrores
+  inf_Categoria:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Categoria
+  inf_Cep:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Cep
+  inf_Cidade:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Cidade
+  inf_Complemento:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Complemento
+  inf_Condominio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Condominio
+  inf_CondoNome:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_CondoNome
+  inf_Construtora:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Construtora
+  inf_cubtipo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_cubtipo
+  inf_Descricao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Descricao
+  inf_Edificio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Edificio
+  inf_Empreendimento:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Empreendimento
+  inf_Endereco:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Endereco
+  inf_Estado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Estado
+  inf_financiado:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_financiado
+  inf_Gleba:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Gleba
+  inf_Locacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Locacao
+  inf_locacao_estu:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_locacao_estu
+  inf_Localizacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Localizacao
+  inf_Lote:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Lote
+  inf_Numero:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Numero
+  inf_Ocupacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Ocupacao
+  inf_Padra:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Padra
+  inf_Permuta:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Permuta
+  inf_pontoref:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_pontoref
+  inf_Quadra:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Quadra
+  inf_referencia:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_referencia
+  inf_referencia_antiga:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_referencia_antiga
+  inf_Regiao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Regiao
+  inf_reserva:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_reserva
+  inf_Situacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Situacao
+  inf_SubTipo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_SubTipo
+  inf_Temporada:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Temporada
+  inf_Tipo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Tipo
+  inf_Uf:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Uf
+  inf_valcub:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_valcub
+  inf_ValLocacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_ValLocacao
+  inf_vallocacao_estu:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_vallocacao_estu
+  inf_valsobconsulta:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_valsobconsulta
+  inf_ValTemporada:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_ValTemporada
+  inf_ValVenda:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_ValVenda
+  inf_Venda:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Venda
+  int_AnuncioInternet:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_AnuncioInternet
+  int_AnuncioJornal:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_AnuncioJornal
+  int_IncRelAnuncio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_IncRelAnuncio
+  int_metadescription:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_metadescription
+  int_metatag:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_metatag
+  int_OptNegocio:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_OptNegocio
+  int_PubDestaque:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_PubDestaque
+  int_PubSite:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_PubSite
+  int_pubsite_rede:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_pubsite_rede
+  int_title:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_title
+  lkprevisite:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.lkprevisite
+  loc_Classificacao:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_Classificacao
+  loc_Latitude:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_Latitude
+  loc_Longitude:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_Longitude
+  loc_NumeroPlacas:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_NumeroPlacas
+  loc_placa_qrcode:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_placa_qrcode
+  loc_PlacaLocal:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_PlacaLocal
+  loc_Tipo:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_Tipo
+  minia:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.minia
+  minia_amazon:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.minia_amazon
+  moeda:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.moeda
+  pais:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.pais
+  perc_adiantamento:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.perc_adiantamento
+  site_visitas:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.site_visitas
+  tour:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.tour
+  userExclu:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.userExclu
+  video_flag:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.video_flag
+  dt_inf_state:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_DtEstado
+  dt_loc_order_placed:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_PedidoColocacao
+  dt_loc_placed:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_DataColocacao
+  dt_order_withdraw:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_PedidoRetirada
+  dt_loc_withdraw:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_DataRetirada
+  dt_cap_registered:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CadEm
+  dt_cap_updated:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_AtuaEm
+  dt_cap_start:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_DtInicio
+  dt_cap_end:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_DtFim
+  dt_exclusion:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dataExclu
+  dt_inf_aut_published:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Dtaut_pub
+  dt_conf_aut_start:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Conf_Aut_DtInicio
+  dt_conf_aut_end:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.Conf_Aut_DtFim
+  dt_paratime:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.paratime
+  dt_active:
+    description: ""
+    lineage:
+      - datalake_union_cdc_raw.imovel.dataativa

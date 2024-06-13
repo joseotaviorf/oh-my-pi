@@ -364,13 +364,6 @@ SELECT
     licencas_uniloc_web,
     limite_contratos_uniloc_web,
     quality_score,
-    flag_atta_seguros,
-    year,
-    month,
-    day
+    flag_atta_seguros
 FROM
-    datalake_union_raw.empresa
-WHERE
-    year <> 1900
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY pkempresa ORDER BY paratime DESC) = 1
+    datalake_union_cdc_raw.empresa

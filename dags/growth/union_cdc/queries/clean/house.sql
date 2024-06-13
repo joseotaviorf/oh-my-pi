@@ -333,4 +333,4 @@ SELECT
     paratime AS dt_paratime,
     dataativa AS dt_active
 FROM
-    datalake_test_union_cdc_raw.imovel
+    datalake_union_cdc_raw.imovel
