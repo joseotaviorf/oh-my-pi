@@ -29,7 +29,9 @@ def parse_arguments():
     parser.add_argument("table_name")
     parser.add_argument("start_date")
     parser.add_argument("end_date")
-    parser.add_argument("primary_keys", help="Comma separated list of primary keys for the clean table")
+    parser.add_argument(
+        "primary_keys", help="Comma separated list of primary keys for the clean table"
+    )
 
     return parser.parse_args()
 
@@ -41,14 +43,14 @@ def get_primary_keys_from_args(args: Namespace) -> List[str]:
     """
 
     if args.primary_keys:
-       return [key.strip() for key in args.primary_keys.split(",")]
-    
+        return [key.strip() for key in args.primary_keys.split(",")]
+
     clean_pk_identifier = CleanPrimaryKeyIdentifier(
         args.data_documentation_bucket,
     )
     return clean_pk_identifier.find_primary_keys(args.schema, args.table_name)
 
-    
+
 def insert_columns_into_query(query, columns):
     """
     Insert CDC columns to persist those informations
@@ -76,6 +78,12 @@ def main():
     end_date = args.end_date
     clean_primary_keys = get_primary_keys_from_args(args)
 
+    if not clean_primary_keys:
+        raise ValueError(
+            f"The primary keys of the table {table_name} could not be automatically identified."
+            "Please, provide the primary keys manually in DAG Declaration file."
+        )
+
     logger.info(
         f"""
         m=__main__, environment={environment}, dag_name={dag_name}
@@ -95,7 +103,9 @@ def main():
     cdc_columns = ["op_cdc", "ts_cdc_transaction", "ts_database_transaction"]
 
     query_with_cdc_columns = insert_columns_into_query(clean_query, cdc_columns)
-    clean_updates_df = spark.sql(query_with_cdc_columns).filter(col("ts_cdc_transaction").cast("date").between(start_date, end_date))
+    clean_updates_df = spark.sql(query_with_cdc_columns).filter(
+        col("ts_cdc_transaction").cast("date").between(start_date, end_date)
+    )
 
     full_clean_table_name = f"datalake_{schema}_clean.{table_name}"
     loader = DeltaLoader()

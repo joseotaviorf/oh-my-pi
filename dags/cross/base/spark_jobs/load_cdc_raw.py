@@ -4,7 +4,9 @@ from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
 from bietlejuice.base.cdc.primary_key_identifiers.raw_primary_key_identifier import (
     RawPrimaryKeyIdentifier,
 )
-from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import CdcSchemaFinderFactory
+from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
+    CdcSchemaFinderFactory,
+)
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from quintoandar_logger import QuintoAndarLogger
@@ -72,7 +74,8 @@ def dml_processor(transactional_df, primary_keys):
         "m=dml_processor, msg=Applying deduplication and preserving the lasest operation on Transactional layer..."
     )
     window_spec = Window.partitionBy(*primary_keys).orderBy(
-        transactional_df["ts_database_transaction"].desc(), transactional_df["cdc_binlog_position"].desc()
+        transactional_df["ts_database_transaction"].desc(),
+        transactional_df["cdc_binlog_position"].desc(),
     )
     transactional_df = transactional_df.withColumn(
         "row_number", row_number().over(window_spec)
@@ -109,11 +112,19 @@ def main():
                 environment=environment,
                 start_date=start_date,
                 end_date=end_date,
-                dbutils_secret_key=dbutils_secret_key
+                dbutils_secret_key=dbutils_secret_key,
             ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
-            datalake_table_schema=f"datalake_{schema}_raw"
+            datalake_table_schema=f"datalake_{schema}_raw",
         )
-        primary_keys = pk_identifier.find_primary_keys(args.table_name) # We don't use the table name in lowercase, because this is case sensitive
+        primary_keys = pk_identifier.find_primary_keys(
+            args.table_name
+        )  # We don't use the table name in lowercase, because this is case sensitive
+
+    if not primary_keys:
+        raise ValueError(
+            f"The primary keys of the table {table_name} could not be automatically identified."
+            "Please, provide the primary keys manually in DAG Declaration file."
+        )
 
     logger.info(
         f"""
@@ -146,9 +157,11 @@ def main():
         path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
         source_df=transactional_df,
         merge_on=primary_keys,
-        when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction"
+        when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction",
     )
-    SparkTablePropertyHelper.set_property(full_raw_table_name, "primary_keys", ",".join(primary_keys))
+    SparkTablePropertyHelper.set_property(
+        full_raw_table_name, "primary_keys", ",".join(primary_keys)
+    )
 
 
 if __name__ == "__main__":
