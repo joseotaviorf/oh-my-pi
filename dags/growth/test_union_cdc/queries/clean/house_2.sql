@@ -44,7 +44,6 @@ SELECT
     inf_cartafianca,
     inf_valleilao2,
     det_solmanha,
-    det_aceitapet,
-    paratime
+    det_aceitapet
 FROM
     datalake_test_union_cdc_raw.imovel2

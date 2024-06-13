@@ -193,7 +193,3 @@ columns:
     description: ""
     lineage:
       - datalake_test_union_cdc_raw.imovel2.det_aceitapet
-  paratime:
-    description: ""
-    lineage:
-      - datalake_test_union_cdc_raw.imovel2.paratime
