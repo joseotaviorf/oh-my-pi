@@ -18,7 +18,9 @@ medians (
         id_dag,
         MEDIAN(duration) AS median_duration,
         TIMESTAMP(MEDIAN(BIGINT(TIMESTAMP(DATE_FORMAT(ts_started,'HH:mm:ss'))))) AS ts_median_execution_started,
-        TIMESTAMP(MEDIAN(BIGINT(TIMESTAMP(DATE_FORMAT(ts_started,'HH:mm:ss'))))) AS ts_median_execution_ended
+        TIMESTAMP(MEDIAN(BIGINT(TIMESTAMP(DATE_FORMAT(ts_started_brt,'HH:mm:ss'))))) AS ts_median_execution_started_brt,
+        TIMESTAMP(MEDIAN(BIGINT(TIMESTAMP(DATE_FORMAT(ts_ended,'HH:mm:ss'))))) AS ts_median_execution_ended,
+        TIMESTAMP(MEDIAN(BIGINT(TIMESTAMP(DATE_FORMAT(ts_ended_brt,'HH:mm:ss'))))) AS ts_median_execution_ended_brt
     FROM
         datalake_pipeline.dag_run
     WHERE
@@ -166,9 +168,11 @@ SELECT
     s.ts_last_execution_started,
     s.ts_last_execution_started_brt,
     m.ts_median_execution_started,
+    m.ts_median_execution_started_brt,
     s.ts_last_execution_ended,
     s.ts_last_execution_ended_brt,
     m.ts_median_execution_ended,
+    m.ts_median_execution_ended_brt,
     s.ts_last_run_first_success,
     s.ts_last_run_first_success_brt,
     NOW() AS ts_load,

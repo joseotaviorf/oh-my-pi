@@ -106,6 +106,10 @@ columns:
     lineage:
       - datalake_pipeline.dag_run.ts_started
     description: The DAG's median timestamp of start.
+  ts_median_execution_started_brt:
+    lineage:
+      - datalake_pipeline.dag_run.ts_started_brt
+    description: The DAG's median timestamp of start in BRT timezone.
   ts_last_execution_ended:
     lineage:
       - datalake_pipeline.dag_run.ts_ended
@@ -122,6 +126,10 @@ columns:
     lineage:
       - datalake_pipeline.dag_run.ts_ended
     description: The DAG's median timestamp of end.
+  ts_median_execution_ended_brt:
+    lineage:
+      - datalake_pipeline.dag_run.ts_ended_brt
+    description: The DAG's median timestamp of end in BRT timezone.
   ts_last_run_first_success:
     lineage:
       - datalake_pipeline.dag_run.ts_first_execution_success

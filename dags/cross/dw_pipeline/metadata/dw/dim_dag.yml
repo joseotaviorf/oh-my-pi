@@ -97,6 +97,14 @@ columns:
     description: The BRT timestamp of when the DAG's last execution has been started.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
+  ts_median_execution_started:
+    lineage:
+      - datalake_pipeline.dag.ts_median_execution_started
+    description: The DAG's median timestamp of start.
+  ts_median_execution_started_brt:
+    lineage:
+      - datalake_pipeline.dag.ts_median_execution_started_brt
+    description: The DAG's median timestamp of start in BRT timezone.
   ts_last_execution_ended:
     lineage:
       -datalake_pipeline.dag.ts_last_run_ended
@@ -109,6 +117,14 @@ columns:
     description: The BRT timestamp of when the DAG's last execution has ended.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
+  ts_median_execution_ended:
+    lineage:
+      - datalake_pipeline.dag.ts_median_execution_ended
+    description: The DAG's median timestamp of end.
+  ts_median_execution_ended_brt:
+    lineage:
+      - datalake_pipeline.dag.ts_median_execution_ended_brt
+    description: The DAG's median timestamp of end in BRT timezone.
   ts_last_run_first_success:
     lineage:
       - datalake_pipeline.dag.ts_last_run_first_success
