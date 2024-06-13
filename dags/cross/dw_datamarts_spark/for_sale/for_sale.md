@@ -22,7 +22,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `liquidity_by_sk_region`
 - `repressed_demand_sale_booking_fit_in`
 - `repressed_demand_sale`
-- `sale_agents_weekly_performance`
 - `sale_lead_flow`
 
 ### Additional Information
