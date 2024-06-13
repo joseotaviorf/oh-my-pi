@@ -136,6 +136,7 @@ incoming_bucket: 5a-datalake-incoming-prod
 doc_md_chart_url: https://n2065e18540524a1cp-tp.appspot.com/admin/airflow/chart?chart_id=11&iteration_no=22&dag_id=
 dw_bucket: 5a-dw-prod
 people_bucket: people-s3-data-quintoandar-com-br
+union_bucket: ingestao-dados-union/union
 analytical_environment_costs_bucket: 5a-analytical-environment-costs-prod
 inmetro_bucket: s3://inmetro-s3-data-quintoandar-com-br
 metrics_bucket: 5a-business-metrics-com-br-prod
@@ -307,7 +308,7 @@ databricks_12_2_med_compute_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
-        
+
 databricks_12_2_min_memory_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5a.large

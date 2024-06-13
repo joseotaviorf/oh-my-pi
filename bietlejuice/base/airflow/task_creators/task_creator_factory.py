@@ -22,6 +22,12 @@ from bietlejuice.base.airflow.task_creators.load_cdc_raw_task_creator import (
 from bietlejuice.base.airflow.task_creators.load_cdc_transactional_task_creator import (
     LoadCDCTransactionalTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.load_dms_cdc_clean_task_creator import (
+    LoadDMSCDCCleanTaskCreator,
+)
+from bietlejuice.base.airflow.task_creators.load_dms_cdc_raw_task_creator import (
+    LoadDMSCDCRawTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.load_postgres_raw_task_creator import (
     LoadPostgresRawTaskCreator,
 )
@@ -68,6 +74,8 @@ class TaskCreatorFactory:
         TaskEnum.LOAD_CDC_RAW: LoadCDCRawTaskCreator,
         TaskEnum.LOAD_CDC_TRANSACTIONAL: LoadCDCTransactionalTaskCreator,
         TaskEnum.LOAD_CUSTOM: LoadCustomTaskCreator,
+        TaskEnum.LOAD_DMS_CDC_CLEAN: LoadDMSCDCCleanTaskCreator,
+        TaskEnum.LOAD_DMS_CDC_RAW: LoadDMSCDCRawTaskCreator,
         TaskEnum.LOAD_MONGO_RAW: LoadMongoRawTaskCreator,
         TaskEnum.LOAD_POSTGRES_RAW: LoadPostgresRawTaskCreator,
         TaskEnum.LOAD_QUERY: LoadQueryTaskCreator,

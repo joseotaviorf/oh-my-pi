@@ -1,0 +1,1471 @@
+---
+database_name: datalake_temp_union_cdc_clean
+table_name: company
+owner: "@data-growth"
+domain: Data Growth
+description: This table contains information about companies from the UnionDB.
+columns:
+  id_company:
+    description: Company primary key.
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pkempresa
+  id_onboarding:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fkonboarding
+  nome:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.nome
+  creci:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.creci
+  endereco:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.endereco
+  numero:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.numero
+  complemento:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.complemento
+  bairro:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.bairro
+  cidade:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cidade
+  uf:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uf
+  cep:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cep
+  dddtelefone:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.dddtelefone
+  telefone:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.telefone
+  dddfax:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.dddfax
+  fax:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fax
+  email:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.email
+  site:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.site
+  cnpj:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cnpj
+  ie:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ie
+  im:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.im
+  responsavel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.responsavel
+  cpfresp:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cpfresp
+  rgresp:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.rgresp
+  moeda:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.moeda
+  intmoedasing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.intmoedasing
+  fracmoedasing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fracmoedasing
+  intmoedaplu:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.intmoedaplu
+  fracmoedaplu:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fracmoedaplu
+  reserva:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.reserva
+  logorpt:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.logorpt
+  logofigura:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.logofigura
+  simbolo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.simbolo
+  path_foto:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.path_foto
+  path_foto360:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.path_foto360
+  path_video:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.path_video
+  fotolarg:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fotolarg
+  fotoalt:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fotoalt
+  textofoto:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.textofoto
+  textofoto2:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.textofoto2
+  textname:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.textname
+  textosize:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.textosize
+  textstilo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.textstilo
+  textocor:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.textocor
+  posicao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.posicao
+  lingua:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.lingua
+  autoref:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.autoref
+  dominio:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.dominio
+  dfc:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.dfc
+  nomeu:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.nomeu
+  senha:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.senha
+  indicador:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.indicador
+  tipoftp:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.tipoftp
+  forcacep:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.forcacep
+  inidt_importa:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.inidt_importa
+  jumbo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.jumbo
+  latitude:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.latitude
+  codigo_rdstation:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.codigo_rdstation
+  setup:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.setup
+  email_inicial_enviado:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.email_inicial_enviado
+  chave_admin_web:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.chave_admin_web
+  email_rede_dono_site:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.email_rede_dono_site
+  uniloc_segundavia_codigo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_segundavia_codigo
+  fkwebdesign:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fkwebdesign
+  fimdt_importa:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fimdt_importa
+  situacao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.situacao
+  tipoipmac:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.tipoipmac
+  ipmac:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ipmac
+  urlfoto:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.urlfoto
+  iniftp_importa:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.iniftp_importa
+  fimftp_importa:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fimftp_importa
+  wssenha:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.wssenha
+  identimo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.identimo
+  idcontrole:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.idcontrole
+  idpartner:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.idpartner
+  previsite:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.previsite
+  razao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.razao
+  numtour:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.numtour
+  pathlogo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pathlogo
+  servsmtp:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.servsmtp
+  usersmtp:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.usersmtp
+  senhasmtp:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.senhasmtp
+  flagdesk:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flagdesk
+  paratime:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.paratime
+  busca_miniatura:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.busca_miniatura
+  id_imobiliaria:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.id_imobiliaria
+  licensas:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.licensas
+  sincCount:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.sincCount
+  sincData:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.sincData
+  sincDiaria:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.sincDiaria
+  ftp_redemorar:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ftp_redemorar
+  idt_redemorar:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.idt_redemorar
+  redemorar_dir:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.redemorar_dir
+  redemorar_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.redemorar_user
+  redemorar_password:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.redemorar_password
+  eptvanuncios:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.eptvanuncios
+  eptvdestaques:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.eptvdestaques
+  subdominio_corretor:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.subdominio_corretor
+  path_logo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.path_logo
+  site_union:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.site_union
+  segmento:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.segmento
+  end_datasul:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.end_datasul
+  investigador_venda:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.investigador_venda
+  investigador_locacao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.investigador_locacao
+  pub_webcasas:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pub_webcasas
+  tipo_site:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.tipo_site
+  flag_live_externo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_live_externo
+  cad_life:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cad_life
+  wslimite:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.wslimite
+  wssinc:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.wssinc
+  wssincdata:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.wssincdata
+  wsjanelainicio:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.wsjanelainicio
+  wsjanelafim:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.wsjanelafim
+  fksecovi:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fksecovi
+  flag_departamento:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_departamento
+  legenda_equipe:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.legenda_equipe
+  codigo_rac:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.codigo_rac
+  secovi_corretor:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.secovi_corretor
+  secovi_gerente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.secovi_gerente
+  ativar_atendimento:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ativar_atendimento
+  inad_univen_cliente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.inad_univen_cliente
+  inad_univen_data:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.inad_univen_data
+  inad_univen_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.inad_univen_user
+  noti_univen_cliente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.noti_univen_cliente
+  noti_univen_data:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.noti_univen_data
+  noti_univen_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.noti_univen_user
+  bloq_univen_cliente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.bloq_univen_cliente
+  bloq_univen_data:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.bloq_univen_data
+  bloq_univen_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.bloq_univen_user
+  inad_uniloc_cliente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.inad_uniloc_cliente
+  inad_uniloc_data:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.inad_uniloc_data
+  inad_uniloc_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.inad_uniloc_user
+  noti_uniloc_cliente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.noti_uniloc_cliente
+  noti_uniloc_data:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.noti_uniloc_data
+  noti_uniloc_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.noti_uniloc_user
+  bloq_uniloc_cliente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.bloq_uniloc_cliente
+  bloq_uniloc_data:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.bloq_uniloc_data
+  bloq_uniloc_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.bloq_uniloc_user
+  user_cadastro:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.user_cadastro
+  data_cadastro:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_cadastro
+  user_altera:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.user_altera
+  data_altera:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_altera
+  lider_rede:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.lider_rede
+  flag_pi:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_pi
+  servicos:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.servicos
+  data_extensao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_extensao
+  possui_uniloc:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.possui_uniloc
+  possui_univen:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.possui_univen
+  possui_univen_web:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.possui_univen_web
+  flag_mascara_telefone:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_mascara_telefone
+  flag_mascara_rg:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_mascara_rg
+  situacao_uniloc:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.situacao_uniloc
+  flag_foto_life:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_foto_life
+  hotsites_rede:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.hotsites_rede
+  situacao_univen_web:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.situacao_univen_web
+  publicado:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.publicado
+  google_verificador:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.google_verificador
+  exibir_boleto_vencido:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.exibir_boleto_vencido
+  data_uniloc_web_inativo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_uniloc_web_inativo
+  wschave:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.wschave
+  cnabReader:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cnabReader
+  cnabCobranca:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cnabCobranca
+  versao_univen:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.versao_univen
+  log_sincronizacao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.log_sincronizacao
+  monitor_online:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.monitor_online
+  versao_monitor:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.versao_monitor
+  caminho_banco:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.caminho_banco
+  espaco_disco:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.espaco_disco
+  data_ultima_sincronizacao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_ultima_sincronizacao
+  ultimo_backup:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ultimo_backup
+  site_estatisticas:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.site_estatisticas
+  pref_clientes_sobrenome:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pref_clientes_sobrenome
+  qtde_email:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.qtde_email
+  hotsites_personalizado:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.hotsites_personalizado
+  codigoEmailMarketing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.codigoEmailMarketing
+  enviadoEmailMarketing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.enviadoEmailMarketing
+  hostEmailMarketing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pkemhostEmailMarketingpresa
+  loginEmailMarketing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.loginEmailMarketing
+  chaveEmailMarketing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.chaveEmailMarketing
+  flagEmailMarketing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flagEmailMarketing
+  cod_webcasas:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cod_webcasas
+  chat_externo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.chat_externo
+  chave_redemorar:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.chave_redemorar
+  flag_condordo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_condordo
+  flag_condordo_web:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_condordo_web
+  flag_condordo_uniloc:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_condordo_uniloc
+  concordo_date:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.concordo_date
+  condordo_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.condordo_user
+  concordo_ip:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.concordo_ip
+  condordo_web_date:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.condordo_web_date
+  condordo_web_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.condordo_web_user
+  condordo_web_ip:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.condordo_web_ip
+  condordo_uniloc_date:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.condordo_uniloc_date
+  condordo_uniloc_user:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.condordo_uniloc_user
+  condordo_uniloc_ip:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.condordo_uniloc_ip
+  possui_tag:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.possui_tag
+  uniloc_planos_codigo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_planos_codigo
+  uniloc_planos_ate:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_planos_ate
+  sen_webcasas:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.sen_webcasas
+  usu_webcasas:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.usu_webcasas
+  uniloc_mudou_plano:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_mudou_plano
+  uniloc_u_codinq:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_u_codinq
+  renovar_senha:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.renovar_senha
+  flagCargaWebservice:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flagCargaWebservice
+  flag_verificar_iptu:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_verificar_iptu
+  flag_univen_totem:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_univen_totem
+  flag_univen_indoor:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_univen_indoor
+  flag_perfil_marketing:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_perfil_marketing
+  perfil_marketing_qtd:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.perfil_marketing_qtd
+  flag_possui_app:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_possui_app
+  app_date_final:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.app_date_final
+  flag_possui_android:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_possui_android
+  android_date_final:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.android_date_final
+  ftp_servidor:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ftp_servidor
+  ftp_senha:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ftp_senha
+  ftp_usuario:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ftp_usuario
+  olx:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.olx
+  trovit:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.trovit
+  mapafixo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.mapafixo
+  flag_univen_docs:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_univen_docs
+  portalapp:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.portalapp
+  appgps:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.appgps
+  pub_vivareal:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pub_vivareal
+  codigo_vivareal:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.codigo_vivareal
+  contato_vivareal:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.contato_vivareal
+  pub_pronto:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pub_pronto
+  id_pronto:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.id_pronto
+  ftp_pronto:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ftp_pronto
+  usuario_pronto:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.usuario_pronto
+  senha_pronto:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.senha_pronto
+  pub_zlimovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pub_zlimovel
+  user_zlimovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.user_zlimovel
+  pass_zlimovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pass_zlimovel
+  flag_mud:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_mud
+  flag_facebook:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_facebook
+  pagina_depoimento:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pagina_depoimento
+  possui_imovelweb:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.possui_imovelweb
+  codigo_imovelweb:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.codigo_imovelweb
+  possui_123i:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.possui_123i
+  codigo_123i:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.codigo_123i
+  cub_mensal:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cub_mensal
+  url_download_app:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.url_download_app
+  url_download_android:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.url_download_android
+  ftp_imovelweb:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ftp_imovelweb
+  usuario_imovelweb:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.usuario_imovelweb
+  senha_imovelweb:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.senha_imovelweb
+  previste_internacional:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.previste_internacional
+  possui_i123:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.possui_i123
+  codigo_i123:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.codigo_i123
+  mercadolivre:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.mercadolivre
+  secret_key_mercadolivre:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.secret_key_mercadolivre
+  id_mercadolivre:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.id_mercadolivre
+  univen30hs:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.univen30hs
+  possui_imoveissc:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.possui_imoveissc
+  token_mercadolivre:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.token_mercadolivre
+  refresh_token_mercadolivre:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.refresh_token_mercadolivre
+  univen_guardiao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.univen_guardiao
+  imobox:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.imobox
+  plugimoveis:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.plugimoveis
+  guiadeimoveis:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.guiadeimoveis
+  imoveis_triangulo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.imoveis_triangulo
+  imoveis_triangulo_chave:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.imoveis_triangulo_chave
+  imoveis_triangulo_chave_senha:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.imoveis_triangulo_chave_senha
+  posicao_imagem:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.posicao_imagem
+  flag_atua_empre:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_atua_empre
+  uniloc_qtde_contrato:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_qtde_contrato
+  uniloc_total_contrato:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_total_contrato
+  zap_usuario:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.zap_usuario
+  zap_senha:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.zap_senha
+  flag_4:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_4
+  redeimob:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.redeimob
+  abcimovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.abcimovel
+  amazon_fotos:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.amazon_fotos
+  guardiao_ip:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.guardiao_ip
+  guardiao_horario1:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.guardiao_horario1
+  guardiao_horario2:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.guardiao_horario2
+  ftp_canaldoimovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ftp_canaldoimovel
+  usuario_canaldoimovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.usuario_canaldoimovel
+  senha_canaldoimovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.senha_canaldoimovel
+  codigo_canaldoimovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.codigo_canaldoimovel
+  email_capacidade:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.email_capacidade
+  tiqueimoveis_usuario:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.tiqueimoveis_usuario
+  tiqueimoveis_senha:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.tiqueimoveis_senha
+  flag_clientes_proprietario:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_clientes_proprietario
+  flag_imoveis_sem_atua:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_imoveis_sem_atua
+  flag_clientes_sem_atua:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_clientes_sem_atua
+  penseimoveis:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.penseimoveis
+  penseimoveis_ftp:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.penseimoveis_ftp
+  penseimoveis_usuario:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.penseimoveis_usuario
+  penseimoveis_senha:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.penseimoveis_senha
+  univen_docs_qtd:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.univen_docs_qtd
+  penseimoveis_diretorio:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.penseimoveis_diretorio
+  viaprincipal:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.viaprincipal
+  ftp_viaprincipal:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.ftp_viaprincipal
+  usuario_viaprincipal:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.usuario_viaprincipal
+  senha_viaprincipal:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.senha_viaprincipal
+  flag_no_universidade:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_no_universidade
+  flag_licencas:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_licencas
+  flag_block_consulta_net:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_block_consulta_net
+  dddcelular:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.dddcelular
+  celular:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.celular
+  email_leads_portais:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.email_leads_portais
+  temporada_pernoite:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.temporada_pernoite
+  uniloc_versao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_versao
+  fkgerenteconta:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fkgerenteconta
+  univen_participa_rodada:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.univen_participa_rodada
+  data_univen_web_inativo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_univen_web_inativo
+  cargassites:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.cargassites
+  univen_web_tipo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.univen_web_tipo
+  data_univen_web_ativo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_univen_web_ativo
+  verifica_financeiro:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.verifica_financeiro
+  corretor_em_rede:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.corretor_em_rede
+  bing_verificador:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.bing_verificador
+  fkimplantacao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.fkimplantacao
+  uniloc_segundavia_chave:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.uniloc_segundavia_chave
+  email_inicial_enviado_date:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.email_inicial_enviado_date
+  longitude:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.longitude
+  situacao_app:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.situacao_app
+  user_univen_altera:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.user_univen_altera
+  data_univen_altera:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_univen_altera
+  flag_permite_pesq_cliente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_permite_pesq_cliente
+  flag_permite_pesq_imovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_permite_pesq_imovel
+  flag_verificar_dup_imovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_verificar_dup_imovel
+  flag_verificar_dup_cliente:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_verificar_dup_cliente
+  chave_unilocweb:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.chave_unilocweb
+  secret_unilocweb:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.secret_unilocweb
+  promessa_pagamento_data:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.promessa_pagamento_data
+  sistema_origem:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.sistema_origem
+  sistema_destino:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.sistema_destino
+  motivo_rescisao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.motivo_rescisao
+  data_importacao:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_importacao
+  financeiro_email:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.financeiro_email
+  financeiro_dddtelefone:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.financeiro_dddtelefone
+  financeiro_telefone:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.financeiro_telefone
+  pref_bloquear_atd:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pref_bloquear_atd
+  motivo_rescisao2:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.motivo_rescisao2
+  promessa_pagamento_contador:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.promessa_pagamento_contador
+  idsap:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.idsap
+  vendido_brasilia:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.vendido_brasilia
+  univen_not_acesso:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.univen_not_acesso
+  univen_not_novo_imovel:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.univen_not_novo_imovel
+  pref_imovel_prop:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.pref_imovel_prop
+  inicio_contrato:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.inicio_contrato
+  oportunidades_app:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.oportunidades_app
+  data_uniloc_web_ativo:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.data_uniloc_web_ativo
+  flag_controle_chaveiro:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_controle_chaveiro
+  situacao_univen_chat:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.situacao_univen_chat
+  flag_email_prop:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_email_prop
+  flag_verificar_dup_imovel_ed:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_verificar_dup_imovel_ed
+  flag_verificar_dup_cliente_ed:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_verificar_dup_cliente_ed
+  robots:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.robots
+  dddtelefone4:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.dddtelefone4
+  telefone4:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.telefone4
+  dddtelefone5:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.dddtelefone5
+  telefone5:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.telefone5
+  dddtelefone6:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.dddtelefone6
+  telefone6:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.telefone6
+  admin_web_frase:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.admin_web_frase
+  orulo_block:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.orulo_block
+  orulo_client_id:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.orulo_client_id
+  orulo_client_secret:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.orulo_client_secret
+  flag_perfil_aviso:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_perfil_aviso
+  situacao_uniloc_web:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.situacao_uniloc_web
+  licencas_uniloc_web:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.licencas_uniloc_web
+  limite_contratos_uniloc_web:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.limite_contratos_uniloc_web
+  quality_score:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.quality_score
+  flag_atta_seguros:
+    description: ""
+    lineage:
+      - datalake_test_union_cdc_raw.empresa.flag_atta_seguros

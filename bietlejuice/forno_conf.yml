@@ -133,6 +133,7 @@ data_documentation_bucket: data-documentation.s3.forno.data.quintoandar.com.br
 datalake_bucket: 5a-datalake-forno
 incoming_bucket: 5a-datalake-incoming-forno
 people_bucket: people-s3-forno-data-quintoandar-com-br
+union_bucket: ingestao-dados-union/union
 analytical_environment_costs_bucket: 5a-analytical-environment-costs-prod
 doc_md_chart_url: https://qb343dade3ecd6cd6p-tp.appspot.com/admin/airflow/chart?chart_id=3&iteration_no=0&dag_id=
 dw_bucket: dw.s3.forno.data.quintoandar.com.br

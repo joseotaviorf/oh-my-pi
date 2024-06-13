@@ -16,6 +16,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_cdc_workfl
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_database_pull_workflow import (
     RawDatabasePullWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_dms_cdc_workflow import (
+    RawDMSCDCWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.raw_custom_ingestion_workflow import (
     RawCustomIngestionWorkflow,
 )
@@ -37,6 +40,7 @@ class RawFactory(BaseFactory):
         WorkflowEnum.CUSTOM_INGESTION_WORKFLOW: RawCustomIngestionWorkflow,
         WorkflowEnum.CDC_WORKFLOW: RawCDCWorkflow,
         WorkflowEnum.DATABASE_PULL_DELTA_WORKFLOW: RawDatabasePullDeltaWorkflow,
+        WorkflowEnum.DMS_CDC_WORKFLOW: RawDMSCDCWorkflow,
     }
 
     def __init__(self, dag_conf: dict, workflow_conf: dict, cluster_conf: dict):

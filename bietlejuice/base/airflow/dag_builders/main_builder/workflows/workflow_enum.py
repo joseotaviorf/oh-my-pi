@@ -8,6 +8,7 @@ class WorkflowEnum(Enum):
 
     CDC_WORKFLOW = "cdc"
     DATABASE_PULL_WORKFLOW = "database_pull"
+    DMS_CDC_WORKFLOW = "dms_cdc"
     CUSTOM_INGESTION_WORKFLOW = "custom_ingestion"
     GSHEETS_WORKFLOW = "gsheets"
     QUERY_WORKFLOW = "query"
