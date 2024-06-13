@@ -9,9 +9,11 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  custom_schema: supply_flows_migrate
+  custom_schema: supply_flows
   default_extraction_type: full
-  default_partitions: ["year", "month", "day"]
+  tables_customization:
+    conversion_taxonomy:
+      z_order_by: ['id_lead', 'id_house', 'business_context']
   inner_dependencies:
     conversion_taxonomy:
       - fallback_taxonomy

@@ -11,7 +11,6 @@ workflow:
   layer: enrich
   custom_schema: supply_flows_migrate
   default_extraction_type: full
-  default_partitions: ["year", "month", "day"]
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   inner_dependencies:
