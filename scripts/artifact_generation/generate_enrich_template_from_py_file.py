@@ -18,7 +18,37 @@ BI_ETL_EJUICE_ROOT = os.path.dirname(
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+class DAGOwnerEnum:
+    """
+    Mapping of all Analytics and Data Engineering teams for defining DAG owners.
+    """
+
+    DEFAULT_OWNER = "Data Engineering"
+    DATA_AGENTS = "Data Agents"
+    DATA_AVAILABILITY = "Data Availability"
+    DATA_BEDROCK = "Data Bedrock"
+    DATA_FINTECH = "Data Fintech"
+    DATA_FOR_RENT = "Data ForRent"
+    DATA_FOR_SALE = "Data ForSale"
+    DATA_GOVERNANCE = "Data Governance"
+    DATA_GROWTH = "Data Growth"
+    DATA_INTERNATIONAL = "Data International"
+    DATA_PEOPLE = "Data People"
+    DATA_PLATFORM = "Data Platform"
+    DATA_PRIMITIVES = "Data Primitives"
+    DATA_REDE = "Data Rede"
+    DATA_SS = "Data SS"
+    MLOPS = "MLOps"
+    TECH_PLATAFORM_CYBER_SECURITY = "Tech Platform Cyber Security"
+
+    @classmethod
+    def get_available_enum_values(cls):
+        return [
+            v
+            for k, v in cls.__dict__.items()
+            if not k.startswith("_") and isinstance(v, str)
+        ]
+
 
 def main(dag_name: str) -> None:
     dag_path, dag_file_content = read_dag_file(dag_name)
@@ -34,7 +64,7 @@ def read_dag_file(dag_name: str) -> Tuple[str, str]:
     )[0]
     with open(dag_path, "r") as f:
         return dag_path, f.read()
-    
+
 def read_prod_conf_file(dag_name: str) -> dict:
     """Returns the content of the prod_conf.yml file in the DAG package, if it exists."""
 
@@ -46,7 +76,7 @@ def read_prod_conf_file(dag_name: str) -> dict:
     conf_path = conf_paths[0]
     with open(conf_path, "r") as f:
         return yaml.safe_load(f)
-    
+
 def read_markdown_file(dag_name: str) -> str:
     md_paths = list(
         glob.iglob(f"{DAG_PACKAGES_ROOT}/**/{dag_name}/*.md", recursive=True)
@@ -56,7 +86,7 @@ def read_markdown_file(dag_name: str) -> str:
     md_path = md_paths[0]
     with open(md_path, "r") as f:
         return f.read()
-    
+
 def generate_dag_declaration(dag_name: str, dag_file: str, conf_file: dict) -> dict:
     """Generates the content of the DAG declaration file"""
 
@@ -71,12 +101,12 @@ def generate_dag_declaration(dag_name: str, dag_file: str, conf_file: dict) -> d
 
 def write_to_dag_package(dag_path: str, dag_declaration: dict) -> None:
     """Writes the DAG declaration to the DAG package"""
-    
+
     declaration_path = dag_path.replace(".py", "_declaration.yml")
 
     with open(declaration_path, "w") as f:
         yaml.dump(dag_declaration, f, sort_keys=False, explicit_start=True)
-    
+
 def extract_dag_key_content_for_declaration(dag_name: str, dag_file: str, conf_file: dict) -> dict:
     """Extracts the content of the DAG key for the declaration file, using regexes in the python file and the config file"""
 
@@ -99,7 +129,7 @@ def extract_dag_key_content_for_declaration(dag_name: str, dag_file: str, conf_f
     else:
         content_from_md = extract_dag_documentation_from_md(dag_name)
         if content_from_md:
-            content["documentation"] = {"dag_purpose": content_from_md} 
+            content["documentation"] = {"dag_purpose": content_from_md}
 
     return content
 
@@ -128,7 +158,7 @@ def extract_workflow_key_content_for_declaration(dag_file: str, conf_file: dict)
     if re.search(r"is_incremental\s*=\s*True", dag_file):
         content["default_extraction_type"] = "incremental"
         content["default_partitions"] = ["year", "month", "day"]
-    
+
     # Matches strings like
     # partition_cols = ["year", "month", "day"]
     # partitions = ["year", "month", "day"]
@@ -156,7 +186,7 @@ def extract_tables_customization(conf_file: dict) -> dict:
     tables_customization = {}
     if conf_file is None:
         return tables_customization
-    
+
     # For when tables is a list in the format
     # tables:
     #   - table_name: table1
@@ -214,7 +244,7 @@ def extract_tables_customization(conf_file: dict) -> dict:
 def extract_cluster_key_content_for_declaration(dag_file: str, conf_file: dict) -> dict:
     """Extracts the content of the cluster key for the declaration file, using regexes in the python file and the config file"""
 
-    cluster_type_pattern = r"((?:databricks_\d|custom_cluster).*)(?:\"|')" 
+    cluster_type_pattern = r"((?:databricks_\d|custom_cluster).*)(?:\"|')"
     cluster_type_match = re.search(cluster_type_pattern, dag_file)
     cluster_type = cluster_type_match.group(1)
     content = {"type": cluster_type}

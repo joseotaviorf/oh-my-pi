@@ -1,0 +1,27 @@
+---
+dag:
+  name: robin_hood
+  schedule_interval: 0 3 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: 'This DAG creates the full tables for Robin Hood, a digital wallet
+      that has two main features: users financial data management and management of
+      payment requests.'
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  custom_schema: robin_hood
+  dbutils_secret_key: ROBIN_HOOD_DB
+  tables_customization:
+    accounting_entry: {}
+    accounting_entry_balance: {}
+    accounting_entry_source: {}
+    financial_data: {}
+    payee: {}
+    payee_account: {}
+    payment_request: {}
+    payment_request_lot: {}
+    tax: {}
+cluster:
+  type: databricks_12_2_med_general_cluster
