@@ -1,5 +1,0 @@
-dag_documentation:
-  dag_purpose: "The Zordominium plugin is responsible for, using data from Vespúcio condominiums, 
-  filtering and enriching data necessary for the condominium pages and feeding Zordominium's Redis. 
-  This DAG will run this pipeline weekly. For more information, see this [documentation on GitHub]
-  (https://github.com/quintoandar/vespucio/tree/main/pipeline/vespucio/plugins/zordominium)."
