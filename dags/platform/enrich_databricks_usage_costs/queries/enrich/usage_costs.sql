@@ -1,7 +1,7 @@
 WITH granularity_ids AS (
     SELECT
         dbu.id_cluster,
-        IF(LOWER(dbu.cluster_name) LIKE "%bietlejuice%", REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(dbu.cluster_name, '.+-bietlejuice', 'bietlejuice'), '(?:_mediator|_scheduled).+', ''), '-', '.'), NULL) AS id_dag,
+        IF(LOWER(dbu.cluster_name) LIKE "%bietlejuice%", REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(dbu.cluster_name, '.+-bietlejuice', 'bietlejuice'), '(?:_mediator|_scheduled|_manual).+', ''), '-', '.'), NULL) AS id_dag,
         get_json_object(dbu.tags, '$.JobId') AS id_job,
         dbu.cluster_name,
         get_json_object(dbu.tags, '$.RunName') AS job_name,
@@ -62,7 +62,7 @@ FROM
   granularity_ids AS gi
 LEFT JOIN
   datalake_gsheets_clean.databricks_contract_details AS dcd
-    ON gi.cluster_compute_type = dcd.sku
+    ON gi.cluster_compute_type = dcd.cluster_compute_type
 LEFT JOIN
   datalake_databricks.daily_clusters AS dc
     ON gi.id_cluster = dc.id_cluster
