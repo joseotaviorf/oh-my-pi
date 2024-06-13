@@ -1,12 +1,14 @@
 WITH events AS (
-  SELECT DISTINCT 
+  SELECT 
     ops_objective, 
     ops_agent, 
     ops_partner, 
     ops_contact_medium, 
     ops_approach,
-    ops_assigned
-  FROM datalake_supply_flows.supply_events_tracking
+    REPLACE(ops_assigned, 'quinto_andar_outbound', 'quinto_andar') AS ops_assigned
+  FROM 
+    datalake_supply_flows.supply_events_tracking
+  GROUP BY ALL
 )
 
 SELECT
@@ -26,4 +28,3 @@ SELECT
   ops_approach AS cd_approach,
   NOW() AS ts_updated
 FROM events
-GROUP BY ALL
