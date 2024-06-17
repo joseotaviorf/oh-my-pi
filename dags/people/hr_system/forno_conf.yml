@@ -2,7 +2,7 @@ partition_cols: ["year", "month", "day"]
 dag_documentation:
   dag_purpose: |
     Retrieve data from Oracle HR System API, a sub product of Oracle Human Capital Resources (Oracle HCM).
-    HCM is a cloud-based software application suite for human resources, talent management, and customer experience. 
+    HCM is a cloud-based software application suite for human resources, talent management, and customer experience.
   additional_information: |
     We get data from the folowing endpoints:
     - /workers: returns all data from workers from Oracle HR System
@@ -13,8 +13,8 @@ endpoints:
     has_partitions: true
     column_to_partition: "CreationDate"
     has_columns_to_delete: true
-    columns_to_delete: 
-        - "objectVersionNumber"
+    columns_to_delete:
+      - "objectVersionNumber"
     params:
       onlyData: true
       orderBy: "absenceCaseId:asc"
@@ -40,6 +40,13 @@ endpoints:
     params:
       onlyData: true
       orderBy: "ActionReasonId:asc"
+      limit: 100
+  areas_of_responsibility:
+    has_partitions: false
+    has_columns_to_delete: false
+    params:
+      onlyData: true
+      orderBy: "ResponsibilityId:asc"
       limit: 100
   benefit_enrollments:
     deduplication_key: "EnrollmentResultId"
@@ -217,7 +224,7 @@ endpoints:
     has_dt_effective: true
     future_offset: 30
     past_offset: 35
-    partition_cols: ['dt_effective', 'year', 'month', 'day']
+    partition_cols: ["dt_effective", "year", "month", "day"]
     params:
       onlyData: true
       limit: 100

@@ -1,0 +1,87 @@
+---
+database_name: datalake_hr_system_clean
+table_name: areas_of_responsibility
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "The representatives resource provides details of representatives of a person. A person can have different types of representatives such as benefits representative, human resources representative, and so on."
+columns:
+  id_responsibility:
+    description: "Identifier of the responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.ResponsibilityId
+  id_person:
+    description: "Person identifier of the representative."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.PersonId
+  id_assignment:
+    description: "Surrogate identifier for the representative's assignment."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.AssignmentId
+  id_template:
+    description: "Responsibility template identifier associated to this responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.TemplateId
+  id_legal_entity:
+    description: "Legal entity identifier of the responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.LegalEntityId
+  department_id:
+    description: "Department identifier of the responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.DepartmentId
+  person_number:
+    description: "Person number of the representative."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.PersonNumber
+  assignment_number:
+    description: "Unique assignment identifier of the representative who has one or more responsibilities."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.AssignmentNumber
+  assignment_name:
+    description: "Name of the representative's assignment."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.AssignmentName
+  responsibility_name:
+    description: "Name of the responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.ResponsibilityName
+  responsibility_type:
+    description: "Type of the responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.ResponsibilityType
+  Display_Name:
+    description: "Display name of the representative with the responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.DisplayName
+  Template_Code:
+    description: "Description of the responsibility template code that's associated to this responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.TemplateCode
+  template_name:
+    description: "Responsibility template name associated to this responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.TemplateName
+  active_status:
+    description: "Status of the responsibility, such as active or inactive."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.ActiveStatus
+  usage:
+    description: "Value of the responsibility's usage. It can contain multiple comma-separated values, such as ORA_PER_AOR_APPROVAL and ORA_PER_AOR_CHECKLIST."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.Usage
+  work_contacts_flag:
+    description: "Work contact of the responsibility, such as include or exclude."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.WorkContactsFlag
+  dt_started:
+    description: "Start date of the responsibility."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.StartDate
+  dt_ended:
+    description: "The responsibility's end date."
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.EndDate
+  ts_load:
+    description: "Timestamp of the load of the worker record in the data lake"
+    lineage:
+      - datalake_hr_system_raw.areas_of_responsibility.ts_load
