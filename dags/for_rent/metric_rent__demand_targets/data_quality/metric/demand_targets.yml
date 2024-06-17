@@ -4,9 +4,13 @@ alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   city_group: 
     is_complete:
+      severity_level: Error
   business_type:
     is_complete:
+      severity_level: Error
   rent_flow_origin:
     is_complete:
+      severity_level: Error
   dt_event:
     is_complete:
+      severity_level: Error

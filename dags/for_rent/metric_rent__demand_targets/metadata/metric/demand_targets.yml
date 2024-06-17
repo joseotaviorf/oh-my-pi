@@ -1,7 +1,7 @@
 database_name: metric_rent
 table_name: demand_targets
 description: This table contains the ForRent targets of the Demand funnel.
-  Each line has Demand or Budget targets of each demand event.
+  Each line has the Demand or Budget target of each demand event.
 domain: For Rent
 owner: gustavo.alencar@quintoandar.com.br
 columns:
