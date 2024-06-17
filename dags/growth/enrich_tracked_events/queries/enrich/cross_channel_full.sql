@@ -169,6 +169,22 @@ cross_channel AS (
                 'sale_offer_form_accepted')
                 THEN media_source
         END AS attribution_media_source_conversion,
+        CASE 
+            WHEN event_type_sanitized NOT IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN entrance_uri
+        END AS attribution_entrance_uri,
+        CASE 
+            WHEN event_type_sanitized IN (
+                'visit_schedule_confirmed',
+                'debug_visit_schedule_confirmed',
+                'offer_submitted',
+                'sale_offer_form_accepted')
+                THEN entrance_uri
+        END AS attribution_entrance_uri_conversion,
         ts_event,
         year,
         month,
@@ -234,6 +250,8 @@ cross_channel AS (
         'offline_table' AS attribution_content_conversion,
         'offline_table' AS attribution_media_source,
         'offline_table' AS attribution_media_source_conversion,
+        'offline_table' AS attribution_entrance_uri,
+        'offline_table' AS attribution_entrance_uri_conversion,
         ts_event,
         year,
         month,
@@ -297,6 +315,9 @@ apply_attribution_rule AS (
         LAST(attribution_media_source, TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_media_source,
+        LAST(attribution_entrance_uri, TRUE) OVER(
+            PARTITION BY id_user_conversion 
+            ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_entrance_uri,    
         attribution_app_type_conversion,
         attribution_branded_conversion,
         attribution_origin_conversion,
@@ -306,6 +327,7 @@ apply_attribution_rule AS (
         attribution_term_conversion,
         attribution_content_conversion,
         attribution_media_source_conversion,
+        attribution_entrance_uri_conversion,
         ts_event,
         year,
         month,
@@ -386,6 +408,12 @@ SELECT
             AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_media_source_conversion
         ELSE final_attribution_media_source
     END AS final_attribution_media_source,
+    CASE
+        WHEN NULLIF(final_attribution_app_type, '') IS NULL
+            OR (NULLIF(final_attribution_source, '') IS NULL
+            AND NULLIF(final_attribution_medium, '') IS NULL) THEN attribution_entrance_uri_conversion
+        ELSE final_attribution_entrance_uri
+    END AS final_attribution_entrance_uri,
     ts_event,
     year,
     month,

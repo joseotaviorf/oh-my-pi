@@ -79,6 +79,10 @@ columns:
     description: Final media source attributed to the event.
     lineage:
       - datalake_online_attribution.online_attribution.media_source
+  final_attribution_entrance_uri:
+    description: The URL of the first page a user visits in a session
+    lineage:
+      - datalake_online_attribution.online_attribution.entrance_uri    
   ts_event:
     description: Date of the event.
     lineage:
