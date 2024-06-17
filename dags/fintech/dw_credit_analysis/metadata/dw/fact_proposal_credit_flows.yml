@@ -260,5 +260,9 @@ columns:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
     description: "Date when the contract was signed."
+  dt_reference:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_offer_submitted_date
+    description: "Date used to create a reference between early credit created and offer submitted date in superset"
   ts_load:
     description: "Timestamp of data recorded in the table."

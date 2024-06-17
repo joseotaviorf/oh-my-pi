@@ -346,6 +346,7 @@ early_credit_full (
     CAST(NULL AS DATE) AS dt_guarantee_paid_date,
     CAST(NULL AS DATE) AS dt_contract_created_date,
     CAST(NULL AS DATE) AS dt_contract_signed_date,
+    CAST(NULL AS DATE) AS dt_reference,
     NOW() AS ts_load
   FROM
     early_credit_analysis AS eca
@@ -415,6 +416,7 @@ SELECT
   dt_guarantee_paid_date,
   dt_contract_created_date,
   dt_contract_signed_date,
+  CAST(NULL AS DATE) AS dt_reference,
   NOW() AS ts_load
 FROM
   proposal_credit_flows
