@@ -27,4 +27,4 @@ workflow:
       clean_table_name: "house_2"
       clean_primary_keys: ["id_house_2"]
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_memory_photon_cluster
