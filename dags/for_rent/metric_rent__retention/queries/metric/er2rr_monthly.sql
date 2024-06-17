@@ -22,7 +22,6 @@ ended_rentals_confirmed AS (
             ON dhl.sk_house_listing = fct_or.sk_house_listing
     WHERE 
         dc.status IN ('Finalizado')  
-        AND (dc.country_code = 'BR' OR dc.country_code IS NULL)
         AND COALESCE(dc.ts_analyst_annulment_input,dc.dt_annulment) IS NOT NULL
     QUALIFY 
       rn = 1
@@ -30,7 +29,6 @@ ended_rentals_confirmed AS (
 contract_signed AS (
   SELECT
       DATE(dc.ts_signature) AS contract_signed_date,
-      DATE_TRUNC('MONTH', dc.ts_signature) AS contract_signed_month,
       fct_or.sk_house_listing,
       fct_or.sk_contract AS sk_contract,
       dc.value_segment
@@ -41,15 +39,15 @@ contract_signed AS (
       ON fct_or.sk_contract = dc.sk_contract
   WHERE
     dc.ts_signature IS NOT NULL
-    AND (dc.country_code = 'BR' OR dc.country_code IS NULL)
     AND IF(dc.status IN ('Ativo','Finalizado'), TRUE, FALSE)
     AND dc.ts_signature < CURRENT_DATE
   GROUP BY
-    1,2,3,4,5
+    1,2,3,4
 ),
 metric_calculations AS (
   SELECT
-    DATE_TRUNC('MONTH',erc.dt_ended_rental_confirmed) AS month_ref,
+    CAST(DATE_TRUNC('MONTH',erc.dt_ended_rental_confirmed) AS DATE) AS dt_reference_month,
+    erc.country_code,
     erc.value_segment AS category,
     COUNT(DISTINCT erc.sk_house_listing) AS qtd_ended_rental,
     COUNT(DISTINCT cs.sk_contract) AS qtd_rerental,
@@ -121,46 +119,152 @@ metric_calculations AS (
     contract_signed AS cs
       ON cs.sk_house_listing = erc.nxt_sk_house_listing
   GROUP BY 
-    1, 2
+    1, 2, 3
+),
+metric_calculations_maturation_4W AS (
+  SELECT
+    CAST(DATE_TRUNC('MONTH', DATE_ADD(erc.dt_ended_rental_confirmed, 28)) AS DATE) AS dt_reference_month,
+    erc.country_code,
+    erc.value_segment AS category,
+    COUNT(DISTINCT 
+      IF(
+          dt_ended_rental_confirmed <= DATE_ADD(current_date, -28)
+          , erc.sk_house_listing
+          , NULL
+        )
+    ) AS qtd_ended_rental_matured_4W_by_maturation_date,
+    COUNT(DISTINCT 
+      IF(
+          dt_ended_rental_confirmed <= DATE_ADD(current_date, -28)
+          , cs.sk_contract
+          , NULL
+        )
+    ) AS qtd_rerental_matured_4W_by_maturation_date,
+    SUM(
+      IF(
+        cs.sk_contract IS NOT NULL 
+        AND DATEDIFF(cs.contract_signed_date, dt_ended_rental_confirmed) <= 28
+        AND dt_ended_rental_confirmed <= DATE_ADD(current_date, -28)
+        , 1
+        , 0
+      )
+    ) AS qtd_RR_4W_by_maturation_date
+  FROM
+    ended_rentals_confirmed AS erc
+  LEFT JOIN
+    contract_signed AS cs
+      ON cs.sk_house_listing = erc.nxt_sk_house_listing
+  GROUP BY 
+    1, 2, 3
+),
+metric_calculations_maturation_12W AS (
+  SELECT
+    CAST(DATE_TRUNC('MONTH', DATE_ADD(erc.dt_ended_rental_confirmed, 84)) AS DATE) AS dt_reference_month,
+    erc.country_code,
+    erc.value_segment AS category,
+    COUNT(DISTINCT 
+      IF(
+          dt_ended_rental_confirmed <= DATE_ADD(current_date, -84)
+          , erc.sk_house_listing
+          , NULL
+        )
+    ) AS qtd_ended_rental_matured_12W_by_maturation_date,
+    COUNT(DISTINCT 
+      IF(
+          dt_ended_rental_confirmed <= DATE_ADD(current_date, -84)
+          , cs.sk_contract
+          , NULL
+        )
+    ) AS qtd_rerental_matured_12W_by_maturation_date,
+    SUM(
+      IF(
+        cs.sk_contract IS NOT NULL 
+        AND DATEDIFF(cs.contract_signed_date, dt_ended_rental_confirmed) <= 84
+        AND dt_ended_rental_confirmed <= DATE_ADD(current_date, -84)
+        , 1
+        , 0
+      )
+    ) AS qtd_RR_12W_matured_by_maturation_date
+  FROM
+    ended_rentals_confirmed AS erc
+  LEFT JOIN
+    contract_signed AS cs
+      ON cs.sk_house_listing = erc.nxt_sk_house_listing
+  GROUP BY 
+    1, 2, 3
 )
 SELECT 
-  month_ref,
+  mc.dt_reference_month,
   'OVERALL' AS category,
-  SUM(qtd_ended_rental) AS ended_rentals,
-  SUM(qtd_rerental) AS rerentals,
-  SUM(qtd_RR_4W) AS rr_4w,
-  SUM(qtd_RR_12W) AS rr_12w,
-  CAST(SUM(qtd_RR_4W) AS DOUBLE) / (SUM(qtd_ended_rental) * 1.00) AS ER2RR_4W,
-  CAST(SUM(qtd_RR_12W) AS DOUBLE) / (SUM(qtd_ended_rental) * 1.00) AS ER2RR_12W,
-  SUM(qtd_ended_rental_matured_4W) AS ended_rentals_matured_4W,
-  SUM(qtd_rerental_matured_4W) AS rerentals_matured_4W,
-  CAST(SUM(qtd_RR_4W_matured) AS DOUBLE) / (SUM(qtd_ended_rental_matured_4W) * 1.00) AS ER2RR_4W_matured,
-  SUM(qtd_ended_rental_matured_12W) AS ended_rentals_matured_12W,
-  SUM(qtd_rerental_matured_12W) AS rerentals_matured_12W,
-  CAST(SUM(qtd_RR_12W_matured) AS DOUBLE) / (SUM(qtd_ended_rental_matured_12W) * 1.00) AS ER2RR_12W_matured
+  mc.country_code,
+  SUM(mc.qtd_ended_rental) AS ended_rentals,
+  SUM(mc.qtd_rerental) AS rerentals,
+  SUM(mc.qtd_RR_4W) AS rr_4w,
+  SUM(mc.qtd_RR_12W) AS rr_12w,
+  CAST(SUM(mc.qtd_RR_4W) AS DOUBLE) / (SUM(mc.qtd_ended_rental) * 1.00) AS ER2RR_4W,
+  CAST(SUM(mc.qtd_RR_12W) AS DOUBLE) / (SUM(mc.qtd_ended_rental) * 1.00) AS ER2RR_12W,
+  SUM(mc.qtd_ended_rental_matured_4W) AS ended_rentals_matured_4W,
+  SUM(mc.qtd_rerental_matured_4W) AS rerentals_matured_4W,
+  CAST(SUM(mc.qtd_RR_4W_matured) AS DOUBLE) / (SUM(mc.qtd_ended_rental_matured_4W) * 1.00) AS ER2RR_4W_matured,
+  SUM(mc.qtd_ended_rental_matured_12W) AS ended_rentals_matured_12W,
+  SUM(mc.qtd_rerental_matured_12W) AS rerentals_matured_12W,
+  CAST(SUM(mc.qtd_RR_12W_matured) AS DOUBLE) / (SUM(mc.qtd_ended_rental_matured_12W) * 1.00) AS ER2RR_12W_matured,
+  SUM(mc4w.qtd_ended_rental_matured_4W_by_maturation_date) AS ended_rentals_4W_by_maturation_date,
+  SUM(mc4w.qtd_rerental_matured_4W_by_maturation_date) AS rerentals_4W_by_maturation_date,
+  CAST(SUM(mc4w.qtd_RR_4W_by_maturation_date) AS DOUBLE) / (SUM(mc4w.qtd_ended_rental_matured_4W_by_maturation_date) * 1.00) AS ER2RR_4W_by_maturation_date,
+  SUM(mc12w.qtd_ended_rental_matured_12W_by_maturation_date) AS ended_rentals_12W_by_maturation_date,
+  SUM(mc12w.qtd_rerental_matured_12W_by_maturation_date) AS rerentals_12W_by_maturation_date,
+  CAST(SUM(mc12w.qtd_RR_12W_matured_by_maturation_date) AS DOUBLE) / (SUM(mc12w.qtd_ended_rental_matured_12W_by_maturation_date) * 1.00) AS ER2RR_12W_by_maturation_date
 FROM
-  metric_calculations
+  metric_calculations AS mc
+JOIN
+  metric_calculations_maturation_4W AS mc4w
+    ON mc4w.dt_reference_month = mc.dt_reference_month
+      AND mc.category = mc4w.category
+      AND mc.country_code = mc4w.country_code
+JOIN
+  metric_calculations_maturation_12W AS mc12w
+    ON mc12w.dt_reference_month = mc.dt_reference_month
+      AND mc12w.category = mc.category
+      AND mc12w.country_code = mc.country_code
 GROUP BY
-  1, 2
+  1, 2, 3
 
 UNION
 
 SELECT 
-  month_ref,
-  category,
-  SUM(qtd_ended_rental) AS ended_rentals,
-  SUM(qtd_rerental) AS rerentals,
-  SUM(qtd_RR_4W) AS rr_4w,
-  SUM(qtd_RR_12W) AS rr_12w,
-  CAST(SUM(qtd_RR_4W) AS DOUBLE) / (SUM(qtd_ended_rental) * 1.00) AS ER2RR_4W,
-  CAST(SUM(qtd_RR_12W) AS DOUBLE) / (SUM(qtd_ended_rental) * 1.00) AS ER2RR_12W,
-  SUM(qtd_ended_rental_matured_4W) AS ended_rentals_matured_4W,
-  SUM(qtd_rerental_matured_4W) AS rerentals_matured_4W,
-  CAST(SUM(qtd_RR_4W_matured) AS DOUBLE) / (SUM(qtd_ended_rental_matured_4W) * 1.00) AS ER2RR_4W_matured,
-  SUM(qtd_ended_rental_matured_12W) AS ended_rentals_matured_12W,
-  SUM(qtd_rerental_matured_12W) AS rerentals_matured_12W,
-  CAST(SUM(qtd_RR_12W_matured) AS DOUBLE) / (SUM(qtd_ended_rental_matured_12W) * 1.00) AS ER2RR_12W_matured
+  mc.dt_reference_month,
+  mc.category,
+  mc.country_code,
+  SUM(mc.qtd_ended_rental) AS ended_rentals,
+  SUM(mc.qtd_rerental) AS rerentals,
+  SUM(mc.qtd_RR_4W) AS rr_4w,
+  SUM(mc.qtd_RR_12W) AS rr_12w,
+  CAST(SUM(mc.qtd_RR_4W) AS DOUBLE) / (SUM(mc.qtd_ended_rental) * 1.00) AS ER2RR_4W,
+  CAST(SUM(mc.qtd_RR_12W) AS DOUBLE) / (SUM(mc.qtd_ended_rental) * 1.00) AS ER2RR_12W,
+  SUM(mc.qtd_ended_rental_matured_4W) AS ended_rentals_matured_4W,
+  SUM(mc.qtd_rerental_matured_4W) AS rerentals_matured_4W,
+  CAST(SUM(mc.qtd_RR_4W_matured) AS DOUBLE) / (SUM(mc.qtd_ended_rental_matured_4W) * 1.00) AS ER2RR_4W_matured,
+  SUM(mc.qtd_ended_rental_matured_12W) AS ended_rentals_matured_12W,
+  SUM(mc.qtd_rerental_matured_12W) AS rerentals_matured_12W,
+  CAST(SUM(mc.qtd_RR_12W_matured) AS DOUBLE) / (SUM(mc.qtd_ended_rental_matured_12W) * 1.00) AS ER2RR_12W_matured,
+  SUM(mc4w.qtd_ended_rental_matured_4W_by_maturation_date) AS ended_rentals_4W_by_maturation_date,
+  SUM(mc4w.qtd_rerental_matured_4W_by_maturation_date) AS rerentals_4W_by_maturation_date,
+  CAST(SUM(mc4w.qtd_RR_4W_by_maturation_date) AS DOUBLE) / (SUM(mc4w.qtd_ended_rental_matured_4W_by_maturation_date) * 1.00) AS ER2RR_4W_by_maturation_date,
+  SUM(mc12w.qtd_ended_rental_matured_12W_by_maturation_date) AS ended_rentals_12W_by_maturation_date,
+  SUM(mc12w.qtd_rerental_matured_12W_by_maturation_date) AS rerentals_12W_by_maturation_date,
+  CAST(SUM(mc12w.qtd_RR_12W_matured_by_maturation_date) AS DOUBLE) / (SUM(mc12w.qtd_ended_rental_matured_12W_by_maturation_date) * 1.00) AS ER2RR_12W_by_maturation_date
 FROM
-  metric_calculations
+  metric_calculations AS mc
+JOIN
+  metric_calculations_maturation_4W AS mc4w
+    ON mc4w.dt_reference_month = mc.dt_reference_month
+      AND mc.category = mc4w.category
+      AND mc.country_code = mc4w.country_code
+JOIN
+  metric_calculations_maturation_12W AS mc12w
+    ON mc12w.dt_reference_month = mc.dt_reference_month
+      AND mc12w.category = mc.category
+      AND mc12w.country_code = mc.country_code
 GROUP BY
-  1, 2
+  1, 2, 3
