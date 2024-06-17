@@ -11,9 +11,3 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  id_registration_user:
-    is_complete:
-      severity_level: Error
-  id_franchise_status:
-    is_complete:
-      severity_level: Error
