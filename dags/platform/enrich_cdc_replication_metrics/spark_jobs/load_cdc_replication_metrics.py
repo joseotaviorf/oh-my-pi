@@ -171,7 +171,7 @@ def get_metrics_df(start_date: str, end_date: str) -> DataFrame:
     ]
 
     for database_name in database_names:
-        tables = [table.name for table in spark.catalog.listTables(database_name)]
+        tables = [table.name for table in spark.catalog.listTables(database_name) if not table.name.endswith("temp_df")]
         for table in tables:
             logger.info(
                 f"m=get_metrics_df, msg=Generating table {database_name}.{table} metrics based on start_date={start_date} and end_date={end_date}..."
