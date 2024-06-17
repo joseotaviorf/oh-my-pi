@@ -1,0 +1,133 @@
+database_name: metric_rent
+table_name: demand_targets
+description: This table contains the ForRent targets of the Demand funnel.
+  Each line has Demand or Budget targets of each demand event.
+domain: For Rent
+owner: gustavo.alencar@quintoandar.com.br
+columns:
+  city_group:
+    description: The city group related to the target.
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.city_group
+      - datalake_gsheets.rental_demand_coincident_targets.city_group
+    dimension: True
+  business_type:
+    description: The business type related to the target.
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.business_type
+      - datalake_gsheets.rental_demand_coincident_targets.business_type
+    dimension: True
+  rent_flow_origin:
+    description: The rent flow origin type related to the target.
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.rent_flow_origin
+      - datalake_gsheets.rental_demand_coincident_targets.rent_flow_origin
+    dimension: True
+  rental_administrator:
+    description: The rental administrator type related to the target.
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.rental_administrator
+      - datalake_gsheets.rental_demand_coincident_targets.rental_administrator
+    dimension: True
+  visits_booked:
+    metric:
+      name: Visits Booked Target
+      description: Target of visits booked within the aggregation.
+      acronym: VB
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  visits_completed:
+    metric:
+      name: Visits Completed Target
+      description: Target of visits completed within the aggregation.
+      acronym: VC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  offers_submitted:
+    metric:
+      name: Offers Submitted Target
+      description: Target of offers submitted within the aggregation.
+      acronym: OS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  offers_accepted:
+    metric:
+      name: Offers Accepted Target
+      description: Target of offers accepted within the aggregation.
+      acronym: OA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  evaluation_started:
+    metric:
+      name: Evaluation Started Target
+      description: Target of evaluations started within the aggregation.
+      acronym: ES
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  evaluation_positive:
+    metric:
+      name: Evaluation Positive Target
+      description: Target of evaluations positive within the aggregation.
+      acronym: EP
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  documentation_sent:
+    metric:
+      name: Documentation Sent Target
+      description: Target of documentation sent within the aggregation.
+      acronym: DS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  credit_approved:
+    metric:
+      name: Credit Approved Target
+      description: Target of credits approved within the aggregation.
+      acronym: CA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  contracts_signed:
+    metric:
+      name: Contracts Signed Target
+      description: Target of contracts signed within the aggregation.
+      acronym: CS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ''
+  target_type:
+    description: The type of the target.
+    categories:
+      BUDGET: The target is related to a budget target.
+      FORECAST: The target is related to a forecast target.
+    dimension: True
+  dt_target:
+    description: The target date.
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.dt_budget
+      - datalake_gsheets.rental_demand_coincident_targets.dt_target
+    dimension: True

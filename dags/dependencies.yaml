@@ -3063,6 +3063,9 @@ bietlejuice.metric_rent__demand_events:
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-cohort-conversions-snapshot
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot
   - bietlejuice.dw_user:load-dw-rent-dim-owner-category
+bietlejuice.metric_rent__demand_targets:
+  - bietlejuice.enrich_gsheets:load-enrich-rental-demand-coincident-targets
+  - bietlejuice.gsheets_for_rent:done-clean-rent-demand-budget-2024
 bietlejuice.metric_rent__gross_profit:
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
   - bietlejuice.enrich_sap:load-enrich-ledger

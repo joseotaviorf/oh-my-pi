@@ -1,0 +1,13 @@
+---
+dag:
+  name: metric_rent__demand_targets
+  schedule_start_date: 2014,06,17
+  owner: Data ForRent
+workflow:
+  type: query
+  layer: metric
+cluster:
+  type: databricks_12_2_min_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

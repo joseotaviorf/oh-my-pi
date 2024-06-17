@@ -1,0 +1,12 @@
+---
+table_name: metric_rent.demand_targets
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  city_group: 
+    is_complete:
+  business_type:
+    is_complete:
+  rent_flow_origin:
+    is_complete:
+  dt_event:
+    is_complete:
