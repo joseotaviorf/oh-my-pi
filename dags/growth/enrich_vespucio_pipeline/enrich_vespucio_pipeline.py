@@ -17,13 +17,13 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
 
-# from bietlejuice.base.spark import BaseDBUtils  # @todo uncomment to enable image step.
+from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 # TO DO: Add the package version in the config file
 # When updating the vespucio version here, don't forget to update this in the zordominium_vespucio_plugin dag
-VESPUCIO_PACKAGE_VERSION = "0.10.0"
+VESPUCIO_PACKAGE_VERSION = "0.12.0"
 VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
@@ -120,8 +120,7 @@ class Tables:
     step3_clustered_houses = "vespucio_pipeline_delta.step3_clustered_houses"
     step4_merged_condos = "vespucio_pipeline_delta.step4_merged_condos"
     step4_merged_houses = "vespucio_pipeline_delta.step4_merged_houses"
-    # @todo change step5_images_houses step table to step5_images_houses after enabling image step
-    step5_images_houses = "vespucio_pipeline_delta.step4_merged_houses"
+    step5_images_houses = "vespucio_pipeline_delta.step5_images_houses"
     step6_linked_condos = "vespucio_pipeline_delta.step6_linked_condos"
 
     condo_compounds = "vespucio_prod_delta.condo_compounds"
@@ -197,12 +196,11 @@ source_tasks = [
     ),
 ]
 
-# @todo uncomment to enable image step
-# dbutils = BaseDBUtils().get_dbutils()
-# if dbutils is None:
-#     raise RuntimeError("DBUtils not found")
-#
-# kodak_api_key = dbutils.secrets.get('quintoandar', APIEnum.KODAK)
+dbutils = BaseDBUtils().get_dbutils()
+if dbutils is None:
+    raise RuntimeError("DBUtils not found")
+
+kodak_api_key = dbutils.secrets.get('quintoandar', APIEnum.KODAK)
 
 core_tasks = [
     create_task(
@@ -256,18 +254,18 @@ core_tasks = [
             f"--output_merged_houses={Tables.step4_merged_houses}",
         ],
     ),
-    # create_task(  # @todo uncomment to enable image step. Don't forget to update Tables.step5_images_houses
-    #     entry_point="core_step5images",
-    #     parameters=[
-    #         f"--input_merged_houses={Tables.step4_merged_houses}",
-    #         f"--input_images_houses={Tables.step5_images_houses}",
-    #         "--overwrite_schema",
-    #         f"--output_images_houses={Tables.step5_images_houses}",
-    #         f"--kodak_auth_token={kodak_api_key}",
-    #         "--kodak_api_url=https://kodak.quintoandar.com.br/s2s/v1",
-    #         "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
-    #     ],
-    # )
+    create_task(
+        entry_point="core_step5images",
+        parameters=[
+            f"--input_merged_houses={Tables.step4_merged_houses}",
+            f"--input_images_houses={Tables.step5_images_houses}",
+            "--overwrite_schema",
+            f"--output_images_houses={Tables.step5_images_houses}",
+            f"--kodak_auth_token={kodak_api_key}",
+            "--kodak_api_url=https://kodak.quintoandar.com.br/s2s/v1",
+            "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
+        ],
+    )
 ]
 
 listing_task = create_task(
