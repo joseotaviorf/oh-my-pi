@@ -13,24 +13,24 @@ workflow:
   tables_customization:
     dim_acquisition_lead:
       merge_on: ['bk_acq_lead']
-      z_order_by: ['bk_acq_lead']
+      z_order_by: ['sk_acquisition_lead', 'bk_acq_lead']
     dim_affiliate_tracking:
       z_order_by: ['sk_user_affiliate']
     dim_funnel_step:
       merge_on: ['bk_funnel_step']
-      z_order_by: ['bk_funnel_step']
+      z_order_by: ['sk_funnel_step', 'bk_funnel_step']
     dim_supply_discards:
       merge_on: ['bk_discard']
-      z_order_by: ['bk_discard']
+      z_order_by: ['sk_discard', 'bk_discard']
     dim_supply_operation_flow:
       merge_on: ['bk_ops']
-      z_order_by: ['bk_ops']
+      z_order_by: ['sk_ops', 'bk_ops']
     dim_supply_recovery_flow:
       merge_on: ['bk_recovery']
-      z_order_by: ['bk_recovery']
+      z_order_by: ['sk_recovery', 'id_level', 'bk_recovery']
     dim_supply_user_path:
       merge_on: ['bk_user_path']
-      z_order_by: ['bk_user_path']
+      z_order_by: ['sk_user_path', 'id_level', 'bk_user_path']
     fact_supply_events:
       z_order_by: ['sk_supply', 'nm_business_context']
   inner_dependencies:
