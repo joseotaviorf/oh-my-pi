@@ -11,6 +11,6 @@ column_level_validations:
   rent_flow_origin:
     is_complete:
       severity_level: Error
-  dt_event:
+  dt_target:
     is_complete:
       severity_level: Error
