@@ -1,4 +1,3 @@
-
 WITH person AS (
     SELECT *,
       ROW_NUMBER() OVER(PARTITION BY p.uuid_person ORDER BY p.ts_updated DESC) AS rn
@@ -53,15 +52,14 @@ person_contact AS (
 ,serasa_neurotech as (
     SELECT
         CAST(proposal_number AS INT) as id_propose,
-        TRANSFORM(SPLIT(serasa_score_csba_bureau, '#@#'), x -> CAST(x AS DECIMAL)) AS bureau_score_serasa_neurotech,
+        serasa_score_csba_bureau AS bureau_score_serasa_neurotech,
         proposal_cpfs AS cpf,
         proposal_rating AS risk_rating
     FROM
         neurotech_clean AS b1
     WHERE
-        SUBSTR(serasa_score_csba_bureau,1,1) <> '-' -- Removing negative values
-        AND b1.proposal_number <> 'NaN'
-        AND b1.serasa_score_csba_bureau <> ('NaN')
+        serasa_score_csba_bureau[0] > 0 -- Removing negative values
+        AND b1.proposal_number IS NOT NULL
 ),
 serasa_neurotech_per_person AS (
     WITH base_persons_info AS (
