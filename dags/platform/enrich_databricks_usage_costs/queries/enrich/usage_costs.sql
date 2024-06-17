@@ -44,7 +44,13 @@ SELECT
     dc.spark_version,
     dc.runtime_engine,
     gi.dbus,
-    ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2) AS price,
+    CASE 
+      WHEN gi.id_dag IS NOT NULL THEN ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2)
+      WHEN gi.id_job IS NOT NULL AND gi.id_dag IS NULL THEN ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2)
+      WHEN LOWER(gi.cluster_name) LIKE "%wonka%" OR LOWER(gi.job_name) LIKE "wonka" AND gi.id_dag IS NOT NULL THEN ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2)
+      WHEN LOWER(gi.cluster_name) LIKE "%wonka%" OR LOWER(gi.job_name) LIKE "wonka" AND gi.id_dag IS NULL THEN ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2)
+      ELSE ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY gi.id_cluster, gi.ts_execution), 2)
+    END AS price,
     COUNT(gi.ts_execution) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), date(gi.ts_execution)) AS daily_executions,
     CAST(SPLIT_PART(dc.spark_version, '.', 1) AS INTEGER) AS spark_version_number,
     IF(id_dag IS NOT NULL AND id_job IS NOT NULL, TRUE, FALSE) AS is_dag_builder_migrated,
