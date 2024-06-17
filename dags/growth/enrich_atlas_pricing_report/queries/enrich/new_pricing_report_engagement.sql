@@ -29,7 +29,7 @@ SELECT
   house_metrics.id_house::BIGINT,
   house_metrics.business_context::STRING,
   hlvm.views_quantity::BIGINT,
-  hlvm.demand_level::STRING,
+  COALESCE(hlvm.demand_level, 'NO_VIEWS')::STRING AS demand_level,
   condo_metrics.condominium_price_median::BIGINT,
   condo_metrics.urban_property_tax_median::BIGINT,
   house_metrics.on_market_price_median::BIGINT,
