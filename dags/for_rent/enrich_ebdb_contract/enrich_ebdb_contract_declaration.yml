@@ -18,4 +18,4 @@ cluster:
     driver_node_type_id: m5a.2xlarge
     node_type_id: c5d.9xlarge
     num_workers: 2
-    spark_version: 10.4.x-scala2.12
+    spark_version: 12.2.x-scala2.12

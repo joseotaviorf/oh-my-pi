@@ -19,3 +19,4 @@ cluster:
     num_workers: 2
     aws_attributes:
       availability: ON_DEMAND
+    spark_version: 12.2.x-scala2.12
