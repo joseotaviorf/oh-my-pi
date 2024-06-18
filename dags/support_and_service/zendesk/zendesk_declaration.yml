@@ -1,0 +1,58 @@
+dag:
+  name: zendesk
+  schedule_start_date: 2019, 9, 27
+  schedule_interval: 0 0 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Load data of the Zendesk to the Clean layer, the Raw layer is loaded by Stitch.
+      Zendesk is responsible for the tickets of the customer services.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: add_data_from_stitch_to_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{{ ds }}"
+    - "{{ next_ds }}"
+    - "{table_name}"
+
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    users:
+      z_order_by: [id_user]
+    groups:
+      z_order_by: [id_group]
+    group_memberships:
+      z_order_by: [id_group_membership]
+    organizations:
+      z_order_by: [id_organization]
+    satisfaction_ratings:
+      z_order_by: [id_satisfaction_rating]
+    tickets:
+      z_order_by: [id_ticket]
+    ticket_metrics:
+      z_order_by: [id_ticket]
+    ticket_fields:
+      z_order_by: [id_ticket_field]
+    ticket_comments:
+      load_spark_job: add_data_from_airbyte_to_raw
+      z_order_by: [id_ticket]
+    ticket_audits:
+      load_spark_job: add_data_from_airbyte_to_raw
+      z_order_by: [id_ticket]
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.4xlarge
+    num_workers: 4
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+      availability: ON_DEMAND
+    spark_conf:
+      spark.driver.maxResultSize: "0"
