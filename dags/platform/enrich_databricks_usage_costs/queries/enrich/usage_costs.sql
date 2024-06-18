@@ -34,7 +34,7 @@ daily_cluster AS (
         datalake_databricks.daily_clusters
     QUALIFY 
         ROW_NUMBER() OVER (PARTITION BY id_cluster ORDER BY dt_cluster_run DESC) = 1
-),
+)
 SELECT
     gi.id_cluster,
     gi.id_dag,
@@ -74,5 +74,3 @@ LEFT JOIN
 LEFT JOIN
   daily_cluster AS dc
     ON gi.id_cluster = dc.id_cluster
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY gi.id_cluster, gi.ts_execution ORDER BY gi.ts_execution DESC) = 1
