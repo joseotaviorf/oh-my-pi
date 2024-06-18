@@ -11,7 +11,7 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  id_contract:
+  sk_contract:
     is_complete:
       severity_level: Error
   id_invoice:
