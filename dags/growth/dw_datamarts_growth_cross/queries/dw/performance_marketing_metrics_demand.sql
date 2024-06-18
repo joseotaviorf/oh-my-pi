@@ -70,8 +70,14 @@ fact_rent_flows AS (
         CAST(dr.country_name AS STRING) AS country_name,
         CAST(rf.flow_event AS STRING) AS flow_event,
         CAST(rf.mkt_origin AS STRING) AS mkt_origin,
-        CAST(rf.mkt_channel AS STRING) AS mkt_channel,
-        CAST(rf.mkt_medium AS STRING) AS mkt_medium,
+        CASE 
+            WHEN LOWER(rf.utm_campaign) LIKE '%semnon-branded%' THEN 'Paid Acquisition'
+            ELSE CAST(rf.mkt_channel AS STRING)
+        END AS mkt_channel, 
+        CASE 
+            WHEN LOWER(rf.utm_campaign) LIKE '%semnon-branded%' THEN 'SEM non-branded'
+            ELSE CAST(rf.mkt_medium AS STRING)
+        END AS mkt_medium, 
         CAST(rf.mkt_source AS STRING) AS mkt_source,
         CAST(rf.utm_medium AS STRING) AS utm_medium,
         CAST(rf.utm_source AS STRING) AS utm_source,

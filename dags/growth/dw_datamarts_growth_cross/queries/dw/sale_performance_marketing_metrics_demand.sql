@@ -207,8 +207,14 @@ sale_flows_funnel_events AS (
         TRIM(sf.city_group) as city_group,
         sf.flow_event,
         sf.mkt_origin,
-        sf.mkt_channel,
-        sf.mkt_medium,
+        CASE 
+            WHEN LOWER(sf.utm_campaign) LIKE '%semnon-branded%' THEN 'Paid Acquisition'
+            ELSE CAST(sf.mkt_channel AS STRING)
+        END AS mkt_channel, 
+        CASE 
+            WHEN LOWER(sf.utm_campaign) LIKE '%semnon-branded%' THEN 'SEM non-branded'
+            ELSE CAST(sf.mkt_medium AS STRING)
+        END AS mkt_medium, 
         sf.mkt_source,
         sf.utm_medium,
         sf.utm_source,

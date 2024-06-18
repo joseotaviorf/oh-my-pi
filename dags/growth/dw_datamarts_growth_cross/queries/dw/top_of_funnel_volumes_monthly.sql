@@ -171,8 +171,14 @@ events AS (
             ELSE 'Rental'
         END AS campaign_context,
         ui.mkt_origin,
-        ui.mkt_channel,
-        ui.mkt_medium,
+        CASE 
+            WHEN LOWER(ui.utm_campaign) LIKE '%semnon-branded%' THEN 'Paid Acquisition'
+            ELSE CAST(ui.mkt_channel AS STRING)
+        END AS mkt_channel, 
+        CASE 
+            WHEN LOWER(ui.utm_campaign) LIKE '%semnon-branded%' THEN 'SEM non-branded'
+            ELSE CAST(ui.mkt_medium AS STRING)
+        END AS mkt_medium, 
         ui.mkt_source,
         CAST(NULL AS STRING) AS is_3p,
         COUNT(NULL) as marketing_cost,
