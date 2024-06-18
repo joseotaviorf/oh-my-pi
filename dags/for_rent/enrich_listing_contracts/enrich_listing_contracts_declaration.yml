@@ -11,4 +11,4 @@ workflow:
     default_extraction_type: full 
     default_partitions: [country_code]
 cluster:
-    type: databricks_12_2_med_2_fixed_workers_general_photon_cluster
+    type: databricks_12_2_min_general_photon_cluster
