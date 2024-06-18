@@ -9,6 +9,7 @@ SELECT
     up_utm_campaign AS utm_campaign,
     up_utm_content AS utm_content,
     up_utm_term AS utm_term,
+    up_entrance_uri AS entrance_uri,
     CASE
         WHEN (UPPER(up_utm_campaign) LIKE '%BRANDED%'
         OR UPPER(up_utm_campaign) LIKE '%INSTITUCIONAL%')

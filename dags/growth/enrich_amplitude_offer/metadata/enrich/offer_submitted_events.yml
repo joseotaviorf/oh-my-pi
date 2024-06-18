@@ -70,6 +70,12 @@ columns:
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_utm_term
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_utm_term
     description: Returns utm_term parameter defined at campaing configuration at marketing platforms
+  entrance_uri:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_entrance_uri
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_entrance_uri
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_entrance_uri
+    description: The URL of the first page a user visits in a session 
   branded:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_campaign

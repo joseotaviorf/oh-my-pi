@@ -12,6 +12,7 @@ WITH deduplicated_offer_events AS (
         up_utm_campaign AS utm_campaign,
         up_utm_content AS utm_content,
         up_utm_term AS utm_term,
+        up_entrance_uri AS entrance_uri,
         dt_event,
         ts_event,
         year,
@@ -35,6 +36,7 @@ WITH deduplicated_offer_events AS (
         up_utm_campaign AS utm_campaign,
         up_utm_content AS utm_content,
         up_utm_term AS utm_term,
+        up_entrance_uri AS entrance_uri,
         dt_event,
         ts_event,
         year,
@@ -58,6 +60,7 @@ WITH deduplicated_offer_events AS (
         up_utm_campaign AS utm_campaign,
         up_utm_content AS utm_content,
         up_utm_term AS utm_term,
+        up_entrance_uri AS entrance_uri,
         dt_event,
         ts_event,
         year,
@@ -81,6 +84,7 @@ SELECT
     utm_campaign,
     utm_content,
     utm_term,
+    entrance_uri,
     CASE
         WHEN (UPPER(utm_campaign) LIKE '%BRANDED%'
         OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%')
