@@ -17,7 +17,7 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
 
-from bietlejuice.base.spark import BaseDBUtils
+# from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
@@ -196,11 +196,13 @@ source_tasks = [
     ),
 ]
 
-dbutils = BaseDBUtils().get_dbutils()
-if dbutils is None:
-    raise RuntimeError("DBUtils not found")
+#dbutils = BaseDBUtils().get_dbutils()
+#if dbutils is None:
+#    raise RuntimeError("DBUtils not found")
 
-kodak_api_key = dbutils.secrets.get('quintoandar', APIEnum.KODAK)
+kodak_api_key = ""
+# @toodo fix dbutils secret loading
+# kodak_api_key = dbutils.secrets.get("quintoandar", APIEnum.KODAK)
 
 core_tasks = [
     create_task(
