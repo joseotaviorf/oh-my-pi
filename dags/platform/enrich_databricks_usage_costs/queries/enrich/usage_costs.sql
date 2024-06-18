@@ -26,7 +26,15 @@ WITH granularity_ids AS (
         MAKE_DATE(dbu.year, dbu.month, dbu.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY dbu.id_cluster, dbu.ts_execution ORDER BY dbu.ts_execution DESC) = 1
-)
+),
+daily_cluster AS (
+    SELECT 
+        * 
+    FROM 
+        datalake_databricks.daily_clusters
+    QUALIFY 
+        ROW_NUMBER() OVER (PARTITION BY id_cluster ORDER BY dt_cluster_run DESC) = 1
+),
 SELECT
     gi.id_cluster,
     gi.id_dag,
@@ -43,14 +51,8 @@ SELECT
     END AS execution_context,
     dc.spark_version,
     dc.runtime_engine,
-    gi.dbus,
-    CASE 
-      WHEN gi.id_dag IS NOT NULL THEN ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2)
-      WHEN gi.id_job IS NOT NULL AND gi.id_dag IS NULL THEN ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2)
-      WHEN LOWER(gi.cluster_name) LIKE "%wonka%" OR LOWER(gi.job_name) LIKE "wonka" AND gi.id_dag IS NOT NULL THEN ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2)
-      WHEN LOWER(gi.cluster_name) LIKE "%wonka%" OR LOWER(gi.job_name) LIKE "wonka" AND gi.id_dag IS NULL THEN ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), gi.ts_execution), 2)
-      ELSE ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY gi.id_cluster, gi.ts_execution), 2)
-    END AS price,
+    ROUND(SUM(gi.dbus) OVER (PARTITION BY gi.id_cluster, gi.ts_execution), 2) AS dbus,
+    ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY gi.id_cluster, gi.ts_execution), 2) AS price,
     COUNT(gi.ts_execution) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), date(gi.ts_execution)) AS daily_executions,
     CAST(SPLIT_PART(dc.spark_version, '.', 1) AS INTEGER) AS spark_version_number,
     IF(id_dag IS NOT NULL AND id_job IS NOT NULL, TRUE, FALSE) AS is_dag_builder_migrated,
@@ -70,7 +72,7 @@ LEFT JOIN
   datalake_gsheets_clean.databricks_contract_details AS dcd
     ON gi.cluster_compute_type = dcd.cluster_compute_type
 LEFT JOIN
-  datalake_databricks.daily_clusters AS dc
+  daily_cluster AS dc
     ON gi.id_cluster = dc.id_cluster
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY gi.id_cluster, gi.ts_execution ORDER BY gi.ts_execution DESC) = 1
