@@ -59,17 +59,70 @@ class TableAttributes:
         return table_schema
 
     def _get_extraction_type(self):
+        """
+        Follows this order of priority:
+        1. Table customization for that specific layer
+        2. Table customization
+        3. Default for that specific layer
+        4. Default
+        If none of the above are set, it defaults to "full"
+        """
+
         default_extraction_type = self._workflow_args.get(
             "default_extraction_type", "full"
         )
+        if self.layer == LayerEnum.RAW:
+            default_extraction_type = self._workflow_args.get(
+                "default_raw_extraction_type", default_extraction_type
+            )
+        elif self.layer == LayerEnum.CLEAN:
+            default_extraction_type = self._workflow_args.get(
+                "default_clean_extraction_type", default_extraction_type
+            )
+
         table_extraction_type = self.table_customization.get(
             "extraction_type", default_extraction_type
         )
+        if self.layer == LayerEnum.RAW:
+            table_extraction_type = self.table_customization.get(
+                "raw_extraction_type", table_extraction_type
+            )
+        elif self.layer == LayerEnum.CLEAN:
+            table_extraction_type = self.table_customization.get(
+                "clean_extraction_type", table_extraction_type
+            )
         return table_extraction_type
 
     def _get_partitions(self):
+        """
+        Follows this order of priority:
+        1. Table customization for that specific layer
+        2. Table customization
+        3. Default for that specific layer
+        4. Default
+        If none of the above are set, it defaults to an empty list
+        """
+
         default_partitions = self._workflow_args.get("default_partitions", [])
+        if self.layer == LayerEnum.RAW:
+            default_partitions = self._workflow_args.get(
+                "default_raw_partitions", default_partitions
+            )
+        elif self.layer == LayerEnum.CLEAN:
+            default_partitions = self._workflow_args.get(
+                "default_clean_partitions", default_partitions
+            )
+
         table_partitions = self.table_customization.get(
             "partitions", default_partitions
         )
+        if self.layer == LayerEnum.RAW:
+            table_partitions = self.table_customization.get(
+                "raw_partitions", table_partitions
+            )
+        elif self.layer == LayerEnum.CLEAN:
+            table_partitions = self.table_customization.get(
+                "clean_partitions", table_partitions
+            )
+
         return table_partitions

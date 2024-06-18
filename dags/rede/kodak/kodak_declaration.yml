@@ -1,0 +1,57 @@
+dag:
+  name: kodak
+  schedule_start_date: 2020, 3, 19
+  schedule_interval: 0 0 * * *
+  owner: Data Rede
+  documentation:
+    dag_purpose: |
+      This flow is intended to retrieve data related to images and videos used on our platforms.
+workflow:
+  type: database_pull_delta
+  layer: raw
+  database_type: postgres
+  default_raw_extraction_type: incremental
+  default_clean_extraction_type: full
+  default_raw_partitions: [year, month, day]
+  default_clean_partitions: []
+  tables_customization:
+    image_inspection:
+      date_filter_column: updated_at
+    image_analysis:
+      raw_extraction_type: full
+      raw_partitions: []
+    image_inspection_group:
+      date_filter_column: updated_at
+    image_inspection_group_result:
+      date_filter_column: updated_at
+    group_analysis:
+      raw_extraction_type: full
+      raw_partitions: []
+    photo:
+      raw_extraction_type: full
+      raw_partitions: []
+    photo_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    photosphere:
+      raw_extraction_type: full
+      raw_partitions: []
+      clean_table_name: photo_sphere
+    photosphere_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+      clean_table_name: photo_sphere_aud
+    userrevisionentity:
+      raw_extraction_type: full
+      raw_partitions: []
+      clean_table_name: user_revision_entity
+    video:
+      raw_extraction_type: full
+      raw_partitions: []
+    video_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    watermark_removal:
+      date_filter_column: updated_at
+cluster:
+  type: databricks_12_2_med_general_cluster

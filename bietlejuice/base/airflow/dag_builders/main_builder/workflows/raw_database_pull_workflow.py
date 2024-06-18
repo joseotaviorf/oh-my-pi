@@ -46,7 +46,9 @@ class RawDatabasePullWorkflow(BaseWorkflow):
                 )
                 execute_job_cluster_local_id += 1
             raw_initial_task, raw_final_task = self._create_raw_tasks(
-                table_name=raw_table_name, dag_final_tasks=dag_final_tasks
+                table_name=raw_table_name,
+                table_customization=table_parameters,
+                dag_final_tasks=dag_final_tasks,
             )
             clean_initial_task, clean_final_task = self._create_clean_tasks(
                 table_name=table_parameters.get(
@@ -86,7 +88,9 @@ class RawDatabasePullWorkflow(BaseWorkflow):
             TaskEnum.GENERATE_DATABASE_TABLE_METRICS
         )
 
-    def _create_raw_tasks(self, table_name: str, dag_final_tasks) -> Tuple:
+    def _create_raw_tasks(
+        self, table_name: str, table_customization: dict, dag_final_tasks
+    ) -> Tuple:
         """
         Creates raw tasks, sets their internal dependencies and returns the first
         and the last tasks of the dependency flow.
@@ -96,6 +100,7 @@ class RawDatabasePullWorkflow(BaseWorkflow):
             self.workflow_args,
             LayerEnum.RAW,
             table_name.lower(),  # The table name must be lower case for most of the tasks, to avoid problems with Hive
+            table_customization,
         )
 
         load_raw_task = self.load_database_pull_raw_task_creator.create_task(
