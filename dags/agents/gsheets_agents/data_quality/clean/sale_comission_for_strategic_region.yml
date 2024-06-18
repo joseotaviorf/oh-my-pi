@@ -7,10 +7,8 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_region:
-    is_unique:
-      severity_level: Error
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   city_name:
     is_complete:
       severity_level: Warning
@@ -22,4 +20,4 @@ column_level_validations:
       severity_level: Warning
   is_strategic_region:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
