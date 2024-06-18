@@ -24,14 +24,7 @@ retsuko_reversao AS (
               'entry.bill-item/igpm-adm-fee', 
               'entry.bill-item/ipca-adm-fee', 
               'entry.bill-item/adjustment-agreement-adm-fee', 
-              'entry.bill-item/lockin',
-              'entry.bill-item/adm-fee-tax-pcc-adm-partner',
-              'entry.bill-item/adm-fee-tax-pcc-quintoandar',
-              'entry.bill-item/adm-fee-tax-ir-quinto-andar',
-              'entry.bill-item/adm-fee-tax-ir',
-              'entry.bill-item/adm-fee-tax-pcc',
-              'entry.bill-item/adm-fee-tax-ir-adm-partner',
-              'entry.bill-item/adm-fee-tax-pcc-quinto-andar') THEN 'adm fee'
+              'entry.bill-item/lockin') THEN 'adm fee'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar',
               'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
               'entry.bill-item/brokerage-fee-tax-ir', 
@@ -48,14 +41,7 @@ retsuko_reversao AS (
               'entry.bill-item/igpm-adm-fee', 
               'entry.bill-item/ipca-adm-fee', 
               'entry.bill-item/adjustment-agreement-adm-fee', 
-              'entry.bill-item/lockin',
-              'entry.bill-item/adm-fee-tax-pcc-adm-partner',
-              'entry.bill-item/adm-fee-tax-pcc-quintoandar',
-              'entry.bill-item/adm-fee-tax-ir-quinto-andar',
-              'entry.bill-item/adm-fee-tax-ir',
-              'entry.bill-item/adm-fee-tax-pcc',
-              'entry.bill-item/adm-fee-tax-ir-adm-partner',
-              'entry.bill-item/adm-fee-tax-pcc-quinto-andar') THEN '31101.02.02'
+              'entry.bill-item/lockin') THEN '31101.02.02'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar',
               'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
               'entry.bill-item/brokerage-fee-tax-ir', 
@@ -89,6 +75,10 @@ retsuko_reversao AS (
                     (ii.invoice_user = 'landlord') AND 
                     (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'adm-fee',  
+                      'igpm-adm-fee', 
+                      'ipca-adm-fee'
+                      'adjustment-agreement-adm-fee', 
+                      'lockin', 
                       'adm-fee-tax-pcc-adm-partner',
                       'adm-fee-tax-pcc-quintoandar',
                       'adm-fee-tax-ir-quinto-andar',
@@ -101,11 +91,7 @@ retsuko_reversao AS (
                       'brokerage-fee-tax-ir-adm-partner',
                       'brokerage-fee-tax-ir',
                       'brokerage-fee-tax-ir-quinto-andar',
-                      'lockin', 
-                      'pro-guarantor-5A-installment', 
-                      'adjustment-agreement-adm-fee', 
-                      'igpm-adm-fee', 
-                      'ipca-adm-fee'
+                      'pro-guarantor-5A-installment'
                       )
                     ) 
                 ) 

@@ -85,11 +85,15 @@ retsuko_fine AS (
             ON i.id_external = se.id_finance_entity
     WHERE 
         TRUE
-        AND SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
+        AND (
+            (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'fine-and-interest',
-                      'negotiation-fine-and-interest',
+                      'negotiation-fine-and-interest'
+                      )) OR 
+            (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'credit-card-revenue'
-                      )
+                      ) AND (se.version = 'v2' OR se.version IS NULL))
+            )
         AND ct.country_code = 'BR'
         AND i.ts_paid >= '2024-01-01'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -168,46 +172,10 @@ df AS (
         retsuko_final r
     LEFT JOIN
         sap_gateway
-            ON r.id_invoice = sap_gateway.id_finance_entity
-    LEFT JOIN
-        sap 
-            ON sap.id_finance_entity = r.id_invoice
-    WHERE 
-        revenue_name = 'credit card revenue'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
-
-    UNION ALL 
-
-    SELECT 
-        id_contract,
-        id_invoice,
-        id_entry,
-        version,
-        source_name,
-        revenue_name,
-        accrual_year_month,
-        sap.account_number,
-        MIN(CASE 
-          WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
-          WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
-          WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NULL THEN 'SB FAILURE'
-        END) AS status,
-        MIN(IF(sap.hash IS NULL OR sap_gateway.id_feature IS NULL, FALSE, TRUE)) AS is_completeness_compliance,
-        CAST(SUM(source_amount) AS DECIMAL(12,2)) AS source_amount,
-        CAST(SUM(debit_credit) AS DECIMAL(12,2)) AS sap_amount,
-        MAX(dt_source_trigger) AS dt_source_trigger,
-        MAX(dt_sap_created) AS dt_sap_created,
-        MAX(dt_sap_reference) AS dt_sap_reference
-    FROM 
-        retsuko_final r
-    LEFT JOIN
-        sap_gateway
             ON r.id_sap_gateway_feature = sap_gateway.id_feature
     LEFT JOIN
         sap 
             ON sap.hash = sap_gateway.hash
-    WHERE 
-        revenue_name != 'credit card revenue'
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
 ),
 
@@ -262,6 +230,4 @@ SELECT
     dt_sap_created,
     dt_sap_reference
 FROM 
-    df_final 
-WHERE 
-    TRUE
+    df_final
