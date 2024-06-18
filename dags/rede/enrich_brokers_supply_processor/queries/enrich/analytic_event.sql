@@ -15,6 +15,16 @@ SELECT
   GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesRent.70') AS pricing_percentiles_rent_70,
   GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesRent.80') AS pricing_percentiles_rent_80,
   GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesRent.90') AS pricing_percentiles_rent_90,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.payloadToPricingReport.pricing.salePrice') AS pricing_sale_price,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.10') AS pricing_percentiles_sale_10,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.20') AS pricing_percentiles_sale_20,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.30') AS pricing_percentiles_sale_30,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.40') AS pricing_percentiles_sale_40,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.50') AS pricing_percentiles_sale_50,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.60') AS pricing_percentiles_sale_60,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.70') AS pricing_percentiles_sale_70,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.80') AS pricing_percentiles_sale_80,
+  GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.percentilesSale.90') AS pricing_percentiles_sale_90,
   GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.payloadToPricingReport.details.description') AS pricing_details_description,
   GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.payloadToPricingReport.location.city') AS pricing_city,
   GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.payloadToPricingReport.location.address') AS pricing_address,
@@ -28,5 +38,5 @@ SELECT
   ae.year,
   ae.month,
   ae.day
-FROM 
+FROM
   datalake_brokers_supply_processor_clean.analytic_event AS ae

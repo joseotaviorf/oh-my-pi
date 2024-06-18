@@ -65,6 +65,46 @@ columns:
     description: '90th percentile of rent price from pricing forms.'
     lineage:
       - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_sale_price:
+    description: 'The lead sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_10:
+    description: '10th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_20:
+    description: '20th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_30:
+    description: '30th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_40:
+    description: '40th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_50:
+    description: '50th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_60:
+    description: '60th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_70:
+    description: '70th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_80:
+    description: '80th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
+  pricing_percentiles_sale_90:
+    description: '90th percentile of sale price from pricing forms.'
+    lineage:
+      - datalake_brokers_supply_processor_clean.analytic_event.event_properties
   pricing_details_description:
     description: 'Detailed description of the lead from pricing forms.'
     lineage:
