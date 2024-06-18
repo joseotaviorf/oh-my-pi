@@ -1,7 +1,8 @@
 ---
 database_name: metric_rent
-table_name: open_reports_weekly
-description: Weekly volume / percentage of tenant, landlord and total inspections the access review filtering inspection_type = 'offboarding' and status = 'reviewed'.
+table_name: inspections_weekly
+description: Weekly volume / percentage of tenant, landlord and total inspections the access review 
+  and calculations about contestations, filtering inspection_type = 'offboarding' and status = 'reviewed'.
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
@@ -137,6 +138,84 @@ columns:
         It's the division of sk_inspections when the has_owner_access_review and has_tenant_access_review columns are true with total inspections * 2, 
         filtering the inspection_type = 'offboarding' and status = 'reviewed'.
       acronym: WPILTWAR
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  tenant_contestations:
+    description: Weekly volume of contestations from tenants.
+    metric:
+      name: Weekly Volume of Tenant Contestations
+      description: Weekly volume of contestations from tenants.
+        It's the count of sk_inspections when the total_repair_contested columns is greater than 0 (zero) 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WVTC
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  landlord_contestations:
+    description: Weekly volume of contestations from landlords.
+    metric:
+      name: Weekly Volume of Landlord Contestations
+      description: Weekly volume of contestations from landlords.
+        It's the count of sk_inspections when the total_repair_request_by_owner columns is greater than 0 (zero) 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WVLC
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  total_contestations:
+    description: Weekly total volume of contestations.
+    metric:
+      name: Weekly Total Volume of Contestations
+      description: Weekly volume of contestations.
+        It's the count of sk_inspections when the total_repair_contested or total_repair_request_by_owner are greater than 0 (zero) 
+        filtering inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WTVC
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_tentant_contestations:
+    description: Weekly percentage of contestations from tenants.
+    metric:
+      name: Weekly Percentage of Tenant Contestations
+      description: Weekly percentage of contestations from tenants.
+        It's the division of count of sk_inspections when the total_repair_contested column is greater than zero with total inspections
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WPTC
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_landlord_contestations:
+    description: Weekly percentage of contestations from landlords.
+    metric:
+      name: Weekly Percentage of Landlord Contestations
+      description: Weekly percentage of contestations from landlords.
+        It's the division of count of sk_inspections when the total_repair_request_by_owner column is greater than zero with total inspections
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WPTC
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_total_contestations:
+    description: Weekly percentage of contestations.
+    metric:
+      name: Weekly Percentage of Contestations
+      description: Weekly percentage of contestations.
+        It's the division of sk_inspections when the total_repair_contested or total_repair_request_by_owner columns are greater than zero with total inspections, 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WPC
       is_additive: False
       business_stage: Offboarding
       hierarchy: User analysis

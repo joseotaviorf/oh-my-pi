@@ -1,8 +1,10 @@
-WITH inspections AS(
+WITH inspections AS (
   SELECT
     fi.sk_inspection,
     dc.value_segment AS category,
     dc.country_code,
+    frr.total_repair_request_by_owner,
+    frr.total_repair_contested,
     frr.has_owner_access_review,
     frr.has_tenant_access_review,
     frr.ts_reviewed
@@ -23,7 +25,7 @@ WITH inspections AS(
     AND frr.ts_reviewed IS NOT NULL
 ),
 
-calculation as (
+calculation AS (
   SELECT 
       DATE_TRUNC('MONTH', ts_reviewed) AS dt_month_reference,
       category,
@@ -32,6 +34,9 @@ calculation as (
       COUNT(DISTINCT IF(has_owner_access_review, sk_inspection, NULL)) AS inspections_landlord_review,
       COUNT(DISTINCT IF(has_owner_access_review AND has_tenant_access_review, sk_inspection, NULL)) AS inspections_both_review,
       COUNT(DISTINCT IF(has_owner_access_review = FALSE AND has_tenant_access_review = FALSE, sk_inspection, NULL)) AS inspections_both_without_review,
+      COUNT(DISTINCT IF(total_repair_contested > 0, sk_inspection, NULL)) AS tenant_contestations,
+      COUNT(DISTINCT IF(total_repair_request_by_owner > 0, sk_inspection, NULL)) AS landlord_contestations,
+      COUNT(DISTINCT IF(total_repair_contested + total_repair_request_by_owner > 0, sk_inspection, NULL)) AS total_contestations,
       COUNT(DISTINCT sk_inspection) AS total_inspections
   FROM
     inspections
@@ -51,7 +56,13 @@ SELECT
   inspections_tenant_review / total_inspections AS pct_inpsections_tenant_review,
   inspections_landlord_review / total_inspections  AS pct_inspections_landlord_review,
   inspections_both_review / total_inspections AS pct_inspections_both_without_review,
-  (inspections_tenant_review + inspections_landlord_review) / (2 * total_inspections) AS pct_tenant_landlord_review
+  (inspections_tenant_review + inspections_landlord_review) / (2 * total_inspections) AS pct_tenant_landlord_review,
+  tenant_contestations,
+  landlord_contestations,
+  total_contestations,
+  tenant_contestations / total_inspections AS pct_tentant_contestations,
+  landlord_contestations / total_inspections AS pct_landlord_contestations,
+  total_contestations / total_inspections AS pct_total_contestations
 FROM
   calculation
 
@@ -69,7 +80,13 @@ SELECT
   SUM(inspections_tenant_review) / SUM(total_inspections) AS pct_inspections_tenant_review,
   SUM(inspections_landlord_review) / SUM(total_inspections)  AS pct_inspections_landlord_review,
   SUM(inspections_both_without_review) / SUM(total_inspections) AS pct_both_without_access,
-  (SUM(inspections_tenant_review) + SUM(inspections_landlord_review)) / (2 * SUM(total_inspections)) AS pct_tenant_landlord_review
+  (SUM(inspections_tenant_review) + SUM(inspections_landlord_review)) / (2 * SUM(total_inspections)) AS pct_tenant_landlord_review,
+  SUM(tenant_contestations) AS tenant_contestations,
+  SUM(landlord_contestations) AS landlord_contestations,
+  SUM(total_contestations) AS total_contestations,
+  SUM(tenant_contestations) / SUM(total_inspections) AS pct_tentant_contestations,
+  SUM(landlord_contestations) / SUM(total_inspections) AS pct_landlord_contestations,
+  SUM(total_contestations) / SUM(total_inspections) AS pct_total_contestations
 FROM
   calculation
 GROUP BY

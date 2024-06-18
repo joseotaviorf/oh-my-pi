@@ -1,7 +1,8 @@
 ---
 database_name: metric_rent
-table_name: open_reports_monthly
-description: Monthly volume / percentage of tenant, landlord and total inspections the access review filtering inspection_type = 'offboarding' and status = 'reviewed'.
+table_name: inspections_monthly
+description: Monthly volume / percentage of tenant, landlord and total inspections the access review 
+  and calculations about contestations, filtering inspection_type = 'offboarding' and status = 'reviewed'.
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
@@ -66,7 +67,7 @@ columns:
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
   inspections_both_without_review:
-    description: Monthly volume of inspections which the tenant and landlor don't have access to review.
+    description: Monthly volume of inspections which the tenant and landlord don't have access to review.
     metric:
       name: Monthly Volume of Inspections - Landlord and Tenant Without Access Review
       description: Monthly volume of inspections which the tenant and landlord don't have access to review.
@@ -137,6 +138,84 @@ columns:
         It's the division of sk_inspections when the has_owner_access_review and has_tenant_access_review columns are true with total inspections * 2, 
         filtering the inspection_type = 'offboarding' and status = 'reviewed'.
       acronym: MPILTWAR
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  tenant_contestations:
+    description: Monthly volume of contestations from tenants.
+    metric:
+      name: Monthly Volume of Tenant Contestations
+      description: Monthly volume of contestations from tenants.
+        It's the count of sk_inspections when the total_repair_contested columns is greater than 0 (zero) 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: MVTC
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  landlord_contestations:
+    description: Monthly volume of contestations from landlords.
+    metric:
+      name: Monthly Volume of Landlord Contestations
+      description: Monthly volume of contestations from landlords.
+        It's the count of sk_inspections when the total_repair_request_by_owner columns is greater than 0 (zero) 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: MVLC
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  total_contestations:
+    description: Monthly total volume of contestations.
+    metric:
+      name: Monthly Total Volume of Contestations
+      description: Monthly volume of contestations.
+        It's the count of sk_inspections when the total_repair_contested or total_repair_request_by_owner are greater than 0 (zero) 
+        filtering inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: MTVC
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_tentant_contestations:
+    description: Monthly percentage of contestations from tenants.
+    metric:
+      name: Monthly Percentage of Tenant Contestations
+      description: Monthly percentage of contestations from tenants.
+        It's the division of count of sk_inspections when the total_repair_contested column is greater than zero with total inspections
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: MPTC
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_landlord_contestations:
+    description: Monthly percentage of contestations from landlords.
+    metric:
+      name: Monthly Percentage of Landlord Contestations
+      description: Monthly percentage of contestations from landlords.
+        It's the division of count of sk_inspections when the total_repair_request_by_owner column is greater than zero with total inspections
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: MPTC
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_total_contestations:
+    description: Monthly percentage of contestations.
+    metric:
+      name: Monthly Percentage of Contestations
+      description: Monthly percentage of contestations.
+        It's the division of sk_inspections when the total_repair_contested or total_repair_request_by_owner columns are greater than zero with total inspections, 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: MPC
       is_additive: False
       business_stage: Offboarding
       hierarchy: User analysis

@@ -28,6 +28,8 @@ Currently, there is the following output tables in the metric layer:
 - `house_not_relisted_weekly`
 - `house_republished_unpublished_monthly`
 - `house_republished_unpublished_weekly`
+- `inspections_monthly`
+- `inspections_weekly`
 - `lead_time_cc2nr_monthly`
 - `lead_time_cc2nr_weekly`
 - `nps_pp_monthly`
@@ -36,8 +38,6 @@ Currently, there is the following output tables in the metric layer:
 - `nps_pp_with_repairs_weekly`
 - `nps_pp_without_repairs_monthly`
 - `nps_pp_without_repairs_weekly`
-- `open_reports_monthly`
-- `open_reports_weekly`
 - `relisting_before_tr_3_days_monthly`
 - `relisting_before_tr_3_days_weekly`
 - `relisting_early_demand_total_monthly`
