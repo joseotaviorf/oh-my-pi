@@ -27,12 +27,12 @@ WITH taxonomy AS (
       datalake_supply_flows.operations_agents AS ops
         ON (ops.id_user = ct.id_user_registrant)
     LEFT JOIN 
-      datalake_supply_flows.manual_reprocessing AS mr_leads 
+      datalake_supply_flows.manual_reprocessing_events AS mr_leads 
         ON (ct.id_lead = mr_leads.id_entity)
         AND (ct.business_context = mr_leads.business_context)
         AND (mr_leads.reprocessing_entity_type = 'lead')
     LEFT JOIN 
-      datalake_supply_flows.manual_reprocessing AS mr_houses
+      datalake_supply_flows.manual_reprocessing_events AS mr_houses
         ON (ct.id_house = mr_houses.id_entity)
         AND (ct.business_context = mr_houses.business_context)
         AND mr_houses.reprocessing_entity_type = 'house'  

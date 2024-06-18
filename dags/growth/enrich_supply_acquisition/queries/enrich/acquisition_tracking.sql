@@ -140,6 +140,8 @@ event_tracking_1p AS (
         COALESCE(lo.campaign, -1) AS campaign,
         COALESCE(lo.medium, -1) AS medium,
         COALESCE(lo.source, -1) AS source,
+        COALESCE(lo.term, -1) AS term,
+        COALESCE(lo.content, -1) AS content,
         lo.ops_agent,
         lo.ops_objective,
         lo.ops_partner,
@@ -154,7 +156,9 @@ event_tracking_1p AS (
         lo.original_lead,
         lo.database_tracking_campaign,
         lo.database_tracking_medium,
-        lo.database_tracking_source
+        lo.database_tracking_source,
+        lo.database_tracking_term,
+        lo.database_tracking_content
     FROM 1p_union AS et
     LEFT JOIN datalake_supply_flows.lead_origin AS lo 
         USING(id_lead)
@@ -181,6 +185,8 @@ event_tracking_3p AS (
     CAST(-1 AS STRING) AS campaign,
     CAST(-1 AS STRING) AS medium,
     CAST(-1 AS STRING) AS source,
+    CAST(-1 AS STRING) AS term,
+    CAST(-1 AS STRING) AS content,
     CAST(NULL AS STRING) AS ops_agent,
     CAST(NULL AS STRING) AS ops_objective,
     CAST(NULL AS STRING) AS ops_partner,
@@ -195,7 +201,9 @@ event_tracking_3p AS (
     -1 AS original_lead,
     CAST('3p_supply_processor' AS STRING) AS database_tracking_campaign,
     CAST('3p_supply_processor' AS STRING) AS database_tracking_medium,
-    CAST('3p_supply_processor' AS STRING) AS database_tracking_source
+    CAST('3p_supply_processor' AS STRING) AS database_tracking_source,
+    CAST('3p_supply_processor' AS STRING) AS database_tracking_term,
+    CAST('3p_supply_processor' AS STRING) AS database_tracking_content
     FROM 3p_union AS et
 ),
 event_tracking_ciq AS (
@@ -220,6 +228,8 @@ event_tracking_ciq AS (
         CAST(-1 AS STRING) AS campaign,
         CAST(-1 AS STRING) AS medium,
         CAST(-1 AS STRING) AS source,
+        CAST(-1 AS STRING) AS term,
+        CAST(-1 AS STRING) AS content,
         CAST(NULL AS STRING) AS ops_agent,
         CAST(NULL AS STRING) AS ops_objective,
         CAST(NULL AS STRING) AS ops_partner,
@@ -234,7 +244,9 @@ event_tracking_ciq AS (
         -1 AS original_lead,
         CAST('ciq_bob' AS STRING) AS database_tracking_campaign,
         CAST('ciq_bob' AS STRING) AS database_tracking_medium,
-        CAST('ciq_bob' AS STRING) AS database_tracking_source
+        CAST('ciq_bob' AS STRING) AS database_tracking_source,
+        CAST('ciq_bob' AS STRING) AS database_tracking_term,
+        CAST('ciq_bob' AS STRING) AS database_tracking_content
     FROM ciq_union AS et
 ),
 
@@ -247,86 +259,140 @@ all_tracking AS (
   UNION ALL
   SELECT *
   FROM event_tracking_ciq
+),
+stg_acquisition_tracking AS (
+  SELECT
+    sk_supply_lead,
+    business_context,
+    id_lead,
+    id_lead_ebdb,
+    id_region,
+    id_referred_by,
+    id_wololo,
+    id_house,
+    business_event,
+    funnel_step,
+    supply_source,
+    drop_step_reason,
+    funnel_level,
+    aux_product_status,
+    affiliate_type,
+    campaign,
+    medium,
+    source,
+    term,
+    content,
+    ops_agent,
+    ops_objective,
+    ops_partner,
+    ops_assigned,
+    application,
+    landing_page,
+    reprocessed,
+    ops_approach,
+    ops_contact_medium,
+    platform,
+    lead_type,
+    original_lead,
+    database_tracking_campaign,
+    database_tracking_medium,
+    database_tracking_source,
+    database_tracking_term,
+    database_tracking_content,
+    ts_event,
+    ts_load
+  FROM
+    all_tracking
+  UNION ALL
+  -- Adding backfill cases
+  SELECT
+    sk_supply_lead,
+    business_context,
+    id_lead,
+    id_lead_ebdb,
+    id_region,
+    id_referred_by,
+    id_wololo,
+    id_house,
+    business_event,
+    funnel_step,
+    supply_source,
+    drop_step_reason,
+    funnel_level,
+    aux_product_status,
+    affiliate_type,
+    COALESCE(campaign, -1) AS campaign,
+    COALESCE(medium, -1) AS medium,
+    COALESCE(source, -1) AS source,
+    CAST(-1 AS STRING) AS term,
+    CAST(-1 AS STRING) AS content,
+    ops_agent,
+    ops_objective,
+    ops_partner,
+    ops_assigned,
+    application,
+    landing_page,
+    reprocessed,
+    ops_approach,
+    ops_contact_medium,
+    platform,
+    lead_type,
+    original_lead,
+    database_tracking_campaign,
+    database_tracking_medium,
+    database_tracking_source,
+    'backfill' AS database_tracking_term,
+    'backfill' AS database_tracking_content,
+    ts_event,
+    ts_load
+  FROM
+    datalake_supply_flows.acquisition_backfill AS ab
+  LEFT ANTI JOIN 
+    all_tracking AS at
+      ON (ab.id_lead_ebdb = at.id_lead_ebdb)
+      AND (ab.supply_source = at.supply_source)
 )
 
-SELECT
-  sk_supply_lead,
-  business_context,
-  id_lead,
-  id_lead_ebdb,
-  id_region,
-  id_referred_by,
-  id_wololo,
-  id_house,
-  business_event,
-  funnel_step,
-  supply_source,
-  drop_step_reason,
-  funnel_level,
-  aux_product_status,
-  affiliate_type,
-  campaign,
-  medium,
-  source,
-  ops_agent,
-  ops_objective,
-  ops_partner,
-  ops_assigned,
-  application,
-  landing_page,
-  reprocessed,
-  ops_approach,
-  ops_contact_medium,
-  platform,
-  lead_type,
-  original_lead,
-  database_tracking_campaign,
-  database_tracking_medium,
-  database_tracking_source,
-  ts_event,
-  ts_load
-FROM
-  all_tracking
-UNION ALL
--- Adding backfill cases
-SELECT
-  sk_supply_lead,
-  business_context,
-  id_lead,
-  id_lead_ebdb,
-  id_region,
-  id_referred_by,
-  id_wololo,
-  id_house,
-  business_event,
-  funnel_step,
-  supply_source,
-  drop_step_reason,
-  funnel_level,
-  aux_product_status,
-  affiliate_type,
-  COALESCE(campaign, -1) AS campaign,
-  COALESCE(medium, -1) AS medium,
-  COALESCE(source, -1) AS source,
-  ops_agent,
-  ops_objective,
-  ops_partner,
-  ops_assigned,
-  application,
-  landing_page,
-  reprocessed,
-  ops_approach,
-  ops_contact_medium,
-  platform,
-  lead_type,
-  original_lead,
-  database_tracking_campaign,
-  database_tracking_medium,
-  database_tracking_source,
-  ts_event,
-  ts_load
-FROM
-  datalake_supply_flows.acquisition_backfill AS ab
-LEFT ANTI JOIN all_tracking AS at
-  ON (ab.id_lead_ebdb = at.id_lead_ebdb)
-    AND (ab.supply_source = at.supply_source)
+SELECT 
+    sta.sk_supply_lead,
+    sta.business_context,
+    sta.id_lead,
+    sta.id_lead_ebdb,
+    sta.id_region,
+    sta.id_referred_by,
+    sta.id_wololo,
+    sta.id_house,
+    sta.business_event,
+    sta.funnel_step,
+    sta.supply_source,
+    sta.drop_step_reason,
+    sta.funnel_level,
+    sta.aux_product_status,
+    sta.affiliate_type,
+    sta.campaign,
+    sta.medium,
+    sta.source,
+    sta.term,
+    sta.content,
+    sta.ops_agent,
+    sta.ops_objective,
+    sta.ops_partner,
+    sta.ops_assigned,
+    COALESCE(sta.application, lwo.application) AS application,
+    sta.landing_page,
+    sta.reprocessed,
+    sta.ops_approach,
+    sta.ops_contact_medium,
+    sta.platform,
+    COALESCE(sta.lead_type, lwo.lead_type) AS lead_type,
+    sta.original_lead,
+    sta.database_tracking_campaign,
+    sta.database_tracking_medium,
+    sta.database_tracking_source,
+    sta.database_tracking_term,
+    sta.database_tracking_content,
+    sta.ts_event,
+    sta.ts_load
+FROM stg_acquisition_tracking AS sta
+LEFT JOIN datalake_supply_flows.leads_without_origin AS lwo
+  USING (id_lead_ebdb, supply_source)

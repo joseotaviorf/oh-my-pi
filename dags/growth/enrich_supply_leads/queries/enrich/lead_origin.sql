@@ -7,6 +7,8 @@ WITH lead_origin_rene_descartes AS (
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmCampaign') AS STRING) AS campaign,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmMedium') AS STRING) AS medium,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmSource') AS STRING) AS source,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmContent') AS STRING) AS content,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmTerm') AS STRING) AS term,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.team') AS STRING) AS ops_agent, 
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.company') AS STRING) AS ops_partner,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) AS application,
@@ -44,6 +46,8 @@ lead_origin_amplitude AS (
     IF(utm_campaign == '', '-1', utm_campaign) AS campaign,
     IF(utm_medium == '', '-1', utm_medium) AS medium, 
     IF(utm_source == '', '-1', utm_source) AS source, 
+    IF(utm_content == '', '-1', utm_content) AS content,
+    IF(utm_term == '', '-1', utm_term) AS term,
     IF(city == '', '-1', city) AS city, 
     IF(platform == '', '-1', platform) AS platform, 
     ts_event
@@ -60,6 +64,8 @@ mid_table AS (
     COALESCE(r.campaign, a.campaign, a2.campaign) AS campaign,
     COALESCE(r.medium, a.medium, a2.medium) AS medium,  
     COALESCE(r.source, a.source, a2.source) AS source,
+    COALESCE(r.content, a.content, a2.content) AS content,
+    COALESCE(r.term, a.term, a2.term) AS term,
     r.ops_agent,
     r.ops_partner,
     r.application,
@@ -74,6 +80,8 @@ mid_table AS (
     NVL2(r.campaign, 'rene_descartes', NVL2(a.campaign, 'amplitude', NVL2(a2.campaign, 'amplitude', 'lost_tracking'))) AS database_tracking_campaign,
     NVL2(r.medium, 'rene_descartes', NVL2(a.medium, 'amplitude', NVL2(a2.medium, 'amplitude', 'lost_tracking'))) AS database_tracking_medium,
     NVL2(r.source, 'rene_descartes', NVL2(a.source, 'amplitude', NVL2(a2.source, 'amplitude', 'lost_tracking'))) AS database_tracking_source,
+    NVL2(r.content, 'rene_descartes', NVL2(a.content, 'amplitude', NVL2(a2.content, 'amplitude', 'lost_tracking'))) AS database_tracking_content,
+    NVL2(r.term, 'rene_descartes', NVL2(a.term, 'amplitude', NVL2(a2.term, 'amplitude', 'lost_tracking'))) AS database_tracking_term,
     COALESCE(r.ts_event, a.ts_event) AS ts_event
   FROM lead_origin_rene_descartes AS r
   LEFT JOIN lead_origin_amplitude AS a
@@ -92,6 +100,8 @@ SELECT
   campaign,
   SF_NORMALIZE_STRING(medium) AS medium,  
   SF_NORMALIZE_STRING(source) AS source,
+  SF_NORMALIZE_STRING(content) AS content,
+  SF_NORMALIZE_STRING(term) AS term,
   SF_NORMALIZE_STRING(ops_agent) AS ops_agent,
   CASE 
     WHEN ops_agent = 'CAPTA_AI' THEN 'acquisition'
@@ -112,6 +122,8 @@ SELECT
   database_tracking_campaign,
   database_tracking_medium,
   database_tracking_source,
+  database_tracking_content,
+  database_tracking_term,
   ts_event,
   CURRENT_TIMESTAMP AS ts_load
 FROM 

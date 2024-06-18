@@ -26,7 +26,7 @@ WITH events_3p AS (
 ),
 original_events AS (
     SELECT 
-      * EXCEPT (year, month, day)
+      *
     FROM 
       datalake_supply_flows.conversion_attributed_events
     UNION ALL

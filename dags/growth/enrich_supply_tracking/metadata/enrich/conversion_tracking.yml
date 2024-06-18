@@ -72,40 +72,40 @@ columns:
     description: Agent that reprocessed the lead. For this scenario, it is always the outbound team.
     lineage:
       - datalake_supply_flows.conversion_taxonomy.ops_agent
-      - datalake_supply_flows.manual_reprocessing.ops_agent
+      - datalake_supply_flows.manual_reprocessing_events.ops_agent
   ops_approach:
     description: Approach of the conversion event.
     lineage:
       - datalake_supply_flows.conversion_taxonomy.ops_approach
-      - datalake_supply_flows.manual_reprocessing.ops_approach
+      - datalake_supply_flows.manual_reprocessing_events.ops_approach
   ops_contact_medium:
     description: Medium of the conversion event.
     lineage:
       - datalake_supply_flows.conversion_taxonomy.ops_contact_medium
-      - datalake_supply_flows.manual_reprocessing.ops_contact_medium
+      - datalake_supply_flows.manual_reprocessing_events.ops_contact_medium
   ops_objective:
     description: Objective of the conversion event.
     lineage:
       - datalake_supply_flows.conversion_taxonomy.ops_objective
-      - datalake_supply_flows.manual_reprocessing.ops_objective
+      - datalake_supply_flows.manual_reprocessing_events.ops_objective
   ops_partner:
     description: The name of the company that registered the lead.
     lineage:
       - datalake_supply_flows.conversion_events.ops_partner
-      - datalake_supply_flows.manual_reprocessing.ops_partner
+      - datalake_supply_flows.manual_reprocessing_events.ops_partner
   reprocessed:
     description: Indicates if the event has been reprocessed manually.
     lineage:
       - datalake_supply_flows.conversion_events.reprocessed
-      - datalake_supply_flows.manual_reprocessing.reprocessed
+      - datalake_supply_flows.manual_reprocessing_events.reprocessed
   reprocessing_entity_type:
     description: Type of entity that was reprocessed.
     lineage:
-      - datalake_supply_flows.manual_reprocessing.reprocessing_entity_type
+      - datalake_supply_flows.manual_reprocessing_events.reprocessing_entity_type
   reprocessing_table_name:
     description: Name of the table where reprocessing occurred.
     lineage:
-      - datalake_supply_flows.manual_reprocessing.reprocessing_table_name
+      - datalake_supply_flows.manual_reprocessing_events.reprocessing_table_name
   ts_event_original:
     description: Timestamp of the original event.
     lineage:
@@ -125,7 +125,7 @@ columns:
   ts_reprocessing_event:
     description: Timestamp of the reprocessing event.
     lineage:
-      - datalake_supply_flows.manual_reprocessing.ts_created
+      - datalake_supply_flows.manual_reprocessing_events.ts_created
   ts_load:
     description: Timestamp of when the data was loaded into the table.
   aux_group:
