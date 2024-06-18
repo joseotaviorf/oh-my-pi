@@ -27,7 +27,7 @@ collection_calculation AS (
 SELECT
     md5(CONCAT(sk_debtor, creditor, id_operator, id_occurrence, dt_occurrence)) AS sk_collection,
     sk_debtor,
-    id_contract,
+    id_contract AS sk_contract,
     id_operator,
     id_operator_registration,
     id_occurrence,

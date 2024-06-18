@@ -74,7 +74,7 @@ SELECT DISTINCT
     CAST(tfi.id_invoice_extra AS BIGINT) AS id_invoice_extra,
     COALESCE(i.id_receipt, tfi.id_receipt) AS id_receipt,
     CAST(COALESCE(i.installment_number, tfi.installment_number) AS INT) AS installment_number,
-    COALESCE(i.creditor, tfi.creditor) AS creditor,
+    COALESCE(tfi.creditor, i.creditor) AS creditor,
     i.is_special_installment,
     CASE
       WHEN tfi.installment_status = 'paid' OR i.installment_status = 'Pago' THEN 'paid'

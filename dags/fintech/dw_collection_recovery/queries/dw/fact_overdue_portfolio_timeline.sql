@@ -1,4 +1,10 @@
 WITH
+region_contract AS (
+  SELECT DISTINCT
+    id_contract,
+    id_region
+  FROM datalake_rent_demand_events.rent_demand_events
+),
 distinct_contract_customer AS (
   SELECT DISTINCT
     id_contract,
@@ -82,6 +88,33 @@ SELECT
         WHEN bossn.id_invoice IS NOT NULL AND o.payment_status = "written-down" THEN "BOSSN (single debt negotiation)"
         ELSE NULL
     END AS type_ssn,
+    CASE
+      WHEN possn.id_invoice IS NOT NULL
+        AND o.payment_status = "paid"
+        AND o.reason NOT IN ("negotiation-recupera", "agreement")
+      THEN "Self Service Negotiation - Payment of original debt"
+      WHEN bossn.id_invoice IS NOT NULL
+        AND o.payment_status = "written-down"
+      THEN "Self Service Negotiation - Negotiation"
+      WHEN possn.id_invoice IS NULL
+        AND bossn.id_invoice IS NULL
+        AND o.payment_status = 'paid'
+        AND o.reason NOT IN ("negotiation-recupera", "agreement")
+        AND o.invoice_type != "extra"
+      THEN "Original debt"
+      WHEN possn.id_invoice IS NULL
+        AND bossn.id_invoice IS NULL
+        AND o.payment_status = 'written-down'
+        AND o.reason NOT IN ("negotiation-recupera", "agreement")
+        AND o.invoice_type != "extra"
+      THEN "Negotiation"
+      WHEN possn.id_invoice IS NULL
+        AND bossn.id_invoice IS NULL
+        AND o.payment_status = 'paid'
+        AND o.reason IN ("negotiation-recupera", "agreement")
+        AND o.invoice_type = "extra"
+      THEN "Negotiation installments (extra)"
+    END AS recovery_method,
     o.debtor_type,
     o.delay_contamined_range,
     o.contract_overdue_invoices,
@@ -130,7 +163,8 @@ get_last_valid_partner AS (
 )
 SELECT
     a.sk_overdue_portfolio_timeline,
-    a.id_contract,
+    r.id_region AS sk_region,
+    a.id_contract AS sk_contract,
     a.id_invoice,
     a.id_proposal,
     a.contract_status,
@@ -138,6 +172,7 @@ SELECT
     a.payment_status,
     a.is_ssn,
     a.type_ssn,
+    a.recovery_method,
     a.debtor_type,
     a.delay_contamined_range,
     a.contract_overdue_invoices,
@@ -162,3 +197,5 @@ FROM add_all_dimensions AS a
 LEFT JOIN get_last_valid_partner AS g
   ON a.id_contract = g.id_contract
     AND a.id_invoice = g.id_invoice
+LEFT JOIN region_contract AS r
+  ON r.id_contract = a.id_contract

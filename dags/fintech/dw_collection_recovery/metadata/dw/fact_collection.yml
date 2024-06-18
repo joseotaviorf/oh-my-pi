@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_recupera.collection.id_customer
     description: Customer document (CPF). Foreign key of table dim_debtor.
+  sk_contract:
+    lineage:
+      - datalake_recupera.collection.id_contract
+    description: Contract ID
   creditor:
     lineage:
       - datalake_recupera.collection.id_creditor

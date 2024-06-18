@@ -10,7 +10,7 @@ columns:
       - datalake_invoice.overdue_portfolio_timeline.id_invoice
       - datalake_invoice.overdue_portfolio_timeline.dt_reference
     description: Surrogate key of table. It is the concat between id_invoice and dt_reference
-  id_contract:
+  sk_contract:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.id_contract
     description: Contract ID
@@ -56,6 +56,19 @@ columns:
     categories:
       "POSSN (payment of original)": "In this case, the customer paid the original invoice without a negotiation through the app's SSN screen."
       "BOSSN (single debt negotiation)": "Boletão. In this case, the customer himself paid the debts through a negotiation that resulted in a single installment/invoice. This was carried out without the help of external advisors or a 5A employee"
+  recovery_method:
+    lineage:
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_invoice
+      - datalake_invoice.overdue_portfolio_timeline.reason
+      - datalake_invoice.overdue_portfolio_timeline.payment_status
+      - datalake_trato_feito_clean.debt.id_external
+    description: "Recovery Method"
+    categories:
+      Self Service Negotiation - Payment of original debt: ""
+      Self Service Negotiation - Negotiation: ""
+      Original debt: ""
+      Negotiation: ""
+      Negotiation installments (extra): ""
   debtor_type:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.debtor_type
@@ -90,7 +103,7 @@ columns:
   business_day:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.business_day
-    description: Number of business day on reference months
+    description: Working days accumulated up to the reference date
   is_last_business_days:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.is_last_business_days
