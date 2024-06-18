@@ -427,5 +427,54 @@ columns:
       Not Mapped: ''
       Web Desktop: ''
       Web Mobile: ''
+  ts_first_listing:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_listing
+    description: Timestamp date of first publication of the house in sale context
+  ts_first_event:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_event
+    description: Timestamp date first event of the flow
+  ts_first_tta_message_sent:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_tta_message_sent
+    description: Timestamp date of the first message sent through talk to agent feature in
+      the flow
+  ts_first_booking_created:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_booking_created
+    description: Timestamp date of the first booking created in the sale flow
+  ts_first_visit_completed:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_visit_completed
+    description: Timestamp date of the first visit completed in the sale flow
+  ts_first_offer_submitted:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+    description: Timestamp date of the first offer submitted in the flow
+  ts_first_offer_accepted:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
+    description: Timestamp date of the first offer acceptance in the flow
+  ts_first_offer_dismissed:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_first_offer_dismissed
+    description: Timestamp date of the first offer dismissed in the flow
+  ts_sale_agreement_created:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_sale_agreement_created
+    description: Timestamp date of sale agreement creation
+  ts_sale_agreement_signed:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+    description: Timestamp date of sale agreement signature
+  ts_sale_agreement_cancelled:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_sale_agreement_cancelled
+    description: Timestamp date of sale agreement cancellation
+  ts_house_registry_ended:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_house_registry_ended
+    description: Timestamp date of the end of house registry transfered to buyer's name
   ts_load:
     description: Timestamp indicating when this table was loaded.

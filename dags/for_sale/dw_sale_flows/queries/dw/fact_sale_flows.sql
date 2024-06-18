@@ -234,6 +234,18 @@ SELECT
   COALESCE(tx.mkt_medium,'Not Mapped') AS mkt_medium,
   COALESCE(tx.mkt_source,'Not Mapped') AS mkt_source,
   COALESCE(tx.mkt_platform,'Not Mapped') AS mkt_platform,
+  sf.ts_first_listing,
+  sf.ts_first_event,
+  sf.ts_first_tta_message_sent,
+  sf.ts_first_booking_created,
+  sf.ts_first_visit_completed,
+  sf.ts_first_offer_submitted,
+  sf.dt_first_offer_accepted AS ts_first_offer_accepted,
+  sf.dt_first_offer_dismissed AS ts_first_offer_dismissed,
+  CAST(sf.dt_sale_agreement_created AS TIMESTAMP) AS ts_sale_agreement_created,
+  sf.dt_sale_agreement_signed AS ts_sale_agreement_signed,
+  CAST(sf.dt_sale_agreement_cancelled AS TIMESTAMP) AS ts_sale_agreement_cancelled,
+  CAST(sf.dt_house_registry_ended AS TIMESTAMP) AS ts_house_registry_ended,
   NOW() AS ts_load
 FROM
   datalake_sale_flows.sale_flow AS sf
