@@ -32,6 +32,7 @@ SELECT
     final_attribution_term,
     final_attribution_content,
     final_attribution_media_source,
+    final_attribution_entrance_uri,
     ts_event,
     year,
     month,
