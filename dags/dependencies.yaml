@@ -3080,6 +3080,9 @@ bietlejuice.metric_rent__listings:
 bietlejuice.metric_rent__retention:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_house:load-dw-rent-dim-house-status
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-report-review
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-daily-infos
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status

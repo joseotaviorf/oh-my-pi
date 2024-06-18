@@ -1,0 +1,144 @@
+---
+database_name: metric_rent
+table_name: open_reports_weekly
+description: Weekly volume / percentage of tenant, landlord and total inspections the access review filtering inspection_type = 'offboarding' and status = 'reviewed'.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  dt_week_reference:
+    lineage:
+      - dw_inspections.fact_report_review.ts_reviewed
+    description: Week when the inspection was reviewed.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_contract.country_code
+    description: Country code of the house.
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: Rent value segment.
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  inspections_tenant_review:
+    description: Weekly volume of inspections which the tenant has access to review.
+    metric:
+      name: Weekly Volume of Inspections - Tenant Access Review
+      description: Weekly volume of inspections which the tenant has access to review.
+        It's the count of sk_inspections when the has_tenant_access_review column is true, 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WVITAR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  inspections_landlord_review:
+    description: Weekly volume of inspections which the landlord has access to review.
+    metric:
+      name: Weekly Volume of Inspections - Landlord Access Review
+      description: Weekly volume of inspections which the landlord has access to review.
+        It's the count of sk_inspections when the has_owner_access_review column is true, 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WVILAR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  inspections_both_review:
+    description: Weekly volume of inspections which the tenant and landlord have access to review.
+    metric:
+      name: Weekly Volume of Inspections - Landlord and Tenant Access Review
+      description: Weekly volume of inspections which the tenant and landlord have access to review.
+        It's the count of sk_inspections when the has_owner_access_review and has_tenant_access_review columns are true, 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WVITLAR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  inspections_both_without_review:
+    description: Weekly volume of inspections which the tenant and landlor don't have access to review.
+    metric:
+      name: Weekly Volume of Inspections - Landlord and Tenant Without Access Review
+      description: Weekly volume of inspections which the tenant and landlord don't have access to review.
+        It's the count of sk_inspections when the has_owner_access_review and has_tenant_access_review columns are false, 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WVILTWOAR
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  total_inspections:
+    description: Weekly total volume of inspections.
+    metric:
+      name: Weekly Total Volume of Inspections
+      description: Weekly volume of inspections.
+        It's the count of sk_inspections filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WTVI
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_inpsections_tenant_review:
+    description: Weekly percentage of inspections which the tenant has access to review.
+    metric:
+      name: Weekly Percentage of Inspections - Tenant Access Review
+      description: Weekly percentage of inspections which the tenant has access to review.
+        It's the division of sk_inspections when the has_tenant_access_review column is true with total inspections
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WPITAR
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_inspections_landlord_review:
+    description: Weekly percentage of inspections which the landlord has access to review.
+    metric:
+      name: Weekly Percentage of Inspections - Landlord Access Review
+      description: Weekly percentage of inspections which the landlord has access to review.
+        It's the division of sk_inspections when the has_landlord_access_review column is true with total inspections
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WPILAR
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_inspections_both_without_review:
+    description: Weekly percentage of inspections which the landlord and tenant don't have access to review.
+    metric:
+      name: Weekly Percentage of Inspections - Landlord and Tenant Without Access Review
+      description: Weekly percentage of inspections which the landlord and tenant don't have access to review.
+        It's the division of sk_inspections when the has_owner_access_review and has_tenant_access_review columns are false with total inspections, 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WPILTWOAR
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  pct_tenant_landlord_with_review:
+    description: Weekly percentage of inspections which the landlord and tenant have access to review.
+    metric:
+      name: Weekly Percentage of Inspections - Landlord and Tenant With Access Review
+      description: Weekly percentage of inspections which the landlord and tenant have access to review.
+        It's the division of sk_inspections when the has_owner_access_review and has_tenant_access_review columns are true with total inspections * 2, 
+        filtering the inspection_type = 'offboarding' and status = 'reviewed'.
+      acronym: WPILTWAR
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
