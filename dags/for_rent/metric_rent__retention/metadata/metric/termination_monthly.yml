@@ -31,6 +31,8 @@ columns:
     categories:
       with_repair: Some house repair was necessary.
       without_repair: None house repair was necessary.
+      OVERALL: All repair resolution classes.
+    dimension: True
   total_terminations:
     description: Total volume of contract terminations.
     metric:
@@ -38,7 +40,18 @@ columns:
       description: Total volume of contract terminations.
       acronym: MTVT
       is_additive: True
-      business_stage: Demand
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  leadtime_offboarding:
+    description: Average days of offboarding's leadtime.
+    metric:
+      name: Monthly Average of Offboarding's Leadtime
+      description: Average days of offboarding's leadtime.
+      acronym: MAOL
+      is_additive: False
+      business_stage: Offboarding
       hierarchy: User analysis
       approved_by: pilar.valente@quintoandar.com.br
       link_to_metric: ""
