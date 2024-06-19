@@ -22,6 +22,8 @@ collection_calculation AS (
     FROM datalake_recupera.collection AS c
     LEFT JOIN datalake_recupera_clean.operators AS o
         ON UPPER(c.operator_name) = UPPER(o.id_operator)
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
 )
 SELECT

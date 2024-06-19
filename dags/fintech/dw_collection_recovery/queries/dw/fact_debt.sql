@@ -3,31 +3,29 @@ deduplicate_creditor_pending AS (
   SELECT DISTINCT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice,
-    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
+    id_installment AS id_invoice
   FROM datalake_recupera_clean.creditor_pending
   WHERE installment_code IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
 ),
 deduplicate_complementary_records AS (
   SELECT DISTINCT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice,
-    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
+    id_installment AS id_invoice
   FROM datalake_recupera_clean.complementary_records
   WHERE installment_code IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY ts_last_debt_update DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
 ),
 deduplicate_complementary_records_written_down AS (
   SELECT DISTINCT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice,
-    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) AS id_negotiation
+    id_installment AS id_invoice
   FROM datalake_recupera_clean.complementary_records_written_down
-  WHERE installment_code IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY ts_last_debt_update DESC) = 1
+  WHERE
+    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
 ),
 trato_feito_debts AS (
   SELECT DISTINCT
@@ -46,7 +44,7 @@ trato_feito_debts AS (
   LEFT JOIN datalake_debt_recovery.negotiation AS n
     ON d.id_negotiation = n.id_negotiation
   WHERE d.id_negotiation IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY  n.id_contract, d.id_external ORDER BY  d.ts_created DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_external ORDER BY d.ts_created DESC) = 1
 ),
 recupera_debts AS (
   SELECT DISTINCT
@@ -61,12 +59,9 @@ recupera_debts AS (
   FULL OUTER JOIN deduplicate_complementary_records AS cr
       ON cp.id_contract = cr.id_contract
       AND cp.id_invoice  = cr.id_invoice
-      AND cp.id_negotiation = cr.id_negotiation
   FULL OUTER JOIN deduplicate_complementary_records_written_down AS crwd
       ON cp.id_contract = crwd.id_contract
       AND cp.id_invoice  = crwd.id_invoice
-      AND cp.id_negotiation = crwd.id_negotiation
-  WHERE COALESCE(cp.id_negotiation, cr.id_negotiation, crwd.id_negotiation) IS NOT NULL
 ),
 debts AS (
  SELECT
@@ -114,8 +109,8 @@ union_quintoandar_quintocred AS (
     ON o.id_occurrence_status = j.id_junk
 )
 SELECT DISTINCT
-  CONCAT(d.id_contract, "-", d.id_invoice) AS sk_debt,
-  d.id_contract,
+  CONCAT(COALESCE(u.id_contract, d.id_contract), "-", d.id_invoice) AS sk_debt,
+  COALESCE(u.id_contract, d.id_contract) AS id_contract,
   d.id_invoice,
   d.creditor,
   u.invoice_payment_status,
