@@ -9,7 +9,7 @@ WITH most_recent_run AS (
   FROM 
     datalake_pipeline.dag_run
   WHERE
-    id_run NOT LIKE 'manual%'   -- Excluding manual DAG runs, because it's created as D0.
+    is_manual_run = FALSE   -- Excluding manual DAG runs, because it's created as D0.
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_run DESC) = 1
 ),
@@ -103,16 +103,9 @@ dag_info AS (
 sla_base AS (
     SELECT
         d.id_dag,
-        l.id_line,
-        d.line_name,
         d.layer,
         d.schedule_interval,
         mc.state,
-        CASE
-            WHEN d.is_datamart = FALSE AND d.layer IN ('raw/clean', 'enrich', 'dw', 'metric') THEN 11 -- UTC hour
-            WHEN d.is_datamart = TRUE THEN 13
-            WHEN d.layer = 'reverse' THEN 15
-        END AS utc_sla_hour,
         me.duration,
         d.is_active,
         d.is_paused,
@@ -135,32 +128,32 @@ sla_base AS (
     JOIN
         most_recent_events AS me
             ON me.id_dag = d.id_dag
-    JOIN
-        datalake_pipeline.line AS l
-            ON l.line_name = d.line_name
 )
 SELECT
-    s.id_dag,
-    s.id_line,
-    s.line_name,
-    s.layer,
-    s.schedule_interval,
+    d.id_dag,
+    l.id_line,
+    l.line_name,
+    d.layer,
+    d.schedule_interval,
     s.state,
-    s.utc_sla_hour,
     CASE
-        WHEN s.utc_sla_hour = 11 THEN 8
-        WHEN s.utc_sla_hour = 13 THEN 10
-        WHEN s.utc_sla_hour = 15 THEN 12
-        ELSE NULL
+      WHEN d.is_datamart = FALSE AND d.layer IN ('raw/clean', 'enrich', 'dw', 'metric') THEN 11 -- UTC hour
+      WHEN d.is_datamart = TRUE THEN 13
+      WHEN d.layer = 'reverse' THEN 15
+    END AS utc_sla_hour,
+    CASE
+      WHEN d.is_datamart = FALSE AND d.layer IN ('raw/clean', 'enrich', 'dw', 'metric') THEN 8 -- BRT hour
+      WHEN d.is_datamart = TRUE THEN 10
+      WHEN d.layer = 'reverse' THEN 12
     END AS brt_sla_hour,
     ao.number_of_tasks,
     s.duration,
     m.median_duration,
-    s.is_active,
-    s.is_paused,
+    d.is_active,
+    d.is_paused,
     s.is_in_exclusion_list,
     IF(s.is_ignored = TRUE, NULL, s.is_inside_sla) AS is_inside_sla,
-    s.is_datamart,
+    d.is_datamart,
     IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
     fe.ts_first_event,
     FROM_UTC_TIMESTAMP(fe.ts_first_event, 'America/Sao_Paulo') AS ts_first_event_brt,
@@ -178,13 +171,19 @@ SELECT
     NOW() AS ts_load,
     FROM_UTC_TIMESTAMP(NOW(), 'America/Sao_Paulo') AS ts_load_brt
 FROM
-    sla_base AS s
-JOIN
+  dag_info AS d
+LEFT JOIN
+  sla_base AS s
+    ON s.id_dag = d.id_dag
+LEFT JOIN
     first_execution AS fe
-        ON fe.id_dag = s.id_dag
-JOIN
+        ON fe.id_dag = d.id_dag
+LEFT JOIN
     medians AS m
-        ON m.id_dag = s.id_dag
+        ON m.id_dag = d.id_dag
 LEFT JOIN
     amount_of_tasks AS ao
-        ON ao.id_dag = s.id_dag
+        ON ao.id_dag = d.id_dag
+JOIN
+  datalake_pipeline.line AS l
+    ON l.line_name = d.line_name
