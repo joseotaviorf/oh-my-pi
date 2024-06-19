@@ -13,3 +13,4 @@ cluster:
     autoscale:
       min_workers: 1
       max_workers: 2
+    spark_version: 12.2.x-scala2.12
