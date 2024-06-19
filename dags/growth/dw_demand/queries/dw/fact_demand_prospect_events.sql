@@ -28,6 +28,7 @@ SELECT
   utm_medium,
   utm_source,
   utm_term,
+  utm_content,
   ROW_NUMBER() OVER(PARTITION BY COALESCE(id_rent_flow, id_sale_flow), event_type, business_context ORDER BY ts_event ASC) AS flow_order,
   id_event_date AS sk_event_date,
   ts_event,

@@ -141,6 +141,29 @@ columns:
     - datalake_amplitude_offer.offer_submitted_events.utm_campaign
     - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
     - datalake_talk_to_agent.talk_to_agent.utm_campaign
+  utm_term:
+    description: 'Marketing parameter defined at campaing configuration at marketing platforms'
+    lineage:
+    - datalake_tracked_events.attribution_cross_channel.utm_term
+    - datalake_amplitude_visit.aplitude_visit.utm_term
+    - datalake_amplitude_offer.offer_submitted_events.utm_term
+    - datalake_amplitude_offer.sale_offer_raw_events.utm_term
+    - datalake_talk_to_agent.talk_to_agent.utm_term  
+  utm_content:
+    description: 'Marketing parameter defined at campaing configuration at marketing platforms'
+    lineage:
+    - datalake_tracked_events.attribution_cross_channel.utm_content
+    - datalake_amplitude_visit.aplitude_visit.utm_content
+    - datalake_amplitude_offer.offer_submitted_events.utm_content
+    - datalake_amplitude_offer.sale_offer_raw_events.utm_content
+    - datalake_talk_to_agent.talk_to_agent.utm_content
+  entrance_uri:
+    description: 'The URL of the first page a user visits in a session.'
+    lineage:
+    - datalake_tracked_events.attribution_cross_channel.entrance_uri
+    - datalake_amplitude_visit.aplitude_visit.entrance_uri
+    - datalake_amplitude_offer.offer_submitted_events.entrance_uri
+    - datalake_amplitude_offer.sale_offer_raw_events.entrance_uri  
   branded:
     description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
     lineage:

@@ -97,6 +97,14 @@ columns:
     description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
     lineage:
       - datalake_demand_flows.prospect_daily_results.utm_campaign  
+  utm_term:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.utm_term
+  utm_content:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.utm_content
   branded:
     description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
     lineage:

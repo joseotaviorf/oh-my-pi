@@ -115,6 +115,18 @@ columns:
     description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.utm_campaign  
+  utm_term:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_term  
+  utm_content:
+    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    lineage:
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_content  
+  entrance_uri:
+    description: 'The URL of the first page a user visits in a session.'
+    lineage:
+      - datalake_demand_flows.demand_prospect_conversion_events.entrance_uri              
   branded:
     description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
     lineage:
