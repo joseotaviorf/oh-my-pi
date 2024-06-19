@@ -14,4 +14,4 @@ workflow:
     pivotted_amenities:
     - amenity_change_history
 cluster:
-  type: databricks_10_4_med_general_photon_cluster
+  type: databricks_12_2_med_general_photon_cluster
