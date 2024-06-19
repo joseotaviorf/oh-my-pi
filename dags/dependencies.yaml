@@ -1649,6 +1649,11 @@ bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.hubspot:load-clean-company
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs
+bietlejuice.enrich_expected_contribution_margin:
+  - bietlejuice.enrich_losses:load-enrich-provision
+  - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
+  - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all

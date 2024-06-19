@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_expected_contribution_margin
+  owner: MLOps
+  schedule_start_date: 2024, 01, 01
+  documentation:
+    dag_purpose: Computes the observed and expected contribution margin of the 4Rent contracts.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+    - month_of_year
+  extra_query_template_params: 
+    start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -30), 'start_date') }}"
+    end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+cluster:
+  type: databricks_12_2_med_general_photon_cluster
