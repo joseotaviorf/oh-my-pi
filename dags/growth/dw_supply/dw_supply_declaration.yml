@@ -16,6 +16,7 @@ workflow:
       z_order_by: ['sk_acquisition_lead', 'bk_acq_lead']
     dim_affiliate_tracking:
       z_order_by: ['sk_user_affiliate']
+      extraction_type: full
     dim_funnel_step:
       merge_on: ['bk_funnel_step']
       z_order_by: ['sk_funnel_step', 'bk_funnel_step']
