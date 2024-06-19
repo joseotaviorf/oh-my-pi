@@ -18,4 +18,4 @@ workflow:
         - month
         - day
 cluster:
-  type: databricks_10_4_min_io-memory_photon_cluster
+  type: databricks_12_2_min_io-memory_photon_cluster
