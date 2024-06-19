@@ -1,0 +1,24 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: quintocred_real_estates
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  sk_broker:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.sk_broker
+  id_pipedrive:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.id_pipedrive
+  broker_name:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.broker_name
+  cnpj:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.cnpj
+  potential_segmentation:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.potential_segmentation
+  credit_segmentation:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.credit_segmentation

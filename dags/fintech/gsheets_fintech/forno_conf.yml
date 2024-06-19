@@ -224,3 +224,9 @@ sheets_info:
     sheet_name: quintocred_targets
     clean_table_name: quintocred_targets
     sheet_context: fintech
+
+  quintocred_real_estates:
+    sheet_id: 1Xj7ISmSwT4RMDjfMyEvmCPq5QQQrruqNd-ygu9DjOVE
+    sheet_name: all_realestates
+    clean_table_name: quintocred_real_estates
+    sheet_context: fintech
