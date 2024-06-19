@@ -33,6 +33,7 @@ workflow:
       z_order_by: ['sk_user_path', 'id_level', 'bk_user_path']
     fact_supply_events:
       z_order_by: ['sk_supply', 'nm_business_context']
+      extraction_type: full
   inner_dependencies:
     fact_supply_events:
       - dim_acquisition_lead
