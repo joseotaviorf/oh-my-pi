@@ -14,4 +14,4 @@ workflow:
             - auditable_expenses
             - expenses
 cluster:
-    type: databricks_10_4_med_general_cluster
+    type: databricks_12_2_med_general_cluster
