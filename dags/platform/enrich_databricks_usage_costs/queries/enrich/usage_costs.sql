@@ -1,7 +1,17 @@
 WITH granularity_ids AS (
     SELECT
         dbu.id_cluster,
-        IF(LOWER(dbu.cluster_name) LIKE "%bietlejuice%", REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(dbu.cluster_name, '.+-bietlejuice', 'bietlejuice'), '(?:_mediator|_scheduled|_manual).+', ''), '-', '.'), NULL) AS id_dag,
+        IF(
+          LOWER(dbu.cluster_name) LIKE "%bietlejuice%" AND dbu.cluster_name NOT LIKE "% %", 
+          REPLACE(
+            REPLACE(
+              REGEXP_REPLACE(
+                REGEXP_REPLACE(dbu.cluster_name, '.+-bietlejuice', 'bietlejuice'), '(?:_mediator|_scheduled|_manual).+', ''
+              ), '-', '.'
+            ), '_None', ''
+          ), 
+          NULL
+        ) AS id_dag,
         get_json_object(dbu.tags, '$.JobId') AS id_job,
         dbu.cluster_name,
         get_json_object(dbu.tags, '$.RunName') AS job_name,
