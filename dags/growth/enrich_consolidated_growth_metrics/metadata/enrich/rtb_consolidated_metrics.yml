@@ -17,6 +17,10 @@ columns:
     description: Accont name at rtb platform
     lineage:
       - datalake_rtb_campaigns_clean.rtb_campaigns.account_name
+  country_code:
+    description: Country code the campaign belongs to.
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.country_code
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:

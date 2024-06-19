@@ -4,7 +4,7 @@ table_name: rtb_campaigns
 owner: '@data-growth'
 domain: Growth
 description: Table load RTB House Performance Report from RTB House Ads API extraction.
-columns: 
+columns:
   id_account:
     description: The ID number of your ad account
     lineage:
@@ -25,6 +25,8 @@ columns:
     description: The name of the sub campaign name you're viewing in reporting
     lineage:
       - datalake_rtb_campaigns_raw.rtb_campaigns.subcampaign
+  country_code:
+    description: Country code the campaign belongs to.
   currency:
     description: Cost currency
     lineage:

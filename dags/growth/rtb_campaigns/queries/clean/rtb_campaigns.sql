@@ -4,6 +4,7 @@ SELECT
     accountName AS account_name,
     accountStatus AS account_status,
     subcampaign AS sub_campaign_name,
+    'BR' AS country_code,
     accountCurrency AS currency,
     impsCount AS impressions,
     clicksCount AS clicks,
