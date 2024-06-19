@@ -9,4 +9,4 @@ workflow:
     listing_accuracy:
       - listing_accuracy_history
 cluster:
-  type: databricks_10_4_min_memory_photon_cluster
+  type: databricks_12_2_min_memory_photon_cluster
