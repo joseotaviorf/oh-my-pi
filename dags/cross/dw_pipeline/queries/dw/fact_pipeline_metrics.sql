@@ -13,12 +13,29 @@ WITH dag_run_base AS (
     WHERE
         DATE(ts_run) = DATE_SUB(MAKE_DATE({year}, {month}, {day}), 1)  -- D-1
 ),
+dags_never_executed AS (
+    -- If a DAG is active but has never been executed, it was "born" paused and the only two possible
+    -- log events will be 'tree' or 'trigger'
+    SELECT
+        l.id_dag,
+        COUNT(DISTINCT event) AS events
+    FROM
+        datalake_composer_clean.log AS l
+    JOIN
+        datalake_composer_clean.dag AS dd
+            ON dd.id_dag = l.id_dag
+    WHERE 
+        MAKE_DATE({year}, {month}, {day}) BETWEEN DATE(l.ts_event) AND DATE(dd.ts_last_scheduler_ran)  -- Assuring that the DAG is active
+    GROUP BY 1
+),
 paused_dates AS (
     SELECT
         id_dag,
         event,
+        LAG(event) OVER(PARTITION BY id_dag ORDER BY ts_event) AS previous_event,
         LEAD(event) OVER(PARTITION BY id_dag ORDER BY ts_event) AS next_event,
         ts_event,
+        LAG(ts_event) OVER(PARTITION BY id_dag ORDER BY ts_event) AS ts_previous_event,
         LEAD(ts_event) OVER(PARTITION BY id_dag ORDER BY ts_event) AS ts_next_event
     FROM
         datalake_composer_clean.log
@@ -36,8 +53,9 @@ paused_cli_run AS (
     FROM
         paused_dates
     WHERE
-        event = 'paused'
-        AND next_event = 'cli_run'
+        (event = 'paused' AND next_event IS NULL)   -- The DAG is currently paused and hasn't had any event since then
+        OR (event = 'paused' AND next_event = 'cli_run')    -- The DAG was paused for a period but had another active event
+        OR (event = 'cli_run' AND next_event = 'paused')    -- The DAG was active but was paused
 ),
 dag_base AS (
     SELECT
@@ -45,7 +63,10 @@ dag_base AS (
         d.id_line,
         d.layer,
         d.is_datamart,
-        IF(MAKE_DATE({year}, {month}, {day}) BETWEEN pc.ts_event AND pc.ts_next_event, TRUE, FALSE) AS is_paused
+        IF(
+            (MAKE_DATE({year}, {month}, {day})
+                BETWEEN pc.ts_event AND COALESCE(pc.ts_next_event, MAKE_DATE({year}, {month}, {day})))
+                OR dn.id_dag IS NOT NULL, TRUE, FALSE) AS is_paused
     FROM
         datalake_pipeline.dag AS d
     JOIN
@@ -54,66 +75,76 @@ dag_base AS (
     LEFT JOIN
         paused_cli_run AS pc
             ON pc.id_dag = d.id_dag
-            AND MAKE_DATE({year}, {month}, {day}) BETWEEN pc.ts_event AND pc.ts_next_event
+            AND MAKE_DATE({year}, {month}, {day}) BETWEEN pc.ts_event AND COALESCE(pc.ts_next_event, MAKE_DATE({year}, {month}, {day}))
+    LEFT JOIN
+        dags_never_executed AS dn
+            ON dn.id_dag = d.id_dag
+            AND dn.events <= 2
     WHERE
         MAKE_DATE({year}, {month}, {day}) BETWEEN DATE(d.ts_first_event) AND DATE(dd.ts_last_scheduler_ran) -- Active DAGs only
 ),
 sla_exclusion_list AS (
     SELECT
-        dag AS id_dag,
-        dt_dag_added,
-        dt_dag_removed
+        dag AS id_dag
     FROM
         datalake_gsheets_clean.dags_sla_exclusion_list
     WHERE
-        MAKE_DATE({year}, {month}, {day}) BETWEEN dt_dag_added AND COALESCE(dt_dag_removed, CURRENT_DATE)
+        MAKE_DATE({year}, {month}, {day}) BETWEEN dt_dag_added AND COALESCE(dt_dag_removed, MAKE_DATE({year}, {month}, {day}))
 ),
 special_scheduler AS (
     SELECT
         ds.id_dag,
-        dr.dt_run,
-        ds.dt_added,
-        ds.dt_removed
+        dr.dt_run
     FROM
         datalake_gsheets_clean.dags_special_scheduler AS ds
-    JOIN
-        dag_base AS db 
-            ON db.id_dag = ds.id_dag    -- Only active DAGs
-    LEFT JOIN
+    LEFT JOIN   -- The DAG may have a current run or not
         dag_run_base AS dr
             ON dr.id_dag = ds.id_dag
     WHERE
-        MAKE_DATE({year}, {month}, {day}) BETWEEN ds.dt_added AND COALESCE(ds.dt_removed, CURRENT_DATE)
+        MAKE_DATE({year}, {month}, {day}) BETWEEN ds.dt_added AND COALESCE(ds.dt_removed, MAKE_DATE({year}, {month}, {day}))
 ),
 ignoring_list AS (
     -- Unifying all DAGs that has special scheduler + are in the SLA exclusion list + first execution has null SLA
     SELECT
         id_dag  
     FROM
-        special_scheduler
+        special_scheduler   -- DAGs that has special scheduler and doesn't run every day
     UNION
     SELECT
         id_dag
     FROM 
-        sla_exclusion_list
+        sla_exclusion_list  -- DAGS in the SLA exclusion list
     UNION
     SELECT
         id_dag
     FROM
         dag_run_base
     WHERE 
-        is_first_execution_inside_sla IS NULL
-        AND rn = 1 
+        rn = 1 
+        AND is_first_execution_inside_sla IS NULL   -- DAGs that for some reason we're excluding the first run
+),
+checking_ignored_tables AS (
+    -- Assuring that the DAGs to be ignored are currently active and running on Airflow, 
+    -- otherwise we could be counting on the calculation DAGs that doesn't exist anymore
+    SELECT
+        i.id_dag
+    FROM
+        ignoring_list AS i
+    JOIN
+        dag_base AS d
+            ON d.id_dag = i.id_dag
+            AND d.is_paused = FALSE
 ),
 totals_base AS (
     SELECT
         d.id_line,
         COUNT(DISTINCT d.id_dag) AS total_active_dags,
+        COUNT(DISTINCT d.id_dag) FILTER (WHERE d.is_paused = FALSE) AS total_active_unpaused_dags,
         COUNT(DISTINCT db.id_dag) AS total_dags_executed,
         COUNT(DISTINCT ss.id_dag) AS total_dags_special_scheduler,
         COUNT(DISTINCT ss.id_dag) FILTER (WHERE ss.dt_run IS NOT NULL) total_dags_special_scheduler_executed,
         COUNT(DISTINCT d.id_dag) FILTER (WHERE ds.id_dag IS NOT NULL) AS total_dags_in_sla_exclusion_list,
-        COUNT(DISTINCT el.id_dag) AS total_dags_ignoring_list,
+        COUNT(DISTINCT c.id_dag) AS total_dags_ignoring_list,
         COUNT(DISTINCT db.id_dag) FILTER (WHERE db.is_first_execution_inside_sla = TRUE) AS total_dags_inside_sla,
         COUNT(DISTINCT db.id_dag) FILTER (WHERE db.is_first_execution_inside_sla = FALSE) AS total_dags_outside_sla,
         COUNT(DISTINCT db.id_dag) FILTER (WHERE db.is_first_execution_inside_sla IS NULL) AS total_dags_null_sla,
@@ -142,8 +173,8 @@ totals_base AS (
         special_scheduler AS ss
             ON ss.id_dag = d.id_dag
     LEFT JOIN
-        ignoring_list AS el
-            ON el.id_dag = d.id_dag
+        checking_ignored_tables AS c
+            ON c.id_dag = d.id_dag
     LEFT JOIN
         sla_exclusion_list AS ds
             ON ds.id_dag = d.id_dag
@@ -152,8 +183,9 @@ totals_base AS (
 SELECT
     tb.id_line AS sk_line,
     DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd') AS sk_snapshot_date,
-    ROUND(100*(tb.total_dags_inside_sla/(tb.total_active_dags - tb.total_dags_ignoring_list + tb.total_dags_special_scheduler_executed)), 1) AS sla,
+    ROUND(100*(tb.total_dags_inside_sla/(tb.total_active_unpaused_dags - tb.total_dags_ignoring_list + tb.total_dags_special_scheduler_executed)), 1) AS sla,
     tb.total_active_dags,
+    tb.total_active_unpaused_dags,
     tb.total_dags_executed,
     tb.total_dags_special_scheduler,
     tb.total_dags_special_scheduler_executed,

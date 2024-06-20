@@ -13,11 +13,13 @@ columns:
   sk_snapshot_date:
     description: Key of the snapshot date. Joins with dw_public.dim_date.
   sla:
-    description: The line SLA. It's the calculation of the amount of DAGs inside SLA divided by the total amount of active DAGs - the total
-      amount of DAGs that should be ignored (in the SLA exclusion list or in the special scheduler list) + the amount of DAGs that are in the 
-      special scheduler list but that executed today.
+    description: The line SLA. It's the calculation of the amount of DAGs inside SLA divided by the total amount of active and unpaused
+      DAGs, plus the amount of DAGs that are in the special scheduler list but that executed today, minus the total amount of DAGs
+      that should be ignored (in the SLA exclusion list, in the special scheduler list or with ignored runs) 
   total_active_dags:
     description: The total amount of active DAGs that the line has til the specific date.
+  total_active_unpaused_dags:
+    description: The total amount of active and unpaused DAGs that the line has til the specific date.
   total_dags_executed:
     description: The total amount of DAGs that were executed in the specific date.
   total_dags_special_scheduler:
