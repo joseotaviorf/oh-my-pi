@@ -48,6 +48,10 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_general_cluster")
+CLUSTER_DESCRIPTION["spark_conf"].update(
+    {"spark.metrics.namespace": "data_products.enrich_vespucio_pipeline"}
+)
+
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
