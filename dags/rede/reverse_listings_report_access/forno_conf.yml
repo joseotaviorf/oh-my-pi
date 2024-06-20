@@ -23,10 +23,7 @@ custom_cluster:
   driver_node_type_id: m5a.xlarge
   node_type_id: m5a.xlarge
   num_workers: 3
-  # autoscale:
-  #   max_workers: 3
-  #   min_workers: 1
-  spark_version: 10.4.x-scala2.12
+  spark_version: 12.2.x-scala2.12
   aws_attributes:
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
