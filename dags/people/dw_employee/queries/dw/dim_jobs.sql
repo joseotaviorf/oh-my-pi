@@ -39,6 +39,7 @@ WITH jobs AS (
         comp_ladder_directorate
     FROM
         datalake_hr_system.assignments
+    QUALIFY dt_effective_start = MAX(dt_effective_start) OVER (PARTITION BY id_band_ladder)
 )
 SELECT DISTINCT
     -- ids
