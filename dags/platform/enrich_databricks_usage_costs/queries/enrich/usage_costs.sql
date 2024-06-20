@@ -34,8 +34,6 @@ WITH granularity_ids AS (
         datalake_databricks_usage_clean.billable_usage AS dbu
     WHERE
         MAKE_DATE(dbu.year, dbu.month, dbu.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY dbu.id_cluster, dbu.ts_execution ORDER BY dbu.ts_execution DESC) = 1
 ),
 daily_cluster AS (
     SELECT 
@@ -61,8 +59,8 @@ SELECT
     END AS execution_context,
     dc.spark_version,
     dc.runtime_engine,
-    ROUND(SUM(gi.dbus) OVER (PARTITION BY gi.id_cluster, gi.ts_execution), 2) AS dbus,
-    ROUND(SUM(gi.dbus * dcd.dbu_price) OVER (PARTITION BY gi.id_cluster, gi.ts_execution), 2) AS price,
+    ROUND(gi.dbus, 2) AS dbus,
+    ROUND(gi.dbus * dcd.dbu_price, 2) AS price,
     COUNT(gi.ts_execution) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), date(gi.ts_execution)) AS daily_executions,
     CAST(SPLIT_PART(dc.spark_version, '.', 1) AS INTEGER) AS spark_version_number,
     IF(id_dag IS NOT NULL AND id_job IS NOT NULL, TRUE, FALSE) AS is_dag_builder_migrated,

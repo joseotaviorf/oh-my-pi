@@ -21,5 +21,8 @@ workflow:
     billable_usage:
       partitions: ["year", "month", "day"]
       extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_12_2_min_io-memory_cluster

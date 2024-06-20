@@ -17,6 +17,4 @@ SELECT
 FROM
     datalake_databricks_usage_raw.billable_usage
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -12,7 +12,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import *
 
 JOB_NAME = "load_databricks_usage_raw"
 
@@ -66,11 +66,7 @@ if __name__ == "__main__":
             .option("escape", "\"") \
             .load(proxy_path.format(execution_date.year, str(execution_date.month).zfill(2)))
 
-        df = (
-            df.withColumn("year", lit(execution_date.year))
-            .withColumn("month", lit(execution_date.month))
-            .withColumn("day", lit(execution_date.day))
-        )
+        df = df.alias("df").select("df.*", year(df.timestamp).alias('year'), month(df.timestamp).alias('month'), dayofmonth(df.timestamp).alias('day'))
     
         s3_loader.load_df(
             df=df,
