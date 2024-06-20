@@ -1,0 +1,47 @@
+---
+database_name: datalake_mexico_truora_reports
+table_name: truora_user
+description: This table contains user information provided by Truora for KYC (Know Your Client) process.
+domain: International
+owner: bruna.prates@quintoandar.com.br
+columns:
+  id_external:
+    lineage:
+      - datalake_arquivo_confidencial_clean.truora_check_process_aud.id_external
+    description: ID of the user reference to Docx folder table and EBDB.
+  id_account:
+    lineage:
+      - datalake_arquivo_confidencial_clean.truora_check_process_aud.payload
+    description: ID related to the report of the user. It can be joined with datalake_mexico_truora_reports.truora_validations.
+  rfc:
+    lineage:
+      - datalake_arquivo_confidencial_clean.truora_check_process_aud.payload
+    description: RFC (Federal Taxpayer Registry) of the user.
+  curp:
+    lineage:
+      - datalake_arquivo_confidencial_clean.truora_check_process_aud.payload
+    description: CURP (Mexico Unique Population Registration Code) of the user. It's an unique identifier for individuals in Mexico.
+  first_name:
+    lineage:
+      - datalake_arquivo_confidencial_clean.truora_check_process_aud.payload
+    description: First name of the user.
+  last_name:
+    lineage:
+      - datalake_arquivo_confidencial_clean.truora_check_process_aud.payload
+    description: Last name of the user.
+  ts_report:
+    lineage:
+      - datalake_arquivo_confidencial_clean.rev_info.ts_created
+    description: Timestamp of when the report was provided.
+  year:
+    lineage:
+      - datalake_arquivo_confidencial_clean.rev_info.year
+    description: Year of when the report was provided. Also, it's a partition of this table.
+  month:
+    lineage:
+      - datalake_arquivo_confidencial_clean.rev_info.month
+    description: Month of when the report was provided. Also, it's a partition of this table.
+  day:
+    lineage:
+      - datalake_arquivo_confidencial_clean.rev_info.day
+    description: Day of when the report was provided. Also, it's a partition of this table.

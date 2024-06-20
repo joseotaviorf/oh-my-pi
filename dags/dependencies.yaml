@@ -2030,6 +2030,9 @@ bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listings-reprocessed-leads
   - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
+bietlejuice.enrich_mexico_truora_reports:
+  - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.arquivo_confidencial:load-clean-truora-check-process-aud
 bietlejuice.enrich_mission_control:
   - bietlejuice.mission_control:load-clean-contract
   - bietlejuice.mission_control:load-clean-contract-person
