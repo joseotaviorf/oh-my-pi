@@ -70,6 +70,10 @@ columns:
     description: Account name pos string transformation
     lineage:
       - datalake_google_ads_raw.campaigns_performance.account_snake_case
+  country_code:
+    description: Country code the account belongs to.
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.account_snake_case
   dt_loaded:
     description: Date of loaded data
     lineage:

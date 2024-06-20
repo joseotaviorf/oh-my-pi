@@ -14,6 +14,11 @@ SELECT
     campaign.labels,
     report_type,
     account_snake_case,
+    CASE
+        WHEN account_snake_case LIKE '%mx%' THEN 'MX'
+        WHEN account_snake_case IS NULL THEN 'Undefined'
+        ELSE 'BR'
+    END AS country_code,
     DATE(segments.date) AS dt_loaded,
     dt_created
 FROM

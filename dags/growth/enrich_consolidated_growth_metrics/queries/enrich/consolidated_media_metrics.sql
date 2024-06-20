@@ -6,7 +6,7 @@ WITH consolidated_sources AS (
         NULL AS business_context,
         campaign_name,
         account_name,
-        'BR' AS country_code,
+        country_code,
         report_type,
         ad_type,
         utm_term,
