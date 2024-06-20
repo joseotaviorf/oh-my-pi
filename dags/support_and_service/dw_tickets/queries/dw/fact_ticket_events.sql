@@ -20,7 +20,7 @@ SELECT
   type,
   via_channel,
   tags,
-  custom_fields,
+  TO_JSON(custom_fields) AS custom_fields,
   is_public,
   ts_created AS ts_ticket_created,
   ts_updated AS ts_event,
