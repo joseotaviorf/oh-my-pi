@@ -21,7 +21,7 @@ workflow:
     - "{partitions}"
 
   default_extraction_type: incremental
-  default_partitions: [year, month, day]
+  default_partitions: [year, month, day, hour]
   tables_customization:
     chat5a_messages:
       clean_table_name: internal_chat_messages
