@@ -26,13 +26,6 @@ columns:
       - datalake_google_ads_clean.campaigns_performance.account_descriptive_name
       - datalake_google_ads_clean.keywords_performance.account_descriptive_name
       - datalake_google_ads_clean.videos_performance.account_descriptive_name
-  country_code:
-    description: Country code the account belongs to.
-    lineage:
-      - datalake_google_ads_clean.ads_performance.country_code
-      - datalake_google_ads_clean.campaigns_performance.country_code
-      - datalake_google_ads_clean.keywords_performance.country_code
-      - datalake_google_ads_clean.videos_performance.country_code
   report_type:
     description: Type of report extracted from google ads platform
     lineage:
@@ -40,7 +33,7 @@ columns:
       - datalake_google_ads_clean.campaigns_performance.report_type
       - datalake_google_ads_clean.keywords_performance.report_type
       - datalake_google_ads_clean.videos_performance.report_type
-    categories:
+    categories: 
       VIDEO_PERFORMANCE_REPORT: ''
       CAMPAIGN_PERFORMANCE_REPORT: ''
       AD_PERFORMANCE_REPORT: ''
@@ -49,7 +42,7 @@ columns:
     description: Type of ad report extracted from google ads platform
     lineage:
       - datalake_gsheets_clean.marketing_costs_google_ad_type_flags.flag
-    categories:
+    categories: 
       display_ad: ''
       other: ''
       dsa_ad: ''

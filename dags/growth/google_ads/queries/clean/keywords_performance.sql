@@ -14,11 +14,6 @@ SELECT
     adGroupCriterion.keyword.text AS criteria,
     customer.descriptiveName AS account_descriptive_name,
     account_snake_case,
-    CASE
-        WHEN account_snake_case LIKE '%mx%' THEN 'MX'
-        WHEN account_snake_case IS NULL THEN 'Undefined'
-        ELSE 'BR'
-    END AS country_code,
     report_type,
     DATE(segments.date) AS dt_loaded,
     dt_created

@@ -10,7 +10,6 @@ WITH campaign_reports AS (
             datalake_google_ads_clean.ads_performance
         WHERE
             dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-            AND country_code <> 'MX'
         UNION ALL
         SELECT
             DISTINCT campaign_name,
@@ -23,7 +22,6 @@ WITH campaign_reports AS (
             datalake_google_ads_clean.keywords_performance
         WHERE
             dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-            AND country_code <> 'MX'
             AND id_keyword NOT BETWEEN 3000000 AND 3000006 -- these campaigns should be extracted from ADS report
         UNION ALL
         SELECT
@@ -37,7 +35,6 @@ WITH campaign_reports AS (
             datalake_google_ads_clean.campaigns_performance
         WHERE
             dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-            AND country_code <> 'MX'
         UNION ALL
         SELECT
             DISTINCT campaign_name,
@@ -50,7 +47,6 @@ WITH campaign_reports AS (
             datalake_google_ads_clean.videos_performance
         WHERE
             dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-            AND country_code <> 'MX'
     ),
     report_type_mapping AS (
         SELECT
@@ -117,7 +113,6 @@ keywords_metrics AS (
             AND rtm.ad_network_type = gkpr.ad_network_type
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND country_code <> 'MX'
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
@@ -178,7 +173,6 @@ ads_metrics AS (
             ON ad_types.ad_type = gapr.ad_type
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND country_code <> 'MX'
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
@@ -218,7 +212,6 @@ campaigns_metrics AS (
             AND rtm.ad_network_type = gcpr.ad_network_type
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND country_code <> 'MX'
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
@@ -259,15 +252,14 @@ videos_metrics AS (
             AND rtm.ad_network_type = gvpr.ad_network_type
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND country_code <> 'MX'
     GROUP BY
         1,2,3,4,5,6,7,8
 )
 
-SELECT * FROM keywords_metrics
+SELECT * FROM keywords_metrics WHERE account_name NOT ILIKE '%mx%'
 UNION ALL
-SELECT * FROM ads_metrics
+SELECT * FROM ads_metrics WHERE account_name NOT ILIKE '%mx%'
 UNION ALL
-SELECT * FROM campaigns_metrics
+SELECT * FROM campaigns_metrics WHERE account_name NOT ILIKE '%mx%'
 UNION ALL
-SELECT * FROM videos_metrics
+SELECT * FROM videos_metrics WHERE account_name NOT ILIKE '%mx%'
