@@ -1,0 +1,37 @@
+dag:
+  name: internal_chat
+  schedule_start_date: 2019, 9, 27
+  schedule_interval: 0 0 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This dag aims to ingest information related to messages within our chat in app.
+      This ingestion is done through files made available within s3.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_internal_chat_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{{ ds }}"
+    - "{table_name}"
+    - { partitions }
+
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    chat5a_messages:
+      clean_table_name: internal_chat_messages
+      z_order_by: [id_chat]
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5n.2xlarge
+    node_type_id: m5n.2xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    spark_conf:
+      spark.sql.legacy.json.allowEmptyString.enabled: "true"

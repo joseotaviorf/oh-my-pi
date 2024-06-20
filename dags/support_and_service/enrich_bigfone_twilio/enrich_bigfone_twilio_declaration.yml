@@ -2,7 +2,7 @@ dag:
     name: enrich_bigfone_twilio
     schedule_start_date: 2020, 8, 29
     owner: Data SS
-    documentation: 
+    documentation:
         dag_purpose: |
             This is the second layer of the enrichment phase of the [Bigfone](github.com/quintoandar/big-fone) data preparation.
             [Bigfone](https://github.com/quintoandar/big-fone) is a system responsible for interacting with Twilio (an external service)
@@ -13,9 +13,9 @@ dag:
             and untie by the alphabetical of the event).Changing these event names may impact on the results of this table and consequently
             the whole call model.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     default_extraction_type: incremental
     default_partitions: ["year", "month", "day"]
 cluster:
-    type: databricks_10_4_med_memory_photon_cluster
+    type: databricks_12_2_med_memory_photon_cluster

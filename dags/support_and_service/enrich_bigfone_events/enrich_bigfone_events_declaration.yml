@@ -2,15 +2,15 @@ dag:
     name: enrich_bigfone_events
     schedule_start_date: 2020, 8, 29
     owner: Data SS
-    documentation: 
+    documentation:
         dag_purpose: |
             Prepares [Bigfone](github.com/quintoandar/big-fone) data for business utilization. [Bigfone](https://github.com/quintoandar/big-fone)
             is a system responsible for interacting with Twilio (an external service) to manage calls, peers and store data used to generate
             some reports. Also, it acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     default_extraction_type: incremental
     default_partitions: ["year", "month", "day"]
 cluster:
-    type: databricks_10_4_med_general_photon_cluster
+    type: databricks_12_2_med_general_photon_cluster

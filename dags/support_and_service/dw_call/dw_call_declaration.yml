@@ -7,11 +7,11 @@ dag:
       (https://github.com/quintoandar/big-fone), which is responsible for interacting with Twilio (an
       external service) to manage calls, peers and store data.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: call
 cluster:
-  type: databricks_10_4_med_general_photon_cluster
+  type: databricks_12_2_med_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
