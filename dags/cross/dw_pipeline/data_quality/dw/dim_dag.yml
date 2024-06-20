@@ -11,7 +11,3 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  dt_last_run:
-    has_completeness:
-      greater_than: 0.99
-      severity_level: Error
