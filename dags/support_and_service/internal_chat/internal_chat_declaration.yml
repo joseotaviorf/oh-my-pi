@@ -15,6 +15,7 @@ workflow:
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
+    - "{schema}"
     - "{{ ds }}"
     - "{table_name}"
     - "{partitions}"
