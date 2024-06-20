@@ -954,6 +954,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.ebdb_contract:load-clean-contract-aud
   - bietlejuice.ebdb_contract:load-clean-contract-partnership-data
   - bietlejuice.ebdb_rent_flow:load-clean-agent-rent-flow
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice

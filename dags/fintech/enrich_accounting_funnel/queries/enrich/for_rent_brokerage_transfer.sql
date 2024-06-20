@@ -2,6 +2,8 @@ WITH pre_seu_barriga AS (
     SELECT
         sk_contract AS id_contract,
         id_invoice,
+        purpose,
+        ended_before_started,
         CASE
             WHEN bill_item IN ('brokerage partner select', 'brokerage partner select postponed') THEN 'select'
             WHEN bill_item IN ('brokerage adm partner', 'brokerage adm partner postponed') AND LOWER(description) LIKE '%consultor imobiliário%' THEN 'ciq'
@@ -11,6 +13,9 @@ WITH pre_seu_barriga AS (
         END AS partner_type,
         accrual_year_month,
         MAX(IF(lower(bill_item) LIKE '%postponed' AND lower(description) LIKE 'crédito%', TRUE, FALSE)) AS has_postponed_brokerage,
+        MAX(IF(lower(bill_item) LIKE '%installment' AND 
+            (TRY_CAST(SPLIT(SPLIT(description, 'Comissão do QuintoAndar - Parcela ')[1], ' de ')[1] AS INTEGER) -
+            TRY_CAST(SPLIT(SPLIT(description, 'Comissão do QuintoAndar - Parcela ')[1], ' de ')[0] AS INTEGER) != 0) OR (description = 'Crédito - Parcelamento corretagem - QuintoAndar'), TRUE, FALSE)) AS has_installment_brokerage,         
         SUM(due_amount) AS source_due_amount
     FROM 
         datalake_accounting_funnel.invoice_all
@@ -25,17 +30,19 @@ WITH pre_seu_barriga AS (
         AND description != 'Desconto por cadastro com link de indicação'
         AND id_invoice > 0
         AND contract_status IN ('Ativo','Finalizado')
-        AND ((ended_before_started = false) OR (status IN ('divergent payment', 'paid')))
-    GROUP BY 1,2,3,4
+    GROUP BY 1,2,3,4,5,6
 ),
 
 seu_barriga AS (
     SELECT
         id_contract,
         id_invoice,
+        purpose,
+        ended_before_started,
         partner_type,
         accrual_year_month,
         has_postponed_brokerage,
+        has_installment_brokerage,
         source_due_amount,
         SUM(source_due_amount) OVER (PARTITION BY id_contract, partner_type) AS source_due_amount_accumulated
     FROM
@@ -131,7 +138,7 @@ rh_visitas AS (
         datalake_robin_hood_clean.payment_request pr 
             ON pr.id = eb.id_payment_request
     WHERE 
-        aes.source_name IN ('Corretagem de aluguel')
+        aes.source_name IN ('Corretagem de aluguel', 'estate agent services')
         AND pr.status = 'paid'
     GROUP BY 1,2,3
 ),
@@ -157,22 +164,22 @@ pre_robin_hood AS (
 robin_hood AS (
     SELECT 
         id_contract,
-        accrual_year_month,
         source_name,
-        COALESCE(payment_due_amount, 0.00) AS payment_due_amount,
-        SUM(payment_due_amount) OVER (PARTITION BY id_contract, source_name) AS payment_due_amount_accumulated
+        SUM(payment_due_amount) AS payment_due_amount_accumulated
     FROM
         pre_robin_hood
+    GROUP BY 1,2
 ),
 
 main AS (
 SELECT 
     id_contract,
+    rent,
     partner_type,
     dt_contract_started,
     brokerage_amount
 FROM 
-    datalake_accounting_funnel.for_rent_contract_brokerage UNPIVOT (
+    for_rent_contract_brokerage UNPIVOT (
         brokerage_amount FOR partner_type IN (
             5A_brokerage_amount AS `quintoandar`,
             agent_brokerage_amount AS `estate agent`,
@@ -180,8 +187,9 @@ FROM
             select_brokerage_amount AS `select`,
             3p_brokerage_amount AS `3p`)
             )
-)
+),
 
+df_final AS (
 SELECT
     CASE 
         WHEN main.partner_type = 'quintoandar' THEN '5A-' || sb.id_contract || '-' || sb.id_invoice
@@ -191,24 +199,30 @@ SELECT
         WHEN main.partner_type = '3p' THEN '3P-' || sb.id_contract || '-' || sb.id_invoice 
     END AS id_brokerage_transfer,
     main.id_contract,
+    main.rent,
     sb.id_invoice,
     sb.accrual_year_month,
     main.partner_type,
-    COALESCE(main.brokerage_amount, 0.00) AS contract_amount,
-    COALESCE(sb.source_due_amount, 0.00) AS source_due_amount,
-    COALESCE(rh.payment_due_amount, 0.00) as payment_due_amount,
-    COALESCE(sb.source_due_amount_accumulated, 0.00) AS source_due_amount_accumulated,
-    COALESCE(rh.payment_due_amount_accumulated, 0.00) AS payment_due_amount_accumulated,
+    ROUND(COALESCE(main.brokerage_amount, 0.00),2) AS contract_amount,
+    ROUND(COALESCE(sb.source_due_amount, 0.00),2) AS source_due_amount,
+    ROUND(COALESCE(rh.payment_due_amount, 0.00),2) as payment_due_amount,
+    ROUND(COALESCE(sb.source_due_amount_accumulated, 0.00),2) AS source_due_amount_accumulated,
+    ROUND(COALESCE(rh2.payment_due_amount_accumulated, 0.00),2) AS payment_due_amount_accumulated,
+    ROUND(SUM(COALESCE(main.brokerage_amount, 0.00)) OVER (PARTITION BY main.id_contract),2) AS brokerage_amount_by_contract,
+    ROUND(SUM(COALESCE(sb.source_due_amount, 0.00)) OVER (PARTITION BY main.id_contract),2) AS source_due_amount_by_contract,
     sb.has_postponed_brokerage,
+    sb.has_installment_brokerage,
     IF(main.partner_type != 'quintoandar',
         CASE
-        WHEN sb.has_postponed_brokerage IS TRUE AND COALESCE(sb.source_due_amount, 0.00) - COALESCE(rh.payment_due_amount, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
-        WHEN sb.has_postponed_brokerage IS FALSE AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(rh.payment_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+          WHEN sb.ended_before_started IS TRUE AND sb.purpose = 'monthly' AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+          WHEN sb.ended_before_started IS TRUE AND sb.purpose != 'monthly' AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(rh.payment_due_amount, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+          WHEN sb.has_postponed_brokerage IS TRUE AND COALESCE(sb.source_due_amount, 0.00) - COALESCE(rh.payment_due_amount, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+          WHEN sb.has_postponed_brokerage IS FALSE AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(rh2.payment_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
         ELSE FALSE
     END,
         CASE
-        WHEN sb.has_postponed_brokerage IS FALSE AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
-        WHEN sb.has_postponed_brokerage IS TRUE THEN TRUE
+          WHEN sb.has_postponed_brokerage IS FALSE AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+          WHEN sb.has_postponed_brokerage IS TRUE OR sb.has_installment_brokerage IS TRUE THEN TRUE
         ELSE FALSE
     END) AS is_compliance,
     main.dt_contract_started
@@ -219,7 +233,7 @@ LEFT JOIN
         ON main.id_contract = sb.id_contract 
         AND main.partner_type = sb.partner_type
 LEFT JOIN 
-    robin_hood rh 
+    pre_robin_hood rh 
         ON sb.id_contract = rh.id_contract 
         AND sb.partner_type = rh.source_name
         AND (
@@ -227,5 +241,31 @@ LEFT JOIN
             sb.accrual_year_month < rh.accrual_year_month AND sb.partner_type = '3p'
             )
         )
+LEFT JOIN 
+    robin_hood rh2 
+        ON sb.id_contract = rh2.id_contract 
+        AND sb.partner_type = rh2.source_name
 WHERE
     sb.accrual_year_month >= 202301
+)
+
+SELECT 
+    id_brokerage_transfer,
+    id_contract,
+    rent,
+    id_invoice,
+    accrual_year_month,
+    partner_type,
+    contract_amount,
+    source_due_amount,
+    payment_due_amount,
+    source_due_amount_accumulated,
+    payment_due_amount_accumulated,
+    brokerage_amount_by_contract,
+    source_due_amount_by_contract,
+    has_postponed_brokerage,
+    has_installment_brokerage, 
+    is_compliance,
+    dt_contract_started
+FROM
+    df_final

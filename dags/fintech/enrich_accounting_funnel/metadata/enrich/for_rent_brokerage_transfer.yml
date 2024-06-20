@@ -46,10 +46,22 @@ columns:
    lineage:
      - datalake_robin_hood.accounting_entry.due_amount
    description: "Indicates the amount of brokerage transfered by Robin Hood accumulated (sum over) by contract and partner type"
+ brokerage_amount_by_contract:
+   lineage:
+     - datalake_accounting_funnel.for_rent_contract_transfer.brokerage_amount
+   description: "Indicates the amount of brokerage created on Main accumulated (sum over) by contract"
+ source_due_amount_by_contract:
+   lineage:
+     - datalake_accounting_funnel.invoice_all.due_amount
+   description: "Indicates the amount of brokerage created on the invoice (Retsuko) accumulated (sum over) by contract"
  has_postponed_brokerage:
    lineage:
      - datalake_accounting_funnel.invoice_all.bill_item
-   description: "Indicates if an invoice has a entry to postponed reasons"
+   description: "Indicates if an invoice has an entry to postponed reasons"
+ has_installment_brokerage:
+   lineage:
+     - datalake_accounting_funnel.invoice_all.bill_item
+   description: "Indicates if an invoice has an entry with installments"
  is_compliance:
    description: "Indicates if brokerage transfer (retsuko/robin hood) is in compliance with what is in contract (main)"
  dt_contract_started:

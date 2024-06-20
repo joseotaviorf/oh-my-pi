@@ -32,6 +32,43 @@ first_rent_from_contract AS (
         ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY rev) = 1
 ),
 
+dt_brokerage_share_from_contract AS (
+      SELECT
+        sk_contract,
+        MIN(invoice_created_date) AS invoice_created_date
+    FROM 
+        datalake_accounting_funnel.invoice_all
+    WHERE (
+        (bill_item IN ('brokerage partner select', 'brokerage partner select postponed', 'brokerage third party real estate', 'brokerage third party real estate postponed')) OR 
+        (bill_item IN ('brokerage adm partner', 'brokerage adm partner postponed') AND LOWER(description) LIKE '%consultor imobiliário%') OR 
+        (bill_item IN ('brokerage estate agent', 'brokerage estate agent postponed')) OR 
+        (bill_item IN ('brokerage quinto andar', 'brokerage quinto andar postponed', 'brokerage installment'))
+    )
+    AND status != 'canceled'
+    AND description != 'Desconto por cadastro com link de indicação'
+    AND id_invoice > 0
+    AND contract_status IN ('Ativo','Finalizado')
+GROUP BY 1
+),
+
+brokerage_share_from_contract_at_signature AS (
+    SELECT
+        id_contract,
+        agent_brokerage_share
+    FROM 
+        datalake_ebdb_clean.contract_aud AS ca
+    LEFT JOIN 
+        datalake_ebdb_clean.user_revision_entity AS ur
+            ON ca.rev = ur.id
+    LEFT JOIN 
+        dt_brokerage_share_from_contract AS dt
+            ON dt.sk_contract = ca.id_contract
+    WHERE 
+        DATE(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))) <= DATE(dt.invoice_created_date)
+    QUALIFY 
+        ROW_NUMBER() OVER (PARTITION BY ca.id_contract ORDER BY rev DESC) = 1
+),
+
 agents_by_contract AS (
     SELECT
         con.id AS id_contract,
@@ -59,7 +96,7 @@ df AS (
         c.fist_rent_comission_fee AS first_rent_commission_fee,
         CASE
             WHEN a.num_agents = 0 THEN NULL
-            WHEN a.num_agents = 1 THEN NULLIF(c.agent_brokerage_share, 0.00)
+            WHEN a.num_agents = 1 THEN NULLIF(brokerage_aud.agent_brokerage_share, 0.00)
             WHEN a.num_agents > 1 THEN 0.20
         END AS agent_brokerage_share,
         NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', NULL, p.brokerage_split_percentage), 0.00) AS ciq_brokerage_share,
@@ -68,7 +105,7 @@ df AS (
         NULLIF(f_rent.rent *
         (CASE
             WHEN a.num_agents = 0 THEN 0.00
-            WHEN a.num_agents = 1 THEN c.agent_brokerage_share
+            WHEN a.num_agents = 1 THEN brokerage_aud.agent_brokerage_share
             WHEN a.num_agents > 1 THEN 0.20
         END), 0.00) AS agent_brokerage_amount,
         NULLIF(IF(contract_rent_model:rentalAdministrator = 'THIRD_PARTY', NULL, f_rent.rent * c.fist_rent_comission_fee * p.brokerage_split_percentage), 0.00) AS ciq_brokerage_amount,
@@ -90,6 +127,9 @@ df AS (
         first_rent_from_contract f_rent
             ON f_rent.id_contract = c.id
     LEFT JOIN 
+        brokerage_share_from_contract_at_signature brokerage_aud
+            ON brokerage_aud.id_contract = c.id
+    LEFT JOIN 
         agents_by_contract a
             ON a.id_contract = c.id
 ),
@@ -97,18 +137,19 @@ df AS (
 df_final AS (
     SELECT
     id_contract,
+    rental_administrator,
     rent,
     first_rent_commission_fee,
-    IF(rental_administrator != 'THIRD_PARTY', ROUND(1.00 - (COALESCE(agent_brokerage_share, 0) + COALESCE(ciq_brokerage_share, 0) + COALESCE(select_brokerage_share, 0) + COALESCE(3p_brokerage_share, 0)),3), ROUND(1.00 - (COALESCE(agent_brokerage_share, 0) + COALESCE(3p_brokerage_share, 0)),3)) AS 5A_brokerage_share,
-    ROUND(agent_brokerage_share,3) AS agent_brokerage_share,
-    ROUND(ciq_brokerage_share,3) AS ciq_brokerage_share,
-    ROUND(select_brokerage_share,3) AS select_brokerage_share,
-    ROUND(3p_brokerage_share,3) AS 3p_brokerage_share,
-    IF(rental_administrator != 'THIRD_PARTY', ROUND((rent * first_rent_commission_fee) - COALESCE(agent_brokerage_amount, 0) - COALESCE(ciq_brokerage_amount, 0) - COALESCE(select_brokerage_amount, 0) - COALESCE(3p_brokerage_amount, 0), 2), ROUND((rent * first_rent_commission_fee) - COALESCE(agent_brokerage_amount, 0) - COALESCE(3p_brokerage_amount, 0), 2)) AS 5A_brokerage_amount,
-    ROUND(agent_brokerage_amount,2) AS agent_brokerage_amount,
-    ROUND(ciq_brokerage_amount,2) AS ciq_brokerage_amount,
-    ROUND(select_brokerage_amount,2) AS select_brokerage_amount,
-    ROUND(3p_brokerage_amount,2) AS 3p_brokerage_amount,
+    COALESCE(IF(rental_administrator != 'THIRD_PARTY', ROUND(1.00 - (COALESCE(agent_brokerage_share, 0) + COALESCE(ciq_brokerage_share, 0) + COALESCE(select_brokerage_share, 0) + COALESCE(3p_brokerage_share, 0)),3), ROUND(1.00 - (COALESCE(agent_brokerage_share, 0) + COALESCE(3p_brokerage_share, 0)),3)),0) AS 5A_brokerage_share,
+    COALESCE(ROUND(agent_brokerage_share,3),0) AS agent_brokerage_share,
+    COALESCE(ROUND(ciq_brokerage_share,3),0) AS ciq_brokerage_share,
+    COALESCE(ROUND(select_brokerage_share,3),0) AS select_brokerage_share,
+    COALESCE(ROUND(3p_brokerage_share,3),0) AS 3p_brokerage_share,
+    COALESCE(IF(rental_administrator != 'THIRD_PARTY', ROUND((rent * first_rent_commission_fee) - COALESCE(agent_brokerage_amount, 0) - COALESCE(ciq_brokerage_amount, 0) - COALESCE(select_brokerage_amount, 0) - COALESCE(3p_brokerage_amount, 0), 2), ROUND((rent * first_rent_commission_fee) - COALESCE(agent_brokerage_amount, 0) - COALESCE(3p_brokerage_amount, 0), 2)),0) AS 5A_brokerage_amount,
+    COALESCE(ROUND(agent_brokerage_amount,2),0) AS agent_brokerage_amount,
+    COALESCE(ROUND(ciq_brokerage_amount,2),0) AS ciq_brokerage_amount,
+    COALESCE(ROUND(select_brokerage_amount,2),0) AS select_brokerage_amount,
+    COALESCE(ROUND(3p_brokerage_amount,2),0) AS 3p_brokerage_amount,
     dt_contract_started,
     dt_contract_annulment
     FROM 
@@ -117,26 +158,39 @@ df_final AS (
 
 SELECT
     id_contract,
+    rental_administrator,
     rent,
     first_rent_commission_fee,
     CASE 
-        WHEN (agent_brokerage_share + ciq_brokerage_share >= 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0
-        WHEN (agent_brokerage_share + ciq_brokerage_share < 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0.4 - (agent_brokerage_share + ciq_brokerage_share)
+        WHEN ((agent_brokerage_share + ciq_brokerage_share) >= 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0
+        WHEN ((agent_brokerage_share + ciq_brokerage_share) < 0.4) AND (rental_administrator = 'THIRD_PARTY') AND (dt_contract_started > dt_contract_annulment) THEN (0.4 - (agent_brokerage_share + ciq_brokerage_share))/2
+        WHEN ((agent_brokerage_share + ciq_brokerage_share) < 0.4) AND (rental_administrator != 'THIRD_PARTY') AND (dt_contract_started > dt_contract_annulment) THEN 0.4 - (agent_brokerage_share + ciq_brokerage_share)
         ELSE 5A_brokerage_share
     END AS 5A_brokerage_share,
     agent_brokerage_share,
     ciq_brokerage_share,
     IF((dt_contract_started > dt_contract_annulment), 0, select_brokerage_share) AS select_brokerage_share,
-    3p_brokerage_share,
+    CASE
+        WHEN rental_administrator != 'THIRD_PARTY' THEN 0
+        WHEN (ciq_brokerage_share + agent_brokerage_share) < 0.4 AND (dt_contract_started > dt_contract_annulment) THEN ((0.4) - (ciq_brokerage_share + agent_brokerage_share))/2
+        WHEN (ciq_brokerage_share + agent_brokerage_share) >= 0.4 AND (dt_contract_started > dt_contract_annulment) THEN 0 
+        ELSE 3p_brokerage_share
+    END AS 3p_brokerage_share,
     CASE 
-        WHEN (agent_brokerage_amount + ciq_brokerage_amount >= 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0
-        WHEN (agent_brokerage_amount + ciq_brokerage_amount < 0.4) AND (dt_contract_started > dt_contract_annulment) THEN rent * 0.4 - (agent_brokerage_amount + ciq_brokerage_amount)
+        WHEN ((agent_brokerage_share + ciq_brokerage_share) >= (0.4)) AND (dt_contract_started > dt_contract_annulment) THEN 0
+        WHEN ((agent_brokerage_share + ciq_brokerage_share) < (0.4)) AND (rental_administrator = 'THIRD_PARTY') AND (dt_contract_started > dt_contract_annulment) THEN ((rent * 0.4) - (agent_brokerage_amount + ciq_brokerage_amount))/2
+        WHEN ((agent_brokerage_share + ciq_brokerage_share) < (0.4)) AND (rental_administrator != 'THIRD_PARTY') AND (dt_contract_started > dt_contract_annulment) THEN (rent * 0.4) - (agent_brokerage_amount + ciq_brokerage_amount)
         ELSE 5A_brokerage_amount 
     END AS 5A_brokerage_amount,
     agent_brokerage_amount,
     ciq_brokerage_amount,
     IF((dt_contract_started > dt_contract_annulment), 0, select_brokerage_amount) AS select_brokerage_amount,
-    3p_brokerage_amount,
+    CASE 
+        WHEN rental_administrator != 'THIRD_PARTY' THEN 0
+        WHEN (ciq_brokerage_share + agent_brokerage_share) < (rent * 0.4) AND (dt_contract_started > dt_contract_annulment) THEN ((rent * 0.4) - (ciq_brokerage_amount + agent_brokerage_amount))/2
+        WHEN (ciq_brokerage_share + agent_brokerage_share) >= (rent * 0.4) AND (dt_contract_started > dt_contract_annulment) THEN 0 
+        ELSE 3p_brokerage_amount
+    END AS 3p_brokerage_amount,
     dt_contract_started,
     dt_contract_annulment
 FROM 
