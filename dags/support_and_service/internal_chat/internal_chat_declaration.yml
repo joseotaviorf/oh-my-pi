@@ -17,7 +17,7 @@ workflow:
     - "{bucket}"
     - "{{ ds }}"
     - "{table_name}"
-    - { partitions }
+    - "{partitions}"
 
   default_extraction_type: incremental
   default_partitions: [year, month, day]
