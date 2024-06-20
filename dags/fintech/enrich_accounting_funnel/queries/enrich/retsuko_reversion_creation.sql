@@ -26,9 +26,6 @@ retsuko_reversao AS (
               'entry.bill-item/adjustment-agreement-adm-fee', 
               'entry.bill-item/lockin') THEN 'adm fee'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar',
-              'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
-              'entry.bill-item/brokerage-fee-tax-ir', 
-              'entry.bill-item/brokerage-fee-tax-ir-quinto-andar', 
               'entry.bill-item/brokerage-installment') THEN 'brokerage'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN 'BFI v1'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN 'BFI v2'
@@ -43,9 +40,6 @@ retsuko_reversao AS (
               'entry.bill-item/adjustment-agreement-adm-fee', 
               'entry.bill-item/lockin') THEN '31101.02.02'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar',
-              'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
-              'entry.bill-item/brokerage-fee-tax-ir', 
-              'entry.bill-item/brokerage-fee-tax-ir-quinto-andar', 
               'entry.bill-item/brokerage-installment') THEN '31101.01.04'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN '31101.01.04'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN '31101.01.13'

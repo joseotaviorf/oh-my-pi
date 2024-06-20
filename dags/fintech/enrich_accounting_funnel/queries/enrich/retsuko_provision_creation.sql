@@ -24,18 +24,8 @@ retsuko_provisao AS (
                 'entry.bill-item/igpm-adm-fee', 
                 'entry.bill-item/ipca-adm-fee', 
                 'entry.bill-item/adjustment-agreement-adm-fee', 
-                'entry.bill-item/lockin',
-                'entry.bill-item/adm-fee-tax-pcc-adm-partner',
-                'entry.bill-item/adm-fee-tax-pcc-quintoandar',
-                'entry.bill-item/adm-fee-tax-ir-quinto-andar',
-                'entry.bill-item/adm-fee-tax-ir',
-                'entry.bill-item/adm-fee-tax-pcc',
-                'entry.bill-item/adm-fee-tax-ir-adm-partner',
-                'entry.bill-item/adm-fee-tax-pcc-quinto-andar') THEN 'adm fee'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar', 
-                'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
-                'entry.bill-item/brokerage-fee-tax-ir', 
-                'entry.bill-item/brokerage-fee-tax-ir-quinto-andar') THEN 'brokerage'
+                'entry.bill-item/lockin') THEN 'adm fee'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN 'brokerage'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN 'BFI v1'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN 'BFI v2'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN 'BFI'
@@ -46,18 +36,8 @@ retsuko_provisao AS (
                 'entry.bill-item/igpm-adm-fee', 
                 'entry.bill-item/ipca-adm-fee', 
                 'entry.bill-item/adjustment-agreement-adm-fee', 
-                'entry.bill-item/lockin',
-                'entry.bill-item/adm-fee-tax-pcc-adm-partner',
-                'entry.bill-item/adm-fee-tax-pcc-quintoandar',
-                'entry.bill-item/adm-fee-tax-ir-quinto-andar',
-                'entry.bill-item/adm-fee-tax-ir',
-                'entry.bill-item/adm-fee-tax-pcc',
-                'entry.bill-item/adm-fee-tax-ir-adm-partner',
-                'entry.bill-item/adm-fee-tax-pcc-quinto-andar') THEN '31101.02.02'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar', 
-                'entry.bill-item/brokerage-fee-tax-ir-adm-partner', 
-                'entry.bill-item/brokerage-fee-tax-ir', 
-                'entry.bill-item/brokerage-fee-tax-ir-quinto-andar') THEN '31101.01.04'
+                'entry.bill-item/lockin') THEN '31101.02.02'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '31101.01.04'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN '31101.01.04'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN '31101.01.13'
         END AS account_number,
