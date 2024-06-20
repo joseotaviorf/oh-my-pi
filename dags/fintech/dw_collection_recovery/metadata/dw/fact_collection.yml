@@ -7,6 +7,11 @@ columns:
   sk_collection:
     lineage:
       - datalake_recupera.collection.ts_occurrence
+      - datalake_recupera.collection.id_customer
+      - datalake_recupera.collection.id_contract
+      - datalake_recupera.collection.id_creditor
+      - datalake_recupera.collection.operator_name
+      - datalake_recupera.collection.occurrence
     description: Surrogate key of table. It is a sequential number created based on the occurrence timestamp ordered in ascending order
   sk_debtor:
     lineage:

@@ -11,7 +11,7 @@ collection_calculation AS (
         UPPER(c.operator_name) AS id_operator,
         o.id_operator_registration,
         UPPER(c.id_occurrence) AS id_occurrence,
-        UPPER(COALESCE(c.occurrence, c.status_occurrence)) AS occurrence,
+        UPPER(c.occurrence) AS occurrence,
         DATE(c.ts_occurrence) AS dt_occurrence,
         INT(SUM(c.esforco)) AS total_esforco,
         INT(SUM(c.alo)) AS total_alo,
@@ -27,7 +27,7 @@ collection_calculation AS (
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
 )
 SELECT
-    md5(CONCAT(sk_debtor, creditor, id_operator, id_occurrence, dt_occurrence)) AS sk_collection,
+    md5(CONCAT(sk_debtor, COALESCE(id_contract,0), creditor, id_operator, id_occurrence, dt_occurrence)) AS sk_collection,
     sk_debtor,
     id_contract AS sk_contract,
     id_operator,
