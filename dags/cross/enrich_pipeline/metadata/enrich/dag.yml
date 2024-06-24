@@ -75,6 +75,9 @@ columns:
       If it's null, it could be because the DAG is in our SLA exclusion list, it's not active or it's paused.
   is_datamart:
     description: Boolean flag indicating if the DAG is related to datamarts.
+  has_special_scheduler:
+    description: Boolean flag indicating if the DAG doesn't run everyday and has a special scheduler 
+      (such as only runs on fridays, only runs on the first day of the month, etc.).
   has_todays_run_happened:
     description: Boolean flag indicating if the DAG has run on the present day, which would indicate that
       its data is already available.

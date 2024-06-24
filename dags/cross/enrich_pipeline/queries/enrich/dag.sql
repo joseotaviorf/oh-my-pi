@@ -128,62 +128,110 @@ sla_base AS (
     JOIN
         most_recent_events AS me
             ON me.id_dag = d.id_dag
+),
+base AS (
+    SELECT
+        d.id_dag,
+        l.id_line,
+        l.line_name,
+        d.layer,
+        d.schedule_interval,
+        s.state,
+        ao.number_of_tasks,
+        s.duration,
+        m.median_duration,
+        d.is_active,
+        d.is_paused,
+        s.is_in_exclusion_list,
+        s.is_ignored,
+        s.is_inside_sla,
+        d.is_datamart,
+        IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
+        fe.ts_first_event,
+        FROM_UTC_TIMESTAMP(fe.ts_first_event, 'America/Sao_Paulo') AS ts_first_event_brt,
+        s.dt_run AS dt_last_run,
+        CASE
+            WHEN d.is_datamart = FALSE AND d.layer IN ('raw/clean', 'enrich', 'dw', 'metric') THEN CURRENT_DATE + INTERVAL 11 HOUR -- UTC hour
+            WHEN d.is_datamart = TRUE THEN CURRENT_DATE + INTERVAL 13 HOUR
+            WHEN d.layer = 'reverse' THEN CURRENT_DATE + INTERVAL 15 HOUR
+        END AS ts_utc_sla,
+        CASE
+            WHEN d.is_datamart = FALSE AND d.layer IN ('raw/clean', 'enrich', 'dw', 'metric') THEN CURRENT_DATE + INTERVAL 8 HOUR -- BRT hour
+            WHEN d.is_datamart = TRUE THEN CURRENT_DATE + INTERVAL 10 HOUR
+            WHEN d.layer = 'reverse' THEN CURRENT_DATE + INTERVAL 12 HOUR
+        END AS ts_brt_sla,
+        s.ts_last_execution_started,
+        s.ts_last_execution_started_brt,
+        m.ts_median_execution_started,
+        m.ts_median_execution_started_brt,
+        s.ts_last_execution_ended,
+        s.ts_last_execution_ended_brt,
+        m.ts_median_execution_ended,
+        m.ts_median_execution_ended_brt,
+        s.ts_last_run_first_success,
+        s.ts_last_run_first_success_brt
+    FROM
+        dag_info AS d
+    LEFT JOIN
+        sla_base AS s
+            ON s.id_dag = d.id_dag
+    LEFT JOIN
+        first_execution AS fe
+            ON fe.id_dag = d.id_dag
+    LEFT JOIN
+        medians AS m
+            ON m.id_dag = d.id_dag
+    LEFT JOIN
+        amount_of_tasks AS ao
+            ON ao.id_dag = d.id_dag
+    JOIN
+        datalake_pipeline.line AS l
+            ON l.line_name = d.line_name
 )
 SELECT
-    d.id_dag,
-    l.id_line,
-    l.line_name,
-    d.layer,
-    d.schedule_interval,
-    s.state,
+    b.id_dag,
+    id_line,
+    line_name,
+    layer,
+    schedule_interval,
+    state,
+    HOUR(ts_utc_sla) AS utc_sla_hour,
+    HOUR(ts_brt_sla) AS brt_sla_hour,
+    number_of_tasks,
+    duration,
+    median_duration,
+    is_active,
+    is_paused,
+    is_in_exclusion_list,
+    is_ignored,
+    is_datamart,
+    IF(ds.id_dag IS NOT NULL, TRUE, FALSE) AS has_special_scheduler,
+    has_todays_run_happened,
     CASE
-      WHEN d.is_datamart = FALSE AND d.layer IN ('raw/clean', 'enrich', 'dw', 'metric') THEN 11 -- UTC hour
-      WHEN d.is_datamart = TRUE THEN 13
-      WHEN d.layer = 'reverse' THEN 15
-    END AS utc_sla_hour,
-    CASE
-      WHEN d.is_datamart = FALSE AND d.layer IN ('raw/clean', 'enrich', 'dw', 'metric') THEN 8 -- BRT hour
-      WHEN d.is_datamart = TRUE THEN 10
-      WHEN d.layer = 'reverse' THEN 12
-    END AS brt_sla_hour,
-    ao.number_of_tasks,
-    s.duration,
-    m.median_duration,
-    d.is_active,
-    d.is_paused,
-    s.is_in_exclusion_list,
-    IF(s.is_ignored = TRUE, NULL, s.is_inside_sla) AS is_inside_sla,
-    d.is_datamart,
-    IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
-    fe.ts_first_event,
-    FROM_UTC_TIMESTAMP(fe.ts_first_event, 'America/Sao_Paulo') AS ts_first_event_brt,
-    s.dt_run AS dt_last_run,
-    s.ts_last_execution_started,
-    s.ts_last_execution_started_brt,
-    m.ts_median_execution_started,
-    m.ts_median_execution_started_brt,
-    s.ts_last_execution_ended,
-    s.ts_last_execution_ended_brt,
-    m.ts_median_execution_ended,
-    m.ts_median_execution_ended_brt,
-    s.ts_last_run_first_success,
-    s.ts_last_run_first_success_brt,
+        WHEN has_todays_run_happened = TRUE AND is_inside_sla = TRUE AND is_ignored = FALSE THEN TRUE
+        WHEN has_todays_run_happened = TRUE AND is_inside_sla = FALSE AND is_ignored = FALSE THEN FALSE
+        WHEN has_todays_run_happened = FALSE AND is_inside_sla = FALSE AND is_ignored = FALSE AND ds.id_dag IS NULL THEN FALSE
+        WHEN has_todays_run_happened = FALSE AND is_ignored = FALSE AND ds.id_dag IS NULL AND NOW() > ts_utc_sla THEN FALSE
+        ELSE NULL
+    END AS is_inside_sla,
+    ts_first_event,
+    ts_first_event_brt,
+    dt_last_run,
+    ts_last_execution_started,
+    ts_last_execution_started_brt,
+    ts_median_execution_started,
+    ts_median_execution_started_brt,
+    ts_last_execution_ended,
+    ts_last_execution_ended_brt,
+    ts_median_execution_ended,
+    ts_median_execution_ended_brt,
+    ts_last_run_first_success,
+    ts_last_run_first_success_brt,
     NOW() AS ts_load,
     FROM_UTC_TIMESTAMP(NOW(), 'America/Sao_Paulo') AS ts_load_brt
 FROM
-  dag_info AS d
+    base AS b
 LEFT JOIN
-  sla_base AS s
-    ON s.id_dag = d.id_dag
-LEFT JOIN
-    first_execution AS fe
-        ON fe.id_dag = d.id_dag
-LEFT JOIN
-    medians AS m
-        ON m.id_dag = d.id_dag
-LEFT JOIN
-    amount_of_tasks AS ao
-        ON ao.id_dag = d.id_dag
-JOIN
-  datalake_pipeline.line AS l
-    ON l.line_name = d.line_name
+    datalake_gsheets_clean.dags_special_scheduler AS ds
+        ON ds.id_dag = b.id_dag
+        AND CURRENT_DATE BETWEEN dt_added AND COALESCE(dt_removed, CURRENT_DATE)
