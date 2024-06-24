@@ -106,6 +106,7 @@ raw_task_group = task_group.build_raw_task_group_for_single_table(
         SOURCE,
         table_name
     ],
+    has_metadata_propagation=False,
 )
 
 clean_task_group = task_group.build_clean_task_group(
@@ -114,6 +115,7 @@ clean_task_group = task_group.build_clean_task_group(
     has_create_external_table_task=False,
     table_name=table_name,
     has_hive_sync=False,
+    has_metadata_propagation=False,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))

@@ -247,6 +247,14 @@ class BaseWorkflow(BuilderInterface):
         if table_attributes.layer == LayerEnum.RAW and has_product_database_name:
             return True
 
+        default_has_metadata_propagation = self.workflow_args.get(
+            "has_metadata_propagation", True
+        )
+        if not table_attributes.table_customization.get(
+            "has_metadata_propagation", default_has_metadata_propagation
+        ):
+            return False
+
         return DAGPackagesPathService.artifact_file_exists(
             artifact_type="metadata",
             dag_name=self.dag_name,

@@ -79,12 +79,18 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
             add_default_row = self.add_default_row_task_creator.create_task(table)
             load >> add_default_row
             last_task_in_group = add_default_row
+        before_sync = load
         if self._check_include_sync_hive_tasks(table):
             register_table = self.register_delta_table_task_creator.create_task(table)
+            load >> register_table
+            before_sync = register_table
+        if self._check_include_propagate_metadata_task(table):
             sync_metadata = self.sync_metadata_task_creator.create_task(
                 table, "--bypass-hive"
             )
-            (load >> register_table >> sync_metadata >> last_task_after_groups)
+            before_sync >> sync_metadata >> last_task_after_groups
+        else:
+            before_sync >> last_task_after_groups
         if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
             load >> data_quality >> last_task_after_groups

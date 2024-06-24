@@ -118,6 +118,11 @@ class DAGDeclarationValidator(Validator):
                     "required": False,
                 },
                 "mysql_version": {"type": "string", "empty": False, "required": False},
+                "has_metadata_propagation": {
+                    "type": "boolean",
+                    "empty": False,
+                    "required": False,
+                },
             },
         },
         "cluster": {

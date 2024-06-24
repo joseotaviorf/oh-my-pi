@@ -151,9 +151,22 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         )
         last_clean_task = load_clean_task
 
-        if self._check_include_sync_hive_tasks(clean_table_attributes):
+        bypass_hive = (
+            "--bypass-hive"
+            if not self._check_include_sync_hive_tasks(clean_table_attributes)
+            else ""
+        )
+        bypass_propagate = (
+            "--bypass-propagate"
+            if not self._check_include_propagate_metadata_task(clean_table_attributes)
+            else ""
+        )
+        if not bypass_hive or not bypass_propagate:
             sync_metadata = self.sync_metadata_task_creator.create_task(
-                clean_table_attributes
+                clean_table_attributes, f"{bypass_hive} {bypass_propagate}".strip()
+            )
+            sync_metadata = self.sync_metadata_task_creator.create_task(
+                clean_table_attributes, f"{bypass_hive} {bypass_propagate}".strip()
             )
 
             last_clean_task = sync_metadata

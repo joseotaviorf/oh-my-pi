@@ -18,5 +18,6 @@ workflow:
   layer: raw
   custom_schema: gsheets
   has_hive_sync: False
+  has_metadata_propagation: False
   credentials_scope: people
   bucket_config_name: people_bucket

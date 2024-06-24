@@ -86,9 +86,18 @@ class EnrichQueryWorkflow(BaseWorkflow):
             load = self.load_custom_task_creator.create_task(table)
         else:
             load = self.load_enrich_task_creator.create_task(table)
-
-        if self._check_include_sync_hive_tasks(table):
-            sync_metadata = self.sync_metadata_task_creator.create_task(table)
+        bypass_hive = (
+            "--bypass-hive" if not self._check_include_sync_hive_tasks(table) else ""
+        )
+        bypass_propagate = (
+            "--bypass-propagate"
+            if not self._check_include_propagate_metadata_task(table)
+            else ""
+        )
+        if not bypass_hive or not bypass_propagate:
+            sync_metadata = self.sync_metadata_task_creator.create_task(
+                table, f"{bypass_hive} {bypass_propagate}".strip()
+            )
             (load >> sync_metadata >> last_task)
 
         if self._check_include_data_quality_task(table):

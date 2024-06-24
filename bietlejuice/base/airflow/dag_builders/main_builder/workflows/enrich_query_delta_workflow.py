@@ -90,16 +90,21 @@ class EnrichQueryDeltaWorkflow(BaseWorkflow):
             load = self.load_custom_task_creator.create_task(table)
         else:
             load = self.load_enrich_task_creator.create_task(table)
-
+        before_sync = load
         if self._check_include_sync_hive_tasks(table):
             register_table = self.register_delta_table_task_creator.create_task(table)
+            before_sync >> register_table
+            before_sync = register_table
+        if self._check_include_propagate_metadata_task(table):
             sync_metadata = self.sync_metadata_task_creator.create_task(
                 table, "--bypass-hive"
             )
-            (load >> register_table >> sync_metadata >> last_task)
+            before_sync >> sync_metadata
+            before_sync = sync_metadata
         if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
             load >> data_quality >> last_task
+        before_sync >> last_task
         return load, load
 
     def _set_dependencies(

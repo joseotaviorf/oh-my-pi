@@ -65,6 +65,9 @@ class RawGsheetsWorkflow(BaseWorkflow):
             f"{self.databricks_bietlejuice_repo_path}/spark_jobs/base/"
         )
         self.has_hive_sync = workflow_args.get("has_hive_sync", True)
+        self.has_metadata_propagation = workflow_args.get(
+            "has_metadata_propagation", True
+        )
 
         CREDENTIALS_SCOPE = {
             "quintoandar": APIEnum.GSHEETS_CREDENTIALS,
@@ -124,6 +127,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
             source_database_base_name=schema,
             target_database_base_name=schema,
             has_hive_sync=self.has_hive_sync,
+            has_metadata_propagation=self.has_metadata_propagation,
         )
 
         done_tasks = self._set_done_tasks(tables_customization)
@@ -367,6 +371,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
                 ],
                 pool=task_pool,
                 has_hive_sync=self.has_hive_sync,
+                has_metadata_propagation=self.has_metadata_propagation,
             )
             raw_task_groups[sheet_details["clean_table_name"]] = raw_task_group
 
