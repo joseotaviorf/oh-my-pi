@@ -23,11 +23,6 @@ from bietlejuice.services.configuration_service import ConfigurationService
 VESPUCIO_PACKAGE_NAME = "vespucio"
 # TO DO: Add the package version in the config file
 # When updating the vespucio version here, don't forget to update this in the zordominium_vespucio_plugin dag
-VESPUCIO_PACKAGE_VERSION = "0.14.0"
-VESPUCIO_WHEEL_FILE = (
-    f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
-)
-
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 8, 24, 0, 0, 0, tzinfo=LOCAL_TZ)
 
@@ -46,6 +41,11 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+
+VESPUCIO_PACKAGE_VERSION = config_service.get_config("vespucio_pipeline_version")
+VESPUCIO_WHEEL_FILE = (
+    f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
+)
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_general_cluster")
 CLUSTER_DESCRIPTION["spark_conf"].update(

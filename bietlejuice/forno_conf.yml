@@ -839,3 +839,5 @@ databricks_12_2_med_cluster:
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
+
+vespucio_pipeline_version: 0.14.0
