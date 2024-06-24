@@ -51,6 +51,19 @@ columns:
       - datalake_growth_costs.daily_costs.utm_term
     description: The UTM term associated with the event for tracking keywords or phrases.
     dimension: True
+  utm_content:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.utm_content
+      - dw_growth.fact_demand_prospect_events.utm_content
+      - datalake_growth_costs.daily_costs.utm_content
+    description: The UTM content associated with the event for tracking keywords or phrases.
+    dimension: True
+  content_page:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.content_page
+      - dw_growth.fact_demand_prospect_events.content_page
+    description:  Indicates if the user visited a content page.
+    dimension: True    
   business_context:
     lineage:
       - dw_growth.fact_demand_top_of_funnel_events.business_context

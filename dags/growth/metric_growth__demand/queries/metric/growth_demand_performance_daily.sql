@@ -8,7 +8,9 @@ daily_tof_metrics AS (
     fdtof.platform,
     CAST(NULL AS STRING) AS referral_type, 
     CAST(NULL AS STRING) AS utm_campaign, 
-    CAST(NULL AS STRING) AS utm_term, 
+    CAST(NULL AS STRING) AS utm_term,
+    fdtof.utm_content,
+    fdtof.content_page,
     LOWER(fdtof.business_context) AS business_context,
     fdtof.funnel_side,
     fdtof.campaign_business_context,
@@ -31,7 +33,7 @@ daily_tof_metrics AS (
         ON dr.sk_region = fdtof.sk_region
   WHERE 
     DATE(fdtof.dt_event) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
-  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+  GROUP BY ALL
 
 ), 
 daily_prospect_metrics AS ( 
@@ -43,7 +45,9 @@ daily_prospect_metrics AS (
     fdpe.referral_type, 
     fdpe.platform,
     fdpe.utm_campaign, 
-    fdpe.utm_term,  
+    fdpe.utm_term,
+    fdpe.utm_content,
+    fdpe.content_page,
     LOWER(fdpe.business_context) AS business_context, 
     dms.funnel_side, 
     dms.campaign_business_context, 
@@ -70,7 +74,7 @@ daily_prospect_metrics AS (
       ON fdpe.sk_region = dr.sk_region
   WHERE 
     DATE(fdpe.ts_event) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
-  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+  GROUP BY ALL
 ), 
 daily_costs_metrics AS ( 
   SELECT
@@ -81,7 +85,9 @@ daily_costs_metrics AS (
     NULL AS referral_type, 
     NULL AS platform, 
     dc.campaign_name AS utm_campaign,
-    dc.utm_term, 
+    dc.utm_term,
+    dc.utm_content,
+    CAST(NULL AS STRING) AS content_page,
     LOWER(dc.business_context) AS business_context,
     dc.funnel_side, 
     dc.campaign_business_context, 
@@ -100,7 +106,7 @@ daily_costs_metrics AS (
   WHERE 
     DATE(dd.date) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
     AND LOWER(funnel_side) IN ('demand', 'branding')
-  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18  
+  GROUP BY ALL
 )
 SELECT
   COALESCE(t.date, p.date, c.date) AS dt_event,
@@ -110,6 +116,8 @@ SELECT
   COALESCE(t.referral_type, p.referral_type, c.referral_type) AS referral_type,
   COALESCE(t.platform, p.platform, c.platform) AS platform,
   COALESCE(t.utm_term, p.utm_term, c.utm_term) AS utm_term,
+  COALESCE(t.utm_content, p.utm_content, c.utm_content) AS utm_content,
+  COALESCE(t.content_page, p.content_page, c.content_page) AS content_page,
   COALESCE(t.utm_campaign, p.utm_campaign, c.utm_campaign) AS utm_campaign,
   COALESCE(t.business_context, p.business_context, c.business_context) AS business_context,
   COALESCE(t.funnel_side, p.funnel_side, c.funnel_side) AS funnel_side,
@@ -139,6 +147,8 @@ FROM
     AND t.referral_type = p.referral_type
     AND t.platform = p.platform
     AND t.utm_term = p.utm_term
+    AND t.utm_content = p.utm_content
+    AND t.content_page = p.content_page
     AND t.utm_campaign = p.utm_campaign
     AND t.business_context = p.business_context
     AND t.funnel_side = p.funnel_side
@@ -154,6 +164,8 @@ FROM
     AND t.referral_type = c.referral_type
     AND t.platform = c.platform
     AND t.utm_term = c.utm_term
+    AND t.utm_content = c.utm_content
+    AND t.content_page = c.content_page
     AND t.utm_campaign = c.utm_campaign
     AND t.business_context = c.business_context
     AND t.funnel_side = c.funnel_side
