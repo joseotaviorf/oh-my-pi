@@ -16,9 +16,9 @@ QUALIFY --filter to return only the user with the most recent creation date.
 )
 SELECT
     policy_report_extract_json.id AS id_policy_evaluation,
-    GET_JSON_OBJECT(extract_json, '$.retenant_contract_id') AS id_retenant_contract,
-    GET_JSON_OBJECT(extract_json, '$.retenant_contract_proposal_id') AS id_retenant_contract_proposal,
-    GET_JSON_OBJECT(extract_json, '$.retenant_contract_user_id') AS id_retenant_contract_user,
+    CAST(GET_JSON_OBJECT(extract_json, '$.retenant_contract_id') AS INTEGER) AS id_retenant_contract,
+    CAST(GET_JSON_OBJECT(extract_json, '$.retenant_contract_proposal_id') AS INTEGER) AS id_retenant_contract_proposal,
+    CAST(GET_JSON_OBJECT(extract_json, '$.retenant_contract_user_id') AS INTEGER) AS id_retenant_contract_user,
     user.id_user,
     GET_JSON_OBJECT(extract_json, '$.retenant_score') AS retenant_score,
     GET_JSON_OBJECT(extract_json, '$.is_retenant') AS is_retenant

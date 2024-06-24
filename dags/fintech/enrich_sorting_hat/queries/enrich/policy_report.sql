@@ -30,7 +30,7 @@ FROM
 )
 SELECT
     pr.id AS id_policy_evaluation,
-    pr.id_external,
+    CAST(pr.id_external AS INTEGER) AS id_external,
     pr.type AS policy_name,
     pr.external_source,
     GET_JSON_OBJECT(pr.result, '$.type') AS proponent_group_class,
