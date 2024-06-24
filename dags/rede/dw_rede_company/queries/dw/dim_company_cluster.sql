@@ -15,11 +15,13 @@ WITH cluster_changes AS (
 
 SELECT
   MD5(CONCAT(cc.id_company, cc.company_cluster, cc.ts_updated)) AS sk_company_cluster,
-  cc.id_company AS sk_company,
+  cc.id_company AS sk_company_hubspot,
   cc.company_name,
   cc.company_cluster,
+  cc.company_cluster LIKE 'Decola%' AS is_decola_community,
+  cc.company_cluster LIKE 'Decola%' AND LEAD(cc.ts_updated) OVER (PARTITION BY cc.id_company ORDER BY cc.ts_updated ASC) IS NULL AS is_decola_current_cohort,
   cc.ts_updated AS ts_cluster_start,
-  LEAD(cc.ts_updated) OVER (PARTITION BY cc.id_company ORDER BY cc.ts_updated) AS ts_cluster_end
+  LEAD(cc.ts_updated) OVER (PARTITION BY cc.id_company ORDER BY cc.ts_updated ASC) AS ts_cluster_end
 FROM
   cluster_changes AS cc
 WHERE

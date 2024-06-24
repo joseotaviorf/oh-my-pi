@@ -10,7 +10,7 @@ columns:
     - datalake_hubspot.company_history.company_cluster
     - datalake_hubspot.company_history.ts_updated
     description: Primary key of the table, composed of the combination of sk_company, company_cluster and ts_cluster_start
-  sk_company:
+  sk_company_hubspot:
     lineage: 
     - datalake_hubspot.company_history.id_company
     description: Identification of a company registered on HubSpot
@@ -22,6 +22,16 @@ columns:
     lineage:
     - datalake_hubspot.company_history.company_cluster
     description: Classification assigned by the Operations team to the Rede partner company
+  is_decola_community:
+    lineage:
+    - datalake_hubspot.company_history.company_cluster
+    description: True if the cluster given to the company is part of the "Decola" community, otherwise false
+  is_decola_current_cohort:
+    lineage:
+    - datalake_hubspot.company_history.id_company
+    - datalake_hubspot.company_history.company_cluster
+    - datalake_hubspot.company_history.ts_updated
+    description: True if the current cluster given to the company is part of the "Decola" community, otherwise false
   ts_cluster_start:
     lineage:
     - datalake_hubspot.company_history.id_company
