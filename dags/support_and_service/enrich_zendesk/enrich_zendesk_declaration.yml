@@ -5,7 +5,7 @@ dag:
         dag_purpose: |
             This DAG comprises all the logic on ticket and ticket metrics from Zendesk.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     inner_dependencies:
         tickets_current:
@@ -16,6 +16,10 @@ workflow:
     tables_customization:
         tickets_curent:
             extraction_type: full
+        tickets_metric:
+            z_order_by: [id_ticket]
+        tickets:
+            z_order_by: [id_ticket]
 cluster:
     type: custom_cluster
     custom_configurations:
@@ -23,6 +27,6 @@ cluster:
         node_type_id: r5d.8xlarge
         runtime_engine: PHOTON
         spark_version: 12.2.x-scala2.12
-        num_workers: 4
+        num_workers: 5
         spark_conf:
             spark.sql.mapKeyDedupPolicy: "LAST_WIN"
