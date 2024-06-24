@@ -6,7 +6,7 @@ dag:
     dag_purpose: |
       This DAG load the DW tables for Customer Support.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: customer_support
   default_extraction_type: full
@@ -32,6 +32,7 @@ cluster:
     driver_node_type_id: i3.4xlarge
     node_type_id: i3.2xlarge
     runtime_engine: PHOTON
+    spark_version: 12.2.x-scala2.12
     num_workers: 2
     spark_conf:
       spark.sql.broadcastTimeout: "600"

@@ -6,7 +6,7 @@ dag:
         dag_purpose: Tranform and centralize tasks from different sources to calculate the backoffice demand and SLA rate.
 
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     inner_dependencies:
         demand_metrics_tasks:
@@ -30,6 +30,7 @@ cluster:
         driver_node_type_id: r5d.8xlarge
         node_type_id: r5d.8xlarge
         runtime_engine: PHOTON
+        spark_version: 12.2.x-scala2.12
         num_workers: 3
         aws_attributes:
             ebs_volume_size: 300
