@@ -128,8 +128,10 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_recupera:load-enrich-installment
   - bietlejuice.enrich_recupera:load-enrich-negotiation
   - bietlejuice.enrich_recupera:load-enrich-snapshot-daily-debts
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.enrich_velo:load-enrich-collections-wallet
   - bietlejuice.enrich_velo:load-enrich-junk
   - bietlejuice.enrich_velo:load-enrich-occurrence
   - bietlejuice.paschoalotto:load-clean-agreement-detail
@@ -148,7 +150,6 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.trato_feito:load-clean-eviction
   - bietlejuice.trato_feito:load-clean-eviction-data
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -1651,9 +1652,9 @@ bietlejuice.enrich_ebdb_work_contract:
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs
 bietlejuice.enrich_expected_contribution_margin:
-  - bietlejuice.enrich_losses:load-enrich-provision
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
   - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.enrich_losses:load-enrich-provision
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
@@ -2005,7 +2006,6 @@ bietlejuice.enrich_mexico_consolidated_marketing_metrics:
   - bietlejuice.enrich_mexico_google_ads:load-enrich-videos-performance
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
-  #- bietlejuice.mexico_facebook_insights:load-clean-facebook-insights
   - bietlejuice.mexico_lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.mexico_lifull_campaigns:load-clean-trovit-campaigns
 bietlejuice.enrich_mexico_google_ads:

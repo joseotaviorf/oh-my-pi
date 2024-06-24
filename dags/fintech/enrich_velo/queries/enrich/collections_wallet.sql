@@ -1,0 +1,98 @@
+WITH timeline AS (
+    SELECT
+        t.dt_base AS `date`,
+        pp.name,
+        pp.document,
+        CASE
+            WHEN is_legacy_agreement THEN INT(months_between(date_trunc('MONTH', t.dt_base), t.dt_due))
+            WHEN t.type_description = 'SIGNATURE' AND t.dt_created >= DATE('2024-02-01') THEN INT(months_between(date_trunc('MONTH', t.dt_base), t.dt_due))
+            ELSE INT(months_between(date_trunc('MONTH', t.dt_base), t.dt_created))
+        END AS mob_delinquency,
+        t.*
+    FROM
+        datalake_velo.delinquency_timeline AS t
+    LEFT JOIN
+        datalake_velo.propose AS p
+            ON t.id_propose = p.id_propose
+    LEFT JOIN
+        datalake_velo.propose_person AS pp
+            ON p.id_primary_person = pp.id_person
+),
+-- major type and aging are calculed per person, not per propose
+cte_type_aging AS (
+    SELECT
+        name,
+        document,
+        MAX(mob_delinquency) AS mob,
+        array_distinct(array_agg(type_description)) AS type_description_array,
+        CASE
+            WHEN MAX(dt_ended_propose) IS NOT NULL THEN "RECISAO"
+            WHEN array_contains(array_agg(type_description), 'TERMINATION') THEN 'RECISAO'
+            WHEN array_contains(array_agg(type_description), 'GUARANTEE') THEN 'GARANTIA'
+            WHEN array_contains(array_agg(type_description), 'SIGNATURE') THEN 'ASSINATURA'
+            ELSE 'CHECK'
+        END AS major_type,
+        `date`
+    FROM
+        timeline
+    GROUP BY 1,2,6
+    ORDER BY 6,1
+),
+timeline_final AS (
+    SELECT
+        t.name,
+        t.document,
+        t.id_propose,
+        ta.mob,
+        ta.type_description_array,
+        ta.major_type,
+        SUM(t.delinquency_amount) AS total_delinquency_amount,
+        SUM(t.original_value) AS total_original_value,
+        SUM(t.amount_paid) AS total_amount_paid,
+        SUM(t.amount_paid_added) AS amount_paid_added,
+        SUM(t.open_amount) AS total_open_amount,
+        array_agg(t.is_finished) As is_finished_array,
+        MAX(t.is_legacy_propose) AS is_legacy_propose,
+        MAX(t.is_currently_active) AS is_currently_active,
+        MAX(t.dt_ended_propose) AS dt_ended_propose,
+        t.`date` AS dt_base,
+        array_agg(t.dt_paid) AS dt_paid_array
+    FROM
+        timeline AS t
+    LEFT JOIN
+        cte_type_aging AS ta
+        ON ta.document = t.document
+        AND t.`date` = ta.`date`
+    GROUP BY 1,2,3,4,5,6,16
+)
+SELECT
+    t.name,
+    t.document,
+    t.id_propose,
+    t.mob,
+    t.type_description_array,
+    t.major_type,
+    t.total_delinquency_amount,
+    t.total_original_value,
+    t.total_amount_paid,
+    t.amount_paid_added,
+    t.total_open_amount,
+    t.is_finished_array,
+    t.is_legacy_propose,
+    t.is_currently_active,
+    IF(e.cpf_cnpj IS NOT NULL, TRUE, FALSE) AS has_month_eviction,
+    t.dt_ended_propose,
+    t.dt_base,
+    t.dt_paid_array
+FROM
+    timeline_final AS t
+LEFT JOIN
+    datalake_gsheets_clean.quintocred_process_evictions AS e
+        ON REGEXP_REPLACE(e.cpf_cnpj, '[^0-9]', '') = t.document
+        AND e.dt_distribution >= t.dt_base
+        AND (
+            e.dt_finalized <= date_trunc('MONTH', t.dt_base)
+            OR e.dt_finalized IS NULL
+            )
+        AND e.is_archived IS FALSE
+ORDER BY 17,1
