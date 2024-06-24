@@ -15,6 +15,11 @@ columns:
     - datalake_ebdb_listing.listing_business_context.id_house
     description: >
       Foreign key referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
+  sk_company_hubspot:
+    lineage:
+    - datalake_ebdb_listing.house.id_company_hubspot
+    description: >
+      Foreign key referring to the company ID on Hubspot. Can be joined with dw_quintoandar.dim_company and all other sale modeling tables.
   consultant_type:
     lineage:
     - datalake_big_agent.house_sale_listing_consultant.consultant_type

@@ -1,6 +1,7 @@
 SELECT
   sl.id_sale_listing AS sk_sale_listing,
   lbc.id_house AS sk_house,
+  h.id_company_hubspot AS sk_company_hubspot,
   hslc.consultant_type,
   hslc.first_consultant_type,
   lbc.status AS status,

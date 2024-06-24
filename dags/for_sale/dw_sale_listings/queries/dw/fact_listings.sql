@@ -2,6 +2,7 @@ SELECT
   sl.id_sale_listing AS sk_sale_listing,
   sl.id_house AS sk_house,
   h.id_user AS sk_owner,
+  h.id_company_hubspot AS sk_company_hubspot,
   CAST(hslc.id_user AS BIGINT) AS sk_user_consultant,
   h.id_region AS sk_region, 
   COALESCE(
