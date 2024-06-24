@@ -9,7 +9,7 @@ dag:
     It also acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.
 
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   dbutils_secret_key: BIGFONE_DB
@@ -22,6 +22,7 @@ workflow:
       clean_table_name: event
       date_filter_column: event_timestamp
       partitions: [year, month, day]
+      z_order_by: [id_task]
     IVRClosedHistory:
       clean_table_name: ivr_closed_history
       extraction_type: full
@@ -31,4 +32,9 @@ workflow:
       partitions: [year, month, day]
 
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
