@@ -10,6 +10,9 @@ workflow:
     layer: enrich
     default_extraction_type: incremental
     default_partitions: [year, month, day]
+    tables_customization:
+        termination:
+            merge_on: ['sk_termination']
     extra_query_template_params:
         load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
         load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"

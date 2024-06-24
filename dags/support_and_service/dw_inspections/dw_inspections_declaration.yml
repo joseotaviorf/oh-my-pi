@@ -20,6 +20,8 @@ workflow:
     dim_inspector:
       extraction_type: full
       partitions: []
+    dim_reviewer:
+      merge_on: ['sk_reviewer']
     fact_inspection:
       extraction_type: full
       partitions: []

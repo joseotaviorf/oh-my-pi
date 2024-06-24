@@ -3,10 +3,11 @@ SELECT DISTINCT
     r.id_user AS sk_user,
     r.reviewer_type,
     r.ts_created,
+    r.ts_updated,
     NOW() AS ts_load,
-    YEAR(r.ts_created) AS year,
-    MONTH(r.ts_created) AS month,
-    DAY(r.ts_created) AS day
+    YEAR(r.ts_updated) AS year,
+    MONTH(r.ts_updated) AS month,
+    DAY(r.ts_updated) AS day
 FROM
     datalake_inspections.reviewer r
 WHERE

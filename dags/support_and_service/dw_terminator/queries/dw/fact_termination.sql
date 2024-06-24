@@ -34,4 +34,4 @@ SELECT
 FROM
     datalake_terminator.termination
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
