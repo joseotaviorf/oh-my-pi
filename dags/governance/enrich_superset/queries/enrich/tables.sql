@@ -1,39 +1,39 @@
 with last_table AS (
   SELECT
     *,
-    regexp_extract(table_name,'\\[(Bedrock|Cross|Data Ops \\& Governance|Fintech|For Brokers|For Rent|For Sale|Growth|Internacional|MLOps|Rede|Support and Services)\\]') company_line,
-    RANK() OVER (PARTITION BY id ORDER BY ts_changed DESC) most_recent_rank 
+    regexp_extract(table_name,'\\[(Bedrock|Cross|Data Ops \\& Governance|Fintech|For Brokers|For Rent|For Sale|Growth|Internacional|MLOps|Rede|Support and Services|People|Agents)\\]') company_line,
+    RANK() OVER (PARTITION BY id ORDER BY ts_changed DESC) most_recent_rank
   FROM datalake_superset_clean.tables
 ), table_owners as (
-  SELECT 
+  SELECT
     squ.id_table,
     collect_set(u.email) as owners_email
   FROM datalake_superset_clean.sqlatable_user squ
   JOIN datalake_superset.ab_user u ON u.id = squ.id_user
   GROUP BY 1
 ), logs as (
-  select 
+  select
     id_slice,
     count(0) last_90d_views
   FROM datalake_superset_clean.logs
   WHERE id_slice IS NOT NULL
-    AND action = 'ChartDataRestApi.data' 
+    AND action = 'ChartDataRestApi.data'
     AND ts_event > CURRENT_DATE - interval '90' day
   GROUP BY 1
 ), columns_list AS (
-  SELECT 
-    id_table, 
+  SELECT
+    id_table,
     collect_set(named_struct("column_name",column_name, "column_type", type, "description", description)) columns
   FROM datalake_superset.table_columns
   GROUP BY 1
 ), metrics_list AS (
-  SELECT 
+  SELECT
     id_table,
     collect_set(named_struct("metric_name",metric_name, "verbose_name", verbose_name, "description", description, "metric_type", metric_type, "expression", expression)) metrics
   FROM datalake_superset_clean.sql_metrics
   GROUP BY 1
 )
-SELECT 
+SELECT
   lt.id,
   lt.table_name,
   if(nullif(lt.sql_code,'') is null, "physical", "virtual") AS dataset_type,
@@ -51,7 +51,7 @@ SELECT
   lt.ts_created,
   lt.ts_changed,
   "superset" AS platform
-FROM last_table lt 
+FROM last_table lt
 JOIN datalake_superset.ab_user u_creator ON u_creator.id = lt.id_user_created
 JOIN datalake_superset.ab_user u_changed ON u_changed.id = lt.id_user_changed
 LEFT JOIN table_owners tow ON tow.id_table = lt.id

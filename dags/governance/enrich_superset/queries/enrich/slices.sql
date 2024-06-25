@@ -1,27 +1,27 @@
 with last_slice AS (
   SELECT
     *,
-    regexp_extract(slice_name,'\\[(Bedrock|Cross|Data Ops \\& Governance|Fintech|For Brokers|For Rent|For Sale|Growth|Internacional|MLOps|Rede|Support and Services)\\]') company_line,
-    RANK() OVER (PARTITION BY id ORDER BY ts_changed DESC) most_recent_rank 
+    regexp_extract(slice_name,'\\[(Bedrock|Cross|Data Ops \\& Governance|Fintech|For Brokers|For Rent|For Sale|Growth|Internacional|MLOps|Rede|Support and Services|People|Agents)\\]') company_line,
+    RANK() OVER (PARTITION BY id ORDER BY ts_changed DESC) most_recent_rank
   FROM datalake_superset_clean.slices
 ), slice_owners AS (
-  SELECT 
+  SELECT
     su.id_slice,
     COLLECT_SET(u.email) as owners_email
   from datalake_superset_clean.slice_user su
   join datalake_superset.ab_user u ON u.id = su.id_user
   GROUP BY 1
 ), logs as (
-  select 
+  select
     id_slice,
     count(0) last_90d_views
   FROM datalake_superset_clean.logs
   WHERE id_slice IS NOT NULL
-    AND action = 'ChartDataRestApi.data' 
+    AND action = 'ChartDataRestApi.data'
     AND ts_event > CURRENT_DATE - interval '90' day
   GROUP BY 1
 ), tags AS (
-  SELECT 
+  SELECT
       tog.id_object,
       collect_set(t.tag_name) AS tags
   FROM datalake_superset.tagged_object tog
@@ -30,15 +30,15 @@ with last_slice AS (
   GROUP BY 1
 )
 SELECT
-  ls.id, 
+  ls.id,
   ls.slice_name,
   ls.viz_type,
   ls.description,
-  ls.id_datasource, 
+  ls.id_datasource,
   sow.owners_email AS business_owners,
   u_creator.email AS technical_owner,
   u_changed.email AS last_owner,
-  ls.certified_by, 
+  ls.certified_by,
   ls.ts_created,
   ls.ts_changed,
   ls.company_line,
@@ -51,7 +51,7 @@ SELECT
 FROM last_slice ls
 JOIN datalake_superset.ab_user u_creator ON u_creator.id = ls.id_user_created
 JOIN datalake_superset.ab_user u_changed ON u_changed.id = ls.id_user_changed
-JOIN slice_owners sow ON sow.id_slice = ls.id 
+JOIN slice_owners sow ON sow.id_slice = ls.id
 LEFT JOIN logs l on l.id_slice = ls.id
 LEFT JOIN tags ON tags.id_object = ls.id
 WHERE ls.most_recent_rank = 1
