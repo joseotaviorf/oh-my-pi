@@ -19,7 +19,9 @@ manual_costs AS (
     medium,
     source,
     funnel_side,
-    cost AS total_cost
+    cost AS total_cost, 
+    impressions, 
+    clicks
     FROM
         datalake_gsheets_clean.marketing_manual_costs
     WHERE
@@ -47,7 +49,9 @@ manual_costs_share_rules AS (
     s.medium,
     s.source,
     s.funnel_side,
-    s.cost::FLOAT * r.share AS total_cost
+    s.cost::FLOAT * r.share AS total_cost, 
+    s.impressions, 
+    s.clicks
     FROM
         datalake_gsheets_clean.marketing_manual_costs_name_convetion AS s
     JOIN

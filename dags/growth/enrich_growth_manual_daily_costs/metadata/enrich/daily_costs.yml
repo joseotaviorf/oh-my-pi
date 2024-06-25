@@ -138,3 +138,15 @@ columns:
     categories: 
         manual: ''
         automatic: ''
+  impressions:
+    description: Impressions on Marketing Media Plataforms
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.impressions
+      - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.impressions
+      - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.impressions
+  clicks:
+    description: Clicks on Marketing Media Plataforms
+    lineage:
+      - datalake_consolidated_growth_metrics.consolidated_media_metrics.clicks
+      - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.clicks
+      - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.clicks

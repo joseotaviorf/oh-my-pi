@@ -13,6 +13,8 @@ SELECT
   NULLIF(campaign_business_context, '') AS campaign_business_context,
   NULLIF(landing_page, '') AS landing_page,
   CAST(REPLACE(NULLIF(cost, ''), ',', '') AS FLOAT) AS cost,
+  CAST(REPLACE(NULLIF(impressions, ''), ',', '') AS FLOAT) AS impressions,
+  CAST(REPLACE(NULLIF(clicks, ''), ',', '') AS FLOAT) AS clicks,
   CAST(NULLIF(dt, '') AS DATE) AS dt_cost
 FROM
   datalake_gsheets_raw.marketing_manual_costs_name_convetion

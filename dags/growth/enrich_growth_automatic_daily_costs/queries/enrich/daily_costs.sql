@@ -17,7 +17,9 @@ SELECT
     COALESCE(msp.medium, 'Not Mapped') AS medium,
     COALESCE(msp.source, 'Not Mapped') AS source,
     COALESCE(msp.funnel_side, 'Not Mapped') AS funnel_side,
-    cmm.total_cost
+    cmm.total_cost, 
+    cmm.impressions, 
+    cmm.clicks
 FROM
     datalake_consolidated_growth_metrics.consolidated_media_metrics cmm
 LEFT JOIN
