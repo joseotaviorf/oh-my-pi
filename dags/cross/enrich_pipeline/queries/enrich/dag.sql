@@ -45,7 +45,7 @@ most_recent_events AS (
 first_execution AS (
     SELECT
         id_dag,
-        MIN(ts_event) AS ts_first_event
+        CAST(MIN(ts_event) AS TIMESTAMP) AS ts_first_event
     FROM
         datalake_composer_clean.log
     WHERE
@@ -177,7 +177,7 @@ base AS (
             ON s.id_dag = d.id_dag
     LEFT JOIN
         first_execution AS fe
-            ON fe.id_dag = d.id_dag
+            ON LOWER(fe.id_dag) = d.id_dag
     LEFT JOIN
         medians AS m
             ON m.id_dag = d.id_dag
