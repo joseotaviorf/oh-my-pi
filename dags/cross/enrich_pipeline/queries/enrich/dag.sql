@@ -44,7 +44,7 @@ most_recent_events AS (
 ),
 first_execution AS (
     SELECT
-        id_dag,
+        LOWER(id_dag) AS id_dag,    -- There're some cases of the same DAG written in caps
         CAST(MIN(ts_event) AS TIMESTAMP) AS ts_first_event
     FROM
         datalake_composer_clean.log
@@ -177,7 +177,7 @@ base AS (
             ON s.id_dag = d.id_dag
     LEFT JOIN
         first_execution AS fe
-            ON LOWER(fe.id_dag) = d.id_dag
+            ON fe.id_dag = d.id_dag
     LEFT JOIN
         medians AS m
             ON m.id_dag = d.id_dag
