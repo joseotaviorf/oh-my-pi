@@ -845,6 +845,12 @@ bietlejuice.dw_smart_price:
   - bietlejuice.ebdb_listing:load-clean-dynamic-pricing-parameters
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_smart_price:load-enrich-smart-price-versioning
+bietlejuice.dw_supply:
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
+  - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
 bietlejuice.dw_supply_outbound_contacts:
   - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
 bietlejuice.dw_taxonomy:
