@@ -367,12 +367,6 @@ bietlejuice.enrich_golden_set:
 bietlejuice.enrich_supply_leads:
   remove:
     - bietlejuice.enrich_region:load-enrich-region
-bietlejuice.enrich_supply_acquisition:
-  override: []
-bietlejuice.enrich_supply_conversion:
-  override: []
-bietlejuice.enrich_supply_conversion_3p:
-  override: []
 bietlejuice.enrich_static_files_ss:
   override: []
 bietlejuice.enrich_growth_costs_sharing_rules:
@@ -380,16 +374,11 @@ bietlejuice.enrich_growth_costs_sharing_rules:
     - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead
     - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking
     - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
-bietlejuice.enrich_supply_taxonomy:
-  override: []
-bietlejuice.enrich_supply_tracking:
-  override: []
 bietlejuice.enrich_growth_taxonomy:
   remove:
     - bietlejuice.ebdb:load-clean-visit-origin
     - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
     - bietlejuice.enrich_booking:load-enrich-booking
-
 bietlejuice.enrich_health_metrics:
   override: []
 bietlejuice.enrich_house_feature_inference:

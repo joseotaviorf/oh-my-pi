@@ -2690,6 +2690,52 @@ bietlejuice.enrich_superset:
   - bietlejuice.superset_entities:load-clean-tagged-object
   - bietlejuice.superset_internal:load-clean-ab-user
   - bietlejuice.superset_internal:load-clean-logs
+bietlejuice.enrich_supply_acquisition:
+  - bietlejuice.bob:load-clean-location
+  - bietlejuice.bob:load-clean-submission-progress
+  - bietlejuice.ebdb:load-clean-conversion-lead
+  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
+  - bietlejuice.enrich_bob:load-enrich-house-draft-business-context
+  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
+  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-last-contact
+  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-mailing
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes
+  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
+  - bietlejuice.enrich_supply_leads:load-enrich-lead-origin
+  - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
+  - bietlejuice.enrich_supply_leads:load-enrich-recovered-region-leads
+  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
+  - bietlejuice.rene_descartes:load-clean-address
+  - bietlejuice.rene_descartes:load-clean-house-lead
+  - bietlejuice.rene_descartes:load-clean-house-lead-aud
+  - bietlejuice.rene_descartes:load-clean-house-lead-conversion
+  - bietlejuice.rene_descartes:load-clean-lead-rejection
+  - bietlejuice.rene_descartes:load-clean-revinfo
+  - bietlejuice.wololo:load-clean-prospect
+bietlejuice.enrich_supply_conversion:
+  - bietlejuice.bob:load-clean-registrar
+  - bietlejuice.ebdb:load-clean-photographer-job-aud
+  - bietlejuice.ebdb_house:load-clean-house-aud
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
+  - bietlejuice.enrich_bob:load-enrich-house-draft
+  - bietlejuice.enrich_bob:load-enrich-house-draft-business-context
+  - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-events
+  - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-mailing
+  - bietlejuice.enrich_supply_acquisition:load-enrich-acquisition-tracking
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
+  - bietlejuice.enrich_supply_acquisition:load-enrich-landing-3p
+  - bietlejuice.enrich_supply_acquisition:load-enrich-prospects-3p
+  - bietlejuice.enrich_supply_leads:load-enrich-leads-sks
+  - bietlejuice.olos_dialer:load-clean-attempts-raw-data
+  - bietlejuice.olos_dialer:load-clean-campaign
+  - bietlejuice.olos_dialer:load-clean-users
+  - bietlejuice.wololo:load-clean-context-discard
+  - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_supply_leads:
   - bietlejuice.bob:load-clean-house-draft
   - bietlejuice.bob:load-clean-submission-progress
@@ -2707,6 +2753,27 @@ bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_wololo:load-enrich-prospect-calls
   - bietlejuice.jaiminho:load-clean-user-notifications
   - bietlejuice.wololo:load-clean-whatsapp
+bietlejuice.enrich_supply_taxonomy:
+  - bietlejuice.bob:load-clean-registrar
+  - bietlejuice.bob:load-clean-submission-progress
+  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.enrich_bob:load-enrich-house-draft
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
+  - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
+  - bietlejuice.enrich_supply_conversion:load-enrich-operations-agents
+  - bietlejuice.wololo:load-clean-context-discard
+  - bietlejuice.wololo:load-clean-prospect
+bietlejuice.enrich_supply_tracking:
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_supply_acquisition:load-enrich-acquisition-tracking
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup
+  - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events
+  - bietlejuice.enrich_supply_conversion:load-enrich-manual-reprocessing-events
+  - bietlejuice.enrich_supply_conversion:load-enrich-operations-agents
+  - bietlejuice.enrich_supply_taxonomy:load-enrich-conversion-taxonomy
 bietlejuice.enrich_support_and_service_kpis_targets:
   - bietlejuice.gsheets_support_and_service:done-clean-target-service-kpis
   - bietlejuice.gsheets_support_and_service:done-clean-target-support-kpis
