@@ -1,0 +1,28 @@
+database_name: dw_retention
+table_name: fact_nps
+description: Fact table containing information regarding NPS survey answers. Each row corresponds to a unique NPS customer answer.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  sk_nps:
+    lineage:
+      - datalake_offboarding.contract_termination.id_termination
+      - datalake_tracksale.customer_conversions.id_customer
+      - datalake_casa_mineira_tracksale.customer_conversions.id_customer
+    description: NPS answer ID, generated with the MD5 function using id_termination and id_customer.
+  sk_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.id_termination
+    description: Contract termination ID.
+  sk_nps_respondent:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_customer
+      - datalake_casa_mineira_tracksale.customer_conversions.id_customer
+    description: NPS survey respondent ID, generated with the MD5 function using id_customer.
+  sk_nps_answer:
+    lineage:
+      - datalake_tracksale.answer.id
+      - datalake_casa_mineira_tracksale.answer.id
+    description: NPS answer ID.
+  ts_load:
+    description: Timestamp of when this data was loaded.

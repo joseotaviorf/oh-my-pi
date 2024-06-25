@@ -1,16 +1,15 @@
-SELECT 
-    nps.id AS sk_nps_answer,
-    nps.score_category,
-    nps.nps_answer AS score,
-    c.customer_type,
-    nps.nps_comment,
-    c.metric_group AS nps_campaign,
-    nps.ts_answer_sent_local AS ts_answered,
+SELECT
+    MD5(cc.id_customer) AS sk_nps_respondent,
+    nps.name,
+    nps.email,
+    nps.alternative_email,
+    nps.phone,
+    nps.alternative_phone,
     NOW() AS ts_load
 FROM
     (SELECT * FROM datalake_tracksale.answer
-	UNION ALL
-	SELECT * FROM datalake_casa_mineira_tracksale.answer) AS nps
+    UNION ALL
+    SELECT * FROM datalake_casa_mineira_tracksale.answer) AS nps
 JOIN
     (SELECT * FROM datalake_tracksale.customer_conversions
     UNION ALL
