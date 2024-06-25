@@ -4,6 +4,7 @@ vsl AS (
     id_visit_status_log,
     id_visit,
     id_schedule,
+    id_author_user,
     event_type,
     ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created ASC) AS ranking,
     CASE
@@ -34,6 +35,7 @@ booking AS(
     b.ts_created,
     vsl.id_visit_status_log,
     vsl.id_visit,
+    vsl.id_author_user,
     vsl.id_schedule,
     vsl.event_type,
     vsl.ranking,
@@ -93,6 +95,7 @@ SELECT
   b.id_visitor,
   b.id_owner,
   b.id_agent,
+  b.id_author_user,
   b.id_house,
   b.id_house_listing,
   b.id_rent_flow,

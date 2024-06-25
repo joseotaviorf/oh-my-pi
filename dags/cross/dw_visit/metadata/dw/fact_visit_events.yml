@@ -1,0 +1,129 @@
+database_name: dw_visit
+table_name: fact_visit_events
+description: This fact table has all the events of the visits with some important keys. Each line is an unique visit event identified by the key sk_event.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_event:
+    lineage:
+      - datalake_visits.visit_status_events.id_visit_status_events
+    description:
+      Is the unique key of the table.
+  sk_visits_status_log:
+    lineage:
+      - datalake_visits.visit_status_events.id_visit_status_log
+    description:
+      Is the visit status log key. Joins with visit_status_log table.
+  sk_event_type:
+    lineage:
+      - dw_visit.dim_event_type.sk_event_type
+    description:
+      Is the event type key. Joins with the dim_event_type.
+  sk_previous_event:
+    lineage:
+      - dw_visit.dim_event_type.id_visit_status_events
+    description:
+      Is the visit status event key, to identifies the previous event.
+  sk_previous_event_type:
+    lineage:
+      - datalake_visits.visit_status_events.sk_event_type
+    description:
+      Is the previous event type. Joins with dim_event_type.
+  sk_visit:
+    lineage:
+      - datalake_visits.visit_status_events.id_visit
+    description:
+      Is the visit unique key. Joins with visit table.
+  sk_schedule:
+    lineage:
+      - datalake_visits.visit_status_events.id_schedule
+    description:
+      Is the booking key. Joins with booking table.
+  sk_author:
+    lineage:
+      - datalake_visits.visit_status_events.id_author_user
+    description:
+      Is the key of the responsible for the event.
+  sk_author_type:
+    lineage:
+      - dw_visit.dim_author_type.sk_author_type
+    description:
+      Is the key which identifies the author type. Joins with dim_author_type.
+  sk_company_demand:
+    lineage:
+      - datalake_visits.visit_status_events.id_company_demand
+    description:
+      Is the company demand key if applicable.
+  sk_company_supply:
+    lineage:
+      - datalake_visits.visit_status_events.id_company_supply
+    description:
+      Is the company supply key if applicable.
+  sk_agent:
+    lineage:
+      - datalake_visits.visit_status_events.id_agent
+    description:
+      Is the unique key of the agent. Joins with dim_user.
+  sk_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+    description:
+      Is the unique key of the region of the property.
+  sk_house:
+    lineage:
+      - datalake_visits.visit_status_events.id_house
+    description:
+      Is the unique key of the property.
+  sk_house_listing:
+    lineage:
+      - datalake_visits.visit_status_events.id_house_listing
+    description:
+      Is the unique key of the house listing. Joins with ebdb listing House.
+  sk_rent_flow:
+    lineage:
+      - datalake_visits.visit_status_events.id_rent_flow
+    description:
+      Identifies the rent flow key if applicable.
+  sk_sale_flow:
+    lineage:
+      - datalake_visits.visit_status_events.id_sale_flow
+    description:
+      Identifies the sale flow key if applicable.
+  sk_entrance_type:
+    lineage:
+      - dw_visit.dim_entrance_type.sk_entrance_type
+    description:
+      Key which identifies the entrance type of the visit. Joins with dim_entrance_type.
+  sk_cancellation_type:
+    lineage:
+      - dw_visit.dim_cancellation_type.sk_cancellation_type
+    description:
+      Key used to identifies the cancellation type of the visit if applicable.
+  sk_event_date:
+    lineage:
+      - datalake_visits.visit_status_events.ts_event_created
+    description:
+      Key used to see the date of the event.
+  country_code:
+    lineage:
+      - datalake_visits.visit_status_events.country_code
+    description:
+      Identification of the country code.
+  ranking:
+    lineage:
+      - datalake_visits.visit_status_events.ranking
+    description:
+      Identifies the ranking of the event.
+  minutes_between_last_event:
+    lineage:
+      - datalake_visits.visit_status_events.ts_event_created
+    description:
+      Identifies the time passed between the last event of the vist and the actual event (in minutes).
+  hours_between_last_event:
+    lineage:
+      - datalake_visits.visit_status_events.ts_event_created
+    description:
+      Identifies the time passed between the last event of the vist and the actual event (in hours).
+  ts_load:
+    description:
+      Timestamp of the load of the table.

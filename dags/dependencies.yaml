@@ -935,10 +935,15 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics
   - bietlejuice.velo_zendesk:load-clean-users
 bietlejuice.dw_visit:
+  - bietlejuice.ebdb:load-clean-booking
   - bietlejuice.ebdb:load-clean-entrance
   - bietlejuice.ebdb:load-clean-feedback-tag
+  - bietlejuice.ebdb:load-clean-follow-up-details
   - bietlejuice.ebdb:load-clean-visit
+  - bietlejuice.ebdb:load-clean-visit-cancellation-details
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
+  - bietlejuice.enrich_visit:load-enrich-visit-status-events
 bietlejuice.enrich_3p:
   - bietlejuice.ebdb:load-clean-agent-data
   - bietlejuice.ebdb_contract:load-clean-work-contract

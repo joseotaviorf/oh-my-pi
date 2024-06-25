@@ -33,6 +33,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.booking.id_agent
     description: Agent user who is following the visit
+  id_author_user:
+    lineage:
+      - datalake_ebdb_clean.visits_status_log
+    description: User who made the last update.
   id_house:
     lineage:
       - datalake_ebdb_clean.booking.id_house

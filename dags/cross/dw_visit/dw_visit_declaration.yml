@@ -6,7 +6,7 @@ dag:
       dag_purpose:
         This DAG loads to DW our base of Visits (Including rent and sale).
 workflow:
-    type: query
+    type: query_delta
     layer: dw
     custom_schema: visit
     tables_customization:
