@@ -1,0 +1,112 @@
+database_name: dw_visit
+table_name: fact_visits
+description: This fact table has the most important visit metrics. Each line is a visit.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_visit:
+    description: Visit's id.
+    lineage:
+        - datalake_visit.visits.id_visit
+  sk_visitor:
+    description: Visitor's id. (Connect with dim_user)
+    lineage:
+        - datalake_visit.visits.id_visitor
+  sk_owner:
+    description: Owner's id. (Connect with dim_user)
+    lineage:
+        - datalake_visit.visits.id_owner
+  sk_first_associated_agent:
+    description: Is the Id of the first agent who was associated with the visit.
+    lineage:
+        - datalake_visit.visits.sk_first_associated_agent
+  sk_last_associated_agent:
+    description: Is the Id of the last agent who was associated with the visit.
+    lineage:
+        - datalake_visit.visits.sk_last_associated_agent
+  sk_house:
+    description: House's Id.
+    lineage:
+        - datalake_visit.visits.id_house
+  sk_house_listing:
+    description: House's Id.
+    lineage:
+        - datalake_visit.visits.id_house_listing
+  sk_company_demand:
+    description: Id of company demand.
+    lineage:
+        - datalake_visit.visits.id_company_demand
+  sk_company_supply:
+    description: Id of company supply.
+    lineage:
+        - datalake_visit.visits.id_company_supply
+  sk_entrance_type:
+    description: Entrance type Id.
+    lineage:
+        - datalake_visit.visits.id_entrance_type
+  sk_cancellation_detail:
+    description: Id of cancellation of the visit. (If applicable)
+    lineage:
+        - datalake_visit.visits.id_cancellation_detail
+  sk_visit_request_date:
+    description: Requested date of the visit.
+    lineage:
+        - datalake_visit.visits.ts_visit_requested
+  sk_visit_created_date:
+    description: First event of the visit.
+    lineage:
+        - datalake_visit.visits.ts_created
+  sk_visit_date_local_tz:
+    description: Date of the visit.
+    lineage:
+        - datalake_visit.visits.ts_visit_local_tz
+  sk_first_visit_confirmed_date:
+    description: First confirmed date of the visit.
+    lineage:
+        - datalake_visit.visits.ts_first_confirmation
+  sk_last_visit_confirmed_date:
+    description: Last confirmed date of the visit.
+    lineage:
+        - datalake_visit.visits.ts_last_confirmation
+  sk_first_visit_reschedule_date:
+    description: First reschedule date.
+    lineage:
+        - datalake_visit.visits.ts_first_reschedule
+  sk_last_visit_reschedule_date:
+    description: Last reschedule date.
+    lineage:
+        - datalake_visit.visits.ts_last_reschedule
+  sk_visit_done:
+    description: Date of the end of the visit.
+    lineage:
+        - datalake_visit.visits.ts_visit_done
+  sk_visit_canceled:
+    description: Date of the canceled of the visit. (If applicable)
+    lineage:
+        - datalake_visit.visits.ts_visit_canceled
+  nbr_reschedule:
+    description: Number of reschedules.
+    lineage:
+        - datalake_visit.visits.nbr_reschedule
+  journey_days:
+    description: Journey days since the first created event.
+    lineage:
+        - datalake_visit.visits.journey_days
+  has_tenant_living:
+    description: If have a tenant living in the house.
+    lineage:
+        - datalake_visit.visits.ts_event_tenant
+  hours_between_created_and_visit_day:
+    description: Hours between the creation of visit and visit day.
+  hours_between_request_and_cancellation:
+    description: Hours between requested date and visit day.
+  hours_between_first_booked_and_visit_day:
+    description: Hours first booking and visit day.
+  hours_between_last_booked_and_visit_day:
+    description: Hours between last booking and visit day.
+  hours_between_cancellation_and_visit_date:
+    description: Hours between cancellation and visit day.
+  hours_waiting_for_answers:
+    description: Hours waiting for the answers.
+    lineage:
+        -datalake_visit.visits.hours_waiting_for_answers

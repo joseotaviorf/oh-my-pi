@@ -944,6 +944,7 @@ bietlejuice.dw_visit:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
+  - bietlejuice.enrich_visit:load-enrich-visits
 bietlejuice.enrich_3p:
   - bietlejuice.ebdb:load-clean-agent-data
   - bietlejuice.ebdb_contract:load-clean-work-contract
