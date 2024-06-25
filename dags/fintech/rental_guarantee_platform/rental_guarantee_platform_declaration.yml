@@ -1,0 +1,247 @@
+---
+dag:
+  name: rental_guarantee_platform
+  schedule_interval: 0 1 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: This DAG imports the tables from **Rental Guarantee Platform**, a
+      For Brokers service that provides insurance against loss of rent for real estate
+      agencies.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  custom_schema: rental_guarantee_platform
+  dbutils_secret_key: RENTAL_GUARANTEE_PLATFORM_DB
+  default_raw_extraction_type: incremental
+  default_clean_extraction_type: full
+  default_raw_partitions:
+    - year
+    - month
+    - day
+  lineage_product_database_name: rentalguaranteeplatform
+  tables_customization:
+    address:
+      date_filter_column: updated_at
+    address_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    company:
+      date_filter_column: updated_at
+    company_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    company_draft:
+      date_filter_column: updated_at
+    company_draft_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    company_user_account:
+      date_filter_column: updated_at
+    company_user_account_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    contract_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    contract_item:
+      date_filter_column: updated_at
+    contract_item_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    contract_payment:
+      date_filter_column: updated_at
+    contract_payment_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    contract_payment_hook_history:
+      date_filter_column: updated_at
+    contract_payment_hook_history_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    contract_person:
+      date_filter_column: updated_at
+    contract_person_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    contract_status_history:
+      date_filter_column: updated_at
+    contract_status_history_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    credit_analysis:
+      date_filter_column: updated_at
+    credit_analysis_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    income_document:
+      date_filter_column: updated_at
+    income_document_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    person:
+      date_filter_column: updated_at
+    person_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    profile_account:
+      date_filter_column: updated_at
+    profile_account_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    property:
+      date_filter_column: updated_at
+    property_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    revinfo:
+      clean_table_name: rev_info
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+    user_account:
+      date_filter_column: updated_at
+    user_account_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    payment:
+      date_filter_column: updated_at
+    bussines_type:
+      date_filter_column: dateupdate
+    contract:
+      date_filter_column: dateupdate
+    contract_status:
+      date_filter_column: dateupdate
+    document_status:
+      date_filter_column: dateupdate
+    documents:
+      date_filter_column: dateupdate
+    history_type:
+      date_filter_column: dateupdate
+    item_type:
+      date_filter_column: dateupdate
+    person_documents:
+      date_filter_column: dateupdate
+    property_propose:
+      date_filter_column: dateupdate
+    property_type:
+      date_filter_column: dateupdate
+    propose:
+      date_filter_column: dateupdate
+    propose_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    propose_documents:
+      date_filter_column: dateupdate
+    propose_history:
+      date_filter_column: dateupdate
+    propose_item:
+      date_filter_column: dateupdate
+    propose_person:
+      date_filter_column: dateupdate
+    propose_person_type:
+      date_filter_column: dateupdate
+    propose_status:
+      date_filter_column: dateupdate
+    delinquency:
+      date_filter_column: updated_at
+    agreement:
+      date_filter_column: updated_at
+    agreement_payment:
+      date_filter_column: updated_at
+    agreement_payment_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    delinquency_has_agreement:
+      date_filter_column: created_at
+    subscription:
+      date_filter_column: updated_at
+    subscription_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    company_plan:
+      date_filter_column: updated_at
+    company_plan_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    cancellation_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    cancellation:
+      date_filter_column: updated_at
+    plan_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    plan:
+      date_filter_column: dateupdate
+    boleto_aud:
+      clean_table_name: bill_aud
+      raw_extraction_type: full
+      raw_partitions: []
+    boleto:
+      clean_table_name: bill
+      date_filter_column: updated_at
+    entry_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    entry:
+      date_filter_column: updated_at
+    billing_report_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    billing_report:
+      date_filter_column: updated_at
+    renewal_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    renewal:
+      date_filter_column: updated_at
+    tenant_company:
+      date_filter_column: updated_at
+    omie_occurrence_legacy:
+      raw_extraction_type: full
+      raw_partitions: []
+    delinquency_entry:
+      date_filter_column: updated_at
+    fiancavelo_payment_legacy:
+      date_filter_column: dateupdate
+    fiancavelo_propose_legacy:
+      date_filter_column: dateupdate
+    fiancavelo_proposehistory_legacy:
+      date_filter_column: dateupdate
+    fiancavelo_proposecompany_legacy:
+      date_filter_column: dateupdate
+    fiancavelo_fianca_legacy:
+      date_filter_column: dateupdate
+    fiancavelo_object_legacy:
+      date_filter_column: dateupdate
+    fiancavelo_property_legacy:
+      date_filter_column: dateupdate
+    fiancavelo_proposeperson_legacy:
+      date_filter_column: dateupdate
+    clientes_person_legacy:
+      date_filter_column: dateupdate
+    sap:
+      date_filter_column: created_at
+    agreement_payment_legacy:
+      date_filter_column: updated_at
+    agreement_payment_legacy_aud:
+      date_filter_column: created_at
+    payment_event:
+      date_filter_column: created_at
+    delinquency_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    delinquency_cancellation:
+      date_filter_column: updated_at
+    delinquency_cancellation_aud:
+      date_filter_column: created_at
+    lannister_payment_register_aud:
+      date_filter_column: updated_at
+    lannister_payment_register:
+      date_filter_column: updated_at
+    propose_event:
+      date_filter_column: created_at
+    company_executive:
+      date_filter_column: updated_at
+cluster:
+  type: databricks_12_2_med_general_cluster
