@@ -14,7 +14,6 @@ workflow:
   type: custom_ingestion
   bucket_config_name: people_bucket
   has_hive_sync: false
-  has_metadata_propagation: false
   load_spark_job: load_workable_into_datalake
   spark_job_arguments:
     - "{environment}"

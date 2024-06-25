@@ -213,7 +213,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         has_hive_sync=True,
         tree_path="",
         do_output_xcom_push=False,
-        has_metadata_propagation=True,
     ):
         """
         Create a task group containing 2 tasks:
@@ -238,7 +237,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param has_hive_sync: if this table is going to have Hive sync
         :param tree_path: partial path used in some DAGs off of our pattern
         :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
-        :param has_metadata_propagation: flag indicating if the metadata should be propagated
         :return: initial and final tasks of the created task group
         :rtype: dict
         """
@@ -259,22 +257,17 @@ class DatalakeTaskGroup(BaseTaskGroup):
             spark_job_extra_args=raw_spark_job_extra_args or [],
             do_output_xcom_push=do_output_xcom_push,
         )
-        final_tasks = [load_table_task]
-        if has_metadata_propagation or has_hive_sync:
-            bypass_hive = "--bypass-hive" if not has_hive_sync else ""
-            bypass_propagate = (
-                "--bypass-propagate" if not has_metadata_propagation else ""
-            )
-            sync_metadata_task = self._build_metadata_sync_task(
-                source=source,
-                sync_mode=sync_mode,
-                layer=layer,
-                database_name=database_name,
-                table_name=table_name,
-                bypass=f"{bypass_hive} {bypass_propagate}".strip(),
-            )
-            chain(load_table_task, sync_metadata_task)
-            final_tasks.append(sync_metadata_task)
+
+        sync_metadata_task = self._build_metadata_sync_task(
+            source=source,
+            sync_mode=sync_mode,
+            layer=layer,
+            database_name=database_name,
+            table_name=table_name,
+            bypass="" if has_hive_sync else "--bypass-hive",
+        )
+
+        chain(load_table_task, sync_metadata_task)
 
         quality_tasks = self._build_data_quality_tasks(
             layer=layer,
@@ -289,7 +282,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
-            final_tasks=final_tasks,
+            final_tasks=[load_table_task, sync_metadata_task],
             independent_tasks=quality_tasks,
         )
 
@@ -312,7 +305,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         has_hive_sync=True,
         table_customization=None,
         do_output_xcom_push=False,
-        has_metadata_propagation=True,
     ):
         """
         Create a task group containing 2 tasks:
@@ -385,23 +377,18 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 tree_path,
             ],
         )
-        final_tasks = [load_table_task]
-        if has_metadata_propagation or has_hive_sync:
-            bypass_hive = "--bypass-hive" if not has_hive_sync else ""
-            bypass_propagate = (
-                "--bypass-propagate" if not has_metadata_propagation else ""
-            )
-            metadata_sync_task = self._build_metadata_sync_task(
-                source=source_database_base_name,
-                sync_mode=self.SINGLE_TABLE,
-                layer=layer,
-                database_name=target_database_base_name,
-                table_name=table_name,
-                metadata_file_type=MetadataTypeEnum.LINEAGE.value,
-                bypass=f"{bypass_hive} {bypass_propagate}".strip(),
-            )
-            chain(load_table_task, metadata_sync_task)
-            final_tasks.append(metadata_sync_task)
+
+        metadata_sync_task = self._build_metadata_sync_task(
+            source=source_database_base_name,
+            sync_mode=self.SINGLE_TABLE,
+            layer=layer,
+            database_name=target_database_base_name,
+            table_name=table_name,
+            metadata_file_type=MetadataTypeEnum.LINEAGE.value,
+            bypass="" if has_hive_sync else "--bypass-hive",
+        )
+
+        chain(load_table_task, metadata_sync_task)
 
         quality_tasks = []
         if DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
@@ -422,7 +409,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
-            final_tasks=final_tasks,
+            final_tasks=[load_table_task, metadata_sync_task],
             independent_tasks=quality_tasks,
         )
 
@@ -437,7 +424,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         has_hive_sync=True,
         tree_path="",
         do_output_xcom_push=False,
-        has_metadata_propagation=True,
     ):
         """
         Build a task group for raw layer to extract a specific table from source
@@ -472,7 +458,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
             has_hive_sync=has_hive_sync,
             tree_path=tree_path,
             do_output_xcom_push=do_output_xcom_push,
-            has_metadata_propagation=has_metadata_propagation,
         )
 
     def build_raw_task_group_for_all_tables(
@@ -528,7 +513,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         has_hive_sync=True,
         table_customization: Dict[str, Dict[str, str]] = None,
         do_output_xcom_push=False,
-        has_metadata_propagation=True,
     ):
         """
         Build a task group for clean layer
@@ -576,7 +560,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
             has_hive_sync,
             table_customization,
             do_output_xcom_push,
-            has_metadata_propagation,
         )
 
     def build_enrich_task_group(

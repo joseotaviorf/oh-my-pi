@@ -211,25 +211,25 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         load_clean_task = self.load_query_clean_task_creator.create_task(
             clean_table_attributes
         )
-        last_task = load_clean_task
+
         if self._check_include_sync_hive_tasks(clean_table_attributes):
             register_table = self.register_delta_table_task_creator.create_task(
                 clean_table_attributes
             )
-            load_clean_task >> register_table
-            last_task = register_table
-        if self._check_include_propagate_metadata_task(clean_table_attributes):
             sync_metadata = self.sync_metadata_task_creator.create_task(
                 clean_table_attributes, "--bypass-hive"
             )
-            last_task >> sync_metadata
-            last_task = sync_metadata
+            (
+                load_clean_task
+                >> register_table
+                >> sync_metadata
+                >> optimize_delta_tables_task
+            )
         if self._check_include_data_quality_task(clean_table_attributes):
             data_quality = self.data_quality_task_creator.create_task(
                 clean_table_attributes
             )
             load_clean_task >> data_quality >> optimize_delta_tables_task
-        last_task >> optimize_delta_tables_task
         return load_clean_task, load_clean_task
 
     def _generate_filtered_tables_customizations(self, tables_customization: dict):

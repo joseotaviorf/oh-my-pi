@@ -119,7 +119,6 @@ for endpoint_id, endpoint_details in endpoints.items():
             json.dumps(endpoint_details),
         ],
         has_hive_sync=False,
-        has_metadata_propagation=False,
     )
 
     clean_task_group = task_group.build_clean_task_group(
@@ -129,7 +128,6 @@ for endpoint_id, endpoint_details in endpoints.items():
         table_name=endpoint_id,
         partitions=partition_cols if endpoint_details['has_partitions'] else None,
         has_hive_sync=False,
-        has_metadata_propagation=False,
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))

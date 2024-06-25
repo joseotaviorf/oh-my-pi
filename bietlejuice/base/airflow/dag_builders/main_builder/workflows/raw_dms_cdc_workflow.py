@@ -190,22 +190,23 @@ class RawDMSCDCWorkflow(BaseWorkflow):
         )
         load_clean_task >> optimize_clean_task
         last_clean_task = load_clean_task
-        before_sync = last_clean_task
 
         if self._check_include_sync_hive_tasks(clean_table_attributes):
             register_delta_table_clean_task = self.register_delta_table_task_creator.create_task(
                 clean_table_attributes
             )
-            load_clean_task >> register_delta_table_clean_task
-            before_sync = register_delta_table_clean_task
 
-        if self._check_include_propagate_metadata_task(clean_table_attributes):
             sync_metadata_clean_task = self.sync_metadata_task_creator.create_task(
                 clean_table_attributes, "--bypass-hive"
             )
-            before_sync >> sync_metadata_clean_task
-            before_sync = sync_metadata_clean_task
-        before_sync >> dag_final_tasks
+            last_clean_task = sync_metadata_clean_task
+
+            (
+                load_clean_task
+                >> register_delta_table_clean_task
+                >> sync_metadata_clean_task
+            )
+
         if self._check_include_data_quality_task(clean_table_attributes):
             data_quality_tests_clean_task = self.data_quality_task_creator.create_task(
                 clean_table_attributes
