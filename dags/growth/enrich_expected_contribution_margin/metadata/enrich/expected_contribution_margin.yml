@@ -1,0 +1,54 @@
+database_name: datalake_expected_contribution_margin
+table_name: expected_contribution_margin
+description: This table contains the estimated monthly revenue that each ForRent contract will bring to QuintoAndar. Each row corresponds to the estimated revenue of a (contract, month) tuple.
+columns:
+  id_rent_flow:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_rent_flow
+    description: Key of the rent flow
+  id_house:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_house
+      - dw_rental_contribution_margin.fact_house_listing_revenues.id_house
+    description: Key of the house
+  id_tenant_prospect:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+    description: Key of the tenant prospect (also known as id_user in other tables)
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+      - datalake_rent_demand_events.rent_demand_events.id_contract
+      - dw_rental_contribution_margin.fact_house_listing_revenues.id_contract
+      - datalake_losses.provision.id_contract
+    description: Key of the contract or NULL if no contract was signed for the given rent flow
+  months_since_contract_start:
+    lineage:
+      - dw_rental_contribution_margin.fact_house_listing_revenues.contract_lifetime
+    description: The age of the contract in months.
+  estimated_gross_revenue:
+    lineage:
+      - dw_rental_contribution_margin.fact_house_listing_revenues.gross_revenue
+    description: The estimated total revenue that will be received by QuintoAndar for a given (contract, month), ignoring the costs.
+  estimated_net_revenue:
+    lineage:
+      - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
+    description: The estimated total revenue minus the Sales Tax and the Revenue Sharing on Brokerage costs.
+  estimated_net_revenue_after_losses:
+    lineage:
+      - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
+      - datalake_losses.provision.provision_balance_p4_delay_e
+      - datalake_losses.provision.id_contract
+      - datalake_losses.provision.dt_closing
+    description: The estimated net_revenue that will be received by QuintoAndar minus the losses.
+  estimated_contribution_margin:
+    lineage:
+      - dw_rental_contribution_margin.fact_house_listing_revenues.net_revenue_pre_taxes
+      - datalake_losses.fact_provision.provision_balance_p4_delay_e
+      - datalake_losses.fact_provision.id_contract
+      - datalake_losses.fact_provision.dt_closing
+    description: The estimated contribution margin that the (contract, month) will generate to QuintoAndar.
+  dt_inference:
+    lineage:
+      - datalake_batch_inference_clean.batch_inference.ts_inference
+    description: The date in which the prediction was made. Also the partition key of the table

@@ -9,10 +9,18 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
-  default_partitions:
-    - month_of_year
-  extra_query_template_params: 
-    start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -30), 'start_date') }}"
-    end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+  tables_customization:
+    expected_contribution_margin:
+      merge_on: ["id_rent_flow", "id_house", "id_tenant_prospect"]
+      partitions: [dt_inference]
+      extra_query_template_params:
+        start_date: "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"
+        end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+    observed_contribution_margin:
+      partitions: [month_of_year]
+      extra_query_template_params:
+        start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -30), 'start_date') }}"
+        end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+
 cluster:
   type: databricks_12_2_med_general_photon_cluster

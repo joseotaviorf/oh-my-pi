@@ -4,7 +4,9 @@ WITH contracts_table AS (
         date_format(dt_termination, "yyyy-MM-01") AS dt_termination
     FROM
         datalake_ebdb_clean.contract
-), rent_flows_table AS (
+),
+
+rent_flows_table AS (
     SELECT DISTINCT
         id_rent_flow,
         id_house,
@@ -15,7 +17,9 @@ WITH contracts_table AS (
     WHERE
         id_event = id_contract
         AND id_event_type = 9
-), revenue_table AS (
+),
+
+revenue_table AS (
     SELECT
         id_rent_flow,
         id_house,
@@ -35,7 +39,9 @@ WITH contracts_table AS (
         rent_flows_table USING (id_contract, id_house)
     WHERE
         dt_month_start BETWEEN date_format("{start_date}", "yyyy-MM-01") AND "{end_date}"
-), taxes_table as (
+),
+
+taxes_table as (
   SELECT
     accrual_year_month,
     tax_rate
@@ -69,7 +75,9 @@ WITH contracts_table AS (
            ('202403', -8.73),
            ('202404', -8.55)
   ) AS (accrual_year_month, tax_rate)
-), contract_onboarding_costs AS (
+),
+
+contract_onboarding_costs AS (
     SELECT
         id_contract,
         contract_lifetime,
@@ -79,7 +87,9 @@ WITH contracts_table AS (
         revenue_table
     WHERE
         contract_lifetime = 0
-), contract_ongoing_costs AS (
+),
+
+contract_ongoing_costs AS (
     SELECT
         id_contract,
         contract_lifetime,
@@ -92,7 +102,9 @@ WITH contracts_table AS (
             dt_termination IS NOT NULL
             AND dt_month_start = dt_termination
         )
-), contract_offboarding_costs AS (
+),
+
+contract_offboarding_costs AS (
     SELECT
         id_contract,
         contract_lifetime,
@@ -102,7 +114,9 @@ WITH contracts_table AS (
     WHERE
         dt_termination IS NOT NULL
         AND dt_month_start = dt_termination
-), provision_table AS (
+),
+
+provision_table AS (
     SELECT
         id_contract,
         date_format(dt_closing, "yyyy-MM-01") AS dt_month_start,
@@ -111,8 +125,13 @@ WITH contracts_table AS (
         datalake_losses.provision
     WHERE
         dt_closing >= date_format(add_months("{start_date}", -1), "yyyy-MM-01")
+        AND NOT is_international
+        AND NOT is_before_started
+        AND payment_status NOT IN ('written down', 'written-down', 'canceled')
     GROUP BY ALL
-), losses_table AS (
+),
+
+losses_table AS (
     SELECT
         id_contract,
         dt_month_start,
@@ -123,8 +142,10 @@ WITH contracts_table AS (
     FROM
         provision_table
     WHERE
-        dt_month_start <> date_format(add_months(current_date, -1), "yyyy-MM-01")
-), final_table AS (
+        dt_month_start <> date_format(current_date, "yyyy-MM-01")
+),
+
+final_table AS (
     SELECT
         * EXCEPT (tax_rate, losses),
         coalesce(tax_rate, -8.0) AS tax_rate,

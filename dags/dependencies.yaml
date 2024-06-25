@@ -1668,6 +1668,7 @@ bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.enrich_losses:load-enrich-provision
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.batch_inference:load-clean-batch-inference
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all
