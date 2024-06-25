@@ -3,8 +3,6 @@ database_name: datalake_hub_services
 table_name: users
 description: |
   Crosses user data from Hub Services and user data from main/ebdb. 
-  Attention: non-merged users are considered here, so this table does not have a connector 
-  with the ebdb user table, only with the user audit.
 domain: Data Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -22,28 +20,28 @@ columns:
       Attention: This ID refers to the user in main/admin/ebdb.
   id_agent:
     lineage:
-      - datalake_ebdb_clean.user_aud.id_agent
+      - datalake_ebdb_clean.user.id_agent
     description: |
       Agent unique identifier.
       Attention: This ID refers to the agent in main/admin/ebdb.
   name:
     lineage:
       - datalake_hub_services_clean.users.name
-      - datalake_ebdb_clean.user_aud.name
+      - datalake_ebdb_clean.user.name
     description: User name.
   email:
     lineage:
       - datalake_hub_services_clean.users.email
-      - datalake_ebdb_clean.user_aud.email
+      - datalake_ebdb_clean.user.email
     description: User e-mail.
   phone_number:
     lineage:
       - datalake_hub_services_clean.users.phone_number
-      - datalake_ebdb_clean.user_aud.phone_number
+      - datalake_ebdb_clean.user.phone_number
     description: User phone number.
   is_active:
     lineage:
-      - datalake_ebdb_clean.user_aud.is_active
+      - datalake_ebdb_clean.user.is_active
     description: Indicates whether this user is active in the admin/main system.
   ts_created:
     lineage:

@@ -1,24 +1,22 @@
-WITH external_user AS (
-    SELECT 
-        u.id_user,
-        u.id_agent,
+WITH users AS (
+    SELECT
+        u.id,
+        COALESCE(um.id_user, u.id_external) AS id_external,
         u.name,
         u.email,
-        u.number AS phone_number,
-        COALESCE(us.is_active, FALSE) AS is_active
+        u.phone_number,
+        u.ts_created,
+        u.ts_updated,
+        u.year,
+        u.month,
+        u.day
     FROM
-        datalake_ebdb_clean.user_aud AS u 
-        -- the audit table keeps users merged, and therefore has greater compatibility with Hub Services data
-    JOIN
-        datalake_ebdb_user.user_revision_entity AS ure
-            ON ure.id = u.rev
+        datalake_hub_services_clean.users AS u
     LEFT JOIN
-        datalake_ebdb_clean.user AS us
-            ON us.id = u.id_user
-    WHERE
-        ure.ts_revision <= MAKE_DATE({year}, {month}, {day})
+        datalake_ebdb_user.user_merge AS um
+            ON ARRAY_CONTAINS(um.predecessor_user_list, u.id_external)
     QUALIFY
-        ure.ts_revision = MAX(ure.ts_revision) OVER(PARTITION BY u.id_user)
+        u.ts_updated = FIRST(u.ts_updated) OVER (PARTITION BY u.id ORDER BY u.ts_updated DESC)
 )
 SELECT
     u.id AS id_user,
@@ -26,7 +24,7 @@ SELECT
     ua.id_agent,
     COALESCE(u.name, ua.name) AS name,
     COALESCE(u.email, ua.email) AS email,
-    COALESCE(u.phone_number, ua.phone_number) AS phone_number,
+    COALESCE(u.phone_number, ua.number) AS phone_number,
     ua.is_active,
     u.ts_created,
     u.ts_updated,
@@ -34,11 +32,7 @@ SELECT
     u.month,
     u.day
 FROM
-    datalake_hub_services_clean.users AS u
+    users AS u
 LEFT JOIN
-    external_user AS ua
-        ON ua.id_user = u.id_external
-WHERE
-    u.year = {year}
-    AND u.month = {month}
-    AND u.day = {day}
+    datalake_ebdb_clean.user AS ua
+        ON ua.id = u.id_external

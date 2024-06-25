@@ -20,5 +20,8 @@ workflow:
     member_profile:
       extraction_type: full
       partitions: []
+    users:
+      extraction_type: full
+      partitions: []
 cluster:
   type: databricks_12_2_med_general_cluster

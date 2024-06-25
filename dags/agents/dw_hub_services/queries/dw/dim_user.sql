@@ -10,5 +10,3 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_hub_services.users AS u
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY u.ts_updated DESC) = 1

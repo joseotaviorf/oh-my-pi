@@ -1,17 +1,4 @@
-WITH users AS (
-    SELECT DISTINCT
-        u.id_user,
-        u.id_main_user,
-        u.id_agent,
-        u.name,
-        u.email,
-        u.phone_number
-    FROM
-        datalake_hub_services.users AS u
-    QUALIFY 
-        u.ts_updated = MAX(u.ts_updated) OVER(PARTITION BY u.id_user)
-),
-member_profile AS (
+WITH member_profile AS (
     SELECT
         mp.id_member_relationship,
         mp.id_member_profile,
@@ -55,10 +42,10 @@ JOIN
     datalake_quintoandar.aux_date
         ON aux_date.date BETWEEN DATE(mp.ts_relationship_started) AND DATE(mp.ts_relationship_ended)
 LEFT JOIN
-    users AS u
+    datalake_hub_services.users AS u
         ON u.id_user = mp.id_user
 LEFT JOIN
-    users AS u_parent
+    datalake_hub_services.users AS u_parent
         ON u_parent.id_user = mp.id_parent_user
 LEFT JOIN
     datalake_hub_services_clean.business_unit AS bu

@@ -1,13 +1,3 @@
-WITH users AS (
-    SELECT
-        u.id_user,
-        u.id_main_user,
-        u.id_agent
-    FROM
-        datalake_hub_services.users AS u
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY u.ts_updated DESC) = 1
-)
 SELECT
     mp.id_member_profile AS sk_member_profile,
     mp.id_member_relationship AS sk_member_relationship,
@@ -30,5 +20,5 @@ JOIN
     datalake_hub_services.profile AS p
         ON p.profile = mp.profile
 LEFT JOIN
-    users AS u
+    datalake_hub_services.users AS u
         ON u.id_user = mp.id_user

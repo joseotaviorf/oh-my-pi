@@ -1742,8 +1742,6 @@ bietlejuice.enrich_hub_services:
 bietlejuice.enrich_hub_services_agents:
   - bietlejuice.ebdb:load-clean-agent-data
   - bietlejuice.ebdb_user:load-clean-user
-  - bietlejuice.ebdb_user:load-clean-user-aud
-  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.hub_services:load-clean-member-profile-aud
   - bietlejuice.hub_services:load-clean-rev-info
