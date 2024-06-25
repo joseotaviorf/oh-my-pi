@@ -200,7 +200,12 @@ def create_data_payload(item):
 
 def initialize_worker(local):
     local.session = requests.Session()
-    local.session.headers.update({"Content-Type": "application/json"})
+    local.session.headers.update(
+        {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {dbutils.secrets.get(scope='quintoandar', key='MINORITY_REPORT_API')}"
+        }
+    )
     logger.info(f"Initializing session for thread {threading.current_thread().name}")
 
 

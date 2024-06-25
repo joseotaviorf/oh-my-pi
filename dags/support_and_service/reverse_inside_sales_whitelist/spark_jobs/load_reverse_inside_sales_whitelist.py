@@ -73,7 +73,12 @@ if __name__ == "__main__":
     total_batches = len(batches)
 
     session = requests.Session()
-    session.headers.update({"Content-Type": "application/json"})
+    session.headers.update(
+        {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {dbutils.secrets.get(scope='quintoandar', key='MINORITY_REPORT_API')}"
+        }
+    )
 
     for idx, batch in enumerate(batches):
         new_batch = [create_data_payload(x) for x in batch]

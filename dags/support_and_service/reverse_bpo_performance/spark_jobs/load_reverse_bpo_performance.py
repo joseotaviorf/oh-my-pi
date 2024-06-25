@@ -78,7 +78,10 @@ if __name__ == "__main__":
     environment = args.environment
     dag_name = args.dag_name
     minority_report_endpoint = args.minority_report_endpoint
-    minority_request_header = {"Content-Type": "application/json"}
+    minority_request_header = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {dbutils.secrets.get(scope='quintoandar', key='MINORITY_REPORT_API')}"
+    }
     table = args.table
     table_details = args.table_details
     api_type = args.type

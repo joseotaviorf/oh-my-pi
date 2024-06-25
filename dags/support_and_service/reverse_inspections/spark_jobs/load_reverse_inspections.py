@@ -66,7 +66,10 @@ if __name__ == "__main__":
     environment = args.environment
     dag_name = args.dag_name
     minority_report_endpoint = args.minority_report_endpoint
-    minority_request_header = json.loads(args.minority_request_header)
+    minority_request_header = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {dbutils.secrets.get(scope='quintoandar', key='MINORITY_REPORT_API')}"
+    }
     table_to_send = args.table_to_send
     query = args.query_model
     execution_date = args.execution_date
