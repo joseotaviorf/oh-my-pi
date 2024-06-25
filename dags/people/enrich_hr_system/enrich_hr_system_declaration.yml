@@ -20,7 +20,7 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
 cluster:
-  type: databricks_12_2_min_people_cluster
+  type: databricks_12_2_min_memory_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
