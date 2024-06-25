@@ -11,6 +11,6 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  sk_company:
+  sk_company_hubspot:
     is_complete:
       severity_level: Error
