@@ -115,7 +115,7 @@ ignoring_list AS (
     UNION
     SELECT
         id_dag,
-        dt_run AS dt_event
+        DATE_ADD(dt_run, 1) AS dt_event -- DAG runs are D-1
     FROM
         dag_run_base
     WHERE 
@@ -156,7 +156,7 @@ totals_base AS (
     LEFT JOIN   -- The DAG run may not exist yet
         dag_run_base AS db
             ON d.id_dag = db.id_dag
-            AND d.dt_event = db.dt_run
+            AND d.dt_event = DATE_ADD(db.dt_run, 1) -- DAG runs are D-1
     LEFT JOIN
         special_scheduler AS ss
             ON ss.id_dag = d.id_dag
