@@ -15,9 +15,9 @@ SELECT
     paid_amount,
     paid_date AS dt_paid,
     due_date AS dt_due,
+    start_processing_at AS dt_start_processing,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    last_received_at AS ts_last_received,
-    start_processing_at AS ts_start_processing
+    last_received_at AS ts_last_received
 FROM
     datalake_trato_feito_raw.installment_charges

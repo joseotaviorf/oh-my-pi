@@ -1,0 +1,87 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: installment_charges
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Installment charges
+columns:
+  id:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.id
+  id_installment:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.installment_id
+  id_order:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.order_id
+  id_payment_entity:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.payment_entity_id
+  id_charge:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.charge_id
+  charge_method:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.charge_method
+  charge_gateway:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.charge_gateway
+  status:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.status
+  request_payload:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.request_payload
+  response_payload:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.response_payload
+  user_data:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.user_data
+  metadata:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.metadata
+  due_amount:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.due_amount
+  paid_amount:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.paid_amount
+  dt_paid:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.paid_date
+  dt_due:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.due_date
+  dt_start_processing:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.start_processing_at
+  ts_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.created_at
+  ts_updated:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.updated_at
+  ts_last_received:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.last_received_at
