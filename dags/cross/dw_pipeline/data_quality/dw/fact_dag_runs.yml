@@ -1,5 +1,5 @@
 ---
-table_name: dw_pipeline_staging.fact_dag_runs
+table_name: dw_pipeline.fact_dag_runs
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

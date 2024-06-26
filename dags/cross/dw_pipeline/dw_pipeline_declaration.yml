@@ -1,15 +1,15 @@
 dag:
-    name: dw_pipeline
-    owner: Data Engineering
-    schedule_start_date: 2024, 4, 1
-    documentation:
-      dag_purpose:
-        This DAG loads to DW our pipeline models, based in our bi-etl-ejuice Airflow DAGs.
+  name: dw_pipeline
+  schedule_start_date: 2024, 4, 1
+  owner: Data Engineering
+  documentation: 
+    dag_purpose: |
+      This DAG loads to DW our pipeline models, based in our bi-etl-ejuice Airflow DAGs.
 workflow:
-    type: query
-    layer: dw
-    custom_schema: pipeline
-    tables_customization:
+  type: query_delta
+  layer: dw
+  custom_schema: pipeline
+  tables_customization:
         dim_dag:
             extraction_type: full
         dim_line:
@@ -20,7 +20,8 @@ workflow:
             extraction_type: incremental
             partitions: [year, month, day]
             extra_query_template_params:
-                "sk_snapshot_date": "DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd')"
+                load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+                load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}" 
 cluster:
     type: databricks_12_2_med_general_photon_cluster
     access_control_list:
