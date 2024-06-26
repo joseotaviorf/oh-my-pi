@@ -1,0 +1,20 @@
+---
+dag:
+  name: enrich_ticket_rate_classification_snapshot
+  schedule_start_date: 2023, 9, 10
+  owner: Data ForRent
+  documentation:
+    dag_purpose: This DAG creates a snapshot of the table ticket_rate_classification
+      in order to keep track of the changes that could undesirebly change ticket_rate
+      metrics.
+workflow:
+  type: query_delta
+  layer: enrich
+  tables_customization:
+    ticket_rate_classification:
+      partitions:
+      - year
+      - month
+      - day
+cluster:
+  type: databricks_12_2_min_general_photon_cluster
