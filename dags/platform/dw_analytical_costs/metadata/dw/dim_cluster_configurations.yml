@@ -1,0 +1,53 @@
+---
+database_name: dw_analytical_costs
+table_name: dim_cluster_configurations
+description: Dimensional table of combinations that aims to gather descriptive information about the configuration of the clusters. 
+  Each row in this table generates a unique combination of settings.
+domain: Data Platform 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  sk_cluster_config:
+    description: Unique identification key for a combination.
+    lineage:
+      - datalake_databricks_usage_costs.usage_costs.cluster_compute_type
+      - datalake_databricks_usage_costs.usage_costs.execution_context
+      - datalake_databricks_usage_costs.usage_costs.spark_version
+      - datalake_databricks_usage_costs.usage_costs.runtime_engine
+  cluster_compute_type:
+    description: Descriptive information used to identify the dbu value charged by Databricks.
+    categories:
+      PREMIUM_ALL_PURPOSE_COMPUTE_(PHOTON): 'Iterative cluster using photon optimization.'
+      PREMIUM_JOBS_COMPUTE_(PHOTON): 'Job cluster using photon optimization.'
+      PREMIUM_JOBS_COMPUTE: 'Job cluster without using photon.'
+      PREMIUM_ALL_PURPOSE_COMPUTE: 'Iterative cluster without using photon.'
+      PREMIUM_SQL_COMPUTE: ''
+      PREMIUM_SQL_PRO_COMPUTE_US_EAST_N_VIRGINIA: ''
+      INTERACTIVE: 'Iterative cluster with no photon usage.'
+      AUTOMATED: 'Job cluster without using photon.'
+      SQLCOMPUTE: ''
+      JOBLIGHT: 'Job cluster without using photon.'
+    lineage:
+      - datalake_databricks_usage_costs.usage_costs.cluster_compute_type
+  execution_context:
+    description: Descriptive information that indicates the type of execution carried out.
+    categories:
+      bietlejuice: 'Execution done by a dag.'
+      job: 'Execution carried out by a scheduled job.'
+      adhoc execution: 'Execution done by an adhoc test.'
+      wonka dag: 'Execution carried out by a dag from the wonka project.'
+      wonka job: 'Execution carried out by a job from the wonka project.'
+    lineage:
+      - datalake_databricks_usage_costs.usage_costs.execution_context
+  spark_version:
+    description: Descriptive information indicating the version of Spark used by the cluster.
+    lineage:
+      - datalake_databricks_usage_costs.usage_costs.spark_version
+  runtime_engine:
+    description: Descriptive information that indicates whether the cluster uses a Databricks optimization configuration (PHOTON).
+    categories:
+      PHOTON: 'Optimization setup with Photon.'
+      STANDARD: 'Without Photon optimization setting.'
+    lineage:
+      - datalake_databricks_usage_costs.usage_costs.runtime_engine
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_analytical_costs.

@@ -1,0 +1,27 @@
+dag:
+  name: dw_analytical_costs
+  schedule_start_date: 2024, 06, 19
+  owner: Data Platform
+  documentation:
+    dag_purpose: |
+      Dag with the aim of gathering cost information from clusters.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: analytical_costs
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    dim_cluster_configurations:
+      extraction_type: full
+    fact_bietlejuice_costs:
+      merge_on: ['sk_snapshot']
+    fact_execution_costs:
+      merge_on: ['sk_cluster']
+    fact_bietlejuice_costs:
+      merge_on: ['sk_snapshot']
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_med_general_photon_cluster

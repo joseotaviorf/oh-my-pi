@@ -36,6 +36,8 @@ bietlejuice.dw_agents_availability:
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-business-context-history
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-region
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-slots-hourly
+bietlejuice.dw_analytical_costs:
+  - bietlejuice.enrich_databricks_usage_costs:load-enrich-usage-costs
 bietlejuice.dw_atta:
   - bietlejuice.atta:load-clean-client-info
   - bietlejuice.atta:load-clean-financing-proposal
