@@ -1,0 +1,14 @@
+---
+database_name: datalake_hr_system
+table_name: management_hierarchy
+columns:
+  id_assignment:
+    description: "id assignment of the employee"
+    lineage:
+      - datalake_hr_system.managers.id_assignment
+  id_manager_assignment:
+    description: "id assignment of a person who is higher in hierarchy"
+    lineage:
+      - datalake_hr_system.managers.id_manager_assignment
+  separation_degree:
+    description: "distance between the employee and the manager"
