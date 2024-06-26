@@ -1,0 +1,31 @@
+---
+database_name: dw_employee
+table_name: dim_product_tech
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Dimension table with information about information about which teams product and tech employees are part of."
+columns:
+  sk_employee:
+    description: "Surrogate key for the employee."
+    lineage:
+      - datalake_gsheets_clean.team_formation_product_tech.sk_employee
+  team_1:
+    description: "Primary team of the employee."
+    lineage:
+      - datalake_gsheets_clean.team_formation_product_tech.team_1
+  team_2:
+    description: "One of the teams of the employee."
+    lineage:
+      - datalake_gsheets_clean.team_formation_product_tech.team_2
+  team_3:
+    description: "One of the teams of the employee."
+    lineage:
+      - datalake_gsheets_clean.team_formation_product_tech.team_3
+  team_4:
+    description: "One of the teams of the employee."
+    lineage:
+      - datalake_gsheets_clean.team_formation_product_tech.team_4
+  team_5:
+    description: "One of the teams of the employee."
+    lineage:
+      - datalake_gsheets_clean.team_formation_product_tech.team_5
