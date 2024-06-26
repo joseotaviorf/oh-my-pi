@@ -35,6 +35,7 @@ workflow:
     installment:
       get_table_metrics:
         count: id
+    installment_charges: {}
     negotiation:
       get_table_metrics:
         count: id
