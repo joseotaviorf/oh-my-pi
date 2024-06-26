@@ -1119,7 +1119,6 @@ bietlejuice.enrich_big_agent:
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-  - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_hub_services_agents:load-enrich-users
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
