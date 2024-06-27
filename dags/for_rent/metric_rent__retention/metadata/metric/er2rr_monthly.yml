@@ -27,6 +27,12 @@ columns:
       - dw_rent.dim_contract.country_code
     description: "Country code of the house."
     dimension: True
+  administrator:
+    description: "Group of administration. This column was created to understand if the Brokerage Only program are influencing the ER2RR metric"
+    categories:
+      WITH BO: The calculation are including Brokerage Only (OWNER)
+      WITHOUT BO: The calculation are not including Brokerage Only (OWNER)
+    dimension: True
   ended_rentals:
     description: "Volume of ended rentals that happended in the month being referenced."
     metric:
