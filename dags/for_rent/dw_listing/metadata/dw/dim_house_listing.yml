@@ -337,6 +337,10 @@ columns:
     lineage:
     - datalake_ebdb_listing.house_listing.is_extended_rental
     description: Boolean indicating if the contract termination was canceled after relisting as early demand.
+  is_brokerage_only_decommissioned:
+    lineage: 
+      - datalake_ebdb_listing.house_listing.is_brokerage_only_decommissioned
+    description: "Boolean indicating if this listing was decommissioned from the Brokerage Only program. If the listing is re-published after decommissioned in the same version, this flag will be false."
   is_for_rent:
     description: Boolean indicating if the listing is for rent.
   is_for_sale:

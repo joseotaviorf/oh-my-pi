@@ -144,6 +144,7 @@ house_listings AS (
         h.is_casa_mineira_migration,
         h.is_sale_primary_market,
         hl.is_extended_rental,
+        hl.is_brokerage_only_decommissioned,
         rl.ts_administrator_changed,
         hl.is_early_demand,
         hl.ts_early_demand_started
@@ -232,6 +233,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_last_version,
     hl.is_exclusive,
     hl.is_extended_rental,
+    hl.is_brokerage_only_decommissioned,
     b2b.is_b2b,
     COALESCE(aa_info.sk_partner_agent IS NOT NULL, FALSE) AS is_autonomous_agent,
     hl.is_originals_active,
