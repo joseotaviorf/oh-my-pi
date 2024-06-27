@@ -996,6 +996,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-contract-aud
+  - bietlejuice.ebdb_contract:load-clean-contract-person-aud
   - bietlejuice.ebdb_contract:load-clean-contract-partnership-data
   - bietlejuice.ebdb_rent_flow:load-clean-agent-rent-flow
   - bietlejuice.ebdb_user:load-clean-user-revision-entity

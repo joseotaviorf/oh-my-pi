@@ -1,5 +1,10 @@
 WITH grouped_adm_fee AS (
-    SELECT *, 
+    SELECT
+        e.id_invoice,
+        e.ts_created,
+        e.bill_item,
+        e.amount, 
+        e.description,
         IF(bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'), 'adm-fee', bill_item) AS bill_item_grouped
     FROM 
         datalake_retsuko.entry e 
@@ -11,7 +16,12 @@ WITH grouped_adm_fee AS (
 ),
 
 treated_entry AS (
-    SELECT *, 
+    SELECT 
+        e.id_invoice, 
+        e.ts_created,
+        e.bill_item,
+        e.description,
+        e.amount,
         SUM(amount) OVER (partition by i.id_external, e.bill_item_grouped) as agg
     FROM 
         grouped_adm_fee e 
@@ -20,9 +30,32 @@ treated_entry AS (
             ON e.id_invoice = i.id  
 ),
 
+contract_type AS (
+    SELECT
+        ct.id_external AS id_contract,
+        i.id_external AS id_invoice,
+        IF(LENGTH(ca.cpf) = 18, 'PJ', 'PF') AS contract_type
+    FROM 
+        datalake_retsuko.invoice AS i
+    INNER JOIN
+        datalake_retsuko_clean.contract AS ct 
+            ON i.id_contract = ct.id
+    LEFT JOIN
+        datalake_ebdb_clean.contract_person_aud AS ca
+            ON ct.id_external = ca.id_contract
+    LEFT JOIN 
+        datalake_ebdb_clean.user_revision_entity AS ur
+            ON ca.rev = ur.id
+    WHERE 
+        DATE(FROM_UNIXTIME(ROUND(ur.ts_revision / 1000.0))) <= DATE(i.ts_created)
+    QUALIFY 
+        ROW_NUMBER() OVER (PARTITION BY ca.id_contract, i.id_external ORDER BY rev DESC) = 1
+),
+
 retsuko AS (
     SELECT DISTINCT
         ct.id_external AS id_contract,
+        ctt.contract_type,
         i.id_external AS id_invoice,
         'seu barriga' AS source_name,
         CASE
@@ -31,7 +64,12 @@ retsuko AS (
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee', 'entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
         END AS revenue_name,
         i.accrual_year_month,
-        IF(e.bill_item = 'entry.bill-item/service-fee', DATE(i.ts_paid), DATE(i.ts_due)) AS dt_source_trigger,
+        MIN(CASE 
+          WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND i.accrual_year_month >= 202405 AND ctt.contract_type = 'PF' THEN DATE(e.ts_created)
+          WHEN e.bill_item = 'entry.bill-item/service-fee' AND i.accrual_year_month < 202405 THEN DATE(i.ts_paid)
+          WHEN e.bill_item = 'entry.bill-item/service-fee' AND i.accrual_year_month >= 202405 THEN DATE(e.ts_created)
+          ELSE DATE(i.ts_due)
+        END) AS dt_source_trigger,
         CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount
     FROM 
         treated_entry e
@@ -44,13 +82,16 @@ retsuko AS (
     INNER JOIN
         datalake_retsuko_clean.contract ct 
             ON ct.id = i.id_contract
+    LEFT JOIN 
+        contract_type ctt 
+            ON ctt.id_invoice = i.id_external
     WHERE 
         description != 'Crédito - Parcelamento corretagem - QuintoAndar' 
     AND agg > 0
     AND (
             (
                 (ii.invoice_user = 'landlord') AND 
-                (i.ts_due < current_date) AND
+                (NOT(i.ts_due < current_date AND i.accrual_year_month < 202405)) AND
                 (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                   'adm-fee',  
                   'brokerage-installment-fee', 
@@ -67,7 +108,7 @@ retsuko AS (
             (
                 (ii.invoice_user = 'tenant') AND 
                 (i.status IN ('paid', 'written-down', 'not-payable')) AND
-                (i.ts_due < current_date) AND
+                (NOT(i.ts_due < current_date AND i.accrual_year_month < 202405)) AND
                 (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                   'service-fee'
                   )            
@@ -146,6 +187,7 @@ pre_df AS (
             WHEN r.revenue_name = 'brokerage quinto andar' THEN '2' 
             WHEN r.revenue_name = 'service fee' THEN '3' END AS id_retsuko_invoice_issuance,
         id_contract AS id_business_entity,
+        contract_type,
         id_invoice AS id_finance_entity,
         CAST(NULL AS INT) AS id_finance_entity_entry,
         se.version,
@@ -194,11 +236,12 @@ df AS (
         MAX(dt_sap_created) AS dt_sap_created,
         MAX(dt_sap_reference) AS dt_sap_reference,
         account_number,
-        version
+        version,
+        contract_type
     FROM 
         pre_df
     GROUP BY 
-        1, 2, 3, 4, 5, 6, 7, 9, 12, 15, 16
+        1, 2, 3, 4, 5, 6, 7, 9, 12, 15, 16, 17
 ),
 df_final AS (
     SELECT 
@@ -207,6 +250,7 @@ df_final AS (
         id_finance_entity,
         id_finance_entity_entry,
         version,
+        contract_type,
         source_name,
         revenue_name,
         accrual_year_month,
@@ -230,6 +274,7 @@ SELECT
     id_finance_entity,
     id_finance_entity_entry,
     version,
+    contract_type,
     source_name,
     revenue_name,
     accrual_year_month,

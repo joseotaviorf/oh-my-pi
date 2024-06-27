@@ -62,6 +62,12 @@ columns:
    lineage:
      - datalake_accounting_funnel.invoice_all.bill_item
    description: "Indicates if an invoice has an entry with installments"
+ is_correctly_charged:
+   description: "Indicates if Seu Barriga charge is correct based on Main"
+ is_correctly_paid:
+   description: "Indicates if Robin Hood payment is correct based on Main"
+ is_brokerage_total_correct:
+   description: "Indicates if in all contract it was charged more than supposed to"
  is_compliance:
    description: "Indicates if brokerage transfer (retsuko/robin hood) is in compliance with what is in contract (main)"
  dt_contract_started:

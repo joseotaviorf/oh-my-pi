@@ -177,9 +177,10 @@ SELECT
     rent,
     partner_type,
     dt_contract_started,
-    brokerage_amount
+    brokerage_amount,
+    ROUND(SUM(COALESCE(brokerage_amount, 0.00)) OVER (PARTITION BY id_contract),2) AS brokerage_amount_by_contract
 FROM 
-    for_rent_contract_brokerage UNPIVOT (
+    datalake_accounting_funnel.for_rent_contract_brokerage UNPIVOT (
         brokerage_amount FOR partner_type IN (
             5A_brokerage_amount AS `quintoandar`,
             agent_brokerage_amount AS `estate agent`,
@@ -208,7 +209,7 @@ SELECT
     ROUND(COALESCE(rh.payment_due_amount, 0.00),2) as payment_due_amount,
     ROUND(COALESCE(sb.source_due_amount_accumulated, 0.00),2) AS source_due_amount_accumulated,
     ROUND(COALESCE(rh2.payment_due_amount_accumulated, 0.00),2) AS payment_due_amount_accumulated,
-    ROUND(SUM(COALESCE(main.brokerage_amount, 0.00)) OVER (PARTITION BY main.id_contract),2) AS brokerage_amount_by_contract,
+    main.brokerage_amount_by_contract,
     ROUND(SUM(COALESCE(sb.source_due_amount, 0.00)) OVER (PARTITION BY main.id_contract),2) AS source_due_amount_by_contract,
     sb.has_postponed_brokerage,
     sb.has_installment_brokerage,
@@ -225,6 +226,20 @@ SELECT
           WHEN sb.has_postponed_brokerage IS TRUE OR sb.has_installment_brokerage IS TRUE THEN TRUE
         ELSE FALSE
     END) AS is_compliance,
+    CASE
+        WHEN main.partner_type != 'quintoandar' AND sb.ended_before_started IS TRUE AND sb.purpose = 'monthly' AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+        WHEN main.partner_type != 'quintoandar' AND sb.has_postponed_brokerage IS FALSE AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+        WHEN main.partner_type = 'quintoandar' AND sb.has_postponed_brokerage IS FALSE AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+        WHEN sb.has_postponed_brokerage IS TRUE OR sb.has_installment_brokerage IS TRUE THEN TRUE
+        ELSE FALSE
+    END is_correctly_charged,
+    CASE
+        WHEN main.partner_type != 'quintoandar' AND sb.ended_before_started IS TRUE AND sb.purpose != 'monthly' AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(rh.payment_due_amount, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+        WHEN main.partner_type != 'quintoandar' AND sb.has_postponed_brokerage IS TRUE AND COALESCE(sb.source_due_amount, 0.00) - COALESCE(rh.payment_due_amount, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+        WHEN main.partner_type != 'quintoandar' AND sb.has_postponed_brokerage IS FALSE AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(sb.source_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 AND COALESCE(main.brokerage_amount, 0.00) - COALESCE(rh2.payment_due_amount_accumulated, 0.00) BETWEEN -0.05 AND 0.05 THEN TRUE
+        WHEN main.partner_type = 'quintoandar' THEN NULL
+        ELSE FALSE
+    END is_correctly_paid,
     main.dt_contract_started
 FROM
     main 
@@ -256,16 +271,19 @@ SELECT
     id_invoice,
     accrual_year_month,
     partner_type,
-    contract_amount,
-    source_due_amount,
-    payment_due_amount,
-    source_due_amount_accumulated,
-    payment_due_amount_accumulated,
-    brokerage_amount_by_contract,
-    source_due_amount_by_contract,
+    CAST(contract_amount AS DECIMAL(14,2)) AS contract_amount,
+    CAST(source_due_amount AS DECIMAL(14,2)) AS source_due_amount,
+    CAST(payment_due_amount AS DECIMAL(14,2)) AS payment_due_amount,
+    CAST(source_due_amount_accumulated AS DECIMAL(14,2)) AS source_due_amount_accumulated,
+    CAST(payment_due_amount_accumulated AS DECIMAL(14,2)) AS payment_due_amount_accumulated,
+    CAST(brokerage_amount_by_contract AS DECIMAL(14,2)) AS brokerage_amount_by_contract,
+    CAST(source_due_amount_by_contract AS DECIMAL(14,2)) AS source_due_amount_by_contract,
     has_postponed_brokerage,
     has_installment_brokerage, 
-    is_compliance,
+    is_correctly_charged,
+    is_correctly_paid,
+    IF(brokerage_amount_by_contract < source_due_amount_by_contract, FALSE, is_compliance) AS is_brokerage_total_correct,
+    IF(is_correctly_charged IS TRUE AND (is_correctly_paid IS TRUE OR is_correctly_paid IS NULL) AND (brokerage_amount_by_contract >= source_due_amount_by_contract), TRUE, FALSE) AS is_compliance,
     dt_contract_started
 FROM
     df_final
