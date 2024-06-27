@@ -1,0 +1,95 @@
+---
+database_name: datalake_opsgenie
+table_name: alerts
+domain: Cross
+owner: "@data-cross"
+description: This table contains detailed information from OpsGenie alerts to monitor Data Engineering Incidents.
+columns:
+  id:
+    description: The unique alert identifier, use it as the primary key for alert data
+    lineage:
+      - datalake_opsgenie_clean.alerts.id
+  id_alias:
+    description: The alias used for the alert
+    lineage:
+      - datalake_opsgenie_clean.alerts.id_alias
+  id_issue_jira:
+    description: The ticket identifier generated in Jira for the incident
+    lineage:
+      - datalake_opsgenie_clean.logs.id_issue_jira
+  dag_name:
+    description: The name of the DAG that generated the alert
+    lineage:
+      - datalake_opsgenie_clean.alerts.dag_name
+  task_name: 
+    description: The task name of the DAG that generated the alert
+    lineage:
+      - datalake_opsgenie_clean.alerts.task_name
+  owned_by:
+    description: The user of the person who own the alert
+    lineage:
+      - datalake_opsgenie_clean.alerts.owned_by
+  acknowledged_by:
+    description: The user of the person who acknowledged the alert
+    lineage:
+      - datalake_opsgenie_clean.alerts.acknowledged_by
+  closed_by:
+    description: The user of the person who closed the alert
+    lineage:
+      - datalake_opsgenie_clean.alerts.closed_by
+  status:
+    description: The status of the alert
+    lineage:
+      - datalake_opsgenie_clean.alerts.status
+  is_seen:
+    description: True if the alert is seen; otherwise, false
+    lineage:
+      - datalake_opsgenie_clean.alerts.is_seen
+  is_acknowledged:
+    description: True if the alert is acknowledged; otherwise, false
+    lineage:
+      - datalake_opsgenie_clean.alerts.is_acknowledged
+  is_snoozed:
+    description: True if the alert is snoozed; otherwise, false
+    lineage:
+      - datalake_opsgenie_clean.alerts.is_snoozed
+  is_closed:
+    description: True if the alert is closed; otherwise, false
+    lineage:
+      - datalake_opsgenie_clean.alerts.ts_closed
+  has_email_notification_sent:
+    description: True if an email was sent for this alert; otherwise, false
+    lineage:
+      - datalake_opsgenie_clean.logs.has_email_notification_sent
+  has_call_notification_made:
+    description: True if a call notification was sent for this alert; otherwise, false
+    lineage:
+      - datalake_opsgenie_clean.logs.has_call_notification_made
+  ts_created:
+    description: Timestamp when the alert was created
+    lineage:
+      - datalake_opsgenie_clean.alerts.ts_created
+  ts_updated:
+    description: Timestamp when the alert was updated
+    lineage:
+      - datalake_opsgenie_clean.alerts.ts_updated
+  ts_acknowledged:
+    description: Timestamp when the alert was acknowledged
+    lineage:
+      - datalake_opsgenie_clean.alerts.ts_acknowledged
+  ts_closed:
+    description: Timestamp when the alert was closed
+    lineage:
+      - datalake_opsgenie_clean.alerts.ts_closed
+  year:
+    description: Year when the alert was updated
+    lineage:
+      - datalake_opsgenie_clean.alerts.year
+  month:
+    description: Month when the alert was updated
+    lineage:
+      - datalake_opsgenie_clean.alerts.month
+  day:
+    description: Day when the alert was updated
+    lineage:
+      - datalake_opsgenie_clean.alerts.day

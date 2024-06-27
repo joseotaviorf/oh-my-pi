@@ -2152,6 +2152,8 @@ bietlejuice.enrich_olos_dialer:
   - bietlejuice.olos_dialer:load-clean-users
 bietlejuice.enrich_online_attribution:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+bietlejuice.enrich_opsgenie:
+  - bietlejuice.opsgenie:load-clean-alerts
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
