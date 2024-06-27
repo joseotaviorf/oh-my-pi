@@ -47,7 +47,9 @@ VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_13_3_med_general_photon_cluster"
+)
 CLUSTER_DESCRIPTION["spark_conf"].update(
     {"spark.metrics.namespace": "data_products.enrich_vespucio_pipeline"}
 )
@@ -200,8 +202,8 @@ source_tasks = [
     ),
 ]
 
-#dbutils = BaseDBUtils().get_dbutils()
-#if dbutils is None:
+# dbutils = BaseDBUtils().get_dbutils()
+# if dbutils is None:
 #    raise RuntimeError("DBUtils not found")
 
 kodak_api_key = ""
@@ -271,7 +273,7 @@ core_tasks = [
             "--kodak_api_url=https://kodak.quintoandar.com.br/s2s/v1",
             "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
         ],
-    )
+    ),
 ]
 
 listing_task = create_task(

@@ -290,6 +290,17 @@ databricks_13_3_med_general_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_13_3_med_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.4xlarge
+    num_workers: 3
+    runtime_engine: PHOTON
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_10_4_med_compute_cluster:
     <<: *cluster_anchor
     driver_node_type_id: c5a.2xlarge
