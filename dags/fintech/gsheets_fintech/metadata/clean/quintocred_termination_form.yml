@@ -1,0 +1,102 @@
+---
+database_name: datalake_gsheets_clean
+table_name: quintocred_termination_form
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  ts_form:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.carimbo_de_datahora
+  analyst_name:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.nome_do_analista
+  id_ticket:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.ticket
+  id_propose:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.proposta
+  termination_type:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.qual_o_tipo_de_rescisao
+  was_adherent:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.o_processo_foi_aderente
+  root_cause:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.qual_a_causa_raiz_identificada
+  loss_due_process_error:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.houve_prejuizo_por_erro_de_processo
+  loss_amount_due_process_error:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.se_houve_prejuizo_ocasionado_por_processo_qual_o_valor
+  loss_due_exception:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.houve_prejuizo_ocasionado_por_excecoes
+  loss_amount_due_exception:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.se_houve_prejuizo_ocasionado_por_excecoes_qual_o_valor
+  loss_due_product:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.houve_prejuizo_relacionado_a_produto
+  loss_amount_due_product:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.se_houve_prejuizo_ocasionado_por_produto_qual_o_valor
+  financial_loss:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.houve_prejuizo_financeiro
+  financial_loss_amount:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.qual_o_valor_que_impacta_como_prejuizo_final
+  score:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.pontuacao
+  grade:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.nota
+  dt_monitoring:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.data
+  value_financial_loss:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.prejuizo_financeiro
+  contested:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.contestado
+  critical_error:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.erro_critico
+  analyst_is_polite:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.1_analista_e_preciso_amavel_cortes_integro_ou_empatico_com_o_parceiro_
+  analyst_attends_requests:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.2_analista_atende_prontamente_pedidosolicitacao_do_parceiro_quando_tem_esta_possibilidade
+  analyst_maintains_calm_with_the_partner:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.3_analista_mantem_a_calma_com_o_parceiro_quando_o_mesmo_discorda_de_alguma_informacao
+  analyst_agrees_with_positive_citation:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.1_analista_fala_bem_ou_concorda_com_citacao_positiva_sobre_a_quintocredconcorrentecolaboradorclientes_ou_parceiros
+  analyst_makes_ethical_comments:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.2_analista_faz_comentariosorientacoes_devidas_e_eticas_ao_parceiro
+  analyst_affirms_foreseen_items_in_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.3_analista_afirma_obrigacao_ou_direito_previsto_em_contrato
+  analyst_not_inflicting_lgpd:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.4_analista_se_atenta_aos_dados_pessoais_de_outros_clientes_e_ou_parceiros_nao_infligindo_a_lgpd
+  analyst_passes_true_information:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.5_analista_passa_informacoes_veridicas_sobre_o_produtoempresa
+  service_solution_has_correct_values_quintocred:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.1_solucao_do_atendimento_tem_valores_corretos_nao_causando_prejuizo_financeiro_para_a_quintocred
+  service_solution_has_correct_values_partner:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.2_solucao_do_atendimento_tem_valores_corretos_nao_causando_prejuizo_financeiro_para_o_parceiro
+  service_solution_follows_flow:
+    lineage:
+      - datalake_gsheets_raw.quintocred_termination_form.3_solucao_do_atendimento_segue_o_fluxo_desenhado_no_processo_nao_impactando_no_sla_para_resolucao

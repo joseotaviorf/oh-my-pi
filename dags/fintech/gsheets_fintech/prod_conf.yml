@@ -230,3 +230,21 @@ sheets_info:
     sheet_name: all_realestates
     clean_table_name: quintocred_real_estates
     sheet_context: fintech
+
+  quintocred_termination_form:
+    sheet_id: 1dFAXZk-TA6DjRlNkH1crncWZlMZkQ2LYKyHEH84a6MM
+    sheet_name: Respostas Forms 2.0 Rescisao
+    clean_table_name: quintocred_termination_form
+    sheet_context: fintech
+
+  quintocred_claim_form:
+    sheet_id: 1dFAXZk-TA6DjRlNkH1crncWZlMZkQ2LYKyHEH84a6MM
+    sheet_name: Respostas Forms 2.0 Simples
+    clean_table_name: quintocred_claim_form
+    sheet_context: fintech
+
+  quintocred_aux_form:
+    sheet_id: 1dFAXZk-TA6DjRlNkH1crncWZlMZkQ2LYKyHEH84a6MM
+    sheet_name: Aux
+    clean_table_name: quintocred_aux_form
+    sheet_context: fintech
