@@ -763,7 +763,7 @@ persons_metrics AS (
         MAX(mp.declared_income) / SUM(pp.declared_income) AS percentage_income_from_primary_person,
         COUNT(pp.id_person) AS count_persons_included,
         AVG(pp.serasa_score) AS avg_serasa_score,
-        AVG(pp.risk_score) AS avg_risk_score,
+        MAX(pp.risk_score) AS avg_risk_score,
         AVG(pp.declared_income) AS avg_declared_income,
         SUM(pp.declared_income) AS total_declared_income
     FROM
