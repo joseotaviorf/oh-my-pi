@@ -15,7 +15,7 @@ manual_costs AS (
     campaign_business_context,
     campaign_strategy_intent,
     behavior_type,
-    landing_page,
+    landing_page AS campaign_landing_page,
     medium,
     source,
     funnel_side,
@@ -45,13 +45,13 @@ manual_costs_share_rules AS (
     s.campaign_business_context,
     s.campaign_strategy_intent,
     s.behavior_type,
-    s.landing_page,
+    s.landing_page AS campaign_landing_page,
     s.medium,
     s.source,
     s.funnel_side,
     s.cost::FLOAT * r.share AS total_cost, 
-    s.impressions, 
-    s.clicks
+    s.impressions::FLOAT AS impressions, 
+    s.clicks::FLOAT AS clicks
     FROM
         datalake_gsheets_clean.marketing_manual_costs_name_convetion AS s
     JOIN
