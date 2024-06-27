@@ -75,6 +75,8 @@ bietlejuice.dw_datamarts_spark.fintech:
     - bietlejuice.retsuko:load-clean-contract
   remove:
     - bietlejuice.dw_fintech_snapshot:load-dw-public-snapshot-dim-contract-snapshot
+
+
 bietlejuice.dw_datamarts_spark.fintech_cross:
   remove:
     - bietlejuice.dw_region:load-dw-public-dim-region
@@ -715,6 +717,13 @@ bietlejuice.enrich_tracksale:
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
     - bietlejuice.tracksale:load-clean-campaign
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
+bietlejuice.dw_quintocred_ifrs:
+  remove:
+    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
+    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
+    - bietlejuice.velo_omie:load-clean-bank-account
+    - bietlejuice.velo_omie:load-clean-categories
+    - bietlejuice.velo_omie:load-clean-projects
 bietlejuice.enrich_velo:
   add:
     - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposecompany-legacy
@@ -757,7 +766,7 @@ bietlejuice.enrich_zap_imoveis_crawler_listings:
     - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
 bietlejuice.metric_growth__demand:
   remove:
-    - bietlejuice.enrich_growth_manual_daily_costs:load-enrich-daily-costs    
+    - bietlejuice.enrich_growth_manual_daily_costs:load-enrich-daily-costs
 bietlejuice.metric_rent_benvi__demand:
   remove:
     - bietlejuice.enrich_mexico_marketing_manual_daily_costs:load-enrich-daily-costs # dependency not added due to be running later, should not be a block of the pipeline

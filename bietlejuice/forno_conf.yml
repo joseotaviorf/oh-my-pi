@@ -125,6 +125,7 @@ dags_out_of_pattern:
         "wonka.user_embeddings_main",
         "zordominium_vespucio_plugin",
         "quintoml.recs.house_user_embeddings_quintoml.inference",
+        "dw_quintocred_ifrs"
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
 databricks_bucket: databricks.s3.forno.data.quintoandar.com.br

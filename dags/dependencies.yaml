@@ -480,6 +480,9 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
+
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
@@ -611,6 +614,32 @@ bietlejuice.dw_quinto_messenger:
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel
   - bietlejuice.enrich_quinto_messenger:load-enrich-task
   - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
+bietlejuice.dw_quintocred_ifrs:
+  - bietlejuice.dw_velo:load-dw-velo-bridge-velo-propose-person
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-omie-client
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-person
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-transaction
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-transaction-category
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-payment
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-transaction-entries
+  - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
+  - bietlejuice.enrich_velo:load-enrich-transaction-entries
+  - bietlejuice.rental_guarantee_platform:load-clean-agreement
+  - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment-legacy
+  - bietlejuice.rental_guarantee_platform:load-clean-bill
+  - bietlejuice.rental_guarantee_platform:load-clean-billing-report
+  - bietlejuice.rental_guarantee_platform:load-clean-company
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-entry
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
+  - bietlejuice.rental_guarantee_platform:load-clean-entry
+  - bietlejuice.rental_guarantee_platform:load-clean-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-sap
 bietlejuice.dw_rede_company:
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.enrich_company:load-enrich-company
@@ -1665,11 +1694,11 @@ bietlejuice.enrich_ebdb_work_contract:
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs
 bietlejuice.enrich_expected_contribution_margin:
+  - bietlejuice.batch_inference:load-clean-batch-inference
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.enrich_losses:load-enrich-provision
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.batch_inference:load-clean-batch-inference
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all

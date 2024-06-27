@@ -20,6 +20,10 @@ workflow:
       custom_schema: payment_snapshot
     dim_contract_snapshot:
       custom_schema: public_snapshot
+    quintocred_ifrs_occurrence:
+      custom_schema: fintech_auditing
+    quintocred_ifrs_recurring_payment:
+      custom_schema: fintech_auditing
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   access_control_list:

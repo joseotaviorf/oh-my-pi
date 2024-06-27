@@ -1,0 +1,60 @@
+database_name: dw_velo
+table_name: quintocred_ifrs_recurring_payment
+description: Table made to measure IFRS Recurring Payments.
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  origin_table:
+    description: "Source table of payment information for each line. Possible tables : Omie, Payment, Invoice (direct billing information), Delinquency and Sap"
+  sk_propose:
+    description: "Proposal ID related to payment information"
+  sk_propose_20:
+    description: "Proposal ID related to payment information"
+  sk_delinquency:
+    description: "Delinquency ID from the delinquency table"
+  sk_transaction:
+    description: "Delinquency ID from the delinquency table"
+  client_cpf_cnpj:
+    description: "For 3.0 cases, it will be the delinquency entry id, for 2.0 cases, it will be the delinquency id."
+  dt_register:
+    description: "Delinquency creation date"
+  dt_register_ajustada:
+    description: "For 3.0 cases, it will be delinquency creation date (dt_register) , for 2.0 cases, it will be the dt_due."
+  dt_due:
+    description: "Due date of the original invoice that became delinquent"
+  dt_paid:
+    description: "Date of the most recent payment of the default."
+  dias_atraso:
+    description: "Number of days that the invoice is overdue, calculated by the difference between the due date of the original charge and the date of the most recent payment."
+  due_amount:
+    description: "Amount of the original unpaid charge."
+  due_amount_ajustado:
+    description: "For some cases of 2.0, the original value of the delinquency includes 11% interest. In this column, this was readjusted and interest was removed."
+  paid_amount:
+    description: "Delinquency amount paid"
+  open_amount:
+    description: "Difference between the amount paid and the original invoice amount"
+  open_amount_ajustado:
+    description: "Difference between the amount paid and the original invoice amount ( considering the due_amount_ajustado)"
+  discount_value:
+    description: "value of the discount given when paying the delinquency"
+  bill_item:
+    description: "discrimination of delinquency entry (condominium, energy bill, contractual termination fine, fire insurance, garbage fee, gas bill, IPTU, others, damage to property, rent, water bill)"
+  provisional_group:
+    description: "column that identifies whether the delinquency refers to Guarantee or Termination"
+  is_danos_imovel:
+    description: "column that identifies whether the delinquency refers to a charge for damage to the property"
+  is_contract_active:
+    description: "column that identifies whether the contract is active"
+  dt_contract_started:
+    description: "contract start date"
+  dt_contract_ended:
+    description: "Contract cancellation date"
+  valor_pacote:
+    description: "total value of the package (rent + condo + water+IPTU+etc)"
+  is_delinquency_renovacao:
+    description: "column that signals whether it is a Renewal delinquency"
+  is_perdao_divida:
+    description: "column that indicates whether it is a delinquency whose debt was forgiven"
+  ts_load:
+    description: Timestamp when the data was loaded.
