@@ -29,7 +29,8 @@ WITH cte_base AS (
         END AS dt_paid,
         p.dt_ended AS dt_ended_propose,
         DATE(COALESCE(r.ts_created, d.dt_paid)) AS dt_updated,
-        DATE(del.ts_created) AS dt_created
+        DATE(del.ts_created) AS dt_created,
+        ROW_NUMBER() OVER (PARTITION BY d.id ORDER BY DATE(COALESCE(r.ts_created, d.dt_paid)) ASC) AS rn
     FROM
         datalake_rental_guarantee_platform_clean.delinquency_aud AS d
     LEFT JOIN
@@ -70,8 +71,11 @@ cte_final AS (
     FROM
         cte_base
     WHERE
-        amount_paid = 0
-        OR amount_paid_added > 0
+        (
+            amount_paid = 0
+            OR amount_paid_added > 0
+        )
+        OR rn = 1
 ),
 base_timeline AS (
   SELECT
