@@ -1,7 +1,7 @@
 WITH get_validations AS (
     SELECT DISTINCT
         t.dag,
-        dv.database,
+        IF(startswith(dv.database, 'dw_') AND endswith(dv.database, '_staging'), REPLACE(dv.database, "_staging", ""), dv.database) AS database,
         dv.table,
         dv.suite_result,
         EXPLODE(FROM_JSON(dv.validations, 'ARRAY<STRING>')) AS validations,
@@ -14,7 +14,7 @@ WITH get_validations AS (
         datalake_inmetro_clean.data_validations AS dv
     INNER JOIN
         datalake_dag_inventory_clean.table AS t
-            ON t.table = CONCAT(REPLACE(dv.database, "_staging", ""), ".", dv.table)
+            ON t.table = CONCAT(IF(startswith(dv.database, 'dw_') AND endswith(dv.database, '_staging'), REPLACE(dv.database, "_staging", ""), dv.database), ".", dv.table)
     WHERE
         MAKE_DATE(dv.year, dv.month, dv.day) BETWEEN '{load_start_date}' AND '{load_end_date}'
         AND dv.repo = 'bietlejuice'
