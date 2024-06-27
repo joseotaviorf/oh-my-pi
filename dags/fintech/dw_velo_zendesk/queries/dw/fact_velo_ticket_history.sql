@@ -18,6 +18,7 @@ SELECT
     satisfaction_rating,
     satisfaction_reason,
     satisfaction_comments,
+    smiley_scale,
     priority,
     recipient,
     ticket_via,

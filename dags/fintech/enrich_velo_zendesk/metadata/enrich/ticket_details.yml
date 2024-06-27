@@ -74,6 +74,8 @@ columns:
     description: "Reason of satisfaction rating evaluation"
   satisfaction_comments:
     description: "Comments of satisfaction rating evaluation"
+  smiley_scale:
+    description: "Satisfaction rating based on smiley scale"
   ticket_order:
     description: "Order of the current register according to ticket timeline"
   priority:

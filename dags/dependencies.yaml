@@ -2968,6 +2968,8 @@ bietlejuice.enrich_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-ticket-metrics
   - bietlejuice.velo_zendesk:load-clean-tickets
   - bietlejuice.velo_zendesk:load-clean-tickets-history
+  - bietlejuice.enrich_survicate:load-enrich-response-content
+  - bietlejuice.enrich_survicate:load-enrich-survey-responses
 bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.ebdb_condo:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-condo

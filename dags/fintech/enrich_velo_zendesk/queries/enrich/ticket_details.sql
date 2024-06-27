@@ -18,7 +18,42 @@ last_register AS (
           datalake_velo_zendesk_clean.tickets_history
       GROUP BY
           1
-    )
+    ),
+
+base_survicate AS (
+  SELECT
+      rc.id_response AS id_answer,
+      sr.id_survey,
+      sr.id_respondent,
+      REGEXP_EXTRACT(sr.response_url, 'contractid=([0-9]+)', 1) AS id_contract,
+      REGEXP_EXTRACT(sr.response_url, 'ticket_id=([0-9]+)', 1) AS id_ticket,
+      REGEXP_EXTRACT(sr.response_url, 'email=([^&]+)', 1) AS email,
+      'survicate' AS survey_source,
+      rc3.answer_content AS user_comment,
+      rc2.answer_content AS smiley_scale,
+      rc.answer_content AS satisfaction_rating,
+      'satisfaction evaluation' AS score_description,
+      rc.ts_collected AS ts_first_response,
+      rc.year,
+      rc.month,
+      rc.day
+  FROM
+      datalake_survicate.survey_responses AS sr
+  LEFT JOIN
+      datalake_survicate.response_content AS rc
+          ON sr.id_response = rc.id_response
+          AND rc.id_question = '2461800'
+  LEFT JOIN
+      datalake_survicate.response_content AS rc2
+          ON sr.id_response = rc2.id_response
+          AND rc2.id_question = '2461801'
+  LEFT JOIN
+      datalake_survicate.response_content AS rc3
+          ON sr.id_response = rc3.id_response
+          AND rc3.id_question = '2461802'
+  WHERE
+      sr.id_survey IN ('7c875afca4130e7a')
+)
 
     SELECT
         th.id_ticket,
@@ -50,9 +85,10 @@ last_register AS (
         th.type AS ticket_type,
         le.name,
         th.priority,
-        SPLIT(REPLACE(REPLACE(SPLIT(th.satisfaction_rating, ':')[1],'}}',''),'"',''),',')[0] AS satisfaction_rating,
+        COALESCE(s.satisfaction_rating, SPLIT(REPLACE(REPLACE(SPLIT(th.satisfaction_rating, ':')[1],'}}',''),'"',''),',')[0]) AS satisfaction_rating,
         SPLIT(REPLACE(REPLACE(SPLIT(th.satisfaction_rating, ':')[2],'}}',''),'"',''),',')[0] AS satisfaction_reason,
-        SPLIT(REPLACE(REPLACE(SPLIT(th.satisfaction_rating, ':')[3],'}}',''),'"',''),',')[0] AS satisfaction_comments,
+        COALESCE(s.user_comment, SPLIT(REPLACE(REPLACE(SPLIT(th.satisfaction_rating, ':')[3],'}}',''),'"',''),',')[0]) AS satisfaction_comments,
+        s.smiley_scale,
         ROW_NUMBER() OVER(PARTITION BY th.id_ticket ORDER BY th.ts_updated DESC) AS ticket_order,
         th.subject,
         th.url_ticket AS ticket_url,
@@ -85,3 +121,6 @@ last_register AS (
         ON th.id_ticket = lr.id_ticket
         AND th.ts_updated = lr.ts_updated
         AND th.ts_load = lr.ts_load
+    LEFT JOIN
+        base_survicate s
+        ON s.id_ticket = th.id_ticket
