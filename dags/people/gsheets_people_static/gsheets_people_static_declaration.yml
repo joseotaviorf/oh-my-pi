@@ -2,7 +2,7 @@ dag:
   name: gsheets_people_static
   owner: Data People
 cluster:
-  type: databricks_12_2_med_people_cluster
+  type: databricks_13_3_med_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
