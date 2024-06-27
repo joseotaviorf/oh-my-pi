@@ -10,18 +10,17 @@ workflow:
   layer: dw
   custom_schema: analytical_costs
   default_extraction_type: incremental
-  default_partitions: [year, month, day]
   tables_customization:
     dim_cluster_configurations:
       extraction_type: full
     fact_bietlejuice_costs:
       merge_on: ['sk_snapshot']
     fact_execution_costs:
-      merge_on: ['sk_cluster']
+      merge_on: ['sk_snapshot']
     fact_bietlejuice_costs:
       merge_on: ['sk_snapshot']
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: databricks_12_2_min_general_cluster

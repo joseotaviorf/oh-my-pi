@@ -1,4 +1,5 @@
 SELECT
+    MD5(id_cluster || ts_execution) AS sk_snapshot,
     id_cluster AS sk_cluster,
     MD5(
       COALESCE(cluster_compute_type, 'N/A') 
@@ -8,8 +9,8 @@ SELECT
     ) AS sk_cluster_config,
     COALESCE(CAST(REPLACE(SUBSTRING(dt_execution, 1, 10),'-','') AS BIGINT), -1) AS sk_execution_date,
     cluster_name,
-    dbus,
-    price,
+    SUM(dbus) OVER (PARTITION BY id_cluster, ts_execution) AS dbus,
+    SUM(price) OVER (PARTITION BY id_cluster, ts_execution) AS price,
     spark_version_number,
     ts_execution,
     year,
@@ -21,3 +22,5 @@ FROM
 WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}') 
     AND execution_context = "adhoc execution"
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_cluster, ts_execution ORDER BY ts_execution DESC) = 1

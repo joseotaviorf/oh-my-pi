@@ -6,6 +6,11 @@ description: Transactional fact table with the objective of gathering the main c
 domain: Data Platform 
 owner: data-platform-team@quintoandar.com.br
 columns:
+  sk_snapshot:
+    description: Unique execution record identification key, based on id_cluster and execution time.
+    lineage:
+      - datalake_databricks_usage_costs.usage_costs.id_cluster
+      - datalake_databricks_usage_costs.usage_costs.ts_execution
   sk_cluster:
     description: Databricks cluster key.
     lineage:
