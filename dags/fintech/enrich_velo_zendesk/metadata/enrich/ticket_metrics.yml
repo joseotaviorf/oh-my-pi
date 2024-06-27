@@ -188,3 +188,9 @@ columns:
     description: "Timestamp when the ticket was loaded"
     lineage:
       - datalake_velo_zendesk_clean.tickets.ts_load
+  dt_first_call:
+    description: "Date when the first contact by phone from the claims team was made"
+  dt_second_call:
+    description: "Date when the second contact by phone from the claims team was made"
+  dt_third_call:
+    description: "Date when the third contact by phone from the claims team was made"
