@@ -39,8 +39,8 @@ LEFT JOIN
   extracted_log AS el
     ON a.id = el.id
 WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}
+  a.year = {year}
+  AND a.month = {month}
+  AND a.day = {day}
 GROUP BY
   ALL
