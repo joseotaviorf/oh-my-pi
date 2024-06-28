@@ -1,6 +1,7 @@
 WITH contracts_table AS (
     SELECT
         id AS id_contract,
+        date_format(dt_started, "yyyy-MM-01") as contract_start_month,
         date_format(dt_termination, "yyyy-MM-01") AS dt_termination
     FROM
         datalake_ebdb_clean.contract
@@ -25,6 +26,7 @@ revenue_table AS (
         id_house,
         id_tenant_prospect,
         id_contract,
+        contract_start_month,
         dt_termination,
         contract_lifetime,
         dt_month_start,
@@ -35,7 +37,7 @@ revenue_table AS (
         dw_rental_contribution_margin.fact_house_listing_revenues
     LEFT JOIN
         contracts_table USING (id_contract)
-    JOIN
+    JOIN  -- FIXME: Missing revenue from reservations without contract
         rent_flows_table USING (id_contract, id_house)
     WHERE
         dt_month_start BETWEEN date_format("{start_date}", "yyyy-MM-01") AND "{end_date}"
@@ -171,7 +173,7 @@ SELECT
     id_house,
     id_tenant_prospect,
     id_contract,
-    add_months(dt_month_start, -contract_lifetime) AS contract_start_month,
+    contract_start_month,
     CAST(dt_termination AS DATE) AS contract_termination_month,
     dt_month_start AS month_of_year,
     contract_lifetime AS months_since_contract_start,
