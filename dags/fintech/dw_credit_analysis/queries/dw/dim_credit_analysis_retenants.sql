@@ -231,6 +231,20 @@ SELECT
   pcl.last_active_contract,
   cpca.number_of_contracts,
   pcl.contract_age,
+  CASE 
+    WHEN( pcl.main_proponent_with_more_proponents_in_proposal = "retenant" 
+    OR    pcl.main_proponent_with_different_proponents_in_proposal = "retenant" 
+    OR    pcl.main_proponent_with_fewer_proponents_in_proposal = "retenant" )
+      THEN  "new_group_same_main_proponent"
+    WHEN  pcl.main_proponent = "retenant" 
+    AND   pcl.equal_proponents_in_proposal = "retenant"
+      THEN "same_group_same_main_proponent"
+    WHEN  pcl.main_proponent = "retenant"
+      THEN "main_proponent_only"
+    WHEN  pcl.any_proponent = "retenant"
+      THEN "group_member_only"
+    ELSE  "newcustomer"
+  END AS retenant_type,
   pcl.any_proponent,
   pcl.main_proponent,
   pcl.main_proponent_with_more_proponents_in_proposal,
@@ -238,6 +252,11 @@ SELECT
   pcl.main_proponent_with_fewer_proponents_in_proposal,
   pcl.equal_proponents_in_proposal,
   pcl.retenant_policy,
+  CASE 
+    WHEN pcl.main_proponent = "retenant" THEN TRUE
+    WHEN pcl.any_proponent  = "retenant" THEN TRUE
+    ELSE FALSE
+  END AS is_retenant,
   pcl.dt_contract_annulment,
   pcl.ts_proposal_created,
   pcl.ts_last_contract_created,

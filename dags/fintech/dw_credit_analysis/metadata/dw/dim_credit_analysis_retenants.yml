@@ -21,6 +21,13 @@ columns:
       - datalake_ebdb_contract.contract.dt_termination
       - datalake_sorting_hat_clean.proposal.ts_created
     description: "Contract age in months. It is calculated as the difference between the contract annulment date and the latest proposal creation date of a retenant. Contracts that are still active at the proposal creation date are not considered"
+  retenant_type:
+    description: "Classification of the retenant type."
+    categories:
+      new_group_same_main_proponent: "The main proponent is retenant but with a new group."
+      same_group_same_main_proponent: "All the group is retenant."
+      main_proponent_only: "Only the main proponent in the proposal is retenant."
+      group_member_only: "Only a group member is retenant."
   any_proponent:
     description: "Classification of the proposal based on the proponents CPF and the previous contract, if applied. If any proponent present in the proposal has ever signed a contract with QuintoAndar, the proposal is classified as 'retenant'. Otherwise none of the proponents has ever signed a contract, which means that they are new users."
   main_proponent:
@@ -35,6 +42,8 @@ columns:
     description: "Classification of the proposal based on the proponents CPF and the previous contract, if applied. If the main proponent present in the proposal has ever signed a contract with QuintoAndar, and all proponents in the proposal are the same as in the previous one, this column is classified as 'retenant'. Otherwise it is classified as new user."
   retenant_policy:
     description: "Indicates which policy was applied to the proposal: the new retenant policy or the old one. All proposals created before 2023-12-06 are classified as 'old_retenant_policy'."
+  is_retenant:
+    description: "TRUE if one or more proponents are retenants."
   dt_contract_annulment:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
