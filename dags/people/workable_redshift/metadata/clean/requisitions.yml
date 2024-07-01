@@ -117,7 +117,6 @@ columns:
     description: ''
     lineage:
     - datalake_workable_redshift_raw.requisitions.plan_date
-      */
   dt_start:
     description: ''
     lineage:

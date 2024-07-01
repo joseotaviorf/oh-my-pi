@@ -1,0 +1,51 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: stages
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.id
+  id_base_stage:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.base_stage_id
+  id_pipeline:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.pipeline_id
+  name:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages."name"
+  kind:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.kind
+  position:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages."position"
+  slug:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.slug
+  is_confidential:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.confidential
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.stage_created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.updated_at
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.stages.NOW()

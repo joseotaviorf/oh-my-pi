@@ -19,6 +19,14 @@ workflow:
   dbutils_secret_key: WORKABLE_DB
   has_hive_sync: false
   tables_customization:
+    activities:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    answers:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id', 'answer']
     candidates:
       date_filter_column: updated_at
       extraction_type: incremental
@@ -43,7 +51,19 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ['id']
+    members:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    pipelines:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
     requisitions:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    stages:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ['id']

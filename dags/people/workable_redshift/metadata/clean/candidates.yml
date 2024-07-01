@@ -125,7 +125,6 @@ columns:
     description: ''
     lineage:
     - datalake_workable_redshift_raw.candidates.candidate_created_at
-      */
   ts_job_first_published:
     description: ''
     lineage:
