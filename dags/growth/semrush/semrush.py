@@ -5,6 +5,7 @@ from pendulum import timezone
 
 from airflow.models import DAG
 from airflow.utils.helpers import cross_downstream
+from airflow.operators.python_operator import ShortCircuitOperator
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -15,6 +16,9 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
+    DAGRunDateValidators,
+)
 
 ## fuction to fetch toggles
 def get_toggle_param(dag_run, toggle_param_name):
@@ -26,7 +30,7 @@ def get_toggle_param(dag_run, toggle_param_name):
 SOURCE = "semrush"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 4, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 10 28 * *"
+MAIN_SCHEDULE_INTERVAL = "0 10 * * *"
 CLUSTER_DESCRIPTION = "databricks_10_4_max_io-memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
@@ -73,6 +77,12 @@ dag = DAG(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
     user_defined_macros={"get_toggle_param": get_toggle_param},
+)
+
+skip_run_task = ShortCircuitOperator(
+    task_id=f"check-day-to-skip-execution",
+    python_callable=DAGRunDateValidators.check_is_first_business_day_of_month,
+    op_args=["{{ macros.ds_add(ds, 1) }}"],
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -140,6 +150,8 @@ for table_name in tables:
             "domain": "{{ table_name }}",
         },          
     )
+
+    skip_run_task.set_downstream(create_cluster_task)
 
     create_cluster_task.set_downstream(load_semrush_transient_task)
 
