@@ -1,0 +1,78 @@
+database_name: datalake_gsheets_clean
+table_name: qc_qa_ops_targets
+columns:
+  sla_claim_total:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamentos_total
+  sla_claim_15_days:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamentos_15dias
+  sla_claim_2_days:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamentos_2dias
+  sla_claim_termination:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamentos_rescisao
+  sla_claim_simple:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_acionamento_simples
+  dsat_claim_total:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dsat_acionamentos_total
+  dsat_claim_15_days:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dsat_acionamentos_15dias
+  dsat_claim_2_days:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dsat_acionamentos_2dias
+  dsat_claim_termination:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dsat_acionamentos_rescisao
+  avg_lt_claim_total:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.lt_medio_acionamentos_total
+  avg_lt_claim_15_days:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.lt_medio_acionamentos_15dias
+  avg_lt_claim_2_days:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.lt_medio_acionamentos_2dias
+  avg_lt_claim_termination:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.lt_medio_acionamentos_rescisao
+  score_monitoring_claim:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.nota_monitoria_acionamentos
+  sla_credit_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_credito_qc
+  sla_closing_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_closing_qc
+  dsat_closing_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dsat_closing_qc
+  sla_credit_qa:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_credito_qa
+  sla_ca2cc_qa:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_ca2cc_qa
+  sla_cc2cs_qa:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_cc2cs_qa
+  sla_ca2cs_qa:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_ca2cs_qa
+  dsat_closing_qa:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dsat_closing_qa
+  dsat_credit_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dsat_credito_qc
+  reference_month_weekly_target:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.mes_de_referencia_tgt_semanal
+  dt_reference:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dia

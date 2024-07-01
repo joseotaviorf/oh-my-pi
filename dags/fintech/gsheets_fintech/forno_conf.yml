@@ -219,10 +219,16 @@ sheets_info:
     clean_table_name: quintocred_pre_evictions
     sheet_context: fintech
 
-  quintocred_targets:
-    sheet_id: 1c9RYSJJtN9edc0-XRanDWiMSdEvPgcvrubq89Gnc2No
-    sheet_name: quintocred_targets
-    clean_table_name: quintocred_targets
+  quintocred_coincident_targets:
+    sheet_id: 1fabc1xJK_qD2NLWSbtNnbY8Qt67JvylhrgsnZblqfCs
+    sheet_name: Target Coincident
+    clean_table_name: quintocred_coincident_targets
+    sheet_context: fintech
+
+  qc_qa_ops_targets:
+    sheet_id: 1BhTxPZ-zF_Z4wM0ZdqSQdKUIgdostoK5CIEQsFjI1pw
+    sheet_name: daily
+    clean_table_name: qc_qa_ops_targets
     sheet_context: fintech
 
   quintocred_real_estates:

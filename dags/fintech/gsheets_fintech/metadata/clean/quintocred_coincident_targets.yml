@@ -1,0 +1,135 @@
+database_name: datalake_gsheets_clean
+table_name: quintocred_coincident_targets
+columns:
+  evaluation_started:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.evaluation_started
+  credit_approved:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.credit_approved
+  new_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.new_contract
+  ended_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.ended_contract
+  ongoing_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.ongoing_contract
+  gmv_new_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.gmv_new_contract
+  gmv_ongoing_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.gmv_ongoing_contract
+  gmv_ended_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.gmv_ended_contract
+  avg_ticket_new_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_new_contract
+  avg_ticket_ended_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_ended_contract
+  avg_ticket_ongoing_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_ongoing_contract
+  activation_fee:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.activation_fee
+  revenue_new_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.revenue_new_contract
+  revenue_ongoing_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.revenue_ongoing_contract
+  take_rate_new_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.take_rate_new_contract
+  take_rate_ongoing_contract:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.take_rate_ongoing_contract
+  monthly_brokers_w_evaluation_accumulated:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.monthly_brokers_w_evaluation_accumulated
+  daily_brokers_w_evaluation:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.daily_brokers_w_evaluation
+  monthly_active_brokers_accumulated:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.monthly_active_brokers_accumulated
+  daily_active_brokers:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.daily_active_brokers
+  total_active_brokers_w_evaluation_accumulated:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.total_active_brokers_w_evaluation_accumulated
+  daily_total_active_brokers_w_evaluation:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.daily_total_active_brokers_w_evaluation
+  total_active_brokers:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.total_active_brokers
+  first_active_brokers:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.first_active_brokers
+  pre_active_brokers_w_evaluation:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.pre_active_brokers_w_evaluation
+  claims_total:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.claims_total
+  claims_active:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.claims_active
+  claims_termination:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.claims_termination
+  avg_ticket_claims_total:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_claims_total
+  avg_ticket_claims_active:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_claims_active
+  avg_ticket_claims_termination:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.avg_ticket_claims_termination
+  claims_created_tickets:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.claims_created_tickets
+  collections_total_projected:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.collections_total_projected
+  collections_active_projected:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.collections_active_projected
+  collections_termination_projected:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.collections_termination_projected
+  evictions_solved_cases:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.evictions_solved_cases
+  evictions_new_cases:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.evictions_new_cases
+  evictions_ongoing_cases:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.evictions_ongoing_cases
+  month:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.month
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.quarter
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.halfyear
+  year:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.date
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.week_start

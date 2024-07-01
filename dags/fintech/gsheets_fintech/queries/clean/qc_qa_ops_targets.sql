@@ -1,0 +1,28 @@
+SELECT
+    sla_acionamentos_total AS sla_claim_total,
+    sla_acionamentos_15dias AS sla_claim_15_days,
+    sla_acionamentos_2dias AS sla_claim_2_days,
+    sla_acionamentos_rescisao AS sla_claim_termination,
+    sla_acionamento_simples AS sla_claim_simple,
+    dsat_acionamentos_total AS dsat_claim_total,
+    dsat_acionamentos_15dias AS dsat_claim_15_days,
+    dsat_acionamentos_2dias AS dsat_claim_2_days,
+    dsat_acionamentos_rescisao AS dsat_claim_termination,
+    lt_medio_acionamentos_total AS avg_lt_claim_total,
+    lt_medio_acionamentos_15dias AS avg_lt_claim_15_days,
+    lt_medio_acionamentos_2dias AS avg_lt_claim_2_days,
+    lt_medio_acionamentos_rescisao AS avg_lt_claim_termination,
+    nota_monitoria_acionamentos AS score_monitoring_claim,
+    sla_credito_qc AS sla_credit_qc,
+    sla_closing_qc,
+    dsat_closing_qc,
+    sla_credito_qa AS sla_credit_qa,
+    sla_ca2cc_qa,
+    sla_cc2cs_qa,
+    sla_ca2cs_qa,
+    dsat_closing_qa,
+    dsat_credito_qc AS dsat_credit_qc,
+    mes_de_referencia_tgt_semanal AS reference_month_weekly_target,
+    dia AS dt_reference
+FROM
+    datalake_gsheets_raw.qc_qa_ops_targets
