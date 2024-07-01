@@ -64,6 +64,7 @@ dags_out_of_pattern:
         "ebdb",
         "enrich_ebdb_listing",
         "enrich_house_feature_inference",
+        "enrich_hr_system_custom",
         "enrich_losses",
         "enrich_lost_listings",
         "enrich_marketing_costs_offline",
