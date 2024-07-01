@@ -35,7 +35,7 @@ WITH raw_predicted_durations_table AS (
             datalake_batch_inference_clean.batch_inference
         WHERE
             model_name = 'eCM-duration'
-            AND format_string("%04d-%02d-%02d", year, month, day) = current_date
+            AND format_string("%04d-%02d-%02d", year, month, day) BETWEEN '{start_date}' AND '{end_date}'
     )
     GROUP BY ALL
 ),
@@ -65,7 +65,7 @@ raw_predicted_vb2cs_table AS (
             datalake_batch_inference_clean.batch_inference
         WHERE
             model_name = 'eCM-vb2cs'
-            AND format_string("%04d-%02d-%02d", year, month, day) = current_date
+            AND format_string("%04d-%02d-%02d", year, month, day) BETWEEN '{start_date}' AND '{end_date}'
     )
     GROUP BY ALL
 ),
@@ -95,7 +95,7 @@ raw_predicted_do2cs_table AS (
             datalake_batch_inference_clean.batch_inference
         WHERE
             model_name = 'eCM-do2cs'
-            AND format_string("%04d-%02d-%02d", year, month, day) = current_date
+            AND format_string("%04d-%02d-%02d", year, month, day) BETWEEN '{start_date}' AND '{end_date}'
     )
     GROUP BY ALL
 ),
