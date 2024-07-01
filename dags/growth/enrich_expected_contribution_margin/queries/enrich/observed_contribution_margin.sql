@@ -173,7 +173,7 @@ SELECT
     id_house,
     id_tenant_prospect,
     id_contract,
-    contract_start_month,
+    CAST(contract_start_month AS DATE) AS contract_start_month,
     CAST(dt_termination AS DATE) AS contract_termination_month,
     dt_month_start AS month_of_year,
     contract_lifetime AS months_since_contract_start,

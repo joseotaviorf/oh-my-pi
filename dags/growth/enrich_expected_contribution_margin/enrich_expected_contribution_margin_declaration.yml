@@ -11,13 +11,12 @@ workflow:
   default_extraction_type: incremental
   tables_customization:
     expected_contribution_margin:
-      merge_on: ["id_rent_flow", "id_house", "id_tenant_prospect"]
+      merge_on: ["id_rent_flow", "id_house", "id_tenant_prospect", "months_since_contract_start"]
       partitions: [dt_inference]
       extra_query_template_params:
         start_date: "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"
         end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
     expected_contribution_margin_by_event:
-      merge_on: ["id_rent_flow", "id_house", "id_tenant_prospect", "id_booking", "id_offer"]
       partitions: [dt_event_time]
       extra_query_template_params:
         start_date: "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"

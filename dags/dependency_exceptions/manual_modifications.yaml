@@ -361,6 +361,9 @@ bietlejuice.enrich_ebdb_photo_jobs:
 bietlejuice.enrich_ebdb_user:
   add:
     - bietlejuice.ebdb_user:load-clean-user-merge
+bietlejuice.enrich_expected_contribution_margin:
+  remove:
+    - bietlejuice.enrich_losses:load-enrich-provision
 bietlejuice.enrich_golden_set:
   remove:
     - bietlejuice.enrich_vespucio:load-enrich-dejavu
