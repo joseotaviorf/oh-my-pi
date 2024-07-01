@@ -391,6 +391,17 @@ salaries AS (
   WHERE
     qnt_movimentations = 1
     OR change_date = dt_last_increase
+),
+subordinates AS (
+  SELECT
+    id_manager_assignment AS id_assignment,
+    COUNT(*) AS qnt_undirectly_led
+  FROM
+    datalake_hr_system.management_hierarchy
+  WHERE
+    not is_direct_manager
+  GROUP BY
+    id_manager_assignment
 )
 
 SELECT
@@ -437,8 +448,8 @@ SELECT
       THEN '-1'
     ELSE COALESCE(REPLACE(wr.dt_termination, '-', ''), '-1')
   END AS sk_dt_termination_work_relationship,
-  COALESCE(REPLACE(s.dt_last_increase, '-', ''), '-1') AS dt_last_increase,
-  COALESCE(REPLACE(s.dt_first_promotion, '-', ''), '-1') AS dt_first_promotion,
+  COALESCE(REPLACE(s.dt_last_increase, '-', ''), '-1') AS sk_dt_last_increase,
+  COALESCE(REPLACE(s.dt_first_promotion, '-', ''), '-1') AS sk_dt_first_promotion,
   -- metrics
   CASE
     WHEN wr.dt_start = MAX(wr.dt_start) over (PARTITION BY wr.id_person)
@@ -472,6 +483,7 @@ SELECT
     )
   END AS assignment_age_months,
   COALESCE(mdl.qnt_directly_led, 0) AS qnt_directly_led,
+  COALESCE(subordinates.qnt_undirectly_led, 0) AS qnt_undirectly_led,
   COALESCE(ap.qnt_promotions, 0) AS qnt_promotions,
   COALESCE(s.salary, -1) AS salary,
   COALESCE(ap.target_plr, 0) AS target_plr,
@@ -528,6 +540,9 @@ FROM
   LEFT JOIN
     salaries AS s
       ON COALESCE(ap.id_assignment, af.id_assignment) = s.id_assignment
+  LEFT JOIN
+    subordinates
+      ON subordinates.id_assignment = ap.id_assignment
 WHERE
   (
     wr.dt_start <= DATE('{load_start_date}')

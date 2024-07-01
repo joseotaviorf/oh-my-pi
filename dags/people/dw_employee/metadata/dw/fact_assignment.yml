@@ -6,98 +6,107 @@ domain: people
 description: null
 columns:
   sk_assignment:
-    description: 'Surrogate key for the assignment. Just the id_period_of_service'
+    description: "Surrogate key for the assignment. Just the id_period_of_service"
     lineage:
-    - datalake_hr_system.work_relationships.id_period_of_service
+      - datalake_hr_system.work_relationships.id_period_of_service
   sk_employee:
-    description: 'Surrogate key for the employee. Just the id_person'
+    description: "Surrogate key for the employee. Just the id_person"
     lineage:
-    - datalake_hr_system.work_relationships.id_person
+      - datalake_hr_system.work_relationships.id_person
   sk_cost_center:
-    description: 'Surrogate key for the cost center. Just the id_cost_center'
+    description: "Surrogate key for the cost center. Just the id_cost_center"
     lineage:
-    - datalake_hr_system.assignments.id_cost_center
+      - datalake_hr_system.assignments.id_cost_center
   sk_business_unit:
-    description: 'Surrogate key for the business unit. Just the id_business_unit'
+    description: "Surrogate key for the business unit. Just the id_business_unit"
     lineage:
-    - datalake_hr_system.assignments.id_business_unit
+      - datalake_hr_system.assignments.id_business_unit
   sk_job:
-    description: 'Surrogate key for the job. Just the id_job'
+    description: "Surrogate key for the job. Just the id_job"
     lineage:
-    - datalake_hr_system.assignments.id_job
+      - datalake_hr_system.assignments.id_job
   sk_manager:
-    description: 'Surrogate key for dim_employee, with the manager of the employee. Just
-      the id_person'
+    description:
+      "Surrogate key for dim_employee, with the manager of the employee. Just
+      the id_person"
     lineage:
-    - datalake_hr_system.assignments.id_assignment
-    - datalake_hr_system.assignments.id_person
+      - datalake_hr_system.assignments.id_assignment
+      - datalake_hr_system.assignments.id_person
   sk_manager_assignment:
-    description: 'Surrogate key for dim_assignment with the manager of the employee. Just
-      the id_assignment'
+    description:
+      "Surrogate key for dim_assignment with the manager of the employee. Just
+      the id_assignment"
     lineage:
-    - datalake_hr_system.assignments.id_assignment
-    - datalake_hr_system.managers.id_manager_assignment
+      - datalake_hr_system.assignments.id_assignment
+      - datalake_hr_system.managers.id_manager_assignment
   sk_business_partner:
-    description: 'Surrogate key for dim_employee, with the business partner of the employee.
-      Just the id_person'
+    description:
+      "Surrogate key for dim_employee, with the business partner of the employee.
+      Just the id_person"
     lineage:
-    - datalake_hr_system.assignments.representatives.id_person
+      - datalake_hr_system.assignments.representatives.id_person
   sk_business_partner_assignment:
-    description: 'Surrogate key for dim_assignment with the business partner of the employee.
-      Just the id_assignment'
+    description:
+      "Surrogate key for dim_assignment with the business partner of the employee.
+      Just the id_assignment"
     lineage:
-    - datalake_hr_system.assignments.representatives.id_assignment
+      - datalake_hr_system.assignments.representatives.id_assignment
   sk_dt_start_work_relationship:
-    description: 'Date key for the start of the work relationship. Format: YYYYMMDD'
+    description: "Date key for the start of the work relationship. Format: YYYYMMDD"
     lineage:
-    - datalake_hr_system.work_relationships.dt_start
+      - datalake_hr_system.work_relationships.dt_start
   sk_dt_termination_work_relationship:
-    description: 'Date key for the termination of the work relationship. Format: YYYYMMDD'
+    description: "Date key for the termination of the work relationship. Format: YYYYMMDD"
     lineage:
-    - datalake_hr_system.work_relationships.dt_termination
+      - datalake_hr_system.work_relationships.dt_termination
   is_last_work_relationship:
-    description: 'Indicates if is the last work relationship of the employee.'
+    description: "Indicates if is the last work relationship of the employee."
     lineage:
-    - datalake_hr_system.work_relationships.dt_start
-    - datalake_hr_system.work_relationships.id_person
+      - datalake_hr_system.work_relationships.dt_start
+      - datalake_hr_system.work_relationships.id_person
   is_active:
-    description: 'Indicates if the assignment is active.'
+    description: "Indicates if the assignment is active."
     lineage:
-    - datalake_hr_system.assignments.assignment_status_type
+      - datalake_hr_system.assignments.assignment_status_type
   is_pending_worker:
-    description: 'Indicates if the worker is pending, that is, the worker is not yet
-      active.'
+    description:
+      "Indicates if the worker is pending, that is, the worker is not yet
+      active."
     lineage:
-    - datalake_hr_system.assignments.assignment_status_type
-    - datalake_hr_system.work_relationships.dt_start
+      - datalake_hr_system.assignments.assignment_status_type
+      - datalake_hr_system.work_relationships.dt_start
   is_manager:
-    description: 'Indicates if the employee is a manager.'
+    description: "Indicates if the employee is a manager."
     lineage:
-    - datalake_hr_system.assignments.career_track
-    - datalake_hr_system.managers.id_manager_assignment
+      - datalake_hr_system.assignments.career_track
+      - datalake_hr_system.managers.id_manager_assignment
   assignment_age_months:
-    description: 'Age of the assignment in months.'
+    description: "Age of the assignment in months."
     lineage:
-    - datalake_hr_system.work_relationships.dt_start
-    - datalake_hr_system.work_relationships.dt_termination
+      - datalake_hr_system.work_relationships.dt_start
+      - datalake_hr_system.work_relationships.dt_termination
   qnt_directly_led:
-    description: 'Number of employees directly led by the employee.'
+    description: "Number of employees directly led by the employee."
     lineage:
-    - - datalake_hr_system.managers.id_manager_assignment
+      - datalake_hr_system.managers.id_manager_assignment
+  qnt_undirectly_led:
+    description: "Number of employees undirectly led by the employee"
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
   qnt_promotions:
-    description: 'Number of promotions of the employee, since Jannuary 1st, 2021.'
+    description: "Number of promotions of the employee, since Jannuary 1st, 2021."
     lineage:
-    - datalake_hr_system.assignments.band
-    - datalake_hr_system.assignments.id_assignment
-    - datalake_hr_system.assignments.dt_effective_start
-    - datalake_hr_system.assignments.action_code
+      - datalake_hr_system.assignments.band
+      - datalake_hr_system.assignments.id_assignment
+      - datalake_hr_system.assignments.dt_effective_start
+      - datalake_hr_system.assignments.action_code
   salary:
-    description: 'Value of the salary.'
+    description: "Value of the salary."
     lineage:
-    - datalake_hr_system_clean.salaries.salary_amount
+      - datalake_hr_system_clean.salaries.salary_amount
   target_plr:
-    description: 'Value of the target for the Variable Remuneration Program.'
+    description: "Value of the target for the Variable Remuneration Program."
     lineage:
-    - datalake_hr_system.assignments.target_plr
+      - datalake_hr_system.assignments.target_plr
   ts_load:
-    description: 'Timestamp of the load.'
+    description: "Timestamp of the load."
