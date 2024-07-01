@@ -46,7 +46,8 @@ columns:
   is_active:
     description: Boolean flag indicating if the table is still being loaded or not.
   is_certified_layer:
-    description: Boolean flag indicating if the table layer is certified, which means that the tables is from a DW or Metric layer.
+    description: Boolean flag indicating if the table's layer is certified, which means that the tables is from a DW or Metric layer
+      and is not a datamart.
   dt_last_updated:
     description: Date of when the table was loaded to the last time. It might be D-1, if the table is still active.
     lineage:

@@ -15,7 +15,7 @@ SELECT
   t.avg_file_size_in_bytes,
   t.is_delta,
   IF(l.dt_last_updated IS NOT NULL, TRUE, FALSE) AS is_active,
-  IF(t.layer IN ('dw', 'metric'), TRUE, FALSE) AS is_certified_layer,
+  IF(t.layer IN ('dw', 'metric') AND id_dag NOT LIKE '%datamart%', TRUE, FALSE) AS is_certified_layer,
   MAKE_DATE(t.year, t.month, t.day) AS dt_last_updated
 FROM
   datalake_dag_inventory_clean.table AS t
