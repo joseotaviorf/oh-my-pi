@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       This DAG brings data from Workable instance on Redshift to datalake.
 cluster:
-  type: databricks_13_3_min_people_cluster
+  type: databricks_13_3_med_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
@@ -18,6 +18,9 @@ workflow:
   database_type: postgres
   dbutils_secret_key: WORKABLE_DB
   has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
     activities:
       date_filter_column: updated_at
