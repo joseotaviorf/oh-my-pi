@@ -1,0 +1,50 @@
+---
+database_name: datalake_accounting_funnel
+table_name: monopoly_invoice_issuance
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table brings all Monopoly transactions that suppose to create an invoice in SAP's and check if it was created"
+columns:
+  id_business_entity:
+    lineage:
+      - datalake_monopoly_clean.sale.id_external_offer
+    description: "ID to identify offer."
+  sale_source:
+    lineage:
+      - datalake_monopoly_clean.sale_revision.id_state_external
+    description: "If it was a Casa Mineira sale or QuintoAndar's."
+  source_amount:
+    lineage:
+      - datalake_monopoly_clean.accounting_entry.credit
+      - datalake_monopoly_clean.sale_revision.total_payment_amount
+      - datalake_monopoly_clean.sale_revision.brokerage_fee
+      - datalake_monopoly_clean.sale_revision.brokerage_quintoandar_fee
+    description: "Invoiceable amount from Monopoly"
+  sap_amount:
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+    description: "Amount that was credited in the respective revenue account"
+  account_number:
+    lineage:
+      - datalake_accounting_funnel.ledger.account_number
+    description: "Account Number from SAP"
+  is_compliance:
+    lineage:
+      - datalake_monopoly_clean.accounting_entry.credit
+      - datalake_monopoly_clean.sale_revision.total_payment_amount
+      - datalake_monopoly_clean.sale_revision.brokerage_fee
+      - datalake_monopoly_clean.sale_revision.brokerage_quintoandar_fee
+      - datalake_accounting_funnel.ledger.debit_credit
+    description: "Boolean that indicated if everything is compliance"
+  dt_source_trigger:
+    lineage:
+      - datalake_monopoly_clean.sale_revision.dt_notary_start
+    description: "Date that the sale was confirmed in Monopoly"
+  dt_sap_created:
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_created
+    description: "Date that the entry was created in SAP. If more than one entry, it's considered the most recent date"
+  dt_sap_reference:
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_reference
+    description: "Date that the entry was referenced in SAP. If more than one entry, it's considered the most recent date"

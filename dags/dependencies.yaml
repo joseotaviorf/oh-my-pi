@@ -1013,6 +1013,10 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_sap_gateway:load-enrich-feature
   - bietlejuice.enrich_sap_gateway:load-enrich-sync-sap-job
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
+  - bietlejuice.monopoly:load-clean-accounting-entry
+  - bietlejuice.monopoly:load-clean-sale
+  - bietlejuice.monopoly:load-clean-sale-revision
+  - bietlejuice.monopoly:load-clean-sale-transaction
   - bietlejuice.payable_accounts_transactions:load-clean-accounts-payable
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-sap-entity
