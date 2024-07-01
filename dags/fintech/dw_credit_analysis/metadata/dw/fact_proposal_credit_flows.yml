@@ -149,12 +149,17 @@ columns:
   funnel_drop_step:
     description: "The funnel step where the client has dropped."
     categories:
+      EC2OS: "The client dropped between EC and OS"
       OS2OA: "The client dropped between OS and OA"
       OA2ES: "The client dropped between OA and ES"
       ES2EP: "The client dropped between ES and EP"
       EP2DS: "The client dropped between EP and DS"
       DS2CA: "The client dropped between DS and CA"
       CA2CS: "The client dropped between CA and CS"
+  funnel_drop_step_ordered:
+    description: "Same as the funnel_drop_step but in alphabetical order."
+  client_max_funnel_drop_step:
+    description: "Only the last funnel_drop_step that the client reached by month."
   guarantee_offered:
     description: "If the tenant prospect is not a clear no by income reasons, 5A offers one or more type of guarantee.  The offered guarantee can be paid or free. This column indicates which guarantee was offered to the TP after the evaluation process. The guarantee offered might be null if the credit analysis was transfered or had a later approval to free."
     categories:

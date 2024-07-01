@@ -354,7 +354,8 @@ early_credit_full (
     proposal_credit_flows AS pcf
       ON  pcf.sk_early_credit_analysis = eca.sk_early_credit_analysis
   WHERE pcf.sk_early_credit_analysis IS NULL
-)
+),
+final_flow AS ( 
 SELECT
   sk_client,
   sk_house_listing,
@@ -429,3 +430,154 @@ SELECT
   * 
 FROM 
   early_credit_full
+), 
+add_dt_reference AS (
+SELECT
+  sk_client,
+  sk_house_listing,
+  sk_house,
+  sk_contract,
+  sk_contract_created_date,
+  sk_contract_signed_date,
+  sk_credit_analysis,
+  sk_early_credit_analysis,
+  sk_analysis_request,
+  sk_checklist,
+  sk_credit_analysis_approved_date,
+  sk_credit_evaluation_approved_date,
+  sk_first_credit_analysis,
+  sk_first_variant,
+  sk_last_variant_not_null,
+  sk_guarantee_category,
+  sk_guarantee_paid_date,
+  sk_guarantee_accepted_date,
+  sk_last_credit_analysis,
+  sk_last_credit_evaluation_init,
+  sk_last_credit_evaluation_negative,
+  sk_last_credit_evaluation_positive,
+  sk_offer,
+  sk_offer_approved_date,
+  sk_offer_submitted_date,
+  sk_proposal,
+  sk_region,
+  sk_tenant_doc_complete_date,
+  sk_tenant_first_doc_sent_date,
+  sk_drop_reason,
+  sk_early_credit_created,
+  sk_early_credit_expired,
+  funnel_step,
+  funnel_drop_step,
+  CASE 
+    WHEN funnel_drop_step = 'EC2OS' THEN 'A. EC2OS'
+    WHEN funnel_drop_step = 'OS2OA' THEN 'B. OS2OA'
+    WHEN funnel_drop_step = 'OA2ES' THEN 'C. OA2ES'
+    WHEN funnel_drop_step = 'ES2EP' THEN 'D. ES2EP'
+    WHEN funnel_drop_step = 'EP2DS' THEN 'E. EP2DS'
+    WHEN funnel_drop_step = 'DS2CA' THEN 'F. DS2CA'
+    WHEN funnel_drop_step = 'CA2CS' THEN 'G. CA2CS'
+    ELSE NULL
+  END AS funnel_drop_step_ordered,
+  guarantee_offered,
+  guarantee_accepted,
+  country_code,
+  rental_administrator,
+  is_guarantee_accepted,
+  is_first_credit_evaluation,
+  is_last_credit_evaluation,
+  is_bypass,
+  is_early_credit,
+  dt_early_credit_created,
+  dt_early_credit_expired,
+  dt_last_credit_evaluation_init,
+  dt_tenant_first_doc_sent_date,
+  dt_offer_submitted_date,
+  dt_offer_approved_date,
+  dt_tenant_doc_complete_date,
+  dt_credit_evaluation_approved_date,
+  dt_credit_analysis_approved_date,
+  dt_guarantee_accepted_date,
+  dt_guarantee_paid_date,
+  dt_contract_created_date,
+  dt_contract_signed_date,
+  COALESCE(dt_offer_submitted_date, dt_early_credit_created) AS dt_reference,
+  ts_load
+FROM
+  final_flow
+),
+client_max_funnel_drop_step AS (
+SELECT
+  sk_client AS sk_client_max_funnel,
+  DATE_TRUNC('month', dt_reference) AS dt_reference_user_max_funnel,
+  funnel_drop_step_ordered AS client_max_funnel_drop_step
+FROM 
+  add_dt_reference
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY CASE WHEN sk_client IS NULL THEN 1 ELSE sk_client END, DATE_TRUNC('month',dt_reference) ORDER BY IF(funnel_drop_step_ordered IS NULL, "Z", funnel_drop_step_ordered) DESC) = 1
+)
+SELECT
+  sk_client,
+  sk_house_listing,
+  sk_house,
+  sk_contract,
+  sk_contract_created_date,
+  sk_contract_signed_date,
+  sk_credit_analysis,
+  sk_early_credit_analysis,
+  sk_analysis_request,
+  sk_checklist,
+  sk_credit_analysis_approved_date,
+  sk_credit_evaluation_approved_date,
+  sk_first_credit_analysis,
+  sk_first_variant,
+  sk_last_variant_not_null,
+  sk_guarantee_category,
+  sk_guarantee_paid_date,
+  sk_guarantee_accepted_date,
+  sk_last_credit_analysis,
+  sk_last_credit_evaluation_init,
+  sk_last_credit_evaluation_negative,
+  sk_last_credit_evaluation_positive,
+  sk_offer,
+  sk_offer_approved_date,
+  sk_offer_submitted_date,
+  sk_proposal,
+  sk_region,
+  sk_tenant_doc_complete_date,
+  sk_tenant_first_doc_sent_date,
+  sk_drop_reason,
+  sk_early_credit_created,
+  sk_early_credit_expired,
+  funnel_step,
+  funnel_drop_step,
+  funnel_drop_step_ordered,
+  umf.client_max_funnel_drop_step,
+  guarantee_offered,
+  guarantee_accepted,
+  country_code,
+  rental_administrator,
+  is_guarantee_accepted,
+  is_first_credit_evaluation,
+  is_last_credit_evaluation,
+  is_bypass,
+  is_early_credit,
+  dt_early_credit_created,
+  dt_early_credit_expired,
+  dt_last_credit_evaluation_init,
+  dt_tenant_first_doc_sent_date,
+  dt_offer_submitted_date,
+  dt_offer_approved_date,
+  dt_tenant_doc_complete_date,
+  dt_credit_evaluation_approved_date,
+  dt_credit_analysis_approved_date,
+  dt_guarantee_accepted_date,
+  dt_guarantee_paid_date,
+  dt_contract_created_date,
+  dt_contract_signed_date,
+  dt_reference,
+  ts_load
+FROM
+  add_dt_reference adr
+LEFT JOIN 
+  client_max_funnel_drop_step umf
+  ON adr.sk_client = umf.sk_client_max_funnel
+  AND DATE_TRUNC('month', adr.dt_reference) = umf.dt_reference_user_max_funnel
