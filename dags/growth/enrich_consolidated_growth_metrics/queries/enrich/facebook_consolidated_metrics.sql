@@ -10,7 +10,7 @@ SELECT
     SUM(IF(impression_device = 'other', spend, 0)) AS other_cost,
     SUM(spend) AS total_cost,
     SUM(impressions) AS impressions,
-    SUM(clicks) AS clicks
+    SUM(inline_link_clicks) AS clicks
 FROM
     datalake_facebook_insights_clean.facebook_insights
 WHERE

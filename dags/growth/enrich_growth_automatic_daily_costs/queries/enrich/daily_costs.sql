@@ -29,5 +29,7 @@ ON
 WHERE
     cmm.id_date BETWEEN INT(REPLACE('{load_start_date}', '-', ''))
     AND INT(REPLACE('{load_end_date}', '-', ''))
-    AND cmm.total_cost != 0
+    AND (cmm.total_cost != 0
+        OR cmm.impressions != 0
+        OR cmm.clicks != 0)
     AND LOWER(SPLIT(cmm.campaign_name, '[.]') [0]) <> 'zebra'
