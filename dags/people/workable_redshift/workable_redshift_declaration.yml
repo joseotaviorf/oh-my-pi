@@ -23,6 +23,22 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ['id']
+    field_choices:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    field_value_choices:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    field_values:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    fields:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
     jobs:
       date_filter_column: updated_at
       extraction_type: incremental

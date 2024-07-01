@@ -46,4 +46,6 @@ SELECT
     updated_at AS ts_updated,
     NOW() AS ts_load
 FROM
-    datalake_workable_redshift_raw.candidates;
+    datalake_workable_redshift_raw.candidates
+WHERE  
+    DATE(updated_at) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
