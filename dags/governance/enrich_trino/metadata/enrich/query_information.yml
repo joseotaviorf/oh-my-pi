@@ -12,6 +12,11 @@ columns:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.queryId
     description: Id of the query. 
+  id_table:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referenced_table
+    description: Id of the table used in the query, which is the concatenation of the database name
+      and the table name -- how the table is referenced on queries.
   tool:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.resourceGroupId
@@ -37,6 +42,10 @@ columns:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
     description: The table name used in the query. The query might use one or several tables.
+  execution_hour:
+    lineage: 
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.hour
+    description: Hour in which the query execution started.
   dt_extraction:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.year
