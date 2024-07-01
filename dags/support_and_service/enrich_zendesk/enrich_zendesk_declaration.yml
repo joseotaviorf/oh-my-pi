@@ -23,10 +23,9 @@ workflow:
 cluster:
     type: custom_cluster
     custom_configurations:
-        driver_node_type_id: r5d.8xlarge
-        node_type_id: r5d.8xlarge
-        runtime_engine: PHOTON
-        spark_version: 12.2.x-scala2.12
+        driver_node_type_id: r7g.4xlarge
+        node_type_id: r7g.8xlarge
+        spark_version: 13.3.x-scala2.12
         num_workers: 5
         spark_conf:
             spark.sql.mapKeyDedupPolicy: "LAST_WIN"
