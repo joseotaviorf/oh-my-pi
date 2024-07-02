@@ -3,6 +3,8 @@ dag:
   name: metric_rent__tickets
   schedule_start_date: 2023,07,13
   owner: Data ForRent
+  documentation:
+    dag_purpose: "This DAG consolidates the main metrics related to the Ticket Rate (FLUX) context."
 workflow:
   type: query
   layer: metric

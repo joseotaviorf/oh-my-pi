@@ -1,0 +1,110 @@
+---
+database_name: metric_rent
+table_name: total_tickets_daily
+description: Daily total tickets related to the Ticket Rate classification.
+    This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate
+    in the new format proposed on Q1/2024.
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
+columns:
+  dt_day:
+    lineage:
+      - dw_customer_support.fact_ticket.ts_solved
+    description: "Reference date."
+    dimension: True
+  context:
+    lineage:
+      - dw_customer_support.dim_taxonomy.sub_journey
+    description: "Context of the ticket based on its sub journey."
+    categories:
+     ForRent: "Ticket belongs to ForRent context"
+     ForSale: "Ticket belongs to ForSale context"
+     Partners: "Ticket belongs to Partners context"
+    dimension: True
+  journey:
+    lineage:
+      - dw_customer_support.dim_taxonomy.journey
+    description: "Journey of the ticket."
+    dimension: True
+  sub_journey:
+    lineage:
+      - dw_customer_support.dim_taxonomy.sub_journey
+    description: "Sub journey of the ticket."
+    dimension: True
+  line_owner:
+    lineage:
+      - dw_customer_support.dim_taxonomy.line_owner
+    description: "Line owner of the ticket."
+    dimension: True
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: "Team responsible for the ticket."
+    dimension: True
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: "Department responsible for the ticket."
+    dimension: True
+  ticket_type:
+    lineage:
+      - dw_customer_support.dim_department.front_or_back
+    description: "Type of the ticket."
+    categories:
+      front: "Front ticket."
+      back: "Back ticket."
+    dimension: True
+  theme:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: "Theme of the ticket."
+    dimension: True
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: "Theme detail of the ticket."
+    dimension: True
+  driver:
+    lineage:
+      - metric_rent.ongoing_rentals_daily
+    description: "Driver of the ticket, which depends on the sub journey type."
+    dimension: True
+  total_tickets_pure:
+    description: "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution
+      of missing tickets and abandoned calls."
+    metric:
+      name: Total Tickets Pure
+      description: "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution
+        of missing tickets and abandoned calls."
+      acronym: TTP
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analysis
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ""
+  total_tickets_proportional:
+    description: "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked
+      as Ticket Rate after applying the respective weights and proportional distribution of missing tickets and
+      abandoned calls."
+    metric:
+      name: Total Tickets Proportional
+      description: "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked
+        as Ticket Rate after applying the respective weights and proportional distribution of missing tickets and
+        abandoned calls."
+      acronym: ""
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analysis
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ""
+  ticket_rate_daily:
+    description: "Daily Ticket Rate, which is the division of total_tickets_proportional by the respective driver."
+    metric:
+      name: Ticket Rate Daily
+      description: "Daily Ticket Rate, which is the division of total_tickets_proportional by the respective driver."
+      acronym: ""
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analysis
+      approved_by: matheus.madeira@quintoandar.com.br
+      link_to_metric: ""
