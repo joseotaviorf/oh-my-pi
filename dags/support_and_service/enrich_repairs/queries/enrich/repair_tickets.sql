@@ -1,33 +1,33 @@
 WITH ticket_history_base AS (
     SELECT
-        id_ticket,
-        MIN(CASE
-          WHEN tags LIKE ANY (
-            "%pp_autosserviço_contestou%",
-            "%iq_pp_autosserviço_contestou%",
-            "%alteração_de_responsabilidade_criticidade%",
-            "%acompanhamento_alteracao_responsabilidade_criticidade%",
-            "%check_responsabilidade_reparos%",
-            "%pp_autosserviço_contestou%"
-          ) THEN ts_updated
-        END) AS ts_contestation,
-        MIN(CASE
-          WHEN tags LIKE ANY (
-            "%macro_ro_cont_benfeitoria_pp%", "%macro_ro_cont_benfeitoria_iq%", "%macro_ro_cont_terceiros_pp%",
-            "%macro_ro_cont_terceiros_iq%", "%macro_ro_cont_aprovada_iq%", "%macro_ro_cont_aprovada_pp%",
-            "%macro_ro_cont_reprovada_pp%", "%macro_ro_cont_reprovada_iq%", "%closed_by_merge%",
-            "%reprovado_ro_%", "%aprovado_ro_%", "%opcional_ro_%", "%ação_backlog_contestação%",
-            "%alteração_reprovada%", "%alteração_aprovada%", "%alteração_benfeitoria%"
-          ) THEN ts_updated
-        END) AS ts_resolution_contestation
+      id_ticket,
+      MIN(CASE
+        WHEN tags LIKE ANY (
+          "%pp_autosserviço_contestou%",
+          "%iq_pp_autosserviço_contestou%",
+          "%alteração_de_responsabilidade_criticidade%",
+          "%acompanhamento_alteracao_responsabilidade_criticidade%",
+          "%check_responsabilidade_reparos%",
+          "%pp_autosserviço_contestou%"
+        ) THEN ts_updated
+      END) AS ts_contestation,
+      MIN(CASE
+        WHEN tags LIKE ANY (
+          "%macro_ro_cont_benfeitoria_pp%", "%macro_ro_cont_benfeitoria_iq%", "%macro_ro_cont_terceiros_pp%",
+          "%macro_ro_cont_terceiros_iq%", "%macro_ro_cont_aprovada_iq%", "%macro_ro_cont_aprovada_pp%",
+          "%macro_ro_cont_reprovada_pp%", "%macro_ro_cont_reprovada_iq%", "%closed_by_merge%",
+          "%reprovado_ro_%", "%aprovado_ro_%", "%opcional_ro_%", "%ação_backlog_contestação%",
+          "%alteração_reprovada%", "%alteração_aprovada%", "%alteração_benfeitoria%"
+        ) THEN ts_updated
+      END) AS ts_resolution_contestation
     FROM
-        datalake_zendesk.tickets
+      datalake_zendesk.tickets
     WHERE
-        year >= YEAR(CURRENT_DATE()) - 1
-        AND YEAR(ts_updated) >= YEAR(CURRENT_DATE()) - 1
+      year >= YEAR(CURRENT_DATE()) - 1
+      AND YEAR(ts_updated) >= YEAR(CURRENT_DATE()) - 1
     GROUP BY 1
-),
-repair_tickets AS (
+)
+,repair_tickets AS (
   SELECT DISTINCT
     tc.id_ticket,
     CASE
@@ -48,21 +48,21 @@ repair_tickets AS (
     th.ts_contestation,
     th.ts_resolution_contestation
   FROM
-      datalake_zendesk.tickets_current AS tc
+    datalake_zendesk.tickets_current AS tc
   INNER JOIN
-      ticket_history_base AS th
-          ON th.id_ticket = tc.id_ticket
+    ticket_history_base AS th
+      ON th.id_ticket = tc.id_ticket
   LEFT JOIN
-      datalake_date.workday_window AS ww
-          ON ww.dt_Ref = DATE(th.ts_contestation) AND id_city = 39
+    datalake_date.workday_window AS ww
+      ON ww.dt_Ref = DATE(th.ts_contestation) AND id_city = 39
   WHERE
-      tc.group_name IN ('FullService [Back]','Prestadores Parceiros [SO]','Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]')
-      AND (DATE(tc.ts_solved - INTERVAL 3 HOUR) >= DATE('2023-06-01') OR tc.ts_solved - INTERVAL 3 HOUR IS NULL)
-      AND tc.channel NOT IN ('call')
-      AND tc.status NOT IN ('deleted')
-      AND tc.tags NOT LIKE '%caso_ticket_agregador%'
-),
-relisting_db AS (
+    tc.group_name IN ('FullService [Back]','Prestadores Parceiros [SO]','Reparos [BACK]','Triagem Reparos [Back]','FullService [BACK]')
+    AND (DATE(tc.ts_solved - INTERVAL 3 HOUR) >= DATE('2023-06-01') OR tc.ts_solved - INTERVAL 3 HOUR IS NULL)
+    AND tc.channel NOT IN ('call')
+    AND tc.status NOT IN ('deleted')
+    AND tc.tags NOT LIKE '%caso_ticket_agregador%'
+)
+,relisting_db AS (
     SELECT
       rf.id_contract,
       IF(hl.version >= 0, hl.id_house_listing, NULL) AS listing
@@ -79,60 +79,84 @@ relisting_db AS (
       AND DATE_TRUNC('month',hl.ts_listing_version_start) <= DATE_ADD(CURRENT_DATE, -1)
       AND (hl.listing_category = 'Re-Listing')
       AND ((h.country_code <> 'MX') OR (h.country_code IS NULL))
-),
-relisting_distinct AS (
-    SELECT
-      id_contract,
-      COUNT(DISTINCT listing) AS relisting
-    FROM
-      relisting_db
-    WHERE
-      id_contract IS NOT NULL
-    GROUP BY 1
-),
-repairs_interaction AS (
-    SELECT
-      rr.id AS id_request,
-      MIN(rr.ts_updated) AS ts_updated
-    FROM
-      datalake_repairs_clean.repair_request AS rr
-    WHERE
-      (STRING(GET_JSON_OBJECT(rr.owner_approval, '$.approved')) IS NOT NULL)
-      AND CAST(rr.ts_created AS DATE) >= DATE('2023-01-01')
-      AND rr.id_third_party_crm_ticket_external IS NOT NULL
-    GROUP BY
-      rr.id
-),
-service_provider AS (
-    SELECT
-      rr.id_third_party_crm_ticket_external AS sk_ticket,
-      rr.id AS id_repair_request,
-      rr.service_provider,
-      rr.ts_created
-    FROM
-      datalake_repairs_clean.repair_request AS rr
-    QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated DESC) = 1
-),
-first_interaction AS(
-    SELECT
-      rr.id_third_party_crm_ticket_external,
-      COALESCE(ri.ts_updated - INTERVAL 3 HOUR, rc.ts_started - INTERVAL 3 HOUR) AS ts_first_interaction,
-      IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation
-    FROM
-      datalake_repairs_clean.repair_request AS rr
-    LEFT JOIN
-      datalake_repairs_clean.repair_request_chat AS rc
+)
+,relisting_distinct AS (
+  SELECT
+    id_contract,
+    COUNT(DISTINCT listing) AS relisting
+  FROM
+    relisting_db
+  WHERE
+    id_contract IS NOT NULL
+  GROUP BY 1
+)
+,repairs_interaction AS (
+  SELECT
+    rr.id AS id_request,
+    rr.id_contract,
+    rr.ts_updated
+  FROM
+    datalake_repairs_clean.repair_request AS rr
+  WHERE
+    (STRING(GET_JSON_OBJECT(rr.owner_approval, '$.approved')) IS NOT NULL)
+    AND CAST(rr.ts_created AS DATE) >= DATE('2023-01-01')
+    AND rr.id_third_party_crm_ticket_external IS NOT NULL
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY rr.id, rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated ASC) = 1
+)
+,repair_interaction_pp AS (
+  SELECT
+    sr.id_repair_request
+    , ri.ts_updated
+    , sr.id_third_party_crm_ticket_external
+  FROM
+    datalake_repairs_clean.service_request sr
+  LEFT JOIN
+    repairs_interaction AS ri
+      ON ri.id_request = sr.id_repair_request
+  WHERE
+    CAST(sr.ts_created as DATE) >= DATE('2023-01-01')
+    AND sr.id_third_party_crm_ticket_external IS NOT NULL
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY sr.id_repair_request, ri.id_contract ORDER BY sr.id_third_party_crm_ticket_external ASC) = 1
+)
+,service_provider AS (
+  SELECT
+    rr.id_third_party_crm_ticket_external AS sk_ticket,
+    rr.id AS id_repair_request,
+    rr.service_provider,
+    rr.ts_created
+  FROM
+    datalake_repairs_clean.repair_request AS rr
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated DESC) = 1
+)
+,first_interaction AS(
+  SELECT
+    sr.id_third_party_crm_ticket_external,
+    CASE
+      WHEN ri.ts_updated <= rc.ts_started THEN (ri.ts_updated - INTERVAL 3 HOUR)
+      WHEN ri.ts_updated > rc.ts_started THEN (rc.ts_started - INTERVAL 3 HOUR)
+      ELSE COALESCE(ri.ts_updated - INTERVAL 3 HOUR ,rc.ts_started - INTERVAL 3 HOUR)
+    END AS ts_first_interaction,
+    IF(rc.ts_started IS NOT NULL, TRUE, FALSE) AS has_chat_negociation
+  FROM
+    datalake_repairs_clean.service_request sr
+  LEFT JOIN
+    datalake_repairs_clean.repair_request AS rr
+      ON rr.id = sr.id_repair_request
+  LEFT JOIN
+    datalake_repairs_clean.repair_request_chat AS rc
       ON rr.id = rc.id_repair_request
-    LEFT JOIN
-      repairs_interaction AS ri
+  LEFT JOIN
+    repairs_interaction AS ri
       ON ri.id_request = rr.id
-    GROUP BY rc.ts_started, ri.ts_updated, rr.id_third_party_crm_ticket_external
+  GROUP BY rc.ts_started, ri.ts_updated, sr.id_third_party_crm_ticket_external
 )
 
 SELECT
   tc.id_ticket,
-  rr.id_repair_request AS id_request,
+  sr.id_repair_request AS id_request,
   CAST(tc.id_contract AS INTEGER) AS id_contract,
   tc.group_name,
   tc.client_type,
@@ -167,7 +191,12 @@ SELECT
   c.dt_entered AS entrance_date,
   th.ts_contestation,
   th.ts_resolution_contestation,
-  fi.ts_first_interaction,
+  CASE
+    WHEN tc.client_type = 'proprietário'
+      AND rpp.ts_updated >= tc.ts_created - INTERVAL 3 HOUR
+    THEN rpp.ts_updated
+    ELSE fi.ts_first_interaction
+  END AS ts_first_interaction,
   tc.ts_created - INTERVAL 3 HOUR AS ts_created_local,
   tc.ts_updated - INTERVAL 3 HOUR AS ts_updated_local,
   CASE
@@ -197,8 +226,11 @@ LEFT JOIN
   datalake_ebdb_contract.contract AS c
     ON tc.id_contract = c.id
 LEFT JOIN
+  datalake_repairs_clean.service_request AS sr
+    ON sr.id_third_party_crm_ticket_external = tc.id_ticket
+LEFT JOIN
   service_provider AS rr
-    ON tc.id_ticket = rr.sk_ticket
+    ON sr.id_repair_request = rr.id_repair_request
 LEFT JOIN
   repairs_interaction AS ri
     ON ri.id_request = rr.id_repair_request
@@ -215,6 +247,9 @@ LEFT JOIN
 LEFT JOIN
   first_interaction AS fi
     ON fi.id_third_party_crm_ticket_external = tc.id_ticket
+LEFT JOIN
+  repair_interaction_pp AS rpp
+    ON rpp.id_third_party_crm_ticket_external = tc.id_ticket
 LEFT JOIN
   repair_tickets AS th
     ON tc.id_ticket = th.id_ticket

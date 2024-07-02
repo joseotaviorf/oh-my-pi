@@ -2428,6 +2428,7 @@ bietlejuice.enrich_repairs:
   - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.repairs:load-clean-repair-request-chat
+  - bietlejuice.repairs:load-clean-service-request
 bietlejuice.enrich_reports_validation:
   - bietlejuice.reports:load-clean-daily-listings-summary
   - bietlejuice.reports:load-clean-processed-event
