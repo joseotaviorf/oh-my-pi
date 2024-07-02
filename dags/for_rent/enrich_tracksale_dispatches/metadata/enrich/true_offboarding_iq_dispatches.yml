@@ -1,0 +1,46 @@
+database_name: datalake_tracksale_dispatches
+table_name: true_offboarding_iq_dispatches
+description: This table contains the information about tenant and it's going to be delivered to reverse_tracksale DAG.
+  Today we're having an issue that the same email is sent in different days to the same person and about the same contract.
+  With this table, is going to be possible to filter the email already sent to the person, limiting one email per person and contract.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  customer_name:
+    lineage:
+      - datalake_ebdb_clean.contract_person.name
+    description: User's name.
+  customer_email:
+    lineage:
+      - datalake_ebdb_clean.contract_person.email
+    description: User's email.
+  customer_phone:
+    lineage:
+      - datalake_ebdb_clean.contract_person.phone_number
+    description: User's phone.
+  campaign_step:
+    description: Campaign type, which is offboarding.
+  customer_type:
+    description: Type of the customer, which is tenant.
+  customer_cpf:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf
+    description: User's CPF (Person's document number).
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id_user
+    description: ID of the user.
+  campaign_type:
+    description: Type of the campaign, which is true.
+  driver_type:
+    description: Type of the driver, which is contract.
+  id_driver:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id_contract
+    description: ID of the contract related to the offboarding.
+  year:
+    description: Year of when the register was sent to Tracksale. Also, it's a partition of this table.
+  month:
+    description: Month of when the register was sent to Tracksale. Also, it's a partition of this table.
+  day:
+    description: Day of when the register was sent to Tracksale. Also, it's a partition of this table.

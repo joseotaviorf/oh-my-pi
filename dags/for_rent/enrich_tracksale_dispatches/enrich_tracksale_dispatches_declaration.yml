@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_tracksale_dispatches
+  schedule_start_date: 2020, 7, 1
+  owner: Data ForRent
+  documentation: 
+    dag_purpose: |
+      Creates enriched tables which contains data to be delivered to Tracksale, NPS tool.
+      This DAG was created to help the dispatches already sent to Tracksale and use them to filter in reverse_tracksale DAG.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+cluster:
+  type: databricks_12_2_min_general_photon_cluster
