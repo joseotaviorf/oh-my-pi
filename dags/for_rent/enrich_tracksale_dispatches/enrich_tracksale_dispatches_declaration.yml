@@ -15,4 +15,4 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
 cluster:
-  type: databricks_12_2_min_general_photon_cluster
+  type: databricks_12_2_med_general_cluster
