@@ -106,9 +106,9 @@ columns:
   collections_termination_projected:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.collections_termination_projected
-  evictions_solved_cases:
+  evictions_resolved_cases:
     lineage:
-      - datalake_gsheets_raw.quintocred_coincident_targets.evictions_solved_cases
+      - datalake_gsheets_raw.quintocred_coincident_targets.evictions_resolved_cases
   evictions_new_cases:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.evictions_new_cases

@@ -34,7 +34,7 @@ SELECT
     CAST(collections_total_projected AS INTEGER) AS collections_total_projected,
     CAST(collections_active_projected AS INTEGER) AS collections_active_projected,
     CAST(collections_termination_projected AS INTEGER) AS collections_termination_projected,
-    CAST(evictions_solved_cases AS INTEGER) AS evictions_solved_cases,
+    CAST(evictions_resolved_cases AS INTEGER) AS evictions_resolved_cases,
     CAST(evictions_new_cases AS INTEGER) AS evictions_new_cases,
     CAST(evictions_ongoing_cases AS INTEGER) AS evictions_ongoing_cases,
     month,
