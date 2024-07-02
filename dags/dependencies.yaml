@@ -483,7 +483,6 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
-
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
@@ -546,6 +545,7 @@ bietlejuice.dw_lead:
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
+  - bietlejuice.ebdb_administration:load-clean-rental-administrator-change-request-aud
   - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_b2b:load-enrich-house-listing
@@ -557,7 +557,6 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-fees
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-  - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
@@ -997,8 +996,8 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-contract-aud
-  - bietlejuice.ebdb_contract:load-clean-contract-person-aud
   - bietlejuice.ebdb_contract:load-clean-contract-partnership-data
+  - bietlejuice.ebdb_contract:load-clean-contract-person-aud
   - bietlejuice.ebdb_rent_flow:load-clean-agent-rent-flow
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
@@ -2967,14 +2966,14 @@ bietlejuice.enrich_velo:
   - bietlejuice.velo:load-clean-fiancavelo-propose
   - bietlejuice.velo_neurotech:load-clean-logs-credit-granting
 bietlejuice.enrich_velo_zendesk:
+  - bietlejuice.enrich_survicate:load-enrich-response-content
+  - bietlejuice.enrich_survicate:load-enrich-survey-responses
   - bietlejuice.velo_zendesk:load-clean-groups
   - bietlejuice.velo_zendesk:load-clean-ticket-audits
   - bietlejuice.velo_zendesk:load-clean-ticket-fields
   - bietlejuice.velo_zendesk:load-clean-ticket-metrics
   - bietlejuice.velo_zendesk:load-clean-tickets
   - bietlejuice.velo_zendesk:load-clean-tickets-history
-  - bietlejuice.enrich_survicate:load-enrich-response-content
-  - bietlejuice.enrich_survicate:load-enrich-survey-responses
 bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.ebdb_condo:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-condo

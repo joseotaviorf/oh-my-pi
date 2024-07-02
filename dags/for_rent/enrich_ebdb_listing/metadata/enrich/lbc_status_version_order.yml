@@ -19,8 +19,6 @@ columns:
     description: "Number of days in this specific status."
   is_extended_rental:
     description: "Boolean indicating if the contract termination was canceled after relisting as early demand."
-  is_brokerage_only_decommissioned:
-    description: "Boolean indicating if this listing was decommissioned from the Brokerage Only program. If the listing is re-published after decommissioned in the same version, this flag will be false."
   lbc_state_order:
     description: "Position of this particular state in the listing_business_context history."
   listing_version:

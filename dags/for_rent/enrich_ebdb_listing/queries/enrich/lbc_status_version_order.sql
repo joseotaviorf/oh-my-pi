@@ -446,8 +446,8 @@ trigger AS (
         AND t.status = bch.status
         AND COALESCE(t.status_reason, '') = COALESCE(bch.status_reason, '')
         AND t.ts_state_started = bch.ts_state_started
-), versioning AS (
-  SELECT 
+)
+SELECT 
     m.id_house,
     m.country_code,
     m.status,
@@ -516,53 +516,8 @@ trigger AS (
       TRUE,
       FALSE
     ) AS is_last_state_of_day
-  FROM 
-    merge_version AS m
-  LEFT JOIN 
-      last_house_state AS lhs
-        ON lhs.id_house = m.id_house
-), last_version_publishing AS (
-  SELECT
-    id_house,
-    listing_version,
-    MAX(state_order) AS last_version_publication
-  FROM
-    versioning
-  WHERE
-    status = 'PUBLISHED'
-  GROUP BY
-    id_house,
-    listing_version
-)
-SELECT
-    v.id_house,
-    v.country_code,
-    v.status,
-    v.status_reason,
-    v.rev,
-    v.revision_reason,
-    v.ts_first_publication,
-    v.ts_state_started,
-    v.ts_state_ended,
-    v.days_in_state,
-    v.days_in_status,
-    v.trigger_new_version,
-    v.listing_version,
-    v.is_extended_rental,
-    IF(
-      v.revision_reason LIKE '%BO-DECOMMISSION%'
-      AND
-      v.state_order < COALESCE(lvp.last_version_publication, -1)
-      , TRUE
-      , FALSE
-    ) AS is_brokerage_only_decommissioned,
-    v.lbc_state_order,
-    v.state_order,
-    v.max_state_order,
-    v.is_last_state_of_day
-  FROM
-    versioning AS v
-  LEFT JOIN
-    last_version_publishing AS lvp
-      ON lvp.id_house = v.id_house
-        AND lvp.listing_version = v.listing_version
+FROM 
+  merge_version AS m
+LEFT JOIN 
+    last_house_state AS lhs
+      ON lhs.id_house = m.id_house
