@@ -143,7 +143,7 @@ WITH transfer_reason AS (
       MIN(ts_created) AS ts_first_reservation,
       MAX(ts_created) AS ts_last_reservation
     FROM
-      reservations
+      datalake_bigfone.reservations
     WHERE
       is_answered IS TRUE
     GROUP BY 1
