@@ -10,11 +10,11 @@ SELECT
     CAST(avg_ticket_new_contract AS INTEGER) AS avg_ticket_new_contract,
     CAST(avg_ticket_ended_contract AS INTEGER) AS avg_ticket_ended_contract,
     CAST(avg_ticket_ongoing_contract AS INTEGER) AS avg_ticket_ongoing_contract,
-    CAST(activation_fee AS INTEGER) AS activation_fee,
+    activation_fee,
     CAST(revenue_new_contract AS INTEGER) AS revenue_new_contract,
     CAST(revenue_ongoing_contract AS INTEGER) AS revenue_ongoing_contract,
-    CAST(take_rate_new_contract AS INTEGER) AS take_rate_new_contract,
-    CAST(take_rate_ongoing_contract AS INTEGER) AS take_rate_ongoing_contract,
+    take_rate_new_contract,
+    take_rate_ongoing_contract,
     CAST(monthly_brokers_w_evaluation_accumulated AS INTEGER) AS monthly_brokers_w_evaluation_accumulated,
     CAST(daily_brokers_w_evaluation AS INTEGER) AS daily_brokers_w_evaluation,
     CAST(monthly_active_brokers_accumulated AS INTEGER) AS monthly_active_brokers_accumulated,
@@ -41,7 +41,7 @@ SELECT
     quarter,
     halfyear AS half_year,
     year,
-    DATE(date) AS dt_reference,
-    DATE(week_start) AS dt_week
+    TO_DATE(date, 'mm-dd-yyyy') AS dt_reference,
+    TO_DATE(week_start, 'mm-dd-yyyy') AS dt_week
 FROM
     datalake_gsheets_raw.quintocred_coincident_targets
