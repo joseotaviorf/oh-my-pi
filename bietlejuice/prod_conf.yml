@@ -23,6 +23,7 @@ dags_out_of_pattern:
         "dw_datamarts_spark.for_sale",
         "dw_datamarts_spark.for_sale_cross",
         "dw_datamarts_spark.growth",
+        "dw_datamarts_for_rent",
         "dw_datamarts_growth_cross",
         "dw_demand",
         "dw_fintech_snapshot",

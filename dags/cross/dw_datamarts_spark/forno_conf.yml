@@ -29,9 +29,6 @@ dags:
   cross:
     owner: Data Engineering
     cluster_name: databricks_10_4_med_memory_cluster
-  for_rent:
-    owner: Data ForRent
-    cluster_name: databricks_12_2_high_fixed_workers_8xlarge_general_cluster
   for_rent_cross:
     owner: Data ForRent
     cluster_name: databricks_10_4_med_cluster
