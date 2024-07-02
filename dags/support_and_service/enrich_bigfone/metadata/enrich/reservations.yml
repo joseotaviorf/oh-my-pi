@@ -67,4 +67,8 @@ columns:
   ts_created:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Timestamp of when the reservation was created
+    description: Timestamp of the first event of the reservation
+  ts_ended:
+    lineage:
+      - datalake_bigfone_clean.event.ts_created
+    description: Timestamp of the last event of the reservation

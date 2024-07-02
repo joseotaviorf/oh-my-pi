@@ -6,10 +6,10 @@ WITH legacy_chat_flow AS (
     qmc.ts_created AS ts_event
   FROM
     datalake_quinto_messenger.task_event AS qmte
-  INNER JOIN 
+  INNER JOIN
     datalake_quinto_messenger.task AS qmt
       ON qmte.id_task = qmt.id_task
-  INNER JOIN 
+  INNER JOIN
     datalake_quinto_messenger.channel AS qmc
       ON qmt.id_channel = qmc.id_channel
   INNER JOIN
@@ -18,7 +18,7 @@ WITH legacy_chat_flow AS (
   WHERE
     LOWER(qmte.task_queue_name) LIKE '%plaquinhas%'
     AND  user.id > 0
-), 
+),
 
 -- New chat flows
 pre_chatbot_sessions AS (
@@ -81,7 +81,7 @@ total_chat AS (
   FROM
     legacy_chat_flow
   WHERE
-    DATE(ts_event) < DATE('2022-10-17')	
+    DATE(ts_event) < DATE('2022-10-17')
     AND id_user IS NOT NULL
 ),
 
@@ -89,36 +89,51 @@ total_chat AS (
 ivr_events AS (
   SELECT
     id_call,
-    from_number,
-    to_number,
+    from_phone_number AS from_number,
+    to_phone_number AS to_number,
     MIN(id_task) AS id_task,
-    MIN(ts_created_local) AS ts_first_event
+    MIN(ts_created - INTERVAL 3 HOUR) AS ts_first_event
   FROM
-    datalake_bigfone_twilio.call_ivr_events
+    datalake_bigfone.ivr_tasks
   WHERE
     -- CX's exclusive phone number to plaquinhas contacts
-    (to_number IN ('+5511933058701', '+5531933007908', '+5540202507') AND DATE(ts_created_local) < DATE('2022-10-17'))
-    OR (to_number LIKE '%40202507%' AND DATE(ts_created_local) >= DATE('2022-10-17'))
-  GROUP BY
-    1, 2, 3
+    (
+      to_phone_number IN (
+        "+5511933058701",
+        "+5531933007908",
+        "+5540202507"
+      ) AND ts_created  - INTERVAL 3 HOUR < "2022-10-17"
+    ) OR (
+      to_phone_number LIKE "%40202507%"
+      AND ts_created  - INTERVAL 3 HOUR >= "2022-10-17"
+    )
+  GROUP BY 1, 2, 3
 ),
 
 flex_events AS (
   SELECT
-    id_task,
     id_call,
-    id_conversation,
-    from_number,
-    to_number,
-    MIN(ts_created_local) AS ts_first_event
+    id_task,
+    from_phone_number AS from_number,
+    to_phone_number AS to_number,
+    MIN(ts_created - INTERVAL 3 HOUR) AS ts_first_event
   FROM
-    datalake_bigfone_twilio.call_flex_events
+    datalake_bigfone_clean.event
   WHERE
     -- CX's exclusive phone number to plaquinhas contacts
-    (to_number IN ('+5511933058701', '+5531933007908', '+5540202507') AND DATE(ts_created_local) < DATE('2022-10-17'))
-    OR (to_number LIKE '%40202507%' AND DATE(ts_created_local) >= DATE('2022-10-17'))
+    workflow_name IN ('Assign to Anyone', 'Assign to Flex')
+    AND (
+      to_phone_number IN (
+        "+5511933058701",
+        "+5531933007908",
+        "+5540202507"
+      ) AND ts_created  - INTERVAL 3 HOUR < "2022-10-17"
+    ) OR (
+      to_phone_number LIKE "%40202507%"
+      AND ts_created  - INTERVAL 3 HOUR >= "2022-10-17"
+    )
   GROUP BY
-    1, 2, 3, 4, 5
+    1, 2, 3, 4
 ),
 
 total_phone AS (
@@ -139,14 +154,14 @@ total_phone AS (
 
 plaquinhas_offline_touchpoints AS (
   SELECT
-    id_user, 
+    id_user,
     contact_channel,
     ts_event
   FROM
     total_chat
   UNION ALL
   SELECT
-    id_user, 
+    id_user,
     contact_channel,
     ts_event
   FROM
@@ -173,5 +188,5 @@ SELECT DISTINCT
   YEAR(ts_event) AS year,
   MONTH(ts_event) AS month,
   DAY(ts_event) AS day
-FROM 
-  plaquinhas_offline_touchpoints 
+FROM
+  plaquinhas_offline_touchpoints

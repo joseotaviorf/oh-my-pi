@@ -275,7 +275,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliates-cost-attributions
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
+  - bietlejuice.enrich_bigfone:load-enrich-reservations
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_listing_temp:load-enrich-fact-listing-rent-flows-house
   - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
@@ -1399,11 +1399,12 @@ bietlejuice.enrich_customer_resolution:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_customer_support:
   - bietlejuice.bigfone:load-clean-call
+  - bietlejuice.bigfone:load-clean-event
   - bietlejuice.chat_fup:load-clean-chats-chat
   - bietlejuice.chat_fup:load-clean-surveys-answer
   - bietlejuice.chat_fup:load-clean-surveys-survey
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-reservations
+  - bietlejuice.enrich_bigfone:load-enrich-ivr-tasks
+  - bietlejuice.enrich_bigfone:load-enrich-reservations
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
@@ -2659,8 +2660,6 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.chat_fup:load-clean-rating
   - bietlejuice.chat_fup:load-clean-surveys-answer
   - bietlejuice.chat_fup:load-clean-surveys-survey
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
   - bietlejuice.enrich_survicate:load-enrich-keys-surveys
@@ -2884,13 +2883,13 @@ bietlejuice.enrich_tqc_referral:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.gsheets_for_sale:done-clean-tqc-leads
 bietlejuice.enrich_tracked_events:
+  - bietlejuice.bigfone:load-clean-event
   - bietlejuice.casa_mineira_crm:load-clean-contact
   - bietlejuice.casa_mineira_crm:load-clean-media-contact
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions
   - bietlejuice.ebdb_user:load-clean-user
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
+  - bietlejuice.enrich_bigfone:load-enrich-ivr-tasks
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel

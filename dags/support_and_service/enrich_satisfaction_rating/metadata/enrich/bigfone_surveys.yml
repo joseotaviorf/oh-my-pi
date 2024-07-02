@@ -8,8 +8,8 @@ columns:
   id_answer:
     description: Unique identifier of the satisfaction response.
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.id_call
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_clean.event.id_call
+      - datalake_bigfone_clean.event.ts_created
       - datalake_bigfone_clean.event.metadata
   id_contract:
     description: Identifier of the contract linked to the satisfaction response.
@@ -32,29 +32,29 @@ columns:
   satisfaction_score:
     description: Main satisfaction form responses.
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.csat_1
-      - datalake_bigfone_twilio.call_ivr_events.csat_2
-      - datalake_bigfone_twilio.call_ivr_events.csat_3
+      - datalake_bigfone_clean.event.csat_1
+      - datalake_bigfone_clean.event.csat_2
+      - datalake_bigfone_clean.event.csat_3
       - datalake_bigfone_clean.event.metadata
   score_description:
     description: Main satisfaction score description.
   ts_submitted:
     description: Date the satisfaction response was submitted.
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_clean.event.ts_created
       - datalake_bigfone_clean.event.ts_created
   year:
     description: Year referring to the data loading day.
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.year
+      - datalake_bigfone_clean.event.year
       - datalake_bigfone_clean.event.year
   month:
     description: Month referring to the data loading day.
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.month
+      - datalake_bigfone_clean.event.month
       - datalake_bigfone_clean.event.month
   day:
     description: Day referring to the data loading day.
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.day
+      - datalake_bigfone_clean.event.day
       - datalake_bigfone_clean.event.day

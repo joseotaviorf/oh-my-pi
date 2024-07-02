@@ -18,8 +18,8 @@ columns:
       information on the status of each call and its associated ticket.
   id_external_service:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.id_task
-      - datalake_bigfone_twilio.call_flex_events.id_task
+      - datalaek_bigfne.ivr_tasks.id_task
+      - datalake_bigfone_clean.event.id_task
     description:
       A Twilio call task refers to the process of initiating a phone call between
       two parties and executing a series of actions during the call based on user
@@ -30,7 +30,7 @@ columns:
       associated with it.
   id_segment:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+      - datalake_bigfone.reservations.id_reservation
     description:
       The ID segment is a unique identifier that corresponds to a Twilio call
       reservation and is particularly valuable in real-time call applications,
@@ -41,8 +41,8 @@ columns:
       call connections.
   id_call:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.id_call
-      - datalake_bigfone_twilio.call_flex_events.id_call
+      - datalaek_bigfne.ivr_tasks.id_call
+      - datalake_bigfone_clean.event.id_call
     description:
       The Twilio call ID is a unique identifier that represents a single phone call
       initiated on the Twilio platform. When a call is made, it can be routed to
@@ -53,10 +53,10 @@ columns:
       accepted.
   sk_call:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.id_call
-      - datalake_bigfone_twilio.call_flex_events.id_call
-      - datalake_bigfone_twilio.call_flex_events.id_conversation
-      - datalake_bigfone_twilio.call_flex_events.id_task
+      - datalaek_bigfne.ivr_tasks.id_call
+      - datalake_bigfone_clean.event.id_call
+      - datalake_bigfone_clean.event.id_conversation
+      - datalake_bigfone_clean.event.id_task
     description:
       In cases where a Twilio Call ID is not available, the primary call identifier
       sk_call may be replaced with either id_conversation or id_task.
@@ -69,21 +69,21 @@ columns:
     description: Session ID, only valid for Call InApp calls.
   id_agent:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_agent
+      - datalake_bigfone.reservations.id_agent
     description:
       The Twilio agent unique identifier is associated with each Twilio reservation,
       and is used to identify the agent who handled the call or task.
   first_agent_email:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.agent_email
+      - datalake_bigfone.reservations.agent_email
     description: First agent email that answered the first reservation.
   last_agent_email:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.agent_email
+      - datalake_bigfone.reservations.agent_email
     description: Last agent email that answered the last reservation.
   id_queue:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_queue
+      - datalake_bigfone.reservations.id_queue
     description:
       A queue in Twilio is identified by a unique identifier called Queue SID, and it
       serves as a holding area for tasks that are waiting to be assigned to workers for
@@ -107,11 +107,11 @@ columns:
       call inapp: The ticket is related to a Call InApp interaction.
   agent_email:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.agent_email
+      - datalake_bigfone_clean.event.agent_email
     description: The Twilio agent email.
   department:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.queue_name
+      - datalake_bigfone.reservations.queue_name
     description: The Twilio task department name, defined in Twilio as queue name.
   zendesk_department:
     lineage:
@@ -119,19 +119,19 @@ columns:
     description: The Zendesk Ticket department.
   first_department:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.queue_name
+      - datalake_bigfone.reservations.queue_name
     description: The Twilio first department, or queue name, regarding the task first reservation.
   last_department:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.queue_name
+      - datalake_bigfone.reservations.queue_name
     description: The Twilio last department, or queue name, regarding the task last reservation.
   transferred_from_dept:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.queue_name
+      - datalake_bigfone.reservations.queue_name
     description: The reservation started from a transfer from this department.
   transferred_to_dept:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.queue_name
+      - datalake_bigfone.reservations.queue_name
     description: The reservation was trasferred to this department.
   transference_type:
     description: The type of transference. It could be internal-same-agent.
@@ -143,8 +143,8 @@ columns:
     description: Identifies the country
   sla_achieved:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.seconds_wait_time
-      - datalake_bigfone_twilio.call_flex_reservations.is_answered
+      - datalake_bigfone.reservations.seconds_wait_time
+      - datalake_bigfone.reservations.is_answered
     description:
       If the customer satisfaction (CSAT) survey from the Interactive Voice Response
       (IVR) events was answered and the total wait time is one minute or less, the
@@ -152,7 +152,7 @@ columns:
       assumed to be NULL.
   total_minutes_reception_time:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
     description:
       The IVR duration time is calculated as the difference between the date of the
       last IVR event and the date of the first IVR event during the call. The reception
@@ -160,7 +160,7 @@ columns:
       IVR first interacts with the caller.
   segment_minutes_duration:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.seconds_duration
+      - datalake_bigfone.reservations.seconds_duration
     description:
       The total interaction time of a task segment is the cumulative duration of both
       the queue time and talk time. Specifically, it refers to the amount of time a
@@ -168,14 +168,14 @@ columns:
       until the end of the call.
   segment_minutes_wait_time:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.seconds_wait_time
+      - datalake_bigfone.reservations.seconds_wait_time
     description:
       In the context of a task reservation, queue time refers to the duration that a
       call spends waiting in a queue before a worker answers it. It begins when the
       call is placed in the queue and ends when a worker picks it up.
   segment_minutes_talk_time:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.seconds_talk_time
+      - datalake_bigfone.reservations.seconds_talk_time
     description:
       This is the duration of the active conversation between the caller and the worker,
       from the moment the call is answered by the worker until either the caller or the
@@ -184,7 +184,7 @@ columns:
   total_minutes_talk_time:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
-      - datalake_bigfone_twilio.call_flex_reservations.seconds_talk_time
+      - datalake_bigfone.reservations.seconds_talk_time
     description:
       The talk time refers to the amount of time that a call spends in an active
       conversation between the caller and the worker, but it is calculated specifically
@@ -216,8 +216,8 @@ columns:
       are performed after the call.
   minutes_full_resolution_time_calendar:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local_unix
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local_unix
+      - datalaek_bigfne.ivr_tasks.ts_created_local_unix
+      - datalake_bigfone_clean.event.ts_created_local_unix
     description:
       To calculate the full resolution time for a Twilio task, it is necessary to take
       into account the events related to the Twilio reservation. These events refer to
@@ -229,15 +229,15 @@ columns:
       reservation and the first event creation date of the same reservation.
   number_of_departments:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.queue_name
+      - datalake_bigfone.reservations.queue_name
     description: Total departments of a Twilio task.
   number_of_segments:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+      - datalake_bigfone.reservations.id_reservation
     description: Total answered reservations of a Twilio task.
   direction:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.direction
+      - datalake_bigfone_clean.event.direction
     description: It is the support direction.
     categories:
       inbound:
@@ -248,7 +248,7 @@ columns:
         external party, such as a customer or a client.
   channel_type:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.channel_type
+      - datalake_bigfone_clean.event.channel_type
     description: Column used to identify Call InApp records
   minutes_first_resolution_time_calendar:
     lineage:
@@ -324,11 +324,11 @@ columns:
     description: Area of which the call belongs to.
   is_last_segment:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+      - datalake_bigfone.reservations.id_reservation
     description: If the reservation is the last opened for its respective task.
   is_first_segment:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+      - datalake_bigfone.reservations.id_reservation
     description: If the reservation is the first opened for its respective task.
   has_back_tickets:
     lineage:
@@ -357,8 +357,8 @@ columns:
       department_control sheet for this specific main department.
   is_answered:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
-      - datalake_bigfone_twilio.call_flex_reservations.is_answered
+      - datalake_bigfone.reservations.id_reservation
+      - datalake_bigfone.reservations.is_answered
     description: Boolean that indicates if the user has answered the CSAT survey.
   has_back_ticket:
     lineage:
@@ -373,13 +373,13 @@ columns:
       different than closed.
   has_transfers:
     lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+      - datalake_bigfone.reservations.id_reservation
     description: True if the ticket have more than 1 segment (reservation), False otherwise.
   frt:
     lineage:
       - datalake_zendesk.tickets_current.ts_solved
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
     description:
       FRT (Full Resolution Time) calculates the total time from the beggining of the
       support in the front until the end, considering the backoffice time if there is
@@ -400,65 +400,65 @@ columns:
   total_minutes_front_to_open_back_ticket_time:
     lineage:
       - datalake_zendesk.tickets_current.ts_created_local
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
     description: Time in minutes to open the related backoffice ticket after solving the front ticket.
   is_csat_answered:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.csat_2
-      - datalake_bigfone_twilio.call_ivr_events.csat_1
+      - datalaek_bigfne.ivr_tasks.csat_2
+      - datalaek_bigfne.ivr_tasks.csat_1
     description: Boolean that indicates if the user has answered the CSAT survey.
   is_solved:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.csat_1
+      - datalaek_bigfne.ivr_tasks.csat_1
     description:
       If the call csat ivr event assumes value equal to 1 for the satisfaction survey
       for the respective call.
   first_csat_score:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.csat_2
+      - datalaek_bigfne.ivr_tasks.csat_2
     description:
       The csat score or csat rating for the respective call. It considers the first csat
       score (values goes from 1 to 5).
   last_csat_score:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.csat_2
+      - datalaek_bigfne.ivr_tasks.csat_2
     description:
       The csat score or csat rating for the respective call. It considers the last csat
       score (values goes from 1 to 5).
   csat_rating:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.csat_2
+      - datalaek_bigfne.ivr_tasks.csat_2
     description:
       The csat score or csat rating for the respective call. It considers the last csat
       score (values goes from 1 to 5).
   ts_csat_answered:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
     description: Timestamp of the last CSAT survey answer
   ts_csat_first_response:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
     description: Timestamp of the first CSAT survey answer
   ts_csat_last_response:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
     description: Timestamp of the last CSAT survey answer
   ts_segment_created:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
     description: The reservation creation timestamp.
   ts_segment_closed:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
     description: The reservation closing timestamp.
   ts_ticket_started:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
     description: Start timestamp. This is the first event creation timestamp for the id_call.
   ts_ticket_ended:
     lineage:
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
     description: End timestamp. This is the last event creation timestamp for the id_call.

@@ -193,7 +193,7 @@ inbound_tasks_reservations AS (
     FROM
       inbound_leads AS il
     INNER JOIN
-      datalake_bigfone_twilio.call_flex_events AS e
+      datalake_bigfone.reservations AS e
         ON il.inbound_id_task = e.id_task
     LEFT JOIN
       call_tasks AS ft
@@ -453,4 +453,3 @@ FROM
 LEFT JOIN
   lead_unique_table AS lt
     ON lt.sk_lead = at.sk_lead
-

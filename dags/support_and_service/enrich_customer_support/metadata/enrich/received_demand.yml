@@ -10,7 +10,7 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_call:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_call
+      - datalake_bigfone_clean.event.id_call
     description:
       The Twilio call ID is a unique identifier that represents a single phone call
       initiated on the Twilio platform. When a call is made, it can be routed to
@@ -33,7 +33,7 @@ columns:
     description: Zendesk's ticket ID.
   id_task:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_task
+      - datalake_bigfone_clean.event.id_task
       - datalake_quinto_messenger_clean.task_event.id_task_external
     description:
       Segment ID of Twilio Flex platform. Each ID is a demand, it's not unique because
@@ -49,11 +49,11 @@ columns:
     description: User ID from main/EBDB
   id_reservation:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_reservation
+      - datalake_bigfone_clean.event.id_reservation
     description: Reservation ID from Twilio, identifies an event which an agent has been assigned to a call
   agent_email:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_task_external
+      - datalake_bigfone_clean.event.id_task_external
       - datalake_quinto_messenger_clean.task.assigned_to
       - datalake_customer_support.email.agent_email
     description: The agent email.
@@ -65,7 +65,7 @@ columns:
       email: channel_name receives this value when the customer get in touch via email
   customer_phone:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.customer_phone
+      - datalake_bigfone_clean.event.customer_phone
       - datalake_quinto_messenger_clean.task_event.event_payload
     description: The customer phone associated with the id_user.
   customer_email:
@@ -74,7 +74,7 @@ columns:
     description: The user customer email associated with the id_user.
   department:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.id_task_queue
+      - datalake_bigfone_clean.event.id_task_queue
       - datalake_quinto_messenger_clean.task_event.event_payload
       - datalake_customer_support.email.department
     description:
@@ -185,7 +185,7 @@ columns:
       Only present in the 'chat' channel
   ts_created:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalake_bigfone_clean.event.ts_created
       - datalake_quinto_messenger_clean.task_event.ts_created
       - datalake_customer_support.email.ts_ticket_started
     description:
@@ -194,6 +194,6 @@ columns:
       to the ticket creation date in UTC-3.
   ts_task_created:
     lineage:
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+      - datalake_bigfone_clean.event.ts_created
       - datalake_quinto_messenger_clean.task_event.ts_created
     description: For Twilio Events, the creation timestamp of every task
