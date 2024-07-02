@@ -11,7 +11,7 @@ SELECT
     rental_administrator,
     consultancy,
     rental_amount,
-    iptu_installment,
+    iptu_installments,
     iptu_amount,
     condominium_amount,
     guarantee_start_date AS dt_guarantee_start,

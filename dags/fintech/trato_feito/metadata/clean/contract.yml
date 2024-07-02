@@ -53,10 +53,10 @@ columns:
     description: "Rent amount"
     lineage:
       - datalake_trato_feito_raw.contract.rental_amount
-  iptu_installment:
+  iptu_installments:
     description: "IPTU installment amount"
     lineage:
-      - datalake_trato_feito_raw.contract.iptu_installment
+      - datalake_trato_feito_raw.contract.iptu_installments
   iptu_amount:
     description: "IPTU amount"
     lineage:
