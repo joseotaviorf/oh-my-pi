@@ -1,16 +1,16 @@
 ---
 database_name: metric_rent
-table_name: total_tickets_daily
-description: Daily total tickets related to the Ticket Rate classification.
+table_name: total_tickets_weekly
+description: Weekly total tickets related to the Ticket Rate classification.
     This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate
     in the new format proposed on Q1/2024.
 domain: For Rent
 owner: gustavo.silva@quintoandar.com.br
 columns:
-  dt_day:
+  dt_week:
     lineage:
       - dw_customer_support.fact_ticket.ts_solved
-    description: "Reference date."
+    description: "Reference week date."
     dimension: True
   context:
     lineage:
@@ -97,11 +97,11 @@ columns:
       hierarchy: User analysis
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ""
-  ticket_rate_daily:
-    description: "Daily Ticket Rate, which is the division of total_tickets_proportional by the respective driver."
+  ticket_rate_weekly:
+    description: "Weekly Ticket Rate, which is the division of total_tickets_proportional by the respective driver."
     metric:
-      name: Ticket Rate Daily
-      description: "Daily Ticket Rate, which is the division of total_tickets_proportional by the respective driver."
+      name: Ticket Rate Weekly
+      description: "Weekly Ticket Rate, which is the division of total_tickets_proportional by the respective driver."
       acronym: ""
       is_additive: True
       business_stage: CX

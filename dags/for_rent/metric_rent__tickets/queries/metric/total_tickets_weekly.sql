@@ -1,7 +1,7 @@
 WITH contract_signed AS (
     SELECT
         SUM(new_contracts_signed) AS new_contracts_signed,
-        day AS dt_day
+        DATE(DATE_TRUNC('week', day)) AS dt_week
     FROM
         metric_rent.new_contracts_signed_daily
     WHERE
@@ -12,7 +12,7 @@ WITH contract_signed AS (
 ccv AS (
     SELECT 
         COUNT(DISTINCT CASE WHEN fo.sk_sale_agreement_signed_date > 0 THEN sk_offer END) AS ccvs,
-        dd.date AS dt_day
+        dd.week_start AS dt_week
     FROM 
         dw_sale.fact_offers fo
     INNER JOIN 
@@ -25,7 +25,7 @@ ccv AS (
 aux_ongoing_rentals AS (
     SELECT
         MAX(day) AS dt_last_day,
-        day AS dt_day
+        DATE(DATE_TRUNC('week', day)) AS dt_week
     FROM
         metric_rent.ongoing_rentals_daily
     GROUP BY 2
@@ -33,7 +33,7 @@ aux_ongoing_rentals AS (
 ongoing_rentals AS (
     SELECT DISTINCT
         o.ongoing_rentals,
-        a.dt_day
+        a.dt_week
     FROM
         metric_rent.ongoing_rentals_daily AS o
     INNER JOIN
@@ -46,7 +46,7 @@ ongoing_rentals AS (
 ended_rentals AS (
     SELECT
         SUM(ended_rentals_confirmed) AS ended_rentals,
-        day AS dt_day
+        DATE(DATE_TRUNC('week', day)) AS dt_week
     FROM 
         metric_rent.ended_rentals_confirmed_daily
     WHERE 
@@ -60,27 +60,27 @@ drivers AS (
         ccv.ccvs,
         ors.ongoing_rentals,
         ers.ended_rentals,
-        d.date AS dt_day
+        d.week_start AS dt_week
     FROM
         dw_public.dim_date AS d 
     LEFT JOIN
         contract_signed AS cs 
-            ON cs.dt_day = d.date
+            ON cs.dt_week = d.week_start
     LEFT JOIN 
         ccv
-            ON ccv.dt_day = d.date
+            ON ccv.dt_week = d.week_start
     LEFT JOIN 
         ongoing_rentals ors
-            ON ors.dt_day = d.date
+            ON ors.dt_week = d.week_start
     LEFT JOIN 
         ended_rentals ers
-            ON ers.dt_day = d.date
+            ON ers.dt_week = d.week_start
     WHERE
         d.sk_date >= 20220101
 ),
 total_tickets_prep AS (
     SELECT 
-        DATE(ts_solved) AS dt_day,
+        DATE(DATE_TRUNC('week', ts_solved)) AS dt_week,
         CASE 
             WHEN dt.sub_journey NOT IN ('Partners', 'For Sale') THEN 'ForRent'
             WHEN dt.sub_journey IN ('For Sale') THEN 'ForSale'
@@ -115,13 +115,13 @@ total_tickets_prep AS (
             ON ft.sk_main_department = dd.sk_department
     LEFT JOIN 
         drivers AS dv
-            ON DATE(ft.ts_solved) = dv.dt_day
+            ON DATE(DATE_TRUNC('week', ft.ts_solved)) = dv.dt_week
     WHERE 
         ft.is_ticket_rate = TRUE
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 )
 SELECT
-    dt_day,
+    dt_week,
     context,
     journey,
     sub_journey,
@@ -133,6 +133,6 @@ SELECT
     theme_detail,
     total_tickets_pure,
     total_tickets_proportional,
-    (total_tickets_proportional/driver) AS ticket_rate_daily
+    (total_tickets_proportional/driver) AS ticket_rate_weekly
 FROM 
     total_tickets_prep

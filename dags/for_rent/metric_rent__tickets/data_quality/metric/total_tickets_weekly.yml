@@ -1,6 +1,6 @@
 ---
-table_name: metric_rent.total_tickets_daily
+table_name: metric_rent.total_tickets_weekly
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  dt_day:
+  dt_week:
     is_complete:
