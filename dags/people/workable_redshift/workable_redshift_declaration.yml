@@ -18,6 +18,7 @@ workflow:
   database_type: postgres
   dbutils_secret_key: WORKABLE_DB
   has_hive_sync: false
+  default_raw_partitions: ['year', 'month', 'day']
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
