@@ -1,7 +1,7 @@
 dag:
   name: dw_bridge_demand_agent
   schedule_start_date: 2021,11,14
-  owner: Data ForRent
+  owner: Data Agents
 workflow:
   type: query
   layer: dw
