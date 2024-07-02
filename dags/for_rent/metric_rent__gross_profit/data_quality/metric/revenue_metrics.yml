@@ -14,10 +14,10 @@ column_level_validations:
       less_than_or_equal_to: 0
   insurance_commission:
     has_min_value:
-      greater_than: 0
+      greater_than_or_equal_to: 0
   late_payments:
     has_min_value:
-      greater_than: 0
+      greater_than_or_equal_to: 0
   addons_guarantee:
     has_min_value:
       greater_than_or_equal_to: 0
