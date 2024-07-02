@@ -514,7 +514,7 @@ columns:
     description: House listing status reason.
   ts_administrator_changed:
     lineage:
-    - datalake_ebdb_listing.rent_listing.ts_administrator_changed
+    - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Timestamp when the house administrator changed (OWNER, QUINTOANDAR
       or THIRD_PARTY).
   ts_consultant_deleted:

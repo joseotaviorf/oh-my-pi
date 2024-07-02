@@ -35,15 +35,20 @@ house_listings AS (
             datalake_ebdb_listing.listing_business_context
         GROUP BY 1
     ),
-    rl AS (
+    lrm AS (
         SELECT
-            id_house,
-            new_rental_administrator AS rental_administrator,
-            ts_created AS ts_administrator_changed
-        FROM
-            datalake_ebdb_clean.rental_administrator_change_request_aud
-        WHERE
-            status = 'SUCCESS'
+            lbc.id_house,
+            lrm.rental_administrator,
+            ure.ts_revision AS ts_rental_administrator_start,
+            LEAD(ure.ts_revision) OVER (PARTITION BY lbc.id_house ORDER BY lrm.rev) AS ts_rental_administrator_end
+        FROM 
+            datalake_ebdb_clean.listing_rent_model_aud AS lrm
+        JOIN 
+            datalake_ebdb_clean.listing_business_context AS lbc
+                ON lbc.id = lrm.id_listing_business_context
+        JOIN 
+            datalake_ebdb_user.user_revision_entity AS ure
+                ON ure.id = lrm.rev
     )
     SELECT DISTINCT
         hl.id_house_listing AS sk_house_listing,
@@ -67,7 +72,7 @@ house_listings AS (
         END AS ts_publication,
         hl.ts_last_unpublished,
         hl.rent,
-        FIRST(rl.rental_administrator) OVER (PARTITION BY hl.id_house_listing ORDER BY rl.ts_administrator_changed DESC) AS rental_administrator,
+        FIRST(lrm.rental_administrator) OVER (PARTITION BY hl.id_house_listing ORDER BY lrm.ts_rental_administrator_start DESC) AS rental_administrator,
         h.rent AS house_rent,
         h.neighborhood AS house_neighborhood,
         h.zipcode AS house_zipcode,
@@ -145,7 +150,7 @@ house_listings AS (
         h.is_casa_mineira_migration,
         h.is_sale_primary_market,
         hl.is_extended_rental,
-        MAX(rl.ts_administrator_changed) OVER (PARTITION BY hl.id_house_listing) AS ts_administrator_changed,
+        MAX(lrm.ts_rental_administrator_start) OVER (PARTITION BY hl.id_house_listing) AS ts_administrator_changed,
         hl.is_early_demand,
         hl.ts_early_demand_started
     FROM
@@ -155,9 +160,10 @@ house_listings AS (
             ON hl.id_house = h.id
     LEFT JOIN lbc
         ON lbc.id_house = h.id
-    LEFT JOIN rl
-        ON rl.id_house = lbc.id_house
-          AND rl.ts_administrator_changed BETWEEN hl.ts_listing_version_start AND COALESCE(hl.ts_listing_version_end, NOW())
+    LEFT JOIN lrm
+        ON lrm.id_house = lbc.id_house
+            AND lrm.ts_rental_administrator_start <= COALESCE(hl.ts_listing_version_end, NOW())
+            AND lrm.ts_rental_administrator_end >= hl.ts_listing_version_start
     LEFT JOIN
         datalake_ebdb_listing.agents_with_keys AS awk
             ON hl.id_house_listing = awk.id_house_listing
