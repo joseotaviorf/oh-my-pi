@@ -28,7 +28,7 @@ contracts AS (
     datalake_ebdb_contract.contract AS c
   JOIN
     datalake_quintoandar.aux_date AS ad
-      ON ad.date = DATE('{load_start_date}')
+      ON ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   INNER JOIN
     datalake_offboarding.contract_termination AS ct
       ON c.id = ct.id_contract
@@ -124,7 +124,7 @@ INNER JOIN
     ON cp.id_contract = cs.id_contract
 JOIN
   datalake_quintoandar.aux_date AS ad
-    ON ad.date = DATE('{load_start_date}')
+    ON ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 LEFT JOIN
   datalake_ebdb_clean.user AS u
     ON (cp.email = u.email
