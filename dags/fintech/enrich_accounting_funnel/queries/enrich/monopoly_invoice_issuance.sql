@@ -90,7 +90,7 @@ GROUP BY 1,2,3,4,5,6,7,9,10,11
 SELECT
     id_external_offer AS id_business_entity,
     sale_source,
-    ROUND(COALESCE(source_amount, credit),2) AS souce_amount,
+    ROUND(COALESCE(source_amount, credit),2) AS source_amount,
     sap_amount,
     account_number,
     IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_compliance,

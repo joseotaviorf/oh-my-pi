@@ -5,6 +5,7 @@ WITH grouped_adm_fee AS (
         e.bill_item,
         e.amount, 
         e.description,
+        e.producer,
         IF(bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'), 'adm-fee', bill_item) AS bill_item_grouped
     FROM 
         datalake_retsuko.entry e 
@@ -21,6 +22,7 @@ treated_entry AS (
         e.ts_created,
         e.bill_item,
         e.description,
+        e.producer,
         e.amount,
         SUM(amount) OVER (partition by i.id_external, e.bill_item_grouped) as agg
     FROM 
@@ -67,7 +69,8 @@ retsuko AS (
         MIN(CASE 
           WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND i.accrual_year_month >= 202405 AND ctt.contract_type = 'PF' THEN DATE(e.ts_created)
           WHEN e.bill_item = 'entry.bill-item/service-fee' AND i.accrual_year_month < 202405 THEN DATE(i.ts_paid)
-          WHEN e.bill_item = 'entry.bill-item/service-fee' AND i.accrual_year_month >= 202405 THEN DATE(e.ts_created)
+          WHEN e.bill_item = 'entry.bill-item/service-fee' AND i.accrual_year_month >= 202405 AND ct.guarantee = 'contract.guarantee/fairfax' AND e.producer NOT IN ('onboarding-routine', 'onboarding-routine-delayed') THEN TO_DATE(CONCAT(i.accrual_year_month, '01'), 'yyyyMMdd') + INTERVAL '1' MONTH
+          WHEN e.bill_item = 'entry.bill-item/service-fee' AND i.accrual_year_month >= 202405 THEN TO_DATE(CONCAT(i.accrual_year_month, '01'), 'yyyyMMdd')
           ELSE DATE(i.ts_due)
         END) AS dt_source_trigger,
         CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount
