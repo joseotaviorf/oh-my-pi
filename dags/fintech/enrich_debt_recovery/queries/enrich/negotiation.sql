@@ -20,7 +20,8 @@ paid_installments AS (
     SELECT
         n.`id` AS id_negotiation,
         FIRST_VALUE(i.total_amount) OVER(PARTITION BY n.`id` ORDER BY i.ts_updated) AS down_payment_amount,
-        IF(i.status = 'paid', i.total_amount, 0) AS total_amount,
+        IF(i.status = 'paid', n.`id`, NULL) AS paid_negotiation,
+        IF(i.status = 'paid', i.total_amount, 0) AS paid_amount,
         IF(i.status = 'paid', i.ts_updated, NULL) AS ts_updated
     FROM
        datalake_trato_feito_clean.negotiation AS n
@@ -32,8 +33,8 @@ cte_paid AS (
     SELECT
         id_negotiation,
         down_payment_amount,
-        SUM(total_amount) AS paid_amount,
-        COUNT(id_negotiation) AS qt_paid,
+        SUM(paid_amount) AS paid_amount,
+        COUNT(paid_negotiation) AS qt_paid,
         MIN(ts_updated) AS ts_first_payment,
         MAX(ts_updated) AS ts_last_payment
     FROM paid_installments
@@ -96,13 +97,14 @@ cte_breach AS (
     SELECT
         cb.id_negotiation,
         cb.ts_breach,
-        co.installment_number AS breached_installment
+        MIN(co.installment_number) AS breached_installment
     FROM
         cte_ts_breach AS cb
     LEFT JOIN
         cte_installment_order AS co
             ON cb.id_negotiation = co.id_negotiation
             AND cb.ts_breach = co.ts_expired
+    GROUP BY 1, 2
 ),
 cte_debts AS (
     SELECT

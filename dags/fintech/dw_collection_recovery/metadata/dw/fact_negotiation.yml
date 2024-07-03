@@ -153,11 +153,12 @@ columns:
       - datalake_debt_recovery.negotiation.qt_installments_paid
       - datalake_recupera.negotiation.paid_installments
     description: "Number of paid installments of the negotiation"
-  breached_installment:
+  breached_installments:
     lineage:
-      - datalake_debt_recovery.negotiation.breached_installment
+      - datalake_debt_recovery.negotiation.qt_installments
+      - datalake_debt_recovery.negotiation.qt_installments_paid
       - datalake_recupera.negotiation.breached_installments
-    description: "If a negotiation was broken, it will be the total installment of the negotiation"
+    description: "Total of negotiation installments broken. Calculation if negotiation status is broken: total installment -  paid installments"
   original_debt_amount:
     lineage:
       - datalake_debt_recovery.negotiation.negotiation_original_amount

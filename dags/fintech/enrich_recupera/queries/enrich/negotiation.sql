@@ -214,7 +214,7 @@ SELECT DISTINCT
   a.agreement_promise,
   a.number_of_installments,
   a.paid_installments,
-  IF(ic.id_installment IS NOT NULL, a.number_of_installments, NULL) AS breached_installments,
+  IF(ic.id_installment IS NOT NULL, a.number_of_installments - a.paid_installments , NULL) AS breached_installments,
   COALESCE(a.original_debt_amount, 0) AS original_debt_amount,
   COALESCE(a.total_interest_fee_amount, 0) AS interest_fee_amount,
   COALESCE(a.total_adm_fee_amount, 0) AS adm_fee_amount,
