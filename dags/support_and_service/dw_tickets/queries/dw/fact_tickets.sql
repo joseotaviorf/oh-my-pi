@@ -26,6 +26,20 @@ house_owner AS (
     WHERE
         ch_o.id_owner > 0
     GROUP BY 1, 3
+),
+ticket_comment_metrics AS (
+  SELECT
+    tc.id_ticket,
+    SUM(CASE WHEN tc.is_public THEN 1 ELSE 0 END) AS total_public_comments,
+    SUM(CASE WHEN NOT tc.is_public THEN 1 ELSE 0 END) AS total_private_comments,
+    MAX(CASE WHEN is_public AND zu.role = 'end-user' THEN tc.ts_created END) AS ts_latest_customer_comment,
+    MAX(CASE WHEN is_public AND zu.role = 'agent' THEN tc.ts_created END) AS ts_latest_analyst_comment
+  FROM
+    datalake_zendesk_clean.ticket_comments AS tc
+  LEFT JOIN
+    datalake_support_users.zendesk_users AS zu
+      ON zu.id_user_zendesk = tc.id_author
+  GROUP BY 1
 )
 SELECT
     CAST(t.id_ticket AS BIGINT) AS sk_ticket,
@@ -75,6 +89,10 @@ SELECT
     t.full_resolution_time_min_business AS minutes_full_resolution_time_business,
     t.reopens,
     t.replies,
+    tcm.total_public_comments,
+    tcm.total_private_comments,
+    tcm.ts_latest_customer_comment,
+    tcm.ts_latest_analyst_comment,
     t.ts_initially_assigned,
     t.ts_initially_assigned - INTERVAL 3 HOUR AS ts_initially_assigned_local,
     t.ts_assigned AS ts_last_assigned,

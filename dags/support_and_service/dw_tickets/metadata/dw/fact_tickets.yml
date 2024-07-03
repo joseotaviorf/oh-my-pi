@@ -233,6 +233,14 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.replies
     description: Total number of times ticket was replied to
+  total_public_comments:
+    description: Total number of public comments in a ticket
+  total_private_comments:
+    description: Total number of private comments in a ticket
+  ts_latest_customer_comment:
+    description: Timestamp of the latest comment in a ticket made by a customer/end user
+  ts_latest_analyst_comment:
+    description: Timestamp of the latest comment in a ticket made by an analyst
   ts_initially_assigned:
     lineage:
       - datalake_zendesk.tickets_current.ts_initially_assigned

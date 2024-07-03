@@ -905,6 +905,7 @@ bietlejuice.dw_tickets:
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
+  - bietlejuice.zendesk:load-clean-ticket-comments
 bietlejuice.dw_tracksale:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
