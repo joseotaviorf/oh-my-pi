@@ -35,6 +35,9 @@ workflow:
     fact_supply_events:
       z_order_by: ['sk_supply', 'nm_business_context']
       extraction_type: full
+    obt_supply:
+      z_order_by: ['sk_supply', 'nm_business_context']
+      extraction_type: full
   inner_dependencies:
     fact_supply_events:
       - dim_acquisition_lead
@@ -44,5 +47,7 @@ workflow:
       - dim_supply_operation_flow
       - dim_supply_recovery_flow
       - dim_supply_user_path
+    obt_supply:
+      - fact_supply_events
 cluster:
   type: databricks_12_2_med_general_cluster

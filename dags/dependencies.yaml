@@ -879,9 +879,11 @@ bietlejuice.dw_smart_price:
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_smart_price:load-enrich-smart-price-versioning
 bietlejuice.dw_supply:
+  - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
+  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
 bietlejuice.dw_supply_outbound_contacts:
