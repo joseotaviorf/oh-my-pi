@@ -22,6 +22,8 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         """
         Returns the task that optimizes all the Delta tables in the list.
+
+        :param optimize_delta_table_local_id: This ID is used for adding a suffix to the task name since we can have multiple optmization tasks in the same DAG.
         """
 
         spark_job_name = f"optimize_delta_table"

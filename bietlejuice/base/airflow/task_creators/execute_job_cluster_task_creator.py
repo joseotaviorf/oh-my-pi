@@ -71,13 +71,17 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
     def __get_libraries(self) -> list:
         default_libraries = self.config_service.get_config("default_libraries")
         custom_libraries = [
-            {
-                lib_type: lib_name.format(
-                    artifacts_bucket=self.config_service.get_config("artifacts_bucket")
-                )
-            }
-            if isinstance(lib_name, str)
-            else {lib_type: lib_name}
+            (
+                {
+                    lib_type: lib_name.format(
+                        artifacts_bucket=self.config_service.get_config(
+                            "artifacts_bucket"
+                        )
+                    )
+                }
+                if isinstance(lib_name, str)
+                else {lib_type: lib_name}
+            )
             for custom_libraries in self.cluster_args.get("custom_libraries", [])
             for lib_type, lib_name in custom_libraries.items()
         ]
@@ -89,6 +93,8 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
     ) -> QuintoAndarDatabricksExecuteJobClusterOperator:
         """
         Creates the ExecuteJobCluster task to enable Spark Jobs to run on Databricks Job Cluster
+
+        :param execute_job_cluster_local_id: This param adds a suffix with this ID to the task name, since a DAG can have multiple `execute-job-cluster` tasks due to Job Cluster API 100 tasks limitation.
         """
         cluster_configuration = self.__get_cluster_configuration()
         self.__validate_databricks_version(cluster_configuration)

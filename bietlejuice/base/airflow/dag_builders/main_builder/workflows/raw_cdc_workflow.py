@@ -1,3 +1,4 @@
+import math
 from typing import List, Tuple
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
@@ -15,6 +16,8 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
 class RawCDCWorkflow(BaseWorkflow):
+    MAX_TABLES_PER_CLUSTER = 15
+
     def __init__(self, dag_args, workflow_args, cluster_args):
         super().__init__(dag_args, workflow_args, cluster_args)
 
@@ -43,14 +46,19 @@ class RawCDCWorkflow(BaseWorkflow):
         raw_tables = self._get_raw_tables(transactional_tables)
         clean_tables = self._get_clean_tables(raw_tables)
 
-        self._create_all_tasks(transactional_tables, raw_tables, clean_tables)
+        self._create_all_tasks(
+            transactional_tables,
+            raw_tables,
+            clean_tables,
+            self.workflow_args["tables_customization"],
+        )
 
         return dag
 
     def _add_mandatory_libraries(
         self, dag_execution_context: DagExecutionContext
     ) -> None:
-        """"Adds mandatory libraries to cluster_args. For example, for MySQL we need the MySQL connector library."""
+        """Adds mandatory libraries to cluster_args. For example, for MySQL we need the MySQL connector library."""
 
         if dag_execution_context.workflow_args["database_type"] == "mysql":
             mysql_version = dag_execution_context.workflow_args.get(
@@ -138,28 +146,76 @@ class RawCDCWorkflow(BaseWorkflow):
 
     def _create_all_tasks(
         self,
+        all_transactional_tables: List[TableAttributes],
+        all_raw_tables: List[TableAttributes],
+        all_clean_tables: List[TableAttributes],
+        tables_customization: dict,
+    ):
+        cluster_transactional_tables = []
+        cluster_raw_tables = []
+        cluster_clean_tables = []
+        execute_job_cluster_local_id = 1
+        n_clusters = len(tables_customization) // self.MAX_TABLES_PER_CLUSTER + 1
+        tables_per_cluster = math.ceil(len(tables_customization) / n_clusters)
+        n_tables_so_far = 0
+
+        for transactional_table, raw_table, clean_table in zip(
+            all_transactional_tables, all_raw_tables, all_clean_tables
+        ):
+            if n_tables_so_far != 0 and n_tables_so_far % tables_per_cluster == 0:
+                self._create_all_tasks_for_cluster(
+                    cluster_transactional_tables,
+                    cluster_raw_tables,
+                    cluster_clean_tables,
+                    execute_job_cluster_local_id,
+                )
+                cluster_transactional_tables = []
+                cluster_raw_tables = []
+                cluster_clean_tables = []
+                execute_job_cluster_local_id += 1
+            cluster_transactional_tables.append(transactional_table)
+            cluster_raw_tables.append(raw_table)
+            cluster_clean_tables.append(clean_table)
+            n_tables_so_far += 1
+
+        if len(cluster_transactional_tables) > 0:
+            self._create_all_tasks_for_cluster(
+                cluster_transactional_tables,
+                cluster_raw_tables,
+                cluster_clean_tables,
+                execute_job_cluster_local_id,
+            )
+
+    def _create_all_tasks_for_cluster(
+        self,
         transactional_tables: List[TableAttributes],
-        raw_tables: List[TableAttributes],
-        clean_tables: List[TableAttributes],
+        cluster_raw_tables: List[TableAttributes],
+        cluster_clean_tables: List[TableAttributes],
+        execute_job_cluster_local_id: int,
     ) -> None:
         """Creates all the tasks for the workflow and sets their dependencies."""
 
-        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
-        dag_final_tasks = self._set_dag_final_tasks()
+        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
+            execute_job_cluster_local_id
+        )
+        dag_final_tasks = self._set_dag_final_tasks(execute_job_cluster_local_id)
         optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
             transactional_tables,
             parallelism=2,  # Lower because we don't want to overload the cluster while the next layers are being loaded
+            optimize_delta_table_local_id=execute_job_cluster_local_id,
         )
         optimize_raw_task = self.optimize_delta_table_task_creator.create_task(
-            raw_tables,
+            cluster_raw_tables,
             parallelism=2,  # Lower because we don't want to overload the cluster while the next layer is being loaded
+            optimize_delta_table_local_id=execute_job_cluster_local_id,
         )
         optimize_clean_task = self.optimize_delta_table_task_creator.create_task(
-            clean_tables
+            cluster_clean_tables,
+            optimize_delta_table_local_id=execute_job_cluster_local_id,
         )
 
         for transactional_table, raw_table, clean_table in zip(
-            transactional_tables, raw_tables, clean_tables
+            transactional_tables, cluster_raw_tables, cluster_clean_tables
         ):
             transactional_initial_task, transactional_final_task = self._create_transactional_tasks(
                 transactional_table, optimize_transactional_task
@@ -279,7 +335,7 @@ class RawCDCWorkflow(BaseWorkflow):
 
         return load_clean_task, last_clean_task
 
-    def _set_dag_final_tasks(self):
+    def _set_dag_final_tasks(self, execute_job_cluster_local_id: int):
         """
         The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
         This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
@@ -289,8 +345,14 @@ class RawCDCWorkflow(BaseWorkflow):
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
 
-        if self._check_include_get_table_metrics_task(
-            self.workflow_args["tables_customization"]
+        # Since we use a single task for get_metrics task extract metrics
+        # from all tables, this validates if this is the first time the
+        # task is being added.
+        if (
+            self._check_include_get_table_metrics_task(
+                self.workflow_args["tables_customization"]
+            )
+            and execute_job_cluster_local_id == 1
         ):
             first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
                 self.generate_database_table_metrics_task_creator,
