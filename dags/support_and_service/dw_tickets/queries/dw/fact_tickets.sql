@@ -33,7 +33,7 @@ ticket_comment_metrics AS (
     SUM(CASE WHEN tc.is_public THEN 1 ELSE 0 END) AS total_public_comments,
     SUM(CASE WHEN NOT tc.is_public THEN 1 ELSE 0 END) AS total_private_comments,
     MAX(CASE WHEN is_public AND zu.role = 'end-user' THEN tc.ts_created END) AS ts_latest_customer_comment,
-    MAX(CASE WHEN is_public AND zu.role = 'agent' THEN tc.ts_created END) AS ts_latest_analyst_comment
+    MAX(CASE WHEN is_public AND zu.role = 'agent' THEN tc.ts_created END) AS ts_lastest_analyst_comment
   FROM
     datalake_zendesk_clean.ticket_comments AS tc
   LEFT JOIN
@@ -92,7 +92,7 @@ SELECT
     tcm.total_public_comments,
     tcm.total_private_comments,
     tcm.ts_latest_customer_comment,
-    tcm.ts_latest_analyst_comment,
+    tcm.ts_lastest_analyst_comment,
     t.ts_initially_assigned,
     t.ts_initially_assigned - INTERVAL 3 HOUR AS ts_initially_assigned_local,
     t.ts_assigned AS ts_last_assigned,
@@ -118,3 +118,6 @@ LEFT JOIN
 LEFT JOIN
     house_owner own
         ON t.id_ticket = own.id_ticket
+LEFT JOIN
+    ticket_comment_metrics AS tcm
+      ON tcm.id_ticket = t.id_ticket
