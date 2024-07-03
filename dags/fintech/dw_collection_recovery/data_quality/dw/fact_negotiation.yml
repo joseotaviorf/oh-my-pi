@@ -14,10 +14,6 @@ column_level_validations:
   id_negotiation_trato_feito:
     is_unique:
       severity_level: Error
-    is_complete:
-      severity_level: Error
   id_negotiation_recupera:
     is_unique:
-      severity_level: Error
-    is_complete:
       severity_level: Error

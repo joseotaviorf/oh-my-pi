@@ -17,12 +17,8 @@ column_level_validations:
   id_invoice_extra:
     is_unique:
       severity_level: Error
-    is_complete:
-      severity_level: Error
   id_receipt:
     is_unique:
-      severity_level: Error
-    is_complete:
       severity_level: Error
   installment_number:
     is_complete:
