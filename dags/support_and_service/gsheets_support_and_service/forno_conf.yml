@@ -158,3 +158,10 @@ sheets_info:
     sheet_name: DB Target Share
     clean_table_name: nps_target_share
     sheet_context: support_and_service
+
+  manual_kpis_polygon:
+    sheet_id: 1-vnpltk8Yb1Y7SUgYOd3gc0CwZNpBsIKz36XH9C9JJE
+    sheet_name: Base
+    clean_table_name: manual_kpis_polygon
+    sheet_context: support_and_service
+
