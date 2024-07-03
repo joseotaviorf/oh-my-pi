@@ -198,6 +198,8 @@ columns:
     description: "True if the analysis was bypassed."
   is_early_credit:
     description: "Indicates if the offer had an early credit analysis."
+  is_last_client_max_funnel_drop_step:
+    description: "True only for the latested client_max_funnel_drop_step in that month"
   dt_early_credit_created:
     lineage:
       - dw_credit.fact_early_credit.dt_early_credit_created

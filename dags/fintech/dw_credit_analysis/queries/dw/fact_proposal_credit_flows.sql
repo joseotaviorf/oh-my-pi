@@ -560,6 +560,13 @@ SELECT
   is_last_credit_evaluation,
   is_bypass,
   is_early_credit,
+  CASE 
+    WHEN umf.client_max_funnel_drop_step IS NULL THEN FALSE 
+    WHEN ROW_NUMBER() OVER(
+      PARTITION BY adr.sk_client, umf.client_max_funnel_drop_step, date_trunc('MONTH',adr.dt_reference) 
+      ORDER BY adr.dt_reference DESC) = 1 THEN TRUE
+    ELSE false
+  END as is_last_client_max_funnel_drop_step,
   dt_early_credit_created,
   dt_early_credit_expired,
   dt_last_credit_evaluation_init,
