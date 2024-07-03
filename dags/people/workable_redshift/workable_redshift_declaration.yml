@@ -11,6 +11,9 @@ cluster:
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
+  custom_libraries:
+    - maven:
+        coordinates: "com.amazon.redshift:redshift-jdbc42:2.1.0.29"
 workflow:
   type: database_pull_delta
   layer: raw
