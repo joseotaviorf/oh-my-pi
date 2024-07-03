@@ -24,8 +24,8 @@ paused_dates AS (
     FROM
         datalake_composer_clean.log
     WHERE
-        id_dag LIKE 'bietlejuice%'
-        AND event IN ('paused', 'cli_run')
+        event IN ('paused', 'cli_run')
+        AND id_dag LIKE 'bietlejuice%'
 ),
 paused_cli_run AS (
     SELECT
@@ -136,35 +136,56 @@ checking_ignored_tables AS (
             AND d.dt_event = i.dt_event
             AND d.is_paused = FALSE
 ),
-totals_base AS (
-    SELECT
+base AS (
+    SELECT DISTINCT
+        d.id_dag,
         d.id_line,
-        COUNT(DISTINCT d.id_dag) AS total_active_dags,
-        COUNT(DISTINCT d.id_dag) FILTER (WHERE d.is_paused = FALSE) AS total_active_unpaused_dags,
-        COUNT(DISTINCT db.id_dag) AS total_dags_executed,
-        COUNT(DISTINCT ss.id_dag) AS total_dags_special_scheduler,
-        COUNT(DISTINCT ss.id_dag) FILTER (WHERE ss.dt_run IS NOT NULL) total_dags_special_scheduler_executed,
-        COUNT(DISTINCT d.id_dag) FILTER (WHERE ds.id_dag IS NOT NULL) AS total_dags_in_sla_exclusion_list,
-        COUNT(DISTINCT c.id_dag) AS total_dags_ignoring_list,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE db.is_first_execution_inside_sla = TRUE) AS total_dags_inside_sla,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE db.is_first_execution_inside_sla = FALSE) AS total_dags_outside_sla,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE db.is_first_execution_inside_sla IS NULL) AS total_dags_null_sla,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE db.state = 'success') AS total_success_dags,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE db.state = 'failed') AS total_failed_dags,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE db.is_manual_run = TRUE) AS total_dags_with_manual_run,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE db.is_triggered_by_mediator = TRUE) AS total_dags_triggered_by_mediator,
-        COUNT(DISTINCT d.id_dag) FILTER (WHERE d.layer = 'raw/clean') AS total_raw_clean_dags,
-        COUNT(DISTINCT d.id_dag) FILTER (WHERE d.layer = 'enrich') AS total_enrich_dags,
-        COUNT(DISTINCT d.id_dag) FILTER (WHERE d.layer = 'dw') AS total_dw_dags,
-        COUNT(DISTINCT d.id_dag) FILTER (WHERE d.layer = 'metric') AS total_metric_dags,
-        COUNT(DISTINCT d.id_dag) FILTER (WHERE d.layer = 'reverse') AS total_reverse_dags,
-        COUNT(DISTINCT d.id_dag) FILTER (WHERE d.is_datamart = TRUE) AS total_datamart_dags,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE d.layer = 'raw/clean') AS total_raw_clean_dags_excuted,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE d.layer = 'enrich') AS total_enrich_dags_executed,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE d.layer = 'dw') AS total_dw_dags_executed,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE d.layer = 'metric') AS total_metric_dags_executed,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE d.layer = 'reverse') AS total_reverse_dags_executed,
-        COUNT(DISTINCT db.id_dag) FILTER (WHERE d.is_datamart = TRUE) AS total_datamart_dags_executed,
+        TRUE AS is_active,
+        CASE
+            WHEN d.is_paused = FALSE THEN TRUE
+            WHEN d.is_paused = TRUE THEN FALSE 
+            ELSE NULL
+        END AS is_active_and_unpaused,
+        CASE
+            WHEN db.id_dag IS NOT NULL THEN TRUE
+            WHEN db.id_dag IS NULL THEN FALSE
+            ELSE NULL
+        END AS is_executed,
+        CASE
+            WHEN ss.id_dag IS NOT NULL THEN TRUE
+            WHEN ss.id_dag IS NULL THEN FALSE
+            ELSE NULL
+        END AS is_special_scheduler,
+        CASE
+            WHEN ss.id_dag IS NOT NULL AND ss.dt_run IS NOT NULL THEN TRUE
+            WHEN ss.id_dag IS NOT NULL AND ss.dt_run IS NULL THEN FALSE
+            ELSE NULL
+        END AS is_special_scheduler_executed,
+        CASE
+            WHEN ds.id_dag IS NOT NULL THEN TRUE 
+            WHEN ds.id_dag IS NULL THEN FALSE
+            ELSE NULL
+        END AS is_in_sla_exclusion_list,
+        CASE
+            WHEN c.id_dag IS NOT NULL THEN TRUE
+            WHEN c.id_dag IS NULL THEN FALSE
+            ELSE NULL
+        END AS is_in_ignoring_list,
+        CASE
+            WHEN db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = TRUE THEN TRUE
+            WHEN db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN FALSE
+            ELSE NULL 
+        END AS is_inside_sla,
+        CASE
+            WHEN db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN TRUE
+            WHEN db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = TRUE THEN FALSE
+            ELSE NULL
+        END AS is_outside_sla,
+        CASE
+            WHEN (db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla IS NULL) OR c.id_dag IS NOT NULL THEN TRUE
+            WHEN (db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla IS NOT NULL) OR c.id_dag IS NULL THEN FALSE
+            ELSE NULL
+        END AS is_null_sla,
         d.dt_event
     FROM
         dag_base AS d
@@ -184,42 +205,30 @@ totals_base AS (
         sla_exclusion_list AS ds
             ON ds.id_dag = d.id_dag
             AND ds.dt_event = d.dt_event
-    GROUP BY 1, 28
 )
 SELECT
-    tb.id_line AS sk_line,
-    DATE_FORMAT(dt_event, 'yyyyMMdd') AS sk_snapshot_date,
-    ROUND(100*(tb.total_dags_inside_sla/(tb.total_active_unpaused_dags - tb.total_dags_ignoring_list + tb.total_dags_special_scheduler_executed)), 1) AS sla,
-    tb.total_active_dags,
-    tb.total_active_unpaused_dags,
-    tb.total_dags_executed,
-    tb.total_dags_special_scheduler,
-    tb.total_dags_special_scheduler_executed,
-    tb.total_dags_in_sla_exclusion_list,
-    tb.total_dags_ignoring_list,
-    tb.total_dags_inside_sla,
-    tb.total_dags_outside_sla,
-    tb.total_dags_null_sla,
-    tb.total_success_dags,
-    tb.total_failed_dags,
-    tb.total_dags_with_manual_run,
-    tb.total_dags_triggered_by_mediator,
-    tb.total_raw_clean_dags,
-    tb.total_raw_clean_dags_excuted,
-    tb.total_enrich_dags,
-    tb.total_enrich_dags_executed,
-    tb.total_dw_dags,
-    tb.total_dw_dags_executed,
-    tb.total_metric_dags,
-    tb.total_metric_dags_executed,
-    tb.total_reverse_dags,
-    tb.total_reverse_dags_executed,
-    tb.total_datamart_dags,
-    tb.total_datamart_dags_executed,
+    id_dag,
+    id_line,
+    is_active,
+    is_active_and_unpaused,
+    is_executed,
+    is_special_scheduler,
+    is_special_scheduler_executed,
+    is_in_sla_exclusion_list,
+    is_in_ignoring_list,
+    is_inside_sla,
+    is_outside_sla,
+    is_null_sla,
+    CASE
+        WHEN is_active_and_unpaused = TRUE AND COALESCE(is_inside_sla, is_outside_sla, is_null_sla) IS NULL THEN TRUE
+        WHEN is_active_and_unpaused = TRUE AND is_in_ignoring_list = FALSE AND COALESCE(is_inside_sla, is_outside_sla) IS NULL THEN TRUE
+        WHEN is_active_and_unpaused = TRUE AND is_special_scheduler_executed = TRUE AND is_in_sla_exclusion_list = FALSE 
+         AND COALESCE(is_inside_sla, is_outside_sla) IS NULL AND is_null_sla = TRUE THEN TRUE
+        ELSE NULL  
+    END AS has_possible_problem,
     dt_event AS dt_snapshot,
-    NOW() AS ts_load,
     YEAR(dt_event) AS year,
     MONTH(dt_event) AS month,
     DAY(dt_event) AS day
 FROM
-    totals_base AS tb
+    base 

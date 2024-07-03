@@ -1,0 +1,55 @@
+---
+database_name: datalake_pipeline
+table_name: dag_sla_information
+description:
+  This table consolidates information about a DAG SLA. With it, it's possible to understand
+  why a DAG was marked as inside/outslide SLA or why a line couldn't achieve 100% on the SLA.
+domain: Cross
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_dag:
+    lineage:
+      - datalake_pipeline.dag.id_dag
+    description:  DAG id, which is also the DAG name on Airflow.
+  id_line:
+    lineage:
+      - datalake_pipeline.dag.id_line
+    description: DAG line id, which is also known as the "DAG owner".
+  is_active:
+    description: Boolean flag indicating if the DAG is active.
+  is_active_and_unpaused:
+    description: Boolean flag indicating if the DAG is active and unpaused, which means that it's
+      expected that it will run.
+  is_executed:
+    description: Boolean flag indicating if the DAG had an execution.
+  is_special_scheduler:
+    description: Boolean flag indicating if the DAG is in the special scheduler gsheet list.
+  is_special_scheduler_executed:
+    description: Boolean flag indicating if the DAG is in the special scheduler gsheet list and
+      had run.
+  is_in_sla_exclusion_list:
+    description: Boolean flag indicating if the DAG is in the SLA exclusion gsheet list.
+  is_in_ignoring_list:
+    description: Boolean flag indicating if the DAG is being ignored on the SLA calculation for a
+      a few reasons (is part of the SLA exclusion list, it's part of the special scheduler list and
+      hadn't run, is in its first execution ever, etc.)
+  is_inside_sla:
+    description: Boolean flag indicating if the DAG is marked as inside the SLA.
+  is_outside_sla:
+    description: Boolean flag indicating if the DAG is marked as outside the SLA.
+  is_null_sla:
+    description: Boolean flag indicating if the DAG is marked as null SLA, which means that for some
+      reason it's not considered in the SLA calculation.
+  has_possible_problem:
+    description: Boolean flag indicating if the DAG has a possible problem related to its SLA information.
+      This column can be used to debug why a DAG is not being considered on the SLA.
+  dt_snapshot:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: Date of the snapshot.
+  year:
+    description: Year of the snapshot. Also, a partition of the table.
+  month:
+    description: Month of the snapshot. Also, a partition of the table.
+  day:
+    description: Day of the snapshot. Also, a partition of the table.
