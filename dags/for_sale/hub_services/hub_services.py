@@ -38,7 +38,7 @@ RAW_SPARK_JOB_PATH = (
     "load_hub_services_raw.py"
 )
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_general_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
