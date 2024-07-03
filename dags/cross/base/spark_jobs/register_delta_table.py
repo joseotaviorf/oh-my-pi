@@ -48,7 +48,7 @@ def register_table(
     trino_client.run(f"CREATE SCHEMA IF NOT EXISTS {DELTA_CATALOG}.{database_name}")
     if trino_client.table_exists(database_name, table_name):
         table_ddl = trino_client.get_table_ddl(database_name, table_name)
-        is_delta = f"{DELTA_CATALOG}.{database_name}.{table_name}" in table_ddl
+        is_delta = f"{DELTA_CATALOG}.{database_name}.{table_name}" in table_ddl.replace("\"", "")
         if not is_delta:
             trino_client.drop_table(database_name, table_name)
 

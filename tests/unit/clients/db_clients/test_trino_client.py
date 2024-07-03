@@ -122,7 +122,7 @@ class TestTrinoClient:
         schema_name = "schema"
         table_name = "table"
 
-        command = f"DROP TABLE {schema_name}.{table_name}"
+        command = f'DROP TABLE "{schema_name}"."{table_name}"'
 
         mocked_trino_client.run = Mock()
 
@@ -179,5 +179,5 @@ class TestTrinoClient:
         # assert
         assert returned_value == expected_return
         mocked_trino_client.get_records.assert_called_once_with(
-            f"SHOW CREATE TABLE schema.table"
+            f'SHOW CREATE TABLE "schema"."table"'
         )
