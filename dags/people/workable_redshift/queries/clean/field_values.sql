@@ -12,4 +12,4 @@ SELECT
 FROM
     datalake_workable_redshift_raw.field_values
 WHERE  
-    DATE(updated_at) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
