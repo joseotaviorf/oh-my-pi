@@ -41,7 +41,7 @@ SELECT
     quarter,
     halfyear AS half_year,
     year,
-    TO_DATE(date, 'mm-dd-yyyy') AS dt_reference,
-    TO_DATE(week_start, 'mm-dd-yyyy') AS dt_week
+    TO_DATE(date, 'MM-dd-yyyy') AS dt_reference,
+    TO_DATE(week_start, 'MM-dd-yyyy') AS dt_week
 FROM
     datalake_gsheets_raw.quintocred_coincident_targets
