@@ -8,7 +8,9 @@ WITH dag_run_base AS (
         dr.is_first_execution_inside_sla,
         ROW_NUMBER() OVER(PARTITION BY id_dag, DATE(dr.ts_run) ORDER BY ts_run) AS rn,
         DATE(dr.ts_run) AS dt_run,
-        DATE_ADD(dr.ts_run, 1) AS dt_event
+        DATE_ADD(dr.ts_run, 1) AS dt_event,
+        ts_first_execution_success,
+        ts_first_execution_success_brt
     FROM
         datalake_pipeline.dag_run AS dr
     WHERE
@@ -186,7 +188,10 @@ base AS (
             WHEN (db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla IS NOT NULL) OR c.id_dag IS NULL THEN FALSE
             ELSE NULL
         END AS is_null_sla,
-        d.dt_event
+        d.dt_event,
+        db.dt_run,
+        db.ts_first_execution_success,
+        db.ts_first_execution_success_brt
     FROM
         dag_base AS d
     LEFT JOIN   -- The DAG run may not exist yet
@@ -227,6 +232,9 @@ SELECT
         ELSE NULL  
     END AS has_possible_problem,
     dt_event AS dt_snapshot,
+    dt_run,
+    ts_first_execution_success,
+    ts_first_execution_success_brt,
     YEAR(dt_event) AS year,
     MONTH(dt_event) AS month,
     DAY(dt_event) AS day

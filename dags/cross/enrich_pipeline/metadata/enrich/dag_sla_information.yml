@@ -47,6 +47,23 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.date
     description: Date of the snapshot.
+  dt_run:
+    lineage:
+      -  datalake_pipeline.dag_run.ts_run
+    description: The DAG run date, which usually is D-1.
+  ts_first_execution_success:
+    lineage:
+      - datalake_pipeline.dag_run.ts_first_execution_success
+    description: The UTC timestamp of when the DAG execution has first received a successful state.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
+      successful timestamp will be shown.
+  ts_first_execution_success_brt:
+    lineage:
+      - datalake_pipeline.dag_run.ts_first_execution_success_brt
+    description: The timestamp of when the DAG execution has first received a successful state, in
+      Brasilia (BR) timezone.
+      A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
+      successful timestamp will be shown.
   year:
     description: Year of the snapshot. Also, a partition of the table.
   month:
