@@ -118,7 +118,6 @@ recupera_negotiation AS (
     dt_down_payment,
     dt_paid_all
   FROM datalake_recupera.negotiation
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_negotiation ORDER BY MAKE_DATE(year,month,day) DESC) = 1
 ),
 invalid_negotiations AS (
   SELECT

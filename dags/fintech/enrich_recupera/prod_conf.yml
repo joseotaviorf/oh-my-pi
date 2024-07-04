@@ -7,8 +7,7 @@ tables:
     is_incremental: true
     partitions: [year, month, day]
   - table_name: negotiation
-    is_incremental: true
-    partitions: [year, month, day]
+    is_incremental: false
   - table_name: installment
     is_incremental: false
   - table_name: changes_debts_distribution
