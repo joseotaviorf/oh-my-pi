@@ -12,7 +12,7 @@ WITH bob_houses AS (
       ON (hd.id_draft = sp.id_house_draft) 
         AND (sp.id_external IS NOT NULL)
   WHERE 
-    DATE(ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(hd.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 lbc_houses AS (
   SELECT 
@@ -31,7 +31,7 @@ lbc_houses AS (
         AND (aud.id_house = lbc.id_house)
   WHERE
     aud.status IN ('EDITING', 'PUBLISHED')
-      AND lbc.ts_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      AND DATE(lbc.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   QUALIFY ROW_NUMBER() OVER (PARTITION BY aud.id_house, aud.business_context ORDER BY aud.rev) = 1
 ),
 joined_tb AS (
@@ -76,7 +76,7 @@ lead_conversion_1p AS (
       houses_with_context AS hw
         ON (hlc.id_house = hw.id_house)
     WHERE 
-      DATE(hlc.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      DATE(hlc.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     -- EBDB is a source of historic information
     SELECT 
@@ -122,7 +122,7 @@ lead_conversion_3p AS (
     JOIN datalake_ebdb_clean.listing_business_context_aud AS lbca
         ON lbca.id_house = h.id
     WHERE 
-      DATE(l.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      DATE(l.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY ROW_NUMBER() OVER (PARTITION BY l.id, lbca.id_house, lbca.business_context ORDER BY l.ts_created) = 1
 ),
 lead_conversion_ciq AS (
@@ -144,7 +144,7 @@ lead_conversion_ciq AS (
           AND (s.id_external IS NOT NULL)
     WHERE 
       (hd.type = 'ADMIN_CONFIRMATION')
-        AND DATE(hd.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND DATE(hd.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 
 all_conversions AS (
