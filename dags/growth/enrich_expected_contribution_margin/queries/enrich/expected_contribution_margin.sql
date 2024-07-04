@@ -3,24 +3,24 @@ WITH raw_predicted_durations_table AS (
         CAST(input_data.id_rent_flow AS BIGINT) AS id_rent_flow,
         CAST(input_data.id_house AS BIGINT) AS id_house,
         CAST(input_data.id_tenant_prospect AS BIGINT) AS id_tenant_prospect,
-        max_by(
+        MAX_BY(
             output_data.estimated_duration / 30,  -- Convert from days to months
             struct(model_version, ts_inference)
         ) AS estimated_duration,
-        max_by(
+        MAX_BY(
             CAST(input_data.rent AS DOUBLE),
             struct(model_version, ts_inference)
         ) AS rent,
-        CAST(max_by(
+        CAST(MAX_BY(
           ts_inference,
           struct(model_version, ts_inference)
-        ) AS DATE) as dt_inference
+        ) AS DATE) AS dt_inference
     FROM (
         SELECT
             ts_inference,
             model_version,
-            from_json(input_data, 'MAP<STRING, STRING>') as input_data,
-            from_json(output_data, 'STRUCT<estimated_duration: DOUBLE>') as output_data
+            from_json(input_data, 'MAP<STRING, STRING>') AS input_data,
+            from_json(output_data, 'STRUCT<estimated_duration: DOUBLE>') AS output_data
         FROM
             datalake_batch_inference_clean.batch_inference
         WHERE
@@ -38,7 +38,7 @@ raw_predicted_vb2cs_table AS (
         CAST(input_data.id_rent_flow AS BIGINT) AS id_rent_flow,
         CAST(input_data.id_house AS BIGINT) AS id_house,
         CAST(input_data.id_tenant_prospect AS BIGINT) AS id_tenant_prospect,
-        max_by(
+        MAX_BY(
             output_data.estimated_vb2cs,
             struct(model_version, ts_inference)
         ) AS estimated_vb2cs
@@ -46,8 +46,8 @@ raw_predicted_vb2cs_table AS (
         SELECT
             ts_inference,
             model_version,
-            from_json(input_data, 'MAP<STRING, STRING>') as input_data,
-            from_json(output_data, 'STRUCT<estimated_vb2cs: DOUBLE>') as output_data
+            from_json(input_data, 'MAP<STRING, STRING>') AS input_data,
+            from_json(output_data, 'STRUCT<estimated_vb2cs: DOUBLE>') AS output_data
         FROM
             datalake_batch_inference_clean.batch_inference
         WHERE
@@ -65,7 +65,7 @@ raw_predicted_do2cs_table AS (
         CAST(input_data.id_rent_flow AS BIGINT) AS id_rent_flow,
         CAST(input_data.id_house AS BIGINT) AS id_house,
         CAST(input_data.id_tenant_prospect AS BIGINT) AS id_tenant_prospect,
-        max_by(
+        MAX_BY(
             output_data.estimated_do2cs,
             struct(model_version, ts_inference)
         ) AS estimated_do2cs
@@ -73,8 +73,8 @@ raw_predicted_do2cs_table AS (
         SELECT
             ts_inference,
             model_version,
-            from_json(input_data, 'MAP<STRING, STRING>') as input_data,
-            from_json(output_data, 'STRUCT<estimated_do2cs: DOUBLE>') as output_data
+            from_json(input_data, 'MAP<STRING, STRING>') AS input_data,
+            from_json(output_data, 'STRUCT<estimated_do2cs: DOUBLE>') AS output_data
         FROM
             datalake_batch_inference_clean.batch_inference
         WHERE
@@ -117,11 +117,13 @@ cs_table AS (
         id_rent_flow,
         id_house,
         id_tenant_prospect,
-        id_contract
+        MAX_BY(id_contract, ts_event) as id_contract  -- FIXME: The same RF can have more than 1 contract
     FROM
         datalake_rent_demand_events.rent_demand_events
     WHERE
         id_event_type = 9
+    GROUP BY
+        ALL
 ),
 
 raw_predictions_table AS (
@@ -182,6 +184,7 @@ exploded_table AS (
 contract_onboarding_costs AS (
     SELECT
         id_rent_flow,
+        id_contract,
         months_since_contract_start,
         800 AS pre_rental_costs,
         255 AS onboarding_costs
@@ -194,6 +197,7 @@ contract_onboarding_costs AS (
 contract_ongoing_costs AS (
     SELECT
         id_rent_flow,
+        id_contract,
         months_since_contract_start,
         25 AS ongoing_costs
     FROM
@@ -206,6 +210,7 @@ contract_ongoing_costs AS (
 contract_offboarding_costs AS (
     SELECT
         id_rent_flow,
+        id_contract,
         months_since_contract_start,
         700 AS offboarding_costs
     FROM
@@ -250,8 +255,8 @@ SELECT
 FROM
     exploded_table
 LEFT JOIN
-    contract_onboarding_costs USING (id_rent_flow, months_since_contract_start)
+    contract_onboarding_costs USING (id_rent_flow, id_contract, months_since_contract_start)
 LEFT JOIN
-    contract_ongoing_costs USING (id_rent_flow, months_since_contract_start)
+    contract_ongoing_costs USING (id_rent_flow, id_contract, months_since_contract_start)
 LEFT JOIN
-    contract_offboarding_costs USING (id_rent_flow, months_since_contract_start)
+    contract_offboarding_costs USING (id_rent_flow, id_contract, months_since_contract_start)

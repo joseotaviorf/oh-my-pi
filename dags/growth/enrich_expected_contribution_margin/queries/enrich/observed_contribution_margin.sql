@@ -75,7 +75,8 @@ taxes_table as (
            ('202401', -9.08),
            ('202402', -8.38),
            ('202403', -8.73),
-           ('202404', -8.55)
+           ('202404', -8.55),
+           ('202405', -8.16)
   ) AS (accrual_year_month, tax_rate)
 ),
 
@@ -137,12 +138,19 @@ losses_table AS (
     SELECT
         id_contract,
         dt_month_start,
-        provision_balance - lag(provision_balance) OVER (
-            PARTITION BY id_contract
-            ORDER BY dt_month_start
-        ) AS losses
+        CASE
+            WHEN dt_month_start = contract_start_month
+                THEN provision_balance
+            ELSE
+                provision_balance - lag(provision_balance) OVER (
+                    PARTITION BY id_contract
+                    ORDER BY dt_month_start
+                )
+        END as losses
     FROM
         provision_table
+    LEFT JOIN
+        contracts_table USING (id_contract)
     WHERE
         dt_month_start <> date_format(current_date, "yyyy-MM-01")
 ),

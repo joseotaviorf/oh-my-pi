@@ -3,12 +3,8 @@ WITH raw_predicted_durations_table AS (
         CAST(input_data.id_rent_flow AS BIGINT) AS id_rent_flow,
         CAST(input_data.id_house AS BIGINT) AS id_house,
         CAST(input_data.id_tenant_prospect AS BIGINT) AS id_tenant_prospect,
-        BIGINT(DOUBLE(input_data.id_booking)) AS id_booking,
-        BIGINT(DOUBLE(input_data.id_offer)) AS id_offer,
-        COALESCE(
-            BIGINT(DOUBLE(input_data.id_booking)),
-            BIGINT(DOUBLE(input_data.id_offer))
-        ) AS id_event,
+        COALESCE(BIGINT(DOUBLE(input_data.id_booking)), -1) AS id_booking,
+        COALESCE(BIGINT(DOUBLE(input_data.id_offer)), -1) AS id_offer,
         MAX_BY(
             output_data.estimated_duration / 30,  -- Convert from days to months
             struct(model_version, ts_inference)
@@ -45,12 +41,8 @@ raw_predicted_vb2cs_table AS (
         CAST(input_data.id_rent_flow AS BIGINT) AS id_rent_flow,
         CAST(input_data.id_house AS BIGINT) AS id_house,
         CAST(input_data.id_tenant_prospect AS BIGINT) AS id_tenant_prospect,
-        BIGINT(DOUBLE(input_data.id_booking)) AS id_booking,
-        BIGINT(DOUBLE(input_data.id_offer)) AS id_offer,
-        COALESCE(
-            BIGINT(DOUBLE(input_data.id_booking)),
-            BIGINT(DOUBLE(input_data.id_offer))
-        ) AS id_event,
+        COALESCE(BIGINT(DOUBLE(input_data.id_booking)), -1) AS id_booking,
+        COALESCE(BIGINT(DOUBLE(input_data.id_offer)), -1) AS id_offer,
         MAX_BY(
             output_data.estimated_vb2cs,
             struct(model_version, ts_inference)
@@ -75,12 +67,8 @@ raw_predicted_do2cs_table AS (
         CAST(input_data.id_rent_flow AS BIGINT) AS id_rent_flow,
         CAST(input_data.id_house AS BIGINT) AS id_house,
         CAST(input_data.id_tenant_prospect AS BIGINT) AS id_tenant_prospect,
-        BIGINT(DOUBLE(input_data.id_booking)) AS id_booking,
-        BIGINT(DOUBLE(input_data.id_offer)) AS id_offer,
-        COALESCE(
-            BIGINT(DOUBLE(input_data.id_booking)),
-            BIGINT(DOUBLE(input_data.id_offer))
-        ) AS id_event,
+        COALESCE(BIGINT(DOUBLE(input_data.id_booking)), -1) AS id_booking,
+        COALESCE(BIGINT(DOUBLE(input_data.id_offer)), -1) AS id_offer,
         MAX_BY(
             output_data.estimated_do2cs,
             struct(model_version, ts_inference)
@@ -105,8 +93,8 @@ raw_predictions_table AS (
         id_rent_flow,
         id_house,
         id_tenant_prospect,
-        table1.id_booking,
-        table1.id_offer,
+        id_booking,
+        id_offer,
         estimated_duration,
         estimated_vb2cs,
         estimated_do2cs,
@@ -114,15 +102,18 @@ raw_predictions_table AS (
         table1.dt_inference,
         table1.dt_event_time,
         CASE
-            WHEN table1.id_booking IS NULL THEN TRUE
+            WHEN id_booking = -1 THEN TRUE
             ELSE FALSE
         END AS is_do
     FROM
         raw_predicted_durations_table table1
     JOIN
-        raw_predicted_vb2cs_table USING (id_rent_flow, id_house, id_tenant_prospect, id_event)
+        raw_predicted_vb2cs_table USING (id_rent_flow, id_house, id_tenant_prospect, id_booking, id_offer)
     JOIN
-        raw_predicted_do2cs_table USING (id_rent_flow, id_house, id_tenant_prospect, id_event)
+        raw_predicted_do2cs_table USING (id_rent_flow, id_house, id_tenant_prospect, id_booking, id_offer)
+    WHERE
+        id_booking <> -1
+        OR id_offer <> -1
 ),
 
 exploded_table AS (
@@ -162,6 +153,10 @@ exploded_table AS (
 contract_onboarding_costs AS (
     SELECT
         id_rent_flow,
+        id_house,
+        id_tenant_prospect,
+        id_booking,
+        id_offer,
         months_since_contract_start,
         800 AS pre_rental_costs,
         255 AS onboarding_costs
@@ -174,6 +169,10 @@ contract_onboarding_costs AS (
 contract_ongoing_costs AS (
     SELECT
         id_rent_flow,
+        id_house,
+        id_tenant_prospect,
+        id_booking,
+        id_offer,
         months_since_contract_start,
         25 AS ongoing_costs
     FROM
@@ -186,6 +185,10 @@ contract_ongoing_costs AS (
 contract_offboarding_costs AS (
     SELECT
         id_rent_flow,
+        id_house,
+        id_tenant_prospect,
+        id_booking,
+        id_offer,
         months_since_contract_start,
         700 AS offboarding_costs
     FROM
@@ -198,8 +201,14 @@ SELECT
     id_rent_flow,
     id_house,
     id_tenant_prospect,
-    id_booking,
-    id_offer,
+    CASE
+        WHEN id_booking = -1 THEN NULL
+        ELSE id_booking
+    END AS id_booking,
+    CASE
+        WHEN id_offer = -1 THEN NULL
+        ELSE id_offer
+    END AS id_offer,
     months_since_contract_start,
     CASE
         WHEN months_since_contract_start = 1 THEN rent  -- Brokerage fee
@@ -232,8 +241,29 @@ SELECT
 FROM
     exploded_table
 LEFT JOIN
-    contract_onboarding_costs USING (id_rent_flow, months_since_contract_start)
+    contract_onboarding_costs USING (
+        id_rent_flow,
+        id_house,
+        id_tenant_prospect,
+        id_booking,
+        id_offer,
+        months_since_contract_start
+    )
 LEFT JOIN
-    contract_ongoing_costs USING (id_rent_flow, months_since_contract_start)
+    contract_ongoing_costs USING (
+        id_rent_flow,
+        id_house,
+        id_tenant_prospect,
+        id_booking,
+        id_offer,
+        months_since_contract_start
+    )
 LEFT JOIN
-    contract_offboarding_costs USING (id_rent_flow, months_since_contract_start)
+    contract_offboarding_costs USING (
+        id_rent_flow,
+        id_house,
+        id_tenant_prospect,
+        id_booking,
+        id_offer,
+        months_since_contract_start
+    )
