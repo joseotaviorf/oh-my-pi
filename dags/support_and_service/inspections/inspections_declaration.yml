@@ -19,6 +19,8 @@ workflow:
   tables_customization:
     appointment_aud:
       date_filter_column: updated_at
+    appointment:
+      date_filter_column: updated_at
     assessment:
       date_filter_column: updated_at
     contestation_media:
