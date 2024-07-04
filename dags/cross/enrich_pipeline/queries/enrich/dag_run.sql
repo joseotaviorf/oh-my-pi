@@ -37,7 +37,7 @@ dag_clear AS (
     datalake_composer_clean.log
   WHERE
     id_dag LIKE 'bietlejuice%'
-    AND event = 'dagrun_clear'
+    AND event IN ('clear', 'dagrun_clear')
 ),
 composer_run AS (
   /** Finding the most recent run of the Composer DAG for each execution date.

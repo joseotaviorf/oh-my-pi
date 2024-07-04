@@ -31,8 +31,8 @@ columns:
     description: Boolean flag indicating if the DAG is in the SLA exclusion gsheet list.
   is_in_ignoring_list:
     description: Boolean flag indicating if the DAG is being ignored on the SLA calculation for a
-      a few reasons (is part of the SLA exclusion list, it's part of the special scheduler list and
-      hadn't run, is in its first execution ever, etc.)
+      a few reasons (it needs to be active and unpaused, and then may be part of the SLA exclusion list,
+      or it's part of the special scheduler list and hadn't run, is in its first execution ever, etc.)
   is_inside_sla:
     description: Boolean flag indicating if the DAG is marked as inside the SLA.
   is_outside_sla:

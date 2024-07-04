@@ -1,19 +1,20 @@
 WITH most_recent_run AS (
   SELECT
-  -- The last run date of a DAG. A reminder that usually our DAGs are D-1.
+  -- The last run date of a DAG. A reminder that usually our DAGs are D-1
     id_dag,
     state,
     is_in_exclusion_list,
     is_first_execution_inside_sla AS is_inside_sla,
-    DATE(ts_run) AS dt_run
+    DATE(ts_run) AS dt_run,
+    ts_first_execution_success
   FROM 
     datalake_pipeline.dag_run
   WHERE
-    is_manual_run = FALSE   -- Excluding manual DAG runs, because it's created as D0.
+    is_manual_run = FALSE   -- Excluding manual DAG runs, because it's created as D0
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_run DESC) = 1
 ),
-medians (
+medians AS (
     SELECT
         id_dag,
         MEDIAN(duration) AS median_duration,
@@ -57,7 +58,7 @@ base_amount_of_tasks AS (
     -- that had a cluster/job terminated is the one that we'll use to count the amount of tasks
     SELECT
         id_dag,
-        MAX(ts_executed) AS ts_last_run
+        CAST(MAX(ts_executed) AS TIMESTAMP) AS ts_last_run
     FROM
         datalake_composer_clean.log
     WHERE
@@ -71,34 +72,44 @@ amount_of_tasks AS (
     SELECT
         l.id_dag,
         COUNT(DISTINCT l.id_task) AS number_of_tasks,
-        l.ts_executed AS ts_run
+        CAST(l.ts_executed AS TIMESTAMP) AS ts_run
     FROM
         datalake_composer_clean.log AS l
     JOIN
         base_amount_of_tasks AS b
             ON b.id_dag = l.id_dag
-            AND b.ts_last_run = l.ts_executed
+            AND b.ts_last_run = CAST(l.ts_executed AS TIMESTAMP)
     GROUP BY 1, 3
 ),
 dag_info AS (
     SELECT
-        id_dag,
+        d.id_dag,
         REPLACE(REPLACE(owners, 'airflow, ', ''), ', airflow', '') AS line_name,
         CASE
-            WHEN id_dag LIKE '%.enrich_%' THEN 'enrich'
-            WHEN id_dag LIKE '%.dw_%' THEN 'dw'
-            WHEN id_dag LIKE '%.metric_%' THEN 'metric'
-            WHEN id_dag LIKE '%.reverse_%' THEN 'reverse'
+            WHEN d.id_dag LIKE '%.enrich_%' THEN 'enrich'
+            WHEN d.id_dag LIKE '%.dw_%' THEN 'dw'
+            WHEN d.id_dag LIKE '%.metric_%' THEN 'metric'
+            WHEN d.id_dag LIKE '%.reverse_%' THEN 'reverse'
             ELSE 'raw/clean'
         END AS layer,
         schedule_interval,
         is_active,
         is_paused,
-        IF(id_dag LIKE '%datamarts%', TRUE, FALSE) AS is_datamart
+        IF(d.id_dag LIKE '%datamarts%', TRUE, FALSE) AS is_datamart,
+        IF(de.dag IS NOT NULL, TRUE, FALSE) AS is_in_exclusion_list,
+        IF(ds.id_dag IS NOT NULL, TRUE, FALSE) AS has_special_scheduler
     FROM
-        datalake_composer_clean.dag
+        datalake_composer_clean.dag AS d
+    LEFT JOIN
+        datalake_gsheets_clean.dags_special_scheduler AS ds
+            ON ds.id_dag = d.id_dag
+            AND CURRENT_DATE BETWEEN dt_added AND COALESCE(dt_removed, CURRENT_DATE)
+    LEFT JOIN
+        datalake_gsheets_clean.dags_sla_exclusion_list AS de
+            ON de.dag = d.id_dag
+            AND d.ts_last_scheduler_ran BETWEEN de.dt_dag_added AND COALESCE(de.dt_dag_removed, NOW())
     WHERE
-        id_dag LIKE 'bietlejuice%'
+        d.id_dag LIKE 'bietlejuice%'
 ),
 sla_base AS (
     SELECT
@@ -109,8 +120,19 @@ sla_base AS (
         me.duration,
         d.is_active,
         d.is_paused,
-        mc.is_in_exclusion_list,
-        IF(d.is_active = FALSE OR d.is_paused = TRUE OR mc.is_in_exclusion_list = TRUE, TRUE, FALSE) AS is_ignored,
+        d.is_in_exclusion_list,
+        d.has_special_scheduler,
+        CASE
+            WHEN d.is_active = TRUE AND d.is_paused = FALSE THEN    -- Only considering DAGs that are active and not paused
+            CASE
+                WHEN d.is_in_exclusion_list = TRUE THEN TRUE
+                WHEN d.is_in_exclusion_list = FALSE AND d.has_special_scheduler = FALSE THEN FALSE
+                WHEN d.has_special_scheduler = TRUE AND mc.ts_first_execution_success IS NULL THEN TRUE
+                WHEN d.has_special_scheduler = TRUE AND DATE(mc.ts_first_execution_success) < CURRENT_DATE THEN TRUE -- DAGs with special scheduler that didn't run today
+                WHEN d.has_special_scheduler = TRUE AND DATE(mc.ts_first_execution_success) = CURRENT_DATE THEN FALSE -- DAGs with special scheduler that had a run today
+            END 
+            ELSE NULL
+        END AS is_in_sla_ignoring_list,  -- DAGs that should be ignored in the SLA calculation
         d.is_datamart,
         mc.is_inside_sla,
         mc.dt_run,
@@ -122,10 +144,10 @@ sla_base AS (
         me.ts_last_run_first_success_brt
     FROM
         dag_info AS d
-    JOIN
+    LEFT JOIN   -- Some DAGs hadn't had any run
         most_recent_run AS mc
             ON mc.id_dag = d.id_dag
-    JOIN
+    LEFT JOIN
         most_recent_events AS me
             ON me.id_dag = d.id_dag
 ),
@@ -142,8 +164,9 @@ base AS (
         m.median_duration,
         d.is_active,
         d.is_paused,
-        s.is_in_exclusion_list,
-        s.is_ignored,
+        d.is_in_exclusion_list,
+        d.has_special_scheduler,
+        s.is_in_sla_ignoring_list,
         s.is_inside_sla,
         d.is_datamart,
         IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
@@ -203,15 +226,15 @@ SELECT
     is_active,
     is_paused,
     is_in_exclusion_list,
-    is_ignored,
+    has_special_scheduler,
+    is_in_sla_ignoring_list,
     is_datamart,
-    IF(ds.id_dag IS NOT NULL, TRUE, FALSE) AS has_special_scheduler,
     has_todays_run_happened,
     CASE
-        WHEN has_todays_run_happened = TRUE AND is_inside_sla = TRUE AND is_ignored = FALSE THEN TRUE
-        WHEN has_todays_run_happened = TRUE AND is_inside_sla = FALSE AND is_ignored = FALSE THEN FALSE
-        WHEN has_todays_run_happened = FALSE AND is_inside_sla = FALSE AND is_ignored = FALSE AND ds.id_dag IS NULL THEN FALSE
-        WHEN has_todays_run_happened = FALSE AND is_ignored = FALSE AND ds.id_dag IS NULL AND NOW() > ts_utc_sla THEN FALSE
+        WHEN has_todays_run_happened = TRUE AND is_inside_sla = TRUE AND is_in_sla_ignoring_list = FALSE THEN TRUE
+        WHEN has_todays_run_happened = TRUE AND is_inside_sla = FALSE AND is_in_sla_ignoring_list = FALSE THEN FALSE
+        WHEN has_todays_run_happened = FALSE AND is_inside_sla = FALSE AND is_in_sla_ignoring_list = FALSE AND has_special_scheduler = FALSE THEN FALSE
+        WHEN has_todays_run_happened = FALSE AND is_in_sla_ignoring_list = FALSE AND has_special_scheduler = FALSE AND NOW() > ts_utc_sla THEN FALSE
         ELSE NULL
     END AS is_inside_sla,
     ts_first_event,
@@ -231,7 +254,3 @@ SELECT
     FROM_UTC_TIMESTAMP(NOW(), 'America/Sao_Paulo') AS ts_load_brt
 FROM
     base AS b
-LEFT JOIN
-    datalake_gsheets_clean.dags_special_scheduler AS ds
-        ON ds.id_dag = b.id_dag
-        AND CURRENT_DATE BETWEEN dt_added AND COALESCE(dt_removed, CURRENT_DATE)

@@ -78,6 +78,9 @@ columns:
   has_special_scheduler:
     description: Boolean flag indicating if the DAG doesn't run everyday and has a special scheduler 
       (such as only runs on fridays, only runs on the first day of the month, etc.).
+  is_in_sla_ignoring_list:
+    description: Boolean flag indicating if the DAG should be ignored or not on the SLA calculation, related to our ignoring lists (DAGs that 
+      are already expected to be outside the SLA and DAGs that has a special scheduler and hadn't run).
   has_todays_run_happened:
     description: Boolean flag indicating if the DAG has run on the present day, which would indicate that
       its data is already available.
