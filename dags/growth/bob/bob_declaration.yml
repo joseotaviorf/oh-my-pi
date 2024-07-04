@@ -21,7 +21,7 @@ workflow:
     attribution_progress:
       extraction_type: full
     house_draft_aud:
-      date_filter_column: created_at
+      date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]
       z_order_by: [id_house_draft]

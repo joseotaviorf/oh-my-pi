@@ -272,6 +272,9 @@ bietlejuice.enrich_app_installed:
 bietlejuice.enrich_braze_events:
   remove:
     - bietlejuice.braze_events:load-clean-events-indica-ai
+bietlejuice.enrich_bob:
+  remove:
+    - bietlejuice.bob:load-clean-house-draft-aud
 bietlejuice.enrich_braze_events_dispatches:
   remove:
     - bietlejuice.enrich_braze_events:load-enrich-events-affiliates
