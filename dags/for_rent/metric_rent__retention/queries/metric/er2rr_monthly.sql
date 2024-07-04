@@ -62,25 +62,11 @@ metric_calculations AS (
     ) AS qtd_ended_rental_matured_4W,
     COUNT(DISTINCT
         IF(
-          dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
-          , cs.sk_contract
-          , NULL
-        )
-    ) AS qtd_rerental_matured_4W,
-    COUNT(DISTINCT
-        IF(
           dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
           , erc.sk_house_listing
           , NULL
         )
     ) AS qtd_ended_rental_matured_12W,
-    COUNT(DISTINCT
-        IF(
-          dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
-          , cs.sk_contract
-          , NULL
-        )
-    ) AS qtd_rerental_matured_12W,
     SUM(
       IF(
         cs.sk_contract IS NOT NULL
@@ -136,13 +122,6 @@ metric_calculations_maturation_4W AS (
           , NULL
         )
     ) AS qtd_ended_rental_matured_4W_by_maturation_date,
-    COUNT(DISTINCT
-        IF(
-          dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
-          , cs.sk_contract
-          , NULL
-        )
-    ) AS qtd_rerental_matured_4W_by_maturation_date,
     SUM(
       IF(
         cs.sk_contract IS NOT NULL
@@ -173,13 +152,6 @@ metric_calculations_maturation_12W AS (
           , NULL
         )
     ) AS qtd_ended_rental_matured_12W_by_maturation_date,
-    COUNT(DISTINCT
-        IF(
-          dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
-          , cs.sk_contract
-          , NULL
-        )
-    ) AS qtd_rerental_matured_12W_by_maturation_date,
     SUM(
       IF(
         cs.sk_contract IS NOT NULL
@@ -208,16 +180,12 @@ all_calculations AS (
     SUM(mc.qtd_RR_4W) AS rr_4w,
     SUM(mc.qtd_RR_12W) AS rr_12w,
     SUM(mc.qtd_ended_rental_matured_4W) AS ended_rentals_matured_4W,
-    SUM(mc.qtd_rerental_matured_4W) AS rerentals_matured_4W,
     SUM(mc.qtd_RR_4W_matured) AS qtd_RR_4W_matured,
     SUM(mc.qtd_ended_rental_matured_12W) AS ended_rentals_matured_12W,
-    SUM(mc.qtd_rerental_matured_12W) AS rerentals_matured_12W,
     SUM(mc.qtd_RR_12W_matured) AS qtd_RR_12W_matured,
     SUM(mc4w.qtd_ended_rental_matured_4W_by_maturation_date) AS ended_rentals_4W_by_maturation_date,
-    SUM(mc4w.qtd_rerental_matured_4W_by_maturation_date) AS rerentals_4W_by_maturation_date,
     SUM(mc4w.qtd_RR_4W_by_maturation_date) AS qtd_RR_4W_by_maturation_date,
     SUM(mc12w.qtd_ended_rental_matured_12W_by_maturation_date) AS ended_rentals_12W_by_maturation_date,
-    SUM(mc12w.qtd_rerental_matured_12W_by_maturation_date) AS rerentals_12W_by_maturation_date,
     SUM(mc12w.qtd_RR_12W_matured_by_maturation_date) AS qtd_RR_12W_matured_by_maturation_date
   FROM
     metric_calculations AS mc
@@ -248,16 +216,12 @@ all_calculations AS (
     SUM(mc.qtd_RR_4W) AS rr_4w,
     SUM(mc.qtd_RR_12W) AS rr_12w,
     SUM(mc.qtd_ended_rental_matured_4W) AS ended_rentals_matured_4W,
-    SUM(mc.qtd_rerental_matured_4W) AS rerentals_matured_4W,
     SUM(mc.qtd_RR_4W_matured) AS qtd_RR_4W_matured,
     SUM(mc.qtd_ended_rental_matured_12W) AS ended_rentals_matured_12W,
-    SUM(mc.qtd_rerental_matured_12W) AS rerentals_matured_12W,
     SUM(mc.qtd_RR_12W_matured) AS qtd_RR_12W_matured,
     SUM(mc4w.qtd_ended_rental_matured_4W_by_maturation_date) AS ended_rentals_4W_by_maturation_date,
-    SUM(mc4w.qtd_rerental_matured_4W_by_maturation_date) AS rerentals_4W_by_maturation_date,
     SUM(mc4w.qtd_RR_4W_by_maturation_date) AS qtd_RR_4W_by_maturation_date,
     SUM(mc12w.qtd_ended_rental_matured_12W_by_maturation_date) AS ended_rentals_12W_by_maturation_date,
-    SUM(mc12w.qtd_rerental_matured_12W_by_maturation_date) AS rerentals_12W_by_maturation_date,
     SUM(mc12w.qtd_RR_12W_matured_by_maturation_date) AS qtd_RR_12W_matured_by_maturation_date
   FROM
     metric_calculations AS mc
@@ -289,16 +253,16 @@ SELECT
   CAST(SUM(rr_4w) AS DOUBLE) / (SUM(ended_rentals) * 1.00) AS ER2RR_4W,
   CAST(SUM(rr_12w) AS DOUBLE) / (SUM(ended_rentals) * 1.00) AS ER2RR_12W,
   SUM(ended_rentals_matured_4W) AS ended_rentals_matured_4W,
-  SUM(rerentals_matured_4W) AS rerentals_matured_4W,
+  SUM(qtd_RR_4W_matured) AS rerentals_matured_4W,
   CAST(SUM(qtd_RR_4W_matured) AS DOUBLE) / (SUM(ended_rentals_matured_4W) * 1.00) AS ER2RR_4W_matured,
   SUM(ended_rentals_matured_12W) AS ended_rentals_matured_12W,
-  SUM(rerentals_matured_12W) AS rerentals_matured_12W,
+  SUM(qtd_RR_12W_matured) AS rerentals_matured_12W,
   CAST(SUM(qtd_RR_12W_matured) AS DOUBLE) / (SUM(ended_rentals_matured_12W) * 1.00) AS ER2RR_12W_matured,
   SUM(ended_rentals_4W_by_maturation_date) AS ended_rentals_4W_by_maturation_date,
-  SUM(rerentals_4W_by_maturation_date) AS rerentals_4W_by_maturation_date,
+  SUM(qtd_RR_4W_by_maturation_date) AS rerentals_4W_by_maturation_date,
   CAST(SUM(qtd_RR_4W_by_maturation_date) AS DOUBLE) / (SUM(ended_rentals_4W_by_maturation_date) * 1.00) AS ER2RR_4W_by_maturation_date,
   SUM(ended_rentals_12W_by_maturation_date) AS ended_rentals_12W_by_maturation_date,
-  SUM(rerentals_12W_by_maturation_date) AS rerentals_12W_by_maturation_date,
+  SUM(qtd_RR_12W_matured_by_maturation_date) AS rerentals_12W_by_maturation_date,
   CAST(SUM(qtd_RR_12W_matured_by_maturation_date) AS DOUBLE) / (SUM(ended_rentals_12W_by_maturation_date) * 1.00) AS ER2RR_12W_by_maturation_date
 FROM
   all_calculations
@@ -319,16 +283,16 @@ SELECT
   CAST(SUM(rr_4w) AS DOUBLE) / (SUM(ended_rentals) * 1.00) AS ER2RR_4W,
   CAST(SUM(rr_12w) AS DOUBLE) / (SUM(ended_rentals) * 1.00) AS ER2RR_12W,
   SUM(ended_rentals_matured_4W) AS ended_rentals_matured_4W,
-  SUM(rerentals_matured_4W) AS rerentals_matured_4W,
+  SUM(qtd_RR_4W_matured) AS rerentals_matured_4W,
   CAST(SUM(qtd_RR_4W_matured) AS DOUBLE) / (SUM(ended_rentals_matured_4W) * 1.00) AS ER2RR_4W_matured,
   SUM(ended_rentals_matured_12W) AS ended_rentals_matured_12W,
-  SUM(rerentals_matured_12W) AS rerentals_matured_12W,
+  SUM(qtd_RR_12W_matured) AS rerentals_matured_12W,
   CAST(SUM(qtd_RR_12W_matured) AS DOUBLE) / (SUM(ended_rentals_matured_12W) * 1.00) AS ER2RR_12W_matured,
   SUM(ended_rentals_4W_by_maturation_date) AS ended_rentals_4W_by_maturation_date,
-  SUM(rerentals_4W_by_maturation_date) AS rerentals_4W_by_maturation_date,
+  SUM(qtd_RR_4W_by_maturation_date) AS rerentals_4W_by_maturation_date,
   CAST(SUM(qtd_RR_4W_by_maturation_date) AS DOUBLE) / (SUM(ended_rentals_4W_by_maturation_date) * 1.00) AS ER2RR_4W_by_maturation_date,
   SUM(ended_rentals_12W_by_maturation_date) AS ended_rentals_12W_by_maturation_date,
-  SUM(rerentals_12W_by_maturation_date) AS rerentals_12W_by_maturation_date,
+  SUM(qtd_RR_12W_matured_by_maturation_date) AS rerentals_12W_by_maturation_date,
   CAST(SUM(qtd_RR_12W_matured_by_maturation_date) AS DOUBLE) / (SUM(ended_rentals_12W_by_maturation_date) * 1.00) AS ER2RR_12W_by_maturation_date
 FROM
   all_calculations
