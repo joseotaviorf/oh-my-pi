@@ -95,7 +95,7 @@ member_profile AS (
 SELECT
     u.id_agent,
     u.id_main_user AS id_user,
-    mp.id_business_unit,
+    bu.id_business_unit,
     mp.bimester_name,
     u.name,
     u.email,

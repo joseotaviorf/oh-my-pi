@@ -8,5 +8,6 @@ dag:
 workflow:
   type: query
   layer: enrich
+  custom_schema: quintoandar
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_12_2_min_memory_cluster
