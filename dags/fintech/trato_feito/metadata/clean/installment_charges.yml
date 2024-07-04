@@ -3,85 +3,93 @@ database_name: datalake_trato_feito_clean
 table_name: installment_charges
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: Installment charges
+description: "It is a table that references the billing data that was created at checkout, where their model is built through orders and charges. Here we link a charge (checkout) with an installment (tf)"
 columns:
   id:
-    description: ""
+    description: "Table ID"
     lineage:
       - datalake_trato_feito_raw.installment_charges.id
   id_installment:
-    description: ""
+    description: "FK table installment"
     lineage:
       - datalake_trato_feito_raw.installment_charges.installment_id
   id_order:
-    description: ""
+    description: "Order ID created by checkout"
     lineage:
       - datalake_trato_feito_raw.installment_charges.order_id
   id_payment_entity:
-    description: ""
+    description: "Charge payment ID at checkout"
     lineage:
       - datalake_trato_feito_raw.installment_charges.payment_entity_id
+  id_scheduler:
+    description: "Scheduler (reminder) ID"
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.scheduler_id
   id_charge:
-    description: ""
+    description: "Charge ID at checkout"
     lineage:
       - datalake_trato_feito_raw.installment_charges.charge_id
   charge_method:
-    description: ""
+    description: "Payment method (boleto, pix, credit card)"
     lineage:
       - datalake_trato_feito_raw.installment_charges.charge_method
   charge_gateway:
-    description: ""
+    description: "Gateway used by trato feito to create the billing (checkout)"
     lineage:
       - datalake_trato_feito_raw.installment_charges.charge_gateway
   status:
-    description: ""
+    description: "Billing status: open, processing or paid"
     lineage:
       - datalake_trato_feito_raw.installment_charges.status
+  rev:
+    description: "Revision"
+    lineage:
+      - datalake_trato_feito_raw.installment_charges.rev
   request_payload:
-    description: ""
+    description: "Request data sent to checkout to create the charge (order->charge)"
     lineage:
       - datalake_trato_feito_raw.installment_charges.request_payload
   response_payload:
-    description: ""
+    description: "Checkout response data for the charge creation request"
     lineage:
       - datalake_trato_feito_raw.installment_charges.response_payload
   user_data:
-    description: ""
+    description: "User data involved in the billing (generally used to create invoices)"
     lineage:
       - datalake_trato_feito_raw.installment_charges.user_data
   metadata:
-    description: ""
+    description: "General data about the payment method, such as our number, etc."
     lineage:
       - datalake_trato_feito_raw.installment_charges.metadata
   due_amount:
-    description: ""
+    description: "Due amount"
     lineage:
       - datalake_trato_feito_raw.installment_charges.due_amount
   paid_amount:
-    description: ""
+    description: "Paid amount"
     lineage:
       - datalake_trato_feito_raw.installment_charges.paid_amount
   dt_paid:
-    description: ""
+    description: "Date of payment"
     lineage:
       - datalake_trato_feito_raw.installment_charges.paid_date
   dt_due:
-    description: ""
+    description: "Due date"
     lineage:
       - datalake_trato_feito_raw.installment_charges.due_date
   dt_start_processing:
-    description: ""
+    description: "Payment processing start date"
     lineage:
       - datalake_trato_feito_raw.installment_charges.start_processing_at
   ts_created:
-    description: ""
+    description: "Charge creation date"
     lineage:
       - datalake_trato_feito_raw.installment_charges.created_at
   ts_updated:
-    description: ""
+    description: "Charge update date"
     lineage:
       - datalake_trato_feito_raw.installment_charges.updated_at
   ts_last_received:
-    description: ""
+    description: "Date of receipt of the last event"
     lineage:
       - datalake_trato_feito_raw.installment_charges.last_received_at

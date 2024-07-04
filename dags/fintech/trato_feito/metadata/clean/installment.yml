@@ -17,6 +17,10 @@ columns:
     description: "ID that connects with negotiation table"
     lineage:
       - datalake_trato_feito_raw.installment.negotiation_id
+  id_installment_charge:
+    description: Installment Charge ID (FK table installment_charges)
+    lineage:
+      - datalake_trato_feito_raw.installment.installment_charge_id
   status:
     description: "Status of installment"
     lineage:

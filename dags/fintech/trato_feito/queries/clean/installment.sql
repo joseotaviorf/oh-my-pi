@@ -2,6 +2,7 @@ SELECT
     id,
     external_id AS id_external,
     negotiation_id AS id_negotiation,
+    installment_charge_id AS id_installment_charge,
     status,
     status_reason,
     adm_fee_amount,
