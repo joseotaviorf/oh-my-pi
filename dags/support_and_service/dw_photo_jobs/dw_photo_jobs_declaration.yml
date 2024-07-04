@@ -5,11 +5,11 @@ dag:
   documentation:
     dag_purpose: This DAG loads to DW our models related to the listings jobs.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: public
 cluster:
-  type: databricks_10_4_med_general_photon_cluster
+  type: databricks_12_2_med_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

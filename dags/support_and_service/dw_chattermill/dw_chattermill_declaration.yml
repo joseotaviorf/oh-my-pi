@@ -5,11 +5,11 @@ dag:
   documentation:
     dag_purpose: This DAG load the DW tables for Chatttermill data. Those data are related to NPS.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: chattermill
 cluster:
-  type: databricks_10_4_min_io-general_cluster
+  type: databricks_12_2_min_io-general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
