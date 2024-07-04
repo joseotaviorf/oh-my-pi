@@ -1,0 +1,43 @@
+---
+database_name: metric_rent
+table_name: ongoing_terminations_overdue_stock
+description: Percentage of terminations currently in overdue stock.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_reference_day:
+    description: Date when the data was loaded.
+    dimension: True
+  qtd_overdue_stock:
+    description: Total volume of termination in overdue stock.
+    metric:
+      name: Total Overdue Stock
+      description: Total volume of termination in overdue stock.
+      acronym: TOS
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: gustavo.silva@quintoandar.com.br
+      link_to_metric: ""
+  qtd_ongoing_terminations:
+    description: Total volume of ongoing terminations.
+    metric:
+      name: Total Ongoing Terminations
+      description: Total volume of ongoing terminations.
+      acronym: TOT
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: gustavo.silva@quintoandar.com.br
+      link_to_metric: ""
+  percent_overdue_stock:
+    description: Percentage of terminations in overdue stock.
+    metric:
+      name: Percentage of Overdue Stock
+      description: Percentage of terminations in overdue stock.
+      acronym: POS
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: gustavo.silva@quintoandar.com.br
+      link_to_metric: ""

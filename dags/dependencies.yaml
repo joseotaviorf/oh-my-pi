@@ -3236,6 +3236,8 @@ bietlejuice.metric_rent__listings:
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
 bietlejuice.metric_rent__retention:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_crm:load-dw-crm-dim-inspection-task
+  - bietlejuice.dw_crm:load-dw-crm-fact-inspection-tasks
   - bietlejuice.dw_house:load-dw-rent-dim-house-status
   - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection
   - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection
@@ -3252,9 +3254,14 @@ bietlejuice.metric_rent__retention:
   - bietlejuice.dw_retention:load-dw-retention-dim-termination
   - bietlejuice.dw_retention:load-dw-retention-fact-contract-termination
   - bietlejuice.dw_retention:load-dw-retention-fact-owner-retention
+  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
+  - bietlejuice.enrich_date:load-enrich-workday-window
   - bietlejuice.enrich_ebdb_listing:load-enrich-business-context-history
   - bietlejuice.enrich_ebdb_pricing:load-enrich-rent-percentile-price-changes
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
+  - bietlejuice.terminator:load-clean-termination
 bietlejuice.metric_rent__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
