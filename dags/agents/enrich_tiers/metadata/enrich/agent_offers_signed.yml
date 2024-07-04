@@ -1,0 +1,47 @@
+---
+database_name: datalake_tiers
+table_name: agent_offers_signed
+description: Data on signed offers and the agents involved in the process.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_offer:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+    description: Unique identifier of the offer.
+  id_user:
+    lineage:
+      - datalake_offer.sale_offer.id_user
+    description: Unique identifier of the user.
+  id_agent:
+    lineage:
+      - datalake_offer.sale_offer.id_agent
+      - datalake_sale_offer_flows.offer_specialists.id_agent
+      - datalake_ebdb_user.user.id_agent
+    description: Unique identifier of the agent.
+  has_tqc:
+    description: Indicates that the offer had a buyer referral through the ‘Tem Quem Compra’ (TQC) program.
+  ts_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.ts_sale_agreement_signed
+    description: Timestamp of sale agreement signature.
+  ts_updated:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
+    description: Record update date.
+  day:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
+    description: Day of the record update date.
+  month:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
+    description: Month of the record update date.
+  year:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
+    description: Year of the record update date.

@@ -1,0 +1,47 @@
+---
+database_name: datalake_tiers
+table_name: ciq_first_listing
+description: Data from houses recommended by CIQ agents that had a first publication.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.id_house
+    description: Unique identifier of the house.
+  id_user:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.id_user
+    description: Unique identifier of the user.
+  consultant_type:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.consultant_type
+    description: CIQ profile.
+  ts_first_listing:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+    description: Timestamp of when the opportunity became a first listing.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+    description: Record update date.
+  day:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+    description: Day of the record update date.
+  month:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+    description: Month of the record update date.
+  year:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+    description: Year of the record update date.

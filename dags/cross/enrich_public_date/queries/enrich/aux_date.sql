@@ -24,6 +24,25 @@ brazillian_holidays AS (
     FROM datalake_google_calendar_clean.brazillian_holidays
     QUALIFY ROW_NUMBER() OVER(PARTITION BY dt_holiday_start, dt_holiday_end ORDER BY ts_updated DESC) = 1
 ),
+month_to_bimester AS (
+    SELECT 
+        *
+    FROM (
+        VALUES
+            (1, 1, 'Jan/Feb', ARRAY(1, 2)),
+            (2, 1, 'Jan/Feb', ARRAY(1, 2)),
+            (3, 2, 'Mar/Apr', ARRAY(3, 4)),
+            (4, 2, 'Mar/Apr', ARRAY(3, 4)),
+            (5, 3, 'May/Jun', ARRAY(5, 6)),
+            (6, 3, 'May/Jun', ARRAY(5, 6)),
+            (7, 4, 'Jul/Aug', ARRAY(7, 8)),
+            (8, 4, 'Jul/Aug', ARRAY(7, 8)),
+            (9, 5, 'Sep/Oct', ARRAY(9, 10)),
+            (10, 5, 'Sep/Oct', ARRAY(9, 10)),
+            (11, 6, 'Nov/Dec', ARRAY(11, 12)),
+            (12, 6, 'Nov/Dec', ARRAY(11, 12))
+    ) AS t(month, bimester, bimester_name, bimester_months)
+),
 base_date AS (
     SELECT
         CAST(REPLACE(dt, '-','') AS BIGINT) AS id_date,
@@ -38,6 +57,9 @@ base_date AS (
         END AS weekend,
         MONTH(dt) AS month,
         DATE_FORMAT(dt, 'MMMM') AS month_name,
+        mtb.bimester,
+        mtb.bimester_name,
+        mtb.bimester_months,
         'Q' || QUARTER(dt) AS quarter,
         CASE
             WHEN DATE_FORMAT(dt, 'MMdd') BETWEEN '0320' AND '0619' THEN 'Autumn'
@@ -105,6 +127,8 @@ base_date AS (
         DATE_TRUNC('week',dt) + INTERVAL 1 WEEK - INTERVAL 1 DAY AS week_end,
         DATE_TRUNC('month',dt) AS month_start,
         DATE_TRUNC('month',dt) + INTERVAL 1 MONTH - INTERVAL 1 DAY AS month_end,
+        MAKE_DATE(YEAR(dt), mtb.bimester_months[0], 1) AS bimester_start,
+        LAST_DAY(MAKE_DATE(YEAR(dt), mtb.bimester_months[1], 1)) AS bimester_end,
         dt - INTERVAL 1 DAY AS last_day,
         dt - INTERVAL 7 DAY AS last_week,
         dt - INTERVAL 14 DAY AS last_2_weeks,
@@ -139,10 +163,11 @@ base_date AS (
                 ON dt = mx.dt_holiday_start
                 AND (mx.holiday_category = "Public holiday" OR mx.holiday_name like 'Revolution Day%')
 
-    )
-
-
-  ORDER BY 1
+    ) AS d
+    JOIN
+        month_to_bimester AS mtb
+            ON MONTH(d.dt) = mtb.month
+    ORDER BY 1
 )
 SELECT DISTINCT
     id_date,
@@ -154,6 +179,9 @@ SELECT DISTINCT
     weekend,
     month,
     month_name,
+    bimester,
+    bimester_name,
+    bimester_months,
     quarter,
     brz_season,
     year,
@@ -181,6 +209,8 @@ SELECT DISTINCT
     DATE(week_end) AS week_end,
     DATE(month_start) AS month_start,
     DATE(month_end) AS month_end,
+    DATE(bimester_start) AS bimester_start,
+    DATE(bimester_end) AS bimester_end,
     last_day,
     last_week,
     last_2_weeks,

@@ -12,7 +12,8 @@ WITH last_specialist AS (
         sp.id_sales_flow,
         sfu.name AS specialist_name,
         sfu.email,
-        us.id AS id_user
+        us.id AS id_user,
+        sp.ts_updated
     FROM
         datalake_sales_flow_clean.specialist AS sp
     INNER JOIN
@@ -60,6 +61,8 @@ SELECT
     ag.id_specialist AS id_agent,
     pdd.id_user AS id_user_post_dd_specialist,
     pdd.id_specialist AS id_post_dd_specialist,
+    alr.id_user AS id_user_agent_lead_referral,
+    alr.id_specialist AS id_agent_lead_referral,
     dm.specialist_name AS consultant_name,
     dm.email AS consultant_email,
     tl.specialist_name AS team_lead_name,
@@ -85,7 +88,8 @@ SELECT
     ag.specialist_name AS agent_name,
     ag.email AS agent_email,
     pdd.specialist_name AS post_dd_specialist_name,
-    pdd.email AS post_dd_specialist_email
+    pdd.email AS post_dd_specialist_email,
+    alr.ts_updated AS ts_agent_lead_referral_updated
 FROM
     offers_specialists AS o
 LEFT JOIN
@@ -153,3 +157,8 @@ LEFT JOIN
     ON pdd.id_sales_flow = o.id_sales_flow
     AND pdd.kind = 'POST_DD'
     AND pdd.row = 1
+LEFT JOIN
+    last_specialist AS alr
+    ON alr.id_sales_flow = o.id_sales_flow
+    AND alr.kind = 'AGENT_LEAD_REFERRAL'
+    AND alr.row = 1

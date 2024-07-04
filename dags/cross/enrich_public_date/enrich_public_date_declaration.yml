@@ -9,4 +9,4 @@ workflow:
   type: query
   layer: enrich
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_12_2_min_general_cluster

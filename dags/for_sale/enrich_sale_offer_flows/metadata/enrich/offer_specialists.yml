@@ -83,6 +83,12 @@ columns:
   id_post_dd_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_agent_lead_referral:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_agent_lead_referral:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
   consultant_name:
     lineage:
       - datalake_sales_flow_clean.users.name
@@ -161,3 +167,6 @@ columns:
   post_dd_specialist_email:
     lineage:
       - datalake_sales_flow_clean.users.email
+  ts_agent_lead_referral_updated:
+    lineage:
+      - datalake_sales_flow_clean.specialist.ts_updated

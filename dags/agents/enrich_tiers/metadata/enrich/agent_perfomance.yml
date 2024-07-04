@@ -1,0 +1,70 @@
+---
+database_name: datalake_tiers
+table_name: agent_perfomance
+description: |
+  This table calculates the performance indicators of Broker and Negotiation Executive agents.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_hub_services.users.id_agent
+    description: Agent unique identifier.
+  id_user:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: |
+      User unique identifier.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_business_unit:
+    lineage:
+      - datalake_hub_services.member_profile.id_business_unit
+    description: Business Unit unique identifier.
+  bimester_name:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_name
+    description: Name of the tier consolidation bimester.
+  name: 
+    lineage:
+      - datalake_hub_services.users.name
+    description: User name.
+  email:
+    lineage:
+      - datalake_hub_services.users.email
+    description: User email.
+  phone_number:
+    lineage:
+      - datalake_hub_services.users.phone_number
+    description: User phone number.
+  profile:
+    lineage:
+      - datalake_hub_services.member_profile.profile
+    description: Describes the member's profile.
+    categories:
+      AGENT: Brokers.
+      NEGOTIATION_EXECUTIVE: Responsible for intermediating the offer negotiation stage between buyer and seller, until this results in a CCV (signed contract).
+  hub_name:
+    lineage:
+      - datalake_hub_services.business_unit.hub_name
+    description: Business unit name.
+  total_offer_signed:
+    description: Total offers, where the broker was responsible for the visit, that were signed.
+  total_offer_signed_with_tqc:
+    description: 
+      Total offers, where the broker was responsible for the visit, which were signed, 
+      but with a buyer indication through the 'Tem Quem Compra' (TQC) program.
+  total_offer_signed_without_tqc:
+    description: 
+      Total offers, where the broker was responsible for the visit, which were signed 
+      in the normal way, that is, without any indication of a buyer through the 
+      'Tem Quem Compra' (TQC) program.
+  total_first_listing:
+    description: Total CIQ houses nominations that resulted in a first publication.
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.year
+    description: Year of tier consolidation.
+  bimester:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester
+    description: Bimester of tier consolidation.

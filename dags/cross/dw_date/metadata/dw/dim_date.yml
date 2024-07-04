@@ -41,6 +41,21 @@ columns:
     description: Name of the month
     lineage:
       - datalake_quintoandar.aux_date.month_name
+  bimester:
+    description: Number of the bimester.
+    categories:
+      "1": January to February
+      "2": March to April
+      "3": May to June
+      "4": July to August
+      "5": September to October
+      "6": November to December
+    lineage:
+      - datalake_quintoandar.aux_date.bimester
+  bimester_name:
+    description: Name of the bimester.
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_name
   quarter:
     description: The quarter of the year.
     categories:
@@ -143,11 +158,19 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.month_start
   month_end:
-    description: The last day of the month
+    description: The last day of the month.
     lineage:
       - datalake_quintoandar.aux_date.month_end
+  bimester_start:
+    description: The first day of the bimester.
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_start
+  bimester_end:
+    description: The last day of the bimester.
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_end
   last_day:
-    description: Previous day (date - 1 day)
+    description: Previous day (date - 1 day).
     lineage:
       - datalake_quintoandar.aux_date.last_day
   last_week:
