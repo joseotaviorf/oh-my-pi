@@ -244,7 +244,86 @@ report_origin AS (
 )
 
 SELECT 
-    obt.*
+    obt.*,
+    CASE
+        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Novos Afiliados' THEN 'Indica Aí - General_Novo Afiliado'
+        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'AAVs BH' THEN 'Indica Aí - General_Afiliados_BH'
+        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Outros AAVs' THEN 'Indica Aí - General_Afiliados_Alto_Volume'
+        WHEN company_report_origin = 'Indica Aí - General' THEN 'Indica Aí - General_Baixo Volume'
+        WHEN company_report_origin = 'Owner PWA - Paid' AND lower(medium) = 'web display' THEN 'Owner PWA - Paid_Display'
+        WHEN company_report_origin = 'Owner PWA - Paid' AND lower(medium) = 'sem non-branded' THEN 'Owner PWA - Paid_SEM non-branded'
+        WHEN company_report_origin = 'Owner PWA - Paid' AND lower(medium) = 'performance max' THEN 'Owner PWA - Paid_Performance_Max'
+        WHEN company_report_origin = 'Owner PWA - Paid' THEN 'Owner PWA - Paid_Other Paid'
+        WHEN company_report_origin IN ('Price Calculator', 'Price Calculator - Sale') AND lower(source) = 'braze' THEN CONCAT(company_report_origin, '_CRM/Notification')
+        WHEN company_report_origin IN ('Price Calculator', 'Price Calculator - Sale') AND lower(behavior_type) = 'organic' THEN CONCAT(company_report_origin, '_Organic')
+        WHEN company_report_origin IN ('Price Calculator', 'Price Calculator - Sale') AND lower(behavior_type) = 'non organic' AND lower(medium) = 'web display' THEN CONCAT(company_report_origin, '_Display')
+        WHEN company_report_origin IN ('Price Calculator', 'Price Calculator - Sale') AND lower(behavior_type) = 'non organic' AND lower(medium) = 'sem non-branded' THEN CONCAT(company_report_origin, '_SEM non-branded')
+        WHEN company_report_origin IN ('Price Calculator', 'Price Calculator - Sale') AND lower(behavior_type) = 'non organic' AND lower(medium) = 'performance max' THEN CONCAT(company_report_origin, '_Performance_Max')
+        WHEN company_report_origin IN ('Price Calculator', 'Price Calculator - Sale') THEN CONCAT(company_report_origin, '_Other Paid')
+        ELSE company_report_origin
+    END AS planning_cluster,
+    CASE
+        WHEN tp_reprocessing <> '-1' THEN 'Outbound'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'capta_ai' THEN 'Capta Aí'
+        WHEN full_conversion_origin = 'operations' AND operation_channel IN ('prime','account_manager_pp_multi','asp') THEN 'PP Multi'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'is_inbound' THEN 'Inbound'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'is_outbound' THEN 'Outbound'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'is_expert' THEN 'IS Expert'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'primary_market_bh' THEN 'Mercado Primário BH'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'ciq' THEN 'CIQ'
+        WHEN full_conversion_origin = 'other' AND nm_assigned_partner = 'mensageria' THEN 'Mensageria'
+        WHEN full_conversion_origin = 'operations' AND nm_assigned_partner = 'mensageria' THEN 'Mensageria'
+        WHEN full_conversion_origin = 'operations' THEN 'Outbound'
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_expert' THEN 'IS Expert'
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel IN ('asp','prime', 'account_manager_pp_multi') THEN 'PP Multi'
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'capta_ai' THEN 'Capta Aí'         
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_inbound' THEN 'Inbound'
+        WHEN full_conversion_origin = 'ownerpwa' THEN 'FSS'
+        WHEN full_conversion_origin = 'rede' THEN 'Rede'
+        WHEN full_conversion_origin = 'ciq' THEN 'CIQ'
+        WHEN nm_assigned_partner = 'mensageria' THEN 'Mensageria'
+        WHEN nm_assigned_partner IS NOT NULL THEN 'Outbound'
+        WHEN acquisition_origin = 'operations' AND operation_channel = 'is_inbound' THEN 'Inbound'
+        WHEN acquisition_origin = 'rede' THEN 'Rede'
+        WHEN acquisition_origin = 'ciq' THEN 'CIQ'
+        ELSE 'Not Mapped'
+    END AS planning_operation,
+    CASE
+        WHEN company_report_origin IN ('Backend','Other','Owner PWA - CRM/Notification','Owner PWA - Not Mapped','Owner PWA - Organic') THEN 'High'
+        WHEN company_report_origin IN ('Indica Aí - Agents','Owner PWA - Paid','Price Calculator','Price Calculator - Sale') THEN 'Low'
+        WHEN company_report_origin = 'Partners' THEN 'Very low'
+        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'AAVs BH' THEN 'Very low'
+        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Outros AAVs' THEN 'Very low'
+        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Novos Afiliados' THEN 'Average'
+        WHEN company_report_origin = 'Indica Aí - General' THEN 'Average'    
+        ELSE 'sem_cluster'
+    END AS planning_conversion_cluster,
+    CASE
+        WHEN tp_reprocessing <> '-1' THEN 'IS'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'capta_ai' THEN 'Capta Aí'
+        WHEN full_conversion_origin = 'operations' AND operation_channel IN ('asp','prime', 'account_manager_pp_multi') THEN 'PP Multi'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'is_inbound' THEN 'IS'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'is_outbound' THEN 'IS'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'is_expert' THEN 'IS'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'primary_market_bh' THEN 'Mercado Primário BH'
+        WHEN full_conversion_origin = 'operations' AND operation_channel = 'ciq' THEN 'CIQ'
+        WHEN full_conversion_origin = 'other' AND nm_assigned_partner = 'mensageria' THEN 'Mensageria'
+        WHEN full_conversion_origin = 'operations' AND nm_assigned_partner = 'mensageria' THEN 'Mensageria'
+        WHEN full_conversion_origin = 'operations' THEN 'IS'
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_expert' THEN 'IS'
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel IN ('asp','prime', 'account_manager_pp_multi') THEN 'PP Multi'
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'capta_ai' THEN 'Capta Aí'
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_inbound' THEN 'IS'
+        WHEN full_conversion_origin = 'ownerpwa' THEN 'FSS'
+        WHEN full_conversion_origin = 'rede' THEN 'Rede'
+        WHEN full_conversion_origin = 'ciq' THEN 'CIQ'
+        WHEN nm_assigned_partner = 'mensageria' THEN 'Mensageria'
+        WHEN nm_assigned_partner IS NOT NULL THEN 'IS'
+        WHEN acquisition_origin = 'operations' AND operation_channel = 'is_inbound' THEN 'IS'
+        WHEN acquisition_origin = 'rede' THEN 'Rede'
+        WHEN acquisition_origin = 'ciq' THEN 'CIQ'
+        ELSE 'Not Mapped' 
+    END AS planning_conversion
 FROM
     report_origin AS obt
 LEFT JOIN 
