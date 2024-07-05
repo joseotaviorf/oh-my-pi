@@ -547,8 +547,6 @@ bietlejuice.dw_listing:
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.ebdb_house:load-clean-house
-  - bietlejuice.ebdb_listing:load-clean-listing-business-context
-  - bietlejuice.ebdb_listing:load-clean-listing-rent-model-aud
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -558,7 +556,7 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-fees
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
