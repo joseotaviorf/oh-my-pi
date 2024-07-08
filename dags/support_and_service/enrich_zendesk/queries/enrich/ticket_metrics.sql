@@ -23,13 +23,10 @@ SELECT DISTINCT
     ts_created,
     ts_updated,
     NOW() AS ts_load,
-    {year} AS year,
-    {month} AS month,
-    {day} AS day
+    year,
+    month,
+    day
 FROM
     datalake_zendesk_clean.ticket_metrics
 WHERE
-    year IN (YEAR(CAST('{year}-{month}-{day}' AS DATE)), YEAR(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
-    AND month IN (MONTH(CAST('{year}-{month}-{day}' AS DATE)), MONTH(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
-    AND day IN (DAY(CAST('{year}-{month}-{day}' AS DATE)), DAY(CAST('{year}-{month}-{day}' AS DATE) + INTERVAL 1 DAY))
-    AND ts_updated <= TIMESTAMP(CAST("{year}-{month}-{day}" AS DATE) + INTERVAL 1 DAY) + INTERVAL 3 HOUR
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

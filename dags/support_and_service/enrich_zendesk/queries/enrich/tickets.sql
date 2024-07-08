@@ -69,9 +69,7 @@ tickets AS (
             raw_subject != "scrubbed"
             AND via_channel IS NOT NULL
         )
-        AND year = {year}
-        AND month = {month}
-        AND day = {day}
+        AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 exploded_cf AS (
     SELECT
