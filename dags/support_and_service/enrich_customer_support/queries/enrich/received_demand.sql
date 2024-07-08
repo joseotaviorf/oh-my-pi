@@ -37,28 +37,23 @@ call AS (
     SELECT
       id_call,
       id_task,
-      id_queue AS id_task_queue,
+      id_task_queue,
       id_reservation,
       event_type,
-      worker_email AS agent_email,
-      queue_name AS task_queue_name,
+      agent_email,
+      task_queue_name,
       CASE
         WHEN channel_type = "call-in-app" OR direction = "outbound-api" THEN "call inapp"
         ELSE CONCAT("call ", direction)
       END AS origin,
-      IFNULL(LAG(queue_name) OVER (PARTITION BY id_task ORDER BY ts_created), '-') AS previous_task_queue_name,
-      CASE
-        WHEN direction = "inbound"
-          THEN REGEXP_REPLACE(NULLIF(REGEXP_EXTRACT(from_phone_number,'(sip:)?([0-9+]+)@?',2),''),'(^\\+?55)|(\\D*)','')
-        WHEN direction = "outbound"
-          THEN REGEXP_REPLACE(NULLIF(REGEXP_EXTRACT(outbound_to_phone_number,'(sip:)?([0-9+]+)@?',2),''),'(^\\+?55)|(\\D*)','')
-      END AS customer_phone,
-      ts_created - INTERVAL 3 HOUR AS ts_created
+      IFNULL(LAG(task_queue_name) OVER (PARTITION BY id_task ORDER BY ts_created_local), '-') AS previous_task_queue_name,
+      customer_phone,
+      ts_created_local AS ts_created
     FROM
-      datalake_bigfone_clean.event
+      datalake_bigfone_twilio.call_flex_events
     WHERE
-      direction IN ("inbound", "outbound-api")
-      OR channel_type = "call-in-app"
+      direction IN ('inbound', 'outbound-api')
+      OR channel_type = 'call-in-app'
   ),
   reservations_ts AS (
     SELECT
@@ -187,7 +182,7 @@ call AS (
     NULL AS completion_reason,
     CASE
       WHEN ct.id_external_service IS NULL THEN 'ABANDONED'
-      WHEN ROW_NUMBER() OVER(PARTITION BY cs.id_call ORDER BY cs.ts_created DESC) = 1 THEN 'COMPLETED'
+      WHEN ROW_NUMBER() OVER(PARTITION BY cs.id_call, cs.id_reservation ORDER BY cs.ts_created DESC) = 1 THEN 'COMPLETED'
       ELSE 'TRANSFERRED'
     END AS status,
     cfr.is_answered,
@@ -202,7 +197,7 @@ call AS (
       ON cs.id_task = ct.id_external_service
       AND cs.id_reservation = ct.id_segment
   LEFT JOIN
-    datalake_bigfone.reservations AS cfr
+    datalake_bigfone_twilio.call_flex_reservations AS cfr
       ON cs.id_reservation = cfr.id_reservation
 ),
 chat AS (
