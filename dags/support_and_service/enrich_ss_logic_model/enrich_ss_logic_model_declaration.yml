@@ -9,7 +9,7 @@ dag:
             photographer, pp multi, prospect, among others. It provides a daily snapshot."
 
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     inner_dependencies:
         user_ss_metrics:
@@ -22,21 +22,27 @@ workflow:
         user_app_installed_metric:
             partitions: [year, month, day]
             extraction_type: incremental
+            z_order_by: [id_user, id_snapshot]
         user_csat_bot_metric:
             partitions: [year, month, day]
             extraction_type: incremental
+            z_order_by: [id_user, id_snapshot]
         user_csat_human_metric:
             partitions: [year, month, day]
             extraction_type: incremental
+            z_order_by: [id_user, id_snapshot]
         user_csi_metric:
             partitions: [year, month, day]
             extraction_type: incremental
+            z_order_by: [id_user, id_snapshot]
         user_recontact_metric:
             partitions: [year, month, day]
             extraction_type: incremental
+            z_order_by: [id_user, id_snapshot]
         user_ss_metrics:
             partitions: [year, month, day]
             extraction_type: incremental
+            z_order_by: [id_user, id_snapshot]
 
 cluster:
     type: custom_cluster
@@ -44,6 +50,7 @@ cluster:
         driver_node_type_id: m5d.4xlarge
         node_type_id: m5d.4xlarge
         runtime_engine: PHOTON
+        spark_version: 13.3.x-scala2.12
         num_workers: 5
         aws_attributes:
             ebs_volume_size: 200

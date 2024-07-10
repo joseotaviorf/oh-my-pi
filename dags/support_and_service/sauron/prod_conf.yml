@@ -11,6 +11,7 @@ dag_documentation:
 custom_cluster:
   driver_node_type_id: m5a.xlarge
   node_type_id: c5a.4xlarge
+  spark_version: 13.3.x-scala2.12
   num_workers: 3
 
 tables:

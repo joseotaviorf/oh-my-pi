@@ -1,9 +1,0 @@
----
-dag_documentation:
-  dag_purpose:
-    "This DAG main responsibility is to provide all the S&S logs data, \n
-    not considering warn and notice messages, extracting specific information \n
-    such as endpoint, and status code. It can be used for various purposes in the \n
-    context of the system or application it is designed for."
-
-partition_cols: [year, month, day, hour]

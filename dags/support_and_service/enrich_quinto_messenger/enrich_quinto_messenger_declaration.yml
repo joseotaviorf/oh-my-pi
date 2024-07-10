@@ -7,7 +7,7 @@ dag:
             Prepares **chat** data from the [Quinto Messenger](github.com/quintoandar/big-fone) for business utilization.
             [Quinto Messenger](https://github.com/quintoandar/quinto-messenger) is the service built to be the connection between Twilio and QuintoAndar's system.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     inner_dependencies:
         message:
@@ -18,7 +18,7 @@ cluster:
         driver_node_type_id: r5d.4xlarge
         node_type_id: r5d.8xlarge
         runtime_engine: PHOTON
-        spark_version: 12.2.x-scala2.12
+        spark_version: 13.3.x-scala2.12
         num_workers: 4
         aws_attributes:
             ebs_volume_size: 200

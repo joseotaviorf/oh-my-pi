@@ -10,23 +10,16 @@ WITH filtered_logs AS (
   FROM
     datalake_kong_clean.kong_logs AS kl
   WHERE
-    kl.year={year}
-  AND
-    kl.month={month}
-  AND
-    kl.day={day}
-  AND
-    kl.message NOT LIKE "%[warn]%"
-  AND
-    kl.message NOT LIKE "%[notice]%"
+    MAKE_DATE(kl.year, kl.month, kl.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND kl.message NOT LIKE "%[warn]%"
+    AND kl.message NOT LIKE "%[notice]%"
 ),
 entities_extract AS (
   SELECT
     fl.*,
     CASE
       WHEN RLIKE(fl.endpoint, "^/api/") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/([^/?]+)/?'), '')
-    ELSE
-      NULL
+      ELSE NULL
     END AS entity,
     CASE
       WHEN RLIKE(fl.endpoint, "^/api/tasks") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/tasks/(\\w+)'), '')
@@ -35,15 +28,13 @@ entities_extract AS (
       WHEN RLIKE(fl.endpoint, "^/api/offer/rental") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/offer/rental/(\\w+)'), '')
       WHEN RLIKE(fl.endpoint, "^/api/offer/") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/offer/(\\w+)/[a-zA-Z+]'), '')
       WHEN RLIKE(fl.endpoint, "^/api/") THEN NULLIF(REGEXP_EXTRACT(fl.endpoint, 'api/[^/?]+/(\\d+)'), '')
-    ELSE
-      NULL
+      ELSE NULL
     END AS entity_code
   FROM
     filtered_logs AS fl
   WHERE
     fl.request_user IS NOT NULL
-  AND
-    (
+    AND (
       fl.host LIKE "%imoveis%"
       OR fl.host LIKE "%crm%"
       OR fl.host LIKE "%magiclink%"
