@@ -1168,6 +1168,7 @@ bietlejuice.enrich_bigfone_twilio:
   - bietlejuice.enrich_bigfone_events:load-enrich-events
 bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-house-draft
+  - bietlejuice.bob:load-clean-house-draft-aud
   - bietlejuice.bob:load-clean-location
   - bietlejuice.bob:load-clean-registrar
   - bietlejuice.bob:load-clean-submission-progress
@@ -2740,6 +2741,7 @@ bietlejuice.enrich_supply_acquisition:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
+  - bietlejuice.enrich_bob:load-enrich-house-draft
   - bietlejuice.enrich_bob:load-enrich-house-draft-business-context
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-last-contact

@@ -13,7 +13,7 @@ workflow:
   default_extraction_type: incremental
   tables_customization:
     conversion_lookup:
-      merge_on: ["id_house", "business_context"]
+      extraction_type: full
       z_order_by: ["id_house", "business_context", "id_lead"]
     landing_3p:
       extraction_type: full
