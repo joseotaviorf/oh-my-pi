@@ -50,6 +50,10 @@ columns:
     lineage:
       - datalake_inspections_raw.item.present
     description: Indicates if the issue checklist item was checked by the inspector
+  is_active:
+    lineage:
+      - datalake_inspections_raw.item.active
+    description: Boolean information with the aim of indicating whether the item is active or not.
   ts_created:
     lineage:
       - datalake_inspections_raw.item.created_at

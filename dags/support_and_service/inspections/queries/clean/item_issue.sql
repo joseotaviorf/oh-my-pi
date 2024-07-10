@@ -4,6 +4,7 @@ SELECT
     type_id AS id_type,
     uuid,
     comment,
+    active AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

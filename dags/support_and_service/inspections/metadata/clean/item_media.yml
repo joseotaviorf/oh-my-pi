@@ -29,6 +29,10 @@ columns:
     lineage:
       - datalake_inspections_raw.item_media.url
     description: It is the email address of the media
+  is_active:
+    lineage:
+      - datalake_inspections_raw.item_media.active
+    description: Boolean information with the aim of indicating whether the item media is active or not.
   ts_created:
     lineage:
       - datalake_inspections_raw.item_media.created_at

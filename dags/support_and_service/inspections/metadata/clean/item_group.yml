@@ -49,6 +49,14 @@ columns:
     lineage:
       - datalake_inspections_raw.item_group.is_inferior_quality
     description: indicates the quality of the object in case of replacement
+  is_active_status:
+    lineage:
+      - datalake_inspections_raw.item_group.active_status
+    description: indicates the quality of the object in case of replacement
+  is_active_inferior_quality:
+    lineage:
+      - datalake_inspections_raw.item_group.active_is_inferior_quality
+    description: indicates the quality of the object in case of replacement
   ts_created:
     lineage:
       - datalake_inspections_raw.item_group.created_at

@@ -5,6 +5,7 @@ SELECT
     uuid,
     type,
     url,
+    active AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

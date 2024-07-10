@@ -25,6 +25,10 @@ columns:
     lineage:
       - datalake_inspections_raw.item_issue.comment
     description: Displays a inspector's comment
+  is_active:
+    lineage:
+      - datalake_inspections_raw.item_issue.active
+    description: Boolean information with the aim of indicating whether the item issue is active or not.
   ts_created:
     lineage:
       - datalake_inspections_raw.item_issue.created_at

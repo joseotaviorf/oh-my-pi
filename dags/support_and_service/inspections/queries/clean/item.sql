@@ -9,6 +9,7 @@ SELECT
     count,
     status,
     present AS is_present,
+    active AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

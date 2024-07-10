@@ -8,6 +8,8 @@ SELECT
     comment,
     status,
     is_inferior_quality,
+    active_status AS is_active_status,
+    active_is_inferior_quality AS is_active_inferior_quality,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
