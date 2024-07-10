@@ -57,28 +57,35 @@ key_location_aud AS (
         ata.id_house,
         ata.rev,
         aat.name AS key_location,
+        kt.name AS key_type,
         LAG(aat.name) OVER(PARTITION BY ata.id_house ORDER BY ata.rev) AS previous_key_location,
+        LAG(kt.name) OVER(PARTITION BY ata.id_house ORDER BY ata.rev) AS previous_key_type,
         FROM_UNIXTIME(ure.ts_revision/1000) AS ts_updated
     FROM
         datalake_ebdb_clean.access_type_aud AS ata
     JOIN
         datalake_ebdb_clean.user_revision_entity AS ure
             ON ata.rev = ure.id
-    LEFT JOIN
+    JOIN
         datalake_ebdb_clean.access_authorization_type AS aat
             ON ata.id_authorization = aat.id
+    JOIN
+        datalake_ebdb_clean.key_type AS kt
+            ON ata.id_type = kt.id
 ),
 scd_key_location AS (
     SELECT
         id_house,
         rev,
         key_location,
+        key_type,
         ts_updated AS ts_key_location_started,
         LEAD(ts_updated) OVER(PARTITION BY id_house ORDER BY rev) AS ts_key_location_ended
     FROM
         key_location_aud
     WHERE
         key_location <> COALESCE(previous_key_location, -1)
+        OR key_type <> COALESCE(previous_key_type, -1)
 ),
 event_bus AS (
     SELECT
@@ -109,7 +116,8 @@ SELECT
     eb.rev,
     sd.doorman_type,
     skl.key_location,
-    COALESCE(MAX(eb.rev) OVER(PARTITION BY eb.id_house, DATE(eb.ts_event)) = eb.rev, False) AS is_last_status_of_day,
+    skl.key_type,
+    COALESCE(MAX(eb.rev) OVER(PARTITION BY eb.id_house, DATE(eb.ts_event)) = eb.rev, FALSE) AS is_last_status_of_day,
     eb.ts_event AS ts_entrance_started,
     LEAD(eb.ts_event) OVER(PARTITION BY eb.id_house ORDER BY eb.rev) AS ts_entrance_ended
 FROM

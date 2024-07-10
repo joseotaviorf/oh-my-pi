@@ -32,11 +32,15 @@ columns:
   doorman_type:
     lineage:
       - datalake_ebdb_clean.house_aud.doorman_type
-    description: Type of doorman of the listing.
+    description: Type of doorman of the house during the period.
   key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
-    description: Location of the listing's key.
+    description: Location of the houses's key during the period.
+  key_type:
+    lineage:
+      - datalake_ebdb_clean.key_type.name
+    description: Type of the house's key during the period.
   is_last_status_of_day:
     description: Flag to indicate if the entry condition status is the last one of the day.
   ts_entrance_started:
