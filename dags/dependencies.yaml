@@ -1768,6 +1768,8 @@ bietlejuice.enrich_hr_system:
   - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
+bietlejuice.enrich_hr_system_custom:
+  - bietlejuice.enrich_hr_system:load-enrich-managers
 bietlejuice.enrich_hub_services:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-aud

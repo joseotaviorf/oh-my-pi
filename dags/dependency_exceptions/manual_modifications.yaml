@@ -387,6 +387,9 @@ bietlejuice.enrich_growth_taxonomy:
     - bietlejuice.enrich_booking:load-enrich-booking
 bietlejuice.enrich_health_metrics:
   override: []
+bietlejuice.enrich_hr_system_custom:
+  add:
+    - bietlejuice.enrich_hr_system:load-enrich-managers
 bietlejuice.enrich_house_feature_inference:
   add:
     - bietlejuice.ebdb_house:load-clean-house
