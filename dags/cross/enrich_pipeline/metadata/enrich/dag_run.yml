@@ -44,8 +44,8 @@ columns:
     description: Boolean flag indicating if the current state of the DAG run is successful,
       which means that all tasks of the DAG are marked as successful.
   is_first_execution_inside_sla:
-    description: Boolean flag indicating if the DAG's first execution of the day was successful
-      and also inside of our Data SLA. Each layer has its own SLA.
+    description: Boolean flag indicating if the DAG's first execution of the day or if all DAG's table
+      were successfully executed and also inside of our Data SLA. Each layer has its own SLA.
   has_been_cleared:
     description: Boolean flag indicating if the DAG run suffered any clear, which means that it ran
       at least one more time.
@@ -94,6 +94,16 @@ columns:
       Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
       successful timestamp will be shown.
+  ts_last_table_task_successful:
+    lineage:
+      - datalake_composer_clean.log.ts_event
+    description: UTC timestamp of when the last table of the DAG executed successfully. This timestamp
+      will only be assigned if all the tables of the DAG had run inside the expected SLA.
+  ts_last_table_task_successful_brt:
+    lineage:
+      - datalake_composer_clean.log.ts_event
+    description: BRT timestamp of when the last table of the DAG executed successfully. This timestamp
+      will only be assigned if all the tables of the DAG had run inside the expected SLA.
   ts_last_composer_run:
     lineage:
       - datalake_composer_clean.dag_run.ts_ended
