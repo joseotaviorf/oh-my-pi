@@ -109,6 +109,8 @@ LEFT JOIN
     ON  gs.id_user = cc.id_user
     AND cc.previews_contact_date = gs.ts_started
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    gs.year = {year}
+    AND gs.month = {month}
+    AND gs.day = {day}
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY gs.id_session ORDER BY gs.ts_updated DESC) = 1

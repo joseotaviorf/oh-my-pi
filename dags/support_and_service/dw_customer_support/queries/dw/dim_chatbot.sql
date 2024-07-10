@@ -33,6 +33,8 @@ SELECT
 FROM
   datalake_greenseer.sessions
 WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  year = {year}
+  AND month = {month}
+  AND day = {day}
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1

@@ -75,6 +75,14 @@ greenseer_sessions AS (
         ''
       ) <> ''
     ) AS is_menu_available,
+    (
+      COALESCE(
+        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_taxonomies.message'),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.confused_class.message'),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_theme_details.message'),
+        ''
+      ) <> ''
+    ) AS is_menu_availle,
     CASE
       WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_menu_automatic_selection_intent') THEN 'bot_automatic_selection_intent'
       WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_menu_automatic_selection_taxonomy') THEN 'bot_menu_automatic_selection_taxonomy'

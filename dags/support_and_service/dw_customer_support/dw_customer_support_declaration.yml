@@ -23,21 +23,16 @@ workflow:
     fact_sessions_chatbot:
       partitions: [year, month, day]
       extraction_type: incremental
-      z_order_by: [sk_session, sk_ticket, sk_user, sk_pipeline, sk_content, sk_contract, sk_survey, sk_answer,sk_started_chat, sk_ended_chat]
     dim_chatbot:
       partitions: [year, month, day]
       extraction_type: incremental
-      z_order_by: [sk_session]
-  extra_query_template_params:
-      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: i3.4xlarge
     node_type_id: i3.2xlarge
     runtime_engine: PHOTON
-    spark_version: 13.3.x-scala2.12
+    spark_version: 12.2.x-scala2.12
     num_workers: 2
     spark_conf:
       spark.sql.broadcastTimeout: "600"

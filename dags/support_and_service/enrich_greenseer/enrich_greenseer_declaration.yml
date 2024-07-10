@@ -2,7 +2,7 @@ dag:
     name: enrich_greenseer
     schedule_start_date: 2020, 7, 1
     owner: Data SS
-    documentation:
+    documentation: 
         dag_purpose: |
             Extract relevant fields from greenseer memory json and add relevant business rules to reduce the analysis.
 workflow:
@@ -12,8 +12,6 @@ workflow:
         sessions:
             partitions: [year, month, day]
             extraction_type: incremental
-            merge_on: [id_session]
-            z_order_by: [id_session, id_ticket, id_user, id_contract]
     extra_query_template_params:
         load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
         load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
