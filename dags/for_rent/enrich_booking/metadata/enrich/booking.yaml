@@ -490,7 +490,7 @@ columns:
   is_agent_fixed:
     lineage:
     - datalake_ebdb_clean.booking.is_agent_fixed
-    description: Boolean column to identify if the agent that was assigned for that visit was a PFA (Preferred Fixed Agent) or was a random agent
+    description: Boolean column that identifies whether an agent has been fixed/assigned to the booking. This agent may or may not be the PFA.
   is_3p_supply_5a:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_5a
