@@ -10,7 +10,9 @@ WITH dag_run_base AS (
         DATE(dr.ts_run) AS dt_run,
         DATE_ADD(dr.ts_run, 1) AS dt_event,
         ts_first_execution_success,
-        ts_first_execution_success_brt
+        ts_first_execution_success_brt,
+        ts_last_table_task_successful,
+        ts_last_table_task_successful_brt
     FROM
         datalake_pipeline.dag_run AS dr
     WHERE
@@ -188,10 +190,32 @@ base AS (
             WHEN (db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla IS NOT NULL) OR c.id_dag IS NULL THEN FALSE
             ELSE NULL
         END AS is_null_sla,
+        CASE
+            WHEN db.id_dag IS NOT NULL AND db.state = 'success' THEN TRUE 
+            WHEN db.id_dag IS NOT NULL AND db.state <> 'success' THEN FALSE
+            ELSE NULL
+        END AS is_run_successful,
+        CASE
+            WHEN db.id_dag IS NOT NULL AND db.state = 'failed' THEN TRUE 
+            WHEN db.id_dag IS NOT NULL AND db.state <> 'failed' THEN FALSE
+            ELSE NULL
+        END AS is_run_failed,
+        CASE
+            WHEN db.id_dag IS NOT NULL AND db.is_manual_run = TRUE THEN TRUE 
+            WHEN db.id_dag IS NOT NULL AND db.is_manual_run <> TRUE THEN FALSE
+            ELSE NULL
+        END AS is_manual_run,
+        CASE
+            WHEN db.id_dag IS NOT NULL AND db.is_triggered_by_mediator = TRUE THEN TRUE 
+            WHEN db.id_dag IS NOT NULL AND db.is_triggered_by_mediator <> TRUE THEN FALSE
+            ELSE NULL
+        END AS is_run_triggered_by_mediator,
         d.dt_event,
         db.dt_run,
         db.ts_first_execution_success,
-        db.ts_first_execution_success_brt
+        db.ts_first_execution_success_brt,
+        db.ts_last_table_task_successful,
+        db.ts_last_table_task_successful_brt
     FROM
         dag_base AS d
     LEFT JOIN   -- The DAG run may not exist yet
@@ -224,6 +248,10 @@ SELECT
     is_inside_sla,
     is_outside_sla,
     is_null_sla,
+    is_run_successful,
+    is_run_failed,
+    is_manual_run,
+    is_run_triggered_by_mediator,
     CASE
         WHEN is_active_and_unpaused = TRUE AND COALESCE(is_inside_sla, is_outside_sla, is_null_sla) IS NULL THEN TRUE
         WHEN is_active_and_unpaused = TRUE AND is_in_ignoring_list = FALSE AND COALESCE(is_inside_sla, is_outside_sla) IS NULL THEN TRUE
@@ -235,6 +263,8 @@ SELECT
     dt_run,
     ts_first_execution_success,
     ts_first_execution_success_brt,
+    ts_last_table_task_successful,
+    ts_last_table_task_successful_brt,
     YEAR(dt_event) AS year,
     MONTH(dt_event) AS month,
     DAY(dt_event) AS day

@@ -43,6 +43,14 @@ columns:
   has_possible_problem:
     description: Boolean flag indicating if the DAG has a possible problem related to its SLA information.
       This column can be used to debug why a DAG is not being considered on the SLA.
+  is_run_successful:
+    description: Boolean flag indicating if the DAG run was successful.
+  is_run_failed:
+    description: Boolean flag indicating if the DAG run has failed.
+  is_manual_run:
+    description: Boolean flag indicating if the DAG run was manually created.
+  is_run_triggered_by_mediator:
+    description: Boolean flag indicating if the DAG run was triggered by the Mediator.
   dt_snapshot:
     lineage:
       - datalake_quintoandar.aux_date.date
@@ -64,6 +72,16 @@ columns:
       Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
       successful timestamp will be shown.
+  ts_last_table_task_successful:
+    lineage:
+      - datalake_pipeline.dag_run.ts_last_table_task_successful
+    description: UTC timestamp of when the last table of the DAG executed successfully. This timestamp
+      will only be assigned if all the tables of the DAG had run inside the expected SLA.
+  ts_last_table_task_successful_brt:
+    lineage:
+      - datalake_pipeline.dag_run.ts_last_table_task_successful_brt
+    description: BRT timestamp of when the last table of the DAG executed successfully. This timestamp
+      will only be assigned if all the tables of the DAG had run inside the expected SLA.
   year:
     description: Year of the snapshot. Also, a partition of the table.
   month:
