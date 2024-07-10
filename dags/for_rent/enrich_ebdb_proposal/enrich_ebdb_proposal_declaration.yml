@@ -14,4 +14,4 @@ workflow:
   default_partitions:
     - country_code
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: databricks_12_2_min_xlarge_io-memory_photon_cluster
