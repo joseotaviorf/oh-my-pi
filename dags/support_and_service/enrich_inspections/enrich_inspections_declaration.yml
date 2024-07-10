@@ -11,6 +11,8 @@ workflow:
   type: query
   layer: enrich
   inner_dependencies:
+    inspection_booking:
+      - main_inspection_booking
     item:
       - item_group
     item_issue:

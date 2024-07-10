@@ -1,13 +1,4 @@
-WITH main_inspection_aud_sync as(
-    SELECT DISTINCT
-        ia.id_inspection,
-        FIRST_VALUE(ia.ts_last_synced) OVER (PARTITION BY ia.id_inspection, status ORDER BY ia.ts_last_synced ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ts_first_synced
-    FROM
-        datalake_ebdb_clean.inspection_aud ia
-    WHERE
-        ia.status = 'Revisada'
-),
-union_inspection_history AS (
+WITH union_inspection_history AS (
     WITH last_inspection_update AS (
         SELECT
             *
@@ -15,17 +6,6 @@ union_inspection_history AS (
             datalake_inspections_clean.inspection_aud AS ia
         QUALIFY
             ia.ts_updated = FIRST(ia.ts_updated) OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC)
-    ),
-    main_exception AS (
-        SELECT
-            DISTINCT i.id AS id_inspection
-        FROM
-            datalake_ebdb_clean.inspection i
-        EXCEPT
-        SELECT
-            DISTINCT i.id_external AS id_inspection
-        FROM
-            last_inspection_update AS i
     )
     SELECT
         i.id_inspection,
@@ -48,15 +28,16 @@ union_inspection_history AS (
         END AS has_owner_accompanying,
         NULL AS ts_inspected,
         i.ts_created,
-        i.ts_updated
+        i.ts_updated,
+        NULL AS ts_first_synced
     FROM
         last_inspection_update AS i
     UNION
     SELECT
-        MD5(CONCAT(i.id, 'PWA')) AS id_inspection,
+        i.id_inspection,
         NULL AS id_previous_inspection,
-        i.id AS id_external,
-        i.id_user_inspector AS id_inspector,
+        i.id_external,
+        i.id_inspector,
         i.id_booking,
         i.id_contract,
         NULL AS id_client_side,
@@ -64,29 +45,30 @@ union_inspection_history AS (
         NULL AS id_city,
         NULL AS city_name,
         NULL AS country_code,
-        CASE
-            WHEN i.type = 'Entrada' THEN 'onboarding'
-            WHEN i.type = 'Saida' THEN 'offboarding'
-            WHEN i.type = 'Constatacao' THEN 'verification'
-            WHEN i.type = 'Portabilidade' THEN 'portability'
-            ELSE NULL
-        END inspection_type,
+        i.inspection_type,
         "PWA" AS source,
-        CASE
-            WHEN i.status = 'Agendada' THEN 'scheduled'
-            WHEN i.status = 'Cancelada' THEN 'cancelled'
-            WHEN i.status IN ('Revisada' , 'EmRevisao') THEN 'reviewed'
-            ELSE i.status
-        END AS status,
+        i.status,
         NULL AS has_owner_accompanying,
-        TIMESTAMP(i.dt_inspected) AS ts_inspected,
+        i.ts_inspected,
         i.ts_created,
-        i.ts_updated
+        i.ts_updated,
+        i.ts_first_synced
     FROM
-        main_exception AS me
-    JOIN
-        datalake_ebdb_clean.inspection AS i
-            ON me.id_inspection = i.id
+        datalake_inspections.main_inspection_booking AS i
+),
+appointment_data AS (
+    SELECT 
+        *,
+        dt_scheduled AS ts_booking_inspected_utc,
+        dt_scheduled - INTERVAL 3 HOURS AS ts_booking_inspected_local_tz,
+        ts_created AS ts_booking_created_utc,
+        ts_created - INTERVAL 3 HOURS AS ts_booking_created_local_tz,
+        IF(status = "CANCELLED", FIRST(ts_updated) OVER (PARTITION BY id_inspection ORDER BY ts_updated), NULL) AS ts_booking_cancelled_utc,
+        IF(status = "CANCELLED", FIRST(ts_updated - INTERVAL 3 HOURS) OVER (PARTITION BY id_inspection ORDER BY ts_updated), NULL) AS ts_booking_cancelled_local_tz
+    FROM 
+        datalake_inspections_clean.appointment
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 ),
 inspection_contract AS (
     SELECT
@@ -146,42 +128,33 @@ SELECT DISTINCT
         ELSE FALSE
     END AS is_first_schedule,
     CASE
-        WHEN ic.total_rescheduling = 1
-            AND (
-                i.status = 'received'
-                OR (i.status IN ('reviewed','Comentada', 'Finalizada') AND i.source = 'PWA')
-            )
-            THEN TRUE
-        ELSE FALSE
-    END AS is_executed_in_first_schedule,
-    CASE
-        WHEN DATE(b.ts_first_canceled_unevaluated) = DATE(b.ts_booking_utc) THEN True
+        WHEN DATE(COALESCE(b.ts_first_canceled_unevaluated, ad.ts_booking_cancelled_utc)) = DATE(COALESCE(b.ts_booking_utc, ad.ts_booking_inspected_utc)) THEN True
         ELSE False
     END AS is_d0_canceled,
     CASE
-        WHEN DATE(b.ts_first_canceled_unevaluated) = DATE_SUB(DATE(b.ts_booking_utc), 1) THEN True
+        WHEN DATE(COALESCE(b.ts_first_canceled_unevaluated, ad.ts_booking_cancelled_utc)) = DATE_SUB(DATE(COALESCE(b.ts_booking_utc, ad.ts_booking_inspected_utc)), 1) THEN True
         ELSE False
     END AS is_d1_canceled,
     CASE
-        WHEN b.cancellation_reason NOT IN (
+        WHEN COALESCE(b.cancellation_reason, ad.cancellation_reason) NOT IN (
                 'INSPECTOR_BLOCKED_SCHEDULE',
                 'CANCELED_PROBLEM_INSPECTOR',
                 'CANCELED_INSPECTOR_NOT_ATTEND',
                 'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'
             )
             THEN TRUE
-        WHEN b.cancellation_reason IS NULL THEN NULL
+        WHEN COALESCE(b.cancellation_reason, ad.cancellation_reason) IS NULL THEN NULL
         ELSE FALSE
     END AS is_not_canceled_by_inspector,
     ic.dt_contract_entrance,
     ic.dt_contract_termination,
     ic.dt_execution_limit,
-    b.ts_booking_utc AS ts_booking_inspected_utc,
-    b.ts_booking_local_tz AS ts_booking_inspected_local_tz,
-    b.ts_created AS ts_booking_created_utc,
-    b.ts_created_local_tz AS ts_booking_created_local_tz,
-    b.ts_first_canceled_unevaluated AS ts_booking_cancelled_utc,
-    b.ts_first_canceled_unevaluated_local_tz AS ts_booking_cancelled_local_tz,
+    COALESCE(b.ts_booking_utc, ad.ts_booking_inspected_utc) AS ts_booking_inspected_utc,
+    COALESCE(b.ts_booking_local_tz, ad.ts_booking_inspected_local_tz) AS ts_booking_inspected_local_tz,
+    COALESCE(b.ts_created, ad.ts_booking_created_utc) AS ts_booking_created_utc,
+    COALESCE(b.ts_created_local_tz, ad.ts_booking_created_local_tz) AS ts_booking_created_local_tz,
+    COALESCE(b.ts_first_canceled_unevaluated, ad.ts_booking_cancelled_utc) AS ts_booking_cancelled_utc,
+    COALESCE(b.ts_first_canceled_unevaluated_local_tz, ad.ts_booking_cancelled_local_tz) AS ts_booking_cancelled_local_tz,
     ic.ts_termination_canceled,
     a.ts_started AS ts_execution_started_local_tz,
     a.ts_finished AS ts_execution_finished_local_tz,
@@ -190,7 +163,7 @@ SELECT DISTINCT
         i.ts_inspected
     ) AS ts_inspected,
     CASE
-        WHEN i.source = "PWA" THEN mias.ts_first_synced
+        WHEN i.source = "PWA" THEN i.ts_first_synced
         ELSE a.ts_created
     END AS ts_synced,
     i.ts_created,
@@ -201,9 +174,6 @@ LEFT JOIN
     datalake_inspections_clean.assessment AS a
         ON a.id_inspection = i.id_inspection
 LEFT JOIN
-    main_inspection_aud_sync AS mias
-        ON mias.id_inspection = i.id_external
-LEFT JOIN
     datalake_booking.booking AS b
         ON i.id_booking = b.id
 LEFT JOIN
@@ -213,3 +183,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.country c
         ON c.id = COALESCE(b.id_country, ic.id_country)
+LEFT JOIN
+    appointment_data AS ad
+      ON ad.id_inspection = i.id_inspection
