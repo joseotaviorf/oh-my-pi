@@ -12,7 +12,7 @@ dag:
       creation, ending, comment events about a session and about workflows.
 
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: saruman

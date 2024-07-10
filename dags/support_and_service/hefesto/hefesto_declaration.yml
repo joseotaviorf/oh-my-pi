@@ -7,7 +7,7 @@ dag:
     dag_purpose: This DAG imports tables from [Hefesto](https://github.com/quintoandar/hefesto)
 
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: hefesto

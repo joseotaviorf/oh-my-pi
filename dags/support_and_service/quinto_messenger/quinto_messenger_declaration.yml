@@ -9,12 +9,10 @@ dag:
       is the service built to be the connection between Twilio and QuintoAdar's system.
 
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: quintomessenger
-  load_options:
-    max_records_per_file: 250000
   dbutils_secret_key: QUINTO_MESSENGER_DB
   default_extraction_type: incremental
   tables_customization:
@@ -22,18 +20,22 @@ workflow:
       clean_table_name: channel
       date_filter_column: updated_at
       partitions: [year, month, day]
+      z_order_by: [id_channel]
     ChannelEvent:
       clean_table_name: channel_event
       date_filter_column: updated_at
       partitions: [year, month, day]
+      z_order_by: [id_channel]
     Task:
       clean_table_name: task
       date_filter_column: updated_at
       partitions: [year, month, day]
+      z_order_by: [id_task]
     TaskEvent:
       clean_table_name: task_event
       date_filter_column: updated_at
       partitions: [year, month, day]
+      z_order_by: [id_task]
     Chat:
       clean_table_name: chat
       date_filter_column: updated_at
