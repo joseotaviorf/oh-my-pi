@@ -13,16 +13,16 @@ WITH trato_feito AS (
     CAST(p.metadata:paid_amount AS DOUBLE) AS paid_amount,
     CAST(SPLIT(p.metadata:paid_date, 'T')[0] AS DATE) AS dt_paid,
     CAST(SPLIT(p.metadata:paid_date, 'T')[0] AS DATE) AS dt_receipt
-  FROM 
-    datalake_trato_feito_clean.negotiation n 
+  FROM
+    datalake_trato_feito_clean.negotiation n
   INNER JOIN
-    datalake_trato_feito_clean.installment i 
+    datalake_trato_feito_clean.installment i
       ON n.id = i.id_negotiation
   INNER JOIN
-    datalake_trato_feito_clean.accounting_installment ai 
+    datalake_trato_feito_clean.accounting_installment ai
       ON ai.id_installment = i.id
-  LEFT JOIN 
-    datalake_trato_feito_clean.payment p 
+  LEFT JOIN
+    datalake_trato_feito_clean.payment p
       ON p.id_installment = i.id
 ),
 
@@ -41,7 +41,7 @@ wallstreet AS (
     CAST(amount/100.00 AS DOUBLE) AS paid_amount,
     CAST(c.ts_paid AS DATE) AS dt_paid,
     CAST(c.ts_paid AS DATE) AS dt_receipt
-  FROM  
+  FROM
     datalake_wall_street_clean.charge c
   QUALIFY
     RANK() OVER (PARTITION BY c.id_finance_entity ORDER BY c.ts_updated DESC) = 1
@@ -62,27 +62,27 @@ robin_hood AS (
     ae.due_amount AS paid_amount,
     pr.dt_paid,
     dt_paid AS dt_receipt
-  FROM 
+  FROM
     datalake_robin_hood.accounting_entry ae
-  LEFT JOIN 
-    datalake_robin_hood_clean.accounting_entry_balance eb 
+  LEFT JOIN
+    datalake_robin_hood_clean.accounting_entry_balance eb
       ON eb.id_accounting_entry = ae.id
-  LEFT JOIN 
-    datalake_robin_hood_clean.payment_request pr 
+  LEFT JOIN
+    datalake_robin_hood_clean.payment_request pr
       ON pr.id = eb.id_payment_request
-  WHERE 
+  WHERE
     source_bill_item = 'estate-agent-services'
   QUALIFY
     RANK() OVER (PARTITION BY ae.id_external ORDER BY pr.ts_created DESC) = 1
 ),
 
 vans AS (
-WITH boleto_file_response AS (    
+WITH boleto_file_response AS (
   SELECT
     id
-  FROM 
-    datalake_vans_clean.file f 
-  WHERE 
+  FROM
+    datalake_vans_clean.file f
+  WHERE
     f.type =':file.type/boleto'
   AND f.origin = ':file.origin/response'
 ),
@@ -103,19 +103,20 @@ next_business_day AS (
 ),
 
 file_payment AS (
-select 
-    company_use,
-    RANK() OVER (PARTITION BY company_use ORDER BY f.ts_created DESC) as rk
-from 
+SELECT
+    company_use
+FROM
     datalake_vans_clean.payment p2
-inner join 
-    datalake_vans_clean.file_payment fp on fp.id_payment=p2.id
-inner join 
-    datalake_vans_clean.file f on f.id = fp.id_file 
-where 
+INNER JOIN
+    datalake_vans_clean.file_payment fp ON fp.id_payment=p2.id
+INNER JOIN
+    datalake_vans_clean.file f ON f.id = fp.id_file
+WHERE
     f.type=':file.type/payment.csv'
-and
-    p2.dt_paid is not null
+AND
+    p2.dt_paid IS NOT NULL
+QUALIFY
+    RANK() OVER (PARTITION BY company_use ORDER BY f.ts_created DESC) = 1
 ),
 
 CAP AS (
@@ -130,12 +131,15 @@ SELECT
   CASE
     WHEN UPPER(pagamento) LIKE 'PROTEÇÃO 5A%' AND UPPER(our_number) LIKE 'MANUAL%' THEN 'Repasse Extra'
     WHEN UPPER(pagamento) LIKE 'PROTEÇÃO 5A%' THEN 'Repasse Extra'
+    WHEN UPPER(pagamento) LIKE '%3P%' THEN 'Imobiliarias 3P'
     WHEN UPPER(pagamento) LIKE 'CONDOM%' THEN 'Condomínio'
     WHEN UPPER(pagamento) LIKE 'ANTECIPA%' THEN 'MRA'
     WHEN UPPER(pagamento) LIKE 'CIQ%' THEN 'CIQ'
+    WHEN UPPER(pagamento) LIKE 'PP não residente' THEN 'PP não residente'
     WHEN UPPER(pagamento) LIKE 'ONG%' THEN 'Aluguel'
-    WHEN regexp_like(UPPER(pagamento),'^MULTA RESCISÓRIA|^CONTAS DE CONSUMO|^ALUGUEL|^CORRETORES|^IPTU|^REPASSE B2B|ˆREPASSE-B2B|^BAND-AID|^CRÉDITO A SALDAR|^EARLY TERMINATION') THEN pagamento
+    WHEN UPPER(pagamento) LIKE 'Aporte FIDC' THEN 'Aporte FIDC'
     WHEN regexp_like(UPPER(pagamento),'^DEVOLUÇÃO|^EXTRA') THEN 'Repasse Extra'
+    WHEN regexp_like(UPPER(pagamento),'^MULTA RESCISÓRIA|^CONTAS DE CONSUMO|^ALUGUEL|^CORRETORES|^IPTU|^REPASSE B2B|^BAND-AID|^CRÉDITO A SALDAR|^EARLY TERMINATION|^MRA|^REPASSES EXTRAS|^REPASSES BAND-AID|^CONDOMÍNIO DEPÓSITO|^ALUGUEL MANUAL|^CORRETOR 3P|^ONGOING MANUAL|^B2B|^CONTAS DE CONSUMO|^NÃO PROTEÇÃO|^REEMBOLSO') THEN pagamento
     ELSE NULL
   END AS reference_3,
   TipoPagamento AS reference_4,
@@ -149,9 +153,9 @@ FROM
     id_related_document,
     p.our_number,
     p.company_use,
-    SPLIT(p.status, '/')[1] as status,
+    SPLIT(p.status, '/')[1] AS status,
     p.dt_paid,
-    if (status = ':payment.status/chargeback', p.paid_amount, p.paid_amount*(-1)) as paid_amount,
+    IF(status = ':payment.status/chargeback', p.paid_amount, p.paid_amount*(-1)) AS paid_amount,
     p.requested_by,
     p.id_bank_payment,
     p.ts_updated,
@@ -163,20 +167,43 @@ FROM
           WHEN p.requested_by = 'rh-ciq' THEN 'CIQ'
           WHEN p.requested_by = 'executive-for-rent' THEN 'CIQ Select'
           WHEN p.requested_by = 'ciq-captacao' THEN 'CIQ Captação'
+          WHEN p.requested_by = 'imobs-for-rent' THEN 'Imobiliarias 3P'
           WHEN regexp_like((p.company_use), '^[0-9]+T[0-9]+$') THEN 'Aluguel'
           WHEN regexp_like((p.company_use), '^[0-9]+I[0-9]+$') THEN 'Crédito a Saldar'
           WHEN regexp_like((p.company_use), '^[0-9]+L[0-9]+$') THEN 'Multa rescisória'
           WHEN regexp_like((p.company_use), '^[0-9]+R[0-9]+$') THEN 'Early termination'
           WHEN regexp_like((p.company_use), '^[0-9]+!MO[0-9]+$') THEN 'Ongoing'
           WHEN regexp_like((p.company_use), '^[0-9]+Corretor$') THEN 'Corretores'
-      END as pagamento,
+          WHEN regexp_like((p.company_use), '^[0-9]+BAI[0-9]+$') THEN 'Band-Aid'
+          WHEN regexp_like((p.company_use), '^[0-9]+BAP[0-9]+$') THEN 'Band-Aid'
+          WHEN regexp_like((p.company_use), '^[0-9]+MR[0-9]+$') THEN 'MRA'
+          WHEN regexp_like((p.company_use), '^[0-9]+RBI[0-9]+$') THEN 'Reembolso'
+          WHEN regexp_like((p.company_use), '^[0-9]+RBP[0-9]+$') THEN 'Reembolso'
+          WHEN regexp_like((p.company_use), '^[0-9]+EI[0-9]+$') THEN 'Repasses Extras'
+          WHEN regexp_like((p.company_use), '^[0-9]+EP[0-9]+$') THEN 'Repasses Extras'
+          WHEN regexp_like((p.company_use), '^[0-9]+NPP[0-9]+$') THEN 'Não Proteção'
+          WHEN regexp_like((p.company_use), '^[0-9]+NPI[0-9]+$') THEN 'Não Proteção'
+          WHEN regexp_like((p.company_use), '^[0-9]+BA[0-9]+$') THEN 'BandAid'
+          WHEN regexp_like((p.company_use), '^[0-9]+CI[0-9]+$') THEN 'Conciliação'
+          WHEN regexp_like((p.company_use), '^[0-9]+CP[0-9]+$') THEN 'Conciliação'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MBD[0-9]+$') AND dt_paid >= '2024-02-05'THEN 'Band-Aid'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+ME[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Repasses Extras'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MC[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Repasses Band-Aid'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MCP[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Condomínio Depósito'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MA[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'MRA'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MT[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Aluguel Manual'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MC3P[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Corretor 3P'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MO[0-9]+$') AND dt_paid >= '2024-02-05' THEN 'Ongoing Manual'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MB[0-9]+$') AND dt_paid <= '2024-02-19' THEN 'Band-Aid'
+          WHEN regexp_like((p.company_use), '^[0-9]+![0-9]+MB[0-9]+$') AND dt_paid > '2024-02-19' THEN 'B2B'
+      END AS pagamento,
   CASE
       WHEN p.style='05' THEN 'Crédito em Conta Poupança'
       WHEN p.style='01' THEN 'Crédito em Conta Corrente'
       WHEN p.style='41' THEN 'TED'
       WHEN p.style='03' THEN 'DOC'
       ELSE p.style
-  END as TipoPagamento
+  END AS TipoPagamento
   FROM
     datalake_vans_clean.payment p
   WHERE
@@ -196,12 +223,14 @@ FROM
     CAST((if(pb.id_bank_payment = null, '0', '1')) AS decimal(20,0)) as id_bank_payment,
     pb.ts_updated,
     CASE
-      WHEN pb.company_use = '00000000000000000000' THEN 'Ongoing - Boleto'
+      WHEN pb.company_use = '00000000000000000000' THEN null
       WHEN regexp_like((company_use),'^[0-9]+P[0-9]+$') THEN 'Condomínio V8'
       WHEN regexp_like((company_use),'^00000000000000+[0-9]+$') THEN 'Condomínio V9'
       WHEN regexp_like((company_use),'^[0-9]+![0-9]+MC[0-9]+$') THEN 'Condominio v9'
-      WHEN regexp_like((company_use),'^[0-9]+![0-9]+MT[0-9]+$') THEN 'Aluguel'
+      WHEN regexp_like((company_use),'^[0-9]+![0-9]+MT[0-9]+$') THEN 'Aluguel Manual'
       WHEN regexp_like((company_use),'^[0-9]+![0-9]+MCD[0-9]+$') THEN 'Condominio v9 - Despejo'
+      WHEN regexp_like((company_use),'REFERA+!MO[0-9]+$') THEN 'Ongoing - Boleto'
+      WHEN regexp_like((company_use),'^[0-9]+![0-9]+MCCM[0-9]+$') AND ts_updated >= '2024-02-06' THEN 'Contas de Consumo'
     END as pagamento,
   CASE
       WHEN pb.style='05' THEN 'Crédito em Conta Poupança'
@@ -215,15 +244,15 @@ FROM
   WHERE
     pb.dt_paid >= '2022-12-01'
   ) c
-INNER JOIN 
+INNER JOIN
   file_payment fp
-      on fp.company_use = c.company_use and fp.rk = 1
+      ON fp.company_use = c.company_use
 LEFT JOIN
   datalake_vans_clean.bank_payment bp
-      on c.id_bank_payment = bp.id
+      ON c.id_bank_payment = bp.id
 LEFT JOIN
   datalake_vans_clean.bank b
-      on bp.id_bank = b.id
+      ON bp.id_bank = b.id
 )
 
 SELECT *
@@ -236,8 +265,8 @@ SELECT
   CAST(b.id AS STRING) as id_payment_platform,
   SPLIT(b.company_use, '[a-zA-Z!]')[0] AS id_business_entity,
   b.id_related_document AS id_finance_entity,
-  'vans_car' AS payment_platform, 
-  SPLIT(b.status, "/")[1] AS payment_status, 
+  'vans_car' AS payment_platform,
+  SPLIT(b.status, "/")[1] AS payment_status,
   b.company_use AS reference_1,
   b.our_number AS reference_2,
   NULL AS reference_3,
@@ -246,11 +275,11 @@ SELECT
   b.paid_amount AS payment_amount,
   b.dt_paid,
   nbd.date_next_bd AS dt_receipt
-FROM 
+FROM
   datalake_vans_clean.boleto b
 INNER JOIN
   datalake_vans_clean.boleto_file bf
-    ON b.id = bf.id_boleto 
+    ON b.id = bf.id_boleto
 INNER JOIN
   boleto_file_response bfr
     ON bfr.id = bf.id_file
@@ -261,22 +290,22 @@ QUALIFY
   RANK() OVER (PARTITION BY b.id_related_document ORDER BY b.ts_updated DESC) = 1
 )
 
-SELECT 
-  * 
-FROM 
+SELECT
+  *
+FROM
   trato_feito
 UNION ALL
-SELECT 
-  * 
-FROM 
+SELECT
+  *
+FROM
   wallstreet
-UNION ALL 
-SELECT 
-  * 
-FROM 
+UNION ALL
+SELECT
+  *
+FROM
   robin_hood
 UNION ALL
-SELECT 
-  * 
-FROM 
+SELECT
+  *
+FROM
   vans
