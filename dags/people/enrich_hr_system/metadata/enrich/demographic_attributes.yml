@@ -1,0 +1,137 @@
+---
+database_name: datalake_hr_system
+table_name: demographic_attributes
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table with demographic attributes of employees
+columns:
+  id_person:
+    description: 'Id of the employee from the HR system'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.id_person
+  id_person_legislative:
+    description: 'Id of the column legislative_info'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.id_person_legislative
+  id_ethnicity:
+    description: 'Id of the column ethnicities'
+    lineage:
+    - datalake_hr_system_clean.workers.ethnicities.id_ethnicity
+  id_religion:
+    description: 'Id of the column religions'
+    lineage:
+    - datalake_hr_system_clean.workers.religions.id_religion
+  marital_status:
+    description: 'Marital status of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.marital_status
+  gender:
+    description: 'Gender of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.gender
+  highest_education_level:
+    description: 'Numeric value that represents the highest education level of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.highest_education_level
+  legislation_code:
+    description: 'Legislation code of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.legislation_code
+  sexual_orientation:
+    description: 'Sexual orientation of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.sexual_orientation
+  gender_identity:
+    description: 'Gender identity of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.gender_identity
+  neurodiversity:
+    description: 'Neurodiversity of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.neurodiversity
+  nationality:
+    description: 'Nationality of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.nationality
+  disability_self_declaration_code:
+    description: 'Column that contains the code of the disability, this field is self declared by the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.disability_self_declaration_code
+  disability_self_declaration_description:
+    description: 'Column that contains the description of the disability, this field is self declared by the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.disability_self_declaration_description
+  ctps_number:
+    description: 'Number of the CTPS (work card) of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.ctps_number
+  ctps_series:
+    description: 'Series number of the CTPS (work card) of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.ctps_series
+  issuing_state_ctps:
+    description: 'Issuing state of the CTPS (work card) of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.issuing_state_ctps
+  vote_registration_number:
+    description: 'Number of the vote registration of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.vote_registration_number
+  electoral_zone:
+    description: 'Electoral zone of the vote registration of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.electoral_zone
+  polling_station:
+    description: 'Polling station of the vote registration of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.polling_station
+  country_situation:
+    description: 'Country situation of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.country_situation
+  housing_type:
+    description: 'Housing type of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.housing_type
+  quinto_andar_joining_method:
+    description: 'Which method the employee used to join QuintoAndar'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.quinto_andar_joining_method
+  ethnicity:
+    description: Ethnicity of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.ethinities.ethnicity
+  religion:
+    description: 'Religion of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.religion.religion
+  has_disability:
+    description: 'Boolean that represents if the employee has a disability, this field is self declared by the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.has_disability
+  has_salary_advance:
+    description: 'Boolean that represents if the employee has a salary advance'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.has_salary_advance
+  dt_effective_start:
+    description: 'Date when the information became effective'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.li.dt_effective_start
+  dt_effective_end:
+    description: 'Date when the information will not be effective anymore'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.li.dt_effective_end
+  ts_created:
+    description: 'When the record was created'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.ts_created, 
+    - datalake_hr_system_clean.workers.ethnicities.ts_created
+    - datalake_hr_system_clean.workers.religion.ts_created
+  ts_last_update:
+    description: 'When the record was last updated'
+    lineage:
+    - datalake_hr_system_clean.workers.legislative_info.ts_last_update, 
+    - datalake_hr_system_clean.workers.ethnicities.ts_last_update
+    - datalake_hr_system_clean.workers.religion.ts_last_update
+  ts_load:
+    description: 'When the record was loaded into the table'

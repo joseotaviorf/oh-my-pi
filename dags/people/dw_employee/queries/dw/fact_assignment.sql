@@ -402,6 +402,24 @@ subordinates AS (
     not is_direct_manager
   GROUP BY
     id_manager_assignment
+),
+cte_enrich_demographic_attributes AS (
+  SELECT 
+    id_person,
+    md5(
+    concat(
+      COALESCE(ethnicity, '-1'),
+      COALESCE(gender_identity, '-1'),
+      COALESCE(sexual_orientation, '-1'),
+      COALESCE(neurodiversity, '-1'),
+      COALESCE(religion,'-1'),
+      COALESCE(country_situation, '-1'),
+      COALESCE(housing_type, '-1'),
+      COALESCE(quinto_andar_joining_method, '-1')
+    )
+  ) AS sk_employee_census
+  FROM datalake_hr_system.demographic_attributes
+  QUALIFY ts_last_update = MAX(ts_last_update) OVER (PARTITION BY id_person)
 )
 
 SELECT
@@ -409,6 +427,7 @@ SELECT
   wr.id_period_of_service AS sk_assignment,
   -- non ids
   wr.id_person AS sk_employee,
+  da.sk_employee_census, 
   COALESCE(ap.id_cost_center, af.id_cost_center, '-1') AS sk_cost_center,
   COALESCE(ap.id_business_unit, af.id_business_unit, '-1') AS sk_business_unit,
   coalesce(ap.id_job, af.id_job, '-1') AS sk_job,
@@ -543,6 +562,9 @@ FROM
   LEFT JOIN
     subordinates
       ON subordinates.id_assignment = ap.id_assignment
+  LEFT JOIN 
+    cte_enrich_demographic_attributes AS da 
+      ON wr.id_person = da.id_person
 WHERE
   (
     wr.dt_start <= DATE('{load_start_date}')

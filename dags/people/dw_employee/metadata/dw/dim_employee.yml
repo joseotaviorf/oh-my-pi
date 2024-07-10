@@ -93,14 +93,6 @@ columns:
     description: 'Father name of the employee'
     lineage:
     - datalake_hr_system_clean.workers.father_name
-  ethnicity_code:
-    description: 'Ethnicity of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.ethnicity
-  ethnicity_description:
-    description: 'Ethnicity description of the employee'
-    lineage:
-    - "datalake_hr_system_clean.workers.ethnicity"
   marital_status_code:
     description: 'Marital status of the employee'
     lineage:
@@ -113,26 +105,6 @@ columns:
     description: 'Gender of the employee'
     lineage:
     - datalake_hr_system_clean.workers.gender
-  sexual_orientation:
-    description: 'Sexual orientation of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.sexual_orientation
-  gender_identity:
-    description: 'Gender identity of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.genero
-  neurodiversity:
-    description: 'Neurodiversity of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.neurodiversidade
-  religion_code:
-    description: 'Religion of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.religion
-  religion_description:
-    description: 'Religion name of the employee'
-    lineage:
-    - "datalake_hr_system_clean.workers.religion"
   highest_education_level_code:
     description: 'Code for the highest education level of the employee'
     lineage:

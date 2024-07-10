@@ -12,7 +12,8 @@ workflow:
   custom_schema: employee
   has_hive_sync: false
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}" 
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_13_3_min_memory_people_cluster
   access_control_list:

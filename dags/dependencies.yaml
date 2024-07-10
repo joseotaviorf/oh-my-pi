@@ -468,6 +468,7 @@ bietlejuice.dw_demand:
   - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results
 bietlejuice.dw_employee:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
+  - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-managers
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
