@@ -3324,8 +3324,9 @@ bietlejuice.reverse_atento_access:
   - bietlejuice.reverse_atento:load-reverse-taxonomia-email
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.reverse_atlas_pricing_report_access:
-  - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-engagement
-  - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-listing-price-history
+  - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement
+  - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history
+  - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-region
 bietlejuice.reverse_bic_ss:
   - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics

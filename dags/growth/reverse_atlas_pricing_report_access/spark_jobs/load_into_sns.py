@@ -1,15 +1,14 @@
-import logging
+import boto3
 import json
+import logging
 
 from argparse import ArgumentParser
 from datetime import datetime, date, timezone
-from typing import Tuple
-
-import boto3
 from uuid import uuid4
 
-from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.clients.db_clients import SparkClient
+
+from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_into_sns"
 
@@ -17,10 +16,11 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def parse_arguments() -> Tuple[str, str, str, str, datetime]:
+def parse_arguments() -> dict:
     """
     Parse the arguments passed to the job.
-    Returns a tuple with the database name, table name, event type, ARN of the SNS topic and execution date.
+    Returns a dictionary with the database name, table name, event type,
+    ARN of the SNS topic and chunk size.
     """
 
     parser = ArgumentParser(description=JOB_NAME)
@@ -39,7 +39,13 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     sns_topic_arn = args.sns_topic_arn
     chunk_size = args.chunk_size
 
-    return database_name, table_name, event_type, sns_topic_arn, chunk_size
+    return {
+        "database_name": database_name,
+        "table_name": table_name,
+        "event_type": event_type,
+        "sns_topic_arn": sns_topic_arn,
+        "chunk_size": chunk_size
+    }
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
@@ -116,16 +122,19 @@ def main():
     """
     Start the pipeline.
     """
-    database_name, table_name, event_type, sns_topic_arn, chunk_size = (
-        parse_arguments()
-    )
+    job_args_dict = parse_arguments()
+
     logger.info(
-        f"""m=__main__, database_name={database_name}, table_name={table_name},
-        event_type={event_type}, sns_topic_arn={sns_topic_arn}"""
+        f"""m=__main__, database_name={job_args_dict["database_name"]}, table_name={job_args_dict["table_name"]},
+        event_type={job_args_dict["event_type"]}, sns_topic_arn={job_args_dict["sns_topic_arn"]}"""
     )
 
     load_table_into_sns(
-        database_name, table_name, event_type, sns_topic_arn, chunk_size
+        database_name=job_args_dict["database_name"],
+        table_name=job_args_dict["table_name"],
+        event_type=job_args_dict["event_type"],
+        sns_topic_arn=job_args_dict["sns_topic_arn"],
+        chunk_size=job_args_dict["chunk_size"]
     )
 
 if __name__ == "__main__":

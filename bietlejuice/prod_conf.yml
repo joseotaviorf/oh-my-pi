@@ -92,7 +92,6 @@ dags_out_of_pattern:
         "quintoandar",
         "reports",
         "reverse_atlas_pricing_report_access",
-        "reverse_atlas_pricing_report_load",
         "reverse_atento",
         "reverse_bic_ss",
         "reverse_bpo_performance",
@@ -128,7 +127,7 @@ dags_out_of_pattern:
         "wonka.user_embeddings_main",
         "zordominium_vespucio_plugin",
         "quintoml.recs.house_user_embeddings_quintoml.inference",
-        "dw_quintocred_ifrs"
+        "dw_quintocred_ifrs",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks

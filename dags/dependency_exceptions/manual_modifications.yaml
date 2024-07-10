@@ -76,7 +76,6 @@ bietlejuice.dw_datamarts_spark.fintech:
   remove:
     - bietlejuice.dw_fintech_snapshot:load-dw-public-snapshot-dim-contract-snapshot
 
-
 bietlejuice.dw_datamarts_spark.fintech_cross:
   remove:
     - bietlejuice.dw_region:load-dw-public-dim-region
@@ -847,8 +846,9 @@ bietlejuice.enrich_atlas_pricing_report:
     - bietlejuice.dw_smart_price:load-dw-quintoandar-fact-listing-price-changes
 bietlejuice.reverse_atlas_pricing_report_access:
   add:
-    - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-engagement
-    - bietlejuice.reverse_atlas_pricing_report_load:load-reverse-pricing-report-listing-price-history
+    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement
+    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history
+    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-region
 bietlejuice.reverse_robbyson_access:
   add:
     - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance

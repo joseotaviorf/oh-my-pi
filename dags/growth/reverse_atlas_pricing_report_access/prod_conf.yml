@@ -1,22 +1,25 @@
 ---
+dag_documentation:
+  dag_purpose: |
+    This DAG retrieves data stored in the `datalake_atlas_pricing_report` schema,
+    which was previously processed by the DAG `enrich_atlas_pricing_report`, and transmits
+    it through SNS. This dataset serves as the foundation for generating pricing reports
+    to QuintoAndar Seekers.
+
 database_name: datalake_atlas_pricing_report
 tables:
-  new_pricing_report_region:
-    event_type: NEW_PRICING_REPORT_REGION
+  new_pricing_report_engagement:
+    event_type: NEW_PRICING_REPORT_ENGAGEMENT
     sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
-    chunk_size: 1000
+    chunk_size: 150
   new_pricing_report_listing_price_history:
     event_type: NEW_PRICING_REPORT_LISTING_PRICE_HISTORY
     sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-listing-events
     chunk_size: 1000
-  # new_pricing_report_new_rent_price_published:
-  #   event_type: NEW_PRICING_REPORT_NEW_RENT_PRICE_PUBLISHED
-  #   sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
-  #   chunk_size: 1000
-  new_pricing_report_engagement:
-    event_type: NEW_PRICING_REPORT_ENGAGEMENT
+  new_pricing_report_region:
+    event_type: NEW_PRICING_REPORT_REGION
     sns_topic_arn: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
-    chunk_size: 500
+    chunk_size: 1000
 
 custom_cluster:
   driver_node_type_id: r5n.2xlarge
