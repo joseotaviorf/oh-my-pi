@@ -37,9 +37,6 @@ workflow:
     idled_channel:
       date_filter_column: updated_at
       partitions: [year, month, day]
-    idled_channel_event:
-      date_filter_column: created_at
-      partitions: [year, month, day]
     account:
       extraction_type: full
   extra_query_template_params:

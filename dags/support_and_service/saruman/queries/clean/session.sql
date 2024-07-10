@@ -13,4 +13,4 @@ SELECT
 FROM
     datalake_saruman_raw.session
 WHERE
-    yMAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
