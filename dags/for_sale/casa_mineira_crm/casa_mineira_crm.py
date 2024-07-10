@@ -41,9 +41,7 @@ RAW_SPARK_JOB_PATH = (
     f"{S3_PREFIX}/spark_jobs/{CONTEXT}/load_{CONTEXT}_into_datalake_raw.py"
 )
 
-CLUSTER_DESCRIPTION = Variable.get(
-    f"databricks_9_1_med_general_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_general_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,

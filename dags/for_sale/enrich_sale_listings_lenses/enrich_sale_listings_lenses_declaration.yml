@@ -16,4 +16,4 @@ workflow:
     - sellability_lens
     - segmentation_bins
 cluster:
-  type: databricks_10_4_med_memory_cluster
+  type: databricks_12_2_med_memory_cluster

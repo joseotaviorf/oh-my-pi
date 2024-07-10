@@ -16,4 +16,4 @@ workflow:
     sale_listing_price_changes:
     - sale_status_version_order
 cluster:
-  type: databricks_10_4_med_memory_photon_cluster
+  type: databricks_12_2_med_memory_photon_cluster

@@ -15,4 +15,4 @@ workflow:
     sale_offer_users_info:
     - sale_offer_users
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_12_2_med_general_cluster
