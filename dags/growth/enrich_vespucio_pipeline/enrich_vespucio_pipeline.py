@@ -21,8 +21,6 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
-# TO DO: Add the package version in the config file
-# When updating the vespucio version here, don't forget to update this in the zordominium_vespucio_plugin dag
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 8, 24, 0, 0, 0, tzinfo=LOCAL_TZ)
 
@@ -313,7 +311,7 @@ plugin_tasks = [
     create_task(
         entry_point="plugins_compound_indexer",
         parameters=[
-            f"--elasticsearch_url=https://vpc-vespucio-prod-us-east-1-o56l6pbmnwaphvb7rqxzsapso4.us-east-1.es.amazonaws.com/",
+            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
             f"--update_alias",
             f"--delete_old_indices",
             f"--input_condo_compounds={Tables.condo_compounds}",
@@ -323,9 +321,19 @@ plugin_tasks = [
         ],
     ),
     create_task(
+        entry_point="plugins_listing_indexer",
+        parameters=[
+            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
+            f"--update_alias",
+            f"--delete_old_indices",
+            f"--input_listings={Tables.listings}",
+            f"--output_index_prefix=vespucio_prod",
+        ],
+    ),
+    create_task(
         entry_point="plugins_rede_house_enrichment_consolidate",
         parameters=[
-            f"--sqs_queue_url=https://sqs.us-east-1.amazonaws.com/632540934959/ProdMainHouseEnrichmentHousesToBeReEnriched",
+            f"--sqs_queue_url={config_service.get_config('sqs_url_house_enrichment')}",
             f"--sqs_region=us-east-1",
             f"--sqs_batch_size=10",
             f"--sqs_num_writers=10",

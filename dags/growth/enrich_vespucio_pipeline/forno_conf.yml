@@ -2,3 +2,5 @@ dag_documentation:
   dag_purpose: "Vespúcio is a service that aims to generate a source of truth for condos and houses, joining multiple separate
     sources of data. This DAG is responsible for orchestrating its execution. For more information, there is the GitHub
     [Vespucio Repository](https://github.com/quintoandar/vespucio)"
+elastic_search_url: "https://vpc-vespucio-forno-us-east-1-3l2ywytq5dagy7tdeitbyxew7m.us-east-1.es.amazonaws.com/"
+sqs_url_house_enrichment: "https://sqs.us-east-1.amazonaws.com/632540934959/DevMainHouseEnrichmentHousesToBeReEnriched"
