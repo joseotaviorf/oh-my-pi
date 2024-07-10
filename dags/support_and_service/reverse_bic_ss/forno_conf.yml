@@ -13,10 +13,15 @@ tables_to_send:
     type: CUSTOMER_DATA
 
 custom_cluster:
-  driver_node_type_id: r5dn.12xlarge
-  node_type_id: r5dn.4xlarge
+  autotermination_minutes: 20
+  driver_node_type_id: r5a.12xlarge
+  node_type_id: r5a.4xlarge
   num_workers: 4
   aws_attributes:
+    first_on_demand: 1
+    spot_bid_price_percent: 100
+    zone_id: us-east-1d
+    availability: SPOT_WITH_FALLBACK
     ebs_volume_size: 200
   spark_conf:
     spark.driver.maxResultSize: "0"

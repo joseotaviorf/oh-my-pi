@@ -31,7 +31,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
             "spot_bid_price_percent": 100,
-            "zone_id": "us-east-1a"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -126,7 +126,7 @@
             "ebs_volume_size": 32,
             "ebs_volume_type": "GENERAL_PURPOSE_SSD",
             "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
-            "zone_id": "us-east-1e"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -211,7 +211,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
             "spot_bid_price_percent": 100,
-            "zone_id": "us-east-1a"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -305,7 +305,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
             "spot_bid_price_percent": 100,
-            "zone_id": "us-east-1a"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -407,7 +407,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
             "spot_bid_price_percent": 100,
-            "zone_id": "us-east-1a"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -504,7 +504,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
             "spot_bid_price_percent": 100,
-            "zone_id": "us-east-1a"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -600,7 +600,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
             "spot_bid_price_percent": 100,
-            "zone_id": "us-east-1a"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -705,7 +705,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
             "spot_bid_price_percent": 100,
-            "zone_id": "us-east-1a"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -806,7 +806,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
             "spot_bid_price_percent": 100,
-            "zone_id": "auto"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {
@@ -900,7 +900,7 @@
             "first_on_demand": 1,
             "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
             "spot_bid_price_percent": 100,
-            "zone_id": "us-east-1a"
+            "zone_id": "us-east-1d"
         },
         "cluster_log_conf": {
             "s3": {

@@ -8,10 +8,15 @@ tables:
   - table_name: rede_user_pool
     user_pool_id: us-east-1_YGGKO9kNZ
 custom_cluster:
+  autotermination_minutes: 20
   driver_node_type_id: r5a.4xlarge
   node_type_id: r5a.2xlarge
   num_workers: 3
   spark_version: 12.2.x-scala2.12
   aws_attributes:
+    first_on_demand: 1
+    spot_bid_price_percent: 100
+    zone_id: us-east-1d
+    availability: SPOT_WITH_FALLBACK
     ebs_volume_size: 200
     instance_profile_arn: "{{ var.value.instance_profile_secret_arn_cognito_ingestion }}"

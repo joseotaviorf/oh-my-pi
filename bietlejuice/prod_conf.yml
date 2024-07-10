@@ -172,7 +172,7 @@ cluster_template:
             first_on_demand: 1
             instance_profile_arn: "{{ var.value.instance_profile_arn }}"
             spot_bid_price_percent: 100
-            zone_id: us-east-1a
+            zone_id: us-east-1d
         cluster_log_conf:
             s3:
                 destination: s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}
@@ -384,8 +384,8 @@ databricks_12_2_max_memory_cluster:
 
 databricks_10_4_min_io-memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5n.large
-    node_type_id: r5n.xlarge
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.xlarge
     num_workers: 2
     spark_version: 10.4.x-scala2.12
     aws_attributes:
@@ -394,8 +394,8 @@ databricks_10_4_min_io-memory_cluster:
 
 databricks_12_2_min_io-memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5n.large
-    node_type_id: r5n.xlarge
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.xlarge
     num_workers: 2
     spark_version: 12.2.x-scala2.12
     aws_attributes:
@@ -404,8 +404,8 @@ databricks_12_2_min_io-memory_cluster:
 
 databricks_10_4_med_io-memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5n.2xlarge
-    node_type_id: r5n.4xlarge
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.4xlarge
     num_workers: 3
     spark_version: 10.4.x-scala2.12
     aws_attributes:
@@ -414,8 +414,8 @@ databricks_10_4_med_io-memory_cluster:
 
 databricks_12_2_med_io-memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5n.2xlarge
-    node_type_id: r5n.4xlarge
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.4xlarge
     num_workers: 3
     spark_version: 12.2.x-scala2.12
     aws_attributes:
@@ -424,8 +424,8 @@ databricks_12_2_med_io-memory_cluster:
 
 databricks_10_4_max_io-memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5n.4xlarge
-    node_type_id: r5n.8xlarge
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.8xlarge
     num_workers: 4
     spark_version: 10.4.x-scala2.12
     aws_attributes:
@@ -434,8 +434,8 @@ databricks_10_4_max_io-memory_cluster:
 
 databricks_12_2_max_io-memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5n.4xlarge
-    node_type_id: r5n.8xlarge
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.8xlarge
     num_workers: 4
     spark_version: 12.2.x-scala2.12
     aws_attributes:
@@ -520,8 +520,8 @@ databricks_12_2_min_general_photon_cluster:
 
 databricks_10_4_min_xlarge_io-memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5d.xlarge
-    node_type_id: r5d.large
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.large
     num_workers: 2
     spark_version: 10.4.x-scala2.12
     aws_attributes:
@@ -552,8 +552,8 @@ databricks_12_2_min_xlarge_io-memory_photon_cluster:
 
 databricks_12_2_min_xlarge_io-memory_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5d.xlarge
-    node_type_id: r5d.large
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.large
     num_workers: 2
     spark_version: 12.2.x-scala2.12
     aws_attributes:
@@ -721,8 +721,8 @@ databricks_12_2_med_2xlarge_general_photon_cluster:
 
 databricks_10_4_high_fixed_workers_8xlarge_general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5d.xlarge
-    node_type_id: m5d.8xlarge
+    driver_node_type_id: r5a.xlarge
+    node_type_id: m5a.8xlarge
     num_workers: 4
     spark_version: 10.4.x-scala2.12
     aws_attributes:
@@ -731,8 +731,8 @@ databricks_10_4_high_fixed_workers_8xlarge_general_cluster:
 
 databricks_12_2_high_fixed_workers_8xlarge_general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5d.xlarge
-    node_type_id: m5d.8xlarge
+    driver_node_type_id: r5a.xlarge
+    node_type_id: m5a.8xlarge
     num_workers: 4
     spark_version: 12.2.x-scala2.12
     aws_attributes:
@@ -862,8 +862,8 @@ databricks_13_3_med_people_cluster:
 
 databricks_12_2_min_analytical_costs_cluster:
     <<: *cluster_anchor
-    node_type_id: m5d.large
-    driver_node_type_id: m5d.large
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
     num_workers: 2
     spark_version: 12.2.x-scala2.12
     aws_attributes:
@@ -885,8 +885,8 @@ databricks_12_2_med_io-general_analytical_costs_photon_cluster:
 
 databricks_10_4_med_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m5d.xlarge
-    node_type_id: m5d.4xlarge
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.4xlarge
     num_workers: 4
     spark_version: 10.4.x-scala2.12
     aws_attributes:
@@ -895,8 +895,8 @@ databricks_10_4_med_cluster:
 
 databricks_12_2_med_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m5d.xlarge
-    node_type_id: m5d.4xlarge
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.4xlarge
     num_workers: 4
     spark_version: 12.2.x-scala2.12
     aws_attributes:

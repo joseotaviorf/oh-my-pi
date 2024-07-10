@@ -10,19 +10,28 @@
 #       # Mandatory.
 #       # Eg: Data ForSale
 custom_cluster:
-  driver_node_type_id: c5n.2xlarge
-  node_type_id: c5n.4xlarge
+  autotermination_minutes: 20
+  driver_node_type_id: c5a.2xlarge
+  node_type_id: c5a.4xlarge
   num_workers: 6
   aws_attributes:
-    availability: ON_DEMAND
+    availability: SPOT_WITH_FALLBACK
+    first_on_demand: 1
+    spot_bid_price_percent: 100
+    zone_id: us-east-1d
     ebs_volume_size: 200
 
 databricks_10_4_max_memory_cluster:
+  autotermination_minutes: 20
   driver_node_type_id: r5d.8xlarge
   node_type_id: r5d.12xlarge
   runtime_engine: PHOTON
   num_workers: 4
   aws_attributes:
+    first_on_demand: 1
+    spot_bid_price_percent: 100
+    zone_id: us-east-1d
+    availability: SPOT_WITH_FALLBACK
     ebs_volume_size: 200
 
 dags:

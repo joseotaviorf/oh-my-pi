@@ -22,12 +22,17 @@ tables:
     chunk_size: 1000
 
 custom_cluster:
-  driver_node_type_id: r5n.2xlarge
-  node_type_id: c5n.2xlarge
+  autotermination_minutes: 20
+  driver_node_type_id: r5a.2xlarge
+  node_type_id: c5a.2xlarge
   num_workers: 6
   spark_version: 12.2.x-scala2.12
   spark_conf:
     spark.driver.memory: "30g"
   aws_attributes:
+    first_on_demand: 1
+    spot_bid_price_percent: 100
+    zone_id: us-east-1d
+    availability: SPOT_WITH_FALLBACK
     ebs_volume_size: 200
     instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
