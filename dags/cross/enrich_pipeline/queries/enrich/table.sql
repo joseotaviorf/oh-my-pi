@@ -25,5 +25,3 @@ JOIN
 LEFT JOIN
   last_dag_inventory_update AS l
     ON l.dt_last_updated = MAKE_DATE(t.year, t.month, t.day)
-QUALIFY 
-  ROW_NUMBER() OVER (PARTITION BY t.table ORDER BY MAKE_DATE(t.year, t.month, t.day) DESC) = 1

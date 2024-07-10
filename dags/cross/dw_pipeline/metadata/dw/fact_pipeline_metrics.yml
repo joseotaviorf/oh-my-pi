@@ -8,7 +8,7 @@ owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_line:
     lineage:
-      - datalake_pipeline.dag.id_line
+      - datalake_pipeline.dag_sla_information.id_line
     description: Key that identifies the line/DAG owner. Joins with dw_pipeline.dim_line.
   sk_snapshot_date:
     description: Key of the snapshot date. Joins with dw_public.dim_date.
