@@ -1,25 +1,25 @@
 WITH 
 ToF AS (
-    SELECT
-        t.id_contract,
+    SELECT 
+        ft.sk_contract AS id_contract,
         dc.rent,
         dc.is_exit_inspection_opted_out,
-        DATE(MAX(t.ts_created)) AS dt_termination_request,
-        MAX(t.dt_vacancy) AS dt_termination,
+        DATE(MAX(dt.ts_created)) AS dt_termination_request,
+        MAX(dt.dt_termination) AS dt_termination,
         MAX(DATE(dc.ts_analyst_annulment_input)) AS dt_ended_confirmed
     FROM 
-        datalake_terminator_clean.termination AS t
+        dw_retention.fact_contract_termination AS ft 
     JOIN 
-        datalake_offboarding.contract_termination AS dt
-            ON dt.id_termination = t.id
+        dw_retention.dim_termination AS dt
+            ON dt.sk_termination = ft.sk_termination
     JOIN 
         dw_rent.dim_contract AS dc
-            ON dc.sk_contract = t.id_contract
+            ON dc.sk_contract = ft.sk_contract
     WHERE 
         dc.country_code = 'BR'
-        AND t.dt_termination <= ADD_MONTHS(CURRENT_DATE, 1)
+        AND dt.dt_termination <= ADD_MONTHS(CURRENT_DATE, 1)
         AND dt.ts_termination_finished IS NULL
-        AND t.status NOT IN ('CANCELED', 'DONE')
+        AND dt.status NOT IN ('CANCELED', 'DONE')
     GROUP BY 
         1, 2, 3
 ),
