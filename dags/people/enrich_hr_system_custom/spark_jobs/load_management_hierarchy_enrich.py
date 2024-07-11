@@ -59,7 +59,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
 
     df = spark_client.conn.sql(managers_query)
-    df = df.filter(df.sk_manager.isNotNull())
+    df = df.filter(df.id_manager_assignment.isNotNull())
 
     df_degree = df.withColumn("separation_degree", lit(1))\
                 .withColumn("is_direct_manager", lit(True))
