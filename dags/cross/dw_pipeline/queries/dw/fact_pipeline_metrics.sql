@@ -2,19 +2,19 @@ WITH totals_base AS (
     SELECT
         ds.id_line,
         COUNT(DISTINCT ds.id_dag) AS total_active_dags,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_active_and_unpaused = TRUE) AS total_active_unpaused_dags,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_executed = TRUE) AS total_dags_executed,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_special_scheduler = TRUE) AS total_dags_special_scheduler,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_special_scheduler_executed = TRUE) total_dags_special_scheduler_executed,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_in_sla_exclusion_list = TRUE) AS total_dags_in_sla_exclusion_list,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_in_ignoring_list = TRUE) AS total_dags_ignoring_list,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_inside_sla = TRUE) AS total_dags_inside_sla,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_outside_sla = TRUE) AS total_dags_outside_sla,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_null_sla = TRUE) AS total_dags_null_sla,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_run_successful = TRUE) AS total_success_dags,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_run_failed = TRUE) AS total_failed_dags,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_manual_run = TRUE) AS total_dags_with_manual_run,
-        COUNT(DISTINCT ds.id_dag) FILTER (WHERE is_run_triggered_by_mediator = TRUE) AS total_dags_triggered_by_mediator,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_active_and_unpaused = TRUE) AS total_active_unpaused_dags,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_executed = TRUE) AS total_dags_executed,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_special_scheduler = TRUE) AS total_dags_special_scheduler,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_special_scheduler_executed = TRUE) AS total_dags_special_scheduler_executed,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_in_sla_exclusion_list = TRUE) AS total_dags_in_sla_exclusion_list,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_in_ignoring_list = TRUE) AS total_dags_ignoring_list,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_inside_sla = TRUE) AS total_dags_inside_sla,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_outside_sla = TRUE) AS total_dags_outside_sla,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_null_sla = TRUE) AS total_dags_null_sla,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_run_successful = TRUE) AS total_success_dags,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_run_failed = TRUE) AS total_failed_dags,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_manual_run = TRUE) AS total_dags_with_manual_run,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_run_triggered_by_mediator = TRUE) AS total_dags_triggered_by_mediator,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'raw/clean') AS total_raw_clean_dags,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'enrich') AS total_enrich_dags,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'dw') AS total_dw_dags,
@@ -35,6 +35,7 @@ WITH totals_base AS (
             ON d.id_dag = ds.id_dag
     WHERE
         ds.dt_snapshot BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    GROUP BY 1, 28
 )
 SELECT
     tb.id_line AS sk_line,
