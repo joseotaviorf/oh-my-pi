@@ -14,12 +14,12 @@ WITH people_to_send AS (
     datalake_tracksale_dispatches.true_offboarding_pp_dispatches AS topd
   LEFT JOIN
     datalake_tracksale_dispatches.true_offboarding_pp_dispatches AS hist
-      ON MAKE_DATE(hist.year, hist.month, hist.day) BETWEEN DATE_SUB(MAKE_DATE({year}, {month}, {day}), 90) AND MAKE_DATE({year}, {month}, {day})
+      ON MAKE_DATE(hist.year, hist.month, hist.day) BETWEEN DATE_SUB(CURRENT_DATE(), 90) AND DATE_SUB(CURRENT_DATE(), 1)
       AND topd.id_driver = hist.id_driver
       AND topd.customer_email = hist.customer_email
       AND topd.customer_name = hist.customer_name
   WHERE
-    MAKE_DATE(topd.year, topd.month, topd.day) = DATE_ADD(MAKE_DATE({year}, {month}, {day}), 1)
+    MAKE_DATE(topd.year, topd.month, topd.day) = CURRENT_DATE()
     AND hist.customer_email IS NULL
 
 )
