@@ -186,7 +186,7 @@ app_ALL_lead_referred_events AS (
     FROM
         datalake_amplitude_clean.155697_refer_lead_referred_events
     WHERE
-        ep_id_lead::INTEGER IS NOT NULL            
+        ep_id_lead::INTEGER IS NOT NULL
 ),
 user_attribution_exploded AS (
     SELECT
@@ -295,6 +295,31 @@ app_183047_intro_page_viewed_events AS(
   WHERE
     GET_JSON_OBJECT(event_properties, '$.lead_id') IS NOT NULL
 ),
+app_183047_property_details_page_viewed_events AS (
+  SELECT
+    event_properties:lead_id::BIGINT AS id_lead,
+    NULL AS id_firestore,
+    NULL AS formfield_lead_uuid,
+    6 AS rule_num,
+    'opr' AS rule,
+    country AS user_country,
+    user_properties:country AS country_code,
+    ts_event,
+    up_utm_campaign AS utm_campaign,
+    up_utm_medium AS utm_medium,
+    up_utm_source AS utm_source,
+    up_utm_content AS utm_content,
+    up_utm_term AS utm_term,
+    user_properties:platform::STRING AS platform,
+    user_properties:referring_domain::STRING AS referring_domain,
+    region,
+    city,
+    uuid
+  FROM
+    datalake_amplitude_clean.183047_property_details_page_viewed_events
+  WHERE
+    event_properties:lead_id IS NOT NULL
+),
 lead_events_union AS (
     SELECT
         *,
@@ -320,6 +345,11 @@ lead_events_union AS (
         *,
         RANK() OVER(PARTITION BY id_lead ORDER BY ts_event DESC) AS rn
     FROM app_183047_intro_page_viewed_events
+    UNION
+    SELECT
+        *,
+        RANK() OVER(PARTITION BY id_lead ORDER BY ts_event DESC) AS rn
+    FROM app_183047_property_details_page_viewed_events
 )
 SELECT
     id_lead,
