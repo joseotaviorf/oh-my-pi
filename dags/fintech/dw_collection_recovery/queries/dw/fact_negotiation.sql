@@ -118,6 +118,7 @@ recupera_negotiation AS (
     dt_down_payment,
     dt_paid_all
   FROM datalake_recupera.negotiation
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_negotiation ORDER BY ts_snapshot DESC, id_contract DESC) = 1
 ),
 invalid_negotiations AS (
   SELECT
@@ -236,7 +237,7 @@ SELECT
   sk_debtor,
   id_negotiation_trato_feito,
   id_negotiation_recupera,
-  u.id_contract,
+  CAST(u.id_contract AS BIGINT) AS id_contract,
   COALESCE(po.operator_name, u.id_operator) AS id_operator,
   creditor,
   is_invalid_negotiation,

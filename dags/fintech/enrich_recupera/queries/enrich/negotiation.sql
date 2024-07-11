@@ -157,7 +157,7 @@ installment_detail AS (
     id_creditor,
     id_customer
   FROM datalake_recupera_clean.installment_detail
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, id_customer, id_contract, id_product, dt_expiration_installment_agreement ORDER BY year DESC, month desc, day desc) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, id_customer, BIGINT(id_contract), id_product, dt_expiration_installment_agreement ORDER BY year DESC, month desc, day desc) = 1
 ),
 deduplicate_records AS (
   SELECT
@@ -181,7 +181,7 @@ operational_records AS (
 )
 SELECT DISTINCT
   a.id_creditor,
-  pd.id_contract,
+  CAST(pd.id_contract AS BIGINT) AS id_contract,
   a.id_negotiation,
   a.id_operator,
   CASE
