@@ -101,6 +101,10 @@ columns:
     description: The total of working days in a month based on bank calendar (Fintech)
     lineage:
       - datalake_quintoandar.aux_date.total_working_days_in_month_fintech
+  total_days_in_month:
+    description: The total of days in a month
+    lineage:
+      - datalake_quintoandar.aux_date.total_days_in_month
   is_brz_holiday:
     description: Indicates whether the day is a brazilian nacional holiday not. The dates listed as holidays are the same dates Google Calendar reports as holidays.
     lineage:
@@ -169,6 +173,14 @@ columns:
     description: The last day of the bimester.
     lineage:
       - datalake_quintoandar.aux_date.bimester_end
+  days_since_beginning_of_month:
+    description: Difference between the first day of the month and the date referred to (date - month_start)
+    lineage:
+      - datalake_quintoandar.aux_date.days_since_beginning_of_month
+  days_until_end_of_month:
+    description: Difference between the last day of the month and the date referred to (month_end - date)
+    lineage:
+      - datalake_quintoandar.aux_date.days_until_end_of_month
   last_day:
     description: Previous day (date - 1 day).
     lineage:

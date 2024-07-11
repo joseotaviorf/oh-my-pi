@@ -25,7 +25,7 @@ brazillian_holidays AS (
     QUALIFY ROW_NUMBER() OVER(PARTITION BY dt_holiday_start, dt_holiday_end ORDER BY ts_updated DESC) = 1
 ),
 month_to_bimester AS (
-    SELECT 
+    SELECT
         *
     FROM (
         VALUES
@@ -192,6 +192,7 @@ SELECT DISTINCT
     working_days_in_month_fintech,
     MAX(working_days_in_month) OVER (PARTITION BY year, month) AS total_working_days_in_month,
     MAX(working_days_in_month_fintech) OVER (PARTITION BY year, month) AS total_working_days_in_month_fintech,
+    INT(RIGHT(DATE(month_end), 2)) AS total_days_in_month,
     is_brz_holiday,
     is_brz_fintech_holiday,
     br_holiday_name,
@@ -211,6 +212,8 @@ SELECT DISTINCT
     DATE(month_end) AS month_end,
     DATE(bimester_start) AS bimester_start,
     DATE(bimester_end) AS bimester_end,
+    INT(DATEDIFF(date, DATE(month_start))) days_since_beginning_of_month,
+    INT(DATEDIFF(DATE(month_end), date)) days_until_end_of_month,
     last_day,
     last_week,
     last_2_weeks,
