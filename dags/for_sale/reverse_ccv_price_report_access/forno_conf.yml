@@ -9,7 +9,7 @@ custom_cluster:
   autotermination_minutes: 20
   driver_node_type_id: m5a.large
   node_type_id: m5a.large
-  num_workers: 2
+  num_workers: 1
   # autoscale:
   #     max_workers: 2
   #     min_workers: 1

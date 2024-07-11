@@ -9,9 +9,9 @@ tables:
     user_pool_id: us-east-1_7nT6JT2v3
 custom_cluster:
   autotermination_minutes: 20
-  driver_node_type_id: r5a.4xlarge
-  node_type_id: r5a.2xlarge
-  num_workers: 3
+  driver_node_type_id: r5a.large
+  node_type_id: r5a.large
+  num_workers: 1
   spark_version: 12.2.x-scala2.12
   aws_attributes:
     first_on_demand: 1

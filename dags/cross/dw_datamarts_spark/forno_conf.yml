@@ -11,9 +11,9 @@
 #       # Eg: Data ForSale
 custom_cluster:
   autotermination_minutes: 20
-  driver_node_type_id: c5a.2xlarge
-  node_type_id: c5a.4xlarge
-  num_workers: 6
+  driver_node_type_id: c5a.large
+  node_type_id: c5a.large
+  num_workers: 1
   aws_attributes:
     availability: SPOT_WITH_FALLBACK
     first_on_demand: 1
@@ -23,10 +23,10 @@ custom_cluster:
 
 databricks_10_4_max_memory_cluster:
   autotermination_minutes: 20
-  driver_node_type_id: r5d.8xlarge
-  node_type_id: r5d.12xlarge
+  driver_node_type_id: r5d.large
+  node_type_id: r5d.large
   runtime_engine: PHOTON
-  num_workers: 4
+  num_workers: 1
   aws_attributes:
     first_on_demand: 1
     spot_bid_price_percent: 100

@@ -23,9 +23,9 @@ tables:
 
 custom_cluster:
   autotermination_minutes: 20
-  driver_node_type_id: r5a.2xlarge
-  node_type_id: c5a.2xlarge
-  num_workers: 6
+  driver_node_type_id: r5a.large
+  node_type_id: c5a.large
+  num_workers: 1
   spark_version: 12.2.x-scala2.12
   spark_conf:
     spark.driver.memory: "30g"
