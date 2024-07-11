@@ -145,13 +145,42 @@ original_flow AS (
 ),
 all_tables AS (
     SELECT 
-        *
+        id_lead,
+        id_house,
+        business_context,
+        id_user_registrant,
+        source,
+        application,
+        funnel_step,
+        id_region,
+        ops_objective,
+        ops_agent,
+        ops_partner,
+        ops_approach,
+        ops_contact_medium,
+        ts_event,
+        ts_load
     FROM 
         original_flow
     UNION ALL
     SELECT 
-        *
-    FROM datalake_supply_flows.fallback_taxonomy
+      id_lead,
+      id_house,
+      business_context,
+      id_user_registrant,
+      source,
+      application,
+      funnel_step,
+      id_region,
+      ops_objective,
+      ops_agent,
+      ops_partner,
+      ops_approach,
+      ops_contact_medium,
+      ts_event,
+      ts_load
+    FROM 
+        datalake_supply_flows.fallback_taxonomy
 )
 
 SELECT 
