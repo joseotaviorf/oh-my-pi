@@ -91,21 +91,21 @@ event_bus AS (
     SELECT
         id_house,
         rev,
-        ts_occupant_started AS ts_event
+        TIMESTAMP(ts_occupant_started) AS ts_event
     FROM
         scd_occupant
     UNION
     SELECT
         id_house,
         rev,
-        ts_doorman_type_started AS ts_event
+        TIMESTAMP(ts_doorman_type_started) AS ts_event
     FROM
         scd_doorman
     UNION
     SELECT
         id_house,
         rev,
-        ts_key_location_started AS ts_event
+        TIMESTAMP(ts_key_location_started) AS ts_event
     FROM
         scd_key_location
 )
