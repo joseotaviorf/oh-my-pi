@@ -725,6 +725,9 @@ bietlejuice.enrich_tracksale:
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
     - bietlejuice.tracksale:load-clean-campaign
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
+bietlejuice.enrich_tracksale_dispatches:
+  remove:
+    - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
 bietlejuice.dw_quintocred_ifrs:
   remove:
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
