@@ -30,7 +30,7 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         bucket = self.config_service.get_config(bucket_config)
         load_start_date, load_end_date = self._initialize_load_start_and_end_date()
         dag_execution_context = self._get_dag_execution_context(
-            dag, bucket, start_date=load_start_date, end_date=load_end_date
+            dag, bucket, load_start_date=load_start_date, load_end_date=load_end_date
         )
         self._initialize_task_creators(dag_execution_context)
         self._create_all_tasks()

@@ -55,6 +55,6 @@ class LoadPostgresRawTaskCreator(BaseTaskCreator):
             db_schema,
             load_options,
             read_from_sql,
-            self.dag_execution_context.start_date,
-            self.dag_execution_context.end_date,
+            self.dag_execution_context.load_start_date,
+            self.dag_execution_context.load_end_date,
         ]

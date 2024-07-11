@@ -12,8 +12,8 @@ class DagExecutionContext:
     dag_args: dict
     workflow_args: dict
     cluster_args: dict
-    start_date: str = "{{ ds }}"
-    end_date: str = "{{ ds }}"
+    load_start_date: str = "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: str = "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
     execution_date: str = "{{ ds }}"
     incoming_bucket: str = None
 

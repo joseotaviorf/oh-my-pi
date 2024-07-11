@@ -37,8 +37,8 @@ class LoadDMSCDCCleanTaskCreator(BaseTaskCreator):
             self.data_documentation_bucket,
             table_attributes.schema,
             table_attributes.table_name,
-            self.dag_execution_context.start_date,
-            self.dag_execution_context.end_date,
+            self.dag_execution_context.load_start_date,
+            self.dag_execution_context.load_end_date,
             clean_primary_keys,
         ]
 

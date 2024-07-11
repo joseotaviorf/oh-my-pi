@@ -12,13 +12,9 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
     SPARK_JOB_NAME = "load_delta_table"
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
-        default_extra_query_template_params = self.dag_execution_context.workflow_args.get(
-            "extra_query_template_params", {}
+        extra_query_template_params = self._get_extra_query_template_params(
+            table_attributes
         )
-        extra_query_template_params = table_attributes.table_customization.get(
-            "extra_query_template_params", default_extra_query_template_params
-        )
-
         merge_on = table_attributes.table_customization.get("merge_on", None)
         when_not_matched_insert_condition = table_attributes.table_customization.get(
             "when_not_matched_insert_condition", None
@@ -51,6 +47,26 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
             json.dumps(when_matched_update_condition),
             json.dumps(when_matched_delete_condition),
         ]
+
+    def _get_extra_query_template_params(
+        self, table_attributes: TableAttributes
+    ) -> dict:
+        default_extra_query_template_params = self.dag_execution_context.workflow_args.get(
+            "extra_query_template_params", {}
+        )
+        extra_query_template_params = table_attributes.table_customization.get(
+            "extra_query_template_params", default_extra_query_template_params
+        )
+        if "load_start_date" not in extra_query_template_params:
+            extra_query_template_params[
+                "load_start_date"
+            ] = self.dag_execution_context.load_start_date
+        if "load_end_date" not in extra_query_template_params:
+            extra_query_template_params[
+                "load_end_date"
+            ] = self.dag_execution_context.load_end_date
+
+        return extra_query_template_params
 
     def create_task(
         self, table_attributes: TableAttributes

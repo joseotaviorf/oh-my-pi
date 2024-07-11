@@ -35,8 +35,8 @@ class RawCDCWorkflow(BaseWorkflow):
         dag_execution_context = self._get_dag_execution_context(
             dag,
             bucket,
-            start_date=load_start_date,
-            end_date=load_end_date,
+            load_start_date=load_start_date,
+            load_end_date=load_end_date,
             incoming_bucket=incoming_bucket,
         )
         self._add_mandatory_libraries(dag_execution_context)

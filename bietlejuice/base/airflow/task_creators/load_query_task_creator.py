@@ -21,7 +21,12 @@ class LoadQueryTaskCreator(BaseTaskCreator):
             )
         else:
             task_id = self.generate_task_id(table_attributes)
-        parameters = [
+        parameters = self._get_parameters(table_attributes)
+
+        return self._create_spark_job_task(spark_job_name, task_id, parameters)
+
+    def _get_parameters(self, table_attributes: TableAttributes) -> list:
+        return [
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
             table_attributes.layer.value,
@@ -37,13 +42,27 @@ class LoadQueryTaskCreator(BaseTaskCreator):
                     "spark_session_configs", {}
                 )
             ),
-            json.dumps(
-                self.dag_execution_context.workflow_args.get(
-                    "extra_query_template_params", {}
-                )
-            ),
+            json.dumps(self._get_extra_query_template_params(table_attributes)),
             "",  # Schema. This is out of pattern, and used in very few DAGs. We're going to force it to be empty to require a refactor
             "",  # Tree path. This is out of pattern, and used in very few DAGs. We're going to force it to be empty to require a refactor
         ]
 
-        return self._create_spark_job_task(spark_job_name, task_id, parameters)
+    def _get_extra_query_template_params(
+        self, table_attributes: TableAttributes
+    ) -> dict:
+        default_extra_query_template_params = self.dag_execution_context.workflow_args.get(
+            "extra_query_template_params", {}
+        )
+        extra_query_template_params = table_attributes.table_customization.get(
+            "extra_query_template_params", default_extra_query_template_params
+        )
+        if "load_start_date" not in extra_query_template_params:
+            extra_query_template_params[
+                "load_start_date"
+            ] = self.dag_execution_context.load_start_date
+        if "load_end_date" not in extra_query_template_params:
+            extra_query_template_params[
+                "load_end_date"
+            ] = self.dag_execution_context.load_end_date
+
+        return extra_query_template_params

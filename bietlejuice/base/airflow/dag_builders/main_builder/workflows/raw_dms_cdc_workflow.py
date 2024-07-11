@@ -35,8 +35,8 @@ class RawDMSCDCWorkflow(BaseWorkflow):
         dag_execution_context = self._get_dag_execution_context(
             dag,
             bucket,
-            start_date=load_start_date,
-            end_date=load_end_date,
+            load_start_date=load_start_date,
+            load_end_date=load_end_date,
             incoming_bucket=incoming_bucket,
         )
         self._initialize_task_creators(dag_execution_context)
