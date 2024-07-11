@@ -9,7 +9,7 @@ workflow:
   default_extraction_type: full
   has_load_to_redshift_task: false
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_12_2_med_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
