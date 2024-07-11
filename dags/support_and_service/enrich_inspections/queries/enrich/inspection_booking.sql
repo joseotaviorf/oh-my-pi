@@ -128,6 +128,15 @@ SELECT DISTINCT
         ELSE FALSE
     END AS is_first_schedule,
     CASE
+        WHEN ic.total_rescheduling = 1
+            AND (
+                i.status = 'received'
+                OR (i.status IN ('reviewed','Comentada', 'Finalizada') AND i.source = 'PWA')
+            )
+            THEN TRUE
+        ELSE FALSE
+    END AS is_executed_in_first_schedule,
+    CASE
         WHEN DATE(COALESCE(b.ts_first_canceled_unevaluated, ad.ts_booking_cancelled_utc)) = DATE(COALESCE(b.ts_booking_utc, ad.ts_booking_inspected_utc)) THEN True
         ELSE False
     END AS is_d0_canceled,
