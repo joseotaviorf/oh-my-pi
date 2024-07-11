@@ -2,14 +2,14 @@
 database_name: metric_rent
 table_name: generated_anomalies_monthly
 description: Monthly table with percentage of terminations with anomaly.
-  A contract in anomaly is when the termination was requested more than 20 days and it's not finished.
+  A contract in anomaly is when the termination was requested more than 30 days and it's not finished.
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
   dt_termination_expected_finish_monthly:
     lineage:
       - dw_retention.dim_termination.dt_termination
-    description: "Month date of when the termination should be finished, that is, 20 days ahed of dt_termination."
+    description: "Month date of when the termination should be finished, that is, 30 days ahed of dt_termination."
     dimension: True
   country_code:
     lineage:

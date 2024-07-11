@@ -1,6 +1,6 @@
 WITH calculations AS (
   SELECT
-    DATE(DATE_TRUNC('MONTH', DATE_ADD(dt.dt_termination, 20))) AS dt_termination_expected_finish_month,
+    DATE(DATE_TRUNC('MONTH', DATE_ADD(dt.dt_termination, 30))) AS dt_termination_expected_finish_month,
     dc.country_code,
     dc.value_segment AS category,
     COUNT(fct.sk_contract) AS terminations,
@@ -15,8 +15,8 @@ WITH calculations AS (
       ON fct.sk_termination = dt.sk_termination
   WHERE
     dt.status <> 'CANCELED'
-    AND DATE_ADD(dt.dt_termination, 20) >= DATE('2022-09-01')
-    AND DATE_ADD(dt.dt_termination, 20) < CURRENT_DATE()
+    AND DATE_ADD(dt.dt_termination, 30) >= DATE('2022-09-01')
+    AND DATE_ADD(dt.dt_termination, 30) < CURRENT_DATE()
   GROUP BY
     1, 2, 3
 )
