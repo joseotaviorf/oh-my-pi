@@ -11,4 +11,10 @@ workflow:
     default_extraction_type: full 
     default_partitions: [country_code]
 cluster:
-    type: databricks_12_2_min_general_photon_cluster
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.large
+    node_type_id: r5d.large
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
