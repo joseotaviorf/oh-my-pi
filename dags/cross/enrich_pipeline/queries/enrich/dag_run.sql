@@ -120,13 +120,18 @@ success_run AS (
     dag_inventory AS di
       ON di.id_dag = l.id_dag
       AND di.dt_extracted = DATE(l.ts_executed)
+  JOIN
+    datalake_composer_clean.dag_run AS dr
+      ON dr.id_dag = l.id_dag
+      AND dr.ts_executed = l.ts_executed
+      AND dr.id_run NOT LIKE 'manual%'  -- Excluding manual runs, which we're not considering on the SLA
   WHERE
     l.id_dag LIKE 'bietlejuice%'
     AND event = 'success'
     AND (l.id_task IN ('terminate-cluster', 'job-cluster-finished')
       OR l.id_task LIKE '%-skip-execution%') -- Some DAGs may have as the first task a short-circuit that skips the cluster/job creation
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY l.id_dag, DATE(ts_executed) ORDER BY ts_event ASC) = 1
+    ROW_NUMBER() OVER (PARTITION BY l.id_dag, DATE(l.ts_executed) ORDER BY l.ts_event ASC) = 1
 ),
 dag_clear AS (
   -- Checking if the DAG run suffered any clear, which indicates that it ran more than once

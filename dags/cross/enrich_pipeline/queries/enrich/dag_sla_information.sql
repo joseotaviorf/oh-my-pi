@@ -107,9 +107,8 @@ ignoring_list AS (
         id_dag,
         dt_event 
     FROM
-        special_scheduler
-    WHERE
-        dt_run IS NULL  -- Ignoring just DAGs with special scheduler that hasn't run today
+        special_scheduler 
+    -- Adding DAGs with special scheduler that executed or not, since the ones that executed soon will be removed
     UNION
     SELECT
         id_dag,
@@ -176,18 +175,18 @@ base AS (
             ELSE NULL
         END AS is_in_ignoring_list,
         CASE
-            WHEN db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = TRUE THEN TRUE
-            WHEN db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN FALSE
+            WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = TRUE THEN TRUE
+            WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN FALSE
             ELSE NULL 
         END AS is_inside_sla,
         CASE
-            WHEN db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN TRUE
-            WHEN db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = TRUE THEN FALSE
+            WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN TRUE
+            WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = TRUE THEN FALSE
             ELSE NULL
         END AS is_outside_sla,
         CASE
-            WHEN (db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla IS NULL) OR c.id_dag IS NOT NULL THEN TRUE
-            WHEN (db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla IS NOT NULL) OR c.id_dag IS NULL THEN FALSE
+            WHEN (d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla IS NULL) OR c.id_dag IS NOT NULL THEN TRUE
+            WHEN (d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla IS NOT NULL) OR c.id_dag IS NULL THEN FALSE
             ELSE NULL
         END AS is_null_sla,
         CASE
@@ -257,6 +256,7 @@ SELECT
         WHEN is_active_and_unpaused = TRUE AND is_in_ignoring_list = FALSE AND COALESCE(is_inside_sla, is_outside_sla) IS NULL THEN TRUE
         WHEN is_active_and_unpaused = TRUE AND is_special_scheduler_executed = TRUE AND is_in_sla_exclusion_list = FALSE 
          AND COALESCE(is_inside_sla, is_outside_sla) IS NULL AND is_null_sla = TRUE THEN TRUE
+        WHEN is_active_and_unpaused = TRUE AND is_special_scheduler_executed = TRUE AND is_in_ignoring_list = FALSE THEN TRUE
         ELSE NULL  
     END AS has_possible_problem,
     dt_event AS dt_snapshot,
