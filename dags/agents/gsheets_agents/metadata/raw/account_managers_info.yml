@@ -1,0 +1,28 @@
+---
+database_name: datalake_gsheets_clean
+table_name: account_managers_info
+columns:
+  id:
+    tags:
+      - Confidential
+      - PII
+  nome:
+    tags:
+      - Confidential
+      - PII
+  time:
+    tags:
+      - Confidential
+      - PII
+  funcao:
+    tags:
+      - Confidential
+      - PII
+  status:
+    tags:
+      - Confidential
+      - PII
+  obs:
+    tags:
+      - Confidential
+      - PII

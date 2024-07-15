@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: account_managers_info
+description: Information about account managers, which team they are allocated to and their current status.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_user:
+    description: ID user of the Account Manager.
+    lineage:
+      - datalake_gsheets_raw.account_managers_info.id
+  account_manager_name:
+    description: Name of the Account Manager.
+    lineage:
+      - datalake_gsheets_raw.account_managers_info.nome
+  account_manager_team:
+    description: Team of the Account Manager.
+    lineage:
+      - datalake_gsheets_raw.account_managers_info.time
+  account_manager_function:
+    description: Function of the Account Manager (Analyst or Leadership).
+    lineage:
+      - datalake_gsheets_raw.account_managers_info.funcao
+  account_manager_status:
+    description: Status of the Account Manager (Active or Inactive).
+    lineage:
+      - datalake_gsheets_raw.account_managers_info.status
+  additional_information:
+    description: Additional informations of the Account Manager.
+    lineage:
+      - datalake_gsheets_raw.account_managers_info.obs

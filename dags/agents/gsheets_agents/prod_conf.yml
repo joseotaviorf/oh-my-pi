@@ -26,3 +26,8 @@ sheets_info:
     sheet_name: Programa Piloto Traz Quem Compra Pro
     clean_table_name: tqc_pro_pilot_program_cognito_form
     sheet_context: agents
+  account_managers_info:
+    sheet_id: 1u-blwq-Ct5cRMIuyJFaSdnbCfMf9hXNaSwpznyi2ycc
+    sheet_name: analistas
+    clean_table_name: account_managers_info
+    sheet_context: agents
