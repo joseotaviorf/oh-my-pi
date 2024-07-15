@@ -337,6 +337,8 @@ columns:
     lineage:
     - datalake_ebdb_listing.house_listing.is_extended_rental
     description: Boolean indicating if the contract termination was canceled after relisting as early demand.
+  is_brokerage_only_migrated:
+    description: Boolean indicating if the rental administrator changed from OWNER to QUINTOANDAR during this listing.
   is_for_rent:
     description: Boolean indicating if the listing is for rent.
   is_for_sale:

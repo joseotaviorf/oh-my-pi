@@ -546,6 +546,7 @@ bietlejuice.dw_lead:
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
+  - bietlejuice.ebdb_administration:load-clean-rental-administrator-change-request
   - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context

@@ -49,6 +49,17 @@ house_listings AS (
         JOIN
             datalake_ebdb_clean.user_revision_entity AS ure
                 ON ure.id = lrm.rev
+    ),
+    change_requests AS (
+        SELECT
+            rcr.id_house,
+            rcr.ts_migrated AS ts_administration_ended,
+            rcr.old_rental_administrator AS rental_administrator_origin
+        FROM
+            datalake_ebdb_clean.rental_administrator_change_request AS rcr
+        WHERE
+            rcr.old_rental_administrator = 'OWNER' 
+            AND rcr.status = 'SUCCESS'
     )
     SELECT DISTINCT
         hl.id_house_listing AS sk_house_listing,
@@ -150,6 +161,7 @@ house_listings AS (
         h.is_casa_mineira_migration,
         h.is_sale_primary_market,
         hl.is_extended_rental,
+        IF(cr.id_house IS NOT NULL, TRUE, FALSE) AS is_brokerage_only_migrated,
         MAX(lrm.ts_rental_administrator_start) OVER (PARTITION BY hl.id_house_listing) AS ts_administrator_changed,
         hl.is_early_demand,
         hl.ts_early_demand_started
@@ -158,12 +170,18 @@ house_listings AS (
     JOIN
         datalake_ebdb_listing.house_listing AS hl
             ON hl.id_house = h.id
-    LEFT JOIN lbc
-        ON lbc.id_house = h.id
-    LEFT JOIN lrm
-        ON lrm.id_house = lbc.id_house
-            AND lrm.ts_rental_administrator_start <= COALESCE(hl.ts_listing_version_end, NOW())
-            AND COALESCE(lrm.ts_rental_administrator_end, NOW()) >= hl.ts_listing_version_start
+    LEFT JOIN 
+        lbc
+            ON lbc.id_house = h.id
+    LEFT JOIN 
+        lrm
+            ON lrm.id_house = lbc.id_house
+                AND lrm.ts_rental_administrator_start <= COALESCE(hl.ts_listing_version_end, NOW())
+                AND COALESCE(lrm.ts_rental_administrator_end, NOW()) >= hl.ts_listing_version_start
+    LEFT JOIN
+        change_requests AS cr
+            ON cr.id_house = hl.id_house
+                AND cr.ts_administration_ended BETWEEN hl.ts_listing_version_start AND COALESCE(hl.ts_listing_version_end, NOW())
     LEFT JOIN
         datalake_ebdb_listing.agents_with_keys AS awk
             ON hl.id_house_listing = awk.id_house_listing
@@ -240,6 +258,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_last_version,
     hl.is_exclusive,
     hl.is_extended_rental,
+    hl.is_brokerage_only_migrated,
     b2b.is_b2b,
     COALESCE(aa_info.sk_partner_agent IS NOT NULL, FALSE) AS is_autonomous_agent,
     hl.is_originals_active,
