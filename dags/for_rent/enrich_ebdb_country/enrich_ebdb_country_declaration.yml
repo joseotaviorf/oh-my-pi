@@ -2,9 +2,9 @@ dag:
     name: enrich_ebdb_country
     schedule_start_date: 2020, 7, 1
     owner: Data International
-    documentation: 
+    documentation:
         dag_purpose: |
-            Creates enriched tables in order to relate different entities to the country of origin, where the source is the EBDB. 
+            Creates enriched tables in order to relate different entities to the country of origin, where the source is the EBDB.
             Every table is partitioned by the `country_code`, some may have extra partitions.
 workflow:
     type: query
@@ -21,3 +21,5 @@ cluster:
         node_type_id: m5a.xlarge
         num_workers: 2
         spark_version: 12.2.x-scala2.12
+        spark_conf:
+            spark.sql.sources.partitionOverwriteMode: static
