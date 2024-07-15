@@ -1,0 +1,43 @@
+---
+database_name: datalake_copilot_service_clean
+table_name: message
+owner: lucas.cardozo@quintoandar.com.br
+domain: primitives
+description: "This table stores information about messages sent/received by the Copilot service"
+columns:
+  id:
+    description: "The message identifier"
+    lineage:
+    - datalake_copilot_service_raw.message.id
+  id_external:
+    description: "The message identifier in the external system"
+    lineage:
+    - datalake_copilot_service_raw.message.external_id
+  id_session:
+    description: "The session identifier"
+    lineage:
+    - datalake_copilot_service_raw.message.session_id
+  message_index:
+    description: "The message index"
+    lineage:
+    - datalake_copilot_service_raw.message.message_index
+  role:
+    description: "The role of the message author (USER, AI, HARDCODED)"
+    lineage:
+    - datalake_copilot_service_raw.message.role
+  input_type:
+    description: "The message input type"
+    lineage:
+    - datalake_copilot_service_raw.message.input_type
+  content:
+    description: "The message content"
+    lineage:
+    - datalake_copilot_service_raw.message.content
+  extra:
+    description: "Extra data provided with the message"
+    lineage:
+    - datalake_copilot_service_raw.message.extra
+  ts_created:
+    description: "The message creation date"
+    lineage:
+    - datalake_copilot_service_raw.message.created_at

@@ -1,0 +1,28 @@
+---
+database_name: datalake_copilot_service_clean
+table_name: session
+owner: lucas.cardozo@quintoandar.com.br
+domain: primitives
+description: "This table stores information about chat sessions in the Copilot service"
+columns:
+  id:
+    description: "The message identifier"
+    lineage:
+    - datalake_copilot_service_raw.session.id
+  id_external:
+    description: "The message identifier in the external system"
+    lineage:
+    - datalake_copilot_service_raw.session.external_id
+  id_user:
+    description: "Identifier of the user that started the session"
+    lineage:
+    - datalake_copilot_service_raw.session.user_id
+  chat_configuration:
+    description: "Configuration of the chat session"
+    lineage:
+    - datalake_copilot_service_raw.session.chat_configuration
+  ts_created:
+    description: "The message creation date"
+    lineage:
+    - datalake_copilot_service_raw.session.created_at
+  

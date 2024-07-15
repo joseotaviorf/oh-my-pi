@@ -1,0 +1,35 @@
+---
+database_name: datalake_copilot_service_clean
+table_name: state
+owner: lucas.cardozo@quintoandar.com.br
+domain: primitives
+description: "This table stores chat states in the Copilot service"
+columns:
+  id:
+    description: "The state identifier"
+    lineage:
+    - datalake_copilot_service_raw.state.id
+  id_session:
+    description: "The session identifier"
+    lineage:
+    - datalake_copilot_service_raw.state.external_id
+  id_message:
+    description: "The message identifier"
+    lineage:
+    - datalake_copilot_service_raw.state.message_id
+  state_version:
+    description: "The state version"
+    lineage:
+    - datalake_copilot_service_raw.state.state_version
+  flow:
+    description: "The chat flow associated with this state"
+    lineage:
+    - datalake_copilot_service_raw.state.flow
+  state:
+    description: "The state content"
+    lineage:
+    - datalake_copilot_service_raw.state.state
+  ts_created:
+    description: "The state creation date"
+    lineage:
+    - datalake_copilot_service_raw.state.created_at
