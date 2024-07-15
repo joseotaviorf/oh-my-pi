@@ -49,4 +49,11 @@ LEFT JOIN
         ON customer.id_customer = campaign_customer.id_customer
 WHERE
     MAKE_DATE(mailing.year, mailing.month, mailing.day) BETWEEN DATE_SUB(DATE('{load_start_date}'), {days_past}) AND DATE('{load_end_date}')
-    AND customer.name = 'Inside Sales'
+    AND customer.name in (
+        'Inside Sales',
+        'AL Inside Sales',
+        'AeC Inside Sales',
+        'Atento Inside Sales',
+        'Inside Sales',
+        'QA Inside Sales'
+    )
