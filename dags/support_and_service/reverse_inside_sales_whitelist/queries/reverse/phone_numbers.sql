@@ -22,7 +22,7 @@ outbound AS (
     id_lead,
     ('+55' || phone_number) AS phone_number,
     make_date(year,month,day) AS dt_call,
-    date_add(current_date(), -30) AS dt_cut
+    date_add(current_date(), -90) AS dt_cut
   FROM
     datalake_olos_dialer.outbound_contact_attempts
 ),
