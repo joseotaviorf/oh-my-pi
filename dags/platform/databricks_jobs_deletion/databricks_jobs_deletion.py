@@ -59,6 +59,7 @@ for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
     delete_jobs_task = PythonOperator(
         task_id=f"delete-{project}-databricks-jobs",
         dag=dag,
+        retries=3,
         python_callable=delete_databricks_jobs,
         op_kwargs={
             "remove_before_timedelta": JOBS_REMOVAL_TIMEDELTA,
