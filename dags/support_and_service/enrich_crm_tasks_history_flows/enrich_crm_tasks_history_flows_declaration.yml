@@ -6,9 +6,9 @@ dag:
         dag_purpose: |
             Creates CRM (Customer Relationship Management) base tasks history table. These tables will be used to generate.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     default_extraction_type: incremental
     default_partitions: ["year", "month", "day"]
 cluster:
-    type: databricks_10_4_med_general_photon_cluster
+    type: databricks_12_2_med_general_photon_cluster

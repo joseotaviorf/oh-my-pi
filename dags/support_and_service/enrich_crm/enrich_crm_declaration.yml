@@ -1,0 +1,21 @@
+dag:
+  name: enrich_crm
+  schedule_start_date: 2020, 8, 29
+  owner: Data SS
+  documentation:
+    dag_purpose: Normalize and prepare CRM data for further enrichment.
+workflow:
+  type: query_delta
+  layer: enrich
+  tables_customization:
+    tasks_actions:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    workflows_transitions:
+      extraction_type: incremental
+      partitions: [year, month, day]
+cluster:
+  type: databricks_12_2_med_general_photon_cluster

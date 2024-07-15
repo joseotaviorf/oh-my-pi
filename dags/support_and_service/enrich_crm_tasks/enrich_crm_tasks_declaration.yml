@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: Creates CRM (Customer Relationship Management) enrich tasks (migrated tables from bi-crm-tasks).
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
-  type: databricks_10_4_med_2xlarge_general_photon_cluster
+  type: databricks_12_2_med_2xlarge_general_photon_cluster
