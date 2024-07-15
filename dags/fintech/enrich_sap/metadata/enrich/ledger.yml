@@ -72,6 +72,24 @@ columns:
       - datalake_pas.journal_entries.source_document_number
       - datalake_pas.invoices.source_document_number
       - datalake_pas.incoming_payments.source_document_number
+  accounting_rule:
+    description: "Accounting rule applied"
+    lineage:
+      - datalake_pas.journal_entry_lines.accounting_rule
+      - datalake_pas.invoice_lines.accounting_rule
+      - datalake_pas.incoming_payments.accounting_rule
+  accounting_type:
+    description: "Accounting type: bill or transfer"
+    lineage:
+      - datalake_pas.journal_entry_lines.accounting_type
+      - datalake_pas.invoice_lines.accounting_type
+      - datalake_pas.incoming_payments.accounting_type
+  user_type:
+    description: "Type of user involved in the referred transactions"
+    lineage:
+      - datalake_pas.journal_entry_lines.user_type
+      - datalake_pas.invoice_lines.user_type
+      - datalake_pas.incoming_payments.user_type
   comments:
     description: "Comments and observations"
     lineage:

@@ -159,6 +159,9 @@ db AS (
             je.series,
             je.account,
             je.account_shortname,
+            je.accounting_rule,
+            je.accounting_type,
+            je.user_type,
             je.transaction_type,
             je.credit,
             je.debit,
@@ -190,6 +193,9 @@ db AS (
             iin.series,
             iin.account,
             iin.account_shortname,
+            iin.accounting_rule,
+            iin.accounting_type,
+            iin.user_type,
             iin.transaction_type,
             iin.credit,
             iin.debit,
@@ -219,6 +225,9 @@ db AS (
             ip.series,
             ip.account,
             ip.account_shortname,
+            ip.accounting_rule,
+            ip.accounting_type,
+            ip.user_type,
             ip.transaction_type,
             ip.credit,
             ip.debit,
@@ -253,6 +262,9 @@ SELECT
     coa.name AS account_name,
     dh.series AS series,
     dh.transaction_type || ' ' || dh.source_document_number AS document_number,
+    db.accounting_rule,
+    db.accounting_type,
+    db.user_type,
     COALESCE(dh.memo, db.memo_line) AS comments,
     (db.debit - db.credit) AS debit_credit,
     db.debit,
@@ -271,14 +283,14 @@ FROM
     dh
 INNER JOIN db
     ON db.id_transaction = dh.id_transaction
-LEFT JOIN datalake_pas_clean.users u 
+LEFT JOIN datalake_pas_clean.users u
     ON u.id = dh.id_user_sign
-LEFT JOIN datalake_pas_clean.chart_of_accounts coa 
+LEFT JOIN datalake_pas_clean.chart_of_accounts coa
     ON coa.id = db.account
 ORDER BY
-    dh.dt_reference desc,
-    dh.dt_due desc,
-    dh.id_transaction asc,
-    db.id_line asc,
-    dh.transaction_type asc,
-    db.account asc
+    dh.dt_reference DESC,
+    dh.dt_due DESC,
+    dh.id_transaction ASC,
+    db.id_line ASC,
+    dh.transaction_type ASC,
+    db.account ASC
