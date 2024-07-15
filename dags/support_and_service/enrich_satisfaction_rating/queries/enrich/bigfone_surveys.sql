@@ -28,9 +28,9 @@ WITH csat_events AS (
   call_csat AS (
     SELECT DISTINCT
       ce.id_call,
-      CAST(ftm.id_contract AS BIGINT) AS id_contract,
-      ftm.id_ticket,
-      ftm.id_user_main AS id_user,
+      CAST(cs.id_contract AS BIGINT) AS id_contract,
+      cs.id_ticket,
+      cs.id_user,
       ce.csat_1,
       ce.csat_2,
       ce.csat_3,
@@ -45,8 +45,8 @@ WITH csat_events AS (
     FROM
       csat_events AS ce
     LEFT JOIN
-      datalake_zendesk.tickets_current ftm
-        ON ce.id_call = ftm.id_call
+      datalake_customer_support.call AS cs
+        ON ce.id_call = cs.id_call
   )
   SELECT
       MD5(CONCAT(id_call, "csat1", ts_created_local)) AS id_answer,

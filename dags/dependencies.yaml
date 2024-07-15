@@ -2666,6 +2666,7 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.chat_fup:load-clean-rating
   - bietlejuice.chat_fup:load-clean-surveys-answer
   - bietlejuice.chat_fup:load-clean-surveys-survey
+  - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
   - bietlejuice.enrich_survicate:load-enrich-keys-surveys

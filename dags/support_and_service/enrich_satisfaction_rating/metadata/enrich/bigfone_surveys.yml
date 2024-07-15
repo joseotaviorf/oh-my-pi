@@ -14,15 +14,15 @@ columns:
   id_contract:
     description: Identifier of the contract linked to the satisfaction response.
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+      - datalake_customer_support.call.id_contract
   id_ticket:
     description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+      - datalake_customer_support.call.id_ticket
   id_user:
     description: Identifier of the person who answered the form.
     lineage:
-      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+      - datalake_customer_support.call.id_user
   service_type:
     description: Indicates the service that originated the satisfaction response.
   service_context:
