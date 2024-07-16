@@ -218,7 +218,7 @@ proposal_credit_flows AS (
     rf.guarantee_accepted,
     CASE
       WHEN rf.sk_offer_submitted_date > 0
-      AND rf.sk_offer_approved_date < 0 THEN 'OS2OA'
+      AND rf.sk_proposal < 0 THEN 'OS2OA'
       WHEN rf.sk_offer_approved_date > 0
       AND (
         rf.sk_last_credit_evaluation_init < 0
@@ -423,7 +423,6 @@ FROM
   proposal_credit_flows
 WHERE
   sk_offer_submitted_date > 0
-  AND sk_proposal > 0
   AND linsting_rank = 1
 UNION
 SELECT 
