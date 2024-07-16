@@ -1,0 +1,74 @@
+---
+database_name: metric_rede
+table_name: offers_weekly
+description: Table containing the Offer metrics that make up the Rede Performance Score.
+domain: Rede
+owner: ae-rede@quintoandar.com.br
+columns:
+  dt_week:
+    description: Reference week of the metric result.
+    lineage:
+      - dw_sale.fact_daily_ongoing_listing.sk_snapshot_date
+      - dw_sale.fact_offers.ts_offer_dismissed
+      - dw_sale.fact_offers.ts_sale_agreement_signed
+  partner_name:
+    description: Name of Rede partner company registered with HubSpot.
+    lineage: 
+      - dw_rede.dim_company_cluster.company_name
+  company_cluster:
+    description: Classification assigned by the Operations team to the Rede partner company.
+    lineage:
+      - dw_rede.dim_company_cluster.company_cluster
+  is_decola_community:
+    description: True if the cluster given to the company is part of the "Decola" community, otherwise false.
+    lineage:
+      - dw_rede.dim_company_cluster.is_decola_community
+  is_decola_current_cohort:
+    description: True if the current cluster given to the company is part of the "Decola" community, otherwise false.
+    lineage:
+      - dw_rede.dim_company_cluster.is_decola_current_cohort
+  total_offers_dismissed:
+    description: Total volume of dismissed offers.
+    metric:
+      name: Total Offers Dismissed
+      description: Total volume of dismissed offers.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
+  total_ccvs_signed:
+    description: Total volume of signed offers.
+    metric:
+      name: Total CCVs Signed
+      description: Total volume of signed offers.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
+  total_offers_dismissed_last_3_week:
+    description: Total volume of dismissed offers in the last three weeks.
+    metric:
+      name: Total Offers Dismissed in the Last 3 Weeks
+      description: Total volume of dismissed offers in the last three weeks.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
+  total_ccvs_signed_last_3_week:
+    description: Total volume of offers signed in the last three weeks.
+    metric:
+      name: Total CCVs Signed in the Last 3 Weeks
+      description: Total volume of offers signed in the last three weeks.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
+  share_offers:
+    description: Total percentage of offers signed in the last three weeks in relation to the total offers in the last three weeks.
+    metric:
+      name: Percentage of Offers Signed in the Last 3 Weeks
+      description: Total percentage of offers signed in the last three weeks in relation to the total offers in the last three weeks.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""

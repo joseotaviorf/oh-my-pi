@@ -1,0 +1,54 @@
+---
+database_name: metric_rede
+table_name: pricing_ongoing_listing_weekly
+description: Table containing the Ongoing Listing Pricing metrics that make up the Rede Performance Score.
+domain: Rede
+owner: ae-rede@quintoandar.com.br
+columns:
+  dt_week:
+    description: Reference week of the metric result.
+    lineage:
+      - dw_sale.fact_daily_ongoing_listing.sk_snapshot_date
+  partner_name:
+    description: Name of Rede partner company registered with HubSpot.
+    lineage: 
+      - dw_rede.dim_company_cluster.company_name
+  company_cluster:
+    description: Classification assigned by the Operations team to the Rede partner company.
+    lineage:
+      - dw_rede.dim_company_cluster.company_cluster
+  is_decola_community:
+    description: True if the cluster given to the company is part of the "Decola" community, otherwise false.
+    lineage:
+      - dw_rede.dim_company_cluster.is_decola_community
+  is_decola_current_cohort:
+    description: True if the current cluster given to the company is part of the "Decola" community, otherwise false.
+    lineage:
+      - dw_rede.dim_company_cluster.is_decola_current_cohort
+  total_listings:
+    description: Total volume of listings.
+    metric:
+      name: Total of Listings
+      description: Total volume of listings.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
+  total_listings_less_p70:
+    description: Total volume of listings with a value below 70th percentile in the price calculator.
+    metric:
+      name: Total of Listings Less Than p70
+      description: Total volume of listings with a value below 70th percentile in the price calculator.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
+  share_total_listings_less_p70:
+    description: Percentage of listings with a value below 70th percentile in the price calculator in relation to total listings.
+    metric:
+      name: Percentage of Listings Less Than p70
+      description: Percentage of listings with a value below 70th percentile in the price calculator in relation to total listings.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""

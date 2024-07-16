@@ -3203,6 +3203,20 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_growth_automatic_daily_costs:load-enrich-daily-costs
+bietlejuice.metric_rede__performance_score:
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
+  - bietlejuice.dw_house_amenities:load-dw-house-dim-house-information
+  - bietlejuice.dw_house_amenities:load-dw-house-dim-house-price-calculator-revision
+  - bietlejuice.dw_house_amenities:load-dw-house-fact-house-information-filling
+  - bietlejuice.dw_rede_company:load-dw-rede-dim-company-cluster
+  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.dw_sale_ongoing_listings:load-dw-sale-fact-daily-ongoing-listing
+  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.dw_visit:load-dw-visit-dim-cancellation-type
+  - bietlejuice.dw_visit:load-dw-visit-fact-visit-events
+  - bietlejuice.dw_visit:load-dw-visit-fact-visits
 bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_region:load-dw-public-dim-region

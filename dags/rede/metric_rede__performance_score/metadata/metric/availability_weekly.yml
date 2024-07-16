@@ -1,0 +1,54 @@
+---
+database_name: metric_rede
+table_name: availability_weekly
+description: Table containing the Availability metrics that make up the Rede Performance Score.
+domain: Rede
+owner: ae-rede@quintoandar.com.br
+columns:
+  dt_week:
+    description: Reference week of the metric result.
+    lineage:
+      - dw_sale.fact_visits.ts_visit
+  partner_name:
+    description: Name of Rede partner company registered with HubSpot.
+    lineage: 
+      - dw_rede.dim_company_cluster.company_name
+  company_cluster:
+    description: Classification assigned by the Operations team to the Rede partner company.
+    lineage:
+      - dw_rede.dim_company_cluster.company_cluster
+  is_decola_community:
+    description: True if the cluster given to the company is part of the "Decola" community, otherwise false.
+    lineage:
+      - dw_rede.dim_company_cluster.is_decola_community
+  is_decola_current_cohort:
+    description: True if the current cluster given to the company is part of the "Decola" community, otherwise false.
+    lineage:
+      - dw_rede.dim_company_cluster.is_decola_current_cohort
+  total_visits_sheduled:
+    description: Total volume of scheduled visits.
+    metric:
+      name: Total Visits Scheduled
+      description: Total volume of scheduled visits.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
+  total_visits_unavailable:
+    description: Total volume of unavailable visits.
+    metric:
+      name: Total Visits Unavailable
+      description: Total volume of unavailable visits.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
+  share_visits_unavailable:
+    description: Percentage of unavailable visits in relation to the total number of scheduled visits.
+    metric:
+      name: Percentage of Visits unavailable
+      description: Percentage of unavailable visits in relation to the total number of scheduled visits.
+      business_stage: Rede
+      hierarchy: Performance Score
+      approved_by: lucas.psantos@quintoandar.com.br
+      link_to_metric: ""
