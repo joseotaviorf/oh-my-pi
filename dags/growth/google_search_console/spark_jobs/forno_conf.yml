@@ -44,3 +44,22 @@ by_page_and_query:
   type_list:
     - WEB
   filters: []
+by_discover:
+  aggregation_type: AUTO
+  dimensions:
+    - PAGE
+    - COUNTRY
+    - DATE
+  type_list:
+    - DISCOVER
+  filters: []
+by_google_news:
+  aggregation_type: AUTO
+  dimensions:
+    - PAGE
+    - COUNTRY
+    - DEVICE
+    - DATE
+  type_list:
+    - GOOGLE_NEWS
+  filters: []  

@@ -4,6 +4,8 @@ report_type_list:
   - by_page
   - by_query
   - by_page_and_query
+  - by_discover
+  - by_google_news
 partition_cols:
   - year
   - month
