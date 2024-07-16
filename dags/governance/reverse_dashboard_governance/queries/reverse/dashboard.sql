@@ -19,7 +19,7 @@ SELECT
 FROM
   datalake_dashboard_governance.dashboard_metadata
 WHERE
-  day == {day} and month == {month} and year == {year}
+  day == {day} and month == {month} and year == {year} and platform = "metabase"
 UNION ALL
 SELECT
   ARRAY('datahub') AS vendor,
@@ -39,6 +39,6 @@ SELECT
   date_format(ts_created, 'yyyy-MM-dd hh:mm:ss') AS created_on,
   date_format(ts_changed, 'yyyy-MM-dd hh:mm:ss') AS changed_on,
   tags
-FROM 
+FROM
     datalake_superset.dashboards
 WHERE published = true
