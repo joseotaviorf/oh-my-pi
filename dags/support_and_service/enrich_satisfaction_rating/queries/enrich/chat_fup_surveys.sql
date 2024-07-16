@@ -55,7 +55,7 @@ WITH chat_fup_surveys AS (
             ON cc.id = ss.id_chat
     WHERE
         COALESCE(CAST(sa.is_solved AS string), CAST(sa.rating AS string)) IS NOT NULL
-        AND DATE(sa.ts_updated) = BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND DATE(sa.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT DISTINCT
     cfs.id_answer,
