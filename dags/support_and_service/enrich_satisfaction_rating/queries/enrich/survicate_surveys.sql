@@ -146,7 +146,7 @@ WITH survicate_surveys AS (
         datalake_survicate.keys_surveys AS kss
     WHERE
         kss.survey_source = 'survicate'
-        MAKE_DATE(kss.year, kss.month, kss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND MAKE_DATE(kss.year, kss.month, kss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
     UNION ALL
 

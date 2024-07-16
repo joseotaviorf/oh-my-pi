@@ -18,7 +18,7 @@ WITH csat_events AS (
         OR csat_2 IS NOT NULL
         OR csat_3 IS NOT NULL
       )
-      MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_call ORDER BY ts_created DESC) = 1
 

@@ -7,7 +7,7 @@ dag:
       This DAG unifies various sources of satisfaction survey data, so that it is possible to stack
       and enrich these sources in a single view for the Support and Service line.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions: [year, month, day]
