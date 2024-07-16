@@ -21,9 +21,7 @@ WITH chat_fup_surveys AS (
     FROM
         datalake_chat_fup_clean.rating AS r
     WHERE
-        r.year = {year}
-        AND r.month = {month}
-        AND r.day = {day}
+        MAKE_DATE(r.year, r.month, r.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT DISTINCT
         sa.id AS id_answer,
@@ -57,7 +55,7 @@ WITH chat_fup_surveys AS (
             ON cc.id = ss.id_chat
     WHERE
         COALESCE(CAST(sa.is_solved AS string), CAST(sa.rating AS string)) IS NOT NULL
-        AND DATE(sa.ts_updated) = DATE('{year}-{month}-{day}')
+        AND DATE(sa.ts_updated) = BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT DISTINCT
     cfs.id_answer,

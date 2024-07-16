@@ -7,7 +7,7 @@ WITH zendesk_users_contact AS (
     FROM
         datalake_support_users.zendesk_users AS zuc
     WHERE
-        DATE(zuc.ts_updated) <= DATE('{year}-{month}-{day}')
+        DATE(zuc.ts_updated) <= DATE('{load_end_date}')
     QUALIFY
         zuc.id_user_main = MAX(zuc.id_user_main) OVER(PARTITION BY zuc.id_user_zendesk)
 )
@@ -41,5 +41,5 @@ LEFT JOIN
     zendesk_users_contact AS zuc
         ON zuc.id_user_zendesk = tfm.id_requester
 WHERE
-    DATE(sr.ts_updated) = '{year}-{month}-{day}'
+    DATE(sr.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND sr.score IN ('good', 'bad')

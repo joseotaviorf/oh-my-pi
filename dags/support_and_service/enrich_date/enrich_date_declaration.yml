@@ -6,10 +6,10 @@ dag:
         dag_purpose: |
           Creation of workday windows, considering holidays at city level, for construction and calculation of SLA metrics.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     inner_dependencies:
       workday_window:
         - cities_calendar
 cluster:
-    type: databricks_10_4_min_general_photon_cluster
+    type: databricks_12_2_min_general_photon_cluster

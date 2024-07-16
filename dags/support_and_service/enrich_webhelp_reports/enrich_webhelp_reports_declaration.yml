@@ -6,7 +6,7 @@ dag:
         dag_purpose: |
             Reverse webhelp context enrichment table. The objective of this table is to be able to maintain daily monitoring of the execution of the bases.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
 cluster:
-    type: databricks_10_4_med_general_cluster
+    type: databricks_12_2_min_general_photon_cluster

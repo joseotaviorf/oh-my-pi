@@ -25,10 +25,10 @@ WITH survicate_surveys AS (
     FROM
         datalake_survicate.inspections_surveys AS iss
     WHERE
-        iss.year = {year}
-        AND iss.month = {month}
-        AND iss.day = {day}
+        MAKE_DATE(iss.year, iss.month, iss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         rss.id_answer,
         rss.id_survey,
@@ -55,10 +55,10 @@ WITH survicate_surveys AS (
     FROM
         datalake_survicate.repairs_surveys AS rss
     WHERE
-        rss.year = {year}
-        AND rss.month = {month}
-        AND rss.day = {day}
+        MAKE_DATE(rss.year, rss.month, rss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         lss.id_answer,
         lss.id_survey,
@@ -85,10 +85,10 @@ WITH survicate_surveys AS (
     FROM
         datalake_survicate.lockbox_surveys AS lss
     WHERE
-        lss.year = {year}
-        AND lss.month = {month}
-        AND lss.day = {day}
+        MAKE_DATE(lss.year, lss.month, lss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         sss.id_answer,
         sss.id_survey,
@@ -115,10 +115,10 @@ WITH survicate_surveys AS (
     FROM
         datalake_survicate.scheduling_surveys AS sss
     WHERE
-        sss.year = {year}
-        AND sss.month = {month}
-        AND sss.day = {day}
+        MAKE_DATE(sss.year, sss.month, sss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         kss.id_answer,
         kss.id_survey,
@@ -146,10 +146,10 @@ WITH survicate_surveys AS (
         datalake_survicate.keys_surveys AS kss
     WHERE
         kss.survey_source = 'survicate'
-        AND kss.year = {year}
-        AND kss.month = {month}
-        AND kss.day = {day}
+        MAKE_DATE(kss.year, kss.month, kss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         pss.id_response AS id_answer,
         pss.id_survey,
@@ -176,9 +176,7 @@ WITH survicate_surveys AS (
     FROM
         datalake_survicate.photo_surveys AS pss
     WHERE
-        pss.year = {year}
-        AND pss.month = {month}
-        AND pss.day = {day}
+        MAKE_DATE(pss.year, pss.month, pss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
     MD5(CONCAT(ss.id_answer, year, month, day)) AS id_answer,
@@ -206,6 +204,4 @@ SELECT
 FROM
     survicate_surveys AS ss
 WHERE
-    ss.year = {year}
-    AND ss.month = {month}
-    AND ss.day = {day}
+    MAKE_DATE(ss.year, ss.month, ss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

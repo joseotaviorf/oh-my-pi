@@ -10,5 +10,29 @@ workflow:
   layer: dw
   custom_schema: repairs
   default_extraction_type: full
+  tables_customization:
+    dim_repair_ongoing:
+      z_order_by: [sk_ticket]
+    fact_repair_ongoing:
+      z_order_by: [
+        sk_ticket,
+        sk_request,
+        sk_contract,
+        sk_answer,
+        sk_user,
+        sk_agent,
+        sk_budget_sender,
+        sk_first_interaction_date,
+        sk_created_local,
+        sk_solved_local,
+        sk_request_created,
+        sk_created_chat,
+        sk_updated_local,
+        sk_initially_assigned_local,
+        sk_last_assigned_local,
+        sk_closed_local,
+        sk_measurement,
+        sk_first_reply_milestone,
+        sk_first_public_comment]
 cluster:
   type: databricks_12_2_med_io-memory_photon_cluster

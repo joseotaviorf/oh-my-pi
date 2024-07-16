@@ -26,10 +26,10 @@ WITH union_surveys_answers AS (
     FROM
         datalake_satisfaction_rating.gsheets_surveys AS ssg
     WHERE
-        ssg.year = {year}
-        AND ssg.month = {month}
-        AND ssg.day = {day}
+        MAKE_DATE(ssg.year, ssg.month, ssg.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         ssz.id_answer,
         MD5(ssz.source_name) AS id_survey,
@@ -57,10 +57,10 @@ WITH union_surveys_answers AS (
     FROM
         datalake_satisfaction_rating.zendesk_surveys AS ssz
     WHERE
-        ssz.year = {year}
-        AND ssz.month = {month}
-        AND ssz.day = {day}
+        MAKE_DATE(ssz.year, ssz.month, ssz.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         ssb.id_answer,
         MD5(ssb.source_name) AS id_survey,
@@ -88,10 +88,10 @@ WITH union_surveys_answers AS (
     FROM
         datalake_satisfaction_rating.bigfone_surveys AS ssb
     WHERE
-        ssb.year = {year}
-        AND ssb.month = {month}
-        AND ssb.day = {day}
+        MAKE_DATE(ssb.year, ssb.month, ssb.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         sscf.id_answer,
         COALESCE(sscf.id_survey, MD5(sscf.source_name)) AS id_survey,
@@ -119,10 +119,10 @@ WITH union_surveys_answers AS (
     FROM
         datalake_satisfaction_rating.chat_fup_surveys AS sscf
     WHERE
-        sscf.year = {year}
-        AND sscf.month = {month}
-        AND sscf.day = {day}
+        MAKE_DATE(sscf.year, sscf.month, sscf.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
     UNION ALL
+
     SELECT
         sss.id_answer,
         sss.id_survey,
@@ -150,9 +150,7 @@ WITH union_surveys_answers AS (
     FROM
         datalake_satisfaction_rating.survicate_surveys AS sss
     WHERE
-        sss.year = {year}
-        AND sss.month = {month}
-        AND sss.day = {day}
+        MAKE_DATE(sss.year, sss.month, sss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 users AS (
     SELECT
@@ -161,7 +159,7 @@ users AS (
     FROM
         datalake_ebdb_user.user AS u
     WHERE
-        DATE(u.ts_updated) <= DATE('{year}-{month}-{day}')
+        DATE(u.ts_updated) <= DATE('{load_end_date}')
     QUALIFY
         u.ts_updated = FIRST(u.ts_updated) OVER(PARTITION BY LOWER(u.email) ORDER BY u.ts_updated DESC)
 )

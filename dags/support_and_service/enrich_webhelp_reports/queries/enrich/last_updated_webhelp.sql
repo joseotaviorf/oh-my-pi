@@ -86,6 +86,6 @@ WITH webhelp_tables AS (
 SELECT DISTINCT
     'Webhelp' AS bpo,
     table_name,
-    ts_load   
+    ts_load
 FROM
     webhelp_tables

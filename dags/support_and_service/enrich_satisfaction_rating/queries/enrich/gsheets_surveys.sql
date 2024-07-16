@@ -21,7 +21,7 @@ WITH gsheets_surveys AS (
     FROM
         datalake_gsheets_clean.owner_exit_inspection_csat
     WHERE
-        DATE(ts_submitted) = DATE('{year}-{month}-{day}')
+        DATE(ts_submitted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         id_contract,
@@ -45,7 +45,7 @@ WITH gsheets_surveys AS (
     FROM
         datalake_gsheets_clean.tenant_exit_inspection_csat
     WHERE
-        DATE(ts_submitted) = DATE('{year}-{month}-{day}')
+        DATE(ts_submitted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         id_contract,
@@ -69,7 +69,7 @@ WITH gsheets_surveys AS (
     FROM
         datalake_gsheets_clean.tenant_entrance_inspection_csat
     WHERE
-        DATE(ts_submitted) = DATE('{year}-{month}-{day}')
+        DATE(ts_submitted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         id_contract,
@@ -93,7 +93,7 @@ WITH gsheets_surveys AS (
     FROM
         datalake_gsheets_clean.owner_entrance_inspection_csat
     WHERE
-        DATE(ts_submitted) = DATE('{year}-{month}-{day}')
+        DATE(ts_submitted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         id_contract,
@@ -117,7 +117,7 @@ WITH gsheets_surveys AS (
     FROM
         datalake_gsheets_clean.csat_reimbursement_true
     WHERE
-        DATE(ts_submitted) = DATE('{year}-{month}-{day}')
+        DATE(ts_submitted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT DISTINCT
     MD5(CONCAT(COALESCE(gs.id_contract, ''), gs.source_name, gs.survey_name, COALESCE(gs.ts_submitted, ''))) AS id_answer,
