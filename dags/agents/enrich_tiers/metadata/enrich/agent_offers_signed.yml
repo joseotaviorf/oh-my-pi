@@ -21,6 +21,10 @@ columns:
     description: Unique identifier of the agent.
   has_tqc:
     description: Indicates that the offer had a buyer referral through the ‘Tem Quem Compra’ (TQC) program.
+  has_ciq:
+    description: 
+      Indicates that the property on offer was recommended by the broker responsible for the visit, for 
+      listing through the CIQ program.
   ts_sale_agreement_signed:
     lineage:
       - datalake_offer.sale_offer.ts_sale_agreement_signed

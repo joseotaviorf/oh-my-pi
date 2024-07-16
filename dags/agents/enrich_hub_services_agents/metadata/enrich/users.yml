@@ -39,6 +39,10 @@ columns:
       - datalake_hub_services_clean.users.phone_number
       - datalake_ebdb_clean.user.phone_number
     description: User phone number.
+  cpf:
+    lineage:
+      - datalake_ebdb_clean.user.cpf
+    description: User CPF.
   is_active:
     lineage:
       - datalake_ebdb_clean.user.is_active

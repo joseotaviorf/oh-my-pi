@@ -1,3 +1,4 @@
+
 -- Do not reprocess the table, as the source tables are still fully loaded
 WITH offer_agents AS (
     SELECT DISTINCT
@@ -6,6 +7,7 @@ WITH offer_agents AS (
         u.id_agent AS id_agent_negotiation_executive,
         so.id_user_agent AS id_user_broker,
         COALESCE(so.id_agent, os.id_agent) AS id_agent_broker,
+        cfl.id_user AS id_user_ciq,
         os.id_offer IS NOT NULL AS has_broker_tqc,
         os2.id_offer IS NOT NULL AS has_negotiation_executive_tqc,
         so.dt_sale_agreement_signed AS ts_sale_agreement_signed,
@@ -23,6 +25,9 @@ WITH offer_agents AS (
     LEFT JOIN
         datalake_ebdb_user.user AS u
             ON u.id = so.id_user_consultant
+    LEFT JOIN
+        datalake_tiers.ciq_first_listing AS cfl 
+            ON cfl.id_house = so.id_house
 ),
 union_offer_agents AS (
     SELECT
@@ -31,6 +36,7 @@ union_offer_agents AS (
         oa.id_agent_broker AS id_agent,
         "Broker" AS agent_profile,
         oa.has_broker_tqc AS has_tqc,
+        IF(oa.id_user_ciq = oa.id_user_broker, TRUE, FALSE) AS has_ciq,
         oa.ts_sale_agreement_signed,
         oa.ts_updated,
         DAY(oa.ts_updated) AS day,
@@ -38,6 +44,8 @@ union_offer_agents AS (
         YEAR(oa.ts_updated) AS year
     FROM
         offer_agents AS oa
+    WHERE 
+        oa.id_user_broker IS NOT NULL
     UNION ALL
     SELECT
         oa.id_offer,
@@ -45,6 +53,7 @@ union_offer_agents AS (
         oa.id_agent_negotiation_executive AS id_agent,
         "Negotiation Executive" AS agent_profile,
         oa.has_negotiation_executive_tqc AS has_tqc,
+        IF(oa.id_user_ciq = oa.id_user_negotiation_executive, TRUE, FALSE) AS has_ciq,
         oa.ts_sale_agreement_signed,
         oa.ts_updated,
         DAY(oa.ts_updated) AS day,
@@ -52,6 +61,8 @@ union_offer_agents AS (
         YEAR(oa.ts_updated) AS year
     FROM
         offer_agents AS oa
+    WHERE 
+        oa.id_user_negotiation_executive IS NOT NULL
 )
 SELECT
     uoa.id_offer,
@@ -59,6 +70,7 @@ SELECT
     uoa.id_agent,
     uoa.agent_profile,
     uoa.has_tqc,
+    uoa.has_ciq,
     uoa.ts_sale_agreement_signed,
     uoa.ts_updated,
     uoa.day,
@@ -68,7 +80,4 @@ FROM
     union_offer_agents AS uoa
 WHERE 
     uoa.ts_sale_agreement_signed IS NOT NULL
-    AND uoa.id_user IS NOT NULL
-    AND uoa.ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-       
-    
+    AND uoa.ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}') 

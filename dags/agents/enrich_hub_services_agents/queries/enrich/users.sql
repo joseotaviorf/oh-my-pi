@@ -25,6 +25,7 @@ SELECT
     COALESCE(u.name, ua.name) AS name,
     COALESCE(u.email, ua.email) AS email,
     COALESCE(u.phone_number, ua.number) AS phone_number,
+    ua.cpf,
     ua.is_active,
     u.ts_created,
     u.ts_updated,

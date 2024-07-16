@@ -1,6 +1,6 @@
 ---
 database_name: datalake_tiers
-table_name: agent_perfomance
+table_name: agent_performance
 description: |
   This table calculates the performance indicators of Broker and Negotiation Executive agents.
 domain: Data Agents
@@ -32,6 +32,10 @@ columns:
     lineage:
       - datalake_hub_services.users.email
     description: User email.
+  cpf:
+    lineage:
+      - datalake_hub_services.users.cpf
+    description: User CPF.
   phone_number:
     lineage:
       - datalake_hub_services.users.phone_number
@@ -58,6 +62,9 @@ columns:
       Total offers, where the broker was responsible for the visit, which were signed 
       in the normal way, that is, without any indication of a buyer through the 
       'Tem Quem Compra' (TQC) program.
+  total_offer_signed_with_ciq:
+    description: 
+      Total signed offers, where the broker responsible for the visit was also the one who recommended the property for listing through the CIQ program.
   total_first_listing:
     description: Total CIQ houses nominations that resulted in a first publication.
   year:
