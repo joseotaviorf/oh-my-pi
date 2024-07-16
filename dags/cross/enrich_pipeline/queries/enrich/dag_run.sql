@@ -116,7 +116,7 @@ success_run AS (
       END AS ts_expected_sla
   FROM
     datalake_composer_clean.log AS l
-  JOIN
+  LEFT JOIN -- We have cases where DAG Inventory was broken and didn't run
     dag_inventory AS di
       ON di.id_dag = l.id_dag
       AND di.dt_extracted = DATE(l.ts_executed)
