@@ -1,0 +1,82 @@
+---
+database_name: metric_rent
+table_name: nps_offboarding_tenant_weekly
+description: Weekly NPS of tenants with contract termination.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  dt_week_answered:
+    lineage:
+      - dw_public.dim_date.date
+    description: Week date of NPS answer.
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Category of rent value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_contract.country_code
+    description: Country code of the house related to the contract.
+  promoters:
+    description: "Weekly volume of promoters among tenants that answered the NPS survey after a contract termination. To be in promoter category, the score should be greater or equal than 9."
+    metric:
+      name: Total Weekly Promoters Among Tenants
+      description: "Weekly volume of promoters among tenants that answered the NPS survey after a contract termination. To be in promoter category, the score should be higher or equal than 9."
+      acronym: TWPAT
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  detractors:
+    description: "Weekly volume of detractors among tenants that answered the NPS survey after a contract termination. To be in detractor category the score should be less than 7."
+    metric:
+      name: Total Weekly Detractors Among Tenants
+      description: "Weekly volume of detractors among tenants that answered the NPS survey after a contract termination. To be in detractor category the score should be less than 7."
+      acronym: TWDAT
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  neutrals:
+    description: "Weekly volume of neutrals among tenants that answered the NPS survey after a contract termination. To be in neutral category the score should be in 7 and 8."
+    metric:
+      name: Total Weekly Neutrals Among Tenants
+      description: "Weekly volume of neutrals among tenants that answered the NPS survey after a contract termination. To be in neutral category the score should be in 7 and 8."
+      acronym: TWDAT
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  total_answers:
+    description: "Weekly volume of NPS answers of tenants after a contract termination."
+    metric:
+      name: Total Weekly Answers Of Tenants
+      description: "Weekly volume of NPS answers of tenants after a contract termination."
+      acronym: TWAOT
+      is_additive: True
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  nps:
+    description: "Weekly NPS of tenants with contract terminations."
+    metric:
+      name: Weekly NPS Of Tenants
+      description: "Weekly NPS of tenants with contract terminations."
+      acronym: WNPSOT
+      is_additive: False
+      business_stage: Offboarding
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""  
