@@ -488,6 +488,9 @@ bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
 bietlejuice.dw_house_amenities:
+  - bietlejuice.ebdb_house:load-clean-house-aud
+  - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
   - bietlejuice.enrich_ebdb_amenities:load-enrich-pivotted-amenities

@@ -1,0 +1,30 @@
+---
+database_name: dw_house
+table_name: dim_house_price_calculator_revision
+description: Dimension that shows all revisions in house price p70 (used for pricing indicators) and their period of validity based on the price calculator.
+domain: Rede
+owner: ae-rede@quintoandar.com.br
+columns:
+  sk_price_calculator_revision:
+    description: Primary key of the table.
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.id_house
+      - datalake_ebdb_clean.house_predicted_price_aud.p_70
+  id_house:
+    description: Id of the house.
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.id_house
+  price_p_70:
+    description: 70th percentile of house price from predicted house calculator.
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_70
+  dt_revision_started:
+    description: Beginning of the validity of the p70 value.
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_revision_ended:
+    description: End of the validity of the p70 value.
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_load:
+    description: Table data update date.
