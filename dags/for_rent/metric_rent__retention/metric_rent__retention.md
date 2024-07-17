@@ -16,6 +16,7 @@ Currently, there is the following output tables in the metric layer:
 - `churn_weekly`
 - `early_demand_ca2cs_monthly`
 - `early_demand_ca2cs_weekly`
+- `er2rr_daily`
 - `er2rr_monthly`
 - `er2rr_weekly`
 - `er2unp_susp_monthly`

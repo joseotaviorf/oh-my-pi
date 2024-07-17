@@ -1,0 +1,233 @@
+---
+database_name: metric_rent
+table_name: er2rr_daily
+description: Daily calculated metrics of Ended Rental (ER) to Re-rental (RR).
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  dt_reference_day:
+    lineage:
+      - dw_rent.dim_contract.ts_analyst_annulment_input
+      - dw_rent.dim_contract.dt_annulment
+    description: "Day of the ended rental or listing maturation."
+    dimension: True
+  category:
+    lineage:
+      - dw_rent.dim_contract.value_segment
+    description: "Rent value category based on its value."
+    categories:
+      LOW: Rent lower than R$1500,00.
+      MEDIUM: Rent between R$1500,01 and R$2499,99.
+      HIGH: Rent higher than R$2500,00.
+      UNDEFINED: Undefined.
+      OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_contract.country_code
+    description: "Country code of the house."
+    dimension: True
+  administrator:
+    description: "Group of administration. This column was created to understand if the Brokerage Only program are influencing the ER2RR metric"
+    categories:
+      WITH BO: The calculation are including Brokerage Only (OWNER)
+      WITHOUT BO: The calculation are not including Brokerage Only (OWNER)
+    dimension: True
+  ended_rentals:
+    description: "Volume of ended rentals that happended in the day being referenced."
+    metric:
+      name: Daily Ended Rentals
+      description: "Volume of ended rentals that happended in the day being referenced."
+      acronym: ER
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  rerentals:
+    description: "Volume of re-rentals that happended in the day being referenced."
+    metric:
+      name: Daily Re-Rentals
+      description: "Volume of re-rentals that happended in the day being referenced."
+      acronym: RR
+      is_additive: True
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  rr_4w:
+    description: "Volume of re-rentals in 4 weeks that happended in the day being referenced."
+    metric:
+      name: Daily Re-Rentals in 4W
+      description: "Volume of re-rentals in 4 weeks that happended in the day being referenced."
+      acronym: RR_4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rr_12w:
+    description: "Volume of re-rentals in 12 weeks that happended in the day being referenced."
+    metric:
+      name: Daily Re-Rentals in 12W
+      description: "Volume of re-rentals in 12 weeks that happended in the day being referenced."
+      acronym: RR_12W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ER2RR_4W:
+    description: "Percentage of re-rentals that happended in less than 4 weeks (28 days) after the ended rental in the day being referenced."
+    metric:
+      name: Percentage of Ended Rental to Re-Rental in Less Than 4 Weeks
+      description: "Percentage of re-rentals that happended in less than 4 weeks (28 days) after the ended rental in the day being referenced."
+      acronym: ER2RR_4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  ER2RR_12W:
+    description: "Percentage of re-rentals that happended in less than 12 weeks (84 days) after the ended rental in the day being referenced."
+    metric:
+      name: Percentage of Ended Rental to Re-Rental in Less Than 12 Weeks
+      description: "Percentage of re-rentals that happended in less than 12 weeks (84 days) after the ended rental in the day being referenced."
+      acronym: ER2RR_12W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: camila.simoes@quintoandar.com.br
+      link_to_metric: ""
+  ended_rentals_matured_4W:
+    description: "Volume of ended rentals that happended before at least 28 days ago."
+    metric:
+      name: Daily Matured Ended Rentals 4 Weeks
+      description: "Volume of ended rentals that happended before at least 28 days ago."
+      acronym: ERM_4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rerentals_matured_4W:
+    description: "Volume of re-rentals considering only 4 weeks matured ended rental (at least 28 days ago)."
+    metric:
+      name: Daily Matured Re-Rentals 4 Weeks
+      description: "Volume of re-rentals considering only 4 weeks matured ended rental (at least 28 days ago)."
+      acronym: RRM_4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ER2RR_4W_matured:
+    description: "Percentage of re-rentals considering only 4 weeks matured ended rentals (at least 28 days ago) that happended in the day being referenced."
+    metric:
+      name: Percentage of 4 Weeks Matured Ended Rental to Re-Rental
+      description: "Percentage of re-rentals considering only 4 weeks matured ended rentals (at least 28 days ago) that happended in the day being referenced."
+      acronym: ER2RRM_4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ended_rentals_matured_12W:
+    description: "Volume of ended rentals that happended before at least 84 days ago."
+    metric:
+      name: Daily Matured Ended Rentals 12 Weeks
+      description: "Volume of ended rentals that happended before at least 84 days ago."
+      acronym: ERM_12W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rerentals_matured_12W:
+    description: "Volume of re-rentals considering only 12 weeks matured ended rental (at least 84 days ago)."
+    metric:
+      name: Daily Matured Re-Rentals 4 Weeks
+      description: "Volume of re-rentals considering only 12 weeks matured ended rental (at least 84 days ago)."
+      acronym: RRM_4W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ER2RR_12W_matured:
+    description: "Percentage of re-rentals considering only 12 weeks matured ended rentals (at least 84 days ago) that happended in the day being referenced."
+    metric:
+      name: Percentage of 12 Weeks Matured Ended Rental to Re-Rental
+      description: "Percentage of re-rentals considering only 12 weeks matured ended rentals (at least 84 days ago) that happended in the day being referenced."
+      acronym: ER2RRM_12W
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ended_rentals_4W_by_maturation_date:
+    description: "Volume of ended rentals that happended before at least 28 days ago by maturation date."
+    metric:
+      name: Daily Matured Ended Rentals 4 Weeks by Maturation Date
+      description: "Volume of ended rentals that happended before at least 28 days ago by maturation date."
+      acronym: ERM_4W_BMD
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rerentals_4W_by_maturation_date:
+    description: "Volume of re-rentals considering only 4 weeks matured ended rental (at least 28 days ago) by maturation date."
+    metric:
+      name: Daily Matured Re-Rentals 4 Weeks by Maturation Date
+      description: "Volume of re-rentals considering only 4 weeks matured ended rental (at least 28 days ago) by maturation date."
+      acronym: RRM_4W_BMD
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ER2RR_4W_by_maturation_date:
+    description: "Percentage of re-rentals considering only 4 weeks matured ended rentals (at least 28 days ago) that happended in the day being referenced by maturation date."
+    metric:
+      name: Percentage of 4 Weeks Matured Ended Rental to Re-Rental by Maturation Date
+      description: "Percentage of re-rentals considering only 4 weeks matured ended rentals (at least 28 days ago) that happended in the day being referenced by maturation date."
+      acronym: ER2RRM_4W_BMD
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ended_rentals_12W_by_maturation_date:
+    description: "Volume of ended rentals that happended before at least 84 days ago by maturation date."
+    metric:
+      name: Daily Matured Ended Rentals 12 Weeks by Maturation Date
+      description: "Volume of ended rentals that happended before at least 84 days ago by maturation date."
+      acronym: ERM_12W_BMD
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  rerentals_12W_by_maturation_date:
+    description: "Volume of re-rentals considering only 12 weeks matured ended rental (at least 84 days ago) by maturation date."
+    metric:
+      name: Daily Matured Re-Rentals 4 Weeks by Maturation Date
+      description: "Volume of re-rentals considering only 12 weeks matured ended rental (at least 84 days ago) by maturation date."
+      acronym: RRM_4W_BMD
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
+  ER2RR_12W_by_maturation_date:
+    description: "Percentage of re-rentals considering only 12 weeks matured ended rentals (at least 84 days ago) that happended in the day being referenced by maturation date."
+    metric:
+      name: Percentage of 12 Weeks Matured Ended Rental to Re-Rental by Maturation Date
+      description: "Percentage of re-rentals considering only 12 weeks matured ended rentals (at least 84 days ago) that happended in the day being referenced by maturation date."
+      acronym: ER2RRM_12W_BMD
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: pilar.valente@quintoandar.com.br
+      link_to_metric: ""
