@@ -39,4 +39,4 @@ workflow:
     User:
       clean_table_name: user
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_12_2_med_general_cluster
