@@ -884,6 +884,16 @@ databricks_12_2_med_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_12_2_med_mem_driver_high_mem_nodes:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.large
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
