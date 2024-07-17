@@ -14,12 +14,16 @@ workflow:
   source_schema: ebdb
   tables_customization:
     Vistoria:
+      raw_primary_keys: ["id"]
       clean_table_name: inspection
     Vistoria_AUD:
+      raw_primary_keys: ["id"]
       clean_table_name: inspection_aud
     ItemVistoria:
+      raw_primary_keys: ["id"]
       clean_table_name: inspection_item
     FotoItemVistoria:
+      raw_primary_keys: ["id"]
       clean_table_name: inspection_photo_item
 cluster:
   type: databricks_12_2_med_general_cluster
