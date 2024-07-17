@@ -15,3 +15,6 @@ workflow:
     - country_code
 cluster:
   type: databricks_12_2_min_xlarge_io-memory_photon_cluster
+  custom_configurations:
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static

@@ -24,3 +24,5 @@ cluster:
       spark_version: 12.2.x-scala2.12
       aws_attributes:
         availability: ON_DEMAND
+      spark_conf:
+        spark.sql.sources.partitionOverwriteMode: static

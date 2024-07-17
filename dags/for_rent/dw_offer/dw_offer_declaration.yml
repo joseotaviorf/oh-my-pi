@@ -15,3 +15,5 @@ cluster:
     num_workers: 2
     runtime_engine: PHOTON
     spark_version: 12.2.x-scala2.12
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static
