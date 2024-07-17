@@ -16,7 +16,6 @@ custom_cluster:
   num_workers: 6
   aws_attributes:
     availability: SPOT_WITH_FALLBACK
-    first_on_demand: 1
     spot_bid_price_percent: 100
     zone_id: us-east-1d
     ebs_volume_size: 200
@@ -28,7 +27,6 @@ databricks_10_4_max_memory_cluster:
   runtime_engine: PHOTON
   num_workers: 4
   aws_attributes:
-    first_on_demand: 1
     spot_bid_price_percent: 100
     zone_id: us-east-1d
     availability: SPOT_WITH_FALLBACK

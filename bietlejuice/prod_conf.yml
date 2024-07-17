@@ -172,7 +172,6 @@ cluster_template:
             ebs_volume_count: 1
             ebs_volume_size: 100
             ebs_volume_type: GENERAL_PURPOSE_SSD
-            first_on_demand: 1
             instance_profile_arn: "{{ var.value.instance_profile_arn }}"
             spot_bid_price_percent: 100
             zone_id: us-east-1d
