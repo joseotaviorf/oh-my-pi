@@ -36,4 +36,4 @@ workflow:
     message: {}
     processed_message: {}
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_13_3_med_general_cluster

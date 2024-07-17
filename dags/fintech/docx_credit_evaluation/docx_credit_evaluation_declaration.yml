@@ -18,8 +18,4 @@ workflow:
       get_table_metrics:
         count: id
 cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.2xlarge
-    num_workers: 4
+  type: databricks_13_3_med_general_cluster

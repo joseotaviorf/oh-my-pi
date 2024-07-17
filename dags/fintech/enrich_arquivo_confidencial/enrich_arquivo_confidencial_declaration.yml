@@ -13,4 +13,4 @@ workflow:
     scr_pivot:
       - scr
 cluster:
-  type: databricks_10_4_min_io-memory_cluster
+  type: databricks_12_2_min_io-memory_cluster

@@ -13,4 +13,4 @@ workflow:
     credit_analysis:
       - credit_analysis_proposals
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_13_3_med_general_cluster
