@@ -30,7 +30,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("databricks_12_2_med_general_cluster")
 CUSTOM_LIBRARIES = [
     {"jar": f"{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"}
 ]

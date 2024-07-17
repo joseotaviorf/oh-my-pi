@@ -11,7 +11,7 @@ workflow:
     dim_contract:
       custom_schema: public
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_12_2_med_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

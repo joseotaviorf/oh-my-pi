@@ -8,7 +8,7 @@ workflow:
   custom_schema: public
   default_partitions: [country_code]
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_12_2_med_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
