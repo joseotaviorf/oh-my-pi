@@ -5,6 +5,8 @@ custom_cluster:
   runtime_engine: PHOTON
   num_workers: 2
   spark_version: 12.2.x-scala2.12
+  spark_conf:
+    spark.sql.sources.partitionOverwriteMode: static
 inner_dependencies:
   agent_data:
     - user

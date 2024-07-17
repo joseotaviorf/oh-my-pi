@@ -2,7 +2,7 @@
 dag:
   name: enrich_region
   schedule_start_date: 2020, 7, 1
-  documentation: 
+  documentation:
     dag_purpose: |
           Creates enriched tables for the context `Region`.
   owner: Data ForRent

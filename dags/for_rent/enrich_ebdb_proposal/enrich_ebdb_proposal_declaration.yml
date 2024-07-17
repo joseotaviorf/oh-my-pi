@@ -3,7 +3,7 @@ dag:
   name: enrich_ebdb_proposal
   schedule_start_date: 2020, 7, 1
   owner: Data ForRent
-  documentation: 
+  documentation:
     dag_purpose: |
       Creates enriched tables for the context `Proposal` of ebdb, like pre proposal.
       This DAG is triggered by Mediator and loads the table via full load.

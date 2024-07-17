@@ -2,13 +2,13 @@ dag:
     name: enrich_listing_contracts
     owner: Data ForRent
     schedule_start_date: 2019, 5, 31
-    documentation: 
+    documentation:
       dag_purpose: |
             This DAG has the goal to unify information related to listings and its contracts.
 workflow:
     type: query
     layer: enrich
-    default_extraction_type: full 
+    default_extraction_type: full
     default_partitions: [country_code]
 cluster:
   type: custom_cluster
@@ -18,3 +18,5 @@ cluster:
     runtime_engine: PHOTON
     num_workers: 2
     spark_version: 12.2.x-scala2.12
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static

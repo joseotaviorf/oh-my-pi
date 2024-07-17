@@ -3,7 +3,7 @@ dag:
   name: enrich_ebdb_listing
   schedule_start_date: 2020, 7, 1
   owner: Data ForRent
-  documentation: 
+  documentation:
     dag_purpose: |
       Creates enriched tables for the context `Listing` of EBDB.
       This DAG is triggered by Mediator and loads the table via full load.
@@ -102,6 +102,7 @@ cluster:
     num_workers: 3
     spark_conf:
       spark.sql.broadcastTimeout: 1200
+      spark.sql.sources.partitionOverwriteMode: static
     aws_attributes:
       spot_bid_price_percent: 100
       zone_id: us-east-1d

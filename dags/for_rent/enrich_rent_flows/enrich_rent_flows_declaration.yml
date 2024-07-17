@@ -2,7 +2,7 @@ dag:
     name: enrich_rent_flows
     owner: Data ForRent
     schedule_start_date: 2014, 6, 17
-    documentation: 
+    documentation:
       dag_purpose: |
             This DAG creates the enriched tables about rent flows and its entities (property, tenant prospect,
             booking, offer, contract, etc.).

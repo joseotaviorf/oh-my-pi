@@ -19,3 +19,5 @@ cluster:
     node_type_id: c5d.9xlarge
     num_workers: 2
     spark_version: 12.2.x-scala2.12
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static

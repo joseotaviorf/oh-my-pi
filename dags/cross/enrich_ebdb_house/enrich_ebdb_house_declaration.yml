@@ -10,8 +10,10 @@ dag:
 workflow:
   type: query
   layer: enrich
-  default_extraction_type: incremental
   default_partitions:
   - country_code
 cluster:
   type: databricks_12_2_min_io-memory_photon_cluster
+  custom_configurations:
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static
