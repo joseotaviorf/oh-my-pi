@@ -7,9 +7,9 @@ columns:
   id_user:
     description: This column represents the unique identifier for each user
     lineage:
-     - datalake_ebdb_clean.user.id
-     - datalake_wololo_clean.context_discard.id_user
-     - datalake_bob_clean.registrar.id_main
+      - datalake_ebdb_clean.user.id
+      - datalake_wololo_clean.context_discard.id_user
+      - datalake_bob_clean.registrar.id_main
   application: 
     description: This column represents the application that the user is using for last attribution
   source:
@@ -25,11 +25,13 @@ columns:
     lineage:
       - datalake_wololo_clean.context_discard.attendance_info
       - datalake_bob.house_draft.ops_agent
+      - datalake_bob_clean.house_draft_aud.attendance_info
   ops_partner:
     description: The partner or company responsible for the operation
     lineage:
       - datalake_wololo_clean.context_discard.attendance_info
       - datalake_bob.house_draft.ops_partner
+      - datalake_bob_clean.house_draft_aud.attendance_info
   ops_approach:
     description: The approach used by the team to convert the lead
     lineage:
@@ -45,9 +47,11 @@ columns:
     lineage:
       - datalake_wololo_clean.context_discard.attendance_info
       - datalake_bob.house_draft.ops_objective
+      - datalake_bob_clean.house_draft_aud.attendance_info
   ts_register:
     description: The timestamp of the registration for operation agent
     lineage:
       - datalake_ebdb_clean.user.ts_created
       - datalake_wololo_clean.context_discard.ts_created
       - datalake_bob.house_draft.ts_created
+      - datalake_bob_clean.house_draft_aud.ts_updated

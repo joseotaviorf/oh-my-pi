@@ -9,8 +9,7 @@ WITH wololo AS (
     COALESCE(GET_JSON_OBJECT(attendance_info, '$.company'), sales_company) AS company,
     GET_JSON_OBJECT(attendance_info, '$.contactType') AS contact_type,
     GET_JSON_OBJECT(attendance_info, '$.contactChannel') AS contact_channel,
-    ts_created AS ts_register,
-    -1 AS id_agent_olos
+    ts_created AS ts_register
   FROM
     datalake_wololo_clean.context_discard
   WHERE
@@ -63,8 +62,7 @@ olos AS (
     sales_company AS company,
     'ACTIVE' AS contact_type,
     'PHONE_CALL' AS contact_channel,
-    u.ts_created AS ts_register,
-    olos.id_agent AS id_agent_olos  
+    u.ts_created AS ts_register
   FROM 
     datalake_ebdb_clean.user AS u
   JOIN 
@@ -87,8 +85,32 @@ conversion_base AS (
     datalake_bob_clean.registrar AS r 
       ON (d.registrar = r.id)
   WHERE
-    d.ops_company IS NOT NULL 
+    NULLIF(d.ops_company, '') IS NOT NULL 
   QUALIFY ROW_NUMBER() OVER (PARTITION BY r.id_main ORDER BY ts_created DESC) = 1
+),
+/* This CTE is responsible for getting the last record of each analyst into CIQ context,
+and needs to be updated when the context of the CIQ create a new model to capture this info */
+ciq AS ( 
+  SELECT
+    r.id_main AS id_user,
+    'owner_conversion' AS application,
+    'BOB_AUD' AS source,
+    'CIQ' AS journey,
+    TRUE AS has_ops_info,
+    GET_JSON_OBJECT(d.attendance_info, '$.team') AS team,
+    NULLIF(GET_JSON_OBJECT(d.attendance_info, '$.company'), '') AS company,
+    CAST(NULL AS STRING) AS contact_type,
+    CAST(NULL AS STRING) AS contact_channel,
+    d.ts_updated AS ts_register
+  FROM
+    datalake_bob_clean.house_draft_aud AS d
+  JOIN 
+    datalake_bob_clean.registrar AS r
+      ON (d.registrar = r.id)
+  WHERE
+    (UPPER(GET_JSON_OBJECT(d.attendance_info, '$.team')) = 'CIQ')
+      AND MAKE_DATE(d.year, d.month, d.day) >= DATE('2023-08-01')
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY r.id_main ORDER BY d.ts_updated DESC) = 1 -- PEGANDO ÚLTIMO REGISTRO DE CADA ANALISTA
 ),
 bob AS (
   SELECT 
@@ -99,22 +121,24 @@ bob AS (
     TRUE AS has_ops_info,
     ops_team AS team,
     ops_company AS company,
-    ops_contact_type AS contact_type,
-    ops_contact_channel AS contact_channel,
-    ts_created AS ts_register,
-    -1 AS id_agent_olos
+    NULLIF(ops_contact_type, '') AS contact_type,
+    NULLIF(ops_contact_channel, '') AS contact_channel,
+    ts_created AS ts_register
   FROM 
     conversion_base
 ),
 all_ops_registers AS (
-  SELECT *, 3 AS order
-  FROM olos
+  SELECT *, 1 AS order
+  FROM bob
   UNION ALL
   SELECT *, 2 AS order
   FROM wololo
   UNION ALL
-  SELECT *, 1 AS order
-  FROM bob
+  SELECT *, 3 AS order
+  FROM ciq
+  UNION ALL
+  SELECT *, 4 AS order
+  FROM olos
 )
 
 SELECT 
