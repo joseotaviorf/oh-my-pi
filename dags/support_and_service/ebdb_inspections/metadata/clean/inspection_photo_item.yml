@@ -1,0 +1,27 @@
+database_name: datalake_ebdb_test_clean
+table_name: inspection_photo_item
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.fotoitemvistoria.id
+  id_item:
+    lineage:
+      - datalake_ebdb_test_raw.fotoitemvistoria.item_id
+  id_ref:
+    lineage:
+      - datalake_ebdb_test_raw.fotoitemvistoria.refid
+  checklist_item:
+    lineage:
+      - datalake_ebdb_test_raw.fotoitemvistoria.checklistitem
+  name:
+    lineage:
+      - datalake_ebdb_test_raw.fotoitemvistoria.nome
+  type:
+    lineage:
+      - datalake_ebdb_test_raw.fotoitemvistoria.tipo
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.fotoitemvistoria.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.fotoitemvistoria.atualizadoem

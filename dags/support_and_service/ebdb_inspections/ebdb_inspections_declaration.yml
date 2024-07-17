@@ -1,0 +1,25 @@
+dag:
+  name: ebdb_inspections
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 45 21 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to Inspections into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb_test
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  tables_customization:
+    Vistoria:
+      clean_table_name: inspection
+    Vistoria_AUD:
+      clean_table_name: inspection_aud
+    ItemVistoria:
+      clean_table_name: inspection_item
+    FotoItemVistoria:
+      clean_table_name: inspection_photo_item
+cluster:
+  type: databricks_12_2_med_general_cluster
