@@ -1,0 +1,53 @@
+---
+database_name: datalake_accounting_funnel
+table_name: for_rent_cap_bank_recon
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This model was created to do For Rent accounts payable bank recon"
+columns:
+  id_company_use:
+    lineage:
+      - datalake_nexxera.cnab_payments.company_use
+      - datalake_accounting_funnel.payment_platforms.reference_1
+      - datalake_accounting_funnel.ledger.id_external_payment
+    description: "Unique code to identify bank payments"
+  bank_account:
+    lineage:
+      - datalake_nexxera.cnab_payments.bank_account
+    description: "Bank account where de payments was made"
+  bank_paid_amount:
+    lineage:
+      - datalake_nexxera.cnab_payments.paid_amount
+    description: "Paid amount from Bank"
+  cap_paid_amount:
+    lineage:
+      - datalake_accounting_funnel.payment_platforms.paid_amount
+    description: "Paid amount from Vans/Checkout"
+  sap_paid_amount:
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+    description: "Paid amount from SAP - Ledger"
+  is_reconcilied:
+    description: "If TRUE, Bank and SAP are matching in company_use, paid_amount and dt_paid"
+  dt_bank_paid:
+    lineage:
+      - datalake_nexxera.cnab_payments.dt_paid
+    description: "Paid date from Bank"
+  dt_cap_paid:
+    lineage:
+      - datalake_accounting_funnel.payment_platforms.dt_paid
+    description: "Paid date from Vans/Checkout"
+  dt_sap_paid:
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_reference
+    description: "Paid date from SAP/Ledger - RefDate"
+  dt_sap_tax:
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_tax
+    description: "Document date - TaxDate - from SAP/Ledger"
+  dt_paid:
+    lineage:
+      - datalake_nexxera.cnab_payments.dt_paid
+      - datalake_accounting_funnel.payment_platforms.dt_paid
+      - datalake_accounting_funnel.ledger.dt_reference
+    description: "Dates combine from all systems to filter in recon process"
