@@ -3,16 +3,11 @@ dag:
   name: metric_rede__performance_score
   schedule_start_date: 2024,01,01
   owner: Data Rede
-  documentation:
-     dag_purpose: 'Workflow for loading the Rede metrics used to generate the Performance Score.
-      Currently, there is the following output tables in the metric layer:
-      - `availability_weekly`
-      - `completeness_weekly`
-      - `offers_weekly`
-      - `pricing_first_listing_weekly`
-      - `pricing_ongoing_listing_weekly`'
 workflow:
   type: query
   layer: metric
 cluster:
   type: databricks_12_2_min_general_cluster
+  access_control_list:
+     group_name: analytics-engineers
+     permission_level: CAN_MANAGE

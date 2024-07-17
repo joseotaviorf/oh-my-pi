@@ -1,0 +1,9 @@
+---
+table_name: metric_rede.pricing_first_listing_weekly
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  dt_week:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error

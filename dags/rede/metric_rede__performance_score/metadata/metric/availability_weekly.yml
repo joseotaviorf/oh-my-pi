@@ -7,26 +7,32 @@ owner: ae-rede@quintoandar.com.br
 columns:
   dt_week:
     description: Reference week of the metric result.
+    dimension: True
     lineage:
       - dw_sale.fact_visits.ts_visit
   partner_name:
     description: Name of Rede partner company registered with HubSpot.
+    dimension: True
     lineage: 
       - dw_rede.dim_company_cluster.company_name
   company_cluster:
     description: Classification assigned by the Operations team to the Rede partner company.
+    dimension: True
     lineage:
       - dw_rede.dim_company_cluster.company_cluster
   is_decola_community:
     description: True if the cluster given to the company is part of the "Decola" community, otherwise false.
+    dimension: True
     lineage:
       - dw_rede.dim_company_cluster.is_decola_community
   is_decola_current_cohort:
     description: True if the current cluster given to the company is part of the "Decola" community, otherwise false.
+    dimension: True
     lineage:
       - dw_rede.dim_company_cluster.is_decola_current_cohort
   total_visits_sheduled:
     description: Total volume of scheduled visits.
+    dimension: True
     metric:
       name: Total Visits Scheduled
       description: Total volume of scheduled visits.
