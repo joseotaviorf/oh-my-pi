@@ -3,18 +3,22 @@ dataset_aux AS (
     SELECT DISTINCT
         nps.sk_nps_answer,
         nps.score_category,
-        DATE_TRUNC('MONTH', DATE(nps.ts_answered)) AS month_answers,
+        CAST(DATE_TRUNC('MONTH', DATE(nps.ts_answered)) AS DATE) AS month_answers,
         dc.value_segment AS category
     FROM 
-        dw_retention.fact_contract_termination AS fct
+        dw_retention.fact_nps AS fct_nps
+    JOIN 
+        dw_retention.fact_contract_termination AS fct_termination
+            ON fct_termination.sk_termination = fct_nps.sk_termination
     JOIN
         dw_retention.dim_nps_answer AS nps
-            ON nps.sk_nps_answer = fct.sk_nps_answer_owner
-    LEFT JOIN 
+            ON nps.sk_nps_answer = fct_nps.sk_nps_answer
+    JOIN 
         dw_rent.dim_contract AS dc
-            ON fct.sk_contract = dc.sk_contract
+            ON fct_termination.sk_contract = dc.sk_contract
     WHERE
-        DATE(nps.ts_answered) >= DATE('2023-01-01')
+        nps.customer_type = 'PP'
+        AND DATE(nps.ts_answered) >= DATE('2023-01-01')
         AND DATE(nps.ts_answered) < ADD_MONTHS(CURRENT_DATE, 1)
         AND nps.nps_campaign LIKE '%offboarding%'
         AND dc.is_repair_tenant_duty <> TRUE
@@ -35,7 +39,8 @@ dataset_final AS (
         COUNT(1) AS total_answers_no_repairs_need
     FROM 
         dataset_aux
-    GROUP BY 1,2
+    GROUP BY 
+        1, 2
 
     UNION
     
@@ -53,7 +58,8 @@ dataset_final AS (
         COUNT(1) AS total_answers_no_repairs_need
     FROM 
         dataset_aux
-    GROUP BY 1,2
+    GROUP BY 
+        1, 2
 )
 SELECT 
     month_answers,
@@ -64,4 +70,5 @@ SELECT
     CAST((SUM(promoters_no_repairs_need) - SUM(detractors_no_repairs_need))*100 AS DOUBLE)/ SUM(total_answers_no_repairs_need) * 1.0 AS nps_no_repairs_needs
 FROM 
     dataset_final
-GROUP BY 1,2,3,4,5    
+GROUP BY 
+    1, 2, 3, 4, 5    

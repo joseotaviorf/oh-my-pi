@@ -12,14 +12,6 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.id_termination
     description: ID of the contract termination.
-  sk_nps_answer_owner:
-    lineage:
-      - dw_retention.dim_nps_answer.sk_nps_answer
-    description: ID of the landlord's NPS answer.
-  sk_nps_answer_tenant:
-    lineage:
-      - dw_retention.dim_nps_answer.sk_nps_answer
-    description: ID of the tenant's NPS answer.
   country_code:
     lineage:
       - datalake_ebdb_contract.contract.country_code
