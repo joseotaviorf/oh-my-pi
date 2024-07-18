@@ -38,7 +38,7 @@ DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 
-cluster_description = config_service.get_config("databricks_10_4_min_general_cluster")
+cluster_description = config_service.get_config("databricks_12_2_min_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
 dag_documentation = config_service.get_config("dag_documentation")
 

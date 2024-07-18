@@ -39,3 +39,4 @@ cluster:
     node_type_id: m5d.4xlarge
     runtime_engine: PHOTON
     num_workers: 4
+    spark_version: 13.3.x-scala2.12

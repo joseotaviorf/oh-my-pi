@@ -7,7 +7,7 @@ dag_documentation:
 
 custom_cluster:
   runtime_engine: PHOTON
-  driver_node_type_id: r5d.xlarge
+  driver_node_type_id: r5d.2xlarge
   node_type_id: r5d.2xlarge
-  num_workers: 3
-  spark_version: 12.2.x-scala2.12
+  num_workers: 4
+  spark_version: 13.3.x-scala2.12

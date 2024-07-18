@@ -21,6 +21,7 @@ custom_cluster:
   autotermination_minutes: 20
   driver_node_type_id: r5a.large
   node_type_id: r5a.large
+  spark_version: 13.3.x-scala2.12
   num_workers: 1
   aws_attributes:
     spot_bid_price_percent: 100
