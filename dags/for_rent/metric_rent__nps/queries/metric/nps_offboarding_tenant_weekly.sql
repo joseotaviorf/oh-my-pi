@@ -1,5 +1,5 @@
 SELECT
-  DATE(DATE_TRUNC('WEEK', dd_answer.date)) AS dt_week_answered,
+  dd_answer.week_start AS dt_week_answered,
   dc.value_segment AS category,
   dc.country_code,
   COUNT(fnd.sk_nps_answer) AS total_answers,
@@ -30,7 +30,7 @@ GROUP BY
 UNION ALL
 
 SELECT
-  DATE(DATE_TRUNC('WEEK', dd_answer.date)) AS dt_week_answered,
+  dd_answer.week_start AS dt_week_answered,
   'OVERALL' AS category,
   dc.country_code,
   COUNT(fnd.sk_nps_answer) AS total_answers,

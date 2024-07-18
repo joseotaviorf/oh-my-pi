@@ -1,5 +1,5 @@
 SELECT
-  DATE(DATE_TRUNC('MONTH', dd_answer.date)) AS dt_month_answered,
+  dd_answer.month_start AS dt_month_answered,
   dc.value_segment AS category,
   dc.country_code,
   COUNT(fnd.sk_nps_answer) AS total_answers_repairs_needed,
@@ -31,7 +31,7 @@ GROUP BY
 UNION ALL
 
 SELECT
-  DATE(DATE_TRUNC('MONTH', dd_answer.date)) AS dt_month_answered,
+  dd_answer.month_start AS dt_month_answered,
   'OVERALL' AS category,
   dc.country_code,
   COUNT(fnd.sk_nps_answer) AS total_answers_repairs_needed,
