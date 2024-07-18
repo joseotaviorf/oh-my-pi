@@ -1,0 +1,189 @@
+database_name: dw_sale
+table_name: fact_closing_offer_partners
+description: This table contains information about financed proposals, including their statuses, dates, and various metrics related to the financing process.
+domain: Data ForSale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_offer:
+    description: The unique identifier for the offer.
+    lineage:
+      - dw_sale.fact_offers.sk_offer
+  sk_pre_analysis:
+    description: The unique identifier for the pre-analysis.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.sk_pre_analysis
+  sk_proposal:
+    description: The unique identifier for the proposal.
+    lineage:
+      - dw_atta.dim_proposal_atta.sk_proposal
+  sk_closing_specialist:
+    description: The unique identifier for the closing specialist.
+    lineage:
+      - dw_sale.fact_offers.sk_closing_specialist
+  sk_buyer:
+    description: The unique identifier for the buyer.
+    lineage:
+      - dw_sale.fact_offers.sk_buyer
+  sk_owner:
+    description: The unique identifier for the owner.
+    lineage:
+      - dw_sale.fact_offers.sk_owner
+  financing_value:
+    description: The value of the financing.
+    lineage:
+      - dw_atta.dim_proposal_atta.financing_value
+  internal_vendors_flag:
+    description: Flag indicating internal vendors.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.last_credit_ended
+      - dw_atta.fact_pre_analysis_proposal_flow.credit_ended_isolve
+  days_offer_accepted_to_sale_agreement_signed:
+    description: SLA metric for days from offer accepted to sale agreement signed.
+    lineage:
+      - dw_sale.fact_offers.days_offer_accepted_to_sale_agreement_signed
+  days_offer_submitted_to_offer_accepted:
+    description: SLA metric for days from offer submitted to offer accepted.
+    lineage:
+      - dw_sale.fact_offers.days_offer_submitted_to_offer_accepted
+  days_offer_submitted_to_sale_agreement_signed:
+    description: SLA metric for days from offer submitted to sale agreement signed.
+    lineage:
+      - dw_sale.fact_offers.days_offer_submitted_to_sale_agreement_signed
+  days_offer_submitted_to_credit_approved:
+    description: SLA metric for days from offer submitted to credit approved.
+    lineage:
+      - dw_sale.fact_offers.ts_offer_submitted
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
+  days_offer_submitted_to_credit_ended:
+    description: SLA metric for days from offer submitted to credit ended.
+    lineage:
+      - dw_sale.fact_offers.ts_offer_submitted
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+  days_offer_submitted_to_financing_ended:
+    description: SLA metric for days from offer submitted to financing ended.
+    lineage:
+      - dw_sale.fact_offers.ts_offer_submitted
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+  days_credit_ended_to_financing_ended:
+    description: SLA metric for days from credit ended to financing ended.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+  days_credit_approved_to_financing_ended:
+    description: SLA metric for days from credit approved to financing ended.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+  days_CCV_to_credit_approved:
+    description: SLA metric for days from CCV signed to credit approved.
+    lineage:
+      - dw_sale.fact_offers.ts_sale_agreement_signed
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
+  days_CCV_to_credit_ended:
+    description: SLA metric for days from CCV signed to credit ended.
+    lineage:
+      - dw_sale.fact_offers.ts_sale_agreement_signed
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+  days_CCV_to_financing_ended:
+    description: SLA metric for days from CCV signed to financing ended.
+    lineage:
+      - dw_sale.fact_offers.ts_sale_agreement_signed
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_max_credit_application_approval
+  ts_offer_sumitted:
+    description: Timestamp when the offer was submitted.
+    lineage:
+      - dw_sale.fact_offers.ts_offer_submitted
+  ts_offer_accepted:
+    description: Timestamp when the offer was accepted.
+    lineage:
+      - dw_sale.fact_offers.ts_offer_accepted
+  ts_ccv_signed:
+    description: Timestamp when the CCV was signed.
+    lineage:
+      - dw_sale.fact_offers.ts_sale_agreement_signed
+  ts_sale_agreement_cancelled:
+    description: Timestamp when the sale agreement was cancelled.
+    lineage:
+      - dw_sale.dim_sale_agreement.ts_sale_agreement_cancelled
+  dt_first_pre_analysis:
+    description: Date of the first pre-analysis.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.first_pre_analysis
+  dt_credit_started:
+    description: Date when the credit process started.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_started
+  dt_credit_approved:
+    description: Date when the credit was approved.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_approved
+  dt_credit_ended:
+    description: Date when the credit process ended.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_credit_ended
+  ts_first_inspection:
+    description: Timestamp of the first inspection.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_min_inspection
+  ts_last_inspection:
+    description: Timestamp of the last inspection.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_max_inspection
+  ts_first_checklist:
+    description: Timestamp of the first checklist.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_min_checklist
+  ts_last_checklist:
+    description: Timestamp of the last checklist.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_max_checklist
+  ts_first_bank_legal_analysis_started:
+    description: Timestamp when the first bank legal analysis started.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_bank_legal_analysis_started
+  ts_last_bank_legal_analysis_ended:
+    description: Timestamp when the last bank legal analysis ended.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_bank_legal_analysis_ended
+  ts_first_financing_contract:
+    description: Timestamp of the first financing contract.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_min_financing_contract
+  ts_last_financing_contract:
+    description: Timestamp of the last financing contract.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_max_financing_contract
+  ts_first_contracted:
+    description: Timestamp of the first contracted date.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_min_contracted
+  ts_last_contracted:
+    description: Timestamp of the last contracted date.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_max_contracted
+  ts_first_financing_started:
+    description: Timestamp when the financing started.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_started
+  dt_financing_ended:
+    description: Date when the financing ended.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_financing_ended
+  ts_last_updated_isolve:
+    description: Timestamp of the last update.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.ts_last_updated
+  dt_offer_submitted_week:
+    description: Week of the offer submission.
+    lineage:
+      - dw_sale.fact_offers.ts_offer_submitted
+  dt_offer_accepted_week:
+    description: Week of the offer acceptance.
+    lineage:
+      - dw_sale.fact_offers.ts_offer_accepted
+  dt_ccv_signed_week:
+    description: Week of the CCV signature.
+    lineage:
+      - dw_sale.fact_offers.ts_sale_agreement_signed
+  ts_load:
+    description: Date of ingestion.

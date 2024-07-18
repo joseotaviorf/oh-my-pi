@@ -24,6 +24,8 @@ columns:
     lineage:
       - datalake_atta.partner_info.partner_name
     description: "Partner's name"
+  partner_type:
+    description: "Partner's type"
   wallet:
     lineage:
       - datalake_atta.partner_info.wallet

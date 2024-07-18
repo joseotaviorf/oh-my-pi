@@ -1,0 +1,9 @@
+---
+table_name: dw_sale.dim_closing_offer_partner
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_offer:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error

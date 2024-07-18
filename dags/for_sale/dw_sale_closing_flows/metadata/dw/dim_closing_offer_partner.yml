@@ -1,0 +1,78 @@
+database_name: dw_sale
+table_name: dim_closing_offer_partner
+description: This table contains information about financed proposals, including their BU`s, Buyer`s name and etc.
+domain: Data ForSale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_offer:
+    description: The unique identifier for the offer.
+    lineage:
+      - dw_sale.fact_offers.sk_offer
+  business_unit:
+    description: The business unit related to the offer.
+    lineage:
+      - dw_sale.dim_offer.business_unit
+  partner_name:
+    description: The name of the partner.
+    lineage:
+      - dw_atta.dim_partner_atta.partner_name
+  franchise_name:
+    description: The name of the franchise.
+    lineage:
+      - dw_atta.dim_franchise_atta.franchise_name
+  consultant_name:
+    description: The name of the consultant.
+    lineage:
+      - dw_atta.dim_consultant_atta.consultant_name
+  partner_type:
+    description: The type of the partner.
+  partner_type_group:
+    description: The grouped type of the partner.
+    lineage:
+      - dw_atta.dim_proposal_atta.partner_type
+      - dw_atta.dim_proposal_atta.first_pre_analysis
+  last_credit_analysis_status:
+    description: The status of the last credit analysis.
+    lineage:
+      - dw_atta.dim_proposal_atta.last_credit_analysis_status
+      - dw_atta.dim_proposal_atta.first_credit_approved_date
+  financing_bank:
+    description: The bank providing the financing.
+    lineage:
+      - dw_atta.dim_proposal_atta.financing_bank
+  buyer_name:
+    description: The name of the buyer.
+    lineage:
+      - dw_public.dim_user.nome
+  owner_name:
+    description: The name of the owner.
+    lineage:
+      - dw_public.dim_user.nome
+  proposal_status:
+    description: The status of the proposal.
+    lineage:
+      - dw_atta.dim_proposal_atta.proposal_status
+  proposal_situation:
+    description: The situation of the proposal.
+    lineage:
+      - dw_atta.dim_proposal_atta.proposal_situation
+  is_ccv_canceled:
+    description: Indicates if the CCV was canceled.
+  is_offer_financed:
+    description: Indicates if the offer is financed.
+  is_offer_canceled:
+    description: Indicates if the offer was canceled.
+  is_offer_accepted:
+    description: Indicates if the offer was accepted.
+  is_credit_approved:
+    description: Indicates if the credit was approved.
+  is_credit_ended:
+    description: Indicates if the credit process ended.
+  is_credit_ended_general:
+    description: General indicator if the credit process ended.
+  is_ccv_signed:
+    description: Indicates if the CCV was signed.
+  is_financing_ended:
+    description: Indicates if the financing process ended.
+  ts_load:
+    description: Date of ingestion.

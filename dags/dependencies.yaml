@@ -50,7 +50,6 @@ bietlejuice.dw_atta:
   - bietlejuice.atta:load-clean-providers-info
   - bietlejuice.atta:load-clean-track-step-detail
   - bietlejuice.atta:load-clean-users-info
-  - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_user:load-dw-public-dim-user
@@ -782,6 +781,8 @@ bietlejuice.dw_sale_available_booking_hours:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.enrich_sale_available_booking_hours:load-enrich-weekly-available-booking-hours
 bietlejuice.dw_sale_closing_flows:
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
 bietlejuice.dw_sale_events:
