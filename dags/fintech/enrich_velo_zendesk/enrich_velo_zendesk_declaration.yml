@@ -8,12 +8,11 @@ workflow:
   layer: enrich
   inner_dependencies:
     ticket_details:
-    - custom_fields
+      - custom_fields
     ticket_metrics:
-    - custom_fields
+      - custom_fields
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: databricks_13_3_med_general_cluster
   custom_configurations:
     spark_conf:
       spark.sql.mapKeyDedupPolicy: "LAST_WIN"
-

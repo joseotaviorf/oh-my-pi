@@ -8,6 +8,6 @@ workflow:
   layer: enrich
   inner_dependencies:
     cash_flows_categories:
-    - cash_flows
+      - cash_flows
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_12_2_min_general_cluster
