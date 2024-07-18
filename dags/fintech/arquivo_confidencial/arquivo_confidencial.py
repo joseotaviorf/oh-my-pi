@@ -19,7 +19,7 @@ SOURCE = "arquivo_confidencial"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 16, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_med_general_cluster"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(SOURCE)
