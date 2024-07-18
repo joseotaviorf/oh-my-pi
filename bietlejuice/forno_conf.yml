@@ -400,7 +400,7 @@ databricks_12_2_min_io-memory_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
-databricks_13_3_min_memory_photon_cluster:
+databricks_13_3_med_mem_driver_min_memory_2_nodes_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.large
     node_type_id: r5d.large
