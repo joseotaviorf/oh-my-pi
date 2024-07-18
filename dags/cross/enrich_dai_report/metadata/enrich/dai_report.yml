@@ -2,7 +2,7 @@
 database_name: datalake_dai_report
 table_name: dai_report
 description: DAI (declaração de atividades imobiliárias) contains informations about tributes in the state of São Paulo - SP (Brazil)
-domain: Bedrock
+domain: Cross
 owner: marlon.simas@quintoandar.com.br
 columns:
   id_house:
