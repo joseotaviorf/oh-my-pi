@@ -427,19 +427,19 @@ cover AS (
       -- WHEN max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL THEN NULL
       WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
             AND LOWER(o.business_context) = 'rent'
-            AND date_diff(current_date, max_dt_manutencao) >= 30 
+            AND DATEDIFF(current_date, max_dt_manutencao) >= 30 
         THEN TRUE -- com manutenção
       WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
             AND LOWER(o.business_context) = 'sale'
-            AND date_diff(current_date, max_dt_manutencao) >= 90 
+            AND DATEDIFF(current_date, max_dt_manutencao) >= 90 
         THEN TRUE -- com manutenção
       WHEN (COALESCE(max_dt_manutencao, '1900-01-01') < COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
             AND LOWER(o.business_context) = 'rent'
-            AND date_diff(current_date, max_dt_sem_manutencao) >= 30
+            AND DATEDIFF(current_date, max_dt_sem_manutencao) >= 30
         THEN TRUE -- com manutenção
       WHEN (COALESCE(max_dt_manutencao, '1900-01-01') < COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
             AND LOWER(o.business_context) = 'sale'
-            AND date_diff(current_date, max_dt_sem_manutencao) >= 90
+            AND DATEDIFF(current_date, max_dt_sem_manutencao) >= 90
         THEN TRUE -- com manutenção
       WHEN (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
               AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_manutencao, '1900-01-01')) 
@@ -452,7 +452,7 @@ cover AS (
               AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
           AND max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL
           AND LOWER(o.business_context) = 'rent'
-          AND date_diff(current_date, max_dt_install) >= 30
+          AND DATEDIFF(current_date, max_dt_install) >= 30
         THEN TRUE -- com instalação e sem manutenção
       WHEN (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
               AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_manutencao, '1900-01-01')) 
@@ -465,7 +465,7 @@ cover AS (
               AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
           AND max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL
           AND LOWER(o.business_context) = 'sale'
-          AND date_diff(current_date, max_dt_install) >= 90
+          AND DATEDIFF(current_date, max_dt_install) >= 90
         THEN TRUE -- com instalação e sem manutenção
       WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_install, '1900-01-01')) 
               AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
@@ -478,7 +478,7 @@ cover AS (
               AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
           AND max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL
           AND LOWER(o.business_context) = 'rent'
-          AND date_diff(current_date, max_dt_manutencao) >= 30
+          AND DATEDIFF(current_date, max_dt_manutencao) >= 30
         THEN TRUE -- com instalação e sem manutenção
       WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_install, '1900-01-01')) 
               AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
@@ -491,7 +491,7 @@ cover AS (
               AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
           AND max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL
           AND LOWER(o.business_context) = 'sale'
-          AND date_diff(current_date, max_dt_manutencao) >= 90
+          AND DATEDIFF(current_date, max_dt_manutencao) >= 90
         THEN TRUE -- com instalação e sem manutenção
       ELSE NULL 
     END AS is_ready_for_maintenance,
