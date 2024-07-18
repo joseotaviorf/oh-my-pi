@@ -1,0 +1,43 @@
+---
+database_name: datalake_revenue_lines_homolog
+table_name: management_fee
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing management fee and payment data by contract"
+columns:
+  id_contract_ebdb:
+    description: "Contract ID on EBDB"
+    lineage:
+      - dw_rent.dim_contract.sk_contract
+  management_fee_share:
+    description: "Share of management fee"
+  payment_status:
+    description: "Payment status"
+    lineage:
+      - datalake_retsuko.invoice.id
+  monthly_administration_fee:
+    description: "Monthly administration fee value"
+    lineage:
+      - dw_rent.dim_contract.monthly_administration_fee
+  administration_split_percentage:
+    description: "Split Percentage for the administration fee"
+    lineage:
+      - datalake_ebdb_clean.administration_Split_Percentage
+  prod_theorical_amount:
+    description: "Total amount that appears on the invoice"
+  invoice_theorical_amount:
+    description: "Due amount in BRL"
+  invoice_paid_amount:
+    description: "Paid amount in BRL"
+  accrual_year_month:
+    description: "Reference year-month"
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+  dt_due:
+    description: "Invoice's due date"
+    lineage:
+      - datalake_retsuko.invoice_info.ts_due
+  dt_paid:
+    description: "Invoice's paid date"
+    lineage:
+      - datalake_retsuko.invoice_info.ts_paid

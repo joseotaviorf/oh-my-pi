@@ -1,0 +1,69 @@
+---
+database_name: datalake_recupera_homolog
+table_name: collection
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table represents the Recupera report called MISOCO. It contains the data about 'acionamentos'. New data based on the date of occurrence will be appended to the table every day"
+columns:
+  id_creditor:
+    description: Creditor code
+    lineage:
+      - datalake_recupera_clean.historical_records.id_creditor
+  id_customer:
+    description: Customer ID
+    lineage:
+      - datalake_recupera_clean.historical_records.id_customer
+  operator_name:
+    description: Operator ID
+    lineage:
+      - datalake_recupera_clean.operational_records.operator_name
+  occurrence:
+    description: History Code
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+  occurrence_description:
+    description: Description in the occurrence
+    lineage:
+      - datalake_recupera_clean.historical_records.occurence_description
+  esforco:
+    description: Any dialer attempt, used to calculate the spin
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+  alo:
+    description: Flag to indicate that a person answer the call.
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+  cpc:
+    description: Flag to indicate contact with the correct person
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+  promisse:
+    description: Flag to indicate that was made
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+  agreement:
+    description: Flag to indicate that a agreement was made
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+  failure:
+    description: Flag to indicate a failure to contact the delinquency
+    lineage:
+      - datalake_recupera_clean.historical_records.historical_code
+  ts_occurrence:
+    description: Timestamp of the occurrence
+    lineage:
+      - datalake_recupera_clean.historical_records.ts_occurrence
+  ts_load:
+    description: Timestamp when the data was loaded
+  year:
+    description: Year from ts_occurrence
+    lineage:
+      - datalake_recupera_clean.historical_records.year
+  month:
+    description: Month from ts_occurrence
+    lineage:
+      - datalake_recupera_clean.historical_records.month
+  day:
+    description: Day from ts_occurrence
+    lineage:
+      - datalake_recupera_clean.historical_records.day

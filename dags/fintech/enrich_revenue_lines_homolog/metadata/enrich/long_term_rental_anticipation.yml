@@ -1,0 +1,96 @@
+---
+database_name: datalake_revenue_lines_homolog
+table_name: long_term_rental_anticipation
+description:
+  This For Rent addon makes it possible to our client (PP) to anticipate more than one rent - LRA.
+  In this table we have Fastforward and MOVA (gsheet) source.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  id_lra:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.id
+    description: Id of the LRA, it's not unique because one LRA may have more than one installment.
+  id_contract_ebdb:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.sk_contract
+    description: Id of the contract from Main (EBDB).
+  status:
+    description: Status of the LRA from MOVA.
+    categories:
+      A VENCER: The charge is close to due date.
+      ATRASADA: The invoice wasn't paid.
+      EM APURAÇÃO: Who didn't paid and can have some divergence in conciliation or any of that.
+      EM FORMALIZAÇÃO: Who has a debt and is formalizing an agreement.
+      INADIMPLENTE: Who didn't already paid, but there's no acting on it.
+      PAGA: The charge was paid.
+      PDD: Who already had a provisioned due.
+  months_anticipated:
+    lineage:
+      - datalake_fastforward_clean.lra_installment_option.months_anticipated
+    description: Number of rental months that were anticipated.
+  installment:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.installment_number
+    description: Number of the installment given a specific month.
+  total_installments:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.installment_total_count
+    description: Number of installments that the lra value was divided.
+  total_rent:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.main_value
+    description: Rent value of the house from Main (EBDB).
+  nbr_transactions_signed:
+    description:
+      Number of times that the same PP asked for a anticipation (LRA).
+      In theory there could only be one, but in practice it happens differently.
+  prod_theorical_amount:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.installment_value
+    description: Amortization amount calculated by the LRA product.
+  prod_theorical_fee:
+    lineage:
+      - datalake_fastforward_clean.lra_installment.interest_value
+    description: Interest amount calculated by the LRA product.
+  mova_invoice_theorical_amount:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.installment_value
+    description: Amortization amount that appears on the invoice.
+  mova_invoice_paid_amount:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.paid_value
+    description: Amortization amount that whas paid.
+  mova_invoice_theorical_fee:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.contract_installment_interest
+    description: Interest amount that appears on the invoice.
+  mova_invoice_paid_fee:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.contract_installment_interest
+    description: Interest amount that whas paid.
+  mova_interest_value:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.interest_value
+    description: Interest amount from MOVA source.
+  accrual_year_month:
+    lineage:
+      - datalake_fastforward_clean.lra_installment.ts_expected_due
+      - datalake_gsheets_clean.mova_lra_owners.dt_expiration
+    description: Reference year-month of the LRA installment.
+  dt_due:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.dt_expiration
+    description: Invoice's due date.
+  dt_paid:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.dt_payment
+    description: Invoice's paid date.
+  dt_created:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.ts_created_at
+    description: Date of when longterm anticipation was created.
+  dt_signed:
+    lineage:
+      - datalake_gsheets_clean.mova_lra_owners.dt_signed_contract
+    description: Date that LRA's contract was signed.

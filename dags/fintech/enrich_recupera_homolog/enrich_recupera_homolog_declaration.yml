@@ -1,0 +1,32 @@
+---
+dag:
+  name: enrich_recupera_homolog
+  schedule_start_date: 2023, 9, 10
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Enrich pipe for Recupera data.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    changes_debts_distribution:
+      - snapshot_daily_debts
+  tables_customization:
+    collection:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+    snapshot_daily_debts:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
+cluster:
+  type: databricks_13_3_med_general_photon_cluster

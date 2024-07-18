@@ -1,0 +1,94 @@
+---
+database_name: datalake_invoice_homolog
+table_name: invoice_all
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing data from invoice"
+columns:
+  id_invoice_entry:
+    description: "Invoice entry ID"
+    lineage:
+      - datalake_invoice_homolog.invoice_entries.id
+  id_region:
+    description: "Region ID"
+    lineage:
+      - datalake_invoice_homolog.invoice_entries.id_region
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_ebdb_contract.contract.id
+  rent:
+    description: "Rent amount"
+    lineage:
+      - datalake_ebdb_contract.contract.rent
+  version:
+    description: "Version number"
+    lineage:
+      - datalake_ebdb_contract.contract.contract_version
+  guarantee:
+    description: "Guarantee description"
+    lineage:
+      - datalake_ebdb_contract.contract.guarantee
+  description:
+    description: "Invoice description"
+    lineage:
+      - datalake_retsuko.invoice_entry.description
+  bill_item:
+    description: "Bill item description"
+    lineage:
+      - datalake_retsuko.invoice_entry.entry_type
+  frequency:
+    description: "Frequency description"
+    lineage:
+      - datalake_retsuko.invoice_info.invoice_frequency
+  status:
+    description: "Status description"
+    lineage:
+      - datalake_retsuko.invoice_info.payment_status
+  invoice_account_type:
+    description: "Invoice account type description"
+    lineage:
+      - datalake_retsuko.invoice_info.user
+  sb_value:
+    description: "SB amount"
+  sign_value:
+    description: "Sign amount"
+  is_b2b:
+    description: "Boolean that indicates if it's b2b"
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.is_b2b
+  is_created_before_third_business_day:
+    description: "Boolean that indicates if the invoice was created before third business day"
+  dt_third_business_day:
+    description: "Date of third business day"
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_contract_month_signed:
+    description: "Year and month of contract signing"
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+  dt_contract_month_started:
+    description: "Year and month when the contract started"
+    lineage:
+      - datalake_ebdb_contract.contract.dt_started
+  dt_invoice_paid:
+    description: "Date when invoice was paid"
+    lineage:
+      - datalake_invoice_homolog.invoice_entries.id_paid_date
+  accrual_year_month:
+    description: "Accural year and month"
+    lineage:
+      - datalake_retsuko.invoice_entry.accrual_year_month
+  dt_next_accrual:
+    description: "Next accural date"
+    lineage:
+      - datalake_retsuko.invoice_entry.accrual_year_month
+  ts_created:
+    description: "Timestamp of creation"
+    lineage:
+      - datalake_retsuko.invoice.ts_created
+      - datalake_invoice_homolog.invoice_entries.id_created_date
+  dt_created_for_filter:
+    description: "Date of creation to be used on filters"
+    lineage:
+      - datalake_invoice_homolog.invoice_entries.id_created_date

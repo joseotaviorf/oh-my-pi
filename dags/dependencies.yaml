@@ -1468,6 +1468,14 @@ bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
+bietlejuice.enrich_debt_recovery_homolog:
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-collector
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-debtor
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-negotiation
+  - bietlejuice.trato_feito:load-clean-payment
 bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
@@ -1714,6 +1722,9 @@ bietlejuice.enrich_expected_contribution_margin:
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all
+bietlejuice.enrich_fintech_snapshot_homolog:
+  - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
+  - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-rent-offer
 bietlejuice.enrich_golden_set:
@@ -1875,6 +1886,27 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
+bietlejuice.enrich_invoice_homolog:
+  - bietlejuice.ebdb:load-clean-affiliate-data
+  - bietlejuice.ebdb:load-clean-conversion-lead
+  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb:load-clean-partner-agent
+  - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-portability
+  - bietlejuice.enrich_proposal:load-enrich-proposal
+  - bietlejuice.enrich_retsuko:load-enrich-debt-forgiveness
+  - bietlejuice.enrich_retsuko:load-enrich-entry
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-contract
 bietlejuice.enrich_jira:
   - bietlejuice.jira:load-clean-issues
 bietlejuice.enrich_kill_queue:
@@ -1981,6 +2013,18 @@ bietlejuice.enrich_listing_temp:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
 bietlejuice.enrich_losses:
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-entry-snapshot
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-snapshot
+  - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-fact-invoice-entries-snapshot
+  - bietlejuice.dw_fintech_snapshot:load-dw-public-snapshot-dim-contract-snapshot
+  - bietlejuice.enrich_retsuko:load-enrich-entry
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-negotiation
+bietlejuice.enrich_losses_homolog:
   - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-entry-snapshot
   - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-dim-invoice-snapshot
   - bietlejuice.dw_fintech_snapshot:load-dw-payment-snapshot-fact-invoice-entries-snapshot
@@ -2287,6 +2331,26 @@ bietlejuice.enrich_recupera:
   - bietlejuice.recupera:load-clean-status
   - bietlejuice.trato_feito:load-clean-client
   - bietlejuice.trato_feito:load-clean-contract
+bietlejuice.enrich_recupera_homolog:
+  - bietlejuice.recupera:load-clean-complementary-records
+  - bietlejuice.recupera:load-clean-contracts
+  - bietlejuice.recupera:load-clean-creditor-pending
+  - bietlejuice.recupera:load-clean-detail-movement
+  - bietlejuice.recupera:load-clean-historical
+  - bietlejuice.recupera:load-clean-historical-records
+  - bietlejuice.recupera:load-clean-indicator-contracts
+  - bietlejuice.recupera:load-clean-installment
+  - bietlejuice.recupera:load-clean-installment-canceled
+  - bietlejuice.recupera:load-clean-installment-detail
+  - bietlejuice.recupera:load-clean-installments-indicators
+  - bietlejuice.recupera:load-clean-operational-records
+  - bietlejuice.recupera:load-clean-operators
+  - bietlejuice.recupera:load-clean-receipt
+  - bietlejuice.recupera:load-clean-records
+  - bietlejuice.recupera:load-clean-records-distributed-channels
+  - bietlejuice.recupera:load-clean-status
+  - bietlejuice.trato_feito:load-clean-client
+  - bietlejuice.trato_feito:load-clean-contract
 bietlejuice.enrich_rede_company:
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -2474,10 +2538,37 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.fastforward:load-clean-lra-installment
   - bietlejuice.fastforward:load-clean-lra-installment-option
   - bietlejuice.gsheets_fintech:done-clean-mova-lra-owners
-  - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
   - bietlejuice.rental_guarantee:load-clean-guarantee-aud
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-credit-card-payment
+  - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
+bietlejuice.enrich_revenue_lines_homolog:
+  - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.ebdb_contract:load-clean-contract-partnership-data
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_invoice:load-enrich-invoice-entries
+  - bietlejuice.enrich_owner_fees:load-enrich-contract
+  - bietlejuice.enrich_owner_fees:load-enrich-contract-brokerage-fee
+  - bietlejuice.enrich_rental_guarantee:load-enrich-charge
+  - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
+  - bietlejuice.enrich_retsuko:load-enrich-entry
+  - bietlejuice.fastforward:load-clean-anticipation
+  - bietlejuice.fastforward:load-clean-contract
+  - bietlejuice.fastforward:load-clean-long-term-anticipation
+  - bietlejuice.fastforward:load-clean-lra-installment
+  - bietlejuice.fastforward:load-clean-lra-installment-option
+  - bietlejuice.gsheets_fintech:done-clean-mova-lra-owners
+  - bietlejuice.rental_guarantee:load-clean-guarantee-aud
+  - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-credit-card-payment
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_kill_queue:load-enrich-reservation
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.fastforward:load-clean-gateway-loan-installment
+  - bietlejuice.retsuko:load-clean-contract
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-payee

@@ -1,0 +1,13 @@
+---
+dag:
+  name: enrich_revenue_lines_homolog
+  schedule_start_date: 2022, 3, 1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates the enriched tables for Revenue Lines model.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_13_3_med_general_cluster

@@ -1,0 +1,239 @@
+---
+database_name: datalake_losses_homolog
+table_name: provision
+description: "Enrich table with the losses model informations for the fact tables"
+owner: felipe.chies@quintoandar.com.br
+domain: fintech
+columns:
+  id_invoice:
+    lineage:
+      - datalake_losses_homolog.delay.id_invoice
+    description: Id of the invoice.
+  id_contract:
+    lineage:
+      - datalake_losses_homolog.delay.id_contract
+    description: Id of the contract.
+  accrual_year_month:
+    lineage:
+      - datalake_losses_homolog.delay.accrual_year_month
+    description: String with Year number and Month number 'yyyymm' related to the sent date.
+  deal_delay_rule_a:
+    lineage:
+      - datalake_losses_homolog.delay.deal_delay_rule_a
+    description: Rule A related to the delay of the payment.
+  deal_delay_rule_b:
+    lineage:
+      - datalake_losses_homolog.delay.deal_delay_rule_b
+    description: Rule B related to the delay of the payment.
+  deal_delay_rule_c:
+    lineage:
+      - datalake_losses_homolog.delay.deal_delay_rule_c
+    description: Rule C related to the delay of the payment.
+  deal_delay_rule_d:
+    lineage:
+      - datalake_losses_homolog.delay.deal_delay_rule_d
+    description: Rule D related to the delay of the payment.
+  deal_delay_rule_e:
+    lineage:
+      - datalake_losses_homolog.delay.deal_delay_rule_e
+    description: Rule E related to the delay of the payment.
+  deal_order:
+    lineage:
+      - datalake_losses_homolog.delay.deal_order
+    description: Information related to the deal position.
+  deal_status:
+    lineage:
+      - datalake_losses_homolog.delay.deal_status
+    description: Status of the deal.
+  delay_at_deal_creation:
+    lineage:
+      - datalake_losses_homolog.delay.delay_at_deal_creation
+    description: Date difference between deal_anchor_due_date and dt_created_deal.
+  bigger_anchor_deal_at_contract:
+    lineage:
+      - datalake_losses_homolog.delay.bigger_anchor_deal_at_contract
+    description: Worst debt in active negotiation for the contract.
+  delay_contaminated_range_rule_a:
+    lineage:
+      - datalake_losses_homolog.delay.delay_contaminated_range_rule_a
+    description: Minimun value for deal_delay_rule_a.
+  delay_contaminated_range_rule_b:
+    lineage:
+      - datalake_losses_homolog.delay.delay_contaminated_range_rule_b
+    description: Minimun value for deal_delay_rule_b.
+  delay_contaminated_range_rule_c:
+    lineage:
+      - datalake_losses_homolog.delay.delay_contaminated_range_rule_c
+    description: Minimun value for deal_delay_rule_c.
+  delay_contaminated_range_rule_d:
+    lineage:
+      - datalake_losses_homolog.delay.delay_contaminated_range_rule_d
+    description: Minimun value for deal_delay_rule_d.
+  delay_contaminated_range_rule_e:
+    lineage:
+      - datalake_losses_homolog.delay.delay_contaminated_range_rule_e
+    description: Minimun value for deal_delay_rule_e.
+  delta_days:
+    lineage:
+      - datalake_losses_homolog.delay.delta_days
+    description: Date difference between dt_due_adjs and dt_closing.
+  due_amount:
+    lineage:
+      - datalake_losses_homolog.delay.due_amount
+    description: Total value of the invoice.
+  frequency:
+    lineage:
+      - datalake_losses_homolog.delay.frequency
+    description: Frequency of the payment.
+  full_delay_at_deal:
+    lineage:
+      - datalake_losses_homolog.delay.full_delay_at_deal
+    description: Date difference between deal_anchor_due_date and dt_closing.
+  guarantee_type:
+    lineage:
+      - datalake_losses_homolog.delay.guarantee_type
+    description: Guarantee information related to the invoice.
+  invoice_account_type:
+    description: Account type information associated with the user information.
+  payment_status:
+    lineage:
+      - datalake_losses_homolog.delay.payment_status
+    description: Invoice status of payment i.e if it is open, paid, canceled or was written down
+  invoice_status:
+    description: Invoice status information related to the payment status.
+  pd_range_rule_a:
+    lineage:
+      - datalake_losses_homolog.delay.pd_range_rule_a
+    description: Range of the delay in days related to Rule A.
+  pd_range_rule_b:
+    lineage:
+      - datalake_losses_homolog.delay.pd_range_rule_b
+    description: Range of the delay in days related to Rule B.
+  pd_range_rule_c:
+    lineage:
+      - datalake_losses_homolog.delay.pd_range_rule_c
+    description: Range of the delay in days related to Rule C.
+  pd_range_rule_d:
+    lineage:
+      - datalake_losses_homolog.delay.pd_range_rule_d
+    description: Range of the delay in days related to Rule D.
+  pd_range_rule_e:
+    lineage:
+      - datalake_losses_homolog.delay.pd_range_rule_e
+    description: Range of the delay in days related to Rule E.
+  provision_balance_p1_delay_a:
+    description: Provision balance for the rule A during 2022.
+  provision_balance_p2_delay_a:
+    description: Provision balance for the rule A on jan/2023.
+  provision_balance_p3_delay_a:
+    description: Provision balance for the rule A on fev/2023.
+  provision_balance_p4_delay_a:
+    description: Provision balance for the rule A from mar/2023 to nov/2023.
+  provision_balance_p5_delay_a:
+    description: Current provision balance for the rule A.
+  provision_balance_p1_delay_b:
+    description: Provision balance for the rule B during 2022.
+  provision_balance_p2_delay_b:
+    description: Provision balance for the rule B on jan/2023.
+  provision_balance_p3_delay_b:
+    description: Provision balance for the rule B on fev/2023.
+  provision_balance_p4_delay_b:
+    description: Provision balance for the rule B from mar/2023 to nov/2023.
+  provision_balance_p5_delay_b:
+    description: Current provision balance for the rule B.
+  provision_balance_p1_delay_c:
+    description: Provision balance for the rule C during 2022.
+  provision_balance_p2_delay_c:
+    description: Provision balance for the rule C on jan/2023.
+  provision_balance_p3_delay_c:
+    description: Provision balance for the rule C on fev/2023.
+  provision_balance_p4_delay_c:
+    description: Provision balance for the rule C from mar/2023 to nov/2023.
+  provision_balance_p5_delay_c:
+    description: Current provision balance for the rule C.
+  provision_balance_p1_delay_d:
+    description: Provision balance for the rule D during 2022.
+  provision_balance_p2_delay_d:
+    description: Provision balance for the rule D on jan/2023.
+  provision_balance_p3_delay_d:
+    description: Provision balance for the rule D on fev/2023.
+  provision_balance_p4_delay_d:
+    description: Provision balance for the rule D from mar/2023 to nov/2023.
+  provision_balance_p5_delay_d:
+    description: Current provision balance for the rule D.
+  provision_balance_p1_delay_e:
+    description: Provision balance for the rule E during 2022.
+  provision_balance_p2_delay_e:
+    description: Provision balance for the rule E on jan/2023.
+  provision_balance_p3_delay_e:
+    description: Provision balance for the rule E on fev/2023.
+  provision_balance_p4_delay_e:
+    description: Provision balance for the rule E from mar/2023 to nov/2023.
+  provision_balance_p5_delay_e:
+    description: Current provision balance for the rule E.
+  provision_balance:
+    description: Provision balance being applied to the invoice.
+  provision_factor:
+    description: Provision factor being applied to the invoice.
+  risk_type:
+    lineage:
+      - datalake_losses_homolog.delay.risk_type
+    description: Risk type of the deal.
+  user:
+    lineage:
+      - datalake_losses_homolog.delay.user
+    description: User information related to the invoice.
+  is_before_started:
+    lineage:
+      - datalake_losses_homolog.delay.is_before_started
+    description: Flag to show if the date is before started.
+  is_contract_with_deal:
+    lineage:
+      - datalake_losses_homolog.delay.is_contract_with_deal
+    description: Flag to show if the contract had deal.
+  is_hr:
+    lineage:
+      - datalake_losses_homolog.delay.is_hr
+    description: Flag to identify if the deal is high risk.
+  is_invoice_deal:
+    lineage:
+      - datalake_losses_homolog.delay.is_invoice_deal
+    description: Flag to identify if the invoice has deal.
+  is_international:
+    lineage:
+      - datalake_losses_homolog.delay.is_international
+    description: Flag to show if the invoice is international.
+  is_writtendown_in_dead_time:
+    lineage:
+      - datalake_losses_homolog.delay.is_writtendown_in_dead_time
+    description: Flag to show if the invoice is writtendown in dead time.
+  has_repair_offboarding_bill_item:
+    description: Flag to indicate the existence of 'repair offboarding' bill item for an invoice
+  dt_closing:
+    lineage:
+      - datalake_losses_homolog.delay.dt_closing
+    description: Last day of the month.
+  dt_created_deal:
+    lineage:
+      - datalake_losses_homolog.delay.dt_created_deal
+    description: Date of the deal creation.
+  dt_due_adjs:
+    lineage:
+      - datalake_losses_homolog.delay.dt_due_adjs
+    description: Due date of the deal.
+  dt_due_deal_anchor:
+    lineage:
+      - datalake_losses_homolog.delay.dt_due_deal_anchor
+    description: Due date of the deal anchor.
+  dt_due_general_accrual:
+    lineage:
+      - datalake_losses_homolog.delay.dt_due_general_accrual
+    description: Due date accrual.
+  dt_paid_adjs:
+    lineage:
+      - datalake_losses_homolog.delay.dt_paid_adjs
+    description: Payment date of the deal.
+  dt_snapshot:
+    lineage:
+      - datalake_losses_homolog.delay.dt_snapshot
+    description: Date of the snapshot.

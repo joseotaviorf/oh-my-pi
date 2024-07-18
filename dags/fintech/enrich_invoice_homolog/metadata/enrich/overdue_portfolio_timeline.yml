@@ -1,0 +1,134 @@
+---
+database_name: datalake_invoice_homolog
+table_name: overdue_portfolio_timeline
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: |
+  The table contains information about the daily timeline of overdue tenant (IQ) invoices.
+  The table does not include canceled invoices and canceled contracts.
+  An invoice is inserted into the table 1 day after its due date, and it's replicated every day until the day the debt is paid or written down.
+columns:
+  id_contract:
+    lineage:
+      - datalake_retsuko.invoice.id_contract_external
+    description: Contract ID
+  id_proposal:
+    lineage:
+      - datalake_proposal.proposal.id
+    description: Proposal ID. Use it as key to dw_rent.dim_proposal
+  id_invoice:
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: Invoice ID
+  contract_status:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_termination
+      - datalake_ebdb_contract.contract.status
+    description: Contract status
+  user:
+    lineage:
+      - datalake_retsuko.invoice_info.invoice_user
+    description: User. It will always be 'tenant'
+  invoice_type:
+    lineage:
+      - datalake_retsuko.invoice.purpose
+    description: Invoice's type frequency - monthly, extra, pos rental, onboarding, early termination...
+  payment_status:
+    lineage:
+      - datalake_retsuko.invoice.status
+    description: Payment status on the reference date
+  substatus:
+    lineage:
+      - datalake_retsuko.invoice.substatus
+    description: Invoice Substatus - debt, ongoing-negotiation or none.
+  reason:
+    lineage:
+      - datalake_retsuko.invoice.reason
+    description: Invoice Reason. Example negotiation-recupera, negotiation-5A, agreement ...
+  debtor_type:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_quintoandar.aux_date.month_start
+    description: "Debtor type: Flow or Stock"
+    categories:
+      Flow: customers that are new in the Portfolio. The day the flow contracts enters the portfolio is the first day of the overdue (i.e first business day after the due date).
+      Stock: customers that were already in the portfolio in the last month. Important to notice that the cut off date to this reference is the first day of the month.
+  due_amount:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+    description: Invoice due amount
+  paid_amount:
+    lineage:
+      - datalake_retsuko.invoice.paid_amount
+    description: Invoice paid amount
+  recovered_amount:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+    description: Amount recovered between reference month start and reference date
+  contract_overdue_invoices:
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: Total number of overdue invoices in a contract on the reference date
+  contract_debt:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+    description: The total debt of a contract on the reference date. It is the sum of all overdue invoices due amount (i.e those that have already expired and have not been paid by the reference date)
+  delay_invoice_at_reference:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+    description: Delay invoice at reference
+  delay_invoice_at_closure:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice.ts_paid
+    description: Delay invoice at closure
+  delay_contamined_at_closure:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_quintoandar.aux_date.month_start
+    description: Delay contamined at closure
+  delay_contamined_range:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_quintoandar.aux_date.month_start
+    description: Delay contamined range. We calculate it based on the contract and not the invoice
+  business_day:
+    lineage:
+      - datalake_quintoandar.aux_date.working_days_in_month
+    description: Number of business day on reference months
+  is_last_business_days:
+    lineage:
+      - datalake_quintoandar.aux_date.working_days_in_month
+    description: Boolean to inform whether it is the most recent date among days with the same business day, same invoice and month. It deduplicates the calculations per business day.
+  dt_contract_due_date_min:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+    description: The minimum due date among all invoices in a contract
+  dt_contract_annulled:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_termination
+    description: Contract annulled date
+  dt_invoice_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+    description: Invoice due date
+  dt_invoice_due_adjust:
+    lineage:
+      - datalake_retsuko.invoice.dt_due_adjusted
+    description: Invoice due date adjust for next business day
+  dt_invoice_paid:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+    description: Invoice paid date
+  dt_month_start:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+    description: The first day of the month of reference date
+  dt_month_end:
+    lineage:
+      - datalake_quintoandar.aux_date.month_end
+    description: The last day of the month of reference date
+  dt_reference:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: Invoice timeline reference date

@@ -1,0 +1,69 @@
+---
+database_name: datalake_debt_recovery_homolog
+table_name: installment
+owner: athos.sampayo@quintoandar.com.br
+domain: fintech
+description: "Enrich table focused on Installment context for Debt Recovery"
+columns:
+  id:
+    description: "Installment unique ID"
+    lineage:
+      - datalake_trato_feito_clean.installment.id
+  id_external:
+    description: "External ID"
+    lineage:
+      - datalake_trato_feito_clean.installment.id_external
+  id_negotiation:
+    description: "Negotiation unique ID"
+    lineage:
+      - datalake_trato_feito_clean.installment.id_negotiation
+  status:
+    description: "Status of the installment"
+    lineage:
+      - datalake_trato_feito_clean.installment.status
+  adm_fee_amount:
+    description: "Amount charged of Administration Fee"
+    lineage:
+      - datalake_trato_feito_clean.installment.adm_fee_amount
+  installment_fee_amount:
+    description: "Installment Fee"
+    lineage:
+      - datalake_trato_feito_clean.installment.installment_fee_amount
+  debts_fee_amount:
+    description: "Debts Fee"
+    lineage:
+      - datalake_trato_feito_clean.installment.debts_fee_amount
+  discount_amount:
+    description: "Discount Amount"
+    lineage:
+      - datalake_trato_feito_clean.installment.discount_amount
+  total_amount:
+    description: "Total Amount"
+    lineage:
+      - datalake_trato_feito_clean.installment.total_amount
+  payment_type:
+    description: "How the payment was made"
+    lineage:
+      - datalake_trato_feito_clean.payment.type
+  dt_due:
+    description: "Date Due"
+    lineage:
+      - datalake_trato_feito_clean.installment.dt_due
+  ts_paid_difference:
+    description: "Difference in days between payment date and due date"
+  ts_expired:
+    description: "Timestamp of expiration"
+    lineage:
+      - datalake_trato_feito_clean.installment.ts_expired
+  ts_created:
+    description: "Timestamp of creation"
+    lineage:
+      - datalake_trato_feito_clean.installment.ts_created
+  ts_updated:
+    description: "Timestamp of last update"
+    lineage:
+      - datalake_trato_feito_clean.installment.ts_updated
+  ts_paid:
+    description: "Timestamp of the payment"
+    lineage:
+      - datalake_trato_feito_clean.payment.ts_updated

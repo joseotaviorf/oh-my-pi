@@ -1,0 +1,99 @@
+---
+database_name: datalake_recupera_homolog
+table_name: installment
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table represents the Recupera report called MISACO. It contains information about the installment of a negotiation. This table is overwritten every day with the most recent data"
+columns:
+  id_negotiation:
+    description: Negotiation ID. Original field name = id_acordo
+    lineage:
+      - datalake_recupera_clean.installment.id_installment
+  id_contract:
+    description: Contract ID. Original field name = contrato
+    lineage:
+      - datalake_recupera_clean.installment_detail.id_contract
+  id_operator:
+    description: Operator ID. Original field name = cod_opera
+    lineage:
+      - datalake_recupera_clean.installment.id_operator
+  customer_document:
+    description: Customer Document (CPF). Original field name = doc_cliente
+    lineage:
+      - datalake_recupera_clean.installment.id_customer
+  id_first_installment_paid:
+    description: ID of the first installment paid. Original field name = id_0_paga
+    lineage:
+      - datalake_recupera_clean.installment.id_installment
+  id_paid_customer_document:
+    description: The customer document who paid the installment. Original field name = doc_cli_pago
+    lineage:
+      - datalake_recupera_clean.installment.id_customer
+  creditor:
+    description: Creditor - QuintoAndar, Velo or PP. Original field name = un
+    lineage:
+      - datalake_recupera_clean.installment.id_creditor
+  contract_status:
+    description: Contract Status. Original field name = status_contrato
+    lineage:
+      - datalake_recupera_clean.indicator_contracts.indicator_content
+  installment_status:
+    description: Installment Status. Original field name = status_parcela
+    lineage:
+      - datalake_recupera_clean.installment.installment_situation
+  negotiation_status:
+    description: Negotiation Status. Original field name = status_acordo
+    lineage:
+      - datalake_recupera_clean.installment.installment_situation
+  number_of_installments:
+    description: Number of installments. It starts at 0. Original field name = qt_parcela
+    lineage:
+      - datalake_recupera_clean.installment.installments_amount
+  adjusted_number_of_installments:
+    description: Adjusted number of installments. It starts at 1. Original field name = qt_parcela_ajust
+    lineage:
+      - datalake_recupera_clean.installment.installments_amount
+  installment_number:
+    description: The number of the installment. Original field name = nr_parcela
+    lineage:
+      - datalake_recupera_clean.installment.installment_number
+  delay_days:
+    description: Delay days of the negotiation. Original field name = atraso_acordo
+    lineage:
+      - datalake_recupera_clean.installment.dt_installment
+      - datalake_recupera_clean.creditor_pending.dt_due
+  main_amount:
+    description: Installment Main amount. Original field name = saldo_principal
+    lineage:
+      - datalake_recupera_clean.installment.main_amount
+  updated_balance:
+    description: Installment Updated Balance (saldo). Original field name = saldo_atualizado
+    lineage:
+      - datalake_recupera_clean.installment.transfer_amount
+  paid_amount:
+    description: Installment Paid Amount. Original field name = vl_pago
+    lineage:
+      - datalake_recupera_clean.detail_movement.paid_amount
+  charges:
+    description: Installment Charges (fees). Original field name = encargos
+    lineage:
+      - datalake_recupera_clean.installment.transfer_amount
+      - datalake_recupera_clean.installment.main_amount
+  dt_formalization:
+    description: Installment creation date. Original field name = dt_formalizacao
+    lineage:
+      - datalake_recupera_clean.installment.dt_installment
+  dt_due:
+    description: Installment due date. Original field name = dt_vencimento
+    lineage:
+      - datalake_recupera_clean.installment.dt_due
+  dt_paid:
+    description: Installment Payment Date. Original field name = dt_pagamento
+    lineage:
+      - datalake_recupera_clean.detail_movement.dt_paid
+  dt_canceled:
+    description: Installment cancellation date. Original field name = dt_cancelamento
+    lineage:
+      - datalake_recupera_clean.installment_canceled.ts_canceled_installment
+  dt_base:
+    description: Base date. It will be CURRENT DATE - 1 day. Original field name = dt_base

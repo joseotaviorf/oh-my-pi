@@ -1,0 +1,14 @@
+---
+dag:
+  name: enrich_debt_recovery_homolog
+  schedule_start_date: 2022, 3, 1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Enrich pipe for Debt Recovery data from TratoFeito, the service that handles debts
+      and redirects to and receive feedback from `Recupera` third party service.
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_13_3_med_general_cluster

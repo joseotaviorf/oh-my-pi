@@ -1,0 +1,192 @@
+---
+database_name: datalake_fintech_snapshot_homolog
+table_name: invoice_all
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "datalake_accounting_funnel.invoice_all monthly snapshot. Snapshots are taken the day after the first business day from the month."
+columns:
+  id_entry:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice_entry
+    description: "Invoice entry (credit or debit) registered in an invoice"
+  sk_invoice_reversed_entry:
+    lineage:
+      - dw_payment.dim_invoice_entry.sk_invoice_reversed_entry
+    description: "When an entry is created to cancel another entry, this field is filled with the Id of the canceled one"
+  id_invoice:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice
+    description: "Invoice registered in SeuBarriga"
+  sk_contract:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_contract
+    description: "Contract related to an invoice"
+  version:
+    lineage:
+      - dw_rent.dim_contract.version
+    description: "Contract version"
+  is_contract_b2b:
+    lineage:
+      - dw_rent.dim_contract.version
+    description: "Flag indicating if the contract is shared with partners"
+  locale:
+    lineage:
+      - dw_public.dim_region.city_name
+    description: "City name"
+  localidade:
+    lineage:
+      - datalake_gsheets_clean.cod_locale.id_locale
+    description: "City ID"
+  guarantee:
+    lineage:
+      - dw_rent.dim_contract.guarantee
+    description: "Type/Insurer hired"
+  rental_administrator:
+    lineage:
+      - dw_rent.dim_contract.rental_administrator
+    description: "Type of administration of the property"
+  contract_status:
+    lineage:
+      - dw_rent.dim_contract.status
+      - dw_rent.dim_contract.ts_expected_termination
+    description: "Contract status description"
+  is_rental_paid_in_advance:
+    lineage:
+      - dw_payment.dim_invoice_entry.is_rental_paid_in_advance
+    description: "Some versions of contracts have variation in the payment method (aka mora/paga, paga/mora)"
+  bill_item:
+    lineage:
+      - dw_payment.dim_invoice_entry.entry_type
+    description: "Bill item"
+  description:
+    lineage:
+      - dw_payment.dim_invoice_entry.description
+    description: "Invoice entry title as shown in invoice"
+  has_negotiation:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.has_negotiation
+    description: "Flag indicating if the register has any negociation"
+  has_installments:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.has_installments
+    description: "Flag indicating if the register has installments"
+  purpose:
+    lineage:
+      - dw_payment.dim_invoice.frequency
+    description: "Invoice frequency type to be sent, such as monthly, extra or pos"
+  invoice_account_type:
+    lineage:
+      - dw_payment.dim_invoice.user
+    description: "Description of invoice account type"
+  from_account_type:
+    lineage:
+      - dw_payment.dim_invoice_entry.from_account_type
+    description: "From account type in the invoice entry (contract or stakeholder)"
+  to_account_type:
+    lineage:
+      - dw_payment.dim_invoice_entry.to_account_type
+    description: "To account type in the invoice entry  (contract or stakeholder)"
+  producer:
+    lineage:
+      - dw_payment.dim_invoice_entry.producer
+    description: "Rotine that produces the entry"
+  account_type:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.account_type
+    description: "Description of account type"
+  account_classification:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.account_classification
+    description: "Description of account classification"
+  status:
+    lineage:
+      - dw_payment.dim_invoice.payment_status
+    description: "Description of payment status"
+  closing_mode:
+    lineage:
+      - dw_payment.dim_invoice.closing_mode
+    description: "Description that shows if closing is automatic or manual"
+  paid_via:
+    lineage:
+      - dw_payment.dim_invoice.paid_via
+    description: "Description of how the invoice was paid"
+  due_amount:
+    lineage:
+      - dw_payment.fact_invoice_entries.brl_entry_due_amount
+    description: "Invoice entry due value, considering debit or credit related to the contract cash flow"
+  invoice_due_amount:
+    lineage:
+      - dw_payment.fact_invoice_entries.due_amount
+    description: "Invoice due value, considering debit or credit related to the contract cash flow"
+  accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice.accrual_year_month
+    description: "Expense reference month"
+  invoice_accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice.accrual_year_month
+    description: "Invoice expense reference month"
+  entry_accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice_entry.accrual_year_month
+    description: "Entry expense reference month"
+  entry_creation_accrual_year_month:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.accrual_year_month
+    description: "Entry creation expense reference month"
+  entry_created_date:
+    lineage:
+      - dw_public.dim_date.date
+    description: "Entry creation date"
+  invoice_created_date:
+    lineage:
+      - dw_payment.dim_invoice.ts_created
+    description: "Invoice creation date"
+  invoice_due_date:
+    lineage:
+      - dw_payment.dim_invoice.dt_due
+    description: "Invoice due date"
+  invoice_sent_date:
+    lineage:
+      - dw_payment.dim_invoice.dt_sent
+    description: "Date when the invoice was sent"
+  invoice_paid_date:
+    lineage:
+      - dw_payment.dim_invoice.dt_paid
+    description: "Date when the invoice was paid"
+  invoice_canceled_date:
+    lineage:
+      - dw_payment.dim_invoice.ts_canceled
+    description: "Date when the invoice was canceled"
+  invoice_paid_date_next_business_day:
+    lineage:
+      - dw_public.dim_date.date
+    description: "First business day after the invoice payment"
+  contract_start:
+    lineage:
+      - dw_rent.dim_contract.dt_start
+    description: "Begining of contract date"
+  contract_annulment:
+    lineage:
+      - dw_rent.dim_contract.dt_annulment
+    description: "Annulment of contract date"
+  ended_before_started:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.ended_before_started
+    description: "Flag indicating if the contract has suffered annulment before started"
+  ts_snapshot:
+    lineage:
+      - datalake_accounting_funnel.accounts_payable.ts_load
+    description: "Timestamp when the data was loaded"
+  year:
+    lineage:
+      - datalake_accounting_funnel.accounts_payable.ts_load
+    description: "Year when the data was loaded"
+  month:
+    lineage:
+      - datalake_accounting_funnel.accounts_payable.ts_load
+    description: "Month when the data was loaded"
+  day:
+    lineage:
+      - datalake_accounting_funnel.accounts_payable.ts_load
+    description: "Day when the data was loaded"

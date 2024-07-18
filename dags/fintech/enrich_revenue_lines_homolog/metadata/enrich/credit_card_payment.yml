@@ -1,0 +1,63 @@
+database_name: datalake_revenue_lines_homolog
+table_name: credit_card_payment
+description: "This For Rent addon opportunizes our clients to pay using credit card - CCP"
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  id_ccp:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.id
+    description: "Id of credit card payment transaction"
+  id_contract_ebdb:
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+    description: "Id of the contract in main"
+  status:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.status
+    description: "Status of the credit card payment"
+  brand_name:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.brand_name
+    description: "Credit card brand"
+  type_paid:
+    description: "Payment type choose, sight or installments"
+    categories:
+      installments: ""
+      sight: ""
+  installments:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.installments
+    description: "Number of installments that the rental value was divided"
+  invoice_theorical_amount:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+    description: "Invoice total amount"
+  invoice_paid_amount:
+    lineage:
+      - datalake_retsuko.invoice.paid_amount
+    description: "Invoice total amount paid"
+  invoice_paid_fee:
+    description: "Fee from CCP transaction paid"
+  acquirer_cost:
+    description: "Fee/cost value that is shared with the acquirer"
+  advance_cost:
+    description:
+      "Fee/cost value that is shared with the acquirer when there's an anticipate
+      recievement"
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+    description: Reference year-month
+  dt_ccp_created:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.ts_created
+    description: "Date of rental payment opted to be via credit card"
+  dt_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+    description: Invoice's due date
+  dt_paid:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+    description: Date when it was paid by a credit card

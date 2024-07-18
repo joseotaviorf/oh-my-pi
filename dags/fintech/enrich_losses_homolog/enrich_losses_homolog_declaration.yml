@@ -1,0 +1,21 @@
+---
+dag:
+  name: enrich_losses_homolog
+  schedule_start_date: 2020, 7, 1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for the `Losses` context, which aims to analyze NPV for Rental Contracts, initially.
+      This Dag has a table from the DW as a dependency!
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    closing:
+      - bill_items
+    delay:
+      - closing
+    provision:
+      - delay
+cluster:
+  type: databricks_13_3_med_general_photon_cluster
