@@ -5,7 +5,7 @@ SELECT
   COUNT(fnd.sk_nps_answer) AS total_answers,
   COUNT(IF(fnd.score < 7, fnd.sk_nps_answer, NULL)) AS detractors,
   COUNT(IF(fnd.score > 8, fnd.sk_nps_answer, NULL)) AS promoters,
-  COUNT(IF(fnd.score between 7 and 8, fnd.sk_nps_answer, NULL)) AS neutrals,
+  COUNT(IF(fnd.score BETWEEN 7 AND 8, fnd.sk_nps_answer, NULL)) AS neutrals,
   100 * (COUNT(IF(fnd.score > 8, sk_nps_answer, NULL)) - COUNT(IF(fnd.score < 7, sk_nps_answer, NULL))) / COUNT(sk_nps_answer) AS nps
 FROM
   dw_tracksale.fact_nps_dispatches AS fnd
@@ -22,8 +22,7 @@ WHERE
   dd_answer.year >= 2022
   AND fnd.sk_nps_answer > 0
   AND dnc.business_context = 'forRent'
-  AND dnc.metric_group = 'iqoffboarding'
-  AND dnc.customer_type = 'IQ'
+  AND dnc.metric_group IN ('iqoffboarding', 'ppoffboarding')
 GROUP BY
   1, 2, 3
 
@@ -36,7 +35,7 @@ SELECT
   COUNT(fnd.sk_nps_answer) AS total_answers,
   COUNT(IF(fnd.score < 7, fnd.sk_nps_answer, NULL)) AS detractors,
   COUNT(IF(fnd.score > 8, fnd.sk_nps_answer, NULL)) AS promoters,
-  COUNT(IF(fnd.score between 7 and 8, fnd.sk_nps_answer, NULL)) AS neutrals,
+  COUNT(IF(fnd.score BETWEEN 7 AND 8, fnd.sk_nps_answer, NULL)) AS neutrals,
   100 * (COUNT(IF(fnd.score > 8, sk_nps_answer, NULL)) - COUNT(IF(fnd.score < 7, sk_nps_answer, NULL))) / COUNT(sk_nps_answer) AS nps
 FROM
   dw_tracksale.fact_nps_dispatches AS fnd
@@ -53,7 +52,6 @@ WHERE
   dd_answer.year >= 2022
   AND fnd.sk_nps_answer > 0
   AND dnc.business_context = 'forRent'
-  AND dnc.metric_group = 'iqoffboarding'
-  AND dnc.customer_type = 'IQ'
+  AND dnc.metric_group IN ('iqoffboarding', 'ppoffboarding')
 GROUP BY
   1, 2, 3

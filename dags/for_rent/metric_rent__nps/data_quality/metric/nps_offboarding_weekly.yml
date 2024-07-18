@@ -1,0 +1,7 @@
+---
+table_name: metric_rent.nps_offboarding_weekly
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  dt_week_answered:
+    is_complete:
+      severity_level: Error

@@ -12,7 +12,7 @@ FROM
 JOIN
   dw_tracksale.dim_nps_campaign AS dnc
     ON fnd.sk_nps_campaign = dnc.sk_nps_campaign
-LEFT JOIN
+JOIN
   dw_rent.dim_contract AS dc
     ON fnd.sk_contract = dc.sk_contract
 JOIN
@@ -43,7 +43,7 @@ FROM
 JOIN
   dw_tracksale.dim_nps_campaign AS dnc
     ON fnd.sk_nps_campaign = dnc.sk_nps_campaign
-LEFT JOIN
+JOIN
   dw_rent.dim_contract AS dc
     ON fnd.sk_contract = dc.sk_contract
 JOIN

@@ -3257,6 +3257,9 @@ bietlejuice.metric_rent__listings:
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
 bietlejuice.metric_rent__nps:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_retention:load-dw-retention-dim-nps-answer
+  - bietlejuice.dw_retention:load-dw-retention-fact-contract-termination
+  - bietlejuice.dw_retention:load-dw-retention-fact-nps
   - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-campaign
   - bietlejuice.dw_tracksale:load-dw-tracksale-fact-nps-dispatches
 bietlejuice.metric_rent__retention:
@@ -3275,10 +3278,8 @@ bietlejuice.metric_rent__retention:
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-rent-flows
-  - bietlejuice.dw_retention:load-dw-retention-dim-nps-answer
   - bietlejuice.dw_retention:load-dw-retention-dim-termination
   - bietlejuice.dw_retention:load-dw-retention-fact-contract-termination
-  - bietlejuice.dw_retention:load-dw-retention-fact-nps
   - bietlejuice.dw_retention:load-dw-retention-fact-owner-retention
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
