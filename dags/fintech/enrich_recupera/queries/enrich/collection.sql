@@ -55,9 +55,7 @@ extract_contract AS (
     LEFT JOIN historical_code_description AS h
         ON hr.historical_code = h.id_historical
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(hr.year, hr.month, hr.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
 ),
 get_last_contract AS (

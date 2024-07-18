@@ -3,8 +3,7 @@ database_name: datalake_revenue_lines
 table_name: brokerage_finance
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description:
-  "This For Rent addon makes it possible to our clients to split brokeragefee - BFI"
+description: "This For Rent addon makes it possible to our clients to split brokeragefee - BFI"
 columns:
   id_bfi:
     description: "BFI ID"

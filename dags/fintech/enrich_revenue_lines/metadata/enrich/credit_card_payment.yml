@@ -31,11 +31,11 @@ columns:
     description: "Number of installments that the rental value was divided"
   invoice_theorical_amount:
     lineage:
-    - datalake_retsuko.invoice.due_amount
+      - datalake_retsuko.invoice.due_amount
     description: "Invoice total amount"
   invoice_paid_amount:
     lineage:
-    - datalake_retsuko.invoice.paid_amount
+      - datalake_retsuko.invoice.paid_amount
     description: "Invoice total amount paid"
   invoice_paid_fee:
     description: "Fee from CCP transaction paid"
@@ -47,7 +47,7 @@ columns:
       recievement"
   accrual_year_month:
     lineage:
-    - datalake_retsuko.invoice.accrual_year_month
+      - datalake_retsuko.invoice.accrual_year_month
     description: Reference year-month
   dt_ccp_created:
     lineage:
@@ -55,9 +55,9 @@ columns:
     description: "Date of rental payment opted to be via credit card"
   dt_due:
     lineage:
-    - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice.ts_due
     description: Invoice's due date
   dt_paid:
     lineage:
-    - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice.ts_paid
     description: Date when it was paid by a credit card

@@ -1,7 +1,8 @@
 ---
 database_name: datalake_revenue_lines
 table_name: long_term_rental_anticipation
-description: This For Rent addon makes it possible to our client (PP) to anticipate more than one rent - LRA.
+description:
+  This For Rent addon makes it possible to our client (PP) to anticipate more than one rent - LRA.
   In this table we have Fastforward and MOVA (gsheet) source.
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
@@ -19,7 +20,7 @@ columns:
     categories:
       A VENCER: The charge is close to due date.
       ATRASADA: The invoice wasn't paid.
-      EM APURAÇÃO: Who didn't paid and can have some divergence in conciliation or any of that. 
+      EM APURAÇÃO: Who didn't paid and can have some divergence in conciliation or any of that.
       EM FORMALIZAÇÃO: Who has a debt and is formalizing an agreement.
       INADIMPLENTE: Who didn't already paid, but there's no acting on it.
       PAGA: The charge was paid.
@@ -41,7 +42,8 @@ columns:
       - datalake_gsheets_clean.mova_lra_owners.main_value
     description: Rent value of the house from Main (EBDB).
   nbr_transactions_signed:
-    description: Number of times that the same PP asked for a anticipation (LRA).
+    description:
+      Number of times that the same PP asked for a anticipation (LRA).
       In theory there could only be one, but in practice it happens differently.
   prod_theorical_amount:
     lineage:

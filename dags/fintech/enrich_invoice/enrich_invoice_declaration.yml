@@ -1,6 +1,6 @@
 ---
 dag:
-  name: enrich_invoice_homolog
+  name: enrich_invoice
   schedule_start_date: 2021, 1, 4
   owner: Data Fintech
   documentation:

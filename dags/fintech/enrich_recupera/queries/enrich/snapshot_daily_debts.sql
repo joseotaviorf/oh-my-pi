@@ -17,9 +17,9 @@ operational_records AS (
     distributor_code,
     collesction_customer_situation
   FROM datalake_recupera_clean.operational_records
-  WHERE year = {year}
-    AND month = {month}
-    AND day = {day}
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
 ),
 collection_base AS (
     SELECT

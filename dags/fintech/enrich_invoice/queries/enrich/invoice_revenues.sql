@@ -5,7 +5,7 @@ rental_brokerage_fee_5A AS (
           SELECT
               *,
               ROW_NUMBER() OVER (PARTITION BY  id_contract, accrual_year_month ORDER BY accrual_year_month) AS seqnum
-          FROM 
+          FROM
               datalake_invoice.invoice_all
           WHERE
               bill_item IN ('brokerage quinto andar')
@@ -19,7 +19,7 @@ rental_brokerage_fee_5A AS (
 		credit_discount AS (
 			SELECT
 				id_invoice_entry
-			FROM 
+			FROM
 				invoice_list
 			WHERE
 				seqnum = 1
@@ -37,14 +37,14 @@ rental_brokerage_fee_5A AS (
 		),
 
 		discount AS (
-			SELECT 
+			SELECT
 				dc.id_invoice_entry
-			FROM 
+			FROM
 				credit_discount AS dc
 			UNION ALL
-			SELECT 
+			SELECT
 				dp.id_invoice_entry
-			FROM 
+			FROM
 				installment_discount AS dp
 		)
 
@@ -67,7 +67,7 @@ rental_agents_commission AS (
 			*,
 			ROW_NUMBER() OVER (PARTITION BY  id_contract, accrual_year_month ORDER BY accrual_year_month) AS seqnum
 		FROM datalake_invoice.invoice_all
-		WHERE 
+		WHERE
 			bill_item IN ('brokerage estate agent')
 			AND (
 			(description LIKE '%Credito%')
@@ -79,7 +79,7 @@ rental_agents_commission AS (
 	credit_discount AS (
 		SELECT
 			id_invoice_entry
-		FROM 
+		FROM
 			invoice_list
 		WHERE
 			seqnum = 1
@@ -90,32 +90,32 @@ rental_agents_commission AS (
 			id_invoice_entry
 		FROM
 			datalake_invoice.invoice_all
-		WHERE 
+		WHERE
 			bill_item IN ('brokerage estate agent')
 			AND description LIKE '%parcela%'
 			AND description NOT LIKE '%parcela% 1 de 1'
 	),
 
 	discount AS (
-		SELECT 
+		SELECT
 			dc.id_invoice_entry
-		FROM 
+		FROM
 			credit_discount AS dc
 		UNION ALL
-		SELECT 
+		SELECT
 			dp.id_invoice_entry
-		FROM 
+		FROM
 			installment_discount AS dp
 	)
-	
+
 	SELECT
 		ia.id_invoice_entry,
 		cast('rental_agents_commission' as STRING) AS rental_agents_commission
 	FROM datalake_invoice.invoice_all AS ia
-	LEFT JOIN 
+	LEFT JOIN
 		discount AS d
 			ON ia.id_invoice_entry = d.id_invoice_entry
-	WHERE 
+	WHERE
 		ia.bill_item IN ('brokerage estate agent')
 		AND d.id_invoice_entry IS NULL
 
@@ -127,7 +127,7 @@ partner_revenue_share_brokerage AS (
       SELECT
           *,
           ROW_NUMBER() OVER (PARTITION BY  id_contract, accrual_year_month ORDER BY accrual_year_month) AS seqnum
-      FROM 
+      FROM
           datalake_invoice.invoice_all
       WHERE
           bill_item IN ('brokerage adm partner')
@@ -143,7 +143,7 @@ partner_revenue_share_brokerage AS (
 	credit_discount AS (
 	    SELECT
 	    	id_invoice_entry
-	    FROM 
+	    FROM
 			invoice_list
 	    WHERE
 	    	seqnum = 1
@@ -162,23 +162,23 @@ partner_revenue_share_brokerage AS (
 	),
 
 	discount AS (
-    	SELECT 
+    	SELECT
 			dc.id_invoice_entry
-		FROM 
+		FROM
 			credit_discount AS dc
 		UNION ALL
-		SELECT 
+		SELECT
 			dp.id_invoice_entry
-		FROM 
+		FROM
 			installment_discount AS dp
 	)
-    
+
     SELECT
         ia.id_invoice_entry,
         CAST('partner_revenue_share_brokerage' as STRING) AS partner_revenue_share_brokerage
-    FROM 
+    FROM
         datalake_invoice.invoice_all AS ia
-    LEFT JOIN 
+    LEFT JOIN
         discount AS d
             ON ia.id_invoice_entry = d.id_invoice_entry
     WHERE
@@ -194,7 +194,7 @@ rental_CIQ_commission AS (
           SELECT
               *,
               ROW_NUMBER() OVER (PARTITION BY  id_contract, accrual_year_month ORDER BY accrual_year_month) AS seqnum
-          FROM 
+          FROM
               datalake_invoice.invoice_all
           WHERE
               bill_item IN ('brokerage adm partner')
@@ -209,7 +209,7 @@ rental_CIQ_commission AS (
 		credit_discount AS (
 			SELECT
 				id_invoice_entry
-			FROM 
+			FROM
 				invoice_list
 			WHERE
 				seqnum = 1
@@ -228,23 +228,23 @@ rental_CIQ_commission AS (
 		),
 
 		discount AS (
-			SELECT 
+			SELECT
 				dc.id_invoice_entry
-			FROM 
+			FROM
 				credit_discount AS dc
 			UNION ALL
-			SELECT 
+			SELECT
 				dp.id_invoice_entry
-			FROM 
+			FROM
 				installment_discount AS dp
 		)
-		
+
         SELECT
             ia.id_invoice_entry,
             CAST('rental_CIQ_commission' AS STRING) AS rental_CIQ_commission
-        FROM 
+        FROM
             datalake_invoice.invoice_all AS ia
-        LEFT JOIN 
+        LEFT JOIN
             discount AS d
                 ON ia.id_invoice_entry = d.id_invoice_entry
         WHERE
@@ -258,7 +258,7 @@ rental_management_fee_5A AS (
 	SELECT
 		id_invoice_entry,
 		CAST('rental_management_fee_5A' AS STRING) AS rental_management_fee_5A
-	FROM 
+	FROM
 		datalake_invoice.invoice_all
     WHERE
         bill_item IN ('adm fee', 'igpm adm fee', 'lockin', 'ipca adm fee', 'adjustment agreement adm fee')
@@ -268,7 +268,7 @@ partner_revenue_share_management AS (
 	SELECT
 		id_invoice_entry,
 		CAST('partner_revenue_share_management' AS STRING) AS partner_revenue_share_management
-	FROM 
+	FROM
 		datalake_invoice.invoice_all
     WHERE
         bill_item IN ('adm fee adm partner', 'igpm adm partner adm fee', 'adjustment agreement adm partner adm fee')
@@ -278,7 +278,7 @@ brokerage_financing_fee AS (
 	SELECT
 		id_invoice_entry,
 		CAST('brokerage_financing_fee' AS STRING) AS brokerage_financing_fee
-	FROM 
+	FROM
 		datalake_invoice.invoice_all
     WHERE
         bill_item IN ('brokerage installment fee')
@@ -288,26 +288,26 @@ brokerage_financing_fee AS (
 SELECT
 	ia.id_invoice_entry,
 	COALESCE(rbf.rental_brokerage_fee_5a, rac.rental_agents_commission, prsb.partner_revenue_share_brokerage, rc.rental_ciq_commission, rmf.rental_management_fee_5a, prsm.partner_revenue_share_management, bff.brokerage_financing_fee) AS invoice_entry_revenue
-FROM 
+FROM
 	datalake_invoice.invoice_all AS ia
-	LEFT JOIN 
+	LEFT JOIN
 		rental_brokerage_fee_5A AS rbf
 			ON ia.id_invoice_entry = rbf.id_invoice_entry
-	LEFT JOIN 
+	LEFT JOIN
 		rental_agents_commission AS rac
 			ON ia.id_invoice_entry = rac.id_invoice_entry
-	LEFT JOIN 
+	LEFT JOIN
 		partner_revenue_share_brokerage AS prsb
 			ON ia.id_invoice_entry = prsb.id_invoice_entry
-	LEFT JOIN 
+	LEFT JOIN
 		rental_CIQ_commission AS rc
 			ON ia.id_invoice_entry = rc.id_invoice_entry
-	LEFT JOIN 
+	LEFT JOIN
 		rental_management_fee_5A AS rmf
 			ON ia.id_invoice_entry = rmf.id_invoice_entry
-	LEFT JOIN 
+	LEFT JOIN
 		partner_revenue_share_management AS prsm
 			ON ia.id_invoice_entry = prsm.id_invoice_entry
-	LEFT JOIN 
+	LEFT JOIN
 		brokerage_financing_fee AS bff
 			ON ia.id_invoice_entry = bff.id_invoice_entry

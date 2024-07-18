@@ -1,6 +1,6 @@
 ---
 dag:
-  name: enrich_debt_recovery_homolog
+  name: enrich_debt_recovery
   schedule_start_date: 2022, 3, 1
   owner: Data Fintech
   documentation:

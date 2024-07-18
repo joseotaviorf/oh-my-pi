@@ -175,6 +175,7 @@ operational_records AS (
     collesction_customer_situation
   FROM datalake_recupera_clean.operational_records
   WHERE
+    -- Filter the most recent records from operational_records since this table is a stack snapshot
     year = {year}
     AND month = {month}
     AND day = {day}

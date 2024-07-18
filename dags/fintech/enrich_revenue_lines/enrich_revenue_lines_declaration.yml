@@ -1,6 +1,6 @@
 ---
 dag:
-  name: enrich_revenue_lines_homolog
+  name: enrich_revenue_lines
   schedule_start_date: 2022, 3, 1
   owner: Data Fintech
   documentation:

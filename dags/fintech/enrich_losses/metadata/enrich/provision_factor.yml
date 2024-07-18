@@ -6,18 +6,18 @@ owner: felipe.chies@quintoandar.com.br
 domain: fintech
 columns:
   sk_factor_risk:
-    description: Id of the factor risk. 
+    description: Id of the factor risk.
   sk_provision_rule:
-    description: Id of the provision rule. 
+    description: Id of the provision rule.
   pd_range:
-    description: Range of the delay. 
+    description: Range of the delay.
   risk_type:
-    description: Type of the risk. 
+    description: Type of the risk.
   provision_factor:
-    description: Provision factor to be applied on the formula. 
+    description: Provision factor to be applied on the formula.
   begin_date_application:
-    description: Related begin date. 
+    description: Related begin date.
   end_date_application:
-    description: Related end date.  
+    description: Related end date.
   provision_name:
-    description: Name of the applied provision. 
+    description: Name of the applied provision.

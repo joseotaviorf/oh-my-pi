@@ -1,6 +1,6 @@
 ---
 dag:
-  name: enrich_recupera_homolog
+  name: enrich_recupera
   schedule_start_date: 2023, 9, 10
   owner: Data Fintech
   documentation:

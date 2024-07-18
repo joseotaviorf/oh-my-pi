@@ -1,6 +1,7 @@
 database_name: datalake_revenue_lines
 table_name: reservation
-description: This is a For Rent addon that make it possible to IQ pay to have a reservation
+description:
+  This is a For Rent addon that make it possible to IQ pay to have a reservation
   of a certain property. This property has all the visits e offers canceled. And also
   we're not filtering the status or cancellation_reason in this table
 domain: Fintech
@@ -8,76 +9,87 @@ owner: ae-fintech@quintoandar.com.br
 columns:
   id_reservation:
     lineage:
-    - datalake_kill_queue.reservation.id_reservation
+      - datalake_kill_queue.reservation.id_reservation
     description: Key of reservation transaction
   id_house_listing:
     lineage:
-    - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_ebdb_listing.house_listing.id_house_listing
     description: Id house listing of the period that the reservation was created
   id_house:
     lineage:
-    - datalake_kill_queue.reservation.id_house
+      - datalake_kill_queue.reservation.id_house
     description: Id house of the reservation
   status:
     lineage:
-    - datalake_kill_queue.reservation.status
-    description: Status of the reservation. If tenant has concluded or cancelled for
+      - datalake_kill_queue.reservation.status
+    description:
+      Status of the reservation. If tenant has concluded or cancelled for
       example
     categories:
       CANCELED: rent flow was interrupted at some point
       CHARGED: credit card info sent to MundiPagg and authorization token was saved
       FAILED: charging failed
-      FINISHED: 'rent flow complete: contract was signed'
+      FINISHED: "rent flow complete: contract was signed"
       RETURNED: value was returned to the customer
       START: reservation has just started, credit card info wasnt filled yet
-      TOKEN_RECEIVED: credit card info sent to MundiPagg and authorization token was
+      TOKEN_RECEIVED:
+        credit card info sent to MundiPagg and authorization token was
         saved
       WAITING_REFUND: waiting for value to be refunded to the customer
   cancellation_reason:
     lineage:
-    - datalake_kill_queue.reservation.cancellation_reason
-    description: Reason why reservation was cancelled if status is equal to 'CANCELED'
+      - datalake_kill_queue.reservation.cancellation_reason
+    description:
+      Reason why reservation was cancelled if status is equal to 'CANCELED'
       or 'FINISHED'
     categories:
-      CONTRACT_CANCELED_WITHOUT_CHARGE_BACK: It happens when the contract is canceled
+      CONTRACT_CANCELED_WITHOUT_CHARGE_BACK:
+        It happens when the contract is canceled
         and the money is not charged back
-      DOCUMENTATION_REJECTED_WITH_CHARGE_BACK: It happens when the documentation is
+      DOCUMENTATION_REJECTED_WITH_CHARGE_BACK:
+        It happens when the documentation is
         rejected and the money is charged back
-      DOCUMENTATION_REJECTED_WITHOUT_CHARGE_BACK: It happens when the documentation
+      DOCUMENTATION_REJECTED_WITHOUT_CHARGE_BACK:
+        It happens when the documentation
         is rejected and the money is not charged back
-      OTHER_WITH_CHARGE_BACK: It happens for some reason and the money is charged
+      OTHER_WITH_CHARGE_BACK:
+        It happens for some reason and the money is charged
         back
-      OTHER_WITHOUT_CHARGE_BACK: It happens for some reason and the money is not charged
+      OTHER_WITHOUT_CHARGE_BACK:
+        It happens for some reason and the money is not charged
         back
-      RENTAL_GUARANTEE_PAID: It happens when the rental guarantee is paid, the money
+      RENTAL_GUARANTEE_PAID:
+        It happens when the rental guarantee is paid, the money
         is charged back
-      TENANT_DECLINED_ON_CREDIT_ANALYSIS: It happens when the tenant is not approved
+      TENANT_DECLINED_ON_CREDIT_ANALYSIS:
+        It happens when the tenant is not approved
         in credit analysis, the money is charged back
-      TENANT_GAVE_UP: It happens when the tenant gives up and the money is not charged
+      TENANT_GAVE_UP:
+        It happens when the tenant gives up and the money is not charged
         back
   total_installments:
     lineage:
-    - datalake_kill_queue.reservation.installments
+      - datalake_kill_queue.reservation.installments
     description: Number of installments that the reserve value was divided
   total_value:
     lineage:
-    - datalake_kill_queue.reservation.value
+      - datalake_kill_queue.reservation.value
     description: Value to be paid by the tenant to confirm that house is reserved
   is_ongoing:
     lineage:
-    - datalake_kill_queue.reservation.is_ongoing
+      - datalake_kill_queue.reservation.is_ongoing
     description: Flag to check if the reservation is ongoing status
   accrual_month:
     lineage:
-    - datalake_quintoandar.aux_date.month_start
+      - datalake_quintoandar.aux_date.month_start
     description: Reference month
   dt_end_payment:
     lineage:
-    - datalake_kill_queue.reservation.ts_created
+      - datalake_kill_queue.reservation.ts_created
     description: Date of the last installment payment
   dt_created:
     lineage:
-    - datalake_kill_queue.reservation.ts_created
+      - datalake_kill_queue.reservation.ts_created
     description: Date of reserve creation
   monthly_value:
     description: Monthly value paid by the tenant
