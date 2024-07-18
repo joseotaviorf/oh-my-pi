@@ -8,7 +8,7 @@ dag:
       Retrieves data from the Quinturk database
 
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: quinturk
@@ -28,4 +28,9 @@ workflow:
       extraction_type: incremental
 
 cluster:
-  type: databricks_10_4_med_general_cluster
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12

@@ -5,9 +5,9 @@ dag:
   owner: Data SS
   documentation:
     dag_purpose: This DAG imports the tables from [Taskmaster](https://github.com/quintoandar/taskmaster)
-    
+
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: taskmaster
@@ -26,5 +26,6 @@ cluster:
     driver_node_type_id: m5a.xlarge
     node_type_id: m5a.xlarge
     num_workers: 3
+    spark_version: 13.3.x-scala2.12
     spark_conf:
       spark.sql.session.timeZone: "America/Sao_Paulo"

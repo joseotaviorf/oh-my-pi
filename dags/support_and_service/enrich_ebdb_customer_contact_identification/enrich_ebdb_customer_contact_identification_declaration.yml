@@ -4,10 +4,15 @@ dag:
     owner: Data SS
     documentation:
         dag_purpose: |
-          Creates enriched tables for the context `Customer Contact Identification`
-          of ebdb adding information like emails and phone numbers for customer.
+            Creates enriched tables for the context `Customer Contact Identification`
+            of ebdb adding information like emails and phone numbers for customer.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
 cluster:
-    type: databricks_10_4_med_general_photon_cluster
+    type: custom_cluster
+    custom_configurations:
+        driver_node_type_id: m5a.xlarge
+        node_type_id: m5a.xlarge
+        num_workers: 3
+        spark_version: 13.3.x-scala2.12
