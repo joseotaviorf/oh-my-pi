@@ -9,112 +9,138 @@ columns:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.id_user
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.id_user
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.id_user
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.id_user
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.id_user
     description: Id of the user who made the offer.
   id_house:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.ep_id_house
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.ep_id_house
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.ep_id_house
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.ep_id_house
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.ep_id_house
     description: Id of the house associated with the offer.
   id_firestore:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.ep_id_firestore
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.ep_id_firestore
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.ep_id_firestore
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.ep_id_firestore
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.ep_id_firestore
     description: Id firestore of the offer.
   country_code:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.user_properties
     description: Country code of the house associated with the event.
   user_country:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.country
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.country
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.country
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.country
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.country
     description: Country code of the user who made the event.
   app_type:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_app_type
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_app_type
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_app_type
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.up_app_type
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.up_app_type
     description: App type/device where the event was made.
   utm_source:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_source
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_utm_source
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_utm_source
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.up_utm_source
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.up_utm_source
     description: Returns utm_source parameter defined at campaing configuration at marketing platforms
   utm_medium:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_medium
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_utm_medium
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_utm_medium
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.up_utm_medium
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.up_utm_medium
     description: Returns utm_medium parameter defined at campaing configuration at marketing platforms
   utm_campaign:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_campaign
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_utm_campaign
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.up_utm_campaign
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.up_utm_campaign
     description: Returns utm_campaign parameter defined at campaing configuration at marketing platforms
   utm_content:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_content
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_utm_content
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_utm_content
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.up_utm_content
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.up_utm_content
     description: Returns utm_content parameter defined at campaing configuration at marketing platforms
   utm_term:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_term
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_utm_term
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_utm_term
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.up_utm_term
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.up_utm_term
     description: Returns utm_term parameter defined at campaing configuration at marketing platforms
   entrance_uri:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_entrance_uri
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_entrance_uri
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_entrance_uri
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.up_entrance_uri
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.up_entrance_uri
     description: The URL of the first page a user visits in a session 
   branded:
-    lineage:
-      - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_utm_campaign
-    description: Describes if the campaign associated to the event is Brandad or not.
+    description: Describes if the campaign associated to the event is Branded or not.
   is_branded:
-    lineage:
-      - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean_staging.170135_offer_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean_staging.183049_offer_submitted_events.up_utm_campaign
-    description: Flag to point if the campaign associated to the event is Brandad or not.
+    description: Boolean flag to point if the campaign associated to the event is Branded or not.
   dt_event:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.dt_event
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.dt_event
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.dt_event
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.dt_event
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.dt_event
     description: Date of the event
   ts_event:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.ts_event
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.ts_event
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.ts_event
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.ts_event
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.ts_event
     description: Timestamp of the event
   year:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.year
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.year
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.year
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.year
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.year
     description: Year of the execution date that updated that row.
   month:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.month
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.month
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.month
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.month
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.month
     description: Month of the execution date that updated that row.
   day:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.day
       - datalake_amplitude_clean_staging.170135_offer_submitted_events.day
       - datalake_amplitude_clean_staging.183049_offer_submitted_events.day
+      - datalake_amplitude_clean_staging.170135_offer_submitted_new_events.day
+      - datalake_amplitude_clean_staging.183049_offer_submitted_new_events.day
     description: Day of the execution date that updated that row.
