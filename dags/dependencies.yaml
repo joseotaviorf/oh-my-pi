@@ -440,6 +440,7 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.gsheets_growth:done-clean-city-share
   - bietlejuice.gsheets_growth:done-clean-local-holidays
   - bietlejuice.gsheets_growth:done-clean-plaquinhas-cover-targets
+  - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-pp-organic
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-cost
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-nbp
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-ncp
@@ -1357,7 +1358,7 @@ bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
 bietlejuice.enrich_credit_evers_homolog:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice
-  - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date 
+  - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
 bietlejuice.enrich_crm:
   - bietlejuice.crm:load-clean-task-status-histories
   - bietlejuice.crm:load-clean-task-titles
@@ -2472,10 +2473,10 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.fastforward:load-clean-lra-installment
   - bietlejuice.fastforward:load-clean-lra-installment-option
   - bietlejuice.gsheets_fintech:done-clean-mova-lra-owners
+  - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
   - bietlejuice.rental_guarantee:load-clean-guarantee-aud
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-credit-card-payment
-  - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-payee

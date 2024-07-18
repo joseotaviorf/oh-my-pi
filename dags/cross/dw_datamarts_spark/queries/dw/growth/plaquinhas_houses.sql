@@ -171,7 +171,7 @@ installs_aux AS (
     0 AS condo_nao_permite_flg,
     "owner" AS tipo_install,
     DATE(p.dt_install) AS dt_install
-  FRO
+  FROM
     datalake_gsheets_clean.plaquinhas_installation_pp_organic AS p
   WHERE
     client_type = "Proprietário"
