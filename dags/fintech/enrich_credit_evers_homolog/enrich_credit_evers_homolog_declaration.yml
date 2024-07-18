@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_credit_evers_homolog
+  schedule_start_date: 2021, 4, 22
+  owner: Data Fintech
+  documentation:
+    dag_purpose: 'The Ever concept determines whether a tenant on 5A is a delinquent or not. A
+                  given contract is considered an EverXMobY if it has at least one invoice overdue
+                  by X days in the first Y months of the contract.
+
+                  This concept is closely related to the concept of an Over invoice. This table
+                  will bring benefits to Credit Analytics Team and Data Products Team, in order
+                  to produce Machine Learning models.'
+workflow:
+  type: query
+  layer: enrich
+cluster:
+  type: databricks_13_3_med_general_cluster

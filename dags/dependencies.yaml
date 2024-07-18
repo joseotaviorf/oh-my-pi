@@ -1355,6 +1355,9 @@ bietlejuice.enrich_credit_analysis:
 bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
+bietlejuice.enrich_credit_evers_homolog:
+  - bietlejuice.enrich_invoice:load-enrich-credit-invoice
+  - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date 
 bietlejuice.enrich_crm:
   - bietlejuice.crm:load-clean-task-status-histories
   - bietlejuice.crm:load-clean-task-titles

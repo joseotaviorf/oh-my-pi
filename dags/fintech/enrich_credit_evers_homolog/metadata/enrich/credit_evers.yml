@@ -1,0 +1,42 @@
+database_name: datalake_credit_evers_homolog
+table_name: credit_evers
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Credit Evers contracts
+columns:
+  id_contract_ebdb:
+    lineage:
+      - datalake_invoice.credit_invoice.id_contract_ebdb
+    description: "External ID of contract, i.e from main"
+  id_contract_retsuko:
+    lineage:
+      - datalake_invoice.credit_invoice.id_contract_retsuko
+    description: "Internal ID of contract, i.e from retsuko"
+  id_proposal:
+    lineage:
+      - datalake_invoice.credit_invoice.id_proposal
+    description: "Proposal ID of contract"
+  months_of_contract:
+    description: "Age of contracts in month, if ended, the total age"
+  contract_mob_number:
+    description: "Auxiliary array for explode the contract by its monthly age classifications"
+  contract_ever_number:
+    description: "Auxiliary array for explode the contract by its delay classification"
+  is_ever:
+    description: "Operation that determines if the delay of invoice is higher than the auxiliary ever classification columns and takes the maximum"
+  num_overs_in_mob_window:
+    description: "Operation that determines how many times the contract had an invoice positively over in delay by age evolution"
+  total_due_amount_in_mob_window:
+    description: "Operation that determines how much money the contract had over in delay by age evolution"
+  num_total_overs:
+    description: "Operation that determines how many times the contract had an invoice positively over in delay to maximum age"
+  total_due_amount:
+    description: "Operation that determines how much money the contract had over in delay by maximum age"
+  ts_signature:
+    lineage:
+      - datalake_invoice.credit_invoice.ts_signature
+    description: "Date that the contract started"
+  dt_contract_updated:
+    lineage:
+      - datalake_invoice.credit_invoice.dt_contract_updated
+    description: "Last date that the contract had informations updated in main"
