@@ -8,10 +8,9 @@ tables:
   - table_name: rede_user_pool
     user_pool_id: us-east-1_YGGKO9kNZ
 custom_cluster:
-  autotermination_minutes: 20
-  driver_node_type_id: r5a.4xlarge
-  node_type_id: r5a.2xlarge
-  num_workers: 3
+  driver_node_type_id: r5a.2xlarge
+  node_type_id: r5a.xlarge
+  num_workers: 2
   spark_version: 12.2.x-scala2.12
   aws_attributes:
     spot_bid_price_percent: 100
