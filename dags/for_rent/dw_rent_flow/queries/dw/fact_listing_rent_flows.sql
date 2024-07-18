@@ -13,19 +13,7 @@ WITH listing_rent_flows AS (
         SELECT
             rent_flow.id_house_rent_flow,
             rent_flow.id_house,
-            COALESCE(
-                CAST(
-                    rent_flow.id_house ||
-                    LPAD(
-                        COALESCE(
-                            CAST(COALESCE(dhl_contract.version, dim_house_listing.version) AS VARCHAR(3)),
-                            '1'
-                        ),
-                        3,
-                        '0')
-                    AS BIGINT),
-                CAST(-1 AS BIGINT)
-            ) AS sk_house_listing,
+            MAX(dim_house_listing.sk_house_listing) OVER (PARTITION BY rent_flow.id_house, rent_flow.id_house_rent_flow) AS sk_house_listing,
             COALESCE(h.id_region, -1) AS sk_region,
             COALESCE(h.id_condo_parent, -1) AS sk_condo,
             COALESCE(rent_flow.id_rent_flow, -1) AS sk_rent_flow,
@@ -154,19 +142,24 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(dim_contract.ts_signature AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_signed,
             COALESCE(CAST(dim_contract.ts_created AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_created,
             CAST(NOW() AS TIMESTAMP) AS ts_load
-        FROM datalake_ebdb_rent_flow.rent_flow
-        JOIN dw_rent.dim_house_listing -- 1:M (M rent_flow x 1 listing)
-            ON dim_house_listing.id_house = rent_flow.id_house
-            AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01') BETWEEN
-                COALESCE(dim_house_listing.ts_listing_version_start, '1900-01-01')
-                AND COALESCE(dim_house_listing.ts_listing_version_end, NOW())
-        LEFT JOIN datalake_ebdb_listing.house h
-            ON dim_house_listing.id_house = h.id
-        LEFT JOIN dw_rent.dim_offer
-            ON dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
-            AND dim_offer.sk_offer != -1
-        LEFT JOIN dw_rent.dim_proposal
-            ON rent_flow.id_proposal = dim_proposal.id_proposal
+        FROM 
+            datalake_ebdb_rent_flow.rent_flow
+        JOIN 
+            dw_rent.dim_house_listing -- 1:M (M rent_flow x 1 listing)
+                ON dim_house_listing.id_house = rent_flow.id_house
+                AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01') BETWEEN
+                    COALESCE(dim_house_listing.ts_listing_version_start, '1900-01-01')
+                    AND COALESCE(dim_house_listing.ts_listing_version_end, NOW())
+        LEFT JOIN 
+            datalake_ebdb_listing.house h
+                ON dim_house_listing.id_house = h.id
+        LEFT JOIN 
+            dw_rent.dim_offer
+                ON dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
+                AND dim_offer.sk_offer != -1
+        LEFT JOIN 
+            dw_rent.dim_proposal
+                ON rent_flow.id_proposal = dim_proposal.id_proposal
         LEFT JOIN
             datalake_ebdb_clean.contract AS con
                 ON con.id_house = rent_flow.id_house
@@ -186,21 +179,24 @@ WITH listing_rent_flows AS (
             dw_rent.dim_house_listing AS dhl_contract
                 ON con.id_house = dhl_contract.id_house
                 AND dim_contract.ts_created BETWEEN COALESCE(dhl_contract.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(dhl_contract.ts_listing_version_end, CURRENT_DATE)
-        LEFT JOIN datalake_ebdb_agents.agents_review ar
-            ON rent_flow.id_booking = ar.id_booking
-        LEFT JOIN reservation
-            ON reservation.max_id = reservation.id_reservation
-            AND rent_flow.id_house = reservation.id_house
-            AND rent_flow.id_client = id_tenant
-            AND dim_offer.status = 'Aprovada'
-            AND reservation.ts_created BETWEEN
-                COALESCE(dim_house_listing.ts_listing_version_start, '1900-01-01')
-                AND COALESCE(dim_house_listing.ts_listing_version_end, NOW())
-            AND reservation.ts_created BETWEEN
-                COALESCE(dim_offer.dt_created, '1900-01-01')
-                AND COALESCE(dim_proposal.ts_processed, dim_proposal.dt_updated)
-        LEFT JOIN dw_public.dim_booking
-            ON dim_booking.sk_booking = rent_flow.id_booking
+        LEFT JOIN 
+            datalake_ebdb_agents.agents_review ar
+                ON rent_flow.id_booking = ar.id_booking
+        LEFT JOIN 
+            reservation
+                ON reservation.max_id = reservation.id_reservation
+                AND rent_flow.id_house = reservation.id_house
+                AND rent_flow.id_client = id_tenant
+                AND dim_offer.status = 'Aprovada'
+                AND reservation.ts_created BETWEEN
+                    COALESCE(dim_house_listing.ts_listing_version_start, '1900-01-01')
+                    AND COALESCE(dim_house_listing.ts_listing_version_end, NOW())
+                AND reservation.ts_created BETWEEN
+                    COALESCE(dim_offer.dt_created, '1900-01-01')
+                    AND COALESCE(dim_proposal.ts_processed, dim_proposal.dt_updated)
+        LEFT JOIN 
+            dw_public.dim_booking
+                ON dim_booking.sk_booking = rent_flow.id_booking
         LEFT JOIN
             datalake_rede_company.company_sks AS cs
                 ON h.is_rent_3p_supply
@@ -216,7 +212,8 @@ WITH listing_rent_flows AS (
                     AND h.id_company_hubspot IS NULL
                     AND h.partner_3p_supply = cs.extracted_3p_tag
                 ))
-        WHERE dim_house_listing.is_for_rent
+        WHERE 
+            dim_house_listing.is_for_rent
             AND (
                 COALESCE(dim_booking.visit_intent, '') <> 'SALE'
                 -- The OR condition is covering cases where the last booking, that resulted ON a contract,
@@ -227,33 +224,33 @@ WITH listing_rent_flows AS (
                     )
                 )
     ),
-  sla_working_minutes AS (
-    SELECT
-      sla.sk_contract AS sk_contract,
-      sla.sk_proposal AS sk_proposal,
-      sla.ca2cc_working_minutes AS ca2cc_working_minutes,
-      sla.ca2cs_working_minutes AS ca2cs_working_minutes,
-      sla.cc2cs_working_minutes AS cc2cs_working_minutes
-    FROM
-      (
+    sla_working_minutes AS (
         SELECT
-          rf.sk_contract,
-          rf.sk_proposal,
-          COALESCE(rf.ts_credit_last_approved, TIMESTAMP '1900-01-01') AS ts_credit_last_approved,
-          COALESCE(rf.ts_contract_created, TIMESTAMP '1900-01-01') AS ts_contract_created,
-          COALESCE(rf.ts_contract_signed, TIMESTAMP '1900-01-01') AS ts_contract_signed,
-          CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_created, TIMESTAMP '1900-01-01')) AS FLOAT) AS ca2cc_working_minutes,
-          CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) ca2cs_working_minutes,
-          CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_contract_created, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) cc2cs_working_minutes
-          -- generic date 1900-01-01 is being used as a workaround for null dates error. Businesstimedelta cant handle null dates.
+            sla.sk_contract,
+            sla.sk_proposal,
+            sla.ca2cc_working_minutes,
+            sla.ca2cs_working_minutes,
+            sla.cc2cs_working_minutes
         FROM
-          rent_flows_base rf
-      ) sla
-    WHERE
-      sla.ts_credit_last_approved <> CAST('1900-01-01' AS TIMESTAMP)
-      AND sla.ts_contract_created <> CAST('1900-01-01' AS TIMESTAMP)
-      AND sla.ts_contract_signed <> CAST('1900-01-01' AS TIMESTAMP)
-  )
+        (
+            SELECT
+                rf.sk_contract,
+                rf.sk_proposal,
+                COALESCE(rf.ts_credit_last_approved, TIMESTAMP '1900-01-01') AS ts_credit_last_approved,
+                COALESCE(rf.ts_contract_created, TIMESTAMP '1900-01-01') AS ts_contract_created,
+                COALESCE(rf.ts_contract_signed, TIMESTAMP '1900-01-01') AS ts_contract_signed,
+                CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_created, TIMESTAMP '1900-01-01')) AS FLOAT) AS ca2cc_working_minutes,
+                CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) ca2cs_working_minutes,
+                CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_contract_created, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) cc2cs_working_minutes
+                -- generic date 1900-01-01 is being used as a workaround for null dates error. Businesstimedelta cant handle null dates.
+            FROM
+                rent_flows_base rf
+        ) sla
+        WHERE
+            sla.ts_credit_last_approved <> CAST('1900-01-01' AS TIMESTAMP)
+            AND sla.ts_contract_created <> CAST('1900-01-01' AS TIMESTAMP)
+            AND sla.ts_contract_signed <> CAST('1900-01-01' AS TIMESTAMP)
+    )
     SELECT
         rent_flows_base.*,
         COALESCE(
@@ -377,8 +374,10 @@ WITH listing_rent_flows AS (
         sla.cc2cs_working_minutes AS cc2cs_working_minutes
     FROM
         rent_flows_base
-    LEFT JOIN sla_working_minutes sla ON rent_flows_base.sk_proposal = sla.sk_proposal
-    AND rent_flows_base.sk_contract = sla.sk_contract
+    LEFT JOIN 
+        sla_working_minutes sla 
+            ON rent_flows_base.sk_proposal = sla.sk_proposal
+            AND rent_flows_base.sk_contract = sla.sk_contract
 )
 SELECT
     id_house_rent_flow AS ods_id,
