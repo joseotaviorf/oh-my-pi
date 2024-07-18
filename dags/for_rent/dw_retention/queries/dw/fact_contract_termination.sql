@@ -8,5 +8,3 @@ FROM
 JOIN 
     datalake_ebdb_contract.contract AS dc
         ON dc.id = ct.id_contract
-GROUP BY
-    1, 2, 5
