@@ -10,6 +10,10 @@ columns:
     lineage:
       - datalake_listing_temp.fact_house_listing_status_house.sk_house_listing
       - dw_sale.fact_listing_status.sk_sale_listing
+  id_condo:
+    description: Cover Session - This column represents the ID associated with a condo within the dataset for Ongoing Listings.
+    lineage:
+      - datalake_ebdb_clean.house.id_condo_parent
   id_install:
     description: New Installs Session - This column represents the identifier of installs in each source used to compute installs. Therefore could be same numbers referening to different installs.
     lineage:
@@ -87,12 +91,43 @@ columns:
     description: New Installs Session - States the reason that was not possible to install that Placa.
     lineage:
       - dw_tickets.dim_ticket.custom_fields
-  has_plaquinha:
+  placa_unica:
     description: Cover & New Installs Session - This column specifies whether a house or property specifically has a plaquinha
     lineage:
       - datalake_listing_jobs.listing_quality_tasks.id_house
       - dw_tickets.dim_ticket.custom_fields
       - dw_sale.fact_listing_flows.sk_condo
+  imovel_coberto:
+    description: Cover & New Installs Session - This column specifies whether a house or property is covered by a plaquinha
+    lineage:
+      - datalake_listing_jobs.listing_quality_tasks.id_house
+      - dw_tickets.dim_ticket.custom_fields
+      - dw_sale.fact_listing_flows.sk_condo
+      - datalake_ebdb_clean.house.id_condo_parent
+  install_not_allowed:
+    description: New Installs Session - States the reason that was not possible to install that Placa.
+    lineage:
+      - dw_tickets.dim_ticket.custom_fields
+  first_maintenance:
+    description: Cover & New Installs Session - This column indicates the proxy date or timestamp of the first maintenance of a plaquinha.
+    lineage:
+      - dw_tickets.dim_ticket.custom_fields
+  last_maintenance:
+    description: Cover & New Installs Session - This column indicates the proxy date or timestamp of the last maintenance of a plaquinha.
+    lineage:
+      - dw_tickets.dim_ticket.custom_fields
+  is_ready_for_maintenance:
+    description: Cover & New Installs Session - This column indicates wheater the house needs a maintenance.
+    lineage:
+      - dw_tickets.dim_ticket.custom_fields
+  is_ready_for_maintenance:
+    description: Cover & New Installs Session - This column indicates the reason why a maintenance didn't happen.
+    lineage:
+      - dw_tickets.dim_ticket.custom_fields
+  total_maintenances:
+    description: Cover & New Installs Session - This column indicates the amount of maintenance a house has had.
+    lineage:
+      - dw_tickets.dim_ticket.custom_fields
   new_installed_plaquinhas_target:
     description: New Installs Session - The goal of installed plaquinhas.
     lineage:

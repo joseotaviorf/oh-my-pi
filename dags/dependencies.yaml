@@ -418,9 +418,7 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
 bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_lead:load-dw-public-dim-lead
-  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
-  - bietlejuice.dw_photo_jobs:load-dw-public-fact-photo-job
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
   - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
@@ -433,10 +431,8 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-search-results-page-viewed
-  - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
-  - bietlejuice.enrich_listing_temp:load-enrich-dim-house-listing-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
-  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listings-house
   - bietlejuice.enrich_lost_listings:load-enrich-lost-listings
   - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
   - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets
@@ -444,7 +440,6 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.gsheets_growth:done-clean-city-share
   - bietlejuice.gsheets_growth:done-clean-local-holidays
   - bietlejuice.gsheets_growth:done-clean-plaquinhas-cover-targets
-  - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-pp-organic
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-cost
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-nbp
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-ncp
