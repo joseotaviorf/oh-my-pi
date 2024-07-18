@@ -18,7 +18,7 @@ WITH cte_base AS (
         d.value <= d.amount_paid AS is_finished,
         del.is_legacy_agreement,
         del.id_propose < 5000000 AS is_legacy_propose,
-        del.is_active AS is_currently_active,
+        d.is_active AS is_currently_active,
         d.dt_due,
         CASE
             WHEN d.dt_paid IS NOT NULL THEN d.dt_paid
@@ -78,27 +78,27 @@ cte_final AS (
         OR rn = 1
 ),
 base_timeline AS (
-  SELECT
-      id_delinquency,
-      id_propose,
-      type_description,
-      delinquency_amount,
-      original_value,
-      amount_paid,
-      MAX(amount_paid_added) AS amount_paid_added,
-      open_amount,
-      is_finished,
-      is_legacy_agreement,
-      is_legacy_propose,
-      is_currently_active,
-      dt_due,
-      dt_paid,
-      dt_ended_propose,
-      MIN(dt_updated) AS dt_updated,
-      dt_created
-  FROM
-      cte_final
-  GROUP BY 1,2,3,4,5,6,8,9,10,11,12,13,14,15,17
+    SELECT
+        id_delinquency,
+        id_propose,
+        type_description,
+        delinquency_amount,
+        original_value,
+        amount_paid,
+        MAX(amount_paid_added) AS amount_paid_added,
+        open_amount,
+        is_finished,
+        is_legacy_agreement,
+        is_legacy_propose,
+        is_currently_active,
+        dt_due,
+        dt_paid,
+        dt_ended_propose,
+        MIN(dt_updated) AS dt_updated,
+        dt_created
+    FROM
+        cte_final
+    GROUP BY 1,2,3,4,5,6,8,9,10,11,12,13,14,15,17
 ),
 delinquency_end AS (
     SELECT DISTINCT
@@ -148,16 +148,46 @@ timeline AS (
         base_timeline AS t
             ON td.id_delinquency = t.id_delinquency
             AND td.dt_updated = COALESCE(t.dt_paid, t.dt_updated)
+),
+cte_timeline_status AS (
+    WITH base_cte_status AS (
+        SELECT
+            a.id,
+            LAST_VALUE(a.id_status) AS id_status,
+            DATE(r.ts_created)
+        FROM
+            datalake_rental_guarantee_platform_clean.delinquency_aud a
+        LEFT JOIN
+            datalake_rental_guarantee_platform_clean.rev_info r
+            ON a.rev = r.rev
+        WHERE a.mod_id_status = true
+        GROUP BY 1,3
+        )
+    SELECT
+        s.id,
+        LAST_VALUE(s.id_status) AS id_status,
+        d.date AS dt_status_updated
+    FROM
+        datalake_quintoandar.aux_date AS d
+    LEFT JOIN
+        base_cte_status s
+        ON d.`date` >= DATE(s.ts_created)
+    WHERE
+        d.`date` > DATE('2020-01-01')
+        AND d.`date` < CURRENT_DATE()
+    GROUP BY 1,3
 )
 SELECT
     t.id_delinquency,
     t.id_propose,
     t.type_description,
+    MIN(s.id_status) AS id_status,
     MAX(t.delinquency_amount) AS delinquency_amount,
     MAX(t.original_value) AS original_value,
     MAX(t.amount_paid) AS amount_paid,
     SUM(t.amount_paid_added_fixed) AS amount_paid_added,
     MIN(t.open_amount) AS open_amount,
+    FIRST_VALUE(MIN(t.open_amount)) OVER (PARTITION BY t.id_delinquency, YEAR(t.`date`), MONTH(t.`date`) ORDER BY t.`date`) AS open_amount_first_day_of_month,
     MAX(t.is_finished) As is_finished,
     MAX(t.is_legacy_agreement) AS is_legacy_agreement,
     MAX(t.is_legacy_propose) AS is_legacy_propose,
@@ -169,4 +199,8 @@ SELECT
     MAX(t.dt_created) AS dt_created
 FROM
     timeline AS t
-GROUP BY 1,2,3,15
+LEFT JOIN
+    cte_timeline_status s
+    ON t.id_delinquency = s.id
+    AND t.`date` = DATE(s.dt_status_updated)
+GROUP BY 1,2,3,17
