@@ -150,5 +150,8 @@ LEFT JOIN
 LEFT JOIN
     dim_financed_proposal AS ca
         ON fo.sk_offer = ca.sk_offer
+LEFT JOIN
+    dw_sale.dim_offer  AS do
+        ON fo.sk_offer = do.sk_offer
 WHERE
     fo.ts_offer_submitted >= DATE('2023-02-01')

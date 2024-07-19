@@ -781,6 +781,7 @@ bietlejuice.dw_sale_available_booking_hours:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.enrich_sale_available_booking_hours:load-enrich-weekly-available-booking-hours
 bietlejuice.dw_sale_closing_flows:
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
