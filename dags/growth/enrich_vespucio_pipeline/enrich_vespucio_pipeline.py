@@ -4,6 +4,7 @@ from typing import List
 
 import pendulum
 from airflow.models import DAG
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.utils.helpers import chain
 from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
@@ -108,6 +109,7 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
 class Tables:
     source_ebdb_condo = "vespucio_sources_delta.source_ebdb_condo"
     source_kodak_metadata_condo = "vespucio_sources_delta.source_kodak_metadata_condo"
+    source_navent_condo = "vespucio_sources_delta.source_navent_condo"
     source_sindiconet_condo = "vespucio_sources_delta.source_sindiconet_condo"
     source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
     source_navent_houses = "vespucio_sources_delta.source_navent_houses"
@@ -149,6 +151,14 @@ source_tasks = [
             f"--output_table={Tables.source_ebdb_condo}",
         ],
         task_id="ebdb_condo",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=navent_condo.sql",
+            f"--output_table={Tables.source_navent_condo}",
+        ],
+        task_id="navent_condo",
     ),
     create_task(
         entry_point="sources_sql_job",
@@ -213,6 +223,7 @@ core_tasks = [
         entry_point="core_step1stage",
         parameters=[
             f"--input_source_ebdb_condos={Tables.source_ebdb_condo}",
+            f"--input_source_navent_condos={Tables.source_navent_condo}",
             f"--input_source_kodak_metadata_condos={Tables.source_kodak_metadata_condo}",
             f"--input_source_sindiconet_condos={Tables.source_sindiconet_condo}",
             f"--input_source_ebdb_houses={Tables.source_ebdb_house}",
@@ -272,37 +283,39 @@ core_tasks = [
             "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
         ],
     ),
+    create_task(
+        entry_point="core_step6link",
+        parameters=[
+            f"--input_merged_condos={Tables.step4_merged_condos}",
+            f"--input_images_houses={Tables.step5_images_houses}",
+            f"--overwrite_schema",
+            f"--output_linked_condos={Tables.step6_linked_condos}",
+            f"--output_house_compounds={Tables.house_compounds}",
+        ],
+    ),
 ]
 
-listing_task = create_task(
-    entry_point="core_step6listing",
-    parameters=[
-        f"--input_images_houses={Tables.step5_images_houses}",
-        f"--overwrite_schema",
-        f"--output_listings={Tables.listings}",
-    ],
-)
+step7_tasks = [
+    create_task(
+        entry_point="core_step7listing",
+        parameters=[
+            f"--input_house_compounds={Tables.house_compounds}",
+            f"--input_linked_condos={Tables.step6_linked_condos}",
+            f"--overwrite_schema",
+            f"--output_listings_houses={Tables.listings}",
+        ],
+    ),
+    create_task(
+        entry_point="core_step7condo_plans",
+        parameters=[
+            f"--input_linked_condos={Tables.step6_linked_condos}",
+            f"--input_house_compounds={Tables.house_compounds}",
+            "--overwrite_schema",
+            f"--output_condo_compounds={Tables.condo_compounds}",
+        ],
+    ),
+]
 
-linking_task = create_task(
-    entry_point="core_step6link",
-    parameters=[
-        f"--input_merged_condos={Tables.step4_merged_condos}",
-        f"--input_images_houses={Tables.step5_images_houses}",
-        f"--overwrite_schema",
-        f"--output_linked_condos={Tables.step6_linked_condos}",
-        f"--output_house_compounds={Tables.house_compounds}",
-    ],
-)
-
-condo_plans_task = create_task(
-    entry_point="core_step7condo_plans",
-    parameters=[
-        f"--input_linked_condos={Tables.step6_linked_condos}",
-        f"--input_house_compounds={Tables.house_compounds}",
-        "--overwrite_schema",
-        f"--output_condo_compounds={Tables.condo_compounds}",
-    ],
-)
 
 yesterday = "{{ ds }}"
 today = "{{ macros.ds_add(ds, 1)  }}"
@@ -387,9 +400,11 @@ plugin_tasks = [
     # ),
 ]
 
+join_plugins = DummyOperator(task_id='join_plugins', dag=dag)
+
 execute_job_cluster_task >> source_tasks
-core_tasks[0] << source_tasks
+source_tasks >> core_tasks[0]
 chain(*core_tasks)
-core_tasks[-1] >> listing_task
-core_tasks[-1] >> linking_task
-linking_task >> condo_plans_task >> plugin_tasks
+core_tasks[-1] >> step7_tasks
+step7_tasks >> join_plugins
+join_plugins >> plugin_tasks
