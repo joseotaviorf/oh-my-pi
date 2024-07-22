@@ -8,10 +8,10 @@ dag:
         additional_information: |
             Partitioned by `country_code`.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     tables_customization:
         photo_job:
             partitions: [country_code]
 cluster:
-    type: databricks_10_4_med_io-general_photon_cluster
+    type: databricks_12_2_med_io-general_photon_cluster

@@ -9,7 +9,7 @@ dag:
       is a microservice that handles notification schedule processing.
 
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: jaiminho
@@ -23,7 +23,4 @@ workflow:
       clean_table_name: user_notifications
 
 cluster:
-  type: databricks_10_4_med_general_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
+  type: databricks_12_2_med_general_cluster

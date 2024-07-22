@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: Compile different tables of offboading context, to better elaborate questions about it.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     customer_support:
@@ -30,4 +30,4 @@ workflow:
     tickets:
       - ongoing
 cluster:
-  type: databricks_10_4_med_general_photon_cluster
+  type: databricks_12_2_med_general_photon_cluster

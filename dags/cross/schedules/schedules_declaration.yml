@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: New Service for managing the QuintoAndar schedulling operations.
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: schedules
@@ -21,4 +21,4 @@ workflow:
     attendee:
       date_filter_column: updated_at
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_12_2_min_general_cluster

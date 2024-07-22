@@ -9,7 +9,7 @@ dag:
       is a micro service to inspections with this database we need to measure the lead time inspections, when inspector start and \n
       finish inspection, if he follow the planner's route."
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: inspections
