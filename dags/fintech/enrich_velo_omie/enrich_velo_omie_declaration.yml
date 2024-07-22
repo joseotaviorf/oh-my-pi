@@ -10,4 +10,4 @@ workflow:
     cash_flows_categories:
       - cash_flows
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_13_3_min_general_cluster
