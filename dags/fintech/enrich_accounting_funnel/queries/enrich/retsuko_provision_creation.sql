@@ -25,7 +25,7 @@ retsuko_provisao AS (
                 'entry.bill-item/ipca-adm-fee',
                 'entry.bill-item/adjustment-agreement-adm-fee',
                 'entry.bill-item/lockin') THEN 'adm fee'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN 'brokerage'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN 'BFI v1'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN 'BFI v2'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN 'BFI'
@@ -215,8 +215,8 @@ metrics AS (
         sap_amount,
         account_number,
         is_completeness_compliance,
-        IF(ABS(source_amount) - ABS(sap_amount) = 0 OR (source_amount = 0 AND sap_amount IS NULL), true, false) AS is_correctness_compliance,
-        IF(dt_sap_reference <= date_add(dt_source_trigger, 3), true, false) AS is_temporality_compliance,
+        IF(ABS(source_amount) - ABS(sap_amount) = 0 OR (source_amount = 0 AND sap_amount IS NULL), TRUE, FALSE) AS is_correctness_compliance,
+        IF(dt_sap_reference BETWEEN dt_source_trigger AND DATE_ADD(dt_source_trigger, 3), TRUE, FALSE) AS is_temporality_compliance,
         dt_source_trigger,
         dt_sap_created,
         dt_sap_reference
