@@ -17,4 +17,4 @@ workflow:
       - offline_manual_costs
   custom_schema: marketing_costs
 cluster:
-  type: databricks_10_4_min_general_photon_cluster
+  type: databricks_12_2_min_general_photon_cluster

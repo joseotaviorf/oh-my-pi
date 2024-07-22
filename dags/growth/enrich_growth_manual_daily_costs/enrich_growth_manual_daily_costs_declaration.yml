@@ -14,4 +14,4 @@ workflow:
   - id_date
   - flow_type
 cluster:
-  type: databricks_10_4_min_general_photon_cluster
+  type: databricks_12_2_min_general_photon_cluster

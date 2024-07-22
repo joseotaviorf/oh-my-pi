@@ -22,7 +22,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
 PARTITION_COLS = ["id_date", "flow_type"]
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_photon_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_general_photon_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
