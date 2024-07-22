@@ -5,10 +5,14 @@ columns:
   id_user:
     lineage:
       - datalake_online_attribution.events_exploded.id_user
+      - datalake_amplitude_clean.170698_offer_submitted_new_events.id_user
+      - datalake_amplitude_clean.183047_offer_submitted_new_events.id_user
   id_amplitude:
     lineage:
       - datalake_online_attribution.events_exploded.id_amplitude
       - datalake_amplitude_clean.170698_user_merge.id_amplitude_merged
+      - datalake_amplitude_clean.170698_offer_submitted_new_events.id_amplitude
+      - datalake_amplitude_clean.183047_offer_submitted_new_events.id_amplitude
   id_session:
     lineage:
       - datalake_online_attribution.events_exploded.id_session

@@ -48,6 +48,27 @@ WITH conversions AS (
         year = {year}
         AND month = {month}
         AND day = {day}
+    -- New offer submitted events
+    UNION
+    SELECT
+        id_amplitude,
+        id_user
+    FROM
+        datalake_amplitude_clean.170698_offer_submitted_new_events -- IQ Prod new events
+    WHERE 
+        year = {year}
+        AND month = {month}
+        AND day = {day}
+    UNION
+    SELECT
+        id_amplitude,
+        id_user
+    FROM
+        datalake_amplitude_clean.183047_offer_submitted_new_events -- PP Prod new events
+    WHERE 
+        year = {year}
+        AND month = {month}
+        AND day = {day}
     UNION
     SELECT
         id_amplitude,
