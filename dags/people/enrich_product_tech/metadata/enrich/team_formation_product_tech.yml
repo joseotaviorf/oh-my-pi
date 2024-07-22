@@ -1,0 +1,61 @@
+---
+database_name: datalake_product_tech
+table_name: team_formation_product_tech
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table that contains the team formation of the Product and Tech team historic changes.
+columns:
+  id:
+    description: 'Unique identifier of the employee teams in a particular date'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.id
+    - datalake_gsheets_clean.team_formation_product_tech.email
+    - datalake_gsheets_clean.team_formation_product_tech.subdirectorate
+    - datalake_gsheets_clean.team_formation_product_tech.team_1
+    - datalake_gsheets_clean.team_formation_product_tech.team_2
+    - datalake_gsheets_clean.team_formation_product_tech.team_3
+    - datalake_gsheets_clean.team_formation_product_tech.team_4
+    - datalake_gsheets_clean.team_formation_product_tech.team_5
+    - datalake_gsheets_clean.team_formation_product_tech.ts_load
+  id_teams:
+    description: 'Unique identifier of the employee teams combination'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.id
+  email:
+    description: 'Employee email'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.email
+  employees_name:
+    description: 'Employee name'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.employees_name
+  subdirectorate:
+    description: 'Employee subdirectorate'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.subdirectorate
+  team_1:
+    description: 'Primary team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_1
+  team_2:
+    description: 'Secondary team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_2
+  team_3:
+    description: 'Third team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_3
+  team_4:
+    description: 'Fourth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_4
+  team_5:
+    description: 'Fifth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_5
+  ts_change:
+    description: 'Timestamp of the team formation change'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.ts_load
+  ts_load:
+    description: 'Timestamp of the data load'

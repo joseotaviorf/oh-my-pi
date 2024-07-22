@@ -948,3 +948,7 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
     - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
     - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
     - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
+
+bietlejuice.enrich_product_tech:
+  add:
+    - bietlejuice.gsheets_people:done-clean-team-formation-product-tech

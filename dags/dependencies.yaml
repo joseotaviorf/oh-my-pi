@@ -2255,6 +2255,8 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
+bietlejuice.enrich_product_tech:
+  - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
 bietlejuice.enrich_property_tax:
   - bietlejuice.property_tax:load-clean-tax-report
 bietlejuice.enrich_proposal:

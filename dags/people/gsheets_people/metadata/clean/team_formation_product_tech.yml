@@ -5,6 +5,16 @@ owner: isabella.araujo@quintoandar.com.br
 domain: people
 description: information about product and tech's structure
 columns:
+  id:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.team_formation_product_tech.email
+      - datalake_gsheets_raw.team_formation_product_tech.subdirectorate
+      - datalake_gsheets_raw.team_formation_product_tech.team_1_primary
+      - datalake_gsheets_raw.team_formation_product_tech.team_2
+      - datalake_gsheets_raw.team_formation_product_tech.team_3
+      - datalake_gsheets_raw.team_formation_product_tech.team_4
+      - datalake_gsheets_raw.team_formation_product_tech.team_5
   employees_name:
     description: ""
     lineage:

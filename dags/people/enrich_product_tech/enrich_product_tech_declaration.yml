@@ -1,0 +1,21 @@
+dag:
+  name: enrich_product_tech
+  schedule_start_date: 2024, 7, 15
+  owner: Data People
+  documentation:
+    dag_purpose: Enrich Product and Tech data.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  has_hive_sync: false
+  bucket_config_name: people_bucket
+  tables_customization:
+    team_formation_product_tech:
+      extraction_type: incremental
+      merge_on: ["id"]
+cluster:
+  type: databricks_13_3_min_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
