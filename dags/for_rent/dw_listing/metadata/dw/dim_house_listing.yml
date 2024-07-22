@@ -340,8 +340,12 @@ columns:
   is_brokerage_only_migrated:
     description: Boolean indicating if the rental administrator changed from OWNER to QUINTOANDAR during this listing.
   is_for_rent:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_for_rent
     description: Boolean indicating if the listing is for rent.
   is_for_sale:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_for_sale
     description: Boolean indicating if the listing is for sale.
   is_house_furnished:
     lineage:

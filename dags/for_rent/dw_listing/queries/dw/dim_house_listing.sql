@@ -25,8 +25,6 @@ house_listings AS (
     lbc AS (
         SELECT
             id_house,
-            CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
-            CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent,
             MAX(IF(business_context = 'SALE', status, NULL)) AS house_sale_status,
             MAX(IF(business_context = 'SALE', status_reason, NULL)) AS house_sale_status_reason,
             MAX(IF(business_context = 'RENT', status, NULL)) AS house_rent_status,
@@ -146,12 +144,8 @@ house_listings AS (
         hl.dt_last_iorent_opted_in,
         hl.dt_last_iorent_opted_out,
         h.sale_price,
-        CASE
-            WHEN lbc.id_house IS NULL
-                THEN TRUE -- When house is not in listing_business_context, it is for rent
-            ELSE COALESCE(lbc.is_for_rent, FALSE)
-        END AS is_for_rent,
-        COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
+        hl.is_for_rent,
+        hl.is_for_sale,
         h.has_instant_offer_enabled,
         h.is_3p_supply,
         h.is_sale_3p_supply,

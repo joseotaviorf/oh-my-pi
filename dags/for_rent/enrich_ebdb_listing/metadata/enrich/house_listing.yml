@@ -87,6 +87,10 @@ columns:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_out
     description: Once the listing has been flagged as IORent, it says whether it is
       current active.
+  is_for_rent:
+    description: Boolean indicating if the listing is for rent.
+  is_for_sale:
+    description: Boolean indicating if the listing is for sale.
   ts_listing_version_start:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.ts_state_started

@@ -147,6 +147,15 @@ sale_only AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY sale.id_house ORDER BY sale.ts_updated DESC) = 1
 ),
+lbc AS (
+    SELECT
+        id_house,
+        CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
+        CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
+    FROM
+        datalake_ebdb_listing.listing_business_context
+    GROUP BY 1
+),
 house_listing AS (
     SELECT
       CAST(CAST(sa.id_house AS STRING)||'000' AS BIGINT) AS id_house_listing,
@@ -198,6 +207,8 @@ house_listing AS (
             OR (lsc_originals.dt_last_opted_in > lsc_originals.dt_last_opted_out)) AS is_originals_active,
         ((lsc_iorent.dt_last_opted_in IS NOT NULL and lsc_iorent.dt_last_opted_out IS NULL)
             OR (lsc_iorent.dt_last_opted_in > lsc_iorent.dt_last_opted_out)) AS is_iorent_active,
+        IF(lbc.id_house IS NULL, TRUE, COALESCE(lbc.is_for_rent, FALSE)) AS is_for_rent, -- When house is not in listing_business_context, it is for rent
+        COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
         hl.ts_listing_version_start,
         hl.ts_listing_version_end,
         ts_last_unpublished,
@@ -224,6 +235,9 @@ house_listing AS (
     LEFT JOIN
       listing_rent_last AS rent_last
         ON hl.id_house_listing = rent_last.id_house_listing
+    LEFT JOIN
+      lbc
+        ON lbc.id_house = hl.id_house
 ),
 house_listing_latest_contracts AS (
 ----------------------------------------------------------------------------------------------------------
@@ -417,6 +431,8 @@ SELECT
     hl.is_extended_rental,
     hl.is_originals_active,
     hl.is_iorent_active,
+    hl.is_for_rent,
+    hl.is_for_sale,
     CAST(hled.ts_early_demand_started AS TIMESTAMP) AS ts_early_demand_started,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
