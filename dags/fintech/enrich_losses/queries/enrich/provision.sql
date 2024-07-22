@@ -45,26 +45,31 @@ WITH provision AS(
     p3A.provision_factor * due_amount AS provision_balance_p3_delay_a,
     p4A.provision_factor * due_amount AS provision_balance_p4_delay_a,
     p5A.provision_factor * due_amount AS provision_balance_p5_delay_a,
+    p6A.provision_factor * due_amount AS provision_balance_p6_delay_a,
     p1B.provision_factor * due_amount AS provision_balance_p1_delay_b,
     p2B.provision_factor * due_amount AS provision_balance_p2_delay_b,
     p3B.provision_factor * due_amount AS provision_balance_p3_delay_b,
     p4B.provision_factor * due_amount AS provision_balance_p4_delay_b,
     p5B.provision_factor * due_amount AS provision_balance_p5_delay_b,
+    p6B.provision_factor * due_amount AS provision_balance_p6_delay_b,
     p1C.provision_factor * due_amount AS provision_balance_p1_delay_c,
     p2C.provision_factor * due_amount AS provision_balance_p2_delay_c,
     p3C.provision_factor * due_amount AS provision_balance_p3_delay_c,
     p4C.provision_factor * due_amount AS provision_balance_p4_delay_c,
     p5C.provision_factor * due_amount AS provision_balance_p5_delay_c,
+    p6C.provision_factor * due_amount AS provision_balance_p6_delay_c,
     p1D.provision_factor * due_amount AS provision_balance_p1_delay_d,
     p2D.provision_factor * due_amount AS provision_balance_p2_delay_d,
     p3D.provision_factor * due_amount AS provision_balance_p3_delay_d,
     p4D.provision_factor * due_amount AS provision_balance_p4_delay_d,
     p5D.provision_factor * due_amount AS provision_balance_p5_delay_d,
+    p6D.provision_factor * due_amount AS provision_balance_p6_delay_d,
     p1E.provision_factor * due_amount AS provision_balance_p1_delay_e,
     p2E.provision_factor * due_amount AS provision_balance_p2_delay_e,
     p3E.provision_factor * due_amount AS provision_balance_p3_delay_e,
     p4E.provision_factor * due_amount AS provision_balance_p4_delay_e,
     p5E.provision_factor * due_amount AS provision_balance_p5_delay_e,
+    p6E.provision_factor * due_amount AS provision_balance_p6_delay_e,
     CASE
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH <= DATE('2022-11-01') THEN p1B.provision_factor
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH = DATE('2022-12-01') THEN p4B.provision_factor
@@ -72,7 +77,8 @@ WITH provision AS(
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH = DATE('2023-02-01') THEN p3B.provision_factor
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH BETWEEN DATE('2023-03-01') AND DATE('2023-05-01') THEN p4B.provision_factor
       WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH BETWEEN DATE('2023-06-01') AND DATE('2023-11-01') THEN p4E.provision_factor
-      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH >= DATE('2023-12-01') THEN p5E.provision_factor
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH BETWEEN DATE('2023-12-01') AND DATE('2024-06-01') THEN p5E.provision_factor
+      WHEN DATE_TRUNC('month', dt_snapshot) - INTERVAL '1' MONTH >= DATE('2024-07-01') THEN p6E.provision_factor
     END AS provision_factor,
     m.risk_type,
     m.user,
@@ -111,6 +117,10 @@ WITH provision AS(
       ON (p5D.risk_type = guarantee_type)
       AND (p5D.pd_range = m.pd_range_rule_d)
       AND (p5D.sk_provision_rule = 5)
+    LEFT JOIN datalake_losses.provision_factor AS p6D
+      ON (p6D.risk_type = guarantee_type)
+      AND (p6D.pd_range = m.pd_range_rule_d)
+      AND (p6D.sk_provision_rule = 6)
     LEFT JOIN datalake_losses.provision_factor AS p1B
       ON (p1B.risk_type = m.risk_type)
       AND (p1B.pd_range = m.pd_range_rule_b)
@@ -131,6 +141,10 @@ WITH provision AS(
       ON (p5B.risk_type = guarantee_type)
       AND (p5B.pd_range = m.pd_range_rule_b)
       AND (p5B.sk_provision_rule = 5)
+    LEFT JOIN datalake_losses.provision_factor AS p6B
+      ON (p6B.risk_type = guarantee_type)
+      AND (p6B.pd_range = m.pd_range_rule_b)
+      AND (p6B.sk_provision_rule = 6)
     LEFT JOIN datalake_losses.provision_factor AS p1A
       ON (p1A.risk_type = m.risk_type)
       AND (p1A.pd_range = m.pd_range_rule_a)
@@ -151,6 +165,10 @@ WITH provision AS(
       ON (p5A.risk_type = guarantee_type)
       AND (p5A.pd_range = m.pd_range_rule_a)
       AND (p5A.sk_provision_rule = 5)
+    LEFT JOIN datalake_losses.provision_factor AS p6A
+      ON (p6A.risk_type = guarantee_type)
+      AND (p6A.pd_range = m.pd_range_rule_a)
+      AND (p6A.sk_provision_rule = 6)
     LEFT JOIN datalake_losses.provision_factor AS p1C
       ON (p1C.risk_type = m.risk_type)
       AND (p1C.pd_range = m.pd_range_rule_c)
@@ -171,6 +189,10 @@ WITH provision AS(
       ON (p5C.risk_type = guarantee_type)
       AND (p5C.pd_range = m.pd_range_rule_c)
       AND (p5C.sk_provision_rule = 5)
+    LEFT JOIN datalake_losses.provision_factor AS p6C
+      ON (p6C.risk_type = guarantee_type)
+      AND (p6C.pd_range = m.pd_range_rule_c)
+      AND (p6C.sk_provision_rule = 6)
     LEFT JOIN datalake_losses.provision_factor AS p1E
       ON (p1E.risk_type = m.risk_type)
       AND (p1E.pd_range = m.pd_range_rule_e)
@@ -191,6 +213,10 @@ WITH provision AS(
       ON (p5E.risk_type = guarantee_type)
       AND (p5E.pd_range = m.pd_range_rule_e)
       AND (p5E.sk_provision_rule = 5)
+    LEFT JOIN datalake_losses.provision_factor AS p6E
+      ON (p6E.risk_type = guarantee_type)
+      AND (p6E.pd_range = m.pd_range_rule_e)
+      AND (p6E.sk_provision_rule = 6)
 )
 SELECT
   id_invoice,
@@ -228,26 +254,31 @@ SELECT
   provision_balance_p3_delay_a,
   provision_balance_p4_delay_a,
   provision_balance_p5_delay_a,
+  provision_balance_p6_delay_a,
   provision_balance_p1_delay_b,
   provision_balance_p2_delay_b,
   provision_balance_p3_delay_b,
   provision_balance_p4_delay_b,
   provision_balance_p5_delay_b,
+  provision_balance_p6_delay_b,
   provision_balance_p1_delay_c,
   provision_balance_p2_delay_c,
   provision_balance_p3_delay_c,
   provision_balance_p4_delay_c,
   provision_balance_p5_delay_c,
+  provision_balance_p6_delay_c,
   provision_balance_p1_delay_d,
   provision_balance_p2_delay_d,
   provision_balance_p3_delay_d,
   provision_balance_p4_delay_d,
   provision_balance_p5_delay_d,
+  provision_balance_p6_delay_d,
   provision_balance_p1_delay_e,
   provision_balance_p2_delay_e,
   provision_balance_p3_delay_e,
   provision_balance_p4_delay_e,
   provision_balance_p5_delay_e,
+  provision_balance_p6_delay_e,
   CASE
     WHEN date_trunc('month', dt_snapshot) - interval '1' month <= DATE('2022-11-01') THEN provision_balance_p1_delay_b
     WHEN date_trunc('month', dt_snapshot) - interval '1' month = DATE('2022-12-01') THEN provision_balance_p4_delay_b
@@ -255,7 +286,8 @@ SELECT
     WHEN date_trunc('month', dt_snapshot) - interval '1' month = DATE('2023-02-01') THEN provision_balance_p3_delay_b
     WHEN date_trunc('month', dt_snapshot) - interval '1' month BETWEEN DATE('2023-03-01') AND DATE('2023-05-01') THEN provision_balance_p4_delay_b
     WHEN date_trunc('month', dt_snapshot) - interval '1' month BETWEEN DATE('2023-06-01') AND DATE('2023-11-01') THEN provision_balance_p4_delay_e
-    WHEN date_trunc('month', dt_snapshot) - interval '1' month >= DATE('2023-12-01') THEN provision_balance_p5_delay_e
+    WHEN date_trunc('month', dt_snapshot) - interval '1' month BETWEEN DATE('2023-12-01') AND DATE('2024-06-01') THEN provision_balance_p5_delay_e
+    WHEN date_trunc('month', dt_snapshot) - interval '1' month >= DATE('2024-07-01') THEN provision_balance_p6_delay_e
   END AS provision_balance,
   provision_factor,
   risk_type,
