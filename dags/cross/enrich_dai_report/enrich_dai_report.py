@@ -80,7 +80,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 skip_run_task = ShortCircuitOperator(
     task_id=f"check-day-to-skip-execution",
     python_callable=DAGRunDateValidators.check_is_specific_day_of_month,
-    op_args=["{{ macros.ds_add(ds, 1) }}", 10],
+    op_args=["{{ macros.ds_add(ds, 1) }}", 22],
 )
 
 datalake_task_group = DatalakeTaskGroup(
