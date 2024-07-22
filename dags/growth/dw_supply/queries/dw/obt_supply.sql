@@ -87,7 +87,7 @@ base AS (
             WHEN dsupc.tp_origin = 'consultantpwa' THEN 'ciq'
             WHEN dsupc.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsof.nm_agent IS NOT NULL THEN 'operations'
-            WHEN dsupc.tp_origin IN ('full_self_service', 'referral') THEN 'ownerpwa'
+            WHEN dsupc.tp_origin IN ('full_self_service', 'referral', 'ios') THEN 'ownerpwa'
             WHEN dsupc.tp_origin IN ('prime','owner_conversion') THEN 'operations'
             ELSE concat('notmapped-',dsupc.tp_origin)
         END AS conversion_origin,
@@ -97,7 +97,7 @@ base AS (
             WHEN fse.sk_user_affiliate > -1 AND (dsupa.tp_origin not in ('consultantpwa', 'supplyprocessor')) THEN 'referrals'
             WHEN dsupa.tp_origin = 'app' THEN 'referrals'
             WHEN dsupa.tp_origin = 'whatsapp' THEN 'test'
-            WHEN dsupa.tp_origin IN ('facebookleads', 'ownerpwa', 'landingproowners', 'landing', 'facebook', 'i24') THEN 'ownerlanding'
+            WHEN dsupa.tp_origin IN ('facebookleads', 'ownerpwa', 'landingproowners', 'landing', 'facebook', 'i24', 'ios') THEN 'ownerlanding'
             WHEN dsupa.tp_origin = 'humancrawler' THEN 'crawler'
             WHEN dsupa.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsupa.tp_origin = 'consultantpwa' THEN 'ciq'
