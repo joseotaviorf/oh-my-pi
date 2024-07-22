@@ -1,0 +1,111 @@
+---
+database_name: datalake_pas_homolog
+table_name: invoices
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing invoice info according to SAP"
+columns:
+  id_transaction:
+    description: "Identification number of the transaction"
+    lineage:
+      - datalake_pas_clean.invoices.id_transaction
+  id_business_entity:
+    description: "Identification number of the business entity"
+    lineage:
+      - datalake_pas_clean.invoices.id_business_entity
+  id_external_payment:
+    description: "External ID of the payment"
+    lineage:
+      - datalake_pas_clean.invoices.id_external_payment
+  id_financial_entity:
+    description: "Identification number of the financial entity"
+    lineage:
+      - datalake_pas_clean.invoices.id_financial_entity
+  id_user_sign:
+    description: "Identification number of the user"
+    lineage:
+      - datalake_pas_clean.invoices.id_user_sign
+  uuid:
+    description: "Invoice Unic ID"
+    lineage:
+      - datalake_pas_clean.invoices.uuid
+  legacy_uuid:
+    description: "Legacu Unic ID"
+    lineage:
+      - datalake_pas_clean.invoices.legacy_uuid
+  id_document:
+    description: "Identification number of the document"
+    lineage:
+      - datalake_pas_clean.invoices.id_document
+  document_entry:
+    description: "Identification number of the document entry"
+    lineage:
+      - datalake_pas_clean.invoices.document_entry
+  memo:
+    description: "Memo description"
+    lineage:
+      - datalake_pas_clean.invoices.memo
+  source_document_number:
+    description: "Source document number"
+    lineage:
+      - datalake_pas_clean.invoices.source_document_number
+  series:
+    description: "Series number"
+    lineage:
+      - datalake_pas_clean.invoices.series
+  source_client:
+    description: "Source client description"
+    lineage:
+      - datalake_pas_clean.invoices.source_client
+  transaction_type:
+    description: "Identification number of the transaction type"
+    lineage:
+      - datalake_pas_clean.invoices.transaction_type
+  updated_by:
+    description: "Identification number of the user who updated the register"
+    lineage:
+      - datalake_pas_clean.invoices.updated_by
+  accrual_year_month:
+    description: "Accrual date"
+    lineage:
+      - datalake_pas_clean.invoices.accrual_year_month
+  loc_total:
+    description: "Total loc number"
+    lineage:
+      - datalake_pas_clean.invoices.loc_total
+  dt_document:
+    description: "Document date"
+    lineage:
+      - datalake_pas_clean.invoices.dt_document
+  dt_tax:
+    description: "Tax date"
+    lineage:
+      - datalake_pas_clean.invoices.dt_tax
+  dt_reference:
+    description: "Reference date"
+    lineage:
+      - datalake_pas_clean.invoices.dt_reference
+  dt_due:
+    description: "Due date"
+    lineage:
+      - datalake_pas_clean.invoices.dt_due
+  dt_created:
+    description: "Creation date"
+    lineage:
+      - datalake_pas_clean.invoices.dt_created
+  dt_updated:
+    description: "Update date"
+    lineage:
+      - datalake_pas_clean.invoices.dt_updated
+  year:
+    description: "Partition year"
+    lineage:
+      - datalake_pas_clean.invoices.year
+  month:
+    description: "Partition month"
+    lineage:
+      - datalake_pas_clean.invoices.month
+  day:
+    description: "Partition day"
+    lineage:
+      - datalake_pas_clean.invoices.day

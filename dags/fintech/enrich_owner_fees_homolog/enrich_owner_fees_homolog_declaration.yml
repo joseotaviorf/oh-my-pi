@@ -1,0 +1,10 @@
+---
+dag:
+  name: enrich_owner_fees_homolog
+  schedule_start_date: 2021, 4, 22
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_13_3_med_general_cluster

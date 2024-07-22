@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_sap_homolog
+  schedule_start_date: 2022, 10, 25
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    ledger:
+      - incoming_payments_lines
+      - incoming_payments
+      - invoice_lines
+      - invoices
+      - journal_entries
+      - journal_entry_lines
+cluster:
+  type: databricks_12_2_med_2xlarge_general_cluster

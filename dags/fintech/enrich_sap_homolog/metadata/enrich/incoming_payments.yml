@@ -1,0 +1,107 @@
+---
+database_name: datalake_pas_homolog
+table_name: incoming_payments
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing incoming payments info according to SAP"
+columns:
+  id_transaction:
+    description: "Identification number of the transaction"
+    lineage:
+      - datalake_pas_clean.incoming_payments.id_transaction
+  id_business_entity:
+    description: "Identification number of the business entity"
+    lineage:
+      - datalake_pas_clean.incoming_payments.id_business_entity
+  id_financial_entity:
+    description: "Identification number of the financial entity"
+    lineage:
+      - datalake_pas_clean.incoming_payments.id_financial_entity
+  id_external_payment:
+    description: "External ID of the payment"
+    lineage:
+      - datalake_pas_clean.incoming_payments.id_external_payment
+  id_user_sign:
+    description: "Identification number of the user"
+    lineage:
+      - datalake_pas_clean.incoming_payments.id_user_sign
+  legacy_uuid:
+    description: "Legacy Unic ID"
+    lineage:
+      - datalake_pas_clean.incoming_payments.legacy_uuid
+  uuid:
+    description: "Unic ID"
+    lineage:
+      - datalake_pas_clean.incoming_payments.uuid
+  document_entry:
+    description: "Identification number of the document entry"
+    lineage:
+      - datalake_pas_clean.incoming_payments.document_entry
+  memo:
+    description: "Memo description"
+    lineage:
+      - datalake_pas_clean.incoming_payments.memo
+  source_document_number:
+    description: "Source document number"
+    lineage:
+      - datalake_pas_clean.incoming_payments.source_document_number
+  series:
+    description: "Series number"
+    lineage:
+      - datalake_pas_clean.incoming_payments.series
+  source_client:
+    description: "Source client description"
+    lineage:
+      - datalake_pas_clean.incoming_payments.source_client
+  transaction_type:
+    description: "Identification number of the transaction type"
+    lineage:
+      - datalake_pas_clean.incoming_payments.transaction_type
+  updated_by:
+    description: "Identification number of the user who updated the register"
+    lineage:
+      - datalake_pas_clean.incoming_payments.updated_by
+  accrual_year_month:
+    description: "Accrual date"
+    lineage:
+      - datalake_pas_clean.incoming_payments.accrual_year_month
+  loc_total:
+    description: "Total loc number"
+    lineage:
+      - datalake_pas_clean.incoming_payments.loc_total
+  dt_document:
+    description: "Document date"
+    lineage:
+      - datalake_pas_clean.incoming_payments.dt_document
+  dt_tax:
+    description: "Tax date"
+    lineage:
+      - datalake_pas_clean.incoming_payments.dt_tax
+  dt_reference:
+    description: "Reference date"
+    lineage:
+      - datalake_pas_clean.incoming_payments.dt_reference
+  dt_due:
+    description: "Due date"
+    lineage:
+      - datalake_pas_clean.incoming_payments.dt_due
+  dt_created:
+    description: "Creation date"
+    lineage:
+      - datalake_pas_clean.incoming_payments.dt_created
+  dt_updated:
+    description: "Update date"
+    lineage:
+      - datalake_pas_clean.incoming_payments.dt_updated
+  year:
+    description: "Partition year"
+    lineage:
+      - datalake_pas_clean.incoming_payments.year
+  month:
+    description: "Partition month"
+    lineage:
+      - datalake_pas_clean.incoming_payments.month
+  day:
+    description: "Partition day"
+    lineage:
+      - datalake_pas_clean.incoming_payments.day

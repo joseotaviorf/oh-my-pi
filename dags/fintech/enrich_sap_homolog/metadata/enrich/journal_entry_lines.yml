@@ -1,0 +1,123 @@
+---
+database_name: datalake_pas_homolog
+table_name: journal_entry_lines
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing journal entry lines info according to SAP"
+columns:
+  id_transaction:
+    description: "Identification number of the transaction"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.id_transaction
+  id_line:
+    description: "Identification number of the line"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.id_line
+  id_business_entity:
+    description: "Identification number of the business entity"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.id_business_entity
+  id_finance_entity_entry:
+    description: "Identification number of the finance entitiy of entry"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.id_finance_entity_entry
+  id_finance_entity:
+    description: "Identification number of the finance entity"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.id_finance_entity
+  id_branch:
+    description: "ID that indicates which company from 5A group"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.id_branch
+  cost_center_code:
+    description: "Identification number of the cost center"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.cost_center_code
+  contra_act:
+    description: "Contra act code"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.contra_act
+  location_profit_code:
+    description: "Location profit code"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.location_profit_code
+  managerial_code:
+    description: "Managerial code"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.managerial_code
+  memo_line:
+    description: "Memo line description"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.memo_line
+  sap_document_number:
+    description: "References the input or output sap document table"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.sap_document_number
+  source_document_number:
+    description: "Source document number"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.source_document_number
+  series:
+    description: "Series number"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.series
+  account:
+    description: "Account number"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.account
+  account_shortname:
+    description: "Description of the account shortname"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.account_shortname
+  accounting_rule:
+    description: "Accounting rule applied"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.accounting_rule
+  accounting_type:
+    description: "Accounting type"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.accounting_type
+  user_type:
+    description: "User type"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.user_type
+  transaction_type:
+    description: "Identification number of the transaction type"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.transaction_type
+  accrual_year_month:
+    description: "Accrual date"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.accrual_year_month
+  credit:
+    description: "Credit value"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.credit
+  debit:
+    description: "Debit value"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.debit
+  dt_due:
+    description: "Due date"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.dt_due
+  dt_reference:
+    description: "Reference date"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.dt_reference
+  dt_tax:
+    description: "Tax date"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.dt_tax
+  year:
+    description: "Partition year"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.year
+  month:
+    description: "Partition month"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.month
+  day:
+    description: "Partition day"
+    lineage:
+      - datalake_pas_clean.journal_entry_lines.day

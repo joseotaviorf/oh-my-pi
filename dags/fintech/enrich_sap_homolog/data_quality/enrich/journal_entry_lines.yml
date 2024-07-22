@@ -1,0 +1,23 @@
+---
+table_name: datalake_pas.journal_entry_lines
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_transaction:
+    is_complete:
+      severity_level: Error
+  id_line:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

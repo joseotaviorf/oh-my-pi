@@ -1,0 +1,52 @@
+database_name: datalake_betopera_homolog
+table_name: insurance
+description: "Information about the life cycle of insurance policies: creation, cancellation and renewal"
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_betopera_clean.insurance.id
+    description: "Id of the Insurance"
+  id_idempotency:
+    lineage:
+      - datalake_betopera_clean.insurance.id_idempotency
+    description: "Id of the Idempotency"
+  source_type_code:
+    lineage:
+      - datalake_betopera_clean.insurance.source_type_code
+    description: "Type of the insurance"
+  status:
+    lineage:
+      - datalake_betopera_clean.insurance.status
+    description: "The current status for the insurance entity"
+    categories:
+      PENDING: ""
+      CREATED: ""
+      FAILED: ""
+      PENDING_CANCELLATION: ""
+      CANCELED: ""
+  version:
+    lineage:
+      - datalake_betopera_clean.insurance.version
+    description: "Version of the insurance"
+  ts_created:
+    lineage:
+      - datalake_betopera_clean.insurance.ts_created
+    description: "Timestamp of the created date"
+  ts_updated:
+    lineage:
+      - datalake_betopera_clean.insurance.ts_updated
+    description: "Timestamp of the last updated date"
+  year:
+    lineage:
+      - datalake_betopera_clean.insurance.year
+    description: "Year Information"
+  month:
+    lineage:
+      - datalake_betopera_clean.insurance.month
+    description: "Month Information"
+  day:
+    lineage:
+      - datalake_betopera_clean.insurance.day
+    description: "Day Information"

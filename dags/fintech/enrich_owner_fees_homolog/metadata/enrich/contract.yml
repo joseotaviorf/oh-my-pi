@@ -1,0 +1,42 @@
+database_name: datalake_owner_fees_homolog
+table_name: contract
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: The table contains information about a contract owner's fees.
+columns:
+  id:
+    lineage:
+      - datalake_owner_fees_clean.contract.id
+    description: Contract ID. Use this column to join with 'contract_brokerage_fee' table
+  id_house:
+    lineage:
+      - datalake_owner_fees_clean.contract.id_house
+    description: House ID from fastforward
+  id_external:
+    lineage:
+      - datalake_owner_fees_clean.contract.id_external
+    description: External ID used to join with Main
+  id_admin_fee_option:
+    lineage:
+      - datalake_owner_fees_clean.contract.id_admin_fee_option
+    description: Administration fee option ID
+  real_state_agent_share:
+    lineage:
+      - datalake_owner_fees_clean.contract.real_state_agent_share
+    description: Brokerage partner (real state agent) share.
+  rent:
+    lineage:
+      - datalake_owner_fees_clean.contract.rent
+    description: Rent amount
+  dt_validity:
+    lineage:
+      - datalake_owner_fees_clean.contract.dt_validity
+    description: Contract started date
+  ts_created:
+    lineage:
+      - datalake_owner_fees_clean.contract.ts_created
+    description: Timestamp when contract (record) was created in database
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_clean.contract.ts_updated
+    description: Timestamp when contract (records) was last updated in database

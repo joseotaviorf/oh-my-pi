@@ -1,0 +1,46 @@
+database_name: datalake_pixar_homolog
+table_name: account
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing account data"
+columns:
+  id:
+    description: "Account identification number (ID)"
+    lineage:
+      - datalake_pixar_clean.account.id
+  pix_key:
+    description: "PIX key"
+    lineage:
+      - datalake_pixar_clean.account.pix_key
+  requested_by:
+    description: "Request source description"
+    lineage:
+      - datalake_pixar_clean.account.requested_by
+  bank_name:
+    description: "Bank name"
+    lineage:
+      - datalake_pixar_clean.account.bank_name
+  bank_fee:
+    description: "Bank fee amount"
+    lineage:
+      - datalake_pixar_clean.account.bank_fee
+  ts_created:
+    description: "Creation timestamp"
+    lineage:
+      - datalake_pixar_clean.account.ts_created
+  ts_updated:
+    description: "Update timestamp"
+    lineage:
+      - datalake_pixar_clean.account.ts_updated
+  year:
+    description: "Update year"
+    lineage:
+      - datalake_pixar_clean.account.year
+  month:
+    description: "Update month"
+    lineage:
+      - datalake_pixar_clean.account.month
+  day:
+    description: "Update day"
+    lineage:
+      - datalake_pixar_clean.account.day

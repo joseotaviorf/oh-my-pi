@@ -1,0 +1,25 @@
+SELECT
+    id_feature,
+    id_source,
+    id_business_entity,
+    id_finance_entity,
+    id_external_payment,
+    uuid,
+    source,
+    transaction_type,
+    metadata,
+    request_payload,
+    sync_sap_status,
+    source_client,
+    user_type,
+    finance_entity_type,
+    ts_accrual,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sap_gateway_clean.feature
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_feature ORDER BY ts_updated DESC) = 1

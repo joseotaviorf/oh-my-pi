@@ -1,0 +1,86 @@
+database_name: datalake_sap_gateway_homolog
+table_name: feature
+owner: juliana.hocihara@quintoandar.com.br
+domain: fintech
+description: "Feature table from SAP Gateway"
+columns:
+  id_feature:
+    description: "Main ID for feature table"
+    lineage:
+      - datalake_sap_gateway_clean.feature.id_feature
+  id_source:
+    description: "Source ID"
+    lineage:
+      - datalake_sap_gateway_clean.feature.id_source
+  id_business_entity:
+    description: "Business entity ID"
+    lineage:
+      - datalake_sap_gateway_clean.feature.id_business_entity
+  id_finance_entity:
+    description: "Finance entity ID"
+    lineage:
+      - datalake_sap_gateway_clean.feature.id_finance_entity
+  id_external_payment:
+    description: "External payment ID"
+    lineage:
+      - datalake_sap_gateway_clean.feature.id_external_payment
+  uuid:
+    description: "Unique ID in uuid format"
+    lineage:
+      - datalake_sap_gateway_clean.feature.uuid
+  source:
+    description: "Source description"
+    lineage:
+      - datalake_sap_gateway_clean.feature.source
+  transaction_type:
+    description: "Type of transaction"
+    lineage:
+      - datalake_sap_gateway_clean.feature.transaction_type
+  metadata:
+    description: "Metadata JSON"
+    lineage:
+      - datalake_sap_gateway_clean.feature.metadata
+  request_payload:
+    description: "Request payload JSON"
+    lineage:
+      - datalake_sap_gateway_clean.feature.request_payload
+  sync_sap_status:
+    description: "Status from sync sap"
+    lineage:
+      - datalake_sap_gateway_clean.feature.sync_sap_status
+  source_client:
+    description: "Source client description"
+    lineage:
+      - datalake_sap_gateway_clean.feature.source_client
+  user_type:
+    description: "User type description"
+    lineage:
+      - datalake_sap_gateway_clean.feature.user_type
+  finance_entity_type:
+    description: "Finance entity type description"
+    lineage:
+      - datalake_sap_gateway_clean.feature.finance_entity_type
+  ts_accrual:
+    description: "Accural timestamp"
+    lineage:
+      - datalake_sap_gateway_clean.feature.ts_accrual
+  ts_created:
+    description: "Creation timestamp"
+    lineage:
+      - datalake_sap_gateway_clean.feature.ts_created
+  ts_updated:
+    description: "Update timestamp"
+    lineage:
+      - datalake_sap_gateway_clean.feature.updated_at
+  year:
+    description: "Update year"
+    lineage:
+      - datalake_sap_gateway_clean.feature.year
+  month:
+    description: "Update month"
+    lineage:
+      - datalake_sap_gateway_clean.feature.month
+  day:
+    description: "Update day"
+    lineage:
+      - datalake_sap_gateway_clean.feature.day

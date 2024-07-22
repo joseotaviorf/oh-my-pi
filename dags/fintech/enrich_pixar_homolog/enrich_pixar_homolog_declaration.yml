@@ -1,0 +1,10 @@
+---
+dag:
+  name: enrich_pixar_homolog
+  schedule_start_date: 2020, 7, 1
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_13_3_med_general_cluster

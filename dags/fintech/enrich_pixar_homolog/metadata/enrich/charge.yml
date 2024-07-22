@@ -1,0 +1,70 @@
+database_name: datalake_pixar_homolog
+table_name: charge
+description: Enriched table with charge data, filtered by the most recent update date.
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_pixar_clean.charge.id
+    description: "Unique identification number of the table"
+  id_account:
+    lineage:
+      - datalake_pixar_clean.charge.id_account
+    description: "Identification number of the account"
+  id_external:
+    lineage:
+      - datalake_pixar_clean.charge.id_external
+    description: "External identification number"
+  id_transaction:
+    lineage:
+      - datalake_pixar_clean.charge.id_transaction
+    description: "Identification number of the transaction"
+  id_bank_payment:
+    lineage:
+      - datalake_pixar_clean.charge.id_bank_payment
+    description: "Identification number of the bank the payment was made"
+  pix_link:
+    lineage:
+      - datalake_pixar_clean.charge.pix_link
+    description: "PIX URL"
+  pix_emv:
+    lineage:
+      - datalake_pixar_clean.charge.pix_emv
+    description: "PIX EMV code"
+  amount:
+    lineage:
+      - datalake_pixar_clean.charge.amount
+    description: "Transaction amount"
+  bank_fee:
+    lineage:
+      - datalake_pixar_clean.charge.bank_fee
+    description: "Bank fee amount"
+  status:
+    lineage:
+      - datalake_pixar_clean.charge.status
+    description: "Transaction status"
+  dt_limit:
+    lineage:
+      - datalake_pixar_clean.charge.dt_limit
+    description: "Limit date for payment"
+  ts_created:
+    lineage:
+      - datalake_pixar_clean.charge.ts_created
+    description: "Timestamp when the charge was created"
+  ts_updated:
+    lineage:
+      - datalake_pixar_clean.charge.ts_updated
+    description: "Update timestamp"
+  year:
+    lineage:
+      - datalake_pixar_clean.charge.year
+    description: "Update year"
+  month:
+    lineage:
+      - datalake_pixar_clean.charge.month
+    description: "Update month"
+  day:
+    lineage:
+      - datalake_pixar_clean.charge.day
+    description: "Update day"
