@@ -29,48 +29,6 @@ WITH pre_proposal_aud AS (
 	WINDOW
 		w AS (PARTITION BY pp.id)
 ),
-all_offer_submitted_events AS (
-    SELECT
-        CAST(id_user AS BIGINT) AS id_user,
-        CAST(ep_id_house AS BIGINT) AS id_house,
-        ep_id_firestore AS id_firestore,
-        ts_event,
-        up_app_type AS app_type,
-        up_utm_source AS utm_source,
-        up_utm_medium AS utm_medium,
-        up_utm_campaign AS utm_campaign,
-        up_utm_content AS utm_content,
-        up_utm_term AS utm_term
-    FROM
-        datalake_amplitude_clean.170698_offer_submitted_events
-    UNION
-    SELECT
-        CAST(id_user AS BIGINT) AS id_user,
-        CAST(ep_id_house AS BIGINT) AS id_house,
-        ep_id_firestore AS id_firestore,
-        ts_event,
-        up_app_type AS app_type,
-        up_utm_source AS utm_source,
-        up_utm_medium AS utm_medium,
-        up_utm_campaign AS utm_campaign,
-        up_utm_content AS utm_content,
-        up_utm_term AS utm_term
-    FROM
-        datalake_amplitude_clean.170135_offer_submitted_events
-    UNION
-    SELECT
-        CAST(id_user AS BIGINT) AS id_user,
-        CAST(ep_id_house AS BIGINT) AS id_house,
-        ep_id_firestore AS id_firestore,
-        ts_event,
-        up_app_type AS app_type,
-        up_utm_source AS utm_source,
-        up_utm_medium AS utm_medium,
-        up_utm_campaign AS utm_campaign,
-        up_utm_content AS utm_content,
-        up_utm_term AS utm_term
-    FROM datalake_amplitude_clean.183049_offer_submitted_events
-),
 enrich_attribution AS (
     SELECT
         aos.id_user,
@@ -82,41 +40,19 @@ enrich_attribution AS (
         The new one starts on H2/2021.
         Using CASE WHEN instead of COALESCE to don't create strange combinations.
         */
-        CASE 
-            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_app_type
-            ELSE aos.app_type
-        END AS app_type,
-        CASE 
-            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_source
-            ELSE aos.utm_source
-        END AS utm_source,
-        CASE 
-            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_medium
-            ELSE aos.utm_medium
-        END AS utm_medium,
-        CASE 
-            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_campaign
-            ELSE aos.utm_campaign
-        END AS utm_campaign,
-        CASE 
-            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_content
-            ELSE aos.utm_content
-        END AS utm_content,
-        CASE 
-            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_term
-            ELSE aos.utm_term
-        END AS utm_term,
-        CASE 
-            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_branded = 'Branded'
-            ELSE COALESCE(((UPPER(utm_campaign) LIKE '%BRANDED%'OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%') AND UPPER(utm_campaign) NOT LIKE '%NON-BRANDED%'), FALSE)
-        END AS flg_branded,
-        CASE 
-            WHEN acc.id_firestore IS NOT NULL THEN acc.final_attribution_origin
-            ELSE 'old_attribution'
-        END AS final_attribution_origin
+        IF(acc.id_firestore IS NOT NULL, acc.final_attribution_app_type, aos.app_type) AS app_type,
+        IF(acc.id_firestore IS NOT NULL, acc.final_attribution_source, aos.utm_source) AS utm_source,
+        IF(acc.id_firestore IS NOT NULL, acc.final_attribution_medium, aos.utm_medium) AS utm_medium,
+        IF(acc.id_firestore IS NOT NULL, acc.final_attribution_campaign, aos.utm_campaign) AS utm_campaign,
+        IF(acc.id_firestore IS NOT NULL, acc.final_attribution_content, aos.utm_content) AS utm_content,
+        IF(acc.id_firestore IS NOT NULL, acc.final_attribution_term, aos.utm_term) AS utm_term,
+        IF(acc.id_firestore IS NOT NULL, acc.final_attribution_origin, 'old_attribution') AS final_attribution_origin,
+        IF(acc.id_firestore IS NOT NULL, acc.final_attribution_branded = 'Branded',
+            COALESCE(((UPPER(utm_campaign) LIKE '%BRANDED%'OR UPPER(utm_campaign) LIKE '%INSTITUCIONAL%') AND UPPER(utm_campaign) NOT LIKE '%NON-BRANDED%'), FALSE)) AS flg_branded
     FROM
-        all_offer_submitted_events aos
-        LEFT JOIN datalake_tracked_events.attribution_cross_channel acc
+        datalake_amplitude_offer.offer_submitted_events AS aos
+    LEFT JOIN
+        datalake_tracked_events.attribution_cross_channel AS acc
             ON aos.id_firestore = acc.id_firestore
             AND acc.event_name = 'offer_submitted'
 ),
@@ -229,61 +165,33 @@ all_offers AS (
 offer_enriched AS (
     SELECT
         o.*,
-        CASE
-            WHEN ose_id_firestore.id_firestore IS NOT NULL
-                THEN ose_id_firestore.app_type
-            ELSE ose_wo_id_firestore.app_type
-        END AS app_type,
-        CASE
-            WHEN ose_id_firestore.id_firestore IS NOT NULL
-                THEN ose_id_firestore.utm_source
-            ELSE ose_wo_id_firestore.utm_source
-        END AS utm_source,
-        CASE
-            WHEN ose_id_firestore.id_firestore IS NOT NULL
-                THEN ose_id_firestore.utm_medium
-            ELSE ose_wo_id_firestore.utm_medium
-        END AS utm_medium,
-        CASE
-            WHEN ose_id_firestore.id_firestore IS NOT NULL
-                THEN ose_id_firestore.utm_campaign
-            ELSE ose_wo_id_firestore.utm_campaign
-        END AS utm_campaign,
-        CASE
-            WHEN ose_id_firestore.id_firestore IS NOT NULL
-                THEN ose_id_firestore.utm_content
-            ELSE ose_wo_id_firestore.utm_content
-        END AS utm_content,
-        CASE
-            WHEN ose_id_firestore.id_firestore IS NOT NULL
-                THEN ose_id_firestore.utm_term
-            ELSE ose_wo_id_firestore.utm_term
-        END AS utm_term,
-        CASE
-            WHEN ose_id_firestore.id_firestore IS NOT NULL
-                THEN ose_id_firestore.flg_branded
-            ELSE ose_wo_id_firestore.flg_branded
-        END AS flg_branded,
-        CASE
-            WHEN ose_id_firestore.final_attribution_origin IS NOT NULL
-                THEN ose_id_firestore.final_attribution_origin
-            ELSE ose_wo_id_firestore.final_attribution_origin
-        END AS final_attribution_origin
+        IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.app_type, ose_wo_id_firestore.app_type) AS app_type,
+        IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.utm_source, ose_wo_id_firestore.utm_source) AS utm_source,
+        IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.utm_medium, ose_wo_id_firestore.utm_medium) AS utm_medium,
+        IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.utm_campaign, ose_wo_id_firestore.utm_campaign) AS utm_campaign,
+        IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.utm_content, ose_wo_id_firestore.utm_content) AS utm_content,
+        IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.utm_term, ose_wo_id_firestore.utm_term) AS utm_term,
+        IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.flg_branded, ose_wo_id_firestore.flg_branded) AS flg_branded,
+        IF(ose_id_firestore.final_attribution_origin IS NOT NULL, ose_id_firestore.final_attribution_origin, ose_wo_id_firestore.final_attribution_origin) AS final_attribution_origin
     FROM
-        all_offers o
+        all_offers AS o
     LEFT JOIN
-        offer_submitted_events ose_wo_id_firestore
+        offer_submitted_events AS ose_wo_id_firestore
             ON ose_wo_id_firestore.has_id_firestore = FALSE
             AND ose_wo_id_firestore.rn_without_id_firestore = 1
             AND o.id_user = ose_wo_id_firestore.id_user
             AND o.id_property = ose_wo_id_firestore.id_house
     LEFT JOIN
-        offer_submitted_events ose_id_firestore
+        offer_submitted_events AS ose_id_firestore
             ON ose_id_firestore.has_id_firestore
             AND ose_id_firestore.rn_id_firestore = 1
             AND o.id_firestore = ose_id_firestore.id_firestore
 ),
 taxonomy_demand AS (
+    /*
+        As flg_branded is used to define a relationship with offer, it is necessary to make sure that this CTE will be deduplicated 
+        considering this column to. In this way offer: taxonomy will be 1:1
+    */
     SELECT
         id,
 		app_type,
@@ -303,40 +211,11 @@ taxonomy_demand AS (
 	WHERE
 		first_update_source = 'Inquilinos'
 		AND flg_via_reschedule = 0
-),
-taxonomy_demand_versions AS (
-    /*
-    As flg_branded is used to define a relationship with offer
-    it is necessary to make sure that this CTE will be deduplicated 
-    considering this column to. In this way offer: taxonomy will
-    be 1:1.
-    */
-    SELECT
-        row_number() OVER (PARTITION BY lower(app_type),
-                                lower(utm_source),
-                                lower(utm_medium),
-                                flg_branded
-                    ORDER BY lower(app_type),
-                                lower(utm_source),
-                                lower(utm_medium),
-                                flg_branded,
-                                id) AS rn,
-        app_type,
-        utm_source,
-        utm_medium,
-        flg_branded,
-        mkt_category,
-        mkt_flow,
-        mkt_completion,
-        mkt_channel,
-        mkt_medium,
-        mkt_origin,
-        mkt_source,
-        mkt_platform
-    FROM
-        taxonomy_demand
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY LOWER(app_type), LOWER(utm_source), LOWER(utm_medium), branded = 'Branded'
+            ORDER BY LOWER(app_type), LOWER(utm_source), LOWER(utm_medium), branded = 'Branded', id) = 1
 )
-SELECT-- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+SELECT
     o.sk_offer,
     o.id_offer,
     o.id_godfather,
@@ -355,14 +234,14 @@ SELECT-- [ODS] This table was migrated from ODS flow and needs a future refactor
     o.utm_content,
     o.utm_term,
     o.final_attribution_origin,
-    CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_category END AS mkt_category,
-	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_flow END AS mkt_flow,
-	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_completion END AS mkt_completion,
-	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_origin END AS mkt_origin,
-	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_channel END AS mkt_channel,
-	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_medium END AS mkt_medium,
-	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_source END AS mkt_source,
-	CASE WHEN td.mkt_flow IS NULL THEN 'Not Mapped' ELSE td.mkt_platform END AS mkt_platform,
+    IF(td.mkt_flow IS NULL, 'Not Mapped', td.mkt_category) AS mkt_category,
+    IF(td.mkt_flow IS NULL, 'Not Mapped', td.mkt_flow) AS mkt_flow,
+    IF(td.mkt_flow IS NULL, 'Not Mapped', td.mkt_completion) AS mkt_completion,
+    IF(td.mkt_flow IS NULL, 'Not Mapped', td.mkt_origin) AS mkt_origin,
+    IF(td.mkt_flow IS NULL, 'Not Mapped', td.mkt_channel) AS mkt_channel,
+    IF(td.mkt_flow IS NULL, 'Not Mapped', td.mkt_medium) AS mkt_medium,
+    IF(td.mkt_flow IS NULL, 'Not Mapped', td.mkt_source) AS mkt_source,
+    IF(td.mkt_flow IS NULL, 'Not Mapped', td.mkt_platform) AS mkt_platform,
     o.last_offered_rent,
     o.original_rent,
     o.original_condo,
@@ -390,10 +269,10 @@ SELECT-- [ODS] This table was migrated from ODS flow and needs a future refactor
     o.dt_updated,
     o.dt_timestamp
 FROM
-    offer_enriched o
-LEFT JOIN taxonomy_demand_versions td
-    ON td.rn = 1
-    AND LOWER(COALESCE(td.app_type,'')) = LOWER(COALESCE(o.app_type,''))
-	AND LOWER(COALESCE(td.utm_source,'')) = LOWER(COALESCE(o.utm_source,''))
-	AND LOWER(COALESCE(td.utm_medium,'')) = LOWER(COALESCE(o.utm_medium,''))
-	AND COALESCE(td.flg_branded, FALSE) = COALESCE(o.flg_branded, FALSE)
+    offer_enriched AS o
+LEFT JOIN
+    taxonomy_demand AS td
+        ON LOWER(COALESCE(td.app_type,'')) = LOWER(COALESCE(o.app_type,''))
+        AND LOWER(COALESCE(td.utm_source,'')) = LOWER(COALESCE(o.utm_source,''))
+        AND LOWER(COALESCE(td.utm_medium,'')) = LOWER(COALESCE(o.utm_medium,''))
+        AND COALESCE(td.flg_branded, FALSE) = COALESCE(o.flg_branded, FALSE)

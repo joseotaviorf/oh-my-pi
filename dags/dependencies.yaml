@@ -583,7 +583,7 @@ bietlejuice.dw_losses:
   - bietlejuice.enrich_losses:load-enrich-historical-closing
   - bietlejuice.enrich_losses:load-enrich-provision
 bietlejuice.dw_offer:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal-aud
   - bietlejuice.enrich_offer:load-enrich-offer
