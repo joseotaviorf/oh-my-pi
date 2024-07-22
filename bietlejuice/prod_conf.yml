@@ -172,6 +172,7 @@ cluster_template:
         aws_attributes: &aws_anchor
             availability: SPOT_WITH_FALLBACK
             ebs_volume_count: 1
+            first_on_demand: 1
             ebs_volume_size: 100
             ebs_volume_type: GENERAL_PURPOSE_SSD
             instance_profile_arn: "{{ var.value.instance_profile_arn }}"

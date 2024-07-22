@@ -22,6 +22,7 @@ cluster:
         spark_version: 13.3.x-scala2.12
         num_workers: 4
         aws_attributes:
+            first_on_demand: 1
             spot_bid_price_percent: 100
             zone_id: us-east-1d
             availability: SPOT_WITH_FALLBACK

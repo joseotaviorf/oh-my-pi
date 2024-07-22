@@ -15,6 +15,7 @@ custom_cluster:
   node_type_id: c5a.4xlarge
   num_workers: 6
   aws_attributes:
+    first_on_demand: 1
     availability: SPOT_WITH_FALLBACK
     spot_bid_price_percent: 100
     zone_id: us-east-1d
@@ -27,6 +28,7 @@ databricks_10_4_max_memory_cluster:
   runtime_engine: PHOTON
   num_workers: 4
   aws_attributes:
+    first_on_demand: 1
     spot_bid_price_percent: 100
     zone_id: us-east-1d
     availability: SPOT_WITH_FALLBACK

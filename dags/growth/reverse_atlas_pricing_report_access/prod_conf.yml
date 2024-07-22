@@ -30,6 +30,7 @@ custom_cluster:
   spark_conf:
     spark.driver.memory: "30g"
   aws_attributes:
+    first_on_demand: 1
     spot_bid_price_percent: 100
     zone_id: us-east-1d
     availability: SPOT_WITH_FALLBACK

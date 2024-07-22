@@ -104,6 +104,7 @@ cluster:
       spark.sql.broadcastTimeout: 1200
       spark.sql.sources.partitionOverwriteMode: static
     aws_attributes:
+      first_on_demand: 1
       spot_bid_price_percent: 100
       zone_id: us-east-1d
       ebs_volume_size: 200

@@ -30,6 +30,7 @@ cluster:
     node_type_id: r5d.4xlarge
     num_workers: 3
     aws_attributes:
+        first_on_demand: 1
         spot_bid_price_percent: 100
         zone_id: us-east-1d
         ebs_volume_size: 200
