@@ -63,6 +63,6 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean_staging.183049_offer_submitted_new_events
+    datalake_amplitude_clean_staging.170698_offer_submitted_new_events
 WHERE
     year={} and month={} and day={}

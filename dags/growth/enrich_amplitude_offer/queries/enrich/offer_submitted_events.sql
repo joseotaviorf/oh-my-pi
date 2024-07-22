@@ -92,7 +92,7 @@ WITH deduplicated_offer_events AS (
         month,
         day
     FROM
-        datalake_amplitude_clean.170135_offer_submitted_new_events
+        datalake_amplitude_clean.170698_offer_submitted_new_events
     WHERE
         MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
@@ -116,7 +116,7 @@ WITH deduplicated_offer_events AS (
         month,
         day
     FROM
-        datalake_amplitude_clean.183049_offer_submitted_new_events
+        datalake_amplitude_clean.183047_offer_submitted_new_events
     WHERE
         MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
