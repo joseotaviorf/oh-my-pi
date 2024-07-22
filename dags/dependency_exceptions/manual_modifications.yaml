@@ -928,6 +928,17 @@ wonka.house_listing_business_context:
     - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
     - bietlejuice.ebdb_user:load-clean-user-revision-entity
 
+wonka.house_rent_offer:
+  add:
+    - bietlejuice.ebdb_offer:load-clean-offer
+
+wonka.house_rent_proposal:
+  add:
+    - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+    - bietlejuice.arquivo_confidencial:load-clean-rev-info
+    - bietlejuice.sorting_hat:load-clean-proponent
+    - bietlejuice.sorting_hat:load-clean-proposal
+
 quintoml.recs.house_user_embeddings_quintoml.inference:
   add:
     - wonka.house_listing_business_context:load-house_listing_business_context

@@ -3561,3 +3561,11 @@ wonka.user_region_listing_page_viewed:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_location:load-clean-region
+wonka.house_rent_offer:
+  - bietlejuice.ebdb_offer:load-clean-offer
+wonka.house_rent_proposal:
+  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+  - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.sorting_hat:load-clean-proponent
+  - bietlejuice.sorting_hat:load-clean-proposal
+

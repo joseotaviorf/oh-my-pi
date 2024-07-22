@@ -127,6 +127,8 @@ dags_out_of_pattern:
         "wonka.user_most_viewed_city",
         "wonka.house_embeddings_main",
         "wonka.user_embeddings_main",
+        "wonka.house_rent_offer",
+        "wonka.house_rent_proposal",
         "zordominium_vespucio_plugin",
         "quintoml.recs.house_user_embeddings_quintoml.inference",
         "dw_quintocred_ifrs",
