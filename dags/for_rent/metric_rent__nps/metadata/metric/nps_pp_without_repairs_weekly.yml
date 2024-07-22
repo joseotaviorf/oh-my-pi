@@ -21,6 +21,11 @@ columns:
       UNDEFINED: Undefined.
       OVERALL: All rent value. LOW, MEDIUM, HIGH and UNDEFINED included in OVERALL category.
     dimension: True
+  country_code:
+    lineage:
+      - dw_rent.dim_contract.country_code
+    description: "Country code of the house"
+    dimension: True
   promoters_no_repairs_need:
     description: "Volume of promoters among owners that answered the NPS survey after a contract termination without the need of repairs."
     metric:

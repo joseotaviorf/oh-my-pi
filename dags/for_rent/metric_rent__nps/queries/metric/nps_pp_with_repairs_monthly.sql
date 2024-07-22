@@ -3,6 +3,7 @@ dataset_aux AS (
     SELECT DISTINCT
         nps.sk_nps_answer,
         nps.score_category,
+        dc.country_code,
         CAST(DATE_TRUNC('MONTH', DATE(nps.ts_answered)) AS DATE) AS month_answers,
         dc.value_segment AS category
     FROM 
@@ -28,6 +29,7 @@ dataset_final AS (
     SELECT 
         month_answers,
         category,
+        country_code,
         COUNT(
             CASE
                 WHEN score_category = 'promoter' THEN 0 
@@ -43,13 +45,14 @@ dataset_final AS (
     FROM 
         dataset_aux
     GROUP BY 
-        1, 2
+        1, 2, 3
 
     UNION
     
     SELECT 
         month_answers,
         'OVERALL' AS category,
+        country_code,
         COUNT(
             CASE
                 WHEN score_category = 'promoter' THEN 0 
@@ -65,11 +68,12 @@ dataset_final AS (
     FROM 
         dataset_aux
     GROUP BY 
-        1, 2
+        1, 2, 3
 )
 SELECT 
     month_answers,
     category,
+    country_code,
     promoters_repairs_need,
     detractors_repairs_need,
     total_answers_repairs_need,
@@ -77,4 +81,4 @@ SELECT
 FROM 
     dataset_final
 GROUP BY 
-    1, 2, 3, 4, 5
+    1, 2, 3, 4, 5, 6

@@ -3,6 +3,7 @@ dataset_aux AS (
     SELECT DISTINCT
         nps.sk_nps_answer,
         nps.score_category,
+        dc.country_code,
         CAST(DATE_TRUNC('WEEK', DATE(nps.ts_answered)) AS DATE) AS week_answers,
         dc.value_segment AS category
     FROM 
@@ -27,30 +28,33 @@ dataset_final AS (
     SELECT 
         week_answers,
         category,
+        country_code,
         COUNT_IF(score_category = 'promoter') AS promoters,
         COUNT_IF(score_category = 'detractor') AS detractors,
         COUNT(1) AS total_answers
     FROM 
         dataset_aux
     GROUP BY 
-        1, 2
+        1, 2, 3
 
     UNION
     
     SELECT 
         week_answers,
         'OVERALL' AS category,
+        country_code,
         COUNT_IF(score_category = 'promoter') AS promoters,
         COUNT_IF(score_category = 'detractor') AS detractors,
         COUNT(1) AS total_answers
     FROM 
         dataset_aux
     GROUP BY 
-        1, 2
+        1, 2, 3
 )
 SELECT 
     week_answers,
     category,
+    country_code,
     promoters,
     detractors,
     total_answers,
@@ -58,4 +62,4 @@ SELECT
 FROM 
     dataset_final
 GROUP BY 
-    1, 2, 3, 4, 5
+    1, 2, 3, 4, 5, 6
