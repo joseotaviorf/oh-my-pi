@@ -174,6 +174,8 @@ house_listing AS (
       FALSE AS is_extended_rental,
       FALSE AS is_originals_active,
       FALSE AS is_iorent_active,
+      FALSE AS is_for_rent,
+      TRUE AS is_for_sale,
       sa.ts_created AS ts_listing_version_start,
       NULL AS ts_listing_version_end,
       NULL AS ts_last_unpublished,
