@@ -58,4 +58,4 @@ workflow:
     obt_supply:
       - fact_supply_events
 cluster:
-  type: databricks_12_2_med_memory_photon_cluster
+  type: databricks_12_2_min_memory_photon_cluster
