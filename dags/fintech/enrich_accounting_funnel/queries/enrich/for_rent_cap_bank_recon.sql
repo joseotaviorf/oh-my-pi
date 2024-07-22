@@ -51,7 +51,7 @@ sap AS (
         dt_tax,
         SUM(debit_credit) AS paid_amount
     FROM
-        datalake_accounting_funnel.ledger
+        datalake_pas.ledger
     WHERE
         account_number IN ('11102.01.04', '11102.02.01')
     GROUP BY

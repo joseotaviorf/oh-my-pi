@@ -8,7 +8,6 @@ workflow:
   layer: enrich
   inner_dependencies:
     for_rent_cap_bank_recon:
-      - ledger
       - payment_platforms
     retsuko_revenue_accounting:
       - ledger

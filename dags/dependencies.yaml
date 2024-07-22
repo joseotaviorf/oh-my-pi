@@ -1015,6 +1015,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_sap:load-enrich-invoices
   - bietlejuice.enrich_sap:load-enrich-journal-entries
   - bietlejuice.enrich_sap:load-enrich-journal-entry-lines
+  - bietlejuice.enrich_sap:load-enrich-ledger
   - bietlejuice.enrich_sap_gateway:load-enrich-feature
   - bietlejuice.enrich_sap_gateway:load-enrich-sync-sap-job
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
@@ -3568,4 +3569,3 @@ wonka.house_rent_proposal:
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
-
