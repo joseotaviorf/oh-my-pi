@@ -119,8 +119,7 @@ load_data_into_s3 = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-chain(
-    skip_run_task,
+chain(    #skip_run_task,
     create_cluster_task,
     DatalakeTaskGroup.all_first_tasks(enrich_task_groups),
 )
