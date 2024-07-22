@@ -219,7 +219,7 @@ def generate_schema(data: dict) -> list:
 
 
 def transform_tables_into_dataframes(tables: dict) -> None:
-    """Transforms all tables in the dictionary into dataframes, assigning the result to the key "dataframe"."""
+    """Transforms all tables in the dictionary into dataframes, assigning the result to the key 'dataframe'."""
 
     for table in tables.values():
         if "schema" not in table or table["schema"] is None:
@@ -228,18 +228,29 @@ def transform_tables_into_dataframes(tables: dict) -> None:
             schema = HubSpotSchemaEnum[table["schema"].upper() + "_SCHEMA"].value
 
         table["dataframe"] = create_dataframe_with_schema(table["content"], schema, table["encode_inner_dictionaries"])
+        
+        if table["dataframe"] is None:
+            continue
+        
         if "archived_content" in table:
-            table["dataframe"] = (
-                table["dataframe"]
-                .unionAll(create_dataframe_with_schema(table["archived_content"], schema, table["encode_inner_dictionaries"]))
-                .withColumn(
-                    "updated_at", greatest(col("updated_at"), col("archived_at"))
-                )  # HubSpot doesn't change updated_at when it archives an object
-            )
+            archived_df = create_dataframe_with_schema(table["archived_content"], schema, table["encode_inner_dictionaries"])
+            
+            if archived_df is not None:
+                table["dataframe"] = (
+                    table["dataframe"]
+                    .unionAll(archived_df)
+                    .withColumn(
+                        "updated_at", greatest(col("updated_at"), col("archived_at"))
+                    )
+                )
 
 
 def create_dataframe_with_schema(table_content: dict, schema: StructType, encode_inner_dictionaries: bool):
     """Receives the raw content returned by the consumer, and returns a Spark Dataframe"""
+    
+    if not table_content:  # Verifies if the data frame is empty
+        logger.info("No data to convert into dataframe.")
+        return None
 
     if encode_inner_dictionaries:
         table_content = JsonService.transform_json_list_terms(
