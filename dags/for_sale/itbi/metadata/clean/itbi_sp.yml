@@ -1,125 +1,173 @@
 ---
 database_name: datalake_itbi_clean
 table_name: itbi_sp
-description: Table extracted from the São Paulo City Hall website. It has all the records of transactions that were subject to the ITBI tax (Imposto de Transmissão de Bens Imóveis).
-  We run the extraction fortnightly. However, the data is monthly and is also fed back by the municipality
+description:
+  Table extracted from the São Paulo City Hall website.It has all the records of
+  transactions that were subject to the ITBI tax (Imposto de Transmissão de Bens Imóveis).
+  The ingestion of ITBI BH data occurs on the 15th and 30th of each month.
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   iptu_sql_registration_number:
     lineage:
       - datalake_itbi_raw.itbi_sp.n_cadastro_sql
-    description: 'The property registration number (SETOR QUADRA LOTE) represents the identification of the lots in the Cadastro Imobiliário
-       Fiscal of the Municipality of São Paulo, also used by the IPTU (Imposto Predial e Territorial Urbano).'
+    description: |
+      "The property registration number (SETOR QUADRA LOTE) represents the identification of the
+      lots in the Cadastro Imobiliário Fiscal of the Municipality of São Paulo, also used by the
+      IPTU (Imposto Predial e Territorial Urbano)."
   house_registry_number:
     lineage:
       - datalake_itbi_raw.itbi_sp.matricula_imovel
-    description: 'The property registration number is the registration number of that property in a specific house register office.'
+    description: |
+      "The property registration number is the registration number of that property in a specific
+      house register office."
   address_street_name:
     lineage:
       - datalake_itbi_raw.itbi_sp.nome_logradouro
-    description: Street name linked to the transaction's zip code.
+    description: |
+      "Street name linked to the transaction's zip code."
   address_number:
     lineage:
       - datalake_itbi_raw.itbi_sp.numero
-    description: Unit number of the property.
+    description: |
+      "Unit number of the property."
   address_complement:
     lineage:
       - datalake_itbi_raw.itbi_sp.complemento
-    description: 'Complement of the property address.'
+    description: |
+      "Complement of the property address."
   address_neighborhood:
     lineage:
       - datalake_itbi_raw.itbi_sp.bairro
-    description: "The neighborhood of the property address."
+    description: |
+      "The neighborhood of the property address."
   address_reference:
     lineage:
       - datalake_itbi_raw.itbi_sp.referencia
-    description: 'Reference of the property address.'
+    description: |
+      "Reference of the property address."
   address_zipcode:
     lineage:
       - datalake_itbi_raw.itbi_sp.cep
-    description: 'Zip code of the property address.'
+    description: |
+      "Zip code of the property address."
   transaction_nature:
     lineage:
       - datalake_itbi_raw.itbi_sp.natureza_transacao
-    description: What is the nature of that transaction, such as purchase and sale, granting of rights, etc.
+    description: |
+      "What is the nature of that transaction, such as purchase and sale, granting of rights, etc."
   financing_type:
     lineage:
       - datalake_itbi_raw.itbi_sp.tipo_financiamento
-    description: The financing system used to purchase the property.
+    description: |
+      The financing system used to purchase the property.
   house_registry_office:
     lineage:
       - datalake_itbi_raw.itbi_sp.cartorio_registro
-    description: 'The house registry office is the notary office where the property was registered.'
+    description: |
+      "The house registry office is the notary office where the property was registered."
   iptu_sql_status:
     lineage:
       - datalake_itbi_raw.itbi_sp.situacao_sql
-    description: 'The IPTU status is the status of the property in the IPTU (Imposto Predial e Territorial Urbano) system.'
+    description: |
+      "The IPTU status is the status of the property in the IPTU (Imposto Predial e
+      Territorial Urbano) system."
   iptu_use_description:
     lineage:
       - datalake_itbi_raw.itbi_sp.descricao_uso_iptu
-    description: 'The IPTU use description is the description of the type of use of the property.'
+    description: |
+      "The IPTU use description is the description of the type of use of the property."
   iptu_standard_description:
     lineage:
       - datalake_itbi_raw.itbi_sp.descricao_padrao_iptu
-    description: 'The IPTU standard description is the description of the type of property.'
+    description: |
+      "The IPTU standard description is the description of the type of property."
   declared_transaction_value:
     lineage:
       - datalake_itbi_raw.itbi_sp.valor_transacao_declarado
-    description: 'The declared transaction value is the value declared by the buyer and seller of the property.'
+    description: |
+      "The declared transaction value is the value declared by the buyer and seller of the property."
   reference_appraisal_value:
     lineage:
       - datalake_itbi_raw.itbi_sp.valor_venal_referencia
-    description: 'The reference appraisal value is the value of the property used by the municipality to calculate the property tax (IPTU).'
+    description: |
+      "The reference appraisal value is the value of the property used by the municipality to calculate
+      the property tax (IPTU)."
   transmitted_proportion:
     lineage:
       - datalake_itbi_raw.itbi_sp.proporcao_transmitida
-    description: 'The transmitted proportion is the proportion of the property that was sold.'
+    description: |
+      "The transmitted proportion is the proportion of the property that was sold."
   proportional_reference_appraisal_value:
     lineage:
       - datalake_itbi_raw.itbi_sp.valor_venal_referencia_proporcional
-    description: 'The proportional reference appraisal value is the reference appraisal value multiplied by the transmitted proportion.'
+    description: |
+      "The proportional reference appraisal value is the reference appraisal value multiplied by the
+      transmitted proportion."
   adopted_calculation_basis:
     lineage:
       - datalake_itbi_raw.itbi_sp.base_calculo_adotada
-    description: 'The adopted calculation basis is the value used to calculate the ITBI.'
+    description: |
+      "The adopted calculation basis is the value used to calculate the ITBI."
   financed_value:
     lineage:
       - datalake_itbi_raw.itbi_sp.valor_financiado
-    description: 'The financed value is the value of the property that was financed.'
+    description: |
+      "The financed value is the value of the property that was financed."
   land_area_m2:
     lineage:
       - datalake_itbi_raw.itbi_sp.area_terreno_m2
-    description: 'The land area is the area of the property in square meters.'
+    description: |
+      "The land area is the area of the property in square meters."
   portion_public_road_land_m:
     lineage:
       - datalake_itbi_raw.itbi_sp.testada_m
-    description: 'The portion of the property that is on the public road.'
+    description: |
+      "The portion of the property that is on the public road."
   ideal_fraction:
     lineage:
       - datalake_itbi_raw.itbi_sp.fracao_ideal
-    description: Incidence of the acquisition percentage over the ideal fraction original.
+    description: |
+      "Incidence of the acquisition percentage over the ideal fraction original."
   built_area_m2:
     lineage:
       - datalake_itbi_raw.itbi_sp.area_construida_m2
-    description: 'Result of the application of the percentage acquired by the unit construction area.'
+    description: |
+      "Result of the application of the percentage acquired by the unit construction area."
   iptu_use_code:
     lineage:
       - datalake_itbi_raw.itbi_sp.uso_iptu
-    description: 'The IPTU use code is the code that represents the type of use of the property.'
+    description: |
+      "The IPTU use code is the code that represents the type of use of the property."
   iptu_standard_code:
     lineage:
       - datalake_itbi_raw.itbi_sp.padrao_iptu
-    description: 'The IPTU standard code is the code that represents the type of property.'
+    description: |
+      "The IPTU standard code is the code that represents the type of property."
   iptu_registration_year:
     lineage:
       - datalake_itbi_raw.itbi_sp.acc_iptu
-    description: 'Year that the construction of the property was finished.'
+    description: |
+      "Year that the construction of the property was finished."
   dt_transaction:
     lineage:
       - datalake_itbi_raw.itbi_sp.data_transacao
-    description: 'Date the ITBI transaction was registered by the municipality.'
+    description: |
+      "Date the ITBI transaction was registered by the municipality."
   dt_load:
     lineage:
       - datalake_itbi_raw.itbi_sp.dt_load
-    description: 'Date we updated the ITBI SP data.'
+    description: |
+      "Date we updated the ITBI SP data."
+  year:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.year
+    description: |
+      "ITBI Transaction Year.
+      It is a partition column."
+  month:
+    lineage:
+      - datalake_itbi_raw.itbi_sp.month
+    description: |
+      "ITBI Transaction Month.
+      It is a partition column."

@@ -1,78 +1,120 @@
 ---
 database_name: datalake_itbi_clean
 table_name: itbi_bh
-description: ITBI - Belo Horizonte
+description:
+  Table extracted from the Belo Horizonte City Hall website.It has all the records of
+  transactions that were subject to the ITBI tax (Imposto de Transmissão de Bens Imóveis).
+  The ingestion of ITBI BH data occurs on the 15th and 30th of each month.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br / guilherme.ventura@quintoandar.com.br
+owner: data-for-sale@quintoandar.com.br
 columns:
-  neighborhood:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.bairro
-    description: 'Neighborhood where the property is located.'
   address:
     lineage:
       - datalake_itbi_raw.itbi_bh.endereco_completo
-    description: 'Address where the property is located.'
+    description: |
+      "Address where the property is located."
+  neighborhood:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.bairro
+    description: |
+      "Neighborhood where the property is located."
+  standard_finish:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.padrao_acabamento_unidade
+    description: |
+      "Finishing Standard of the unit according to the score received from
+      the constructive characteristics."
+  predominant_construction_type:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.tipo_construtivo_preponderante
+    description: |
+      "Building type with the largest area."
   occupation_description:
     lineage:
       - datalake_itbi_raw.itbi_bh.descricao_tipo_ocupacao_unidade
-    description: 'Whether the occupancy type is residential, non-residential or territorial.'
+    description: |
+      "Whether the occupancy type is residential, non-residential or territorial."
     categories:
-      RESIDENCIAL: 'If the occupation is residential (used for living).'
-      NAO RESIDENCIAL: 'If the occupation is non-residential (not used for living).'
-      TERRITORIAL: 'It is only a piece of land, it does not have the property built.'
-      VALOR NULO: 'No information.'
-  standard_finish:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.standard_finish
-    description: 'Finishing Standard of the unit according to the score received from the constructive characteristics.'
+      RESIDENCIAL: "If the occupation is residential (used for living)."
+      NAO RESIDENCIAL: "If the occupation is non-residential (not used for living)."
+      TERRITORIAL: "It is only a piece of land, it does not have the property built."
+      VALOR NULO: "No information."
   urban_zoning_code:
     lineage:
-      - datalake_itbi_raw.itbi_bh.urban_zoning_code
-    description: 'Urban zoning coding for the property, assigned by the Use and Occupancy Law in effect at the time of the transaction.'
-  predominant_construction_type:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.predominant_construction_type
-    description: 'Building type with the largest area.'
+      - datalake_itbi_raw.itbi_bh.zona_uso_itbi
+    description: |
+      "Urban zoning coding for the property, assigned by the
+      Use and Occupancy Law in effect at the time of the transaction.'
   source_file:
     lineage:
       - datalake_itbi_raw.itbi_bh.source_file
-    description: 'URL of the CSV downloaded for ingesting the data from the BH municipality.'
-  land_area_m2:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.area_terreno_total
-    description: 'Land area in square meters'
-  built_area_m2:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.area_construida_adquirida
-    description: 'Result of the application of the percentage acquired by the unit construction area.'
-  all_units_area_m2:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.area_adquirida_unidades_somadas
-    description: "Sum of the units in cases where we have several building types. 
-      It occurs when the units represent distinct blocks because they are not contiguous or because they constitute different savings."
-  ideal_fraction:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.fracao_ideal_adquirida
-    description: Incidence of the acquisition percentage over the ideal fraction original.
-  adopted_calculation_basis:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.valor_base_calculo
-    description: 'Value determined by the tax administration through an appraisal based on the elements contained in the
-      Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher'
-  amount_tax_paid_summarized:
-    lineage:
-      - datalake_itbi_raw.itbi_bh.valor_imposto_cobrado_sumarizado
-    description: 'Total amount of tax collected and summarized (only available for the year 2021).'
+    description: |
+      "URL of the CSV downloaded for ingesting the data from the
+      BH municipality."
   year_built:
     lineage:
       - datalake_itbi_raw.itbi_bh.ano_construcao_unidade
-    description: 'Year that the construction of the property was finished.'
+    description: |
+      "Year that the construction of the property was finished."
+  land_area_m2:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.area_terreno_total
+    description: |
+      "Land area in square meters."
+  built_area_m2:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.area_construida_adquirida
+    description: |
+      "Result of the application of the percentage acquired by
+      the unit construction area."
+  all_units_area_m2:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.area_adquirida_unidades_somadas
+    description: |
+      "Sum of the units in cases where we have several building types.
+      It occurs when the units represent distinct blocks because they are not
+      contiguous or because they constitute different savings."
+  ideal_fraction:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.fracao_ideal_adquirida
+    description: |
+      "Incidence of the acquisition percentage over the ideal
+      fraction original."
+  adopted_calculation_basis:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.valor_base_calculo
+    description: |
+      "Value determined by the tax administration through an
+      appraisal based on the elements contained in the Cadastro
+      Imobiliário or the value declared by the taxpayer, if
+      the latter is higher."
+  declared_transaction_value:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.valor_declarado
+    description: |
+      "Acquisition value declared by the tax payer."
+  amount_tax_paid_summarized:
+    description: |
+      "Total amount of tax collected and summarized."
   dt_transaction:
     lineage:
       - datalake_itbi_raw.itbi_bh.data_inclusao_transacao
-    description: 'Date the transaction was created.'
+    description: |
+      "Date the transaction was created."
   dt_load:
     lineage:
       - datalake_itbi_raw.itbi_bh.dt_load
-    description: 'Date we updated the ITBI BH data.'
+    description: |
+      "Date we updated the ITBI BH data."
+  month:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.month
+    description: |
+      "Month of the transaction creation date.
+      It is a partition column."
+  year:
+    lineage:
+      - datalake_itbi_raw.itbi_bh.year
+    description: |
+      "Year of the transaction creation date.
+      It is a partition column."

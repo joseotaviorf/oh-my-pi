@@ -1,10 +1,11 @@
 import logging
+import pandas as pd
 import requests
 import re
-import pandas as pd
 
-from functools import reduce
 from argparse import ArgumentParser
+from datetime import date
+from functools import reduce
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -12,25 +13,20 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from pyspark.sql.types import IntegerType, StringType
-from pyspark.sql.functions import lit, expr, udf
-
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from datetime import datetime
-from datetime import date
+from pyspark.sql.functions import lit, expr, udf
+from pyspark.sql.types import IntegerType, StringType
 
 
 ITBI_REGION = "itbi_sp"
 JOB_NAME = f"load_{ITBI_REGION}_raw"
 
-
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
-
 
 def main():
     (
@@ -91,7 +87,6 @@ def main():
             source,
             datalake_bucket,
         )
-
 
 def get_data(
     source_download_page_url,
@@ -157,22 +152,18 @@ def get_data(
 
     return dataframe
 
-
 def extract_urls(request_response, source_format):
     return re.findall(r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?\{source_format})"'.format(source_format = source_format), request_response.text, re.IGNORECASE)
-
 
 def extract_google_drive_urls(request_response):
     drive_ids = re.findall(r'docs\.google\.com/spreadsheets/d/([a-zA-Z0-9_-]+)', request_response.text)
     return ['https://drive.google.com/uc?export=download&id={}'.format(drive_id) for drive_id in drive_ids]
-
 
 def scrap_files_url(source_download_page_url, source_format):
     u = requests.get(source_download_page_url)
     xslx_urls = extract_urls(u, source_format)
     drive_urls = extract_google_drive_urls(u)
     return xslx_urls + drive_urls
-
 
 def rename_columns(dataframe, columns_rename_mapped, problematic_columns_rename_mapped):
   columns_rename_mapped = dict(columns_rename_mapped)
@@ -186,7 +177,6 @@ def rename_columns(dataframe, columns_rename_mapped, problematic_columns_rename_
       dataframe = dataframe.withColumnRenamed(old_name, new_name)
 
   return dataframe
-
 
 def transform_month_to_portuguese_relative(month, reverse=True):
 
@@ -209,7 +199,6 @@ def transform_month_to_portuguese_relative(month, reverse=True):
         months = dict(zip(months.values(), months.keys()))
 
     return months[str(month)]
-
 
 def load_dataframe_into_datalake(
     df, table_name, is_incremental, environment, source, datalake_bucket
@@ -250,7 +239,6 @@ def load_dataframe_into_datalake(
             partition_cols,
         ).load_and_register(df, format_options)
 
-
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
@@ -266,7 +254,6 @@ def parse_arguments():
         args.source,
         args.execution_date,
     )
-
 
 if __name__ == "__main__":
     main()

@@ -1,35 +1,33 @@
-import re
 import ast
 import logging
-import requests
-import unidecode
-
 import pandas as pd
-from io import StringIO
-from datetime import date, datetime
-from functools import reduce
-from argparse import ArgumentParser
+import re
+import requests
 
-from quintoandar_logger import QuintoAndarLogger
+from argparse import ArgumentParser
+from io import StringIO
+from datetime import date
+from functools import reduce
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from pyspark.sql.functions import lit, to_date, to_timestamp, coalesce, year, month
-
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
+from pyspark.sql.functions import lit, to_date, to_timestamp, coalesce, year, month
+
+from quintoandar_logger import QuintoAndarLogger
+
+
 ITBI_REGION = "itbi_bh"
 JOB_NAME = f"load_{ITBI_REGION}_raw"
-
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
-
 
 def main():
     (environment, datalake_bucket, source, execution_date) = parse_arguments()
@@ -79,7 +77,6 @@ def main():
         load_dataframe_into_datalake(
             dataframe, table_name, is_incremental, environment, source, datalake_bucket
         )
-
 
 def get_data(
     source_download_page_url,
@@ -145,7 +142,6 @@ def get_data(
 
     return dataframe
 
-
 def scrap_files_url(source_download_page_url, source_headers, source_format):
     u = requests.get(source_download_page_url, headers=source_headers)
     urls = re.findall(
@@ -157,14 +153,12 @@ def scrap_files_url(source_download_page_url, source_headers, source_format):
     )
     return urls
 
-
 def rename_columns(dataframe, columns_rename_mapped):
 
     for old_name, new_name in columns_rename_mapped:
         dataframe = dataframe.withColumnRenamed(old_name, new_name)
 
     return dataframe
-
 
 def load_dataframe_into_datalake(
     df, table_name, is_incremental, environment, source, datalake_bucket
@@ -205,7 +199,6 @@ def load_dataframe_into_datalake(
             partition_cols,
         ).load_and_register(df, format_options)
 
-
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
@@ -221,7 +214,6 @@ def parse_arguments():
         args.source,
         args.execution_date,
     )
-
 
 if __name__ == "__main__":
     main()
