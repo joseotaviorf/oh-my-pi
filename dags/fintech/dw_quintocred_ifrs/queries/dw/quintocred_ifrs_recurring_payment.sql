@@ -1028,7 +1028,7 @@ repasse_direto AS (
             fp.dt_ended AS dt_contract_ended,
             IF(fp.is_contract AND fp.dt_ended IS NULL, true, false) AS is_contract_active,
             vp.total_package_amount AS valor_pacote,
-            ROW_NUMBER() OVER (PARTITION BY sap.id_contract,ADD_MONTHS(DATE(CONCAT(CAST(i.accrual_year AS VARCHAR(10)),'-',CAST((i.accrual_month) AS VARCHAR(10)),'-','01')),1 ) ORDER BY DATE(b.ts_paid) DESC) AS rn
+            ROW_NUMBER() OVER (PARTITION BY sap.id_contract,ADD_MONTHS(DATE(CONCAT(CAST(i.accrual_year AS VARCHAR(10)),'-',CAST((i.accrual_month) AS VARCHAR(10)),'-','01')),1 ) ORDER BY DATE(b.ts_paid) DESC, DATE(b.ts_created) DESC) AS rn
         FROM
             datalake_rental_guarantee_platform_clean.billing_report i
         LEFT JOIN
