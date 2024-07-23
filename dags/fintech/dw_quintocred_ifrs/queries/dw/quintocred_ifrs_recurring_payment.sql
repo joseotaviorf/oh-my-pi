@@ -1021,6 +1021,7 @@ repasse_direto AS (
             sap.mensalidade_por_contrato,
             IF(b.status IN ('PAID','PAID_AFTER_DUE_DATE'), mensalidade_por_contrato, 0) AS paid_amount,
             DATE(b.ts_paid) AS boleto_compensando_em,
+            DATE(b.ts_created) AS dt_boleto_created,
             b.status AS boleto_status,
             doc.document AS client_cpf_cnpj,
             fp.dt_contract_started,
@@ -1055,9 +1056,9 @@ repasse_direto AS (
         LEFT JOIN
             cpf_cnpj_person doc
                 ON doc.sk_propose = fp.sk_propose AND rn = 1
-        WHERE
-            b.status NOT IN ('WRITTEN_DOWN')
-            AND CONCAT(b.status,i.status) NOT IN ('OVERDUECANCELED')
+        -- WHERE
+        --     b.status NOT IN ('WRITTEN_DOWN')
+        --     AND CONCAT(b.status,i.status) NOT IN ('OVERDUECANCELED')
     )
     SELECT
         'invoice' AS origin_table,
