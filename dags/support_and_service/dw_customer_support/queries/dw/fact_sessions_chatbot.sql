@@ -143,7 +143,7 @@ SELECT
   CASE
     WHEN gs.current_state LIKE '%CSAT%' THEN True ELSE False
   END AS has_questionnaire_sent,
-  gs.context_detection_attempts AS context_identification_tentatives,
+  -- gs.context_detection_attempts AS context_identification_tentatives,
   gs.has_same_previous_theme,
   gs.year,
   gs.month,
