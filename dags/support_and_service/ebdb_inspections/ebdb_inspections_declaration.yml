@@ -1,7 +1,7 @@
 dag:
   name: ebdb_inspections
   schedule_start_date: 2021, 2, 20
-  schedule_interval: 45 21 * * *
+  schedule_interval: 0 0 * * *
   owner: Data SS
   documentation:
     dag_purpose: Extraction of EBDB tables related to Inspections into data lake. EBDB is the main database for QuintoAndar.
@@ -25,5 +25,11 @@ workflow:
     FotoItemVistoria:
       raw_primary_keys: ["id"]
       clean_table_name: inspection_photo_item
+    ConservationAssessment:
+      raw_primary_keys: ["id"]
+      clean_table_name: conservation_assessment
+    ConservationItem:
+      raw_primary_keys: ["id"]
+      clean_table_name: conservation_item
 cluster:
   type: databricks_12_2_med_general_cluster
