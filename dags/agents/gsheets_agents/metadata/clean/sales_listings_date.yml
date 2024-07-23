@@ -1,0 +1,9 @@
+database_name: datalake_gsheets_clean
+table_name: sale_listings_date
+columns:
+  id_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_listings_date.listing_id
+  dt_alloc:
+    lineage:
+      - datalake_gsheets_raw.sale_listings_date.dt_alloc

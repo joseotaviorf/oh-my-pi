@@ -31,3 +31,18 @@ sheets_info:
     sheet_name: analistas
     clean_table_name: account_managers_info
     sheet_context: agents
+  sales_listings_date:
+    sheet_id: 1beK8cE7kXJ-fdbrJQB6LkdPtVxhMG7jsoQmNEkpSGXQ
+    sheet_name: listings_date
+    clean_table_name: sales_listings_date
+    sheet_context: agents
+  sales_ongoing_listings_date:
+    sheet_id: 1p-LDBU61HTO6qEjW2lujKHfyVIIxlpnZVwyupCJcbN8
+    sheet_name: listings_date_ol
+    clean_table_name: sales_ongoing_listings_date
+    sheet_context: agents
+  asp_consultants_allocation:
+    sheet_id: 1xEMHNMbTb6tBLghGSDwv5kLi0vid66oUNEirUY672oY
+    sheet_name: aux_table
+    clean_table_name: asp_consultants_allocation
+    sheet_context: agents

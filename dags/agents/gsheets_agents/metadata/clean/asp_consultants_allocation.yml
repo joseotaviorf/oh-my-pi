@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: asp_consultants_allocation
+columns:
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.asp_consultants_allocation.sk_user
+  team:
+    lineage:
+      - datalake_gsheets_raw.asp_consultants_allocation.team
+  range_start:
+    lineage:
+      - datalake_gsheets_raw.asp_consultants_allocation.range_start
+  range_end:
+    lineage:
+      - datalake_gsheets_raw.asp_consultants_allocation.range_end
+  obs:
+    lineage:
+      - datalake_gsheets_raw.asp_consultants_allocation.obs
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.asp_consultants_allocation.dt_start
+  dt_end:
+    lineage:
+      - datalake_gsheets_raw.asp_consultants_allocation.dt_end
