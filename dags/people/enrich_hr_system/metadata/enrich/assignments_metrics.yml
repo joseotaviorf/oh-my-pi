@@ -1,9 +1,9 @@
 ---
-database_name: dw_employee
-table_name: fact_assignment
-owner: leonardo.soares@quintoandar.com.br
+database_name: enrich_hr_system
+table_name: assignments_metrics
+owner: isabella.araujo@quintoandar.com.br
 domain: people
-description: null
+description: Metrics about assignments. Used to generate fact tables in dw_employee.
 columns:
   sk_assignment:
     description: "Surrogate key for the assignment. Just the id_period_of_service"
@@ -55,11 +55,11 @@ columns:
       Just the id_assignment"
     lineage:
       - datalake_hr_system.assignments.representatives.id_assignment
-  sk_dt_start_work_relationship:
+  dt_start_work_relationship:
     description: "Date key for the start of the work relationship. Format: YYYYMMDD"
     lineage:
       - datalake_hr_system.work_relationships.dt_start
-  sk_dt_termination_work_relationship:
+  dt_termination_work_relationship:
     description: "Date key for the termination of the work relationship. Format: YYYYMMDD"
     lineage:
       - datalake_hr_system.work_relationships.dt_termination

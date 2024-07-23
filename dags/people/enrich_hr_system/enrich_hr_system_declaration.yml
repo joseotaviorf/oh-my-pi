@@ -7,16 +7,19 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    assignment_metrics:
+      - assignments
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket
   tables_customization:
     assignments:
       extraction_type: incremental
-      partitions: ['year', 'month']
+      partitions: ["year", "month"]
     managers:
       extraction_type: incremental
-      partitions: ['year', 'month']
+      partitions: ["year", "month"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"

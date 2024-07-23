@@ -230,7 +230,9 @@ salary_raw AS (
     s.dt_from AS change_date
   FROM
     datalake_hr_system_clean.salaries AS s
-    LEFT JOIN datalake_hr_system.assignments AS a ON s.id_assignment = a.id_assignment
+  LEFT JOIN
+    datalake_hr_system.assignments AS a
+      ON s.id_assignment = a.id_assignment
   WHERE
     dt_from <= DATE('{load_start_date}')
     AND s.assignment_number NOT LIKE 'P%'
@@ -392,19 +394,8 @@ salaries AS (
     qnt_movimentations = 1
     OR change_date = dt_last_increase
 ),
-subordinates AS (
-  SELECT
-    id_manager_assignment AS id_assignment,
-    COUNT(*) AS qnt_undirectly_led
-  FROM
-    datalake_hr_system.management_hierarchy
-  WHERE
-    not is_direct_manager
-  GROUP BY
-    id_manager_assignment
-),
 cte_enrich_demographic_attributes AS (
-  SELECT 
+  SELECT
     id_person,
     md5(
     concat(
@@ -421,13 +412,12 @@ cte_enrich_demographic_attributes AS (
   FROM datalake_hr_system.demographic_attributes
   QUALIFY ts_last_update = MAX(ts_last_update) OVER (PARTITION BY id_person)
 )
-
 SELECT
   -- ids
   wr.id_period_of_service AS sk_assignment,
   -- non ids
   wr.id_person AS sk_employee,
-  da.sk_employee_census, 
+  da.sk_employee_census,
   COALESCE(ap.id_cost_center, af.id_cost_center, '-1') AS sk_cost_center,
   COALESCE(ap.id_business_unit, af.id_business_unit, '-1') AS sk_business_unit,
   coalesce(ap.id_job, af.id_job, '-1') AS sk_job,
@@ -455,20 +445,14 @@ SELECT
   COALESCE(ap_hbrp.id_assignment, '-1') AS sk_business_partner_assignment,
   CASE
     WHEN wr.worker_type = 'P'
-      THEN REPLACE(
-        COALESCE(ap.dt_projected_start, af.dt_projected_start),
-        '-',
-        ''
-      )
-    ELSE REPLACE(wr.dt_start, '-', '')
-  END AS sk_dt_start_work_relationship,
-  CASE
-    WHEN wr.worker_type = 'P'
-      THEN '-1'
-    ELSE COALESCE(REPLACE(wr.dt_termination, '-', ''), '-1')
-  END AS sk_dt_termination_work_relationship,
-  COALESCE(REPLACE(s.dt_last_increase, '-', ''), '-1') AS sk_dt_last_increase,
-  COALESCE(REPLACE(s.dt_first_promotion, '-', ''), '-1') AS sk_dt_first_promotion,
+      THEN
+        COALESCE(ap.dt_projected_start, af.dt_projected_start)
+    ELSE wr.dt_start
+  END AS dt_start_work_relationship,
+  wr.dt_termination AS dt_termination_work_relationship,
+  COALESCE(REPLACE(s.dt_last_increase, '-', ''), '-1') AS sk_last_increase_date,
+  COALESCE(REPLACE(s.dt_first_promotion, '-', ''), '-1') AS sk_first_promotion_date,
+  wr.worker_type,
   -- metrics
   CASE
     WHEN wr.dt_start = MAX(wr.dt_start) over (PARTITION BY wr.id_person)
@@ -502,7 +486,6 @@ SELECT
     )
   END AS assignment_age_months,
   COALESCE(mdl.qnt_directly_led, 0) AS qnt_directly_led,
-  COALESCE(subordinates.qnt_undirectly_led, 0) AS qnt_undirectly_led,
   COALESCE(ap.qnt_promotions, 0) AS qnt_promotions,
   COALESCE(s.salary, -1) AS salary,
   COALESCE(ap.target_plr, 0) AS target_plr,
@@ -517,8 +500,7 @@ SELECT
   COALESCE(s.first_promotion_salary, 0) AS first_promotion_salary,
   COALESCE(s.nominal_increase_first_promotion, 0) AS nominal_increase_first_promotion,
   COALESCE(s.pct_increase_first_promotion, 0) AS pct_increase_first_promotion,
-  s.months_to_first_promotion AS months_to_first_promotion,
-  -- dates
+  s.months_to_first_promotion,
   NOW() AS ts_load
 FROM
   datalake_hr_system.work_relationships AS wr
@@ -560,10 +542,7 @@ FROM
     salaries AS s
       ON COALESCE(ap.id_assignment, af.id_assignment) = s.id_assignment
   LEFT JOIN
-    subordinates
-      ON subordinates.id_assignment = ap.id_assignment
-  LEFT JOIN 
-    cte_enrich_demographic_attributes AS da 
+    cte_enrich_demographic_attributes AS da
       ON wr.id_person = da.id_person
 WHERE
   (

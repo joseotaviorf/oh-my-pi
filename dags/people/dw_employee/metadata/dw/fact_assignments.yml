@@ -1,0 +1,146 @@
+database_name: dw_employee
+table_name: fact_assignments
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Table storing detailed information about employee assignments."
+columns:
+  sk_assignment:
+    description: "Unique identifier for the period of service related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_period_of_service
+  sk_employee:
+    description: "Unique identifier for the person related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_person
+  sk_cost_center:
+    description: "Unique identifier for the cost center related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_cost_center
+  sk_business_unit:
+    description: "Unique identifier for the business unit related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_business_unit
+  sk_job:
+    description: "Unique identifier for the job related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_job
+  sk_manager:
+    description: "Unique identifier for the manager related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_manager
+  sk_manager_assignment:
+    description: "Unique identifier for the manager’s assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_manager_assignment
+  sk_business_partner:
+    description: "Unique identifier for the business partner related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_business_partner
+  sk_business_partner_assignment:
+    description: "Unique identifier for the business partner’s assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_business_partner_assignment
+  sk_start_work_relationship_date:
+    description: "Start date of the work relationship related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.dt_start_work_relationship
+  sk_termination_work_relationship_date:
+    description: "Termination date of the work relationship related to the assignment, formatted as SK (replacing hyphens with spaces)."
+    lineage:
+      - datalake_hr_system.assignments_metrics.dt_termination_work_relationship
+  sk_last_increase_date:
+    description: "Date of the last increase related to the assignment, formatted as SK."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_last_increase_date
+  sk_first_promotion_date:
+    description: "Date of the first promotion related to the assignment, formatted as SK."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_first_promotion_date
+  is_last_work_relationship:
+    description: "Indicates if this is the last work relationship (TRUE or FALSE)."
+    lineage:
+      - datalake_hr_system.assignments_metrics.is_last_work_relationship
+  is_active:
+    description: "Indicates if the assignment is active (TRUE or FALSE)."
+    lineage:
+      - datalake_hr_system.assignments_metrics.is_active
+  is_pending_worker:
+    description: "Indicates if the worker is pending (TRUE or FALSE)."
+    lineage:
+      - datalake_hr_system.assignments_metrics.is_pending_worker
+  is_manager:
+    description: "Indicates if the assignment is for a managerial position (TRUE or FALSE)."
+    lineage:
+      - datalake_hr_system.assignments_metrics.is_manager
+  assignment_age_months:
+    description: "Age of the assignment in months."
+    lineage:
+      - datalake_hr_system.assignments_metrics.assignment_age_months
+  qnt_directly_led:
+    description: "Number of employees directly led by the manager."
+    lineage:
+      - datalake_hr_system.assignments_metrics.qnt_directly_led
+  qnt_undirectly_led:
+    description: "Number of employees indirectly led by the manager."
+    lineage:
+      - datalake_hr_system.assignments_metrics.qnt_undirectly_led
+  qnt_promotions:
+    description: "Number of promotions during the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.qnt_promotions
+  salary:
+    description: "Salary of the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.salary
+  target_plr:
+    description: "Target PLR (Profit Sharing)."
+    lineage:
+      - datalake_hr_system.assignments_metrics.target_plr
+  salary_reference:
+    description: "Reference salary for the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.salary_reference
+  average_time_between_movimentations:
+    description: "Average time between movements during the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.average_time_between_movimentations
+  last_increase:
+    description: "Last salary increase amount."
+    lineage:
+      - datalake_hr_system.assignments_metrics.last_increase
+  pct_last_increase:
+    description: "Last salary increase percentage."
+    lineage:
+      - datalake_hr_system.assignments_metrics.pct_last_increase
+  first_salary:
+    description: "Initial salary for the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.first_salary
+  last_salary:
+    description: "Most recent salary for the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.last_salary
+  range_salary_movement:
+    description: "Salary movement range during the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.range_salary_movement
+  first_promotion_salary:
+    description: "Salary after the first promotion."
+    lineage:
+      - datalake_hr_system.assignments_metrics.first_promotion_salary
+  nominal_increase_first_promotion:
+    description: "Nominal increase after the first promotion."
+    lineage:
+      - datalake_hr_system.assignments_metrics.nominal_increase_first_promotion
+  pct_increase_first_promotion:
+    description: "Percentage increase after the first promotion."
+    lineage:
+      - datalake_hr_system.assignments_metrics.pct_increase_first_promotion
+  months_to_first_promotion:
+    description: "Months to the first promotion."
+    lineage:
+      - datalake_hr_system.assignments_metrics.months_to_first_promotion
+  ts_load:
+    description: "Timestamp of when the data was loaded."
+    lineage:
+      - datalake_hr_system.assignments_metrics.NOW()
