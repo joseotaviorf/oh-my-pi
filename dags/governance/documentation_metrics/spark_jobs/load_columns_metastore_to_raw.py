@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pyspark.sql.functions import udf, lit
 from pyspark.sql.types import StructType, StructField, StringType
+from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 from py4j.protocol import Py4JJavaError
 
@@ -39,12 +40,21 @@ def get_columns_from_metastore(spark_client, schemas_skip_list):
                 )
             except Py4JJavaError as e:
                 if "AccessDeniedException" in str(e):
-                    logging.error(f"Permission error. Skiping table {table}")
+                    logging.error(
+                        f"Permission error. Skiping table {database_name}.{table}"
+                    )
                     continue
 
                 logging.error(
                     f"m={JOB_NAME}, msg=Error getting columns from {database}.{table}. Error: {e}"
                 )
+                raise e
+            except AnalysisException as e:
+                if "TABLE_OR_VIEW_NOT_FOUND" in str(e):
+                    logging.error(
+                        f"Table not found, check if it is a temporary table. Skiping table {database}.{table}"
+                    )
+                    continue
                 raise e
             final_df = final_df.union(columns_df)
 
