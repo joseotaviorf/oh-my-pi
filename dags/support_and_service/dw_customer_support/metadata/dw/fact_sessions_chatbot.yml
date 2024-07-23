@@ -93,6 +93,10 @@ columns:
     lineage:
       - datalake_greenseer.sessions.ticket_origin
     description: Boolean value that indicates whether the session is call in app.
+  is_other_option:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Boolean value that indicates whether the session is other option menu.
   has_exceeded_session_timeout:
     lineage:
       - datalake_greenseer.sessions.has_exceeded_session_timeout

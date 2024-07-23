@@ -7,46 +7,95 @@ WITH surveys_fup AS (
     datalake_satisfaction_rating.chat_fup_surveys
   WHERE
     GET_JSON_OBJECT(custom_attributes, '$.id_origin') IS NOT NULL
-),
-base_churn AS (
+)
+,base_churn AS (
   SELECT DISTINCT
-    gs.id_user,
-    gs.ts_started,
-    CASE
-      WHEN (
-        gs.id_user IS NOT NULL
-        AND gs.ts_started IS NOT NULL
-      ) OR gs.id_user IS NULL THEN 'chat'
-      WHEN call.id_user IS NOT NULL  AND call.ts_ticket_started IS NOT NULL THEN 'call'
-      ELSE 'chat'
-    END AS channel
+    g.id_user,
+    g.ts_started,
+    'chat' AS channel
   FROM
-    datalake_greenseer.sessions AS gs
-  LEFT JOIN
-    datalake_customer_support.call AS call
-      ON gs.id_user = CAST(call.id_user AS STRING)
-      AND gs.ts_started < call.ts_ticket_started
+    datalake_greenseer.sessions g
   WHERE
-    gs.is_retention IS TRUE
-    AND YEAR(gs.ts_started) >= 2024
-),
-churn_to_call AS (
+    MAKE_DATE(g.year, g.month, g.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND is_retention = TRUE
+
+  UNION
+
+  SELECT
+    CAST(call.id_user AS STRING) AS id_user,
+    call.ts_ticket_started AS ts_started,
+    'call' AS channel
+  FROM
+    datalake_customer_support.call AS call
+  JOIN
+    datalake_greenseer.sessions AS g
+  ON
+    CAST(call.id_user AS STRING) = g.id_user
+    AND g.ts_started < call.ts_ticket_started
+  WHERE
+    MAKE_DATE(g.year, g.month, g.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+)
+,assistances AS (
   SELECT
     id_user,
     channel,
     ts_started,
-    LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) AS previews_channel,
-    LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started) AS previews_contact_date,
-    CASE
-      WHEN channel = 'chat'
-        AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat'
-        AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN False
-      WHEN channel = 'call'
-        AND LAG(channel, 1) OVER(PARTITION BY id_user ORDER BY ts_started) = 'chat'
-        AND (unix_timestamp(ts_started) - unix_timestamp(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started))) / 3600  <= 96 THEN True -- considerando que o cliente churnou se abriu uma sessão por call em até 96h após ser retido no chat
-    END AS is_churn_chat
+    COALESCE(LAG(channel) OVER (PARTITION BY id_user ORDER BY ts_started), channel) AS previews_channel,
+    COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started),ts_started) AS previews_contact_date,
+    (TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started),ts_started))) / 3600 AS hours_to_next_session
   FROM
     base_churn
+)
+,wrangling AS (
+  SELECT
+    id_user,
+    ts_started,
+    previews_contact_date,
+    CASE
+      WHEN channel = 'call' AND previews_channel = 'chat' AND hours_to_next_session <= 96 THEN True
+      ELSE False
+    END AS is_churn_chat
+  FROM
+    assistances
+  WHERE
+    previews_channel = 'chat'
+)
+,options_response AS (
+  SELECT
+    id_session,
+    ts_started,
+    SIZE(COALESCE(
+      map_keys(from_json(get_json_object(memory, '$.business_rules.menu_taxonomies.options'),'map<string, struct<name:string,class:string,score:double>>')),
+      map_keys(from_json(get_json_object(memory, '$.business_rules.menu_confused_class.options'),'map<string, struct<name:string,class:string,score:double>>')),
+      map_keys(from_json(get_json_object(memory, '$.business_rules.menu_theme_details.options'),'map<string, struct<name:string,class:string,score:double>>'))
+    )) AS n_options,
+    regexp_replace(regexp_extract(
+      element_at(
+        ARRAY(
+          COALESCE(
+            GET_JSON_OBJECT(memory, '$.business_rules.menu_taxonomies.raw_answers'),
+            GET_JSON_OBJECT(memory, '$.business_rules.menu_confused_class.raw_answers'),
+            GET_JSON_OBJECT(memory, '$.business_rules.menu_theme_details.raw_answers')
+          )),-1
+        ),
+    '\\d+', 0), '^0+', '')  AS raw_answer_last
+  FROM datalake_greenseer.sessions
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND response_key IS NOT NULL
+)
+,normalize_options AS (
+  SELECT
+    id_session,
+    ts_started,
+    IF(n_options = -1, NULL, n_options) AS n_options,
+    raw_answer_last,
+    CASE
+      WHEN raw_answer_last IS NULL THEN NULL
+      WHEN length(raw_answer_last) = 1 THEN CAST(raw_answer_last AS INT)
+      ELSE 10
+    END AS user_response
+  FROM options_response
 )
 SELECT
   gs.id_session AS sk_session,
@@ -72,7 +121,8 @@ SELECT
     WHEN gs.is_retention = true AND gs.has_fallback = true THEN True
     ELSE False
   END AS is_retained_session_with_fallback,
-  cc.is_churn_chat,
+  w.is_churn_chat,
+  nop.user_response IS NOT NULL AND nop.n_options IS NOT NULL AND nop.user_response = n_options + 1 AS is_other_option,
   IF(gs.ticket_origin = 'call inapp', True, False) AS is_call_in_app_session,
   gs.has_exceeded_session_timeout,
   gs.has_journey_flow_response,
@@ -105,12 +155,13 @@ LEFT JOIN
   surveys_fup AS sf
     ON gs.id_session = sf.id_session
 LEFT JOIN
-  churn_to_call AS cc
-    ON  gs.id_user = cc.id_user
-    AND cc.previews_contact_date = gs.ts_started
+  wrangling AS w
+    ON  gs.id_user = w.id_user
+    AND w.previews_contact_date = gs.ts_started
+LEFT JOIN
+  normalize_options AS nop
+    ON gs.id_session = nop.id_session
 WHERE
-    gs.year = {year}
-    AND gs.month = {month}
-    AND gs.day = {day}
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY gs.id_session ORDER BY gs.ts_updated DESC) = 1

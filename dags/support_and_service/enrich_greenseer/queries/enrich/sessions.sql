@@ -75,14 +75,6 @@ greenseer_sessions AS (
         ''
       ) <> ''
     ) AS is_menu_available,
-    (
-      COALESCE(
-        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_taxonomies.message'),
-        GET_JSON_OBJECT(g.memory, '$.business_rules.confused_class.message'),
-        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_theme_details.message'),
-        ''
-      ) <> ''
-    ) AS is_menu_availle,
     CASE
       WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_menu_automatic_selection_intent') THEN 'bot_automatic_selection_intent'
       WHEN CONTAINS((GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added')), 'bot_menu_automatic_selection_taxonomy') THEN 'bot_menu_automatic_selection_taxonomy'
@@ -97,8 +89,6 @@ greenseer_sessions AS (
     END AS has_emma_flow,
     GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.fallback') AS has_fallback,
     g.memory,
-    -- GET_JSON_OBJECT(g.memory, '$.business_rules.context_detection_attempts') AS context_detection_attempts,
-    EXPLODE(CAST(from_json(GET_JSON_OBJECT(g.memory, '$.business_rules.context_detection_attempts'), 'ARRAY<MAP<STRING, MAP<STRING, FLOAT>>>') AS ARRAY<MAP<STRING, MAP<STRING, FLOAT>>>) ) AS context_detection_attempts,
     g.current_state,
     g.ts_updated,
     g.ts_started,
@@ -170,12 +160,12 @@ sessions_and_tickets AS (
 sessions_with_recontact AS (
   SELECT DISTINCT
     gs.id_session,
-    IF(response_key = LAG(response_key, 1) OVER(PARTITION BY id_user ORDER BY ts_started), True, False) AS has_same_previous_theme,
+    IF(response_key = COALESCE(LAG(response_key, 1) OVER(PARTITION BY id_user ORDER BY ts_started),response_key), True, False) AS has_same_previous_theme,
     CASE
-        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) <= 12 THEN '<12h'
-        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) > 12
-          AND ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) <= 96 THEN '12-96h'
-        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started)))/(3600)) > 96 THEN '>96h'
+        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started), ts_started)))/(3600)) <= 12 THEN '<12h'
+        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started), ts_started)))/(3600)) > 12
+          AND ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started), ts_started)))/(3600)) <= 96 THEN '12-96h'
+        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started), ts_started)))/(3600)) > 96 THEN '>96h'
         ELSE 'NR'
     END AS recontact_time
   FROM greenseer_sessions AS gs
@@ -214,7 +204,6 @@ SELECT
     ELSE False
   END AS has_exceeded_session_timeout,
   gs.has_fallback,
-  context_detection_attempts,
   st.ticket_origin,
   gs.ts_started,
   gs.ts_ended,

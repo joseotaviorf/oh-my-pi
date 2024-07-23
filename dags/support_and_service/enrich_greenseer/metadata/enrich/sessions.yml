@@ -116,10 +116,6 @@ columns:
     description: Boolean that indicates whether the session has a fallback.
     lineage:
       - datalake_greenseer_clean.session.memory
-  context_detection_attempts:
-    description: Number of attempts to detect the context of the session.
-    lineage:
-      - datalake_greenseer_clean.session.memory
   ticket_origin:
     description: Origin of the ticket.
     lineage:
