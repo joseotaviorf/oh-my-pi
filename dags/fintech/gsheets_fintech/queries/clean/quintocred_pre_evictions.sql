@@ -24,6 +24,8 @@ SELECT
     TO_DATE(`_suspensao_`, 'dd/MM/yyyy') AS dt_suspension,
     TO_DATE(liberacao, 'dd/MM/yyyy') AS dt_release,
     TO_DATE(`_data_de_envio_`, 'dd/MM/yyyy') AS dt_sent,
+    TO_DATE(data_recebimento_exoneracao, 'dd/MM/yyyy') AS dt_exoneration_received,
+    TO_DATE(data_recebimento_prcuracao, 'dd/MM/yyyy') AS dt_power_of_attorney_received,
     TO_DATE(data_recebimento_contrato_de_adm, 'dd/MM/yyyy') AS dt_adm_contract_received,
     TO_DATE(data_recebimento_rg_locador, 'dd/MM/yyyy') AS dt_document_renter_received,
     TO_DATE(data_de_movimentacao_, 'dd/MM/yyyy') AS dt_movement,
