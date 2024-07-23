@@ -1,11 +1,12 @@
 ---
 dag:
-  name: enrich_sap_homolog
+  name: enrich_sap
   schedule_start_date: 2022, 10, 25
   owner: Data Fintech
 workflow:
   type: query_delta
   layer: enrich
+  custom_schema: pas
   inner_dependencies:
     ledger:
       - incoming_payments_lines

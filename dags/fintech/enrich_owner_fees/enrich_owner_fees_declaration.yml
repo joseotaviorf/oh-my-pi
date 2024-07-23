@@ -1,7 +1,7 @@
 ---
 dag:
-  name: enrich_monopoly_homolog
-  schedule_start_date: 2022, 4, 25
+  name: enrich_owner_fees
+  schedule_start_date: 2021, 4, 22
   owner: Data Fintech
 workflow:
   type: query_delta

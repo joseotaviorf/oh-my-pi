@@ -1,6 +1,6 @@
 ---
 dag:
-  name: enrich_betopera_homolog
+  name: enrich_betopera
   schedule_start_date: 2022, 8, 28
   owner: Data Fintech
 workflow:

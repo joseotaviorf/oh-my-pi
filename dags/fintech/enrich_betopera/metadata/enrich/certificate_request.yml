@@ -6,51 +6,51 @@ owner: ae-finance-fintech@quintoandar.com.br
 columns:
   id:
     lineage:
-    - datalake_betopera_clean.certificate_request.id
-    description: 'ID of the certificate request'
+      - datalake_betopera_clean.certificate_request.id
+    description: "ID of the certificate request"
   id_insurance:
     lineage:
-    - datalake_betopera_clean.certificate_request.id_insurance
-    description: 'ID of the insurance'
+      - datalake_betopera_clean.certificate_request.id_insurance
+    description: "ID of the insurance"
   version:
     lineage:
-    - datalake_betopera_clean.certificate_request.version
-    description: 'Version of the insurance'
+      - datalake_betopera_clean.certificate_request.version
+    description: "Version of the insurance"
   payload:
     lineage:
-    - datalake_betopera_clean.certificate_request.payload
-    description: 'JSON with the information related to the payload'
+      - datalake_betopera_clean.certificate_request.payload
+    description: "JSON with the information related to the payload"
   status:
     lineage:
-    - datalake_betopera_clean.certificate_request.status
-    description: 'The current status for the insurance entity' 
-    categories: 
-      PENDING: '' 
-      CREATED: ''
-      FAILED: '' 
-      PENDING_CANCELLATION: '' 
-      CANCELED: ''
+      - datalake_betopera_clean.certificate_request.status
+    description: "The current status for the insurance entity"
+    categories:
+      PENDING: ""
+      CREATED: ""
+      FAILED: ""
+      PENDING_CANCELLATION: ""
+      CANCELED: ""
   ts_synced:
     lineage:
-    - datalake_betopera_clean.certificate_request.ts_synced
-    description: 'Timestamp of the synced date'
+      - datalake_betopera_clean.certificate_request.ts_synced
+    description: "Timestamp of the synced date"
   ts_created:
     lineage:
-    - datalake_betopera_clean.certificate_request.ts_created
-    description: 'Timestamp of the created date'
+      - datalake_betopera_clean.certificate_request.ts_created
+    description: "Timestamp of the created date"
   ts_updated:
     lineage:
-    - datalake_betopera_clean.certificate_request.ts_updated
-    description: 'Timestamp of the updated date'
+      - datalake_betopera_clean.certificate_request.ts_updated
+    description: "Timestamp of the updated date"
   year:
     lineage:
-    - datalake_betopera_clean.certificate_request.year
-    description: 'Year Information'
+      - datalake_betopera_clean.certificate_request.year
+    description: "Year Information"
   month:
     lineage:
-    - datalake_certificate_request_raw.certificate_request.month
-    description: 'Month Information'
+      - datalake_certificate_request_raw.certificate_request.month
+    description: "Month Information"
   day:
     lineage:
-    - datalake_certificate_request_raw.certificate_request.day
-    description: 'Day Information'
+      - datalake_certificate_request_raw.certificate_request.day
+    description: "Day Information"

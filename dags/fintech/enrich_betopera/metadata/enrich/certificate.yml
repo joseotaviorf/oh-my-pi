@@ -1,72 +1,72 @@
 database_name: datalake_betopera
 table_name: certificate
-description: ' Information about insurance certificates status.'
+description: " Information about insurance certificates status."
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
 columns:
   id:
     lineage:
-    - datalake_betopera_clean.certificate.id
-    description: 'ID of the certificate'
+      - datalake_betopera_clean.certificate.id
+    description: "ID of the certificate"
   id_insurance:
     lineage:
-    - datalake_betopera_clean.certificate.id_insurance
-    description: 'ID of the insurance'
+      - datalake_betopera_clean.certificate.id_insurance
+    description: "ID of the insurance"
   id_certificate_request:
     lineage:
-    - datalake_betopera_clean.certificate.id_certificate_request
-    description: 'ID of the certificate request'
+      - datalake_betopera_clean.certificate.id_certificate_request
+    description: "ID of the certificate request"
   version:
     lineage:
-    - datalake_betopera_clean.certificate.version
-    description: 'Version of the insurance'
+      - datalake_betopera_clean.certificate.version
+    description: "Version of the insurance"
   status:
     lineage:
-    - datalake_betopera_clean.certificate.status
-    description: 'The current status for the insurance entity' 
-    categories: 
-      PENDING: '' 
-      CREATED: ''
-      FAILED: '' 
-      PENDING_CANCELLATION: '' 
-      CANCELED: ''
+      - datalake_betopera_clean.certificate.status
+    description: "The current status for the insurance entity"
+    categories:
+      PENDING: ""
+      CREATED: ""
+      FAILED: ""
+      PENDING_CANCELLATION: ""
+      CANCELED: ""
   response_payload:
     lineage:
-    - datalake_betopera_clean.certificate.response_payload
-    description: 'JSON with the information related to the response payload'
+      - datalake_betopera_clean.certificate.response_payload
+    description: "JSON with the information related to the response payload"
   file_url:
     lineage:
-    - datalake_betopera_clean.certificate.file_url
-    description: 'URL of the certificate file'
+      - datalake_betopera_clean.certificate.file_url
+    description: "URL of the certificate file"
   dt_start:
     lineage:
-    - datalake_betopera_clean.certificate.dt_start
-    description: 'Start date related to the certificate'
+      - datalake_betopera_clean.certificate.dt_start
+    description: "Start date related to the certificate"
   dt_end:
     lineage:
-    - datalake_betopera_clean.certificate.dt_end
-    description: 'End date related to the certificate'
+      - datalake_betopera_clean.certificate.dt_end
+    description: "End date related to the certificate"
   dt_cancel:
     lineage:
-    - datalake_betopera_clean.certificate.dt_cancel
-    description: 'Cancel date related to the certificate'
+      - datalake_betopera_clean.certificate.dt_cancel
+    description: "Cancel date related to the certificate"
   ts_created:
     lineage:
-    - datalake_betopera_clean.certificate.ts_created
-    description: 'Timestamp of the created date'
+      - datalake_betopera_clean.certificate.ts_created
+    description: "Timestamp of the created date"
   ts_updated:
     lineage:
-    - datalake_betopera_clean.certificate.ts_updated
-    description: 'Timestamp of the updated date'
+      - datalake_betopera_clean.certificate.ts_updated
+    description: "Timestamp of the updated date"
   year:
     lineage:
-    - datalake_betopera_clean.certificate.year
-    description: 'Year Information'
+      - datalake_betopera_clean.certificate.year
+    description: "Year Information"
   month:
     lineage:
-    - datalake_betopera_clean.certificate.month
-    description: 'Month Information'
+      - datalake_betopera_clean.certificate.month
+    description: "Month Information"
   day:
     lineage:
-    - datalake_betopera_clean.certificate.day
-    description: 'Day Information'
+      - datalake_betopera_clean.certificate.day
+    description: "Day Information"
