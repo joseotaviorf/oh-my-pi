@@ -36,9 +36,6 @@ dags:
   cross:
     owner: Data Engineering
     cluster_name: databricks_10_4_med_memory_cluster
-  for_rent_cross:
-    owner: Data ForRent
-    cluster_name: databricks_12_2_med_mem_driver_high_mem_nodes
   for_sale:
     owner: Data ForSale
     cluster_name: databricks_12_2_med_compute_cluster
