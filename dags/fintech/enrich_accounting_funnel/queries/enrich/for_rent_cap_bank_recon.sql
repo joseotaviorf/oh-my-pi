@@ -49,7 +49,7 @@ sap AS (
         account_number,
         dt_reference AS dt_paid,
         dt_tax,
-        SUM(debit_credit) AS paid_amount
+        ROUND(SUM(debit_credit), 2) AS paid_amount
     FROM
         datalake_pas.ledger
     WHERE
