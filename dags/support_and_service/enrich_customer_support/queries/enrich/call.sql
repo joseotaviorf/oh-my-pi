@@ -262,8 +262,8 @@ zendesk_aditional_ticket_info AS (
 back_tickets AS (
   SELECT
     COALESCE(
-      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{20,40})', 1), ''),
-      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{20,40})', 1)
+      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
+      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
     ) AS front_task,
     zd.id_ticket AS back_ticket,
     zd.status,
@@ -275,8 +275,8 @@ back_tickets AS (
   INNER JOIN
     conversation c
       ON c.id_task = COALESCE(
-        NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{20,40})', 1), ''),
-        REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{20,40})', 1)
+        NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
+        REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
       )
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
@@ -288,8 +288,8 @@ back_tickets AS (
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
     AND COALESCE(
-      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{20,40})', 1), ''),
-      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{20,40})', 1)
+      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
+      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
     ) != ''
   GROUP BY 1, 2, 3, 4, 5, 6
 ),
