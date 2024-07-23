@@ -5,9 +5,7 @@ WITH conversions AS (
     FROM
         datalake_amplitude_clean.170698_visit_schedule_confirmed_events
     WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
     SELECT
         id_amplitude,
@@ -15,9 +13,7 @@ WITH conversions AS (
     FROM
         datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events
     WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
     SELECT
         id_amplitude,
@@ -25,9 +21,7 @@ WITH conversions AS (
     FROM
         datalake_amplitude_clean.170698_offer_submitted_events
     WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
     SELECT
         id_amplitude,
@@ -35,9 +29,7 @@ WITH conversions AS (
     FROM
         datalake_amplitude_clean.170135_offer_submitted_events
     WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
     SELECT
         id_amplitude,
@@ -45,9 +37,7 @@ WITH conversions AS (
     FROM
         datalake_amplitude_clean.183049_offer_submitted_events
     WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     -- New offer submitted events
     UNION
     SELECT
@@ -56,9 +46,7 @@ WITH conversions AS (
     FROM
         datalake_amplitude_clean.170698_offer_submitted_new_events -- IQ Prod new events
     WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
     SELECT
         id_amplitude,
@@ -66,9 +54,7 @@ WITH conversions AS (
     FROM
         datalake_amplitude_clean.183047_offer_submitted_new_events -- PP Prod new events
     WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
     SELECT
         id_amplitude,
@@ -76,9 +62,7 @@ WITH conversions AS (
     FROM
         datalake_amplitude_clean.170698_sale_offer_form_accepted_events
     WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 distinct_conversions AS (
     SELECT DISTINCT
@@ -158,7 +142,7 @@ events_filtered AS (
         ids_mapped_from_conversions AS imc 
             ON imc.id_amplitude = evt.id_amplitude
     WHERE
-        DATE(CONCAT_WS("-",evt.year, evt.month, evt.day)) > DATE('{year}-{month}-{day}') - INTERVAL '4' month
+        MAKE_DATE(evt.year, evt.month, evt.day) > DATE('{load_end_date}') - INTERVAL '4' MONTH 
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10,11,12,
         13,14,15,16,17,18,19,20,21,22,23,24,25,26
@@ -334,9 +318,9 @@ SELECT
     COALESCE(web.ts_event, app.ts_event) AS ts_event,
     ts_web_attribution,
     ts_app_attribution,
-    {year} AS year,
-    {month} AS month,
-    {day} AS day
+    YEAR(COALESCE(web.ts_event, app.ts_event)) AS year,
+    MONTH(COALESCE(web.ts_event, app.ts_event)) AS month,
+    DAY(COALESCE(web.ts_event, app.ts_event)) AS day
 FROM
     events_web web
     FULL OUTER JOIN events_app app

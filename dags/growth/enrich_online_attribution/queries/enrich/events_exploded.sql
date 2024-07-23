@@ -55,10 +55,8 @@ WITH events_filtered AS (
     FROM
         datalake_amplitude_clean.events
     WHERE
-      id_app = 170698
-      AND year = {year}
-      AND month = {month}
-      AND day = {day}
+        id_app = 170698
+        AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
     event_type_sanitized,
