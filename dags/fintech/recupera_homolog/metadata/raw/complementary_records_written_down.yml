@@ -1,0 +1,10 @@
+---
+database_name: datalake_recupera_homolog_raw
+table_name: complementary_records_written_down
+columns:
+  bank_branch_code:
+    tags:
+      - Restricted
+  bank_account_number:
+    tags:
+      - Restricted

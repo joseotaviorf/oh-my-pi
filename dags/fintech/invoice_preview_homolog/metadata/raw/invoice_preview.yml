@@ -1,0 +1,3 @@
+---
+database_name: datalake_invoice_preview_homolog_raw
+table_name: invoice_preview

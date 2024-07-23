@@ -1,0 +1,30 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: address_aud
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.id
+  rev:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.rev
+  rev_type:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.revtype
+  state:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.uf
+  city:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.city
+  complement:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.complement
+  neighborhood:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.neighborhood
+  number:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.number
+  street:
+    lineage:
+      - datalake_fastforward_homolog_raw.address_aud.street

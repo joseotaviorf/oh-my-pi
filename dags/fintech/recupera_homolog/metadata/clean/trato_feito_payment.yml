@@ -1,0 +1,44 @@
+---
+database_name: datalake_recupera_homolog_clean
+table_name: trato_feito_payment
+description: |
+  "The table stores the payments to be integrated with Trato Feito.
+  It only contains the negotiation IDs that contain at least one installment paid.
+
+  Original table name: TBL_WS_INTEGRA_PAGAMENTO.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_receipt:
+    description: "Receipt code – unique receipt id"
+    lineage:
+      - datalake_recupera_homolog_raw.status.id_receipt
+  installment_code:
+    description: "Installment code"
+    lineage:
+      - datalake_recupera_homolog_raw.status.installment_code
+  ts_current_registration:
+    description: "Current registration date"
+    lineage:
+      - datalake_recupera_homolog_raw.status.ts_current_registration
+  payment_traffic_flag:
+    description: "Payment Record Traffic Flag"
+    lineage:
+      - datalake_recupera_homolog_raw.status.payment_traffic_flag
+  internal_code:
+    description: "Internal code of the payment integration system"
+    lineage:
+      - datalake_recupera_homolog_raw.status.internal_code
+  trato_feito_payment_send:
+    description: "Number of times it was tried to send the payment to Trato-Feito"
+    lineage:
+      - datalake_recupera_homolog_raw.status.trato_feito_payment_send
+  ts_trato_feito_payment:
+    description: "Date of payment integration with Trato-Feito"
+    lineage:
+      - datalake_recupera_homolog_raw.status.ts_trato_feito_payment
+  error_description_trato_feito:
+    description: "Description of the error that returned in integration with Trato-Feito"
+    lineage:
+      - datalake_recupera_homolog_raw.status.error_description_trato_feito

@@ -1,0 +1,25 @@
+---
+database_name: datalake_webhelp_homolog_clean
+table_name: login
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Login data
+columns:
+  id_user:
+    description: "User ID. PK of table"
+    lineage:
+      - datalake_webhelp_homolog_raw.login.cod_login
+  id_person:
+    description: "Person ID"
+    lineage:
+      - datalake_webhelp_homolog_raw.login.cod_pes
+  id_supervisor:
+    description: "Supervisor ID (relates to the id_user of the same table)"
+    lineage:
+      - datalake_webhelp_homolog_raw.login.cod_superv
+  user_level:
+    description: "User level"
+    lineage:
+      - datalake_webhelp_homolog_raw.login.niv_cod
+  ts_load:
+    description: "Timestamp when data was loaded"

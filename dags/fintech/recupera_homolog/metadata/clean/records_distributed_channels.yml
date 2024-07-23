@@ -1,0 +1,47 @@
+---
+database_name: datalake_recupera_homolog_clean
+table_name: records_distributed_channels
+description: |
+  "Stores distribution data for digital channels.
+
+  Original table name: TBL_REGISTROS_CANAIS_DISTRIB.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_creditor:
+    description: "Creditor code. It is the PK (Primary Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
+    lineage:
+      - datalake_recupera_homolog_raw.records_distributed_channels.id_creditor
+  id_customer:
+    description: "Customer ID. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.records_distributed_channels.id_customer
+  id_digital_channel:
+    description: "Digital channel code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.records_distributed_channels.id_digital_channel
+  ts_current_registration:
+    description: "Current registration date"
+    lineage:
+      - datalake_recupera_homolog_raw.records_distributed_channels.dt_current_registration
+  dt_expiry_token:
+    description: "Expiry date of the token on the digital channel"
+    lineage:
+      - datalake_recupera_homolog_raw.records_distributed_channels.dt_expiry_token
+  distribution_param_code:
+    description: "Distribution parameter code"
+    lineage:
+      - datalake_recupera_homolog_raw.records_distributed_channels.distribution_param_code
+  relocation_code:
+    description: "Relocation code"
+    lineage:
+      - datalake_recupera_homolog_raw.records_distributed_channels.relocation_code
+  distribution_shipment_number:
+    description: "Distribution shipment number to the digital channel"
+    lineage:
+      - datalake_recupera_homolog_raw.records_distributed_channels.distribution_shipment_number

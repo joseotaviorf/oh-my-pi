@@ -1,0 +1,36 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: lra_installment
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.id
+  id_long_term_anticipation:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.long_term_anticipation_id
+  id_partner_reference:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.partner_reference_id
+  installment_number:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.installment_number
+  status:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.status
+  amount:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.amount
+  interest_value:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.interest_value
+  ts_due:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.due_at
+  ts_expected_due:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.expected_due_date
+  ts_created:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.created_at
+  ts_updated:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment.updated_at

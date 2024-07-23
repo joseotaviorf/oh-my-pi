@@ -1,0 +1,114 @@
+---
+database_name: datalake_recupera_homolog_clean
+table_name: guarantor_contracts
+description: |
+  "It contains contact data of a contract.
+  The data can be updated on the contact screen in contract details on the operation screen.
+
+  Original table name: TBL_CONTRATOS_AVALISTA.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_creditor:
+    description: "Creditor code. It is the PK (Primary Key) and the FK (Foreign Key) of the table."
+    categories:
+      "1": IQ QuintoAndar. Status - valid
+      "2": PP QuintoAndar. Status - discontinued
+      "3": IQ QuintoCred 2.0. Status - valid
+      "4": IQ QuintoAndar. Status - discontinued
+      "5": QuintoCred 3.0. Status - valid
+      "6": PP QuintoAndar. Status - discontinued (test API)
+      "7": IQ QuintoAndar. Status - discontinued (test API)
+      "8": IQ QuintoAndar. Status - discontinued (test API)
+      "9": IQ QuintoAndar. Status - discontinued (test API)
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.id_creditor
+  id_customer:
+    description: "Customer identifier code. It is the PK (Primary Key) and the FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.id_customer
+  id_product:
+    description: "Product code. It is the PK (Primary Key) and the FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.id_product
+  id_contract:
+    description: "Contract code. It is the PK (Primary Key) and the FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.id_contract
+  id_contact:
+    description: "Contact identifier code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.id_contact
+  name:
+    description: "Contact name"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.name
+  document:
+    description: "CPF/CNPJ of the contact"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.document
+  brazilian_identity_card:
+    description: "RG of contact"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.brazilian_identity_card
+  brazilian_identity_card_issuing_federal_unit:
+    description: "Contact RG issuance state"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.brazilian_identity_card_issuing_federal_unit
+  dt_contact_birth:
+    description: "Contact's date of birth"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.dt_contact_birth
+  father_name:
+    description: "Contact's father's name"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.father_name
+  mother_name:
+    description: "contact's mother's name"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.mother_name
+  address:
+    description: "Contact address"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.address
+  address_number:
+    description: "Contact address number"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.address_number
+  neighborhood:
+    description: "contact neighborhood"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.neighborhood
+  city:
+    description: "Contact city"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.city
+  state:
+    description: "Contact state"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.state
+  zip_code:
+    description: "Contact zip code"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.zip_code
+  address_add_on:
+    description: "Contact address add-on"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.address_add_on
+  comments:
+    description: "Comments"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.comments
+  spouse_name:
+    description: "Contact's spouse name"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.spouse_name
+  contact_type_code:
+    description: "Contact type code"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.contact_type_code
+  is_contact_active:
+    description: "Indicates whether the contact is active or inactive(has been deleted)"
+    lineage:
+      - datalake_recupera_homolog_raw.guarantor_contracts.is_contact_active

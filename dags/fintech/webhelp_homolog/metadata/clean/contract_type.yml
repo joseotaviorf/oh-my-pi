@@ -1,0 +1,21 @@
+---
+database_name: datalake_webhelp_homolog_clean
+table_name: contract_type
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Contract type data
+columns:
+  id_contract_type:
+    description: "Contract type ID. PK of table"
+    lineage:
+      - datalake_webhelp_homolog_raw.tipo_contrato.cod_tipc
+  id_creditor:
+    description: "Creditor/portfolio/company ID. FK of table creditors"
+    lineage:
+      - datalake_webhelp_homolog_raw.tipo_contrato.cod_cred
+  description_contract_type:
+    description: "Description of the contract type"
+    lineage:
+      - datalake_webhelp_homolog_raw.tipo_contrato.descricao_tipc
+  ts_load:
+    description: "Timestamp when data was loaded"

@@ -1,0 +1,25 @@
+---
+database_name: datalake_recupera_homolog_raw
+table_name: address_records
+columns:
+  address_description:
+    tags:
+      - Restricted
+  address_number:
+    tags:
+      - Restricted
+  address_add_on:
+    tags:
+      - Restricted
+  neighborhood:
+    tags:
+      - Restricted
+  address_city:
+    tags:
+      - Restricted
+  address_state:
+    tags:
+      - Restricted
+  address_zip_code:
+    tags:
+      - Restricted

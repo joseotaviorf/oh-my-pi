@@ -1,0 +1,104 @@
+---
+database_name: datalake_recupera_homolog_clean
+table_name: complementary_records_written_down
+description: |
+  "This table contains all of the customer's written-down debts.
+  The structure is identical to that of table 'complementary_records'.
+  When the debt is written down, it is removed from table 'complementary_records' and inserted in table 'complementary_records_written_down', and
+  the amount_paid and discount_amount fields are updated.
+
+  Original table name: TBL_REGISTROS_COMPL_BAIXAS.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_creditor:
+    description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": IQ QuintoAndar. Status - valid
+      "2": PP QuintoAndar. Status - discontinued
+      "3": IQ QuintoCred 2.0. Status - valid
+      "4": IQ QuintoAndar. Status - discontinued
+      "5": QuintoCred 3.0. Status - valid
+      "6": PP QuintoAndar. Status - discontinued (test API)
+      "7": IQ QuintoAndar. Status - discontinued (test API)
+      "8": IQ QuintoAndar. Status - discontinued (test API)
+      "9": IQ QuintoAndar. Status - discontinued (test API)
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.id_creditor
+  id_customer:
+    description: "Customer Identifier Code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.id_customer
+  id_product:
+    description: "Product code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.id_product
+  bank_branch_code:
+    description: "Bank branch code - completed with the sent in the load"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.bank_branch_code
+  bank_account_number:
+    description: "Bank account number - filled with sent in the load"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.bank_account_number
+  id_contract:
+    description: "Contract Identifier Code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.id_contract
+  dt_contract_start:
+    description: "Start date"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.dt_contract_start
+  dt_debt_due_date:
+    description: "Debt due date"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.dt_debt_due_date
+  installment_number:
+    description: "Installment number"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.installment_number
+  dt_last_debt_correction:
+    description: "Date of last debt correction"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.dt_last_debt_correction
+  dt_paid:
+    description: "Date of payment"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.dt_paid
+  main_amount:
+    description: "Main value - original debt value"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.main_amount
+  corrected_amount:
+    description: "Corrected value - value corrected until the date of the last correction and"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.corrected_amount
+  minimun_amount:
+    description: "Minimum value - filled with the one sent in the load"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.minimun_amount
+  amount_paid:
+    description: "Amount paid"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.amount_paid
+  installments_amount:
+    description: "Number of installments of the contract (plan)"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.installments_amount
+  ts_last_debt_update:
+    description: "Date of the last debt update - whenever the installment is sent in the load this field is updated"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.ts_last_debt_update
+  type_pendency_debt:
+    description: "Indicates the type of pending this debt. When the installment or deposit is canceled, the flag returns to null"
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.type_pendency_debt
+  installment_code:
+    description: "Installment ID. When there is an installment payment in progress, the installment code will be in this field (at the same time the tip_pende is 'PA')."
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.installment_code
+  id_installment:
+    description: "Original Seu Barriga invoice. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.complementary_records_written_down.id_installment

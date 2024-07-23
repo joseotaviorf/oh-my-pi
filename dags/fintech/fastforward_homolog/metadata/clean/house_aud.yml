@@ -1,0 +1,21 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: house_aud
+columns:
+  id_house:
+    lineage:
+      - datalake_fastforward_homolog_raw.house_aud.id
+  id_external:
+    lineage:
+      - datalake_fastforward_homolog_raw.house_aud.external_id
+  id_address:
+    lineage:
+      - datalake_fastforward_homolog_raw.house_aud.address_id
+  rev:
+    lineage:
+      - datalake_fastforward_homolog_raw.house_aud.rev
+  rev_type:
+    lineage:
+      - datalake_fastforward_homolog_raw.house_aud.revtype
+  cover_image_url:
+    lineage:
+      - datalake_fastforward_homolog_raw.house_aud.cover_image_url

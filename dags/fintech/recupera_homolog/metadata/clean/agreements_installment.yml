@@ -1,0 +1,47 @@
+---
+database_name: datalake_recupera_homolog_clean
+table_name: agreements_installment
+description: |
+  "Stores the unique key for the installment of a negotiation.
+
+  Original Table Name: TBL_DEPARA_ACORDOS_PARC_5A.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_installment:
+    description: "Installment ID"
+    lineage:
+      - datalake_recupera_homolog_raw.agreements_installment.id_installment
+  id_creditor:
+    description: "Creditor code"
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
+    lineage:
+      - datalake_recupera_homolog_raw.agreements_installment.id_creditor
+  id_customer:
+    description: "Customer ID"
+    lineage:
+      - datalake_recupera_homolog_raw.agreements_installment.id_customer
+  id_product:
+    description: "Product Code"
+    lineage:
+      - datalake_recupera_homolog_raw.agreements_installment.id_product
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_recupera_homolog_raw.agreements_installment.id_contract
+  dt_due:
+    description: "Expiration date of the installment of the agreement"
+    lineage:
+      - datalake_recupera_homolog_raw.agreements_installment.dt_due
+  installment_number:
+    description: "Installment number of the agreement"
+    lineage:
+      - datalake_recupera_homolog_raw.agreements_installment.installment_number
+  id_installment_agreement:
+    description: "Unique id of the installment of the agreement. It is the concatenation of fields: id_contract + id_installment + installment_number + dt_due "
+    lineage:
+      - datalake_recupera_homolog_raw.agreements_installment.id_installment_agreement

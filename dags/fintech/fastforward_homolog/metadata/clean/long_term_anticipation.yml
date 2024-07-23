@@ -1,0 +1,66 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: long_term_anticipation
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.id
+  id_contract:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.contract_id
+  id_installment_option:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.installment_option_id
+  id_quota:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.quota_id
+  id_operation:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.operation_id
+  months_anticipated:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.months_anticipated_number
+  investment_source:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.investment_source
+  status:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.status
+  status_reason:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.status_reason
+  installment_value:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.installment_value
+  partner_commission:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.partner_commission
+  total_amount:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.total_amount
+  total_rent:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.total_rent
+  ccb_code:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.ccb_code
+  ccb_url:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.ccb_url
+  iof_amount:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.iof_amount
+  ts_created:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.created_at
+  ts_updated:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.updated_at
+  ts_paid:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.paid_at
+  ts_signed:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.signed_at
+  dt_first_installment:
+    lineage:
+      - datalake_fastforward_homolog_raw.long_term_anticipation.first_installment_date

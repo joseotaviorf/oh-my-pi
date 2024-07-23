@@ -1,0 +1,7 @@
+---
+database_name: datalake_recupera_homolog_raw
+table_name: email_records
+columns:
+  customer_email:
+    tags:
+      - Confidential

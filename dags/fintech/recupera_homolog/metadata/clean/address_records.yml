@@ -1,0 +1,55 @@
+---
+database_name: datalake_recupera_homolog_clean
+table_name: address_records
+description: |
+  "This table contains the customer's third address data.
+
+  Original table name: TBL_REGISTROS_ENDERECOS.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_creditor:
+    description: "Creditor code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.id_creditor
+  id_customer:
+    description: "Customer Identifier Code. It is the PK (Primary Key) and FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.id_customer
+  id_sequence_number:
+    description: "Sequential number of the load file. It represents the processing sequence as import control. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.id_sequence_number
+  address_description:
+    description: "Customer Address Description"
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.address_description
+  address_number:
+    description: "Customer Address Number"
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.address_number
+  address_add_on:
+    description: "Customer address complement"
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.address_add_on
+  neighborhood:
+    description: "Neighborhood of the client's address"
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.neighborhood
+  address_city:
+    description: "Customer Address City"
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.address_city
+  address_state:
+    description: "Customer address state"
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.address_state
+  address_zip_code:
+    description: "Customer Address Zip Code"
+    lineage:
+      - datalake_recupera_homolog_raw.address_records.address_zip_code

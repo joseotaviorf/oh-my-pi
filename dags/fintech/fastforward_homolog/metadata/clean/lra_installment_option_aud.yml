@@ -1,0 +1,30 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: lra_installment_option_aud
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.id
+  rev:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.rev
+  rev_type:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.revtype
+  installments:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.installments_number
+  monthly_interest_rate:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.monthly_interest
+  option_bucket:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.option_bucket
+  months_anticipated:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.months_anticipated
+  ts_valid_from:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.valid_from
+  ts_valid_until:
+    lineage:
+      - datalake_fastforward_homolog_raw.lra_installment_option_aud.valid_until

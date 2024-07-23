@@ -1,0 +1,64 @@
+---
+database_name: datalake_recupera_homolog_clean
+table_name: status
+description: |
+  "Table containing the registered status.
+  Statuss 00 and 99 are from the system and cannot be deleted.
+
+  Original table name: TBL_STATUS.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_status:
+    description: "Status Code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.status.id_status
+  status_description:
+    description: "Status Description"
+    lineage:
+      - datalake_recupera_homolog_raw.status.status_description
+  ts_status_inclusion:
+    description: "Date of inclusion of the status"
+    lineage:
+      - datalake_recupera_homolog_raw.status.ts_status_inclusion
+  ts_last_registration_update:
+    description: "Last update date do cadastro"
+    lineage:
+      - datalake_recupera_homolog_raw.status.ts_last_registration_update
+  operator_name:
+    description: "Operator that made the last update of the registration"
+    lineage:
+      - datalake_recupera_homolog_raw.status.operator_name
+  is_accessible:
+    description: "Indicates whether or not it is accessible to the active operator - whether or not it generates agenda"
+    lineage:
+      - datalake_recupera_homolog_raw.status.is_accessible
+  id_operator:
+    description: "Operator code to which the customer forwards. It is the FK (Foreign Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.status.id_operator
+  forwarding_type:
+    description: "Indicates the type of forwarding"
+    lineage:
+      - datalake_recupera_homolog_raw.status.forwarding_type
+  contract_block:
+    description: "Indicates the type of contract block"
+    lineage:
+      - datalake_recupera_homolog_raw.status.contract_block
+  is_boleto_emission_block:
+    description: "Boleto emission block indicator. If positive it will not be allowed to issue a ticket to the customer who is in that status"
+    lineage:
+      - datalake_recupera_homolog_raw.status.is_boleto_emission_block
+  is_installment_block:
+    description: "Installment block indicator. If positive, it will not be allowed to make installments for the customer who is in this status"
+    lineage:
+      - datalake_recupera_homolog_raw.status.is_installment_block
+  is_charge_returned:
+    description: "Indicates whether the non-accessible status will return the charge or not when a new installment is included"
+    lineage:
+      - datalake_recupera_homolog_raw.status.is_charge_returned
+  dt_expiration:
+    description: "Indicates status expiration date"
+    lineage:
+      - datalake_recupera_homolog_raw.status.dt_expiration

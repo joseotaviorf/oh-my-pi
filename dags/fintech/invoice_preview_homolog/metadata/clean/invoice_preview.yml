@@ -1,0 +1,79 @@
+---
+database_name: datalake_invoice_preview_homolog_clean
+table_name: invoice_preview
+columns:
+  id_contract:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.contract-id
+  contract_version:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.version
+  paid_from:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.from
+  paid_to:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.to
+  payment_description:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.description
+  item_category:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.item
+  tenant_status:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.tenant-status
+  landlord_status:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.landlord-status
+  payment_purpose:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.purpose
+  country:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.country
+  paid_amount:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.amount
+  is_blocked:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.blocked
+  entry_accrual_year_month:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.year-month
+  invoice_accrual_year_month:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.invoice_filename
+  dt_due:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.due-date
+  dt_tenant_due:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.tenant-due-date
+  dt_tenant_paid:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.tenant-paid-date
+  dt_landlord_due:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.landlord-due-date
+  dt_landlord_paid:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.landlord-paid-date
+  dt_tenant_invoice_created_at:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.tenant-invoice-created-at
+  dt_landlord_invoice_created_at:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.landlord-invoice-created-at
+  year:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.year
+  month:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.month
+  day:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.day
+  ts_load:
+    lineage:
+      - datalake_invoice_preview_homolog_raw.invoice_preview.ts_load

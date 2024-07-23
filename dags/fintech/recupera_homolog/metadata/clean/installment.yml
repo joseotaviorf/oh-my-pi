@@ -1,0 +1,167 @@
+---
+database_name: datalake_recupera_homolog_clean
+table_name: installment
+description: |
+  "Contains the installments of the agreements.
+  In this table we will have a line for each installment of the agreement.
+  In the case of reversing (refund) the installment receipt, there will be more than one line
+  per installment.
+  The records are never delete.
+
+  To get the most up-to-date installment, you need to filter is_installment_active = TRUE
+
+  Discount amount composition (only registered for id_sequence_number=000):
+  - If paid_amount <= main_amount:  the discount value is the accounting discount (desconto contábil), i.e, only the discount on the main amount.
+  - If paid amount > main_amount: the discount on the financial, i.e, the difference between the total correct balance and the amount to be paid in the negotiation.
+    The correct balance is the main_amount_paid in 'creditor_pending' table where installment_code is not null.
+  - If paid_amount < main_amount:  the discount is the accounting (contábil), i.e, main_amount - paid_amount.
+
+  Original table name: TBL_PARCELAMENTO.
+  Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+columns:
+  id_installment:
+    description: "Installment code. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.installment.id_installment
+  dt_due:
+    description: "Due date. It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.installment.dt_due
+  id_sequence_number:
+    description: "Sequence number of service/receipt. It represents the processing sequence as import control. In the event of reversal, new line is inserted to the portion with this different field). It is the PK (Primary Key) of the table."
+    lineage:
+      - datalake_recupera_homolog_raw.installment.id_sequence_number
+  id_creditor:
+    description: "Creditor code"
+    categories:
+      "1": QuintoAndar
+      "3": QuintoCred, faturas da plataforma 2.0
+      "5": QuintoCred, faturas da plataforma 3.0
+    lineage:
+      - datalake_recupera_homolog_raw.installment.id_creditor
+  id_customer:
+    description: "Customer Identifier Code"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.id_customer
+  dt_installment:
+    description: "Date the installment was made"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.dt_installment
+  installment_number:
+    description: "Installment number - the first is always 000"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.installment_number
+  installments_amount:
+    description: "Total amount of installments"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.installments_amount
+  main_amount:
+    description: "Main installment value contained in the installment"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.main_amount
+  amount_to_pay:
+    description: "Total amount to be paid in the installment"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.amount_to_pay
+  amount_fine:
+    description: "Fine Amount"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.amount_fine
+  interest_fee_amount:
+    description: "Interest Value"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.interest_fee_amount
+  adm_fee_amount:
+    description: "Administrative Fee Amount"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.adm_fee_amount
+  transfer_amount:
+    description: "Transfer value"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.transfer_amount
+  revenue_amount:
+    description: "Revenue valuea"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.revenue_amount
+  discount_amount:
+    description: "Discount amount"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.discount_amount
+  expense_amount:
+    description: "Expense value. Total value of negotiation/agreement"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.expense_amount
+  default_interest_amount:
+    description: "Default interest value (juros de mora)"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.default_interest_amount
+  installment_fee_amount:
+    description: "Value of installment interest"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.installment_fee_amount
+  dt_paid:
+    description: "Date of payment"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.dt_paid
+  id_site:
+    description: "Site code where the installment was made"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.id_site
+  receipt_code:
+    description: "Receipt code. In this table, this field will only be filled in for installments that are open or have already been paid. The receipt table contains the id_receipt field filled in for all installments regardless of their status (cancelled..)"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.receipt_code
+  is_installment_active:
+    description: "Indicates whether the installment is active (valid), or not (was reversed)"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.is_installment_active
+  installment_situation:
+    description: "Installment situation. When the agreement is canceled all lines have this flag"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.installment_situation
+  boleto_emission_indicator:
+    description: |
+      "Boleto emission indicator. Indicates the type of receipt selected when the installment was made"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.boleto_emission_indicator
+  is_special_installment:
+    description: "Indicates whether it is a special installment or not (common installment)"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.is_special_installment
+  id_operator:
+    description: "Operator code that made the agreement"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.id_operator
+  advisory_code:
+    description: "Advisory Code. It will be filled if it is an agreement made for a client in advisory."
+    categories:
+      QPASCHWS: Assessoria Paschoalotto, Operação de Cobrança QuintoAndar
+      V5IAFWS: Assessoria IAF, Operação de Cobrança QuintoCred para Credor 5 (Plataforma 3.0)
+      V5PASCHW: Assessoria Paschoalotto, Operação de Cobrança QuintoCred para Credor 5 (Plataforma 3.0)
+      VPASCHWS: Assessoria Paschoalotto, Operação de Cobrança QuintoCred para Credor 3 (Plataforma 2.0)
+      VIAFWS: Assessoria IAF, Operação de Cobrança QuintoCred para Credor 3 (Plataforma 2.0)
+    lineage:
+      - datalake_recupera_homolog_raw.installment.advisory_code
+  agreement_type:
+    description: "Indicates the type of agreement."
+    categories:
+      Em assessoria por um operador interno: Cliente consta na carteira da assessoria, mas teve o acordo realizado internamente (operação interna de cobrança, acesso ao portal de autonegociacao, carta campanha [boletagem]). Exemplo - cliente está distribuido, porém o próprio cliente ligou para pagar a dívida, nesse caso ele está na assessoria porém o acordo foi feito por um operador interno.
+      Em assessoria por um operador de assessoria: Acordo gerado pela assessoria, pelos seus variados canais
+      Fora de assessoria: Cliente não consta na carteira da assessoria, acordo gerado internamente
+    lineage:
+      - datalake_recupera_homolog_raw.installment.agreement_type
+  installment_rate:
+    description: "Installment fee"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.installment_rate
+  discount_percentage:
+    description: "Discount percentage"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.discount_percentage
+  installlment_renegotiated:
+    description: |
+      "Indicates that the installment was renegotiated (identified at the time the agreement is made)"
+    lineage:
+      - datalake_recupera_homolog_raw.installment.installlment_renegotiated

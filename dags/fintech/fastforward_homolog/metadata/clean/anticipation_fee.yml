@@ -1,0 +1,21 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: anticipation_fee
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_homolog_raw.anticipation_fee.id
+  value:
+    lineage:
+      - datalake_fastforward_homolog_raw.anticipation_fee.value
+  ts_created:
+    lineage:
+      - datalake_fastforward_homolog_raw.anticipation_fee.created_at
+  ts_updated:
+    lineage:
+      - datalake_fastforward_homolog_raw.anticipation_fee.updated_at
+  ts_started:
+    lineage:
+      - datalake_fastforward_homolog_raw.anticipation_fee.started_at
+  ts_finished:
+    lineage:
+      - datalake_fastforward_homolog_raw.anticipation_fee.finished_at

@@ -1,0 +1,18 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: users
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_homolog_raw.users.id
+  id_external:
+    lineage:
+      - datalake_fastforward_homolog_raw.users.external_id
+  name:
+    lineage:
+      - datalake_fastforward_homolog_raw.users.name
+  ts_created:
+    lineage:
+      - datalake_fastforward_homolog_raw.users.created_at
+  ts_updated:
+    lineage:
+      - datalake_fastforward_homolog_raw.users.updated_at

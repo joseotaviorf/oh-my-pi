@@ -1,0 +1,15 @@
+SELECT
+    id_creditor,
+    id_customer,
+    id_product,
+    id_contract,
+    id_installment,
+    id_indicator,
+    indicator_content,
+    content_description,
+    ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_recupera_homolog_raw.installments_indicators

@@ -1,0 +1,27 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: address
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_homolog_raw.address.id
+  state:
+    lineage:
+      - datalake_fastforward_homolog_raw.address.uf
+  city:
+    lineage:
+      - datalake_fastforward_homolog_raw.address.city
+  complement:
+    lineage:
+      - datalake_fastforward_homolog_raw.address.complement
+  neighborhood:
+    lineage:
+      - datalake_fastforward_homolog_raw.address.neighborhood
+  street:
+    lineage:
+      - datalake_fastforward_homolog_raw.address.street
+  ts_created:
+    lineage:
+      - datalake_fastforward_homolog_raw.address.created_at
+  ts_updated:
+    lineage:
+      - datalake_fastforward_homolog_raw.address.updated_at

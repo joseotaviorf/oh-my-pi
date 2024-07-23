@@ -1,0 +1,39 @@
+database_name: datalake_fastforward_homolog_clean
+table_name: contract
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.id
+  id_external:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.external_id
+  id_landlord:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.landlord_id
+  id_owner:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.owner_id
+  id_house:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.house_id
+  id_brokerage_fee:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.brokerage_fee_id
+  id_installment_plan:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.installment_plan_id
+  is_off_limits:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.off_limits
+  ts_started:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.start_date
+  ts_created:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.created_at
+  ts_updated:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.updated_at
+  ts_ended:
+    lineage:
+      - datalake_fastforward_homolog_raw.contract.end_date

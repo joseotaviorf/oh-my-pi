@@ -1,0 +1,53 @@
+dag:
+  name: webhelp_homolog
+  schedule_start_date: 2024, 2, 7
+  schedule_interval: 30 5 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Ingestion of Webhelp data saved in parquet format files stored in an Azure Bucket (wasbs://lake-quinto-andar-sftp). Webhelp is an external company that is responsible for the collection of defaulting customers.
+      The data will be used in the Collection Recovery analysis.
+      Tribe: Portfolio Management.
+      Get more information at: https://drive.google.com/drive/u/0/folders/1KQu5e2Qk6Waa05S46kdUMZpnsm3vUQ0T
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_webhelp_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}" #datalake_bucket
+    - "{dag_name}" #source
+    - "lake-quinto-andar-sftp" #azure_container_name
+    - ["ATENDIMENTO", "COBRANCA"] #azure_sub_folder
+    - "{{ ds }}" #date_to_ingest
+    - "{table_name}"
+    - "parquet" #format
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  tables_customization:
+    historicos_clientes:
+      clean_table_name: historical_customers
+    historicos_clientes_titulos:
+      clean_table_name: historical_customers_titles
+    login:
+      clean_table_name: login
+    ocorrencias_clientes:
+      clean_table_name: customer_occurrences
+    estagios:
+      clean_table_name: stages
+    titulos:
+      clean_table_name: titles
+    tipo_contrato:
+      clean_table_name: contract_type
+    credores:
+      clean_table_name: creditors
+    parcelas:
+      clean_table_name: installments
+    devedores:
+      clean_table_name: debtors
+    grupo_ocorrencias:
+      clean_table_name: group_occurrences
+    importacao:
+      clean_table_name: import
+cluster:
+  type: databricks_12_2_min_general_cluster

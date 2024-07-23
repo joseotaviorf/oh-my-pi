@@ -1,0 +1,17 @@
+---
+database_name: datalake_webhelp_homolog_clean
+table_name: debtors
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Debtors data
+columns:
+  id_debtor:
+    description: "Debtor/customer code in CRM. PK of table"
+    lineage:
+      - datalake_webhelp_homolog_raw.devedores.cod_dev
+  id_person:
+    description: "Person code"
+    lineage:
+      - datalake_webhelp_homolog_raw.devedores.cod_pes
+  ts_load:
+    description: "Timestamp when data was loaded"
