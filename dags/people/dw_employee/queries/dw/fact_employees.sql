@@ -252,7 +252,7 @@ WITH
     salaries_for_employee AS (
         SELECT DISTINCT
             id_person,
-            qnt_movimentations AS qnt_movimentations_employee,
+            qnt_movimentations,
             average_time_between_movimentations,
             first_salary,
             range_salary_movement,
@@ -292,7 +292,7 @@ SELECT
     REPLACE (am.dt_start_work_relationship, '-', '') AS sk_work_relationship_started_date,
     REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
     am.sk_last_increase_date,
-    REPLACE (se.dt_first_promotion_employee, '-', '') AS sk_dt_first_promotion,
+    REPLACE (se.dt_first_promotion, '-', '') AS sk_dt_first_promotion,
     am.is_last_work_relationship,
     am.is_active,
     am.is_pending_worker,
@@ -304,11 +304,11 @@ SELECT
     am.salary,
     am.target_plr,
     am.salary_reference AS salary_range_midpoint,
-    qnt_movimentations,
-    average_time_between_movimentations,
+    se.qnt_movimentations,
+    se.average_time_between_movimentations,
     am.last_increase,
     am.pct_last_increase,
-    se.first_salary_employee AS first_salary,
+    se.first_salary,
     am.last_salary,
     se.range_salary_movement,
     se.first_promotion_salary,
@@ -325,4 +325,4 @@ LEFT JOIN
     subordinates AS s
         ON s.id_assignment = am.sk_assignment
 WHERE
-    am.is_last_work_relationship is True
+    am.is_last_work_relationship
