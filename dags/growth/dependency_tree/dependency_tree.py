@@ -21,7 +21,7 @@ SOURCE = "dependency_tree"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 8, 21, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "00 06 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 
@@ -90,7 +90,7 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
     raw_spark_job_extra_args=[
         SOURCE,
         raw_table_name,
-    ]            
+    ]
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
