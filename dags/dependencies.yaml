@@ -3531,6 +3531,12 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
   - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
+quintoml.growth.eltv.inference:
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_location:load-clean-state
+  - bietlejuice.ebdb_location:load-clean-region
 quintoml.recs.house_user_embeddings_quintoml.inference:
   - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
   - wonka.house_listing_business_context:load-house_listing_business_context

@@ -939,6 +939,14 @@ wonka.house_rent_proposal:
     - bietlejuice.sorting_hat:load-clean-proponent
     - bietlejuice.sorting_hat:load-clean-proposal
 
+quintoml.growth.eltv.inference:
+  add:
+    - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+    - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
+    - bietlejuice.ebdb_house:load-clean-house
+    - bietlejuice.ebdb_location:load-clean-state
+    - bietlejuice.ebdb_location:load-clean-region
+
 quintoml.recs.house_user_embeddings_quintoml.inference:
   add:
     - wonka.house_listing_business_context:load-house_listing_business_context
