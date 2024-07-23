@@ -1,0 +1,26 @@
+dag:
+  name: hr_system_custom
+  dag_documentation:
+    dag_purpose: |
+      Retrieve data from Oracle HR System CUSTOM API, a sub product of Oracle Human Capital Resources (Oracle HCM).
+  schedule_interval: 0 3 * * *
+  owner: Data People
+cluster:
+  type: databricks_13_3_min_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+workflow:
+  layer: raw
+  type: custom_ingestion
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  load_spark_job: load_hr_system_custom_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+  tables_customization:
+    workers_registration:
+      merge_on: ["assignment_number"]

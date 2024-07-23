@@ -1,3 +1,0 @@
-dag_documentation:
-  dag_purpose: |
-    Retrieve data from Oracle HR System CUSTOM API, a sub product of Oracle Human Capital Resources (Oracle HCM).
