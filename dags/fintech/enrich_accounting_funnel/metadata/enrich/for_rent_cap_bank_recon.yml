@@ -11,18 +11,18 @@ columns:
       - datalake_accounting_funnel.payment_platforms.reference_1
       - datalake_pas.ledger.id_external_payment
     description: "Unique code to identify bank payments"
-  bank_account:
+  id_bank_account:
     lineage:
       - datalake_nexxera.cnab_payments.bank_account
     description: "Bank account where de payments was made"
+  latest_occurrence_code:
+    lineage:
+      - datalake_nexxera.cnab_payments.occurrence_code
+    description: "Last occurrence code status for company_use"
   bank_paid_amount:
     lineage:
       - datalake_nexxera.cnab_payments.paid_amount
     description: "Paid amount from Bank"
-  cap_paid_amount:
-    lineage:
-      - datalake_accounting_funnel.payment_platforms.paid_amount
-    description: "Paid amount from Vans/Checkout"
   sap_paid_amount:
     lineage:
       - datalake_pas.ledger.debit_credit
@@ -33,10 +33,6 @@ columns:
     lineage:
       - datalake_nexxera.cnab_payments.dt_paid
     description: "Paid date from Bank"
-  dt_cap_paid:
-    lineage:
-      - datalake_accounting_funnel.payment_platforms.dt_paid
-    description: "Paid date from Vans/Checkout"
   dt_sap_paid:
     lineage:
       - datalake_pas.ledger.dt_reference
