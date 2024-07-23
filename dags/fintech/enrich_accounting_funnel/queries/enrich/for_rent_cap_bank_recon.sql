@@ -14,7 +14,7 @@ WITH francesinha AS (
     WHERE
         occurrence_code IN ('00', 'DV')
     AND
-        bank_account IN (426887, 79952)
+        bank_account IN (426887, 79952, 433065, 502307)
     GROUP BY 1, 2, 3, 4
 ),
 
@@ -38,7 +38,7 @@ cap AS (
     AND
         payment_status IN ('paid', 'chargeback')
     AND
-        CAST(SPLIT(reference_5, ':')[0] AS INT) IN (1, 2, 7)
+        CAST(SPLIT(reference_5, ':')[0] AS INT) IN (1, 2, 7, 10, 13)
     GROUP BY
         1, 2, 3, 4, 5, 6
 ),
@@ -53,7 +53,7 @@ sap AS (
     FROM
         datalake_pas.ledger
     WHERE
-        account_number IN ('11102.01.04', '11102.02.01')
+        account_number IN ('11102.01.04', '11102.02.01', '11102.01.08', '11102.01.07')
     GROUP BY
         1, 2, 3, 4
 ),
