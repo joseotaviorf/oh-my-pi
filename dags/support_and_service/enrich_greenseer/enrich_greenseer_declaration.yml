@@ -21,6 +21,7 @@ cluster:
     type: custom_cluster
     custom_configurations:
         driver_node_type_id: r5d.8xlarge
-        node_type_id: r5d.4xlarge
+        node_type_id: r5d.8xlarge
         runtime_engine: PHOTON
+        num_workers: 3
         spark_version: 13.3.x-scala2.12
