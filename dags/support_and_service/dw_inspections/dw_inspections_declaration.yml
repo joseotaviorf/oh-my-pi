@@ -50,11 +50,11 @@ workflow:
       merge_on: ["sk_reviewer"]
       z_order_by: ["sk_reviewer"]
     dim_room:
-      merge_on: ["sk_room"]
-      z_order_by: ["sk_room"]
+      merge_on: ["sk_assessment"]
+      z_order_by: ["sk_assessment"]
     fact_contestation:
-      merge_on: ["sk_contestation"]
-      z_order_by: ["sk_contestation"]
+      merge_on: ["sk_assessment"]
+      z_order_by: ["sk_assessment"]
     fact_inspection:
       extraction_type: full
       partitions: []
@@ -64,8 +64,8 @@ workflow:
       merge_on: ["sk_item_attachment"]
       z_order_by: ["sk_item_attachment"]
     fact_item_issue:
-      merge_on: ["sk_item_issue"]
-      z_order_by: ["sk_item_issue"]
+      merge_on: ["sk_assessment"]
+      z_order_by: ["sk_assessment"]
     fact_item:
       merge_on: ["sk_item"]
       z_order_by: ["sk_item"]
