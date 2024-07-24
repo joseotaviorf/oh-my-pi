@@ -96,21 +96,6 @@ if __name__ == "__main__":
         
         df = spark_client.conn.read.json(transient_path,  schema=transient_data_schema)
 
-        """
-        TO-DO: Schema Compatibility between API data schema and Amplitude Pull Export data schema
-
-        Creating two NULL columns that doesn't exists in Pull Export data.
-            1. data_type
-            2. insert_id
-        """
-        
-        missing_cols = [col for col in transient_expected_cols if col not in df.columns]
-        for col in missing_cols:
-
-            df = df.withColumn(col, lit(None))
-        
-        df = df.select(transient_expected_cols)
-
         if not(df.isEmpty()):
             logger.info(f'msg= events received from App ID {key["app_id"]} for this day.')
 
@@ -124,6 +109,21 @@ if __name__ == "__main__":
                 )
                 .output()
             )
+
+            """
+            TO-DO: Schema Compatibility between API data schema and Amplitude Pull Export data schema
+
+            Creating two NULL columns that doesn't exists in Pull Export data.
+                1. data_type
+                2. insert_id
+            """
+            
+            missing_cols = [col for col in transient_expected_cols if col not in df.columns]
+            for col in missing_cols:
+
+                df = df.withColumn(col, lit(None))
+            
+            df = df.select(transient_expected_cols)            
 
             df = df.na.drop(subset=partition_cols)
 
