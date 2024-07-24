@@ -90,3 +90,7 @@ transient_expected_cols:
   - user_properties
   - uuid
   - version_name
+  - year
+  - month
+  - day
+  - app  
