@@ -74,7 +74,7 @@ SELECT DISTINCT
         WHEN j.id_job_family = 300000004860309 THEN 'Assistentes'
         WHEN j.id_job_family = 300000004860315 THEN 'Auxiliares'
         ELSE 'UNKNOWN'
-    END AS job_ctegory,
+    END AS job_category,
     COALESCE(jcf.career_track, 'UNKNOWN') AS career_track,
     COALESCE(jcf.working_hours_regime, 'UNKNOWN') AS working_hours_regime,
     jcf.workload,

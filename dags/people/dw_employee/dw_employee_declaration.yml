@@ -4,6 +4,11 @@ dag:
   schedule_start_date: 2024, 4, 1
   documentation:
     dag_purpose: DataWarehouse with information about QuintoAndar Group employees.
+cluster:
+  type: databricks_13_3_min_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
 workflow:
   type: query_delta
   layer: dw
@@ -13,8 +18,7 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
-cluster:
-  type: databricks_13_3_min_memory_people_cluster
-  access_control_list:
-    group_name: people-analytics
-    permission_level: CAN_MANAGE
+  tables_customization:
+    dim_employee_census:
+      extraction_type: incremental
+      merge_on: ["sk_employee_census"]

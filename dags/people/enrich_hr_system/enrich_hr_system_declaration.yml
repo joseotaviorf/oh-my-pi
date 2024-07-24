@@ -4,6 +4,11 @@ dag:
   owner: Data People
   documentation:
     dag_purpose: Enrich HR System data.
+cluster:
+  type: databricks_13_3_min_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
 workflow:
   type: query_delta
   layer: enrich
@@ -13,6 +18,9 @@ workflow:
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
     assignments:
       extraction_type: incremental
@@ -20,11 +28,6 @@ workflow:
     managers:
       extraction_type: incremental
       partitions: ["year", "month"]
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
-cluster:
-  type: databricks_13_3_min_memory_people_cluster
-  access_control_list:
-    group_name: people-analytics
-    permission_level: CAN_MANAGE
+    demographic_attributes:
+      extraction_type: incremental
+      merge_on: ["id_person"]

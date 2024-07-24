@@ -251,4 +251,4 @@ WHERE
     li.dt_effective_start,
     DATE(eth.ts_last_update),
     DATE(rel.ts_last_update)
-  ) BETWEEN DATE('{load_start_date}') AND DATE('{load_start_date}')
+  ) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
