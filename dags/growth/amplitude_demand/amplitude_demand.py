@@ -74,18 +74,6 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-load_amplitude_demand_transient_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"load-transient-{SOURCE}",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": raw_spark_jobs_path + "load_amplitude_demand_transient.py",
-            "parameters": [ENV, datalake_bucket, SOURCE, "{{ ds }}"],
-        }
-    },
-    execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
-)
-
 events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="events-demand-to-datalake-raw",
     dag=dag,
@@ -101,7 +89,6 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
 # raw tasks dependencies
 airflow_helpers.chain(
     create_cluster_task,
-    load_amplitude_demand_transient_task,
     events_to_datalake_raw_task,
     terminate_cluster_task,
 )

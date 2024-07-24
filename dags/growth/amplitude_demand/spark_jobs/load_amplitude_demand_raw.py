@@ -4,6 +4,8 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from pyspark.sql.functions import lit
+
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
@@ -51,13 +53,15 @@ if __name__ == "__main__":
 
     all_keys = json.loads(dbutils.secrets.get("quintoandar", APIEnum.AMPLITUDE))
 
-    keys = [key for key in all_keys if key['app_id'] == 170698]
+    key = [secret for secret in all_keys if secret['app_id'] == 170698][0]
     
     config_service = ConfigurationService(source)
     custom_records_per_file = config_service.get_config("custom_records_per_file")
     partition_cols = config_service.get_config("raw_partition_cols")
     table_name = config_service.get_config("table_name")
     transient_location = config_service.get_config("transient_location")
+    transient_data_schema = config_service.get_config("transient_data_schema")
+    transient_expected_cols = config_service.get_config("transient_expected_cols")
 
     spark_client = SparkClient()
     spark_context = spark_client.conn.sparkContext
@@ -82,21 +86,33 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     s3_loader = S3Loader()
 
-    for key in keys:
+    transient_path = transient_location + f'170698/170698_{execution_date}_*/'
 
-        transient_path = transient_location + f'events/year={dt.year}/month={dt.month}/day={dt.day}/app={key["app_id"]}/'
-        logger.info(
-            f'msg=starting events processing, app_id={key["app_id"]}, app_name={key["app_name"]}, path={transient_path}'
-        )
+    logger.info(
+        f'msg=starting events processing, app_id={key["app_id"]}, app_name={key["app_name"]}, path={transient_path}'
+    )
 
-        try:
-          
-          df = spark_client.conn.read.json(transient_path)
-          
-          if not(df.isEmpty()):
+    try:
+        
+        df = spark_client.conn.read.json(transient_path,  schema=transient_data_schema)
+
+        """
+        TO-DO: Schema Compatibility between API data schema and Amplitude Pull Export data schema
+
+        Creating two NULL columns that doesn't exists in Pull Export data.
+            1. data_type
+            2. insert_id
+        """
+        
+        missing_cols = [col for col in transient_expected_cols if col not in df.columns]
+        for col in missing_cols:
+
+            df = df.withColumn(col, lit(None))
+        
+        df = df.select(transient_expected_cols)
+
+        if not(df.isEmpty()):
             logger.info(f'msg= events received from App ID {key["app_id"]} for this day.')
-            
-            df = df.drop("year", "month", "day", "hour", "app")
 
             df = (
                 dataframe_service.input(df)
@@ -133,10 +149,8 @@ if __name__ == "__main__":
                 database_name, table_name, df, partition_cols, parallelism=8
             )
 
-          else:
+        else:
             logger.info(f'msg=no events received from App ID {key["app_id"]} for this day.')
 
-        except Exception as error:
-          logger.info(f"msg=fail to get events from {dt}, cause={error}")
-          continue
-           
+    except Exception as error:
+        logger.info(f"msg=fail to get events from {dt}, cause={error}")

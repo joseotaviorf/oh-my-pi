@@ -1,6 +1,92 @@
 ---
 custom_records_per_file: 2500000
-transient_partition_cols: [year, month, day, app, hour]
 raw_partition_cols: [year, month, day, app]
 table_name: events
-transient_location: s3://5a-datalake-prod/raw/amplitude_transient/
+transient_location: s3://5a-amplitude-events-external/
+transient_data_schema: |
+      server_received_time timestamp, 
+      app int, 
+      device_carrier string, 
+      `$schema` int, 
+      city string, 
+      user_id string, 
+      uuid string, 
+      event_time timestamp, 
+      platform string, 
+      os_version string, 
+      amplitude_id long, 
+      processed_time timestamp, 
+      user_creation_time timestamp, 
+      version_name string, 
+      ip_address string, 
+      paying boolean, 
+      dma string, 
+      group_properties map<string, string>, 
+      user_properties map<string, string>, 
+      client_upload_time timestamp, 
+      `$insert_id` string, 
+      event_type string, 
+      library string, 
+      amplitude_attribution_ids string, 
+      device_type string, 
+      device_manufacturer string, 
+      start_version string, 
+      location_lng float, 
+      server_upload_time timestamp, 
+      event_id int, 
+      location_lat float, 
+      os_name string, 
+      amplitude_event_type string, 
+      device_brand string, 
+      groups map<string, string>, 
+      event_properties map<string, string>, 
+      data map<string, string>, 
+      device_id string, 
+      language string, 
+      device_model string, 
+      country string, 
+      region string, 
+      is_attribution_event boolean, 
+      adid string, 
+      session_id long, 
+      device_family string, 
+      sample_rate string, 
+      idfa string, 
+      client_event_time timestamp
+transient_expected_cols:
+  - amplitude_attribution_ids
+  - amplitude_id
+  - city
+  - client_event_time
+  - client_upload_time
+  - country
+  - data
+  - data_type
+  - device_carrier
+  - device_family
+  - device_id
+  - device_type
+  - dma
+  - event_id
+  - event_properties
+  - event_time
+  - event_type
+  - insert_id
+  - ip_address
+  - language
+  - library
+  - location_lat
+  - location_lng
+  - os_name
+  - os_version
+  - platform
+  - processed_time
+  - region
+  - server_received_time
+  - server_upload_time
+  - session_id
+  - start_version
+  - user_id
+  - user_properties
+  - uuid
+  - version_name
