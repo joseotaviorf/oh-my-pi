@@ -323,7 +323,8 @@ SELECT
         WHEN acquisition_origin = 'rede' THEN 'Rede'
         WHEN acquisition_origin = 'ciq' THEN 'CIQ'
         ELSE 'Not Mapped' 
-    END AS planning_conversion
+    END AS planning_conversion,
+    NOW() AS ts_load
 FROM
     report_origin AS obt
 LEFT JOIN 

@@ -126,7 +126,8 @@ SELECT
   sfs.sk_date,
   sfs.ts_first_event_date,
   sfs.ts_event_original,
-  sfs.ts_event
+  sfs.ts_event,
+  NOW() AS ts_load
 FROM 
   stg_fact_supply AS sfs
 LEFT JOIN 
