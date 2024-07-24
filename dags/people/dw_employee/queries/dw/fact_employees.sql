@@ -293,6 +293,8 @@ SELECT
     REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
     am.sk_last_increase_date,
     REPLACE (se.dt_first_promotion, '-', '') AS sk_dt_first_promotion,
+    am.assignment_number,
+    am.salary_currency,
     am.is_last_work_relationship,
     am.is_active,
     am.is_pending_worker,

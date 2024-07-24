@@ -51,8 +51,8 @@ WITH
       al.description AS action_description
     FROM
       assignments AS a
-      LEFT JOIN 
-        datalake_hr_system_clean.actions_lov al 
+      LEFT JOIN
+        datalake_hr_system_clean.actions_lov al
           ON a.action_code = al.action_code
     WHERE
       dt_effective_start < DATE ('{load_start_date}') QUALIFY dt_effective_start = MAX(dt_effective_start) over (
@@ -77,8 +77,8 @@ WITH
       al.description AS action_description
     FROM
       assignments AS a
-      LEFT JOIN 
-        datalake_hr_system_clean.actions_lov al 
+      LEFT JOIN
+        datalake_hr_system_clean.actions_lov al
           ON a.action_code = al.action_code
     WHERE
       dt_effective_start >= DATE ('{load_start_date}') QUALIFY dt_effective_start = MAX(dt_effective_start) over (
@@ -90,7 +90,6 @@ SELECT
   wr.id_period_of_service AS sk_assignment,
   wr.legislation_code,
   wr.worker_type,
-  COALESCE(ap.assignment_number, af.assignment_number) AS assignment_number,
   COALESCE(ap.band, af.band) AS band,
   COALESCE(
     ap.assignment_status_type_code,
@@ -110,18 +109,17 @@ SELECT
     END,
     '-1'
   ) AS dismissal_type,
-  s.action_reason AS reason_last_increase,
-  COALESCE(s.currency_code, '-1') AS salary_currency
+  s.action_reason AS reason_last_increase
 FROM
   datalake_hr_system.work_relationships wr
-  LEFT JOIN 
-    assignments_present AS ap 
+  LEFT JOIN
+    assignments_present AS ap
       ON wr.id_period_of_service = ap.id_period_of_service
-  LEFT JOIN 
-    assignment_future AS af 
+  LEFT JOIN
+    assignment_future AS af
       ON wr.id_period_of_service = af.id_period_of_service
-  LEFT JOIN 
-    salaries AS s 
+  LEFT JOIN
+    salaries AS s
       ON COALESCE(ap.id_assignment, af.id_assignment) = s.id_assignment
 WHERE
   (

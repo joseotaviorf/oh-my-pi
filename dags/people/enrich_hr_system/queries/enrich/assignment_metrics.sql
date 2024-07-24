@@ -220,6 +220,7 @@ managers_direct_led AS (
 salary_raw AS (
   SELECT
     s.id_assignment,
+    s.currency_code,
     a.dt_effective_start AS start_date,
     s.grade_name AS grade,
     s.salary_amount AS salary,
@@ -373,6 +374,7 @@ cte_movements AS (
 salaries AS (
   SELECT DISTINCT
     id_assignment,
+    currency_code,
     salary_reference,
     salary,
     qnt_movimentations,
@@ -443,16 +445,12 @@ SELECT
   END AS sk_manager_assignment,
   COALESCE(rep.id_person_hrbp, '-1') AS sk_business_partner,
   COALESCE(ap_hbrp.id_assignment, '-1') AS sk_business_partner_assignment,
-  CASE
-    WHEN wr.worker_type = 'P'
-      THEN
-        COALESCE(ap.dt_projected_start, af.dt_projected_start)
-    ELSE wr.dt_start
-  END AS dt_start_work_relationship,
-  wr.dt_termination AS dt_termination_work_relationship,
   COALESCE(REPLACE(s.dt_last_increase, '-', ''), '-1') AS sk_last_increase_date,
   COALESCE(REPLACE(s.dt_first_promotion, '-', ''), '-1') AS sk_first_promotion_date,
+  -- non metrics
   wr.worker_type,
+  COALESCE(ap.assignment_number, af.assignment_number) AS assignment_number,
+  COALESCE(s.currency_code, -1) AS salary_currency,
   -- metrics
   CASE
     WHEN wr.dt_start = MAX(wr.dt_start) over (PARTITION BY wr.id_person)
@@ -501,6 +499,14 @@ SELECT
   COALESCE(s.nominal_increase_first_promotion, 0) AS nominal_increase_first_promotion,
   COALESCE(s.pct_increase_first_promotion, 0) AS pct_increase_first_promotion,
   s.months_to_first_promotion,
+  -- dates and timestamps
+  CASE
+    WHEN wr.worker_type = 'P'
+      THEN
+        COALESCE(ap.dt_projected_start, af.dt_projected_start)
+    ELSE wr.dt_start
+  END AS dt_start_work_relationship,
+  wr.dt_termination AS dt_termination_work_relationship,
   NOW() AS ts_load
 FROM
   datalake_hr_system.work_relationships AS wr

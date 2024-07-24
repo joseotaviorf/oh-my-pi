@@ -22,6 +22,8 @@ SELECT
   am.sk_business_partner_assignment,
   REPLACE(am.dt_start_work_relationship, '-', '') AS sk_start_work_relationship_date,
   REPLACE(am.dt_termination_work_relationship, '-', '') AS sk_termination_work_relationship_date,
+  am.assignment_number,
+  am.salary_currency,
   am.sk_last_increase_date,
   am.sk_first_promotion_date,
   am.is_last_work_relationship,
