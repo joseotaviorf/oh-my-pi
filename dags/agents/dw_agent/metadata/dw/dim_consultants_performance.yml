@@ -2,7 +2,7 @@ database_name: dw_agent
 table_name: dim_consultants_performance
 description: About the performance of the consultants
 domain: Agents
-owner: allan.melao@quintoandar.com.br
+owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_consultant:
     lineage:
@@ -10,11 +10,11 @@ columns:
     description: Key of the consultant.
   sk_house:
     lineage:
-      - dw_public.fact_house_listings.sk_house_listing
+      - dw_rent.fact_house_listings.sk_house_listing
     description: Key of house.
   sk_house_listing:
     lineage:
-      - dw_public.fact_house_listings.sk_house_listing
+      - dw_rent.fact_house_listings.sk_house_listing
     description: Key of the house listing.
   consultant_name:
     lineage:
@@ -31,8 +31,3 @@ columns:
   ts_facilitated_entry_condition:
     lineage:
     description: Facilitated entry condition if applicable.
-
-
-
-
-
