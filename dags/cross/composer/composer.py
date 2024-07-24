@@ -23,7 +23,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 SOURCE = "composer"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 8, 21, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 6-18/1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 5-18/1 * * *"
 CLUSTER_DESCRIPTION = "databricks_12_2_min_io-memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
