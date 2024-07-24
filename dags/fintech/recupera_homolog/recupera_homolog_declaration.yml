@@ -1,3 +1,4 @@
+---
 dag:
   name: recupera_homolog
   schedule_start_date: 2023, 6, 26
@@ -14,15 +15,18 @@ workflow:
   load_spark_job: load_recupera_raw
   spark_job_arguments:
     - "{environment}"
-    - "{bucket}" #datalake_bucket
-    - "{dag_name}" #source
-    - "s3://5a-sysopen-recupera-prod/UPLOAD" #source_root_path
-    - "{{ ds }}" #date_to_ingest
+    - "{bucket}"
+    - "{dag_name}"
+    - s3://5a-sysopen-recupera-prod/UPLOAD
+    - "{{ ds }}"
     - "{table_name}"
   tables_customization:
     creditor_pending:
       extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      partitions:
+        - year
+        - month
+        - day
       extra_spark_job_arguments:
         original_table_name: TBL_CREDOR_PENDENCIA
         column_names:
@@ -67,7 +71,10 @@ workflow:
           - id_installment
     agreements_installment:
       extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      partitions:
+        - year
+        - month
+        - day
       extra_spark_job_arguments:
         original_table_name: TBL_DEPARA_ACORDOS_PARC_5A
         column_names:
@@ -81,7 +88,10 @@ workflow:
           - id_installment_agreement
     installment_canceled:
       extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      partitions:
+        - year
+        - month
+        - day
       extra_spark_job_arguments:
         original_table_name: TBL_PARCELAMENTO_CANCELADO
         column_names:
@@ -94,7 +104,10 @@ workflow:
           - ind_envio
     installment_detail:
       extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      partitions:
+        - year
+        - month
+        - day
       extra_spark_job_arguments:
         original_table_name: TBL_PARCELAMENTO_DETALHE
         column_names:
@@ -117,7 +130,10 @@ workflow:
           - installment_fee_amount
     records_distributed_channels:
       extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      partitions:
+        - year
+        - month
+        - day
       extra_spark_job_arguments:
         original_table_name: TBL_REGISTROS_CANAIS_DISTRIB
         column_names:
@@ -131,7 +147,10 @@ workflow:
           - distribution_shipment_number
     complementary_records_written_down:
       extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      partitions:
+        - year
+        - month
+        - day
       extra_spark_job_arguments:
         original_table_name: TBL_REGISTROS_COMPL_BAIXAS
         column_names:
@@ -163,7 +182,10 @@ workflow:
           - id_installment
     historical_records:
       extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      partitions:
+        - year
+        - month
+        - day
       extra_spark_job_arguments:
         original_table_name: TBL_REGISTROS_HISTORICOS
         column_names:
@@ -179,7 +201,10 @@ workflow:
           - ts_call_end
     operational_records:
       extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      partitions:
+        - year
+        - month
+        - day
       extra_spark_job_arguments:
         original_table_name: TBL_REGISTROS_OPERACIONAL
         column_names:

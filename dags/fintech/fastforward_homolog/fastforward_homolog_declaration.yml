@@ -46,7 +46,8 @@ workflow:
     promo_fee_aud: {}
     real_estate_agent_fee: {}
     real_estate_agent_fee_aud: {}
-    rev_info: {}
+    revinfo:
+      clean_table_name: rev_info
     users: {}
     users_aud: {}
 cluster:
