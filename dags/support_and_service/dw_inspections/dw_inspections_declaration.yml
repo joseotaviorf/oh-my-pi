@@ -11,24 +11,73 @@ workflow:
   layer: dw
   custom_schema: inspections
   default_extraction_type: incremental
-  default_partitions: [year, month, day]
   has_load_to_redshift_task: False
   tables_customization:
+    dim_assessment:
+      merge_on: ["sk_assessment"]
+      z_order_by: ["sk_assessment"]
+    dim_constestation:
+      merge_on: ["sk_contestation"]
+      z_order_by: ["sk_contestation"]
     dim_inspection:
       extraction_type: full
       partitions: []
     dim_inspector:
       extraction_type: full
       partitions: []
+    dim_item_group:
+      merge_on: ["sk_item_group"]
+      z_order_by: ["sk_item_group"]
+    dim_item_issue:
+      merge_on: ["sk_item_issue"]
+      z_order_by: ["sk_item_issue"]
+    dim_item_media:
+      merge_on: ["sk_item_media"]
+      z_order_by: ["sk_item_media"]
+    dim_item_review:
+      merge_on: ["sk_item_review"]
+      z_order_by: ["sk_item_review"]
+    dim_item:
+      merge_on: ["sk_item"]
+      z_order_by: ["sk_item"]
+    dim_repair_exempted:
+      merge_on: ["sk_repair_request"]
+      z_order_by: ["sk_repair_request"]
+    # dim_repair_request:
+    #   merge_on: ["id_repair_request"]
+    #   z_order_by: ["id_repair_request"]
+    dim_reviewer:
+      merge_on: ["sk_reviewer"]
+      z_order_by: ["sk_reviewer"]
+    dim_room:
+      merge_on: ["sk_assessment"]
+      z_order_by: ["sk_assessment"]
+    fact_contestation:
+      merge_on: ["sk_assessment"]
+      z_order_by: ["sk_assessment"]
     fact_inspection:
       extraction_type: full
       partitions: []
+      merge_on: ["sk_inspection"]
+      z_order_by: ["sk_inspection"]
+    fact_item_attachment:
+      merge_on: ["sk_item_attachment"]
+      z_order_by: ["sk_item_attachment"]
+    fact_item_issue:
+      merge_on: ["sk_assessment"]
+      z_order_by: ["sk_assessment"]
+    fact_item:
+      merge_on: ["sk_item"]
+      z_order_by: ["sk_item"]
     fact_repair_request:
       extraction_type: full
       partitions: []
     fact_report_review:
       extraction_type: full
       partitions: []
+    fact_report_review_approval:
+      merge_on: ["sk_reviewer"]
+      z_order_by: ["sk_reviewer"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
