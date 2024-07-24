@@ -11,4 +11,4 @@ workflow:
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
 cluster:
-  type: databricks_10_4_min_general_photon_cluster
+  type: databricks_12_2_min_memory_cluster
