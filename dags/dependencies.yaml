@@ -471,9 +471,6 @@ bietlejuice.dw_datamarts_spark.growth:
   - bietlejuice.gsheets_growth:done-clean-weekday-supply-channel-share
 bietlejuice.dw_date:
   - bietlejuice.enrich_public_date:load-enrich-aux-date
-bietlejuice.dw_debt_recovery:
-  - bietlejuice.enrich_debt_recovery:load-enrich-installment
-  - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
 bietlejuice.dw_demand:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
@@ -1064,13 +1061,6 @@ bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.gsheets_growth:done-clean-affiliates-cost-tradecom-configuration
   - bietlejuice.gsheets_growth:done-clean-affiliates-manual-cost-engagement
   - bietlejuice.gsheets_growth:done-clean-affiliates-manual-cost-engagement-history
-bietlejuice.enrich_agreement_negotiation:
-  - bietlejuice.enrich_retsuko:load-enrich-invoice
-  - bietlejuice.retsuko:load-clean-contract
-  - bietlejuice.trato_feito:load-clean-accounting-installment
-  - bietlejuice.trato_feito:load-clean-debt
-  - bietlejuice.trato_feito:load-clean-installment
-  - bietlejuice.trato_feito:load-clean-negotiation
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
   - bietlejuice.airtable:load-clean-activations
