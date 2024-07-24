@@ -21,5 +21,17 @@ columns:
     description: "User level"
     lineage:
       - datalake_webhelp_homolog_raw.login.niv_cod
+  person_name:
+    description: "Person Name"
+    lineage:
+      - datalake_webhelp_homolog_raw.login.nome_pes
+  email:
+    description: "Email"
+    lineage:
+      - datalake_webhelp_homolog_raw.login.email
+  context:
+    description: "Context (COBRANCA or ATENDIMENTO)"
+    lineage:
+      - datalake_webhelp_homolog_raw.login.subfolder
   ts_load:
     description: "Timestamp when data was loaded"

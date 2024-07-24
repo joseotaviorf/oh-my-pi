@@ -22,8 +22,7 @@ workflow:
     - "{{ ds }}" #date_to_ingest
     - "{table_name}"
     - "parquet" #format
-  default_extraction_type: incremental
-  default_partitions: ["year", "month", "day"]
+  default_extraction_type: full
   tables_customization:
     historicos_clientes:
       clean_table_name: historical_customers

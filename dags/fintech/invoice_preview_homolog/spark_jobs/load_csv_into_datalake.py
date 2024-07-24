@@ -38,15 +38,9 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
     parser.add_argument("source_root_path", help="source root path")
-    parser.add_argument(
-        "date_to_ingest",
-        help="Date to be used in filtering the files. Format: '%Y-%m-%d'",
-    )
+    parser.add_argument("date_to_ingest", help="Date to be used in filtering the files. Format: '%Y-%m-%d'")
     parser.add_argument("table_name", help="name of the output table")
-    parser.add_argument(
-        "consumer_extra_args",
-        help="extra arguments to pass to get_data_from_file of S3Consumer",
-    )
+    parser.add_argument("consumer_extra_args", help="extra arguments to pass to get_data_from_file of S3Consumer")
 
     args = parser.parse_args()
 

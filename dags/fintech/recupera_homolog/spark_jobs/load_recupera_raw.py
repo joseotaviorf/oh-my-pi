@@ -84,8 +84,8 @@ if __name__ == "__main__":
     parser.add_argument("table_name", help="translated table name (based on original_table_name)")
     parser.add_argument("extraction_type", help="indicates wheter the load is incremental or not (full)")
     parser.add_argument("partitions", help="table partition")
-    parser.add_argument("column_names", help="new names of the columns")
     parser.add_argument("original_table_name", help="the name of the original table, as it is in the Recupera database")
+    parser.add_argument("column_names", help="new names of the columns")
 
     args = parser.parse_args()
 

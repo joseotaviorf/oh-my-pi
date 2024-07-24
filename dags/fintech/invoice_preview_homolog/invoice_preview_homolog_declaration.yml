@@ -18,18 +18,16 @@ workflow:
     - "s3://5a-seubarriga/prod/report" #source_root_path
     - "{{ ds }}" #date_to_ingest
     - "{table_name}"
-    - "{consumer_extra_args}"
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
   tables_customization:
     invoice_preview:
       extra_spark_job_arguments:
         - consumer_extra_args:
-          format: csv
-          options:
-            header: "true"
-            escape: '"'
-            multiLine: "true"
-##ADD TASK check-completion-notify
+            format: csv
+            options:
+              header: "true"
+              escape: '"'
+              multiLine: "true"
 cluster:
   type: databricks_12_2_min_general_cluster
