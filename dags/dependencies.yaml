@@ -12,12 +12,28 @@ bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood:load-enrich-affiliate-costs
   - bietlejuice.robin_hood:load-clean-tax
 bietlejuice.dw_agent:
+  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb:load-clean-agent-data
   - bietlejuice.ebdb:load-clean-agent-data-types
+  - bietlejuice.ebdb_condo:load-clean-access-authorization-type
+  - bietlejuice.ebdb_condo:load-clean-access-type-aud
+  - bietlejuice.ebdb_house:load-clean-house-predicted-price
+  - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
+  - bietlejuice.ebdb_house:load-clean-house-special-condition
+  - bietlejuice.ebdb_house_properties:load-clean-special-condition-aud
+  - bietlejuice.ebdb_user:load-clean-user-pro-owner
+  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-region-group
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
+  - bietlejuice.enrich_ebdb_smart_price:load-enrich-rental-price-history
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_sirena:load-enrich-messages
+  - bietlejuice.sirena:load-clean-agents
+  - bietlejuice.sirena:load-clean-prospects
 bietlejuice.dw_agent_contract:
   - bietlejuice.dw_rede_company:load-dw-rede-dim-company
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-coincident-business-contexts

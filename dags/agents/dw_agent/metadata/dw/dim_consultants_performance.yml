@@ -1,0 +1,38 @@
+database_name: dw_agent
+table_name: dim_consultants_performance
+description: About the performance of the consultants
+domain: Agents
+owner: allan.melao@quintoandar.com.br
+columns:
+  sk_consultant:
+    lineage:
+    - dw_public.dim_user.sk_user
+    description: Key of the consultant.
+  sk_house:
+    lineage:
+      - dw_public.fact_house_listings.sk_house_listing
+    description: Key of house.
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_house_listings.sk_house_listing
+    description: Key of the house listing.
+  consultant_name:
+    lineage:
+      - dw_public.dim_user.nome
+    description: Name of the consultant
+  team:
+    lineage:
+      - datalake_gsheets_clean.asp_consultants_allocation.team
+    description: Consultant's team
+  ts_exclusive:
+    description: Exclusive timestamp if applicable.
+  ts_preco_certo:
+    description: Preço Certo timestamp if applicable.
+  ts_facilitated_entry_condition:
+    lineage:
+    description: Facilitated entry condition if applicable.
+
+
+
+
+
