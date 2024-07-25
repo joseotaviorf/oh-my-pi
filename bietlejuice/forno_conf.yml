@@ -766,9 +766,14 @@ databricks_12_2_driver_med_general_mem_nodes_med_mem_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 12.2.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
+
+databricks_13_3_driver_med_mem_nodes_general_med_mem_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.large
+    node_type_id: m5d.large
+    runtime_engine: PHOTON
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
 
 databricks_10_4_max_io-memory_photon_cluster:
     <<: *cluster_anchor
