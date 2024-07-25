@@ -18,7 +18,7 @@ from quintoandar_hr_system_api_client.clients.hr_system_client import HrSystemCl
 from quintoandar_hr_system_api_client.consumers import get_consumer
 
 DATABRICKS_SCOPE = "people"
-JOB_NAME = "load_hr_system_to_raw"
+JOB_NAME = "load_hr_system_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
@@ -29,14 +29,14 @@ def create_spark_dataframe(endpoint_id, json_data, spark_client, hr_system_clien
 
 
 def run_sync(endpoint_id, url, token, endpoint_details, spark_client):
+    logger.info(f"m={JOB_NAME}, msg=Endpoint Details {endpoint_details}")
     hr_system_client = HrSystemClient(api_url=url, api_token=token)
-    endpoint_params = endpoint_details["params"]
     deduplication_key = endpoint_details.get("deduplication_key", None)
     endpoint_id = endpoint_id.replace("_", "").upper()
     consumer_instance = get_consumer(hr_system_client, endpoint_id)
     path = consumer_instance.path
     json_data = consumer_instance.sync(
-        params=endpoint_params, deduplication_key=deduplication_key
+        params=endpoint_details["params"], deduplication_key=deduplication_key
     )
     return create_spark_dataframe(path, json_data, spark_client, hr_system_client)
 
@@ -168,6 +168,7 @@ def clear_directory(
 
 
 def main():
+
     parser = get_parser()
     args = parser.parse_args()
     environment = args.environment
@@ -176,7 +177,17 @@ def main():
     endpoint_id = args.endpoint_id
     execution_date_str = args.execution_date
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
-    endpoint_details = json.loads(args.endpoint_details)
+
+    if not isinstance(args.endpoint_details, dict):
+        endpoint_details = json.loads(args.endpoint_details)
+
+    if not isinstance(endpoint_details["params"], dict):
+        endpoint_details["params"] = json.loads(endpoint_details["params"])
+
+    if "expand" in endpoint_details:
+        if not isinstance(endpoint_details["params"]["expand"], list):
+            endpoint_details["params"]["expand"] = json.loads(endpoint_details["params"]["expand"])
+
     partition_cols = json.loads(args.partition_cols)
     has_dt_effective = endpoint_details.get("has_dt_effective", False)
     offsets = {
