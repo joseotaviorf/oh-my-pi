@@ -11,7 +11,7 @@ SELECT
       COALESCE(da.housing_type, '-1'),
       COALESCE(da.quinto_andar_joining_method, '-1')
     )
-  ) AS sk_employee_census, 
+  ) AS sk_demographic_information, 
     COALESCE(da.ethnicity, '-1') AS ethnicity_code,
     CASE
       WHEN da.ethnicity IN ('1', '60', '7', 'ORA_HRX_BRIN') THEN 'Indígena'

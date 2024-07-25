@@ -13,8 +13,8 @@ columns:
     description: "Surrogate key for the employee. Just the id_person"
     lineage:
       - datalake_hr_system.work_relationships.id_person
-  sk_employee_census:
-    description: "Surrogate key for the employee census. MD5 of the demographic attributes"
+  sk_demographic_information:
+    description: "Surrogate key for the demographic information. MD5 of the demographic attributes"
     lineage:
       - datalake_hr_system.work_relationships.id_person
   sk_cost_center:

@@ -1,11 +1,11 @@
 ---
 database_name: dw_employee
-table_name: dim_employee_census
+table_name: dim_demographic_information
 owner: leonardo.soares@quintoandar.com.br
 domain: people
 description: null
 columns:
-  sk_employee_census:
+  sk_demographic_information:
     description: 'Surrogate key for the dimension, created with the MD5 of the concatenation of the demographic attributes'
     lineage:
     - datalake_hr_system.demographic_attributes.ethnicity

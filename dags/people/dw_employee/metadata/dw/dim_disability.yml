@@ -1,0 +1,42 @@
+---
+database_name: dw_employee
+table_name: dim_disability
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: null
+columns:
+  sk_disability:
+    description: 'Surrogate key for the dimension table employee_disability.'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+    - datalake_hr_system.demographic_attributes.disability_self_declaration_code
+    - datalake_hr_system.demographic_attributes.has_disability
+  disability_category_code:
+    description: 'Disability category code.'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+  disability_category:
+    description: 'Disability category description.'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+  disability_status:
+    description: 'Disability status.'
+    categories:
+      "A": 'Active'
+      "I": 'Inactive'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+  disability_self_declaration_code:
+    description: 'Self-declared disability code.'
+    lineage:
+    - datalake_hr_system.demographic_attributes.disability_self_declaration_code
+  disability_self_declaration_description:
+    description: 'Self-declared disability description.'
+    lineage:
+    - datalake_hr_system.demographic_attributes.disability_self_declaration_description
+  is_self_declared_disabled:
+    description: 'Boolean that indicates if the employee has self declared a disability.'
+    lineage:
+    - datalake_hr_system.demographic_attributes.has_disability
+  ts_load:
+    description: 'Timestamp of when the record was loaded into the table.'

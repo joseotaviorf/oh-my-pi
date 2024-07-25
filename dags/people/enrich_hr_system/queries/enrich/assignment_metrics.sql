@@ -410,7 +410,7 @@ cte_enrich_demographic_attributes AS (
       COALESCE(housing_type, '-1'),
       COALESCE(quinto_andar_joining_method, '-1')
     )
-  ) AS sk_employee_census
+  ) AS sk_demographic_information
   FROM datalake_hr_system.demographic_attributes
   QUALIFY ts_last_update = MAX(ts_last_update) OVER (PARTITION BY id_person)
 )
@@ -419,7 +419,7 @@ SELECT
   wr.id_period_of_service AS sk_assignment,
   -- non ids
   wr.id_person AS sk_employee,
-  da.sk_employee_census,
+  da.sk_demographic_information,
   COALESCE(ap.id_cost_center, af.id_cost_center, '-1') AS sk_cost_center,
   COALESCE(ap.id_business_unit, af.id_business_unit, '-1') AS sk_business_unit,
   coalesce(ap.id_job, af.id_job, '-1') AS sk_job,

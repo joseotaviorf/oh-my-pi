@@ -278,8 +278,6 @@ SELECT
     addresses.town_or_city AS address_city,
     addresses.region_2 AS address_state,
     addresses.country AS address_country,
-    -- -- -- metrics,,
-    da.has_disability,
     -- -- dates
     DATE(workers.dt_birth) AS dt_birth,
     NOW() AS ts_load
