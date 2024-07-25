@@ -88,12 +88,10 @@ bietlejuice.dw_banking_file_payments:
   - bietlejuice.vans:load-clean-payment
   - bietlejuice.vans:load-clean-payment-boleto
 bietlejuice.dw_booking:
-  - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation
   - bietlejuice.enrich_booking:load-enrich-booking-review
-  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_braze_events_user_centric:
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-1w-before
@@ -1209,6 +1207,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb_location:load-clean-country
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
+  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
@@ -1217,6 +1216,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature

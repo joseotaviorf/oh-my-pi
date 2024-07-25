@@ -623,6 +623,20 @@ SELECT
         ) THEN 'Reschedule'
         ELSE bb.cancellation_reason_category
     END AS responsible,
+    /*
+    Attribution Rules, enriched with the new attribution and the old one.
+    The new one starts in H2/2021.
+    Using CASE WHEN instead of COALESCE to don't create strange combinations.
+    */
+    IF(acc.visit_code IS NOT NULL, acc.final_attribution_app_type, src.app_type) AS app_type,
+    IF(acc.visit_code IS NOT NULL, COALESCE(acc.final_attribution_media_source, "Unknown"), COALESCE(src.media_source, "Unknown")) AS media_source,
+    IF(acc.visit_code IS NOT NULL, acc.final_attribution_source, src.utm_source) AS utm_source,
+    IF(acc.visit_code IS NOT NULL, acc.final_attribution_medium, src.utm_medium) AS utm_medium,
+    IF(acc.visit_code IS NOT NULL, acc.final_attribution_campaign, src.utm_campaign) AS utm_campaign,
+    IF(acc.visit_code IS NOT NULL, acc.final_attribution_content, src.utm_content) AS utm_content,
+    IF(acc.visit_code IS NOT NULL, acc.final_attribution_term, src.utm_term) AS utm_term,
+    IF(acc.visit_code IS NOT NULL, COALESCE(acc.final_attribution_branded, "Outro"), COALESCE(src.branded, "Outro")) AS branded,
+    IF(acc.visit_code IS NOT NULL, acc.final_attribution_origin, 'old_attribution') AS final_attribution_origin,
     DATEDIFF(FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone), bb.ts_created_local_tz) AS days_visit_booked_to_visit_cancelled,
     DATEDIFF(bb.ts_booking_local_tz, FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone)) AS days_visit_cancelled_to_visit,
     DATEDIFF(bb.ts_booking_local_tz, bb.ts_created_local_tz) AS days_visit_booked_to_visit,
@@ -630,3 +644,13 @@ SELECT
     AS days_visit_booked_to_visit_completed
 FROM
     base_booking AS bb
+LEFT JOIN 
+    datalake_ebdb_clean.visit AS v
+        ON bb.id_visit = v.id
+LEFT JOIN 
+    datalake_amplitude_visit.amplitude_visit AS src
+        ON v.code = src.id_visit
+LEFT JOIN 
+    datalake_tracked_events.attribution_cross_channel AS acc
+        ON v.code = acc.visit_code
+        AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')

@@ -544,8 +544,7 @@ columns:
       Column with the name of partner who brought the visitor, if the listing has the is_3p_demand flag.
   app_type:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.app_type
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
+      - datalake_booking.booking.app_type
     description: >
       App used to book the visit.
     categories:
@@ -575,43 +574,37 @@ columns:
         ''
   media_source:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.media_source
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_media_source
+      - datalake_booking.booking.media_source
     description: >
       Type of media source from which comes the booking.
   utm_source:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_source
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_source
+      - datalake_booking.booking.utm_source
     description: >
       UTM (a parameter added to the destination URL) used to track the advertising source.
   utm_medium:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_medium
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
+      - datalake_booking.booking.utm_medium
     description: >
       UTM (a parameter added to the destination URL) used to track the advertising medium.
   utm_campaign:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_campaign
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
+      - datalake_booking.booking.utm_campaign
     description: >
       UTM (a parameter added to the destination URL) used to identify the campaign in the media.
   utm_content:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_content
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_content
+      - datalake_booking.booking.utm_content
     description: >
       Identifies what specifically was clicked to bring the user to the site, such as a banner ad or a text link. It is often used for A/B testing and content-targeted ads.
   utm_term:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_term
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_term
+      - datalake_booking.booking.utm_term
     description: >
       Identifies search terms that brought the lead.
   final_attribution_origin:
     lineage:
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
+      - datalake_booking.booking.final_attribution_origin
     description: >
       Final attribution origin of the booking.
     categories:
@@ -735,9 +728,6 @@ columns:
     description: >
       Boolean column indicating if the visit has been rescheduled. True when this booking came from another booking as a reschedule.
   flg_branded:
-    lineage:
-      - datalake_amplitude_visit.amplitude_visit.is_branded
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
     description: >
       Boolean column indicating if the booking came from a branded campaign, defined by the lead taxonomy. True if we identify if it did.
   is_visit_completed:

@@ -87,47 +87,15 @@ booking AS (
         b.user_sale_booking_creator,
         b.partner_3p_supply,
         b.partner_3p_demand,
-        /*
-        Attribution Rules, enriched with the new attribution and the old one.
-        The new one starts in H2/2021.
-        Using CASE WHEN instead of COALESCE to don't create strange combinations.
-        */
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_app_type
-            ELSE src.app_type
-        END AS app_type,
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN COALESCE(acc.final_attribution_media_source, "Unknown")
-            ELSE COALESCE(src.media_source, "Unknown")
-        END AS media_source,
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_source
-            ELSE src.utm_source
-        END AS utm_source,
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_medium
-            ELSE src.utm_medium
-        END AS utm_medium,
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_campaign
-            ELSE src.utm_campaign
-        END AS utm_campaign,
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_content
-            ELSE src.utm_content
-        END AS utm_content,
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_term
-            ELSE src.utm_term
-        END AS utm_term,
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN COALESCE(acc.final_attribution_branded, "Outro")
-            ELSE COALESCE(src.branded, "Outro")
-        END AS branded,
-        CASE
-            WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_origin
-            ELSE 'old_attribution'
-        END AS final_attribution_origin,
+        b.app_type,
+        b.media_source,
+        b.utm_source,
+        b.utm_medium,
+        b.utm_campaign,
+        b.utm_content,
+        b.utm_term,
+        b.branded,
+        b.final_attribution_origin,
         b.is_3p_supply,
         b.is_3p_supply_5a,
         b.is_3p_supply_bh,
@@ -145,13 +113,6 @@ booking AS (
         datalake_booking.booking AS b
             LEFT JOIN datalake_booking.booking_cancellation AS bc
                 ON b.id = bc.id_booking
-            LEFT JOIN datalake_ebdb_clean.visit AS v
-                ON b.id_visit = v.id
-            LEFT JOIN datalake_amplitude_visit.amplitude_visit AS src
-                ON v.code = src.id_visit
-            LEFT JOIN datalake_tracked_events.attribution_cross_channel acc
-                ON v.code = acc.visit_code
-                AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')
 )
 SELECT
     b.sk_booking,
