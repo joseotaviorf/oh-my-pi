@@ -9,12 +9,9 @@ workflow:
   type: database_pull
   layer: raw
   database_type: postgres
+  custom_schema: iaf_homolog
   dbutils_secret_key: IAF_DB
   default_extraction_type: full
-  default_partitions:
-    - year
-    - month
-    - day
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"

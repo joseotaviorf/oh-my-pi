@@ -7,9 +7,9 @@ dag:
     dag_purpose: Velo is one of QuintoAndar's acquisitions, and this DAG is responsible for data ingestion from Velo's legacy bank account, ASAAS.
 workflow:
   type: custom_ingestion
+  custom_schema: velo_asaas_homolog
   layer: raw
   load_spark_job: load_velo_asaas_into_datalake
-  default_partitions: [year, month, day]
 
   spark_job_arguments:
     - "{environment}"

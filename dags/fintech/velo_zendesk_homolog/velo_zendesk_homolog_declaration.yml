@@ -9,6 +9,7 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
+  custom_schema: velo_zendesk_homolog
   load_spark_job: add_partitions_to_raw_tables
   inner_dependencies:
     tickets_history:
