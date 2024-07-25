@@ -1,0 +1,24 @@
+database_name: datalake_iaf_homolog_clean
+table_name: installment_items
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao_itens.id
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao_itens.idempresa
+  id_installment:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao_itens.idprestacao
+  id_write_off:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao_itens.idbaixa
+  number_installment:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao_itens.nprestacao
+  obs:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao_itens.obs
+  ts_updated:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao_itens.last_update

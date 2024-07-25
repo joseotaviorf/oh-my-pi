@@ -12,16 +12,17 @@ workflow:
   default_partitions: [year, month, day]
 
   spark_job_arguments:
+    - "{environment}"
     - "{bucket}"
-    - "{{ ds }}"
+    - "{dag_name}"
     - "{table_name}"
+    - "{{ ds }}"
+    - "{extraction_type}"
 
   tables_customization:
     customers:
-      api_consumer_id: Parallel
       extraction_type: full
     payments:
-      api_consumer_id: Parallel
       extraction_type: full
 
 cluster:
@@ -30,7 +31,7 @@ cluster:
     driver_node_type_id: m5a.2xlarge
     node_type_id: m5a.xlarge
     num_workers: 1
-    spark_version: 12.2.x-scala2.12
+    spark_version: 13.3.x-scala2.12
     autotermination_minutes: 200
-    custom_libraries:
-      - whl: "{artifacts_bucket}/asaas_api_client_python/quintoandar_asaas_api_client-0.1.0-py2.py3-none-any.whl"
+  custom_libraries:
+    - whl: "{artifacts_bucket}/asaas_api_client_python/quintoandar_asaas_api_client-0.1.0-py2.py3-none-any.whl"

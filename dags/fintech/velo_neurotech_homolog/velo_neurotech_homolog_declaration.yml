@@ -1,0 +1,36 @@
+---
+dag:
+  name: velo_neurotech_homolog
+  schedule_interval: 0 3 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: This DAG imports, via Neurotech API, logs from the policy quintoandar_concessao_credito used by Velo for credit analysis. Note that Neurotech generates reports usually around 3-4am, so it's better run the DAG always some hours after it, to guarantee that the report is already generated.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_incremental_data_into_datalake_raw
+  default_partitions: [year, month, day]
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{{ ds }}"
+    - "{table_name}"
+
+  tables_customization:
+    logs_credit_granting:
+      extra_spark_job_arguments:
+        - extra_config:
+            report_name: DadosConcessaoCreditoAPI
+      partitions: [year, month, day]
+    logs_scoping_policy:
+      extra_spark_job_arguments:
+        - extra_config:
+            report_name: DadosAlcadaAPI
+      partitions: [year, month, day]
+
+cluster:
+  type: databricks_13_3_med_general_cluster
+  custom_libraries:
+    - whl: "{artifacts_bucket}/velo-neurotech-api-client-python/quintoandar_velo_neurotech_api_client-0.3.2-py2.py3-none-any.whl"

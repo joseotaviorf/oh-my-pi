@@ -1,0 +1,90 @@
+database_name: datalake_iaf_homolog_clean
+table_name: receipt_write_off
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.id
+  id_write_off_old:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.idbaixa_old
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.idempresa
+  id_creditor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.idcredor
+  id_debtor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.iddevedor
+  id_receipt:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.idrecebimento
+  id_title:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.idtitulo
+  cad_user:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.usuario_cad
+  alt_neg_user:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.usuario_alt_neg
+  negotiator:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.negociador
+  obs:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.obs
+  paid_capital:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.capitalpago
+  paid_protest:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.protestopago
+  paid_fee:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.jurospago
+  paid_fine:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.multapago
+  paid_honorary:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.honorariospago
+  paid_discount:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.descontopago
+  total_paid:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.totalpago
+  paid_tax:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.taxapago
+  paid_pd:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.pdpago
+  paid_comi_hon:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.comi_hon_paga
+  paid_adm_tax:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.taxaadmpago
+  paid_out_tax:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.taxaoutpago
+  paid_ret_fee:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.jurosretpago
+  total_discharge:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.quitacaotot
+  phase:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.fase
+  origin:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.origem
+  dt_write_off:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.databaixa
+  ts_updated:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_baixas.last_update

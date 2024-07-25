@@ -1,0 +1,27 @@
+database_name: datalake_iaf_homolog_clean
+table_name: distribution
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_distribuicao.id
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_distribuicao.idempresa
+  id_debtor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_distribuicao.iddevedor
+  process:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_distribuicao.processo
+  user_distribution:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_distribuicao.usuario_distri
+  charger:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_distribuicao.cobrador
+  dt_distribution:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_distribuicao.data_distri
+  ts_updated:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_distribuicao.last_update

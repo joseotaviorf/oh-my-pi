@@ -1,0 +1,15 @@
+---
+database_name: datalake_velo_neurotechhomolog_raw
+table_name: logs_scoping_policy
+columns:
+  log_user:
+    tags:
+      - PII
+      - Confidential
+  prop_ffp_nome:
+    tags:
+      - PII
+      - Confidential
+  ret_rf_rua:
+    tags:
+      - Restricted

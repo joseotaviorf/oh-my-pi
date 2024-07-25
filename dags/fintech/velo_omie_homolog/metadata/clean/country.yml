@@ -1,0 +1,3 @@
+---
+database_name: datalake_velo_omie_homolog_clean
+table_name: country

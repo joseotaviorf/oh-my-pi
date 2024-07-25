@@ -1,0 +1,7 @@
+---
+database_name: datalake_velo_omie_homolog_raw
+table_name: projects
+columns:
+  nome:
+    tags:
+      - PII

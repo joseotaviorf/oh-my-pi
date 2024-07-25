@@ -1,0 +1,36 @@
+SELECT
+    id AS id_ticket,
+    assignee_id AS id_assignee,
+    brand_id AS id_brand,
+    collaborator_ids AS ids_collaborator,
+    group_id AS id_group,
+    requester_id AS id_requester,
+    submitter_id AS id_submitter,
+    ticket_form_id AS id_ticket_form,
+    custom_fields,
+    description,
+    priority,
+    raw_subject,
+    recipient,
+    satisfaction_rating,
+    subject,
+    status,
+    tags,
+    type,
+    url AS url_ticket,
+    via,
+    allow_channelback,
+    has_incidents,
+    is_public,
+    dt AS dt_extracted,
+    CAST(created_at AS TIMESTAMP) AS ts_created,
+    FROM_UTC_TIMESTAMP(CAST(created_at AS TIMESTAMP), 'Brazil/East') AS ts_created_local,
+    CAST(updated_at AS TIMESTAMP) AS ts_updated,
+    NOW() AS ts_load,
+    YEAR(CAST(dt AS DATE)) AS year,
+    MONTH(CAST(dt AS DATE)) AS month,
+    DAY(CAST(dt AS DATE)) AS day
+FROM
+    datalake_velo_zendesk_homolog_raw.tickets
+WHERE
+    dt = DATE('{year}-{month}-{day}')

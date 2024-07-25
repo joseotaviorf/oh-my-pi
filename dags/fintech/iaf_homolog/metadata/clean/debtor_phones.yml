@@ -1,0 +1,42 @@
+database_name: datalake_iaf_homolog_clean
+table_name: debtor_phones
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.id
+  id_debtor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.iddevedor
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.idempresa
+  id_uuid:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.id_uuid
+  type:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.tipo
+  status:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.status
+  contact:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.contato
+  hot_number:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.hot_number
+  origin:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.origem
+  qualification:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.qualificacao
+  whatsapp:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.whatsapp
+  date:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.data
+  dt_inactive:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devedor_fones.data_inativa

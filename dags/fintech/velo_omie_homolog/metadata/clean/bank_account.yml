@@ -1,0 +1,127 @@
+---
+database_name: datalake_velo_omie_homolog_clean
+table_name: bank_account
+columns:
+  id_account:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.nCodCC
+  id_country:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.codigo_pais
+  id_bank:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.codigo_banco
+  id_bank_branch:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.codigo_agencia
+  bank_account_number:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.numero_conta_corrente
+  invoice_instructions:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.bol_instr1
+  description:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.descricao
+  point_of_sale_category:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.pdv_categoria
+  type:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.tipo
+  bank_account_type:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.tipo_conta_corrente
+  alteration_user:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.user_alt
+  creation_user:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.user_inc
+  manager_name:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.nome_gerente
+  address:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.endereco
+  address_number:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.numero
+  state:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.estado
+  neighbourhood:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.bairro
+  city:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.cidade
+  zip_code:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.cep
+  email:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.email
+  city_code:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.ddd
+  phone_number:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.telefone
+  point_of_sale_due_days:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.pdv_dias_venc
+  point_of_sale_installments_limit:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.pdv_limite_pacelas
+  point_of_sale_installments:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.pdv_num_parcelas
+  point_of_sale_tef_type:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.pdv_tipo_tef
+  initial_balance:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.saldo_inicial
+  does_point_of_sale_syncs_analytical_mode:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.pdv_sincr_analitica
+  does_not_display_account_summary:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.pdv_enviar
+  nao_resumo:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.nao_resumo
+  does_not_display_cash_flow:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.nao_fluxo
+  is_inactive:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.inativo
+  is_api_imported:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.importado_api
+  is_able_emit_account_charge:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.cobr_sn
+  is_able_emit_invoice_charge:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.bol_sn
+  is_blocked:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.bloqueado
+  dt_account_balance:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.saldo_data
+  ts_created:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.data_inc
+  hora_inc:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.hora_inc
+  ts_updated:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.data_alt
+  hora_alt:
+    lineage:
+      - datalake_velo_omie_homolog_raw.bank_account.hora_alt

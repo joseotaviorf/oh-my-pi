@@ -1,0 +1,13 @@
+---
+database_name: datalake_velo_omie_homolog_clean
+table_name: projects
+columns:
+  id_project:
+    lineage:
+      - datalake_velo_omie_homolog_raw.projects.codigo
+  project_name:
+    lineage:
+      - datalake_velo_omie_homolog_raw.projects.nome
+  is_inactive:
+    lineage:
+      - datalake_velo_omie_homolog_raw.projects.inativo

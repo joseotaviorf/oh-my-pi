@@ -1,0 +1,144 @@
+database_name: datalake_iaf_homolog_clean
+table_name: employee
+columns:
+    id:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.id
+    id_company:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.idempresa
+    id_group:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.idgrupo
+    code:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.codigo
+    name:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.nome
+    cpf:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.cpf
+    rg:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.rg
+    address:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.endereco
+    address_number:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.end_numero
+    zip_code:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.end_cep
+    city:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.end_cidade
+    uf:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.end_uf
+    first_phone:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.fone1
+    second_phone:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.fone2
+    first_email:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.email1
+    second_email:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.email2
+    obs:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.obs
+    login:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.ac_login
+    password:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.ac_senha
+    email:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.ac_email
+    commission:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.comissao
+    contract_tax:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.taxa_contrato
+    status:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.status
+    phase:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.fase
+    bank:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.p_banco
+    agency:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.p_agencia
+    account:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.p_conta
+    obs_p:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.p_obs
+    address_complement:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.end_compl
+    profile:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.perfil
+    last_access:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.ultimo_acesso
+    pd_tax:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.taxa_pd
+    access_level:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.ac_nivel_acesso
+    status_pause:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.pausa_status
+    reason_pause:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.pausa_motivo
+    leader_function:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.funcao_lider
+    com_function:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.funcao_com
+    neg_function:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.funcao_neg
+    commercial_manager:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.ger_comercial
+    commision_type:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.tp_comissao
+    is_fix_ip:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.ipfixo
+    dt_adm:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.data_adm
+    dt_dem:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.data_dem
+    ts_updated:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.last_update
+    neighborhood:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.end_bairro
+    extension:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.ramal
+    manager:
+        lineage:
+            - datalake_iaf_raw.vi_319_tb_colaborador.permgestor

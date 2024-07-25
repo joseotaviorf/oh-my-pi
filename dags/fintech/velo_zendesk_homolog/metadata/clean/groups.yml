@@ -1,0 +1,36 @@
+database_name: datalake_velo_zendesk_homolog_clean
+table_name: groups
+columns:
+  id_group:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.id
+  url_group:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.url
+  name:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.name
+  is_deleted:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.deleted
+  dt_extracted:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.dt
+  ts_created_local:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.created_at
+  ts_created:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.created_at
+  ts_updated:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.updated_at
+  year:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.updated_at
+  month:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.updated_at
+  day:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.groups.updated_at

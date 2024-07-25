@@ -1,0 +1,51 @@
+database_name: datalake_iaf_homolog_clean
+table_name: return
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.id
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.idempresa
+  id_creditor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.idcredor
+  code:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.codigo
+  process:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.processo
+  id_debtor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.iddevedor
+  dt_cad:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.data_cad
+  dt_dev:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.data_dev
+  obs:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.obs
+  reason:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.motivo
+  code_reason:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.cod_motivo
+  status:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.status
+  user_conc:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.usuario_conc
+  user_incl:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.usuario_incl
+  origin:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.origem
+  ts_updated:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_devolucao.last_update

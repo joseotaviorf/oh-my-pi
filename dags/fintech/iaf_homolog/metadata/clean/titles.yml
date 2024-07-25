@@ -1,0 +1,129 @@
+database_name: datalake_iaf_homolog_clean
+table_name: titles
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.id
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.idempresa
+  id_creditor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.idcredor
+  id_debtor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.iddevedor
+  process:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.processo
+  value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.valor
+  status:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.status
+  obs:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.obs
+  dt_cad:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.data_cad
+  ts_updated:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.last_update
+  id_old_title:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.idtitulo_old
+  user_cad:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.usuario_cad
+  user_type:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.usuario_tipo
+  title_number:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.ntitulo
+  installment:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.parcela
+  type:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.especie
+  protest:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.protesto
+  imp_code:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.codimp
+  status_bkp:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.status_bkp
+  currency:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.moeda
+  old_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.valor_old
+  info_1:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.info1
+  info_2:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.info2
+  info_3:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.info3
+  cod_dev_get:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.cod_dev_get
+  field_1:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo1
+  field_2:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo2
+  field_3:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo3
+  field_4:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo4
+  field_5:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo5
+  field_6:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo6
+  field_7:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo7
+  field_8:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo8
+  field_9:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo9
+  field_10:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.campo10
+  dt_write_off:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.data_baixa
+  dt_rem:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.data_rem
+  dt_doc:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.data_doc
+  dt_quit:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.data_quit
+  dt_dev:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.data_dev
+  dt_due:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.vencimento
+  dt_update:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_titulos.data_atualiza

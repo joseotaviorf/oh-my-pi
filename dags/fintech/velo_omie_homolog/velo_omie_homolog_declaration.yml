@@ -1,0 +1,63 @@
+---
+dag:
+  name: velo_omie_homolog
+  owner: Data Fintech
+  documentation:
+    dag_purpose: Velo is one of QuintoAndar's acquisitions, and this DAG is responsible for data ingestion from Velo's records on Omie ERP.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_full_velo_omie_into_datalake
+  default_partitions: [year, month, day]
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "{extraction_type}"
+    - "{partitions}"
+
+  tables_customization:
+    cash_flows:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - api_consumer_id: CashFlow
+          load_spark_job: load_incremental_velo_omie_into_datalake
+          consumer_args:
+            - updated_start_date: execution_date
+              updated_end_date: execution_date
+          extra_body_args:
+            - lDadosCad: true
+              cOrdenarPor: CODIGO_INTEGRACAO
+              cExibirDepartamentos: S
+    categories:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - api_consumer_id: Categories
+    projects:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - api_consumer_id: Projects
+          extra_body_args:
+            - ordenar_por: CODIGO
+    bank_account:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - api_consumer_id: BankAccount
+    clients:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - api_consumer_id: Clients
+          extra_body_args:
+            - apenas_importado_api: N
+    country:
+      raw_table_dependency: clients
+      extraction_type: full
+
+cluster:
+  type: databricks_13_3_med_general_cluster
+  custom_libraries:
+    - whl: "{artifacts_bucket}/omie-api-client-python/quintoandar_omie_api_client-0.4.0-py2.py3-none-any.whl"

@@ -1,0 +1,87 @@
+database_name: datalake_iaf_homolog_clean
+table_name: installment
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.id
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.idempresa
+  id_pc_old:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.idpc_old
+  id_creditor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.idcredor
+  code:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.codigo
+  obs:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.obs
+  number_pass_through:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.nrepasse
+  status:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.status
+  pass_through_type:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.forma_repasse
+  audit_user:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.usuario_auditoria
+  payment_local:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.localpagto
+  total_tax_adm:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.total_taxa_adm
+  conf_status:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.conf_status
+  conf_user:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.conf_usuario
+  conf_obs:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.conf_obs
+  ret_email:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.retemail
+  user_cad:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.usuario_cad
+  user_alt:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.usuario_alt
+  total_credit:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.total_credito
+  total_tax_contr:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.total_taxa_contr
+  total_pass_through:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.total_taxa_contr
+  total_other_debts:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.total_outros_debitos
+  total_honorary:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.total_hon
+  total_pd:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.total_pd
+  dt_rec:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.data_rec
+  dt_cad:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.data_cad
+  dt_audit:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.data_auditoria
+  ts_updated:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_prestacao.last_update

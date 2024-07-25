@@ -1,0 +1,68 @@
+---
+dag:
+  name: iaf_homolog
+  schedule_interval: 0 3 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: This DAG imports the tables from IAF, one of QuintoCred's payment consultings.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: IAF_DB
+  default_extraction_type: full
+  default_partitions:
+    - year
+    - month
+    - day
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{{ ds }}"
+    - "{table_name}"
+  lineage_product_database_name: iaf
+  tables_customization:
+    vi_319_tb_colaborador:
+      clean_table_name: employee
+    vi_319_tb_credor:
+      clean_table_name: creditor
+    vi_319_tb_devedor:
+      clean_table_name: debtor
+    vi_319_tb_processo:
+      clean_table_name: process
+    vi_319_tb_titulos:
+      clean_table_name: titles
+    vi_319_tb_recebimentos:
+      clean_table_name: receipts
+    vi_319_tb_baixas:
+      clean_table_name: receipt_write_off
+    vi_319_tb_acordo:
+      clean_table_name: agreement
+    vi_319_tb_acordo_neg:
+      clean_table_name: agreement_neg
+    vi_319_tb_acordo_tit:
+      clean_table_name: agreement_tit
+    vi_319_tb_devedor_fones:
+      clean_table_name: debtor_phones
+    vi_319_tb_devolucao:
+      clean_table_name: return
+    vi_319_tb_devolucao_tit:
+      clean_table_name: return_tit
+    vi_319_tb_distribuicao:
+      clean_table_name: distribution
+    vi_319_tb_distribuicao_hist:
+      clean_table_name: distribution_hist
+    vi_319_tb_mailling_discador_retorno:
+      clean_table_name: return_dialer_mailling
+    vi_319_tb_ocorrencias:
+      clean_table_name: occurrences
+    vi_319_tb_prestacao:
+      clean_table_name: installment
+    vi_319_tb_prestacao_itens:
+      clean_table_name: installment_items
+    vi_319_tb_qualifica_chamadas:
+      clean_table_name: qualifies_calls
+
+cluster:
+  type: databricks_12_2_med_2xlarge_general_cluster

@@ -1,0 +1,7 @@
+---
+database_name: datalake_velo_omie_homolog_raw
+table_name: cash_flows
+columns:
+  cCPFCNPJCliente:
+    tags:
+      - PII

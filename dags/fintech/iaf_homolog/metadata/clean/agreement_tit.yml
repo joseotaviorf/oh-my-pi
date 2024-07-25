@@ -1,0 +1,48 @@
+database_name: datalake_iaf_homolog_clean
+table_name: agreement_tit
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.id
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.idempresa
+  id_agreement:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.idacordo
+  id_title:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.idtitulo
+  process:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.processo
+  contract_tax_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_tx_contrato
+  protest_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_protesto
+  discount_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_desconto
+  fee_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_juros
+  fine_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_multa
+  honorary_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_honorarios
+  capital_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_capital
+  capital_net_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_capital_liq
+  capital_adjusted_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_capital_corrig
+  ts_updated:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_acordo_tit.last_update

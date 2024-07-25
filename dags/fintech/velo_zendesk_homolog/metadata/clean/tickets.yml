@@ -1,0 +1,96 @@
+database_name: datalake_velo_zendesk_homolog_clean
+table_name: tickets
+columns:
+  id_ticket:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.id_ticket
+  satisfaction_rating:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.satisfaction_rating
+  url_ticket:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.url_ticket
+  priority:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.priority
+  raw_subject:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.raw_subject
+  subject:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.subject
+  ticket_via:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.via
+  via:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.via
+  tags:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.tags
+  id_group:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.id_group
+  id_ticket_form:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.id_ticket_form
+  id_requester:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.id_requester
+  id_assignee:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.id_assignee
+  ids_collaborator:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.ids_collaborator
+  id_brand:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.id_brand
+  id_submitter:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.id_submitter
+  status:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.status
+  custom_fields:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.custom_fields
+  has_incidents:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.has_incidents
+  type:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.type
+  allow_channelback:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.allow_channelback
+  description:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.description
+  recipient:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.recipient
+  is_public:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.is_public
+  dt_extracted:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.dt_extracted
+  ts_created:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.ts_created
+  ts_created_local:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.ts_created
+  ts_updated:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.ts_updated
+  year:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.ts_created
+  month:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.ts_created
+  day:
+    lineage:
+      - datalake_velo_zendesk_homolog_clean.tickets_history.ts_created

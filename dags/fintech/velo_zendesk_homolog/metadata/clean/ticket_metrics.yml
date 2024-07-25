@@ -1,0 +1,99 @@
+database_name: datalake_velo_zendesk_homolog_clean
+table_name: ticket_metrics
+columns:
+  id_ticket_metrics:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.id
+  url_ticket_metrics:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.url
+  assignee_stations:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.assignee_stations
+  reopens:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.reopens
+  id_ticket:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.ticket_id
+  replies:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.replies
+  group_stations:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.group_stations
+  minutes_reply_calendar:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.reply_time_in_minutes
+  minutes_reply_business:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.reply_time_in_minutes
+  minutes_first_resolution_calendar:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.first_resolution_time_in_minutes
+  minutes_first_resolution_business:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.first_resolution_time_in_minutes
+  minutes_full_resolution_calendar:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.full_resolution_time_in_minutes
+  minutes_full_resolution_business:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.full_resolution_time_in_minutes
+  minutes_requester_wait_calendar:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.requester_wait_time_in_minutes
+  minutes_requester_wait_business:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.requester_wait_time_in_minutes
+  minutes_agent_wait_calendar:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.agent_wait_time_in_minutes
+  minutes_agent_wait_business:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.agent_wait_time_in_minutes
+  minutes_on_hold_calendar:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.on_hold_time_in_minutes
+  minutes_on_hold_business:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.on_hold_time_in_minutes
+  dt_extracted:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.dt
+  ts_requester_updated:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.requester_updated_at
+  ts_solved:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.solved_at
+  ts_latest_comment_added:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.latest_comment_added_at
+  ts_initially_assigned:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.initially_assigned_at
+  ts_assignee_updated:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.assignee_updated_at
+  ts_assigned:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.assigned_at
+  ts_created:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.created_at
+  ts_created_local:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.created_at
+  ts_updated:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.updated_at
+  year:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.updated_at
+  month:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.updated_at
+  day:
+    lineage:
+      - datalake_velo_zendesk_homolog_raw.ticket_metrics.updated_at

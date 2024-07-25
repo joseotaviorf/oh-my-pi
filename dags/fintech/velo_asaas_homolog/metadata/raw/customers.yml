@@ -1,48 +1,48 @@
 ---
-database_name: datalake_velo_asaas_raw
+database_name: datalake_velo_asaas_homolog_raw
 table_name: customers
 columns:
   cpfCnpj:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   email:
     tags:
-    - Confidential
+      - Confidential
   additionalEmails:
     tags:
-    - Confidential
+      - Confidential
   name:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   phone:
     tags:
-    - Confidential
+      - Confidential
   mobilePhone:
     tags:
-    - Confidential
+      - Confidential
   address:
     tags:
-    - Restricted
+      - Restricted
   addressNumber:
     tags:
-    - Restricted
+      - Restricted
   complement:
     tags:
-    - Restricted
+      - Restricted
   province:
     tags:
-    - Restricted
+      - Restricted
   postalCode:
     tags:
-    - Restricted
+      - Restricted
   city:
     tags:
-    - Restricted
+      - Restricted
   state:
     tags:
-    - Restricted
+      - Restricted
   country:
     tags:
-    - Restricted
+      - Restricted

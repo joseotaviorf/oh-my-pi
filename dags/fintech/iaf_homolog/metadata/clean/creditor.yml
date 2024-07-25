@@ -1,0 +1,240 @@
+database_name: datalake_iaf_homolog_clean
+table_name: creditor
+columns:
+  id:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.id
+  id_company:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.idempresa
+  id_invoice:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.idboleto
+  id_campaign:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.idcampanha
+  id_monetary_correction:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.id_correcao_mon
+  id_contract:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.idcontrato
+  id_campaign_2:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.idcampanha2
+  id_code:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_codigoid
+  id_campaign_2_ck:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.idcampanha2ck
+  id_invoice_blocked:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.idboleto_bloq
+  code:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.codigo
+  corporate_name:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.razaosocial
+  fantasy_name:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.fantasia
+  cnpj:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.cnpj
+  ie:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.ie
+  address:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.endereco
+  address_number:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.end_numero
+  neighborhood:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.end_bairro
+  zip_code:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.end_cep
+  city:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.end_cidade
+  uf:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.end_uf
+  first_phone:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.fone1
+  second_phone:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.fone2
+  first_email:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.email1
+  second_email:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.email2
+  obs:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.obs
+  obs_cob:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.obs_cob
+  login:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.ac_login
+  password:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.ac_senha
+  ac_email:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.ac_email
+  p_email:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_email
+  consultant:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.consultor
+  activity:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.atividade
+  bank:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_banco
+  agency:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_agencia
+  account:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_conta
+  obs_p:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_obs
+  frequency:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_frequencia
+  term:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.prazo_perm
+  group:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.grupo
+  address_complement:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.end_compl
+  status:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.status
+  last_access:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.ultimo_acesso
+  shipping:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_envionf
+  modality:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_modalidade
+  param_status_proc:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.param_status_proc
+  param_status_oco:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.param_status_oco
+  consultant_2:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.consultor2
+  account_commissions:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.contabilizar_comissoes
+  cod_ext:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.cod_ext
+  model:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.p_modelo
+  districk:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.districk
+  layout_imp:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.layout_imp
+  assignor:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.bol_cedente
+  assignor_cnpj:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.bol_cedente_cnpj
+  breaks_deal:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.a_quebra_acordo
+  breaks_days:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.a_quebra_dias
+  user_cad:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.usuario_cad
+  user_alt:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.usuario_alt
+  segment:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.segmento
+  block_pc:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.bloq_pc
+  installment_amount:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.qtde_parc
+  conf_div:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.conf_div
+  conf_inov:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.conf_inov
+  activate_agreement:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.ativa_acordo
+  min_discount_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_desconto_min
+  discount_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_desconto
+  fee_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_juros
+  fine_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_multa
+  honorary_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_honorarios
+  pd_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_pd
+  contract_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_contrato
+  min_fine_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_multa_min
+  min_fee_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_juros_min
+  min_honorary_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_honorarios_min
+  charge_value:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.vl_cobranca
+  dt_cad:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.data_cad
+  dt_alt:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.data_alt
+  ts_updated:
+    lineage:
+      - datalake_iaf_raw.vi_319_tb_credor.last_update
