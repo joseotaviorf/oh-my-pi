@@ -117,59 +117,6 @@ columns:
     description: 'Age range of the employee'
     lineage:
     - "datalake_hr_system_clean.workers.workers.dt_birth"
-  work_email:
-    description: 'Work email of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.ew.email_address
-  personal_email:
-    description: 'Personal email of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.eh.email_address
-  country_code_number:
-    description: 'Country code of the phone of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.country_code_number
-  area_code:
-    description: 'Area code of the phone of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.area_code
-  phone_number:
-    description: 'Phone number of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.phone_number
-  address:
-    description: 'Address of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.addresses.addl_address_attribute_3
-    - datalake_hr_system_clean.workers.addresses.addresses.address_line_1
-  address_number:
-    description: 'Address number of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.addresses.address_line_2
-  address_complement:
-    description: 'Address complement of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.addresses.address_line_3
-  address_district:
-    description: 'Address district of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.addresses.address_line_4
-  address_zip_code:
-    description: 'Address zip code of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.addresses.postal_code
-  address_city:
-    description: 'Address city of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.addresses.town_or_city
-  address_state:
-    description: 'Address state of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.addresses.region_2
-  address_country:
-    description: 'Address country of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.addresses.country
   has_disability:
     description: 'Flag indicating if the employee has any disability'
     lineage:

@@ -10,11 +10,8 @@ WITH hr_system_workers AS (
         national_identifiers,
         ethnicities,
         legislative_info,
-        emails,
-        addresses,
         names,
         workers_dff,
-        phones,
         religions,
         external_identifiers
     FROM
@@ -70,52 +67,6 @@ national_identifiers_dff AS (
     FROM
         national_identifiers_dff_step1
 ),
-emails_step1 AS (
-    SELECT
-        id_person,
-        EXPLODE (emails) emails
-    FROM
-        hr_system_workers
-),
-emails AS (
-    SELECT
-        id_person,
-        emails['EmailAddressId'] AS id_email_address,
-        emails['EmailType'] AS email_type,
-        emails['EmailAddress'] AS email_address,
-        emails['PrimaryFlag'] AS primary_flag
-    FROM
-        emails_step1
-    WHERE
-        emails['ToDate'] IS NULL
-        OR emails['ToDate'] = '4712-12-31' 
-    QUALIFY emails['LastUpdateDate'] = MAX(emails['LastUpdateDate']) OVER (PARTITION BY id_person, emails['EmailType'])
-),
-addresses_step1 AS (
-    SELECT
-        id_person,
-        EXPLODE (addresses) addresses
-    FROM
-        hr_system_workers
-),
-addresses AS (
-    SELECT
-        id_person,
-        addresses['AddressId']AS id_address,
-        addresses['AddlAddressAttribute3'] AS addl_address_attribute_3,
-        addresses['AddressLine1'] AS address_line_1,
-        addresses['AddressLine2'] AS address_line_2,
-        addresses['AddressLine3'] AS address_line_3,
-        addresses['AddressLine4'] AS address_line_4,
-        addresses['PostalCode'] AS postal_code,
-        addresses['TownOrCity'] AS town_or_city,
-        addresses['Region2'] AS region_2,
-        addresses['Country'] AS country
-    FROM
-        addresses_step1
-    WHERE
-        addresses['PrimaryFlag'] = 'true'
-),
 names_step1 AS (
     SELECT
         id_person,
@@ -148,25 +99,6 @@ workers_dff AS (
         workers_dff["nomeDoPai"] AS father_name
     FROM
         workers_dff_step1
-),
-phones_step1 AS (
-    SELECT
-        id_person,
-        EXPLODE (phones) AS phones
-    FROM
-        hr_system_workers
-),
-phones AS (
-    SELECT
-        id_person,
-        phones['PhoneId'] AS id_phone,
-        phones['CountryCodeNumber'] AS country_code_number,
-        phones['AreaCode'] AS area_code,
-        phones['PhoneNumber'] AS phone_number
-    FROM
-        phones_step1
-    WHERE
-        phones['PrimaryFlag'] = 'true'
 ), cte_enrich_demographic_attributes AS (
   SELECT 
     id_person,
@@ -263,21 +195,6 @@ SELECT
         WHEN DATEDIFF(current_date(), workers.dt_birth) BETWEEN 51 * 365 AND 55 * 365 THEN 'de 51 até 55 anos'
         ELSE 'mais de 55 anos'
     END AS age_range,
-    -- -- -- contacts,
-    ew.email_address AS work_email,
-    eh.email_address AS personal_email,
-    phones.country_code_number,
-    phones.area_code,
-    phones.phone_number,
-    -- -- address,
-    CONCAT(addresses.addl_address_attribute_3, ' ', addresses.address_line_1) AS address,
-    addresses.address_line_2 AS address_number,
-    addresses.address_line_3 AS address_complement,
-    addresses.address_line_4 AS address_district,
-    addresses.postal_code AS address_zip_code,
-    addresses.town_or_city AS address_city,
-    addresses.region_2 AS address_state,
-    addresses.country AS address_country,
     -- -- dates
     DATE(workers.dt_birth) AS dt_birth,
     NOW() AS ts_load
@@ -287,25 +204,11 @@ LEFT JOIN
     cte_enrich_demographic_attributes AS da 
         ON workers.id_person = da.id_person
 LEFT JOIN 
-    emails AS ew 
-        ON workers.id_person = ew.id_person
-        AND ew.email_type = 'W1'
-LEFT JOIN 
-    emails AS eh 
-        ON workers.id_person = eh.id_person
-        AND eh.email_type = 'H1'
-LEFT JOIN 
-    addresses 
-        ON workers.id_person = addresses.id_person
-LEFT JOIN 
     names 
         ON workers.id_person = names.id_person
 LEFT JOIN 
     workers_dff AS wdff 
         ON workers.id_person = wdff.id_person
-LEFT JOIN 
-    phones 
-        ON workers.id_person = phones.id_person
 LEFT JOIN 
     external_identifiers ei 
         ON workers.id_person = ei.id_person

@@ -22,6 +22,9 @@ workflow:
     dim_demographic_information:
       extraction_type: incremental
       merge_on: ["sk_demographic_information"]
+    dim_employee_contact:
+      extraction_type: incremental
+      merge_on: ["sk_employee"]
     dim_employee_disability:
       extraction_type: incremental
       merge_on: ["sk_employee_disability"]
