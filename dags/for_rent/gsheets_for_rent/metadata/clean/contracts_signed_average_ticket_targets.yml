@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: contracts_signed_average_ticket_targets
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Rent
+description: Transformed table created from a Google Sheets file in order to input For Rent contracts average ticket into datalake.
+columns:
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.contracts_signed_average_ticket_targets.city_group
+  dt_month_started:
+    description: Month of the target.
+    lineage:
+      - datalake_gsheets_raw.contracts_signed_average_ticket_targets.month
+  target:
+    description: Average ticket target value. Represents the average value of the rent contracts signed that month in that city group.
+    lineage:
+      - datalake_gsheets_raw.contracts_signed_average_ticket_targets.avg_ticket_cs_target

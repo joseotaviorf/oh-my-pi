@@ -161,3 +161,9 @@ sheets_info:
     clean_table_name: responses_action_line_ciq_full
     sheet_context: for_rent
 
+  contracts_signed_average_ticket_targets:
+    sheet_id: 16hHyvDqUHlMHagD_v18-ky5HGK8Pjgf9TR11ueybHP4
+    sheet_name: db_avg_ticket_cs_target
+    clean_table_name: contracts_signed_average_ticket_targets
+    sheet_context: for_rent
+
