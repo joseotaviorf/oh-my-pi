@@ -1,8 +1,8 @@
 database_name: dw_public
 table_name: dim_booking
 description: Dimensional table with the information of all bookings of QuintoAndar, including visits, inspections and photo sessions. Each line is a booking.
-domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   sk_booking:
     lineage:

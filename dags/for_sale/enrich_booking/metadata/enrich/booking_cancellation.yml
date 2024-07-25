@@ -2,7 +2,7 @@ database_name: datalake_booking
 table_name: booking_cancellation
 description: This table contains information about the first booking cancellation,
   having granularity of booking and event precision in seconds.
-domain: For Rent
+domain: For Sale
 owner: ''
 columns:
   id_booking:

@@ -2,8 +2,8 @@ database_name: datalake_booking
 table_name: booking
 description: This table contains information about booking and is the main source
   for the dim_booking. Here, id is a PK and we have only one booking per line.
-domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   id:
     lineage:

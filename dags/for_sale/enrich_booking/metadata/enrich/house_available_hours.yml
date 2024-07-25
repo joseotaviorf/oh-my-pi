@@ -5,8 +5,8 @@ description: In this table, each line represents the daily availability in a spe
   an aud, but with two columns indicating the dates when the availability is valid.
   id_house_date is the PK, built by the concatenation of id_house, dt_available_started
   and day_of_week.
-domain: For Rent
-owner: gustavo.geiger@quintoandar.com.br
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:
     lineage:

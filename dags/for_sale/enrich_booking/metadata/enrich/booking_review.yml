@@ -2,7 +2,7 @@
 database_name: datalake_booking
 table_name: booking_review
 description: Enriched table that consolidates the booking review. Each line is a review for a specific booking.
-domain: For Rent
+domain: For Sale
 owner: bruna.prates@quintoandar.com.br
 columns:
   id_booking:
