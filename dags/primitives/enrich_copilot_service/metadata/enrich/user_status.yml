@@ -1,0 +1,38 @@
+---
+database_name: datalake_copilot_service_enrich
+table_name: user_status
+owner: lucas.cardozo@quintoandar.com.br
+domain: primitives
+description: "This table stores information about the status of the copilot service user, if they are active or inactive (7 days without using the service)"
+columns:
+  id_user:
+    description: "The user identifier"
+    lineage:
+    - datalake_copilot_service_clean.session.id_user
+  ts_status_start:
+    description: "The begin, in timestamp, of the observation status"
+    lineage:
+    - datalake_copilot_service_clean.session.ts_created
+  ts_status_end:
+    description: "The end, in timestamp, of the observation status"
+    lineage:
+    - datalake_copilot_service_clean.session.ts_created
+  status:
+    description: "The status of the user (ACTIVE, INACTIVE)"
+    lineage:
+    - datalake_copilot_service_clean.session.ts_created
+  status_detail:
+    description: "Detailing of the status (e.g. new user or reactivation)"
+    lineage:
+    - datalake_copilot_service_clean.session.ts_created
+    - datalake_copilot_service_clean.session.id_user
+  is_current_status:
+    description: "If it's the current user's status"
+    lineage:
+    - datalake_copilot_service_clean.session.ts_created
+    - datalake_copilot_service_clean.session.id_user
+  is_last_status_of_the_day:
+    description: "If the status was the ending status in a given day"
+    lineage:
+    - datalake_copilot_service_clean.session.ts_created
+    - datalake_copilot_service_clean.session.id_user

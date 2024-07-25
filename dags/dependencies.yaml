@@ -1338,6 +1338,10 @@ bietlejuice.enrich_content_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+bietlejuice.enrich_copilot_service:
+  - bietlejuice.copilot_service:load-clean-message
+  - bietlejuice.copilot_service:load-clean-session
+  - bietlejuice.copilot_service:load-clean-state
 bietlejuice.enrich_cozy_metrics:
   - bietlejuice.cozy_metrics:load-clean-library-versions
 bietlejuice.enrich_credit_analysis:

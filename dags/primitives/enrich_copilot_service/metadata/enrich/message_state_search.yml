@@ -1,0 +1,159 @@
+---
+database_name: datalake_copilot_service_enrich
+table_name: message_state
+owner: lucas.cardozo@quintoandar.com.br
+domain: primitives
+description: "This table stores information about messages sent/received by the Copilot service and current state with exploded filters"
+columns:
+  id_message:
+    description: "The message identifier"
+    lineage:
+    - datalake_copilot_service_clean.message.id
+  id_session:
+    description: "The session identifier"
+    lineage:
+    - datalake_copilot_service_clean.message.id_session
+  id_state:
+    description: "The state identifier"
+    lineage:
+    - datalake_copilot_service_clean.state.id
+  message_index:
+    description: "The message index"
+    lineage:
+    - datalake_copilot_service_clean.message.message_index
+  role:
+    description: "The role of the message author (USER, AI, HARDCODED)"
+    lineage:
+    - datalake_copilot_service_clean.message.role
+  input_type:
+    description: "The message input type"
+    lineage:
+    - datalake_copilot_service_clean.message.input_type
+  content:
+    description: "The message content"
+    lineage:
+    - datalake_copilot_service_clean.message.content
+  flow:
+    description: "The current flow for the given message"
+    lineage:
+    - datalake_copilot_service_clean.state.flow
+  is_last_search_message:
+    description: "If the current message is the last search message of the session"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  is_search_qualified:
+    description: "If the search button is enabled in the current session (i.e., if filters are already qualified)"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  is_the_search_qualification_event:
+    description: "Whether this is the event in which the search is enabled (filters are qualified)"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  search_count:
+    description: "The number of searches in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state
+  geocoded_location:
+    description: "The geocoded location in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state
+  asked_for_filters:
+    description: "True if the chat has already asked for filters"
+    lineage:
+    - datalake_copilot_service_clean.state
+  business_context:
+    description: "The filter value for business_context in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  property_type:
+    description: "The filter value for property_type in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  price_type:
+    description: "The filter value for price_type in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  min_price:
+    description: "The filter value for min_price in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  max_price:
+    description: "The filter value for max_price in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  location:
+    description: "The filter value for location in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  min_bedrooms:
+    description: "The filter value for min_bedrooms in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  max_bedrooms:
+    description: "The filter value for max_bedrooms in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  min_bathrooms:
+    description: "The filter value for min_bathrooms in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  max_bathrooms:
+    description: "The filter value for max_bathrooms in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  min_area:
+    description: "The filter value for min_area in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  max_area:
+    description: "The filter value for max_area in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  floor:
+    description: "The filter value for floor in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  availability:
+    description: "The filter value for availability in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  min_parking_spaces:
+    description: "The filter value for min_parking_spaces in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  max_parking_spaces:
+    description: "The filter value for max_parking_spaces in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  accept_pets:
+    description: "The filter value for accept_pets in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  near_subway:
+    description: "The filter value for near_subway in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  is_furnished:
+    description: "The filter value for is_furnished in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  amenities:
+    description: "The filter value for amenities in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  installations:
+    description: "The filter value for installations in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  visual_aspects:
+    description: "The filter value for visual_aspects in the current state"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  amenities_installations:
+    description: "Amenities and installations combined"
+    lineage:
+    - datalake_copilot_service_clean.state.state
+  ts_message_sent:
+    description: "The message creation datetime"
+    lineage:
+    - datalake_copilot_service_clean.message.ts_created

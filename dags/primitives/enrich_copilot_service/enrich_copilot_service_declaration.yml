@@ -1,0 +1,13 @@
+dag:
+  name: enrich_copilot_service
+  schedule_start_date: 2024, 01, 01
+  schedule_interval: 0 1 * * *
+  owner: Data Primitives
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for creating enrich tables for the copilot service schema
+workflow:
+  layer: enrich
+  type: query_delta
+cluster:
+  type: databricks_12_2_min_general_cluster
