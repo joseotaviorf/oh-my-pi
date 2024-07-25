@@ -21,7 +21,7 @@ SOURCE = "olos_dialer"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "30 1 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_med_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols")
