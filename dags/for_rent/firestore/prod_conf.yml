@@ -5,6 +5,7 @@ custom_cluster:
   num_workers: 2
   aws_attributes:
     availability: ON_DEMAND
+  spark_version: 13.3.x-scala2.12
 clean_partition_cols: ["year", "month", "day"]
 subscriptions:
   sale_offer: "domainSaleOffer-audit-data-engineering-subscription"
