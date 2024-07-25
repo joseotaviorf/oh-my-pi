@@ -1,5 +1,5 @@
 dag:
-  name: velo_zendesk_homolog
+  name: velo_zendesk
   schedule_start_date: 2019, 9, 9
   schedule_interval: 0 0 * * *
   owner: Data Fintech
@@ -9,7 +9,7 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
-  custom_schema: velo_zendesk_homolog
+  custom_schema: velo_zendesk
   load_spark_job: add_partitions_to_raw_tables
   inner_dependencies:
     tickets_history:

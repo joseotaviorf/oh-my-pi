@@ -26,10 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("table_name")
-    parser.add_argument("extraction_type")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
-    parser.add_argument("date_filter_column", help="Date filter column", default=None)
     parser.add_argument(
         "unixtime_measure",
         nargs="?",
@@ -37,6 +34,8 @@ if __name__ == "__main__":
         type=str,
         help="Unix time measure -> milliseconds, seconds or None",
     )
+    parser.add_argument("table_name")
+    parser.add_argument("extraction_type")
 
     args = parser.parse_args()
     environment = args.env

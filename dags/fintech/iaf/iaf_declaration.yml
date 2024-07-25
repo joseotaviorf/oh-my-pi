@@ -1,6 +1,6 @@
 ---
 dag:
-  name: iaf_homolog
+  name: iaf
   schedule_interval: 0 3 * * *
   owner: Data Fintech
   documentation:
@@ -9,7 +9,7 @@ workflow:
   type: database_pull
   layer: raw
   database_type: postgres
-  custom_schema: iaf_homolog
+  custom_schema: iaf
   dbutils_secret_key: IAF_DB
   default_extraction_type: full
   spark_job_arguments:
