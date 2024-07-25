@@ -186,6 +186,22 @@ columns:
       THIRD_PARTY_GUARANTEE: "The accepted guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
       CLEAR_NO: "When no guarantee was accepted, as it was denied by some reason (such as income reasons)"
       NOT_ACCEPTED: "When 5A has offered a paid guarantee to the TP, but the person has not accepted it"
+  ec_flag:
+    description: "Quantity of events or users in the early credit stage."
+  os_flag:
+    description: "Quantity of events or users in the offer sent stage."
+  oa_flag:
+    description: "Quantity of events or users in the offer approved stage."
+  es_flag:
+    description: "Quantity of events or users in the evaluation star stage."
+  ep_flag:
+    description: "Quantity of events or users in the evaluation positive stage."
+  ds_flag:
+    description: "Quantity of events or users in the document sent stage."
+  ca_flag:
+    description: "Quantity of events or users in the credit approved stage."
+  cs_flag:
+    description: "Quantity of events or users in the contract signed stage."
   is_guarantee_accepted:
     lineage:
       - datalake_rental_guarantee.guarantee

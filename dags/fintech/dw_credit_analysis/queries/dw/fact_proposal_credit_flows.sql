@@ -288,6 +288,15 @@ proposal_credit_flows AS (
         BETWEEN rf.dt_offer_submitted_date - interval '1' MONTH
         AND     rf.dt_offer_submitted_date
 ),
+house_listing AS (
+  SELECT 
+    id_house,
+    country_code,
+    rental_administrator
+  FROM 
+    dw_rent.dim_house_listing
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY sk_house_listing DESC) = 1
+),
 early_credit_full (
   SELECT
     eca.sk_user AS sk_client,
@@ -326,8 +335,8 @@ early_credit_full (
     'EC2OS' AS funnel_drop_step,
     CAST(NULL AS STRING) AS guarantee_offered,
     CAST(NULL AS STRING) AS guarantee_accepted,
-    CAST(NULL AS STRING) AS country_code,
-    CAST(NULL AS STRING) AS rental_administrator,
+    hl.country_code,
+    hl.rental_administrator,
     CAST(NULL AS BOOLEAN) AS is_guarantee_accepted,
     CAST(NULL AS BOOLEAN) AS is_first_credit_evaluation,
     CAST(NULL AS BOOLEAN) AS is_last_credit_evaluation,
@@ -350,6 +359,9 @@ early_credit_full (
     NOW() AS ts_load
   FROM
     early_credit_analysis AS eca
+  LEFT JOIN 
+    house_listing AS hl
+      ON  hl.id_house = eca.sk_house
   LEFT JOIN
     proposal_credit_flows AS pcf
       ON  pcf.sk_early_credit_analysis = eca.sk_early_credit_analysis
@@ -554,6 +566,41 @@ SELECT
   guarantee_accepted,
   country_code,
   rental_administrator,
+  CASE 
+    WHEN sk_early_credit_analysis > 0 
+    THEN 1 ELSE 0 
+  END AS ec_flag,
+  CASE 
+    WHEN sk_offer > 0 
+    THEN 1 ELSE 0 
+  END AS os_flag,
+  CASE 
+    WHEN dt_offer_approved_date IS NOT NULL 
+    THEN 1 ELSE 0 
+  END AS oa_flag,
+  CASE 
+    WHEN dt_last_credit_evaluation_init IS NOT NULL OR 
+    (dt_credit_evaluation_approved_date IS NOT NULL AND guarantee_accepted = 'NOT_ACCEPTED')
+    THEN 1 ELSE 0 
+  END AS es_flag,
+  CASE 
+    WHEN dt_credit_evaluation_approved_date IS NOT NULL AND 
+    guarantee_accepted <> 'NOT_ACCEPTED' 
+    THEN 1 ELSE 0 
+  END AS ep_flag,
+  CASE 
+    WHEN dt_tenant_first_doc_sent_date IS NOT NULL 
+    THEN 1 ELSE 0 
+  END AS ds_flag,
+  CASE 
+    WHEN dt_credit_analysis_approved_date IS NOT NULL 
+    THEN 1 ELSE 0 
+  END AS ca_flag,
+  CASE 
+    WHEN 
+    dt_contract_signed_date IS NOT NULL 
+    THEN 1 ELSE 0 
+  END AS cs_flag,
   is_guarantee_accepted,
   is_first_credit_evaluation,
   is_last_credit_evaluation,
@@ -564,7 +611,7 @@ SELECT
       (
       PARTITION BY adr.sk_client, umf.client_max_funnel_drop_step, date_trunc('MONTH',adr.dt_reference) 
       ORDER BY CASE WHEN adr.funnel_drop_step_ordered IS NULL THEN 'Z' ELSE adr.funnel_drop_step_ordered END DESC, 
-      adr.dt_reference DESC
+      adr.dt_reference DESC, sk_credit_analysis DESC
       ) = 1 THEN TRUE
     ELSE FALSE
   END as is_last_client_max_funnel_drop_step,
