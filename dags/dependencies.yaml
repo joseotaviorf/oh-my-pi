@@ -1896,6 +1896,7 @@ bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-reservation
   - bietlejuice.kill_queue:load-clean-user
 bietlejuice.enrich_kodak:
+  - bietlejuice.brokers_supply_processor:load-clean-lead-3p
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.kodak:load-clean-image-inspection
