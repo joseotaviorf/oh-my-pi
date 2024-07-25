@@ -20,6 +20,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(platform,amplitude_platform,'')
         END AS attribution_app_type,
@@ -28,6 +29,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(platform,amplitude_platform)
         END AS attribution_app_type_conversion,
@@ -36,6 +38,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(branded,'')
         END AS attribution_branded,
@@ -44,6 +47,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN branded
         END AS attribution_branded_conversion,
@@ -52,6 +56,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN (
                     CASE
@@ -65,6 +70,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN (
                     CASE
@@ -78,6 +84,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(utm_source,'')
         END AS attribution_source,
@@ -86,6 +93,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN utm_source
         END AS attribution_source_conversion,
@@ -94,6 +102,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(utm_medium,'')
         END AS attribution_medium,
@@ -102,6 +111,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN utm_medium
         END AS attribution_medium_conversion,
@@ -110,6 +120,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(utm_campaign,'')
         END AS attribution_campaign,
@@ -118,6 +129,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN utm_campaign
         END AS attribution_campaign_conversion,
@@ -126,6 +138,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(utm_term,'')
         END AS attribution_term,
@@ -134,6 +147,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN utm_term
         END AS attribution_term_conversion,
@@ -142,6 +156,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(utm_content,'')
         END AS attribution_content,
@@ -150,6 +165,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN utm_content
         END AS attribution_content_conversion,
@@ -158,6 +174,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN COALESCE(media_source,'')
         END AS attribution_media_source,
@@ -166,6 +183,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN media_source
         END AS attribution_media_source_conversion,
@@ -174,6 +192,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN entrance_uri
         END AS attribution_entrance_uri,
@@ -182,6 +201,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
                 THEN entrance_uri
         END AS attribution_entrance_uri_conversion,
@@ -199,6 +219,7 @@ cross_channel AS (
                 'visit_schedule_confirmed',
                 'debug_visit_schedule_confirmed',
                 'offer_submitted',
+                'offer_submitted_new',
                 'sale_offer_form_accepted')
             )
     UNION ALL

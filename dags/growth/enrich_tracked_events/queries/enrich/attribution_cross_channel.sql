@@ -11,6 +11,7 @@ attribution_cross_channel AS (
             'visit_schedule_confirmed',
             'debug_visit_schedule_confirmed',
             'offer_submitted',
+            'offer_submitted_new',
             'sale_offer_form_accepted'
         )
 )

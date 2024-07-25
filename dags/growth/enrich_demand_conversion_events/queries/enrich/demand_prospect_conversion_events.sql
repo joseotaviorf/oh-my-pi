@@ -260,7 +260,7 @@ rent_offer_attribution AS (
   LEFT JOIN 
     datalake_tracked_events.attribution_cross_channel AS acc
       ON (off.id_firestore = acc.id_firestore)
-        AND (acc.event_name = 'offer_submitted')
+        AND (acc.event_name in ('offer_submitted', 'offer_submitted_new'))
         AND (CAST(acc.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
   WHERE
     roce.id_event_type = 3
