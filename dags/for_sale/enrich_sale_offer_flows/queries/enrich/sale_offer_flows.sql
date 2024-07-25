@@ -610,7 +610,7 @@ rescue_flow AS (
         FROM
             rescue_and_cancelation_status
         WHERE
-            is_canceled = TRUE
+            ts_last_canceled IS NOT NULL
             AND closing_canceled_reason IS NOT NULL
         QUALIFY
             ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
@@ -638,7 +638,7 @@ rescue_flow AS (
             sf.id AS id_sales_flow,
             rof.id_offer,
             rof.is_a_rescued_offer,
-            IF(c_ccvs.ts_signed > c_ccvs.ts_sale_agreement_canceled, True, False) AS is_a_rescued_ccv,
+            IF(c_ccvs.ts_rescued IS NOT NULL, True, False) AS is_a_rescued_ccv,
             rof.ts_last_offer_discarded AS ts_offer_canceled,
             c_ccvs.ts_sale_agreement_canceled,
             rof.ts_rescued AS ts_offer_rescued,
