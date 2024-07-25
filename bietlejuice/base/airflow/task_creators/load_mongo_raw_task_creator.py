@@ -34,6 +34,9 @@ class LoadMongoRawTaskCreator(BaseTaskCreator):
         dbutils_secret_key = self.dag_execution_context.workflow_args.get(
             "dbutils_secret_key", f"{table_attributes.schema.upper()}_DB"
         )
+        dbutils_secret_scope = self.dag_execution_context.workflow_args.get(
+            "dbutils_secret_scope", "quintoandar"
+        )
         load_options = self._get_load_options(table_attributes)
 
         return [
@@ -47,4 +50,5 @@ class LoadMongoRawTaskCreator(BaseTaskCreator):
             dbutils_secret_key,
             self.dag_execution_context.execution_date,
             load_options,
+            dbutils_secret_scope,
         ]

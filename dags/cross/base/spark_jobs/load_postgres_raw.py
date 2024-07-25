@@ -40,11 +40,12 @@ def parse_arguments() -> Namespace:
     parser.add_argument("read_from_sql")
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
+    parser.add_argument("dbutils_secret_scope")
 
     return parser.parse_args()
 
 
-def get_conn_config(dbutils_secret_key: str) -> dict:
+def get_conn_config(dbutils_secret_key: str, dbutils_secret_scope: str) -> dict:
     """Returns the connection configuration from Databricks Secrets."""
 
     base_dbutils = BaseDBUtils()
@@ -52,7 +53,7 @@ def get_conn_config(dbutils_secret_key: str) -> dict:
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
-    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
+    conn_config_json = dbutils.secrets.get(scope=dbutils_secret_scope, key=dbutils_secret_key)
 
     return json.loads(conn_config_json)
 
@@ -86,7 +87,7 @@ def main():
         """
     )
 
-    conn_config = get_conn_config(dbutils_secret_key)
+    conn_config = get_conn_config(dbutils_secret_key, args.dbutils_secret_scope)
     conn_config["schema"] = db_schema
     spark_client = SparkClient()
     postgres_consumer = PostgresConsumer(conn_config, spark_client)

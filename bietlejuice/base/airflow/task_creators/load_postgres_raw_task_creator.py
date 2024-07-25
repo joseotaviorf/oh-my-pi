@@ -31,6 +31,9 @@ class LoadPostgresRawTaskCreator(BaseTaskCreator):
         dbutils_secret_key = self.dag_execution_context.workflow_args.get(
             "dbutils_secret_key", f"{table_attributes.schema.upper()}_DB"
         )
+        dbutils_secret_scope = self.dag_execution_context.workflow_args.get(
+            "dbutils_secret_scope", "quintoandar"
+        )
         unixtime_measure = table_attributes.table_customization.get(
             "unixtime_measure", ""
         )
@@ -57,4 +60,5 @@ class LoadPostgresRawTaskCreator(BaseTaskCreator):
             read_from_sql,
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
+            dbutils_secret_scope,
         ]

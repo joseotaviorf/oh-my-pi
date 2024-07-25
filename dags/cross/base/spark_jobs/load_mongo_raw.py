@@ -135,11 +135,12 @@ def parse_arguments() -> Namespace:
         type=str,
         help="S3 load options for spark dataframe, in JSON format",
     )
+    parser.add_argument("dbutils_secret_scope")
 
     return parser.parse_args()
 
 
-def get_conn_config(dbutils_secret_key: str) -> dict:
+def get_conn_config(dbutils_secret_key: str, dbutils_secret_scope: str) -> dict:
     """Returns the connection configuration from Databricks Secrets."""
 
     base_dbutils = BaseDBUtils()
@@ -147,7 +148,7 @@ def get_conn_config(dbutils_secret_key: str) -> dict:
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
-    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
+    conn_config_json = dbutils.secrets.get(scope=dbutils_secret_scope, key=dbutils_secret_key)
 
     return json.loads(conn_config_json)
 
@@ -162,6 +163,7 @@ if __name__ == "__main__":
     partition_cols = json.loads(args.partition_cols.replace("'", '"'))
     date_filter_column = args.date_filter_column
     dbutils_secret_key = args.dbutils_secret_key
+    dbutils_secret_scope = args.dbutils_secret_scope
     execution_date = args.execution_date
     load_options = json.loads(args.load_options) if args.load_options else {}
 
@@ -176,7 +178,7 @@ if __name__ == "__main__":
         """
     )
 
-    conn_config = get_conn_config(dbutils_secret_key)
+    conn_config = get_conn_config(dbutils_secret_key, dbutils_secret_scope)
     spark_client = SparkClient()
     mongo_consumer = MongoConsumer(
         mongo_client=MongoClient(conn_config), spark_client=spark_client

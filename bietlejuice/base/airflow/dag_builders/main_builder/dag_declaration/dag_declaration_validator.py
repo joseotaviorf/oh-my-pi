@@ -118,6 +118,11 @@ class DAGDeclarationValidator(Validator):
                     "required": False,
                 },
                 "mysql_version": {"type": "string", "empty": False, "required": False},
+                "dbutils_secret_scope": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
             },
         },
         "cluster": {
