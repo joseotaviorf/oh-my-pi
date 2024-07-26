@@ -18,6 +18,9 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  inner_dependencies:
+    dim_product_tech:
+      - dim_employee_contact
   tables_customization:
     dim_demographic_information:
       extraction_type: incremental
@@ -25,6 +28,6 @@ workflow:
     dim_employee_contact:
       extraction_type: incremental
       merge_on: ["sk_employee"]
-    dim_employee_disability:
+    dim_disability:
       extraction_type: incremental
-      merge_on: ["sk_employee_disability"]
+      merge_on: ["sk_disability"]

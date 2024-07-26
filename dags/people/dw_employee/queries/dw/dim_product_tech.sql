@@ -1,5 +1,5 @@
 SELECT
-    dim_employee.sk_employee,
+    dec.sk_employee,
     CASE
         WHEN team_formation_product_tech.team_1 = '' THEN NULL
         ELSE team_formation_product_tech.team_1
@@ -22,4 +22,5 @@ SELECT
     END AS team_5
 FROM
     datalake_gsheets_clean.team_formation_product_tech
-    LEFT JOIN dw_employee.dim_employee ON dim_employee.work_email = team_formation_product_tech.email
+LEFT JOIN dw_employee.dim_employee_contact dec
+    ON dec.work_email = team_formation_product_tech.email
