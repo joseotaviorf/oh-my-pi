@@ -31,16 +31,16 @@ workflow:
       z_order_by: [id_group]
     organizations:
       extraction_type: full
-      z_order_by: [id_organization]
+      z_order_by: [id]
     satisfaction_ratings:
       extraction_type: full
-      z_order_by: [id_satisfaction_rating]
+      z_order_by: [id]
     ticket_fields:
       extraction_type: full
-      z_order_by: [id_ticket_field]
+      z_order_by: [id_ticket_fields]
     ticket_metrics:
       extraction_type: full
-      z_order_by: [id_ticket]
+      z_order_by: [id_ticket_metrics]
     tickets_history:
       extraction_type: incremental
       raw_table_dependency: tickets
@@ -53,7 +53,7 @@ workflow:
       z_order_by: [id_user]
     ticket_audits:
       extraction_type: incremental
-      z_order_by: [id_ticket]
+      z_order_by: [id_ticket_audit]
 
 cluster:
   type: custom_cluster
