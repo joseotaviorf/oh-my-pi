@@ -17,6 +17,10 @@ columns:
     description: "The state identifier"
     lineage:
     - datalake_copilot_service_clean.state.id
+  id_user:
+    description: "The user identifier"
+    lineage:
+    - datalake_copilot_service_clean.session.id_user
   message_index:
     description: "The message index"
     lineage:
@@ -37,10 +41,26 @@ columns:
     description: "The current flow for the given message"
     lineage:
     - datalake_copilot_service_clean.state.flow
+  is_internal_user:
+    description: "If the user is a QuintoAndar employee"
+    lineage:
+    - datalake_copilot_service_clean.session.id_user
+    - datalake_ebdb_user.user.id
+    - datalake_ebdb_user.user.email
+  is_non_cockpit_session:
+    description: "If the session was not created from the app/cockpit (e.g. created for test directly via API)"
+    lineage:
+    - datalake_copilot_service_clean.message.message_index
+    - datalake_copilot_service_clean.message.id_session
+    - datalake_copilot_service_clean.message.role
+    - datalake_copilot_service_clean.state.flow
   is_last_search_message:
     description: "If the current message is the last search message of the session"
     lineage:
-    - datalake_copilot_service_clean.state.state
+    - datalake_copilot_service_clean.message.message_index
+    - datalake_copilot_service_clean.message.id_session
+    - datalake_copilot_service_clean.message.role
+    - datalake_copilot_service_clean.state.flow
   is_search_qualified:
     description: "If the search button is enabled in the current session (i.e., if filters are already qualified)"
     lineage:
@@ -52,15 +72,15 @@ columns:
   search_count:
     description: "The number of searches in the current state"
     lineage:
-    - datalake_copilot_service_clean.state
+    - datalake_copilot_service_clean.state.state
   geocoded_location:
     description: "The geocoded location in the current state"
     lineage:
-    - datalake_copilot_service_clean.state
+    - datalake_copilot_service_clean.state.state
   asked_for_filters:
     description: "True if the chat has already asked for filters"
     lineage:
-    - datalake_copilot_service_clean.state
+    - datalake_copilot_service_clean.state.state
   business_context:
     description: "The filter value for business_context in the current state"
     lineage:
@@ -157,3 +177,7 @@ columns:
     description: "The message creation datetime"
     lineage:
     - datalake_copilot_service_clean.message.ts_created
+  ts_session_created:
+    description: "The session creation datetime"
+    lineage:
+    - datalake_copilot_service_clean.session.ts_created
