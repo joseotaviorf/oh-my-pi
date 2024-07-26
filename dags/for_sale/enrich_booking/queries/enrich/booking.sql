@@ -310,7 +310,7 @@ last_secretariat as (
     JOIN
         datalake_hub_services.buyer_secretariat_changes AS bsc
             ON b.id_visitor = bsc.id_external_lead
-            AND bsc.is_last_responsible 
+            AND bsc.is_last_responsible
 ),
 base_booking AS (
     SELECT
@@ -602,6 +602,26 @@ base_booking AS (
     LEFT JOIN
         last_secretariat AS ls
             ON ls.id = b.id
+),
+--CTE Cross channel
+--This CTE is being created because for some reason this table was duplicated and consequently is duplicating the quantity of booking and disturbing some Fintech metrics. We are investigating this for now.
+cross_channel AS (
+  SELECT
+    visit_code,
+    event_name,
+    final_attribution_app_type,
+    final_attribution_media_source,
+    final_attribution_source,
+    final_attribution_medium,
+    final_attribution_campaign,
+    final_attribution_content,
+    final_attribution_term,
+    final_attribution_branded,
+    final_attribution_origin
+  FROM
+    datalake_tracked_events.attribution_cross_channel
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY visit_code ORDER BY ts_event DESC) = 1
 )
 -- custom columns that need pre-calculated ones
 SELECT
@@ -644,13 +664,13 @@ SELECT
     AS days_visit_booked_to_visit_completed
 FROM
     base_booking AS bb
-LEFT JOIN 
+LEFT JOIN
     datalake_ebdb_clean.visit AS v
         ON bb.id_visit = v.id
-LEFT JOIN 
+LEFT JOIN
     datalake_amplitude_visit.amplitude_visit AS src
         ON v.code = src.id_visit
-LEFT JOIN 
-    datalake_tracked_events.attribution_cross_channel AS acc
+LEFT JOIN
+    cross_channel AS acc
         ON v.code = acc.visit_code
         AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')
