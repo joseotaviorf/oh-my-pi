@@ -12,3 +12,5 @@ FROM
     datalake_inspections.reviewer r
 WHERE
     DATE(r.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_reviewer ORDER BY ts_updated DESC) = 1

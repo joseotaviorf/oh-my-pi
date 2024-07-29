@@ -59,3 +59,5 @@ LEFT JOIN
         ON igc.id_item_group = ig.id_item_group
 WHERE
     MAKE_DATE(ig.year, ig.month, ig.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY ig.id_item_group ORDER BY ig.ts_updated DESC) = 1

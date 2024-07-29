@@ -40,3 +40,5 @@ FROM
 LEFT JOIN
     datalake_inspections_metrics.inspection_achievements im
         ON im.id_assessment = i.id_assessment
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY i.id_inspection ORDER BY i.ts_updated DESC) = 1
