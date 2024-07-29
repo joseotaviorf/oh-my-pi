@@ -18,7 +18,6 @@ workflow:
         sk_ticket,
         sk_request,
         sk_contract,
-        sk_answer,
         sk_user,
         sk_agent,
         sk_budget_sender,
