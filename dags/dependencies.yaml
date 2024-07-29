@@ -702,13 +702,15 @@ bietlejuice.dw_rent_demand_events_snapshot:
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-rent-flows
 bietlejuice.dw_rent_flow:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
+  - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
+  - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
-  - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
