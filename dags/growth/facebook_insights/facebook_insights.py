@@ -37,7 +37,7 @@ RAW_SPARK_JOB_FILE = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/lo
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
 # cluster setup
-CLUSTER_DESCRIPTION = "databricks_10_4_min_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_io-general_cluster"
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 
