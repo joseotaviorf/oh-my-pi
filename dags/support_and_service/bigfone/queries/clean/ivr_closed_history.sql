@@ -6,4 +6,4 @@ SELECT
     strategy,
     requested_at AS ts_requested
 FROM
-    datalake_bigfone_raw.ivr_closed_history
+    datalake_bigfone_raw.ivrclosedhistory
