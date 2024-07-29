@@ -5,6 +5,7 @@ custom_cluster:
   num_workers: 6
   aws_attributes:
     availability: ON_DEMAND
+  spark_version: 12.2.x-scala2.12
   custom_tags:
     - key: app
       value: airflow
