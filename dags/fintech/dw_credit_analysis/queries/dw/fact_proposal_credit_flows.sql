@@ -522,6 +522,10 @@ SELECT
   funnel_drop_step_ordered AS client_max_funnel_drop_step
 FROM 
   add_dt_reference
+WHERE 
+  country_code = 'BR' AND
+	rental_administrator = 'QUINTOANDAR' AND
+  is_last_credit_evaluation = TRUE
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY CASE WHEN sk_client IS NULL THEN 1 ELSE sk_client END, DATE_TRUNC('month',dt_reference) ORDER BY IF(funnel_drop_step_ordered IS NULL, "Z", funnel_drop_step_ordered) DESC) = 1
 )
@@ -607,11 +611,18 @@ SELECT
   is_bypass,
   is_early_credit,
   CASE 
-    WHEN ROW_NUMBER() OVER
-      (
-      PARTITION BY adr.sk_client, umf.client_max_funnel_drop_step, date_trunc('MONTH',adr.dt_reference) 
-      ORDER BY CASE WHEN adr.funnel_drop_step_ordered IS NULL THEN 'Z' ELSE adr.funnel_drop_step_ordered END DESC, 
-      adr.dt_reference DESC, sk_credit_analysis DESC
+    WHEN 
+    ROW_NUMBER() OVER (
+      PARTITION BY 
+        adr.sk_client, 
+        date_trunc('MONTH',adr.dt_reference),
+        umf.client_max_funnel_drop_step
+      ORDER BY
+        CASE WHEN rental_administrator <> 'QUINTOANDAR' THEN NULL ELSE rental_administrator END DESC,
+        CASE WHEN country_code <> 'BR' THEN NULL ELSE country_code END DESC,
+        CASE WHEN is_last_credit_evaluation = FALSE THEN NULL ELSE is_last_credit_evaluation END DESC,
+        CASE WHEN adr.funnel_drop_step_ordered IS NULL THEN 'Z. FULL_FUNNEL' ELSE adr.funnel_drop_step_ordered END DESC,
+        sk_credit_analysis DESC
       ) = 1 THEN TRUE
     ELSE FALSE
   END as is_last_client_max_funnel_drop_step,
