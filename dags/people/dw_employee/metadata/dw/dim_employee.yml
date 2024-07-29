@@ -41,50 +41,6 @@ columns:
     description: 'Birth country of the employee'
     lineage:
     - datalake_hr_system_clean.workers.birth_country
-  cpf:
-    description: 'Number of the CPF of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.ni2_cpf.national_identifier_number
-  rg:
-    description: 'Number of the RG of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.ni2_rg.national_identifier_number
-  pis:
-    description: 'Number of the PIS of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.ni2_pis.national_identifier_number
-  issuing_state_rg:
-    description: 'Issuing state of the RG of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.nidff.issuing_state
-  issuing_authority_rg:
-    description: 'Issuing authority of the RG of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.nidff.issuing_authority
-  ctps_number:
-    description: 'Number of the CTPS (work card) of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.ctps_number
-  ctps_series:
-    description: 'Series number of the CTPS (work card) of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.ctps_series
-  issuing_state_ctps:
-    description: 'Issuing state of the CTPS (work card) of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.issuing_state_ctps
-  vote_registration_number:
-    description: 'Number of the vote registration of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.vote_registration_number
-  electoral_zone:
-    description: 'Electoral zone of the vote registration of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.electoral_zone
-  polling_station:
-    description: 'Polling station of the vote registration of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.polling_station
   mother_name:
     description: 'Mother name of the employee'
     lineage:

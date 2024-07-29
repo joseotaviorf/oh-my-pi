@@ -1,0 +1,62 @@
+---
+database_name: dw_employee
+table_name: dim_employee_documentation
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Dimension table with the employee's documents.
+columns:
+  sk_employee:
+    description: "Surrogate key of the employee."
+    lineage:
+      - datalake_hr_system_clean.workers.id_person
+  cpf:
+    description: "CPF of the employee."
+    lineage:
+      - datalake_hr_system_clean.workers.national_identifiers
+  pis:
+    description: "PIS of the employee."
+    lineage:
+      - datalake_hr_system_clean.workers.national_identifiers
+  rg:
+    description: "RG of the employee."
+    lineage:
+      - datalake_hr_system_clean.workers.national_identifiers
+  issuing_state_rg:
+    description: "Issuing state of the RG."
+    lineage:
+      - datalake_hr_system_clean.workers.national_identifiers
+  issuing_authority_rg:
+    description: "Issuing authority of the RG."
+    lineage:
+      - datalake_hr_system_clean.workers.national_identifiers
+  ctps_number:
+    description: "Work card number of the employee."
+    lineage:
+      - datalake_hr_system.demographic_attributes.ctps_number
+  ctps_series:
+    description: "Work card series of the employee."
+    lineage:
+      - datalake_hr_system.demographic_attributes.ctps_series
+  issuing_state_ctps:
+    description: "Work card issuing state of the employee."
+    lineage:
+      - datalake_hr_system.demographic_attributes.issuing_state_ctps
+  vote_registration_number:
+    description: ""
+    lineage:
+      - datalake_hr_system.demographic_attributes.vote_registration_number
+  electoral_zone:
+    description: "Electoral zone of the employee."
+    lineage:
+      - datalake_hr_system.demographic_attributes.electoral_zone
+  polling_station:
+    description: "Polling station of the employee."
+    lineage:
+      - datalake_hr_system.demographic_attributes.polling_station
+  ts_last_update:
+    description: "Timestamp of the last update of the document."
+    lineage:
+      - datalake_hr_system.demographic_attributes.dt_effective_start
+      - datalake_hr_system_clean.workers.national_identifiers
+  ts_load:
+    description: "Timestamp of the load."

@@ -7,12 +7,8 @@ WITH hr_system_workers AS (
         birth_country,
         birth_country_name,
         dt_birth,
-        national_identifiers,
-        ethnicities,
-        legislative_info,
         names,
         workers_dff,
-        religions,
         external_identifiers
     FROM
         datalake_hr_system_clean.workers 
@@ -32,40 +28,6 @@ external_identifiers AS (
         external_identifiers_step1
     WHERE
         external_identifiers['ExternalIdentifierType'] = 'ID_ONDA1'
-),
-national_identifiers_step1 AS (
-    SELECT
-        id_person,
-        EXPLODE (national_identifiers) national_identifiers
-    FROM
-        hr_system_workers
-),
-national_identifiers_step2 AS (
-    SELECT
-        id_person,
-        national_identifiers['NationalIdentifierId']     AS id_national_identifier,
-        national_identifiers['NationalIdentifierNumber'] AS national_identifier_number,
-        national_identifiers['NationalIdentifierType']   AS national_identifier_type,
-        national_identifiers['nationalIdentifiersDFF']   AS national_identifiers_dff
-    FROM
-        national_identifiers_step1
-),
-national_identifiers_dff_step1 AS (
-    SELECT
-        id_person,
-        id_national_identifier,
-        EXPLODE (national_identifiers_dff) AS national_identifiers_dff
-    FROM
-        national_identifiers_step2
-),
-national_identifiers_dff AS (
-    SELECT
-        id_person,
-        id_national_identifier,
-        national_identifiers_dff["ufDeEmissao"]    AS issuing_state,
-        national_identifiers_dff["orgaoDeEmissao"] AS issuing_authority
-    FROM
-        national_identifiers_dff_step1
 ),
 names_step1 AS (
     SELECT
@@ -130,18 +92,6 @@ SELECT
     workers.birth_town,
     workers.birth_region AS birth_state,
     workers.birth_country,
-    -- -- docs info,
-    ni2_cpf.national_identifier_number AS cpf,
-    ni2_rg.national_identifier_number AS rg,
-    ni2_pis.national_identifier_number AS pis,
-    nidff.issuing_state AS issuing_state_rg,
-    nidff.issuing_authority AS issuing_authority_rg,
-    da.ctps_number,
-    da.ctps_series,
-    da.issuing_state_ctps,
-    da.vote_registration_number,
-    da.electoral_zone,
-    da.polling_station,
     -- -- personal info,
     wdff.mother_name,
     wdff.father_name,
@@ -212,20 +162,4 @@ LEFT JOIN
 LEFT JOIN 
     external_identifiers ei 
         ON workers.id_person = ei.id_person
-LEFT JOIN 
-    national_identifiers_step2 ni2_cpf 
-        ON workers.id_person = ni2_cpf.id_person
-        AND ni2_cpf.national_identifier_type = 'CPF'
-LEFT JOIN 
-    national_identifiers_step2 ni2_rg 
-        ON workers.id_person = ni2_rg.id_person
-        AND ni2_rg.national_identifier_type = 'RG'
-LEFT JOIN 
-    national_identifiers_step2 ni2_pis 
-        ON workers.id_person = ni2_pis.id_person
-        AND ni2_pis.national_identifier_type = 'PIS'
-LEFT JOIN 
-    national_identifiers_dff nidff 
-        ON workers.id_person = nidff.id_person
-        AND ni2_rg.id_national_identifier = nidff.id_national_identifier
 WHERE ei.id_person IS NULL
