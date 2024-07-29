@@ -757,7 +757,6 @@ bietlejuice.dw_rental_payments:
   - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.dw_repairs:
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
-  - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.repairs:load-clean-repair-request
   - bietlejuice.repairs:load-clean-repair-request-budget

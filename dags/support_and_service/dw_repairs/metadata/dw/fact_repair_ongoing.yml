@@ -19,10 +19,6 @@ columns:
     description: Contract unique identifier.
     lineage:
       - datalake_repairs.repair_tickets.id_contract
-  sk_answer:
-    description: Unique identifier of the satisfaction response.
-    lineage:
-      - datalake_satisfaction_rating.satisfaction_answers.id_answer
   sk_user:
     description: User unique identifier.
     lineage:

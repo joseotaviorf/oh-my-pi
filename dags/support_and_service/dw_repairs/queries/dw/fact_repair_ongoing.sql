@@ -21,7 +21,6 @@ SELECT
   CAST(rt.id_ticket AS BIGINT) AS sk_ticket,
   COALESCE(rt.id_request, -1) AS sk_request,
   COALESCE(rt.id_contract, -1) AS sk_contract,
-  COALESCE(sa.id_answer, -1) AS sk_answer,
   COALESCE(tc.id_user_main, -1) AS sk_user,
   COALESCE(MD5(rt.agent_email), -1) AS sk_agent,
   COALESCE(b.id_budget_sender, -1) AS sk_budget_sender,
@@ -55,9 +54,6 @@ FROM
 LEFT JOIN
   datalake_zendesk.tickets_current AS tc
     ON tc.id_ticket = rt.id_ticket
-LEFT JOIN
-  datalake_satisfaction_rating.satisfaction_answers AS sa
-    ON rt.id_ticket = sa.id_ticket
 LEFT JOIN
   repair_request_budget AS b
     ON b.sk_repair_request = rt.id_request

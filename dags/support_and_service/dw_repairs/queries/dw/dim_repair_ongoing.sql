@@ -60,6 +60,10 @@ SELECT
     rt.front_or_back AS created_front_or_back,
     sf.status_fup_iq,
     rr.owner_approval,
+    rt.group_name,
+    rt.channel,
+    rt.client_type,
+    rt.tags,
     NOW() AS ts_load
 FROM datalake_repairs.repair_tickets AS rt
 LEFT JOIN criticidade AS c

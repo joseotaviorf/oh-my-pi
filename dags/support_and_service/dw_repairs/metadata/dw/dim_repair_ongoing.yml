@@ -59,5 +59,21 @@ columns:
     description: Approval status from the owner regarding the repair request.
     lineage:
       - datalake_repairs_clean.repair_request.owner_aproval
+  group_name:
+    description: Discursive data that indicates the department to which the service ticket is linked.
+    lineage:
+      - datalake_repairs.repair_tickets.group_name
+  channel:
+    description: Descriptive data that indicates which service channel was used.
+    lineage:
+      - datalake_repairs.repair_tickets.group_name
+  client_type:
+    description: Type of customer who requested service.
+    lineage:
+      - datalake_repairs.repair_tickets.group_name
+  tags:
+    description: Descriptive data that indicates the process tags used during the service.
+    lineage:
+      - datalake_repairs.repair_tickets.group_name
   ts_load:
     description: Date and time when the data was loaded.
