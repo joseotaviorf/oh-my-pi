@@ -318,9 +318,9 @@ SELECT
     COALESCE(web.ts_event, app.ts_event) AS ts_event,
     ts_web_attribution,
     ts_app_attribution,
-    YEAR(COALESCE(web.ts_event, app.ts_event)) AS year,
-    MONTH(COALESCE(web.ts_event, app.ts_event)) AS month,
-    DAY(COALESCE(web.ts_event, app.ts_event)) AS day
+    YEAR('{load_end_date}') AS year,
+    MONTH('{load_end_date}') AS month,
+    DAY('{load_end_date}') AS day
 FROM
     events_web web
     FULL OUTER JOIN events_app app
