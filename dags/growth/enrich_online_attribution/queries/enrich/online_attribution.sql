@@ -145,7 +145,7 @@ events_filtered AS (
         datalake_quintoandar.aux_date AS dd
             ON dd.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     WHERE
-        MAKE_DATE(evt.year, evt.month, evt.day) BETWEEN dd.date - INTERVAL '4' MONTH 
+        MAKE_DATE(evt.year, evt.month, evt.day) > dd.date - INTERVAL '4' MONTH 
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10,11,12,
         13,14,15,16,17,18,19,20,21,22,23,24,25,26
