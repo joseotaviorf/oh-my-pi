@@ -202,7 +202,7 @@ if __name__ == "__main__":
 
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
        
-         spark_metastore_loader.update_metastore(
+        spark_metastore_loader.update_metastore(
              df=df,
              database_name=database_name,
              table_name=report_type,
