@@ -18,6 +18,4 @@ LEFT JOIN
     datalake_inspections_clean.reviewer AS r
         ON r.id_reviewer = rr.id_granted_by
 WHERE
-    rr.year = {year}
-    AND rr.month = {month}
-    AND rr.day = {day}
+    MAKE_DATE(rr.year, rr.month, rr.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

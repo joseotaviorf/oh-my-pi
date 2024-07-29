@@ -19,9 +19,7 @@ WITH union_medias AS (
         datalake_inspections_clean.repair_request AS rr
         ON rr.id_repair_request = rrm.id_repair_request
     WHERE
-        rrm.year = {year}
-        AND rrm.month = {month}
-        AND rrm.day = {day}
+        MAKE_DATE(rrm.year, rrm.month, rrm.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         cm.id_contestation_media AS id_media,
@@ -43,9 +41,7 @@ WITH union_medias AS (
         datalake_inspections_clean.contestation AS c
         ON c.id_contestation = cm.id_contestation
     WHERE
-        cm.year = {year}
-        AND cm.month = {month}
-        AND cm.day = {day}
+        MAKE_DATE(cm.year, cm.month, cm.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT DISTINCT
     m.id_media,

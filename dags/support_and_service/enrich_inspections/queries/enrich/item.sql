@@ -39,22 +39,20 @@ SELECT DISTINCT
     i.day
 FROM
     datalake_inspections_clean.item i
-JOIN
+LEFT JOIN
     item_type it
-        ON it.id_item_type = i.id_type
-JOIN
+        ON i.id_type = it.id_item_type
+LEFT JOIN
     datalake_inspections.item_group ig
-        ON ig.id_item_group = i.id_item_group
-JOIN
+        ON i.id_item_group = ig.id_item_group
+LEFT JOIN
     datalake_inspections_clean.room r
-        ON r.id_room = ig.id_room
-JOIN
+        ON ig.id_room = r.id_room
+LEFT JOIN
     datalake_inspections_clean.assessment AS a
-        ON a.id_assessment = r.id_assessment
-JOIN
+        ON r.id_assessment = a.id_assessment
+LEFT JOIN
     datalake_inspections_clean.inspection AS ih
-        ON ih.id_inspection = a.id_inspection
+        ON a.id_inspection = ih.id_inspection
 WHERE
-    i.year = {year}
-    AND i.month = {month}
-    AND i.day = {day}
+    MAKE_DATE(i.year, i.month, i.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

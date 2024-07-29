@@ -38,8 +38,6 @@ JOIN
     assessment AS a
       ON a.id_assessment = ra.id_assessment
 WHERE
-    ra.year = {year}
-    AND ra.month = {month}
-    AND ra.day = {day}
+    MAKE_DATE(ra.year, ra.month, ra.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
     ra.ts_updated = MAX(ra.ts_updated) OVER (PARTITION BY ra.id_reviewer)

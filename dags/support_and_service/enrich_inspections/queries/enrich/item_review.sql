@@ -31,6 +31,4 @@ JOIN
     datalake_inspections.item i
         ON i.id_item = r.id_item
 WHERE
-    r.year = {year}
-    AND r.month = {month}
-    AND r.day = {day}
+    MAKE_DATE(r.year, r.month, r.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

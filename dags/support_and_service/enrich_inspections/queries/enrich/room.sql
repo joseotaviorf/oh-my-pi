@@ -24,6 +24,4 @@ JOIN
     room_type rt
         ON r.id_type = rt.id_room_type
 WHERE
-    r.year = {year}
-    AND r.month = {month}
-    AND r.day = {day}
+    MAKE_DATE(r.year, r.month, r.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
