@@ -141,11 +141,8 @@ events_filtered AS (
     JOIN
         ids_mapped_from_conversions AS imc 
             ON imc.id_amplitude = evt.id_amplitude
-    JOIN
-        datalake_quintoandar.aux_date AS dd
-            ON dd.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     WHERE
-        MAKE_DATE(evt.year, evt.month, evt.day) > dd.date - INTERVAL '4' MONTH 
+         MAKE_DATE(evt.year, evt.month, evt.day) > DATE('{load_end_date}') - INTERVAL '4' MONTH 
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10,11,12,
         13,14,15,16,17,18,19,20,21,22,23,24,25,26
@@ -321,14 +318,11 @@ SELECT
     COALESCE(web.ts_event, app.ts_event) AS ts_event,
     ts_web_attribution,
     ts_app_attribution,
-    YEAR(dd.date) AS year,
-    MONTH(dd.date) AS month,
-    DAY(dd.date) AS day
+    YEAR('{load_end_date}') AS year,
+    MONTH('{load_end_date}') AS month,
+    DAY('{load_end_date}') AS day
 FROM
     events_web web
-JOIN
-    datalake_quintoandar.aux_date AS dd 
-        ON dd.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}') 
 FULL OUTER JOIN events_app AS app
     ON web.event_type_sanitized = app.event_type_sanitized
     AND web.ts_event = app.ts_event
