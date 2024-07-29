@@ -625,7 +625,7 @@ SELECT
         sk_credit_analysis DESC
       ) = 1 THEN TRUE
     ELSE FALSE
-  END as is_last_client_max_funnel_drop_step,
+  END as is_user_version,
   dt_early_credit_created,
   dt_early_credit_expired,
   dt_last_credit_evaluation_init,
