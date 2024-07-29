@@ -1,4 +1,4 @@
-SELECT 
+SELECT
   im.id,
   im.id_photo,
   im.id_group,
@@ -11,7 +11,7 @@ SELECT
   im.room_type,
   im.status,
   im.description,
-  CASE 
+  CASE
     WHEN ig.framing_score BETWEEN 0.0 AND 0.3 THEN 'T0-30%'
     WHEN ig.framing_score BETWEEN 0.3 AND 0.6 THEN 'T30-60%'
     WHEN ig.framing_score >= 0.6 THEN 'T60+%'
@@ -27,24 +27,20 @@ SELECT
   ig.framing_score,
   im.ts_created,
   im.ts_updated
-FROM 
+FROM
   datalake_kodak_clean.image_inspection AS im
-INNER JOIN 
+INNER JOIN
   datalake_kodak_clean.image_inspection_group AS ig
     ON ig.id = im.id_group
-LEFT JOIN 
-  datalake_ebdb_clean.house AS h 
+LEFT JOIN
+  datalake_ebdb_clean.house AS h
     ON (ig.external_domain = 'LEAD3P' AND ig.id_external_domain = h.id_external
-          OR ig.external_domain != 'LEAD3P' AND ig.id_external_domain = h.id 
+          OR ig.external_domain != 'LEAD3P' AND ig.id_external_domain = h.id
         )
 LEFT JOIN
   datalake_brokers_supply_processor_clean.lead_3p AS l
     ON ig.id_external_domain = l.uuid_lead
     AND ig.external_domain = 'LEAD3P'
-    ON (ig.external_domain = 'LEAD3P' AND ig.id_external_domain = h.id_external
-          OR ig.external_domain != 'LEAD3P' AND ig.id_external_domain = h.id 
+    AND (ig.external_domain = 'LEAD3P' AND ig.id_external_domain = h.id_external
+          OR ig.external_domain != 'LEAD3P' AND ig.id_external_domain = h.id
         )
-LEFT JOIN
-  datalake_brokers_supply_processor_clean.lead_3p AS l
-    ON ig.id_external_domain = l.uuid_lead
-    AND ig.external_domain = 'LEAD3P'
