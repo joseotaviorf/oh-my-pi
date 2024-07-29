@@ -1001,6 +1001,7 @@ bietlejuice.enrich_3p:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 bietlejuice.enrich_accounting_funnel:
+  - bietlejuice.checkout:load-clean-boleto
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
@@ -1014,6 +1015,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.ebdb_rent_flow:load-clean-agent-rent-flow
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges
   - bietlejuice.enrich_nexxera:load-enrich-cnab-payments
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
