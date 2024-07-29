@@ -115,6 +115,15 @@ columns:
   evictions_ongoing_cases:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.evictions_ongoing_cases
+  new_business_appointments:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.new_business_appointments
+  new_business_opportunities:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.new_business_opportunities
+  new_business_registration:
+    lineage:
+      - datalake_gsheets_raw.quintocred_coincident_targets.new_business_registration
   month:
     lineage:
       - datalake_gsheets_raw.quintocred_coincident_targets.month
