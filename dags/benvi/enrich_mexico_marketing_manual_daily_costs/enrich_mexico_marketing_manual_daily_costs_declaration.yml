@@ -19,3 +19,4 @@ cluster:
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.large
     num_workers: 2
+    spark_version: 13.3.x-scala2.12

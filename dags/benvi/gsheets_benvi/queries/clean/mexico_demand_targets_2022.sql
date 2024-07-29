@@ -22,6 +22,6 @@ SELECT
     CAST(year AS INTEGER) AS year,
     BOOLEAN(guarantee) AS has_guarantee,
     TO_DATE(week_start, 'yyyy-MM-dd') AS dt_week_started,
-    TO_DATE(date, 'yyyy-MM-dd') AS dt_target
+    TO_DATE(DATE(date), 'yyyy-MM-dd') AS dt_target
 FROM
     datalake_gsheets_raw.mexico_demand_targets_2022

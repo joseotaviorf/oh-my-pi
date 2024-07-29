@@ -561,6 +561,13 @@ databricks_10_4_min_xlarge_io-memory_photon_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_13_3_min_xlarge_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.large
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+
 databricks_12_2_min_xlarge_io-memory_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.xlarge
@@ -682,6 +689,13 @@ databricks_10_4_med_general_photon_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
+databricks_13_3_med_general_3_nodes_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
 
 databricks_12_2_med_general_photon_cluster:
     <<: *cluster_anchor
