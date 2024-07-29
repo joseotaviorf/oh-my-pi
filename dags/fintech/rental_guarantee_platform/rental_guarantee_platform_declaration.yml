@@ -4,7 +4,8 @@ dag:
   schedule_interval: 0 1 * * *
   owner: Data Fintech
   documentation:
-    dag_purpose: This DAG imports the tables from **Rental Guarantee Platform**, a
+    dag_purpose:
+      This DAG imports the tables from **Rental Guarantee Platform**, a
       For Brokers service that provides insurance against loss of rent for real estate
       agencies.
 workflow:
@@ -242,6 +243,9 @@ workflow:
     propose_event:
       date_filter_column: created_at
     company_executive:
+      date_filter_column: updated_at
+    bill:
+      clean_table_name: bill_checkout
       date_filter_column: updated_at
 cluster:
   type: databricks_12_2_med_general_cluster
