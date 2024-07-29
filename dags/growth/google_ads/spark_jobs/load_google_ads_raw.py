@@ -208,7 +208,6 @@ if __name__ == "__main__":
             format_options=SparkTableStorageFormat.DEFAULT_RAW,
             database_location=database_location,
             partitions=raw_partition_cols,
-            force_recreate=True,
         )
 
         spark_metastore_service.create_new_partitions_from_df(
