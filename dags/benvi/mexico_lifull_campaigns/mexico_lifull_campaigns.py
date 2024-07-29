@@ -22,7 +22,7 @@ SOURCE = "mexico_lifull_campaigns"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2022, 6, 1, tzinfo=timezone("America/Mexico_City"))
 MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_xlarge_io-memory_photon_cluster"
+CLUSTER_DESCRIPTION = "databricks_13_3_min_xlarge_io-memory_photon_cluster"
 
 config_service = ConfigurationService(SOURCE)
 raw_table_name = config_service.get_config("raw_table_name")
