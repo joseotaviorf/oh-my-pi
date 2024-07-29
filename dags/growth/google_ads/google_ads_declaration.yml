@@ -1,0 +1,47 @@
+dag:
+  name: google_ads
+  owner: Data Growth
+  schedule_start_date: 2019, 1, 1
+  schedule_interval: "0 1 * * *"
+  documentation: 
+    dag_purpose: |    
+      Google Ads DAG retrieves QuintoAndar's marketing campaigns data from Google Ads platform. 
+      It uses data extracted from [ads-performance](https://github.com/quintoandar/ads-performance) extraction tool, developed by Marketing Tools team.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_google_ads_raw
+  default_partitions: [account_snake_case, dt_loaded]
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"  
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
+  tables_customization:
+    ads_performance:
+      extra_spark_job_arguments: 
+        - ads_performance # report type
+    campaigns_performance: 
+      extra_spark_job_arguments: 
+        - campaigns_performance # report type
+    keywords_performance:
+      extra_spark_job_arguments: 
+        - keywords_performance # report type
+    videos_performance: 
+      extra_spark_job_arguments: 
+        - videos_performance # report type
+    # search_term_performance: # Not used, but can be added if needed
+    #   extra_spark_job_arguments:
+    #     - search_term_performance # report type
+cluster:
+  type: databricks_12_2_min_io-memory_cluster
+  custom_libraries:
+    - pypi:
+        package: google-ads==22.1.0
+    - pypi:
+        package: google-auth==2.23

@@ -100,6 +100,8 @@ class LoadCustomTaskCreator(BaseTaskCreator):
                     partitions=json.dumps(table_attributes.partitions),
                     extraction_type=table_attributes.extraction_type,
                     is_incremental=table_attributes.extraction_type == "incremental",
+                    load_start_date=self.dag_execution_context.load_start_date,
+                    load_end_date=self.dag_execution_context.load_end_date,
                 )
             )
         if isinstance(unprocessed_argument, dict):
