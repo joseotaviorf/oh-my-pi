@@ -7,8 +7,6 @@ WITH assessment AS (
         a.dt_tenant_limit_revision
     FROM
         datalake_inspections_clean.assessment AS a 
-    WHERE
-        DATE(a.ts_updated) <= DATE('{year}-{month}-{day}')
     QUALIFY 
         a.ts_updated = MAX(a.ts_updated) OVER(PARTITION BY a.id_assessment)
 )
@@ -43,3 +41,5 @@ WHERE
     ra.year = {year}
     AND ra.month = {month}
     AND ra.day = {day}
+QUALIFY
+    ra.ts_updated = MAX(ra.ts_updated) OVER (PARTITION BY ra.id_reviewer)
