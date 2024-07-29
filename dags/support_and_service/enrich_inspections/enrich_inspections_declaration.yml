@@ -8,7 +8,7 @@ dag:
       as well as the construction of metrics through this data.
 
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     inspection_booking:
@@ -63,3 +63,4 @@ cluster:
     driver_node_type_id: m5a.4xlarge
     node_type_id: m5a.4xlarge
     num_workers: 3
+    spark_version: 12.2.x-scala2.12
