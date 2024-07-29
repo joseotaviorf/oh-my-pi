@@ -201,14 +201,16 @@ if __name__ == "__main__":
         )
 
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-        spark_metastore_loader.update_metastore(
-            df=df,
-            database_name=database_name,
-            table_name=report_type,
-            format_options=SparkTableStorageFormat.DEFAULT_RAW,
-            database_location=database_location,
-            partitions=raw_partition_cols,
-        )
+       
+         spark_metastore_loader.update_metastore(
+             df=df,
+             database_name=database_name,
+             table_name=report_type,
+             format_options=SparkTableStorageFormat.DEFAULT_RAW,
+             database_location=database_location,
+             partitions=raw_partition_cols,
+             force_recreate=False,
+         )
 
         spark_metastore_service.create_new_partitions_from_df(
             df=df,
