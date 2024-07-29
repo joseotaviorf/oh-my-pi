@@ -42,7 +42,7 @@ RAW_SPARK_JOB_PATH = (
     f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/load_{CONTEXT}_raw.py"
 )
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_memory_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_memory_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

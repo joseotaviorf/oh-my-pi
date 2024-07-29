@@ -36,7 +36,7 @@ MAIN_START_DATE = datetime(2020, 12, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 11 15,30 1-4 *"
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_general_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
