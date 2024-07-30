@@ -100,14 +100,14 @@ WITH surveys_fup AS (
 SELECT
   gs.id_session AS sk_session,
   COALESCE(gs.id_ticket, -1) AS sk_ticket,
-  COALESCE(gs.id_user, -1) AS sk_user,
+  COALESCE(CAST(gs.id_user AS BIGINT), -1) AS sk_user,
   COALESCE(gs.id_pipeline, -1) AS sk_pipeline,
   COALESCE(gs.id_content, -1) AS sk_content,
-  COALESCE(gs.id_contract, -1) AS sk_contract,
-  COALESCE(sf.id_survey, -1) AS sk_survey,
-  COALESCE(sf.id_answer, -1) AS sk_answer,
+  COALESCE(CAST(gs.id_contract AS BIGINT), -1) AS sk_contract,
+  COALESCE(CAST(sf.id_survey AS BIGINT), -1) AS sk_survey,
+  COALESCE(CAST(sf.id_answer AS BIGINT), -1) AS sk_answer,
   COALESCE(CAST(DATE_FORMAT(gs.ts_started,'yyyyMMdd') AS BIGINT), -1) AS sk_started_chat,
-  COALESCE(CAST(DATE_FORMAT(gs.ts_ended,'yyyyMMdd') AS BIGINT), -1) AS sk_ended_chat,
+  COALESCE(CAST(DATE_FORMAT(gs.ts_ended,'yyyyMMdd') AS BIGINT), -1) AS sk_ended_chat
   gs.is_menu_available,
   gs.is_more_help_required,
   gs.is_problem_solved,
@@ -138,7 +138,7 @@ SELECT
   gs.before_reception,
   gs.after_reception,
   GET_JSON_OBJECT(gs.memory, '$.basic.session.last_hsm.type') AS last_hsm_type,
-  GET_JSON_OBJECT(memory, '$.basic.session.last_hsm.secs_since') AS secs_since_last_hsm,
+  CAST(GET_JSON_OBJECT(memory, '$.basic.session.last_hsm.secs_since') AS FLOAT) AS secs_since_last_hsm,
   gs.automatic_selection,
   CASE
     WHEN gs.current_state LIKE '%CSAT%' THEN True ELSE False
