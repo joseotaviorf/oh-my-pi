@@ -149,7 +149,11 @@ tainted_dataset_range AS (
             WHEN delay_contamined_at_closure <= 90  THEN "61-90"
             WHEN delay_contamined_at_closure <= 120 THEN "91-120"
             WHEN delay_contamined_at_closure <= 180 THEN "121-180"
-            ELSE "over 180"
+            WHEN delay_contamined_at_closure <= 360 THEN "181-360"
+            WHEN delay_contamined_at_closure <= 540 THEN "361-540"
+            WHEN delay_contamined_at_closure <= 720 THEN "541-720"
+            WHEN delay_contamined_at_closure <= 1080 THEN "721-1080"
+            ELSE "over 1080"
         END AS delay_contamined_range
     FROM
         tainted_dataset
