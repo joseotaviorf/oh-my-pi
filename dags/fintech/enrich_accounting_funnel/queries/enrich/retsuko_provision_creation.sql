@@ -25,7 +25,15 @@ retsuko_provisao AS (
                 'entry.bill-item/ipca-adm-fee',
                 'entry.bill-item/adjustment-agreement-adm-fee',
                 'entry.bill-item/lockin') THEN 'adm fee'
+            WHEN e.bill_item IN (
+                'entry.bill-item/adm-fee-adm-partner',
+                'entry.bill-item/igpm-adm-partner-adm-fee',
+                'entry.bill-item/ipca-adm-partner-adm-fee') THEN 'adm fee partner'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN 'brokerage select'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN 'brokerage ciq'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-third-party-real-estate') THEN 'brokerage partner'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-estate-agent') THEN 'brokerage agent'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN 'BFI v1'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN 'BFI v2'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN 'BFI'
@@ -37,48 +45,51 @@ retsuko_provisao AS (
                 'entry.bill-item/ipca-adm-fee',
                 'entry.bill-item/adjustment-agreement-adm-fee',
                 'entry.bill-item/lockin') THEN '31101.02.02'
+            WHEN e.bill_item IN (
+                'entry.bill-item/adm-fee-adm-partner',
+                'entry.bill-item/igpm-adm-partner-adm-fee',
+                'entry.bill-item/ipca-adm-partner-adm-fee') THEN '61101.01.73'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '31101.01.04'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN '61101.01.82'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN '61101.01.78'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-third-party-real-estate') THEN '61101.01.72'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-estate-agent') THEN '61101.01.71'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN '31101.01.04'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN '31101.01.13'
         END AS account_number,
         i.accrual_year_month,
-        IF(e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND e.producer = 'early-termination-v2', DATE(i.ts_created), DATE(e.ts_created)) AS dt_source_trigger,
+        IF(e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND e.producer = 'early-termination-v2' AND e.accrual_year_month < CAST(REPLACE(LEFT(DATE(e.ts_created) + INTERVAL '1' MONTH, 7), '-', '') AS INTEGER), DATE(e.ts_created) + INTERVAL '1' MONTH, DATE(e.ts_created)) AS dt_source_trigger,
         CAST(amount AS DECIMAL(12,2)) AS source_amount
     FROM
         datalake_retsuko.entry  e
-    INNER JOIN
+    LEFT JOIN
         datalake_retsuko.invoice i
             ON e.id_invoice = i.id
-    INNER JOIN
+    LEFT JOIN
         datalake_retsuko.invoice_info ii
             ON ii.id_invoice = i.id_external
-    INNER JOIN
+    LEFT JOIN
         datalake_retsuko_clean.contract ct
-            ON ct.id = i.id_contract
+            ON ct.id = e.id_contract
     LEFT JOIN
         invoice_entry_version ie
             ON e.id_external = ie.id_finance_entity
     WHERE
-        description != 'Crédito - Parcelamento corretagem - QuintoAndar'
+        e.description != 'Crédito - Parcelamento corretagem - QuintoAndar'
         AND (
                 (
-                    (ii.invoice_user = 'landlord') AND
                     (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'adm-fee',
-                      'adm-fee-tax-pcc-adm-partner',
-                      'adm-fee-tax-pcc-quintoandar',
-                      'adm-fee-tax-ir-quinto-andar',
-                      'adm-fee-tax-ir',
-                      'adm-fee-tax-pcc',
-                      'adm-fee-tax-ir-adm-partner',
-                      'adm-fee-tax-pcc-quinto-andar',
+                      'adm-fee-adm-partner',
+                      'igpm-adm-partner-adm-fee',
+                      'ipca-adm-partner-adm-fee',
                       'brokerage-installment-fee',
                       'brokerage-quinto-andar',
-                      'brokerage-fee-tax-ir-adm-partner',
-                      'brokerage-fee-tax-ir',
-                      'brokerage-fee-tax-ir-quinto-andar',
+                      'brokerage-partner-select'
+                      'brokerage-adm-partner',
+                      'brokerage-estate-agent',
+                      'brokerage-third-party-real-estate',
                       'lockin',
-                      'pro-guarantor-5A-installment',
                       'adjustment-agreement-adm-fee',
                       'igpm-adm-fee',
                       'ipca-adm-fee'
@@ -87,7 +98,7 @@ retsuko_provisao AS (
                 )
             )
         AND ct.country_code = 'BR'
-        AND DATE(e.ts_created) >= '2024-01-01'
+        AND DATE(e.ts_created) >= '2024-01-01' and i.id_external is null
 ),
 
 sap_entity AS (
@@ -154,8 +165,8 @@ sap AS (
     FROM
         datalake_accounting_funnel.ledger
     WHERE
-        account_number like '31101%'
-        AND document_number like 'JE %'
+        (account_number LIKE '31101%' OR account_number LIKE '61101%')
+        AND document_number LIKE 'JE %'
 ),
 
 df_final AS (
@@ -197,11 +208,16 @@ metrics AS (
         'JE'||'-'||id_entry||'-'||'1'||'-'||'2'||'-'||
         CASE
             WHEN revenue_name = 'adm fee' THEN '1'
-            WHEN revenue_name = 'brokerage' THEN '2'
+            WHEN revenue_name = 'brokerage quinto andar' THEN '2'
             WHEN revenue_name = 'service fee' THEN '3'
             WHEN revenue_name = 'BFI' THEN '4'
             WHEN revenue_name = 'BFI v1' THEN '4'
             WHEN revenue_name = 'BFI v2' THEN '4'
+            WHEN revenue_name = 'brokerage select' THEN '5'
+            WHEN revenue_name = 'brokerage ciq' THEN '5'
+            WHEN revenue_name = 'brokerage partner' THEN '5'
+            WHEN revenue_name = 'brokerage agent' THEN '5'
+            WHEN revenue_name = 'adm fee partner' THEN '6'
         END AS id_retsuko_provision_creation,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
