@@ -65,3 +65,9 @@ sheets_info:
     sheet_name: targets
     clean_table_name: sale_tof_weekly_target
     sheet_context: growth
+
+  supply_forecast_daily:
+      sheet_id: 1JzGUC-BCSkRP5jiFrnrksdBKkPfPHqDzEvOGXkXVgQ8
+      sheet_name: forecast_supply
+      clean_table_name: forecast_supply_daily
+      sheet_context: growth

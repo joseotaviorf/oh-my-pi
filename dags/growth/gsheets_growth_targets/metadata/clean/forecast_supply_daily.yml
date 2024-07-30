@@ -1,0 +1,39 @@
+database_name: datalake_gsheets_clean
+table_name: forecast_supply_daily
+columns:
+  business:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.business
+  year_month:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.year_month
+  region:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.region
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.planning_conversion
+  planning_operation:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.planning_operation
+  planning_cluster_adj:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.planning_cluster_adj
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.company_report_origin
+  prospects:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.p
+  qualifieds:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.q
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.aq
+  opportunities:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.o
+  first_listings:
+    lineage:
+      - datalake_gsheets_raw.forecast_supply_daily.fl
