@@ -48,9 +48,9 @@ if __name__ == "__main__":
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    table_details = json.loads(args.table_details)
+    table_details = args.table_details
     raw_table_name = args.raw_table_name
-    partition_cols = json.loads(args.partition_cols)
+    partition_cols = args.partition_cols
 
     logger.info(
         f"""
