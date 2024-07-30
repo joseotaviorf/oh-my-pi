@@ -48,3 +48,5 @@ cluster:
     node_type_id: m5a.xlarge
     num_workers: 3
     spark_version: 13.3.x-scala2.12
+  custom_libraries:
+    - whl: "{artifacts_bucket}/twilio-flex-insights-api-client-python/quintoandar_twilio_flex_insights_api_client-0.1.0-py2.py3-none-any.whl"
