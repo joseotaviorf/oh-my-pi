@@ -13,6 +13,7 @@ workflow:
   load_spark_job: load_google_ads_raw
   default_partitions: [account_snake_case, dt_loaded]
   default_extraction_type: incremental
+  has_hive_sync: false
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"  
