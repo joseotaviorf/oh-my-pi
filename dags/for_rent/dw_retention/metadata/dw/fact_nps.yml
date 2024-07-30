@@ -24,5 +24,9 @@ columns:
       - datalake_tracksale.answer.id
       - datalake_casa_mineira_tracksale.answer.id
     description: NPS answer ID.
+  sk_contract:
+    lineage:
+      - datalake_offboarding.contract_termination.id_contract
+    description: Key of the contract related with the termination.
   ts_load:
     description: Timestamp of when this data was loaded.

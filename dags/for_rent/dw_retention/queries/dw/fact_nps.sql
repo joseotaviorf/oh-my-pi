@@ -3,6 +3,7 @@ SELECT
     ct.id_termination AS sk_termination,
     MD5(cc.id_customer) AS sk_nps_respondent,
     nps.id AS sk_nps_answer,
+    ct.id_contract AS sk_contract,
     NOW() AS ts_load
 FROM
     (SELECT * FROM datalake_tracksale.answer
