@@ -8,7 +8,7 @@ dag:
 workflow:
   type: database_pull
   layer: raw
-  database_type: postgres
+  database_type: mysql
   custom_schema: vans
   dbutils_secret_key: VANS_DB
   tables_customization:
