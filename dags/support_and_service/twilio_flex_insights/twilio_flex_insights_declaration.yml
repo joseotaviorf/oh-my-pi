@@ -1,0 +1,50 @@
+dag:
+  name: twilio_flex_insights
+  schedule_start_date: 2019, 9, 27
+  schedule_interval: 0 0 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Twilio Flex Insights brings the service metrics data (call and chat). We implement a
+      [client API](https://github.com/quintoandar/twilio-flex-insights-api-client-python) for raw use.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_twilio_flex_insights_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{{ ds }}"
+    - "{{ next_ds }}"
+    - "{table_name}"
+
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    benvi_closing_metrics:
+      extra_spark_job_arguments:
+        - table_details:
+            workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
+            object_id: "9051650"
+            column_create_date: "date"
+    benvi_inside_sales_call_metrics:
+      extra_spark_job_arguments:
+        - table_details:
+            workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
+            object_id: "8703789"
+            column_create_date: "date"
+    conversation_time_metrics:
+      extra_spark_job_arguments:
+        - table_details:
+            workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
+            object_id: "801119"
+            column_create_date: "date"
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
