@@ -116,6 +116,7 @@ class Tables:
     source_union_houses = "vespucio_sources_delta.source_union_house"
     source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
     source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
+    source_cnefe_houses = "vespucio_sources_delta.source_cnefe_house"
 
     step1_staged_condos = "vespucio_pipeline_delta.step1_staged_condos"
     step1_staged_houses = "vespucio_pipeline_delta.step1_staged_houses"
@@ -207,6 +208,14 @@ source_tasks = [
             f"--output_table={Tables.source_iptu_houses}",
         ],
         task_id="iptu_house",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=cnefe_house.sql",
+            f"--output_table={Tables.source_cnefe_houses}",
+        ],
+        task_id="cnefe_house",
     ),
 ]
 
@@ -400,7 +409,7 @@ plugin_tasks = [
     # ),
 ]
 
-join_plugins = DummyOperator(task_id='join_plugins', dag=dag)
+join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 
 execute_job_cluster_task >> source_tasks
 source_tasks >> core_tasks[0]
