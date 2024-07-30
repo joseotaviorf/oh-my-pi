@@ -6,6 +6,13 @@ workflow:
   type: query
   layer: dw
   custom_schema: velo
+  inner_dependencies:
+    quintocred_aging_occurrence:
+      - quintocred_ifrs_occurrence
+    quintocred_aging_recurring_payment_no_renewal:
+      - quintocred_ifrs_recurring_payment
+    quintocred_aging_recurring_payment_renewal:
+      - quintocred_ifrs_recurring_payment
   has_load_to_redshift_task: false
 cluster:
   type: databricks_12_2_min_memory_cluster

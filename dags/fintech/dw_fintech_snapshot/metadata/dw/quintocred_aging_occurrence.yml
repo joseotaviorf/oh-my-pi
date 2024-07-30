@@ -1,0 +1,75 @@
+database_name: dw_velo
+table_name: quintocred_aging_recurring_payment_renewal
+description: Table made to measure PDD of Occurrences.
+domain: Fintech
+owner: ae-fintech@quintoandar.com.br
+columns:
+  client_cpf_cnpj:
+    description: "For 3.0 cases, it will be the delinquency entry id, for 2.0 cases, it will be the delinquency id"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.client_cpf_cnpj
+  days_delay:
+    description: "Maximum days of delay calculated between the date of register and end the of the month"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.days_delay
+  delay_range:
+    description: "Range according to the days of delay"
+    categories:
+      "a.Current": "No delay"
+      "b.1 a 30": "Maximum days of delay between 1 and 30 days"
+      "c.31 a 60": "Maximum days of delay between 31 and 60 days"
+      "d.61 a 90": "Maximum days of delay between 61 and 90 days"
+      "e.91 a 120": "Maximum days of delay between 91 and 120 days"
+      "f.121 a 150": "Maximum days of delay between 121 and 150 days"
+      "g.151 a 180": "Maximum days of delay between 151 and 180 days"
+      "h.>180": "Maximum days of delay bigger than 180 days"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.delay_range
+  discount_value:
+    description: "Value of the discount given when paying the delinquency"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.discount_value
+  dt_analyst_annulment_input:
+    description: "Date of when status of the propose/contract ended was included on system"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.dt_analyst_annulment_input
+  dt_contract_started:
+    description: "Contract start date"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.dt_contract_started
+  due_amount:
+    description: "Amount of the original unpaid charge"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.due_amount
+  is_contract_active:
+    description: "Column that identifies whether the contract is active or not"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.is_contract_active
+  open_amount:
+    description: "Difference between the amount paid and the original invoice amount"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.open_amount
+  open_amount_guarantee:
+    description: "Difference between the amount paid and the original invoice amount on guarantee delinquencies"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.open_amount_guarantee
+  open_amount_termination:
+    description: "Difference between the amount paid and the original invoice amount on termination delinquencies"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.open_amount_termination
+  paid_amount:
+    description: "Delinquency amount paid"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.paid_amount
+  paid_amount_2:
+    description: "Paid amount added"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.paid_amount_2
+  sk_propose:
+    description: "Proposal ID related to payment information"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.sk_propose
+  ts_snapshot:
+    description: "Timestamp when the data was loaded"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_renewal.ts_snapshot
