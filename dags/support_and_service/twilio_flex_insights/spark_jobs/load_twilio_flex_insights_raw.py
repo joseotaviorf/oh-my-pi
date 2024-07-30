@@ -27,6 +27,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_twilio_flex_insights_raw"
+SOURCE = "twilio_flex_insights"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -38,24 +39,22 @@ if __name__ == "__main__":
 
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("source", help="name of the source")
-    parser.add_argument("table_details")
     parser.add_argument("raw_table_name")
     parser.add_argument("partition_cols")
+    parser.add_argument("table_details")
 
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
-    source = args.source
-    table_details = args.table_details
+    table_details = json.loads(args.table_details)
     raw_table_name = args.raw_table_name
     partition_cols = args.partition_cols
 
     logger.info(
         f"""
             m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
-            source={source}, partition_cols={partition_cols}, raw_table_name={raw_table_name},
+            source={SOURCE}, partition_cols={partition_cols}, raw_table_name={raw_table_name},
             msg=print spark jobs args"
         """
     )
@@ -83,7 +82,7 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
 
     datalake_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket
+        environment, SOURCE, datalake_bucket
     )
     database_name = datalake_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW

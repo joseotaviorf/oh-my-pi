@@ -15,9 +15,8 @@ workflow:
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
-    - "{{ ds }}"
-    - "{{ next_ds }}"
     - "{table_name}"
+    - "{partitions}"
 
   default_extraction_type: incremental
   default_partitions: [year, month, day]
