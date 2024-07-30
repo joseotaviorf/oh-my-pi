@@ -98,7 +98,7 @@ retsuko_provisao AS (
                 )
             )
         AND ct.country_code = 'BR'
-        AND DATE(e.ts_created) >= '2024-01-01' and i.id_external is null
+        AND DATE(e.ts_created) >= '2024-01-01'
 ),
 
 sap_entity AS (
