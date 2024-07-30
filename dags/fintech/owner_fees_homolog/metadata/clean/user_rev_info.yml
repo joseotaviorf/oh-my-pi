@@ -1,0 +1,12 @@
+database_name: datalake_owner_fees_homolog_clean
+table_name: user_rev_info
+columns:
+  id_user:
+    lineage:
+      - datalake_owner_fees_homolog_raw.user_rev_info.user_id
+  rev:
+    lineage:
+      - datalake_owner_fees_homolog_raw.user_rev_info.rev
+  ts_rev:
+    lineage:
+      - datalake_owner_fees_homolog_raw.user_rev_info.revtstmp

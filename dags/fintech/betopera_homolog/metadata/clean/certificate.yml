@@ -1,0 +1,48 @@
+database_name: datalake_betopera_homolog_clean
+table_name: certificate
+columns:
+  id:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.id
+  id_insurance:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.insurance_id
+  id_certificate_request:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.certificate_request_id
+  version:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.version
+  status:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.status
+  response_payload:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.response_payload
+  file_url:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.file_url
+  dt_start:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.start_date
+  dt_end:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.end_date
+  dt_cancel:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.cancel_date
+  ts_created:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.created_at
+  ts_updated:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.updated_at
+  year:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.year
+  month:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.month
+  day:
+    lineage:
+      - datalake_betopera_homolog_raw.certificate.day

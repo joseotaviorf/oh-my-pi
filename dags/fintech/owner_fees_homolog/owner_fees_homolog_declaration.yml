@@ -1,0 +1,77 @@
+dag:
+  name: owner_fees_homolog
+  schedule_start_date: 2020, 8, 10
+  schedule_interval: 0 5 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates the tables from [Ownerfees](https://github.com/quintoandar/owner-fees), a service that deals with fees related to the contract, listing and bills that are charged to the owner.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: OWNER_FEES_DB
+  lineage_product_database_name: ownerfees
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  tables_customization:
+    admin_fee_option:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    admin_fee_option_aud:
+      extraction_type: full
+    charge_delay:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    charge_delay_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    contract:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    contract_aud:
+      extraction_type: full
+    contract_brokerage_fee:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    contract_brokerage_fee_aud:
+      extraction_type: full
+    house:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    house_aud:
+      extraction_type: full
+    house_brokerage_fee:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    house_brokerage_fee_aud:
+      extraction_type: full
+    installment_option:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    installment_option_aud:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    user_rev_info:
+      extraction_type: full
+    users:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      partitions: ["year", "month", "day"]
+    users_aud:
+      extraction_type: full
+cluster:
+  type: databricks_13_3_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

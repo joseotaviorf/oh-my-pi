@@ -1,0 +1,39 @@
+database_name: datalake_owner_fees_homolog_clean
+table_name: installment_option
+columns:
+  id:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.id
+  id_charge_delay:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.charge_delay_id
+  installment_number:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.installment_number
+  percentage_of_entry:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.percentage_of_entry
+  premium_fee:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.premium_fee
+  dt_valid_from:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.valid_from
+  dt_valid_until:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.valid_until
+  ts_created:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.created_at
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.updated_at
+  year:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.year
+  month:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.month
+  day:
+    lineage:
+      - datalake_owner_fees_homolog_raw.installment_option.day

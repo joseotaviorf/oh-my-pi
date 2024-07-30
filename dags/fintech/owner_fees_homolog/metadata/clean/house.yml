@@ -1,0 +1,33 @@
+database_name: datalake_owner_fees_homolog_clean
+table_name: house
+columns:
+  id:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.id
+  id_user:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.user_id
+  id_external:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.external_id
+  status:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.status
+  rent:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.rent
+  ts_created:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.created_at
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.updated_at
+  year:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.year
+  month:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.month
+  day:
+    lineage:
+      - datalake_owner_fees_homolog_raw.house.day

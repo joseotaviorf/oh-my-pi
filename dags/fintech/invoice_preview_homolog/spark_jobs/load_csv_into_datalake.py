@@ -40,7 +40,8 @@ if __name__ == "__main__":
     parser.add_argument("source_root_path", help="source root path")
     parser.add_argument("date_to_ingest", help="Date to be used in filtering the files. Format: '%Y-%m-%d'")
     parser.add_argument("table_name", help="name of the output table")
-    parser.add_argument("consumer_extra_args", help="extra arguments to pass to get_data_from_file of S3Consumer")
+    parser.add_argument("file_format", help="file format")
+    parser.add_argument("file_options", help="file options")
 
     args = parser.parse_args()
 
@@ -50,7 +51,8 @@ if __name__ == "__main__":
     source_root_path = args.source_root_path
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
-    consumer_extra_args = json.loads(args.consumer_extra_args)
+    format = args.file_format
+    options = json.loads(args.file_options)
     partition_cols = ["year", "month", "day"]
     date_ingested = datetime.strptime(date_to_ingest, "%Y-%m-%d") + timedelta(days=1)
     date_to_ingest = date_ingested.strftime("%Y-%m-%d")
@@ -59,7 +61,7 @@ if __name__ == "__main__":
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
                 source_root_path={source_root_path}, date_to_ingest={date_to_ingest}, table_name={table_name},
-                consumer_extra_args={consumer_extra_args}, msg=Starting spark job...
+                format={format}, options = {options}, msg=Starting spark job...
         """
     )
 
@@ -88,7 +90,7 @@ if __name__ == "__main__":
     if len(by_day_files[date_to_ingest]) > 0:
 
         for csv in by_day_files[date_to_ingest]:
-            df = s3_consumer.get_data_from_file(path=csv, **consumer_extra_args)
+            df = s3_consumer.get_data_from_file(path=csv, format=format, options=options)
             df = df.withColumn("invoice_filename", functions.lit(csv))
             dfs.append(df)
 

@@ -1,9 +1,0 @@
-SELECT
-    id_creditor,
-    id_customer,
-    id_indicator,
-    indicator_content,
-    content_description,
-    ts_load
-FROM
-    datalake_recupera_homolog_raw.indicator_records

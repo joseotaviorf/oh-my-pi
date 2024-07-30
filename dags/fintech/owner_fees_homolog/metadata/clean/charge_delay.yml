@@ -1,0 +1,24 @@
+database_name: datalake_owner_fees_homolog_clean
+table_name: charge_delay
+columns:
+  id:
+    lineage:
+      - datalake_owner_fees_homolog_raw.charge_delay.id
+  waiting_period:
+    lineage:
+      - datalake_owner_fees_homolog_raw.charge_delay.waiting_period
+  ts_created:
+    lineage:
+      - datalake_owner_fees_homolog_raw.charge_delay.created_at
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_homolog_raw.charge_delay.updated_at
+  year:
+    lineage:
+      - datalake_owner_fees_homolog_raw.charge_delay.year
+  month:
+    lineage:
+      - datalake_owner_fees_homolog_raw.charge_delay.month
+  day:
+    lineage:
+      - datalake_owner_fees_homolog_raw.charge_delay.day

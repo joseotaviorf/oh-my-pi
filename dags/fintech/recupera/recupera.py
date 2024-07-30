@@ -34,7 +34,7 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_min_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_2xlarge_general_cluster")
 LIBRARIES_DESCRIPTION = config_service.get_config("default_libraries")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -45,8 +45,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 
 SOURCE_ROOT_PATH = config_service.get_config("source_root_path")
 TABLES = config_service.get_config("tables")
-
-CUSTOM_CLUSTER = config_service.get_config("custom_cluster")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -65,7 +63,7 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
-    cluster_configuration=CUSTOM_CLUSTER,
+    cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=LIBRARIES_DESCRIPTION,
 )
@@ -108,7 +106,7 @@ for table in TABLES:
             json.dumps(partition_columns)
         ],
     )
-    
+
     partitions = partition_columns if load_incremental else None
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
@@ -117,7 +115,6 @@ for table in TABLES:
         is_incremental=load_incremental,
         partitions=partitions
     )
-
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
     cross_downstream(
