@@ -1165,12 +1165,10 @@ bietlejuice.enrich_big_agent:
   - bietlejuice.big_agent_earnings:load-clean-earnings
   - bietlejuice.big_agent_earnings:load-clean-enrollment
   - bietlejuice.big_agent_earnings:load-clean-external-invoice
-  - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.enrich_hub_services_agents:load-enrich-users
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
 bietlejuice.enrich_bigfone:
   - bietlejuice.bigfone:load-clean-event
@@ -1539,6 +1537,7 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:load-clean-device
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-partner-agent
+  - bietlejuice.ebdb:load-clean-partner-agent-aud
   - bietlejuice.ebdb:load-clean-rating-label
   - bietlejuice.ebdb:load-clean-real-estate-agent-rating
   - bietlejuice.ebdb:load-clean-real-estate-agent-rating-rating-label

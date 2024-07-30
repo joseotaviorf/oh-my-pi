@@ -1,0 +1,37 @@
+database_name: datalake_ebdb_agents
+table_name: ciq_users
+description: Each line represents a change in the ciq status, if it has changed between active or inactive, 
+  or has had any change in its user in main.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner.id
+    description: Partner ID (Main)
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.partner_agent_aud.id_user
+    description: User ID (Main)
+  name:
+    lineage:
+      - datalake_ebdb_clean.partner.name
+    description: Full name of user.
+  email:
+    lineage:
+      - datalake_ebdb_clean.partner.email
+    description: Email of user.
+  status:
+    lineage:
+      - datalake_ebdb_clean.partner_agent_aud.status
+    description: Status to identify wheter the agent is active or inactive.
+  is_last_status: 
+    description: Informs when the agent's most recent status.
+  ts_agent_status_start:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of when the status started.
+  ts_agent_status_end:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of when the status ended.
