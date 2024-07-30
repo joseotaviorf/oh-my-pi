@@ -37,4 +37,4 @@ workflow:
     tier_partner_revision:
       clean_table_name: tier_partner_revision
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_13_3_min_general_cluster

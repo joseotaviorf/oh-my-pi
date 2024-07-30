@@ -35,4 +35,4 @@ workflow:
     hub_bonus_revision:
       clean_table_name: hub_bonus_revision
 cluster:
-  type: databricks_10_4_min_general_cluster
+  type: databricks_13_3_min_general_cluster
