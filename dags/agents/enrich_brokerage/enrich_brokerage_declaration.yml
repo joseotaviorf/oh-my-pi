@@ -9,8 +9,6 @@ dag:
 workflow:
   type: query
   layer: enrich
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
 
 cluster:
   type: databricks_12_2_min_general_cluster

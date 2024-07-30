@@ -6,6 +6,7 @@ WITH partner_brokerage_fee AS (
             json_output,
             '$.quintoandar-model-partner-brokerage-fee'
         ) AS partner_brokerage_fee,
+        ts_invalidated,
         ts_created
     FROM
         datalake_nazare_clean.revenue_share_by_participant AS nrev
@@ -21,7 +22,9 @@ SELECT
     noa.agent_role,
     pbf.partner_brokerage_fee,
     pbf.json_output,
+    pbf.ts_invalidated IS NULL AS is_share_invalidated,
     no.dt_cancellation,
+    pbf.ts_invalidated,
     no.ts_created,
     no.ts_updated,
     YEAR(no.ts_updated) AS year,
@@ -38,6 +41,3 @@ LEFT JOIN
 LEFT JOIN
     partner_brokerage_fee AS pbf
         ON pbf.id_offer_agent = noa.id_offer_agent
-WHERE
-    DATE(no.ts_updated) = DATE('{year}-{month}-{day}')
-    OR DATE(noa.ts_created) = DATE('{year}-{month}-{day}')

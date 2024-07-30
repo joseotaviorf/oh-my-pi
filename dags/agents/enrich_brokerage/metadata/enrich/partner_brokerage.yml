@@ -1,7 +1,7 @@
 ---
 database_name: datalake_brokerage
 table_name: partner_brokerage
-description: Relates broker data, brokerage value and offers
+description: This table has data on the brokers related to an offer, and the full or shared commission of these.
 domain: Data Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -37,10 +37,16 @@ columns:
     lineage:
       - datalake_nazare_clean.revenue_share_by_participant.json_output
     description: Json with data on revenue share per participant
+  is_share_invalidated:
+    description: Indicates that the broker's commission share for the offer has been invalidated.
   dt_cancellation:
     lineage:
       - datalake_nazare_clean.offer.dt_cancellation
     description: Offer cancellation date
+  ts_invalidated:
+    lineage:
+      - datalake_nazare_clean.revenue_share_by_participant.ts_invalidated
+    description: Timestamp of when the broker's commission share for the offer was invalidated.
   ts_created:
     lineage:
       - datalake_nazare_clean.offer.ts_created
