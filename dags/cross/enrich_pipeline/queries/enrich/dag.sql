@@ -11,6 +11,7 @@ WITH most_recent_run AS (
     datalake_pipeline.dag_run
   WHERE
     is_manual_run = FALSE   -- Excluding manual DAG runs, because it's created as D0
+    AND id_run IS NOT NULL  -- Excluding runs without id_run because we won't know if it's manual, scheduled, etc.
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_run DESC) = 1
 ),
