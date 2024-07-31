@@ -1,7 +1,0 @@
----
-tables_list:
-  - certificate_request
-  - certificate
-  - insurance
-partition_cols: ["year", "month", "day"]
-lineage_product_database_name: betopera

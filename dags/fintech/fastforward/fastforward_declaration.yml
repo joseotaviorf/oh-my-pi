@@ -1,0 +1,56 @@
+dag:
+  name: fastforward
+  schedule_start_date: 2020, 7, 27
+  schedule_interval: 0 4 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Retrieves data from the FastForward database (postgresql). [FastForward](https://github.com/quintoandar/fast-forward)
+      is the service responsible for handling rent anticipation from its offer creation
+      and acceptance so our operations team can make the payment and SeuBarriga to
+      notify that the rent has already been transferred.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: FASTFORWARD_DB
+  lineage_product_database_name: fastforward
+  tables_customization:
+    address: {}
+    address_aud: {}
+    anticipation: {}
+    anticipation_aud: {}
+    anticipation_fee: {}
+    anticipation_fee_aud: {}
+    anticipation_promo_for_contract: {}
+    anticipation_promo_for_contract_aud: {}
+    brokerage_fee: {}
+    brokerage_fee_aud: {}
+    contract: {}
+    contract_aud: {}
+    gateway_loan: {}
+    gateway_loan_aud: {}
+    gateway_loan_installment: {}
+    gateway_loan_installment_aud: {}
+    house: {}
+    house_aud: {}
+    installment_plan: {}
+    installment_plan_aud: {}
+    long_term_anticipation: {}
+    long_term_anticipation_aud: {}
+    lra_eligibility_process: {}
+    lra_installment: {}
+    lra_installment_option: {}
+    lra_installment_option_aud: {}
+    promo_fee: {}
+    promo_fee_aud: {}
+    real_estate_agent_fee: {}
+    real_estate_agent_fee_aud: {}
+    revinfo:
+      clean_table_name: rev_info
+    users: {}
+    users_aud: {}
+cluster:
+  type: databricks_13_3_med_general_cluster
+  custom_libraries:
+    - jar: "{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"

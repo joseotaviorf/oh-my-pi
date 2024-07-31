@@ -1,0 +1,31 @@
+dag:
+  name: betopera
+  schedule_start_date: 2022, 8, 23
+  schedule_interval: 0 3 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates the incremental tables for betopera, the integration with Insurance providers.
+workflow:
+  type: database_pull
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: BETOPERA_DB
+  lineage_product_database_name: betopera
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  tables_customization:
+    certificate_request:
+      date_filter_column: updated_at
+    certificate:
+      date_filter_column: updated_at
+    insurance:
+      date_filter_column: updated_at
+cluster:
+  type: databricks_13_3_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
