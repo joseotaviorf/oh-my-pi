@@ -747,9 +747,6 @@ bietlejuice.enrich_velo:
     - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-property-legacy
     - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposeperson-legacy
     - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy
-    - bietlejuice.velo:load-clean-fiancavelo-packvalues
-    - bietlejuice.velo:load-clean-fiancavelo-propose
-    - bietlejuice.velo:load-clean-fiancavelo-activator
   remove:
     - bietlejuice.velo_omie:load-clean-bank-account
     - bietlejuice.velo_omie:load-clean-categories
@@ -758,6 +755,18 @@ bietlejuice.enrich_velo:
     - bietlejuice.velo_omie:load-clean-projects
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
+    - bietlejuice.velo:load-clean-fiancavelo-packvalues
+    - bietlejuice.velo:load-clean-fiancavelo-propose
+    - bietlejuice.velo:load-clean-fiancavelo-activator
+    - bietlejuice.velo:load-clean-clientes-company
+    - bietlejuice.velo:load-clean-fiancavelo-activator
+    - bietlejuice.velo:load-clean-fiancavelo-billingtype
+    - bietlejuice.velo:load-clean-fiancavelo-gateway
+    - bietlejuice.velo:load-clean-fiancavelo-occurrence
+    - bietlejuice.velo:load-clean-fiancavelo-packvalues
+    - bietlejuice.velo:load-clean-fiancavelo-payment
+    - bietlejuice.velo:load-clean-fiancavelo-plans
+    - bietlejuice.velo:load-clean-fiancavelo-propose
 bietlejuice.enrich_vespucio:
   override: []
 bietlejuice.enrich_vespucio_pipeline:

@@ -3009,15 +3009,6 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info
   - bietlejuice.rental_guarantee_platform:load-clean-tenant-company
   - bietlejuice.rental_guarantee_platform:load-clean-user-account
-  - bietlejuice.velo:load-clean-clientes-company
-  - bietlejuice.velo:load-clean-fiancavelo-activator
-  - bietlejuice.velo:load-clean-fiancavelo-billingtype
-  - bietlejuice.velo:load-clean-fiancavelo-gateway
-  - bietlejuice.velo:load-clean-fiancavelo-occurrence
-  - bietlejuice.velo:load-clean-fiancavelo-packvalues
-  - bietlejuice.velo:load-clean-fiancavelo-payment
-  - bietlejuice.velo:load-clean-fiancavelo-plans
-  - bietlejuice.velo:load-clean-fiancavelo-propose
   - bietlejuice.velo_neurotech:load-clean-logs-credit-granting
 bietlejuice.enrich_velo_zendesk:
   - bietlejuice.enrich_survicate:load-enrich-response-content
