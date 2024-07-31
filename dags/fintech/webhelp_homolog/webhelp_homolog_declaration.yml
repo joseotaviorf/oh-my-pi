@@ -51,4 +51,4 @@ workflow:
     importacao:
       clean_table_name: import
 cluster:
-  type: databricks_13_3_min_general_cluster
+  type: databricks_13_3_med_general_cluster
