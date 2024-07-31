@@ -10,7 +10,7 @@ workflow:
   default_partitions: [ year, month, day ]
   default_extraction_type: incremental
 cluster:
-  type: databricks_10_4_min_fixed_workers_general_photon_cluster
+  type: databricks_13_3_min_fixed_workers_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

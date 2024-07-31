@@ -7,7 +7,12 @@ workflow:
   type: query
   layer: metric
 cluster:
-  type: databricks_10_4_min_general_photon_cluster
+  type: custom_cluster
+  custom_configurations:
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

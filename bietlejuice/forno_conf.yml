@@ -410,6 +410,13 @@ databricks_13_3_med_mem_driver_min_memory_2_nodes_photon_cluster:
     num_workers: 2
     spark_version: 13.3.x-scala2.12
 
+databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.large
+    node_type_id: r5d.large
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
+
 databricks_10_4_med_io-memory_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5a.large
@@ -525,6 +532,14 @@ databricks_12_2_min_general_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 12.2.x-scala2.12
+
+databricks_13_3_min_general_photon_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    runtime_engine: PHOTON
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
 
 databricks_10_4_min_xlarge_io-memory_photon_cluster:
     <<: *cluster_anchor
@@ -669,6 +684,14 @@ databricks_12_2_med_general_photon_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_13_3_med_general_3_nodes_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.large
+    node_type_id: m5d.large
+    runtime_engine: PHOTON
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
+
 databricks_13_3_med_general_3_nodes_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5d.large
@@ -708,6 +731,13 @@ databricks_12_2_min_fixed_workers_general_photon_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
+databricks_13_3_min_fixed_workers_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.large
+    node_type_id: m5d.large
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
 
 databricks_10_4_med_2xlarge_general_photon_cluster:
     <<: *cluster_anchor
