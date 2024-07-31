@@ -43,19 +43,38 @@ if __name__ == "__main__":
     parser.add_argument("partition_cols")
     parser.add_argument("table_details")
 
+    # TODO this is a temp fix
+    all_table_details = {
+        "benvi_closing_metrics": {
+            "workspace_id": "vz8klwkjsszukriuuqllc3dz4d8sl6yx",
+            "object_id": "9051650",
+            "column_create_date": "date"
+        },
+        "benvi_inside_sales_call_metrics": {
+            "workspace_id": "vz8klwkjsszukriuuqllc3dz4d8sl6yx",
+            "object_id": "8703789",
+            "column_create_date": "date"
+        },
+        "conversation_time_metrics": {
+            "workspace_id": "vz8klwkjsszukriuuqllc3dz4d8sl6yx",
+            "object_id": "801119",
+            "column_create_date": "date"
+        }
+    }
+
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
-    table_details = json.loads(args.table_details)
     raw_table_name = args.raw_table_name
-    partition_cols = args.partition_cols
+    partition_cols = ["year", "month", "day"]
+    table_details = all_table_details[raw_table_name]
 
     logger.info(
         f"""
             m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={SOURCE}, partition_cols={partition_cols}, raw_table_name={raw_table_name},
-            msg=print spark jobs args"
+            table_details={table_details}, msg=print spark jobs args"
         """
     )
 
