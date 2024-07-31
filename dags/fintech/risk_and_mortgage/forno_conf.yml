@@ -1,8 +1,0 @@
----
-lineage_product_database_name: riskandmortgage
-tables:
-  - table_name: credit_proposal
-    date_filter_column: updated_at
-  - table_name: offer_pre_analysis
-    date_filter_column: updated_at
-partition_cols: ["year", "month", "day"]

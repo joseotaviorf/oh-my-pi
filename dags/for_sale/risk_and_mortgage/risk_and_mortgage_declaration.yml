@@ -1,5 +1,5 @@
 dag:
-  name: risk_and_mortgage_homolog
+  name: risk_and_mortgage
   schedule_start_date: 2021, 8, 10
   schedule_interval: 0 3 * * *
   owner: Data ForSale

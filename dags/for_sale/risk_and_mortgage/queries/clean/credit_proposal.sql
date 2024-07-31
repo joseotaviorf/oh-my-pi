@@ -14,6 +14,6 @@ SELECT
   month,
   day
 FROM
-  datalake_risk_and_mortgage_homolog_raw.credit_proposal
+  datalake_risk_and_mortgage_raw.credit_proposal
 WHERE
   MAKE_DATE(year,month,day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
