@@ -59,7 +59,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     azure_container_name = args.azure_container_name
-    azure_sub_folder = json.loads(args.azure_sub_folder)
+    azure_sub_folder = args.azure_sub_folder
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
     format = json.loads(args.format)

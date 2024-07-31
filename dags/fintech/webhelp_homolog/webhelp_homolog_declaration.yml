@@ -21,7 +21,7 @@ workflow:
     - "{bucket}"
     - "{dag_name}"
     - lake-quinto-andar-sftp
-    - "['ATENDIMENTO', 'COBRANCA']"
+    - '["ATENDIMENTO", "COBRANCA"]'
     - "{{ ds }}"
     - "{table_name}"
     - parquet
