@@ -31,15 +31,15 @@ retsuko AS (
         CAST(amount AS DECIMAL(12,2)) AS source_amount
     FROM
         datalake_retsuko.entry  e
-    INNER JOIN
+    LEFT JOIN
         datalake_retsuko.invoice i
             ON e.id_invoice = i.id
-    INNER JOIN
+    LEFT JOIN
         datalake_retsuko.invoice_info ii
             ON ii.id_invoice = i.id_external
-    INNER JOIN
+    LEFT JOIN
         datalake_retsuko_clean.contract ct
-            ON ct.id = i.id_contract
+            ON ct.id = e.id_contract
     LEFT JOIN
         sap_entity se
             ON e.id_external = se.id_finance_entity
