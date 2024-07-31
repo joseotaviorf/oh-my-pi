@@ -12,6 +12,6 @@ SELECT
     documentation_sent,
     credit_approved,
     contracts_signed,
-    TO_DATE(date, 'yyyy-MM-dd') AS dt_target
+    TO_DATE(date) AS dt_target
 FROM
     datalake_gsheets_raw.demand_targets_2024

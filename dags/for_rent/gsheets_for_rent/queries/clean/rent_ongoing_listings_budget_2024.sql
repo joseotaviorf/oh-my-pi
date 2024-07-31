@@ -9,6 +9,6 @@ SELECT
     CAST(REPLACE(suspensions, ',', '') AS DECIMAL(14,6)) AS suspensions,
     CAST(REPLACE(ended_rentals, ',', '') AS DECIMAL(14,6)) AS ended_rentals,
     CAST(REPLACE(erc, ',', '') AS DECIMAL(14,6)) AS erc,
-    TO_DATE(date, 'yyyy-M-d') AS dt_budget
+    TO_DATE(date) AS dt_budget
 FROM
     datalake_gsheets_raw.rent_ongoing_listings_budget_2024

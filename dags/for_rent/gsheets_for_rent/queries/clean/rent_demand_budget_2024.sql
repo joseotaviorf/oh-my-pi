@@ -12,6 +12,6 @@ SELECT
     CAST(REPLACE(documentation_sent, ',', '') AS DECIMAL(14,6)) AS documentation_sent,
     CAST(REPLACE(credit_approved, ',', '') AS DECIMAL(14,6)) AS credit_approved,
     CAST(REPLACE(contracts_signed, ',', '') AS DECIMAL(14,6)) AS contracts_signed,
-    TO_DATE(date, 'yyyy-MM-dd') AS dt_budget
+    TO_DATE(date) AS dt_budget
 FROM
     datalake_gsheets_raw.rent_demand_budget_2024
