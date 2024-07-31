@@ -6,6 +6,9 @@ table_level_validations:
     greater_than: 200
     severity_level: Error
 column_level_validations:
+  id_data_quality:
+    is_complete:
+      severity_level: Error
   id_dag:
     is_complete:
       severity_level: Error
