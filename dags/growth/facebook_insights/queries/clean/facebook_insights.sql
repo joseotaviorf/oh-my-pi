@@ -22,4 +22,4 @@ SELECT
 FROM
     datalake_facebook_insights_raw.facebook_insights
 WHERE
-    date_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(date_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

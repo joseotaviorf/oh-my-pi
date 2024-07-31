@@ -31,13 +31,13 @@ columns:
     description: utm_content applied on growth marketing platform
     lineage:
       - datalake_facebook_insights_clean.facebook_insights.ad_name
-  mobile_cost: 
+  mobile_cost:
     description: Cost from mobile platform
-  desktop_cost: 
+  desktop_cost:
     description: Cost from destop platform
-  other_cost: 
+  other_cost:
     description: Cost from any platform different from desktop or mobile
-  total_cost: 
+  total_cost:
     description: Total cost
   impressions:
     description: Impressions from facebook ads platform

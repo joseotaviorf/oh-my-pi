@@ -82,6 +82,7 @@ keywords_metrics AS (
         INT(REPLACE(gkpr.dt_loaded, '-', '')) AS id_date,
         gkpr.campaign_name,
         gkpr.account_snake_case AS account_name,
+        gkpr.country_code,
         gkpr.report_type,
         NULL AS ad_type,
         criteria || '_' || LOWER(LEFT(match_type, 1)) AS utm_term,
@@ -114,7 +115,7 @@ keywords_metrics AS (
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
-        1,2,3,4,5,6,7,8
+        1,2,3,4,5,6,7,8,9
 ),
 
 -- TEMPORARY CTE UNTIL THIS GSHEETS IS UDPATED
@@ -139,6 +140,7 @@ ads_metrics AS (
         INT(REPLACE(gapr.dt_loaded, '-', '')) AS id_date,
         gapr.campaign_name,
         gapr.account_snake_case AS account_name,
+        gapr.country_code,
         gapr.report_type,
         COALESCE(ad_types.flag, 'other') AS ad_type,
         STRING(gapr.ad_group_name) AS utm_term,
@@ -174,7 +176,7 @@ ads_metrics AS (
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
-        1,2,3,4,5,6,7,8
+        1,2,3,4,5,6,7,8,9
 ),
 
 campaigns_metrics AS (
@@ -182,6 +184,7 @@ campaigns_metrics AS (
         INT(REPLACE(gcpr.dt_loaded, '-', '')) AS id_date,
         gcpr.campaign_name,
         gcpr.account_snake_case AS account_name,
+        gcpr.country_code,
         gcpr.report_type,
         NULL AS ad_type,
         NULL AS utm_term,
@@ -213,7 +216,7 @@ campaigns_metrics AS (
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
-        1,2,3,4,5,6,7,8
+        1,2,3,4,5,6,7,8,9
 ),
 
 videos_metrics AS (
@@ -221,6 +224,7 @@ videos_metrics AS (
         INT(REPLACE(gvpr.dt_loaded, '-', '')) AS id_date,
         gvpr.campaign_name,
         gvpr.account_snake_case AS account_name,
+        gvpr.country_code,
         gvpr.report_type,
         NULL AS ad_type,
         NULL AS utm_term,
@@ -253,13 +257,13 @@ videos_metrics AS (
     WHERE
         dt_loaded BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
-        1,2,3,4,5,6,7,8
+        1,2,3,4,5,6,7,8,9
 )
 
-SELECT * FROM keywords_metrics WHERE account_name NOT ILIKE '%mx%'
+SELECT * FROM keywords_metrics
 UNION ALL
-SELECT * FROM ads_metrics WHERE account_name NOT ILIKE '%mx%'
+SELECT * FROM ads_metrics
 UNION ALL
-SELECT * FROM campaigns_metrics WHERE account_name NOT ILIKE '%mx%'
+SELECT * FROM campaigns_metrics
 UNION ALL
-SELECT * FROM videos_metrics WHERE account_name NOT ILIKE '%mx%'
+SELECT * FROM videos_metrics

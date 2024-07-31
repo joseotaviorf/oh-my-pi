@@ -66,6 +66,10 @@ columns:
       VIDEO_PERFORMANCE_REPORT: Video report type
       CAMPAIGN_PERFORMANCE_REPORT: Campaign report type
       KEYWORDS_PERFORMANCE_REPORT: Keywords report type
+  country_code:
+    description: Country code the account belongs to.
+    lineage:
+      - datalake_google_ads_raw.videos_performance.account_snake_case
   dt_loaded:
     description: Date of loaded data
     lineage:
