@@ -30,8 +30,6 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         )
         self._initialize_task_creators(dag_execution_context)
 
-        dag_final_tasks = self._set_dag_final_tasks()
-
         tables_customization = self.workflow_args["tables_customization"]
 
         n_clusters = len(tables_customization) // self.MAX_TABLES_PER_CLUSTER + 1
@@ -44,7 +42,11 @@ class RawDatabasePullWorkflow(BaseWorkflow):
                 execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
                     execute_job_cluster_local_id=execute_job_cluster_local_id
                 )
+                dag_final_tasks = self._set_dag_final_tasks(
+                    execute_job_cluster_local_id
+                )
                 execute_job_cluster_local_id += 1
+
             raw_initial_task, raw_final_task = self._create_raw_tasks(
                 table_name=raw_table_name,
                 table_customization=table_parameters,
@@ -168,7 +170,7 @@ class RawDatabasePullWorkflow(BaseWorkflow):
 
         return load_clean_task, last_clean_task
 
-    def _set_dag_final_tasks(self):
+    def _set_dag_final_tasks(self, execute_job_cluster_local_id: int):
         """
         The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
         This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
@@ -178,8 +180,11 @@ class RawDatabasePullWorkflow(BaseWorkflow):
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
 
-        if self._check_include_get_table_metrics_task(
-            self.workflow_args["tables_customization"]
+        if (
+            self._check_include_get_table_metrics_task(
+                self.workflow_args["tables_customization"]
+            )
+            and execute_job_cluster_local_id == 1
         ):
             first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
                 self.generate_database_table_metrics_task_creator,
