@@ -40,7 +40,7 @@ tables_customization = config_service.get_config("tables_customization")
 inner_dependencies = config_service.get_config("inner_dependencies")
 
 cluster_description = config_service.get_config(
-    "databricks_10_4_med_memory_photon_cluster"
+    "databricks_13_3_med_general_cluster"
 )
 dag_documentation = config_service.get_config("dag_documentation")
 

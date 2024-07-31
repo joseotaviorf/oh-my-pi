@@ -5,9 +5,9 @@ dag:
   documentation:
     dag_purpose: Formatting and json extract in Amplitude Magic Link 2.0 data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions: [year, month, day]
 cluster:
-  type: databricks_10_4_med_io-memory_photon_cluster
+  type: databricks_13_3_min_io-memory_cluster

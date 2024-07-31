@@ -7,7 +7,7 @@ dag:
       Formatting and json extract in Inspection Service APP data.
 
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     inspection_review_access:
@@ -19,4 +19,4 @@ workflow:
       extraction_type: incremental
 
 cluster:
-  type: databricks_10_4_med_io-memory_photon_cluster
+  type: databricks_13_3_min_io-memory_cluster
