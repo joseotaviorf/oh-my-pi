@@ -1,0 +1,20 @@
+SELECT
+    id,
+    eviction_id AS id_eviction,
+    external_id AS id_contract,
+    context,
+    law_firm,
+    status,
+    user_registered,
+    status_recommendation,
+    status_reason,
+    snapshot,
+    sub_status,
+    external_metadata,
+    distribution_date AS dt_distribution,
+    created_at AS ts_created,
+    eviction_created_at AS ts_eviction_created,
+    eviction_updated_at AS ts_eviction_updated,
+    status_updated_at AS ts_status_updated,
+    sub_status_updated_at AS ts_sub_status_updated
+FROM datalake_trato_feito_raw.eviction_aud

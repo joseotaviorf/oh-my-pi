@@ -5,12 +5,8 @@ SELECT
     debtor_id AS id_debtor,
     debtor_external_id AS id_debtor_external,
     status,
-    currency,
     status_reason,
     payload,
-    manage_type,
-    consultancy,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM
-    datalake_trato_feito_raw.negotiation
+FROM datalake_trato_feito_raw.billing

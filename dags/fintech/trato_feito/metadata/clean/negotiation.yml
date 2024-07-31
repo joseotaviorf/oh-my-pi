@@ -29,6 +29,9 @@ columns:
   status_reason:
     lineage:
       - datalake_trato_feito_raw.negotiation.status_reason
+  consultancy:
+    lineage:
+      - datalake_trato_feito_raw.negotiation.consultancy
   ts_created:
     lineage:
       - datalake_trato_feito_raw.negotiation.created_at

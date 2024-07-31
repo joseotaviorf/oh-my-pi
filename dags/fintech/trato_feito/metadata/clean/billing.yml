@@ -1,0 +1,47 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: billing
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Stores data about billing campaign (boletagem). Billing campaign is similar to a negotiation in the promise phase, in which the debts must not be modified, and the first installment payment closes the deal. But, instead of handling one at a time, there can be several billings for the same contract/debts and, potentially, one of them will become a negotiation if the first installment is paid.
+columns:
+  id:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.id
+  id_collector:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.collector_id
+  id_collector_external:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.collector_external_id
+  id_debtor:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.debtor_id
+  id_debtor_external:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.debtor_external_id
+  status:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.status
+  status_reason:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.status_reason
+  payload:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.payload
+  ts_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.created_at
+  ts_updated:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.billing.updated_at

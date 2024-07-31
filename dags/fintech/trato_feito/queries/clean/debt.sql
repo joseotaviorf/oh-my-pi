@@ -2,6 +2,7 @@ SELECT
     id,
     external_id AS id_external,
     negotiation_id AS id_negotiation,
+    billing_id AS id_billing,
     interest_fee_amount,
     original_amount,
     fine_fee_amount,

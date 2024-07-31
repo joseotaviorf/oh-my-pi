@@ -1,0 +1,79 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: eviction_aud
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Eviction audition. It stores the historical of eviction status
+columns:
+  id:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.id
+  id_eviction:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.eviction_id
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.external_id
+  context:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.context
+  law_firm:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.law_firm
+  status:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.status
+  user_registered:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.user_registered
+  status_recommendation:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.status_recommendation
+  status_reason:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.status_reason
+  snapshot:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.snapshot
+  sub_status:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.sub_status
+  external_metadata:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.external_metadata
+  dt_distribution:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.distribution_date
+  ts_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.created_at
+  ts_eviction_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.eviction_created_at
+  ts_eviction_updated:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.eviction_updated_at
+  ts_status_updated:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.status_updated_at
+  ts_sub_status_updated:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.eviction_aud.sub_status_updated_at

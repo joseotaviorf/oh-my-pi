@@ -21,6 +21,10 @@ columns:
     description: Installment Charge ID (FK table installment_charges)
     lineage:
       - datalake_trato_feito_raw.installment.installment_charge_id
+  id_billing:
+    description: Billing ID (FK table billing)
+    lineage:
+      - datalake_trato_feito_raw.installment.billing_id
   status:
     description: "Status of installment"
     lineage:
@@ -29,6 +33,10 @@ columns:
     description: ""
     lineage:
       - datalake_trato_feito_raw.installment.status_reason
+  external_index:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.installment.external_index
   adm_fee_amount:
     description: "Amount charged of Administration Fee"
     lineage:

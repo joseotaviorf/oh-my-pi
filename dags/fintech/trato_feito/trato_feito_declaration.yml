@@ -19,6 +19,7 @@ workflow:
     bill:
       get_table_metrics:
         count: id
+    billing: {}
     client: {}
     contract: {}
     debt:
@@ -32,6 +33,7 @@ workflow:
       get_table_metrics:
         count: id
     evictions_report: {}
+    eviction_aud: {}
     installment:
       get_table_metrics:
         count: id

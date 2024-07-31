@@ -14,6 +14,9 @@ columns:
   id_negotiation:
     lineage:
       - datalake_trato_feito_raw.debt.negotiation_id
+  id_billing:
+    lineage:
+      - datalake_trato_feito_raw.debt.billing_id
   interest_fee_amount:
     lineage:
       - datalake_trato_feito_raw.debt.interest_fee_amount
