@@ -85,7 +85,7 @@ retsuko_provisao AS (
                       'ipca-adm-partner-adm-fee',
                       'brokerage-installment-fee',
                       'brokerage-quinto-andar',
-                      'brokerage-partner-select'
+                      'brokerage-partner-select',
                       'brokerage-adm-partner',
                       'brokerage-estate-agent',
                       'brokerage-third-party-real-estate',
