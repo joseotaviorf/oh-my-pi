@@ -1,0 +1,45 @@
+---
+database_name: datalake_accounting_funnel
+table_name: for_rent_car_bank_recon_recupera
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This model was created to do For Rent accounts receivable bank recon from Recupera"
+columns:
+  id_our_number:
+    lineage:
+      - datalake_nexxera.cnab_charges_recupera.our_number
+      - datalake_checkout_clean.boleto.our_number
+      - datalake_pas.ledger.id_external_payment
+    description: "Unique code to identify bank payments"
+  bank_amount:
+    lineage:
+      - datalake_nexxera.cnab_charges_recupera.net_amount
+    description: "Paid_amount from Bank"
+  checkout_amount:
+    lineage:
+      - datalake_checkout_clean.boleto.paid_amount
+    description: "Paid amount from Vans and Checkout"
+  sap_amount:
+    lineage:
+      - datalake_pas.ledger.debit_credit
+    description: "Paid amount from SAP - Ledger"
+  status_bank:
+    description: "If TRUE, Bank is recorded"
+  status_checkout:
+    description: "If TRUE, Bank is matching in our_number, paid_amount and dt_paid"
+  status_sap:
+    description: "If TRUE, SAP is matching in our_number, paid_amount and dt_paid"
+  is_reconciled:
+    description: "If TRUE, Bank and SAP are matching in our_number, paid_amount and dt_paid"
+  dt_bank_paid:
+    lineage:
+      - datalake_nexxera.cnab_charges_recupera.dt_paid
+    description: "Paid date from Bank"
+  dt_checkout_paid:
+    lineage:
+      - datalake_checkout_clean.boleto.ts_paid
+    description: "Paid date from Vans and Checkout"
+  dt_sap_paid:
+    lineage:
+      - datalake_pas.ledger.dt_reference
+    description: "Paid date from SAP/Ledger - RefDate"
