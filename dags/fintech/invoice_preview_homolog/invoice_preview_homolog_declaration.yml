@@ -29,10 +29,9 @@ workflow:
   tables_customization:
     invoice_preview:
       extra_spark_job_arguments:
-        - format: csv
-        - options:
-            header: "true"
-            escape: '"'
-            multiLine: "true"
+        - csv
+        - header: "true"
+          escape: '"'
+          multiLine: "true"
 cluster:
   type: databricks_13_3_min_general_cluster
