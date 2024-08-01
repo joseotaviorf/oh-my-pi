@@ -1,7 +1,7 @@
 dag:
   name: velo_zendesk
   schedule_start_date: 2019, 9, 9
-  schedule_interval: 0 0 * * *
+  schedule_interval: 0 3 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |
