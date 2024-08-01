@@ -14,6 +14,10 @@ columns:
     lineage:
       - datalake_braze_webhook_notification.webhook_notification_volumes.canvas_name
       - datalake_braze_webhook_notification.webhook_notification_volumes.rule_status
+  country_code:
+    description: Country code the campaign belongs to.
+    lineage:
+      - datalake_braze_webhook_notification.webhook_notification_volumes.country_code
   ia_general:
     description: Informs the type of notification.
     lineage:

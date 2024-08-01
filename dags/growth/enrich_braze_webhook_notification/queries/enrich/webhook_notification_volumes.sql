@@ -4,6 +4,7 @@ canvas_details_indica_ai AS (
 		id_canvas,
 	    canvas_name,
 	    canvas_description,
+	    country_code,
 	    variants,
 	    steps,
 	    ts_updated
@@ -17,6 +18,7 @@ canvas_details_owners AS (
 		id_canvas,
 	    canvas_name,
 	    canvas_description,
+	    country_code,
 	    variants,
 	    steps,
 	    ts_updated
@@ -30,6 +32,7 @@ canvas_details_tenants AS (
 		id_canvas,
 	    canvas_name,
 	    canvas_description,
+	    country_code,
 	    variants,
 	    steps,
 	    ts_updated
@@ -107,6 +110,7 @@ exploded_indica_ai_variants AS (
         id_canvas,
         canvas_name,
         canvas_description,
+        country_code,
         EXPLODE(variants) AS variant
     FROM
         canvas_details_indica_ai
@@ -116,6 +120,7 @@ exploded_owners_variants AS (
         id_canvas,
         canvas_name,
         canvas_description,
+        country_code,
         EXPLODE(variants) AS variant
     FROM
         canvas_details_owners
@@ -125,6 +130,7 @@ exploded_tenants_variants AS (
         id_canvas,
         canvas_name,
         canvas_description,
+        country_code,
         EXPLODE(variants) AS variant
     FROM
         canvas_details_tenants
@@ -134,28 +140,31 @@ canvas_description AS (
         variant.id AS id_variant_canvas,
         id_canvas,
         canvas_name,
-        variant.name AS variant_name
+        variant.name AS variant_name,
+        country_code
     FROM
         exploded_indica_ai_variants
-    GROUP BY 1,2,3,4
+    GROUP BY 1,2,3,4,5
     UNION ALL
     SELECT
         variant.id AS id_variant_canvas,
         id_canvas,
         canvas_name,
-        variant.name AS variant_name
+        variant.name AS variant_name,
+        country_code
     FROM
         exploded_owners_variants
-    GROUP BY 1,2,3,4
+    GROUP BY 1,2,3,4,5
     UNION ALL
     SELECT
         variant.id AS id_variant_canvas,
         id_canvas,
         canvas_name,
-        variant.name AS variant_name
+        variant.name AS variant_name,
+        country_code
     FROM
         exploded_tenants_variants
-    GROUP BY 1,2,3,4
+    GROUP BY 1,2,3,4,5
 ),
 canvas_user_dispatch AS (
     SELECT
@@ -208,6 +217,7 @@ events AS (
         cud.id_step_canvas,
         cd.canvas_name,
         cd.variant_name,
+        cd.country_code,
         cud.ts_webhook_sent,
         ROW_NUMBER() OVER(PARTITION BY cud.id_user_dispatch, cud.id_canvas ORDER BY cud.ts_webhook_sent DESC) AS row_number
     FROM
@@ -220,6 +230,7 @@ SELECT
     ev.canvas_name,
     ev.variant_name,
     om.step_name,
+    ev.country_code,
     om.rule_status,
     COUNT(*) AS notification_count,
     DATE(ts_webhook_sent) AS dt_webhook_sent
@@ -229,4 +240,4 @@ FROM
         ON ev.id_step_canvas = om.id_step
 WHERE
     row_number = 1
-GROUP BY 1,2,3,4,5,7
+GROUP BY 1,2,3,4,5,6,8

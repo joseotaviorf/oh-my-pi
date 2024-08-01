@@ -22,8 +22,9 @@ notification_indica_ai AS (
     FROM
         datalake_braze_webhook_notification.webhook_notification_volumes
     WHERE
-        rule_status IN ('SupplyAffiliateGenericMessage', 'SupplyDoormanNews', 'SupplyAffiliateSms')
+        country_code <> 'MX'
         AND dt_webhook_sent BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND rule_status IN ('SupplyAffiliateGenericMessage', 'SupplyDoormanNews', 'SupplyAffiliateSms')
 ),
 total_cost_per_notification_type AS (
     SELECT

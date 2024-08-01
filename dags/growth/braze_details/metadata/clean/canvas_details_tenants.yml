@@ -16,6 +16,10 @@ columns:
     description: The Canvas description as defined in Braze Platform.
     lineage:
       - datalake_braze_details_raw.canvas_details_tenants.description
+  country_code:
+    description: Country code the canvas belongs to.
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.name
   variants:
     description: A variant is the path each customer follows on their journey. Canvas supports up to eight variants with a control group.
     lineage:

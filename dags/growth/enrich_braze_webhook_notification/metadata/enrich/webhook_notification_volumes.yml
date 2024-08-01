@@ -25,6 +25,12 @@ columns:
     lineage:
       - datalake_braze_details_clean.canvas_details_indica_ai.steps
     description: Name of the Canvas step.
+  country_code:
+    lineage:
+      - datalake_braze_details_clean.canvas_details_indica_ai.country_code
+      - datalake_braze_details_clean.canvas_details_tenants.country_code
+      - datalake_braze_details_clean.canvas_details_owners.country_code
+    description: Country code the canvas belongs to.
   rule_status:
     lineage:
       - datalake_braze_details_clean.canvas_details_indica_ai.steps

@@ -10,6 +10,9 @@ columns:
   campaign_description:
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.description
+  country_code:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.name
   schedule_type:
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.schedule_type

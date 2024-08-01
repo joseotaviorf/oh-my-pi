@@ -2,6 +2,11 @@ SELECT
     canvas_id AS id_canvas,
     `name` AS canvas_name,
     description AS canvas_description,
+    CASE
+        WHEN `name` LIKE '%MX%' THEN 'MX'
+        WHEN `name` IS NULL THEN 'Undefined'
+        ELSE 'BR'
+    END AS country_code,
     FROM_JSON(variants, 'array<map<string,string>>') AS variants,
     schedule_type,
     FROM_JSON(steps, 'array<map<string,string>>') AS steps,

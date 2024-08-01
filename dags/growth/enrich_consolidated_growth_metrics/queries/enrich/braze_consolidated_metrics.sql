@@ -18,6 +18,7 @@ notification_indica_ai AS (
             ELSE 'Indica Aí - General'
         END AS context,
         'indica_ai_notification' AS account_name,
+        country_code,
         dt_webhook_sent
     FROM
         datalake_braze_webhook_notification.webhook_notification_volumes
@@ -29,6 +30,7 @@ total_cost_per_notification_type AS (
     SELECT
         CONCAT(mkt_vertical, '_', ia_general) AS campaign_name,
         account_name,
+        country_code,
         context,
         ia_general,
         dt_webhook_sent,
@@ -39,7 +41,7 @@ total_cost_per_notification_type AS (
         END AS cost
     FROM
         notification_indica_ai
-    GROUP BY 1,2,3,4,5
+    GROUP BY 1,2,3,4,5,6
 ),
 consolidate_braze_notification_costs AS (
     SELECT
@@ -47,6 +49,7 @@ consolidate_braze_notification_costs AS (
         'braze' AS origin,
         account_name,
         campaign_name,
+        country_code,
         ia_general,
         context,
         'affiliates' AS funnel_side,
@@ -63,6 +66,7 @@ SELECT
     cbnc.origin,
     cbnc.account_name,
     cbnc.campaign_name,
+    cbnc.country_code,
     cbnc.ia_general,
     cbnc.context,
     sr.business_context AS business_context,
@@ -85,6 +89,7 @@ SELECT
     cbnc.origin,
     cbnc.account_name,
     cbnc.campaign_name,
+    cbnc.country_code,
     cbnc.ia_general,
     cbnc.context,
     sr.business_context AS business_context,
@@ -107,6 +112,7 @@ SELECT
     cbnc.origin,
     cbnc.account_name,
     cbnc.campaign_name,
+    cbnc.country_code,
     cbnc.ia_general,
     cbnc.context,
     sr.business_context AS business_context,
@@ -150,6 +156,7 @@ SELECT
         WHEN abc.city_group IS NOT NULL THEN CONCAT(asr.campaign_name, '_', abc.business_context)
         ELSE CONCAT(asr.campaign_name, '_', 'rent')
     END AS campaign_name,
+    asr.country_code,
     asr.business_context,
     asr.ia_general,
     asr.context,

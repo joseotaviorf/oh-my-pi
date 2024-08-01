@@ -10,6 +10,9 @@ columns:
   canvas_description:
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.description
+  country_code:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.name
   variants:
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.variants

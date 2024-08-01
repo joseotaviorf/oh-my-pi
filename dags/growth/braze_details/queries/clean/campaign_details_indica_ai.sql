@@ -2,6 +2,11 @@ SELECT
     campaign_id AS id_campaign,
     `name` AS campaign_name,
     description AS campaign_description,
+    CASE
+        WHEN `name` LIKE '%MX%' THEN 'MX'
+        WHEN `name` IS NULL THEN 'Undefined'
+        ELSE 'BR'
+    END AS country_code,
     schedule_type,
     FROM_JSON(tags, 'array<string>') AS tags,
     REGEXP_EXTRACT(tags, 'journeyStep=(\\w+)') AS journey_step,
