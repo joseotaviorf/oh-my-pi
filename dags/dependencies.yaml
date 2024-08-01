@@ -1041,6 +1041,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.monopoly:load-clean-sale-revision
   - bietlejuice.monopoly:load-clean-sale-transaction
   - bietlejuice.payable_accounts_transactions:load-clean-accounts-payable
+  - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-sap-entity
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance

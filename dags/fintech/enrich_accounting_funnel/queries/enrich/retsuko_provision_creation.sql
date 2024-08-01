@@ -62,6 +62,12 @@ retsuko_provisao AS (
         CAST(amount AS DECIMAL(12,2)) AS source_amount
     FROM
         datalake_retsuko.entry  e
+    INNER JOIN
+        datalake_retsuko_clean.account AS af
+            ON e.id_from_account = af.id
+    INNER JOIN
+        datalake_retsuko_clean.account AS at
+            ON e.id_to_account = at.id
     LEFT JOIN
         datalake_retsuko.invoice i
             ON e.id_invoice = i.id
@@ -99,6 +105,8 @@ retsuko_provisao AS (
             )
         AND ct.country_code = 'BR'
         AND DATE(e.ts_created) >= '2024-01-01'
+        AND af.type IN ('contract', 'tenant','landlord')
+        AND at.type IN ('contract', 'tenant','landlord')
 ),
 
 sap_entity AS (
