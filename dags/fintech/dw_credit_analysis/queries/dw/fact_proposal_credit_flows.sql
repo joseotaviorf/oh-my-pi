@@ -339,7 +339,7 @@ early_credit_full (
     hl.rental_administrator,
     CAST(NULL AS BOOLEAN) AS is_guarantee_accepted,
     CAST(NULL AS BOOLEAN) AS is_first_credit_evaluation,
-    CAST(NULL AS BOOLEAN) AS is_last_credit_evaluation,
+    TRUE AS is_last_credit_evaluation,
     CAST(NULL AS BOOLEAN) AS is_bypass,
     TRUE AS is_early_credit,
     eca.dt_early_credit_created,
@@ -571,39 +571,36 @@ SELECT
   country_code,
   rental_administrator,
   CASE 
-    WHEN sk_early_credit_analysis > 0 
+    WHEN sk_early_credit_analysis IS NOT NULL 
     THEN 1 ELSE 0 
   END AS ec_flag,
   CASE 
-    WHEN sk_offer > 0 
+    WHEN sk_offer IS NOT NULL  
     THEN 1 ELSE 0 
   END AS os_flag,
   CASE 
-    WHEN dt_offer_approved_date IS NOT NULL 
-    THEN 1 ELSE 0 
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA') 
+    THEN 0 ELSE 1 
   END AS oa_flag,
   CASE 
-    WHEN dt_last_credit_evaluation_init IS NOT NULL OR 
-    (dt_credit_evaluation_approved_date IS NOT NULL AND guarantee_accepted = 'NOT_ACCEPTED')
-    THEN 1 ELSE 0 
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES')
+    THEN 0 ELSE 1 
   END AS es_flag,
   CASE 
-    WHEN dt_credit_evaluation_approved_date IS NOT NULL AND 
-    guarantee_accepted <> 'NOT_ACCEPTED' 
-    THEN 1 ELSE 0 
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP')
+    THEN 0 ELSE 1 
   END AS ep_flag,
   CASE 
-    WHEN dt_tenant_first_doc_sent_date IS NOT NULL 
-    THEN 1 ELSE 0 
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP',  'E. EP2DS') 
+    THEN 0 ELSE 1 
   END AS ds_flag,
   CASE 
-    WHEN dt_credit_analysis_approved_date IS NOT NULL 
-    THEN 1 ELSE 0 
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP',  'E. EP2DS',  'F. DS2CA')  
+    THEN 0 ELSE 1 
   END AS ca_flag,
   CASE 
-    WHEN 
-    dt_contract_signed_date IS NOT NULL 
-    THEN 1 ELSE 0 
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP',  'E. EP2DS',  'F. DS2CA',  'G. CA2CS')
+    THEN 0 ELSE 1 
   END AS cs_flag,
   is_guarantee_accepted,
   is_first_credit_evaluation,
