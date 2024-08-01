@@ -2,7 +2,7 @@ dag:
   name: dw_taxonomy
   schedule_start_date: 2022,10,1
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG dw tables related to the process of taxonomy in Growth context.
 workflow:
@@ -10,4 +10,4 @@ workflow:
   layer: dw
   custom_schema: growth
 cluster:
-  type: databricks_10_4_min_general_photon_cluster
+  type: databricks_12_2_min_general_photon_cluster
