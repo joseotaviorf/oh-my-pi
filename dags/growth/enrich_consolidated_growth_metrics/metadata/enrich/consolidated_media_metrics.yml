@@ -38,6 +38,7 @@ columns:
     description: Country code the campaign belongs to.
     lineage:
       - datalake_consolidated_growth_metrics.criteo_consolidated_metrics.country_code
+      - datalake_consolidated_growth_metrics.facebook_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.google_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.mitula_consolidated_metrics.country_code
       - datalake_consolidated_growth_metrics.rtb_consolidated_metrics.country_code

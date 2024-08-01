@@ -19,6 +19,10 @@ columns:
     description: Accont name at facebook ads platform
     lineage:
       - datalake_facebook_insights_clean.facebook_insights.account_name_snake_case
+  country_code:
+    description: Country code the account belongs to.
+    lineage:
+      - datalake_facebook_insights_clean.facebook_insights.country_code
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:
