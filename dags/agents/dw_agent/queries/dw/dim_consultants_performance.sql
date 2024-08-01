@@ -344,10 +344,10 @@ base AS (
 SELECT
     DISTINCT
     sk_consultant,
-    sk_house_listing / 1000 AS sk_house,
-    sk_house_listing,
     consultant_name,
     team,
+    sk_house_listing,
+    CAST(sk_house_listing/1000 AS INT) AS sk_house,
     IF(not_exclusive_before = TRUE, ts_exclusive, NULL) AS ts_exclusive,
     IF(preco_certo_before = FALSE, ts_preco_certo, NULL) AS ts_preco_certo,
     IF(non_facilitated_before = TRUE, ts_facilitated_entry_condition, NULL) AS ts_facilitated_entry_condition
@@ -356,14 +356,14 @@ FROM
 INNER JOIN 
     datalake_gsheets_clean.asp_consultants_allocation AS aux_asp
         ON aux_asp.id_user = base.sk_consultant
-        AND DATE_TRUNC('MM', CURRENT_DATE()) BETWEEN DATE_TRUNC('month', aux_asp.dt_start) AND aux_asp.dt_end
+        AND DATE_TRUNC('MM', CURRENT_DATE() - INTERVAL '1' DAY) BETWEEN DATE_TRUNC('MM', aux_asp.dt_start) AND aux_asp.dt_end
 WHERE (
-    ts_exclusive BETWEEN DATEADD(DAY, -30, DATE_TRUNC('MM', CURRENT_DATE())) AND DATEADD(MONTH, 1, DATE_TRUNC('MM', CURRENT_DATE()))
+    ts_exclusive BETWEEN (CURRENT_DATE() - INTERVAL '1' DAY) - INTERVAL '1' MONTH AND (CURRENT_DATE() - INTERVAL '1' DAY) + INTERVAL '1' MONTH
     AND not_exclusive_before = TRUE
 ) OR (
-    ts_preco_certo BETWEEN DATEADD(DAY, -30, DATE_TRUNC('MM', CURRENT_DATE())) AND DATEADD(MONTH, 1, DATE_TRUNC('MM', CURRENT_DATE()))
+    ts_preco_certo BETWEEN (CURRENT_DATE() - INTERVAL '1' DAY) - INTERVAL '1' MONTH AND (CURRENT_DATE() - INTERVAL '1' DAY) + INTERVAL '1' MONTH
     AND preco_certo_before = FALSE
 ) OR (
-    ts_facilitated_entry_condition BETWEEN DATEADD(DAY, -30, DATE_TRUNC('MM', CURRENT_DATE())) AND DATEADD(MONTH, 1, DATE_TRUNC('MM', CURRENT_DATE()))
+    ts_facilitated_entry_condition BETWEEN (CURRENT_DATE() - INTERVAL '1' DAY) - INTERVAL '1' MONTH AND (CURRENT_DATE() - INTERVAL '1' DAY) + INTERVAL '1' MONTH
     AND non_facilitated_before = TRUE
 )
