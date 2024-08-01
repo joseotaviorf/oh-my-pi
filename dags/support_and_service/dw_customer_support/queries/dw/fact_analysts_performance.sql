@@ -15,7 +15,7 @@ WITH recontact_data AS (
 without_agg_infos AS (
     SELECT
         ut.id_ticket,
-        id_last_agent AS id_agent,
+        ut.id_last_agent AS id_agent,
         dc.team,
         rd.status,
         ut.resolution_survey,
@@ -59,6 +59,7 @@ without_agg_infos AS (
     WHERE
         ut.front_or_back <> "undefined"
         AND dc.team IS NOT NULL
+        AND ut.id_last_agent IS NOT NULL
         AND DATE(tf.ts_updated) = MAKE_DATE({year}, {month}, {day})
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY ut.id_ticket ORDER BY tf.ts_updated DESC) = 1

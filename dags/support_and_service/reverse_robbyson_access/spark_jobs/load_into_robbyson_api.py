@@ -40,7 +40,7 @@ def create_results_payload(configurations: dict, execution_date: str, context: s
                 "indicadorId": int(key),
                 "resultado": 0,
                 "date": row['date'],
-                "factors": [row[column] for column in columns_used]
+                "factors": [row[column] for column in columns_used if row[column] is not None]
             }
             results_list.append(results_json)
     return results_list
