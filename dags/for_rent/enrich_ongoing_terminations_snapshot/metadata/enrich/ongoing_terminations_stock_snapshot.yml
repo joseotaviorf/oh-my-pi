@@ -9,6 +9,10 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.id_contract
     description: Id of the contract related to the termination.
+  id_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.id_termination
+    description: Id of the contract termination.
   country_code:
     lineage:
       - datalake_ebdb_contract.contract.country_code

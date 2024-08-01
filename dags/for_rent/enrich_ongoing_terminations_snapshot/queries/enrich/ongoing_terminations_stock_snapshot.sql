@@ -1,7 +1,8 @@
 WITH 
 ToF AS (
-        SELECT 
+    SELECT 
         ct.id_contract,
+        ct.id_termination,
         dc.rent,
         dc.is_exit_inspection_opted_out,
         DATE(MAX(ct.ts_created)) AS dt_termination_request,
@@ -18,7 +19,7 @@ ToF AS (
         AND ct.ts_termination_finished IS NULL
         AND ct.status NOT IN ('CANCELED', 'DONE')
     GROUP BY 
-        1, 2, 3
+        1, 2, 3, 4
 ),
 last_updated_task AS (
   SELECT
@@ -263,6 +264,7 @@ inspections AS (
 funnel AS (
     SELECT
         to.id_contract,
+        to.id_termination,
         to.dt_termination_request,
         to.dt_termination,
         CASE 
@@ -310,6 +312,7 @@ funnel AS (
 )
 SELECT
     id_contract,
+    id_termination,
     dt_termination_request,
     dt_termination,
     aging,
