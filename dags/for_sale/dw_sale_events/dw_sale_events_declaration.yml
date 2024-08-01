@@ -2,8 +2,10 @@ dag:
   name: dw_sale_events
   schedule_start_date: 2020,8,6
   owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates the DW modelings for Sale Events. These tables track key events in the ForSale funnel, such as visit booked, visit completed, offer submitted, sale agreement signed, and others.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: sale
   default_extraction_type: full
@@ -18,7 +20,7 @@ workflow:
     fact_sale_cohort_conversion:
       partitions: [year, month, day]
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

@@ -297,3 +297,4 @@ LEFT JOIN
         ON e.sk_event_date = f.sk_event_date
         AND e.sk_event_type = f.sk_event_type
         AND COALESCE(NULLIF(e.sk_offer, -1), e.sk_booking) = COALESCE(NULLIF(f.sk_offer, -1), f.sk_booking)
+GROUP BY ALL
