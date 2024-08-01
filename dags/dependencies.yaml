@@ -2215,6 +2215,15 @@ bietlejuice.enrich_olos_dialer:
   - bietlejuice.olos_dialer:load-clean-info-campaign-type
   - bietlejuice.olos_dialer:load-clean-reprocessing-mailing
   - bietlejuice.olos_dialer:load-clean-users
+bietlejuice.enrich_ongoing_terminations_snapshot:
+  - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
+  - bietlejuice.enrich_date:load-enrich-workday-window
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_inspections:load-enrich-inspection-booking
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
 bietlejuice.enrich_online_attribution:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_opsgenie:

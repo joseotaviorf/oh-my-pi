@@ -1,0 +1,39 @@
+---
+database_name: datalake_ongoing_terminations_snapshot
+table_name: ongoing_terminations_stock_snapshot
+description: "This table shows the ongoing contract termination stock, each line is a ongoing termination at the snapshot date and is partitioned by the YEAR, MONTH and DAY."
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  id_contract:
+    lineage:
+      - datalake_offboarding.contract_termination.id_contract
+    description: Id of the contract related to the termination.
+  country_code:
+    lineage:
+      - datalake_ebdb_contract.contract.country_code
+    description: Country code of the house.
+  dt_termination_request:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_created
+    description: Date when the contract termination was requested.
+  dt_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_termination
+    description: Date of the contract's termination. It's the agreed date to the tenant to leave the house.
+  aging:
+    description: Number of days that this contract termination is ongoing.
+  class:
+    description: The class of this termination. For some classes we have a different SLA.
+  is_overdue_stock:
+    description: Boolean indicating if this contract termination is in overdue.
+  is_anomaly:
+    description: Boolean indicating if this contract termination is anomaly (is older than 30 days and still unfinished).
+  ts_snapshot:
+    description: Timestamp related to the load of the data into our system in order to create the snapshot.
+  year:
+    description: Year related to the load of the data into our system in order to create the snapshot. It's also a partition.
+  month:
+    description: Month related to the load of the data into our system in order to create the snapshot. It's also a partition.
+  day:
+    description: Day related to the load of the data into our system in order to create the snapshot. It's also a partition.

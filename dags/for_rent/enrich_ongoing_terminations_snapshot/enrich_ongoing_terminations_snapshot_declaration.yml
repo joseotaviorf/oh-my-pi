@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_ongoing_terminations_snapshot
+  schedule_start_date: 2024, 7, 31
+  owner: Data ForRent
+  documentation:
+    dag_purpose: This DAG creates a snapshot of the ongoing contract terminations.
+workflow:
+  type: query_delta
+  layer: enrich
+  tables_customization:
+    ongoing_terminations_stock_snapshot:
+      partitions:
+      - year
+      - month
+      - day
+cluster:
+  type: databricks_12_2_min_general_cluster
