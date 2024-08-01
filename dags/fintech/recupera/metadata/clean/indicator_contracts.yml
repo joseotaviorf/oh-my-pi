@@ -49,3 +49,23 @@ columns:
     description: "Content Description"
     lineage:
       - datalake_recupera_raw.contracts.content_description
+  dt_snapshot:
+    description: "Timestamp that snapshot was taken. It is the date of S3 file."
+    lineage:
+      - datalake_recupera_raw.indicator_contracts.year
+      - datalake_recupera_raw.indicator_contracts.month
+      - datalake_recupera_raw.indicator_contracts.day
+  ts_load:
+    description: "Timestamp when the table was updated (full load)"
+  year:
+    description: "Year of snasphot extract from S3 file date"
+    lineage:
+      - datalake_recupera_raw.indicator_contracts.year
+  month:
+    description: "Month of snasphot extract from S3 file date"
+    lineage:
+      - datalake_recupera_raw.indicator_contracts.month
+  day:
+    description: "Day of snasphot extract from S3 file date"
+    lineage:
+      - datalake_recupera_raw.indicator_contracts.day

@@ -107,12 +107,13 @@ for table in TABLES:
         ],
     )
 
+    clean_load_incremental = table["clean_load_incremental"] if "clean_load_incremental" in table else load_incremental
     partitions = partition_columns if load_incremental else None
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
-        is_incremental=load_incremental,
+        is_incremental=clean_load_incremental,
         partitions=partitions
     )
 

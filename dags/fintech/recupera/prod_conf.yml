@@ -63,7 +63,8 @@ tables:
       - contact_type_code
       - is_contact_active
   - table_name: indicator_contracts
-    load_incremental: False
+    load_incremental: True
+    clean_load_incremental: False
     original_table_name: TBL_CONTRATOS_INDICADORES
     column_names:
       - id_creditor
