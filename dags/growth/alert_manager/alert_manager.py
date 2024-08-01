@@ -21,7 +21,7 @@ SOURCE = "alert_manager"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 8, 21, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "00 06 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
@@ -100,7 +100,7 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
         SOURCE,
         "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
         "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
-    ]            
+    ]
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
@@ -113,7 +113,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     extra_query_template_params={
         "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
         "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
-    },    
+    },
 )
 
 create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
