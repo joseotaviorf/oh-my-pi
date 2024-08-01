@@ -43,7 +43,7 @@ app_groups_list = config_service.get_config("app_groups_list")
 identifiers = config_service.get_config("identifiers")
 
 # cluster setup
-CLUSTER_DESCRIPTION = "databricks_10_4_min_io-memory_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_io-memory_cluster"
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 

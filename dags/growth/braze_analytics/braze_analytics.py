@@ -41,7 +41,7 @@ identifiers = config_service.get_config("identifiers")
 partition_cols = config_service.get_config("partition_cols")
 
 # cluster setup
-CLUSTER_DESCRIPTION = "databricks_10_4_min_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_io-general_cluster"
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 
