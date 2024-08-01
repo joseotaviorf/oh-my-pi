@@ -6,7 +6,7 @@ SELECT
     member_id AS id_member,
     trackable_id AS id_trackable,
     target_stage_id AS id_target_stage,
-    "action",
+    `action`,
     action_type,
     stage_kind,
     job_title,

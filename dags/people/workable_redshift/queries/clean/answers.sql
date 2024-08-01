@@ -5,7 +5,7 @@ SELECT
     candidate_id AS id_candidate,
     job_title,
     question,
-    "type",
+    `type`,
     answer,
     candidate_name,
     answer_created_at AS ts_answer_created,

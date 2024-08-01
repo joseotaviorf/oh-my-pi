@@ -3,9 +3,9 @@ SELECT
     resource_id AS id_resource,
     field_id AS id_field,
     member_id AS id_member,
-    "type",
+    `type`,
     resource_type,
-    "data",
+    `data`,
     created_at AS ts_created,
     updated_at AS ts_updated,
     NOW() AS ts_load

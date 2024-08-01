@@ -1,7 +1,7 @@
 SELECT
     id,
     owner_id AS id_owner,
-    "type",
+    `type`,
     label,
     hint,
     preview_value,

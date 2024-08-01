@@ -2,7 +2,7 @@ SELECT
     id,
     field_id AS id_field,
     label,
-    "position",
+    `position`,
     enabled AS is_enabled,
     created_at AS ts_created,
     updated_at AS ts_updated,

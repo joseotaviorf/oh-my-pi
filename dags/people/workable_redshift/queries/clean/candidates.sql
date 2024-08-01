@@ -12,7 +12,7 @@ SELECT
     -- non-metrics
     job_title,
     job_department,
-   "name",
+   `name`,
     firstname AS first_name,
     lastname AS last_name,
     headline,
@@ -20,7 +20,7 @@ SELECT
     application_method,
     source_category,
     source_domain,
-    "source",
+    `source`,
     outlet,
     current_stage_name,
     disqualification_reason,

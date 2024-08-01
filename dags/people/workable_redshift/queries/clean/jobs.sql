@@ -20,7 +20,7 @@ SELECT
     advertise_city,
     advertise_zip_code,
     employment_type,
-    "function",
+    `function`,
     industry,
     experience,
     education,

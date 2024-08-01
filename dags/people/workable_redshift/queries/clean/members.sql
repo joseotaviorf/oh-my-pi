@@ -1,9 +1,9 @@
 SELECT
     id,
     api_id AS id_api,
-    "role",
+    `role`,
     email,
-    "name",
+    `name`,
     headline,
     active AS is_active,
     member_created_at AS ts_member_created,
