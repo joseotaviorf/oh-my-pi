@@ -33,6 +33,10 @@ workflow:
       - delinquency_timeline
       - propose
       - propose_person
+    propose_legacy:
+      - junk
+      - payment_legacy
+      - propose_person_legacy
 
 cluster:
   type: databricks_13_3_med_general_cluster
