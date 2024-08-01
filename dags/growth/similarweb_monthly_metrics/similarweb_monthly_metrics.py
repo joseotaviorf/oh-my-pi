@@ -43,7 +43,7 @@ SOURCE = "similarweb_monthly_metrics"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 10, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 9 12 * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_med_general_cluster"
 
 # Task params
 TASK_POOL = "similarweb_pool"
