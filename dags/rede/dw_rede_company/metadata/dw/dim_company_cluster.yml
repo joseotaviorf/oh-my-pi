@@ -18,6 +18,10 @@ columns:
     lineage:
     - datalake_hubspot.company_history.name
     description: Name of Rede partner company registered with HubSpot
+  company_extracted_3p_tag:
+    lineage:
+    - datalake_hubspot.company_history.extracted_3p_tag
+    description: Tag related to the Rede partner company registered with HubSpot
   company_cluster:
     lineage:
     - datalake_hubspot.company_history.company_cluster
@@ -32,6 +36,20 @@ columns:
     - datalake_hubspot.company_history.company_cluster
     - datalake_hubspot.company_history.ts_updated
     description: True if the current cluster given to the company is part of the "Decola" community, otherwise false
+  is_ex_decola:
+    lineage:
+    - datalake_hubspot.company_history.id_company
+    - datalake_hubspot.company_history.company_cluster
+    - datalake_hubspot.company_history.ts_updated
+    description: True if a previous cluster of the company belonged to "Decola" community
+  dt_week_cluster_start:
+    lineage:
+    - datalake_hubspot.company_history.ts_updated
+    description: Effective week of the cluster assigned to the company
+  dt_week_cluster_end:
+    lineage:
+    - datalake_hubspot.company_history.ts_updated
+    description: End week of the cluster assigned to the company (if this field is null, it means that this is the current company cluster)
   ts_cluster_start:
     lineage:
     - datalake_hubspot.company_history.id_company

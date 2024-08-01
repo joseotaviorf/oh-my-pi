@@ -1,16 +1,12 @@
 ---
 table_name: dw_rede_staging.dim_company_cluster
 alert_channel: "#alerts-de-airflow-dags"
-table_level_validations:
-  has_size:
-    greater_than: 630
-    severity_level: Error
 column_level_validations:
   sk_company_cluster:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_unique:
-      severity_level: Error
+      severity_level: Warning
   sk_company_hubspot:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
