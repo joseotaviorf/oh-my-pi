@@ -21,7 +21,7 @@ SOURCE = "rene_descartes"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2020, 7, 27, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_max_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_max_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 
@@ -68,7 +68,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
-    user_defined_macros={"get_date_param": get_date_param},    
+    user_defined_macros={"get_date_param": get_date_param},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
