@@ -252,3 +252,23 @@ columns:
     description: Timestamp of when the propose has started waiting to be secured
   ts_load:
     description: Moment (timestamp) when the table was last loaded
+  risk_category_neurotech:
+    description: Category of the last risk analysis rating from neurotech.
+    lineage:
+      - datalake_velo.propose.risk_category_neurotech
+      - datalake_velo.propose_legacy.risk_category_neurotech
+  max_hspn:
+    description: Maximum hspn value of the propose.
+    lineage:
+      - datalake_velo.propose.max_hspn
+      - datalake_velo.propose_legacy.max_hspn
+  min_hspn:
+    description: Minimum hspn value of the propose.
+    lineage:
+      - datalake_velo.propose.min_hspn
+      - datalake_velo.propose_legacy.min_hspn
+  last_analysis_result:
+    description: Category of the result from the last analysis.
+    lineage:
+      - datalake_velo.propose.last_analysis_result
+      - datalake_velo.propose_legacy.last_analysis_result

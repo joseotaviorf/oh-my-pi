@@ -364,6 +364,19 @@ persons_metrics AS (
         main_person AS mp
             ON mp.id_propose = pp.id_propose
     GROUP BY 1
+),
+credit_analysis AS (
+    SELECT DISTINCT
+        proposal_number AS id_propose,
+        proposal_rating,
+        analysis_result,
+        serasa_score_hspn_api_v3_list,
+        serasa_score_hspn_bureau,
+        ts_operation,
+        ROW_NUMBER() OVER (PARTITION BY proposal_number ORDER BY ts_operation DESC) AS rn
+    FROM
+        datalake_velo_neurotech_clean.logs_credit_granting
+    WHERE 1=1
 )
 
 --query containing proposes from legacy table
@@ -396,6 +409,27 @@ SELECT DISTINCT
     pym.total_payments_expired,
     CAST(NULL AS BIGINT) AS total_occurrences,
     CAST(NULL AS BIGINT) AS occurrences_solved,
+    CASE
+        WHEN ca.proposal_rating IS NULL OR ca.proposal_rating = 'NaN' THEN 'Missing'
+        ELSE ca.proposal_rating
+    END AS risk_category_neurotech,
+    CASE
+        WHEN CAST(ca.ts_operation AS TIMESTAMP) BETWEEN CAST('2024-03-15 00:00:00.000' AS TIMESTAMP) AND CAST('2024-03-18 18:30:00.000' AS TIMESTAMP) OR CAST(ca.ts_operation AS TIMESTAMP) >= CAST('2024-05-09 00:00:00.000' AS TIMESTAMP) THEN CAST(ARRAY_MAX(ca.serasa_score_hspn_api_v3_list) AS BIGINT)
+        ELSE CAST(ARRAY_MAX(ca.serasa_score_hspn_bureau) AS BIGINT)
+    END AS max_hspn,
+    CASE
+        WHEN CAST(ca.ts_operation AS TIMESTAMP) BETWEEN CAST('2024-03-15 00:00:00.000' AS TIMESTAMP) AND CAST('2024-03-18 18:30:00.000' AS TIMESTAMP) OR CAST(ca.ts_operation AS TIMESTAMP) >= CAST('2024-05-09 00:00:00.000' AS TIMESTAMP) THEN CAST(ARRAY_MIN(ca.serasa_score_hspn_api_v3_list) AS BIGINT)
+        ELSE CAST(ARRAY_MIN(ca.serasa_score_hspn_bureau) AS BIGINT)
+    END AS min_hspn,
+    CASE
+        WHEN ca.analysis_result = 'A' THEN '1)Aprovação automática'
+        WHEN ca.analysis_result = 'REANALISE' THEN '2)Mesa'
+        WHEN ca.analysis_result IN ('REPROVADO', 'REPROVADO - BACKGROUND') THEN '5)Clear No'
+        WHEN ca.analysis_result = 'RESSUBMISSAO' THEN 'Solicitado reenvio'
+        WHEN ca.analysis_result = 'FINALIZADO' THEN '3)Enviar DOC de Renda'
+        WHEN ca.analysis_result = 'AD PROP' THEN '4)Adicionar Proponents'
+        ELSE ca.analysis_result
+    END AS last_analysis_result,
     old.id_contract IS NOT NULL AS is_contract,
     FALSE AS is_direct_billing,
     IFNULL(DATEDIFF(old.dt_ended, DATE(old.dt_contract_started)) <= 10, False) AS is_grace_period_cancelled,
@@ -460,5 +494,9 @@ LEFT JOIN
 LEFT JOIN
     persons_metrics AS pm
         ON pm.id_propose = p.id
+LEFT JOIN
+    credit_analysis AS ca
+        ON ca.id_propose = p.id
+        AND ca.rn = 1
 WHERE
     p.id NOT IN (SELECT id FROM datalake_rental_guarantee_platform_clean.propose)

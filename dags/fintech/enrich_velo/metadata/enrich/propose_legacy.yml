@@ -160,3 +160,15 @@ columns:
     description: Timestamp of when the propose has started waiting to be secured
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
+  risk_category_neurotech:
+    description: Category of the last risk analysis rating from neurotech.
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
+  max_hspn:
+    description: Maximum hspn value of the propose.
+  min_hspn:
+    description: Minimum hspn value of the propose.
+  last_analysis_result:
+    description: Category of the result from the last analysis.
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.analysis_result
