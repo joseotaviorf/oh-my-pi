@@ -21,7 +21,7 @@ SOURCE = "property_dedup"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 7, 10, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 10 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_med_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 
@@ -67,7 +67,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
-    user_defined_macros={"get_date_param": get_date_param},    
+    user_defined_macros={"get_date_param": get_date_param},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
