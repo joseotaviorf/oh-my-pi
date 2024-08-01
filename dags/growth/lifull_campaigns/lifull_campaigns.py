@@ -22,7 +22,7 @@ SOURCE = "lifull_campaigns"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 9, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_min_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 raw_table_name = config_service.get_config("raw_table_name")
