@@ -1,3 +1,9 @@
 ---
-tables_list: ["library_versions","count_cozy_imports","cozy_vs_bp_coverage","styled_usage"]
-cluster_description: databricks_10_4_min_general_cluster
+tables_list:
+  [
+    "library_versions",
+    "count_cozy_imports",
+    "cozy_vs_bp_coverage",
+    "styled_usage",
+  ]
+cluster_description: databricks_12_2_min_general_cluster
