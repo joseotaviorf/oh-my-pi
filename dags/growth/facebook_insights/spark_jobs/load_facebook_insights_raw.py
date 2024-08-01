@@ -46,117 +46,109 @@ if __name__ == "__main__":
     manual_accounts = args.manual_accounts
 
     config_service = ConfigurationService(source)
-    type_accounts = config_service.get_config("accounts")
+    accounts = config_service.get_config("accounts")[table_name]
+    fields = config_service.get_config("fields")[table_name]
+    breakdowns = config_service.get_config("breakdowns")[table_name]
+    raw_partition_cols = config_service.get_config("raw_partition_cols")[table_name]
 
-    for country_account, tables in type_accounts.items():
-        if table_name in tables:
-            accounts = tables[table_name]
-            fields = config_service.get_config("fields")[table_name]
-            breakdowns = config_service.get_config("breakdowns")[table_name]
-            raw_partition_cols = config_service.get_config("raw_partition_cols")[table_name]
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
 
-            base_dbutils = BaseDBUtils()
-            if base_dbutils.get_dbutils() is not None:
-                dbutils = base_dbutils.get_dbutils()
+    configs = json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.FACEBOOK))
+    auth = configs.pop("auth")
 
-            if country_account == 'br_accounts':
-                configs = json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.FACEBOOK))
-            elif country_account == 'mx_accounts':
-                configs = json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.MX_FACEBOOK))
-
-            auth = configs.pop("auth")
-
-            # for now, only facebook_insights account can be reprocessed by manual inputed accounts
-            if table_name == "facebook_insights" and manual_accounts:
-                try:
-                    manual_accounts = json.loads(manual_accounts.replace("'", '"'))
-                except ValueError:
-                    raise ValueError("m=get_accounts_param, msg=Enter a valid json string")
+    # for now, only facebook_insights account can be reprocessed by manual inputed accounts
+    if table_name == "facebook_insights" and manual_accounts:
+        try:
+            manual_accounts = json.loads(manual_accounts.replace("'", '"'))
+        except ValueError:
+            raise ValueError("m=get_accounts_param, msg=Enter a valid json string")
+        else:
+            if "facebook_insights" in manual_accounts:
+                manual_accounts_list = manual_accounts.get(table_name)
+                if isinstance(manual_accounts_list, list):
+                    accounts = manual_accounts_list
                 else:
-                    if "facebook_insights" in manual_accounts:
-                        manual_accounts_list = manual_accounts.get(table_name)
-                        if isinstance(manual_accounts_list, list):
-                            accounts = manual_accounts_list
-                        else:
-                            raise Exception(
-                                f"m=get_accounts_param, msg=Accounts inside {table_name} key should be a list"
-                            )
-                    else:
-                        raise Exception(
-                            "m=get_accounts_param, msg=Key should be facebook_insights"
-                        )
+                    raise Exception(
+                        f"m=get_accounts_param, msg=Accounts inside {table_name} key should be a list"
+                    )
+            else:
+                raise Exception(
+                    "m=get_accounts_param, msg=Key should be facebook_insights"
+                )
 
-            logger.info(
-                f"""m=__main__, env={env}, source={source}, datalake_bucket={datalake_bucket},
-                load_start_date={load_start_date}, load_end_date={load_end_date},
-                table_name={table_name}, accounts={accounts}, msg=Starting spark job..."""
+    logger.info(
+        f"""m=__main__, env={env}, source={source}, datalake_bucket={datalake_bucket},
+        load_start_date={load_start_date}, load_end_date={load_end_date},
+        table_name={table_name}, accounts={accounts}, msg=Starting spark job..."""
+    )
+
+    configs["date_start"] = load_start_date
+    configs["date_stop"] = load_end_date
+    configs["accounts"] = accounts
+    configs["fields"] = fields
+    configs["breakdowns"] = breakdowns
+
+    fb_client = FacebookClient(auth["access_token"])
+    client_response = fb_client.get_data(**configs)
+
+    if len(client_response):
+
+        spark_client = SparkClient()
+        df = spark_client.create_dataframe(client_response)
+
+        df = (
+            SparkDataFrameService()
+            .input(df)
+            .create_year_month_day_columns_from_dataframe_column("date_start")
+            .output()
+        )
+
+        if "account_name" in df.columns:
+            df = df.withColumn(
+                "account_name_snake_case",
+                udf(StringFormatter.set_alphanumeric_snake_case)(df.account_name),
             )
 
-            configs["date_start"] = load_start_date
-            configs["date_stop"] = load_end_date
-            configs["accounts"] = accounts
-            configs["fields"] = fields
-            configs["breakdowns"] = breakdowns
+        datalake_info = DatalakeMetastoreService.get_db_info(
+            env, source, datalake_bucket
+        )
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        database_name = datalake_info["db_raw_databricks"]
+        spark_metastore_service.create_database(database_name)
 
-            fb_client = FacebookClient(auth["access_token"])
-            client_response = fb_client.get_data(**configs)
+        database_location = datalake_info["db_raw_path"]
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-            if len(client_response):
+        # loaders
+        s3_loader = S3Loader()
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        s3_loader.load_df(
+            df=df,
+            s3_path=f"{database_location}{table_name}",
+            format_options=format_options,
+            partitions=raw_partition_cols,
+        )
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+            raw_partition_cols,
+            force_recreate=False,
+        )
+        spark_metastore_service.create_new_partitions_from_df(
+            database_name=database_name,
+            table_name=table_name,
+            df=df,
+            partition_cols=raw_partition_cols,
+        )
+        spark_metastore_service.refresh_table(database_name, table_name)
 
-                spark_client = SparkClient()
-                df = spark_client.create_dataframe(client_response)
-
-                df = (
-                    SparkDataFrameService()
-                    .input(df)
-                    .create_year_month_day_columns_from_dataframe_column("date_start")
-                    .output()
-                )
-
-                if "account_name" in df.columns:
-                    df = df.withColumn(
-                        "account_name_snake_case",
-                        udf(StringFormatter.set_alphanumeric_snake_case)(df.account_name),
-                    )
-
-                datalake_info = DatalakeMetastoreService.get_db_info(
-                    env, source, datalake_bucket
-                )
-                spark_metastore_service = SparkMetastoreService(spark_client)
-                database_name = datalake_info["db_raw_databricks"]
-                spark_metastore_service.create_database(database_name)
-
-                database_location = datalake_info["db_raw_path"]
-                format_options = SparkTableStorageFormat.DEFAULT_RAW
-
-                # loaders
-                s3_loader = S3Loader()
-                spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-                s3_loader.load_df(
-                    df=df,
-                    s3_path=f"{database_location}{table_name}",
-                    format_options=format_options,
-                    partitions=raw_partition_cols,
-                )
-                spark_metastore_loader.update_metastore(
-                    df,
-                    database_name,
-                    table_name,
-                    format_options,
-                    database_location,
-                    raw_partition_cols,
-                    force_recreate=False,
-                )
-                spark_metastore_service.create_new_partitions_from_df(
-                    database_name=database_name,
-                    table_name=table_name,
-                    df=df,
-                    partition_cols=raw_partition_cols,
-                )
-                spark_metastore_service.refresh_table(database_name, table_name)
-
-            else:
-                logger.warning(
-                    f"""m=__main__, load_start_date={load_start_date}, load_end_date={load_end_date}, table_name={table_name},
-                    accounts: {accounts}, msg=No data returned from API."""
-                )
+    else:
+        logger.warning(
+            f"""m=__main__, load_start_date={load_start_date}, load_end_date={load_end_date}, table_name={table_name},
+            accounts: {accounts}, msg=No data returned from API."""
+        )

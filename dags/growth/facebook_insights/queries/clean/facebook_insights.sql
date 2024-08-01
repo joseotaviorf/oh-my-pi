@@ -5,11 +5,6 @@ SELECT
     BIGINT(campaign_id) AS id_campaign,
     account_name,
     account_name_snake_case,
-    CASE
-        WHEN account_name_snake_case LIKE '%mx%' THEN 'MX'
-        WHEN account_name_snake_case IS NULL THEN 'Undefined'
-        ELSE 'BR'
-    END AS country_code,
     ad_name,
     adset_name,
     campaign_name,

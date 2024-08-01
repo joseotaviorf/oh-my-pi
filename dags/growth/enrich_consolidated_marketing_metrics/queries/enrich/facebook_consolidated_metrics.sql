@@ -14,6 +14,5 @@ SELECT
 FROM
     datalake_facebook_insights_clean.facebook_insights
 WHERE
-    country_code <> 'MX'
-    AND dt_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    dt_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 GROUP BY 1,2,3,4,5,6

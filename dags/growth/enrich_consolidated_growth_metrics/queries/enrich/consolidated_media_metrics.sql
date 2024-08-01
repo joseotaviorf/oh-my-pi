@@ -131,7 +131,7 @@ WITH consolidated_sources AS (
         NULL AS business_context,
         campaign_name,
         account_name,
-        country_code,
+        'BR' AS country_code,
         NULL AS report_type,
         NULL AS ad_type,
         utm_term,
