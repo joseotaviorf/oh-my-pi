@@ -31,7 +31,7 @@ SOURCE = "semrush"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 4, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 10 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_max_io-memory_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_max_io-memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
 partition_cols = config_service.get_config("clean_partition_cols")
@@ -116,9 +116,9 @@ load_semrush_transient_task = QuintoAndarDatabricksSubmitRunOperator(
             "python_file": transient_spark_job_file,
             "parameters": [ENV, datalake_bucket]
             + [
-                SOURCE, 
-                "{{ ds }}", 
-                "{{ get_toggle_param(dag_run, 'overwrite_enabled') }}", 
+                SOURCE,
+                "{{ ds }}",
+                "{{ get_toggle_param(dag_run, 'overwrite_enabled') }}",
                 "{{ get_toggle_param(dag_run, 'overcosts_enabled') }}",
             ],
         }
@@ -148,7 +148,7 @@ for table_name in tables:
         partitions=partition_cols,
         extra_query_template_params={
             "domain": "{{ table_name }}",
-        },          
+        },
     )
 
     skip_run_task.set_downstream(create_cluster_task)
