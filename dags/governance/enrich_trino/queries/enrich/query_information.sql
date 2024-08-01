@@ -3,6 +3,8 @@ WITH base AS (
         queryId AS id_query,
         resourceGroupId AS id_resource_group,
         GET_JSON_OBJECT(session, '$.user') AS session_user,
+        regexp_extract(query, '"slice_id":\\s*(\\d+)') AS superset_slice_id,
+        regexp_extract(query, 'cardID: (\\d+)') AS metabase_card_id,
         referencedTables AS referenced_tables,
         state,
         execution_time, 
@@ -38,6 +40,8 @@ tools AS (
         GET(b.id_resource_group, 2) AS tool,
         GET(b.id_resource_group, 3) AS user,
         b.session_user,
+        b.superset_slice_id,
+        b.metabase_card_id,
         b.state,
         b.execution_time,
         b.execution_hour,
@@ -64,6 +68,8 @@ SELECT
         WHEN tool = 'other' AND session_user LIKE 'trino_datahub%' THEN 'DataHub'
         ELSE tool
     END AS tool,
+    superset_slice_id AS id_slice_superset,
+    metabase_card_id AS id_metabase_card,
     user,
     state,
     execution_time,

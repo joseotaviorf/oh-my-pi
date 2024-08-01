@@ -21,6 +21,14 @@ columns:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.resourceGroupId
     description: Tool in which the query is running into.
+  id_slice_superset:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+    description: Id of the slice in Superset that the query corresponds.
+  id_metabase_card:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+    description: Id of the card in Metabase that the query corresponds.
   user:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.resourceGroupId
