@@ -221,6 +221,13 @@ report_origin AS (
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'referrals' THEN 'Indica Aí - General'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'is_inbound' THEN 'Inbound'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' THEN 'Backend'
+            -- Adjusting cases without leads
+            WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND obt.acquisition_origin = 'notmapped-notmapped' THEN 'Owner PWA - Not Mapped'
+            -- Adjusting cases with leads equal other
+            WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
+            WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
+            WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
+            WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' THEN 'Owner PWA - Not Mapped'
             ELSE 'Other'
         END AS company_report_origin,
         LAST_VALUE(obt.conversion_origin) OVER (PARTITION BY obt.sk_supply, obt.nm_business_context ORDER BY obt.funnel_order ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS full_conversion_origin,
