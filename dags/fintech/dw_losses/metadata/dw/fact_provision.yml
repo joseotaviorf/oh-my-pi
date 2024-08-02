@@ -49,6 +49,10 @@ columns:
     lineage:
       - datalake_losses.provision.provision_balance_p5_delay_a
     description: "Provision balance considering the delay contamination rule A and the provision factors from rule 5."
+  provision_balance_p6_delay_a:
+    lineage:
+      - datalake_losses.provision.provision_balance_p6_delay_a
+    description: "Provision balance considering the delay contamination rule A and the provision factors from rule 6."
   provision_balance_p1_delay_b:
     lineage:
       - datalake_losses.provision.provision_balance_p1_delay_b
@@ -69,6 +73,10 @@ columns:
     lineage:
       - datalake_losses.provision.provision_balance_p5_delay_b
     description: "Provision balance considering the delay contamination rule B and the provision factors from rule 5."
+  provision_balance_p6_delay_b:
+    lineage:
+      - datalake_losses.provision.provision_balance_p6_delay_b
+    description: "Provision balance considering the delay contamination rule B and the provision factors from rule 6."
   provision_balance_p1_delay_c:
     lineage:
       - datalake_losses.provision.provision_balance_p1_delay_c
@@ -89,6 +97,10 @@ columns:
     lineage:
       - datalake_losses.provision.provision_balance_p5_delay_c
     description: "Provision balance considering the delay contamination rule C and the provision factors from rule 5."
+  provision_balance_p6_delay_c:
+    lineage:
+      - datalake_losses.provision.provision_balance_p6_delay_c
+    description: "Provision balance considering the delay contamination rule C and the provision factors from rule 6."
   provision_balance_p1_delay_d:
     lineage:
       - datalake_losses.provision.provision_balance_p1_delay_d
@@ -109,6 +121,10 @@ columns:
     lineage:
       - datalake_losses.provision.provision_balance_p5_delay_d
     description: "Provision balance considering the delay contamination rule D and the provision factors from rule 5."
+  provision_balance_p6_delay_d:
+    lineage:
+      - datalake_losses.provision.provision_balance_p6_delay_d
+    description: "Provision balance considering the delay contamination rule D and the provision factors from rule 6."
   provision_balance_p1_delay_e:
     lineage:
       - datalake_losses.provision.provision_balance_p1_delay_e
@@ -129,6 +145,10 @@ columns:
     lineage:
       - datalake_losses.provision.provision_balance_p5_delay_e
     description: "Provision balance considering the delay contamination rule E and the provision factors from rule 5."
+  provision_balance_p6_delay_e:
+    lineage:
+      - datalake_losses.provision.provision_balance_p6_delay_e
+    description: "Provision balance considering the delay contamination rule E and the provision factors from rule 6."
   provision_balance:
     lineage:
       - datalake_losses.provision.provision_balance
