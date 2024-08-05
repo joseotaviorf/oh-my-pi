@@ -46,11 +46,7 @@ columns:
     description: "Paid date from Bank"
   dt_retsuko_paid:
     lineage:
-      - datalake_retsuko.invoice.dt_paid
-    description: "Paid date from Retsuko"
-  dt_retsuko_next_business_day:
-    lineage:
-      - datalake_retsuko.invoice.next_brz_fintech_business_day
+      - dw_public.dim_date.next_brz_fintech_business_day
     description: "Paid date from Retsuko"
   dt_vans_checkout_paid:
     lineage:

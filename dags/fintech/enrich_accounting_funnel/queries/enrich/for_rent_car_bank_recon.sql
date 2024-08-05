@@ -1,7 +1,6 @@
 WITH francesinha AS (
     SELECT
         UPPER(REPLACE(document_number, 'C!', '')) AS company_use,
-        TRIM(SUBSTRING(our_number, 1, LENGTH(our_number) - 1)) AS our_number,
         dt_credit AS dt_paid,
         SUM(net_amount) AS amount
     FROM
@@ -12,7 +11,7 @@ WITH francesinha AS (
         AND document_number IS NOT NULL
         AND TRIM(document_number) != ''
     GROUP BY
-        1,2,3
+        1,2
 ),
 
 sap AS (
@@ -101,8 +100,7 @@ seu_barriga AS (
         paid_via,
         reason,
         paid_amount AS amount,
-        dd.next_brz_fintech_business_day,
-        COALESCE(DATE(ts_payment_credit), DATE(ts_payment_confirmation)) AS dt_paid
+        dd.next_brz_fintech_business_day AS dt_paid
     FROM
         datalake_retsuko.invoice
     LEFT JOIN
@@ -151,31 +149,30 @@ df AS (
         IF(f.company_use IS NULL, 'not recorded', 'ok') AS status_bank,
         CASE
             WHEN f.amount = vc.amount AND f.dt_paid = DATE(vc.dt_paid) THEN 'ok'
-            WHEN f.amount != vc.amount AND f.dt_paid != DATE(vc.dt_paid) THEN 'recorded on the wrong date and value'
-            WHEN f.amount != vc.amount AND f.dt_paid = DATE(vc.dt_paid) THEN 'recorded on the wrong value'
-            WHEN f.amount = vc.amount AND f.dt_paid != DATE(vc.dt_paid) THEN 'recorded on the wrong date'
+            WHEN f.amount != vc.amount AND f.dt_paid != DATE(vc.dt_paid) THEN 'recorded with a divergent date and value'
+            WHEN f.amount != vc.amount AND f.dt_paid = DATE(vc.dt_paid) THEN 'recorded with a divergent value'
+            WHEN f.amount = vc.amount AND f.dt_paid != DATE(vc.dt_paid) THEN 'recorded with a divergent date'
             WHEN vc.company_use IS NULL THEN 'not recorded'
             ELSE 'not ok'
         END AS status_vans_checkout,
         CASE
-            WHEN f.amount = sb.amount AND (f.dt_paid = DATE(sb.dt_paid) OR f.dt_paid = DATE(sb.next_brz_fintech_business_day)) THEN 'ok'
-            WHEN f.amount != sb.amount AND f.dt_paid != DATE(sb.dt_paid) AND f.dt_paid != DATE(sb.next_brz_fintech_business_day) THEN 'recorded on the wrong date and value'
-            WHEN f.amount != sb.amount AND (f.dt_paid = DATE(sb.dt_paid) OR f.dt_paid = DATE(sb.next_brz_fintech_business_day)) THEN 'recorded on the wrong value'
-            WHEN f.amount = sb.amount AND f.dt_paid != DATE(sb.dt_paid) AND f.dt_paid != DATE(sb.next_brz_fintech_business_day) THEN 'recorded on the wrong date'
+            WHEN f.amount = sb.amount AND (f.dt_paid = DATE(sb.dt_paid) OR f.dt_paid = DATE(sb.dt_paid)) THEN 'ok'
+            WHEN f.amount != sb.amount AND f.dt_paid != DATE(sb.dt_paid) AND f.dt_paid != DATE(sb.dt_paid) THEN 'recorded with a divergent date and value'
+            WHEN f.amount != sb.amount AND (f.dt_paid = DATE(sb.dt_paid) OR f.dt_paid = DATE(sb.dt_paid)) THEN 'recorded with a divergent value'
+            WHEN f.amount = sb.amount AND f.dt_paid != DATE(sb.dt_paid) AND f.dt_paid != DATE(sb.dt_paid) THEN 'recorded with a divergent date'
             WHEN sb.company_use IS NULL THEN 'not recorded'
             ELSE 'not ok'
         END AS status_retsuko,
         CASE
             WHEN f.amount = s.amount AND f.dt_paid = DATE(s.dt_paid) THEN 'ok'
-            WHEN f.amount != s.amount AND f.dt_paid != DATE(s.dt_paid) THEN 'recorded on the wrong date and value'
-            WHEN f.amount != s.amount AND f.dt_paid = DATE(s.dt_paid) THEN 'recorded on the wrong value'
-            WHEN f.amount = s.amount AND f.dt_paid != DATE(s.dt_paid) THEN 'recorded on the wrong date'
+            WHEN f.amount != s.amount AND f.dt_paid != DATE(s.dt_paid) THEN 'recorded with a divergent date and value'
+            WHEN f.amount != s.amount AND f.dt_paid = DATE(s.dt_paid) THEN 'recorded with a divergent value'
+            WHEN f.amount = s.amount AND f.dt_paid != DATE(s.dt_paid) THEN 'recorded with a divergent date'
             WHEN s.company_use IS NULL THEN 'not recorded'
             ELSE 'not ok'
         END AS status_sap,
         f.dt_paid AS dt_bank_paid,
         sb.dt_paid AS dt_retsuko_paid,
-        sb.next_brz_fintech_business_day AS dt_retsuko_next_business_day,
         vc.dt_paid AS dt_vans_checkout_paid,
         s.dt_paid AS dt_sap_paid
     FROM
@@ -216,7 +213,6 @@ SELECT
     IF(status_bank = 'ok' AND status_vans_checkout = 'ok' AND status_retsuko = 'ok' AND status_sap = 'ok', TRUE, FALSE) AS is_reconciled,
     dt_bank_paid,
     dt_retsuko_paid,
-    dt_retsuko_next_business_day,
     dt_vans_checkout_paid,
     dt_sap_paid
 FROM
