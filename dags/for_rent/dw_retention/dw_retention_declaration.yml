@@ -10,8 +10,9 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: retention
-  default_partitions: [country_code]
   tables_customization:
+    fact_owner_retention:
+      partitions: [country_code]
     fact_ongoing_terminations_snapshots:
       extraction_type: incremental
       partitions: [year, month, day]
