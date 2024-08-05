@@ -3346,6 +3346,7 @@ bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
