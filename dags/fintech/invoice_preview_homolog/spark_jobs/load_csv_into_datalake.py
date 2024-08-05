@@ -110,11 +110,10 @@ if __name__ == "__main__":
         yearmonthday = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d")
         by_day_files[yearmonthday].append(path)
 
-    dfs = []
     days_to_send_warning = []
-
     dates_to_ingest = _generate_date_range(load_start_date, load_end_date)
     for date_to_ingest in dates_to_ingest:
+        dfs = []
         date_ingested = date_to_ingest.strftime("%Y-%m-%d")
         if len(by_day_files[date_ingested]) <= 0:
             logger.warning(
