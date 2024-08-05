@@ -27,6 +27,10 @@ columns:
     description: Status to identify wheter the agent is active or inactive.
   is_last_status: 
     description: Informs when the agent's most recent status.
+  ts_agent_created:
+    lineage:
+      - datalake_ebdb_clean.partner.ts_created
+    description: Timestamp of when the CIQ (Partner) was created.
   ts_agent_status_start:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
