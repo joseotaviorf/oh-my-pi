@@ -781,6 +781,7 @@ bietlejuice.dw_retention:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_ongoing_terminations_snapshot:load-enrich-ongoing-terminations-stock-snapshot
   - bietlejuice.enrich_tracksale:load-enrich-answer
   - bietlejuice.enrich_tracksale:load-enrich-campaign
   - bietlejuice.enrich_tracksale:load-enrich-customer-conversions

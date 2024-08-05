@@ -1,0 +1,44 @@
+database_name: dw_retention
+table_name: fact_ongoing_terminations_snapshots
+description: Fact table containing the daily snapshot of ongoing terminations.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  sk_contract:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.id_contract
+    description: Id of the contract related to the termination.
+  sk_termination:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.id_termination
+    description: Id of the contract termination.
+  sk_snapshot_date:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.ts_snapshot
+    description: Key to indetifiy date when the snapshot was made.
+  is_overdue_stock:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.is_overdue_stock
+    description: Boolean indicating if this contract termination is in overdue.
+  is_anomaly:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.is_anomaly
+    description: Boolean indicating if this contract termination is anomaly (is older than 30 days and still unfinished).
+  ts_snapshot:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.ts_snapshot
+    description: Timestamp of the snapshot.
+  ts_load:
+    description: Timestamp of when this data was loaded.
+  year:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.year
+    description: Year of the snapshot. It's also a table partition.
+  month:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.month
+    description: Month of the snapshot. It's also a table partition.
+  day:
+    lineage:
+      - datalake_ongoing_terminations_snapshot.ongoing_terminations_stock_snapshot.day
+    description: Day of the snapshot. It's also a table partition.
