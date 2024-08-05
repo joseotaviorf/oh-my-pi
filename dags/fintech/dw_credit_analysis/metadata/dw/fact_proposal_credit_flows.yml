@@ -239,6 +239,18 @@ columns:
       OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.
       QUINTOANDAR: Default rental administrator, which is QuintoAndar.
       THIRD_PARTY: The rental administrator is a third party real estate agency.
+  is_direct_offer:
+    lineage:
+      - dw_rent.dim_rent_flow_type.first_touchpoint
+    description: "True if the sk_client has not visited the sk_house before sending the proposal."
+  is_early_demand:
+    lineage:
+      - dw_public.dim_house_listing.ts_early_demand_started
+    description: "True if the sk_house has an early demand."
+  is_resend_request:
+    lineage:
+      - datalake_ebdb_clean.proposal_aud.is_proposal
+    description: "True if the sk_proposal has any resend request."
   dt_last_credit_evaluation_init:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date

@@ -78,6 +78,42 @@ credit_engine AS (
     ON ch.id_analysis_request = ar.id_analysis_request
   WHERE ch.is_current_checklist = TRUE
 ),
+direct_offer AS ( 
+  SELECT  
+    f.sk_tenant_prospect AS sk_client, 
+    f.sk_house,
+    d.first_touchpoint
+  FROM 
+    dw_rent.fact_rent_flows f
+  LEFT JOIN
+    dw_rent.dim_rent_flow_type d
+        ON f.sk_rent_flow_type = f.sk_rent_flow_type
+  WHERE
+    d.first_touchpoint = 'DIRECT'
+  GROUP BY 1,2,3
+),
+early_demand AS (
+  SELECT
+    id_house AS sk_house, 
+    ts_early_demand_started
+  FROM
+    dw_public.dim_house_listing
+  WHERE 
+    ts_early_demand_started IS NOT NULL
+  QUALIFY
+      ROW_NUMBER () OVER (PARTITION BY id_house ORDER BY sk_house_listing DESC) = 1
+),
+resend_request AS (
+  SELECT 
+    id_proposal AS sk_proposal, 
+    count(*) AS resend_request 
+  FROM
+    datalake_ebdb_clean.proposal_aud 
+  WHERE 
+    tenant_documentation_status = 'ReenvioDocumentos'
+    AND mod_tenant_documentation_status = TRUE  
+  GROUP BY 1 
+),
 rent_flows AS (
   SELECT
     flrf.sk_client,
@@ -530,9 +566,9 @@ QUALIFY
   ROW_NUMBER() OVER (PARTITION BY CASE WHEN sk_client IS NULL THEN 1 ELSE sk_client END, DATE_TRUNC('month',dt_reference) ORDER BY IF(funnel_drop_step_ordered IS NULL, "Z", funnel_drop_step_ordered) DESC) = 1
 )
 SELECT
-  sk_client,
-  sk_house_listing,
-  sk_house,
+  adr.sk_client,
+  adr.sk_house_listing,
+  adr.sk_house,
   sk_contract,
   sk_contract_created_date,
   sk_contract_signed_date,
@@ -555,7 +591,7 @@ SELECT
   sk_offer,
   sk_offer_approved_date,
   sk_offer_submitted_date,
-  sk_proposal,
+  adr.sk_proposal,
   sk_region,
   sk_tenant_doc_complete_date,
   sk_tenant_first_doc_sent_date,
@@ -623,6 +659,9 @@ SELECT
       ) = 1 THEN TRUE
     ELSE FALSE
   END as is_user_version,
+  IF(df.first_touchpoint IS NULL, FALSE, TRUE) AS is_direct_offer,
+  IF(ed.ts_early_demand_started IS NULL, FALSE, TRUE) AS is_early_demand,
+  IF(dt_tenant_first_doc_sent_date IS NOT NULL AND rr.resend_request IS NOT NULL, TRUE, FALSE) AS is_resend_request,
   dt_early_credit_created,
   dt_early_credit_expired,
   dt_last_credit_evaluation_init,
@@ -644,3 +683,13 @@ LEFT JOIN
   client_max_funnel_drop_step umf
   ON adr.sk_client = umf.sk_client_max_funnel
   AND DATE_TRUNC('month', adr.dt_reference) = umf.dt_reference_user_max_funnel
+LEFT JOIN
+  direct_offer df
+  ON  df.sk_client = adr.sk_client
+  AND df.sk_house = adr.sk_house
+LEFT JOIN
+  early_demand ed
+  ON ed.sk_house = adr.sk_house
+LEFT JOIN
+  resend_request rr
+  ON rr.sk_proposal = adr.sk_proposal
