@@ -7,7 +7,7 @@ dag:
             This DAG loads to DW our Retention Data Model.
             This DAG is triggered by Mediator and loads the tables via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: retention
   default_partitions: [country_code]
