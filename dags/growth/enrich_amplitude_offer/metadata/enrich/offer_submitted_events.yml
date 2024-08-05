@@ -52,6 +52,14 @@ columns:
       - datalake_amplitude_clean_staging.170698_offer_submitted_new_events.up_app_type
       - datalake_amplitude_clean_staging.183047_offer_submitted_new_events.up_app_type
     description: App type/device where the event was made.
+  version_name:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.version_name
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.version_name
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.version_name
+      - datalake_amplitude_clean_staging.170698_offer_submitted_new_events.version_name
+      - datalake_amplitude_clean_staging.183047_offer_submitted_new_events.version_name
+    description: Version name of the app associated with the event.
   utm_source:
     lineage:
       - datalake_amplitude_clean_staging.170698_offer_submitted_events.up_utm_source
