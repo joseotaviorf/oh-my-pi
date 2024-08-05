@@ -66,7 +66,7 @@ columns:
     description: Key of the proposal related to the rent flow, an offer that was accepted. A rent flow can have none, one or more proposals related.
   sk_contract:
     lineage:
-      - dw_rent.dim_contract.sk_contract
+      - datalake_ebdb_contract.contract.id
     description: Key of the contract related to the rent flow. A rent flow can have none, one or more contracts related.
   sk_rent_flow_taxonomy:
     lineage:
@@ -82,11 +82,11 @@ columns:
     description: Key of the the first listing date of the property related to the rent flow. It's the date of the first listing of the property transformed into a number.
   sk_house_listing_date:
     lineage:
-      - dw_rent.dim_house_listing.ts_listing_version_start
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
     description: Key of the house listing date of the present version related to the rent flow. It's the date of the listing's version start transformed into a number.
   sk_house_listing_de_publication_date:
     lineage:
-      - dw_rent.dim_house_listing.ts_last_de_publication
+      - datalake_ebdb_listing.house_listing.ts_last_unpublished
     description: Key of the house listing depublication date of the present version related to the rent flow. It's the date of the listing's version depublication transformed into a number.
   sk_house_listing_first_offer_submitted_date:
     lineage:
@@ -130,124 +130,124 @@ columns:
     description: Key of the date when the proposal was approved, which means that all steps (documentation and credit analysis) are approved. It's the proposal's approved date transformed into a number. A rent flow can have none, one or more proposal's approved dates.
   sk_proposal_processed_date:
     lineage:
-      - dw_rent.dim_proposal.ts_processed
+      - datalake_proposal.proposal.ts_processed
     description: Key of the date when the proposal was processed, which means that all steps (documentation and credit analysis) are finished. It's the proposal's processed date transformed into a number. A rent flow can have none, one or more proposal's processed dates.
   sk_tenant_first_doc_sent_date:
     lineage:
-      - dw_rent.dim_proposal.dt_tenant_first_document_sent
-      - dw_rent.dim_proposal.dt_tenant_auto_first_doc_sent
+      - datalake_proposal.proposal.ts_tenant_first_doc_sent
+      - datalake_proposal.proposal.ts_tenant_auto_first_doc_sent
     description: Key of the date when the tenant prospect first sent the documentation related to the rent flow. It's the client's first documentation sent date transformed into a number.
   sk_tenant_manual_first_doc_sent_date:
     lineage:
-      - dw_rent.dim_proposal.dt_tenant_first_document_sent
+      - datalake_proposal.proposal.ts_tenant_first_doc_sent
     description: Key of the date when the tenant prospect first manually sent the documentation related to the rent flow. It's the client's first manual documentation sent date transformed into a number.
   sk_tenant_auto_first_doc_sent_date:
     lineage:
-      - dw_rent.dim_proposal.dt_tenant_auto_first_doc_sent
+      - datalake_proposal.proposal.ts_tenant_auto_first_doc_sent
     description: Key of the date when the tenant prospect first automatically sent the documentation related to the rent flow. It's the client's first automatic documentation sent date transformed into a number.
   sk_tenant_first_doc_complete_date:
     lineage:
-      - dw_rent.dim_proposal.dt_tenant_first_doc_complete
+      - datalake_proposal.proposal.ts_tenant_first_doc_complete
     description: Key of the date when the tenant prospect first completed the documentation. It's the client's first completed documentation date transformed into a number.
   sk_tenant_last_doc_complete_date:
     lineage:
-      - dw_rent.dim_proposal.dt_tenant_last_doc_complete
+      - datalake_proposal.proposal.ts_tenant_last_doc_complete
     description: Key of the date when the tenant prospect completed the last documentation. It's the client's last completed documentation date transformed into a number.
   sk_tenant_doc_complete_date:
     lineage:
-      - dw_rent.dim_proposal.dt_tenant_doc_complete
+      - datalake_proposal.proposal.ts_tenant_last_doc_complete
     description: Key of the date when the tenant prospect documentation was completed. It's the client's documentation completed date transformed into a number. A rent flow can have none, one or more documentation completed dates.
   sk_contract_created_date:
     lineage:
-      - dw_rent.dim_contract.ts_created
+      - datalake_ebdb_contract.contract.ts_created
     description: Key of the date when the contract related to the rent flow was created. It's the contract's creation date transformed into a number. A rent flow can have none, one or more contract's created dates.
   sk_contract_signed_date:
     lineage:
-      - dw_rent.dim_contract.ts_signature
+      - datalake_ebdb_contract.contract.ts_signed
     description: Key of the date when the contract related to the rent flow was signed. It's the contract's signed date transformed into a number. A rent flow can have none, one or more contract's signed dates.
   sk_contract_annulment_date:
     lineage:
-      - dw_rent.dim_contract.dt_annulment
+      - datalake_ebdb_contract.contract.dt_termination
     description: Key of the date when the contract related to the rent flow was terminated. It's the contract's termination date transformed into a number. A rent flow can have none, one or more contract's termination dates.
   sk_contract_canceled_date:
     lineage:
-      - dw_rent.dim_contract.ts_canceled
+      - datalake_ebdb_contract.contract.ts_canceled
     description: Key of the date when the contract related to the rent flow was canceled. It's the contract's cancelation date transformed into a number. A rent flow can have none, one or more contract's canceled dates.
   sk_credit_analysis_first_init_date:
     lineage:
-      - dw_rent.dim_proposal.dt_credit_analysis_first_init
+      - datalake_proposal.proposal.ts_credit_analysis_first_init
     description: Key of the date when the first credit analysis started for the proposal. It's the first credit analysis' init date transformed into a number. A rent flow can have none, one or more first credit analysis' init dates.
   sk_credit_analysis_last_init_date:
     lineage:
-      - dw_rent.dim_proposal.dt_credit_analysis_last_init
+      - datalake_proposal.proposal.dt_credit_analysis_last_init
     description: Key of the date when the last credit analysis started for the proposal. It's the last credit analysis' init date transformed into a number. A rent flow can have none, one or more last credit analysis' init dates.
   sk_credit_analysis_init_date:
     lineage:
-      - dw_rent.dim_proposal.dt_credit_analysis_init
+      - datalake_proposal.proposal.ts_credit_analysis_last_init
     description: Key of the date of the credit analysis init for the proposal. It's the credit analysis' init date transformed into a number. A rent flow can have none, one or more credit analysis' init dates.
   sk_credit_analysis_first_end_date:
     lineage:
-      - dw_rent.dim_proposal.dt_credit_analysis_first_end
+      - datalake_proposal.proposal.ts_credit_analysis_first_end
     description: Key of the date when the first credit analysis ended for the proposal. It's the first credit analysis' ended date transformed into a number. A rent flow can have none, one or more first credit analysis' ended dates.
   sk_credit_analysis_last_end_date:
     lineage:
-      - dw_rent.dim_proposal.dt_credit_analysis_last_end
+      - datalake_proposal.proposal.dt_credit_analysis_last_end
     description: Key of the date when the last credit analysis ended for the proposal. It's the last credit analysis' ended date transformed into a number. A rent flow can have none, one or more last credit analysis' ended dates.
   sk_credit_analysis_end_date:
     lineage:
-      - dw_rent.dim_proposal.dt_credit_analysis_end
+      - datalake_proposal.proposal.ts_credit_analysis_last_end
     description: Key of the date when the credit analysis ended for the proposal. It's the credit analysis' ended date transformed into a number. A rent flow can have none, one or more credit analysis' ended dates.
   sk_credit_analysis_approved_date:
     lineage:
-      - dw_rent.dim_proposal.dt_credit_last_approved
+      - datalake_proposal.proposal.ts_credit_approved_last
     description: Key of the date when the credit analysis was approved. It's the credit analysis' approved date transformed into a number. A rent flow can have none, one or more credit analysis' approved dates.
   sk_first_credit_evaluation_init:
     lineage:
-      - dw_rent.dim_proposal.dt_first_credit_evaluation_init
+      - datalake_proposal.proposal.ts_credit_evaluation_first_init
     description: Key of the date when the first credit evaluation was initiated related to the proposal. It's the first credit evaluation's init date transformed into a number. A rent flow can have none, one or more first credit evaluation's init dates.
   sk_last_credit_evaluation_init:
     lineage:
-      - dw_rent.dim_proposal.dt_last_credit_evaluation_init
+      - datalake_proposal.proposal.ts_credit_evaluation_last_init
     description: Key of the date when the last credit evaluation was initiated related to the proposal. It's the last credit evaluation's init date transformed into a number. A rent flow can have none, one or more last credit evaluation's init dates.
   sk_first_credit_evaluation_positive:
     lineage:
-      - dw_rent.dim_proposal.dt_first_credit_evaluation_positive
+      - datalake_proposal.proposal.ts_first_credit_evaluation_positive
     description: Key of the date when the first credit evaluation was positive related to the proposal. It's the first positive credit evaluation date transformed into a number. A rent flow can have none, one or more first positive credit evaluation's dates.
   sk_last_credit_evaluation_positive:
     lineage:
-      - dw_rent.dim_proposal.dt_last_credit_evaluation_positive
+      - datalake_proposal.proposal.ts_last_credit_evaluation_positive
     description: Key of the date when the last credit evaluation was positive related to the proposal. It's the last positive credit evaluation date transformed into a number. A rent flow can have none, one or more last positive credit evaluation's dates.
   sk_first_credit_evaluation_negative:
     lineage:
-      - dw_rent.dim_proposal.dt_first_credit_evaluation_negative
+      - datalake_proposal.proposal.ts_credit_evaluation_first_negative
     description: Key of the date when the first credit evaluation was negative related to the proposal. It's the first negative credit evaluation date transformed into a number. A rent flow can have none, one or more first negative credit evaluation's dates.
   sk_last_credit_evaluation_negative:
     lineage:
-      - dw_rent.dim_proposal.dt_last_credit_evaluation_negative
+      - datalake_proposal.proposal.ts_credit_evaluation_last_negative
     description: Key of the date when the last credit evaluation was negative related to the proposal. It's the last negative credit evaluation date transformed into a number. A rent flow can have none, one or more last negative credit evaluation's dates.
   sk_guarantee_date:
     lineage:
-      - dw_rent.dim_proposal.dt_guarantee
+      - datalake_proposal.proposal.ts_guarantee
     description: Key of the date when the tenant prospect opted for the Rental Guarantee. It's the date of when the Rental Guarantee was processed in our system, transformed into a number. A rent flow can have none, one or more guarantee's dates.
   sk_first_doc_analysis_approved:
     lineage:
-      - dw_rent.dim_proposal.dt_first_doc_analysis_approved
+      - datalake_proposal.proposal.ts_doc_analysis_first_approved
     description: Key of the date when the first documentation analysis was approved. It's the documentation analysis' approval date transformed into a number. A rent flow can have none, one or more first documentation analysis' approved dates.
   sk_last_doc_analysis_approved:
     lineage:
-      - dw_rent.dim_proposal.dt_last_doc_analysis_approved
+      - datalake_proposal.proposal.ts_doc_analysis_last_approved
     description: Key of the date when the last documentation analysis was approved. It's the last documentation analysis' approval date transformed into a number. A rent flow can have none, one or more last documentation analysis' approved dates.
   sk_first_doc_analysis_rejected:
     lineage:
-      - dw_rent.dim_proposal.dt_first_doc_analysis_rejected
+      - datalake_proposal.proposal.ts_doc_analysis_first_rejected
     description: Key of the date when the first documentation analysis was rejected. It's the documentation analysis' rejection date transformed into a number. A rent flow can have none, one or more documentation analysis' rejected dates.
   sk_last_doc_analysis_rejected:
     lineage:
-      - dw_rent.dim_proposal.dt_last_doc_analysis_rejected
+      - datalake_proposal.proposal.ts_doc_analysis_last_rejected
     description: Key of the date when the last documentation analysis was rejected. It's the last documentation analysis' rejection date transformed into a number. A rent flow can have none, one or more last documentation analysis' rejected dates.
   sk_guarantee_paid_date:
     lineage:
-      - dw_rent.dim_proposal.dt_guarantee_paid
+      - datalake_proposal.proposal.ts_guarantee_paid
     description: Key of the date of when the guarantee was paid. It's the guarantee's pay date transformed into a number. A rent flow can have none, one or more guarantees paid dates.
   sk_agent_review_rating_date:
     lineage:
@@ -294,9 +294,9 @@ columns:
       visit_completed: The rent flow is in/stopped with visit completed.
   funnel_step_drop_reason:
     lineage:
-      - dw_rent.dim_contract.cancellation_reason
+      - datalake_ebdb_contract.contract.cancellation_reason
       - dw_rent.dim_offer.rejection_reason
-      - dw_rent.dim_proposal.rejection_reason
+      - datalake_proposal.proposal.rejection_reason
       - dw_public.dim_booking.cancellation_reason
     description: The reason of why the rent flow has stopped in the actual funnel step. A rent flow can have none, one or more values of drop reason.
   flg_visit_completed:
