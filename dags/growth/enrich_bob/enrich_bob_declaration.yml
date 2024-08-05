@@ -4,7 +4,7 @@ dag:
   schedule_start_date: 2020, 8, 29
   owner: Data Growth
   documentation:
-    dag_purpose: | 
+    dag_purpose: |
       This DAG creates the enriched tables for [Bob (bob-o-construtor)](https://github.com/quintoandar/bob-o-construtor), a house registry service and now it has been used by AA (Autonomous Agents).
 workflow:
   type: query
@@ -13,9 +13,9 @@ workflow:
     house_draft_aud:
       extraction_type: incremental
       partitions:
-      - year
-      - month
-      - day
+        - year
+        - month
+        - day
   inner_dependencies:
     house_draft_business_context:
       - house_draft
@@ -27,3 +27,4 @@ cluster:
     autoscale:
       max_workers: 2
       min_workers: 1
+    spark_version: 12.2.x-scala2.12
