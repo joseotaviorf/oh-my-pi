@@ -12,7 +12,7 @@ workflow:
   layer: dw
   custom_schema: quinto_messenger
 cluster:
-  type: databricks_10_4_med_2xlarge_general_photon_cluster
+  type: databricks_12_2_med_2xlarge_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
