@@ -324,13 +324,13 @@ tenant_journey_agg AS (
     COUNT(
       DISTINCT
         CASE
-          WHEN tet.id_event_type = 9 AND tet.contract_status = 'Ativo' AND DATEDIFF(DATE('2023-10-18'), tet.ts_event) <= 40 THEN tet.id_contract
+          WHEN tet.id_event_type = 9 AND tet.contract_status = 'Ativo' AND DATEDIFF(DATE('{year}-{month}-{day}'), tet.ts_event) <= 40 THEN tet.id_contract
         END
     ) AS total_onboarding_active_contracts,
     COUNT(
       DISTINCT
         CASE
-          WHEN tet.id_event_type = 9 AND tet.contract_status = 'Ativo' AND DATEDIFF(DATE('2023-10-18'), tet.ts_event) > 40 THEN tet.id_contract
+          WHEN tet.id_event_type = 9 AND tet.contract_status = 'Ativo' AND DATEDIFF(DATE('{year}-{month}-{day}'), tet.ts_event) > 40 THEN tet.id_contract
         END
     ) AS total_ongoing_active_contracts,
     COUNT(

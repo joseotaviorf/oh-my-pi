@@ -1,5 +1,4 @@
 apiVersion: quintoandar.com.br/checklist/v2
-kind: ServiceChecklist
 metadata:
   name: bi-etl-ejuice
 spec:
@@ -10,10 +9,7 @@ spec:
     and/or SQL queries, triggered by the DAGs and destined to be executed inside
     Databricks clusters.
 
-  costCenter: C092
-  department: data
   lifecycle: production
-  tier: T0
 
   ownership:
     line: tech_platform
@@ -22,9 +18,9 @@ spec:
 
   libraries:
     - name: bi-etl-ejuice
+      tier: T0
       type: common-usage
       path: bietlejuice
-      tier: T0
       description: |
         Gathers two main development subjects: analytical data pipelines developed
         as Airflow DAGs and destined to be orchestrated inside Google Cloud Composer;
@@ -33,10 +29,3 @@ spec:
         Databricks clusters.
       registries:
         - github-packages
-
-  channels:
-    squad: "data-ingestion"
-    alerts: "alerts-de-airflow-dags"
-
-  dates:
-    launch: 27/10/2016
