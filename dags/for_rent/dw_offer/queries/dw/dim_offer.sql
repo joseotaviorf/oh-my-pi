@@ -41,6 +41,7 @@ enrich_attribution AS (
         Using CASE WHEN instead of COALESCE to don't create strange combinations.
         */
         IF(acc.id_firestore IS NOT NULL, acc.final_attribution_app_type, aos.app_type) AS app_type,
+        aos.version_name,
         IF(acc.id_firestore IS NOT NULL, acc.final_attribution_source, aos.utm_source) AS utm_source,
         IF(acc.id_firestore IS NOT NULL, acc.final_attribution_medium, aos.utm_medium) AS utm_medium,
         IF(acc.id_firestore IS NOT NULL, acc.final_attribution_campaign, aos.utm_campaign) AS utm_campaign,
@@ -166,6 +167,7 @@ offer_enriched AS (
     SELECT
         o.*,
         IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.app_type, ose_wo_id_firestore.app_type) AS app_type,
+        COALESCE(ose_id_firestore.version_name, ose_wo_id_firestore.version_name) AS version_name,
         IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.utm_source, ose_wo_id_firestore.utm_source) AS utm_source,
         IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.utm_medium, ose_wo_id_firestore.utm_medium) AS utm_medium,
         IF(ose_id_firestore.id_firestore IS NOT NULL, ose_id_firestore.utm_campaign, ose_wo_id_firestore.utm_campaign) AS utm_campaign,
@@ -228,6 +230,7 @@ SELECT
     o.rejection_reason,
     o.type,
     o.app_type,
+    o.version_name AS app_version_name,
     o.utm_source,
     o.utm_medium,
     o.utm_campaign,

@@ -112,8 +112,8 @@ columns:
         to negotiate the rental price
   app_type:
     lineage:
-    - datalake_amplitude_offer.offer_submitted_events.app_type
-    - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
+      - datalake_amplitude_offer.offer_submitted_events.app_type
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
     description: Amplitude's app type
     categories:
       amp: amp
@@ -122,6 +122,10 @@ columns:
       ios: ios
       web_desktop: web (desktop)
       web_mobile: web (mobile)
+  app_version_name: 
+    lineage:
+      - datalake_amplitude_offer.offer_submitted_events.version_name
+    description: Version name of the app associated with the offer's event on Amplitude.
   utm_source:
     lineage:
     - datalake_amplitude_offer.offer_submitted_events.utm_source
