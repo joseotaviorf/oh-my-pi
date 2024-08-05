@@ -1,6 +1,6 @@
 ---
 dag:
-  name: invoice_preview_homolog
+  name: invoice_preview
   schedule_start_date: 2020, 11, 1
   schedule_interval: 0 8 * * *
   owner: Data Fintech

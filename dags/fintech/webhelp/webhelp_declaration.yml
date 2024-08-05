@@ -1,6 +1,6 @@
 ---
 dag:
-  name: webhelp_homolog
+  name: webhelp
   schedule_start_date: 2024, 2, 7
   schedule_interval: 30 5 * * *
   owner: Data Fintech

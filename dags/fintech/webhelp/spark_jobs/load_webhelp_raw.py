@@ -62,7 +62,7 @@ if __name__ == "__main__":
     azure_sub_folder = json.loads(args.azure_sub_folder)
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
-    format = json.loads(args.format)
+    format = args.format
 
     logger.info(
         f"""m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
