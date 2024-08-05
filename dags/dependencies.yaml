@@ -514,6 +514,7 @@ bietlejuice.dw_hub_services:
   - bietlejuice.enrich_hub_services_agents:load-enrich-profile
   - bietlejuice.enrich_hub_services_agents:load-enrich-users
   - bietlejuice.hub_services:load-clean-business-unit
+  - bietlejuice.hub_services:load-clean-business-unit-region
   - bietlejuice.hub_services:load-clean-business-unit-region-aud
   - bietlejuice.hub_services:load-clean-rev-info
 bietlejuice.dw_inspections:
