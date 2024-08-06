@@ -61,9 +61,6 @@ dags:
   for_sale_cross:
     owner: Data ForSale
     cluster_name: databricks_12_2_med_compute_cluster
-  fintech:
-    cluster_name: databricks_10_4_med_general_cluster
-    owner: Data Fintech
   growth:
     owner: Data Growth
     cluster_name: databricks_10_4_max_memory_cluster
