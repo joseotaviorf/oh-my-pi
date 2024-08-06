@@ -36,5 +36,7 @@ workflow:
       clean_table_name: tier_partner
     tier_partner_revision:
       clean_table_name: tier_partner_revision
+    supply_acquisition_share:
+      clean_table_name: supply_acquisition_share
 cluster:
   type: databricks_13_3_med_general_cluster

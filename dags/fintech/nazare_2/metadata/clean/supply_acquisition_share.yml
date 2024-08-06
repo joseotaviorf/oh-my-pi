@@ -1,0 +1,24 @@
+---
+database_name: datalake_nazare_clean
+table_name: supply_acquisition_share
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_nazare_raw.supply_acquisition_share.id
+  id_house:
+    lineage:
+    - datalake_nazare_raw.supply_acquisition_share.house_id
+  id_agent:
+    lineage:
+    - datalake_nazare_raw.supply_acquisition_share.agent_id
+  bonus_fee:
+    lineage:
+    - datalake_nazare_raw.supply_acquisition_share.bonus_fee
+  ts_created:
+    lineage:
+    - datalake_nazare_raw.supply_acquisition_share.created_at
+  ts_updated:
+    lineage:
+    - datalake_nazare_raw.supply_acquisition_share.updated_at
