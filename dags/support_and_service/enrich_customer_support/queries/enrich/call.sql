@@ -214,6 +214,7 @@ conversation AS (
   LEFT JOIN
     csat_events ce
       ON ce.id_task = fe.id_task
+      OR ce.id_call = fe.id_call
   LEFT JOIN
     call_metrics cm
       ON cm.id_task = fe.id_task
