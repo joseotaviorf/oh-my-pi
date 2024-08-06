@@ -48,6 +48,7 @@ SELECT
   tow.owners_email AS business_owners,
   u_creator.email AS technical_owner,
   u_changed.email AS last_owner,
+  array_contains(regexp_extract_all(lt.table_name, '\\[([^\\]]+)\\]'), 'Core') AS is_semantic_layer,
   lt.ts_created,
   lt.ts_changed,
   "superset" AS platform

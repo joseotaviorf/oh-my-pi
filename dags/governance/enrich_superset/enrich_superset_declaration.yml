@@ -15,6 +15,7 @@ workflow:
       - tagged_object
       slices:
       - ab_user
+      - tables
       - tag
       - tagged_object
       tables:

@@ -20,6 +20,11 @@ with last_slice AS (
     AND action = 'ChartDataRestApi.data'
     AND ts_event > CURRENT_DATE - interval '90' day
   GROUP BY 1
+), semantic_layer AS (
+  SELECT
+    id,
+    is_semantic_layer
+  FROM datalake_superset.tables
 ), tags AS (
   SELECT
       tog.id_object,
@@ -42,6 +47,7 @@ SELECT
   ls.ts_created,
   ls.ts_changed,
   ls.company_line,
+  sl.is_semantic_layer,
   "superset" AS platform,
   IF(l.id_slice IS NOT NULL, 'ACTIVE', 'DEPRECATED') AS entity_status,
   COALESCE(l.last_90d_views,0) AS last_90d_views,
@@ -52,6 +58,7 @@ FROM last_slice ls
 JOIN datalake_superset.ab_user u_creator ON u_creator.id = ls.id_user_created
 JOIN datalake_superset.ab_user u_changed ON u_changed.id = ls.id_user_changed
 JOIN slice_owners sow ON sow.id_slice = ls.id
+JOIN semantic_layer sl ON sl.id = ls.id_datasource
 LEFT JOIN logs l on l.id_slice = ls.id
 LEFT JOIN tags ON tags.id_object = ls.id
 WHERE ls.most_recent_rank = 1
