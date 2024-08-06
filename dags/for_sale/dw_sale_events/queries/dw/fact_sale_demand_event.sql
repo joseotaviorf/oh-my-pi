@@ -259,7 +259,8 @@ last_sk_values AS (
         COALESCE(MAX(sk_sale_demand_event), 0) AS max_sk_sale_demand_event
     FROM
         dw_sale.fact_sale_demand_event
-)
+),
+final_results AS (
 SELECT
     COALESCE(
         f.sk_sale_demand_event,
@@ -281,9 +282,9 @@ SELECT
     COALESCE(e.sk_secretariat_booking_creator, -1) AS sk_secretariat_booking_creator,
     COALESCE(e.sk_secretariat_on_event, -1) AS sk_secretariat_on_event,
     COALESCE(e.sk_last_secretariat, -1) AS sk_last_secretariat,
-    dd.year,
-    dd.month,
-    dd.day,
+    COALESCE(dd.year, YEAR(e.ts_event)) AS year,
+    COALESCE(dd.month, MONTH(e.ts_event)) AS month,
+    COALESCE(dd.day, DAY(e.ts_event)) AS day,
     e.ts_event,
     NOW() AS ts_load
 FROM
@@ -296,5 +297,30 @@ LEFT JOIN
     dw_sale.fact_sale_demand_event AS f
         ON e.sk_event_date = f.sk_event_date
         AND e.sk_event_type = f.sk_event_type
-        AND COALESCE(NULLIF(e.sk_offer, -1), e.sk_booking) = COALESCE(NULLIF(f.sk_offer, -1), f.sk_booking)
+        AND COALESCE(NULLIF(e.sk_offer, -1), e.sk_booking) = COALESCE(NULLIF(f.sk_offer, -1), f.sk_booking))
+SELECT
+    sk_sale_demand_event,
+    sk_event_date,
+    sk_event_type,
+    sk_booking,
+    sk_offer,
+    sk_house,
+    sk_region,
+    sk_buyer,
+    sk_seller,
+    sk_agent,
+    sk_agent_work_contract,
+    sk_business_unit,
+    sk_company_supply,
+    sk_company_demand,
+    sk_secretariat_booking_creator,
+    sk_secretariat_on_event,
+    sk_last_secretariat,
+    year,
+    month,
+    day,
+    ts_event,
+    ts_load
+FROM
+    final_results
 GROUP BY ALL
