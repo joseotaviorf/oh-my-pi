@@ -2007,16 +2007,6 @@ bietlejuice.enrich_losses:
   - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
-bietlejuice.enrich_losses_daily:
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_retsuko:load-enrich-entry
-  - bietlejuice.enrich_retsuko:load-enrich-invoice
-  - bietlejuice.retsuko:load-clean-account
-  - bietlejuice.retsuko:load-clean-contract
-  - bietlejuice.trato_feito:load-clean-accounting-installment
-  - bietlejuice.trato_feito:load-clean-debt
-  - bietlejuice.trato_feito:load-clean-installment
-  - bietlejuice.trato_feito:load-clean-negotiation
 bietlejuice.enrich_lost_listings:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
@@ -3206,8 +3196,6 @@ bietlejuice.metric_fintech__atta:
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow
   - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
-bietlejuice.metric_fintech__losses:
-  - bietlejuice.enrich_losses_daily:load-enrich-pdd
 bietlejuice.metric_fintech__velo:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values

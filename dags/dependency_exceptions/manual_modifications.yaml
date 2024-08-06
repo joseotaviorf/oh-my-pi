@@ -433,9 +433,6 @@ bietlejuice.enrich_lost_listings:
     - bietlejuice.ebdb_condo:load-clean-info-condo-amenities
     - bietlejuice.ebdb_house:load-clean-house-maintenance-condition
     - bietlejuice.enrich_region:load-enrich-region
-bietlejuice.enrich_losses_daily:
-  remove:
-    - bietlejuice.enrich_losses:load-enrich-provision-factor
 bietlejuice.enrich_marketing_automatic_daily_costs:
   remove:
     - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-braze-consolidated-metrics
