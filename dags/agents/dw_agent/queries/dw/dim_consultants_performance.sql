@@ -340,6 +340,15 @@ base AS (
         dw_public.dim_user AS asp
             ON asp.sk_user = CAST(hlco.id_user AS BIGINT)
             OR asp.sk_user = asp_in_ciq_full.sk_user_consultant
+),
+asp_consultants_allocation AS (
+    SELECT
+        id_user,
+        team,
+        DATE(dt_start),
+        COALESCE(DATE(dt_end),CURRENT_DATE()) AS dt_end
+    FROM
+      datalake_gsheets_clean.asp_consultants_allocation
 )
 SELECT
     DISTINCT
@@ -354,7 +363,7 @@ SELECT
 FROM 
     base
 INNER JOIN 
-    datalake_gsheets_clean.asp_consultants_allocation AS aux_asp
+    asp_consultants_allocation AS aux_asp
         ON aux_asp.id_user = base.sk_consultant
         AND DATE_TRUNC('MM', CURRENT_DATE() - INTERVAL '1' DAY) BETWEEN DATE_TRUNC('MM', aux_asp.dt_start) AND aux_asp.dt_end
 WHERE (
