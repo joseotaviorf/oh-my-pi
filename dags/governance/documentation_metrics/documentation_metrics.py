@@ -70,7 +70,7 @@ task_group = DatalakeTaskGroup(
     relative_query_path=SOURCE,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=athena_query_results_bucket,
-    execution_timeout_hours=3,
+    execution_timeout_hours=4,
 )
 
 table_names = config_service.get_config("table_names")
@@ -83,7 +83,7 @@ for table_name in table_names:
         table_name=table_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{table_name}_to_raw.py",
-        raw_spark_job_extra_args=[SOURCE, table_name, EXECUTION_DATE]
+        raw_spark_job_extra_args=[SOURCE, table_name, EXECUTION_DATE],
     )
     raw_task_groups[table_name] = raw_task_group
 
