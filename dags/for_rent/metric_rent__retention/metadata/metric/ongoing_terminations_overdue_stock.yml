@@ -6,7 +6,9 @@ domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   dt_reference_day:
-    description: Date when the data was loaded.
+    lineage:
+      - dw_retention.fact_ongoing_terminations_snapshots.ts_snapshot
+    description: Date when the ongoing terminations snapshot was made.
     dimension: True
   qtd_overdue_stock:
     description: Total volume of termination in overdue stock.
