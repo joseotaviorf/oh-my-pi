@@ -198,9 +198,9 @@ CAP AS (
         WHERE
             p.dt_paid >= '2022-12-01'
         AND
-            f.type=':file.type/payment.csv'
+            f.type LIKE '%:file.type/payment%'
         QUALIFY
-            ROW_NUMBER() OVER (PARTITION BY company_use ORDER BY f.ts_created DESC) = 1
+            ROW_NUMBER() OVER (PARTITION BY company_use, our_number ORDER BY f.ts_created DESC) = 1
 
         UNION ALL
 

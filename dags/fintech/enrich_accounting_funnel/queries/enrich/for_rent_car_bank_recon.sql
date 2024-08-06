@@ -37,11 +37,9 @@ sap AS (
 vans_checkout_union AS (
     SELECT
         NULLIF(b.your_number, '') AS company_use,
-        NULLIF(b.id_business_entity, '') AS id_contract,
         b.id_finance_entity AS id_invoice,
         DATE(b.ts_paid - interval '3' hour) AS ts_paid,
         b.paid_amount,
-        b.payer_name,
         NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number
     FROM
         datalake_checkout_clean.boleto b
@@ -57,11 +55,9 @@ vans_checkout_union AS (
 
     SELECT
         COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, '')) AS company_use,
-        NULLIF(split_part(regexp_replace(b.company_use, '[A-Z]', '|'), '|', 1), '') AS id_contract,
         b.id_related_document AS id_invoice,
         DATE(b.dt_paid) AS ts_paid,
         b.paid_amount AS paid_amount,
-        b.payer_name AS payer_name,
         NULLIF(CAST(b.our_number AS INTEGER), '') AS our_number
     FROM
         datalake_vans_clean.boleto b
@@ -72,15 +68,12 @@ vans_checkout_union AS (
         AND LOWER(b.document_number) NOT LIKE 'fs%'
 ),
 
-vans_checkout AS (
+pre_vans_checkout AS (
     SELECT
         UPPER(vc.company_use) AS company_use,
-        vc.our_number,
-        vc.id_contract,
         vc.id_invoice,
         DATE(dd.next_brz_fintech_business_day) AS dt_paid,
-        vc.paid_amount AS amount,
-        vc.payer_name
+        vc.paid_amount
     FROM
         vans_checkout_union vc
     LEFT JOIN
@@ -88,6 +81,17 @@ vans_checkout AS (
             ON vc.ts_paid = dd.date
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1
+),
+
+vans_checkout AS (
+    SELECT
+        company_use,
+        id_invoice,
+        dt_paid,
+        SUM(paid_amount) AS amount
+    FROM
+        pre_vans_checkout vc
+    GROUP BY 1,2,3
 ),
 
 seu_barriga AS (

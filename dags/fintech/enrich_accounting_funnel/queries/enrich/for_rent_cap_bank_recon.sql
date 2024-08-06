@@ -2,7 +2,6 @@ WITH francesinha AS (
     SELECT
         UPPER(CASE
             WHEN company_use RLIKE '[0-9]P[0-9]' AND LENGTH(TRIM(company_use)) = 11 AND SUBSTRING(company_use, 1, 1) = '0' THEN SUBSTRING(REGEXP_REPLACE(SUBSTRING(REPLACE(company_use, '|', '!'), 1, LENGTH(company_use) - 2), 'P.', 'P'), 2, LENGTH(company_use))
-            WHEN company_use RLIKE '[0-9]P[0-9]' THEN REGEXP_REPLACE(SUBSTRING(REPLACE(company_use, '|', '!'), 1, LENGTH(company_use) - 2), 'P.', 'P')
             ELSE REPLACE(company_use, '|', '!')
         END) AS company_use,
         our_number,
@@ -25,22 +24,19 @@ cap AS (
         dt_paid,
         UPPER(CASE
             WHEN reference_1 RLIKE '[0-9]P[0-9]' AND LENGTH(TRIM(reference_1)) = 11 AND SUBSTRING(reference_1, 1, 1) = '0' THEN SUBSTRING(REGEXP_REPLACE(SUBSTRING(REPLACE(reference_1, '|', '!'), 1, LENGTH(reference_1) - 2), 'P.', 'P'), 2, LENGTH(reference_1))
-            WHEN reference_1 RLIKE '[0-9]P[0-9]' THEN REGEXP_REPLACE(SUBSTRING(REPLACE(reference_1, '|', '!'), 1, LENGTH(reference_1) - 2), 'P.', 'P')
             ELSE REPLACE(reference_1, '|', '!')
         END) AS company_use,
         payment_status,
         reference_3 AS payment_name,
         reference_4 AS payment_type,
         SPLIT(reference_5, ':') AS id_banking_payment,
-        SUM(paid_amount) AS paid_amount
+        SUM(IF(payment_status = 'chargeback', 0, paid_amount)) AS paid_amount
     FROM
         datalake_accounting_funnel.payment_platforms
     WHERE
         payment_platform = 'vans_cap'
     AND
         payment_status IN ('paid', 'chargeback')
-    AND
-        CAST(SPLIT(reference_5, ':')[0] AS INT) IN (1, 2, 7, 10, 13)
     GROUP BY
         1, 2, 3, 4, 5, 6
 ),
