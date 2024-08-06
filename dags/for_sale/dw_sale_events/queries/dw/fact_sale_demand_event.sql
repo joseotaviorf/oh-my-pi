@@ -254,18 +254,9 @@ events AS (
     WHERE
         sk_offer_dismissed_date != -1
 ),
-last_sk_values AS (
-    SELECT
-        COALESCE(MAX(sk_sale_demand_event), 0) AS max_sk_sale_demand_event
-    FROM
-        dw_sale.fact_sale_demand_event
-),
 final_results AS (
 SELECT
-    COALESCE(
-        f.sk_sale_demand_event,
-        lsv.max_sk_sale_demand_event + MONOTONICALLY_INCREASING_ID() + 1
-    ) AS sk_sale_demand_event,
+    CONCAT(sk_event_date,COALESCE(NULLIF(sk_booking,-1),sk_buyer),sk_event_type) AS sk_sale_demand_event,
     e.sk_event_date,
     e.sk_event_type,
     e.sk_booking,
@@ -282,22 +273,15 @@ SELECT
     COALESCE(e.sk_secretariat_booking_creator, -1) AS sk_secretariat_booking_creator,
     COALESCE(e.sk_secretariat_on_event, -1) AS sk_secretariat_on_event,
     COALESCE(e.sk_last_secretariat, -1) AS sk_last_secretariat,
-    COALESCE(dd.year, YEAR(e.ts_event)) AS year,
-    COALESCE(dd.month, MONTH(e.ts_event)) AS month,
-    COALESCE(dd.day, DAY(e.ts_event)) AS day,
+    YEAR(e.ts_event) AS year,
+    MONTH(e.ts_event) AS month,
+    DAY(e.ts_event) AS day,
     e.ts_event,
     NOW() AS ts_load
 FROM
-    events AS e,
-    last_sk_values AS lsv
-JOIN
-    dw_public.dim_date AS dd
-        ON e.sk_event_date = dd.sk_date
-LEFT JOIN
-    dw_sale.fact_sale_demand_event AS f
-        ON e.sk_event_date = f.sk_event_date
-        AND e.sk_event_type = f.sk_event_type
-        AND COALESCE(NULLIF(e.sk_offer, -1), e.sk_booking) = COALESCE(NULLIF(f.sk_offer, -1), f.sk_booking))
+    events AS e
+WHERE
+    sk_event_date IS NOT NULL)
 SELECT
     sk_sale_demand_event,
     sk_event_date,
