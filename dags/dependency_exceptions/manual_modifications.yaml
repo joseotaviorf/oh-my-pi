@@ -69,12 +69,6 @@ bietlejuice.dw_datamarts_spark.cross:
     - bietlejuice.dw_user:load-dw-quintoandar-dim-user-sales-rep
     - bietlejuice.ebdb:load-clean-booking
     - bietlejuice.ebdb_house:load-clean-house
-bietlejuice.dw_datamarts_spark.fintech:
-  add:
-    - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
-    - bietlejuice.retsuko:load-clean-contract
-  remove:
-    - bietlejuice.dw_fintech_snapshot:load-dw-public-snapshot-dim-contract-snapshot
 
 bietlejuice.dw_datamarts_spark.fintech_cross:
   remove:
@@ -485,8 +479,6 @@ bietlejuice.enrich_open_external_data_addresses:
     - bietlejuice.iptu:load-clean-iptu-sp
     - bietlejuice.itbi:load-clean-itbi-bh
     - bietlejuice.itbi:load-clean-itbi-sp
-bietlejuice.enrich_proponent:
-  override: []
 bietlejuice.enrich_pipeline:
   # We need to remove these dependencies because the Composer DAG runs several times during the day, and it's not
   # our intention to run this DAG the same amount of times.
