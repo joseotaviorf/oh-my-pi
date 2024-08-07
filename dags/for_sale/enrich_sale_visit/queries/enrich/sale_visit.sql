@@ -28,7 +28,7 @@ SELECT
     h.id_region,
     svh.id_business_unit,
     cs_supply.sk_company AS sk_company_supply,
-    cs_demand.sk_company AS sk_company_demand,
+    COALESCE(NULLIF(cs_demand.sk_company, -1), b.id_company_demand) AS sk_company_demand,
     b.id_agent,
     ua.id AS id_user_agent,
     svh.id_user_en AS id_user_en,

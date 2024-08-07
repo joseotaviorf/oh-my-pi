@@ -6,7 +6,7 @@ SELECT
     eso.id_owner AS sk_owner,
     COALESCE(eso.id_business_unit, -1) AS sk_business_unit,
     COALESCE(eso.sk_company_supply, -1) AS sk_company_supply,
-    COALESCE(eso.sk_company_demand, -1) AS sk_company_demand,
+    COALESCE(NULLIF(eso.sk_company_demand, -1), eso.id_company_demand, -1) AS sk_company_demand,
     COALESCE(eso.id_region,-1) AS sk_region,
     COALESCE(eso.id_booking,-1) AS sk_booking,
     COALESCE(eso.id_agent,-1) AS sk_agent,
