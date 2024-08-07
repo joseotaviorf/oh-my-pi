@@ -17,7 +17,7 @@ with last_slice AS (
     count(0) last_90d_views
   FROM datalake_superset_clean.logs
   WHERE id_slice IS NOT NULL
-    AND action = 'ChartDataRestApi.data'
+    AND action in ('ChartDataRestApi.data', 'ExploreRestApi.get')
     AND ts_event > CURRENT_DATE - interval '90' day
   GROUP BY 1
 ), semantic_layer AS (
