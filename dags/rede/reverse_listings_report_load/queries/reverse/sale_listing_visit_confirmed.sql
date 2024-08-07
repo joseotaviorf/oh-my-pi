@@ -1,5 +1,5 @@
 SELECT
-    fv.sk_booking * 1000 + 5 AS id,
+    CAST(fv.sk_booking * 1000 + 5 AS BIGINT) AS id,
     fv.sk_region AS location_id,
     fv.sk_house AS property_id,
     dc.uuid_company AS company_uuid,

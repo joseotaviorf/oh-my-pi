@@ -1,5 +1,5 @@
 SELECT
-    flsr.sk_reason_event * 1000 + 2 AS id,
+    CAST(flsr.sk_reason_event * 1000 + 2 AS BIGINT) AS id,
     flsr.sk_region AS location_id,
     dl.id_house AS property_id,
     dc.uuid_company AS company_uuid,

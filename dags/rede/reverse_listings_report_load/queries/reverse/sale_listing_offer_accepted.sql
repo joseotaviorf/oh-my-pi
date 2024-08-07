@@ -1,5 +1,5 @@
 SELECT
-    fsde.sk_sale_demand_event * 1000 + 7 AS id,
+    CAST(fsde.sk_sale_demand_event * 1000 + 7 AS BIGINT) AS id,
     fsde.sk_region AS location_id,
     fsde.sk_house AS property_id,
     dc.uuid_company AS company_uuid,

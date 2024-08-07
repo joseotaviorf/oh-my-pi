@@ -1,5 +1,5 @@
 SELECT
-    MIN(fdol.sk_snapshot) * 100 + 9 AS id,
+    CAST(MIN(fdol.sk_snapshot) * 100 + 9 AS BIGINT) AS id,
     sk_region AS location_id,
     dc.uuid_company AS company_uuid,
     'SALE' AS business_context,

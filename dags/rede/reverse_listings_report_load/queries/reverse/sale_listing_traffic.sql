@@ -1,5 +1,5 @@
 SELECT
-    MIN(fsse.sk_event) * 1000 + 1 AS id,
+    CAST(MIN(fsse.sk_event) * 1000 + 1 AS BIGINT) AS id,
     fsse.sk_house_region AS location_id,
     fsse.sk_house AS property_id,
     dc.uuid_company AS company_uuid,
