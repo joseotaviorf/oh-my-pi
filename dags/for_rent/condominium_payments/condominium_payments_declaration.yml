@@ -1,17 +1,17 @@
-dag: 
+dag:
   name: condominium_payments
-  owner: Data SS
+  owner: Data ForRent
   schedule_start_date: 2022, 4, 7
   schedule_interval: 0 0 * * *
   documentation:
-    dag_purpose:
-      Retrieve data from Condominium Payments database (postgresql)
+    dag_purpose: Retrieve data from Condominium Payments database (postgresql)
       [Condominium Payments](https://github.com/quintoandar/infrastructure
       /blob/master/vault/database/postgres/prod/condominium-payments-api/main.tf)
       into data lake. This data comes from Condominium Payments API
       [Condominium Payments API](https://github.com/quintoandar/condominium-payments-api).
       Condominium Payments is an API that checks non-payment reports and keeps business rules
       related to the workflow of condominium-related payments.
+
 workflow:
   type: database_pull
   layer: raw
@@ -26,8 +26,6 @@ workflow:
       extraction_type: full
     non_payment_report:
       extraction_type: full
+
 cluster:
-  type: databricks_10_4_min_memory_photon_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
+  type: databricks_12_2_min_memory_photon_cluster
