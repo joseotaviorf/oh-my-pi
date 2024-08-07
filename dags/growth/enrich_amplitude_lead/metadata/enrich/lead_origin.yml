@@ -12,6 +12,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.ep_id_lead
       - datalake_amplitude_clean.183047_intro_page_viewed_events.event_properties
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.event_properties
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.event_properties
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.event_properties
   id_firestore:
     lineage:
       - datalake_rene_descartes_clean.house_lead.id
@@ -29,6 +31,8 @@ columns:
       - datalake_amplitude_clean.205027_referral_form_accepted_events.user_properties
       - datalake_amplitude_clean.183047_intro_page_viewed_events.user_properties
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.user_properties
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.user_properties
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.user_properties
   user_country:
     lineage:
       - datalake_amplitude_clean.events.country
@@ -42,6 +46,8 @@ columns:
       - datalake_amplitude_clean.205027_referral_form_accepted_events.country
       - datalake_amplitude_clean.183047_intro_page_viewed_events.country
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.country
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.country
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.country
   formfield_lead_uuid:
     lineage:
       - datalake_amplitude_clean.183047_lead_form_submitted_events.formfield_lead_uuid
@@ -60,6 +66,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.ts_event
       - datalake_amplitude_clean.183047_intro_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.ts_event
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.ts_event
   utm_campaign:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -73,6 +81,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_campaign
       - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_campaign
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_campaign
   utm_medium:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -86,6 +96,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_medium
       - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_medium
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_medium
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_medium
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_medium
   utm_source:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -99,6 +111,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_source
       - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_source
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_source
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_source
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_source
   utm_content:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -112,6 +126,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_content
       - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_content
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_content
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_content
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_content
   utm_term:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -125,6 +141,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_term
       - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_term
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_term
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_term
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_term
   platform:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -138,6 +156,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.up_platform
       - datalake_amplitude_clean.183047_intro_page_viewed_events.user_properties
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.user_properties
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.user_properties
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.user_properties
   referring_domain:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -151,6 +171,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.up_referring_domain
       - datalake_amplitude_clean.183047_intro_page_viewed_events.user_properties
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.user_properties
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.user_properties
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.user_properties
   region:
     lineage:
       - datalake_amplitude_clean.events.region
@@ -164,6 +186,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.region
       - datalake_amplitude_clean.183047_intro_page_viewed_events.region
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.region
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.region
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.region
   city:
     lineage:
       - datalake_amplitude_clean.events.city
@@ -177,6 +201,8 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.city
       - datalake_amplitude_clean.183047_intro_page_viewed_events.city
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.city
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.city
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.city
   uuid:
     lineage:
       - datalake_amplitude_clean.events.uuid
@@ -190,3 +216,5 @@ columns:
       - datalake_amplitude_clean.205027_intro_page_viewed.uuid
       - datalake_amplitude_clean.183047_intro_page_viewed_events.uuid
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.uuid
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.uuid
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.uuid
