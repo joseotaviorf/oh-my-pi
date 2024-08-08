@@ -340,13 +340,13 @@ landlord_journey_agg AS (
     COUNT(
       DISTINCT
         CASE
-          WHEN let.id_event_type = 9 AND let.contract_status = 'Ativo' AND DATEDIFF(DATE('2023-10-18'), let.ts_event) <= 40 THEN let.id_contract
+          WHEN let.id_event_type = 9 AND let.contract_status = 'Ativo' AND DATEDIFF(DATE('{year}-{month}-{day}'), let.ts_event) <= 40 THEN let.id_contract
         END
     ) AS total_onboarding_active_contracts,
     COUNT(
       DISTINCT
         CASE
-          WHEN let.id_event_type = 9 AND let.contract_status = 'Ativo' AND DATEDIFF(DATE('2023-10-18'), let.ts_event) > 40 THEN let.id_contract
+          WHEN let.id_event_type = 9 AND let.contract_status = 'Ativo' AND DATEDIFF(DATE('{year}-{month}-{day}'), let.ts_event) > 40 THEN let.id_contract
         END
     ) AS total_ongoing_active_contracts,
     COUNT(
