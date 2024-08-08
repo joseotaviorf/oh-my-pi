@@ -1,7 +1,0 @@
----
-tables_exclusion_list:
-  - schema_migrations
-  - change_owner_control
-  - charge_status_log
-partition_cols: ["year", "month", "day"]
-lineage_product_database_name: pixar
