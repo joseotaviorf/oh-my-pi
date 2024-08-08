@@ -2,8 +2,11 @@ dag:
   name: enrich_ebdb_pricing
   owner: Data ForRent
   schedule_start_date: 2020, 8, 29
+  documentation:
+    dag_purpose: | 
+      The purpose of this DAG is to allocate the tables related to house rental prices on the platform.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
-  type: databricks_12_2_med_memory_photon_cluster
+  type: databricks_13_3_min_general_cluster

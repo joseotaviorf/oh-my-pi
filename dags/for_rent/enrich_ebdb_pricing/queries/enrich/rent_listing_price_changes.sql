@@ -128,26 +128,17 @@ price_changes AS (
    WHERE 
       (price != lag_price OR lag_price IS NULL)
 ),
-rent_version_order AS (
-   SELECT 
-      id_house,
-      id_house_listing,
-      status_history,
-      DATE(ts_status_started) AS dt_change
-   FROM
-      datalake_ebdb_listing.house_listing_status
-   WHERE 
-      is_last_status_of_day
-),
 rent_status_version_order AS (
    SELECT 
       id_house,
       id_house_listing,
       status_history,
-      dt_change AS dt_status_started_date,
-      DATE(DATEADD(DAY, -1, COALESCE(LEAD(dt_change) OVER (PARTITION BY id_house ORDER BY dt_change), CURRENT_DATE))) AS dt_status_ended_date
+      DATE(ts_status_started) AS dt_status_started_date,
+      DATE(DATEADD(DAY, -1, COALESCE(LEAD(DATE(ts_status_started)) OVER (PARTITION BY id_house ORDER BY DATE(ts_status_started)), CURRENT_DATE))) AS dt_status_ended_date
    FROM
-      rent_version_order
+      datalake_ebdb_listing.house_listing_status
+   WHERE
+      is_last_status_of_day
 ),
 house_predicted_price_aud AS (
    SELECT 
@@ -215,8 +206,8 @@ FROM
 LEFT JOIN 
    rent_status_version_order AS rls
       ON rls.id_house = pc.id_house
-      AND DATE_FORMAT(pc.ts_price_started , 'yyyy-MM-dd') BETWEEN rls.dt_status_started_date AND COALESCE(rls.dt_status_ended_date, CURRENT_TIMESTAMP)
+      AND DATE(pc.ts_price_started) BETWEEN rls.dt_status_started_date AND COALESCE(rls.dt_status_ended_date, CURRENT_DATE)
 LEFT JOIN 
    rent_calculator_changes AS cc
       ON cc.id_house = pc.id_house
-      AND DATE_FORMAT(pc.ts_price_started , 'yyyy-MM-dd') BETWEEN cc.dt_calculator_result_started AND cc.dt_calculator_result_ended
+      AND DATE(pc.ts_price_started) BETWEEN cc.dt_calculator_result_started AND cc.dt_calculator_result_ended
