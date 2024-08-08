@@ -70,6 +70,12 @@ WITH atento_tables AS (
         ts_load
     FROM
         reverse_atento.recontact_mx
+    UNION ALL
+    SELECT
+        'taxonomy' AS table_name,
+        ts_load
+    FROM
+        reverse_atento.taxonomy
 )
 SELECT DISTINCT
     'Atento' AS bpo,

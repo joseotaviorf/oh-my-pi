@@ -547,6 +547,7 @@ bietlejuice.enrich_atento_reports:
     - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
     - bietlejuice.reverse_atento:load-reverse-taxonomia-email
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+    - bietlejuice.reverse_atento:load-reverse-taxonomy
 bietlejuice.enrich_databricks_usage_costs:
   add:
     - bietlejuice.gsheets_platform:done-clean-databricks-contract-details
@@ -825,6 +826,7 @@ bietlejuice.reverse_atento_access:
     - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
     - bietlejuice.reverse_atento:load-reverse-taxonomia-email
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+    - bietlejuice.reverse_atento:load-reverse-taxonomy
 bietlejuice.reverse_bic_ss:
   add:
     - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step

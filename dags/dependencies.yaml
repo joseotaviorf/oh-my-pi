@@ -1104,6 +1104,7 @@ bietlejuice.enrich_atento_reports:
   - bietlejuice.reverse_atento:load-reverse-taxonomia-call
   - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
   - bietlejuice.reverse_atento:load-reverse-taxonomia-email
+  - bietlejuice.reverse_atento:load-reverse-taxonomy
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -3347,6 +3348,7 @@ bietlejuice.reverse_atento_access:
   - bietlejuice.reverse_atento:load-reverse-taxonomia-call
   - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
   - bietlejuice.reverse_atento:load-reverse-taxonomia-email
+  - bietlejuice.reverse_atento:load-reverse-taxonomy
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.reverse_atlas_pricing_report_access:
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement

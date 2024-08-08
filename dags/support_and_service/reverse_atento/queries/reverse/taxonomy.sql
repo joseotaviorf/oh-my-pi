@@ -48,7 +48,8 @@ SELECT DISTINCT
   ts_created,
   YEAR(ts_created) AS year,
   MONTH(ts_created) AS month,
-  DAY(ts_created) AS day
+  DAY(ts_created) AS day,
+  NOW() AS ts_load
 FROM 
   base
 WHERE 
