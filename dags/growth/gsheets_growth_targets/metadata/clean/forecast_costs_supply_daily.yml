@@ -1,0 +1,54 @@
+database_name: datalake_gsheets_clean
+table_name: forecast_costs_supply_daily
+columns:
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.business
+  date:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.date
+  year_month:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.year_month
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.region
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_conversion
+  planning_operation:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_operation
+  planning_cluster_adj:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_cluster_adj
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.funnel_side
+  campaign_strategy_intent:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.campaign_strategy_intent
+  behavior_type:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.behavior_type
+  medium:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.medium
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.company_report_origin
+  supply_medium:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.supply_medium
+  planning_mkt_level1:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level1
+  planning_mkt_level2:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level2
+  planning_mkt_level3:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.planning_mkt_level3
+  cost:
+    lineage:
+      - datalake_gsheets_raw.forecast_costs_supply_daily.cost

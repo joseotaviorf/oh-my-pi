@@ -1,5 +1,11 @@
 sheets_info:
 
+  forecast_costs_supply_daily:
+    sheet_id: 1-d6ETiprXYx6DRYIfg2PblFODxNwsIZHO6WnY9f8pfY
+    sheet_name: forecast_supply_costs
+    clean_table_name: forecast_costs_supply_daily
+    sheet_context: growth  
+
   forecast_supply_daily:
     sheet_id: 1JzGUC-BCSkRP5jiFrnrksdBKkPfPHqDzEvOGXkXVgQ8
     sheet_name: forecast_supply
