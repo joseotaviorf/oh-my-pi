@@ -611,7 +611,7 @@ SELECT
     THEN 1 ELSE 0 
   END AS ec_flag,
   CASE 
-    WHEN sk_offer IS NOT NULL  
+    WHEN sk_offer <> -1
     THEN 1 ELSE 0 
   END AS os_flag,
   CASE 
