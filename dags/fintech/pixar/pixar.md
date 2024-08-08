@@ -15,7 +15,7 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces the following output tables, all via **incremental load**:
+This pipeline produces the following output tables, all via **full load**:
 
 1. In data lake raw:
 

@@ -22,12 +22,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_pixar_raw.account.updated_at
-  year:
-    lineage:
-      - datalake_pixar_raw.account.year
-  month:
-    lineage:
-      - datalake_pixar_raw.account.month
-  day:
-    lineage:
-      - datalake_pixar_raw.account.day

@@ -40,12 +40,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_pixar_raw.charge.updated_at
-  year:
-    lineage:
-      - datalake_pixar_raw.charge.year
-  month:
-    lineage:
-      - datalake_pixar_raw.charge.month
-  day:
-    lineage:
-      - datalake_pixar_raw.charge.day

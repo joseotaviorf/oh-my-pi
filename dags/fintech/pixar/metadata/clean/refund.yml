@@ -19,12 +19,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_pixar_raw.refund.updated_at
-  year:
-    lineage:
-      - datalake_pixar_raw.refund.year
-  month:
-    lineage:
-      - datalake_pixar_raw.refund.month
-  day:
-    lineage:
-      - datalake_pixar_raw.refund.day

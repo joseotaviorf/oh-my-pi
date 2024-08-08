@@ -4,13 +4,6 @@ SELECT
     amount,
     status,
     TIMESTAMP(created_at) AS ts_created,
-    TIMESTAMP(updated_at) AS ts_updated,
-    year,
-    month,
-    day
+    TIMESTAMP(updated_at) AS ts_updated
 FROM
     datalake_pixar_raw.refund
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
