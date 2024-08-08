@@ -71,7 +71,7 @@ workflow:
     users_aud:
       extraction_type: full
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
