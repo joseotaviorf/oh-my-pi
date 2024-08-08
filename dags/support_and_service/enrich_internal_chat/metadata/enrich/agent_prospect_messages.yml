@@ -1,0 +1,36 @@
+database_name: datalake_internal_chat
+table_name: agent_prospect_messages
+description: Messages exchanged between agent and prospect via Agents app
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_channel:
+    description: Channel ID from Twilio
+    lineage:
+      - datalake_internal_chat_clean.internal_chat_messages.id_channel
+  id_message:
+    description: Message ID from Twilio
+    lineage:
+      - datalake_internal_chat_clean.internal_chat_messages.id_message
+  id_user_external:
+    description: ID of the user that sent the message
+    lineage:
+      - datalake_internal_chat_clean.internal_chat_messages.id_user_external
+  changed_turn:
+    description: If the message was a 'turn change', meaning if the previous message was sent by the other person
+  user_role:
+    description: If the user is an agent or a prospect
+  message:
+    description: Message body
+    lineage:
+      - datalake_internal_chat_clean.internal_chat_messages.message
+  index:
+    description: Message index
+    lineage:
+      - datalake_internal_chat_clean.internal_chat_messages.index
+  ts_created:
+    description: Timestamp of when the message was sent
+    lineage:
+      - datalake_internal_chat_clean.internal_chat_messages.ts_created
+  ts_last_message:
+    description: Timestamp of the last message

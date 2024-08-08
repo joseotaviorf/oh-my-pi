@@ -1866,6 +1866,10 @@ bietlejuice.enrich_inspections_metrics:
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_support_and_service_kpis_targets:load-enrich-kpis-targets
   - bietlejuice.gsheets_support_and_service:done-clean-inspectors-control
+bietlejuice.enrich_internal_chat:
+  - bietlejuice.enrich_hub_services_agents:load-enrich-member-profile
+  - bietlejuice.enrich_hub_services_agents:load-enrich-users
+  - bietlejuice.internal_chat:load-clean-internal-chat-messages
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:load-clean-affiliate-data
   - bietlejuice.ebdb:load-clean-conversion-lead
