@@ -1,0 +1,14 @@
+---
+dag:
+  name: enrich_crawlers_listings_deduplicated
+  owner: MLOps
+  schedule_interval: 0 8 * * 7
+  schedule_start_date: 2024, 1, 1
+  documentation:
+    dag_purpose: Computes the listings of Loft, Zapimoveis, VivaReal and EmCasa crawlers without deduplication.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+cluster:
+  type: databricks_12_2_med_general_photon_cluster

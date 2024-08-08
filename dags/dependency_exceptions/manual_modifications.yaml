@@ -314,6 +314,12 @@ bietlejuice.enrich_content_funnel:
     - bietlejuice.ebdb:load-clean-visit
 bietlejuice.enrich_crawlers_listings:
   override: []
+bietlejuice.enrich_crawlers_listings_deduplicated:
+  remove:
+  - bietlejuice.enrich_sale_crawlers_listings:load-enrich-em-casa
+  - bietlejuice.enrich_sale_crawlers_listings:load-enrich-loft
+  - bietlejuice.enrich_viva_real_crawler_listings:load-enrich-viva-real
+  - bietlejuice.enrich_zap_imoveis_crawler_listings:load-enrich-zap-imoveis
 bietlejuice.enrich_credit_analysis:
   remove:
     - bietlejuice.sorting_hat:load-clean-credit-analysis-version

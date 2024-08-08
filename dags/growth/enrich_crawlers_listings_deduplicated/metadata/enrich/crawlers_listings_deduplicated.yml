@@ -1,0 +1,90 @@
+database_name: datalake_crawlers_listings_deduplicated
+table_name: crawlers_listings_deduplicated
+description: This table contains the listings of Loft, Zapimoveis, VivaReal and EmCasa crawlers without deduplication.
+domain: Growth
+owner: leticia.mendes@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: Key of the house.
+  ts_created:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The timestamp of when the listing was created.
+  ts_updated:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The timestamp of when the listing was created.
+  platform:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The platform from which this listing was sourced.
+  state:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The UF state of the house.
+  city:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The city of the house.
+  street:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The street of the house.
+  street_number:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The street number of the house.
+  latitude:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The latitude of the house.
+  longitude:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The longitude of the house.
+  price:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The sale price of the listing.
+  price_m2:
+    lineage:
+      - datalake_crawlers_listings.loft
+      - datalake_crawlers_listings.zap_imoveis
+      - datalake_crawlers_listings.viva_real
+      - datalake_crawlers_listings.em_casa
+    description: The sale price per squared meter of the listing.
