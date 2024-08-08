@@ -65,6 +65,8 @@ class CdcSchemaTreatment(ABC):
                 continue
             if column["typeName"].upper() in ("DECIMAL", "NUMERIC"):
                 type = f"decimal({column['length']}, {column['scale']})"
+                if column["length"] is None or column["scale"] is None:
+                    type = "decimal(38, 18)"
                 transactional_dataframe = transactional_dataframe.withColumn(
                     column["name"], col(column["name"]).cast(type)
                 )

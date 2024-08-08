@@ -1,0 +1,41 @@
+dag:
+  name: wololo
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 0 0 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from [Wololo](https://github.com/quintoandar/wololo), our service for interacting with Prospects.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  lineage_product_database_name: wololo
+  tables_customization:
+    contact:
+      clean_table_name: contact
+    context_discard:
+      clean_table_name: context_discard
+    conversion:
+      clean_table_name: conversion
+    prospect:
+      clean_table_name: prospect 
+    prospect_aud:
+      clean_table_name: prospect_aud
+    prospectdimension:
+      clean_table_name: prospect_dimension
+    prospectdimension_aud:
+      clean_table_name: prospect_dimension_aud
+    revinfo:
+      clean_table_name: rev_info
+    round:
+      clean_table_name: round
+    round_aud:
+      clean_table_name: round_aud
+    whatsapp:
+      clean_table_name: whatsapp_aud
+    whatsapp_aud:
+      clean_table_name: whatsapp
+cluster:
+  type: databricks_12_2_min_general_cluster
