@@ -9,4 +9,4 @@ workflow:
   type: query_delta
   layer: enrich
 cluster:
-  type: databricks_13_3_min_general_cluster
+  type: databricks_13_3_min_general_2_workers_cluster
