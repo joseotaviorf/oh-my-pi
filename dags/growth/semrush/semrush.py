@@ -147,7 +147,7 @@ for table_name in tables:
         has_create_external_table_task=False,
         partitions=partition_cols,
         extra_query_template_params={
-            "domain": "{{ table_name }}",
+            "domain": "{{ tables[table_name] }}",
         },
     )
 

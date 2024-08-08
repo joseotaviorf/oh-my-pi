@@ -1,26 +1,26 @@
 ---
 tables:
-  - quintoandar_organic_search_kw
-  - imovelweb_organic_search_kw
-  - zapimoveis_organic_search_kw
-  - vivareal_organic_search_kw
-  - casamineira_organic_search_kw
-  - lopes_organic_search_kw
-  - emcasa_organic_search_kw
-  - chavesnamao_organic_search_kw
-  - imoveisestadao_organic_search_kw
-  - imoveismercadolivre_organic_search_kw
-  - wimoveis_organic_search_kw
-  - 123i_organic_search_kw
-  - trisul_organic_search_kw
-  - ape11_organic_search_kw
-  - arboimoveis_organic_search_kw
-  - imovelguide_organic_search_kw
-  - direcional_organic_search_kw
-  - auxiliadorapredial_organic_search_kw
-  - secovi_organic_search_kw
-  - loft_organic_search_kw
-  - olximoveis_organic_search_kw
+  123i_organic_search_kw: 123i.com.br
+  ape11_organic_search_kw: ape11.com.br
+  arboimoveis_organic_search_kw: arboimoveis.com.br
+  auxiliadorapredial_organic_search_kw: auxiliadorapredial.com.br
+  casamineira_organic_search_kw: casamineira.com.br
+  chavesnamao_organic_search_kw: chavesnamao.com.br
+  direcional_organic_search_kw: direcional.com.br
+  emcasa_organic_search_kw: emcasa.com
+  imoveisestadao_organic_search_kw: imoveis.estadao.com
+  imoveismercadolivre_organic_search_kw: imoveis.mercadolivre.com
+  imovelguide_organic_search_kw: imovelguide.com.br
+  imovelweb_organic_search_kw: imovelweb.com.br
+  loft_organic_search_kw: loft.com.br
+  lopes_organic_search_kw: lopes.com.br
+  quintoandar_organic_search_kw: quintoandar.com.br
+  secovi_organic_search_kw: secovi.com.br
+  trisul_organic_search_kw: trisul-sa.com
+  vivareal_organic_search_kw: vivareal.com.br
+  wimoveis_organic_search_kw: wimoveis.com.br
+  zapimoveis_organic_search_kw: zapimoveis.com.br
+  olximoveis_organic_search_kw: olx.com.br/imoveis
 clean_partition_cols:
   - year
   - month

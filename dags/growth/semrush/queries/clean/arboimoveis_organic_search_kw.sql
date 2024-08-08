@@ -17,7 +17,7 @@ SELECT
     CAST(_competition AS DOUBLE) AS competition,
     CAST(_number_of__results AS INT) AS number_of_results,
     CAST(_keyword__difficulty AS DOUBLE) AS keyword_difficulty,
-    DATE(date) AS dt_report,
+    TO_DATE(date, 'yyyyMMdd') AS dt_report,
     FROM_UNIXTIME(_timestamp, 'yyyy-MM-dd HH:mm:ss') AS ts_report,
     year AS year,
     month AS month,
