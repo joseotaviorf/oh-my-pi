@@ -38,4 +38,4 @@ workflow:
     whatsapp_aud:
       clean_table_name: whatsapp
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_12_2_med_memory_cluster
