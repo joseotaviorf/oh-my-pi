@@ -263,13 +263,6 @@ databricks_13_3_min_general_cluster:
     num_workers: 1
     spark_version: 13.3.x-scala2.12
 
-databricks_13_3_min_general_2_workers_cluster:
-    <<: *cluster_anchor
-    node_type_id: m5a.large
-    driver_node_type_id: m5a.large
-    num_workers: 2
-    spark_version: 13.3.x-scala2.12
-
 databricks_10_4_med_general_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5a.xlarge

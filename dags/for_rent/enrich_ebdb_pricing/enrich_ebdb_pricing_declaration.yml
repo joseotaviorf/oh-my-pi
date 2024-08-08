@@ -9,4 +9,10 @@ workflow:
   type: query_delta
   layer: enrich
 cluster:
-  type: databricks_13_3_min_general_2_workers_cluster
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.xlarge
+    num_workers: 2
+    runtime_engine: PHOTON
+    spark_version: 13.3.x-scala2.12
