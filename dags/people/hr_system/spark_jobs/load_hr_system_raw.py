@@ -1,6 +1,6 @@
 import json
 import argparse
-import os
+from multiprocessing import Pool
 from datetime import datetime, timedelta
 from pyspark import Row
 from pyspark.sql.types import StructType
@@ -28,17 +28,12 @@ def create_spark_dataframe(endpoint_id, json_data, spark_client, hr_system_clien
     return spark_client.create_dataframe(json_data, schema=schema)
 
 
-def run_sync(endpoint_id, url, token, endpoint_details, spark_client):
+def run_sync(endpoint_details, consumer_instance):
     logger.info(f"m={JOB_NAME}, msg=Endpoint Details {endpoint_details}")
-    hr_system_client = HrSystemClient(api_url=url, api_token=token)
     deduplication_key = endpoint_details.get("deduplication_key", None)
-    endpoint_id = endpoint_id.replace("_", "").upper()
-    consumer_instance = get_consumer(hr_system_client, endpoint_id)
-    path = consumer_instance.path
-    json_data = consumer_instance.sync(
+    return consumer_instance.sync(
         params=endpoint_details["params"], deduplication_key=deduplication_key
     )
-    return create_spark_dataframe(path, json_data, spark_client, hr_system_client)
 
 
 def insert_partitions(df, endpoint_details):
@@ -104,19 +99,34 @@ def load_raw(
     metastore_service.refresh_table(database_name, endpoint_id)
 
 
+def get_data_from_api(endpoint_id, url, token, list_endpoint_details, spark_client):
+    hr_system_client = HrSystemClient(api_url=url, api_token=token)
+    endpoint_id = endpoint_id.replace("_", "").upper()
+    arguments = list()
+    for execution_date_str, endpoint_details in list_endpoint_details.items():
+        consumer_instance = get_consumer(hr_system_client, endpoint_id)
+        aux_arguments = (endpoint_details, consumer_instance)
+        arguments.append(aux_arguments)
+    with Pool(len(arguments)) as p:
+        json_data = p.starmap(run_sync, arguments)
+    all_data = list()
+    for time_data in json_data:
+        all_data.extend(time_data)
+    path = consumer_instance.path
+    return create_spark_dataframe(path, all_data, spark_client, hr_system_client)
+
+
 def pipeline_raw(
-    spark_client,
     endpoint_id,
-    url,
-    token,
     endpoint_details,
     environment,
     source,
     datalake_bucket,
     partition_cols,
     has_dt_effective,
+    spark_client,
+    df,
 ):
-    df = run_sync(endpoint_id, url, token, endpoint_details, spark_client)
     if endpoint_details["has_columns_to_delete"]:
         df = delete_columns(df, endpoint_details)
     df = insert_columns(df, endpoint_details, has_dt_effective)
@@ -157,14 +167,9 @@ def define_offset(endpoint_details, offset, execution_date):
     return offset_date_str, offset_details
 
 
-def clear_directory(
-    datalake_bucket, source, endpoint_id, has_dt_effective, layer
-):
+def clear_directory(datalake_bucket, source, endpoint_id, has_dt_effective, layer):
     if has_dt_effective == True:
-        dbutils.fs.rm(
-            f"s3://{datalake_bucket}/{layer}/{source}/{endpoint_id}/",
-            True
-        )
+        dbutils.fs.rm(f"s3://{datalake_bucket}/{layer}/{source}/{endpoint_id}/", True)
 
 
 def main():
@@ -186,7 +191,9 @@ def main():
 
     if "expand" in endpoint_details:
         if not isinstance(endpoint_details["params"]["expand"], list):
-            endpoint_details["params"]["expand"] = json.loads(endpoint_details["params"]["expand"])
+            endpoint_details["params"]["expand"] = json.loads(
+                endpoint_details["params"]["expand"]
+            )
 
     partition_cols = json.loads(args.partition_cols)
     has_dt_effective = endpoint_details.get("has_dt_effective", False)
@@ -222,29 +229,21 @@ def main():
             )
             list_endpoint_details[offset_date_str] = offset_details
 
-    clear_directory(
-        datalake_bucket, source, endpoint_id, has_dt_effective, "raw"
+    clear_directory(datalake_bucket, source, endpoint_id, has_dt_effective, "raw")
+    spark_client = SparkClient()
+    df = get_data_from_api(endpoint_id, url, token, list_endpoint_details, spark_client)
+    pipeline_raw(
+        endpoint_id,
+        endpoint_details,
+        environment,
+        source,
+        datalake_bucket,
+        partition_cols,
+        has_dt_effective,
+        spark_client,
+        df,
     )
-    for execution_date_str, endpoint_details in list_endpoint_details.items():
-        logger.info(
-            f"m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
-            f"table_name={endpoint_id}, dt_effective={execution_date_str} msg=Getting data from API..."
-        )
-        pipeline_raw(
-            spark_client,
-            endpoint_id,
-            url,
-            token,
-            endpoint_details,
-            environment,
-            source,
-            datalake_bucket,
-            partition_cols,
-            has_dt_effective,
-        )
-    clear_directory(
-        datalake_bucket, source, endpoint_id, has_dt_effective, "clean"
-    )
+    clear_directory(datalake_bucket, source, endpoint_id, has_dt_effective, "clean")
 
 
 if __name__ == "__main__":
