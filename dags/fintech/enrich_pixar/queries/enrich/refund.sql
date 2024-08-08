@@ -12,13 +12,10 @@ SELECT
     r.amount,
     r.status,
     r.ts_created,
-    r.ts_updated,
-    r.year,
-    r.month,
-    r.day
+    r.ts_updated
 FROM
     datalake_pixar_clean.refund r
-RIGHT JOIN 
-    cte_most_recent cte 
+RIGHT JOIN
+    cte_most_recent cte
         ON cte.id = r.id
         AND cte.ts_updated = r.ts_updated

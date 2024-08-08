@@ -28,15 +28,3 @@ columns:
     lineage:
       - datalake_pixar_clean.refund.ts_updated
     description: "Update timestamp"
-  year:
-    lineage:
-      - datalake_pixar_clean.refund.year
-    description: "Update year"
-  month:
-    lineage:
-      - datalake_pixar_clean.refund.month
-    description: "Update month"
-  day:
-    lineage:
-      - datalake_pixar_clean.refund.day
-    description: "Update day"

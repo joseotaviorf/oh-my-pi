@@ -19,13 +19,10 @@ SELECT
     c.status,
     c.dt_limit,
     c.ts_created,
-    c.ts_updated,
-    c.year,
-    c.month,
-    c.day
+    c.ts_updated
 FROM
     datalake_pixar_clean.charge c
-RIGHT JOIN 
-    cte_most_recent cte 
+RIGHT JOIN
+    cte_most_recent cte
         ON cte.id = c.id
         AND cte.ts_updated = c.ts_updated

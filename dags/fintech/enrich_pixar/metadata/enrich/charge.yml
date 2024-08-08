@@ -56,15 +56,3 @@ columns:
     lineage:
       - datalake_pixar_clean.charge.ts_updated
     description: "Update timestamp"
-  year:
-    lineage:
-      - datalake_pixar_clean.charge.year
-    description: "Update year"
-  month:
-    lineage:
-      - datalake_pixar_clean.charge.month
-    description: "Update month"
-  day:
-    lineage:
-      - datalake_pixar_clean.charge.day
-    description: "Update day"

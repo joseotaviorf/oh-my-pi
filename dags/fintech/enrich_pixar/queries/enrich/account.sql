@@ -13,13 +13,10 @@ SELECT
     a.bank_name,
     a.bank_fee,
     a.ts_created,
-    a.ts_updated,
-    a.year,
-    a.month,
-    a.day
+    a.ts_updated
 FROM
     datalake_pixar_clean.account a
-RIGHT JOIN 
-    cte_most_recent cte 
+RIGHT JOIN
+    cte_most_recent cte
         ON cte.id = a.id
         AND cte.ts_updated = a.ts_updated

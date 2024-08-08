@@ -32,15 +32,3 @@ columns:
     description: "Update timestamp"
     lineage:
       - datalake_pixar_clean.account.ts_updated
-  year:
-    description: "Update year"
-    lineage:
-      - datalake_pixar_clean.account.year
-  month:
-    description: "Update month"
-    lineage:
-      - datalake_pixar_clean.account.month
-  day:
-    description: "Update day"
-    lineage:
-      - datalake_pixar_clean.account.day
