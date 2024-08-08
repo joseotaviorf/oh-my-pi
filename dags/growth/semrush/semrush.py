@@ -139,6 +139,8 @@ raw_task_group = datalake_task_group.build_raw_task_group_for_all_tables(
 
 for table_name in tables:
 
+    domain = tables[table_name]
+
     clean_task_group = datalake_task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
@@ -147,7 +149,7 @@ for table_name in tables:
         has_create_external_table_task=False,
         partitions=partition_cols,
         extra_query_template_params={
-            "domain": "{{ tables[table_name] }}",
+            "domain": domain
         },
     )
 
