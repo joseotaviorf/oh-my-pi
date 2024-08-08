@@ -23,7 +23,6 @@ growth:
     depends_on:
       - performance_marketing_metrics_imobiliaria_casa_mineira 
       - performance_marketing_metrics_portal_casa_mineira
-  datamart_opportunity: {}
   performance_marketing_metrics_imobiliaria_casa_mineira: {}
   performance_marketing_metrics_portal_casa_mineira: {}
   plaquinhas_houses: {}

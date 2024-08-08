@@ -3090,7 +3090,6 @@ bietlejuice.looker_temp:
   - bietlejuice.dw_crm:load-dw-crm-dim-inspection-task
   - bietlejuice.dw_crm:load-dw-crm-fact-closing-tasks
   - bietlejuice.dw_crm:load-dw-crm-fact-inspection-tasks
-  - bietlejuice.dw_datamarts_spark.growth:load-dw-datamarts-datamart-opportunity
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
