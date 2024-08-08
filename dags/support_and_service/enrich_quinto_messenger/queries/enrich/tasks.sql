@@ -1,4 +1,3 @@
-
 WITH tasks AS (
   SELECT
     id_task,
@@ -6,22 +5,23 @@ WITH tasks AS (
     id_chat,
     id_worker,
     REPLACE(SPLIT(customer_metadata, ":")[1], '"', "") AS id_user,
-    task_status,
-    REPLACE(customer_contact_info, "whatsapp:+", "") AS customer_contact_info,
+    CASE
+      WHEN channel_type = 'whatsapp' THEN REPLACE(customer_contact_info, "whatsapp:+", "")
+      ELSE NULL
+    END AS from_phone_number,
+    REPLACE(twilio_phone_number, "whatsapp:+", "") AS to_phone_number,
     customer_email,
-    REPLACE(twilio_phone_number, "whatsapp:+", "") AS twilio_phone_number,
     worker_email,
     channel_type,
+    task_status,
+    GET_JSON_OBJECT(conversation_attributes,'$.outcome') AS task_outcome,
     completion_reason AS task_completion_reason,
     channel_status,
     bpo_name,
-    tags,
-    conversation_attributes,
-    task_attributes,
-    task_resource,
     assigned_to,
     seconds_to_first_response,
     is_forwarded,
+    GET_JSON_OBJECT(conversation_attributes,'$.conversation_attribute_2') AS is_per_team_task,
     ts_created,
     ts_updated
   FROM
@@ -31,28 +31,28 @@ WITH tasks AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 ),
-task_events AS (
+task_queues AS (
   SELECT
     id_task,
     id_queue,
-    id_event,
-    queue_name,
-    event_type,
-    ts_created
+    queue_name
   FROM
     datalake_quinto_messenger_clean.task_event
   WHERE
     year >= 2023
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created DESC) = 1
 ),
-chat_sessions AS (
+inapp_sessions AS (
   SELECT DISTINCT
-    id_channel,
+    id_chat,
     id_session
   FROM
     datalake_quinto_messenger_clean.chat
   WHERE
     year >= 2023
-  UNION ALL
+),
+whatsapp_sessions AS (
   SELECT DISTINCT
     id_channel,
     id_session
@@ -62,39 +62,38 @@ chat_sessions AS (
     year >= 2023
 )
 SELECT
-  te.id_event,
   t.id_task,
   t.id_channel,
-  te.id_queue,
+  tq.id_queue,
   t.id_chat,
-  cs.id_session,
+  COALESCE(is.id_session, ws.id_session) AS id_session,
   t.id_worker,
   t.id_user,
-  te.queue_name,
-  t.task_status,
-  te.event_type,
-  t.customer_contact_info,
+  tq.queue_name,
   t.customer_email,
-  t.twilio_phone_number,
+  t.from_phone_number,
+  t.to_phone_number,
   t.worker_email,
   t.channel_type,
+  t.task_status,
+  t.task_outcome,
   t.task_completion_reason,
-  t.channel_status,
   t.bpo_name,
-  t.tags,
-  t.conversation_attributes,
-  t.task_attributes,
-  t.task_resource,
   t.seconds_to_first_response,
   t.is_forwarded,
-  te.ts_created AS ts_event,
-  t.ts_created AS ts_task_created,
-  t.ts_updated AS ts_task_updated
+  t.is_per_team_task,
+  t.ts_created,
+  t.ts_updated AS ts_ended
 FROM
   tasks AS t
 LEFT JOIN
-  chat_sessions AS cs
-    ON cs.id_channel = t.id_channel
+  inapp_sessions AS is
+    ON is.id_chat = t.id_chat
 LEFT JOIN
-  task_events AS te
-    ON te.id_task = t.id_task
+  whatsapp_sessions AS ws
+    ON ws.id_channel = t.id_channel
+LEFT JOIN
+  task_queues AS tq
+    ON tq.id_task = t.id_task
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY t.id_task ORDER BY t.ts_updated DESC) = 1

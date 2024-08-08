@@ -35,7 +35,7 @@ message_tasks AS (
   FROM
     message_events AS me
   INNER JOIN
-    datalake_quinto_messenger.task AS t
+    datalake_quinto_messenger.tasks AS t
       ON me.id_channel = t.id_channel
 )
 SELECT

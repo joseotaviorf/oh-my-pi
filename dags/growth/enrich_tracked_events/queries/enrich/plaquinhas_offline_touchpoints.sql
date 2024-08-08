@@ -3,23 +3,16 @@ WITH legacy_chat_flow AS (
   SELECT DISTINCT
     user.id AS id_user,
     'Chat' AS contact_channel,
-    qmc.ts_created AS ts_event
+    qmt.ts_created AS ts_event
   FROM
-    datalake_quinto_messenger.task_event AS qmte
-  INNER JOIN
-    datalake_quinto_messenger.task AS qmt
-      ON qmte.id_task = qmt.id_task
-  INNER JOIN
-    datalake_quinto_messenger.channel AS qmc
-      ON qmt.id_channel = qmc.id_channel
+    datalake_quinto_messenger.tasks AS qmt
   INNER JOIN
     datalake_ebdb_user.user AS user
-      ON qmc.from_phone_number = user.main_phone
+      ON qmt.from_phone_number = user.main_phone
   WHERE
-    LOWER(qmte.task_queue_name) LIKE '%plaquinhas%'
+    LOWER(qmt.queue_name) LIKE '%plaquinhas%'
     AND  user.id > 0
 ),
-
 -- New chat flows
 pre_chatbot_sessions AS (
   SELECT
@@ -81,6 +74,7 @@ total_chat AS (
   FROM
     legacy_chat_flow
   WHERE
+    DATE(ts_event) < DATE('2022-10-17')
     DATE(ts_event) < DATE('2022-10-17')
     AND id_user IS NOT NULL
 ),
@@ -155,12 +149,14 @@ total_phone AS (
 plaquinhas_offline_touchpoints AS (
   SELECT
     id_user,
+    id_user,
     contact_channel,
     ts_event
   FROM
     total_chat
   UNION ALL
   SELECT
+    id_user,
     id_user,
     contact_channel,
     ts_event
@@ -188,5 +184,8 @@ SELECT DISTINCT
   YEAR(ts_event) AS year,
   MONTH(ts_event) AS month,
   DAY(ts_event) AS day
+FROM
+  plaquinhas_offline_touchpoints
+
 FROM
   plaquinhas_offline_touchpoints

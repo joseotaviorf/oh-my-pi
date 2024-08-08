@@ -11,7 +11,7 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_segment:
     lineage:
-      - datalake_quinto_messenger.task.id_task
+      - datalake_quinto_messenger.tasks.id_task
     description:
       This identifier corresponds to the Twilio task ID for both WhatsApp and chat_5A
       origins. For WhatsApp tasks, it only includes Twilio channels created after
@@ -28,7 +28,7 @@ columns:
       session ID.
   id_conversation:
     lineage:
-      - datalake_quinto_messenger.channel.id_conversation
+      - datalake_quinto_messenger.tasks.id_conversation
     description:
       A Twilio Chat Conversation ID is a unique identifier that represents a
       conversation session between one or more participants. It's generated when a
@@ -37,25 +37,25 @@ columns:
       associated with a single Conversation ID.
   id_session:
     lineage:
-      - datalake_quinto_messenger.channel.id_source
+      - datalake_quinto_messenger.tasks.id_source
     description:
       It is a unique identifier created by the Sauron service for each chat opened
       in either WhatsApp or Chat_5A.
   id_agent:
     lineage:
-      - datalake_quinto_messenger.task.id_agent
+      - datalake_quinto_messenger.tasks.id_agent
     description:
       This is the unique identifier for the Twilio agent who is responsible for
       the task.
   first_agent_email:
     lineage:
-      - datalake_quinto_messenger.task.id_agent
+      - datalake_quinto_messenger.tasks.id_agent
     description:
       When considering the first task of a conversation, the responsible agent for
       that task is taken into account.
   last_agent_email:
     lineage:
-      - datalake_quinto_messenger.task.id_agent
+      - datalake_quinto_messenger.tasks.id_agent
     description:
       When considering the last task of a conversation, the responsible agent for
       that task is taken into account.
@@ -76,7 +76,7 @@ columns:
       chat5a: The ticket is related to a chat 5A session.
   agent_email:
     lineage:
-      - datalake_quinto_messenger.task.agent_email
+      - datalake_quinto_messenger.tasks.agent_email
     description: The email of the Twilio agent responsible for the task.
   csat_comment:
     lineage:
@@ -92,7 +92,7 @@ columns:
     description: The first csat survey comment for the Zendesk Chat Ticket, if available.
   department:
     lineage:
-      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.tasks.task_queue_name
     description: The department name of the Twilio task, defined in Twilio as the queue name.
   country_code:
     description: Identifies the country
@@ -102,23 +102,23 @@ columns:
     description: The department associated with the Zendesk Ticket.
   first_department:
     lineage:
-      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.tasks.task_queue_name
       - datalake_zendesk.tickets_current.id_ticket
-      - datalake_quinto_messenger.task_event.ts_created_local
+      - datalake_quinto_messenger.tasks.ts_created_local
     description:
       The first department in Twilio, or queue name, for the initial task created in
       the conversation.
   last_department:
     lineage:
-      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.tasks.task_queue_name
       - datalake_zendesk.tickets_current.id_ticket
-      - datalake_quinto_messenger.task_event.ts_created_local
+      - datalake_quinto_messenger.tasks.ts_created_local
     description:
       The last department in Twilio, or queue name, for the final task created
       in the conversation.
   completion_reason:
     lineage:
-      - datalake_quinto_messenger.task_event.task_completion_reason
+      - datalake_quinto_messenger.tasks.task_completion_reason
     description:
       In Twilio Chat, a task event completion reason is the reason why a task has been
       marked as completed. When a worker finishes a task, they must provide a
@@ -127,11 +127,11 @@ columns:
       completion reason.
   transferred_from_dept:
     lineage:
-      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.tasks.task_queue_name
     description: The department from which the task was transferred.
   transferred_to_dept:
     lineage:
-      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.tasks.task_queue_name
     description: The department to which the task was transferred.
   transference_type:
     description: The type of transfer, which could be internal-same-agent.
@@ -194,7 +194,7 @@ columns:
   frt:
     lineage:
       - datalake_zendesk.tickets_current.ts_solved_local
-      - datalake_quinto_messenger.task.ts_created_local
+      - datalake_quinto_messenger.tasks.ts_created_local
       - datalake_sauron_clean.session.ts_created
     description:
       FRT (Full Resolution Time) is the total time from the start of support in the
@@ -211,7 +211,7 @@ columns:
     description: A list of back tickets related to this ticket.
   seconds_first_reply:
     lineage:
-      - datalake_quinto_messenger.task.seconds_to_first_response
+      - datalake_quinto_messenger.tasks.seconds_to_first_response
     description:
       First response time (FRT) is the duration between the task's creation time and
       the first response sent by a worker to a customer during a chat conversation,
@@ -224,28 +224,28 @@ columns:
       before a Twilio task was created.
   segment_minutes_wait_time:
     lineage:
-      - datalake_quinto_messenger.task.seconds_to_first_response
+      - datalake_quinto_messenger.tasks.seconds_to_first_response
     description:
       This metric represents the time it took for a worker to send the first response
       to a customer, measured in minutes rather than seconds.
   number_of_departments:
     lineage:
-      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.tasks.task_queue_name
     description: The total number of departments that were involved in a chat session.
   number_of_segments:
     lineage:
-      - datalake_quinto_messenger.task.id_task
+      - datalake_quinto_messenger.tasks.id_task
     description: The total number of tasks created during a chat session.
   sla_achieved:
     lineage:
-      - datalake_quinto_messenger.task.seconds_to_first_response
+      - datalake_quinto_messenger.tasks.seconds_to_first_response
     description:
       This field is a boolean value indicating whether the wait time for a task was
       less than or equal to 15 minutes (TRUE) or not (FALSE). If the value cannot be
       determined, it will be NULL.
   minutes_full_resolution_time_calendar:
     lineage:
-      - datalake_quinto_messenger.channel.seconds_duration
+      - datalake_quinto_messenger.tasks.seconds_duration
     description:
       This metric measures the duration of a chat conversation from its creation to its
       closure or termination, taking into account the total time for WhatsApp
@@ -296,11 +296,11 @@ columns:
       talk time, and wrap-up time for that conversation.
   is_last_segment:
     lineage:
-      - datalake_quinto_messenger.task.id_task
+      - datalake_quinto_messenger.tasks.id_task
     description: If this is the last task opened for its respective session.
   is_first_segment:
     lineage:
-      - datalake_quinto_messenger.task.id_task
+      - datalake_quinto_messenger.tasks.id_task
     description: If this is the first task opened for its respective session.
   transference_reason:
     lineage:
@@ -308,7 +308,7 @@ columns:
     description: The reason for transferring the task.
   has_transfers:
     lineage:
-      - datalake_quinto_messenger.task.id_task
+      - datalake_quinto_messenger.tasks.id_task
     description: A boolean value indicating whether the ticket has more than one segment (task).
   is_bot:
     lineage:
@@ -353,7 +353,7 @@ columns:
   total_minutes_front_to_open_back_ticket_time:
     lineage:
       - datalake_zendesk.tickets_current.ts_created_local
-      - datalake_quinto_messenger.task_event.ts_created_local
+      - datalake_quinto_messenger.tasks.ts_created_local
     description:
       Time taken in minutes to open the related back-office ticket after solving the
       front ticket.
@@ -415,35 +415,35 @@ columns:
       null value if we don't have this information.
   ts_created:
     lineage:
-      - datalake_quinto_messenger.task.ts_created
+      - datalake_quinto_messenger.tasks.ts_created
     description: The task creation timestamp in UTC-0.
   ts_updated:
     lineage:
-      - datalake_quinto_messenger.task.ts_updated
+      - datalake_quinto_messenger.tasks.ts_updated
     description: The task last updated timestamp in UTC-0.
   ts_ticket_started:
     lineage:
-      - datalake_quinto_messenger.task_event.ts_created_local
+      - datalake_quinto_messenger.tasks.ts_created_local
     description:
       The ticket started timestamp is the first event timestamp created for the
       respective Twilio conversation, UTC-3. This field considers all the events
       of the conversation.
   ts_ticket_ended:
     lineage:
-      - datalake_quinto_messenger.task_event.ts_created_local
+      - datalake_quinto_messenger.tasks.ts_created_local
     description:
       The ticket ended timestamp is the last event timestamp created for the respective
       Twilio conversation, UTC-3. This field considers all the events of the
       conversation.
   ts_segment_closed:
     lineage:
-      - datalake_quinto_messenger.task_event.ts_created_local
+      - datalake_quinto_messenger.tasks.ts_created_local
     description:
       The timestamp for the last event creation date of the task. This field considers
       only events of type equal to "reservation".
   ts_segment_created:
     lineage:
-      - datalake_quinto_messenger.task_event.ts_created_local
+      - datalake_quinto_messenger.tasks.ts_created_local
     description:
       The timestamp for the first event creation date of the task. This field considers
       only events of type equal to "reservation".

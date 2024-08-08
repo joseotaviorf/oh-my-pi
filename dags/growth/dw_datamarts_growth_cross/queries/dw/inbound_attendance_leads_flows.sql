@@ -156,33 +156,24 @@ call_tasks AS (
 ),
 chat_tasks AS (
     SELECT DISTINCT
-      ft.sk_chat,
-      ft.sk_task,
+      id_channel AS sk_chat,
+      id_task AS sk_task,
       'chat' AS channel,
-      dc.twilio_phone,
+      to_phone_number AS twilio_phone,
       'inbound' AS direction,
-      qa.email,
-      qa.location,
-      dt.department,
-      dt.ts_created_local,
-      dt.ts_updated_local,
-      dt.ts_twilio_created_local,
-      ft.seconds_first_reply,
-      completion_reason,
-      LEAD(dt.department) OVER (PARTITION BY ft.sk_chat ORDER BY dt.ts_created_local) AS next_queue,
-      LAG(dt.department) OVER (PARTITION BY ft.sk_chat ORDER BY dt.ts_created_local) AS previous_queue,
-      ROW_NUMBER() OVER (PARTITION BY ft.sk_chat  ORDER BY dt.ts_created_local) AS task_number
+      worker_email AS email,
+      NULL AS location,
+      queue_name AS department,
+      ts_created - INTERVAL 3 HOUR AS ts_created_local,
+      ts_ended - INTERVAL 3 HOUR AS ts_updated_local,
+      ts_created - INTERVAL 3 HOUR AS ts_twilio_created_local,
+      seconds_to_first_response AS seconds_first_reply,
+      task_outcome AS completion_reason,
+      LEAD(queue_name) OVER (PARTITION BY id_task ORDER BY ts_created) AS next_queue,
+      LAG(queue_name) OVER (PARTITION BY id_task ORDER BY ts_created) AS previous_queue,
+      ROW_NUMBER() OVER (PARTITION BY id_task  ORDER BY ts_created) AS task_number
     FROM
-      dw_quinto_messenger.fact_tasks AS ft
-    INNER JOIN
-      dw_quinto_messenger.dim_task AS dt
-        ON dt.sk_task = ft.sk_task
-    LEFT JOIN
-      dw_quinto_messenger.dim_chat AS dc
-        ON dc.sk_chat = ft.sk_chat
-    LEFT JOIN
-      dw_quinto_messenger.dim_quinto_messenger_agent AS qa
-        ON qa.sk_quinto_messenger_agent = ft.sk_quinto_messenger_agent
+      datalake_quinto_messenger.tasks
 ),
 inbound_tasks_reservations AS (
     SELECT DISTINCT

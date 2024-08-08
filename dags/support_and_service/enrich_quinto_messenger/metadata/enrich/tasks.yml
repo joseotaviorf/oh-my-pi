@@ -1,13 +1,9 @@
 database_name: datalake_quinto_messenger
-table_name: events
+table_name: tasks
 description: Table containing all task events
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
-  id_event:
-    description: Twilio task event ID
-    lineage:
-      - datalake_quinto_messenger_clean.task_event.id_task_event
   id_task:
     description: Twilio task ID
     lineage:
@@ -117,15 +113,11 @@ columns:
     description: If the message has been forwarded
     lineage:
       - datalake_quinto_messenger_clean.task.task_attributes
-  ts_event:
-    description: Timestamp of the event creation
-    lineage:
-      - datalake_quinto_messenger_clean.task_event.ts_created
-  ts_task_created:
+  ts_created:
     description: Timestamp of the task creation
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
-  ts_task_updated:
+  ts_ended:
     description: Timestamp of when the task was last updated
     lineage:
       - datalake_quinto_messenger_clean.task.ts_updated

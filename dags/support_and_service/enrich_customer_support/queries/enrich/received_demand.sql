@@ -206,28 +206,10 @@ call AS (
       ON cs.id_reservation = cfr.id_reservation
 ),
 chat AS (
-  WITH current_queue AS (
-    SELECT
-      GET_JSON_OBJECT(event_payload,'$.TaskQueueSid') AS id_task_queue,
-      GET_JSON_OBJECT(event_payload,'$.TaskQueueName') AS task_queue_name
-    FROM
-      datalake_quinto_messenger_clean.task_event
-    QUALIFY
-      ROW_NUMBER() OVER(PARTITION BY GET_JSON_OBJECT(event_payload,'$.TaskQueueSid') ORDER BY ts_created DESC) = 1
-  ),
-  per_team_attr AS (
-    SELECT
-      id_task,
-      GET_JSON_OBJECT(task_attributes,'$.conversations.conversation_attribute_2') AS is_per_team_task
-    FROM
-      datalake_quinto_messenger_clean.task
-    QUALIFY
-      ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
-  ),
-  reservation_created_events AS (
+  WITH reservation_created_events AS (
     SELECT
       id_task AS id_task_external,
-      FROM_UTC_TIMESTAMP(ts_created, 'America/Sao_Paulo') AS ts_reservation_created
+      ts_created - INTERVAL 3 HOUR AS ts_reservation_created
     FROM
       datalake_quinto_messenger_clean.task_event
     WHERE
@@ -235,59 +217,32 @@ chat AS (
     QUALIFY
       ROW_NUMBER() OVER(PARTITION BY id_task_external ORDER BY ts_created) = 1
   ),
-  task AS (
-    SELECT
-      id_task,
-      id_channel,
-      task_status,
-      id_chat,
-      agent_email,
-      ticket_group_name,
-      REGEXP_REPLACE(from_phone_number, '^\\+(?=.*)', '') AS customer_phone,
-      completion_reason,
-      ts_created_local AS ts_created
-    FROM
-      datalake_quinto_messenger.task AS t
-  ),
   task_reservations AS (
-    SELECT
+    SELECT DISTINCT
       t.id_task,
-      chn.id_source AS id_session_whats,
-      c.id_session AS id_session_inapp,
-      COALESCE(cq.task_queue_name, t.ticket_group_name) AS task_queue_name,
-      t.agent_email,
-      t.customer_phone,
-      t.completion_reason,
+      t.id_session,
+      t.queue_name AS task_queue_name,
+      t.worker_email AS agent_email,
+      t.from_phone_number AS customer_phone,
+      t.task_completion_reason AS completion_reason,
       CASE
         WHEN t.task_status = 'canceled' THEN FALSE
-        WHEN t.completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
+        WHEN t.task_completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
         ELSE TRUE
       END AS is_answered,
-      pta.is_per_team_task,
+      t.is_per_team_task,
       rce.ts_reservation_created,
-      COALESCE(rce.ts_reservation_created, t.ts_created) AS ts_created,
-      t.ts_created AS ts_task_created
+      COALESCE(rce.ts_reservation_created, t.ts_created - INTERVAL 3 HOUR) AS ts_created,
+      t.ts_created - INTERVAL 3 HOUR AS ts_task_created
     FROM
-      task AS t
+      datalake_quinto_messenger.tasks AS t
     LEFT JOIN
       reservation_created_events AS rce
         ON rce.id_task_external = t.id_task
-    LEFT JOIN
-      current_queue AS cq
-        ON cq.id_task_queue = t.ticket_group_name
-    LEFT JOIN
-      datalake_quinto_messenger.channel AS chn
-        ON chn.id_channel = t.id_channel
-    LEFT JOIN
-      datalake_quinto_messenger.chat AS c
-        ON c.id_chat = t.id_chat
-    LEFT JOIN
-      per_team_attr AS pta
-        ON pta.id_task = t.id_task
   ),
   ticket_assignment AS (
     SELECT DISTINCT
-      COALESCE(tr.id_session_whats, tr.id_session_inapp) AS id_session,
+      tr.id_session,
       c.id_ticket AS id_ticket,
       tr.id_task,
       tr.agent_email,

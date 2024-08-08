@@ -6,7 +6,7 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_task:
     lineage:
-      - datalake_quinto_messenger.task.id_task
+      - datalake_quinto_messenger.tasks.id_task
     description: Twilio's task ID
   id_message:
     lineage:

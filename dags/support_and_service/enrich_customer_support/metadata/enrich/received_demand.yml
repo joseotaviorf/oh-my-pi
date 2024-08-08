@@ -21,8 +21,7 @@ columns:
       been accepted. This column is filled exclusively for call data
   id_session:
     lineage:
-      - datalake_quinto_messenger.chat.id_session
-      - datalake_quinto_messenger.channel.id_source
+      - datalake_quinto_messenger.tasks.id_session
       - datalake_sauron_clean.session.id
     description: ID from Sauron session. This column is filled exclusively for chat data
   id_ticket:
@@ -126,7 +125,7 @@ columns:
     description: Field related to the ticket taxonomy
   completion_reason:
     lineage:
-      - datalake_quinto_messenger.task.completion_reason
+      - datalake_quinto_messenger.tasks.task_completion_reason
     description: Reason for a given Twilio task to have been completed.
   origin:
     description: Describes the origin of the interaction, only valid for call interactions.

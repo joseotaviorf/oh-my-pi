@@ -3,7 +3,7 @@ WITH last_task AS (
         t.id_channel,
         MAX(t.ts_created) AS last_timestamp
     FROM
-        datalake_quinto_messenger.task AS t
+        datalake_quinto_messenger.tasks AS t
     GROUP BY 1
 ),
 chat_tickets AS (
@@ -20,22 +20,13 @@ chat_tickets AS (
     UNION
     SELECT
         ft.sk_ticket,
-        task_queue_name AS dept
+        queue_name AS dept
     FROM
-        datalake_quinto_messenger.task AS t
+        datalake_quinto_messenger.tasks AS t
     INNER JOIN
         last_task AS lt
             ON lt.id_channel = t.id_channel
             AND t.ts_created = lt.last_timestamp
-    INNER JOIN (
-        SELECT
-            task_queue_name,
-            id_task
-        FROM
-            datalake_quinto_messenger.task_event
-        GROUP BY 1, 2
-    ) AS te
-        ON te.id_task = t.id_task
     INNER JOIN
         dw_tickets.fact_tickets AS ft
             ON ft.sk_session = t.id_conversation

@@ -1,22 +1,5 @@
 -- TO RUN ON DATABRICKS: replace double brackets ('{{', '}}') for single ones
-WITH last_updated_task AS (
-  SELECT
-    *
-  FROM
-    datalake_quinto_messenger.task
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
-),
-task_outcome AS (
-  SELECT
-    id_task,
-    task_completion_reason
-  FROM
-    datalake_quinto_messenger.task_event
-  WHERE
-    type = 'reservation.completed'
-),
-task_transfer_reason AS (
+WITH task_transfer_reason AS (
   SELECT DISTINCT
     id_reviewed AS id_task,
     rating_selected[0] AS transference_reason
@@ -33,77 +16,53 @@ task_transfer_reason AS (
 task_timestamps AS (
   SELECT
     id_task,
-    MAX(task_queue_name) AS department,
-    MAX(ts_created_local) AS ts_task_closed,
-    MIN(ts_created_local) AS ts_task_created
+    MAX(queue_name) AS department,
+    MAX(ts_created - INTERVAL 3 HOUR) AS ts_task_closed,
+    MIN(ts_created - INTERVAL 3 HOUR) AS ts_task_created
   FROM
-    datalake_quinto_messenger.task_event
+    datalake_quinto_messenger_clean.task_event
   WHERE
-    type LIKE 'reservation.%'
+    event_type LIKE 'reservation.%'
   GROUP BY 1
 ),
-whatsapp_metrics AS (
+chat_metrics AS (
   SELECT
-    id_conversation,
-    COUNT(DISTINCT t.id_task) AS number_of_tasks,
-    COUNT(DISTINCT te.task_queue_name) AS number_of_departments,
-    MAX(te.ts_created_local) AS ts_last_event,
-    MIN(te.ts_created_local) AS ts_first_event
+    id_session,
+    COUNT(DISTINCT id_task) AS number_of_tasks,
+    COUNT(DISTINCT queue_name) AS number_of_departments,
+    MAX(ts_created - INTERVAL 3 HOUR) AS ts_last_event,
+    MIN(ts_created - INTERVAL 3 HOUR) AS ts_first_event
   FROM
-    datalake_quinto_messenger.task AS t
-  INNER JOIN
-    datalake_quinto_messenger.task_event AS te
-      ON t.id_task = te.id_task
-  GROUP BY 1
-),
-chat5a_metrics AS (
-  SELECT
-    c.id_session,
-    COUNT(DISTINCT t.id_task) AS number_of_tasks,
-    COUNT(DISTINCT te.task_queue_name) AS number_of_departments,
-    MAX(te.ts_created_local) AS ts_last_event,
-    MIN(te.ts_created_local) AS ts_first_event
-  FROM
-    datalake_quinto_messenger.task AS t
-  INNER JOIN
-    datalake_quinto_messenger.task_event AS te
-      ON t.id_task = te.id_task
-  INNER JOIN
-    datalake_quinto_messenger.chat c
-      ON c.id_chat = t.id_chat
+    datalake_quinto_messenger.tasks AS t
   GROUP BY 1
 ),
 task AS (
   SELECT
     t.id_task,
     t.id_channel,
-    t.id_agent,
+    t.id_worker AS id_agent,
     t.id_chat,
-    LOWER(t.agent_email) AS agent_email,
+    LOWER(t.worker_email) AS agent_email,
     tt.department,
-    t.completion_reason,
+    COALESCE(t.task_completion_reason, t.task_outcome) AS completion_reason,
     LAG(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) AS transferred_from_dept,
     LEAD(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) AS transferred_to_dept,
     CASE
-        WHEN
-          LEAD(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) = tt.department
-            AND LEAD(t.id_agent, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) = t.id_agent THEN 'internal-same-agent'
-        WHEN
-          LEAD(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) = tt.department
-            AND LEAD(t.id_agent, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) != t.id_agent THEN 'internal-other-agent'
-        WHEN
-          LEAD(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) != tt.department THEN 'external'
+      WHEN LEAD(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) = tt.department
+        AND LEAD(t.id_worker, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) = t.id_worker
+        THEN 'internal-same-agent'
+      WHEN LEAD(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) = tt.department
+        AND LEAD(t.id_worker, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) != t.id_worker
+        THEN 'internal-other-agent'
+      WHEN LEAD(tt.department, 1) OVER (PARTITION BY t.id_channel ORDER BY tt.ts_task_created) != tt.department THEN 'external'
     END AS transference_type,
-    t.customer_type_tag,
-    t.contact_motivation_tag,
-    t.contact_theme_tag,
     t.seconds_to_first_response,
     tt.ts_task_closed,
     tt.ts_task_created,
     t.ts_created,
-    t.ts_updated
+    t.ts_ended AS ts_updated
   FROM
-    last_updated_task AS t
+    datalake_quinto_messenger.tasks AS t
   INNER JOIN
     task_timestamps AS tt
       ON tt.id_task = t.id_task
@@ -112,7 +71,7 @@ twilio_time_metrics AS (
   WITH task_metrics AS(
     SELECT DISTINCT
       ctm.id_segment AS id_task,
-      lut.id_channel,
+      t.id_channel,
       ctm.total_talk_time,
       ctm.total_queue_time,
       ctm.total_wrap_up_time,
@@ -120,8 +79,8 @@ twilio_time_metrics AS (
     FROM
       datalake_twilio_flex_insights_clean.conversation_time_metrics AS ctm
     INNER JOIN
-      last_updated_task AS lut
-        ON lut.id_task = ctm.id_segment
+      task AS t
+        ON t.id_task = ctm.id_segment
     WHERE
       total_talk_time IS NOT NULL
       AND total_queue_time IS NOT NULL
@@ -185,6 +144,7 @@ chatbot_time_metrics_chat_inapp AS (
 quinto_messenger_tasks AS (
   SELECT
     t.id_task,
+    t.id_channel,
     c.id_conversation,
     c.id_source AS id_session,
     t.id_agent,
@@ -197,35 +157,22 @@ quinto_messenger_tasks AS (
         WHEN t.department LIKE "%MX%" THEN "MX"
         ELSE "BR"
     END AS country_code,
-    to.task_completion_reason AS completion_reason,
+    t.completion_reason,
     t.transferred_from_dept,
     t.transferred_to_dept,
     t.transference_type,
-    ttr.transference_reason,
-    CAST(COALESCE(wm.number_of_departments,0) AS INT) AS number_of_departments,
-    CAST(COALESCE(wm.number_of_tasks,0) AS INT) AS number_of_tasks,
-    wm.number_of_tasks > 1 AS has_transfers,
     CASE
         WHEN t.seconds_to_first_response / 60 <= 15 THEN TRUE
         WHEN t.seconds_to_first_response / 60 > 15 THEN FALSE
         ELSE NULL
     END AS sla_achieved,
-    t.customer_type_tag,
-    t.contact_motivation_tag,
-    t.contact_theme_tag,
     bot.total_minutes_reception_time,
     c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
-    ttm.total_talk_time AS seconds_total_talk_time,
-    ttm.total_queue_time AS seconds_total_queue_time,
-    ttm.total_wrap_up_time AS seconds_total_wrap_up_time,
-    ttm.total_handling_time AS seconds_total_handling_time,
     bot.ts_reception_started,
     t.ts_created,
     t.ts_updated,
     t.ts_task_closed,
-    t.ts_task_created,
-    wm.ts_first_event,
-    wm.ts_last_event
+    t.ts_task_created
   FROM
     task AS t
   INNER JOIN
@@ -234,24 +181,13 @@ quinto_messenger_tasks AS (
   LEFT JOIN
     chatbot_time_metrics_whatsapp AS bot
       ON c.id_source = bot.id_session
-  LEFT JOIN
-    whatsapp_metrics AS wm
-      ON wm.id_conversation = c.id_source
-  LEFT JOIN
-    task_outcome AS to
-      ON to.id_task = t.id_task
-  LEFT JOIN
-    task_transfer_reason AS ttr
-      ON ttr.id_task = t.id_task
-  LEFT JOIN
-    twilio_time_metrics AS ttm
-      ON ttm.id_channel = c.id_channel
   WHERE
     t.ts_created > '2020-08-20'
       AND c.channel_status <> 'missed'
   UNION ALL
   SELECT
     t.id_task,
+    t.id_channel,
     CAST(NULL AS STRING) AS id_conversation,
     c5a.id_session AS id_session,
     t.id_agent,
@@ -268,31 +204,18 @@ quinto_messenger_tasks AS (
     t.transferred_from_dept,
     t.transferred_to_dept,
     t.transference_type,
-    ttr.transference_reason,
-    CAST(COALESCE(cm.number_of_departments,0) AS INT) AS number_of_departments,
-    CAST(COALESCE(cm.number_of_tasks,0) AS INT) AS number_of_tasks,
-    cm.number_of_tasks > 1 AS has_transfers,
     CASE
         WHEN t.seconds_to_first_response / 60 <= 15 THEN TRUE
         WHEN t.seconds_to_first_response / 60 > 15 THEN FALSE
         ELSE NULL
     END AS sla_achieved,
-    t.customer_type_tag,
-    t.contact_motivation_tag,
-    t.contact_theme_tag,
     bot.total_minutes_reception_time,
     (UNIX_TIMESTAMP(c5a.ts_updated) - UNIX_TIMESTAMP(c5a.ts_created))/60.0 AS minutes_full_resolution_time_calendar,
-    ttm.total_talk_time AS seconds_total_talk_time,
-    ttm.total_queue_time AS seconds_total_queue_time,
-    ttm.total_wrap_up_time AS seconds_total_wrap_up_time,
-    ttm.total_handling_time AS seconds_total_handling_time,
     bot.ts_reception_started,
     t.ts_created,
     t.ts_updated,
     t.ts_task_closed,
-    t.ts_task_created,
-    cm.ts_first_event,
-    cm.ts_last_event
+    t.ts_task_created
   FROM
     datalake_quinto_messenger.chat AS c5a
   INNER JOIN
@@ -301,15 +224,52 @@ quinto_messenger_tasks AS (
   LEFT JOIN
     chatbot_time_metrics_chat_inapp AS bot
       ON c5a.id_session = bot.id_session
-  LEFT JOIN
-    chat5a_metrics AS cm
-      ON cm.id_session = c5a.id_session
+),
+tasks AS (
+  SELECT
+    t.id_task,
+    t.id_conversation,
+    t.id_session,
+    t.id_agent,
+    t.origin,
+    t.agent_email,
+    t.seconds_first_reply,
+    t.task_minutes_wait_time,
+    t.department,
+    t.country_code,
+    t.completion_reason,
+    t.transferred_from_dept,
+    t.transferred_to_dept,
+    t.transference_type,
+    ttr.transference_reason,
+    CAST(COALESCE(cm.number_of_departments, 0) AS INT) AS number_of_departments,
+    CAST(COALESCE(cm.number_of_tasks, 0) AS INT) AS number_of_tasks,
+    cm.number_of_tasks > 1 AS has_transfers,
+    t.sla_achieved,
+    t.total_minutes_reception_time,
+    t.minutes_full_resolution_time_calendar,
+    ttm.total_talk_time AS seconds_total_talk_time,
+    ttm.total_queue_time AS seconds_total_queue_time,
+    ttm.total_wrap_up_time AS seconds_total_wrap_up_time,
+    ttm.total_handling_time AS seconds_total_handling_time,
+    t.ts_reception_started,
+    t.ts_created,
+    t.ts_updated,
+    t.ts_task_closed,
+    t.ts_task_created,
+    cm.ts_first_event,
+    cm.ts_last_event
+  FROM
+    quinto_messenger_tasks AS t
   LEFT JOIN
     task_transfer_reason AS ttr
       ON ttr.id_task = t.id_task
   LEFT JOIN
+    chat_metrics AS cm
+      ON cm.id_session = t.id_session
+  LEFT JOIN
     twilio_time_metrics AS ttm
-      ON ttm.id_channel = c5a.id_channel
+      ON ttm.id_channel = t.id_channel
 ),
 csat AS (
   SELECT
@@ -367,6 +327,8 @@ zendesk_ticket_info AS (
     description,
     status,
     TO_JSON(custom_fields) AS custom_fields,
+    contact_ticket,
+    task_sid_twilio,
     group_name AS zendesk_ticket_department,
     first_resolution_time_min_calendar AS minutes_first_resolution_time_calendar,
     first_resolution_time_min_business AS minutes_first_resolution_time_business,
@@ -389,10 +351,10 @@ tickets_with_task AS (
     zti.id_ticket,
     zti.status,
     COALESCE(
-      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zti.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
+      NULLIF(contact_ticket, ''),
       REGEXP_EXTRACT(zti.description, '(WT[a-z0-9]{{20,40}})', 1)
     ) AS twilio_task_whatsapp,
-    REGEXP_EXTRACT(GET_JSON_OBJECT(zti.custom_fields, '$.TaskSid Twilio'), '(WT[a-z0-9]{{20,40}})', 1) AS twilio_task_chat_inapp,
+    task_sid_twilio AS twilio_task_chat_inapp,
     zti.tags,
     zti.zendesk_ticket_department,
     zti.ts_created,
@@ -413,7 +375,7 @@ total_tickets AS (
   FROM
     tickets_with_task AS t
   INNER JOIN
-    quinto_messenger_tasks AS qmt
+    tasks AS qmt
       ON qmt.id_task = t.twilio_task_whatsapp
   UNION ALL
   SELECT
@@ -428,7 +390,7 @@ total_tickets AS (
   FROM
     tickets_with_task AS t
   INNER JOIN
-    quinto_messenger_tasks AS qmt
+    tasks AS qmt
       ON qmt.id_task = t.twilio_task_chat_inapp
 ),
 chat_back_tickets AS (
@@ -520,7 +482,7 @@ first_last_department AS (
     FIRST(qmt.department) OVER (PARTITION BY zti.id_ticket ORDER BY qmt.ts_task_created ASC) AS first_department,
     FIRST(qmt.department) OVER (PARTITION BY zti.id_ticket ORDER BY qmt.ts_task_created DESC) AS last_department
   FROM
-    quinto_messenger_tasks AS qmt
+    tasks AS qmt
   INNER JOIN
     zendesk_ticket_info AS zti
       ON zti.id_session = qmt.id_session
@@ -614,7 +576,7 @@ SELECT DISTINCT
   qmt.ts_task_closed AS ts_segment_closed,
   qmt.ts_task_created AS ts_segment_created
 FROM
-  quinto_messenger_tasks AS qmt
+  tasks AS qmt
 INNER JOIN
   zendesk_ticket_info AS zti
     ON zti.id_session = qmt.id_session
