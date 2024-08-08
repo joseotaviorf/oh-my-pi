@@ -37,6 +37,8 @@ cap AS (
         payment_platform = 'vans_cap'
     AND
         payment_status IN ('paid', 'chargeback')
+    AND
+        (CAST(SPLIT(reference_5, ':')[0] AS INT) IN (1, 2, 7, 10, 13) OR reference_5 IS NULL)
     GROUP BY
         1, 2, 3, 4, 5, 6
 ),
@@ -115,4 +117,5 @@ LEFT JOIN
         AND cs.dt_paid = sap.dt_paid
 WHERE
     cs.company_use IS NOT NULL
+    AND NOT(cap.company_use IS NOT NULL AND f.company_use IS NULL AND sap.company_use IS NULL)
     AND cs.dt_paid >= '2024-01-01'
