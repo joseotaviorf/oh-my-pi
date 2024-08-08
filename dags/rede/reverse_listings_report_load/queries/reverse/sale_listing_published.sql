@@ -1,9 +1,9 @@
 SELECT
-    CAST((
-            100000 * ROUND(fls.sk_sale_listing / 1000) +
-            1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 
-            3
-        ) AS BIGINT) AS id,
+    (
+        100000 * ROUND(fls.sk_sale_listing / 1000) +
+        1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 
+         3
+     ) AS id,
     fls.sk_region AS location_id,
     ROUND(fls.sk_sale_listing / 1000) AS property_id,
     dc.uuid_company AS company_uuid,
