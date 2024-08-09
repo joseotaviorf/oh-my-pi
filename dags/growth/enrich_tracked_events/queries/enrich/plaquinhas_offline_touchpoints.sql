@@ -75,7 +75,6 @@ total_chat AS (
     legacy_chat_flow
   WHERE
     DATE(ts_event) < DATE('2022-10-17')
-    DATE(ts_event) < DATE('2022-10-17')
     AND id_user IS NOT NULL
 ),
 
@@ -145,10 +144,8 @@ total_phone AS (
   WHERE
     user.id > 0
 ),
-
 plaquinhas_offline_touchpoints AS (
   SELECT
-    id_user,
     id_user,
     contact_channel,
     ts_event
@@ -156,7 +153,6 @@ plaquinhas_offline_touchpoints AS (
     total_chat
   UNION ALL
   SELECT
-    id_user,
     id_user,
     contact_channel,
     ts_event
@@ -184,8 +180,5 @@ SELECT DISTINCT
   YEAR(ts_event) AS year,
   MONTH(ts_event) AS month,
   DAY(ts_event) AS day
-FROM
-  plaquinhas_offline_touchpoints
-
 FROM
   plaquinhas_offline_touchpoints
