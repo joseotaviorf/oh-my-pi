@@ -1,6 +1,7 @@
 WITH tasks AS (
   SELECT
     id_task,
+    GET_JSON_OBJECT(conversation_attributes,'$.conversation_id') AS id_conversation,
     id_channel,
     id_chat,
     id_worker,
