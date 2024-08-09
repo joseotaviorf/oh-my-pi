@@ -792,6 +792,7 @@ bietlejuice.looker_temp:
 bietlejuice.metric_growth__demand:
   remove:
     - bietlejuice.enrich_growth_manual_daily_costs:load-enrich-daily-costs
+    - bietlejuice.enrich_growth_automatic_daily_costs:load-enrich-daily-costs
 bietlejuice.metric_rent_benvi__demand:
   remove:
     - bietlejuice.enrich_mexico_marketing_manual_daily_costs:load-enrich-daily-costs # dependency not added due to be running later, should not be a block of the pipeline
