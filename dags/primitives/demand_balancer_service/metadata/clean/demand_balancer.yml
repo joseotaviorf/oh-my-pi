@@ -1,0 +1,28 @@
+---
+database_name: datalake_search
+table_name: demand_balancer
+owner: thays.silva@quintoandar.com.br
+domain: primitives
+
+columns:
+  id_house:
+    lineage:
+      - datalake_search.demand_balancer.id_house
+  prediction:
+    lineage:
+      - datalake_search.demand_balancer.prediction
+  model_version:
+    lineage:
+      - datalake_search.demand_balancer.model_version
+  timestamp_available:
+    lineage:
+      - datalake_search.demand_balancer.timestamp_available
+  year:
+    lineage:
+      - datalake_search.demand_balancer.year
+  month:
+    lineage:
+      - datalake_search.demand_balancer.month
+  day:
+    lineage:
+      - datalake_search.demand_balancer.day
