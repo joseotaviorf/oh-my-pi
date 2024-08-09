@@ -67,6 +67,7 @@ SELECT
   t.id_channel,
   tq.id_queue,
   t.id_chat,
+  t.id_conversation,
   COALESCE(is.id_session, ws.id_session) AS id_session,
   t.id_worker,
   t.id_user,
