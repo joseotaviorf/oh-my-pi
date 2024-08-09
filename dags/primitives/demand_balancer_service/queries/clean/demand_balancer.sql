@@ -7,5 +7,5 @@ select
   month,
   day
 from
-  datalake_search_raw.demand_balancer
+  datalake_demand_balancer_service_raw.demand_balancer
 where year={year} AND month={month} AND day={day}
