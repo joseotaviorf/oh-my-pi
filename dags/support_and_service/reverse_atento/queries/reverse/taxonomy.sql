@@ -46,9 +46,9 @@ SELECT DISTINCT
   theme_detail,
   sub_journey AS area,
   ts_created,
-  YEAR(ts_created) AS year,
-  MONTH(ts_created) AS month,
-  DAY(ts_created) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM 
   base
