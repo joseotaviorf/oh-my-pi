@@ -49,8 +49,8 @@ columns:
     description: "Content Description"
     lineage:
       - datalake_recupera_raw.contracts.content_description
-  dt_snapshot:
-    description: "Timestamp that snapshot was taken. It is the date of S3 file."
+  dt_updated:
+    description: "The first date on which the customer + contract indicator was changed."
     lineage:
       - datalake_recupera_raw.indicator_contracts.year
       - datalake_recupera_raw.indicator_contracts.month
