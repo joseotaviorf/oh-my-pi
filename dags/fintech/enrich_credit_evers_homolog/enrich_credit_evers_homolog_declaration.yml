@@ -14,5 +14,10 @@ dag:
 workflow:
   type: query
   layer: enrich
+  short_circuit_customization:
+    function: CHECK_IS_SPECIFIC_DAY_OF_MONTH
+    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    function_params:
+      day: 14
 cluster:
   type: databricks_13_3_med_general_cluster
