@@ -39,7 +39,7 @@ def delete_databricks_jobs(remove_before_timedelta: timedelta, job_name_regex: s
     databricks_hook.log.info(
         "Jobs to be deleted:\n{}".format("\n".join(list(jobs_id_list.values())))
     )
-    ThreadPool(processes=10).map(databricks_hook.delete_job, list(jobs_id_list.keys()))
+    ThreadPool(processes=5).map(databricks_hook.delete_job, list(jobs_id_list.keys()))
 
 
 dag = DAG(
@@ -59,7 +59,7 @@ for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
     delete_jobs_task = PythonOperator(
         task_id=f"delete-{project}-databricks-jobs",
         dag=dag,
-        retries=3,
+        retries=5,
         python_callable=delete_databricks_jobs,
         op_kwargs={
             "remove_before_timedelta": JOBS_REMOVAL_TIMEDELTA,
