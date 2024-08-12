@@ -24,7 +24,10 @@ SELECT
   m.message,
   m.index,
   m.ts_created,
-  LAG(m.ts_created) OVER(PARTITION BY m.id_channel ORDER BY m.ts_created) AS ts_last_message
+  LAG(m.ts_created) OVER(PARTITION BY m.id_channel ORDER BY m.ts_created) AS ts_last_message,
+  m.year,
+  m.month,
+  m.day
 FROM
   datalake_internal_chat_clean.internal_chat_messages AS m
 LEFT JOIN
