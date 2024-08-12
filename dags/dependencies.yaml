@@ -3,6 +3,8 @@ bietlejuice.amplitude:
   - bietlejuice.amplitude_supply:events-supply-to-datalake-raw
 bietlejuice.amplitude_supply:
   - bietlejuice.amplitude_demand:events-demand-to-datalake-raw
+bietlejuice.demand_balancer_service:
+  - quintoml.search.maestro.inference:batch-predict
 bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-invoice-issuance
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
@@ -3573,3 +3575,11 @@ wonka.user_region_listing_page_viewed:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_location:load-clean-region
+wonka.house_demand_balancer_predictions:
+  - bietlejuice.demand_balancer_service:load-clean-demand-balancer
+quintoml.search.maestro.inference:
+  - wonka.house_rent_proposal:load-house_rent_proposal
+  - wonka.house_rent_offer:load-house_rent_offer
+
+
+

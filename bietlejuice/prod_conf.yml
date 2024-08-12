@@ -7,6 +7,7 @@ dags_out_of_pattern:
         "amplitude_demand",
         "amplitude_supply",
         "dataset_profiling",
+        "demand_balancer_service",
         "dw_affiliate_costs",
         "dw_agent",
         "dw_agent_contract",
@@ -131,8 +132,10 @@ dags_out_of_pattern:
         "wonka.house_rent_offer",
         "wonka.house_rent_proposal",
         "zordominium_vespucio_plugin",
+        "wonka.house_demand_balancer_predictions",
         "quintoml.recs.house_user_embeddings_quintoml.inference",
         "dw_quintocred_ifrs",
+        "quintoml.search.maestro.inference",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks
