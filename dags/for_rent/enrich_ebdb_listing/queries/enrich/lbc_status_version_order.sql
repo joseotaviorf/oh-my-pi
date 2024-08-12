@@ -446,78 +446,116 @@ trigger AS (
         AND t.status = bch.status
         AND COALESCE(t.status_reason, '') = COALESCE(bch.status_reason, '')
         AND t.ts_state_started = bch.ts_state_started
+), versioning AS (
+  SELECT 
+      m.id_house,
+      m.country_code,
+      m.status,
+      m.status_reason,
+      m.rev,
+      m.revision_reason,
+      IF(
+          COALESCE( 
+            m.listing_version,
+            COALESCE(
+              COALESCE(lhs.listing_version, 0)
+              +
+              SUM(
+                  m.trigger_new_version
+              ) OVER (PARTITION BY m.id_house ORDER BY m.ts_state_started, COALESCE(m.ts_state_ended,(CURRENT_TIMESTAMP - INTERVAL 1 DAY)) ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+              , IF(
+                  m.lbc_state_order = 1 
+                  AND m.status = 'PUBLISHED' 
+                  AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL)
+                  , COALESCE(lhs.listing_version, 0) + 1
+                  , COALESCE(lhs.listing_version, 0) + 0
+                ) 
+              , 0
+            )
+          ) > 0
+          , m.ts_first_publication
+          , NULL
+      ) AS ts_first_publication,
+      CAST(m.ts_state_started AS TIMESTAMP) AS ts_state_started,
+      CAST(m.ts_state_ended AS TIMESTAMP) AS ts_state_ended,
+      m.days_in_state,
+      m.days_in_status,
+      m.trigger_new_version,
+      COALESCE( 
+        m.listing_version,
+        COALESCE(
+          COALESCE(lhs.listing_version, 0)
+          +
+          SUM(
+              m.trigger_new_version
+          ) OVER (PARTITION BY m.id_house ORDER BY m.ts_state_started, COALESCE(m.ts_state_ended,(CURRENT_TIMESTAMP - INTERVAL 1 DAY)) ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+          , IF(
+              m.lbc_state_order = 1 
+              AND m.status = 'PUBLISHED' 
+              AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL)
+              , COALESCE(lhs.listing_version, 0) + 1
+              , COALESCE(lhs.listing_version, 0) + 0
+            )
+          , 0
+        )
+      ) AS listing_version,
+      m.lbc_state_order,
+      m.state_order,
+      MAX(m.max_state_order) OVER(PARTITION BY m.id_house) AS max_state_order,
+      IF(
+        MAX(m.state_order) OVER(
+            PARTITION BY m.id_house, CAST(m.ts_state_started AS DATE)
+        ) = m.state_order,
+        TRUE,
+        FALSE
+      ) AS is_last_state_of_day
+  FROM 
+      merge_version AS m
+  LEFT JOIN 
+      last_house_state AS lhs
+        ON lhs.id_house = m.id_house
+),
+early_demand_opt_out AS (
+  SELECT DISTINCT
+      v.id_house,
+      v.listing_version
+  FROM 
+      versioning AS v
+  WHERE
+      v.revision_reason LIKE '[ED OPT-OUT]%'
 )
-SELECT 
-    m.id_house,
-    m.country_code,
-    m.status,
-    m.status_reason,
-    m.rev,
-    m.revision_reason,
+SELECT
+    v.id_house,
+    v.country_code,
+    v.status,
+    v.status_reason,
+    v.rev,
+    v.revision_reason,
+    v.ts_first_publication,
+    v.ts_state_started,
+    v.ts_state_ended,
+    v.days_in_state,
+    v.days_in_status,
+    v.trigger_new_version,
+    v.listing_version,
     IF(
-        COALESCE( 
-          m.listing_version,
-          COALESCE(
-            COALESCE(lhs.listing_version, 0)
-            +
-            SUM(
-                m.trigger_new_version
-            ) OVER (PARTITION BY m.id_house ORDER BY m.ts_state_started, COALESCE(m.ts_state_ended,(CURRENT_TIMESTAMP - INTERVAL 1 DAY)) ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
-            , IF(
-                m.lbc_state_order = 1 
-                AND m.status = 'PUBLISHED' 
-                AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL)
-                , COALESCE(lhs.listing_version, 0) + 1
-                , COALESCE(lhs.listing_version, 0) + 0
-              ) 
-            , 0
-          )
-        ) > 0
-        , m.ts_first_publication
-        , NULL
-    ) AS ts_first_publication,
-    CAST(m.ts_state_started AS TIMESTAMP) AS ts_state_started,
-    CAST(m.ts_state_ended AS TIMESTAMP) AS ts_state_ended,
-    m.days_in_state,
-    m.days_in_status,
-    m.trigger_new_version,
-    COALESCE( 
-      m.listing_version,
-      COALESCE(
-        COALESCE(lhs.listing_version, 0)
-        +
-        SUM(
-            m.trigger_new_version
-        ) OVER (PARTITION BY m.id_house ORDER BY m.ts_state_started, COALESCE(m.ts_state_ended,(CURRENT_TIMESTAMP - INTERVAL 1 DAY)) ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
-        , IF(
-            m.lbc_state_order = 1 
-            AND m.status = 'PUBLISHED' 
-            AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL)
-            , COALESCE(lhs.listing_version, 0) + 1
-            , COALESCE(lhs.listing_version, 0) + 0
-          )
-        , 0
+      ed_opt_out.id_house IS NULL
+      AND
+      (
+        v.revision_reason LIKE '%TERMINATION_CANCELED%' 
+        OR 
+        v.revision_reason LIKE '[TEMPORARY OPT-OUT RELISTING]%' --Manually removed from relisting by our Product Team
       )
-    ) AS listing_version,
-    IF(
-      m.revision_reason LIKE '%TERMINATION_CANCELED%' 
-      OR 
-      m.revision_reason LIKE '[TEMPORARY OPT-OUT RELISTING]%' --Manually removed from relisting by our Product Team
       , TRUE
       , FALSE
     ) AS is_extended_rental,
-    m.lbc_state_order,
-    m.state_order,
-    MAX(m.max_state_order) OVER(PARTITION BY m.id_house) AS max_state_order,
-    IF(
-      MAX(m.state_order) OVER(
-          PARTITION BY m.id_house, CAST(m.ts_state_started AS DATE)
-      ) = m.state_order,
-      TRUE,
-      FALSE
-    ) AS is_last_state_of_day
+    v.lbc_state_order,
+    v.state_order,
+    v.max_state_order,
+    v.is_last_state_of_day
 FROM 
-  merge_version AS m
-LEFT JOIN 
-    last_house_state AS lhs
-      ON lhs.id_house = m.id_house
+    versioning AS v
+LEFT JOIN
+    early_demand_opt_out AS ed_opt_out
+      ON ed_opt_out.id_house = v.id_house
+        AND ed_opt_out.listing_version = v.listing_version
