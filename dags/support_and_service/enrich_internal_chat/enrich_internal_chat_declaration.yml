@@ -20,4 +20,4 @@ cluster:
         driver_node_type_id: m7g.xlarge
         node_type_id: m7g.xlarge
         spark_version: 13.3.x-scala2.12
-        num_workers: 1
+        num_workers: 2

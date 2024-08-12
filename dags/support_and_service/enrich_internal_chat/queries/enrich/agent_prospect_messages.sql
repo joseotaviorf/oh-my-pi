@@ -32,4 +32,4 @@ LEFT JOIN
     ON a.id_main_user = m.id_user_external
 WHERE
   m.chat_type = "QuintoandarPrivate"
-  AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+  AND MAKE_DATE(m.year, m.month, m.day) BETWEEN "{load_start_date}" AND "{load_end_date}"
