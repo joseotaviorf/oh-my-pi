@@ -4,13 +4,16 @@ WITH base AS (
         m.id_session,
         state.id AS id_state,
         session.id_user,
-        user.email LIKE "%@quintoandar.com.br"
+        CASE
+          WHEN user.email LIKE "%@quintoandar.com.br"
           OR user.email IN (
             "edivaldo.delgado@poli.ufrj.br",
             "vicentedepaula@gmaill.com",
             "vpbfmail@gmail.com",
             "rafael.castro@gmail.com"
-          ) AS is_internal_user,
+          ) THEN TRUE
+          ELSE FALSE
+        END AS is_internal_user,
         m.message_index,
         m.role,
         m.input_type,
