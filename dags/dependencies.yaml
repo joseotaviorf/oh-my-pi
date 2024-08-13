@@ -301,22 +301,31 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
   - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
+  - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.enrich_3p:load-enrich-houses-3p
   - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliates-cost-attributions
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-contract-docusign-signed-events
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-home-page-viewed
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-page-viewed
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-search-results-page-viewed
   - bietlejuice.enrich_bigfone:load-enrich-reservations
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
+  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
   - bietlejuice.enrich_listing_temp:load-enrich-fact-listing-rent-flows-house
+  - bietlejuice.enrich_lost_listings:load-enrich-lost-listings
   - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
   - bietlejuice.enrich_quinto_messenger:load-enrich-tasks
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
@@ -331,12 +340,13 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.gsheets_growth:done-clean-ciq-costs
   - bietlejuice.gsheets_growth:done-clean-city-share
-  - bietlejuice.gsheets_growth:done-clean-costs-targets
   - bietlejuice.gsheets_growth:done-clean-daily-target-supply-rental
   - bietlejuice.gsheets_growth:done-clean-daily-target-supply-sale
   - bietlejuice.gsheets_growth:done-clean-local-holidays
   - bietlejuice.gsheets_growth:done-clean-mkt-cost-per-source
+  - bietlejuice.gsheets_growth:done-clean-plaquinhas-cover-targets
   - bietlejuice.gsheets_growth:done-clean-plaquinhas-demand-targets
+  - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-pp-organic
   - bietlejuice.gsheets_growth:done-clean-promotional-bonus-cluster-targets
   - bietlejuice.gsheets_growth:done-clean-promotional-bonus-user-cluster-targets
   - bietlejuice.gsheets_growth:done-clean-provisioned-costs-import
@@ -345,6 +355,15 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-rental-tof-daily-targets
   - bietlejuice.gsheets_growth:done-clean-rental-tof-weekly-targets
   - bietlejuice.gsheets_growth:done-clean-sale-flows-targets
+  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-cost
+  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-nbp
+  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-ncp
+  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-daily
+  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-monthly
+  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-weekly
+  - bietlejuice.gsheets_growth:done-clean-targets-portal-casa-mineira-cost-cf
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-crm-casa-mineira
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-portal-casa-mineira
   - bietlejuice.gsheets_growth:done-clean-tof-supply-targets
   - bietlejuice.gsheets_growth:done-clean-unique-volume-targets-day
   - bietlejuice.gsheets_growth:done-clean-unit-economics-amortization-curve
@@ -424,44 +443,6 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.wololo:load-clean-context-discard
   - bietlejuice.wololo:load-clean-conversion
   - bietlejuice.wololo:load-clean-prospect
-bietlejuice.dw_datamarts_spark.growth:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.dw_lead:load-dw-public-dim-lead
-  - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
-  - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
-  - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
-  - bietlejuice.ebdb:load-clean-polygon-region
-  - bietlejuice.ebdb_house:load-clean-house
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-contract-docusign-signed-events
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-home-page-viewed
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-page-viewed
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-search-results-page-viewed
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
-  - bietlejuice.enrich_lost_listings:load-enrich-lost-listings
-  - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
-  - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets
-  - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
-  - bietlejuice.gsheets_growth:done-clean-city-share
-  - bietlejuice.gsheets_growth:done-clean-local-holidays
-  - bietlejuice.gsheets_growth:done-clean-plaquinhas-cover-targets
-  - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-pp-organic
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-cost
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-nbp
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-ncp
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-daily
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-monthly
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-weekly
-  - bietlejuice.gsheets_growth:done-clean-targets-portal-casa-mineira-cost-cf
-  - bietlejuice.gsheets_growth:done-clean-taxonomy-crm-casa-mineira
-  - bietlejuice.gsheets_growth:done-clean-taxonomy-portal-casa-mineira
-  - bietlejuice.gsheets_growth:done-clean-week-volumes-supply
-  - bietlejuice.gsheets_growth:done-clean-weekday-holiday-share-supply
-  - bietlejuice.gsheets_growth:done-clean-weekday-supply-channel-share
 bietlejuice.dw_date:
   - bietlejuice.enrich_public_date:load-enrich-aux-date
 bietlejuice.dw_demand:
@@ -3543,6 +3524,11 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
   - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
   - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
   - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
+quintoml.search.maestro.inference:
+  - wonka.house_rent_offer:load-house_rent_offer
+  - wonka.house_rent_proposal:load-house_rent_proposal
+wonka.house_demand_balancer_predictions:
+  - bietlejuice.demand_balancer_service:load-clean-demand-balancer
 wonka.house_embeddings_main:
   - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
 wonka.house_listing_business_context:
@@ -3587,5 +3573,3 @@ quintoml.search.maestro.inference:
   - wonka.house_rent_search_page_viewed:load-house_rent_search_page_viewed
   - wonka.house_rent_flow:load-searched_house_rent_flow
   - wonka.h3_geolocation_publication_to_contract_signed:load-h3_geolocation_publication_to_contract_signed
-
-

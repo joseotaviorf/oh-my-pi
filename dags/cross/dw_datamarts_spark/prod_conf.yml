@@ -63,8 +63,3 @@ dags:
   for_sale_cross:
     owner: Data ForSale
     cluster_name: databricks_12_2_med_compute_cluster
-  growth:
-    owner: Data Growth
-    cluster_name: databricks_10_4_max_memory_cluster
-    load_to_redshift: True
-    custom_schema: datamarts
