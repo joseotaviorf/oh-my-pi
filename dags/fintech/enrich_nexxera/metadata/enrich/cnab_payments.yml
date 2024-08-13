@@ -104,6 +104,13 @@ columns:
       - datalake_nexxera_clean.cnab_payments_341_seg_j.dt_paid
       - datalake_nexxera_clean.cnab_payments_341_seg_o.dt_paid
       - datalake_nexxera_clean.cnab_payments_237_seg_a.dt_paid
+  dt_received:
+    description: Date extracted from filename
+    lineage:
+      - datalake_nexxera_clean.cnab_payments_341_seg_a.file_name
+      - datalake_nexxera_clean.cnab_payments_341_seg_j.file_name
+      - datalake_nexxera_clean.cnab_payments_341_seg_o.file_name
+      - datalake_nexxera_clean.cnab_payments_237_seg_a.file_name
   ts_ingested:
     description: Timestamp of load
     lineage:
