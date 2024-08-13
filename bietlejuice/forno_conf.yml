@@ -191,7 +191,7 @@ cluster_template:
                 region: us-east-1
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
         custom_tags:
-            - key: application
+            - key: app
               value: airflow
             - key: resource-name
               value: databricks
