@@ -1749,13 +1749,13 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2022
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024-cohort
-  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2022
-  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024
-  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024-cohort
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-2024
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-bps-2024
   - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-2024
+  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2022
+  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024
+  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024-cohort
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity
 bietlejuice.enrich_house_feature_inference:
@@ -3405,7 +3405,6 @@ bietlejuice.reverse_nazare:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
-  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
@@ -3417,7 +3416,6 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_fintech:done-clean-negotiation-executive-bonus
   - bietlejuice.gsheets_for_sale:done-clean-forbrokers-3p-partner-conditions
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers
-  - bietlejuice.hub_services:load-clean-business-unit
 bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter
 bietlejuice.reverse_regions_polygon:
@@ -3525,10 +3523,17 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
   - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
   - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
 quintoml.search.maestro.inference:
+  - wonka.group_house_rent_flow_house_relisting:load-house_relisting
+  - wonka.h3_geolocation_publication_to_contract_signed:load-h3_geolocation_publication_to_contract_signed
+  - wonka.house_main:load-house_main
+  - wonka.house_rent_flow:load-searched_house_rent_flow
+  - wonka.house_rent_listing_page_viewed:load-house_rent_listing_page_viewed
   - wonka.house_rent_offer:load-house_rent_offer
   - wonka.house_rent_proposal:load-house_rent_proposal
+  - wonka.house_rent_search_page_viewed:load-house_rent_search_page_viewed
+  - wonka.house_visit_availability:load-house_visit_availability
 wonka.house_demand_balancer_predictions:
-  - bietlejuice.demand_balancer_service:load-clean-demand-balancer
+  - quintoml.search.maestro.inference:batch-predict
 wonka.house_embeddings_main:
   - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
 wonka.house_listing_business_context:
@@ -3561,15 +3566,3 @@ wonka.user_region_listing_page_viewed:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_location:load-clean-region
-wonka.house_demand_balancer_predictions:
-  - quintoml.search.maestro.inference:batch-predict
-quintoml.search.maestro.inference:
-  - wonka.house_rent_proposal:load-house_rent_proposal
-  - wonka.house_rent_offer:load-house_rent_offer
-  - wonka.house_main:load-house_main
-  - wonka.house_visit_availability:load-house_visit_availability
-  - wonka.group_house_rent_flow_house_relisting:load-house_relisting
-  - wonka.house_rent_listing_page_viewed:load-house_rent_listing_page_viewed
-  - wonka.house_rent_search_page_viewed:load-house_rent_search_page_viewed
-  - wonka.house_rent_flow:load-searched_house_rent_flow
-  - wonka.h3_geolocation_publication_to_contract_signed:load-h3_geolocation_publication_to_contract_signed
