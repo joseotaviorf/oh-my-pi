@@ -31,6 +31,7 @@ bietlejuice.gsheets_benvi: *gsheets-default
 bietlejuice.gsheets_cross: *gsheets-default
 bietlejuice.gsheets_fintech: *gsheets-default
 bietlejuice.gsheets_for_rent: *gsheets-default
+bietlejuice.gsheets_for_rent_targets: *gsheets-default
 bietlejuice.gsheets_for_sale: *gsheets-default
 bietlejuice.gsheets_growth: *gsheets-default
 bietlejuice.gsheets_growth_intraday: *gsheets-default

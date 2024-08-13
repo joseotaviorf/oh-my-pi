@@ -1,0 +1,21 @@
+dag:
+  name: gsheets_for_rent_targets
+  schedule_interval: 0 23 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: Gsheet's extraction of targets of the ForRent business context.
+cluster:
+  type: databricks_13_3_min_2_workers_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
+    - pypi:
+        package: "google-auth==2.23.0"
+    - pypi:
+        package: "google-api-python-client==2.55.0"
+workflow:
+  type: gsheets
+  layer: raw
+  custom_schema: gsheets

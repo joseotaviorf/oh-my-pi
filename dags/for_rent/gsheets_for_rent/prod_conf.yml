@@ -29,58 +29,10 @@ sheets_info:
     clean_table_name: ciq_training
     sheet_context: for_rent
 
-  demand_targets_2022:
-    sheet_id: 1XL8xkxFzf4Zy-0ehrPR9HJc38_rtpVWsLRMNW6ORI8c
-    sheet_name: demand_targets_2022
-    clean_table_name: demand_targets_2022
-    sheet_context: for_rent
-
-  demand_targets_2024:
-    sheet_id: 1KQ41cUj0gB4whSYubYyPPfdelVdCHS7bBzxorvbrD9I
-    sheet_name: demand_targets_2024
-    clean_table_name: demand_targets_2024
-    sheet_context: for_rent
-
-  demand_targets_2024_cohort:
-    sheet_id: 1yNCA3Y6y4hkqIh-AgFDOdTFB4dsJhgS-VYRgsC8oEe4
-    sheet_name: demand_targets_2024_cohort
-    clean_table_name: demand_targets_2024_cohort
-    sheet_context: for_rent
-
-  rent_demand_budget_2024:
-    sheet_id: 15kh4lhTAwUr3RQktAkInDo7hHLwlQIP3z6vvzNaNi0U
-    sheet_name: demand_targets_2024
-    clean_table_name: rent_demand_budget_2024
-    sheet_context: for_rent
-
   estrutura_gerente_corretor:
     sheet_id: 1ytcDCgwYO0hs2vEexqx8XlJe8etbg7yhLi44z2ja1zw
     sheet_name: Base
     clean_table_name: proj_agent_manager
-    sheet_context: for_rent
-
-  forecast_cohort_demanda:
-    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
-    sheet_name: forecast_cohort_demanda
-    clean_table_name: rental_forecast_cohort_demand
-    sheet_context: for_rent
-
-  forecast_diario_demanda:
-    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
-    sheet_name: forecast_diário_demanda
-    clean_table_name: rental_forecast_daily_demand
-    sheet_context: for_rent
-
-  forecast_cohort_supply:
-    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
-    sheet_name: forecast_cohort_supply
-    clean_table_name: rental_forecast_cohort_supply
-    sheet_context: for_rent
-
-  forecast_diario_supply:
-    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
-    sheet_name: forecast_diário_supply
-    clean_table_name: rental_forecast_daily_supply
     sheet_context: for_rent
 
   fup_agents_historico:
@@ -95,75 +47,15 @@ sheets_info:
     clean_table_name: listings_with_agreed_discounts
     sheet_context: for_rent
 
-  ongoing_listings_targets:
-    sheet_id: 16BHKdlbn4stT8q4bdoGJ_0Fo9i4Z_ibOFevsBR4lD5s
-    sheet_name: ongoing_listings_target
-    clean_table_name: ongoing_listings_target
-    sheet_context: for_rent
-
-  rent_ongoing_listings_budget_2024:
-    sheet_id: 1gMQoDaH8LY3rHCqIr5SCNBxLdSeVmMP9hMI2JCtttqU
-    sheet_name: ongoing_listings_target
-    clean_table_name: rent_ongoing_listings_budget_2024
-    sheet_context: for_rent
-
   ppmulti_goals_am:
     sheet_id: 1QrDKA4PAohi-5olyUcnQBtJvweAdO-gJ59KcjOlLjdI
     sheet_name: ppmulti_goals_am
     clean_table_name: ppmulti_goals_am
     sheet_context: for_rent
 
-  rental_budget_targets:
-    sheet_id: 1LwQpjKEeRCIJ4FcKrUpHTLfEaRn2jV6lG33I-9Ie13c
-    sheet_name: db_budget_targets
-    clean_table_name: rental_budget_targets
-    sheet_context: for_rent
-
-  rental_cohort_demand:
-    sheet_id: 1rTjKP11jXCV8Jfchynmi3UHx5wwoWDVPojxAWABj-rw
-    sheet_name: rental_cohort_demand
-    clean_table_name: rental_cohort_demand
-    sheet_context: for_rent
-
-  retention_targets:
-    sheet_id: 1bcgutgbXuBJAfhOtZ36uawOglwU2leRrEZYE1Dn2yCI
-    sheet_name: Targets
-    clean_table_name: retention_targets
-    sheet_context: for_rent
-
-  supply_targets_2022:
-    sheet_id: 1rU-ptg-ZtD0WdnbXnUVpGw8Lrf-0grc2IitwEmn2yZ0
-    sheet_name: supply_targets_2022
-    clean_table_name: supply_targets_2022
-    sheet_context: for_rent
-
-  supply_targets_2024:
-    sheet_id: 1wMxo1URFvbx11Yj0O4vpNJ20S4CftOCnuyx9q5WR7Eo
-    sheet_name: supply_targets_2024
-    clean_table_name: supply_targets_2024
-    sheet_context: for_rent
-
-  supply_targets_2024_cohort:
-    sheet_id: 1V5HQxP9pI9pm7P4si59P40TJvGxGS1doVUTX-R3h0iY
-    sheet_name: supply_targets_2024_cohort
-    clean_table_name: supply_targets_2024_cohort
-    sheet_context: for_rent
-
-  rent_supply_budget_2024:
-    sheet_id: 1KKsISTNvrwmP-XTZvBg06TRl4tdtFj2DuqtoK29tM_U
-    sheet_name: supply_targets_2024
-    clean_table_name: rent_supply_budget_2024
-    sheet_context: for_rent
-
   tratativas_actionline_ciq_full_responses:
     sheet_id: 1PNFjoLH0RvuQv5u8n4nYzDKF9RrRE2d1jTDPFJeBxA8
     sheet_name: Form Responses 1
     clean_table_name: responses_action_line_ciq_full
-    sheet_context: for_rent
-
-  contracts_signed_average_ticket_targets:
-    sheet_id: 16hHyvDqUHlMHagD_v18-ky5HGK8Pjgf9TR11ueybHP4
-    sheet_name: db_avg_ticket_cs_target
-    clean_table_name: contracts_signed_average_ticket_targets
     sheet_context: for_rent
 
