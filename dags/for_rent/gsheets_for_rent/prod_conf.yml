@@ -23,12 +23,6 @@ sheets_info:
     clean_table_name: carteirizados_info
     sheet_context: for_rent
 
-  ciq_training:
-    sheet_id: 1YsdJ-JHbCFlBL1_6XdiKScJGNrbbBPFglm_rn18iODA
-    sheet_name: Página1
-    clean_table_name: ciq_training
-    sheet_context: for_rent
-
   estrutura_gerente_corretor:
     sheet_id: 1ytcDCgwYO0hs2vEexqx8XlJe8etbg7yhLi44z2ja1zw
     sheet_name: Base
@@ -52,10 +46,3 @@ sheets_info:
     sheet_name: ppmulti_goals_am
     clean_table_name: ppmulti_goals_am
     sheet_context: for_rent
-
-  tratativas_actionline_ciq_full_responses:
-    sheet_id: 1PNFjoLH0RvuQv5u8n4nYzDKF9RrRE2d1jTDPFJeBxA8
-    sheet_name: Form Responses 1
-    clean_table_name: responses_action_line_ciq_full
-    sheet_context: for_rent
-

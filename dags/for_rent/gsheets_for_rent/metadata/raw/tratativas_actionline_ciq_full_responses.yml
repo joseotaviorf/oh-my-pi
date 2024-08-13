@@ -1,7 +1,0 @@
----
-database_name: datalake_gsheets_raw
-table_name: tratativas_actionline_ciq_full_responses
-columns:
-  id_ciq:
-    tags:
-    - confidencial
