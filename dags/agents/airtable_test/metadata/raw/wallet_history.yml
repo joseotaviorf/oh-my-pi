@@ -1,0 +1,15 @@
+database_name: datalake_airtable_test_raw
+table_name: wallet_history
+columns:
+  id_partner:
+    tags:
+      - Confidential
+      - PII
+  carteira:
+    tags:
+      - Confidential
+      - PII
+  categoria:
+    tags:
+      - Confidential
+      - PII

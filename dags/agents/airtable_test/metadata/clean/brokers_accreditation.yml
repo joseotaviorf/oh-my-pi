@@ -1,0 +1,237 @@
+---
+database_name: datalake_airtable_test_clean
+table_name: brokers_accreditation
+description: 
+  Raw data relating to lead registrations in our LP. On this basis we have various information related to the 
+  accreditation process of our brokers, from the lead qualification flow to its activation and onboarding.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_airtable_record:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.id_airtable_record
+    description: Unique record identifier in Airtable view.
+  id_inscription:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.inscricao
+    description: LP Registration identification code.
+  id_broker_referral_ticket:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.ticket_da_indicacao_novo_forms_sale
+    description: Registration code.
+  id_admin:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.id_admin
+    description: Refers to the lead's sk_user_name.
+  cpf:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.cpf
+    description: Broker individual registration.
+  full_name:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.nome_completo
+    description: Broker full name.
+  performance_preference:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.preferencia_de_atuacao
+    description: Accredited broker performance preference.
+  second_option:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.2_opcao
+    description: Second option for From To Region.
+  stage_process:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.etapa_processo
+    description: Status of the accreditation process.
+  region_from_to:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.depara_regiao
+    description: From To Region.
+  state_operation:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.estado_de_atuacao
+    description: Broker's operating state.
+  registration_status:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.situacao_cadastro
+    description: Status of the accreditation process.
+  partner_status:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.status_parceiro
+    description: Accreditation process status.
+  registration_approved:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.aprovado_inscricao
+    description: Status of the accreditation process.
+  chat_approved:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.aprovado_batepapo
+    description: Status of the accreditation process.
+  disapproval_reason:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.motivo_reprovacao
+    description: Reasons for lead disapproval.
+  interview_classification:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.classificacao_entrevista
+    description: Stage of the Qualification Process.
+  registration_type:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.tipo_do_cadastro
+    description: Lead Channel Flag.
+  function:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.funcao
+    description: Indicates the type of link between the lead and 5A.
+  mgm_flag:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.mgm_flag
+    description: MGM Flag.
+  region_operation:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.regiao_de_atuacao
+    description: Registrant's final region
+  negotiation_executive_name:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.executivo_de_negociacao
+    description: Lead negotiation executive (EN).
+  associate_executive_name:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.executivo_associado
+    description: Lead associate executive (EA).
+  stage_process_activation:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.etapa_processo_ativacao
+    description: Status of the accreditation process.
+  chat_ended:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.batepapo_finalizado
+    description: Qualification Process Step.
+  score_inscription_form:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_formulario_de_inscricao
+    description: Score given to Lead registration responses.
+  score_interview:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_entrevista
+    description: Score given to Lead registration responses.
+  score_occupation:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_ocupacao
+    description: Score given to Lead registration responses.
+  score_autonomous:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_autonomo
+    description: Score given to Lead registration responses.
+  score_experience:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_experiencia
+    description: Score given to Lead registration responses.
+  score_capture:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_captacao
+    description: Score given to Lead registration responses.
+  score_availability_week:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_disponibilidade_semana
+    description: Score given to Lead registration responses.
+  score_availability_end_of_week:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_disponibilidade_final_de_semana
+    description: Score given to Lead registration responses.
+  score_before_visit:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_pre_visita
+    description: Score given to Lead registration responses.
+  score_visit:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_visita
+    description: Score given to Lead registration responses.
+  score_after_visit:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_pos_visita
+    description: Score given to Lead registration responses.
+  score_locomotion:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.score_locomocao
+    description: Score given to Lead registration responses.
+  has_schedule_interview:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.puxar_para_agendar_entrevista_time
+    description: Interview schedule flag.
+  is_sent_interview_with_ea_en:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.enviado_para_entrevista_eaen
+    description: Interview flag with Negociation Executive (EN) and Associate Executive (EA).
+  dt_creci_update:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.atualizacao_creci
+    description: Stage of the Qualification Process (Date).
+  dt_interview_ended:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_de_finalizacao_entrevista
+    description: Stage of the Qualification Process (Date).
+  dt_contract_sent:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_de_envio_de_contrato
+    description: Stage of the Qualification Process (Date).
+  dt_contract_signed:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_de_assinatura_de_contrato
+    description: Stage of the Qualification Process (Date).
+  dt_admin_registered:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_de_cadastro_admin
+    description: Stage of the Qualification Process (Date).
+  dt_teams_link_created:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_de_vinculo_teams
+    description: Stage of the Qualification Process (Date).
+  dt_broker_space_registered:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_cadastro_espaco_corretor
+    description: Stage of the Qualification Process (Date).
+  dt_onboarding_sent:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_envio_de_onboarding
+    description: Stage of the Qualification Process (Date).
+  dt_activated:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_de_ativacao_novo_fluxo
+    description: Stage of the Qualification Process (Date).
+  dt_onboarding_completed:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_finalizacao_de_onboarding
+    description: Stage of the Qualification Process (Date).
+  dt_agenda_opened:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.abertura_de_agenda
+    description: Stage of the Qualification Process (Date).
+  dt_birth:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_de_nascimento
+    description: Broker's date of birth.
+  dt_registration:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.data_de_inscricao
+    description: Broker registration date.
+  ts_interview_scheduled:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.puxar_para_entrevista
+    description: Job Lead Flag (Datetime).
+  dt_load:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.dt_load
+    description: Date when the data was loaded.
+  year:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.year
+    description: Year referring to date of load.
+  month:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.month
+    description: Month referring to date of load.
+  day:
+    lineage:
+      - datalake_airtable_test_raw.brokers_accreditation.day
+    description: Day referring to date of load.

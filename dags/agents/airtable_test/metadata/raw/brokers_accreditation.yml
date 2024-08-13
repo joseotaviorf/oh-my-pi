@@ -1,0 +1,16 @@
+---
+database_name: datalake_airtable_test_raw
+table_name: brokers_accreditation
+columns:
+  cpf:
+    tags:
+      - Confidential
+      - PII
+  nome_completo:
+    tags:
+      - Confidential
+      - PII
+  data_de_nascimento:
+    tags:
+      - Confidential
+      - PII

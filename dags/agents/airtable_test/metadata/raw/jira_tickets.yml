@@ -1,0 +1,32 @@
+---
+database_name: datalake_airtable_test_raw
+table_name: jira_tickets
+columns:
+  id_do_corretor:
+    tags:
+      - Confidential
+      - PII
+  ql_id_do_agente:
+    tags:
+      - Confidential
+      - PII
+  cpf_from_ativos:
+    tags:
+      - Confidential
+      - PII
+  descricao:
+    tags:
+      - Confidential
+      - PII
+  ql_nome_completo_do_corretor:
+    tags:
+      - Confidential
+      - PII
+  responsavel:
+    tags:
+      - Confidential
+      - PII
+  resumo:
+    tags:
+      - Confidential
+      - PII

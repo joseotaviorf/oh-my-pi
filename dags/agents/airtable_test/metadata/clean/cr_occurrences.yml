@@ -1,0 +1,86 @@
+database_name: datalake_airtable_test_clean
+table_name: cr_occurrences
+description: This table contains information about cr_occurences.
+domain: For Rent
+owner: guilherme.cunha@quintoandar.com.br
+columns:
+  id_airtable_record:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.id_airtable_record
+    description: Airtable identifier. It doesn't have any correspondence with our
+      internals identifiers.
+  id_agent:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_id_do_agente
+    description: Agent's identifier.
+  id_issue:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.issue_key
+    description: Issue's id.
+  department:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.departamento
+    description: Department related to the issue.
+  description:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.descricao
+    description: Free text about the issue.
+  ql_agent_complete_name:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_nome_completo_do_corretor
+    description: Agent's full name.
+  ql_agent_region:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_regiao_de_atuacao
+    description: Region code where the agent is working.
+  ql_agent_segment:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_seguimento_do_corretor
+    description: Can be Locação, Vendas or HUB Vendas.
+  ql_ocorrency_category:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_qual_ocorrencia_deseja_informar_corretor_presencial_virtual
+    description: What kind of occorrency happened.
+  ql_occorency_type:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_tipo_de_ocorrencia
+    description: The severity of the occorrency.
+  ql_resolution:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_resolucao
+    description: How to solve this.
+  ql_ticket_from:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_ticket_e_de
+    description: Who is the criminal.
+  responsible:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.responsavel
+    description: Who is responsible by this issue.
+  summary:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.resumo
+    description: Who done the occorrency and the severity.
+  who_is_complaining:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.ql_ql_quem_esta_fazendo_essa_reclamacaodenunciasolicitacao
+    description: Who is complaining.
+  ts_created:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.created
+    description: When this issue was created.
+  ts_updated:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.last_modified
+  year:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.year
+    description: year when this record was created. It's a partition.
+  month:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.month
+    description: month when this record was created. It's a partition.
+  day:
+    lineage:
+    - datalake_airtable_test_raw.cr_occurrences.day
+    description: day when this record was created. It's a partition.
