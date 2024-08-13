@@ -86,9 +86,9 @@ media_setup_ids AS (
         AND COALESCE(SF_NORMALIZE_STRING(tof.utm_medium),0) = COALESCE(LOWER(dict.utm_medium),0)
   LEFT JOIN
     datalake_gsheets_clean.taxonomy_demand_exception_flow AS ef
-        ON LOWER(tof.utm_campaign) = LOWER(ef.utm_campaign)
-        AND LOWER(tof.utm_source) = LOWER(ef.utm_source)
-        AND LOWER(tof.utm_medium) = LOWER(ef.utm_medium)
+      ON COALESCE(LOWER(tof.utm_campaign), 0) = COALESCE(LOWER(ef.utm_campaign), 0)
+      AND COALESCE(LOWER(tof.utm_source), 0) = COALESCE(LOWER(ef.utm_source), 0)
+      AND COALESCE(LOWER(tof.utm_medium), 0) = COALESCE(LOWER(ef.utm_medium), 0)
 ),
 final_media_setup as (
 SELECT
