@@ -255,6 +255,9 @@ databricks_10_4_min_general_cluster:
     driver_node_type_id: m5a.large
     num_workers: 1
     spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_12_2_min_general_cluster:
     <<: *cluster_anchor
@@ -262,6 +265,9 @@ databricks_12_2_min_general_cluster:
     driver_node_type_id: m5a.large
     num_workers: 1
     spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_13_3_min_general_cluster:
     <<: *cluster_anchor
@@ -269,6 +275,9 @@ databricks_13_3_min_general_cluster:
     driver_node_type_id: m5a.large
     num_workers: 1
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_13_3_min_2_workers_general_cluster:
     <<: *cluster_anchor
@@ -278,6 +287,7 @@ databricks_13_3_min_2_workers_general_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_10_4_med_general_cluster:
@@ -288,6 +298,7 @@ databricks_10_4_med_general_cluster:
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_general_cluster:
@@ -298,6 +309,7 @@ databricks_12_2_med_general_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_2xlarge_general_cluster:
@@ -308,6 +320,7 @@ databricks_12_2_med_2xlarge_general_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_med_general_cluster:
@@ -318,6 +331,7 @@ databricks_13_3_med_general_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_med_general_photon_cluster:
@@ -329,6 +343,7 @@ databricks_13_3_med_general_photon_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_compute_cluster:
@@ -339,6 +354,7 @@ databricks_12_2_med_compute_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_10_4_med_memory_cluster:
@@ -349,6 +365,7 @@ databricks_10_4_med_memory_cluster:
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_min_memory_cluster:
@@ -359,6 +376,7 @@ databricks_12_2_min_memory_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_memory_cluster:
@@ -369,6 +387,7 @@ databricks_12_2_med_memory_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_10_4_max_memory_cluster:
@@ -379,6 +398,7 @@ databricks_10_4_max_memory_cluster:
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_min_io-memory_cluster:
@@ -389,6 +409,7 @@ databricks_12_2_min_io-memory_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_min_io-memory_cluster:
@@ -399,6 +420,7 @@ databricks_13_3_min_io-memory_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_med_mem_driver_min_memory_2_nodes_photon_cluster:
@@ -408,6 +430,9 @@ databricks_13_3_med_mem_driver_min_memory_2_nodes_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 2
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster:
     <<: *cluster_anchor
@@ -415,6 +440,9 @@ databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster:
     node_type_id: r5d.large
     num_workers: 1
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_10_4_med_io-memory_cluster:
     <<: *cluster_anchor
@@ -424,6 +452,7 @@ databricks_10_4_med_io-memory_cluster:
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_io-memory_cluster:
@@ -434,6 +463,7 @@ databricks_12_2_med_io-memory_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_10_4_max_io-memory_cluster:
@@ -444,6 +474,7 @@ databricks_10_4_max_io-memory_cluster:
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_max_io-memory_cluster:
@@ -454,6 +485,7 @@ databricks_12_2_max_io-memory_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_min_io-general_cluster:
@@ -464,6 +496,7 @@ databricks_12_2_min_io-general_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_io-general_cluster:
@@ -474,6 +507,7 @@ databricks_12_2_med_io-general_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_max_io-general_cluster:
@@ -484,6 +518,7 @@ databricks_12_2_max_io-general_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_10_4_min_general_photon_cluster:
@@ -493,6 +528,9 @@ databricks_10_4_min_general_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_12_2_min_general_photon_cluster:
     <<: *cluster_anchor
@@ -501,6 +539,9 @@ databricks_12_2_min_general_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_13_3_min_general_photon_cluster:
     <<: *cluster_anchor
@@ -509,6 +550,9 @@ databricks_13_3_min_general_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_12_2_min_xlarge_io-memory_photon_cluster:
     <<: *cluster_anchor
@@ -519,6 +563,7 @@ databricks_12_2_min_xlarge_io-memory_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_min_xlarge_io-memory_cluster:
@@ -536,6 +581,7 @@ databricks_12_2_min_xlarge_io-memory_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_min_io-memory_photon_cluster:
@@ -547,6 +593,7 @@ databricks_12_2_min_io-memory_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_min_io-memory_photon_cluster:
@@ -556,6 +603,9 @@ databricks_13_3_min_io-memory_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 2
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_10_4_med_io-memory_photon_cluster:
     <<: *cluster_anchor
@@ -566,6 +616,7 @@ databricks_10_4_med_io-memory_photon_cluster:
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_io-memory_photon_cluster:
@@ -577,6 +628,7 @@ databricks_12_2_med_io-memory_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_10_4_min_memory_photon_cluster:
@@ -586,6 +638,9 @@ databricks_10_4_min_memory_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_12_2_min_memory_photon_cluster:
     <<: *cluster_anchor
@@ -594,6 +649,9 @@ databricks_12_2_min_memory_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_10_4_med_memory_photon_cluster:
     <<: *cluster_anchor
@@ -604,6 +662,7 @@ databricks_10_4_med_memory_photon_cluster:
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_memory_photon_cluster:
@@ -615,6 +674,7 @@ databricks_12_2_med_memory_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_10_4_med_general_photon_cluster:
@@ -626,6 +686,7 @@ databricks_10_4_med_general_photon_cluster:
     spark_version: 10.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_general_photon_cluster:
@@ -637,6 +698,7 @@ databricks_12_2_med_general_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_med_general_3_nodes_cluster:
@@ -645,6 +707,9 @@ databricks_13_3_med_general_3_nodes_cluster:
     node_type_id: m5d.large
     num_workers: 1
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_12_2_med_2_fixed_workers_general_photon_cluster:
     <<: *cluster_anchor
@@ -655,6 +720,7 @@ databricks_12_2_med_2_fixed_workers_general_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_min_fixed_workers_general_cluster:
@@ -663,6 +729,9 @@ databricks_13_3_min_fixed_workers_general_cluster:
     node_type_id: m5d.large
     num_workers: 1
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_12_2_med_2xlarge_general_photon_cluster:
     <<: *cluster_anchor
@@ -673,6 +742,7 @@ databricks_12_2_med_2xlarge_general_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_io-general_photon_cluster:
@@ -684,6 +754,7 @@ databricks_12_2_med_io-general_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_driver_med_general_mem_nodes_med_mem_photon_cluster:
@@ -693,6 +764,9 @@ databricks_12_2_driver_med_general_mem_nodes_med_mem_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
 
 databricks_13_3_driver_med_mem_nodes_general_med_mem_photon_cluster:
     <<: *cluster_anchor
@@ -701,6 +775,10 @@ databricks_13_3_driver_med_mem_nodes_general_med_mem_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 1
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK    
+
 
 databricks_12_2_max_io-memory_photon_cluster:
     <<: *cluster_anchor
@@ -711,6 +789,7 @@ databricks_12_2_max_io-memory_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_13_3_min_people_cluster:
@@ -721,6 +800,7 @@ databricks_13_3_min_people_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
@@ -732,6 +812,7 @@ databricks_13_3_min_memory_people_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
@@ -743,6 +824,7 @@ databricks_13_3_med_people_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
@@ -754,6 +836,7 @@ databricks_12_2_min_analytical_costs_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_analytical_environment_costs }}"
 
@@ -766,6 +849,7 @@ databricks_12_2_med_io-general_analytical_costs_photon_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_analytical_environment_costs }}"
 
@@ -777,6 +861,7 @@ databricks_12_2_med_cluster:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 databricks_12_2_med_mem_driver_high_mem_nodes:
@@ -787,6 +872,7 @@ databricks_12_2_med_mem_driver_high_mem_nodes:
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
 ### Notification Configs ###
