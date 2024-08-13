@@ -1,5 +1,5 @@
 SELECT
-    id_airtable_record,
+    id AS id_airtable_record,
     CAST(id_partner AS BIGINT) AS id_partner,
     Categoria AS category,
     Carteira AS wallet,

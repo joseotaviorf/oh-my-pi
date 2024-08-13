@@ -1,7 +1,7 @@
 SELECT
+    id AS id_airtable_record,
     CAST(inscricao AS BIGINT) AS id_lead,
     CAST(id_admin AS BIGINT) AS id_admin,
-    id_airtable_record,
     CAST(credenciamentos AS INT) AS accreditations,
     ativacao AS activation,
     modalidade_de_atuacao AS actuation_model,

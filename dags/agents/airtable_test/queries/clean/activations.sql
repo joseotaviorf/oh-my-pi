@@ -1,6 +1,6 @@
 SELECT
+    id AS id_airtable_record,
     CAST(id AS BIGINT) AS id_activations,
-    id_airtable_record,
     status_ativacao AS activation_status,
     estado_de_atuacao AS actuation_state,
     nome_completo AS agent_complete_name,

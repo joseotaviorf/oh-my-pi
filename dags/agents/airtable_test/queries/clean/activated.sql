@@ -1,5 +1,5 @@
 SELECT    
-    id_airtable_record,
+    id AS id_airtable_record,
     historico_v2 AS ids_history,
     CAST(id_user AS BIGINT) AS id_user,
     CAST(credenciamentos AS INT) AS accreditations,

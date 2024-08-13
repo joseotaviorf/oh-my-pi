@@ -14,7 +14,7 @@ columns:
     description: admin identifier.
   id_airtable_record:
     lineage:
-    - datalake_airtable_test_raw.historical.id_airtable_record
+    - datalake_airtable_test_raw.historical.id
     description: Airtable identifier.
   id_rental_activated:
     lineage:

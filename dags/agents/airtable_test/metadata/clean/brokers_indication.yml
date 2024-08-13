@@ -10,7 +10,7 @@ owner: data-ae-agents@quintoandar.com.br
 columns:
   id_airtable_record:
     lineage:
-      - datalake_airtable_test_raw.brokers_indication.id_airtable_record
+      - datalake_airtable_test_raw.brokers_indication.id
     description: Unique record identifier in Airtable view.
   id_admin_recommender:
     lineage:

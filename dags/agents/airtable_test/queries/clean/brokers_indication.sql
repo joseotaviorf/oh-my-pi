@@ -1,5 +1,5 @@
 SELECT
-    id_airtable_record,
+    id AS id_airtable_record,
     CAST(bd_indicante_id_admin AS BIGINT) AS id_admin_recommender,
     CAST(id_indicacao AS BIGINT) AS id_indication,
     CAST(ticket_inscricao AS BIGINT) AS id_registration_ticket,

@@ -1,7 +1,7 @@
 SELECT
+    id AS id_airtable_record,
     CAST(id AS BIGINT) AS id_historical,
     CAST(id_admin AS BIGINT) AS id_admin,
-    id_airtable_record,
     ativados_rental AS id_rental_activated,
     CAST(creci AS BIGINT) AS agent_creci,
     email AS agent_email,

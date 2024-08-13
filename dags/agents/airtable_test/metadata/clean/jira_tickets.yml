@@ -10,7 +10,7 @@ columns:
     description: Agent's identifier.
   id_airtable_record:
     lineage:
-    - datalake_airtable_test_raw.jira_tickets.id_airtable_record
+    - datalake_airtable_test_raw.jira_tickets.id
     description: Airtable identifier. It doesn't have any correspondence with our
       internals identifiers.
   id_ql_agent:

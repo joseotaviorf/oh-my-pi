@@ -1,6 +1,6 @@
 SELECT
+    id AS id_airtable_record,
     CAST(id_do_corretor AS BIGINT) AS id_agent,
-    id_airtable_record,
     CAST(ql_id_do_agente AS BIGINT) AS id_ql_agent,
     issue_key AS id_issue,
     ativos AS activated,

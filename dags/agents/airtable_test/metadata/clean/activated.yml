@@ -7,7 +7,7 @@ owner: guilherme.cunha@quintoandar.com.br
 columns:
   id_airtable_record:
     lineage:
-    - datalake_airtable_test_raw.activated.id_airtable_record
+    - datalake_airtable_test_raw.activated.id
     description: It's the record identifier on Airtable and doesn't have a real meaning
       for the table or the business.
   ids_history:

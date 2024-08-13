@@ -1,5 +1,5 @@
 SELECT
-    id_airtable_record,
+    id AS id_airtable_record,
     CAST(ql_id_do_agente AS BIGINT) AS id_agent,
     issue_key AS id_issue,
     departamento AS department,

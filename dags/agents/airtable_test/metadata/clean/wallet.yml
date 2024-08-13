@@ -4,7 +4,7 @@ table_name: wallet
 columns:
   id_airtable_record:
     lineage:
-      - datalake_airtable_test_raw.wallet.id_airtable_record
+      - datalake_airtable_test_raw.wallet.id
   id_partner:
     lineage:
       - datalake_airtable_test_raw.wallet.id_partner

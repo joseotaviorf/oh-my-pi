@@ -6,7 +6,7 @@ owner: guilherme.cunha@quintoandar.com.br
 columns:
   id_airtable_record:
     lineage:
-    - datalake_airtable_test_raw.cr_occurrences.id_airtable_record
+    - datalake_airtable_test_raw.cr_occurrences.id
     description: Airtable identifier. It doesn't have any correspondence with our
       internals identifiers.
   id_agent:
