@@ -11,6 +11,18 @@ sheets_info:
     sheet_name: forecast_supply
     clean_table_name: forecast_supply_daily
     sheet_context: growth
+
+  forecast_cohort_supply:
+    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
+    sheet_name: forecast_cohort_supply
+    clean_table_name: rental_forecast_cohort_supply
+    sheet_context: growth
+
+  forecast_diario_supply:
+    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
+    sheet_name: forecast_diário_supply
+    clean_table_name: rental_forecast_daily_supply
+    sheet_context: growth
   
   mkt_cost_target:
     sheet_id: 1lOcpeZ2YBrpqFi_sIJxt98sgbMfGEES7uhAASxzOuyg
@@ -47,6 +59,30 @@ sheets_info:
     sheet_name: targets
     clean_table_name: rental_tof_weekly_target
     sheet_context: growth
+
+  supply_targets_2022:
+    sheet_id: 1rU-ptg-ZtD0WdnbXnUVpGw8Lrf-0grc2IitwEmn2yZ0
+    sheet_name: supply_targets_2022
+    clean_table_name: supply_targets_2022
+    sheet_context: for_rent_targets
+
+  supply_targets_2024:
+    sheet_id: 1wMxo1URFvbx11Yj0O4vpNJ20S4CftOCnuyx9q5WR7Eo
+    sheet_name: supply_targets_2024
+    clean_table_name: supply_targets_2024
+    sheet_context: for_rent_targets
+
+  supply_targets_2024_cohort:
+    sheet_id: 1V5HQxP9pI9pm7P4si59P40TJvGxGS1doVUTX-R3h0iY
+    sheet_name: supply_targets_2024_cohort
+    clean_table_name: supply_targets_2024_cohort
+    sheet_context: for_rent_targets
+
+  rent_supply_budget_2024:
+    sheet_id: 1KKsISTNvrwmP-XTZvBg06TRl4tdtFj2DuqtoK29tM_U
+    sheet_name: supply_targets_2024
+    clean_table_name: rent_supply_budget_2024
+    sheet_context: for_rent_targets
 
   sale_ciq_target:
     sheet_id: 1euvSgRryIdnfrWJMW-TcJf6MnzQjR2ZzlU7FbNku-Ck

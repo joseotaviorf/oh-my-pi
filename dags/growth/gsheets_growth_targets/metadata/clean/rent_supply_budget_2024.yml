@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: rent_supply_budget_2024
 owner: gustavo.alencar@quintoandar.com.br
-domain: For Rent
+domain: Growth
 description: Transformed table created from a Google Sheets file in order to input supply funnel budgets into datalake
 columns:
   dt_budget:

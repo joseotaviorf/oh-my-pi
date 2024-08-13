@@ -1749,9 +1749,9 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2022
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024-cohort
-  - bietlejuice.gsheets_for_rent_targets:done-clean-supply-targets-2022
-  - bietlejuice.gsheets_for_rent_targets:done-clean-supply-targets-2024
-  - bietlejuice.gsheets_for_rent_targets:done-clean-supply-targets-2024-cohort
+  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2022
+  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024
+  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024-cohort
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-2024
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-bps-2024
