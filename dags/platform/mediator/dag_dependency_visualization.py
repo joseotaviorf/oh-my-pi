@@ -49,7 +49,7 @@ def build_operator(dep_name, dag):
 
 dag = DAG(
     dag_id=DAG_ID,
-    default_args={"owner": DAGOwnerEnum.DEFAULT_OWNER},
+    default_args={"owner": DAGOwnerEnum.DATA_INGESTION},
     start_date=START_DATE,
     schedule_interval=None,
 )

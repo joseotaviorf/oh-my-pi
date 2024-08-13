@@ -53,7 +53,7 @@ DAG_ID = f"airflow.{DAG_NAME}"
 mediator_dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_INGESTION,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

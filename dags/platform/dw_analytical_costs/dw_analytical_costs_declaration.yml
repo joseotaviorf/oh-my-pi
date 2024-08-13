@@ -1,7 +1,7 @@
 dag:
   name: dw_analytical_costs
   schedule_start_date: 2024, 06, 19
-  owner: Data Platform
+  owner: Data Ingestion
   documentation:
     dag_purpose: |
       Dag with the aim of gathering cost information from clusters.

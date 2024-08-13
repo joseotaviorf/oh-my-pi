@@ -58,7 +58,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-DAG_OWNER = DAGOwnerEnum.DATA_PLATFORM
+DAG_OWNER = DAGOwnerEnum.DATA_INGESTION
 
 dag = DAG(
     dag_id=DAG_ID,

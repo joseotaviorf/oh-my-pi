@@ -45,7 +45,7 @@ def delete_databricks_jobs(remove_before_timedelta: timedelta, job_name_regex: s
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_PLATFORM,
+        "owner": DAGOwnerEnum.DATA_INGESTION,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
