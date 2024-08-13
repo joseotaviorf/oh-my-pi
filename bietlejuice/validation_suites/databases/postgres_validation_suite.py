@@ -237,12 +237,6 @@ class PostgresValidationSuite(DatabaseValidationSuitesExecutor):
         )
         self._validate_connection(db_consumer)
 
-    def validate_wololo(self):
-        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
-            self.auth[DatabaseEnum.WOLOLO], SparkClient()
-        )
-        self._validate_connection(db_consumer)
-
     def validate_rene_descartes(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.RENE_DESCARTES], SparkClient()
