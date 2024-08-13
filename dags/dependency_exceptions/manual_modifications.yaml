@@ -970,12 +970,19 @@ bietlejuice.enrich_product_tech:
 
 wonka.house_demand_balancer_predictions:
   add:
-    - bietlejuice.demand_balancer_service:load-clean-demand-balancer
+   - quintoml.search.maestro.inference:batch-predict
 
 quintoml.search.maestro.inference:
   add:
     - wonka.house_rent_proposal:load-house_rent_proposal
     - wonka.house_rent_offer:load-house_rent_offer
+    - wonka.house_main:load-house_main
+    - wonka.house_visit_availability:load-house_visit_availability
+    - wonka.group_house_rent_flow_house_relisting:load-house_relisting
+    - wonka.house_rent_listing_page_viewed:load-house_rent_listing_page_viewed
+    - wonka.house_rent_search_page_viewed:load-house_rent_search_page_viewed
+    - wonka.house_rent_flow:load-searched_house_rent_flow
+    - wonka.h3_geolocation_publication_to_contract_signed:load-h3_geolocation_publication_to_contract_signed
 
 bietlejuice.demand_balancer_service:
   add:
