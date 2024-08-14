@@ -313,8 +313,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
-  - bietlejuice.enrich_3p:load-enrich-houses-3p
-  - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliates-cost-attributions
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-contract-docusign-signed-events
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-home-page-viewed
@@ -330,9 +328,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.enrich_quinto_messenger:load-enrich-tasks
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
-  - bietlejuice.enrich_top_of_funnel_supply:load-enrich-top-of-funnel-supply
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
-  - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-daily-targets
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-monthly-targets
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-weekly-targets
@@ -340,8 +336,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.gsheets_growth:done-clean-ciq-costs
   - bietlejuice.gsheets_growth:done-clean-city-share
-  - bietlejuice.gsheets_growth:done-clean-daily-target-supply-rental
-  - bietlejuice.gsheets_growth:done-clean-daily-target-supply-sale
   - bietlejuice.gsheets_growth:done-clean-local-holidays
   - bietlejuice.gsheets_growth:done-clean-mkt-cost-per-source
   - bietlejuice.gsheets_growth:done-clean-plaquinhas-cover-targets
@@ -364,8 +358,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-targets-portal-casa-mineira-cost-cf
   - bietlejuice.gsheets_growth:done-clean-taxonomy-crm-casa-mineira
   - bietlejuice.gsheets_growth:done-clean-taxonomy-portal-casa-mineira
-  - bietlejuice.gsheets_growth:done-clean-tof-supply-targets
-  - bietlejuice.gsheets_growth:done-clean-unique-volume-targets-day
   - bietlejuice.gsheets_growth:done-clean-unit-economics-amortization-curve
   - bietlejuice.gsheets_growth:done-clean-week-volumes-supply
   - bietlejuice.gsheets_growth:done-clean-weekday-holiday-share-supply
