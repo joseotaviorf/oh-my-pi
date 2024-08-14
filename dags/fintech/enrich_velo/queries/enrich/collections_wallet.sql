@@ -100,8 +100,8 @@ timeline_final AS (
             WHEN ta.major_type = 'RECISAO' THEN md.min_dt_termination
             WHEN ta.major_type = 'GARANTIA' THEN md.min_dt_guarantee
             WHEN ta.major_type = 'ASSINATURA' THEN md.min_dt_signature
-        END AS min_dt_base_major_type,
-        MIN(mpd.min_dt_propose) AS min_dt_base_propose
+        END AS dt_min_major_type,
+        MIN(mpd.min_dt_propose) AS dt_min_propose
     FROM
         timeline AS t
     LEFT JOIN
@@ -147,8 +147,8 @@ SELECT
     t.total_amount_paid,
     t.amount_paid_added,
     t.total_open_amount,
-    DATE_DIFF(t.min_dt_base_major_type, DATE_TRUNC('MONTH', t.dt_base)) AS lead_time_major_type,
-    DATE_DIFF(t.min_dt_base_propose, DATE_TRUNC('MONTH', t.dt_base)) AS lead_time_propose,
+    DATE_DIFF(t.dt_min_major_type, DATE_TRUNC('MONTH', t.dt_base)) AS lead_time_major_type,
+    DATE_DIFF(t.dt_min_propose, DATE_TRUNC('MONTH', t.dt_base)) AS lead_time_propose,
     t.is_finished_array,
     t.is_legacy_propose,
     t.is_currently_active,
@@ -157,8 +157,8 @@ SELECT
     IF(FIRST_VALUE(em.document) IS NOT NULL, TRUE, FALSE) AS has_active_month_eviction,
     t.dt_ended_propose,
     t.dt_base,
-    t.min_dt_base_major_type,
-    t.min_dt_base_propose,
+    t.dt_min_major_type,
+    t.dt_min_propose,
     t.dt_paid_array
 FROM
     timeline_final AS t

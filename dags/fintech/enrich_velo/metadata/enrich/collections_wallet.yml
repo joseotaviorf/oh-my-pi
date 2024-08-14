@@ -67,11 +67,11 @@ columns:
     description: "Daily control of contracts that are active in evictions"
   is_active_month_eviction:
     description: "Monthly control of contracts that are active in evictions"
-  min_dt_base_major_type:
+  dt_min_major_type:
     description: "The first date of the major invoice type"
     lineage:
       - datalake_velo.delinquency_timeline.dt_base
-  min_dt_base_propose:
+  dt_min_propose:
     description: "The first date of the propose"
     lineage:
       - datalake_velo.delinquency_timeline.dt_base

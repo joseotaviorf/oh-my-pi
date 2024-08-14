@@ -153,8 +153,8 @@ SELECT
     cw.has_month_eviction,
     cw.dt_ended_propose,
     cw.dt_base,
-    cw.min_dt_base_major_type,
-    cw.min_dt_base_propose,
+    cw.dt_min_major_type,
+    cw.dt_min_propose,
     cw.dt_paid_array
 FROM
     datalake_velo.collections_wallet AS cw
