@@ -134,4 +134,5 @@ if __name__ == "__main__":
         messages_status = []
         for message in messages:
             logger.info(f"m=__main__, message=sending slack message: {message}")
-            messenger.send_message(message)
+            logger.warning(f"m=__main__, Slack is deprecated on QuintoAndar! No message sent")
+            # messenger.send_message(message)
