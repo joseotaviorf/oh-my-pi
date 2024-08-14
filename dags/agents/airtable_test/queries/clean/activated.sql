@@ -28,6 +28,7 @@ SELECT
     TO_DATE(last_supension_return_date, 'yyyy-MM-dd') AS dt_last_suspension_returned,
     TO_DATE(accreditation_week, 'yyyy-MM-dd') AS dt_week_accreditated,
     TO_TIMESTAMP(last_modified) AS ts_updated,
+    TIMESTAMP(createdTime) AS ts_airtable_record_created,
     year,
     month,
     day

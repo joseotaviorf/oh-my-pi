@@ -187,10 +187,6 @@ columns:
     lineage:
       - datalake_airtable_test_raw.brokers_accreditation.data_de_vinculo_teams
     description: Stage of the Qualification Process (Date).
-  dt_broker_space_registered:
-    lineage:
-      - datalake_airtable_test_raw.brokers_accreditation.data_cadastro_espaco_corretor
-    description: Stage of the Qualification Process (Date).
   dt_onboarding_sent:
     lineage:
       - datalake_airtable_test_raw.brokers_accreditation.data_envio_de_onboarding

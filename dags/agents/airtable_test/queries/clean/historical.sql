@@ -16,6 +16,7 @@ SELECT
     TO_DATE(assinatura_do_contrato, 'yyyy-MM-dd') AS dt_contract_signed,
     TO_DATE(semana_de_credenciamento, 'yyyy-MM-dd') AS dt_week_accreditated,
     TO_TIMESTAMP(last_modified) AS ts_updated,
+    TIMESTAMP(createdTime) AS ts_airtable_record_created,
     year,
     month,
     day

@@ -27,7 +27,7 @@ workflow:
   tables_customization:
     activated:
       extra_spark_job_arguments:
-        - base_id: "app1Xchm7V2ypMlBQ"
+        - base_id: app1Xchm7V2ypMlBQ
           table_id: tblXIVyaK8QFpjLdy
         - view: viwWbSdPz8p3TEow6
     brokers_accreditation:
@@ -40,41 +40,16 @@ workflow:
         - base_id: appgKZQCSVwzoloYh
           table_id: tbl5vup4GEab4jEj4
         - view: viw1PecGNTWXvJGuZ
-    jira_tickets:
-      extra_spark_job_arguments:
-        - base_id: "app1Xchm7V2ypMlBQ"
-          table_id: tblZl2bbgWIJpvhA3
-        - view: viwcC4sQQzVUDa099
-    historical:
-      extra_spark_job_arguments:
-        - base_id: "app1Xchm7V2ypMlBQ"
-          table_id: tblrDwceCJcDMJhBP
-        - view: viwiq3dffbK6z2bog
     cr_occurrences:
       extra_spark_job_arguments:
-        - base_id: "app1Xchm7V2ypMlBQ"
+        - base_id: app1Xchm7V2ypMlBQ
           table_id: tblswVeTPw5LtSXwl
         - view: viwOosdLmusE800Or
-    leads:
+    historical:
       extra_spark_job_arguments:
-        - base_id: appRwCXduJRV0KHfz
-          table_id: tblLIcq7KPI8aZxRY
-        - view: viwPDHngY9tHPHXan
-    activations:
-      extra_spark_job_arguments:
-        - base_id: appRwCXduJRV0KHfz
-          table_id: tblhwdN61WJ5URbrA
-        - view: viwQ1cadHa9ieyfLG
-    wallet:
-      extra_spark_job_arguments:
-        - base_id: appp17zSDz2ovn3CT
-          table_id: tblqVNbYMrcQ329cC
-        - view: viwHENefX9frU3uah
-    wallet_history:
-      extra_spark_job_arguments:
-        - base_id: appp17zSDz2ovn3CT
-          table_id: tblSqRc4S1sK7zteP
-        - view: viw1pKmWJHZUpjuKZ
+        - base_id: app1Xchm7V2ypMlBQ
+          table_id: tblrDwceCJcDMJhBP
+        - view: viwiq3dffbK6z2bog
 cluster:
   type: custom_cluster
   custom_libraries:

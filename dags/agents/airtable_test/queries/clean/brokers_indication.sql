@@ -42,6 +42,7 @@ SELECT
     DATE(REPLACE(REPLACE(REPLACE(bd_indicado_pos_indicacao_atualizacao_entrevista, "]"), "["), "'")) AS dt_indicated_after_indication_interview_updated,
     TIMESTAMP(REPLACE(REPLACE(REPLACE(bd_indicado_pos_indicacao_puxar_entrevista, "]"), "["), "'")) AS ts_indicated_after_indication_interview_scheduled,
     TIMESTAMP(data_da_indicacao) AS ts_recommendation,
+    TIMESTAMP(createdTime) AS ts_airtable_record_created,
     MAKE_DATE(year, month, day) AS dt_load,
     year,
     month,
