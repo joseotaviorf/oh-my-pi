@@ -84,6 +84,7 @@ base AS (
         END AS affiliate_type_adjusted,
         CASE
             WHEN dsupc.tp_origin = 'admin_confirmation' THEN 'ciq'
+            WHEN dsupc.tp_origin = 'portfolio_manager' THEN 'ciq'
             WHEN dsupc.tp_origin = 'consultantpwa' THEN 'ciq'
             WHEN dsupc.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsof.nm_agent IS NOT NULL THEN 'operations'
@@ -110,6 +111,7 @@ base AS (
             WHEN dsupc.tp_origin = 'inbound' THEN 'is_inbound'
             WHEN dsupa.tp_origin = 'inbound' THEN 'is_inbound'
             WHEN dsupc.tp_origin = 'admin_confirmation' THEN 'ciq'
+            WHEN dsupc.tp_origin = 'portfolio_manager' THEN 'ciq'
             WHEN dsof.nm_agent IS NULL AND dsupc.tp_origin = 'prime' THEN 'account_manager_pp_multi'
             WHEN dsof.nm_agent IS NULL AND dsupc.tp_origin = 'referral' THEN 'agent_indicacao_completa'
             ELSE dsof.nm_agent 

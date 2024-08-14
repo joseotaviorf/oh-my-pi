@@ -141,7 +141,7 @@ lead_conversion_ciq AS (
         ON (hd.id_draft = s.id_house_draft) 
           AND (s.id_external IS NOT NULL)
     WHERE 
-      (hd.type = 'ADMIN_CONFIRMATION')
+      (hd.type IN ('ADMIN_CONFIRMATION', 'PORTFOLIO_MANAGER'))
 ),
 
 all_conversions AS (

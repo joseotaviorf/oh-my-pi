@@ -16,11 +16,10 @@ SELECT
 FROM datalake_supply_flows.leads_sks AS ls
 JOIN datalake_bob.house_draft_business_context AS hd
   ON (ls.id_lead = hd.id_draft)
-    AND (hd.type = 'ADMIN_CONFIRMATION')
     AND (ls.source = 'CIQ')
 LEFT JOIN datalake_bob_clean.location AS l
   ON hd.id_draft = l.id_house_draft
-WHERE hd.type = 'ADMIN_CONFIRMATION'
+WHERE hd.type IN ('ADMIN_CONFIRMATION', 'PORTFOLIO_MANAGER')
   AND (l.is_out_of_area IS NOT TRUE)
   AND (hd.status != 'DELETED')
   AND (hd.status != 'EDITING')

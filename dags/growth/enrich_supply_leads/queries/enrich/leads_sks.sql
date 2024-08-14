@@ -37,7 +37,7 @@ draft_with_rene_informations AS (
     LEFT JOIN datalake_rene_descartes_clean.house_lead AS hl 
         ON hlc.id_lead = hl.id_lead_ebdb
     WHERE
-        hd.type = 'ADMIN_CONFIRMATION'
+        hd.type IN ('ADMIN_CONFIRMATION', 'PORTFOLIO_MANAGER')
         AND hl.id IS NOT NULL
 ),
 ciq_tb AS (
@@ -49,8 +49,8 @@ ciq_tb AS (
     FROM 
         datalake_bob_clean.house_draft AS hd
     WHERE
-        (hd.id NOT IN (SELECT DISTINCT id_draft FROM draft_with_rene_informations)) -- INFORMAÇÕES CAPTURADAS PELO RENE
-        AND (hd.type = 'ADMIN_CONFIRMATION') -- PEGANDO SOMENTE O TIPO DE CIQ
+        (hd.id NOT IN (SELECT DISTINCT id_draft FROM draft_with_rene_informations))
+        AND (hd.type IN ('ADMIN_CONFIRMATION', 'PORTFOLIO_MANAGER'))
         AND (DATE(ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
     GROUP BY ALL
 )

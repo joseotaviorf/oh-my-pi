@@ -16,6 +16,6 @@ SELECT
 FROM datalake_supply_flows.leads_sks AS ls
 JOIN datalake_bob.house_draft_business_context AS hd
   ON (ls.id_lead = hd.id_draft)
-    AND (hd.type = 'ADMIN_CONFIRMATION')
+    AND (hd.type IN ('ADMIN_CONFIRMATION', 'PORTFOLIO_MANAGER'))
     AND (ls.source = 'CIQ')
 WHERE DATE(hd.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
