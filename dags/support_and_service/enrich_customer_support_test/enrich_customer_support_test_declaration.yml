@@ -1,0 +1,30 @@
+dag:
+    name: enrich_customer_support_test
+    schedule_start_date: 2024, 1, 1
+    owner: Data SS
+    documentation:
+        dag_purpose: |
+            New customer support DAG
+
+workflow:
+    type: query_delta
+    layer: enrich
+    default_extraction_type: incremental
+    tables_customization:
+        calls:
+            z_order_by: ["id_task"]
+            merge_on: ["id_task"]
+
+cluster:
+    type: custom_cluster
+    custom_configurations:
+        autotermination_minutes: 20
+        driver_node_type_id: r7g.2xlarge
+        node_type_id: r7g.2xlarge
+        spark_version: 13.3.x-scala2.12
+        num_workers: 2
+        aws_attributes:
+            first_on_demand: 1
+            spot_bid_price_percent: 100
+            zone_id: us-east-1d
+            availability: SPOT_WITH_FALLBACK

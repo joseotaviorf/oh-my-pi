@@ -1,0 +1,440 @@
+database_name: datalake_customer_support_test
+table_name: calls
+description: Test table for call data
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_segment:
+    lineage:
+      - datalake_bigfone.reservations.id_reservation
+    description:
+      The ID segment is a unique identifier that corresponds to a Twilio call
+      reservation and is particularly valuable in real-time call applications,
+      such as call centers or customer support. By reserving a phone number in
+      advance, call initiation can be expedited, resulting in a prompt and efficient
+      connection without delay or interruption. In this case, only accepted
+      reservations are being considered, allowing for accurate tracking of successful
+      call connections.
+  id_call:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.id_call
+      - datalake_bigfone_clean.event.id_call
+    description:
+      The Twilio call ID is a unique identifier that represents a single phone call
+      initiated on the Twilio platform. When a call is made, it can be routed to
+      available agents or workers, and a corresponding task is created to represent
+      the incoming call. The task is then assigned to one or more workers, and a
+      reservation is generated for each worker who is considered for the task. For our
+      purposes, we are only including call IDs where the associated reservation was
+      accepted.
+  sk_call:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.id_call
+      - datalake_bigfone_clean.event.id_call
+      - datalake_bigfone_clean.event.id_conversation
+      - datalake_bigfone_clean.event.id_task
+    description:
+      In cases where a Twilio Call ID is not available, the primary call identifier
+      sk_call may be replaced with either id_conversation or id_task.
+      The id_conversation, or Twilio Conversation SID, is a unique identifier for a
+      conversation session that can involve multiple communication channels and devices.
+      This field is linked to the id_call field in Zendesk Ticket for reference purposes.
+  id_session:
+    lineage:
+      - datalake_sauron_clean.session
+    description: Session ID, only valid for Call InApp calls.
+  id_agent:
+    lineage:
+      - datalake_bigfone.reservations.id_agent
+    description:
+      The Twilio agent unique identifier is associated with each Twilio reservation,
+      and is used to identify the agent who handled the call or task.
+  first_agent_email:
+    lineage:
+      - datalake_bigfone.reservations.agent_email
+    description: First agent email that answered the first reservation.
+  last_agent_email:
+    lineage:
+      - datalake_bigfone.reservations.agent_email
+    description: Last agent email that answered the last reservation.
+  id_queue:
+    lineage:
+      - datalake_bigfone.reservations.id_queue
+    description:
+      A queue in Twilio is identified by a unique identifier called Queue SID, and it
+      serves as a holding area for tasks that are waiting to be assigned to workers for
+      processing. Typically, the name of the queue in Twilio corresponds to the
+      department for which the task reservation is intended to be routed.
+  id_user:
+    lineage:
+      - datalake_zendesk.tickets_current.id_user
+    description:
+      This is the unique identifier for the user associated with a Zendesk ticket, who
+      is registered in the main system (ebdb).
+  id_contract:
+    lineage:
+      - datalake_zendesk.tickets_current.id_contract
+    description: The Zendesk Ticket respective contract.
+  ticket_origin:
+    description: It is the origin of the ticket.
+    categories:
+      inbound: The ticket is related to an inbound call.
+      outbound: The ticket is related to an outbound call.
+      call inapp: The ticket is related to a Call InApp interaction.
+  agent_email:
+    lineage:
+      - datalake_bigfone_clean.event.agent_email
+    description: The Twilio agent email.
+  department:
+    lineage:
+      - datalake_bigfone.reservations.queue_name
+    description: The Twilio task department name, defined in Twilio as queue name.
+  zendesk_department:
+    lineage:
+      - datalake_zendesk.tickets_current.group_name
+    description: The Zendesk Ticket department.
+  first_department:
+    lineage:
+      - datalake_bigfone.reservations.queue_name
+    description: The Twilio first department, or queue name, regarding the task first reservation.
+  last_department:
+    lineage:
+      - datalake_bigfone.reservations.queue_name
+    description: The Twilio last department, or queue name, regarding the task last reservation.
+  transferred_from_dept:
+    lineage:
+      - datalake_bigfone.reservations.queue_name
+    description: The reservation started from a transfer from this department.
+  transferred_to_dept:
+    lineage:
+      - datalake_bigfone.reservations.queue_name
+    description: The reservation was trasferred to this department.
+  transference_type:
+    description: The type of transference. It could be internal-same-agent.
+  transference_reason:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+    description: The reason why the reservation was transferred.
+  country_code:
+    description: Identifies the country
+  sla_achieved:
+    lineage:
+      - datalake_bigfone.reservations.seconds_wait_time
+      - datalake_bigfone.reservations.is_answered
+    description:
+      If the customer satisfaction (CSAT) survey from the Interactive Voice Response
+      (IVR) events was answered and the total wait time is one minute or less, the
+      value is TRUE. Otherwise, it is FALSE. If the value is not FALSE or TRUE, it is
+      assumed to be NULL.
+  total_minutes_reception_time:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+    description:
+      The IVR duration time is calculated as the difference between the date of the
+      last IVR event and the date of the first IVR event during the call. The reception
+      time refers to the duration between the start of the call and the moment when the
+      IVR first interacts with the caller.
+  segment_minutes_duration:
+    lineage:
+      - datalake_bigfone.reservations.seconds_duration
+    description:
+      The total interaction time of a task segment is the cumulative duration of both
+      the queue time and talk time. Specifically, it refers to the amount of time a
+      task reservation (segment) takes to complete from the moment it enters the queue
+      until the end of the call.
+  segment_minutes_wait_time:
+    lineage:
+      - datalake_bigfone.reservations.seconds_wait_time
+    description:
+      In the context of a task reservation, queue time refers to the duration that a
+      call spends waiting in a queue before a worker answers it. It begins when the
+      call is placed in the queue and ends when a worker picks it up.
+  segment_minutes_talk_time:
+    lineage:
+      - datalake_bigfone.reservations.seconds_talk_time
+    description:
+      This is the duration of the active conversation between the caller and the worker,
+      from the moment the call is answered by the worker until either the caller or the
+      worker hangs up. This duration is only calculated for the task reservation
+      (segment).
+  total_minutes_talk_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
+      - datalake_bigfone.reservations.seconds_talk_time
+    description:
+      The talk time refers to the amount of time that a call spends in an active
+      conversation between the caller and the worker, but it is calculated specifically
+      for the task reservation (segment) being considered.
+  total_minutes_queue_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
+    description:
+      This is the amount of time that a call spends waiting in a queue, taking into
+      account the specific task it is associated with.
+  total_minutes_wrap_up_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_wrap_up_time
+    description:
+      The total wrap-up time of a Twilio task refers to the time that a worker spends
+      on post-call tasks related to the task, after the conversation has ended. Such
+      tasks may include updating customer records, completing surveys, or other
+      necessary tasks. The wrap-up time begins when the call ends and ends when the
+      worker completes all the required wrap-up tasks related to the task.
+  total_minutes_handling_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
+    description:
+      The total handling time of a Twilio task encompasses the entire duration during
+      which a worker handles a specific task, starting from the moment the task is
+      accepted until all necessary wrap-up tasks are completed. This duration comprises
+      the time that the task spends in the queue waiting for a worker to become
+      available, the time spent conversing with the caller, and any wrap-up tasks that
+      are performed after the call.
+  minutes_full_resolution_time_calendar:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.ts_created_local_unix
+      - datalake_bigfone_clean.event.ts_created_local_unix
+    description:
+      To calculate the full resolution time for a Twilio task, it is necessary to take
+      into account the events related to the Twilio reservation. These events refer to
+      significant actions or occurrences, such as the reservation being created, the
+      worker being assigned, the call being answered, and the reservation being
+      completed. However, in order to calculate the full resolution time, only
+      reservations that were answered are considered. This metric is calculated by
+      taking the difference between the last event creation date of the answered
+      reservation and the first event creation date of the same reservation.
+  number_of_departments:
+    lineage:
+      - datalake_bigfone.reservations.queue_name
+    description: Total departments of a Twilio task.
+  number_of_segments:
+    lineage:
+      - datalake_bigfone.reservations.id_reservation
+    description: Total answered reservations of a Twilio task.
+  direction:
+    lineage:
+      - datalake_bigfone_clean.event.direction
+    description: It is the support direction.
+    categories:
+      inbound:
+        An inbound call is a call that is initiated by an external party, such as a
+        customer or a client, and is received by the Twilio application.
+      outbound:
+        An outbound call is a call that is initiated by the Twilio application to an
+        external party, such as a customer or a client.
+  channel_type:
+    lineage:
+      - datalake_bigfone_clean.event.channel_type
+    description: Column used to identify Call InApp records
+  minutes_first_resolution_time_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.minutes_first_resolution_calendar
+    description: Number of minutes to the first resolution time during calendar hours for Zendesk Ticket.
+  minutes_first_resolution_time_business:
+    lineage:
+      - datalake_zendesk.tickets_current.minutes_first_resolution_business
+    description: Number of minutes to the first resolution time during business hours for the Zendesk Ticket.
+  replies:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnels_metrics.replies
+    description: The number of public replies added to a ticket by an agent.
+  reopens:
+    lineage:
+      - datalake_zendesk.tickets_current.reopens
+    description: Total number of times the ticket was reopened.
+  request_type:
+    lineage:
+      - datalake_zendesk.tickets_current.request_type
+    description: Classification of the zendeks ticket user request.
+  client_type:
+    lineage:
+      - datalake_zendesk.tickets_current.client_type
+    description: The Zendesk Ticket client type obtained through the ticket custom field.
+  step_tag:
+    lineage:
+      - datalake_zendesk.tickets_current.step_tag
+    description: Classification of the zendesk ticket user journey step.
+  customer_type_tag:
+    lineage:
+      - datalake_zendesk.tickets_current.customer_type_tag
+    description: Classification of the zendesk ticket user.
+  contact_motivation_tag:
+    lineage:
+      - datalake_zendesk.tickets_current.contact_motivation_tag
+    description: Classification of the zendesk ticket user motivation.
+  contact_theme_tag:
+    lineage:
+      - datalake_zendesk.tickets_current.contact_theme_tag
+    description:
+      The Zendesk Ticket contact theme, for example, rent_contract_termination. It is
+      obtained through a custom field.
+  contact_theme_detail_tag:
+    lineage:
+      - datalake_zendesk.tickets_current.contact_theme_detail_tag
+    description:
+      The Zendesk Ticket contact them detail, for example, rental_visit_rescheduling.
+      It is obtained through a custom field.
+  tags:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+    description: String field with all ticket tags.
+  status:
+    lineage:
+      - datalake_zendesk.tickets_current.status
+    description: Ticket status.
+  custom_fields:
+    lineage:
+      - datalake_zendesk.tickets_current.custom_fields
+    description: The Zendesk Ticket custom field.
+  journey_step:
+    lineage:
+      - datalake_gsheets_clean.department_control.journey_step
+    description: Journey step in which the call is.
+  team:
+    lineage:
+      - datalake_gsheets_clean.department_control.team
+    description: Team of which the call belongs to.
+  area:
+    lineage:
+      - datalake_gsheets_clean.department_control.area
+    description: Area of which the call belongs to.
+  is_last_segment:
+    lineage:
+      - datalake_bigfone.reservations.id_reservation
+    description: If the reservation is the last opened for its respective task.
+  is_first_segment:
+    lineage:
+      - datalake_bigfone.reservations.id_reservation
+    description: If the reservation is the first opened for its respective task.
+  has_back_tickets:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+    description: Boolean that indicates if this ticket have a related backoffice ticket.
+  is_bot:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+    description:
+      If the ticket has the tag "bot_end_coversation", then it is TRUE,
+      otherwise is FALSE.
+  is_closed_by_merge:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+    description:
+      In Zendesk, a ticket closed by merge refers to scenario where two or more tickets
+      are combined or merged into a single ticket, and the individual tickets are
+      closed as result. It assumes TRUE or FALSE values.
+  front_or_back:
+    lineage:
+      - datalake_gsheets_clean.department_control.front_or_back
+      - datalake_zendesk.tickets_current.tags
+    description:
+      Given the department define if this ticket is front or back. This column have
+      undefined values in case there is no definition of this value in the
+      department_control sheet for this specific main department.
+  is_answered:
+    lineage:
+      - datalake_bigfone.reservations.id_reservation
+      - datalake_bigfone.reservations.is_answered
+    description: Boolean that indicates if the user has answered the CSAT survey.
+  has_back_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+    description: Boolean that indicates if this ticket have a related backoffice ticket.
+  is_open_back_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.status
+      - datalake_zendesk.tickets_current.id_ticket
+    description:
+      Boolean that indicates if any of the related backoffice tickets have a status
+      different than closed.
+  has_transfers:
+    lineage:
+      - datalake_bigfone.reservations.id_reservation
+    description: True if the ticket have more than 1 segment (reservation), False otherwise.
+  frt:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
+    description:
+      FRT (Full Resolution Time) calculates the total time from the beggining of the
+      support in the front until the end, considering the backoffice time if there is
+      a back ticket related.
+  last_back_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+    description: Last back ticket related to this ticket.
+  back_ticket_list:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+    description: List of back tickets related to this ticket.
+  total_backoffice_minutes_time:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created_local
+      - datalake_zendesk.tickets_current.ts_solved_local
+    description: Time in minutes to close all related backoffice tickets.
+  total_minutes_front_to_open_back_ticket_time:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created_local
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
+    description: Time in minutes to open the related backoffice ticket after solving the front ticket.
+  is_csat_answered:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.csat_2
+      - datalaek_bigfne.ivr_tasks.csat_1
+    description: Boolean that indicates if the user has answered the CSAT survey.
+  is_solved:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.csat_1
+    description:
+      If the call csat ivr event assumes value equal to 1 for the satisfaction survey
+      for the respective call.
+  first_csat_score:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.csat_2
+    description:
+      The csat score or csat rating for the respective call. It considers the first csat
+      score (values goes from 1 to 5).
+  last_csat_score:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.csat_2
+    description:
+      The csat score or csat rating for the respective call. It considers the last csat
+      score (values goes from 1 to 5).
+  csat_rating:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.csat_2
+    description:
+      The csat score or csat rating for the respective call. It considers the last csat
+      score (values goes from 1 to 5).
+  ts_csat_answered:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+    description: Timestamp of the last CSAT survey answer
+  ts_csat_first_response:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+    description: Timestamp of the first CSAT survey answer
+  ts_csat_last_response:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+    description: Timestamp of the last CSAT survey answer
+  ts_segment_created:
+    lineage:
+      - datalake_bigfone_clean.event.ts_created_local
+    description: The reservation creation timestamp.
+  ts_segment_closed:
+    lineage:
+      - datalake_bigfone_clean.event.ts_created_local
+    description: The reservation closing timestamp.
+  ts_ticket_started:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
+    description: Start timestamp. This is the first event creation timestamp for the id_call.
+  ts_ticket_ended:
+    lineage:
+      - datalaek_bigfne.ivr_tasks.ts_created_local
+      - datalake_bigfone_clean.event.ts_created_local
+    description: End timestamp. This is the last event creation timestamp for the id_call.

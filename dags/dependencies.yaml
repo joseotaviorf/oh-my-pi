@@ -1420,6 +1420,9 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
   - bietlejuice.zendesk:load-clean-satisfaction-ratings
   - bietlejuice.zendesk:load-clean-tickets
+bietlejuice.enrich_customer_support_test:
+  - bietlejuice.bigfone:load-clean-event
+  - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
