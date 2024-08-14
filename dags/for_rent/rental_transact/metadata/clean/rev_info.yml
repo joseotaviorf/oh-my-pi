@@ -1,0 +1,16 @@
+database_name: datalake_rental_transact_clean
+table_name: rev_info
+description: This table consolidates revision information related to audit tables.
+  Each line should be unique audition identified by the rev column.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  rev:
+    lineage:
+    - datalake_rental_transact_raw.revinfo.id
+    description: Revision's unique id of the modification.
+      Can be joined with audit tables.
+  ts_rev:
+    lineage:
+    - datalake_rental_transact_raw.revinfo.revtstmp
+    description: Timestamp of when the revision happened.

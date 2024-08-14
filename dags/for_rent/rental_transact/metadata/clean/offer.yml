@@ -1,0 +1,68 @@
+database_name: datalake_rental_transact_clean
+table_name: offer
+description: This table consolidates offer information related to the ForRent operation.
+  Each line should be unique and identified by the id column.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_rental_transact_raw.offer.id
+    description: Offer id.
+  id_firestore_offer:
+    lineage:
+    - datalake_rental_transact_raw.offer.firestore_offer_id
+    description: Firestore's offer id.
+  id_house_external:
+    lineage:
+    - datalake_rental_transact_raw.offer.house_external_id
+    description: External house id - joins with EBDB's house id.
+  id_tenant_external:
+    lineage:
+    - datalake_rental_transact_raw.offer.tenant_external_id
+    description: External tenant id - joins with Person's user id.
+  id_owner_external:
+    lineage:
+    - datalake_rental_transact_raw.offer.owner_external_id
+    description: External owner id - joins with Person's user id.
+  id_resident_info:
+    lineage:
+    - datalake_rental_transact_raw.offer.resident_info_id
+    description: Resident info id. Joins with resident_info table.
+  uuid_offer:
+    lineage:
+    - datalake_rental_transact_raw.offer.offer_uuid
+    description: Offer uuid.
+  status:
+    lineage:
+    - datalake_rental_transact_raw.offer.status
+    description: Current status of the offer.
+  type:
+    lineage:
+    - datalake_rental_transact_raw.offer.type
+    description: Type of the offer.
+  iteration:
+    lineage:
+    - datalake_rental_transact_raw.offer.iteration
+    description: Iteration of the offer.
+  turn:
+    lineage:
+    - datalake_rental_transact_raw.offer.turn
+    description: Whose turn is on the offer negotiation.
+  rejection_reason:
+    lineage:
+    - datalake_rental_transact_raw.offer.rejection_reason
+    description: Rejection reason of the offer, if it has any.
+  ts_created:
+    lineage:
+    - datalake_rental_transact_raw.offer.created_at
+    description: Timestamp of the offer creation.
+  ts_updated:
+    lineage:
+    - datalake_rental_transact_raw.offer.updated_at
+    description: Timestamp of the offer update.
+  ts_expiration:
+    lineage:
+    - datalake_rental_transact_raw.offer.expires_at
+    description: Timestamp of when the offer will expire.
+  

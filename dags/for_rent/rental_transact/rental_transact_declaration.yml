@@ -1,0 +1,33 @@
+dag:
+  name: rental_transact
+  schedule_start_date: 2024, 7, 1
+  schedule_interval: 30 1 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      This DAG retrieves data from the Rental Offer project (database rental_transact), which is a source of ForRent offers and negotiation.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: RENTAL_TRANSACT_DB
+  tables_customization:
+    #offer:
+    #  clean_table_name: offer
+    #  raw_primary_keys: [id]
+    #  clean_primary_keys: [id]
+    #offer_aud:
+    #  clean_table_name: offer_aud
+    resident_info:
+      clean_table_name: resident_info
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    resident_info_aud:
+      clean_table_name: resident_info_aud
+    revinfo:
+      clean_table_name: rev_info
+      raw_primary_keys: [rev]
+      clean_primary_keys: [rev]
+cluster:
+  type: databricks_12_2_min_general_cluster

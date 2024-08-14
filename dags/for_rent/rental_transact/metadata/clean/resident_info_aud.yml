@@ -1,0 +1,61 @@
+database_name: datalake_rental_transact_clean
+table_name: resident_info_aud
+description: This table consolidates the audition of the resident information related to an offer.
+  Each line should be unique and identified by the rev column.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.id
+    description: Unique id of the resident information.
+  id_tenant_external:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.tenant_external_id
+    description: External tenant id - joins with Person's user id.
+  rev:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.rev
+    description: Revision of the offer, unique id of the modification.
+      Can be joined with table rev_info to get more details.
+  rev_type:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.revtype
+    description: Type of the revision.
+    categories:
+      '0': Create
+      '1': Update
+      '2': Delete
+  rev_end:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.revend
+    description: Id of the revision that replaced the current entry.
+  introduction:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.introduction
+    description: Introduction of the resident.
+  number_of_cohabitants:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.number_of_cohabitants
+    description: Number of cohabitants.
+  mod_id_tenant_external:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.tenant_external_id_mod
+    description: Boolean flag indicating if the id_tenant_external column was updated in the revision.
+  mod_introduction:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.tenant_external_id_mod
+    description: Boolean flag indicating if the introduction column was updated in the revision.
+  mod_number_of_cohabitants:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.tenant_external_id_mod
+    description: Boolean flag indicating if the number_of_cohabitants column was updated in the revision.
+  ts_created:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.created_at
+    description: Timestamp of the resident info creation.
+  ts_updated:
+    lineage:
+    - datalake_rental_transact_raw.resident_info_aud.updated_at
+    description: Timestamp of the resident info update.
+  
