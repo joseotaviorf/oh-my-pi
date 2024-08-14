@@ -72,3 +72,11 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
     description: "Expiration timestamp"
+  dt_min_early_credit_created:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.created
+    description: "Lowest available early credit creation date for that house and user"
+  dt_max_early_credit_expired:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.expired
+    description: "Longest available early credit expiration date for that house and user"
