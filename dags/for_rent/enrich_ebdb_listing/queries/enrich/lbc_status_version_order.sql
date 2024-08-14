@@ -452,6 +452,7 @@ trigger AS (
       m.country_code,
       m.status,
       m.status_reason,
+      LAG(m.status_reason) OVER(PARTITION BY m.id_house ORDER BY m.ts_state_started, COALESCE(m.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_reason,
       m.rev,
       m.revision_reason,
       IF(
@@ -478,6 +479,7 @@ trigger AS (
       ) AS ts_first_publication,
       CAST(m.ts_state_started AS TIMESTAMP) AS ts_state_started,
       CAST(m.ts_state_ended AS TIMESTAMP) AS ts_state_ended,
+      MIN(m.ts_state_started) OVER (PARTITION BY m.id_house, m.listing_version) AS ts_listing_version_start,
       m.days_in_state,
       m.days_in_status,
       m.trigger_new_version,
@@ -539,12 +541,26 @@ SELECT
     v.trigger_new_version,
     v.listing_version,
     IF(
-      ed_opt_out.id_house IS NULL
+      v.listing_version > 1
       AND
       (
-        v.revision_reason LIKE '%TERMINATION_CANCELED%' 
-        OR 
         v.revision_reason LIKE '[TEMPORARY OPT-OUT RELISTING]%' --Manually removed from relisting by our Product Team
+        OR
+        (
+          ed_opt_out.id_house IS NULL
+          AND
+          v.ts_listing_version_start >= TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
+          AND
+          v.revision_reason LIKE '%TERMINATION_CANCELED%'
+        )
+        OR
+        (
+          v.ts_listing_version_start < TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
+          AND
+          v.previous_status_reason LIKE 'RELISTING_%'
+          AND
+          v.revision_reason LIKE '%TERMINATION_CANCELED%'
+        )
       )
       , TRUE
       , FALSE
