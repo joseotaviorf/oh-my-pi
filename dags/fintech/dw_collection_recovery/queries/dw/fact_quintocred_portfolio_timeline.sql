@@ -148,8 +148,8 @@ SELECT
             ELSE '13)>360'
         END AS propose_aging_range,
     cw.is_finished_array,
-    cw.is_active_day_eviction,
-    cw.is_active_month_eviction,
+    cw.has_active_day_eviction,
+    cw.has_active_month_eviction,
     cw.has_month_eviction,
     cw.dt_ended_propose,
     cw.dt_base,

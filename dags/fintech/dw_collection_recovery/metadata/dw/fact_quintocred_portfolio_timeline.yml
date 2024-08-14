@@ -95,11 +95,11 @@ columns:
     description: "Aging ranges from every 30 days to >360 days. The aging ranges follows the lead time of the main invoice, considering the first date of the major type invoice in the month. It is important to note that the main termination invoice type must also take into account the first guarantee invoice date."
   propose_aging_range:
     description: "Aging ranges from every 30 days to >360 days. The aging ranges follows the lead time of the main invoice, considering the first date of the major type invoice on the day. It is important to note that the main termination invoice type must also take into account the first guarantee invoice date."
-  is_active_day_eviction:
+  has_active_day_eviction:
     description: "Daily control of contracts that are active in evictions"
     lineage:
       - datalake_velo.collections_wallet.is_active_day_eviction
-  is_active_month_eviction:
+  has_active_month_eviction:
     description: "Monthly control of contracts that are active in evictions"
     lineage:
       - datalake_velo.collections_wallet.is_active_month_eviction
