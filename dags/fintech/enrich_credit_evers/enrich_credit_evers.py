@@ -29,6 +29,10 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
+
+default_libraries = config_service.get_config("default_libraries")
+
+config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
@@ -53,7 +57,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=cluster_description
+    dag=dag, 
+    task_id="create-cluster", 
+    cluster_configuration=cluster_description,
+    libraries=default_libraries
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
