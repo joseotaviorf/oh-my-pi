@@ -118,6 +118,7 @@ seu_barriga AS (
         AND due_amount <= 0
         AND payment_status != 'canceled'
         AND status != 'canceled'
+        AND country_code = 'BR'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_invoice, payment_company_use_number ORDER BY ts_created DESC) = 1
 ),
