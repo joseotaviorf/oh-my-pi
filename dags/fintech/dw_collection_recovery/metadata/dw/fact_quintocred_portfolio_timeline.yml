@@ -6,72 +6,108 @@ domain: fintech
 description: The table contains a timeline view of the collections portfolio for QuintoCred context.
 columns:
   sk_propose:
-    description: 'Surrogate key of table. Propose ID from QuintoCred'
+    description: "Surrogate key of table. Propose ID from QuintoCred"
     lineage:
-    - datalake_velo.collections_wallet.id_propose
+      - datalake_velo.collections_wallet.id_propose
   name:
-    description: 'Name of the client being charged'
+    description: "Name of the client being charged"
     lineage:
-    - datalake_velo.collections_wallet.name
+      - datalake_velo.collections_wallet.name
   document:
-    description: 'Document number of the client'
+    description: "Document number of the client"
     lineage:
-    - datalake_velo.collections_wallet.document
+      - datalake_velo.collections_wallet.document
   mob:
-    description: 'Mob calculated between the date of reference (dt_base)'
+    description: "Mob calculated between the date of reference (dt_base)"
     lineage:
-    - datalake_velo.collections_wallet.mob
+      - datalake_velo.collections_wallet.mob
   type_description_array:
-    description: 'Array containing all the delinquencies types considered to decide the major_type'
+    description: "Array containing all the delinquencies types considered to decide the major_type"
     lineage:
-    - datalake_velo.collections_wallet.type_description_array
+      - datalake_velo.collections_wallet.type_description_array
   major_type:
-    description: 'Major type for this debt'
+    description: "Major type for this debt"
     lineage:
-    - datalake_velo.collections_wallet.major_type
+      - datalake_velo.collections_wallet.major_type
   team_negotiation:
-    description: 'Team that made the negotiation'
+    description: "Team that made the negotiation"
   team_distribution:
-    description: 'Team that received the debt via distribution'
+    description: "Team that received the debt via distribution"
     lineage:
-    - datalake_recupera.changes_debts_distribution
+      - datalake_recupera.changes_debts_distribution
   total_delinquency_amount:
-    description: 'Total SUM of delinquencies amount for this debt'
+    description: "Total SUM of delinquencies amount for this debt"
     lineage:
-    - datalake_velo.collections_wallet.total_delinquency_amount
+      - datalake_velo.collections_wallet.total_delinquency_amount
   total_original_value:
-    description: 'Total SUM of delinquencies original amount for this debt'
+    description: "Total SUM of delinquencies original amount for this debt"
     lineage:
-    - datalake_velo.collections_wallet.total_original_value
+      - datalake_velo.collections_wallet.total_original_value
   total_amount_paid:
-    description: 'Total SUM of delinquencies paid amount for this debt'
+    description: "Total SUM of delinquencies paid amount for this debt"
     lineage:
-    - datalake_velo.collections_wallet.total_amount_paid
+      - datalake_velo.collections_wallet.total_amount_paid
   amount_paid_added:
-    description: 'Total SUM of delinquencies paid amount added on this dt_base for this debt'
+    description: "Total SUM of delinquencies paid amount added on this dt_base for this debt"
     lineage:
-    - datalake_velo.collections_wallet.amount_paid_added
+      - datalake_velo.collections_wallet.amount_paid_added
   total_open_amount:
-    description: 'Total SUM of delinquencies open amount for this debt at this dt_base'
+    description: "Total SUM of delinquencies open amount for this debt at this dt_base"
     lineage:
-    - datalake_velo.collections_wallet.total_open_amount
+      - datalake_velo.collections_wallet.total_open_amount
   is_finished_array:
-    description: 'Array containing all the delinquencies is_finished status'
+    description: "Array containing all the delinquencies is_finished status"
     lineage:
-    - datalake_velo.collections_wallet.is_finished_array
+      - datalake_velo.collections_wallet.is_finished_array
   has_month_eviction:
-    description: 'If this contract has any eviction issued this dt_base month'
+    description: "If this contract has any eviction issued this dt_base month"
     lineage:
-    - datalake_velo.collections_wallet.has_month_eviction
+      - datalake_velo.collections_wallet.has_month_eviction
   dt_ended_propose:
-    description: 'dt_ended for this propose'
+    description: "dt_ended for this propose"
     lineage:
-    - datalake_velo.collections_wallet.dt_ended_propose
+      - datalake_velo.collections_wallet.dt_ended_propose
   dt_base:
-    description: 'Major date for this table, it maintains the timeline for each debt'
+    description: "Major date for this table, it maintains the timeline for each debt"
     lineage:
-    - datalake_velo.collections_wallet.dt_base
+      - datalake_velo.collections_wallet.dt_base
   dt_paid_array:
-    description: 'Array containing all the delinquencies dt_paid on this dt_base'
+    description: "Array containing all the delinquencies dt_paid on this dt_base"
     lineage:
-    - datalake_velo.collections_wallet.dt_paid_array
+      - datalake_velo.collections_wallet.dt_paid_array
+  monthly_major_type:
+    description: "Major delinquency type selected for this client, based on Collections Rules, aggregated by month"
+    lineage:
+      - datalake_velo.collections_wallet.monthly_major_type
+  distributor:
+    description: "Distributor code linked to the contract"
+    lineage:
+      - datalake_recupera_clean.operational_records.distributor_code
+  lead_time_major_type:
+    description: "The first date of the main invoice until the first day of the current month"
+    lineage:
+      - datalake_velo.collections_wallet.lead_time_major_type
+  lead_time_propose:
+    description: "The first date of the contract until the first day of the current month"
+    lineage:
+      - datalake_velo.collections_wallet.lead_time_propose
+  major_type_aging_range:
+    description: "Aging ranges from every 30 days to >360 days. The aging ranges follows the lead time of the main invoice, considering the first date of the major type invoice in the month. It is important to note that the main termination invoice type must also take into account the first guarantee invoice date."
+  propose_aging_range:
+    description: "Aging ranges from every 30 days to >360 days. The aging ranges follows the lead time of the main invoice, considering the first date of the major type invoice on the day. It is important to note that the main termination invoice type must also take into account the first guarantee invoice date."
+  is_active_day_eviction:
+    description: "Daily control of contracts that are active in evictions"
+    lineage:
+      - datalake_velo.collections_wallet.is_active_day_eviction
+  is_active_month_eviction:
+    description: "Monthly control of contracts that are active in evictions"
+    lineage:
+      - datalake_velo.collections_wallet.is_active_month_eviction
+  min_dt_base_major_type:
+    description: "The first date of the major invoice type"
+    lineage:
+      - datalake_velo.collections_wallet.min_dt_base_major_type
+  min_dt_base_propose:
+    description: "The first date of the propose"
+    lineage:
+      - datalake_velo.collections_wallet.min_dt_base_propose

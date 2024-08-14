@@ -67,6 +67,41 @@ HAVING
     team <> "TIME NAO LOCALIZADO"
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY dt_month_paid, document ORDER BY original_value DESC ) = 1
+),
+
+distinct_contract_customer AS (
+    SELECT DISTINCT
+        id_contract,
+        id_customer
+    FROM
+        datalake_recupera_clean.contracts
+),
+
+operational_records AS (
+    SELECT DISTINCT
+        id_customer,
+        distributor_code AS distributor,
+        ts_customer_status_last_update,
+        MAKE_DATE(year, month, day) AS dt_snapshot
+    FROM
+        datalake_recupera_clean.operational_records
+    WHERE
+        id_creditor IN ('3','5') -- filter quintocred
+        AND MAKE_DATE(year, month, day) BETWEEN DATE_TRUNC("month", CURRENT_DATE - INTERVAL "48" MONTH) AND CURRENT_DATE - INTERVAL "1" DAY
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_customer, MAKE_DATE(year, month, day) ORDER BY ts_last_update DESC) = 1
+),
+
+responsible_for_contract AS (
+    SELECT DISTINCT
+        c.id_contract,
+        ors.distributor,
+        ors.dt_snapshot
+    FROM
+        operational_records As ors
+    LEFT JOIN
+        distinct_contract_customer AS c
+            ON ors.id_customer = c.id_customer
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY c.id_contract, ors.dt_snapshot ORDER BY ors.ts_customer_status_last_update DESC) = 1
 )
 
 SELECT
@@ -76,17 +111,50 @@ SELECT
     cw.mob,
     cw.type_description_array,
     cw.major_type,
+    cw.monthly_major_type,
+    rc.distributor,
     rt.team AS team_negotiation,
     dt.team AS team_distribution,
-    cw.total_delinquency_amount,
-    cw.total_original_value,
-    cw.total_amount_paid,
-    cw.amount_paid_added,
-    cw.total_open_amount,
+    cw.lead_time_major_type,
+    cw.lead_time_propose,
+        CASE
+            WHEN cw.lead_time_major_type <= 30       THEN '1)001-030'
+            WHEN cw.lead_time_major_type <=60        THEN '2)031-060'
+            WHEN cw.lead_time_major_type <=90        THEN '3)061-090'
+            WHEN cw.lead_time_major_type <=120       THEN '4)091-120'
+            WHEN cw.lead_time_major_type <=150       THEN '5)121-150'
+            WHEN cw.lead_time_major_type <=180       THEN '6)151-180'
+            WHEN cw.lead_time_major_type <=210       THEN '7)181-210'
+            WHEN cw.lead_time_major_type <=240       THEN '8)211-240'
+            WHEN cw.lead_time_major_type <=270       THEN '9)241-270'
+            WHEN cw.lead_time_major_type <=300       THEN '10)271-300'
+            WHEN cw.lead_time_major_type <=330       THEN '11)301-330'
+            WHEN cw.lead_time_major_type <=360       THEN '12)331-360'
+            ELSE '13)>360'
+        END AS major_type_aging_range,
+        CASE
+            WHEN cw.lead_time_propose <= 30       THEN '1)001-030'
+            WHEN cw.lead_time_propose <=60        THEN '2)031-060'
+            WHEN cw.lead_time_propose <=90        THEN '3)061-090'
+            WHEN cw.lead_time_propose <=120       THEN '4)091-120'
+            WHEN cw.lead_time_propose <=150       THEN '5)121-150'
+            WHEN cw.lead_time_propose <=180       THEN '6)151-180'
+            WHEN cw.lead_time_propose <=210       THEN '7)181-210'
+            WHEN cw.lead_time_propose <=240       THEN '8)211-240'
+            WHEN cw.lead_time_propose <=270       THEN '9)241-270'
+            WHEN cw.lead_time_propose <=300       THEN '10)271-300'
+            WHEN cw.lead_time_propose <=330       THEN '11)301-330'
+            WHEN cw.lead_time_propose <=360       THEN '12)331-360'
+            ELSE '13)>360'
+        END AS propose_aging_range,
     cw.is_finished_array,
+    cw.is_active_day_eviction,
+    cw.is_active_month_eviction,
     cw.has_month_eviction,
     cw.dt_ended_propose,
     cw.dt_base,
+    cw.min_dt_base_major_type,
+    cw.min_dt_base_propose,
     cw.dt_paid_array
 FROM
     datalake_velo.collections_wallet AS cw
@@ -102,3 +170,7 @@ LEFT JOIN
             cw.dt_base <= dt.dt_end_interval
             OR dt.dt_end_interval IS NULL
         )
+LEFT JOIN
+    responsible_for_contract AS rc
+        ON cw.id_propose = rc.id_contract
+        AND cw.dt_base = rc.dt_snapshot
