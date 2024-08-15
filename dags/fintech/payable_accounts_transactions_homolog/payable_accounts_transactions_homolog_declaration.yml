@@ -18,6 +18,9 @@ workflow:
     - "1ld0eXsjU9d74TcPhqE8XgsD7xMslRwkV"
     - "['Competência', 'Pagamento', 'Valor Bruto', '# Doc. / NF', 'Fornecedor', 'Cost And Profit Center', 'Revenue and Cost Elements', 'Banco', 'Conta']"
 
+  tables_customization:
+    accounts_payable: {}
+
 cluster:
   type: databricks_13_3_med_general_cluster
   custom_libraries:
