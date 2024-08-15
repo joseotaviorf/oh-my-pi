@@ -4,24 +4,24 @@ dag:
   schedule_start_date: 2019, 1, 1
   schedule_interval: 0 12 * * *
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: The enrich purpose is to concatenate information about DAG's health.
 workflow:
   type: query
   layer: enrich
   inner_dependencies:
     daily_sla_metrics:
-    - dag_historical_executions
+      - dag_historical_executions
     top_reference_sla_days:
-    - daily_sla_metrics
+      - daily_sla_metrics
     dag_execution_metrics:
-    - dag_historical_executions
-    - top_reference_sla_days
+      - dag_historical_executions
+      - top_reference_sla_days
     table_historical_executions:
-    - dag_historical_executions
+      - dag_historical_executions
     table_execution_metrics:
-    - table_historical_executions
-    - top_reference_sla_days
+      - table_historical_executions
+      - top_reference_sla_days
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -30,4 +30,4 @@ cluster:
     autoscale:
       min_workers: 1
       max_workers: 3
-    spark_version: 11.3.x-scala2.12
+    spark_version: 12.2.x-scala2.12
