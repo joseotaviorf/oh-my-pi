@@ -6,7 +6,7 @@ SELECT
     revend AS rev_end,
     introduction,
     number_of_cohabitants,
-    tenant_external_id_mod AS mod_id_tenant_external
+    tenant_external_id_mod AS mod_id_tenant_external,
     introduction_mod AS mod_introduction,
     number_of_cohabitants_mod AS mod_number_of_cohabitants,
     created_at AS ts_created,
