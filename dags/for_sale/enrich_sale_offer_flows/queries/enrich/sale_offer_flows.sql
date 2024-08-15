@@ -458,24 +458,6 @@ monopoly AS (
         last_update_offer_monopoly
     WHERE ROW = 1
 ),
--- RESCISION CTE
-last_update_rescission AS (
-    SELECT
-        *,
-        ROW_NUMBER() OVER (PARTITION BY id_rescission ORDER BY ts_updated DESC) AS ROW
-    FROM
-        datalake_sales_flow_clean.rescission
-),
-rescission AS (
-    SELECT
-        r.id_rescission,
-        r.id_sales_flow,
-        r.comment
-    FROM
-        last_update_rescission AS r
-    WHERE
-        ROW = 1
-),
 -- ONBOARDING CTE
 status_closing_changes AS (
     SELECT
@@ -742,7 +724,7 @@ SELECT
            THEN TRUE
            ELSE FALSE
       END AS has_used_negotiation_chat,
-    COALESCE(sf.closing_canceled_reason, r.comment) AS sale_agreement_cancellation_reason,
+    sf.closing_canceled_reason AS sale_agreement_cancellation_reason,
     off.discard_reason AS drop_reason,
     CASE
         WHEN off.reject_source = 'BUYER' OR off.reject_source IS NULL AND LOWER(off.discard_reason) LIKE '%buyer%'
@@ -923,9 +905,6 @@ LEFT JOIN
 LEFT JOIN
     house AS h
         ON h.id = sf.id_house
-LEFT JOIN
-    rescission AS r
-        ON r.id_sales_flow = off.id_sales_flow
 LEFT JOIN
     onboarding AS o
         ON o.id_sales_flow = off.id_sales_flow

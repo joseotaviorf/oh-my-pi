@@ -100,10 +100,6 @@ tables:
     extraction_type: incremental
   reject_reason_aud:
     extraction_type: incremental
-  rescission:
-    extraction_type: incremental
-  rescission_aud:
-    extraction_type: incremental
   revinfo:
     clean_table_name: rev_info
     extraction_type: incremental
@@ -172,9 +168,5 @@ tables:
   users:
     extraction_type: incremental
   users_aud:
-    extraction_type: incremental
-  visit_lead:
-    extraction_type: incremental
-  visit_lead_aud:
     extraction_type: incremental
 partition_cols: ["year", "month", "day"]

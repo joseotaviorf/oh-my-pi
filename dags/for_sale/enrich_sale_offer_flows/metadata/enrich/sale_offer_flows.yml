@@ -195,7 +195,6 @@ columns:
     description: If the buyer has used the negotiation chat
   sale_agreement_cancellation_reason:
     lineage:
-      - datalake_sales_flow_clean.rescission.comment
       - datalake_sales_flow_clean.sales_flow.closing_canceled_reason
     description: Reason why a sales contract was cancelled.
   drop_reason:
