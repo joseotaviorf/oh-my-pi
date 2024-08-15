@@ -1,0 +1,123 @@
+---
+database_name: datalake_trino
+table_name: query_usage_information
+owner: augusto.torres@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table contains information about queries events on Trino.
+  Each line will have information about the query, bi tool and query purpose, if is a
+  exploratory query or is used in a dashboards.
+columns:
+  id_query:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.id_query
+    description: Trino id generated for the query execution.
+  id_slice_superset:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+    description: If it is a Superset query, the id of the chart associated with this query.
+  id_dash_superset:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+    description: if it is a Superset query, the id of the dashboard associated with this query.
+  id_metabase_card:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+    description: If it is a Metabase query, the id of the chart associated with this query.
+  id_dash_metabase:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+    description: If it is a Metabase query, the id of the dashboard associated with this query.
+  tool:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.id_resource_group
+    description: The tool request the execution of the query
+    categories:
+      Metabase: The user run this query in Metabase.
+      Looker: The user run this query in Looker. (DEPRECATED)
+      Superset: The urser run thie query in Superset.
+      DataHub: Queries executed by DataHub to ingest Trino metadata.
+  query:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+    description: Query code executed.
+  referenced_tables:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
+    description: Tables present in query execution.
+  query_reason:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.id_resource_group
+    description: The use purpose of the query.
+    categories:
+      from dashboard: Query used in a dashboard.
+      from chart: Query used in a chart
+      from filter: Query used to filter data in a dashboards. Superset exclusively.
+      exploratory: Query to exploratory analisis.
+      other: Unforeseen use cases.
+  user:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.id_resource_group
+    description: User to request to run the query.
+  state:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.state
+    description: Query state, if finished, error or another state.
+  has_warnings:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.warnings
+    description: Flag to indicate if exists warning in the query execution.
+  has_row_number:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.query
+    description: Flag to indicate if the number of rows was returned.
+  is_all_dw_metric_tables:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
+    description: Flag to indicate if this query uses only tables from dw and metric layers.
+  nr_dw_metric_tables:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
+    description: Number of dw and metric layers tables referenced.
+  nr_tables:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.referencedTables
+    description: Num of tables referenced.
+  peak_total_memory_reservation_bytes:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.peak_total_memory_reservation_bytes
+    description: Amount of memory reserved to run the query.
+  execution_time:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_time
+    description: The amount of time used to run the query, in seconds.
+  execution_hour:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.hour
+    description: The hour of query executions.
+  dt_extraction:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.year
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.month
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.day
+    description: The date when the data was ingested.
+  ts_execution_started:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_start_time
+    description: The timestamp when the query starts.
+  ts_execution_ended:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_end_time
+    description: The timestamp when the query ends.
+  year:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.year
+    description: The year of the query execution. Also, a partition of the table.
+  month:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.month
+    description: The month of the query execution. Also, a partition of the table.
+  day:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.day
+    description: The day of the query execution. Also, a partition of the table.
