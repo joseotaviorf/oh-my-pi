@@ -20,4 +20,4 @@ workflow:
       raw_primary_keys: [id]
       clean_primary_keys: [id]
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_2xlarge_general_cluster
