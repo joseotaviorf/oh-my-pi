@@ -148,7 +148,6 @@ SELECT
     CAST(IF(`bigdataboost_5andar.result.message`="OK", TRUE, FALSE) AS BOOLEAN) AS is_minor_age_document,
     TRANSFORM(SPLIT(NULLIF(calc_bigdata_message_total, 'NaN'), '#@#'), x -> CAST(IF(x="OK", TRUE, FALSE) AS BOOLEAN) ) AS is_minor_age_document_list,
     TO_TIMESTAMP(REPLACE(instante, '.000', ''), 'yyyy-MM-dd HH:mm:ss') AS ts_operation,
-    TO_TIMESTAMP(REPLACE(calc_mesa_dh_insercao, '.000', ''), 'yyyy-MM-dd HH:mm:ss') AS ts_inserted,
     year,
     month,
     day

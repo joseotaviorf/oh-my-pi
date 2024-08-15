@@ -446,9 +446,6 @@ columns:
   ts_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.instante
-  ts_inserted:
-    lineage:
-      - datalake_velo_neurotech_raw.logs_credit_granting.calc_mesa_dh_insercao
   automatic_reproval_real_state_rs:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_reprovacao_automatica_imobiliaria_rs
