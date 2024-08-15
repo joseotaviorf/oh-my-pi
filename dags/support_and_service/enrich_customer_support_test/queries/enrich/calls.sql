@@ -195,7 +195,10 @@ SELECT
   c.ts_task_created,
   c.ts_reservation_created,
   c.ts_reservation_accepted,
-  c.ts_reservation_ended
+  c.ts_reservation_ended,
+  YEAR(ts_task_created) AS year,
+  MONTH(ts_task_created) AS month,
+  DAY(ts_task_created) AS day
 FROM
   calls AS c
 LEFT JOIN

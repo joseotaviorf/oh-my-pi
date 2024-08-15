@@ -1,0 +1,30 @@
+database_name: datalake_customer_support_test
+table_name: ivr_interactions
+description: Table with all IVR interactions
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_task:
+    lineage:
+      - datalake_bigfone_clean.event.id_task
+    description: Task ID from Twilio
+  id_call:
+    lineage:
+      - datalake_bigfone_clean.event.id_call
+    description: Call ID from Twilio
+  from_phone_number:
+    lineage:
+      - datalake_bigfone_clean.event.from_phone_number
+    description: Phone number the call originated from
+  to_phone_number:
+    lineage:
+      - datalake_bigfone_clean.event.to_phone_number
+    description: Phone number the call was made to
+  ivr_steps:
+    lineage:
+      - datalake_bigfone_clean.event.ivr_steps
+    description: IVR steps, like key presses
+  ts_created:
+    lineage:
+      - datalake_bigfone_clean.event.ts_created
+    description: Timestamp of when the reservation was created

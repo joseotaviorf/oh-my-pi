@@ -10,8 +10,12 @@ workflow:
     type: query_delta
     layer: enrich
     default_extraction_type: incremental
+    default_partitions: [year, month, day]
     tables_customization:
         calls:
+            z_order_by: ["id_task"]
+            merge_on: ["id_task"]
+        ivr_interactions:
             z_order_by: ["id_task"]
             merge_on: ["id_task"]
 
