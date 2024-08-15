@@ -99,7 +99,7 @@ steps:
       branch: [forno, master, hotfix/*]
 
   upload-bi-etl-ejuice-modules-gcs-forno:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync:forno-latest
     settings:
       bucket: us-east4-airflow-forno2-7f52154d-bucket
       source: bietlejuice/
@@ -129,7 +129,7 @@ steps:
       branch: [master, hotfix/*]
 
   upload-dag-packages-dags-gcs-forno:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync:forno-latest
     settings:
       bucket: us-east4-airflow-forno2-7f52154d-bucket
       source: dags/
