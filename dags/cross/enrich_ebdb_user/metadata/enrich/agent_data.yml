@@ -38,3 +38,11 @@ columns:
     description: Flag to indicate if the agent operates in For Sale business context.
   is_rent_agent:
     description: Flag to indicate if the agent operates in For Rent business context.
+  ts_created:
+    description: Timestamp of when the agent was created
+    lineage:
+      - datalake_ebdb_clean.agent_data.ts_created
+  ts_updated:
+    description: Timestamp of when the agent was updated
+    lineage:
+      - datalake_ebdb_clean.agent_data.ts_updated

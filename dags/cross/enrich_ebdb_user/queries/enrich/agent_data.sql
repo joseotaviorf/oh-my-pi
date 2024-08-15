@@ -9,7 +9,9 @@ SELECT
     max(u.is_photographer) AS is_photographer,
     max(coalesce(adbc.business_context = 'SALE', false)) AS is_sale_agent,
     -- non existent agents on businessContextsServed table are assumed as RENT
-    max(coalesce(adbc.business_context, 'RENT') = 'RENT') AS is_rent_agent
+    max(coalesce(adbc.business_context, 'RENT') = 'RENT') AS is_rent_agent,
+    ad.ts_created,
+    ad.ts_updated
 FROM
     datalake_ebdb_clean.agent_data AS ad
 LEFT JOIN
@@ -18,4 +20,4 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_user.user u
         ON u.id_agent = ad.id
-GROUP BY 1, 2, 3, 4, 5, 6
+GROUP BY 1, 2, 3, 4, 5, 6, 11, 12
