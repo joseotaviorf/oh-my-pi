@@ -6,6 +6,7 @@ dag:
     dag_purpose: |
       This DAG unifies various sources of satisfaction survey data, so that it is possible to stack
       and enrich these sources in a single view for the Support and Service line.
+
 workflow:
   type: query_delta
   layer: enrich
@@ -20,7 +21,15 @@ workflow:
       - zendesk_surveys
     tables_customization:
       satisfaction_answers:
-        z_order_by: [id_ticket, id_contract, id_survey, id_answer, id_respondent, id_origin]
+        z_order_by:
+          [
+            id_ticket,
+            id_contract,
+            id_survey,
+            id_answer,
+            id_respondent,
+            id_origin,
+          ]
       bigfone_surveys:
         z_order_by: [id_ticket, id_answer, id_contract, id_user]
       chat_fup_surveys:
@@ -28,12 +37,18 @@ workflow:
       gsheets_surveys:
         z_order_by: [id_answer, id_contract, id_survey]
       survicate_surveys:
-        z_order_by: [id_ticket, id_contract, id_survey, id_answer, id_respondent, id_origin]
+        z_order_by:
+          [
+            id_ticket,
+            id_contract,
+            id_survey,
+            id_answer,
+            id_respondent,
+            id_origin,
+          ]
       zendesk_surveys:
         z_order_by: [id_ticket, id_answer, id_contract, id_respondent]
-    extra_query_template_params:
-      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+
 cluster:
   type: custom_cluster
   custom_configurations:

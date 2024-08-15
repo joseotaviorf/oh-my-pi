@@ -8,14 +8,12 @@ dag:
             not considering warn and notice messages, extracting specific information
             such as endpoint, and status code. It can be used for various purposes in the
             context of the system or application it is designed for.
+
 workflow:
     type: query_delta
     layer: enrich
     default_extraction_type: incremental
     default_partitions: ["year", "month", "day", "hour"]
-    extra_query_template_params:
-        load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-        load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 
 cluster:
     type: custom_cluster

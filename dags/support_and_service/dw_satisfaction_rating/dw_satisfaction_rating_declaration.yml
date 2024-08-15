@@ -5,15 +5,13 @@ dag:
   documentation:
     dag_purpose: |
       This data modeling refers to satisfaction data with the services provided by the QuintoAndar group.
+
 workflow:
   type: query_delta
   layer: dw
   custom_schema: satisfaction_rating
   default_extraction_type: incremental
   default_partitions: [year, month, day]
-  has_load_to_redshift_task: False
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+
 cluster:
   type: databricks_12_2_med_io-memory_photon_cluster

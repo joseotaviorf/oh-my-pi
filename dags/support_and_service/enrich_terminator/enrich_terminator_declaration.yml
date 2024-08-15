@@ -2,9 +2,10 @@ dag:
     name: enrich_terminator
     schedule_start_date: 2024, 5, 17
     owner: Data SS
-    documentation: 
+    documentation:
         dag_purpose: |
-          Dag with the aim of processing data from the termination database.
+            Dag with the aim of processing data from the termination database.
+
 workflow:
     type: query_delta
     layer: enrich
@@ -12,9 +13,7 @@ workflow:
     default_partitions: [year, month, day]
     tables_customization:
         termination:
-            merge_on: ['id_termination']
-    extra_query_template_params:
-        load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-        load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+            merge_on: ["id_termination"]
+
 cluster:
     type: databricks_12_2_med_compute_cluster

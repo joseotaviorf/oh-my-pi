@@ -32,9 +32,6 @@ workflow:
     pendency:
       date_filter_column: created_at
       partitions: [year, month, day]
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 
 cluster:
   type: custom_cluster

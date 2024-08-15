@@ -4,8 +4,9 @@ dag:
   schedule_interval: 30 0 * * *
   owner: Data SS
   documentation:
-    dag_purpose: This DAG imports the tables from [Terminator](https://github.com/quintoandar/terminator),
-        our service to orchestrate the offboard contract process.
+    dag_purpose:
+      This DAG imports the tables from [Terminator](https://github.com/quintoandar/terminator),
+      our service to orchestrate the offboard contract process.
 
 workflow:
   type: database_pull_delta
@@ -77,9 +78,6 @@ workflow:
       extraction_type: incremental
       date_filter_column: updated_at
       partitions: [year, month, day]
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 
 cluster:
   type: databricks_12_2_med_general_photon_cluster
