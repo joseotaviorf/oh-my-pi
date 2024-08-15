@@ -5,9 +5,9 @@ WITH ivr AS (
         from_phone_number,
         to_phone_number,
         STR_TO_MAP(
-        REGEXP_REPLACE(REPLACE(ivr_steps, '"', ''), '^\\{|\\}\\}$', ""),
-            '\\},',
-            ':\\{'
+        REGEXP_REPLACE(REPLACE(ivr_steps, '"', ''), '^\\{{|\\}}\\}}$', ""),
+            '\\}},',
+            ':\\{{'
         ) AS ivr_steps_map,
         MIN(ts_created) OVER(PARTITION BY id_task) AS ts_ivr_started
     FROM
