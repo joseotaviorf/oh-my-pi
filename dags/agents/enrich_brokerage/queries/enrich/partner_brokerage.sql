@@ -22,7 +22,7 @@ SELECT
     noa.agent_role,
     pbf.partner_brokerage_fee,
     pbf.json_output,
-    pbf.ts_invalidated IS NULL AS is_share_invalidated,
+    pbf.ts_invalidated IS NOT NULL AS is_share_invalidated,
     no.dt_cancellation,
     pbf.ts_invalidated,
     no.ts_created,

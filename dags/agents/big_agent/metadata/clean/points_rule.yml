@@ -1,0 +1,101 @@
+---
+database_name: datalake_big_agent_clean
+table_name: points_rule
+description: 
+  This table contains data on the agent's performance requirements for each operation, enabling the calculation of cumulative points.
+  These cumulative points from operations can be used to check which compensation range the agent fits into, in the share_rule table.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.points_rule.id
+    description: Points rule unique identification.
+  id_external_condition:
+    lineage:
+      - datalake_big_agent_raw.points_rule.external_condition_id
+    description:
+      External condition unique identification.
+      An external condition refers to the condition in which this rule applies, 
+      which can be at the level of a business unit (HUB), city regions, state, etc.
+  external_condition_type:
+    lineage:
+      - datalake_big_agent_raw.points_rule.external_condition_type
+    description:
+      An external condition refers to the condition in which this rule applies, 
+      which can be at the level of a business unit (HUB), city regions, state, etc.
+  program_code:
+    lineage:
+      - datalake_big_agent_raw.points_rule.program_code
+    description:
+      Refers to which program this rule is associated with, for example, 
+      it could be a rule associated with brokers or negociation executors.
+  operation:
+    lineage:
+      - datalake_big_agent_raw.points_rule.operation
+    description:
+      The rule's operation indicates the context in which it will be applied, for example, 
+      for remuneration of For Sale brokers, we consider operations such as CCV (purchase and sale 
+      contract), first listing, CCV made with TQC, CCV with property captured by CIQ, etc.
+    categories:
+      CCV: Purchase and sale contract.
+      CCV_TQC: Purchase and sale agreement, where the buyer was indicated (TQC) by an agent.
+      FIRST_LISTING: First publication of the house captured by CIQ.
+  trigger:
+    lineage:
+      - datalake_big_agent_raw.points_rule.trigger
+    description:
+      Each scoring rule will have a trigger, that is, a value that must be reached to obtain the score. 
+      For example, for the CCV_TQC operation we need a trigger of 1 CCV to accumulate 2 points; 
+      if the agent has 5 CCVs, it will then have a proportional score of 10 points.
+      The accumulated points can have a maximum value, defined in the max_points column.
+  points:
+    lineage:
+      - datalake_big_agent_raw.points_rule.points
+    description: 
+      Each scoring rule will have a trigger, which will result in a corresponding score. 
+      This column shows the score value (points).
+  max_points:
+    lineage:
+      - datalake_big_agent_raw.points_rule.max_points
+    description: Value that defines the maximum value for accumulated points.
+  status:
+    lineage:
+      - datalake_big_agent_raw.points_rule.status
+    description: Indicates the rule is still valid.
+  dt_start:
+    lineage:
+      - datalake_big_agent_raw.points_rule.start_at
+    description:
+      If the rule is valid, it indicates the start of the period 
+      in which the rule applies to the program.
+  dt_end:
+    lineage:
+      - datalake_big_agent_raw.points_rule.end_at
+    description:
+      If the rule is valid, it indicates the end of the period 
+      in which the rule applies to the program.
+  ts_invalidated:
+    lineage:
+      - datalake_big_agent_raw.points_rule.invalidated_at
+    description: Indicates when the status has changed and the rule has become invalid.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.points_rule.created_at
+    description: Date and time when the rule was created.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.points_rule.updated_at
+    description: Date and time when the rule was updated.
+  year:
+    lineage:
+      - datalake_big_agent_raw.points_rule.year
+    description: Year the rule was updated.
+  month:
+    lineage:
+      - datalake_big_agent_raw.points_rule.month
+    description: Month the rule was updated.
+  day:
+    lineage:
+      - datalake_big_agent_raw.points_rule.day
+    description: Day the rule was updated.

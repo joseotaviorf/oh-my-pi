@@ -25,9 +25,13 @@ workflow:
       date_filter_column: updated_at
     installment:
       date_filter_column: updated_at
+    points_rule:
+      date_filter_column: updated_at
     program_aud:
       date_filter_column: updated_at
     program:
+      date_filter_column: updated_at
+    share_rule:
       date_filter_column: updated_at
     user_revision_entity:
       date_filter_column: timestamp
