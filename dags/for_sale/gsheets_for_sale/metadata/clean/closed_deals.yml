@@ -1,0 +1,72 @@
+---
+database_name: datalake_gsheets_clean
+table_name: closed_deals
+owner: gustavo.alencar@quintoandar.com.br
+domain: For Sale
+description: Transformed table created from a Google Sheets file in order to input closed deals info.
+columns:
+  contract_group: 
+    description: Shows the contract stage up to which QuintoAndar supports the clients (owner and buyer).
+    lineage:
+      - datalake_gsheets_raw.closed_deals.contract_group
+  id_house:
+    description: ID of the sale listing.
+    lineage:
+      - datalake_gsheets_raw.closed_deals.id_house
+  sk_offer:
+    description: ID of the sale offer.
+    lineage:
+      - datalake_gsheets_raw.closed_deals.sk_offer
+  closed_deal_value:
+    description: Value of the closed deal in brazilian Reais (R$).
+    lineage:
+      - datalake_gsheets_raw.closed_deals.closed_deal_value
+  brokerage_fee:
+    description: Brokerage fee.
+    lineage:
+      - datalake_gsheets_raw.closed_deals.brokerage_fee
+  brokerage_value:
+    description: Brokerage value (closed deal value * brokerage fee) in brazilian Reais (R$).
+    lineage:
+      - datalake_gsheets_raw.closed_deals.brokerage_value
+  quintoandar_value:
+    description: Amount of the brokerage value that goes to QuintoAndar, in brazilian Reais (R$).
+    lineage:
+      - datalake_gsheets_raw.closed_deals.quintoandar_value
+  agent_value:
+    description: Amount of the brokerage value that goes to the sale agent, in brazilian Reais (R$).
+    lineage:
+      - datalake_gsheets_raw.closed_deals.agent_value
+  loc:
+    description: City group code (as found on SAP).
+    lineage:
+      - datalake_gsheets_raw.closed_deals.loc
+  business_context:
+    description: Sale listing business context (1P, 3P Supply or 3P Demand).
+    lineage:
+      - datalake_gsheets_raw.closed_deals.business_context
+  contract_type:
+    description: Type of contract.
+    lineage:
+      - datalake_gsheets_raw.closed_deals.contract_type
+  city_group:
+    description: City group.
+    lineage:
+      - datalake_gsheets_raw.closed_deals.city_group
+  is_high_ticket:
+    description: Column that shows if the closed deal is considered Hight Ticket (closed deal value above R$ 1.000.000,00). 
+    lineage:
+      - datalake_gsheets_raw.closed_deals.is_high_ticket
+  dt_sale_agreement_signed:
+    description: Date of the sale agreement signature.
+    lineage:
+      - datalake_gsheets_raw.closed_deals.sale_agreement_signed_date
+  dt_closed_deal:
+    description: Date of the closed deal.
+    lineage:
+      - datalake_gsheets_raw.closed_deals.closed_deal_date
+  dt_month_started:
+    description: Reference date (date of the revenue calculation).
+    lineage:
+      - datalake_gsheets_raw.closed_deals.month
+

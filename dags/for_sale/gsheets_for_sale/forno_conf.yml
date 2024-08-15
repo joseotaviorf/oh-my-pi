@@ -228,3 +228,9 @@ sheets_info:
     sheet_name: TreatedFormToBeImported
     clean_table_name: vespucio_condo_golden_set
     sheet_context: for_sale
+
+  closed_deals:
+    sheet_id: 1YhbotyW96JNkVBTnHxyARecgs-KDMe2d5KpOAo-B-t4
+    sheet_name: base_historica_5a
+    clean_table_name: closed_deals
+    sheet_context: for_sale
