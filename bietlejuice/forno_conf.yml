@@ -137,8 +137,7 @@ dags_out_of_pattern:
         "quintoml.search.maestro.inference",
         "wonka.group_house_rent_flow_house_relisting",
         "wonka.h3_geolocation_publication_to_contract_signed",
-        "wonka.house_rent_flow",
-        "wonka.house_rent_listing_page_viewed",
+        "wonka.group_house_rent_listing_favorite_set_house_rent_listing_page_viewed",
         "wonka.house_rent_search_page_viewed",
         "wonka.house_visit_availability",
     ]

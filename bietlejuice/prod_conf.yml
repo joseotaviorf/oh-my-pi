@@ -138,11 +138,12 @@ dags_out_of_pattern:
         "quintoml.search.maestro.inference",
         "wonka.group_house_rent_flow_house_relisting",
         "wonka.h3_geolocation_publication_to_contract_signed",
-        "wonka.house_rent_flow",
-        "wonka.house_rent_listing_page_viewed",
+        "wonka.group_house_rent_listing_favorite_set_house_rent_listing_page_viewed",
         "wonka.house_rent_search_page_viewed",
-        "wonka.house_visit_availability",git
+        "wonka.house_visit_availability",
     ]
+
+
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks
 dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
