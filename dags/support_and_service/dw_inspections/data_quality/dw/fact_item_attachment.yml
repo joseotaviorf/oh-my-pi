@@ -1,5 +1,5 @@
 ---
-table_name: dw_inspections_staging.fact_item_attachment
+table_name: dw_inspections.fact_item_attachment
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   sk_item_attachment:

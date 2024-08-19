@@ -1,5 +1,5 @@
 ---
-table_name: dw_satisfaction_rating_staging.fact_answer
+table_name: dw_satisfaction_rating.fact_answer
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   sk_answer:
