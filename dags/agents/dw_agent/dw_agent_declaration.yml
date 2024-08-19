@@ -1,6 +1,8 @@
 dag:
   name: dw_agent
   owner: Data Agents
+  documentation:
+      dag_purpose: This DAG creates tables that summarize the agent context models.
 workflow:
   type: query_delta
   layer: dw
