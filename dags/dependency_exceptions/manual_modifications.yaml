@@ -885,6 +885,9 @@ bietlejuice.reverse_webhelp_access:
     - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
     - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
     - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
+bietlejuice.enrich_wordpress_baroes:
+  remove:
+    - bietlejuice.wordpress_baroes:load-clean-meulugar-data
 bietlejuice.enrich_velo_omie:
   override: []
 

@@ -3033,7 +3033,6 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-round
 bietlejuice.enrich_wordpress_baroes:
   - bietlejuice.wordpress_baroes:load-clean-conteudos-data
-  - bietlejuice.wordpress_baroes:load-clean-meulugar-data
 bietlejuice.enrich_zendesk:
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
