@@ -1,5 +1,5 @@
 SELECT
-    id_airtable_record,
+    id AS id_airtable_record,
     CAST(bd_indicante_id_admin AS BIGINT) AS id_admin_recommender,
     CAST(id_indicacao AS BIGINT) AS id_indication,
     CAST(ticket_inscricao AS BIGINT) AS id_registration_ticket,
@@ -42,6 +42,7 @@ SELECT
     DATE(REPLACE(REPLACE(REPLACE(bd_indicado_pos_indicacao_atualizacao_entrevista, "]"), "["), "'")) AS dt_indicated_after_indication_interview_updated,
     TIMESTAMP(REPLACE(REPLACE(REPLACE(bd_indicado_pos_indicacao_puxar_entrevista, "]"), "["), "'")) AS ts_indicated_after_indication_interview_scheduled,
     TIMESTAMP(data_da_indicacao) AS ts_recommendation,
+    TIMESTAMP(createdTime) AS ts_airtable_record_extracted,
     MAKE_DATE(year, month, day) AS dt_load,
     year,
     month,

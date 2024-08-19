@@ -1,6 +1,6 @@
 SELECT
     CAST(id_do_corretor AS BIGINT) AS id_agent,
-    id_airtable_record,
+    id AS id_airtable_record,
     CAST(ql_id_do_agente AS BIGINT) AS id_ql_agent,
     issue_key AS id_issue,
     ativos AS activated,
@@ -23,6 +23,7 @@ SELECT
     TO_DATE(ql_data_final, 'yyyy-MM-dd') AS dt_end,
     TO_TIMESTAMP(created) AS ts_created,
     TO_TIMESTAMP(last_modified) AS ts_updated,
+    TIMESTAMP(createdTime) AS ts_airtable_record_extracted,
     year,
     month,
     day

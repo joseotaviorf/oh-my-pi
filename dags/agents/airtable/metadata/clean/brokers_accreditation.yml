@@ -9,7 +9,7 @@ owner: data-ae-agents@quintoandar.com.br
 columns:
   id_airtable_record:
     lineage:
-      - datalake_airtable_raw.brokers_accreditation.id_airtable_record
+      - datalake_airtable_raw.brokers_accreditation.id
     description: Unique record identifier in Airtable view.
   id_inscription:
     lineage:
@@ -187,10 +187,6 @@ columns:
     lineage:
       - datalake_airtable_raw.brokers_accreditation.data_de_vinculo_teams
     description: Stage of the Qualification Process (Date).
-  dt_broker_space_registered:
-    lineage:
-      - datalake_airtable_raw.brokers_accreditation.data_cadastro_espaco_corretor
-    description: Stage of the Qualification Process (Date).
   dt_onboarding_sent:
     lineage:
       - datalake_airtable_raw.brokers_accreditation.data_envio_de_onboarding
@@ -219,6 +215,12 @@ columns:
     lineage:
       - datalake_airtable_raw.brokers_accreditation.puxar_para_entrevista
     description: Job Lead Flag (Datetime).
+  ts_airtable_record_extracted:
+    lineage:
+    - datalake_airtable_raw.brokers_accreditation.createdTime
+    description: 
+      Date when the record was pulled by the Airtable API. 
+      This date refers to when the record was created or updated in the tool.
   dt_load:
     lineage:
       - datalake_airtable_raw.brokers_accreditation.dt_load

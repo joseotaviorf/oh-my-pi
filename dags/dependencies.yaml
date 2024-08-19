@@ -1031,12 +1031,8 @@ bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.gsheets_growth:done-clean-affiliates-manual-cost-engagement-history
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
-  - bietlejuice.airtable:load-clean-activations
   - bietlejuice.airtable:load-clean-cr-occurrences
   - bietlejuice.airtable:load-clean-jira-tickets
-  - bietlejuice.airtable:load-clean-leads
-  - bietlejuice.airtable:load-clean-wallet
-  - bietlejuice.airtable:load-clean-wallet-history
 bietlejuice.enrich_amplitude_inspections:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.inspections:load-clean-inspection-aud

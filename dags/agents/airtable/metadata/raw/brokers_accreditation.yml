@@ -1,5 +1,5 @@
 ---
-database_name: datalake_airtable_clean
+database_name: datalake_airtable_raw
 table_name: brokers_accreditation
 columns:
   cpf:

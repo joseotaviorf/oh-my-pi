@@ -1,8 +1,8 @@
 database_name: datalake_airtable_clean
 table_name: jira_tickets
 description: This table contains information about cr_occurences.
-domain: For Rent
-owner: guilherme.cunha@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:
     lineage:
@@ -10,7 +10,7 @@ columns:
     description: Agent's identifier.
   id_airtable_record:
     lineage:
-    - datalake_airtable_raw.jira_tickets.id_airtable_record
+    - datalake_airtable_raw.jira_tickets.id
     description: Airtable identifier. It doesn't have any correspondence with our
       internals identifiers.
   id_ql_agent:
@@ -102,6 +102,12 @@ columns:
     lineage:
     - datalake_airtable_raw.jira_tickets.last_modified
     description: When the record was updated.
+  ts_airtable_record_extracted:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.createdTime
+    description: 
+      Date when the record was pulled by the Airtable API. 
+      This date refers to when the record was created or updated in the tool.
   year:
     lineage:
     - datalake_airtable_raw.jira_tickets.year

@@ -1,5 +1,5 @@
 SELECT    
-    id_airtable_record,
+    id AS id_airtable_record,
     historico_v2 AS ids_history,
     CAST(id_user AS BIGINT) AS id_user,
     CAST(credenciamentos AS INT) AS accreditations,
@@ -28,6 +28,7 @@ SELECT
     TO_DATE(last_supension_return_date, 'yyyy-MM-dd') AS dt_last_suspension_returned,
     TO_DATE(accreditation_week, 'yyyy-MM-dd') AS dt_week_accreditated,
     TO_TIMESTAMP(last_modified) AS ts_updated,
+    TIMESTAMP(createdTime) AS ts_airtable_record_extracted,
     year,
     month,
     day
