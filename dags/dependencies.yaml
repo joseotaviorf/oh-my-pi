@@ -3529,7 +3529,7 @@ quintoml.search.maestro.inference:
   - wonka.house_rent_search_page_viewed:load-house_rent_search_page_viewed
   - wonka.house_visit_availability:load-house_visit_availability
 wonka.house_demand_balancer_predictions:
-  - quintoml.search.maestro.inference:batch-predict
+  - bietlejuice.demand_balancer_service:load-clean-demand-balancer
 wonka.house_embeddings_main:
   - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
 wonka.house_listing_business_context:

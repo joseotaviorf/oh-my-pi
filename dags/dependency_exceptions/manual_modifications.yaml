@@ -964,7 +964,7 @@ bietlejuice.enrich_product_tech:
 
 wonka.house_demand_balancer_predictions:
   add:
-   - quintoml.search.maestro.inference:batch-predict
+   - bietlejuice.demand_balancer_service:load-clean-demand-balancer
 
 quintoml.search.maestro.inference:
   add:
