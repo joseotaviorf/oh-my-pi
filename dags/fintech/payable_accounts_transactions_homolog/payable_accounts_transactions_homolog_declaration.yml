@@ -22,7 +22,13 @@ workflow:
     accounts_payable: {}
 
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+
   custom_libraries:
     - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.3.0-py2.py3-none-any.whl"
     - pypi:
