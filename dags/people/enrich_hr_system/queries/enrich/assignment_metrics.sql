@@ -438,8 +438,8 @@ SELECT
     ) IS NULL
       THEN '-1'
     ELSE COALESCE(
-      mp.id_manager_assignment,
-      mf.id_manager_assignment,
+      ap_manager.id_period_of_service,
+      af_manager.id_period_of_service,
       '-1'
     )
   END AS sk_manager_assignment,
