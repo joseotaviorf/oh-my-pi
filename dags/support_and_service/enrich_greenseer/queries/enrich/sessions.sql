@@ -160,17 +160,23 @@ sessions_and_tickets AS (
 sessions_with_recontact AS (
   SELECT DISTINCT
     gs.id_session,
-    IF(response_key = COALESCE(LAG(response_key, 1) OVER(PARTITION BY id_user ORDER BY ts_started),response_key), True, False) AS has_same_previous_theme,
     CASE
-        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started), ts_started)))/(3600)) <= 12 THEN '<12h'
-        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started), ts_started)))/(3600)) > 12
-          AND ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started), ts_started)))/(3600)) <= 96 THEN '12-96h'
-        WHEN ((TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started), ts_started)))/(3600)) > 96 THEN '>96h'
+      WHEN gs.response_key = LAG(gs.response_key, 1) OVER(PARTITION BY gs.id_user ORDER BY ts_started) THEN True
+      else False
+    END AS has_same_previous_theme,
+    CASE
+        WHEN ((TO_UNIX_TIMESTAMP(gs.ts_started) - TO_UNIX_TIMESTAMP(LAG(gs.ts_started) OVER (PARTITION BY gs.id_user ORDER BY gs.ts_started)))/(3600)) <= 12 THEN '<12h'
+        WHEN ((TO_UNIX_TIMESTAMP(gs.ts_started) - TO_UNIX_TIMESTAMP(LAG(gs.ts_started) OVER (PARTITION BY gs.id_user ORDER BY gs.ts_started)))/(3600)) > 12
+          AND ((TO_UNIX_TIMESTAMP(gs.ts_started) - TO_UNIX_TIMESTAMP(LAG(gs.ts_started) OVER (PARTITION BY gs.id_user ORDER BY gs.ts_started)))/(3600)) <= 96 THEN '12-96h'
+        WHEN ((TO_UNIX_TIMESTAMP(gs.ts_started) - TO_UNIX_TIMESTAMP(LAG(gs.ts_started) OVER (PARTITION BY gs.id_user ORDER BY gs.ts_started)))/(3600)) > 96 THEN '>96h'
         ELSE 'NR'
     END AS recontact_time
   FROM greenseer_sessions AS gs
+    LEFT JOIN datalake_journey_flow_clean.journey_flow j
+      ON gs.id_session = j.id_correlation
+      AND j.journey_name is null
 )
-SELECT
+SELECT DISTINCT
   gs.id_session,
   st.id_ticket,
   gs.id_user,
@@ -195,7 +201,7 @@ SELECT
   gr.is_retention,
   IF(
     sr.has_same_previous_theme = True
-    AND sr.recontact_time in ('12-96h')
+    AND sr.recontact_time IN ('12-96h')
     AND gr.is_retention = True, True, False
   ) AS is_recontact,
   sr.has_same_previous_theme,

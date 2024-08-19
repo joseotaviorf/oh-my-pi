@@ -40,9 +40,9 @@ WITH surveys_fup AS (
     id_user,
     channel,
     ts_started,
-    COALESCE(LAG(channel) OVER (PARTITION BY id_user ORDER BY ts_started), channel) AS previews_channel,
-    COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started),ts_started) AS previews_contact_date,
-    (TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(COALESCE(LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started),ts_started))) / 3600 AS hours_to_next_session
+    LAG(channel) OVER (PARTITION BY id_user ORDER BY ts_started) AS previews_channel,
+    LAG(ts_started) OVER (PARTITION BY id_user ORDER BY ts_started) AS previews_contact_date,
+    (TO_UNIX_TIMESTAMP(ts_started) - TO_UNIX_TIMESTAMP(LAG(ts_started, 1) OVER(PARTITION BY id_user ORDER BY ts_started ASC)))/(3600) hours_to_next_session
   FROM
     base_churn
 )
@@ -53,7 +53,7 @@ WITH surveys_fup AS (
     previews_contact_date,
     CASE
       WHEN channel = 'call' AND previews_channel = 'chat' AND hours_to_next_session <= 96 THEN True
-      ELSE False
+      WHEN channel = 'chat' AND previews_channel = 'chat' AND hours_to_next_session <= 96 THEN False
     END AS is_churn_chat
   FROM
     assistances
@@ -143,6 +143,23 @@ SELECT
   CASE
     WHEN gs.current_state LIKE '%CSAT%' THEN True ELSE False
   END AS has_questionnaire_sent,
+  CASE
+      WHEN
+        CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_hsm') <> True
+        AND CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_partners') <> True
+        OR CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_hsm') IS NULL
+        AND CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_partners') <> True
+        OR CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_hsm') <> True
+        AND CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_partners') IS NULL
+        OR CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_hsm') IS NULL
+        AND CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_partners') IS NULL
+      THEN False
+      WHEN
+        CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_hsm') = True
+        OR CONTAINS(GET_JSON_OBJECT(memory,'$.business_rules.tags.added'),'bot_bypass_triage_partners') = True
+      THEN True
+    ELSE NULL
+  END AS has_valid_hsm_bypass,
   SIZE(
     FROM_JSON(
       GET_JSON_OBJECT(memory, '$.business_rules.context_detection_attempts'),

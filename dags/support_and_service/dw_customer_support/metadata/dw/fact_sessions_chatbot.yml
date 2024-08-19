@@ -161,6 +161,10 @@ columns:
     lineage:
       - datalake_greenseer.sessions.has_same_previous_theme
     description: Boolean value that indicates whether the session has the same previous theme.
+  has_valid_hsm_bypass:
+    lineage:
+      - datalake_greenseer.sessions.memory
+    description: Boolean value that indicates whether the session has a valid HSM bypass.
   year:
     description: Partition year.
   month:

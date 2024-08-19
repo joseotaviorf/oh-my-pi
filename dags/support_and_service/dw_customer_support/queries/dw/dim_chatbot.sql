@@ -12,9 +12,42 @@ SELECT
   GET_JSON_OBJECT(memory, '$.basic.flags') AS flags,
   current_state,
   CASE
-    WHEN GET_JSON_OBJECT(memory, '$.experiments.experiment_taxonomies') IS NULL THEN 'before_reception' --BEFORE_RECEPTION
-    WHEN COALESCE(GET_JSON_OBJECT(memory, '$.experiments.experiment_taxonomies'), '') = 'control' THEN 'V3' --V3
-    WHEN COALESCE(GET_JSON_OBJECT(memory, '$.experiments.experiment_taxonomies'), '') = 'variant_observed' THEN 'V4' --V4
+    WHEN
+      GET_JSON_OBJECT(memory, '$.predictions.tags_v4.theme') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v4.theme') <> 'null'
+      OR GET_JSON_OBJECT(memory, '$.predictions.tags_v4.theme_detail') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v4.theme_detail') <> 'null'
+      OR GET_JSON_OBJECT(memory, '$.predictions.tags_v4.customer_type') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v4.customer_type') <> 'null'
+      OR GET_JSON_OBJECT(memory, '$.predictions.jon_snow') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.jon_snow') <> 'null'
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v3') IS NULL
+      OR GET_JSON_OBJECT(memory, '$.predictions.jon_snow') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.jon_snow') <> 'null'
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v3') = 'null'
+    THEN 'V4'
+    WHEN
+      GET_JSON_OBJECT(memory, '$.predictions.tags_v3') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v3') <> 'null'
+      AND id_pipeline <> 'smarthelp_main'
+      AND GET_JSON_OBJECT(memory, '$.predictions.intents.before_reception.intent') IS NULL
+      OR GET_JSON_OBJECT(memory, '$.predictions.tags_v3') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v3') <> 'null'
+      AND id_pipeline <> 'smarthelp_main'
+      AND GET_JSON_OBJECT(memory, '$.predictions.intents.before_reception.intent') = 'null'
+      OR GET_JSON_OBJECT(memory, '$.predictions.tags_v3') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v3') <> 'null'
+      AND id_pipeline <> 'smarthelp_main'
+      AND GET_JSON_OBJECT(memory, '$.predictions.intents.before_reception.intent') = 'fallback'
+    THEN 'V3'
+    WHEN
+      GET_JSON_OBJECT(memory, '$.predictions.intents.before_reception.intent') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.intents.before_reception.intent') <> 'fallback'
+      OR GET_JSON_OBJECT(memory, '$.predictions.tags_v3') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v3') <> 'null'
+      AND id_pipeline = 'smarthelp_main'
+    THEN 'before_reception'
+    ELSE 'before_reception'
   END AS session_type,
   GET_JSON_OBJECT(memory, '$.business_rules.menu_taxonomies.selected_taxonomy') AS taxonomy,
   GET_JSON_OBJECT(memory, '$.predictions.tags_v4.theme') AS theme,
@@ -36,3 +69,4 @@ WHERE
   MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
+

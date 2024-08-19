@@ -1,4 +1,4 @@
-table_name: dw_customer_support_staging.dim_chatbot
+table_name: dw_customer_support.dim_chatbot
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
@@ -18,6 +18,12 @@ column_level_validations:
       severity_level: Error
   session_type:
     is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - 'V4'
+        - 'V3'
+        - 'before_reception'
       severity_level: Error
   channel:
     is_contained_in:

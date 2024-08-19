@@ -1,4 +1,4 @@
-table_name: dw_customer_support_staging.fact_sessions_chatbot
+table_name: dw_customer_support.fact_sessions_chatbot
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
