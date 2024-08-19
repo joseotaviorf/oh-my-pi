@@ -607,7 +607,7 @@ SELECT
   country_code,
   rental_administrator,
   CASE 
-    WHEN sk_early_credit_analysis IS NOT NULL 
+    WHEN sk_early_credit_analysis <> -1 
     THEN 1 ELSE 0 
   END AS ec_flag,
   CASE 
