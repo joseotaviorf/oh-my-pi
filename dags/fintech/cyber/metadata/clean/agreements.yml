@@ -149,10 +149,6 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.agrhdr.AHMIGRACAO
-  AHSERVENVQB:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHSERVENVQB
   AHQBENVIADA:
     description: ""
     lineage:

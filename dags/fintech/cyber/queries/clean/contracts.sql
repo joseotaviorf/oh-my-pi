@@ -13,7 +13,7 @@ SELECT
     U1SSNUM AS id_client,
     U1CODCONT AS id_contract_external,
     U1CODIMO AS id_contract_property,
-    U1IDFMAN AS id_oldest_negative_invoice
+    U1IDFMAN AS id_oldest_negative_invoice,
     U1SUBSET,
     U1FASECOB,
     U1DTRETOR,
@@ -221,5 +221,5 @@ SELECT
     U1INDCOR27,
     U1INDCOR28,
     U1INDCOR29,
-    U1INDCOR30,
+    U1INDCOR30
 FROM datalake_cyber_raw.uda1
