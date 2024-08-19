@@ -1,5 +1,10 @@
 SELECT
-    MD5(id_task, step_name) AS sk_interaction,
+    MD5(
+        CONCAT(
+            id_task,
+            step_name
+        )
+    ) AS sk_interaction,
     MD5(id_task) AS sk_task,
     from_phone_number,
     to_phone_number,
