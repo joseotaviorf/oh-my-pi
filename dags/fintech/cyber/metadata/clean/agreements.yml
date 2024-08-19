@@ -1,0 +1,171 @@
+---
+database_name: datalake_cyber_clean
+table_name: agreements
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table granularity - id_negotiation.
+columns:
+  id_negotiation:
+    description: "Agreement identifier. Table PK (Primary Key)"
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHID
+  id_type_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHTYPE
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHACCT
+  id_user:
+    description: "Identifies who created the agreement"
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHCOLLID
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHACCTG
+  authorized_by_manager:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHAUTCOLLID
+  frequency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHFREQ
+  total_installments:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHPRD
+  status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHSTATUS
+  payment_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHPYTYPE
+  contact_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHCTTYPE
+  notify_central_system:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHCSPERNT
+  payments_to_notify:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHCSINITNT
+  number_payments_to_exempt:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHCNDPAYN
+  required_number_payments_to_exempt:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHCNDPAYM
+  broken_payments:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHBREAK
+  total_payment_including_discount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHTOTPMT
+  interest_rate:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHRATE
+  additional_interest_rate:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHRATE2
+  payment_type_after_free_term:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHGRPERTY
+  level_agreement_authorization:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHLVL
+  exception_code_creation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHEXCP
+  times_accordion_updated:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHNUMUP
+  percentage_paid_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHFLFLVL
+  ts_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHREGDT
+  ts_negotiation_creation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHDT
+  ts_authorized:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHAUTDT
+  AHFLGACT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHFLGACT
+  AHACTUSR:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHACTUSR
+  AHDSCQB:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHDSCQB
+  AHDTQB:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHDTQB
+  AHSTADT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHSTADT
+  AHSTACOLL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHSTACOLL
+  AHDTCANC:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHDTCANC
+  AHCYTYPE:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHCYTYPE
+  AHMIGRACAO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHMIGRACAO
+  AHSERVENVQB:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHSERVENVQB
+  AHQBENVIADA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHQBENVIADA
+  AHCNIMPERS:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHCNIMPERS
+  AGRHONO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AGRHONO
+  AHTOTPMTSH:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHTOTPMTSH

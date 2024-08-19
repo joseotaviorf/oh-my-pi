@@ -1,0 +1,75 @@
+---
+database_name: datalake_cyber_clean
+table_name: logs
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: |
+  Table that stores all activities, actions taken, results obtained and comments from managers in the
+  system. Contains a record for each activity carried out.
+  Table granularity - id_contract + contract_group + ts_activity.
+  This table is historical, records are always inserted and never overwritten.
+columns:
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACACCT
+  id_user:
+    description: "Identifies the operator who performed the action/log. For more details such as operator name and email, see the 'users' table (original name: COLLID) based on the id_user"
+    lineage:
+      - datalake_cyber_raw.actfil.ACCIDNAM
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACACCTG
+  letter_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACLCCODE
+  region_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACARCOD
+  action:
+    description: "Action performed in the contract."
+    lineage:
+      - datalake_cyber_raw.actfil.ACACCODE
+  result:
+    description: "Result realized in the contract"
+    lineage:
+      - datalake_cyber_raw.actfil.ACRCCODE
+  sequence_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACSEQNUM
+  comment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACCOMM
+  phone_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACPHONE
+  phone_extension:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACEXT
+  latitude:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACLAT
+  longitude:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACLNG
+  ts_activity:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.ACACTDTE
+  ts_load_cyber:
+    description: "This field is used for batch loads. For inserted records, the correct field is ts_activity (original name: ACACTDTE)."
+    lineage:
+      - datalake_cyber_raw.actfil.ACENTDTE
+  ts_load:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actfil.NOW()

@@ -78,3 +78,4 @@ class DatabaseEnum:
     VELO = "VELO_DB"
     WALL_STREET = "WALL_STREET_DB"
     WOLOLO = "WOLOLO"
+    CYBER = "CYBER_DB"

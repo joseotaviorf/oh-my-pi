@@ -1,0 +1,19 @@
+---
+database_name: datalake_cyber_clean
+table_name: contracts_agreements
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrdm.ADACCT
+  id_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrdm.ADAHID
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrdm.ADACCTG

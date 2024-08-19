@@ -1,0 +1,243 @@
+---
+database_name: datalake_cyber_clean
+table_name: commissions_advisory
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Amounts to be paid to the Advisory on account of activations
+columns:
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_CONTRATO
+  id_origin_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_CONTRATO_ORIGEM
+  id_contract_refund:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.IN_ESTORNO
+  id_client:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_CLIENTE
+  id_transaction:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTCODE
+  id_renegotiation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.IN_RENEGOCIACAO
+  id_user_closed_batch:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_USUARIO_FECHADO
+  group_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_GRUPO
+  cpf_cnpj:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_CPFCNPJ
+  company_headquarters_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_MATRIZ
+  regional_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_REGIONAL
+  branch_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_FILIAL
+  status_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_STATUS
+  collection_type_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_TIPO_COBRANCA
+  manager:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMCOLLID
+  queue_transaction_recorded:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMQUE
+  batch_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMBATCH
+  stack:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTAMT
+  agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMAGENCY
+  error_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTYPE
+  affected_column:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTDCOLM
+  consecutive_check_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMAMOUNT
+  previous_column_value:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMPRVVAL
+  field_value_after_calculation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMCURVAL
+  transaction_description:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTDDESC
+  transaction_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTDFLAG
+  transaction_percentage:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTDPCNT
+  transaction_sequence:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTDSEQ
+  installment_delay_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_ATRASO_PARCELA
+  movement_delay_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_ATRASO_DTMOVTO
+  distributed_delay_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_ATRASO_DISTRIB
+  late_payment_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_ATRASO_PAGAMENTO
+  calculation_base_delay_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.NR_ATRASO_BASECAL
+  delay_type_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_TIPO_ATRASO
+  paid_advisory_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_ASSESSORIA_REMUNERADA
+  holding_advisory_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_ASSESSORIA_DETENTORA
+  remuneration_criteria_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.CD_CRITERIO_REMUNERACAO
+  remuneration_percentage:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.PE_REMUNERACAO
+  remuneration_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.VL_REMUNERACAO
+  percentage_participation_origin_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.PE_PART_ORIGEM
+  is_commission_closed:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.IN_FECHADO
+  IN_GLOSA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.IN_GLOSA
+  DT_GLOSA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_GLOSA
+  DS_MOTIVO_GLOSA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DS_MOTIVO_GLOSA
+  DT_IN_PARCIAL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_IN_PARCIAL
+  IN_PARCIAL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.IN_PARCIAL
+  PE_REMUN_SHARE:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.PE_REMUN_SHARE
+  FLAG_ASS_DIGITAL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.FLAG_ASS_DIGITAL
+  ts_payment_sent:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_MOVIMENTO
+  ts_processing:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_PROCESSAMENTO
+  ts_transaction_referred:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMREFDT
+  ts_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMTDATE
+  ts_payment_registration:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.ID_PMEDATE
+  ts_paid_avisory:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_ASSESSORIA_REMUNERADA
+  ts_holding_advisory:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_ASSESSORIA_DETENTORA
+  ts_commission_closed:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_IN_FECHADO
+  ts_search:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_PESQUISA
+  ts_start_validity:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_INICIO_VIGENCIA
+  ts_end_validity:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_comissoes.DT_FIM_VIGENCIA

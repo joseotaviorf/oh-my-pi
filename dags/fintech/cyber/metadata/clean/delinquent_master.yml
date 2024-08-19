@@ -1,0 +1,1031 @@
+---
+database_name: datalake_cyber_clean
+table_name: delinquent_master
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: "Master table with credit and customer/debtor information. Table granularity - id_contract + contract_group. Records can be updated and DMHOSTUP (ts_last_update) informs the date of the last update."
+columns:
+  id_client:
+    description: "ID debtor. TF: client.documentNumber where client-type = 'main-tenant'"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSSNUM
+  id_contract:
+    description: "ID (key) to identify the Cyber ​​Contract (unique, even in exchange of ownership). TF: debtor.product-code + contract.external-id"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACCT
+  id_proof:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCHID
+  id_sample:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSAMPLE
+  id_work_area:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBACODE
+  id_product:
+    description: "Product ID. TF: debtor.product-code"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPROD
+  contract_group:
+    description: "Group (QuintoAndar or QuintoCred). TF: debtor.group"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACCTG
+  day_management_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMWKFLAG
+  sequence_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSEQNO
+  contract_status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSTATUS
+  flag_promise_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPPFLAG
+  flag_account_in_agency_or_court:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLAFLG
+  punctuation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPTSCOR
+  agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBRANCH
+  manager:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMOFFICR
+  debtor_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMRELFLG
+  additional_account_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMADL1
+  additional_account_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMADL2
+  special_description:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSPDESC
+  scheduled_letter_day:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSCHDAY
+  total_records_payments:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPMTTOT
+  current_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGENCY
+  times_account_assigned_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNUMPLC
+  manager_last_payment_promisse:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMENTRY
+  greeting_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSALCD
+  debtor_name:
+    description: "Full name. TF: client.name where client-type = 'main-tenant'"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNAME
+  previous_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVNAM
+  debtor_name_complement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNAME2
+  previous_complement_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVNM2
+  residential_address:
+    description: "Home address. TF: contract.address"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMADDR1
+  additional_address_residential_address:
+    description: "Additional residential address. TF: contract.complement"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMADDR2
+  neighborhood_residential_address:
+    description: "Residential address neighborhood. TF: contract.neighbourhood"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMADDR3
+  previous_address_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAD1
+  previous_address_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAD2
+  business_address:
+    description: "Business address"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBADDR1
+  additional_business_address:
+    description: "Additional business address"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBADDR2
+  neighborhood_business_address:
+    description: "Neighborhood business address"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBADDR3
+  city:
+    description: "City residential address. TF: contract.city"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCITY
+  state:
+    description: "State (UF) residential address. TF: contract.state"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSTATE
+  zip_code:
+    description: "Residential address zip code. TF: contract.zip-code"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMZIP
+  email:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMEMAIL
+  residencial_phone:
+    description: "Home phone with area code"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPHONE
+  cellphone:
+    description: "Cell phone with area code. TF: client.phones[0]"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCPHONE
+  main_phone_extension:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPEXT
+  phone_extension:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCPEXT
+  main_area_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACODE
+  phone_area:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCACODE
+  company_name_work:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBNAME
+  city_business_address:
+    description: "City business address"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBCITY
+  state_business_address:
+    description: "UF commercial address"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBSTATE
+  zip_code_business_address:
+    description: "Business address zip code"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBZIP
+  business_phone:
+    description: "Business telephone with area code"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBPHONE
+  phone_extension_work:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBPEXT
+  agreement_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGTYPE
+  agreement_status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGSTATUS
+  last_payment_promisse_status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGPPSTATUS
+  previous_city:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVCTY
+  previous_state:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVSTA
+  previous_zip_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVZIP
+  subset:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSUBSET
+  previous_interest:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVINT
+  company:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCOMPANY
+  current_priority:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRI
+  supervisor:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSUPV
+  reason_last_supervisor_request:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSUPCOM
+  status_supervisor_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSCODE
+  payment_type:
+    description: "payment_type"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMID
+  review_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMREVCOD
+  reassignin_queues:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMREASSG
+  last_action:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLASTAC
+  last_result_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLASTRC
+  last_letter_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLASTLC
+  permanent_comment_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMP1
+  permanent_comment_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMP2
+  permanent_comment_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMP3
+  times_account_was_30_days_late:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNUM30
+  times_account_was_60_days_late:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNUM60
+  times_account_was_90_days_late:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNUM90
+  times_account_was_120_days_late:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNUM120
+  times_account_was_150_days_late:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNUM150
+  times_account_was_180_days_late:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNUM180
+  agency_automatically_assigned:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMASSAGCY
+  previous_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAGN
+  previous_agency_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAGN1
+  previous_agency_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAGN2
+  previous_agency_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAGN3
+  previous_agency_4:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAGN4
+  previous_agency_5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAGN5
+  status_agency_declined:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGNREJ
+  current_queue:
+    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQUE
+  current_queue_2:
+    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQUE2
+  current_queue_3:
+    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQUE3
+  current_queue_4:
+    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQUE4
+  current_queue_5:
+    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQUE5
+  current_queue_6:
+    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQUE6
+  previous_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPREVQ
+  previous_queue_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPREVQ2
+  previous_queue_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPREVQ3
+  previous_queue_4:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPREVQ4
+  most_important_action_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC1
+  most_important_action_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC2
+  most_important_action_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC3
+  history_2_most_important_action_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC1_2
+  history_2_most_important_action_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC2_2
+  history_2_most_important_action_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC3_2
+  history_3_most_important_action_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC1_3
+  history_3_most_important_action_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC2_3
+  history_3_most_important_action_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC3_3
+  history_4_most_important_action_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC1_4
+  history_4_most_important_action_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC2_4
+  history_4_most_important_action_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC3_4
+  history_5_most_important_action_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC1_5
+  history_5_most_important_action_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC2_5
+  history_5_most_important_action_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACAC3_5
+  most_important_result_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC1
+  most_important_result_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC2
+  most_important_result_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC3
+  history_2_most_important_result_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC1_2
+  history_2_most_important_result_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC2_2
+  history_2_most_important_result_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC3_2
+  history_3_most_important_result_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC1_3
+  history_3_most_important_result_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC2_3
+  history_3_most_important_result_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC3_3
+  history_4_most_important_result_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC1_4
+  history_4_most_important_result_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC2_4
+  history_4_most_important_result_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC3_4
+  history_5_most_important_result_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC1_5
+  history_5_most_important_result_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC2_5
+  history_5_most_important_result_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACRC3_5
+  most_important_letter_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC1
+  most_important_letter_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC2
+  most_important_letter_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC3
+  history_2_most_important_letter_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC1_2
+  history_2_most_important_letter_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC2_2
+  history_2_most_important_letter_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC3_2
+  history_3_most_important_letter_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC1_3
+  history_3_most_important_letter_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC2_3
+  history_3_most_important_letter_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC3_3
+  history_4_most_important_letter_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC1_4
+  history_4_most_important_letter_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC2_4
+  history_4_most_important_letter_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC3_4
+  history_5_most_important_letter_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC1_5
+  history_5_most_important_letter_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC2_5
+  history_5_most_important_letter_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACLC3_5
+  score_most_important_activity_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC1
+  score_most_important_activity_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC2
+  score_most_important_activity_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC3
+  label_1_portfolio_segmentation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLABEL1
+  label_2_portfolio_segmentation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLABEL2
+  label_3_portfolio_segmentation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLABEL3
+  label_4_portfolio_segmentation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLABEL4
+  label_5_portfolio_segmentation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLABEL5
+  label_6_portfolio_segmentation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLABEL6
+  history_2_most_important_ativity_score_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC1_2
+  history_2_most_important_ativity_score_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC2_2
+  history_2_most_important_ativity_score_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC3_2
+  history_3_most_important_ativity_score_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC1_3
+  history_3_most_important_ativity_score_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC2_3
+  history_3_most_important_ativity_score_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC3_3
+  history_4_most_important_ativity_score_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC1_4
+  history_4_most_important_ativity_score_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC2_4
+  history_4_most_important_ativity_score_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC3_4
+  history_5_most_important_ativity_score_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC1_5
+  history_5_most_important_ativity_score_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC2_5
+  history_5_most_important_ativity_score_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACSC3_5
+  broken_promisses:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGNUMBK
+  percentage_paid_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGPCT
+  delay_days:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMDAYS
+  total_promises_kept:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPPKEPT
+  number_broken_promises:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPPBROK
+  amount_prior_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAMT
+  amount_prior_agency_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAMT1
+  amount_prior_agency_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAMT2
+  amount_prior_agency_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAMT3
+  amount_prior_agency_4:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAMT4
+  amount_prior_agency_5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAMT5
+  payment_promisse_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPPAMT
+  current_agency_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGNAMT
+  last_amount_paid:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPAYAMT
+  last_letter_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLTRAMT
+  negotiated_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGAMT
+  accumulated_interest_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACUMINT
+  accumulated_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVAINT
+  overdue_amount:
+    description: "Sum of all invoices due under the contract"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAMTDLQ
+  debt_amount:
+    description: "Sum of all invoices due under the contract. TF: sum(bill.dueAmount) where status = 'open'"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCURBAL
+  current_total_overdue:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPAYOFF
+  next_due_balance_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNXTPOF
+  total_package_amount:
+    description: "Package amount in the contract (base amount of invoices), adding rent, IPTU and Condo. TF: contract.rentalAmount + contract.iptuAmount + contract.condominiumAmount"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMOPNAMT
+  total_due_amount:
+    description: "Sum of all invoices due under the contract. TF: sum(bill.dueAmount) where status = 'open'"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAMTDLQ
+  credit_limit:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCRLIMT
+  DMPKID:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPKID
+  DMPKSTATUS:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPKSTATUS
+  DMADDRLAT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMADDRLAT
+  DMADDRLNG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMADDRLNG
+  DMBADDRLAT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBADDRLAT
+  DMBADDRLNG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMBADDRLNG
+  DMOFFREF:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMOFFREF
+  DMPRVOREF:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVOREF
+  DMPRVOFF:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVOFF
+  DMQCHGDT6:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQCHGDT6
+  DMQCHGDT5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQCHGDT5
+  DMPREVQ6:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPREVQ6
+  DMPREVQ5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPREVQ5
+  DMCYBSCR:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCYBSCR
+  DMSCRDT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMSCRDT
+  DMRESV3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMRESV3
+  DMRESV2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMRESV2
+  ts_credit_opening:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMOPNDT
+  ts_reference_current_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGNREF
+  ts_last_contact_account:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLSTCON
+  ts_next_due_balance:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPOFTIL
+  ts_last_letter_request:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLTRDT
+  ts_account_registered:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCCSDT
+  ts_last_account_inactive:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMINACCT
+  ts_last_account_reactivation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMREACT
+  ts_last_update:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMHOSTUP
+  ts_last_update_manager:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLCLUPD
+  ts_last_activity_history:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMHISTDT
+  ts_last_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPAYDT
+  ts_next_contact:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMNXTCON
+  ts_promise:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPPMADE
+  ts_due_promisse_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPPDUE
+  ts_assignment_previous_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVREF
+  ts_assignment_previous_agency_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVREF1
+  ts_assignment_previous_agency_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVREF2
+  ts_assignment_previous_agency_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVREF3
+  ts_assignment_previous_agency_4:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVREF4
+  ts_assignment_previous_agency_5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVREF5
+  ts_due_oldest_invoice:
+    description: "Due date of the oldest open invoice (regardless of negative rules). TF: min(bill.dueDate) where status = 'open'"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMDLQDT
+  ts_last_activity:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLSTACT
+  ts_automatic_assignment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMASSAGDT
+  ts_last_queue_update:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQCHGDT
+  ts_last_queue_update_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQCHGDT2
+  ts_last_queue_update_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQCHGDT3
+  ts_last_queue_update_4:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQCHGDT4
+  ts_most_important_activity_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT1
+  ts_most_important_activity_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT2
+  ts_most_important_activity_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT3
+  ts_history_2_most_important_activity_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT1_2
+  ts_history_2_most_important_activity_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT2_2
+  ts_history_2_most_important_activity_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT3_2
+  ts_history_3_most_important_activity_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT1_3
+  ts_history_3_most_important_activity_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT2_3
+  ts_history_3_most_important_activity_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT3_3
+  ts_history_4_most_important_activity_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT1_4
+  ts_history_4_most_important_activity_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT2_4
+  ts_history_4_most_important_activity_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT3_4
+  ts_history_5_most_important_activity_class_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT1_5
+  ts_history_5_most_important_activity_class_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT2_5
+  ts_history_5_most_important_activity_class_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACDT3_5
+  ts_previous_interest_calculation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPRVIDT
+  ts_last_interest_calculation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMINTDT
+  ts_manager_assignment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMCLASSDT
+  ts_status_updated:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGCHGDT
+  ts_first_payment_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGINIPAYDT
+  ts_last_payment_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGLSTPAYDT

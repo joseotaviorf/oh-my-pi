@@ -1,0 +1,131 @@
+---
+database_name: datalake_cyber_clean
+table_name: users
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: This Table Contains all general data on system users.
+columns:
+  id_user:
+    description: "Id user"
+    lineage:
+      - datalake_cyber_raw.collid.CLCOLLID
+  id_unique_user:
+    description: "User's unique identification number (RFC)."
+    lineage:
+      - datalake_cyber_raw.collid.CLSSNUM
+  id_ldap:
+    description: "Identifier in LDAP (if applicable)."
+    lineage:
+      - datalake_cyber_raw.collid.CLLDAPID
+  agency:
+    description: "Agency the user work for."
+    lineage:
+      - datalake_cyber_raw.collid.CLAGENCY
+  record_type:
+    description: "Record type"
+    lineage:
+      - datalake_cyber_raw.collid.CLRTYPE
+  manager_type:
+    description: "Type of manager (Not from CyberLega)"
+    lineage:
+      - datalake_cyber_raw.collid.CLCTYPE
+  user_type:
+    description: "User type"
+    lineage:
+      - datalake_cyber_raw.collid.CLUTYPE
+  administer_mode:
+    description: "Administer Mode"
+    lineage:
+      - datalake_cyber_raw.collid.CLMODE
+  supervisor:
+    description: "Supervisor"
+    lineage:
+      - datalake_cyber_raw.collid.CLSUPV
+  user_profile:
+    description: "User profile"
+    lineage:
+      - datalake_cyber_raw.collid.CLPROF
+  time_inactivity:
+    description: "Number of seconds of inactivity allowed for the management program"
+    lineage:
+      - datalake_cyber_raw.collid.CLSECS
+  password_status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLSTATUS
+  name:
+    description: "Name"
+    lineage:
+      - datalake_cyber_raw.collid.CLNAME
+  password:
+    description: "Password"
+    lineage:
+      - datalake_cyber_raw.collid.CLPASSWD
+  email:
+    description: "Email"
+    lineage:
+      - datalake_cyber_raw.collid.CLMAIL
+  phone:
+    description: "Phone"
+    lineage:
+      - datalake_cyber_raw.collid.CLPHONE
+  phone_extension:
+    description: "Phone extension"
+    lineage:
+      - datalake_cyber_raw.collid.CLEXT
+  department:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLDEPT
+  level:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLNIVEL
+  title:
+    description: "Title (posto)"
+    lineage:
+      - datalake_cyber_raw.collid.CLTITLE
+  greeting:
+    description: "Greeting code"
+    lineage:
+      - datalake_cyber_raw.collid.CLSALCD
+  type_legal:
+    description: "Type of manager for CyberLegal"
+    lineage:
+      - datalake_cyber_raw.collid.CLLTYPE
+  has_permission_review_another_supervisor:
+    description: "Permission to review another supervisor's accounts"
+    lineage:
+      - datalake_cyber_raw.collid.CLGROUP
+  printer:
+    description: "Destination printer"
+    lineage:
+      - datalake_cyber_raw.collid.CLPRINT
+  CLENABLED:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLENABLED
+  CLLSTACSDT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLLSTACSDT
+  CLLNG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLLNG
+  CLLAT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLLAT
+  CLRONLY:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLRONLY
+  CLCREUSER:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLCREUSER
+  CLCHGUSER:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.collid.CLCHGUSER

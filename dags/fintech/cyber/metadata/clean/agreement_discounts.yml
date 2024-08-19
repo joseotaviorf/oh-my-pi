@@ -1,0 +1,43 @@
+---
+database_name: datalake_cyber_clean
+table_name: agreement_discounts
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_negotiation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADID
+  field_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ACFIELD
+  arithmetic_operator:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADOP
+  amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADORVL
+  discount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADDISC
+  amount_with_discount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADDISCVL
+  ADFIELD:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADFIELD
+  ADDISCT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADDISCT
+  ADMIGRACAO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADMIGRACAO

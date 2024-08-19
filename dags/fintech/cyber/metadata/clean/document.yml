@@ -1,0 +1,47 @@
+---
+database_name: datalake_cyber_clean
+table_name: document
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_document:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DOID
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DOACCT
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DOACCTG
+  manager_attached_document:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DOCOLLID
+  document_description:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DODESC
+  attached_document:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DOFILE
+  file:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DONAFILE
+  status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DOSTATUS
+  ts_update:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DOADDDT
+  ts_last:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.document.DOLSTDT

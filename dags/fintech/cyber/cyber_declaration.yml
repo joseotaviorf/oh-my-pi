@@ -1,0 +1,62 @@
+---
+dag:
+  name: cyber
+  schedule_start_date: 2024, 8, 1
+  schedule_interval: 0 8 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      ingestion of cyber system tables about debts and collections.
+      cyber folder that contains all details about the system: https://drive.google.com/drive/folders/1qkegwyyddsnj37hdoa2yh8fz52cftfhx?usp=drive_link
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_cyber_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+  tables_customization:
+    relations:
+      clean_table_name: debtor
+    delqmst:
+      clean_table_name: delinquent_master
+    uda1:
+      clean_table_name: contracts
+    phone:
+      clean_table_name: phone
+    address:
+      clean_table_name: address
+    pmtfil:
+      clean_table_name: payments
+    actfil:
+      clean_table_name: logs
+    document:
+      clean_table_name: document
+    agrdm:
+      clean_table_name: contracts_agreements
+    agrhdr:
+      clean_table_name: agreements
+    agpmtdet:
+      clean_table_name: agreement_payment
+    agdscdet:
+      clean_table_name: agreement_discounts
+    tb_historico_disponibilizacao:
+      clean_table_name: history_contract_distribution
+    tb_comissoes:
+      clean_table_name: commissions_advisory
+    tb_parcela:
+      clean_table_name: debt
+    tb_boleto:
+      clean_table_name: invoices
+    collid:
+      clean_table_name: users
+    tb_campanha:
+      clean_table_name: campaign
+    agr_hist:
+      clean_table_name: historical_agreements
+cluster:
+  type: databricks_13_3_med_general_cluster
+  custom_libraries:
+    - jar: "{artifacts_bucket}/jars/ojdbc8.jar"

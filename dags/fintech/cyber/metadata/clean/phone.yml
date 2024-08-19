@@ -1,0 +1,87 @@
+---
+database_name: datalake_cyber_clean
+table_name: phone
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_client:
+    description: "ID client. TF: client.document"
+    lineage:
+      - datalake_cyber_raw.phone.PHSSNUM
+  id_contract:
+    description: "Contract ID (Cyber ​​Key). TF: debtor.product-code + contract.external-id"
+    lineage:
+      - datalake_cyber_raw.phone.PHACCT
+  contract_group:
+    description: "Contract Group (QuintoAndar or QuintoCred). TF: debtor.group"
+    lineage:
+      - datalake_cyber_raw.phone.PHACCTG
+  phone_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHTYPE
+  area_code:
+    description: "DDD"
+    lineage:
+      - datalake_cyber_raw.phone.PHAREACODE
+  phone_number:
+    description: "Phone number. TF: client.phones[1]"
+    lineage:
+      - datalake_cyber_raw.phone.PHPHONE
+  phone_extension:
+    description: "Phone Extension"
+    lineage:
+      - datalake_cyber_raw.phone.PHEXT
+  is_active:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHSTATUS
+  manager_status_update:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHSTCOLLID
+  status_reason:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHSTREASON
+  manager:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHCOLLID
+  phone_rank:
+    description: "Classifier for telephone number: Rank of the best customer contact numbers. Sorting by best contact, that is, if the customer has 3 telephone numbers, they must be ranked in order of total telephone numbers in ascending order."
+    lineage:
+      - datalake_cyber_raw.phone.PHRANK
+  related_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHRELNUM
+  hierarchical_sequence:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHRANKORDER
+  PHSELFCURE:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHSELFCURE
+  PHRERID:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHRERID
+  PHID:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHID
+  ts_hierarchy_calculation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHUPDDT
+  ts_creation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.phone.PHDATE
+  ts_status_update:
+    description: "Status change date"
+    lineage:
+      - datalake_cyber_raw.phone.PHSTATDT

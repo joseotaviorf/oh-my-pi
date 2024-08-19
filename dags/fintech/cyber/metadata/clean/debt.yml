@@ -1,0 +1,318 @@
+---
+database_name: datalake_cyber_clean
+table_name: debt
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Debt
+columns:
+  contract_group:
+    description: "Contract Group (QuintoAndar or QuintoCred). TF: debtor.group"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAACCTG
+  id_contract:
+    description: "Contract ID (cyber key). Primary Key. TF: debtor.product-code + contract.external-id"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAACCT
+  id_invoice:
+    description: "ID Invoice. TF: bill.external-id"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAIDPARC
+  id_boleto_legacy:
+    description: "Bill (boleto) ID in the legacy system. TF: bill.boleto-identifier"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAIDBOL
+  id_bill_item:
+    description: "ID bill item"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABICODIGO
+  invoice_status:
+    description: "Invoice status"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PASTATUS
+  invoice_main_amount:
+    description: "Invoice main amount. TF: bill.due-amount"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLPRINC
+  invoice_interest_amount:
+    description: "Invoice interest amount"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLJUR
+  invoice_fine_amount:
+    description: "Invoice fine amount"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLMUL
+  dt_due_invoice:
+    description: "Invoice due date. TF: bill.due-date"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTVENC
+  cost_withdrawal_quintocred:
+    description: "Costs involved in the withdrawal of QuintoCred"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PACUSTAS
+  fee_quintocred_eviction:
+    description: "Fees involved in the QuintoCred eviction"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAHONORARIOS
+  invoice_status_legacy:
+    description: "Invoice status in legacy system. TF: bill.external-status"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PASTATFA
+  invoice_purpose:
+    description: "Debt type. TF: bill.purpose"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATPDIV
+  ts_due_original_debt:
+    description: "Original due date of debt. TF: bill.due-date"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTVENORI
+  ts_invoice_creation:
+    description: "Invoice creation date. TF: bill.creation-date"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTCRIPA
+  account_type:
+    description: "Tenant and maybe billing in the future"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATPCONTA
+  ts_sending_debt:
+    description: "Date of sending the debt to client. TF: bill.sent-at"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTENVFA
+  invoice_accrual_year_month:
+    description: "Year/month of invoice accrual. TF: bill.accrual-year-month"
+    lineage:
+  our_number_original_invoice:
+    description: "Our bill number (nosso número do boleto) from the original invoice. TF: bill.our-number"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOSSNUM
+  is_negative_bureaus:
+    description: "Negative the customer's invoice at the credit bureaus"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAINDNEG
+  is_tenant_first_invoice:
+    description: "Indicates whether it is the first invoice. TF: bill.is_tenant_first_invoice"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAINDPRIFA
+  has_previously_negotiated:
+    description: "Indicates whether it was previously negotiated. TF: bill.previously_negotiated"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAPREVNEG
+  pause_reason:
+    description: "Pause reason"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAINDMOTPA
+  ts_limit_pause:
+    description: "Date to inform when the pause will be removed"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTLIMPA
+  code_bank_boleto:
+    description: "Bank code for bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PACODBANBOL
+  digit_bank_boleto:
+    description: "Bank digit for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADIGBANBOL
+  name_bank_boleto:
+    description: "Name of the bank for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOMBANBOL
+  digitable_line_boleto_1:
+    description: "First typeable line for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALINDIG1
+  digitable_line_boleto_2:
+    description: "Second typeable line for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALINDIG2
+  digitable_line_boleto_3:
+    description: "Third typeable line for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALINDIG3
+  digitable_line_boleto_4:
+    description: "Fourth typeable line for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALINDIG4
+  digitable_line_boleto_5:
+    description: "Fifth typeable line for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALINDIG5
+  digitable_line_boleto_6:
+    description: "Sixth typeable line for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALINDIG6
+  digitable_line_boleto_7:
+    description: "Seventh typeable line for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALINDIG7
+  digitable_line_boleto_8:
+    description: "Eigth typeable line for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALINDIG8
+  payment_location_boleto:
+    description: "Payment location for the bank slip (boleto) at Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALOCPAGBOL
+  ts_due_boleto:
+    description: "Bank slip (boleto) due date"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTVENCBOL
+  PATPPECEBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATPPECEBOL
+  PATPDOPCBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATPDOPCBOL
+  PADOCPECEBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADOCPECEBOL
+  PANOCEBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOCEBOL
+  code_digit_agency_boleto:
+    description: "Agency code and digit + Transferor code and digit"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PACODAGBOL
+  ts_document_boleto:
+    description: "Date of the document on the bank slip (boleto)"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTDOCBOL
+  document_number_boleto:
+    description: "Document number on the bank slip (boleto)"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANUMDOBOL
+  our_number_boleto:
+    description: "Our number boleto"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOSNUMBOL
+  PAVLRBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLRBOL
+  PAVLDESCBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLDESCBOL
+  PAVLDEDUBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLDEDUBOL
+  PAVLRMOMUBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLRMOMUBOL
+  PAVLACRBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLACRBOL
+  PAVLRTOBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLRTOBOL
+  PATPPESABOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATPPESABOL
+  PATPDPSABOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATPDPSABOL
+  PADOPESABOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADOPESABOL
+  PANOSABOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOSABOL
+  PASEREARBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PASEREARBOL
+  instruction_line_boleto_1:
+    description: "First line of instructions on the bill for Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALININSTBOL1
+  instruction_line_boleto_2:
+    description: "Second line of instructions on the bill for Serasa"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALININSTBOL2
+  instruction_line_boleto_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALININSTBOL3
+  instruction_line_boleto_4:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALININSTBOL4
+  instruction_line_boleto_5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALININSTBOL5
+  instruction_line_boleto_6:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALININSTBOL6
+  instruction_line_boleto_7:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALININSTBOL7
+  instruction_line_boleto_8:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALININSTBOL8
+  PASEQREARBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PASEQREARBOL
+  original_amount:
+    description: "Original invoice amount, used as an amortization comparison in 5C. TF: bill.due-amount"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLRORI
+  PADTINSERT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTINSERT
+  PADTUPDATE:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTUPDATE
+  bill_item_title:
+    description: "Bill item title"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABITITULO
+  bill_item_description:
+    description: "Bill item description"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDESC
+  bill_item_amount:
+    description: "Bill item amount"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIVALOR
+  ts_due_bill_item:
+    description: "Bill item due date"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDTVENC
+  PATIPO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATIPO
+  PABIDTINSERT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDTINSERT
+  PABIDTUPDATE:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDTUPDATE
+  PABIDTEXCLUSAO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDTEXCLUSAO
+  PABIFLGEXCLLOG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIFLGEXCLLOG

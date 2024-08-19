@@ -1,0 +1,155 @@
+---
+database_name: datalake_cyber_clean
+table_name: debtor
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Information on people related to each account.
+columns:
+  id_client:
+    description: "CPF/CNPJ of the Related Person. TF: client.document"
+    lineage:
+      - datalake_cyber_raw.relations.RERSSNUM
+  id_contract:
+    description: "Contract ID (Cyber ​​Key). Primary Key. TF: debtor.product-code + contract.external-id"
+    lineage:
+      - datalake_cyber_raw.relations.RERACCT
+  contract_group:
+    description: "TF: debtor.group"
+    lineage:
+      - datalake_cyber_raw.relations.RERACCTG
+  client_type:
+    description: "Client Type (proprietário, Inquilino...)"
+    lineage:
+      - datalake_cyber_raw.relations.RERDESC
+  greeting:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERSALCD
+  name:
+    description: "Name. TF: client.name"
+    lineage:
+      - datalake_cyber_raw.relations.RERNAME
+  additional_name:
+    description: "Additional Information (Internal ID QuintoAndar uuid). TF: client.person-uuid"
+    lineage:
+      - datalake_cyber_raw.relations.RERNAME2
+  address:
+    description: "Address. TF: contract.address"
+    lineage:
+      - datalake_cyber_raw.relations.RERADDR1
+  neighborhood:
+    description: "Neighborhood. TF: contract.neighbourhood"
+    lineage:
+      - datalake_cyber_raw.relations.RERADDR2
+  city:
+    description: "City. TF: contract.city"
+    lineage:
+      - datalake_cyber_raw.relations.RERCITY
+  state:
+    description: "State. TF: contract.state"
+    lineage:
+      - datalake_cyber_raw.relations.RERSTATE
+  zip_code:
+    description: "Zip Code. TF: contract.zip-code"
+    lineage:
+      - datalake_cyber_raw.relations.RERZIP
+  sequence_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERSEQ
+  personal_phone:
+    description: "Private telephone. TF: client.phones[0]"
+    lineage:
+      - datalake_cyber_raw.relations.RERPHONE
+  business_phone:
+    description: "Commercial Phone"
+    lineage:
+      - datalake_cyber_raw.relations.RERBPHON
+  business_phone_extension:
+    description: "Extension (ramal)"
+    lineage:
+      - datalake_cyber_raw.relations.RERBEXT
+  RERIDCLI:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERIDCLI
+  dt_birth:
+    description: "Date of birth. TF: client.birthDate "
+    lineage:
+      - datalake_cyber_raw.relations.RERDTNASC
+  nationality:
+    description: "Nationality"
+    lineage:
+      - datalake_cyber_raw.relations.RERNATURALID
+  nationality_uf:
+    description: "Nationality UF (state)"
+    lineage:
+      - datalake_cyber_raw.relations.RERUFNATUR
+  father_name:
+    description: "Father name"
+    lineage:
+      - datalake_cyber_raw.relations.RERNMPAI
+  mother_name:
+    description: "Mother name"
+    lineage:
+      - datalake_cyber_raw.relations.RERNMMAE
+  nationality_acronym:
+    description: "Nationality Acronym"
+    lineage:
+      - datalake_cyber_raw.relations.RERNACIONALI
+  marital_status:
+    description: "marital_status. TF: client.maritalStatus"
+    lineage:
+      - datalake_cyber_raw.relations.RERESTCIVIL
+  RERCONJNOME:
+    description: "partner Name"
+    lineage:
+      - datalake_cyber_raw.relations.RERCONJNOME
+  dt_birth_partner:
+    description: "Date of Birth Partner"
+    lineage:
+      - datalake_cyber_raw.relations.RERCONJNASC
+  complement:
+    description: "Complement. TF: contract.complement"
+    lineage:
+      - datalake_cyber_raw.relations.RERADDR3
+  address_number:
+    description: "Address number. TF: contract.number*"
+    lineage:
+      - datalake_cyber_raw.relations.RERNUMERORUA
+  RERID:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERID
+  RERFLACSER:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERFLACSER
+  RERFLACSPC:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERFLACSPC
+  RERFLACCDL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERFLACCDL
+  RERFLACBVS:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERFLACBVS
+  email:
+    description: "Email"
+    lineage:
+      - datalake_cyber_raw.relations.REREMAIL
+  RERDTALTERACAO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERDTALTERACAO
+  RERDTINCLUSAO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERDTINCLUSAO
+  ts_history:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.relations.RERHISTDT

@@ -5,3 +5,4 @@ class DatabaseTypeEnum(Enum):
     POSTGRES = "postgres"
     MONGO = "mongo"
     MYSQL = "mysql"
+    ORACLE = "oracle"

@@ -1,0 +1,327 @@
+---
+database_name: datalake_cyber_clean
+table_name: invoices
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLID
+  id_client:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCODCLIENTE
+  id_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLNUMACORDO
+  id_company:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCODEMP
+  id_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLAGENCIA
+  assignor:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCEDENTE
+  dv_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLDVAGENCIA
+  account_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCONTCOR
+  dv_account:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLDVCONTCOR
+  our_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLNOSSONUM
+  invoice_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLVLBOLETO
+  document_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLNUMDOC
+  document_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLTPDOC
+  acceptance_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLACEITE
+  drawer_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACNOME
+  drawer_cpf_cnpj:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACCPFCNPJ
+  drawer_address:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACEND
+  drawer_neighborhood:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACBAIRRO
+  drawer_zip_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACCEP
+  drawer_city:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACCIDADE
+  drawer_state:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACUF
+  drawer_address_proof:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACENDCMP
+  instruction_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLINST1
+  instruction_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLINST2
+  instruction_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLINST3
+  instruction_4:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLINST4
+  instruction_5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLINST5
+  local_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLLOCAL1
+  local_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLLOCAL2
+  digitable_line:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLLINHADIG
+  barcode:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCODBARRA
+  installment_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLNUMPARC
+  interest_day:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLJURDIA
+  status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSTATUS
+  total_number_installments:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLQTDEPARC
+  debt_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLVLDIVIDA
+  type_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLTIPOBOLETO
+  group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCCTG
+  contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCCT
+  agreement_billing_account:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLACCTCOB
+  dv_our_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLNOSSONUMDV
+  origin:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLFLAG_ARREC
+  transferor_of_cnpj:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCEDENTECNPJ
+  transferor_cnpj:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCNPJCED
+  transferor_bank_check_digit:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLDVBANCO
+  transferor_bank_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLNUMBANCO
+  invoice_wallet:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCARTEIRA
+  layout_pefin:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLLAYOUTPEFIN
+  currency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLMOEDA
+  has_first_invoice_already_been_issued:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLFLENVIOENT
+  has_invoice_already_been_issued:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLFLENVIOPRT
+  main_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLVLPRINC
+  fine_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLMULTA
+  paid_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLVLPAGO
+  BLVLIOF:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLVLIOF
+  BLDEMDESP:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLDEMDESP
+  BLVLDOLAR:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLVLDOLAR
+  BLAGCOBR:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLAGCOBR
+  BLBCCOBR:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLBCCOBR
+  BLNUMCC:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLNUMCC
+  BLSSNUM:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSSNUM
+  BLFLENVIOLEG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLFLENVIOLEG
+  BLTIPOBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLTIPOBOL
+  BLBOLETO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLBOLETO
+  BLSACENDNR:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLSACENDNR
+  BLCOLLID:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCOLLID
+  BLNUMCONVENIO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLNUMCONVENIO
+  BLBANCOCED:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLBANCOCED
+  BLTIPOREGTIT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLTIPOREGTIT
+  BLDTSOLICREGTIT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLDTSOLICREGTIT
+  BLRESV3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLRESV3
+  BLENVIO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLENVIO
+  BLFLAGENV:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLFLAGENV
+  BLFLGLEG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLFLGLEG
+  BLRETLEG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLRETLEG
+  BLESPECIE:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLESPECIE
+  BLCOPIACOLA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCOPIACOLA
+  ts_due:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLDTVENC
+  ts_document:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLDTDOC
+  ts_processing:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLDTPROC

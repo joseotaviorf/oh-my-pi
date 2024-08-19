@@ -1,0 +1,179 @@
+---
+database_name: datalake_cyber_clean
+table_name: history_contract_distribution
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Historical table with consultancy performance. Table granularity - id_contract + contract_group. New records are inserted with each new distribution, maintaining the complete history of distributions.
+columns:
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_ACCT
+  id_client:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_SSNUM
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_ACCTG
+  cpf_cnpj_client:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_CPFCNPJ
+  head_office:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_MATRIZ
+  regional:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_REGIONAL
+  branch:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_FILIAL
+  collection_phase:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_FASE_COBRANCA
+  delay_days:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_DIASATRASO
+  queue:
+    description: "These values ​​are queues defined by QuintoAndar to identify the type of charging/collection action in the decision tree."
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_CRIT_SELECAO
+  harvest:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_REFSAFRA
+  advisory:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_ASSESSORIA
+  contract_status:
+    description: "Contract Status. Same as deliquent_master.contract_status"
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_STATUS
+  new_advisory:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_NOVA_ASSESSORIA
+  new_status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_NOVO_STATUS
+  year_month_received:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_ANOMES_RECEB
+  year_month_recovered:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_ANOMES_RECUPERADO
+  zero_installment_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_IN_PRESTACAO_ZERO
+  flag_performance:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_DESEMPENHO
+  queue_1:
+    description: "Queue 1. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue'"
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE1
+  queue_2:
+    description: "Queue 2. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_2'"
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE2
+  queue_3:
+    description: "Queue 3. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_3'"
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE3
+  queue_4:
+    description: "Queue 4. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_4'"
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE4
+  queue_5:
+    description: "Queue 5. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_5'"
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE5
+  queue_6:
+    description: "Queue 6. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_6'"
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE6
+  label_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL1
+  label_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL2
+  label_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL3
+  label_4:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL4
+  label_5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL5
+  label_6:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL6
+  debt_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_DIVIDA
+  new_debt_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_NOVA_DIVIDA
+  balance_due_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_SLD_DEVIDO
+  new_balance_due_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_NOVO_SLD_DEVIDO
+  accumulated_amount_received:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_RECEB_ACUM
+  received_amount_month:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_RECEB_NO_MES
+  recovered_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_RECUPERADO
+  new_installments_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_NOVAS_PREST
+  paid_amount_the_biggest:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_PAGO_A_MAIOR
+  excluded_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_VL_EXCLUIDO
+  ts_distribution:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_DT_DISPONIBILIZACAO
+  ts_redistribution:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_historico_disponibilizacao.HD_DT_NOVA_DISPONIB

@@ -1,0 +1,131 @@
+---
+database_name: datalake_cyber_clean
+table_name: campaign
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: The table will contain information about the campaigns that were carried out by QuintoAndar/QuintoCred and Assessorias. The table will be updated through the massive billing process.
+columns:
+  id_campaign:
+    description: "Campaign ID"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAID
+  offer_number:
+    description: "Offer Number"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CANUMOFERTA
+  billing_group:
+    description: "Billing Group"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAGRUPO
+  id_client:
+    description: "Client"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CASSNUM
+  cpf_cnpj:
+    description: "Client CPF/CNPJ"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CACPFCGC
+  ts_boletagem_sent:
+    description: "'Boletagem' sending date"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CADTPROC
+  ts_due_boletagem:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CADTVAL
+  ts_due_down_payment:
+    description: "Boletagem down payment (entrada) due date"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CADTVCENTR
+  total_ofers:
+    description: "Number of Offers generated for the customer within the campaign"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAQTDOFER
+  agreement_type:
+    description: "Agreement type"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CATYPE
+  annual_interest_rate:
+    description: "Annual Agreement Installment Interest Rate"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CARATE
+  interest_quota_type:
+    description: "Type of Interest Quotas"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAPYTYPE
+  total_negotiated_with_fees:
+    description: "Total Negotiated Value of the Agreement (Campaign) with Fees"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CATOTPMT
+  total_negotiated_without_fees:
+    description: "Total Negotiated Value of the Agreement (Campaign) without Fees"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CATOTPMTSH
+  fees_amount:
+    description: "Fees amount"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAHONO
+  frequency:
+    description: "Frequency"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAFREQ
+  origin:
+    description: "Boletagem origin"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAORIGEM
+  billing_account:
+    description: "Billing account (contract) number for correspondence"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAACCTCOB
+  id_negotiation:
+    description: "ID negotiation"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAAHID
+  campaign_queue:
+    description: "Campaign Queue"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAQUE
+  our_number:
+    description: "Our Number"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CANOSSONUM
+  down_payment_percentage:
+    description: "First Installment (down_payment) percentage"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAPERENTR
+  agency:
+    description: "agency (advisory)"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAAGENCY
+  down_payment_amount:
+    description: "Down payment (entrada do parcelamento) amount"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAVLRENTR
+  grace_period_interest_rate:
+    description: "Grace Period (carência) Interest Rate"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CARATE2
+  grace_period_days:
+    description: "Grace period (carência) days"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAGRDAYS
+  contract_delay_days:
+    description: "Leader Contract Delay Days"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAAGING
+  CATIPOBOL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CATIPOBOL
+  CASTATUSCA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CASTATUSCA
+  CATOTPARC:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CATOTPARC
+  CAQTDPA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAQTDPA

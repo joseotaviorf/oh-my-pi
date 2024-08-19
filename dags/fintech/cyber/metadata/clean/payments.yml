@@ -1,0 +1,91 @@
+---
+database_name: datalake_cyber_clean
+table_name: payments
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table granularity - id_contract + contract_group
+columns:
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMACCT
+  id_invoice:
+    description: "In case of negotiation payment ('Pagamento Acordo' value for payment_type), this field is filled with the negotiation + installment number. Otherwise, this field will be filled with the ID of the original invoice that was amortized in the payment (used for 5C) "
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTDDESC
+  id_payment:
+    description: "Payment ID"
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMID
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMACCTG
+  payment_type:
+    description: "Payment Type"
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTCODE
+  manager:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMCOLLID
+  queue:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMQUE
+  payment_method:
+    description: "Payment method code (Boleto, PIX, Credit Card)"
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMBATCH
+  agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMAGENCY
+  error_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTYPE
+  field_affected:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTDCOLM
+  trandefs_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTDFLAG
+  trandefs_sequence:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTDSEQ
+  trandefs_percentage:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTDPCNT
+  payment_amount:
+    description: "Payment Amount"
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTAMT
+  actual_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMAMOUNT
+  previous_field_value:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMPRVVAL
+  field_value_after_calculation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMCURVAL
+  ts_payment:
+    description: "Payment Date (Transaction)"
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMTDATE
+  ts_registration_transaction:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMEDATE
+  ts_transaction_referred:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMREFDT

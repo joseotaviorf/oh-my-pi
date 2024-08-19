@@ -1,0 +1,99 @@
+---
+database_name: datalake_cyber_clean
+table_name: address
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Debtor address
+columns:
+  id_client:
+    description: "Client ID (TF: client.document)"
+    lineage:
+      - datalake_cyber_raw.address.ADSSNUM
+  id_contract:
+    description: "ID contract = ID Product  (TF: debtor.product-code) + Retsuko Contract ID (TF: contract.external-id)"
+    lineage:
+      - datalake_cyber_raw.address.ADACCT
+  contract_group:
+    description: "Contract group (QuintoAndar or QuintoCred). TF: debtor.group"
+    lineage:
+      - datalake_cyber_raw.address.ADACCTG
+  address_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADTYPE
+  is_letter_address:
+    description: "Letter sending address"
+    lineage:
+      - datalake_cyber_raw.address.ADLETTERS
+  address_1:
+    description: "Address with number / email. TF: client.email[0]"
+    lineage:
+      - datalake_cyber_raw.address.ADADDR1
+  neighborhood:
+    description: "Neighborhood"
+    lineage:
+      - datalake_cyber_raw.address.ADADDR2
+  complement:
+    description: "Complement"
+    lineage:
+      - datalake_cyber_raw.address.ADADDR3
+  primary_address:
+    description: "Primary Address"
+    lineage:
+      - datalake_cyber_raw.address.ADPRI
+  city:
+    description: "City"
+    lineage:
+      - datalake_cyber_raw.address.ADCITY
+  state:
+    description: "State"
+    lineage:
+      - datalake_cyber_raw.address.ADSTATE
+  zip_code:
+    description: "Zip Code"
+    lineage:
+      - datalake_cyber_raw.address.ADZIP
+  is_active:
+    description: "Status (active or inactive)"
+    lineage:
+      - datalake_cyber_raw.address.ADSTATUS
+  status_reason:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADSTREASON
+  ts_creation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADDATE
+  manager:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADCOLLID
+  manager_update_status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADSTCOLLID
+  ts_status_update:
+    description: "Status change date"
+    lineage:
+      - datalake_cyber_raw.address.ADSTATDT
+  ADLNG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADLNG
+  ADLAT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADLAT
+  ADSELFCURE:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADSELFCURE
+  ADRERID:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADRERID
+  ADID:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADID
