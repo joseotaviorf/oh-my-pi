@@ -26,6 +26,8 @@ workflow:
     agent_region_group:
     - agents_region
     - agents_slots
+    ciq_agents:
+    - ciq_users
   tables_customization:
     agents_activations_suspensions_contracts_changes:
       extraction_type: incremental

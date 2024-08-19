@@ -1,0 +1,59 @@
+database_name: datalake_ebdb_agents
+table_name: ciq_agents
+description: Each line represents a CIQ that is also present in the demand context, whether as a real estate agent or photographer, also detailing whether it belongs to rent or sale.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_partner:
+    lineage:
+      - datalake_ebdb_agents.ciq_users.id_partner
+    description: Partner ID (Main)
+  id_user:
+    lineage:
+      - datalake_ebdb_agents.ciq_users.id_user
+    description: User ID (Main)
+  id_agent:
+    lineage:
+      - datalake_ebdb_user.user.id_agent
+    description: Agent ID (Main)
+  name:
+    lineage:
+      - datalake_ebdb_agents.ciq_users.name
+    description: Full name of user.
+  email:
+    lineage:
+      - datalake_ebdb_agents.ciq_users.email
+    description: Email of user.
+  is_active:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_active
+    description: Status to identify wheter the agent is active or inactive (true or false).
+  is_realstate_agent:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_realstate_agent 
+    description: Flag to indicate if the agent is a realstate agent (has a CRECI number).
+  is_photographer:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_photographer 
+    description: Flag to indicate if the agent is a photographer.
+  is_sale_agent:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_sale_agent
+    description: Flag to indicate if the agent operates in For Sale business context.
+  is_rent_agent:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_rent_agent
+    description: Flag to indicate if the agent operates in For Rent business context.
+  country_code:
+    lineage:
+      - datalake_ebdb_user.agent_data.country_code
+    description: Country code of the agent.
+  ts_created:
+    lineage:
+      - datalake_ebdb_user.agent_data.ts_created
+    description: Timestamp of when the agent was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_user.agent_data.ts_updated
+    description: Timestamp of when the agent was updated.
+
