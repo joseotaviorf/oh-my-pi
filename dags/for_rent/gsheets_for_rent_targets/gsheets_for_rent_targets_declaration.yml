@@ -6,6 +6,9 @@ dag:
     dag_purpose: Gsheet's extraction of targets of the ForRent business context.
 cluster:
   type: databricks_13_3_med_general_2_workers_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
   custom_libraries:
     - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
     - pypi:
