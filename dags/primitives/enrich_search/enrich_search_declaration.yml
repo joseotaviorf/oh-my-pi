@@ -27,10 +27,18 @@ workflow:
       - day
       - interaction_type
 cluster:
-  type: databricks_10_4_med_memory_photon_cluster
-  access_control_list:
-      group_name: data-products
-      permission_level: CAN_MANAGE
+  type: custom_cluster
   custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    spark_version: 10.4.x-scala2.12
+    num_workers: 3
     spark_conf:
       spark.metrics.namespace: "data_products.enrich_search"      
+    aws_attributes:
+      ebs_volume_size: 200
+  access_control_list:
+    group_name: data-products
+    permission_level: CAN_MANAGE
