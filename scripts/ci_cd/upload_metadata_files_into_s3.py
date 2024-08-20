@@ -1,3 +1,4 @@
+import os
 import argparse
 from typing import List, Dict
 
@@ -27,6 +28,11 @@ def parse_args():
         help="Compare changes from current branch to a specific branch",
         required=False,
     )
+    group.add_argument(
+        "--file",
+        help="If only a specific metadata yml file should be uploaded",
+        required=False,
+    )
     parser.add_argument("--bucket", help="S3 Bucket where data should be stored")
     parser.add_argument("--host", help="Metadata Propagator hostname to be used")
     args = parser.parse_args()
@@ -34,13 +40,16 @@ def parse_args():
     bucket = args.bucket
     host = args.host
     branch = args.branch
-    return bucket, host, all_files, branch
+    file = args.file
+    return bucket, host, all_files, branch, file
 
 
-def get_metadata_files(all_files, branch):
+def get_metadata_files(all_files, branch, file):
     metadata_file_service = MetadataFileService()
     if all_files:
         return list(metadata_file_service.list_metadata_files())
+    elif file:
+        return [(file, "M")]
     elif branch:
         git_service = GitService()
         if branch == "master":
@@ -94,7 +103,13 @@ def upload_files(files: List[MetadataFileInfo], bucket):
 
 
 def metric_qualculation_method(metric_path: str) -> str:
+    base_path = "/bi-etl-ejuice"
     sql_file_path = metric_path.replace("metadata", "queries").replace(".ymal", ".sql").replace(".yml", ".sql")
+    safe_path = os.path.realpath(sql_file_path)
+    common_base = os.path.commonpath([base_path, safe_path]) 
+    if common_base != base_path:
+        print(f"common_base = {common_base}, base_path = {base_path}, safe_path = {safe_path}")
+        raise ValueError("Invalid commom path")
     with open(sql_file_path, "r") as sql_file:
         return json.dumps(sql_file.read())
 
@@ -171,8 +186,8 @@ def send_metadata_to_mp(files_info, host):
 
 
 def main():
-    bucket, host, all_files, branch = parse_args()
-    files = get_metadata_files(all_files, branch)
+    bucket, host, all_files, branch, file = parse_args()
+    files = get_metadata_files(all_files, branch, file)
 
     if not files:
         print("m=main, msg=No files found to upload.")
