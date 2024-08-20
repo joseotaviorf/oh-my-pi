@@ -14,7 +14,7 @@ workflow:
     - "{bucket}"
     - "{dag_name}"
     - s3://data-science.s3.data.quintoandar.com.br/maestro/data/
-    - "{{ ds }}"
+    - "{{ next_ds }}"
     - "{table_name}"
     - "{partitions}"
     - parquet
