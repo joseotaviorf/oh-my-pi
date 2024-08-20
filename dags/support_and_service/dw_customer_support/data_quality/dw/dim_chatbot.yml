@@ -10,9 +10,6 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  flags:
-    is_complete:
-      severity_level: Error
   current_state:
     is_complete:
       severity_level: Error

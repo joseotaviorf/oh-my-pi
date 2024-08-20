@@ -175,6 +175,8 @@ sessions_with_recontact AS (
     LEFT JOIN datalake_journey_flow_clean.journey_flow j
       ON gs.id_session = j.id_correlation
       AND j.journey_name is null
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY gs.id_session ORDER BY gs.ts_started DESC, j.ts_updated DESC) = 1
 )
 SELECT DISTINCT
   gs.id_session,
