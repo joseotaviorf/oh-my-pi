@@ -12,6 +12,10 @@ columns:
     description: "Unique identifier for the person related to the assignment."
     lineage:
       - datalake_hr_system.assignments_metrics.sk_person
+  sk_demographic_information:
+    description: "Unique identifier for the demographic information related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_demographic_information
   sk_cost_center:
     description: "Unique identifier for the cost center related to the assignment."
     lineage:

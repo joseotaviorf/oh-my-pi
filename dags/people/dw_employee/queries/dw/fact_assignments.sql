@@ -13,6 +13,7 @@ WITH
 SELECT
   am.sk_assignment,
   am.sk_employee,
+  am.sk_demographic_information,
   am.sk_cost_center,
   am.sk_business_unit,
   am.sk_job,
