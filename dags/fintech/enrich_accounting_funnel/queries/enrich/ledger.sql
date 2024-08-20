@@ -208,6 +208,7 @@ SELECT
     db.accounting_rule,
     db.accounting_type,
     db.user_type,
+    dh.source_client,
     COALESCE(dh.memo, db.memo_line) AS comments,
     (db.debit - db.credit) AS debit_credit,
     db.debit,
@@ -225,9 +226,9 @@ FROM
     dh
 INNER JOIN db
     ON db.id_transaction = dh.id_transaction
-LEFT JOIN datalake_pas_clean.users u 
+LEFT JOIN datalake_pas_clean.users u
     ON u.id = dh.id_user_sign
-LEFT JOIN datalake_pas_clean.chart_of_accounts coa 
+LEFT JOIN datalake_pas_clean.chart_of_accounts coa
     ON coa.id = db.account
-WHERE 
+WHERE
     dh.dt_due >= '2023-01-01'

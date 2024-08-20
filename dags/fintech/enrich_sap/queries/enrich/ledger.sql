@@ -265,6 +265,7 @@ SELECT
     db.accounting_rule,
     db.accounting_type,
     db.user_type,
+    dh.source_client,
     COALESCE(dh.memo, db.memo_line) AS comments,
     (db.debit - db.credit) AS debit_credit,
     db.debit,
@@ -287,10 +288,3 @@ LEFT JOIN datalake_pas_clean.users u
     ON u.id = dh.id_user_sign
 LEFT JOIN datalake_pas_clean.chart_of_accounts coa
     ON coa.id = db.account
-ORDER BY
-    dh.dt_reference DESC,
-    dh.dt_due DESC,
-    dh.id_transaction ASC,
-    db.id_line ASC,
-    dh.transaction_type ASC,
-    db.account ASC
