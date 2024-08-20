@@ -28,11 +28,11 @@ cluster:
     type: custom_cluster
     custom_configurations:
         autotermination_minutes: 20
-        driver_node_type_id: m5d.16xlarge
-        node_type_id: m5d.16xlarge
+        driver_node_type_id: r5d.4xlarge
+        node_type_id: r5d.8xlarge
         runtime_engine: PHOTON
         spark_version: 12.2.x-scala2.12
-        num_workers: 6
+        num_workers: 3
         aws_attributes:
             first_on_demand: 1
             spot_bid_price_percent: 100
