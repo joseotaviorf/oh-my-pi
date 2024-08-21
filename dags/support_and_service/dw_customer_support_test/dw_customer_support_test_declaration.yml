@@ -10,7 +10,6 @@ workflow:
   layer: dw
   custom_schema: customer_support_test
   default_extraction_type: incremental
-  default_partitions: [year, month, day]
   tables_customization:
     fact_ivr_interactions:
       z_order_by: [sk_task]

@@ -1417,6 +1417,10 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.zendesk:load-clean-tickets
 bietlejuice.enrich_customer_support_test:
   - bietlejuice.bigfone:load-clean-event
+  - bietlejuice.quinto_messenger:load-clean-channel
+  - bietlejuice.quinto_messenger:load-clean-chat
+  - bietlejuice.quinto_messenger:load-clean-task
+  - bietlejuice.quinto_messenger:load-clean-task-event
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house

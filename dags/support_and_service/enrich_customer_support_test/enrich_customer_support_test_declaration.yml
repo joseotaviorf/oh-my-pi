@@ -15,6 +15,9 @@ workflow:
         calls:
             z_order_by: [id_task, id_reservation]
             merge_on: [id_task, id_reservation]
+        chats:
+            z_order_by: [id_session, id_task, id_channel]
+            merge_on: [id_task]
         ivr_interactions:
             z_order_by: [id_task]
             merge_on: [id_task]

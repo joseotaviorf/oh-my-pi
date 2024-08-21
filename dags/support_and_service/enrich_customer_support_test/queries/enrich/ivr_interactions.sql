@@ -48,16 +48,8 @@ SELECT
     to_phone_number,
     step_name,
     MAX(UPPER(value)) AS type,
-    MAX(
-        CASE
-            WHEN kind = 'digits' THEN value
-        END
-    ) AS value,
-    MAX(
-        CASE
-            WHEN kind = 'timestamp' THEN TIMESTAMP_MILLIS(CAST(value AS BIGINT))
-        END
-    ) AS ts_event,
+    MAX(CASE WHEN kind = 'digits' THEN value END) AS value,
+    MAX(CASE WHEN kind = 'timestamp' THEN TIMESTAMP_MILLIS(CAST(value AS BIGINT)) END) AS ts_event,
     ts_ivr_started,
     YEAR(ts_ivr_started) AS year,
     MONTH(ts_ivr_started) AS month,
