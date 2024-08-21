@@ -20,7 +20,7 @@ workflow:
             merge_on: [id_task]
         ivr_interactions:
             z_order_by: [id_task]
-            merge_on: [id_task]
+            merge_on: [id_task, step_name]
 
 cluster:
     type: custom_cluster

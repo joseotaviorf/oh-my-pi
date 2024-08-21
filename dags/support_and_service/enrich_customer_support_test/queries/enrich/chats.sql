@@ -8,7 +8,7 @@ WITH task_queues AS (
   WHERE
     MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY updated DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 ),
 inapp_sessions AS (
   SELECT DISTINCT
