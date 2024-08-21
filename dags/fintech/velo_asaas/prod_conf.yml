@@ -1,0 +1,19 @@
+---
+cluster_libs:
+  - whl: "{artifacts_bucket}/asaas_api_client_python/quintoandar_asaas_api_client-0.1.0-py2.py3-none-any.whl"
+partition_columns:
+  - year
+  - month
+  - day
+tables:
+  - api_consumer_id: Parallel
+    extraction_type: full
+    table_name: customers
+  - api_consumer_id: Parallel
+    extraction_type: full
+    table_name: payments
+custom_cluster:
+  driver_node_type_id: m5a.2xlarge
+  node_type_id: m5a.xlarge
+  num_workers: 1
+  autotermination_minutes: 200

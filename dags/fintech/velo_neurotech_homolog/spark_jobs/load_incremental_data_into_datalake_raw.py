@@ -86,14 +86,14 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the API")
     parser.add_argument("execution_date", help="execution date in str format %Y-%m-%d")
     parser.add_argument("table_name", help="Name of the table to store data into")
+    parser.add_argument("report_name", help="Name of the report to load data from Neurotech")
     parser.add_argument("partitions", help="Partition columns name")
-    # parser.add_argument("report_name", help="Name of the report to load data from Neurotech")
-    parser.add_argument("extra_config", help="workable api token")
+    # parser.add_argument("extra_config", help="workable api token")
     args = parser.parse_args()
 
     args.partition_cols = ast.literal_eval(args.partitions)
-    extra_config = json.loads(args.extra_config)
-    report_name = extra_config["report_name"]
+    # extra_config = json.loads(args.extra_config)
+    report_name = args.report_name
 
     logger.info(
         f"""

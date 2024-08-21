@@ -21,13 +21,11 @@ workflow:
   tables_customization:
     logs_credit_granting:
       extra_spark_job_arguments:
-        - extra_config:
-            report_name: DadosConcessaoCreditoAPI
+        - DadosConcessaoCreditoAPI
       partitions: [year, month, day]
     logs_scoping_policy:
       extra_spark_job_arguments:
-        - extra_config:
-            report_name: DadosAlcadaAPI
+        - DadosAlcadaAPI
       partitions: [year, month, day]
 
 cluster:
