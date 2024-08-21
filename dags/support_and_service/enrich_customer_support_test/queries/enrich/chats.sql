@@ -96,7 +96,10 @@ SELECT
   t.is_per_team_task,
   t.ts_created,
   t.ts_updated AS ts_ended,
-  t.task_attributes
+  t.task_attributes,
+  YEAR(t.ts_created) AS year,
+  MONTH(t.ts_created) AS month,
+  DAY(t.ts_created) AS day
 FROM
   tasks AS t
 LEFT JOIN
