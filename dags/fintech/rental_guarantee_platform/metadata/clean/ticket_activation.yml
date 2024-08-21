@@ -1,0 +1,55 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: ticket_activation
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.id
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.propose_id
+  id_delinquency:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.delinquency_id
+  id_lannister_payment_register:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.lannister_payment_register_id
+  id_external_ticket:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.external_ticket_id
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.status
+  payment_period:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.payment_period
+  cancellation_reason:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.cancellation_reason
+  type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.type
+  user_insert:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.userinsert
+  user_update:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.userupdate
+  total_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.total_value
+  due_month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.due_month
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.updated_at
+  ts_approved:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.approved_at
+  ts_keys_delivered:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.ticket_activation.keys_delivery_date

@@ -247,5 +247,7 @@ workflow:
     bill:
       clean_table_name: bill_checkout
       date_filter_column: updated_at
+    ticket_activation:
+      date_filter_column: updated_at
 cluster:
   type: databricks_12_2_med_general_cluster
