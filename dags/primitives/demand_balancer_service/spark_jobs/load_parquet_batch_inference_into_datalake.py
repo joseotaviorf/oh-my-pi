@@ -1,7 +1,7 @@
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 from pyspark.sql.utils import AnalysisException
 
 from quintoandar_logger import QuintoAndarLogger
@@ -76,7 +76,7 @@ def main():
     spark_metastore_service.create_database(database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d")
+    dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d") + timedelta(days=1)
 
     try:
         df = s3_consumer.get_data_from_file(

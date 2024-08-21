@@ -8,4 +8,4 @@ select
   day
 from
   datalake_demand_balancer_service_raw.demand_balancer
-where year={year} AND month={month} AND day={day}
+where MAKE_DATE(year, month, day) = DATE_ADD(MAKE_DATE({year}, {month}, {day}), 1)
