@@ -32,8 +32,6 @@ workflow:
       clean_table_name: payments
     actfil:
       clean_table_name: logs
-    document:
-      clean_table_name: document
     agrdm:
       clean_table_name: contracts_agreements
     agrhdr:
@@ -44,16 +42,14 @@ workflow:
       clean_table_name: agreement_discounts
     tb_historico_disponibilizacao:
       clean_table_name: history_contract_distribution
-    tb_comissoes:
-      clean_table_name: commissions_advisory
     tb_parcela:
       clean_table_name: debt
     tb_boleto:
       clean_table_name: invoices
     collid:
       clean_table_name: users
-    tb_campanha:
-      clean_table_name: campaign
+    agency:
+      clean_table_name: agency
 cluster:
   type: custom_cluster
   custom_configurations:

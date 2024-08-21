@@ -1,7 +1,8 @@
 SELECT
+    PMID AS id_payment,
     PMACCT AS id_contract,
     PMTDDESC AS id_invoice,
-    PMID AS id_payment,
+    PMSSNUM AS id_client,
     CASE
         WHEN PMACCTG = "1" THEN "QuintoAndar"
         WHEN PMACCTG = "2" THEN "QuintoCred"
@@ -33,7 +34,6 @@ SELECT
     PMPRVVAL AS previous_field_value,
     PMCURVAL AS field_value_after_calculation,
     PMDTCICLO,
-    PMSSNUM,
     PMAGENCYPRM,
     PMAGENCYPRM_FLAG,
     PMTDATE AS ts_payment,

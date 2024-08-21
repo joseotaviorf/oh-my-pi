@@ -6,11 +6,11 @@ domain: fintech
 description: Debtor address
 columns:
   id_client:
-    description: "Client ID (TF: client.document)"
+    description: "Client ID = CPF (TF: client.document)"
     lineage:
       - datalake_cyber_raw.address.ADSSNUM
   id_contract:
-    description: "ID contract = ID Product  (TF: debtor.product-code) + Retsuko Contract ID (TF: contract.external-id)"
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.address.ADACCT
   contract_group:

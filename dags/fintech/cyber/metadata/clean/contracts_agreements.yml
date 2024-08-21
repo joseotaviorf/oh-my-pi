@@ -6,7 +6,7 @@ domain: fintech
 description: null
 columns:
   id_contract:
-    description: ""
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.agrdm.ADACCT
   id_agreement:

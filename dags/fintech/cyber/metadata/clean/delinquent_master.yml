@@ -10,9 +10,17 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMSSNUM
   id_contract:
-    description: "ID (key) to identify the Cyber ​​Contract (unique, even in exchange of ownership). TF: debtor.product-code + contract.external-id"
+    description: "ID (key) to identify the Cyber ​​Contract (unique, even in exchange of ownership). ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.delqmst.DMACCT
+  id_agency:
+    description: "Agency ID"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMAGENCY
+  id_product:
+    description: "Product ID. TF: debtor.product-code"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPROD
   id_proof:
     description: ""
     lineage:
@@ -25,10 +33,6 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMBACODE
-  id_product:
-    description: "Product ID. TF: debtor.product-code"
-    lineage:
-      - datalake_cyber_raw.delqmst.DMPROD
   contract_group:
     description: "Group (QuintoAndar or QuintoCred). TF: debtor.group"
     lineage:
@@ -89,10 +93,6 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMPMTTOT
-  current_agency:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMAGENCY
   times_account_assigned_agency:
     description: ""
     lineage:
@@ -401,6 +401,14 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ4
+  previous_queue_5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPREVQ5
+  previous_queue_6:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMPREVQ6
   most_important_action_class_1:
     description: ""
     lineage:
@@ -765,74 +773,6 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMCRLIMT
-  DMPKID:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMPKID
-  DMPKSTATUS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMPKSTATUS
-  DMADDRLAT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMADDRLAT
-  DMADDRLNG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMADDRLNG
-  DMBADDRLAT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMBADDRLAT
-  DMBADDRLNG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMBADDRLNG
-  DMOFFREF:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMOFFREF
-  DMPRVOREF:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMPRVOREF
-  DMPRVOFF:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMPRVOFF
-  DMQCHGDT6:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMQCHGDT6
-  DMQCHGDT5:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMQCHGDT5
-  DMPREVQ6:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMPREVQ6
-  DMPREVQ5:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMPREVQ5
-  DMCYBSCR:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMCYBSCR
-  DMSCRDT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMSCRDT
-  DMRESV3:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMRESV3
-  DMRESV2:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMRESV2
   ts_credit_opening:
     description: ""
     lineage:
@@ -945,6 +885,14 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT4
+  ts_last_queue_update_5:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQCHGDT5
+  ts_last_queue_update_6:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.delqmst.DMQCHGDT6
   ts_most_important_activity_class_1:
     description: ""
     lineage:

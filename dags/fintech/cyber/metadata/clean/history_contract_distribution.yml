@@ -6,11 +6,11 @@ domain: fintech
 description: Historical table with consultancy performance. Table granularity - id_contract + contract_group. New records are inserted with each new distribution, maintaining the complete history of distributions.
 columns:
   id_contract:
-    description: ""
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_ACCT
   id_client:
-    description: ""
+    description: "ID Client = CPF (TF: client.document)"
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_SSNUM
   contract_group:

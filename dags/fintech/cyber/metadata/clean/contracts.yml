@@ -6,7 +6,7 @@ domain: fintech
 description: null
 columns:
   id_contract:
-    description: "ID Contract (Primary Key). TF: debtor.product-code + contract.external-id"
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.uda1.U1ACCT
   id_contract_external:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1CODIMO
   id_client:
-    description: "Customer Code (CPF/CNPJ). TF: client.documentNumber where client-type = 'main-tenant'"
+    description: "Client ID (CPF/CNPJ). TF: client.document Number where client-type = 'main-tenant'"
     lineage:
       - datalake_cyber_raw.uda1.U1SSNUM
   id_oldest_negative_invoice:

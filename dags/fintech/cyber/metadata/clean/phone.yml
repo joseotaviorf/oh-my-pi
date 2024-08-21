@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_cyber_raw.phone.PHSSNUM
   id_contract:
-    description: "Contract ID (Cyber ​​Key). TF: debtor.product-code + contract.external-id"
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.phone.PHACCT
   contract_group:

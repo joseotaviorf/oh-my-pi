@@ -9,6 +9,10 @@ columns:
     description: "Campaign ID"
     lineage:
       - datalake_cyber_raw.tb_campanha.CAID
+  id_client:
+    description: "ID Client = CPF (TF: client.document)"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CASSNUM
   offer_number:
     description: "Offer Number"
     lineage:
@@ -17,10 +21,6 @@ columns:
     description: "Billing Group"
     lineage:
       - datalake_cyber_raw.tb_campanha.CAGRUPO
-  id_client:
-    description: "Client"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CASSNUM
   cpf_cnpj:
     description: "Client CPF/CNPJ"
     lineage:

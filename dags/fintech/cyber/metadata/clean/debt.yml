@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_parcela.PAACCTG
   id_contract:
-    description: "Contract ID (cyber key). Primary Key. TF: debtor.product-code + contract.external-id"
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.tb_parcela.PAACCT
   id_invoice:

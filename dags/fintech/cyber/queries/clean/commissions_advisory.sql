@@ -33,7 +33,7 @@ SELECT
     NR_ATRASO_PAGAMENTO AS late_payment_number,
     NR_ATRASO_BASECAL AS calculation_base_delay_number,
     CD_TIPO_ATRASO AS delay_type_code,
-    CD_ASSESSORIA_REMUNERADA AS paid_advisory_code,
+    CD_ASSESSORIA_REMUNERADA AS paid_agency_code,
     CD_ASSESSORIA_DETENTORA AS holding_advisory_code,
     CD_CRITERIO_REMUNERACAO AS remuneration_criteria_code,
     PE_REMUNERACAO AS remuneration_percentage,

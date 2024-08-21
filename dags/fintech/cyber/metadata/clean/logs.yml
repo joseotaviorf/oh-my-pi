@@ -10,7 +10,7 @@ description: |
   This table is historical, records are always inserted and never overwritten.
 columns:
   id_contract:
-    description: ""
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.actfil.ACACCT
   id_user:

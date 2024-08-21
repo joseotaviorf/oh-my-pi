@@ -43,6 +43,7 @@ def _send_warning(dbutils, environment, table_name):
 
     message_content = (
         f"⚠️\n"
+        f"DAG: *Cyber*\n"
         f"Environment: *{environment}*\n"
         f"Table: `{table_name}`\n"
         f"Status: *FAILED*\n"

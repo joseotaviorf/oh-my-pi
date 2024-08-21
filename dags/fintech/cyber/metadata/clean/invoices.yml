@@ -10,9 +10,9 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLID
   id_client:
-    description: ""
+    description: "ID Client = CPF (TF: client.document)"
     lineage:
-      - datalake_cyber_raw.tb_boleto.BLCODCLIENTE
+      - datalake_cyber_raw.tb_boleto.BLSSNUM
   id_agreement:
     description: ""
     lineage:
@@ -25,6 +25,10 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_boleto.BLAGENCIA
+  client_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCODCLIENTE
   assignor:
     description: ""
     lineage:
@@ -245,10 +249,6 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMCC
-  BLSSNUM:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLSSNUM
   BLFLENVIOLEG:
     description: ""
     lineage:

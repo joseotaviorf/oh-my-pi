@@ -1,0 +1,131 @@
+---
+database_name: datalake_cyber_clean
+table_name: agency
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: This table contains demographic and financial information about the agencies and their contacts.
+columns:
+  id_agency:
+    description: "Agency ID"
+    lineage:
+      - datalake_cyber_raw.agency.AGAGENCY
+  agency_name:
+    description: "Agency Name"
+    lineage:
+      - datalake_cyber_raw.agency.AGFIRM
+  commercial_name:
+    description: "Commercial name of the agency (invented name)"
+    lineage:
+      - datalake_cyber_raw.agency.AGNICKNAME
+  cnpj:
+    description: "Agency CNPJ"
+    lineage:
+      - datalake_cyber_raw.agency.AGIRSNUM
+  agency_type:
+    description: "Agency type"
+    lineage:
+      - datalake_cyber_raw.agency.AGAGCYCD
+  super_agency:
+    description: "Super agency to which the agency belongs"
+    lineage:
+      - datalake_cyber_raw.agency.AGSUPER
+  is_active_agency:
+    description: "Indicates if a agency is active or not"
+    lineage:
+      - datalake_cyber_raw.agency.AGSTATUS
+  distribution_type:
+    description: "Distribution type"
+    lineage:
+      - datalake_cyber_raw.agency.AGDISTTYPE
+  address:
+    description: "Address"
+    lineage:
+      - datalake_cyber_raw.agency.AGADDR1
+  neighborhood:
+    description: "Neighborhood"
+    lineage:
+      - datalake_cyber_raw.agency.AGADDR2
+  city:
+    description: "City"
+    lineage:
+      - datalake_cyber_raw.agency.AGCITY
+  state:
+    description: "State"
+    lineage:
+      - datalake_cyber_raw.agency.AGSTATE
+  zip_code:
+    description: "Zip code"
+    lineage:
+      - datalake_cyber_raw.agency.AGZIP
+  address_complement:
+    description: "Address complement"
+    lineage:
+      - datalake_cyber_raw.agency.AGADDR3
+  phone_number:
+    description: "Phone number"
+    lineage:
+      - datalake_cyber_raw.agency.AGPHONE
+  contract_termination_reason:
+    description: "Contract termination reason"
+    lineage:
+      - datalake_cyber_raw.agency.AGENDOBS
+  has_commission:
+    description: "Flag that indicates whether the agency receives a commission or not"
+    lineage:
+      - datalake_cyber_raw.agency.AGFLGCMS
+  has_shipments:
+    description: "Flag that indicates whether the agency generates shipments (remessa) or not"
+    lineage:
+      - datalake_cyber_raw.agency.AGFLGSND
+  active_accounts:
+    description: "Current number of active accounts"
+    lineage:
+      - datalake_cyber_raw.agency.AGNUMACT
+  accounts_released_month:
+    description: "Number of accounts released this month"
+    lineage:
+      - datalake_cyber_raw.agency.AGNUMREL
+  accounts_satisfied_month:
+    description: "Number of accounts satisfied this month"
+    lineage:
+      - datalake_cyber_raw.agency.AGNUMSAT
+  current_amount_recovered:
+    description: "Current amount recovered"
+    lineage:
+      - datalake_cyber_raw.agency.AGAMTCOL
+  current_commission_rate:
+    description: "Current commission rate"
+    lineage:
+      - datalake_cyber_raw.agency.AGCCRATE
+  waiting_days_before_paying_commission:
+    description: "Waiting days before paying commission"
+    lineage:
+      - datalake_cyber_raw.agency.AGCOMLAG
+  prior_commission_fee:
+    description: "Prior commission fee"
+    lineage:
+      - datalake_cyber_raw.agency.AGPCRATE
+  amount_satisfied:
+    description: "Amount satisfied this month"
+    lineage:
+      - datalake_cyber_raw.agency.AGAMTSAT
+  amount_released:
+    description: "Amount released this month"
+    lineage:
+      - datalake_cyber_raw.agency.AGAMTREL
+  current_active_amount:
+    description: "Current active value"
+    lineage:
+      - datalake_cyber_raw.agency.AGAMTACT
+  ts_start:
+    description: "Contract start date"
+    lineage:
+      - datalake_cyber_raw.agency.AGSTARTDT
+  ts_assigned_agency:
+    description: "Last date an account was assigned to this agency"
+    lineage:
+      - datalake_cyber_raw.agency.AGAGNREF
+  ts_contract_termination:
+    description: "Contract termination date"
+    lineage:
+      - datalake_cyber_raw.agency.AGENDDT
