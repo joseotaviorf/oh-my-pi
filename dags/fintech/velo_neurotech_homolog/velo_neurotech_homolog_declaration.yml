@@ -17,6 +17,7 @@ workflow:
     - "{dag_name}"
     - "{{ ds }}"
     - "{table_name}"
+    - "{partitions}"
 
   tables_customization:
     logs_credit_granting:
