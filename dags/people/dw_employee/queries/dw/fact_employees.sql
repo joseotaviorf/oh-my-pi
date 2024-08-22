@@ -283,7 +283,7 @@ WITH
             id_person,
             EXPLODE(disabilities) AS disabilities
         FROM
-            datalake_hr_system_clean.workers 
+            datalake_hr_system_clean.workers
         QUALIFY 2 = DENSE_RANK() OVER (
             PARTITION BY id_person
             ORDER BY
@@ -316,11 +316,95 @@ WITH
             ) AS sk_disability
         FROM
             disabilities_step1 ds1 FULL
-            OUTER JOIN 
-                self_declaration sd 
+            OUTER JOIN
+                self_declaration sd
                     ON ds1.id_person = sd.id_person
                     AND ds1.disabilities ['LegislationCode'] = sd.legislation_code
+    ),
+    assignments AS (
+        SELECT DISTINCT
+            id_assignment,
+            id_period_of_service
+        FROM
+            datalake_hr_system.assignments
+    ),
+    ranked_managers AS (
+        SELECT
+            mh.id_assignment,
+            mh.id_manager_assignment,
+            a.id_period_of_service AS id_period_of_service_manager,
+            mh.separation_degree,
+            ROW_NUMBER() OVER (
+                PARTITION BY
+                    mh.id_assignment
+                ORDER BY
+                    mh.separation_degree DESC
+            ) as rn
+        FROM
+            datalake_hr_system.management_hierarchy AS mh
+        LEFT JOIN
+            assignments AS a
+                ON a.id_assignment = mh.id_manager_assignment
+    ),
+    managers_long AS (
+        SELECT
+            id_assignment,
+            MAX(
+                CASE
+                    WHEN rn = 1 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_0,
+            MAX(
+                CASE
+                    WHEN rn = 2 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_1,
+            MAX(
+                CASE
+                    WHEN rn = 3 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_2,
+            MAX(
+                CASE
+                    WHEN rn = 4 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_3,
+            MAX(
+                CASE
+                    WHEN rn = 5 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_4,
+            MAX(
+                CASE
+                    WHEN rn = 6 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_5,
+            MAX(
+                CASE
+                    WHEN rn = 7 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_6,
+            MAX(
+                CASE
+                    WHEN rn = 8 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_7,
+            MAX(
+                CASE
+                    WHEN rn = 9 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_8,
+            MAX(
+                CASE
+                    WHEN rn = 10 THEN id_period_of_service_manager
+                END
+            ) AS sk_assignment_leadership_order_9
+        FROM
+            ranked_managers
+        GROUP BY
+            id_assignment
     )
+
 SELECT
     am.sk_assignment,
     am.sk_employee,
@@ -337,6 +421,20 @@ SELECT
     REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
     am.sk_last_increase_date,
     REPLACE (se.dt_first_promotion, '-', '') AS sk_dt_first_promotion,
+    MD5(
+        CONCAT(
+            COALESCE(sk_assignment_leadership_order_0, -1),
+            COALESCE(sk_assignment_leadership_order_1, -1),
+            COALESCE(sk_assignment_leadership_order_2, -1),
+            COALESCE(sk_assignment_leadership_order_3, -1),
+            COALESCE(sk_assignment_leadership_order_4, -1),
+            COALESCE(sk_assignment_leadership_order_5, -1),
+            COALESCE(sk_assignment_leadership_order_6, -1),
+            COALESCE(sk_assignment_leadership_order_7, -1),
+            COALESCE(sk_assignment_leadership_order_8, -1),
+            COALESCE(sk_assignment_leadership_order_9, -1)
+        )
+    ) AS sk_hierarchy,
     am.assignment_number,
     am.salary_currency,
     am.is_last_work_relationship,
@@ -373,5 +471,8 @@ LEFT JOIN
 LEFT JOIN
     cte_dim_employee_disability AS ded
         ON am.sk_employee = ded.id_person
+LEFT JOIN
+    managers_long AS ml
+        ON ml.id_assignment = am.sk_assignment
 WHERE
     am.is_last_work_relationship

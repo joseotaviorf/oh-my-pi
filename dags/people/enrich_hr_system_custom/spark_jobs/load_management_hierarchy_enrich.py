@@ -45,6 +45,7 @@ if __name__ == "__main__":
         WHERE
             dt_effective_start <= current_date
             AND manager_type = 'LINE_MANAGER'
+            AND id_manager_assignment <> '300000008488092'
         QUALIFY
             dt_effective_start = MAX(dt_effective_start)
             OVER (PARTITION BY id_assignment)
