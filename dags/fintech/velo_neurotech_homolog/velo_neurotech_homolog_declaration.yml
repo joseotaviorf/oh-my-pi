@@ -20,13 +20,13 @@ workflow:
 
   tables_customization:
     logs_credit_granting:
+      partitions: [year, month, day]
       extra_spark_job_arguments:
         - DadosConcessaoCreditoAPI
-      partitions: [year, month, day]
     logs_scoping_policy:
+      partitions: [year, month, day]
       extra_spark_job_arguments:
         - DadosAlcadaAPI
-      partitions: [year, month, day]
 
 cluster:
   type: databricks_13_3_med_general_cluster
