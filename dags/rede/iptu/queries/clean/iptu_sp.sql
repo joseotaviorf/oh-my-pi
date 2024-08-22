@@ -1,8 +1,8 @@
-SELECT 
+SELECT
   TRIM(numero_do_contribuinte::STRING) AS taxpayer_number,
   TRIM(numero_do_condominio::STRING) AS condo_number,
   numero_da_nl::INT AS release_notification_number,
-  fase_do_contribuinte::INT AS taxpayer_phase, 
+  fase_do_contribuinte::INT AS taxpayer_phase,
   TRIM(codlog_do_imovel::STRING) AS street_code,
   TRIM(nome_de_logradouro_do_imovel::STRING) AS address,
   numero_do_imovel::INT AS number,
@@ -16,10 +16,10 @@ SELECT
   area_do_terreno::INT AS land_area_m2,
   area_construida::INT AS built_area_m2,
   area_ocupada::INT AS occupied_area_m2,
-  valor_do_m2_de_construcao::DOUBLE AS land_price_m2,
+  valor_do_m2_do_terreno::DOUBLE AS land_price_m2,
   valor_do_m2_de_construcao::DOUBLE AS building_price_m2,
   testada_para_calculo::DOUBLE AS frontage,
-  fracao_ideal::DECIMAL(18, 2) AS ideal_fraction,
+  fracao_ideal::DECIMAL(18, 4) AS ideal_fraction,
   fator_de_obsolescencia::DOUBLE AS depreciation_factor,
   quantidade_de_esquinas_frentes::INT AS qty_street_corners_or_fronts,
   quantidade_de_pavimentos::INT AS qty_floors,
@@ -29,5 +29,5 @@ SELECT
   mes_de_inicio_da_vida_do_contribuinte::INT AS first_month_of_taxpayer_life,
   TO_DATE(data_do_cadastramento, "dd/MM/yy") AS dt_registration,
   dt_load
-FROM 
+FROM
   datalake_iptu_raw.iptu_sp

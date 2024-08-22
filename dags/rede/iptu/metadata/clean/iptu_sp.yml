@@ -2,10 +2,10 @@
 database_name: datalake_iptu_clean
 table_name: iptu_sp
 description: |
-  This table contains IPTU data from São Paulo, featuring details on urban properties such as location, venal value, and property usage. 
-  Extracted from the GeoSampa website, the table is periodically updated by the City Hall. 
-  It's a valuable resource for urban analysis and real estate market studies. 
-  
+  This table contains IPTU data from São Paulo, featuring details on urban properties such as location, venal value, and property usage.
+  Extracted from the GeoSampa website, the table is periodically updated by the City Hall.
+  It's a valuable resource for urban analysis and real estate market studies.
+
   Source: https://geosampa.prefeitura.sp.gov.br/PaginasPublicas/_SBC.aspx
   Metadata: (https://metadados.geosampa.prefeitura.sp.gov.br/geonetwork/srv/por/catalog.search#/metadata/b971efa1-aad5-42f3-ad28-18f1f4efe270).
 domain: Rede
@@ -14,72 +14,72 @@ columns:
   taxpayer_number:
     lineage:
       - datalake_iptu_raw.iptu_sp.numero_do_contribuinte
-    description: | 
+    description: |
       Each property will correspond to a registration number in the Tax Real Estate Registry, with the following being understood as a property: I - the area of land, built or not, defined in the registration of the competent Real Estate Registry Service or in transcripts that are still in force.
   condo_number:
     lineage:
       - datalake_iptu_raw.iptu_sp.numero_do_condominio
-    description: | 
+    description: |
       Condominium number (if any).
   release_notification_number:
     lineage:
       - datalake_iptu_raw.iptu_sp.numero_da_nl
-    description: | 
+    description: |
       Release Notification Number.
   taxpayer_phase:
     lineage:
       - datalake_iptu_raw.iptu_sp.fase_do_contribuinte
-    description: | 
+    description: |
       Taxpayer phase.
   street_code:
     lineage:
       - datalake_iptu_raw.iptu_sp.codlog_do_imovel
-    description: | 
+    description: |
       Street code of the property according to the "Cadastro de Logradouro".
   address:
     lineage:
       - datalake_iptu_raw.iptu_sp.nome_de_logradouro_do_imovel
-    description: | 
+    description: |
       Property street name.
   number:
     lineage:
       - datalake_iptu_raw.iptu_sp.numero_do_imovel
-    description: | 
+    description: |
       Property number. Composes the property's address.
   zipcode:
     lineage:
       - datalake_iptu_raw.iptu_sp.cep_do_imovel
-    description: | 
+    description: |
       Postal Address Code. Composes the property's address.
   complement:
     lineage:
       - datalake_iptu_raw.iptu_sp.complemento_do_imovel
-    description: | 
+    description: |
       Property complement. Composes the property's address.
   reference:
     lineage:
       - datalake_iptu_raw.iptu_sp.referencia_do_imovel
-    description: | 
+    description: |
       Property reference. Composes the property's address.
   neighborhood:
     lineage:
       - datalake_iptu_raw.iptu_sp.bairro_do_imovel
-    description: | 
+    description: |
       Property neighborhood. Composes the property's address.
   property_use_type:
     lineage:
       - datalake_iptu_raw.iptu_sp.tipo_de_uso_do_imovel
-    description: | 
+    description: |
       The IPTU use code is the code that represents the type of use of the property.
   building_standard_type:
     lineage:
       - datalake_iptu_raw.iptu_sp.tipo_de_padrao_da_construcao
-    description: | 
+    description: |
       The IPTU standard code is the code that represents the type of property.
   land_type:
     lineage:
       - datalake_iptu_raw.iptu_sp.tipo_de_terreno
-    description: | 
+    description: |
       Land position.
     categories:
       "De duas ou mais frentes": "Two or more fronts"
@@ -92,75 +92,75 @@ columns:
   land_area_m2:
     lineage:
       - datalake_iptu_raw.iptu_sp.area_do_terreno
-    description: | 
+    description: |
       The land area is the area of the property in square meters.
   built_area_m2:
     lineage:
       - datalake_iptu_raw.iptu_sp.area_construida
-    description: | 
+    description: |
       The built area is This is the area that has buildings on the land in square meters.
   occupied_area_m2:
     lineage:
       - datalake_iptu_raw.iptu_sp.area_ocupada
-    description: | 
+    description: |
       The occupied area is the area of the property that is occupied in square meters.
   land_price_m2:
     lineage:
-      - datalake_iptu_raw.iptu_sp.valor_do_m2_de_construcao
-    description: | 
+      - datalake_iptu_raw.iptu_sp.valor_do_m2_do_terreno
+    description: |
       The land price per square meter is the value of the property divided by the land area in R$.
   building_price_m2:
     lineage:
       - datalake_iptu_raw.iptu_sp.valor_do_m2_de_construcao
-    description: | 
+    description: |
       The building price per square meter is the value of the property divided by the built area in R$.
   frontage:
     lineage:
       - datalake_iptu_raw.iptu_sp.testada_para_calculo
-    description: | 
+    description: |
       The frontage is the width of the property (including the side walls, if there are any). If your property is on a corner, you should add up the front (main) and side (secondary) frontages.
   ideal_fraction:
     lineage:
       - datalake_iptu_raw.iptu_sp.fracao_ideal
-    description: | 
+    description: |
       Incidence of the acquisition percentage over the ideal fraction original.
   depreciation_factor:
     lineage:
       - datalake_iptu_raw.iptu_sp.fator_de_obsolescencia
-    description: | 
+    description: |
       Depreciation coefficients for the value of buildings, by age.
   qty_street_corners_or_fronts:
     lineage:
       - datalake_iptu_raw.iptu_sp.quantidade_de_esquinas_frentes
-    description: | 
+    description: |
       Number of corners or fronts of the property.
   qty_floors:
     lineage:
       - datalake_iptu_raw.iptu_sp.quantidade_de_pavimentos
-    description: | 
+    description: |
       Number of floors of the property.
   built_year:
     lineage:
       - datalake_iptu_raw.iptu_sp.ano_da_construcao_corrigido
-    description: | 
+    description: |
       Year that the construction of the property was finished.
   iptu_year:
     lineage:
       - datalake_iptu_raw.iptu_sp.ano_do_exercicio
-    description: | 
+    description: |
       Year of the IPTU exercise.
   first_year_of_taxpayer_life:
     lineage:
       - datalake_iptu_raw.iptu_sp.ano_de_inicio_da_vida_do_contribuinte
-    description: | 
+    description: |
       Year of the first IPTU of the taxpayer.
   first_month_of_taxpayer_life:
     lineage:
       - datalake_iptu_raw.iptu_sp.ano_de_inicio_da_vida_do_contribuinte
-    description: | 
+    description: |
       Month of the first IPTU of the taxpayer.
   dt_registration:
     lineage:
       - datalake_iptu_raw.iptu_sp.data_do_cadastramento
-    description: | 
+    description: |
       Date of registration of the property.
