@@ -29,4 +29,4 @@ workflow:
     reprocessing_events:
       - outbound_contact_attempts
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: databricks_12_2_med_2_fixed_workers_general_photon_cluster
