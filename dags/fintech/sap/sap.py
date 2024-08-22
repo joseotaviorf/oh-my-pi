@@ -31,7 +31,7 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 clean_partition_cols = config_service.get_config("clean_partition_cols")
 
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("databricks_12_2_med_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

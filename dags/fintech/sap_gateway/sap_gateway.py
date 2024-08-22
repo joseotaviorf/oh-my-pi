@@ -36,7 +36,7 @@ raw_spark_job_path = (
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("databricks_12_2_med_general_cluster")
 
 LIBRARIES_DESCRIPTION = config_service.get_config("default_libraries")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

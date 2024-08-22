@@ -39,7 +39,7 @@ reverse_spark_job_path = (
     f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_s3_data_into_external_bucket.py"
 )
 
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("databricks_12_2_med_general_cluster")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
