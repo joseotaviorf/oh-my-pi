@@ -130,6 +130,15 @@ columns:
   discard_year_month:
     description: The year and month when the lead was discarded.
     lineage: dw_public.dim_date.discard_year_month
+  discard_agent:
+    description: Name of the agent that has discarded the user.
+    lineage: dw_growth.dim_supply_operation_flow.nm_agent
+  discard_partner:
+    description: Name of the partner that has discarded the user.
+    lineage: dw_growth.dim_supply_operation_flow.nm_partner
+  discard_assigned_partner:
+    description: Name of the assigned partner that has discarded the user.
+    lineage: dw_growth.dim_supply_operation_flow.nm_assigned_partner
   ds_objective:
     description: Objective associated with the lead according to business rules.
     lineage: dw_growth.dim_supply_operation_flow.ds_objective

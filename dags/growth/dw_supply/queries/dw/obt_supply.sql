@@ -6,7 +6,10 @@ WITH descartes AS (
         fse.nm_business_context,
         dsd.cd_funnel_step,
         dsd.cd_discard_reason,
-        dsd.ds_discard_reason
+        dsd.ds_discard_reason,
+        dsof.nm_agent,
+        dsof.nm_partner,
+        dsof.nm_assigned_partner
     FROM 
         dw_growth.fact_supply_events AS fse
     LEFT JOIN 
@@ -15,6 +18,9 @@ WITH descartes AS (
     LEFT JOIN 
         dw_growth.dim_funnel_step AS dfs
             ON dfs.sk_funnel_step = fse.sk_funnel_step
+    LEFT JOIN 
+        dw_growth.dim_supply_operation_flow AS dsof 
+            ON fse.sk_ops = dsof.sk_ops
     WHERE dfs.tp_business_event = 'drop'
     QUALIFY discard_order = 1
 ),
@@ -64,6 +70,9 @@ base AS (
         dsd.cd_discard_reason,
         dsd.ds_discard_reason,
         dsd.cd_funnel_step AS discard_funnel_step,
+        dsd.nm_agent discard_agent,
+        dsd.nm_partner discard_partner,
+        dsd.nm_assigned_partner as discard_assigned_partner,
         ddd.date AS discard_date,
         ddd.year_month AS discard_year_month,
         dsof.ds_objective,
@@ -185,10 +194,12 @@ report_origin AS (
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'capta_ai' THEN 'Capta Aí'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel IN ('asp', 'account_manager_pp_multi') THEN 'PP Multi'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
+            WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' THEN 'Owner PWA - Not Mapped'
+            WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
@@ -207,10 +218,12 @@ report_origin AS (
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'capta_ai' THEN 'Capta Aí'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel IN ('asp', 'account_manager_pp_multi') THEN 'PP Multi'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
+            WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' THEN 'Owner PWA - Not Mapped'
+            WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
@@ -226,6 +239,7 @@ report_origin AS (
             -- Adjusting cases without leads
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND obt.acquisition_origin = 'notmapped-notmapped' THEN 'Owner PWA - Not Mapped'
             -- Adjusting cases with leads equal other
+            WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
