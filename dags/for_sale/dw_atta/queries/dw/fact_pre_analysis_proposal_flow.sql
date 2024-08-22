@@ -43,7 +43,6 @@ pre_analysis_proposal_flow AS (
                         COALESCE(cs.id_registration_user,-1) AS sk_registration_user,
                         COALESCE(pp.id_consultant, cs.id_consultant, -1) AS sk_consultant,
                         reg_user.user_name || ' ' || reg_user.user_last_name AS registration_user_name,
-                        pp.send_backoffice,
                         CASE
                             WHEN dsa.is_ccv_canceled = true THEN true
                             WHEN fo.sk_offer_rescued_date > fo.sk_offer_dismissed_date THEN false
@@ -273,7 +272,6 @@ f.sk_partner,
 f.sk_registration_user,
 f.sk_consultant,
 f.registration_user_name,
-f.send_backoffice,
 f.is_offer_canceled,
 CASE WHEN f.sk_proposal = cp.sk_proposal THEN 1 ELSE 0 END AS is_most_advanced_canc,
 CASE WHEN f.sk_proposal = op.sk_proposal THEN 1 ELSE 0 END AS is_most_advanced_og,

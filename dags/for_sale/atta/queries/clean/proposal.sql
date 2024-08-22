@@ -18,7 +18,6 @@ SELECT
     CPF                         AS client_cpf,
     Nome                        AS client_name,
     Valor                       AS financing_value,
-    EnviarMesa                  AS send_backoffice,
     TIMESTAMP(DtEntrada)        AS ts_registration,
     TIMESTAMP(DtFinalizacao)    AS ts_financing_ended,
     TIMESTAMP(DtUltAtu)         AS ts_last_updated

@@ -59,9 +59,6 @@ columns:
   financing_value:
     lineage:
       - datalake_atta_raw.proposta.valor
-  send_backoffice:
-    lineage:
-      - datalake_atta_raw.proposta.EnviarMesa
   ts_registration:
     lineage:
       - datalake_atta_raw.proposta.dtentrada

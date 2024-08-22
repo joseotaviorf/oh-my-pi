@@ -36,7 +36,6 @@ SELECT
         WHEN p.wallet = 'Other partnerships' AND pp.id_franchise > 0 AND pp.id_franchise NOT IN (1, 182) AND f.franchise_name NOT LIKE '%5A%' THEN 'Canal Franquia'
         WHEN p.wallet = 'Other partnerships' AND pp.id_franchise IN (1, 182) THEN 'Canal Jardins'
     END AS channel,
-    pp.send_backoffice,
     COALESCE(conf.house_sale_value, cs.house_value) AS house_value,
     COALESCE(conf.bank_valuation_value, ppi.estimated_house_value) AS house_value_bank_evaluation,
     COALESCE(conf.down_payment_own_resources_value, ppi.down_payment_value, cs.house_value - pp.financing_value, cs.down_payment_amount) AS down_payment_amount,

@@ -48,10 +48,6 @@ columns:
         description: "Description of proposal status"
     proposal_situation:
         description: "Description of proposal situation"
-    send_backoffice:
-        lineage:
-            - datalake_atta_clean.proposal.send_backoffice
-        description: "Send backoffice"
     channel:
         description: "Proposal channel grouping"
     house_value:

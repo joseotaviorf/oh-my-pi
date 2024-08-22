@@ -76,10 +76,6 @@ columns:
         description: "Consultant's identification number"
     registration_user_name:
         description: "Pre analysis registration user's full name"
-    send_backoffice:
-        lineage:
-            - datalake_atta_clean.proposal.send_backoffice
-        description: "Send backoffice"
     is_offer_canceled:
         description: "Flag to identify if proposal is canceled"
     is_most_advanced_canc:
