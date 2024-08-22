@@ -1,6 +1,6 @@
 ---
 dag:
-  name: payable_accounts_transactions_homolog
+  name: payable_accounts_transactions
   schedule_interval: 0 3 * * *
   owner: Data Fintech
   documentation:
@@ -24,8 +24,8 @@ workflow:
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: m5a.4xlarge
-    node_type_id: m5a.2xlarge
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.xlarge
     num_workers: 3
     spark_version: 13.3.x-scala2.12
 
