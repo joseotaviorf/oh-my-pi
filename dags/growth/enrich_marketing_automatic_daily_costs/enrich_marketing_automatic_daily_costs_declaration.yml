@@ -1,0 +1,19 @@
+dag:
+  name: enrich_marketing_automatic_daily_costs
+  schedule_start_date: 2022, 6, 1
+  documentation:
+    dag_purpose: |
+      This DAG generates the automatic costs (i.e. gathered from medias API/Crawlers) combined with the taxonomy tables and saves its part in the final Fact Marketing Daily Costs aside Enrich Marketing Manual Daily Costs.
+      More information about the Fact's architecture can be found at [this diagram] (https://app.diagrams.net/#G1aM-IGy6JcG1rxB0IyDxOJpyCU6GMoFzm) under the "New Arch" tab.
+  owner: Data Growth
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: marketing_costs
+  default_extraction_type: incremental
+  default_partitions: [id_date, flow_type]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_13_3_med_general_3_nodes_cluster
