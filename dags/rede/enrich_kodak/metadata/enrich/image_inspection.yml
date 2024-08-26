@@ -89,6 +89,62 @@ columns:
     description: Overall score for the framing of the photo.
     lineage:
       - datalake_kodak_clean.image_inspection_group.framing_score
+  is_approved:
+    description: Indicates whether the photo is approved. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.is_approved
+  has_red_flag_watermark:
+    description: Indicates if the photo has a watermark. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_watermark
+  has_red_flag_compliance:
+    description: Indicates if the photo has compliance issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_compliance
+  has_red_flag_size:
+    description: Indicates if the photo size is flagged. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_size
+  has_red_flag_sharpness:
+    description: Indicates if the photo sharpness is flagged. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_sharpness
+  has_red_flag_not_property:
+    description: Indicates if the photo does not belong to the property. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_not_property
+  has_red_flag_aspect_ratio:
+    description: Indicates if the photo aspect ratio is flagged. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_aspect_ratio
+  has_red_flag_casamineira:
+    description: Indicates if the photo is flagged for issues related to 'casamineira'. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_casamineira
+  has_red_flag_media_modification:
+    description: Indicates if the photo has been modified. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_media_modification
+  has_red_flag_duplicate_image:
+    description: Indicates if the photo is flagged as a duplicate image. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_duplicate_image
+  has_fault_brightness:
+    description: Indicates if the photo has brightness issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_fault_brightness
+  has_fault_sharpness:
+    description: Indicates if the photo has sharpness issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_fault_sharpness
+  has_fault_aspect_ratio:
+    description: Indicates if the photo has aspect ratio issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_fault_aspect_ratio
+  has_bonus_sharpness:
+    description: Indicates if the photo has a bonus for sharpness. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_sharpness
   ts_created:
     description: Timestamp when the inspection record was created.
     lineage:
