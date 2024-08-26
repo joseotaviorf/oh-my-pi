@@ -1,0 +1,83 @@
+---
+database_name: datalake_superset_clean
+table_name: saved_query
+description: Table with Superset saved queries. This is a personal features that only the creator can see.
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.saved_query.id
+    description: Superset saved query id.
+  id_user:
+    lineage:
+      - datalake_superset_raw.saved_query.id_user
+    description: Superset id to identify the user who created the saved query.
+  id_database:
+    lineage:
+      - datalake_superset_raw.saved_query.id_database
+    description: Superset id to identify the database associated with saved query.
+  uuid:
+    lineage:
+      - datalake_superset_raw.saved_query.uuid
+    description: Universally Unique Identifier
+  label:
+    lineage:
+      - datalake_superset_raw.saved_query.label
+    description: Saved query name.
+  schema:
+    lineage:
+      - datalake_superset_raw.saved_query.schema
+    description: What schemas compose the saved query.
+  sql:
+    lineage:
+      - datalake_superset_raw.saved_query.sql
+    description: Saved query sql code.
+  description:
+    lineage:
+      - datalake_superset_raw.saved_query.description
+    description: Save query description about query purpose.
+  id_user_changed:
+    lineage:
+      - datalake_superset_raw.saved_query.id_user_changed
+    description: Superset id to identify the user who performed the last update.
+  id_user_created:
+    lineage:
+      - datalake_superset_raw.saved_query.id_user_created
+    description: Superset id to identify the user who created saved query.
+  extra_json:
+    lineage:
+      - datalake_superset_raw.saved_query.extra_json
+    description: Superset extra params aggregated in a json field.
+  last_run:
+    lineage:
+      - datalake_superset_raw.saved_query.last_run
+    description: Las execution datetime. NaT if the query not executed yet.
+  rows:
+    lineage:
+      - datalake_superset_raw.saved_query.rows
+    description: Number of rows returned by saved query.
+  template_parameters:
+    lineage:
+      - datalake_superset_raw.saved_query.template_parameters
+    description: Superset frontend params aggregated in a json field.
+  ts_created:
+    lineage:
+      - datalake_superset_raw.saved_query.ts_created
+    description: Timestamp when this entry was created.
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.saved_query.ts_changed
+    description: Timestamp when this entry was modified.
+  year:
+    lineage:
+      - datalake_superset_raw.saved_query.year
+    description: Executed year.
+  month:
+    lineage:
+      - datalake_superset_raw.saved_query.month
+    description: Executed month.
+  day:
+    lineage:
+      - datalake_superset_raw.saved_query.day
+    description: Executed day.

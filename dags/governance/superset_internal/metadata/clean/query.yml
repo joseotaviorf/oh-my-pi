@@ -1,0 +1,135 @@
+---
+database_name: datalake_superset_clean
+table_name: query
+description: Table with queries executed on Superset
+domain: Data Governance
+owner: giuseppe.giovanelli@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_superset_raw.query.id
+    description: Query identifier
+  id_client:
+    lineage:
+      - datalake_superset_raw.query.client_id
+    description: Client identifier.
+  id_database:
+    lineage:
+      - datalake_superset_raw.query.database_id
+    description: Database identifier. It connects to the db table on id.
+  id_sql_editor:
+    lineage:
+      - datalake_superset_raw.query.sql_editor_id
+    description: SQL Editor identifier. 
+  id_user:
+    lineage:
+      - datalake_superset_raw.query.user_id
+    description: User identifier. It connects to the ab_user table on id.
+  tmp_table_name:
+    lineage:
+      - datalake_superset_raw.query.tmp_table_name
+    description: ""
+  tab_name:
+    lineage:
+      - datalake_superset_raw.query.tab_name
+    description: Name on the describe on the sql lab tab.
+  status:
+    lineage:
+      - datalake_superset_raw.query.status
+    description: Marks whether the query is a success or failed.
+  schema:
+    lineage:
+      - datalake_superset_raw.query.schema
+    description: schema selected on the left panel.
+  sql:
+    lineage:
+      - datalake_superset_raw.query.sql
+    description: SQL query executed.
+  select_sql:
+    lineage:
+      - datalake_superset_raw.query.select_sql
+    description: ""
+  executed_sql:
+    lineage:
+      - datalake_superset_raw.query.executed_sql
+    description: SQL code actually executed. Only filled when the query is executed.
+  limit:
+    lineage:
+      - datalake_superset_raw.query.limit
+    description: row limit imposed on the query
+  select_as_cta:
+    lineage:
+      - datalake_superset_raw.query.select_as_cta
+    description: ""
+  select_as_cta_used:
+    lineage:
+      - datalake_superset_raw.query.select_as_cta_used
+    description: ""
+  progress:
+    lineage:
+      - datalake_superset_raw.query.progress
+    description: How much of the query has been executed. Usally is 0 or 100.
+  rows:
+    lineage:
+      - datalake_superset_raw.query.rows
+    description: How many rows is returned by the query
+  error_message:
+    lineage:
+      - datalake_superset_raw.query.error_message
+    description: Error message shown to the user explaining why the query failed.
+  results_key:
+    lineage:
+      - datalake_superset_raw.query.results_key
+    description: ""
+  tracking_url:
+    lineage:
+      - datalake_superset_raw.query.tracking_url
+    description: Query details url. Usually is already out of date.
+  extra_json:
+    lineage:
+      - datalake_superset_raw.query.extra_json
+    description: More details about the query, such as columns list, error messages, etc
+  tmp_schema_name:
+    lineage:
+      - datalake_superset_raw.query.tmp_schema_name
+    description: ""
+  ctas_method:
+    lineage:
+      - datalake_superset_raw.query.ctas_method
+    description: ""
+  limiting_factor:
+    lineage:
+      - datalake_superset_raw.query.limiting_factor
+    description: ""
+  ts_start_running:
+    lineage:
+      - datalake_superset_raw.query.start_running_time
+    description: unixtimestamp when the query started running.
+  ts_end_result_backend:
+    lineage:
+      - datalake_superset_raw.query.end_result_backend_time
+    description: ""
+  ts_start:
+    lineage:
+      - datalake_superset_raw.query.start_time
+    description: unixtimestamp when the query started
+  ts_changed:
+    lineage:
+      - datalake_superset_raw.query.changed_on
+    description: timestamp when this entry was modified.
+  ts_end:
+    lineage:
+      - datalake_superset_raw.query.end_time
+    description: unixtimestamp when the query ended.
+  year:
+    lineage:
+      - datalake_superset_raw.query.year
+    description: executed year
+  month:
+    lineage:
+      - datalake_superset_raw.query.month
+    description: executed month
+  day:
+    lineage:
+      - datalake_superset_raw.query.day
+    description: executed day
