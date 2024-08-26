@@ -115,8 +115,8 @@ recontact_check AS (
           'CX Reparos [FRONT] [POS]',
           'CX Rescisão [FRONT] [POS]')
           THEN 'front'
-    END AS unificador_front
-    ts_started,
+    END AS unificador_front,
+    ts_started
   FROM
     front_tickets_list AS rc
   LEFT JOIN
