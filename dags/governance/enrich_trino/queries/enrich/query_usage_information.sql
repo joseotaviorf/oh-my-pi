@@ -55,6 +55,7 @@ WITH base AS (
     hour AS execution_hour,
     execution_start_time AS ts_execution_started,
     execution_end_time AS ts_execution_ended,
+    ROW_NUMBER() OVER(PARTITION BY queryId ORDER BY MAKE_DATE(year, month, day) DESC) as last_event,
     year,
     month,
     day
@@ -106,3 +107,4 @@ SELECT
   month,
   day
 FROM base
+WHERE last_event = 1
