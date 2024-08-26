@@ -1,0 +1,16 @@
+dag:
+  name: enrich_marketing_manual_daily_costs
+  schedule_start_date: 2019, 1, 1
+  documentation:
+    dag_purpose: |
+      This DAG generates the manual costs (i.e. gathered from gsheets tables) and saves its part in the final Fact Marketing Daily Costs aside Enrich Marketing Automatic Daily Costs.
+      More information about the Fact's architecture can be found at [this diagram] (https://app.diagrams.net/#G1aM-IGy6JcG1rxB0IyDxOJpyCU6GMoFzm) under the "New Arch" tab.
+      Notice that the used gsheet is loaded during the middle of the day, so this pipeline will only be available during the middle of the day.
+  owner: Data Growth
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: marketing_costs
+  default_partitions: [id_date, flow_type]
+cluster:
+  type: databricks_13_3_min_general_2_workers_cluster

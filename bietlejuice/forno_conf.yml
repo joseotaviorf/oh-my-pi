@@ -554,6 +554,16 @@ databricks_13_3_min_general_photon_cluster:
         <<: *aws_anchor
         availability: SPOT_WITH_FALLBACK  
 
+databricks_13_3_min_general_2_workers_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK  
+
 databricks_13_3_med_general_2_workers_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5a.large
