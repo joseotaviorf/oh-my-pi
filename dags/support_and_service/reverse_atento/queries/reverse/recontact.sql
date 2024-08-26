@@ -203,7 +203,11 @@ SELECT
   rc.search_window_from,
   rc.search_window_until,
   rc.ts_started_previous_contact AS ts_started_first_contact,
-  rc.ts_started as ts_started
+  rc.ts_started as ts_started,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
+  NOW() AS ts_load
 FROM
   recontact_check AS rc
 LEFT JOIN

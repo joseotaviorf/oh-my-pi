@@ -11,4 +11,4 @@ custom_cluster:
   driver_node_type_id: r6gd.2xlarge
   node_type_id: r6gd.2xlarge
   spark_version: 13.3.x-scala2.12
-  num_workers: 4
+  num_workers: 5
