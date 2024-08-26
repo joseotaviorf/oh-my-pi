@@ -16,6 +16,8 @@ bietlejuice.enrich_static_files:
   is_static: true
 bietlejuice.enrich_talk_to_agent:
   is_static: true
+bietlejuice.enrich_trino_costs:
+  is_static: false
 bietlejuice.enrich_velo_omie:
   is_static: true
 bietlejuice.velo_omie:

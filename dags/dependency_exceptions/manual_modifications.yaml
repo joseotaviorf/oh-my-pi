@@ -983,3 +983,8 @@ quintoml.search.maestro.inference:
 bietlejuice.demand_balancer_service:
   add:
     - quintoml.search.maestro.inference:batch-predict
+
+bietlejuice.enrich_trino_costs:
+  remove:
+    - bietlejuice.enrich_people_public:load-enrich-org-chart
+    - bietlejuice.gsheets_governance:load-clean-cost-center-directory
