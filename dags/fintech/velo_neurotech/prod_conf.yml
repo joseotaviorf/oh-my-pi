@@ -1,9 +1,0 @@
----
-reports:
-  - report_name: DadosConcessaoCreditoAPI
-    table_name: logs_credit_granting
-  - report_name: DadosAlcadaAPI
-    table_name: logs_scoping_policy
-partition_cols: ["year", "month", "day"]
-cluster_libs:
-  - whl: "{artifacts_bucket}/velo-neurotech-api-client-python/quintoandar_velo_neurotech_api_client-0.3.2-py2.py3-none-any.whl"

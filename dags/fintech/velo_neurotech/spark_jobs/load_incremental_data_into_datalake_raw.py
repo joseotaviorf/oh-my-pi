@@ -86,19 +86,17 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the API")
     parser.add_argument("execution_date", help="execution date in str format %Y-%m-%d")
     parser.add_argument("table_name", help="Name of the table to store data into")
-    parser.add_argument(
-        "report_name", help="Name of the report to load data from Neurotech"
-    )
-    parser.add_argument("partition_cols", help="Partition columns name")
-
+    parser.add_argument("partitions", help="Partition columns name")
+    parser.add_argument("report_name", help="Name of the report to load data from Neurotech")
     args = parser.parse_args()
 
-    args.partition_cols = ast.literal_eval(args.partition_cols)
+    args.partition_cols = ast.literal_eval(args.partitions)
+    report_name = args.report_name
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}, execution_date={args.execution_date},
-            datalake_bucket={args.datalake_bucket}, table_name={args.table_name}, report_name={args.report_name} msg=Starting spark job..."
+            m={JOB_NAME}, environment={args.environment}, datalake_bucket={args.datalake_bucket}, source={args.source}, execution_date={args.execution_date},
+            table_name={args.table_name} msg=Starting spark job..."
         """
     )
 
@@ -119,7 +117,7 @@ if __name__ == "__main__":
         client_id=credentials["client_id"],
         client_secret=credentials["client_secret"],
         end_date=dt_execution,
-        report_name=args.report_name,
+        report_name=report_name,
     )
 
     if len(pandas_df) == 0:
@@ -132,7 +130,7 @@ if __name__ == "__main__":
         message = (
             f":warning:\n"
             f"DAG: *{args.source}*\n"
-            f"Report: *{args.report_name}*\n"
+            f"Report: *{report_name}*\n"
             f"Environment: *{args.environment}*\n"
             f"Status: *FAILED*\n"
             f"*Existence validation failed for `{datetime.now().strftime('%Y-%m-%d')}`\n"

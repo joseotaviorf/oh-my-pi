@@ -1,6 +1,6 @@
 ---
 dag:
-  name: velo_neurotech_homolog
+  name: velo_neurotech
   schedule_interval: 0 3 * * *
   owner: Data Fintech
   documentation:
