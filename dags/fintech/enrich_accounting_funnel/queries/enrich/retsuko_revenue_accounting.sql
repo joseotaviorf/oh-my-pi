@@ -23,8 +23,14 @@ retsuko AS (
         se.id_sap_gateway_feature,
         'seu barriga' AS source_name,
         CASE
+            WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN '41102.01.06'
+            WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN '41103.02.01'
+            WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN '21104.01.07'
+        END AS revenue_account,
+        CASE
             WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN 'rental anticipation fee'
             WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN 'property damage fine'
+            WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN 'pro guarantor 5A installment'
         END AS revenue_name,
         i.accrual_year_month,
         DATE(e.ts_created) AS dt_source_trigger,
@@ -53,7 +59,8 @@ retsuko AS (
         TRUE
         AND SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'rental-anticipation-fee',
-                      'property-damage-fine'
+                      'property-damage-fine',
+                      'pro-guarantor-5A-installment'
                       )
         AND ct.country_code = 'BR'
         AND DATE(e.ts_created) >= '2024-01-01'
@@ -70,9 +77,18 @@ retsuko_fine AS (
         se.id_sap_gateway_feature,
         'seu barriga' AS source_name,
         CASE
+            WHEN e.bill_item IN ('entry.bill-item/fine-and-interest') THEN '31102.01.01'
+            WHEN e.bill_item IN ('entry.bill-item/negotiation-fine-and-interest') THEN '41102.01.16'
+            WHEN e.bill_item IN ('entry.bill-item/credit-card-revenue') THEN '41102.01.05'
+            WHEN e.bill_item IN ('entry.bill-item/fine') THEN '31102.01.01'
+            WHEN e.bill_item IN ('entry.bill-item/interest') THEN '41102.01.15'
+        END AS revenue_account,
+        CASE
             WHEN e.bill_item IN ('entry.bill-item/fine-and-interest') THEN 'fine and interest'
             WHEN e.bill_item IN ('entry.bill-item/negotiation-fine-and-interest') THEN 'negotiation fine and interest'
             WHEN e.bill_item IN ('entry.bill-item/credit-card-revenue') THEN 'credit card revenue'
+            WHEN e.bill_item IN ('entry.bill-item/fine') THEN 'fine'
+            WHEN e.bill_item IN ('entry.bill-item/interest') THEN 'interest'
         END AS revenue_name,
         i.accrual_year_month,
         DATE(i.ts_paid) AS dt_source_trigger,
@@ -97,6 +113,8 @@ retsuko_fine AS (
             (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'fine-and-interest',
                       'negotiation-fine-and-interest'
+                      'fine',
+                      'interest'
                       )) OR
             (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'credit-card-revenue'
@@ -104,7 +122,7 @@ retsuko_fine AS (
             )
         AND ct.country_code = 'BR'
         AND i.ts_paid >= '2024-01-01'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
     HAVING
         SUM(amount) != 0
 ),
@@ -150,7 +168,7 @@ sap AS (
     FROM
         datalake_accounting_funnel.ledger
     WHERE
-        account_number IN ('41102.01.06', '41103.02.01', '41102.01.16', '41102.01.05', '31102.01.01')
+        account_number IN ('41102.01.06', '41103.02.01', '41102.01.16', '41102.01.05', '31102.01.01', '41102.01.15', '21104.01.07')
         AND document_number like 'JE %'
     GROUP BY 1, 2, 3, 5, 6
 ),
@@ -183,7 +201,7 @@ df AS (
             ON r.id_sap_gateway_feature = sap_gateway.id_feature
     LEFT JOIN
         sap
-            ON sap.hash = sap_gateway.hash
+            ON sap.hash = sap_gateway.hash AND r.revenue_account = sap.account_number
     GROUP BY 1, 2, 3, 4, 5 ,6 ,7 ,8 ,11
 ),
 
@@ -191,11 +209,14 @@ df_final AS (
     SELECT
         'JE'||'-'||IF(id_entry IS NOT NULL, id_entry, id_invoice)||'-'||'1'||'-'||'4'||'-'||
         CASE
-          WHEN revenue_name = 'property damage fine' THEN '5'
-          WHEN revenue_name = 'rental anticipation fee' THEN '6'
-          WHEN revenue_name = 'fine and interest' THEN '7'
-          WHEN revenue_name = 'negotiation fine and interest' THEN '8'
-          WHEN revenue_name = 'credit card revenue' THEN '9'
+          WHEN revenue_name = 'property damage fine' THEN '1'
+          WHEN revenue_name = 'rental anticipation fee' THEN '2'
+          WHEN revenue_name = 'fine and interest' THEN '3'
+          WHEN revenue_name = 'negotiation fine and interest' THEN '4'
+          WHEN revenue_name = 'credit card revenue' THEN '5'
+          WHEN revenue_name = 'interest' THEN '6'
+          WHEN revenue_name = 'fine' THEN '7'
+          WHEN revenue_name = 'pro guarantor 5A installment' THEN '8'
         END AS id_retsuko_revenue_accounting,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
