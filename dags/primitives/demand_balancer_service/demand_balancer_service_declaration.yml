@@ -9,12 +9,15 @@ workflow:
   load_spark_job: load_parquet_batch_inference_into_datalake
   default_partitions: [year, month, day, model_version]
 
+  extra_query_template_params:
+    load_processing_date: "{{ get_date_param(dag_run, ds, 'load_processing_date') }}"
+
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
     - s3://data-science.s3.data.quintoandar.com.br/maestro/data/
-    - "{{ next_ds }}"
+    - "{load_processing_date}"
     - "{table_name}"
     - "{partitions}"
     - parquet
