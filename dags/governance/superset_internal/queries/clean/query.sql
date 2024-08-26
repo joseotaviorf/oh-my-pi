@@ -31,5 +31,5 @@ SELECT
     year,
     month,
     day
-FROM datalanke_superset_raw.query
+FROM datalake_superset_raw.query
 WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
