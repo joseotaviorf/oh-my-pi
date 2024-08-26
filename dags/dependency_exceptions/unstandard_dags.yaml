@@ -38,6 +38,7 @@ bietlejuice.gsheets_for_sale: *gsheets-default
 bietlejuice.gsheets_growth: *gsheets-default
 bietlejuice.gsheets_growth_intraday: *gsheets-default
 bietlejuice.gsheets_growth_targets: *gsheets-default
+bietlejuice.gsheets_rede: *gsheets-default
 bietlejuice.gsheets_support_and_service: *gsheets-default
 bietlejuice.gsheets_static:
   <<: *gsheets-default

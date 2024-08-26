@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: rede_performance_targets
+columns:
+  month:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.mes
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.cluster
+  flow:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.flow
+  metric_type:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.type
+  account_manager:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.account_manager
+  metric_target:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.target

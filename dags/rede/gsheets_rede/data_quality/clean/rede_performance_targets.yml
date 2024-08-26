@@ -1,0 +1,29 @@
+---
+table_name: datalake_gsheets_raw.rede_performance_targets
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  month:
+    is_complete:
+      severity_level: Error
+  cluster:
+    is_complete:
+      severity_level: Error
+  flow:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - demand
+        - supply
+        - lead-gen
+  metric_type:
+    is_complete:
+      severity_level: Error
+  metric_target:
+    is_complete:
+      severity_level: Error
+  
