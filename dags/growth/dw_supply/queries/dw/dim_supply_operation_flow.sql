@@ -5,7 +5,8 @@ WITH events AS (
     ops_partner, 
     ops_contact_medium, 
     ops_approach,
-    REPLACE(ops_assigned, 'quinto_andar_outbound', 'quinto_andar') AS ops_assigned
+    REPLACE(ops_assigned, 'quinto_andar_outbound', 'quinto_andar') AS ops_assigned,
+    MAX(ts_event_adjusted) AS last_ts_event
   FROM 
     datalake_supply_flows.supply_events_tracking
   GROUP BY ALL
@@ -28,3 +29,4 @@ SELECT
   ops_approach AS cd_approach,
   NOW() AS ts_updated
 FROM events
+QUALIFY ROW_NUMBER() OVER (PARTITION BY bk_ops ORDER BY last_ts_event DESC) = 1
