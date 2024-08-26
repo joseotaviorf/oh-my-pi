@@ -6,6 +6,7 @@ SELECT
     user_insert,
     installments,
     version,
+    due_date AS dt_due,
     expired AS ts_expired,
     created_at AS ts_created,
     updated_at AS ts_updated,

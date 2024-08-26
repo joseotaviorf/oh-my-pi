@@ -23,6 +23,9 @@ columns:
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.bill.version
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.bill.due_date
   ts_expired:
     lineage:
       - datalake_rental_guarantee_platform_raw.bill.expired
