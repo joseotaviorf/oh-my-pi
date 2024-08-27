@@ -19,6 +19,4 @@ SELECT
 FROM
     datalake_big_agent_raw.earnings
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
