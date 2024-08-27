@@ -35,7 +35,6 @@ workflow:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "absenceCaseId"
-          has_partitions: true
           column_to_partition: "CreationDate"
           has_columns_to_delete: true
           columns_to_delete:
@@ -54,8 +53,6 @@ workflow:
       extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "ActionId"
-          has_partitions: false
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "ActionId:asc"
@@ -64,8 +61,6 @@ workflow:
       extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "ActionReasonId"
-          has_partitions: false
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "ActionReasonId:asc"
@@ -73,9 +68,7 @@ workflow:
     areas_of_responsibility:
       extraction_type: full
       extra_spark_job_arguments:
-        - has_partitions: false
-          has_columns_to_delete: false
-          params:
+        - params:
             onlyData: true
             orderBy: "ResponsibilityId:asc"
             limit: 100
@@ -84,9 +77,7 @@ workflow:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "EnrollmentResultId"
-          has_partitions: true
           column_to_partition: "CreationDate"
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "EnrollmentResultId:asc"
@@ -98,9 +89,7 @@ workflow:
     departments_lov:
       extraction_type: full
       extra_spark_job_arguments:
-        - has_partitions: false
-          has_columns_to_delete: false
-          params:
+        - params:
             onlyData: true
             limit: 100
     hcm_contacts:
@@ -108,9 +97,7 @@ workflow:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "PersonId"
-          has_partitions: true
           column_to_partition: "CreationDate"
-          has_columns_to_delete: false
           params:
             orderBy: "PersonId:asc"
             onlyData: true
@@ -138,9 +125,7 @@ workflow:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "JobId"
-          has_partitions: true
           column_to_partition: "CreationDate"
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "JobId:asc"
@@ -153,9 +138,7 @@ workflow:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "OrganizationId"
-          has_partitions: true
           column_to_partition: "CreationDate"
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "OrganizationId:asc"
@@ -167,8 +150,6 @@ workflow:
       extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "PayrollRelationshipId"
-          has_partitions: false
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "PayrollRelationshipId:asc"
@@ -183,8 +164,6 @@ workflow:
       extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "EvaluationId"
-          has_partitions: false
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "EvaluationId:asc"
@@ -195,8 +174,6 @@ workflow:
       extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "GoalId"
-          has_partitions: false
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "GoalId:asc"
@@ -207,19 +184,16 @@ workflow:
       extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "PersonalPaymentMethodId"
-          has_partitions: false
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "PersonalPaymentMethodId:asc"
             limit: 100
     salaries:
       extraction_type: full
+      partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "SalaryId"
-          has_partitions: true
           column_to_partition: "CreationDate"
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "SalaryId:asc"
@@ -233,9 +207,7 @@ workflow:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "ProfileId"
-          has_partitions: true
           column_to_partition: "CreationDate"
-          has_columns_to_delete: false
           params:
             onlyData: true
             orderBy: "ProfileId:asc"
@@ -267,9 +239,7 @@ workflow:
     talent_ratings:
       extraction_type: full
       extra_spark_job_arguments:
-        - has_partitions: false
-          has_columns_to_delete: false
-          params:
+        - params:
             onlyData: true
             limit: 100
             expand:
@@ -281,9 +251,7 @@ workflow:
       partitions: ["dt_effective", "year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "PersonId"
-          has_partitions: true
           column_to_partition: "CreationDate"
-          has_columns_to_delete: false
           has_dt_effective: true
           future_offset: 30
           past_offset: 35
