@@ -75,6 +75,7 @@ def dml_processor(transactional_df, primary_keys):
     )
     window_spec = Window.partitionBy(*primary_keys).orderBy(
         transactional_df["ts_database_transaction"].desc(),
+        transactional_df["ts_cdc_transaction"].desc(),
         transactional_df["cdc_binlog_position"].desc(),
     )
     transactional_df = transactional_df.withColumn(
