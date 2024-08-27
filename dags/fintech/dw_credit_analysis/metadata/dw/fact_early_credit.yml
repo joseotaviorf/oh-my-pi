@@ -8,6 +8,10 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id
     description: "ID of the credit analysis"
+  sk_offer:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_offer
+    description: "ID of the offer"
   sk_credit_evaluation:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_credit_evaluation
