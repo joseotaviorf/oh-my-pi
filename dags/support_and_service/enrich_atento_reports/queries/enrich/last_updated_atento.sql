@@ -1,85 +1,146 @@
 WITH atento_tables AS (
-    SELECT
-        'backlog_metric' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.backlog_metric
+  SELECT
+    'backlog_metric' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.backlog_metric
+  
     UNION ALL
-    SELECT
-        'csat_front' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.csat_front
+  
+  SELECT
+    'csat_front' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.csat_front
+  
     UNION ALL
-    SELECT
-        'demand_metric' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.demand_metric
+  
+  SELECT
+    'demand_metric' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.demand_metric
+  
     UNION ALL
-    SELECT
-        'fcr_metric' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.fcr_metric
+  
+  SELECT
+    'fcr_metric' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.fcr_metric
+  
     UNION ALL
-    SELECT
-        'general_metric' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.general_metric
+  
+  SELECT
+    'general_metric' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.general_metric
+  
     UNION ALL
-    SELECT
-        'speech_call' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.speech_call
+  
+  SELECT
+    'speech_call' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.speech_call
+  
     UNION ALL
-    SELECT
-        'speech_chat' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.speech_chat
+  
+  SELECT
+    'speech_chat' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.speech_chat
+  
     UNION ALL
-    SELECT
-        'taxonomia_call' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.taxonomia_call
+  
+  SELECT
+    'taxonomia_call' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.taxonomia_call
+  
     UNION ALL
-    SELECT
-        'taxonomia_chat' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.taxonomia_chat
+  
+  SELECT
+    'taxonomia_chat' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.taxonomia_chat
+  
     UNION ALL
-    SELECT
-        'taxonomia_email' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.taxonomia_email
+  
+  SELECT
+    'taxonomia_email' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.taxonomia_email
+  
     UNION ALL
-    SELECT
-        'twilio_chat_aht' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.twilio_chat_aht
+  
+  SELECT
+    'twilio_chat_aht' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.twilio_chat_aht
+  
     UNION ALL
-    SELECT
-        'recontact_mx' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.recontact_mx
+  
+  SELECT
+    'recontact_mx' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.recontact_mx
+  
     UNION ALL
-    SELECT
-        'taxonomy' AS table_name,
-        ts_load
-    FROM
-        reverse_atento.taxonomy
+  
+  SELECT
+    'taxonomy' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.taxonomy
+  
+    UNION ALL
+  
+  SELECT
+    'tickets_transferred_total' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.tickets_transferred_total
+  
+    UNION ALL
+  
+  SELECT
+    'tmr' AS table_name,
+    ts_load
+  FROM
+      reverse_atento.tmr
+  
+    UNION ALL
+  
+  SELECT
+    'tickets_transferred' AS table_name,
+    ts_load
+  FROM reverse_atento.tickets_transferred
+  
+    UNION ALL
+  
+  SELECT
+    'email' AS table_name,
+    ts_load
+  FROM reverse_atento.email
+  
+    UNION ALL
+  
+  SELECT
+    'recontact' AS table_name,
+    ts_load
+  FROM reverse_atento.recontact
 )
 SELECT DISTINCT
-    'Atento' AS bpo,
-    table_name,
-    ts_load   
+  'Atento' AS bpo,
+  table_name,
+  ts_load
 FROM
-    atento_tables
+  atento_tables

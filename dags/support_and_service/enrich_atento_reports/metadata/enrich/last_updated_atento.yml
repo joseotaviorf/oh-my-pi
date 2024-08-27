@@ -12,15 +12,22 @@ columns:
     description: Name of the table sent to the atento partner company.
   ts_load:
     lineage:
-      - reverse_atento.backlog_metric.ts_load
-      - reverse_atento.csat_front.ts_load
-      - reverse_atento.demand_metric.ts_load
-      - reverse_atento.fcr_metric.ts_load
-      - reverse_atento.general_metric.ts_load
-      - reverse_atento.speech_call.ts_load
-      - reverse_atento.speech_chat.ts_load
-      - reverse_atento.taxonomia_call.ts_load
-      - reverse_atento.taxonomia_chat.ts_load
-      - reverse_atento.taxonomia_email.ts_load
-      - reverse_atento.twilio_chat_aht.ts_load
+      - reverse_atento.backlog_metric
+      - reverse_atento.csat_front
+      - reverse_atento.demand_metric
+      - reverse_atento.fcr_metric
+      - reverse_atento.general_metric
+      - reverse_atento.speech_call
+      - reverse_atento.speech_chat
+      - reverse_atento.taxonomia_call
+      - reverse_atento.taxonomia_chat
+      - reverse_atento.taxonomia_email
+      - reverse_atento.twilio_chat_aht
+      - reverse_atento.recontact_mx
+      - reverse_atento.taxonomy
+      - reverse_atento.tickets_transferred_total
+      - reverse_atento.tmr
+      - reverse_atento.tickets_transferred
+      - reverse_atento.email
+      - reverse_atento.recontact
     description: Timestamp date that indicates when our atento reverse process was executed.
