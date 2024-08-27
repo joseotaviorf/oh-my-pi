@@ -622,6 +622,17 @@ databricks_12_2_med_io-memory_photon_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_12_2_xmed_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        
 databricks_12_2_xmin-io-memory_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.xlarge

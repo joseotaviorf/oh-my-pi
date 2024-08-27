@@ -11,4 +11,4 @@ workflow:
   type: query_delta
   layer: enrich
 cluster:
-  type: databricks_12_2_med_io-memory_photon_cluster
+  type: databricks_12_2_xmed_io-memory_photon_cluster
