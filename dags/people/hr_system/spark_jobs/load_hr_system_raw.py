@@ -159,7 +159,7 @@ class IngestionTable:
         self.ingestion = ingestion
         self.dt_effective = dt_effective.strftime("%Y-%m-%d")
         self.table_name = ingestion.endpoint_id
-        self.params = ingestion.endpoint_details["params"]
+        self.params = ingestion.endpoint_details["params"].copy()
         if ingestion.has_dt_effective:
             self.params["effectiveDate"] = self.dt_effective
         self.consumer = get_consumer(ingestion.client, ingestion.endpoint_id)
