@@ -28,6 +28,15 @@ columns:
   details:
     lineage:
       - datalake_big_agent_raw.earnings.details
+  remuneration_value:
+    lineage:
+      - datalake_big_agent_raw.earnings.remuneration_value
+  external_domain_id:
+    lineage:
+      - datalake_big_agent_raw.earnings.external_domain_id
+  external_domain_type:
+    lineage:
+      - datalake_big_agent_raw.earnings.external_domain_type
   ts_created:
     lineage:
       - datalake_big_agent_raw.earnings.created_at
