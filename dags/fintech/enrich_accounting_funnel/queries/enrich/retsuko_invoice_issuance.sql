@@ -99,7 +99,6 @@ retsuko_pre AS (
                   'brokerage-installment-fee',
                   'brokerage-quinto-andar',
                   'lockin',
-                  'pro-guarantor-5A-installment',
                   'adjustment-agreement-adm-fee',
                   'igpm-adm-fee',
                   'ipca-adm-fee'
@@ -140,6 +139,12 @@ retsuko_pos AS (
         CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount
     FROM
         datalake_retsuko.entry e
+    INNER JOIN
+        datalake_retsuko_clean.account AS af
+            ON e.id_from_account = af.id
+    INNER JOIN
+        datalake_retsuko_clean.account AS at
+            ON e.id_to_account = at.id
     LEFT JOIN
         datalake_retsuko.invoice i
             ON e.id_invoice = i.id
@@ -158,10 +163,7 @@ retsuko_pos AS (
             (
                 (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                   'adm-fee',
-                  'brokerage-installment-fee',
-                  'brokerage-quinto-andar',
                   'lockin',
-                  'pro-guarantor-5A-installment',
                   'adjustment-agreement-adm-fee',
                   'igpm-adm-fee',
                   'ipca-adm-fee',
@@ -173,6 +175,8 @@ retsuko_pos AS (
     AND ct.country_code = 'BR'
     AND DATE(e.ts_created) >= '2024-01-01'
     AND NOT(ctt.contract_type = 'PJ' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+    AND af.type IN ('contract', 'tenant','landlord')
+    AND at.type IN ('contract', 'tenant','landlord')
     GROUP BY
         1, 2, 3, 4, 5, 6, 7, 8
     HAVING
@@ -250,7 +254,7 @@ sap AS (
 ),
 pre_df AS (
     SELECT
-        'IN'||'-'||r.id_finance_entity||'-'||'1'||'-'||'1'||'-'||
+        'IN'||'-'||COALESCE(r.id_finance_entity, r.id_finance_entity_entry)||'-'||'1'||'-'||'1'||'-'||
         CASE
             WHEN r.revenue_name = 'adm fee' THEN '1'
             WHEN r.revenue_name = 'brokerage quinto andar' THEN '2'
