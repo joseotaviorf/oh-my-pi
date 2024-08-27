@@ -10,6 +10,7 @@ SELECT
     request_type,
     short_request_type,
     cancellation_reason,
+    rejection_reason,
     broker_name,
     contact_reason,
     tenant_name,

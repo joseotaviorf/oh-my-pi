@@ -76,6 +76,7 @@ base_survicate AS (
         cf.request_error,
         cf.request_type,
         cf.cancellation_reason,
+        cf.rejection_reason,
         cf.broker_name,
         cf.contact_reason,
         cf.tenant_name,

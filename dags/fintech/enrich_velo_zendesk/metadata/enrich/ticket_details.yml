@@ -40,6 +40,10 @@ columns:
     description: "Description of the reason of cancellation"
     lineage:
       - datalake_velo_zendesk.custom_fields.cancellation_reason
+  rejection_reason:
+    description: "Description of the reason of rejection"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.rejection_reason
   broker_name:
     description: "Broker name"
     lineage:

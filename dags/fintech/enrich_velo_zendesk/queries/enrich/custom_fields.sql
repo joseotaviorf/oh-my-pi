@@ -38,6 +38,7 @@ GROUP BY 1
         base.custom_fields['Erros de Solicitação '] AS request_error,
         COALESCE(COALESCE(base.custom_fields['Tipo de Solicitação'], base.custom_fields['Prazo de recebimento']), base.custom_fields['Acionamento de garantia']) AS request_type,
         base.custom_fields['Motivo do cancelamento '] AS cancellation_reason,
+        base.custom_fields['Motivo da Reprovação'] AS rejection_reason,
         base.custom_fields['Nome da imobiliária '] AS broker_name,
         base.custom_fields['Motivo de Contato'] AS contact_reason,
         base.custom_fields['Nome do inquilino'] AS tenant_name,

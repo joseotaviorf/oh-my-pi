@@ -28,6 +28,10 @@ columns:
         description: "Description of the cancellation reason"
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
+    rejection_reason:
+        description: "Description of the reason of rejection"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
     broker_name:
         description: "Name of the broker related to the ticket"
         lineage:
