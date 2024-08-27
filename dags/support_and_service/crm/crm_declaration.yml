@@ -45,3 +45,8 @@ cluster:
       zone_id: us-east-1d
       availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
+    spark_conf:
+      spark.sql.createHiveTableByDefault: "true"
+      spark.sql.parquet.datetimeRebaseModeInRead: LEGACY
+      spark.sql.parquet.datetimeRebaseModeInWrite: LEGACY
+      spark.sql.timeParserPolicy: LEGACY
