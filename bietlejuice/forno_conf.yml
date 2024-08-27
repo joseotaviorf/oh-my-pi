@@ -778,6 +778,17 @@ databricks_12_2_med_io-general_photon_cluster:
         availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
+databricks_12_2_med_4xlarge_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.large
+    node_type_id: r5d.large
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_12_2_driver_med_general_mem_nodes_med_mem_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5d.large
