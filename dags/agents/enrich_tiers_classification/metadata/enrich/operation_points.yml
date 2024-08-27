@@ -1,0 +1,78 @@
+---
+database_name: datalake_tiers_classification
+table_name: operation_points
+description: 
+  This table applies rules to the performance of For Sales agents, to find the final value 
+  achieved in each type of program/operation.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_tiers.agent_performance.id_agent
+    description: Agent unique identifier.
+  id_user:
+    lineage:
+      - datalake_tiers.agent_performance.id_user
+    description: |
+      User unique identifier.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_business_unit:
+    lineage:
+      - datalake_tiers.agent_performance.id_business_unit
+    description: Business Unit unique identifier.
+  id_points_rule:
+    lineage:
+      - datalake_tiers.hub_points_rule.id_points_rule
+    description: Points rule unique identification.
+  bimester_name:
+    lineage:
+      - datalake_tiers.agent_performance.bimester_name
+    description: Name of the tier consolidation bimester.
+  profile:
+    lineage:
+      - datalake_tiers.agent_performance.profile
+    description: Describes the member's profile.
+    categories:
+      AGENT: Brokers.
+      NEGOTIATION_EXECUTIVE: 
+        Responsible for intermediating the offer negotiation stage between buyer and seller, 
+        until this results in a CCV (signed contract).
+  program_code:
+    lineage:
+      - datalake_tiers.agent_performance.program_code
+    description:
+      Refers to which program this rule is associated with, for example, 
+      it could be a rule associated with brokers or negociation executors.
+  operation:
+    lineage:
+      - datalake_tiers.agent_performance.operation
+    description:
+      The rule's operation indicates the context in which it will be applied, for example, 
+      for remuneration of For Sale brokers, we consider operations such as CCV (purchase and sale 
+      contract), first listing, CCV made with TQC, CCV with property captured by CIQ, etc.
+    categories:
+      CCV: Purchase and sale contract.
+      CCV_TQC: Purchase and sale agreement, where the buyer was indicated (TQC) by an agent.
+      FIRST_LISTING: First publication of the house captured by CIQ.
+  performance_points:
+    lineage:
+      - datalake_tiers.agent_performance.performance_points
+    description: 
+      Total performance points achieved by the agent, for example, if an agent managed to close 10 purchase and 
+      sale contracts in the two-month period, then he has 10 performance points for this requirement.
+  operation_points:
+    description: 
+      Total number of operating points achieved by the agent, i.e., the cumulative total of points after 
+      applying weighting rules to the performance score. For example, if an agent managed to close 10 
+      purchase and sale contracts (CCV) in the two-month period, then he has 10 performance points for 
+      this requirement. For each CCV, he earns 2 operating points, which are cumulative up to a maximum 
+      value (if any), so in the end he will have 20 operating points for CCV.
+  year:
+    lineage:
+      - datalake_tiers.agent_performance.year
+    description: Year the rule was updated.
+  bimester:
+    lineage:
+      - datalake_tiers.agent_performance.bimester
+    description: Bimester the rule was updated.

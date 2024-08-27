@@ -2870,6 +2870,8 @@ bietlejuice.enrich_terminator:
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification
 bietlejuice.enrich_tiers:
+  - bietlejuice.big_agent:load-clean-points-rule-aud
+  - bietlejuice.big_agent:load-clean-share-rule-aud
   - bietlejuice.enrich_big_agent:load-enrich-house-sale-listing-consultant
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
@@ -2878,6 +2880,9 @@ bietlejuice.enrich_tiers:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists
   - bietlejuice.hub_services:load-clean-business-unit
+bietlejuice.enrich_tiers_classification:
+  - bietlejuice.enrich_tiers:load-enrich-agent-performance
+  - bietlejuice.enrich_tiers:load-enrich-hub-points-rule
 bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates

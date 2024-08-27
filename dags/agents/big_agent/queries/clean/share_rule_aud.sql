@@ -1,0 +1,38 @@
+SELECT
+    id,
+    external_condition_id AS id_external_condition,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    external_condition_type,
+    name,
+    program_code,
+    value,
+    min_score,
+    max_score,
+    status,
+    external_condition_id_mod AS mod_id_external_condition,
+    external_condition_type_mod AS mod_external_condition_type,
+    program_code_mod AS mod_program_code,
+    name_mod AS mod_name,
+    value_mod AS mod_value,
+    min_score_mod AS mod_min_score,
+    max_score_mod AS mod_max_score,
+    status_mod AS mod_status,
+    start_at_mod AS mod_dt_start,
+    end_at_mod AS mod_dt_end,
+    invalidated_at_mod AS mod_ts_invalidated,
+    DATE(start_at) AS dt_start,
+    DATE(end_at) AS dt_end,
+    TIMESTAMP(invalidated_at) AS ts_invalidated,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_big_agent_raw.share_rule_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

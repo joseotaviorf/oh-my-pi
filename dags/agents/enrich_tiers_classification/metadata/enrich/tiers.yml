@@ -1,0 +1,72 @@
+---
+database_name: datalake_tiers_classification
+table_name: tiers
+description: 
+  This table calculates the tier range achieved by the agent in a given two-month period. 
+  This range can imply increases in the final income paid by 5A.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_tiers_classification.operation_points.id_agent
+    description: Agent unique identifier.
+  id_user:
+    lineage:
+      - datalake_tiers_classification.operation_points.id_user
+    description: |
+      User unique identifier.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_business_unit:
+    lineage:
+      - datalake_tiers_classification.operation_points.id_business_unit
+    description: Business Unit unique identifier.
+  id_share_rule:
+    lineage:
+      - datalake_tiers.hub_share_rule.id_share_rule
+    description: Share rule unique identification.
+  bimester_name:
+    lineage:
+      - datalake_tiers_classification.operation_points.bimester_name
+    description: Name of the tier consolidation bimester.
+  profile:
+    lineage:
+      - datalake_tiers_classification.operation_points.profile
+    description: Describes the member's profile.
+    categories:
+      AGENT: Brokers.
+      NEGOTIATION_EXECUTIVE: Responsible for intermediating the offer negotiation stage between buyer and seller, until this results in a CCV (signed contract).
+  program_code:
+    lineage:
+      - datalake_tiers_classification.operation_points.program_code
+    description:
+      Refers to which program this rule is associated with, for example, 
+      it could be a rule associated with brokers or negociation executors.
+  total_operation_points:
+    lineage:
+      - datalake_tiers_classification.operation_points.total_operation_points
+    description: 
+      Total number of operational points achieved by the agent, i.e., the total accumulated points after applying weighting rules to the performance score. 
+      For example, if an agent managed to close 10 purchase and sale contracts (CCV) in a two-month period, and of these 10, 4 had TQC participation, then 
+      he/she has 6 performance points for CCV and 4 for CCV with TQC. For each criterion (CCV, CCV TQC, etc.) rules inherent to the HUB in which he/she 
+      is allocated are applied, which generate the operational points, which in the end, are all added up to verify which tier (share rule) the total fits into.
+  tier_name:
+    lineage:
+      - datalake_tiers.hub_share_rule.tier_name
+    description: 
+      Indicates the name of the bonus/increase in the remuneration range that this Agent has been eligible for in the given two-month period. 
+      For example, agent X is in the AGENT_SALE program and has achieved enough operational points to achieve the gold range, therefore, 
+      he will receive a bonus in the remuneration corresponding to this tier.
+  brokerage_value:
+    lineage:
+      - datalake_tiers.hub_share_rule.brokerage_value
+    description:
+      Indicates the percentage of compensation earned by the agent, based on the program and performance (name).
+  year:
+    lineage:
+      - datalake_tiers_classification.operation_points.year
+    description: Year the rule was updated.
+  bimester:
+    lineage:
+      - datalake_tiers_classification.operation_points.bimester
+    description: Bimester the rule was updated.

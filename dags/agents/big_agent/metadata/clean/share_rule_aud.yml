@@ -1,0 +1,160 @@
+---
+database_name: datalake_big_agent_clean
+table_name: share_rule_aud
+description: Audit table.
+  Table containing the rules for agent compensation ranges. 
+  These rules determine increases and bonuses in compensation based on performance rules. 
+  This data reflects what these ranges are and what the conditions are for them to be achieved.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.id
+    description: Share rule unique identification.
+  id_external_condition:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.external_condition_id
+    description:
+      External condition unique identification.
+      An external condition refers to the condition in which this rule applies, 
+      which can be at the level of a business unit (HUB), city regions, state, etc.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.revend
+    description: Number of the next revision of this id.
+  external_condition_type:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.external_condition_type
+    description:
+      An external condition refers to the condition in which this rule applies, 
+      which can be at the level of a business unit (HUB), city regions, state, etc.
+  name:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.name
+    description:
+      Indicates the name of the bonus/increase in remuneration range to which this rule refers. 
+      For example, for the AGENT_SALE program, there are diamond, gold and silver bonus ranges.
+  program_code:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.program_code
+    description:
+      Refers to which program this rule is associated with, for example, 
+      it could be a rule associated with brokers or negociation executors.
+  value:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.value
+    description:
+      Indicates the percentage of compensation earned by the agent, based on the program and performance (name).
+      For example, for the AGENT_SALE program, each diamond, gold and silver band (name) will have a percentage 
+      value corresponding to the broker's compensation under each purchase and sale agreement (CCV).
+  min_score:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.min_score
+    description:
+      Minimum value to be reached for this rule to be valid.
+      This score will be defined by a cumulative number of points, considering the valid operations for the program. 
+      These points on the operations can be calculated based on the points_rule table.
+  max_score:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.max_score
+    description:
+      Maximum value to be reached for this rule to be valid.
+      This score will be defined by a cumulative number of points, considering the valid operations for the program. 
+      These points on the operations can be calculated based on the points_rule table.
+  status:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.status
+    description: Indicates the rule is still valid.
+  mod_id_external_condition:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.external_condition_id_mod
+    description: Indicates if the id_external_condition field has been changed
+  mod_external_condition_type:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.external_condition_type_mod
+    description: Indicates if the external_condition_type field has been changed
+  mod_program_code:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.program_code_mod
+    description: Indicates if the program_code field has been changed
+  mod_name:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.name_mod
+    description: Indicates if the name field has been changed
+  mod_value:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.value_mod
+    description: Indicates if the value field has been changed
+  mod_min_score:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.min_score_mod
+    description: Indicates if the min_score field has been changed
+  mod_max_score:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.max_score_mod
+    description: Indicates if the max_score field has been changed
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.status_mod
+    description: Indicates if the status field has been changed
+  mod_dt_start:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.start_at_mod
+    description: Indicates if the dt_start field has been changed
+  mod_dt_end:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.end_at_mod
+    description: Indicates if the dt_end field has been changed
+  mod_ts_invalidated:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.invalidated_at_mod
+    description: Indicates if the ts_invalidated field has been changed
+  dt_start:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.start_at
+    description:
+      If the rule is valid, it indicates the start of the period 
+      in which the rule applies to the program.
+  dt_end:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.end_at
+    description:
+      If the rule is valid, it indicates the end of the period 
+      in which the rule applies to the program.
+  ts_invalidated:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.invalidated_at
+    description: Indicates when the status has changed and the rule has become invalid.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.created_at
+    description: Date and time when the rule was created.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.updated_at
+    description: Date and time when the rule was updated.
+  year:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.year
+    description: Year the rule was updated.
+  month:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.month
+    description: Month the rule was updated.
+  day:
+    lineage:
+      - datalake_big_agent_raw.share_rule_aud.day
+    description: Day the rule was updated.

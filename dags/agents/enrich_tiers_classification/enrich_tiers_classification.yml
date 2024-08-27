@@ -1,6 +1,6 @@
 ---
 dag:
-  name: enrich_tiers
+  name: enrich_tiers_classification
   schedule_start_date: 2024, 5, 22
   owner: Data Agents
   documentation:
@@ -9,20 +9,10 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
-    agent_offers_signed:
-      - ciq_first_listing
-    agent_performance:
-      - agent_offers_signed
-      - ciq_first_listing
+    tiers:
+      - operation_points
   default_extraction_type: incremental
   default_partitions: [year, bimester]
-  tables_customization:
-    agent_offers_signed:
-      extraction_type: incremental
-      partitions: [year, month, day]
-    ciq_first_listing:
-      extraction_type: incremental
-      partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"

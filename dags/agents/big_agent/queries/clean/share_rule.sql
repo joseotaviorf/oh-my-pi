@@ -1,6 +1,6 @@
 SELECT
     id,
-    external_condition_id AS is_external_condition,
+    external_condition_id AS id_external_condition,
     external_condition_type,
     program_code,
     name,

@@ -20,6 +20,10 @@ columns:
     lineage:
       - datalake_hub_services.member_profile.id_business_unit
     description: Business Unit unique identifier.
+  business_context:
+    lineage:
+      - datalake_hub_services_clean.business_unit.business_context
+    description: What context does the business unit operate in, which could be Sales or Rental.
   bimester_name:
     lineage:
       - datalake_quintoandar.aux_date.bimester_name

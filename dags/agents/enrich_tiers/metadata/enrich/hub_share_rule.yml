@@ -1,0 +1,71 @@
+---
+database_name: datalake_tiers
+table_name: hub_points_rule
+description: 
+  Table containing the rules for hub agents compensation ranges. 
+  These rules determine increases and bonuses in compensation based on performance rules. 
+  This data reflects what these ranges are and what the conditions are for them to be achieved.
+
+  Unlike the source table, this enrichment is designed to update the tier rules per hub on a bimonthly basis. 
+  When the bimonthly period ends, the rule is frozen and can no longer be changed retroactively, except in 
+  cases of data reprocessing.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_share_rule:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.id_share_rule
+    description: Share rule unique identification.
+  id_business_unit:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.id_business_unit
+    description: Business Unit unique identifier.
+  program_code:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.program_code
+    description:
+      Refers to which program this rule is associated with, for example, 
+      it could be a rule associated with brokers or negociation executors.
+  tier_name:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.tier_name
+    description:
+      Indicates the name of the bonus/increase in remuneration range to which this rule refers. 
+      For example, for the AGENT_SALE program, there are diamond, gold and silver bonus ranges.
+  brokerage_value:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.brokerage_value
+    description:
+      Indicates the percentage of compensation earned by the agent, based on the program and performance (name).
+      For example, for the AGENT_SALE program, each diamond, gold and silver band (name) will have a percentage 
+      value corresponding to the broker's compensation under each purchase and sale agreement (CCV).
+  min_score:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.min_score
+    description:
+      Minimum value to be reached for this rule to be valid.
+      This score will be defined by a cumulative number of points, considering the valid operations for the program. 
+      These points on the operations can be calculated based on the points_rule table.
+  max_score:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.max_score
+    description:
+      Maximum value to be reached for this rule to be valid.
+      This score will be defined by a cumulative number of points, considering the valid operations for the program. 
+      These points on the operations can be calculated based on the points_rule table.
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.ts_created
+    description: Date and time when the rule was created.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.share_rule_aud.ts_updated
+    description: Date and time when the rule was updated.
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.year
+    description: Year the rule was updated.
+  bimester:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester
+    description: Bimester the rule was updated.

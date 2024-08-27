@@ -26,7 +26,6 @@ WITH bimester AS (
 offer_signed AS (
     SELECT
         oa.id_user,
-        -- agent_profile,
         COUNT(DISTINCT oa.id_offer) AS total_offer_signed,
         COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
         COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_ciq IS TRUE) AS total_offer_signed_with_ciq,
@@ -103,6 +102,7 @@ SELECT
     mp.id_agent,
     mp.id_main_user AS id_user,
     mp.id_business_unit,
+    mp.business_context,
     mp.bimester_name,
     mp.name,
     mp.email,

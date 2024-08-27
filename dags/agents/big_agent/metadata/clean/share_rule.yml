@@ -12,7 +12,7 @@ columns:
     lineage:
       - datalake_big_agent_raw.share_rule.id
     description: Share rule unique identification.
-  is_external_condition:
+  id_external_condition:
     lineage:
       - datalake_big_agent_raw.share_rule.external_condition_id
     description: 
