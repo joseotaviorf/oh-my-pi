@@ -1,8 +1,10 @@
 SELECT
-    id, 
+    id,
     external_id AS id_external,
     source_id AS id_source,
     payee_id AS id_payee,
+    context_id AS id_context,
+    requested_by,
     description,
     source_bill_item,
     due_amount,
@@ -13,6 +15,7 @@ SELECT
     accounting_year_month,
     metadata,
     DATE(occurrence_date) AS dt_occurrence,
+    TIMESTAMP(synced_at) AS ts_synced,
     TIMESTAMP(blocked_at) AS ts_blocked,
     TIMESTAMP(created_at) AS ts_created
 FROM

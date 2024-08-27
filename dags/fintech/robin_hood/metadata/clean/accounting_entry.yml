@@ -13,6 +13,12 @@ columns:
   id_payee:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.payee_id
+  id_context:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.context_id
+  requested_by:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.requested_by
   description:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.description
@@ -43,6 +49,9 @@ columns:
   dt_occurrence:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.occurrence_date
+  ts_synced:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.synced_at
   ts_blocked:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.blocked_at

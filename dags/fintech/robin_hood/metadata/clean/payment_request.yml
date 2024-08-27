@@ -10,21 +10,33 @@ columns:
   id_lot:
     lineage:
       - datalake_robin_hood_raw.payment_request.lot_id
+  id_source:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.source_id
   id_payee:
     lineage:
       - datalake_robin_hood_raw.payment_request.payee_id
   id_payee_account:
     lineage:
       - datalake_robin_hood_raw.payment_request.payee_account_id
+  id_schedule:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.schedule_id
   id_next_attempt:
     lineage:
       - datalake_robin_hood_raw.payment_request.next_attempt_id
+  payment_method:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.payment_method
   due_amount:
     lineage:
       - datalake_robin_hood_raw.payment_request.due_amount
   status:
     lineage:
       - datalake_robin_hood_raw.payment_request.status
+  metadata:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.metadata
   dt_errored:
     lineage:
       - datalake_robin_hood_raw.payment_request.error_at
