@@ -69,7 +69,7 @@ columns:
       - datalake_gsheets_raw.quintocred_termination_form.erro_critico
   analyst_is_polite:
     lineage:
-      - datalake_gsheets_raw.quintocred_termination_form.1_analista_e_preciso_amavel_cortes_integro_ou_empatico_com_o_parceiro_
+      - datalake_gsheets_raw.quintocred_termination_form.1_analista_e_preciso_amavel_cortes_integro_ou_empatico_com_o_parceiro
   analyst_attends_requests:
     lineage:
       - datalake_gsheets_raw.quintocred_termination_form.2_analista_atende_prontamente_pedidosolicitacao_do_parceiro_quando_tem_esta_possibilidade

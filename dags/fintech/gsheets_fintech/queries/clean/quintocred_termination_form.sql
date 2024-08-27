@@ -18,7 +18,7 @@ SELECT
     prejuizo_financeiro AS value_financial_loss,
     contestado AS contested,
     erro_critico AS critical_error,
-    1_analista_e_preciso_amavel_cortes_integro_ou_empatico_com_o_parceiro_ AS analyst_is_polite,
+    1_analista_e_preciso_amavel_cortes_integro_ou_empatico_com_o_parceiro AS analyst_is_polite,
     2_analista_atende_prontamente_pedidosolicitacao_do_parceiro_quando_tem_esta_possibilidade AS analyst_attends_requests,
     3_analista_mantem_a_calma_com_o_parceiro_quando_o_mesmo_discorda_de_alguma_informacao AS analyst_maintains_calm_with_the_partner,
     1_analista_fala_bem_ou_concorda_com_citacao_positiva_sobre_a_quintocredconcorrentecolaboradorclientes_ou_parceiros AS analyst_agrees_with_positive_citation,
