@@ -22,4 +22,4 @@ workflow:
     supply_events_tracking:
       - conversion_tracking
 cluster:
-  type: databricks_12_2_med_io-memory_photon_cluster
+  type: databricks_12_2_xmin-io-memory_photon_cluster
