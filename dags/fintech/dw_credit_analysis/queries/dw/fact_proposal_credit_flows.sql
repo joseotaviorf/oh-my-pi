@@ -14,6 +14,7 @@ WITH credit_analysis AS (
 early_credit_analysis AS (
   SELECT
     sk_early_credit_analysis,
+    sk_offer,
     sk_user,
     sk_house,
     dt_early_credit_created,
@@ -318,11 +319,7 @@ proposal_credit_flows AS (
     rent_flows AS rf
   LEFT JOIN
     early_credit_analysis AS eca
-      ON  rf.sk_client = eca.sk_user
-      AND rf.sk_house  = eca.sk_house
-      AND eca.dt_early_credit_created 
-        BETWEEN rf.dt_offer_submitted_date - interval '1' MONTH
-        AND     rf.dt_offer_submitted_date
+      ON  rf.sk_offer = eca.sk_offer
 ),
 house_listing AS (
   SELECT 
