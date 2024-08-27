@@ -31,23 +31,12 @@ workflow:
       extraction_type: incremental
     workgroups: {}
 cluster:
-  type: custom_cluster
+  type: databricks_12_2_med_compute_cluster
   custom_configurations:
-    spark_version: 14.3.x-scala2.12
     autotermination_minutes: 20
-    driver_node_type_id: c5a.4xlarge
-    node_type_id: c5a.2xlarge
-    autoscale:
-      max_workers: 4
-      min_workers: 1
     aws_attributes:
       first_on_demand: 1
       spot_bid_price_percent: 100
       zone_id: us-east-1d
       availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
-    spark_conf:
-      spark.sql.createHiveTableByDefault: "true"
-      spark.sql.parquet.datetimeRebaseModeInRead: LEGACY
-      spark.sql.parquet.datetimeRebaseModeInWrite: LEGACY
-      spark.sql.timeParserPolicy: LEGACY
