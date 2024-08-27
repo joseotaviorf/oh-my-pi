@@ -1,0 +1,57 @@
+---
+database_name: datalake_velo
+table_name: payment_contracts
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Enriched table focused on the contract payments context for Velo.
+columns:
+  id_propose:
+    description: Unique identification number of the propose
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  id:
+    description: Unique identification number of the payment
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  origin_table:
+    description: Origin table of the contract payment
+  value:
+    description: Due amount
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  status:
+    description: Contract payment status
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  gateway:
+    description: Contract payment gateway
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  billing_type:
+    description: Contract billing type
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  category:
+    description: Contract payment category
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  dt_created:
+    description: Contract creation date
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  dt_month_ref_creation:
+    description: Month referring to the contract creation date
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  dt_due:
+    description: Contract due date
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  dt_month_ref_due:
+    description: Month referring to the contract due date
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
+  dt_paid:
+    description: Contract payment date
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id

@@ -310,10 +310,10 @@ bietlejuice.enrich_crawlers_listings:
   override: []
 bietlejuice.enrich_crawlers_listings_deduplicated:
   remove:
-  - bietlejuice.enrich_sale_crawlers_listings:load-enrich-em-casa
-  - bietlejuice.enrich_sale_crawlers_listings:load-enrich-loft
-  - bietlejuice.enrich_viva_real_crawler_listings:load-enrich-viva-real
-  - bietlejuice.enrich_zap_imoveis_crawler_listings:load-enrich-zap-imoveis
+    - bietlejuice.enrich_sale_crawlers_listings:load-enrich-em-casa
+    - bietlejuice.enrich_sale_crawlers_listings:load-enrich-loft
+    - bietlejuice.enrich_viva_real_crawler_listings:load-enrich-viva-real
+    - bietlejuice.enrich_zap_imoveis_crawler_listings:load-enrich-zap-imoveis
 bietlejuice.enrich_credit_analysis:
   remove:
     - bietlejuice.sorting_hat:load-clean-credit-analysis-version
@@ -757,6 +757,8 @@ bietlejuice.enrich_velo:
     - bietlejuice.velo:load-clean-fiancavelo-payment
     - bietlejuice.velo:load-clean-fiancavelo-plans
     - bietlejuice.velo:load-clean-fiancavelo-propose
+    - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
+    - bietlejuice.velo_asaas:load-clean-payments
 bietlejuice.enrich_vespucio:
   override: []
 bietlejuice.enrich_vespucio_pipeline:
@@ -967,7 +969,7 @@ bietlejuice.enrich_product_tech:
 
 wonka.house_demand_balancer_predictions:
   add:
-   - bietlejuice.demand_balancer_service:load-clean-demand-balancer
+    - bietlejuice.demand_balancer_service:load-clean-demand-balancer
 
 quintoml.search.maestro.inference:
   add:

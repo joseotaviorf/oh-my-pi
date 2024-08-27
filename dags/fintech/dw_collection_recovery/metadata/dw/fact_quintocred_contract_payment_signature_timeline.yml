@@ -1,0 +1,185 @@
+---
+database_name: dw_collection_recovery
+table_name: fact_quintocred_contract_payment_signature_timeline
+owner: juliana.hocihara@quintoandar.com.br
+domain: fintech
+description: The table contains a timeline view of the contract payments / signatures for QuintoCred context.
+columns:
+  sk_propose:
+    description: "Surrogate key of table. Propose ID from QuintoCred"
+    lineage:
+      - datalake_velo.payment_contracts.id_propose
+  sk_broker:
+    description: "Broker's identification number"
+    lineage:
+      - datalake_velo.payment_contracts.id_broker
+  id:
+    description: "Payment identification number"
+    lineage:
+      - datalake_velo.payment_contracts.id
+  origin_table:
+    description: "Origin table of the contract payment"
+    lineage:
+      - datalake_velo.payment_contracts.origin_table
+  status:
+    description: "Contract payment status"
+    lineage:
+      - datalake_velo.payment_contracts.status
+  gateway:
+    description: "Contract payment gateway"
+    lineage:
+      - datalake_velo.payment_contracts.gateway
+  gateway_memory_transaction:
+    description: "Last contract payment gateway"
+  billing_type:
+    description: "Contract billing type"
+    lineage:
+      - datalake_velo.payment_contracts.billing_type
+  category:
+    description: "Contract payment category"
+    lineage:
+      - datalake_velo.payment_contracts.category
+  birth_origin:
+    description: "Field indicating if the contract has its origin on 2.0 or 3.0 platform"
+    lineage:
+      - datalake_velo.payment_contracts.birth_origin
+  status_at_ref:
+    description: "Contract status according to the reference month"
+    lineage:
+      - datalake_velo.payment_contracts.status_at_ref
+  monthly_guarantee_online:
+    description: "Monthly total amount of the guarantee"
+    lineage:
+      - datalake_velo.payment_contracts.monthly_guarantee_online
+  annual_guarantee_original:
+    description: "Annual total amount of the guarantee"
+    lineage:
+      - datalake_velo.payment_contracts.annual_guarantee_original
+  activator_amount:
+    description: "Amount paid to activate the guarantee"
+    lineage:
+      - datalake_velo.payment_contracts.activator_amount
+  package_amount:
+    description: "Total amount of the package (rent + condo)"
+    lineage:
+      - datalake_velo.payment_contracts.package_amount
+  guarantee_status:
+    description: "Status of the guarantee"
+    lineage:
+      - datalake_velo.payment_contracts.guarantee_status
+  propose_status:
+    description: "Status of the propose"
+    lineage:
+      - datalake_velo.payment_contracts.propose_status
+  ref_mob_start:
+    description: "Reference mob from the beginning of the contract"
+    lineage:
+      - datalake_velo.payment_contracts.ref_mob_start
+  ref_mob_end:
+    description: "Reference mob from the end of the contract"
+    lineage:
+      - datalake_velo.payment_contracts.ref_mob_end
+  ref_month:
+    description: "Month of reference"
+    lineage:
+      - datalake_velo.payment_contracts.ref_month
+  mob:
+    description: "Mob calculated between the date of reference"
+    lineage:
+      - datalake_velo.payment_contracts.mob
+  property_dt_mod:
+    description: "Mod indicating the start date"
+    lineage:
+      - datalake_velo.payment_contracts.property_dt_mod
+  billing_model_mod:
+    description: "Mod indicating the billing model"
+    lineage:
+      - datalake_velo.payment_contracts.billing_model_mod
+  monthly_value_mod:
+    description: "Mod indicating the monthly value"
+    lineage:
+      - datalake_velo.payment_contracts.monthly_value_mod
+  billing_mode_at_ref:
+    description: "Billing mode at the moment of the reference date"
+    lineage:
+      - datalake_velo.payment_contracts.billing_mode_at_ref
+  monthly_guarantee:
+    description: "Monthly total amount of the guarantee"
+    lineage:
+      - datalake_velo.payment_contracts.monthly_guarantee
+  annual_guarantee:
+    description: "Annual total amount of the guarantee (Calculated by multiplying the monthly amount by the number of months in the year)"
+    lineage:
+      - datalake_velo.payment_contracts.annual_guarantee
+  value:
+    description: "Due amount"
+    lineage:
+      - datalake_velo.payment_contracts.value
+  memory_annual_limit:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.memory_annual_limit
+  memory_annual_valid_limit:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.memory_annual_valid_limit
+  flag_dm_mod:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_dm_mod
+  flag_missing_payment:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_missing_payment
+  flag_annual_payment:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_annual_payment
+  flag_annual_payment_month:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_annual_payment_month
+  flag_annual_payment_valid:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_annual_payment_valid
+  flag_annual_payment_month_valid:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_annual_payment_month_valid
+  flag_annual_payment_month_limit:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_annual_payment_month_limit
+  flag_annual_payment_month_valid_limit:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_annual_payment_month_valid_limit
+  dt_contract_started:
+    description: "Contract start date"
+    lineage:
+      - datalake_velo.payment_contracts.dt_contract_started
+  dt_ended:
+    description: "Contract end date"
+    lineage:
+      - datalake_velo.payment_contracts.dt_ended
+  dt_created:
+    description: "Contract creation date"
+    lineage:
+      - datalake_velo.payment_contracts.dt_created
+  dt_month_ref_creation:
+    description: "Month referring to the contract creation date"
+    lineage:
+      - datalake_velo.payment_contracts.dt_month_ref_creation
+  dt_due:
+    description: "Contract due date"
+    lineage:
+      - datalake_velo.payment_contracts.dt_due
+  dt_month_ref_due:
+    description: "Month referring to the contract due date"
+    lineage:
+      - datalake_velo.payment_contracts.dt_month_ref_due
+  dt_paid:
+    description: "Contract payment date"
+    lineage:
+      - datalake_velo.payment_contracts.dt_paid
