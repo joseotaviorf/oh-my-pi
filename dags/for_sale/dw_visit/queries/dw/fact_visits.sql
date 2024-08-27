@@ -9,8 +9,8 @@ WITH
       MIN(ts_event_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_first_reschedule,
       MAX(ts_event_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_last_reschedule,
       MAX(ts_event_created) FILTER (WHERE on_behalf_of = 'TENANT_LIVING') AS ts_event_tenant,
-      MIN(ts_event_created) FILTER (WHERE event_type = 'VISIT_BOOKED') AS ts_first_booked,
-      MAX(ts_event_created) FILTER (WHERE event_type = 'VISIT_BOOKED') AS ts_last_booked
+      MIN(ts_event_created) FILTER (WHERE event_type = 'VISIT_BOOKED' OR event_type = 'VISIT_CONFIRMED') AS ts_first_booked,
+      MAX(ts_event_created) FILTER (WHERE event_type = 'VISIT_BOOKED' OR event_type = 'VISIT_CONFIRMED') AS ts_last_booked
       FROM
         datalake_visit.visit_status_events
       GROUP BY

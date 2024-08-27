@@ -52,3 +52,8 @@ SELECT
     11 AS sk_event_type,
     'FOLLOW_UP_COLLECTED' AS event_name,
     NOW() AS ts_load
+UNION ALL
+SELECT
+    12 AS sk_event_type,
+    'VISIT_CONFIRMED' AS event_name,
+    NOW() AS ts_load

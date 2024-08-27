@@ -5,7 +5,10 @@ vsl AS (
     id_visit,
     id_schedule,
     id_author_user,
-    event_type,
+    CASE
+        WHEN event_type = 'VISIT_BOOKED' THEN 'VISIT_CONFIRMED'
+        ELSE event_type
+    END AS event_type,
     ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created ASC) AS ranking,
     CASE
       WHEN ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) == 1 THEN TRUE

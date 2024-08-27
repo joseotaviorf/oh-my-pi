@@ -19,6 +19,7 @@ WITH
             MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'DEMAND') AS ts_visit_demand_confirmed,
             MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'AGENT') AS ts_visit_agent_confirmed,
             MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'TENANT_LIVING') AS ts_visit_tenant_confirmed,
+            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_BOOKED' OR event_type = 'VISIT_CONFIRMED') AS ts_visit_confirmed,
             MIN(ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') AND on_behalf_of = 'SUPPLY') AS ts_visit_supply_canceled,
             MIN(ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') AND on_behalf_of = 'DEMAND') AS ts_visit_demand_canceled,
             MIN(ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') AND on_behalf_of = 'AGENT') AS ts_visit_agent_canceled,
