@@ -49,18 +49,14 @@ columns:
     description: "Number of seconds of inactivity allowed for the management program"
     lineage:
       - datalake_cyber_raw.collid.CLSECS
-  password_status:
-    description: ""
+  user_access_status:
+    description: "User access status. Users will be registered with default value: 2 - 'Aberta' "
     lineage:
       - datalake_cyber_raw.collid.CLSTATUS
   name:
     description: "Name"
     lineage:
       - datalake_cyber_raw.collid.CLNAME
-  password:
-    description: "Password"
-    lineage:
-      - datalake_cyber_raw.collid.CLPASSWD
   email:
     description: "Email"
     lineage:
@@ -101,24 +97,24 @@ columns:
     description: "Destination printer"
     lineage:
       - datalake_cyber_raw.collid.CLPRINT
-  CLENABLED:
-    description: ""
+  is_enabled:
+    description: "Indicates whether the user is active or not"
     lineage:
       - datalake_cyber_raw.collid.CLENABLED
-  CLLSTACSDT:
-    description: ""
+  ts_last_access:
+    description: "Date of last access"
     lineage:
       - datalake_cyber_raw.collid.CLLSTACSDT
-  CLLNG:
-    description: ""
+  longitud_manager:
+    description: "Longitud of the manager's starting point."
     lineage:
       - datalake_cyber_raw.collid.CLLNG
-  CLLAT:
-    description: ""
+  latitud_manager:
+    description: "Latitud of the manager's starting point."
     lineage:
       - datalake_cyber_raw.collid.CLLAT
-  CLRONLY:
-    description: ""
+  has_read_only_access:
+    description: "Indicate whether the user has read-only or normal (bypass option) access. Option valid only for assistants and managers (not supervisors)."
     lineage:
       - datalake_cyber_raw.collid.CLRONLY
   CLCREUSER:

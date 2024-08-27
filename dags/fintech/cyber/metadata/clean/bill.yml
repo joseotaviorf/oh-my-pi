@@ -1,0 +1,280 @@
+---
+database_name: datalake_cyber_clean
+table_name: bill
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table for storing debts (contract invoices). Table granularity - id_invoice.
+columns:
+  id_contract:
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAACCT
+  id_invoice:
+    description: "ID Invoice. TF: bill.external_id"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAIDPARC
+  id_boleto:
+    description: "Bill (boleto) ID in the legacy system. TF: bill.boleto_identifier"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAIDBOL
+  id_entry:
+    description: "Entry ID. TF: bill.entries.id"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABICODIGO
+  boleto_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANUMDOBOL
+  our_number:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOSSNUM
+  our_number_boleto:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOSNUMBOL
+  invoice_or_entry:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CASE WHEN PATIPO = "P" THEN "Parcela" WHEN PATIPO
+        = "B" THEN "Entry" ELSE PATIPO END
+  contract_group:
+    description: "Contract Group (QuintoAndar or QuintoCred). TF: debtor.group"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAACCTG
+  invoice_status:
+    description: ""
+    lineage:
+      - "datalake_cyber_raw.tb_parcela.CASE WHEN PASTATUS = 1 THEN \"Ativa (em aberto)\"\
+        \ WHEN PASTATUS = 2 THEN \"Paga\" WHEN PASTATUS = 3 THEN \"Cancelada\" WHEN\
+        \ PASTATUS = 4 THEN \"Pausa\" WHEN PASTATUS = 5 THEN \"Previamente negociada\"\
+        \ WHEN PASTATUS = 6 THEN \"Em negocia\xE7\xE3o\" ELSE PASTATUS END"
+  retsuko_status:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PASTATFA
+  purpose:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATPDIV
+  pause_reason:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAINDMOTPA
+  account_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PATPCONTA
+  accrual_year_month:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAAMENVFA
+  is_negative_bureaus:
+    description: "Same as bill.negative in Trato Feito database"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CASE WHEN PAINDNEG = "S" THEN TRUE ELSE FALSE
+        END
+  is_tenant_first_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CASE WHEN PAINDPRIFA = "S" THEN TRUE ELSE FALSE
+        END
+  has_previously_negotiated:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CASE WHEN PAPREVNEG = "S" THEN TRUE ELSE FALSE
+        END
+  bank_code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PACODBANBOL
+  bank_digit:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADIGBANBOL
+  bank_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOMBANBOL
+  company_agency_account_digit:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PACODAGBOL
+  charge_barcode:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CONCAT(PALINDIG1, '.', PALINDIG2, ' ', PALINDIG3,
+        '.', PALINDIG4, ' ', PALINDIG5, '.', PALINDIG6, ' ', PALINDIG7, ' ', PALINDIG8)
+  charge_instructions:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CONCAT(PALININSTBOL1, PALININSTBOL2, PALININSTBOL3,
+        PALININSTBOL4, PALININSTBOL5, PALININSTBOL6, PALININSTBOL7, PALININSTBOL8)
+  payment_location_boleto:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PALOCPAGBOL
+  type_transferor:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CASE WHEN PATPPECEBOL = "F" THEN "Fisica" WHEN
+        PATPPECEBOL = "J" THEN "Juridica" ELSE PATPPECEBOL END
+  type_transferor_document:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CASE WHEN PATPDOPCBOL = "1" THEN "CNPJ" WHEN PATPDOPCBOL
+        = "2" THEN "CPF" ELSE PATPDOPCBOL END
+  transferor_document:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADOCPECEBOL
+  transferor_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOCEBOL
+  drawer_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CASE WHEN PATPPESABOL = "F" THEN "Fisica" WHEN
+        PATPPESABOL = "J" THEN "Juridica" ELSE PATPPESABOL END
+  drawer_document_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.CASE WHEN PATPDPSABOL = "1" THEN "CNPJ" WHEN PATPDPSABOL
+        = "2" THEN "CPF" ELSE PATPDPSABOL END
+  drawer_document:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADOPESABOL
+  drawer_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PANOSABOL
+  bill_record_sequence_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PASEREARBOL
+  bill_record_sequence_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PASEQREARBOL
+  due_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLRORI
+  main_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLPRINC
+  interest_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLJUR
+  fine_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLMUL
+  entry_title:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABITITULO
+  entry_description:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDESC
+  entry_amount:
+    description: "TF: bill.entries.id"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIVALOR
+  bill_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLRBOL
+  bill_discount_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLDESCBOL
+  bill_deductions_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLDEDUBOL
+  bill_fees_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLRMOMUBOL
+  bill_additions_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLACRBOL
+  bill_total_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAVLRTOBOL
+  cost_withdrawal_quintocred:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PACUSTAS
+  fee_quintocred_eviction:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAHONORARIOS
+  ts_creation:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTCRIPA
+  ts_due:
+    description: "Original debt due date"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTVENORI
+  ts_invoice_due:
+    description: "Invoice due date"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTVENC
+  ts_due_boleto:
+    description: "Boleto due date"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTVENCBOL
+  ts_entry_due:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDTVENC
+  ts_sent:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTENVFA
+  ts_limit_pause:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTLIMPA
+  ts_issue_boleto:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTDOCBOL
+  ts_entry_insert:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDTINSERT
+  ts_entry_update:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDTUPDATE
+  ts_insert:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTINSERT
+  ts_update:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PADTUPDATE
+  ts_load:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.NOW()
+  PABIDTEXCLUSAO:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIDTEXCLUSAO
+  PABIFLGEXCLLOG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PABIFLGEXCLLOG

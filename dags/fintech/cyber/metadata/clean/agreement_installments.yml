@@ -1,0 +1,71 @@
+---
+database_name: datalake_cyber_clean
+table_name: agreement_installments
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table with information on the installments of the agreement. Table granularity - installment of agreement.
+columns:
+  id_agreement:
+    description: "ID agreement. PK of table"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APAHID
+  id_client:
+    description: "ID Client = CPF (TF: client.document)"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APSSNUM
+  status:
+    description: "Payment status"
+    categories:
+      Programado: "Same as 'registered' in Trato Feito"
+      Quebrado: "Same as 'canceled' or 'expired' in Trato Feito"
+      Concluído: "Same as 'paid' in Trato Feito"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APFLAG
+  revalued_payment_flag:
+    description: "Revalued payment flag"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APFLAG2
+  our_number:
+    description: "Our Number"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APNOSSONUM
+  installment_number:
+    description: "Installment number.'0' is reported for down payment or for the first installment when there is no down payment"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APDETID
+  amount_to_pay:
+    description: "Amount Payable for the Installment"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APAMT
+  payment_amount:
+    description: "Payment amount"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APAMTPAY
+  interest_amount:
+    description: "Installment Interest Value"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APINTAMT
+  amortization_amount:
+    description: "Amortization amount"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APAMZAMT
+  final_balance:
+    description: "Final balance"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APBLNC
+  tax_amount:
+    description: "Tax amount"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APINTTAXAMT
+  fees_amount:
+    description: "Fees (honorários) amount"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APHONO
+  ts_start_payment_term:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APINDATE
+  ts_due_installment:
+    description: "Installment Due Date"
+    lineage:
+      - datalake_cyber_raw.agpmtdet.APDUEDT

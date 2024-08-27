@@ -29,5 +29,6 @@ SELECT
     CATIPOBOL,
     CASTATUSCA,
     CATOTPARC,
-    CAQTDPA
+    CAQTDPA,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.tb_campanha

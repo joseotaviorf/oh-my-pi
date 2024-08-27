@@ -3,10 +3,10 @@ database_name: datalake_cyber_clean
 table_name: delinquent_master
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: "Master table with credit and customer/debtor information. Table granularity - id_contract + contract_group. Records can be updated and DMHOSTUP (ts_last_update) informs the date of the last update."
+description: "Master table with contract data. Table granularity - id_contract + contract_group. Records can be updated and DMHOSTUP (ts_last_update) informs the date of the last update."
 columns:
   id_client:
-    description: "ID debtor. TF: client.documentNumber where client-type = 'main-tenant'"
+    description: "ID client (CPF/CNPJ). TF: client.documentNumber where client-type = 'main-tenant'"
     lineage:
       - datalake_cyber_raw.delqmst.DMSSNUM
   id_contract:
@@ -38,7 +38,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMACCTG
   day_management_flag:
-    description: ""
+    description: "Day management flag. If null it was not managed that day. Otherwise, it indicates the code of the manager who worked on the account."
     lineage:
       - datalake_cyber_raw.delqmst.DMWKFLAG
   sequence_number:
@@ -46,7 +46,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMSEQNO
   contract_status:
-    description: ""
+    description: "Contract status. Same as uda1.U1STATCONT"
     lineage:
       - datalake_cyber_raw.delqmst.DMSTATUS
   flag_promise_payment:
@@ -218,11 +218,11 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMBPEXT
   agreement_type:
-    description: ""
+    description: "Type of Agreement (Campaign). Same as agreements.agreement_type (AGRHDR.AHTYPE)"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGTYPE
   agreement_status:
-    description: ""
+    description: "Agreement Status. Same as agreements.status (AGRHDR.AHSTATUS)"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGSTATUS
   last_payment_promisse_status:
@@ -241,8 +241,8 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVZIP
-  subset:
-    description: ""
+  contract_subset:
+    description: "Contract subset. Random number between 0 and 40, it will be unique per customer, that is, if a new contract from the same customer is inserted, it will have the same subset."
     lineage:
       - datalake_cyber_raw.delqmst.DMSUBSET
   previous_interest:
@@ -361,52 +361,77 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMAGNREJ
-  current_queue:
-    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+  segmentation_queue:
+    description: "Portfolio (carteira) Segmentation queue"
+    categories:
+      REAG: "Queue automatically created by Cyber"
+      REAC: "Reactivation of a Contract written-down (baixado)"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE
-  current_queue_2:
-    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+  commission_queue:
+    description: "Commission queue"
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE2
-  current_queue_3:
-    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+  agreement_queue:
+    description: "Agreement policy queue"
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE3
-  current_queue_4:
-    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+  dialer_queue:
+    description: "Dialer (olos) queue"
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE4
-  current_queue_5:
-    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+  eviction_queue:
+    description: "Eviction queue"
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE5
-  current_queue_6:
-    description: "In Recupera this would be the distributor. A contract can be in more than one queue."
+  negativity_queue:
+    description: "Negativity (negativação) queue"
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE6
-  previous_queue:
+  previous_segmentation_queue:
     description: ""
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ
-  previous_queue_2:
+  previous_commission_queue:
     description: ""
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ2
-  previous_queue_3:
+  previous_agreement_queue:
     description: ""
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ3
-  previous_queue_4:
+  previous_dialer_queue:
     description: ""
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ4
-  previous_queue_5:
+  previous_eviction_queue:
     description: ""
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ5
-  previous_queue_6:
+  previous_negativity_queue:
     description: ""
+    categories:
+      REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ6
   most_important_action_class_1:
@@ -601,27 +626,27 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3
-  label_1_portfolio_segmentation:
+  pre_legal_label:
+    description: "Pre legal label"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMLABEL5
+  label_1:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL1
-  label_2_portfolio_segmentation:
+  label_2:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL2
-  label_3_portfolio_segmentation:
+  label_3:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL3
-  label_4_portfolio_segmentation:
+  label_4:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL4
-  label_5_portfolio_segmentation:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.delqmst.DMLABEL5
-  label_6_portfolio_segmentation:
+  label_6:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL6
@@ -681,8 +706,8 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMAGPCT
-  delay_days:
-    description: ""
+  delay_contamined_days:
+    description: "Days beteween ts_due_oldest_invoice (delqmst.dmdlqdt) and TODAY. Consider from the time the account becomes delinquent until the table update date"
     lineage:
       - datalake_cyber_raw.delqmst.DMDAYS
   total_promises_kept:
@@ -869,28 +894,28 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMASSAGDT
-  ts_last_queue_update:
-    description: ""
+  ts_last_update_segmentation_queue:
+    description: "Segmentation queue change date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT
-  ts_last_queue_update_2:
-    description: ""
+  ts_last_update_commission_queue:
+    description: "Queue Change Date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT2
-  ts_last_queue_update_3:
-    description: ""
+  ts_last_update_queue_3:
+    description: "Agreement queue change date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT3
-  ts_last_queue_update_4:
-    description: ""
+  ts_last_update_queue_4:
+    description: "Queue Change Date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT4
-  ts_last_queue_update_5:
-    description: ""
+  ts_last_update_queue_5:
+    description: "Queue Change Date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT5
-  ts_last_queue_update_6:
-    description: ""
+  ts_last_update_queue_6:
+    description: "Queue Change Date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT6
   ts_most_important_activity_class_1:

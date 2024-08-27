@@ -13,6 +13,14 @@ columns:
     description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.address.ADACCT
+  id_debtor:
+    description: "Relationship identifier to link the address to the debtor."
+    lineage:
+      - datalake_cyber_raw.address.ADRERID
+  id_address:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.address.ADID
   contract_group:
     description: "Contract group (QuintoAndar or QuintoCred). TF: debtor.group"
     lineage:
@@ -77,23 +85,15 @@ columns:
     description: "Status change date"
     lineage:
       - datalake_cyber_raw.address.ADSTATDT
-  ADLNG:
-    description: ""
+  address_longitud:
+    description: "address longitud"
     lineage:
       - datalake_cyber_raw.address.ADLNG
-  ADLAT:
-    description: ""
+  address_latitud:
+    description: "address latitude"
     lineage:
       - datalake_cyber_raw.address.ADLAT
-  ADSELFCURE:
+  has_extract_from_cyberselfserve:
     description: ""
     lineage:
       - datalake_cyber_raw.address.ADSELFCURE
-  ADRERID:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.address.ADRERID
-  ADID:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.address.ADID

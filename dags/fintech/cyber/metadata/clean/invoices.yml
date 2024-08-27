@@ -3,10 +3,10 @@ database_name: datalake_cyber_clean
 table_name: invoices
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: null
+description: Stores payment method data. Table granularity - Installment of Negotiation
 columns:
   id_invoice:
-    description: ""
+    description: "Invoice/boleo ID"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLID
   id_client:
@@ -14,175 +14,178 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSSNUM
   id_agreement:
-    description: ""
+    description: "ID agreement"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMACORDO
+  id_contract:
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
+    lineage:
+      - datalake_cyber_raw.tb_boleto.BLCCT
   id_company:
-    description: ""
+    description: "Company ID"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCODEMP
   id_agency:
-    description: ""
+    description: "Agency ID"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLAGENCIA
   client_code:
-    description: ""
+    description: "Client Code"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCODCLIENTE
-  assignor:
-    description: ""
+  transferor:
+    description: "Transferor (cedente)"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCEDENTE
-  dv_agency:
-    description: ""
+  dv_bank_agency:
+    description: "DV bank agency"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDVAGENCIA
-  account_number:
-    description: ""
+  bank_account_number:
+    description: "Bank Account number"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCONTCOR
-  dv_account:
-    description: ""
+  dv_bank_account:
+    description: "DV Banco account"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDVCONTCOR
   our_number:
-    description: ""
+    description: "Our Number"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNOSSONUM
   invoice_amount:
-    description: ""
+    description: "Invoice/boleto amount"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLVLBOLETO
   document_number:
-    description: ""
+    description: "Document number"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMDOC
   document_type:
-    description: ""
+    description: "Document type"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLTPDOC
   acceptance_code:
-    description: ""
+    description: "Acceptance code"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLACEITE
   drawer_name:
-    description: ""
+    description: "Drawer name"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACNOME
   drawer_cpf_cnpj:
-    description: ""
+    description: "Drawer CPF/CNPJ"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACCPFCNPJ
   drawer_address:
-    description: ""
+    description: "Drawer address"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACEND
   drawer_neighborhood:
-    description: ""
+    description: "Drawer neighborhood"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACBAIRRO
   drawer_zip_code:
-    description: ""
+    description: "Drawer zip code"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACCEP
   drawer_city:
-    description: ""
+    description: "Drawer city"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACCIDADE
   drawer_state:
-    description: ""
+    description: "Drawer state"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACUF
   drawer_address_proof:
-    description: ""
+    description: "Drawer address proof"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACENDCMP
   instruction_1:
-    description: ""
+    description: "Instruction 1"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST1
   instruction_2:
-    description: ""
+    description: "Instruction 2"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST2
   instruction_3:
-    description: ""
+    description: "Instruction 3"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST3
   instruction_4:
-    description: ""
+    description: "Instruction 4"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST4
   instruction_5:
-    description: ""
+    description: "Instruction 5"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST5
-  local_1:
-    description: ""
+  location_1:
+    description: "Location 1"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLLOCAL1
-  local_2:
-    description: ""
+  location_2:
+    description: "Location 2"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLLOCAL2
   digitable_line:
-    description: ""
+    description: "Digitable line"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLLINHADIG
   barcode:
-    description: ""
+    description: "Barcode"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCODBARRA
   installment_number:
-    description: ""
+    description: "Installment number"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMPARC
   interest_day:
-    description: ""
+    description: "Interest day"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLJURDIA
   status:
-    description: ""
+    description: "Status"
+    categories:
+      cancelado: "Same as Canceled in Trato Feito"
+      finalizado: "Invoice has been paid. Same as Finished in Trato Feito. "
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSTATUS
   total_number_installments:
-    description: ""
+    description: "Total number of installments"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLQTDEPARC
   debt_amount:
-    description: ""
+    description: "Debt amoutn"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLVLDIVIDA
   type_invoice:
-    description: ""
+    description: "Invoice type"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLTIPOBOLETO
-  group:
-    description: ""
+  contract_group:
+    description: "Contract group (QuintoAndar or QuintoCred). TF: debtor.group"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCCTG
-  contract:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLCCT
   agreement_billing_account:
-    description: ""
+    description: "Agreement Matching Billing Account"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLACCTCOB
   dv_our_number:
-    description: ""
+    description: "Check digit of our number"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNOSSONUMDV
   origin:
-    description: ""
+    description: "Flag indicating the provenance, origin of the collection"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLFLAG_ARREC
   transferor_of_cnpj:
-    description: ""
+    description: "CNPJ of the transferor"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCEDENTECNPJ
   transferor_cnpj:
-    description: ""
+    description: "CNPJ transferor"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCNPJCED
   transferor_bank_check_digit:
@@ -190,39 +193,39 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDVBANCO
   transferor_bank_number:
-    description: ""
+    description: "Checker digit of the transferor's bank"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMBANCO
   invoice_wallet:
-    description: ""
+    description: "Invoice/Boleto Wallet"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCARTEIRA
   layout_pefin:
-    description: ""
+    description: "PEFIN LAYOUT - DENIAL LETTER"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLLAYOUTPEFIN
   currency:
-    description: ""
+    description: "Currency Type"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLMOEDA
   has_first_invoice_already_been_issued:
-    description: ""
+    description: "Flag indicating that entry of boleto/invoice has already been issued in the interface"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLFLENVIOENT
   has_invoice_already_been_issued:
-    description: ""
+    description: Flag indicating that installment bill has already been issued to the interface"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLFLENVIOPRT
   main_amount:
-    description: ""
+    description: "Main amount"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLVLPRINC
   fine_amount:
-    description: ""
+    description: "Fine amount"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLMULTA
   paid_amount:
-    description: ""
+    description: "Paid amount"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLVLPAGO
   BLVLIOF:
@@ -314,14 +317,14 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCOPIACOLA
   ts_due:
-    description: ""
+    description: "Due date"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDTVENC
   ts_document:
-    description: ""
+    description: "Document date"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDTDOC
   ts_processing:
-    description: ""
+    description: "Processing date"
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDTPROC

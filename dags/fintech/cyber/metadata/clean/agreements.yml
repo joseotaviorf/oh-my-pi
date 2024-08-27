@@ -3,16 +3,12 @@ database_name: datalake_cyber_clean
 table_name: agreements
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: Table granularity - id_negotiation.
+description: Negotiation information. Table granularity - id_agreement.
 columns:
-  id_negotiation:
+  id_agreement:
     description: "Agreement identifier. Table PK (Primary Key)"
     lineage:
       - datalake_cyber_raw.agrhdr.AHID
-  id_type_agreement:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHTYPE
   id_contract:
     description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
@@ -21,32 +17,46 @@ columns:
     description: "Identifies who created the agreement"
     lineage:
       - datalake_cyber_raw.agrhdr.AHCOLLID
+  agreement_type:
+    description: "Agreement type. Same as delinquent_master.agreement_type (DELQMST.DMAGTYPE)"
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHTYPE
   contract_group:
     description: ""
     lineage:
       - datalake_cyber_raw.agrhdr.AHACCTG
   authorized_by_manager:
-    description: ""
+    description: "Manager who authorized the agreement."
     lineage:
       - datalake_cyber_raw.agrhdr.AHAUTCOLLID
   frequency:
-    description: ""
+    description: "Frequency/Periodicity"
+    categories:
+      weekly: ""
+      daily: ""
+      monthly: ""
+      bimonthly: ""
+      quarterly: ""
     lineage:
       - datalake_cyber_raw.agrhdr.AHFREQ
-  total_installments:
-    description: ""
+  number_of_installments:
+    description: "Number of Installments of the Agreement, not counting the Down Payment"
     lineage:
       - datalake_cyber_raw.agrhdr.AHPRD
   status:
-    description: ""
+    description: "Agreement status"
+    categories:
+      Autorizado: "Same as Offset in Trato Feito"
+      Cancelado: "Same as Canceled in Trato Feito"
+      Finalizado: "Same as Finished in Trato Feito"
     lineage:
       - datalake_cyber_raw.agrhdr.AHSTATUS
-  payment_type:
-    description: ""
+  type_interest_quota:
+    description: "Type of interest quotas"
     lineage:
       - datalake_cyber_raw.agrhdr.AHPYTYPE
   contact_type:
-    description: ""
+    description: "Contact type"
     lineage:
       - datalake_cyber_raw.agrhdr.AHCTTYPE
   notify_central_system:
@@ -69,12 +79,20 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.agrhdr.AHBREAK
-  total_payment_including_discount:
-    description: ""
+  total_negotiated_amount_with_fees:
+    description: "Total Negotiated Value of the Agreement with Fees"
     lineage:
       - datalake_cyber_raw.agrhdr.AHTOTPMT
+  total_negotiated_amount_without_fees:
+    description: "Total negotiated amount of the agreement without fees"
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHTOTPMTSH
+  fees_amount:
+    description: "Fees (honorários) amount"
+    lineage:
+      - datalake_cyber_raw.agrhdr.AGRHONO
   interest_rate:
-    description: ""
+    description: "Agreement installment interest rate"
     lineage:
       - datalake_cyber_raw.agrhdr.AHRATE
   additional_interest_rate:
@@ -86,11 +104,11 @@ columns:
     lineage:
       - datalake_cyber_raw.agrhdr.AHGRPERTY
   level_agreement_authorization:
-    description: ""
+    description: "Level that can authorize the agreement"
     lineage:
       - datalake_cyber_raw.agrhdr.AHLVL
-  exception_code_creation:
-    description: ""
+  exception:
+    description: "Exception when the agreement was created"
     lineage:
       - datalake_cyber_raw.agrhdr.AHEXCP
   times_accordion_updated:
@@ -105,7 +123,7 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.agrhdr.AHREGDT
-  ts_negotiation_creation:
+  ts_agreement_creation:
     description: ""
     lineage:
       - datalake_cyber_raw.agrhdr.AHDT
@@ -113,55 +131,11 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.agrhdr.AHAUTDT
-  AHFLGACT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHFLGACT
-  AHACTUSR:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHACTUSR
-  AHDSCQB:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHDSCQB
-  AHDTQB:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHDTQB
-  AHSTADT:
-    description: ""
+  ts_status_update:
+    description: "Date on which the status of the agreement changed, both online and by batch program"
     lineage:
       - datalake_cyber_raw.agrhdr.AHSTADT
-  AHSTACOLL:
-    description: ""
+  manager_updated_status:
+    description: "Manager who changed the status of the agreement with online programs; When using batch programs, the value 'HOST' is assigned."
     lineage:
       - datalake_cyber_raw.agrhdr.AHSTACOLL
-  AHDTCANC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHDTCANC
-  AHCYTYPE:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHCYTYPE
-  AHMIGRACAO:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHMIGRACAO
-  AHQBENVIADA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHQBENVIADA
-  AHCNIMPERS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHCNIMPERS
-  AGRHONO:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AGRHONO
-  AHTOTPMTSH:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agrhdr.AHTOTPMTSH

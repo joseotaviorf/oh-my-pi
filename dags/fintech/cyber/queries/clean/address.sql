@@ -1,6 +1,8 @@
 SELECT
     ADSSNUM AS id_client,
+    ADRERID AS id_debtor,
     ADACCT AS id_contract,
+    ADID AS id_address,
     CASE
         WHEN ADACCTG = "1" THEN "QuintoAndar"
         WHEN ADACCTG = "2" THEN "QuintoCred"
@@ -34,9 +36,8 @@ SELECT
     ADCOLLID AS manager,
     ADSTCOLLID AS manager_update_status,
     ADSTATDT AS ts_status_update,
-    ADLNG,
-    ADLAT,
-    ADSELFCURE,
-    ADRERID,
-    ADID
+    ADLNG AS address_longitud,
+    ADLAT AS address_latitud,
+    IF(ADSELFCURE = "Y", TRUE, FALSE) AS has_extract_from_cyberselfserve,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.address

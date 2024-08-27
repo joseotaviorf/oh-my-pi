@@ -40,9 +40,6 @@ SELECT
     VL_REMUNERACAO AS remuneration_amount,
     PE_PART_ORIGEM AS percentage_participation_origin_contract,
     IN_FECHADO AS is_commission_closed,
-    IN_GLOSA,
-    DT_GLOSA,
-    DS_MOTIVO_GLOSA,
     DT_IN_PARCIAL,
     IN_PARCIAL,
     PE_REMUN_SHARE,
@@ -57,5 +54,6 @@ SELECT
     DT_IN_FECHADO AS ts_commission_closed,
     DT_PESQUISA AS ts_search,
     DT_INICIO_VIGENCIA As ts_start_validity,
-    DT_FIM_VIGENCIA AS ts_end_validity
+    DT_FIM_VIGENCIA AS ts_end_validity,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.tb_comissoes

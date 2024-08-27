@@ -3,7 +3,10 @@ database_name: datalake_cyber_clean
 table_name: debtor
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: Information on people related to each account.
+description: |
+  This table stores information about people related to the debtor. The first 3 relationships
+  are generally co-debtors who add and update each other to and from the host system via update (process
+  load with the beb045 program).
 columns:
   id_client:
     description: "CPF/CNPJ of the Related Person. TF: client.document"
@@ -117,36 +120,36 @@ columns:
     description: "Address number. TF: contract.number*"
     lineage:
       - datalake_cyber_raw.relations.RERNUMERORUA
-  RERID:
-    description: ""
+  id_phone:
+    description: "relationship identifier. It is used to link the relationship with the address and phone tables."
     lineage:
       - datalake_cyber_raw.relations.RERID
-  RERFLACSER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.relations.RERFLACSER
-  RERFLACSPC:
-    description: ""
+  spc_bureau:
+    description: "SPC bureau"
     lineage:
       - datalake_cyber_raw.relations.RERFLACSPC
-  RERFLACCDL:
-    description: ""
+  serasa_bureau:
+    description: "Serasa bureau"
+    lineage:
+      - datalake_cyber_raw.relations.RERFLACSER
+  cdl_bureau:
+    description: "CDL bureau"
     lineage:
       - datalake_cyber_raw.relations.RERFLACCDL
-  RERFLACBVS:
-    description: ""
+  bvs_bureau:
+    description: "BVS bureau"
     lineage:
       - datalake_cyber_raw.relations.RERFLACBVS
   email:
     description: "Email"
     lineage:
       - datalake_cyber_raw.relations.REREMAIL
-  RERDTALTERACAO:
-    description: ""
+  ts_update:
+    description: "Update date"
     lineage:
       - datalake_cyber_raw.relations.RERDTALTERACAO
-  RERDTINCLUSAO:
-    description: ""
+  ts_insert:
+    description: "Insert/inclusion date"
     lineage:
       - datalake_cyber_raw.relations.RERDTINCLUSAO
   ts_history:

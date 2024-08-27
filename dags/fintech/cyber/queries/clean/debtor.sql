@@ -2,6 +2,7 @@ SELECT
     RERSSNUM AS id_client,
     RERACCT AS id_contract,
     RERNAME2 AS id_quintoandar,
+    RERID AS id_phone,
     CASE
         WHEN RERACCTG = "1" THEN "QuintoAndar"
         WHEN RERACCTG = "2" THEN "QuintoCred"
@@ -34,7 +35,6 @@ SELECT
     RERPHONE AS personal_phone,
     RERBPHON AS business_phone,
     RERBEXT AS business_phone_extension,
-    RERIDCLI,
     RERDTNASC AS dt_birth,
     RERNATURALID AS nationality,
     RERUFNATUR AS nationality_uf,
@@ -51,13 +51,13 @@ SELECT
     END AS marital_status,
     RERCONJNOME AS partner_name,
     RERCONJNASC AS dt_birth_partner,
-    RERID,
-    RERFLACSER,
-    RERFLACSPC,
-    RERFLACCDL,
-    RERFLACBVS,
+    RERFLACSPC AS spc_bureau,
+    RERFLACSER AS serasa_bureau,
+    RERFLACCDL AS cdl_bureau,
+    RERFLACBVS AS bvs_bureau,
     REREMAIL AS email,
-    RERDTALTERACAO,
-    RERDTINCLUSAO,
-    RERHISTDT AS ts_history
+    RERDTALTERACAO AS ts_update,
+    RERDTINCLUSAO AS ts_insert,
+    RERHISTDT AS ts_history,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.relations

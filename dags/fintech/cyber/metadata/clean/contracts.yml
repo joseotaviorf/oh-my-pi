@@ -25,199 +25,203 @@ columns:
     description: "ID of the oldest negative invoice (used in the negative and rehabilitation rules)"
     lineage:
       - datalake_cyber_raw.uda1.U1IDFMAN
+  id_client_legacy:
+    description: "Client UUID in legacy. TF: client.person-uuid"
+    lineage:
+      - datalake_cyber_raw.uda1.U1UUIDCLIE
   contract_group:
     description: "Contract group (quintoandar or quintocred). TF: debtor.group*"
     lineage:
       - datalake_cyber_raw.uda1.U1ACCTG
-  U1SUBSET:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1SUBSET
-  U1FASECOB:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FASECOB
-  U1DTRETOR:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTRETOR
-  U1FLACNEGSPC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACNEGSPC
-  U1DTACNEGSPC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTACNEGSPC
-  U1FLACINBSPC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACINBSPC
-  U1DTINBACSPC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTINBACSPC
-  U1REAAVASPC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1REAAVASPC
-  U1DTREAAVSPC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTREAAVSPC
-  U1NEGAVASPC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1NEGAVASPC
-  U1DTNEGAVSPC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTNEGAVSPC
-  U1FLACNEGSER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACNEGSER
-  U1DTACNEGSER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTACNEGSER
-  U1FLACINBSER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACINBSER
-  U1DTINBACSER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTINBACSER
-  U1REAAVASER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1REAAVASER
-  U1NEGAVASER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1NEGAVASER
-  U1DTREAAVSER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTREAAVSER
-  U1DTNEGAVSER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTNEGAVSER
-  U1FLACNEGBVS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACNEGBVS
-  U1DTACNEGBVS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTACNEGBVS
-  U1FLACINBBVS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACINBBVS
-  U1DTINBACBVS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTINBACBVS
-  U1REAAVABVS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1REAAVABVS
-  U1DTREAAVBVS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTREAAVBVS
-  U1NEGAVABVS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1NEGAVABVS
-  U1DTNEGAVBVS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTNEGAVBVS
-  U1FLACNEGCDL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACNEGCDL
-  U1DTACNEGCDL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTACNEGCDL
-  U1FLACINBCDL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACINBCDL
-  U1DTINBACCDL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTINBACCDL
-  U1REAAVACDL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1REAAVACDL
-  U1DTREAAVCDL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTREAAVCDL
-  U1NEGAVACDL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1NEGAVACDL
-  U1DTNEGAVCDL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTNEGAVCDL
-  U1FLACNEGINT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACNEGINT
-  U1DTACNEGINT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTACNEGINT
-  U1REAAVAINT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1REAAVAINT
-  U1NEGAVAINT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1NEGAVAINT
-  U1FLACNEGCYB:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACNEGCYB
-  U1DTACNEGCYB:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTACNEGCYB
-  U1FLACREAB:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACREAB
-  U1DTACREAB:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTACREAB
-  U1FLATISEMAC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLATISEMAC
-  U1FLACAVAL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1FLACAVAL
-  U1CPFCNPJ:
-    description: ""
+  cpf_cnpj:
+    description: "Client CPF/CNPJ"
     lineage:
       - datalake_cyber_raw.uda1.U1CPFCNPJ
   rg:
     description: "RG"
     lineage:
       - datalake_cyber_raw.uda1.U1RG
-  dt_rg_issuance:
+  subset:
+    description: "Subset"
+    lineage:
+      - datalake_cyber_raw.uda1.U1SUBSET
+  collection_phase:
+    description: "Collection phase"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FASECOB
+  ts_return:
+    description: "Return date"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTRETOR
+  has_negative_spc:
+    description: "Indicates that there is a Negative action for the Bureau SPC"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACNEGSPC
+  ts_negative_spc:
+    description: "Date of the Negative action in the SPC"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTACNEGSPC
+  has_inhibition_negative_spc:
+    description: "Negative action inhibition flag for the SPC bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACINBSPC
+  ts_inhibition_negative_spc:
+    description: "Date of Inhibition of the Negative action for the SPC bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTINBACSPC
+  has_guarantor_rehabilitation_spc:
+    description: "Guarantor Rehabilitation Flag at SPC"
+    lineage:
+      - datalake_cyber_raw.uda1.U1REAAVASPC
+  ts_guarantor_reactivation_spc:
+    description: "Guarantor Reactivation Date at SPC"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTREAAVSPC
+  has_guarantor_negative_spc:
+    description: "Guarantor Negative Flag in the SPC"
+    lineage:
+      - datalake_cyber_raw.uda1.U1NEGAVASPC
+  ts_guarantor_negative_spc:
+    description: "Guarantor Negative Date in the SPC"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTNEGAVSPC
+  has_negative_serasa:
+    description: "Indicates that there is a Negative action for Bureau Serasa"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACNEGSER
+  ts_negative_serasa:
+    description: "Date of the Negative action at Serasa"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTACNEGSER
+  has_inhibition_negative_serasa:
+    description: "Negative action Inhibition Flag for the Serasa bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACINBSER
+  ts_inhibition_negative_serasa:
+    description: "Date of Inhibition of the Negativation action for the Serasa bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTINBACSER
+  has_guarantor_rehabilitation_serasa:
+    description: "Guarantor Rehabilitation Flag at SERASA"
+    lineage:
+      - datalake_cyber_raw.uda1.U1REAAVASER
+  has_guarantor_negative_serasa:
+    description: "Guarantor Negative Flag in SERASA"
+    lineage:
+      - datalake_cyber_raw.uda1.U1NEGAVASER
+  ts_guarantor_reactivation_serasa:
+    description: "Guarantor Rehabilitation Date at SERASA"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTREAAVSER
+  ts_guarantor_negative_serasa:
+    description: "Guarantor Negative Date in SERASA"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTNEGAVSER
+  has_negative_bvs:
+    description: "Indicates that there is a Negative action for the BVS Bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACNEGBVS
+  ts_negative_bvs:
+    description: "Date of the Negative action in the BVS"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTACNEGBVS
+  has_inhibition_negative_bvs:
+    description: "Negative action inhibition flag for the BVS bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACINBBVS
+  ts_inhibition_negative_bvs:
+    description: "Date of Inhibition of the Negative action for the BVS bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTINBACBVS
+  has_guarantor_rehabilitation_bvs:
+    description: "Guarantor Rehabilitation Flag in the BVS"
+    lineage:
+      - datalake_cyber_raw.uda1.U1REAAVABVS
+  ts_guarantor_reactivation_bvs:
+    description: "Date of Rehabilitation of the Guarantor in the BVS"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTREAAVBVS
+  has_guarantor_negative_bvs:
+    description: "Guarantor Negative Flag in the BVS"
+    lineage:
+      - datalake_cyber_raw.uda1.U1NEGAVABVS
+  ts_guarantor_negative_bvs:
+    description: "Guarantor Negative Date in the BVS"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTNEGAVBVS
+  has_negative_cdl:
+    description: "Negative Flag in the CDL Bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACNEGCDL
+  ts_negative_cdl:
+    description: "Date of the Negative action in the CDL"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTACNEGCDL
+  has_inhibition_negative_cdl:
+    description: "Negative action inhibition flag for the CDL bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACINBCDL
+  ts_inhibition_negative_cdl:
+    description: "Date of Inhibition of the Negative action for the CDL bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTINBACCDL
+  has_guarantor_rehabilitation_cdl:
+    description: "Guarantor Rehabilitation Flag at CDL"
+    lineage:
+      - datalake_cyber_raw.uda1.U1REAAVACDL
+  ts_guarantor_reactivation_cdl:
+    description: "Guarantor Reactivation Date at CDL"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTREAAVCDL
+  has_guarantor_negative_cdl:
+    description: "Guarantor Negative Flag in the SPC"
+    lineage:
+      - datalake_cyber_raw.uda1.U1NEGAVACDL
+  ts_guarantor_negative_cdl:
+    description: "Guarantor Negative Date in the CDL"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTNEGAVCDL
+  has_negative_internal:
+    description: "Negative Flag in the Internal Bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACNEGINT
+  ts_negative_internal:
+    description: "Negative Date in the Internal Bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTACNEGINT
+  has_guarantor_rehabilitation_internal:
+    description: "Guarantor Rehabilitation Flag in the Internal Bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1REAAVAINT
+  has_guarantor_negative_internal:
+    description: "Guarantor Negative Flag in the Internal Bureau"
+    lineage:
+      - datalake_cyber_raw.uda1.U1NEGAVAINT
+  U1FLACNEGCYB:
+    description: "indicates that there is a Deny action for the CYB Bureau – Internal - (0-unchecked 1 -checked) - Default 0;"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACNEGCYB
+  U1DTACNEGCYB:
+    description: "Date of the Denial action at the CYB Bureau (Internal);"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTACNEGCYB
+  has_rehabilitation_all_credit_bureaus:
+    description: "Indicates that there is a Rehabilitation action (for all credit bureaus);will always be marked (=1) when there is a Rehabilitation action promoted by the Negative/Rehabilitation module, whether resulting from the discharge or administrative event.After confirmation of the Rehabilitation action sent by the Credit Bureaux, the flag will be unmarked '0'"
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACREAB
+  ts_rehabilitation_all_credit_bureaus:
+    description: "Rehabilitation Action Date (for all credit bureaus);"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTACREAB
+  has_none_negative_bureau:
+    description: "identifies that the contract is without Negative action for any Bureau (SERASA/CYB)."
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLATISEMAC
+  U1FLACAVAL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.uda1.U1FLACAVAL
+  ts_rg_issuance:
     description: "RG document issuance date"
     lineage:
       - datalake_cyber_raw.uda1.U1DTEMRG
@@ -273,7 +277,7 @@ columns:
     description: "Home address Country"
     lineage:
       - datalake_cyber_raw.uda1.U1ENDRESPA
-  U1DDITELRES:
+  ddi_phone:
     description: "DDI Home phone"
     lineage:
       - datalake_cyber_raw.uda1.U1DDITELRES
@@ -285,8 +289,8 @@ columns:
     description: "Email. TF: client.emails[0]"
     lineage:
       - datalake_cyber_raw.uda1.U1EMAIL
-  U1ENDCOMNUM:
-    description: ""
+  commercial_address_number:
+    description: "business address number"
     lineage:
       - datalake_cyber_raw.uda1.U1ENDCOMNUM
   business_phone_ddi:
@@ -377,7 +381,7 @@ columns:
     description: "Name of the real estate agency responsible for the contract in 5C"
     lineage:
       - datalake_cyber_raw.uda1.U1NOMIMO
-  flag_pause_collection:
+  has_paused_collection:
     description: "Flag to control whether the contract should be paused during billing."
     lineage:
       - datalake_cyber_raw.uda1.U1FLGPAUSA
@@ -385,294 +389,66 @@ columns:
     description: "Email real estate agency. TF: 5Cred.emailImobiliária"
     lineage:
       - datalake_cyber_raw.uda1.U1CT1
-  U1CT2:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT2
-  U1CT3:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT3
-  U1CT4:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT4
-  U1CT5:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT5
-  U1CN1:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN1
-  U1CN2:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN2
-  U1CN3:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN3
-  U1CN4:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN4
-  U1CN5:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN5
-  U1CD1:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD1
-  U1CD2:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD2
-  U1CD3:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD3
-  U1CD4:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD4
-  U1CD5:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD5
-  U1CT6:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT6
-  U1CT7:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT7
-  U1CT8:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT8
-  U1CT9:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT9
-  U1CT10:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CT10
-  U1CI1:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI1
-  U1CI2:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI2
-  U1CI3:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI3
-  U1CI4:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI4
-  U1CI5:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI5
-  U1CI6:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI6
-  U1CI7:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI7
-  U1CI8:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI8
-  U1CI9:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI9
-  U1CI10:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI10
-  uuid_client_legacy:
-    description: "Client UUID in legacy. TF: client.person-uuid"
-    lineage:
-      - datalake_cyber_raw.uda1.U1UUIDCLIE
-  U1INDMOTPA:
-    description: ""
+  reason_pause:
+    description: "Pause reason.Possible reasons: fraud, legal proceedings, operational errors, friction"
     lineage:
       - datalake_cyber_raw.uda1.U1INDMOTPA
   reason_written_down:
     description: "Reason written down"
     lineage:
       - datalake_cyber_raw.uda1.U1MOTBAIXA
-  U1CDRETRSER:
-    description: ""
+  bureau_latest_rehabilitation_rejection:
+    description: "Bureau's latest rehabilitation rejection code"
     lineage:
       - datalake_cyber_raw.uda1.U1CDRETRSER
-  U1DTRETRSER:
-    description: ""
+  ts_last_rehabilitation_rejection:
+    description: "Date of last rehabilitation rejection"
     lineage:
       - datalake_cyber_raw.uda1.U1DTRETRSER
-  U1CDRETNSER:
-    description: ""
+  latest_bureau_denial_rejection:
+    description: "Latest Bureau denial rejection code"
     lineage:
       - datalake_cyber_raw.uda1.U1CDRETNSER
-  U1DTRETNSER:
-    description: ""
+  ts_bureau_denial_rejection:
+    description: "Date of last denial rejection"
     lineage:
       - datalake_cyber_raw.uda1.U1DTRETNSER
-  U1IDPARCNEG:
-    description: ""
+  id_last_negative_installment:
+    description: "ID of the last negative installment."
     lineage:
       - datalake_cyber_raw.uda1.U1IDPARCNEG
   business_address_country:
     description: "Business address Country"
     lineage:
       - datalake_cyber_raw.uda1.U1ENDCOMPAI
-  U1DTSOLBOL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTSOLBOL
-  U1TIPOBOL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1TIPOBOL
-  U1TPPES:
-    description: ""
+  person_type:
+    description: "Person type"
     lineage:
       - datalake_cyber_raw.uda1.U1TPPES
-  U1VLRPRMUAGR:
-    description: ""
+  residual_fine_amount:
+    description: "Residual fine value of installments"
     lineage:
       - datalake_cyber_raw.uda1.U1VLRPRMUAGR
-  U1VLRPRJUAG:
-    description: ""
+  residual_interest_amount:
+    description: "Residual interest value of installments"
     lineage:
       - datalake_cyber_raw.uda1.U1VLRPRJUAG
-  U1VLVENC:
-    description: ""
+  debt_balance:
+    description: "Debt balance of the Contract + Interest + Fine"
     lineage:
       - datalake_cyber_raw.uda1.U1VLVENC
-  U1NOCAMPANHA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1NOCAMPANHA
-  U1VLCAMPANHA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1VLCAMPANHA
-  U1VLCUSTASAG:
-    description: ""
+  cost_amount:
+    description: "Cost amount"
     lineage:
       - datalake_cyber_raw.uda1.U1VLCUSTASAG
-  U1DTMANFIN:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTMANFIN
-  U1DTMANCAD:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DTMANCAD
-  U1CI11:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI11
-  U1CI13:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI13
-  U1CI14:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI14
-  U1CI15:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI15
-  U1CI16:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI16
-  U1CI17:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI17
-  U1CI18:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI18
-  U1CI19:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI19
-  U1CI29:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI29
-  U1CI20:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI20
-  U1CI21:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI21
-  U1CI22:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI22
-  U1CI23:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI23
-  U1CI24:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI24
-  U1CI25:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI25
-  U1CI26:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI26
-  U1CI27:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI27
-  U1CI28:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI28
-  U1CI30:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI30
-  U1CI12:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CI12
   U2DIASEVIC:
     description: ""
     lineage:
       - datalake_cyber_raw.uda1.U2DIASEVIC
-  U1DIASEMANA:
-    description: ""
+  week_day:
+    description: "week day"
     lineage:
       - datalake_cyber_raw.uda1.U1DIASEMANA
-  U1DIASEVIC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1DIASEVIC
   U1QTDFAVENC:
     description: ""
     lineage:
@@ -681,175 +457,15 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.uda1.U1TPCOB
-  U1DAYS:
-    description: ""
+  days:
+    description: "Days"
     lineage:
       - datalake_cyber_raw.uda1.U1DAYS
-  U1CLASSCTR:
-    description: ""
+  classification:
+    description: "Classification"
     lineage:
       - datalake_cyber_raw.uda1.U1CLASSCTR
   U1OCOREVIC:
     description: ""
     lineage:
       - datalake_cyber_raw.uda1.U1OCOREVIC
-  U1CD6:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD6
-  U1CD7:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD7
-  U1CD8:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD8
-  U1CD9:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD9
-  U1CD10:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CD10
-  U1CN6:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN6
-  U1CN7:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN7
-  U1CN8:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN8
-  U1CN9:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN9
-  U1CN10:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1CN10
-  U1INDCOR1:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR1
-  U1INDCOR2:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR2
-  U1INDCOR3:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR3
-  U1INDCOR4:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR4
-  U1INDCOR5:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR5
-  U1INDCOR6:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR6
-  U1INDCOR7:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR7
-  U1INDCOR8:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR8
-  U1INDCOR9:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR9
-  U1INDCOR10:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR10
-  U1INDCOR11:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR11
-  U1INDCOR12:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR12
-  U1INDCOR13:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR13
-  U1INDCOR14:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR14
-  U1INDCOR15:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR15
-  U1INDCOR16:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR16
-  U1INDCOR17:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR17
-  U1INDCOR18:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR18
-  U1INDCOR19:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR19
-  U1INDCOR20:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR20
-  U1INDCOR21:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR21
-  U1INDCOR22:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR22
-  U1INDCOR23:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR23
-  U1INDCOR24:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR24
-  U1INDCOR25:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR25
-  U1INDCOR26:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR26
-  U1INDCOR27:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR27
-  U1INDCOR28:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR28
-  U1INDCOR29:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR29
-  U1INDCOR30:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U1INDCOR30

@@ -1,0 +1,26 @@
+SELECT
+    APAHID AS id_agreement,
+    CASE
+        WHEN APFLAG = "S" THEN "Programado"
+        WHEN APFLAG = "C" THEN "Concluído"
+        WHEN APFLAG = "R" THEN "Quebrado"
+        ELSE APFLAG
+    END AS status,
+    CASE
+        WHEN APFLAG2 = "S" THEN "Programado"
+        WHEN APFLAG2 = "C" THEN "Concluído"
+        WHEN APFLAG2 = "R" THEN "Quebrado"
+    END AS revalued_payment_flag,
+    APNOSSONUM AS our_number,
+    APDETID AS installment_number,
+    APAMT AS amount_to_pay,
+    APAMTPAY AS payment_amount,
+    APINTAMT AS interest_amount,
+    APHONO AS fees_amount,
+    APINTTAXAMT AS tax_amount,
+    APAMZAMT AS amortization_amount,
+    APBLNC AS final_balance,
+    APINDATE AS ts_start_payment_term,
+    APDUEDT AS ts_due_installment,
+    NOW() AS ts_load
+FROM datalake_cyber_raw.agpmtdet

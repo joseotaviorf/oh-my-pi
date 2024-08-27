@@ -5,6 +5,10 @@ owner: bianca.martins@quintoandar.com.br
 domain: fintech
 description: null
 columns:
+  id_phone:
+    description: "ID Phone"
+    lineage:
+      - datalake_cyber_raw.phone.PHID
   id_client:
     description: "ID client. TF: client.document"
     lineage:
@@ -69,10 +73,6 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.phone.PHRERID
-  PHID:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.phone.PHID
   ts_hierarchy_calculation:
     description: ""
     lineage:

@@ -1,7 +1,7 @@
 SELECT
     AGAGENCY AS id_agency,
     AGFIRM AS agency_name,
-    AGNICKNAME AS commercial_name,
+    AGNICKNAME AS agency_commercial_name,
     AGIRSNUM AS cnpj,
     AGAGCYCD AS agency_type,
     AGSUPER AS super_agency,
@@ -33,5 +33,6 @@ SELECT
     AGAMTACT AS current_active_amount,
     AGSTARTDT AS ts_start,
     AGAGNREF AS ts_assigned_agency,
-    AGENDDT AS ts_contract_termination
+    AGENDDT AS ts_contract_termination,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.agency

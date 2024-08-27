@@ -37,13 +37,13 @@ workflow:
     agrhdr:
       clean_table_name: agreements
     agpmtdet:
-      clean_table_name: agreement_payment
+      clean_table_name: agreement_installments
     agdscdet:
       clean_table_name: agreement_discounts
     tb_historico_disponibilizacao:
       clean_table_name: history_contract_distribution
     tb_parcela:
-      clean_table_name: debt
+      clean_table_name: bill
     tb_boleto:
       clean_table_name: invoices
     collid:

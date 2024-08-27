@@ -3,7 +3,7 @@ database_name: datalake_cyber_clean
 table_name: contracts_agreements
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: null
+description: Table with information on contracts related to the agreement.
 columns:
   id_contract:
     description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"

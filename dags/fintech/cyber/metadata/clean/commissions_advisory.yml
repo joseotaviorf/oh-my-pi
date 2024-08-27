@@ -169,18 +169,6 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_comissoes.IN_FECHADO
-  IN_GLOSA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_comissoes.IN_GLOSA
-  DT_GLOSA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_comissoes.DT_GLOSA
-  DS_MOTIVO_GLOSA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_comissoes.DS_MOTIVO_GLOSA
   DT_IN_PARCIAL:
     description: ""
     lineage:

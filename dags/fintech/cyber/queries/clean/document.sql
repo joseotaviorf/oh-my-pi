@@ -12,5 +12,6 @@ SELECT
     DONAFILE AS file,
     DOSTATUS AS status,
     DOADDDT AS ts_update,
-    DOLSTDT AS ts_last
+    DOLSTDT AS ts_last,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.document

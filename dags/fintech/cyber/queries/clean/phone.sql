@@ -1,4 +1,5 @@
 SELECT
+    PHID AS id_phone,
     PHSSNUM AS id_client,
     PHACCT AS id_contract,
     CASE
@@ -26,8 +27,8 @@ SELECT
     PHRANKORDER AS hierarchical_sequence,
     PHSELFCURE,
     PHRERID,
-    PHID,
     PHUPDDT AS ts_hierarchy_calculation,
     PHDATE AS ts_creation,
-    PHSTATDT AS ts_status_update
+    PHSTATDT AS ts_status_update,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.phone

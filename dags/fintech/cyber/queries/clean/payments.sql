@@ -33,10 +33,8 @@ SELECT
     PMAMOUNT AS actual_amount,
     PMPRVVAL AS previous_field_value,
     PMCURVAL AS field_value_after_calculation,
-    PMDTCICLO,
-    PMAGENCYPRM,
-    PMAGENCYPRM_FLAG,
     PMTDATE AS ts_payment,
     PMEDATE AS ts_registration_transaction,
-    PMREFDT AS ts_transaction_referred
+    PMREFDT AS ts_transaction_referred,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.pmtfil

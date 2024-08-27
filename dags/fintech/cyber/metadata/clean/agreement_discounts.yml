@@ -3,41 +3,37 @@ database_name: datalake_cyber_clean
 table_name: agreement_discounts
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: null
+description: Information on discounts granted in agreements. Table granularity - id_agreement.
 columns:
-  id_negotiation:
-    description: ""
+  id_agreement:
+    description: "ID agreement. PK of table"
     lineage:
       - datalake_cyber_raw.agdscdet.ADID
-  field_name:
-    description: ""
+  field:
+    description: "CyberFinancial field parameterized in the type of agreement"
     lineage:
       - datalake_cyber_raw.agdscdet.ACFIELD
+  field_name:
+    description: "Field"
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADFIELD
   arithmetic_operator:
     description: ""
     lineage:
       - datalake_cyber_raw.agdscdet.ADOP
-  amount:
+  amount_without_discount:
     description: ""
     lineage:
       - datalake_cyber_raw.agdscdet.ADORVL
-  discount:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agdscdet.ADDISC
   amount_with_discount:
-    description: ""
+    description: "Negotiated amount with discounts applied."
     lineage:
       - datalake_cyber_raw.agdscdet.ADDISCVL
-  ADFIELD:
-    description: ""
+  discount:
+    description: "Discount Applied"
     lineage:
-      - datalake_cyber_raw.agdscdet.ADFIELD
-  ADDISCT:
-    description: ""
+      - datalake_cyber_raw.agdscdet.ADDISC
+  discount_percentage:
+    description: "Discount Percentage = (amount_without_discount - amount_with_discount)*100/amount_without_discount"
     lineage:
       - datalake_cyber_raw.agdscdet.ADDISCT
-  ADMIGRACAO:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agdscdet.ADMIGRACAO
