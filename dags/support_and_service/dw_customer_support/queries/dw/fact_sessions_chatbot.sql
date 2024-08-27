@@ -121,7 +121,7 @@ SELECT
     WHEN gs.is_retention = true AND gs.has_fallback = true THEN True
     ELSE False
   END AS is_retained_session_with_fallback,
-  w.is_churn_chat,
+  IFNULL(w.is_churn_chat, False) is_churn_chat,
   nop.user_response IS NOT NULL AND nop.n_options IS NOT NULL AND nop.user_response = n_options + 1 AS is_other_option,
   IF(gs.ticket_origin = 'call inapp', True, False) AS is_call_in_app_session,
   gs.has_exceeded_session_timeout,
