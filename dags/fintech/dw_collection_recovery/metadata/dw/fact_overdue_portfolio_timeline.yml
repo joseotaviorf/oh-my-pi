@@ -76,10 +76,18 @@ columns:
     categories:
       Flow: customers that are new in the Portfolio. The day the flow contracts enters the portfolio is the first day of the overdue (i.e first business day after the due date).
       Stock: customers that were already in the portfolio in the last month. Important to notice that the cut off date to this reference is the first day of the month.
+  delay_contamined_at_closure:
+    lineage:
+      - datalake_invoice.overdue_portfolio_timeline.delay_contamined_at_closure
+    description: Delay contamined at closure (Days that define delay_contract_range and delay_contamined_range)
   delay_contamined_range:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.delay_contamined_range
     description: Delay contamined range. We calculate it based on the contract and not the invoice
+  delay_contract_range:
+    lineage:
+      - datalake_invoice.overdue_portfolio_timeline.delay_contract_range
+    description: Same delay contamined range used for pdd. We calculate it based on the contract and not the invoice
   contract_overdue_invoices:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.contract_overdue_invoices

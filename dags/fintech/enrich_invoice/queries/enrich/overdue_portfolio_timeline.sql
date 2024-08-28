@@ -155,7 +155,18 @@ tainted_dataset_range AS (
             WHEN delay_contamined_at_closure <= 720 THEN "541-720"
             WHEN delay_contamined_at_closure <= 1080 THEN "721-1080"
             ELSE "over 1080"
-        END AS delay_contamined_range
+        END AS delay_contamined_range,
+        CASE
+            WHEN delay_contamined_at_closure IS NULL THEN NULL
+            WHEN delay_contamined_at_closure <= 0   THEN "a. Current"
+            WHEN delay_contamined_at_closure <= 30  THEN "b. 1-30"
+            WHEN delay_contamined_at_closure <= 60  THEN "c. 31-60"
+            WHEN delay_contamined_at_closure <= 90  THEN "d. 61-90"
+            WHEN delay_contamined_at_closure <= 120 THEN "e. 91-120"
+            WHEN delay_contamined_at_closure <= 150 THEN "f. 121-150"
+            WHEN delay_contamined_at_closure <= 180 THEN "g. 151-180"
+            ELSE "h. over 180"
+        END AS delay_contract_range
     FROM
         tainted_dataset
     WHERE
@@ -190,6 +201,7 @@ SELECT
     delay_invoice_at_closure,
     delay_contamined_at_closure,
     delay_contamined_range,
+    delay_contract_range,
     business_day,
     IF(reference_date=max_date_between_business_days, TRUE, FALSE) AS is_last_business_days,
     dt_contract_annulled,

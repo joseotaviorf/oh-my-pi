@@ -92,6 +92,11 @@ columns:
       - datalake_retsuko.invoice.ts_due
       - datalake_quintoandar.aux_date.month_start
     description: Delay contamined range. We calculate it based on the contract and not the invoice
+  delay_contract_range:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_quintoandar.aux_date.month_start
+    description: Same delay contamined range used for pdd. We calculate it based on the contract and not the invoice
   business_day:
     lineage:
       - datalake_quintoandar.aux_date.working_days_in_month
