@@ -45,7 +45,9 @@ SELECT
     pdlpd.total_processed_input_data_gbytes,
     tpcpd.total_cost_in_dollars * (pdlpd.total_processed_input_data_gbytes / SUM(pdlpd.total_processed_input_data_gbytes) OVER (PARTITION BY pdlpd.created_date)) AS proportional_cost_in_dollars,
     pdlpd.created_date AS dt_created,
-    d.year
+    d.year,
+    d.month,
+    d.day
 FROM
     processed_data_per_line_per_day AS pdlpd
 LEFT JOIN
