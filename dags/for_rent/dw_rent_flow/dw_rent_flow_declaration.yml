@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2021,11,14
   owner: Data ForRent
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: rent
   spark_session_configs:

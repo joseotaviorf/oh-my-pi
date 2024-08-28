@@ -1,5 +1,5 @@
 ---
-table_name: dw_rent_staging.dim_rent_flow_type
+table_name: dw_rent.dim_rent_flow_type
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   sk_rent_flow_type:
