@@ -1,9 +1,13 @@
 database_name: dw_credit_analysis
-table_name: fact_early_credit
+table_name: fact_offer_early_credit
 owner: guilherme.sacramento@quintoandar.com.br
 domain: fintech
-description: "Table with the LAST early credit analysis information of the tenant"
+description: "Table with the early credit analysis information for each offer"
 columns:
+  sk_offer:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_offer
+    description: "ID of the offer"
   sk_early_credit_analysis:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id
@@ -15,7 +19,7 @@ columns:
   sk_client:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_user
-    description: "ID of the client"
+    description: "ID of the user"
   sk_house:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_house
@@ -24,10 +28,6 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_variant
     description: "ID of the variant"
-  city:
-    lineage:
-      - datalake_sorting_hat_clean.early_credit_analysis.city
-    description: "City of the tenant" 
   version:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.version

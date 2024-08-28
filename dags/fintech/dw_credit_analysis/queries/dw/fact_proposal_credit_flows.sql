@@ -11,17 +11,6 @@ WITH credit_analysis AS (
   FROM
     datalake_credit_analysis.credit_analysis
 ),
-early_credit_analysis AS (
-  SELECT
-    sk_early_credit_analysis,
-    sk_offer,
-    sk_user,
-    sk_house,
-    dt_early_credit_created,
-    dt_early_credit_expired
-  FROM
-    dw_credit.fact_early_credit
-),
 guarantees AS (
   SELECT
     flrf.sk_proposal,
@@ -318,7 +307,7 @@ proposal_credit_flows AS (
   FROM
     rent_flows AS rf
   LEFT JOIN
-    early_credit_analysis AS eca
+    dw_credit.fact_offer_early_credit AS eca
       ON  rf.sk_offer = eca.sk_offer
 ),
 house_listing AS (
@@ -391,7 +380,7 @@ early_credit_full (
     CAST(NULL AS DATE) AS dt_reference,
     NOW() AS ts_load
   FROM
-    early_credit_analysis AS eca
+    dw_credit.fact_early_credit AS eca
   LEFT JOIN 
     house_listing AS hl
       ON  hl.id_house = eca.sk_house
