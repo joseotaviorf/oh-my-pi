@@ -1,4 +1,4 @@
-SELECT 
+SELECT
   GoalId AS id_goal,
   PersonId AS id_person,
   PersonNumber AS person_number,
