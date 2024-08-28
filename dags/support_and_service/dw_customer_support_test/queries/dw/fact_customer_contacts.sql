@@ -59,7 +59,7 @@ demand AS (
   FROM
     datalake_customer_support_test.calls
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_star_date}' AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
   UNION ALL
   SELECT DISTINCT
     id_session,
@@ -92,7 +92,7 @@ demand AS (
   FROM
     datalake_customer_support_test.chats
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_star_date}' AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
 contacts AS (
   SELECT
