@@ -111,12 +111,17 @@ class Tables:
     source_kodak_metadata_condo = "vespucio_sources_delta.source_kodak_metadata_condo"
     source_navent_condo = "vespucio_sources_delta.source_navent_condo"
     source_sindiconet_condo = "vespucio_sources_delta.source_sindiconet_condo"
+    source_union_condo = "vespucio_sources_delta.source_union_condo"
+    source_iptu_condo = "vespucio_sources_delta.source_iptu_condo"
     source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
     source_navent_houses = "vespucio_sources_delta.source_navent_houses"
     source_union_houses = "vespucio_sources_delta.source_union_house"
     source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
     source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
     source_cnefe_houses = "vespucio_sources_delta.source_cnefe_house"
+    source_loft_houses = "vespucio_sources_delta.source_loft_house"
+    source_viva_real_houses = "vespucio_sources_delta.source_viva_real_house"
+    source_zap_imoveis_houses = "vespucio_sources_delta.source_zap_imoveis_house"
 
     step1_staged_condos = "vespucio_pipeline_delta.step1_staged_condos"
     step1_staged_houses = "vespucio_pipeline_delta.step1_staged_houses"
@@ -180,6 +185,22 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
+            f"--script=union_condo.sql",
+            f"--output_table={Tables.source_union_condo}",
+        ],
+        task_id="union_condo",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=iptu_condo.sql",
+            f"--output_table={Tables.source_iptu_condo}",
+        ],
+        task_id="iptu_condo",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
             f"--script=ebdb_house.sql",
             f"--output_table={Tables.source_ebdb_house}",
         ],
@@ -216,6 +237,30 @@ source_tasks = [
             f"--output_table={Tables.source_cnefe_houses}",
         ],
         task_id="cnefe_house",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=loft_house.sql",
+            f"--output_table={Tables.source_loft_houses}",
+        ],
+        task_id="loft_house",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=viva_real_house.sql",
+            f"--output_table={Tables.source_viva_real_houses}",
+        ],
+        task_id="vivareal_house",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=zap_imoveis_house.sql",
+            f"--output_table={Tables.source_zap_imoveis_houses}",
+        ],
+        task_id="zap_house",
     ),
 ]
 

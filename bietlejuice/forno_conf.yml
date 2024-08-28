@@ -562,7 +562,7 @@ databricks_13_3_min_general_photon_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
-        availability: SPOT_WITH_FALLBACK  
+        availability: SPOT_WITH_FALLBACK
 
 databricks_13_3_min_general_2_workers_cluster:
     <<: *cluster_anchor
@@ -572,7 +572,7 @@ databricks_13_3_min_general_2_workers_cluster:
     spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
-        availability: SPOT_WITH_FALLBACK  
+        availability: SPOT_WITH_FALLBACK
 
 databricks_13_3_med_general_2_workers_cluster:
     <<: *cluster_anchor
@@ -943,4 +943,4 @@ databricks_12_2_med_mem_driver_high_mem_nodes:
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
 
-vespucio_pipeline_version: 0.21.1
+vespucio_pipeline_version: 0.22.0

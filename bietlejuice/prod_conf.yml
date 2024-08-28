@@ -632,7 +632,7 @@ databricks_12_2_xmed_io-memory_photon_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
-        
+
 databricks_12_2_xmin-io-memory_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.xlarge
@@ -869,4 +869,4 @@ databricks_12_2_med_mem_driver_high_mem_nodes:
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_PROD_WEBHOOK
 
-vespucio_pipeline_version: 0.21.1
+vespucio_pipeline_version: 0.22.0
