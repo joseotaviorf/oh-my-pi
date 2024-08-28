@@ -1,0 +1,13 @@
+database_name: dw_customer_support_test
+table_name: fact_customer_contacts
+description: Test table that will replace fact_received_contact
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_interaction:
+    lineage:
+      - datalake_customer_support.received_demand.id_task
+      - datalake_customer_support.received_demand.id_ticket
+    description:
+      MD5 unique ID generated to represent every interaction a customer had.
+      This is basically an MD5 on top of id_task

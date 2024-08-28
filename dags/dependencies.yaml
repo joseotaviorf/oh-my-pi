@@ -253,7 +253,10 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.dw_customer_support_test:
+  - bietlejuice.enrich_customer_support_test:load-enrich-calls
   - bietlejuice.enrich_customer_support_test:load-enrich-ivr-interactions
+  - bietlejuice.enrich_quinto_messenger:load-enrich-message
+  - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_booking:load-dw-public-dim-booking
