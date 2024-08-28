@@ -53,7 +53,7 @@ INNER JOIN
   ON  a.sk_client = ec.id_user
   AND a.sk_house  = ec.id_house
   AND a.dt_offer_submitted_date 
-    BETWEEN cast(ec.ts_created AS DATE) - INTERVAL '1' MONTH AND cast(ec.ts_created AS DATE)
+    BETWEEN cast(ec.ts_created AS DATE) AND cast(ec.ts_created AS DATE) + INTERVAL '1' MONTH
 )
 SELECT 
   sk_offer,
