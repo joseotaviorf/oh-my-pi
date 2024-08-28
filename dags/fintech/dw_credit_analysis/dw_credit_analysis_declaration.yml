@@ -15,6 +15,7 @@ workflow:
     fact_proposal_credit_flows:
       - dim_drop_reason
       - fact_early_credit
+      - fact_offer_early_credit
 cluster:
   type: databricks_13_3_med_general_cluster
   access_control_list:

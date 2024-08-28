@@ -321,7 +321,7 @@ house_listing AS (
 ),
 early_credit_full (
   SELECT
-    eca.sk_user AS sk_client,
+    eca.sk_client,
     -1 AS sk_house_listing,
     eca.sk_house,
     -1 AS sk_contract,
