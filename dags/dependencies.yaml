@@ -32,10 +32,7 @@ bietlejuice.dw_agent:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-  - bietlejuice.enrich_sirena:load-enrich-messages
   - bietlejuice.gsheets_agents:done-clean-asp-consultants-allocation
-  - bietlejuice.sirena:load-clean-agents
-  - bietlejuice.sirena:load-clean-prospects
 bietlejuice.dw_agent_contract:
   - bietlejuice.dw_rede_company:load-dw-rede-dim-company
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-coincident-business-contexts
@@ -2974,7 +2971,6 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-bill
   - bietlejuice.rental_guarantee_platform:load-clean-billing-report
-  - bietlejuice.rental_guarantee_platform:load-clean-entry
   - bietlejuice.rental_guarantee_platform:load-clean-bussines-type
   - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-company
@@ -2985,6 +2981,7 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-aud
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
+  - bietlejuice.rental_guarantee_platform:load-clean-entry
   - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-fianca-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-object-legacy
   - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-property-legacy
