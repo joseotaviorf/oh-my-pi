@@ -2916,9 +2916,17 @@ bietlejuice.enrich_top_of_funnel_supply:
   - bietlejuice.gsheets_growth:done-clean-marketing-cost-taxonomy
 bietlejuice.enrich_tqc_referral:
   - bietlejuice.ebdb:load-clean-agent-lead-referral
-  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.ebdb:load-clean-booking
+  - bietlejuice.ebdb:load-clean-booking-status-change
+  - bietlejuice.ebdb:load-clean-visit
+  - bietlejuice.ebdb:load-clean-visit-origin
+  - bietlejuice.ebdb_location:load-clean-country
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-unified-contract-changes
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_hub_services:load-enrich-agent-hub-relation
+  - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.gsheets_for_sale:done-clean-tqc-leads
 bietlejuice.enrich_tracked_events:
