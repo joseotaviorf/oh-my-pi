@@ -11,6 +11,10 @@ workflow:
     layer: enrich
     default_extraction_type: incremental
     default_partitions: [year, month, day]
+    inner_dependencies:
+        tickets:
+            - chats
+            - calls
     tables_customization:
         calls:
             z_order_by: [id_task, id_reservation]
