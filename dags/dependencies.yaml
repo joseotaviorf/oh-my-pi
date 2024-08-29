@@ -3048,6 +3048,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb:load-clean-follow-up-details
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb:load-clean-visit-cancellation-details
+  - bietlejuice.ebdb:load-clean-visit-fitting
   - bietlejuice.ebdb_location:load-clean-country
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

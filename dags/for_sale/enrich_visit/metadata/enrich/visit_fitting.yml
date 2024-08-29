@@ -1,0 +1,79 @@
+database_name: datalake_visit
+table_name: visit_fitting
+description: Information about Rent and Sale visit fitting.
+  Each row is an unique visit fitting solicitation.
+domain: Data ForSale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.id
+    description: Visit fitting unique ID.
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.id_visit
+    description: ID of visit, when the visit was fitted.
+  id_visitor:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.id_visitor
+    description:  ID of the Visitor.
+  id_owner:
+    lineage:
+      - datalake_ebdb_listing.house.id_user
+    description:  House's Owner ID.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.id_house
+    description: House's ID.
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+    description: House Listing's ID.
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.house_listing.country_code
+    description: Country code.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.business_context
+    description: If the visit is a Sale context or Rent context.
+  intention:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.intention
+    description: Intention of the visit.
+  status:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.status
+    description: Status about this solicitation.
+  channel:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.channel
+    description: What the channel of this solicitation
+  request_context:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.request_context
+    description: The context about the request.
+  dt_visit_desired:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.dt_visit
+    description: Desired date of the visit.
+  ts_visit_desired_begin_local_tz:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.dt_visit
+      - datalake_ebdb_clean.visit_fitting.begin_slot
+      - datalake_ebdb_clean.country.default_timezone
+    description: Desired begin date of this visit.
+  ts_visit_desired_end_local_tz:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.dt_visit
+      - datalake_ebdb_clean.visit_fitting.end_slot
+      - datalake_ebdb_clean.country.default_timezone
+    description: Desired end date of this visit.
+  ts_expiration:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.ts_expiration
+    description: Expiration of the solicitation.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.ts_created
+    description: When was done the solicitation.
