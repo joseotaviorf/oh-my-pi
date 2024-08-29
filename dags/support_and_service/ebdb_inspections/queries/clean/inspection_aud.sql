@@ -63,4 +63,4 @@ SELECT
     dataVistoria as dt_inspected,
     finalReportSentAt as dt_final_report_sent
 FROM
-    datalake_ebdb_test_raw.vistoria_aud
+    datalake_ebdb_raw.vistoria_aud

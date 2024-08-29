@@ -7,4 +7,4 @@ SELECT
     CAST(criadoEm AS TIMESTAMP) AS ts_created,
     CAST(atualizadoEm AS TIMESTAMP) AS ts_updated
 FROM 
-    datalake_ebdb_test_raw.conservationitem
+    datalake_ebdb_raw.conservationitem

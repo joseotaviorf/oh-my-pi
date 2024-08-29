@@ -1,54 +1,54 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: inspection_item
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.id
+      - datalake_ebdb_raw.itemvistoria.id
   id_inspection:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.vistoria_id
+      - datalake_ebdb_raw.itemvistoria.vistoria_id
   id_room:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.roomid
+      - datalake_ebdb_raw.itemvistoria.roomid
   id_ref:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.refid
+      - datalake_ebdb_raw.itemvistoria.refid
   has_photo:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.temfoto
+      - datalake_ebdb_raw.itemvistoria.temfoto
   name:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.nome
+      - datalake_ebdb_raw.itemvistoria.nome
   type:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.tipo
+      - datalake_ebdb_raw.itemvistoria.tipo
   position:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.posicao
+      - datalake_ebdb_raw.itemvistoria.posicao
   photo_name:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.nomefoto
+      - datalake_ebdb_raw.itemvistoria.nomefoto
   room_name:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.roomname
+      - datalake_ebdb_raw.itemvistoria.roomname
   finishing:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.acabamento
+      - datalake_ebdb_raw.itemvistoria.acabamento
   operation:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.funcionamento
+      - datalake_ebdb_raw.itemvistoria.funcionamento
   comment:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.comentario
+      - datalake_ebdb_raw.itemvistoria.comentario
   tenant_comment:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.comentarioinquilino
+      - datalake_ebdb_raw.itemvistoria.comentarioinquilino
   owner_comment:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.comentarioproprietario
+      - datalake_ebdb_raw.itemvistoria.comentarioproprietario
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.criadoem
+      - datalake_ebdb_raw.itemvistoria.criadoem
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.itemvistoria.atualizadoem
+      - datalake_ebdb_raw.itemvistoria.atualizadoem
