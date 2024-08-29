@@ -217,5 +217,7 @@ LEFT JOIN
     cte_timeline_status s
     ON t.id_delinquency = s.id
     AND DATE(t.`date`) = DATE(s.dt_status_updated)
-WHERE s.id_status IS NOT NULL
+WHERE 
+    s.id_status IS NOT NULL
+    AND t.date >= ADD_MONTHS(CURRENT_DATE, -6)
 GROUP BY 1,2,3,17
