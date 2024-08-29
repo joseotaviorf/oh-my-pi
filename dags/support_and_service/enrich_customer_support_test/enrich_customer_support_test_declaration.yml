@@ -21,6 +21,9 @@ workflow:
         ivr_interactions:
             z_order_by: [id_task]
             merge_on: [id_task, step_name]
+        tickets:
+            merge_on: [id_ticket]
+            z_order_by: [id_ticket, id_call, id_session]
 
 cluster:
     type: custom_cluster

@@ -1431,6 +1431,10 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.zendesk:load-clean-tickets
 bietlejuice.enrich_customer_support_test:
   - bietlejuice.bigfone:load-clean-event
+  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
+  - bietlejuice.gsheets_support_and_service:done-clean-department-control
+  - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
+  - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-chat
   - bietlejuice.quinto_messenger:load-clean-task
