@@ -149,9 +149,15 @@ WITH listing_rent_flows AS (
             datalake_ebdb_contract.contract
                 ON contract.id_house = rent_flow.id_house
                 AND contract.id = rent_flow.id_contract
+                /*
+                    The contract join considering listing version will stay as a comment until the rent_flow creation without house status restrictions are not implemented, 
+                    so we can present contract signed and creation dates.
+                */
+                /* 
                 AND contract.ts_created BETWEEN 
                     COALESCE(house_listing.ts_listing_version_start, '2000-01-01 00:00:00') 
                     AND COALESCE(house_listing.ts_listing_version_end, CURRENT_DATE)
+                */
         LEFT JOIN 
             datalake_ebdb_agents.agents_review ar
                 ON rent_flow.id_booking = ar.id_booking
