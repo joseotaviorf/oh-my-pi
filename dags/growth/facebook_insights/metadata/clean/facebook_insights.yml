@@ -2,7 +2,7 @@ database_name: datalake_facebook_insights_clean
 table_name: facebook_insights
 owner: '@data-growth'
 domain: Growth
-description: Table load Facebook Insigths Performance Report from Facebook Ads API extraction. Documentation can be found at https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/insights/
+description: Table load Facebook Insights Performance Report from Facebook Ads API extraction. Documentation can be found at https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/insights/
 columns:
   id_ad:
     description: The unique ID of the ad you're viewing in reporting
@@ -26,6 +26,10 @@ columns:
       - datalake_facebook_insights_raw.facebook_insights.account_name
   account_name_snake_case:
     description: Account name pos string transformation
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights.account_name_snake_case
+  country_code:
+    description: Country code the account belongs to.
     lineage:
       - datalake_facebook_insights_raw.facebook_insights.account_name_snake_case
   ad_name:
