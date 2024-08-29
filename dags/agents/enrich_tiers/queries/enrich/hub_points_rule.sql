@@ -17,7 +17,7 @@ WITH points_rule AS (
         pr.external_condition_type = "HUB"
         AND pr.status = "VALID"
 )
-SELECT
+SELECT DISTINCT
     pr.id_points_rule,
     pr.id_business_unit,
     pr.program_code,

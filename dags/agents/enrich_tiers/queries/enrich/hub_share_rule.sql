@@ -18,7 +18,7 @@ WITH share_rule AS (
         sr.external_condition_type = "HUB"
         AND sr.status = "VALID"
 )
-SELECT
+SELECT DISTINCT
     sr.id_share_rule,
     sr.id_business_unit,
     sr.program_code,

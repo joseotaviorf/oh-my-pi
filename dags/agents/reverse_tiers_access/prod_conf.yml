@@ -1,0 +1,12 @@
+---
+external_s3_bucket: nazare-revenue-share-prod
+
+dag_documentation:
+  dag_purpose: |
+    Sending of performance categorization data for agents: brokers and trade executors. The data is sent to a bucket, where it will be consumed by Nazaré.
+  additional_information: This pipeline also exports Agents Tiers results do Nazaré bucket (`s3://nazare-revenue-share-{ENV}`).
+
+tables_to_send:
+  tiers: {}
+
+partition_cols: ["year", "month"]
