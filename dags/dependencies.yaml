@@ -3471,8 +3471,6 @@ bietlejuice.reverse_sale_unavailable_listings_load:
 bietlejuice.reverse_tiers:
   - bietlejuice.enrich_tiers:load-enrich-agent-performance
   - bietlejuice.enrich_tiers_classification:load-enrich-tiers
-bietlejuice.reverse_tiers_access:
-  - bietlejuice.reverse_tiers:load-reverse-tiers
 bietlejuice.reverse_tracksale:
   - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
   - bietlejuice.dw_booking:load-dw-public-dim-booking

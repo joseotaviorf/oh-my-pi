@@ -1,6 +1,6 @@
-import ast
 import io
 import logging
+import json
 from argparse import ArgumentParser
 from datetime import datetime
 from http.client import HTTPException
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     external_bucket = args.external_bucket
     table_to_send = args.table_to_send
     webhook_key = args.webhook_key
-    partition_cols = ast.literal_eval(args.partition_cols)
+    partition_cols = json.loads(args.partition_cols)
     execution_date = args.execution_date
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")

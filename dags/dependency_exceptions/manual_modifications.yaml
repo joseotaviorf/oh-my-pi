@@ -858,9 +858,9 @@ bietlejuice.reverse_atlas_pricing_report_access:
 bietlejuice.reverse_robbyson_access:
   add:
     - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance
-bietlejuice.reverse_tiers_access:
-  add:
-    - bietlejuice.reverse_tiers:load-reverse-tiers
+# bietlejuice.reverse_tiers_access:
+#   add:
+#     - bietlejuice.reverse_tiers:load-reverse-tiers
 bietlejuice.reverse_tracksale:
   remove:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing

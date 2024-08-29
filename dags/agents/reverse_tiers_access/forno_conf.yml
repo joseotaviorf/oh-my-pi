@@ -9,4 +9,4 @@ dag_documentation:
 tables_to_send:
   tiers: {}
 
-partition_cols: ["year", "month"]
+partition_cols: ["year", "bimester"]
