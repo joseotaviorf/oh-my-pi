@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     SalaryId AS id_salary,
     AssignmentId AS id_assignment,
     SalaryBasisId AS id_salary_basis,
@@ -57,24 +57,25 @@ SELECT
     INT(FTEValue) AS fte_value,
     INT(AmountDecimalPrecision) AS amount_decimal_precision,
     INT(SalaryAmountScale) AS salary_amount_scale,
-    CASE 
-        WHEN hasFutureSalary = 'Y'
-            THEN TRUE
+    CASE
+        WHEN hasFutureSalary = 'Y' THEN TRUE
         ELSE FALSE
     END AS has_future_salary,
-    CASE 
-        WHEN MultipleComponents = 'Y'
-            THEN TRUE
+    CASE
+        WHEN MultipleComponents = 'Y' THEN TRUE
         ELSE FALSE
     END AS has_multiple_components,
-    to_date(DateFrom, 'yyyy-MM-dd') AS dt_from,
-    to_date(DateTo, 'yyyy-MM-dd') AS dt_to,
-    to_date(SearchDate, 'yyyy-MM-dd') AS dt_search,
-    to_date(NextSalReviewDate, 'yyyy-MM-dd') AS dt_next_salary_review,
-    to_timestamp(substr(replace(CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
-    to_timestamp(substr(replace(LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
+    TO_DATE(DateFrom, 'yyyy-MM-dd') AS dt_from,
+    TO_DATE(DateTo, 'yyyy-MM-dd') AS dt_to,
+    TO_DATE(SearchDate, 'yyyy-MM-dd') AS dt_search,
+    TO_DATE(NextSalReviewDate, 'yyyy-MM-dd') AS dt_next_salary_review,
+    TO_TIMESTAMP(SUBSTR(REPLACE(CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
+    TO_TIMESTAMP(SUBSTR(REPLACE(LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
     ts_load,
     year AS year,
     month AS month,
     day AS day
-FROM datalake_hr_system_raw.salaries
+FROM
+    datalake_hr_system_raw.salaries
+WHERE
+    MAKE_DATE(YEAR, MONTH, DAY) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

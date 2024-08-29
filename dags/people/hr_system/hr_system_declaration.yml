@@ -19,6 +19,7 @@ workflow:
   bucket_config_name: people_bucket
   has_hive_sync: false
   load_spark_job: load_hr_system_raw
+  default_extraction_type: full
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
@@ -26,12 +27,14 @@ workflow:
     - "{table_name}"
     - "{{ ds }}"
     - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
     absences:
-      extraction_type: full
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "absenceCaseId"
@@ -50,7 +53,6 @@ workflow:
               - "absenceRecordingDFF"
               - "absenceRecordingsDDF"
     actions_lov:
-      extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "ActionId"
           params:
@@ -58,7 +60,6 @@ workflow:
             orderBy: "ActionId:asc"
             limit: 100
     action_reasons_lov:
-      extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "ActionReasonId"
           params:
@@ -66,14 +67,12 @@ workflow:
             orderBy: "ActionReasonId:asc"
             limit: 100
     areas_of_responsibility:
-      extraction_type: full
       extra_spark_job_arguments:
         - params:
             onlyData: true
             orderBy: "ResponsibilityId:asc"
             limit: 100
     benefit_enrollments:
-      extraction_type: full
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "EnrollmentResultId"
@@ -87,13 +86,11 @@ workflow:
               - "providers"
               - "dependents"
     departments_lov:
-      extraction_type: full
       extra_spark_job_arguments:
         - params:
             onlyData: true
             limit: 100
     hcm_contacts:
-      extraction_type: full
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "PersonId"
@@ -121,7 +118,6 @@ workflow:
               - "religions"
               - "visasPermits"
     jobs:
-      extraction_type: full
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "JobId"
@@ -134,7 +130,6 @@ workflow:
               - "JobCustomerFlex"
               - "validGrades"
     organizations:
-      extraction_type: full
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "OrganizationId"
@@ -147,7 +142,6 @@ workflow:
               - "OrganizationDFF"
               - "extraInformation"
     payroll_relationships:
-      extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "PayrollRelationshipId"
           params:
@@ -161,7 +155,6 @@ workflow:
               - "payrollAssignments.payrollAssignmentDates"
               - "payrollRelationshipDates"
     performance_evaluations:
-      extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "EvaluationId"
           params:
@@ -171,7 +164,6 @@ workflow:
             expand:
               - "Roles.Participants.Tasks"
     performance_goals:
-      extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "GoalId"
           params:
@@ -181,7 +173,6 @@ workflow:
             expand:
               - "associatedGoalPlans"
     personal_payment_methods:
-      extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "PersonalPaymentMethodId"
           params:
@@ -189,11 +180,13 @@ workflow:
             orderBy: "PersonalPaymentMethodId:asc"
             limit: 100
     salaries:
-      extraction_type: full
       partitions: ["year", "month", "day"]
+      extraction_type: incremental
+      merge_on: ["id_salary"]
+      z_order_by: ["id_salary"]
       extra_spark_job_arguments:
         - deduplication_key: "SalaryId"
-          column_to_partition: "CreationDate"
+          column_to_partition: "LastUpdateDate"
           params:
             onlyData: true
             orderBy: "SalaryId:asc"
@@ -203,7 +196,6 @@ workflow:
               - "salaryPayRateComponents"
               - "salarySimpleComponents"
     talent_person_profiles:
-      extraction_type: full
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "ProfileId"
@@ -237,7 +229,6 @@ workflow:
               - "workHistorySections"
               - "workPreferenceSections"
     talent_ratings:
-      extraction_type: full
       extra_spark_job_arguments:
         - params:
             onlyData: true
@@ -247,7 +238,6 @@ workflow:
               - "performanceRatings.performanceRatingsDFF"
               - "userDefinedRatingSections"
     workers:
-      extraction_type: full
       partitions: ["dt_effective", "year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "PersonId"

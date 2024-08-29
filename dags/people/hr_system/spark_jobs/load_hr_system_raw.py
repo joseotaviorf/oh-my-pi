@@ -30,6 +30,11 @@ class Ingestion:
         self.endpoint_id = args.endpoint_id.replace("_", "").upper()
         self.execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
         self.partition_cols = json.loads(args.partition_cols)
+        self.extraction_type = args.extraction_type
+        self.load_start_date = datetime.strptime(args.load_start_date, "%Y-%m-%d")
+        self.load_end_date = datetime.strptime(
+            args.load_end_date, "%Y-%m-%d"
+        ) + timedelta(days=1)
         self.endpoint_details = self.treat_params(args.endpoint_details)
         self.has_dt_effective = self.endpoint_details.get("has_dt_effective", False)
         self.offsets = self.define_offset()
@@ -160,9 +165,18 @@ class IngestionTable:
         self.dt_effective = dt_effective.strftime("%Y-%m-%d")
         self.table_name = ingestion.endpoint_id
         self.params = ingestion.endpoint_details["params"].copy()
+        self.define_params()
+        self.consumer = get_consumer(ingestion.client, ingestion.endpoint_id)
+
+    def define_params(self):
         if ingestion.has_dt_effective:
             self.params["effectiveDate"] = self.dt_effective
-        self.consumer = get_consumer(ingestion.client, ingestion.endpoint_id)
+        if self.ingestion.extraction_type == "incremental":
+            load_start_date = self.ingestion.load_start_date.strftime(
+                "%Y-%m-%dT00:00:00"
+            )
+            load_end_date = self.ingestion.load_end_date.strftime("%Y-%m-%dT00:00:00")
+            self.params["q"] = f"LastUpdateDate>={load_start_date} and <{load_end_date}"
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -173,6 +187,9 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument("endpoint_id", help="endpoint_id/name of the table")
     parser.add_argument("execution_date", help="execution date in str format")
     parser.add_argument("partition_cols")
+    parser.add_argument("extraction_type")
+    parser.add_argument("load_start_date")
+    parser.add_argument("load_end_date")
     parser.add_argument("endpoint_details")
     return parser
 
