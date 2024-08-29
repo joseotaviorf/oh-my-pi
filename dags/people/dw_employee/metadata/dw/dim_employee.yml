@@ -49,6 +49,14 @@ columns:
     description: 'Father name of the employee'
     lineage:
     - datalake_hr_system_clean.workers.father_name
+  gender_code:
+    description: 'gender of employee in document'
+    lineage:
+    - datalake_hr_system.demographic_attributes.gender
+  gender:
+    description: 'gender of employee in document'
+    lineage:
+    - datalake_hr_system.demographic_attributes.gender
   marital_status_code:
     description: 'Marital status of the employee'
     lineage:
@@ -57,10 +65,6 @@ columns:
     description: 'Marital status description of the employee'
     lineage:
     - "datalake_hr_system_clean.workers.marital_status"
-  gender:
-    description: 'Gender of the employee'
-    lineage:
-    - datalake_hr_system_clean.workers.gender
   highest_education_level_code:
     description: 'Code for the highest education level of the employee'
     lineage:
