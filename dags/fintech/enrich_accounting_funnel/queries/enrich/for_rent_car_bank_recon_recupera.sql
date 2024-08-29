@@ -10,6 +10,7 @@ WITH francesinha AS (
         AND occurrence_code = '06'
         AND our_number IS NOT NULL
         AND TRIM(our_number) != ''
+        AND dt_credit >= current_date - 180
     GROUP BY
         1,2
 ),
@@ -28,6 +29,7 @@ sap AS (
         AND id_finance_entity IS NOT NULL
         AND id_external_payment IS NOT NULL
         AND TRIM(id_external_payment) != ''
+        AND dt_tax >= current_date - 180
     GROUP BY
         1,2,3
     HAVING
@@ -53,6 +55,7 @@ vans_checkout_union AS (
         AND b.id NOT IN (5855, 5856, 5857)
         AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
         AND (b.beneficiary_account = '45268' OR b.beneficiary_account IS NULL)
+        AND b.ts_paid >= current_date - 180
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY b.your_number ORDER BY b.ts_paid DESC) = 1
 ),
