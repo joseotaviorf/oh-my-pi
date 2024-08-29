@@ -44,7 +44,7 @@ columns:
     description: Identification key of the region where the house in question is located.
   id_agent:
     lineage:
-      - datalake_booking.booking.id_agent
+      - datalake_ebdb_clean.booking.id_agent
     description: Broker identification key linked to the offer.
   id_team_lead:
     lineage:
@@ -66,7 +66,7 @@ columns:
     description: Deal Maker user ID on SalesFlow tables
   id_user_secretariat_booking_creator:
     lineage:
-      - datalake_booking.booking.id_user_sale_attendence_5a
+      - datalake_hub_services.secretariat_hierarchy.id_user_5a
     description: Id of the secretariat user that created the booking
   id_user_secretariat_on_offer_submitted_date:
     lineage:
@@ -94,7 +94,7 @@ columns:
     description: Id of the last secretariat user associated with the buyer
   id_booking:
     lineage:
-      - datalake_booking.booking.id
+      - datalake_ebdb_clean.booking.id
     description: Booking identification key linked to an offer.
   id_closing_specialist:
     lineage:
@@ -136,7 +136,7 @@ columns:
       the agent. Can be joined with dw_rede.dim_company.
   id_company_demand:
     lineage:
-      - datalake_booking.booking.id_company_demand
+      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
     description: Id of the demand partner
   pendency:
     lineage:
@@ -308,7 +308,7 @@ columns:
     description: Name of the Rede partner that supplied the property.
   partner_3p_demand:
     lineage:
-      - datalake_booking.booking.partner_3p_demand
+      - datalake_ebdb_work_contract.work_contract.3p_partner
     description: Name of the Rede partner that demanded the property.
   current_payment_method:
     lineage:
@@ -399,13 +399,15 @@ columns:
     lineage:
       - datalake_firestore.sale_offer.ts_created
       - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-      - datalake_booking.booking.ts_created
+      - datalake_ebdb_clean.booking.ts_created
     description: Hours difference between booking event and offer created
   hours_visit_to_offer:
     lineage:
       - datalake_firestore.sale_offer.ts_created
       - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-      - datalake_booking.booking.ts_booking_utc
+      - datalake_ebdb_clean.booking.dt_booking
+      - datalake_ebdb_clean.booking.slot_day
+      - datalake_ebdb_clean.country.default_timezone
     description: Hours difference between visit event and offer created
   has_credit_pre_analysis:
     description:
@@ -506,7 +508,7 @@ columns:
     description: If the house is 3P supply BH
   is_3p_demand:
     lineage:
-      - datalake_booking.booking.is_3p_demand
+      - datalake_ebdb_work_contract.work_contract.id
     description: If the booking is 3P demand
   is_a_rescued_ccv:
     lineage:
@@ -598,7 +600,7 @@ columns:
     description: Date when the Closing Analyst sent a message to the Buyer.
   ts_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
+      - datalake_ebdb_clean.booking.ts_created
     description: Timestamp when the booking or visit that preceded this offer was created.
   ts_updated:
     lineage:

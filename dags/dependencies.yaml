@@ -2169,10 +2169,14 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.terminator:load-clean-termination-workflow
   - bietlejuice.terminator:load-clean-utility-bill
 bietlejuice.enrich_offer:
+  - bietlejuice.ebdb:load-clean-agent-data-aud
+  - bietlejuice.ebdb:load-clean-booking
+  - bietlejuice.ebdb:load-clean-booking-status-change
   - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_location:load-clean-country
   - bietlejuice.ebdb_offer:load-clean-offer
   - bietlejuice.ebdb_offer:load-clean-offer-aud
-  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -2182,6 +2186,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
   - bietlejuice.enrich_gsheets:load-enrich-sale-hub-offer
   - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes
+  - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing

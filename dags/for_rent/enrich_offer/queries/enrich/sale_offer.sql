@@ -1,5 +1,101 @@
 -- RELATION BOOKING OFFER
-WITH visit_before_offer AS (
+ WITH 
+    first_booking_author AS (
+        SELECT DISTINCT
+            bsc.id_booking,
+            FIRST_VALUE(id_user) OVER (
+            PARTITION BY bsc.id_booking ORDER BY id
+                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS id_user_creation
+        FROM
+            datalake_ebdb_clean.booking_status_change AS bsc
+    ),
+    agent_contract_aud AS (
+        SELECT
+            adaud.id AS id_agent,
+            adaud.rev,
+            adaud.id_work_contract,
+            CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP) + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS AS ts_revision,
+            LAG(adaud.id_work_contract) OVER (PARTITION BY adaud.id ORDER BY adaud.rev) AS previous_id_work_contract
+        FROM
+            datalake_ebdb_clean.agent_data_aud AS adaud
+        LEFT JOIN
+            datalake_ebdb_clean.user_revision_entity AS ure
+                ON ure.id = adaud.rev
+        WHERE
+            adaud.id_work_contract IS NOT NULL
+    ),
+    agent_contract AS (
+        SELECT
+            id_agent,
+            id_work_contract,
+            ts_revision AS ts_work_contract_start,
+            LEAD(ts_revision) OVER (PARTITION BY id_agent ORDER BY rev) AS ts_work_contract_end
+        FROM
+            agent_contract_aud
+        WHERE
+            previous_id_work_contract <> id_work_contract
+            OR previous_id_work_contract IS NULL
+    ),
+    booking_3p_demand_agent AS (
+        SELECT
+            b.id,
+            wc.id_company_hubspot AS id_company_demand,
+            wc.3p_partner AS partner_3p_demand
+        FROM
+            agent_contract AS ac
+        JOIN
+            datalake_ebdb_clean.booking AS b
+                ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
+                AND ac.id_agent = b.id_agent
+        JOIN
+            datalake_ebdb_work_contract.work_contract AS wc
+                ON wc.id = ac.id_work_contract
+        WHERE
+            is_3p_contract
+    ),
+    base_booking AS (
+      SELECT
+        b.id,
+        b.id_house,
+        b.id_visitor,
+        b.id_agent,
+        su.id_user_5a AS id_user_sale_attendence_5a,
+        b3pa.id_company_demand,
+        b3pa.partner_3p_demand,
+        b.visit_fup,
+        IF(b3pa.id IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
+        (b.status = 'Cancelado') AS is_canceled,
+        CAST(b.dt_booking AS TIMESTAMP)
+          + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
+          + ABS(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES
+        AS ts_booking_local_tz,
+        TO_UTC_TIMESTAMP(CAST(b.dt_booking AS TIMESTAMP)
+          + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
+          + ABS(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES, ct.default_timezone) AS ts_booking_utc,
+        b.ts_created
+      FROM
+        datalake_ebdb_clean.booking AS b
+      LEFT JOIN
+          first_booking_author AS fba
+              ON fba.id_booking = b.id 
+      LEFT JOIN
+          datalake_hub_services.secretariat_hierarchy AS su
+              ON su.id_user_5a = fba.id_user_creation
+      LEFT JOIN
+          booking_3p_demand_agent AS b3pa
+              ON b3pa.id = b.id
+      LEFT JOIN
+        datalake_ebdb_listing.house AS hl
+            ON b.id_house = hl.id
+      LEFT JOIN
+          datalake_ebdb_clean.country AS ct
+              ON ct.code = hl.country_code                                
+      WHERE
+          b.business_context = 'SALE'
+          AND b.type = 'Visita'
+    ),
+  visit_before_offer AS (
     WITH vc_aux AS (
         SELECT
             COALESCE(g.id, vo.id_offer) AS id_offer,
@@ -27,16 +123,14 @@ WITH visit_before_offer AS (
             datalake_sale_offer_flows.sale_offer_flows AS vo
                     ON vo.id_offer = g.id
         JOIN
-            datalake_booking.booking AS bs
+            base_booking AS bs
                 ON bs.id_house = COALESCE(vo.id_house, g.id_house)
                 AND bs.id_visitor = COALESCE(vo.id_buyer, g.id_buyer)
         LEFT JOIN
             datalake_ebdb_user.user AS du
                 ON bs.id_agent = du.id_agent
         WHERE
-            bs.visit_intent = 'SALE'
-            AND bs.type = 'Visita'
-            AND bs.ts_booking_utc < COALESCE(vo.ts_offer_created, g.ts_created)
+            bs.ts_booking_utc < COALESCE(vo.ts_offer_created, g.ts_created)
             AND bs.visit_fup ='VaiNegociar'
     )
     SELECT
@@ -75,16 +169,14 @@ booking_before_offer AS (
             datalake_sale_offer_flows.sale_offer_flows AS vo
                     ON vo.id_offer = g.id
         JOIN
-            datalake_booking.booking AS bs
+            base_booking AS bs
                 ON bs.id_house = COALESCE(vo.id_house, g.id_house)
                 AND bs.id_visitor = COALESCE(vo.id_buyer, g.id_buyer)
         LEFT JOIN
             datalake_ebdb_user.user AS du
                 ON bs.id_agent = du.id_agent
         WHERE
-            bs.visit_intent = 'SALE'
-            AND bs.type = 'Visita'
-            AND bs.ts_created < COALESCE(vo.ts_offer_created, g.ts_created)
+           bs.ts_created < COALESCE(vo.ts_offer_created, g.ts_created)
     )
     SELECT
         bk.*
