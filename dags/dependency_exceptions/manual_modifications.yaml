@@ -528,6 +528,9 @@ bietlejuice.enrich_reports_validation:
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-confirmed
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-scheduled
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
+  remove:
+    - bietlejuice.reports:load-clean-daily-listings-summary
+    - bietlejuice.reports:load-clean-processed-event
 bietlejuice.enrich_atento_reports:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric

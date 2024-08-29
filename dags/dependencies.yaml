@@ -2461,8 +2461,6 @@ bietlejuice.enrich_repairs:
   - bietlejuice.repairs:load-clean-repair-request-chat
   - bietlejuice.repairs:load-clean-service-request
 bietlejuice.enrich_reports_validation:
-  - bietlejuice.reports:load-clean-daily-listings-summary
-  - bietlejuice.reports:load-clean-processed-event
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-published
