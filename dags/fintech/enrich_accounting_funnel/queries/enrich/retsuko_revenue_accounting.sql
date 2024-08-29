@@ -112,7 +112,7 @@ retsuko_fine AS (
         AND (
             (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'fine-and-interest',
-                      'negotiation-fine-and-interest'
+                      'negotiation-fine-and-interest',
                       'fine',
                       'interest'
                       )) OR
