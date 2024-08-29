@@ -1,0 +1,36 @@
+---
+dag:
+  name: paschoalotto_report
+  schedule_start_date: 2024, 8, 27
+  schedule_interval: 15 11 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Ingestion of Paschoalotto reports.
+      The data will be used in the Collection Recovery analysis.
+      Tribe: Portfolio Management.
+      In case we don't find any files, an alert will be sent to the Google Chat channel: Fintech Data Quality Alerts with the missing tables.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: paschoalotto
+  load_spark_job: load_paschoalotto_report_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - 5a-paschoalotto
+    - parquet
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{table_name}"
+  tables_customization:
+    tb_arquivo_ret:
+      clean_table_name: collection_actions
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+cluster:
+  type: databricks_13_3_med_general_cluster

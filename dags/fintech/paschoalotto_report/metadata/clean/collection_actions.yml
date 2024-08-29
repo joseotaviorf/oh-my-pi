@@ -1,0 +1,117 @@
+---
+database_name: datalake_paschoalotto_clean
+table_name: collection_actions
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: It represents the paschoalotto report 'RETORNO' that contains data about collection
+columns:
+  id:
+    description: "Table ID"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.idunico
+  id_action:
+    description: "Action ID (pt: Código da finalização)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.cod_fup
+  id_contract:
+    description: "Contract ID (pt: Número do contrato)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.contrato
+  id_operator:
+    description: "ID operator (pt: Login do agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.login_operador
+  description:
+    description: "Description (pt: Descrição da finalização)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.desc_fup
+  contract_flow:
+    description: "Contract flow (pt: fluxo)"
+    categories:
+      ATIVO: "Mora na residencia"
+      FINALIZADO: "Não mora na residencia"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.fluxo
+  contract_status:
+    description: "Contract status (pt: status indicador)"
+    categories:
+      ATIVO: "Mora no imovel"
+      FINALIZADO: "Não mora no imovel"
+      JURIDICO: "Possui processo jurídico aberto"
+      SEM STATUS: "Sem status enviado na remessa"
+      FORA BASE: "Contrato não localizado no estoque do dia"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.status_indicador
+  delay_range:
+    description: "Delay range (pt: faixa de atraso)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.fx_atraso
+  alo:
+    description: "Action classification defined by a contact"
+    categories:
+      "1": "Sim"
+      "0": "Não"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.alo
+  cpc:
+    description: "Action classification defined by the contact with the correct person"
+    categories:
+      "1": "Sim"
+      "0": "Não"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.cpc
+  agreement:
+    description: "Action classification defined by the agreement existance (pt: acordo)"
+    categories:
+      "1": "Sim"
+      "0": "Não"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.acordo
+  channel:
+    description: "Channel used during the action/collection (pt:Tipo de canal do acionamento)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.canal
+  phone:
+    description: "Phone number (pt: telefone)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.telefone
+  due_amount:
+    description: "Due amount (pt: Valor total da dívida)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.saldo_devedor
+  recovered_amount:
+    description: "Recovered amount (pt: Valor negociado)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.saldo_recuperado
+  call_duration:
+    description: "Call durantion (pt: Tempo falado)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.tempo_falado
+  action_hour:
+    description: "Action hour (pt: Hora do acionamento)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.hora_registro
+  dt_action:
+    description: "Action date (pt: Data do acionamento)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.data_registro
+  dt_operator_admission:
+    description: "Operator admission date (pt: Data admissão agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.data_admissao
+  ts_load:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.ts_load
+  year:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.year
+  month:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.month
+  day:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_ret.day
