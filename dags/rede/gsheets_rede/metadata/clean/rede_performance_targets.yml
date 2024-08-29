@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: rede_performance_targets
 columns:
