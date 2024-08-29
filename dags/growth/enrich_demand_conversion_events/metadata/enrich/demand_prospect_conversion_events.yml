@@ -89,6 +89,10 @@ columns:
     - datalake_sale_demand_events.sale_demand_events.id_agent
     - datalake_rent_demand_events.rent_demand_events.id_agent
     - datalake_talk_to_agent.talk_to_agent.agent_id
+  visit_code:
+    description: Code of the visit when the event is related to a visit.
+    lineage:
+      -  datalake_booking.booking.code  
   business_context:
     description: 'Context in witch that conversion happened.'
     lineage:

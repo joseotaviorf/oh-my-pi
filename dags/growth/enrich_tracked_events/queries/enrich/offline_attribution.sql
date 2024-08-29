@@ -40,3 +40,18 @@ SELECT
 FROM
   datalake_demand_contact_submission_clean.contact_submissions AS cs
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+UNION ALL 
+SELECT
+  COALESCE(id_user_lead,lead_phone) AS id_user,
+  COALESCE(id_user_lead, lead_phone, id_referral_flow) AS id_contact,
+  'TQC' AS event_name,
+  LOWER(origin) AS origin,
+  'TQC' AS channel,
+  'TQC' AS agent,
+  ts_created AS ts_event,
+  YEAR(ts_created) AS year,
+  MONTH(ts_created) AS month,
+  DAY(ts_created) AS day
+FROM datalake_tqc_referral.unified_lead_referral_flow
+WHERE 
+  status IN ('CONFIRMED','TRUE')

@@ -247,7 +247,9 @@ cross_channel AS (
                 'Quinto Andar Classificados Inbound',
                 'CLASSIFIED', 
                 'TQC_5A', 
-                'INBOUND')  
+                'INBOUND',
+                'service_link',
+                'referral')  
                 THEN 'Outro'
             WHEN origin IN (
                 'Quinto Andar - Traz quem compra',
@@ -291,7 +293,9 @@ cross_channel AS (
             'CLASSIFIED', 
             'TQC_5A', 
             'SIGN', 
-            'INBOUND'
+            'INBOUND',
+            'service_link',
+            'referral'
             )
 ),
 apply_attribution_rule AS (

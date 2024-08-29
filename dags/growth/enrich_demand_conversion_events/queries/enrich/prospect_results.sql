@@ -6,6 +6,9 @@ WITH adhoc_rules AS (
     dpce.id_event_type,
     dpce.event_name,
     CASE 
+      WHEN dpce.utm_medium = 'TQC'
+        OR (dpce.product_origin = 'Corretores' AND dpce.id_agent = sef.id_agent)
+      THEN "sale.acq.nonorg.na.d.referral.tqc"
       WHEN dpce.product_origin = 'Corretores'
       THEN "hybr.acq.nonorg.na.d.referral.agents"
       WHEN utm_campaign IS NULL
@@ -46,9 +49,12 @@ WITH adhoc_rules AS (
       ELSE dpce.booking_creator 
     END AS operation_channel,
     CASE
+      WHEN utm_medium = 'TQC'
+        OR (dpce.booking_creator = 'Agent' AND dpce.id_agent = sef.id_agent)
+        THEN 'TQC'
       WHEN dpce.is_3p_demand = TRUE THEN 'Rede'
       WHEN dpce.booking_creator = 'Agent' AND dpce.is_3p_demand = FALSE THEN 'Agent'
-      ELSE 'NA' -- TQC
+      ELSE 'NA'
     END AS referral_type,
     CASE 
       WHEN dpce.product_origin IS NULL THEN 'Lost Tracking'
@@ -69,6 +75,8 @@ WITH adhoc_rules AS (
     dpce.day
   FROM
     datalake_demand_flows.demand_prospect_conversion_events AS dpce
+    LEFT JOIN datalake_tqc_referral.sale_events_flow sef 
+      ON dpce.visit_code = sef.visit_code
   WHERE 
     DATE(dpce.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')  
 ),

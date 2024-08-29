@@ -2949,6 +2949,7 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_quinto_messenger:load-enrich-tasks
+  - bietlejuice.enrich_tqc_referral:load-enrich-unified-lead-referral-flow
   - bietlejuice.hub_services:load-clean-lead
   - bietlejuice.hub_services:load-clean-visitor
 bietlejuice.enrich_tracksale:

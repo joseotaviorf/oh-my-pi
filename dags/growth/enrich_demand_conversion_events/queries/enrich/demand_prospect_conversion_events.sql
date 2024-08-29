@@ -423,6 +423,7 @@ events_with_attribution AS (
 booking_info AS (
   SELECT
     b.id AS id_booking,
+    b.code AS visit_code,
     CASE
       WHEN b.id_user_creation = b.id_user_sale_agent THEN 'Agent'
       WHEN b.id_user_creation = b.id_visitor THEN 'SelfService'
@@ -465,6 +466,7 @@ SELECT
   e.id_owner,
   e.id_agent,
   e.business_context,
+  b.visit_code,
   b.user_booking_creator AS booking_creator,
   b.first_update_source AS product_origin,
   b.is_3p_demand,
