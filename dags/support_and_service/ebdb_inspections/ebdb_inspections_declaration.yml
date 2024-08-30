@@ -32,4 +32,4 @@ workflow:
       raw_primary_keys: ["id"]
       clean_table_name: conservation_item
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_max_io-general_cluster
