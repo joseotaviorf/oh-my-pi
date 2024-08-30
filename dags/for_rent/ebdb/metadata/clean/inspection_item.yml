@@ -1,0 +1,54 @@
+database_name: datalake_ebdb_clean
+table_name: inspection_item
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.id
+  id_inspection:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.vistoria_id
+  id_room:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.roomid
+  id_ref:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.refid
+  has_photo:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.temfoto
+  name:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.nome
+  type:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.tipo
+  position:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.posicao
+  photo_name:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.nomefoto
+  room_name:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.roomname
+  finishing:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.acabamento
+  operation:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.funcionamento
+  comment:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.comentario
+  tenant_comment:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.comentarioinquilino
+  owner_comment:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.comentarioproprietario
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.itemvistoria.atualizadoem

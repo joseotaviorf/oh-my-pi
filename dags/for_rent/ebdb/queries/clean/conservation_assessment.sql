@@ -8,4 +8,4 @@ SELECT
     CAST(startedAt AS TIMESTAMP) AS ts_started,
     CAST(finishedAt AS TIMESTAMP) AS ts_ended
 FROM
-    datalake_ebdb_test_raw.conservationassessment 
+    datalake_ebdb_raw.conservationassessment 

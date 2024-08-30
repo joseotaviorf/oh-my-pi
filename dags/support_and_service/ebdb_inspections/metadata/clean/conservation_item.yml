@@ -1,25 +1,25 @@
 ---
-database_name: datalake_ebdb_clean
+database_name: datalake_ebdb_test_clean
 table_name: conservation_item
 columns:
   id_conservation_item:
     lineage:
-      - datalake_ebdb_raw.conservationitem.id
+      - datalake_ebdb_test_raw.conservationitem.id
   id_room:
     lineage:
-      - datalake_ebdb_raw.conservationitem.roomId
+      - datalake_ebdb_test_raw.conservationitem.roomId
   item_type:
     lineage:
-      - datalake_ebdb_raw.conservationitem.itemType
+      - datalake_ebdb_test_raw.conservationitem.itemType
   item_group:
     lineage:
-      - datalake_ebdb_raw.conservationitem.itemGroup
+      - datalake_ebdb_test_raw.conservationitem.itemGroup
   is_present:
     lineage:
-      - datalake_ebdb_raw.conservationitem.present
+      - datalake_ebdb_test_raw.conservationitem.present
   ts_created:
     lineage:
-      - datalake_ebdb_raw.conservationitem.criadoEm
+      - datalake_ebdb_test_raw.conservationitem.criadoEm
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.conservationitem.atualizadoEm
+      - datalake_ebdb_test_raw.conservationitem.atualizadoEm

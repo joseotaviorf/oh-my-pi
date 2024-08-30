@@ -28,7 +28,7 @@ bietlejuice.dw_country:
   override: []
 bietlejuice.dw_crm:
   add:
-    - bietlejuice.ebdb_inspections:load-clean-inspection
+    - bietlejuice.ebdb:load-clean-inspection
     - bietlejuice.heimdall:load-clean-activity
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
@@ -554,6 +554,10 @@ bietlejuice.enrich_data_quality:
   remove:
     - bietlejuice.dag_inventory:load-clean-table
     - bietlejuice.inmetro:load-clean-data-validations
+bietlejuice.enrich_inspections:
+  remove:
+    - bietlejuice.ebdb_inspections:load-clean-inspection
+    - bietlejuice.ebdb_inspections:load-clean-inspection-aud
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   add:
     - bietlejuice.gsheets_static:load-clean-ticket-rate-classification
@@ -779,6 +783,11 @@ bietlejuice.enrich_viva_real_crawler_listings:
 bietlejuice.enrich_zap_imoveis_crawler_listings:
   remove:
     - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
+bietlejuice.looker_temp:
+  remove:
+    - bietlejuice.ebdb_inspections:load-clean-inspection
+    - bietlejuice.ebdb_inspections:load-clean-inspection-aud
+    - bietlejuice.ebdb_inspections:load-clean-inspection-item
 bietlejuice.metric_growth__demand:
   remove:
     - bietlejuice.enrich_growth_manual_daily_costs:load-enrich-daily-costs
