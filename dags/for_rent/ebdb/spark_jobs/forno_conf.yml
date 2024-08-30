@@ -18,11 +18,17 @@ table_block_list:
   - DocumentoProposta_AUD
   - Visitor_AUD
   - Notificacao
+  - Vistoria
+  - Vistoria_AUD
+  - FotoItemVistoria
   - FotoItemVistoria_AUD
+  - ItemVistoria
   - ItemVistoria_AUD
   - ItemVistoria_Checklist
   - Imovel_Etapas_AUD
   - ItemVistoria_Checklist_AUD
+  - ConservationAssessment
+  - ConservationItem
   - ContratoFull_AUD
   - UserPreferences_AUD
   - NotificacaoAgendamento

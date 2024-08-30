@@ -215,7 +215,7 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat_credit_engine:load-clean-variant
 bietlejuice.dw_crm:
-  - bietlejuice.ebdb:load-clean-inspection
+  - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal
   - bietlejuice.ebdb_rent_flow:load-clean-onboarding
@@ -1830,9 +1830,9 @@ bietlejuice.enrich_hubspot_management:
   - bietlejuice.hubspot:load-clean-task
   - bietlejuice.hubspot:load-clean-team
 bietlejuice.enrich_inspections:
-  - bietlejuice.ebdb:load-clean-inspection
-  - bietlejuice.ebdb:load-clean-inspection-aud
   - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_inspections:load-clean-inspection
+  - bietlejuice.ebdb_inspections:load-clean-inspection-aud
   - bietlejuice.ebdb_location:load-clean-country
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -3121,9 +3121,9 @@ bietlejuice.looker_temp:
   - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-campaign
   - bietlejuice.dw_tracksale:load-dw-tracksale-fact-nps-dispatches
   - bietlejuice.dw_user:load-dw-public-dim-user
-  - bietlejuice.ebdb:load-clean-inspection
-  - bietlejuice.ebdb:load-clean-inspection-aud
-  - bietlejuice.ebdb:load-clean-inspection-item
+  - bietlejuice.ebdb_inspections:load-clean-inspection
+  - bietlejuice.ebdb_inspections:load-clean-inspection-aud
+  - bietlejuice.ebdb_inspections:load-clean-inspection-item
   - bietlejuice.enrich_airtable:load-enrich-activated
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat

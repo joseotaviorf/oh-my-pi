@@ -17,4 +17,4 @@ select
     criadoEm as ts_created,
     atualizadoEm as ts_updated
 from
-    datalake_ebdb_test_raw.itemvistoria
+    datalake_ebdb_raw.itemvistoria

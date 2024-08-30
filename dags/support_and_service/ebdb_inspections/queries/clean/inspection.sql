@@ -44,4 +44,4 @@ select
     criadoEm as ts_created,
     atualizadoEm as ts_updated
 from
-    datalake_ebdb_test_raw.vistoria
+    datalake_ebdb_raw.vistoria

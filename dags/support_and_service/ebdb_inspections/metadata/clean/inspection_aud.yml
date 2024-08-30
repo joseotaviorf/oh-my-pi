@@ -1,192 +1,192 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: inspection_aud
 columns:
   id_inspection:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.id
+      - datalake_ebdb_raw.vistoria_aud.id
   id_contract:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.contrato_id
+      - datalake_ebdb_raw.vistoria_aud.contrato_id
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.imovel_id
+      - datalake_ebdb_raw.vistoria_aud.imovel_id
   id_ref:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.ref_id
+      - datalake_ebdb_raw.vistoria_aud.ref_id
   id_user_inspector:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.vistoriador_id
+      - datalake_ebdb_raw.vistoria_aud.vistoriador_id
   id_final_report_pdf:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.finalreportpdfid
+      - datalake_ebdb_raw.vistoria_aud.finalreportpdfid
   id_booking:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.schedule_id
+      - datalake_ebdb_raw.vistoria_aud.schedule_id
   id_partial_report_pdf:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.partialreportpdfid
+      - datalake_ebdb_raw.vistoria_aud.partialreportpdfid
   rev:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.rev
+      - datalake_ebdb_raw.vistoria_aud.rev
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.revtype
+      - datalake_ebdb_raw.vistoria_aud.revtype
   is_tenant_approved:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.aprovadoinquilino
+      - datalake_ebdb_raw.vistoria_aud.aprovadoinquilino
   mod_is_tenant_approved:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.aprovadoinquilino_mod
+      - datalake_ebdb_raw.vistoria_aud.aprovadoinquilino_mod
   is_owner_approved:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.aprovadoproprietario
+      - datalake_ebdb_raw.vistoria_aud.aprovadoproprietario
   mod_is_owner_approved:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.aprovadoproprietario_mod
+      - datalake_ebdb_raw.vistoria_aud.aprovadoproprietario_mod
   browser_tenant_approval:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.browseraprovacaoinquilino
+      - datalake_ebdb_raw.vistoria_aud.browseraprovacaoinquilino
   browser_owner_approval:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.browseraprovacaoproprietario
+      - datalake_ebdb_raw.vistoria_aud.browseraprovacaoproprietario
   tenant_comment:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.comentarioinquilino
+      - datalake_ebdb_raw.vistoria_aud.comentarioinquilino
   owner_comment:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.comentarioproprietario
+      - datalake_ebdb_raw.vistoria_aud.comentarioproprietario
   hash:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.hash
+      - datalake_ebdb_raw.vistoria_aud.hash
   ip_tenant_approval:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.ipaprovacaoinquilino
+      - datalake_ebdb_raw.vistoria_aud.ipaprovacaoinquilino
   ip_owner_approval:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.ipaprovacaoproprietario
+      - datalake_ebdb_raw.vistoria_aud.ipaprovacaoproprietario
   short_review_tenant:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.shortrevisarinq
+      - datalake_ebdb_raw.vistoria_aud.shortrevisarinq
   short_review_owner:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.shortrevisarprop
+      - datalake_ebdb_raw.vistoria_aud.shortrevisarprop
   os_tenant_approval:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.soaprovacaoinquilino
+      - datalake_ebdb_raw.vistoria_aud.soaprovacaoinquilino
   os_owner_approval:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.soaprovacaoproprietario
+      - datalake_ebdb_raw.vistoria_aud.soaprovacaoproprietario
   status:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.status
+      - datalake_ebdb_raw.vistoria_aud.status
   mod_status:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.status_mod
+      - datalake_ebdb_raw.vistoria_aud.status_mod
   type:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.tipo
+      - datalake_ebdb_raw.vistoria_aud.tipo
   mod_tenant_comment:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.comentarioinquilino_mod
+      - datalake_ebdb_raw.vistoria_aud.comentarioinquilino_mod
   mod_owner_comment:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.comentarioproprietario_mod
+      - datalake_ebdb_raw.vistoria_aud.comentarioproprietario_mod
   is_item_commented:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.itencommented
+      - datalake_ebdb_raw.vistoria_aud.itencommented
   is_final_report_created:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.finalreportcreated
+      - datalake_ebdb_raw.vistoria_aud.finalreportcreated
   report_sent_status:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.reportsentstatus
+      - datalake_ebdb_raw.vistoria_aud.reportsentstatus
   mod_report_sent_status:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.reportsentstatus_mod
+      - datalake_ebdb_raw.vistoria_aud.reportsentstatus_mod
   last_report_sent:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.lastreportsent
+      - datalake_ebdb_raw.vistoria_aud.lastreportsent
   mod_last_report_sent:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.lastreportsent_mod
+      - datalake_ebdb_raw.vistoria_aud.lastreportsent_mod
   mod_ts_expired:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.expiraem_mod
+      - datalake_ebdb_raw.vistoria_aud.expiraem_mod
   is_report_finished:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.reportfinished
+      - datalake_ebdb_raw.vistoria_aud.reportfinished
   mod_is_report_finished:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.reportfinished_mod
+      - datalake_ebdb_raw.vistoria_aud.reportfinished_mod
   key_location:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.keylocation
+      - datalake_ebdb_raw.vistoria_aud.keylocation
   mod_key_location:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.keylocation_mod
+      - datalake_ebdb_raw.vistoria_aud.keylocation_mod
   key_location_details:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.keylocationdetails
+      - datalake_ebdb_raw.vistoria_aud.keylocationdetails
   has_inspector_got_all_info:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.inspectorgotallinfo
+      - datalake_ebdb_raw.vistoria_aud.inspectorgotallinfo
   version:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.version
+      - datalake_ebdb_raw.vistoria_aud.version
   mod_version:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.version_mod
+      - datalake_ebdb_raw.vistoria_aud.version_mod
   mod_id_booking:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.schedule_mod
+      - datalake_ebdb_raw.vistoria_aud.schedule_mod
   schedule_observations:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.scheduleobservations
+      - datalake_ebdb_raw.vistoria_aud.scheduleobservations
   mod_schedule_observations:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.scheduleobservations_mod
+      - datalake_ebdb_raw.vistoria_aud.scheduleobservations_mod
   report_revised:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.reportrevised
+      - datalake_ebdb_raw.vistoria_aud.reportrevised
   mod_report_revised:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.reportrevised_mod
+      - datalake_ebdb_raw.vistoria_aud.reportrevised_mod
   is_schedule_double_checked:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.scheduledoublechecked
+      - datalake_ebdb_raw.vistoria_aud.scheduledoublechecked
   mod_is_schedule_double_checked:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.scheduledoublechecked_mod
+      - datalake_ebdb_raw.vistoria_aud.scheduledoublechecked_mod
   mod_ts_last_synced:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.lastsynced_mod
+      - datalake_ebdb_raw.vistoria_aud.lastsynced_mod
   mode:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.mode
+      - datalake_ebdb_raw.vistoria_aud.mode
   mod_mode:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.mode_mod
+      - datalake_ebdb_raw.vistoria_aud.mode_mod
   ts_tenant_approved:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.dataaprovacaoinquilino
+      - datalake_ebdb_raw.vistoria_aud.dataaprovacaoinquilino
   ts_owner_approved:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.dataaprovacaoproprietario
+      - datalake_ebdb_raw.vistoria_aud.dataaprovacaoproprietario
   ts_expired:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.expiraem
+      - datalake_ebdb_raw.vistoria_aud.expiraem
   ts_partial_owner_report_sent:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.partialownerreportsentat
+      - datalake_ebdb_raw.vistoria_aud.partialownerreportsentat
   ts_partial_tenant_report_sent:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.partialtenantreportsentat
+      - datalake_ebdb_raw.vistoria_aud.partialtenantreportsentat
   ts_last_synced:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.lastsynced
+      - datalake_ebdb_raw.vistoria_aud.lastsynced
   dt_inspected:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.datavistoria
+      - datalake_ebdb_raw.vistoria_aud.datavistoria
   dt_final_report_sent:
     lineage:
-      - datalake_ebdb_test_raw.vistoria_aud.finalreportsentat
+      - datalake_ebdb_raw.vistoria_aud.finalreportsentat
