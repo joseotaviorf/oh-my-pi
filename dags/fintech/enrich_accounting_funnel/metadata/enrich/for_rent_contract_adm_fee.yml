@@ -1,0 +1,69 @@
+---
+database_name: datalake_accounting_funnel
+table_name: for_rent_contract_adm_fee
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table calculates administration fee by month to all For Rent's contracts"
+columns:
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+    description: "ID contract from Main"
+  adm_fee_charge_type:
+    lineage:
+      - datalake_ebdb_clean.full_contract_aud.adm_fee_charge_type
+    description: "Indicates if a adm fee is charged in contract's first or second month"
+  rent:
+    lineage:
+      - datalake_ebdb_clean.contract_aud.rent
+    description: "Contract's rent amount by the moment that adm-fee entry was created (aud)"
+  adm_fee:
+    description: "Amount that suppose to be charged considering several variables."
+  previous_rent:
+    lineage:
+      - datalake_ebdb_clean.contract_aud.rent
+    description: "Contract's rent from reference last month"
+  rent_adjusted:
+    description: "If there is some proportional to be applied, this field is used."
+  readjustment_perc:
+    description: "This field indicates the readjustment percentual in contract's birthday cases"
+  standard_administration_fee:
+    lineage:
+      - datalake_ebdb_clean.full_contract_aud.monthly_administration_fee
+    description: "Monthly administration fee register in contract_aud table"
+  minimum_fee_value:
+    lineage:
+      - datalake_ebdb_clean.full_contract_aud.minimum_fee_value
+    description: "Minimum fee value register in contract_aud table"
+  promotional_adm_fee:
+    lineage:
+      - datalake_ebdb_clean.full_contract_aud.promotional_adm_fee
+    description: "Promotional adm fee register in contract_aud table"
+  promotional_period:
+    lineage:
+      - datalake_ebdb_clean.full_contract_aud.promotional_period
+    description: "Promotional period (in months) that promotional_adm_fee should be applied"
+  promotional_ended_accrual_year_month:
+    description: "Promotional ended accrual year month"
+  invoice_accrual_year_month:
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+    description: "Indicates invoice accrual year month refered"
+  is_contract_start_month:
+    description: "Promotional ended accrual year month"
+  is_contract_closing_month:
+    description: "Promotional ended accrual year month"
+  is_birthday_month:
+    description: "Promotional ended accrual year month"
+  has_ended_before_birthday:
+    description: "Promotional ended accrual year month"
+  dt_contract_started:
+    lineage:
+      - datalake_ebdb_clean.contract_aud.dt_started
+    description: "Indicates when the contract started"
+  dt_contract_end:
+    lineage:
+      - datalake_ebdb_clean.contract_aud.dt_termination
+      - datalake_ebdb_contract.contract.dt_termination
+      - datalake_ebdb_contract.contract.ts_expected_termination
+    description: "Indicates when the contract ended"

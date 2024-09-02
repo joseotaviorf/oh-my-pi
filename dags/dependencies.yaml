@@ -997,8 +997,10 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.ebdb_contract:load-clean-contract-aud
   - bietlejuice.ebdb_contract:load-clean-contract-partnership-data
   - bietlejuice.ebdb_contract:load-clean-contract-person-aud
+  - bietlejuice.ebdb_contract:load-clean-full-contract-aud
   - bietlejuice.ebdb_rent_flow:load-clean-agent-rent-flow
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
