@@ -66,6 +66,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
+    bimester = int((execution_date.month / 2) + 0.5)
 
     datalake_path_prefix = f"reverse/{source}"
 
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     s3_consumer = S3Consumer(spark_client)
     s3_client = boto3.client("s3")
 
-    datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table_to_send}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
+    datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table_to_send}/year={execution_date.year}/bimester={bimester}"
 
     try:
         df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
