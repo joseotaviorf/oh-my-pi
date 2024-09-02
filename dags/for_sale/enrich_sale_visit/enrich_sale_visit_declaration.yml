@@ -9,4 +9,4 @@ workflow:
   type: query
   layer: enrich
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: databricks_12_2_med_2_fixed_workers_general_photon_cluster
