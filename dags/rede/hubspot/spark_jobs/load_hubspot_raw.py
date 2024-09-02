@@ -296,10 +296,10 @@ def load_table_dataframes_into_datalake(
     partition_cols = ["year", "month", "day"]
 
     for table_name, table_content in tables.items():
-        df = table_content["dataframe"]
+        df = table_content.get("dataframe")
 
-        if df.rdd.isEmpty():
-            logger.info(f"m=__main__, msg={table_name}'s RDD is empty")
+        if df is None or df.rdd.isEmpty():
+            logger.info(f"m=__main__, msg={table_name}'s DataFrame is None or empty")
             continue
 
         if table_content["is_incremental"]:
