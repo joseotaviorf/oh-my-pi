@@ -48,9 +48,9 @@ workflow:
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: r7g.2xlarge
-    node_type_id: r7g.4xlarge
-    num_workers: 3
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 2
     spark_version: 13.3.x-scala2.12
     aws_attributes:
       availability: ON_DEMAND
