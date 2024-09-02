@@ -29,7 +29,7 @@ config_service = ConfigurationService(DAG_NAME)
 s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 datalake_s3_bucket = config_service.get_config("datalake_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
-reverse_spark_job_path = f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_{DAG_NAME}.py"
+reverse_spark_job_path = f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_reverse_{SOURCE}.py"
 
 cluster_description = config_service.get_config(
     "databricks_12_2_med_general_photon_cluster"
@@ -94,7 +94,7 @@ for table in tables_to_send.keys():
                     external_s3_bucket,
                     table,
                     webhook_key,
-                    partition_cols,
+                    json.dumps(partition_cols),
                     "{{ ds }}",
                 ],
             }
