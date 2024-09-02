@@ -57,7 +57,11 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
         "permission_level": ClusterPermissionEnum.MANAGE,
-    }
+    },
+    {
+        "group_name": DatabricksGroupNameEnum.SOFTWARE_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    },
 ]
 LIBRARIES = [{"whl": f"{artifacts_bucket}/vespucio/{VESPUCIO_WHEEL_FILE}"}]
 DAG_DOCUMENTATION = config_service.get_config("dag_documentation")
