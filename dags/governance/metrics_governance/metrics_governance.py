@@ -14,6 +14,7 @@ from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 SOURCE = "metrics_governance"
 CONTEXT = SOURCE
@@ -38,6 +39,12 @@ CLUSTER_DESCRIPTION = config_service.get_config(
     "databricks_10_4_min_general_photon_cluster"
 )
 EXECUTION_DATE = "{{ ds }}"
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.DATA_PLATFORM_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 default_libraries = config_service.get_config("default_libraries")
 
 dag = DAG(
@@ -58,6 +65,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
 

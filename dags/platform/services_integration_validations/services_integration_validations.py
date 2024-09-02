@@ -11,6 +11,7 @@ from databricks_plugin import (
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 DAG_NAME = "services_integration_validations"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -22,6 +23,12 @@ MAIN_SCHEDULE_INTERVAL = "0 13,16,18,20 * * *"
 
 config_service = ConfigurationService()
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
@@ -61,6 +68,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries + custom_libraries,
 )
 

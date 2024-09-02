@@ -48,6 +48,12 @@ reverse_asset_spark_job_path = (
 CLUSTER_DESCRIPTION = config_service.get_config(
     "databricks_12_2_min_general_photon_cluster"
 )
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.DATA_PLATFORM_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 default_libraries = config_service.get_config("default_libraries")
 
 dag = DAG(
@@ -69,6 +75,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=default_libraries,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

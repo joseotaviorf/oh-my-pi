@@ -14,6 +14,7 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 
 
 ENV = os.environ.get("ENVIRONMENT")
@@ -33,7 +34,12 @@ SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/"
 CLUSTER_DESCRIPTION = config_service.get_config(
     "databricks_10_4_min_general_photon_cluster"
 )
-
+DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
+    {
+        "group_name": DatabricksGroupNameEnum.DATA_PLATFORM_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    }
+]
 DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 
 dag = DAG(
@@ -54,6 +60,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
+    access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=DEFAULT_LIBRARIES,
 )
 

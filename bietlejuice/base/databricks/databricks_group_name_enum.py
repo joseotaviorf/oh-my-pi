@@ -10,6 +10,7 @@ class DatabricksGroupNameEnum:
     # QuintoAndar custom groups
     ANALYTICS_ENGINEERS = "analytics-engineers"
     DATA_ANALYTICS = "analytics"
+    DATA_PLATFORM_ENGINEERS = "data-platform-engineers"
     DATA_PRODUCTS = "data-products"
     SOFTWARE_ENGINEERS = "software-engineers"
     BUSINESS_ANALYSTS_CREDIT = "credit-team"
