@@ -251,6 +251,12 @@ columns:
   name_check_rating:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_comparacao_fonetica_nome
+  serasa_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_renda_serasa_acumulado
+  transunion_income:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_renda_transunion_acumulado
   refin_pefin_occurrence_amount_list:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_valor_ocorrencia_total
@@ -443,6 +449,9 @@ columns:
   is_minor_age_document_list:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdata_message_total
+  is_document_federal:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.`rfpfimg_5andar.result.message`
   ts_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.instante
