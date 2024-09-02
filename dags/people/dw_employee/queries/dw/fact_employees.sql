@@ -331,6 +331,7 @@ WITH
     ranked_managers AS (
         SELECT
             mh.id_assignment,
+            mh.id_period_of_service,
             mh.id_manager_assignment,
             a.id_period_of_service AS id_period_of_service_manager,
             mh.separation_degree,
@@ -348,7 +349,7 @@ WITH
     ),
     managers_long AS (
         SELECT
-            id_assignment,
+            id_period_of_service,
             MAX(
                 CASE
                     WHEN rn = 1 THEN id_period_of_service_manager
@@ -402,7 +403,7 @@ WITH
         FROM
             ranked_managers
         GROUP BY
-            id_assignment
+            id_period_of_service
     )
 
 SELECT
@@ -473,6 +474,6 @@ LEFT JOIN
         ON am.sk_employee = ded.id_person
 LEFT JOIN
     managers_long AS ml
-        ON ml.id_assignment = am.sk_assignment
+        ON ml.id_period_of_service = am.sk_assignment
 WHERE
     am.is_last_work_relationship
