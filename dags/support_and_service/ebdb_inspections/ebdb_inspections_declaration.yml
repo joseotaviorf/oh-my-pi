@@ -17,7 +17,6 @@ workflow:
       raw_primary_keys: ["id"]
       clean_table_name: inspection
     Vistoria_AUD:
-      raw_primary_keys: ["id"]
       clean_table_name: inspection_aud
     ItemVistoria:
       raw_primary_keys: ["id"]
