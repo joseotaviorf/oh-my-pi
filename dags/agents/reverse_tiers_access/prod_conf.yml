@@ -1,5 +1,6 @@
 ---
 external_s3_bucket: nazare-revenue-share-prod
+range_of_days_to_run: [1, 15]
 
 dag_documentation:
   dag_purpose: |
@@ -8,5 +9,3 @@ dag_documentation:
 
 tables_to_send:
   tiers: {}
-
-partition_cols: ["year", "bimester"]

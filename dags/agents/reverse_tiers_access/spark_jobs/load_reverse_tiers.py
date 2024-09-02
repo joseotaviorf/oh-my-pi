@@ -53,7 +53,6 @@ if __name__ == "__main__":
     parser.add_argument("external_bucket", help="bucket destination for files")
     parser.add_argument("table_to_send")
     parser.add_argument("webhook_key")
-    parser.add_argument("partition_cols")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -64,12 +63,9 @@ if __name__ == "__main__":
     external_bucket = args.external_bucket
     table_to_send = args.table_to_send
     webhook_key = args.webhook_key
-    partition_cols = json.loads(args.partition_cols)
     execution_date = args.execution_date
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
-    year = execution_date.year
-    bimester = int((execution_date.month / 2) + 0.5)
 
     datalake_path_prefix = f"reverse/{source}"
 
@@ -83,14 +79,15 @@ if __name__ == "__main__":
     s3_consumer = S3Consumer(spark_client)
     s3_client = boto3.client("s3")
 
-    datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table_to_send}/year={year}/bimester={bimester}"
+    datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table_to_send}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
 
     try:
         df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
-        df = df.drop(*partition_cols)
 
         destination_path = f"v1/{table_to_send}/"
-        file_name = f"{table_to_send}_{year}_{bimester}.csv"
+        file_name = (
+            f'{table_to_send}_{(execution_date.strftime("%Y_%m_%d_%H_%M_%S%z"))}.csv'
+        )
 
         with io.StringIO() as csv_buffer:
             df.toPandas().convert_dtypes().to_csv(csv_buffer, index=False, header=True)

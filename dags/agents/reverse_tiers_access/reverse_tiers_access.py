@@ -4,6 +4,7 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain
+from airflow.operators.python_operator import ShortCircuitOperator
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -12,6 +13,9 @@ from databricks_plugin import (
 from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
+    DAGRunDateValidators,
+)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -39,7 +43,7 @@ external_s3_bucket = config_service.get_config("external_s3_bucket")
 dag_documentation = config_service.get_config("dag_documentation")
 
 tables_to_send = config_service.get_config("tables_to_send")
-partition_cols = config_service.get_config("partition_cols")
+range_of_days_to_run = config_service.get_config("range_of_days_to_run")
 webhook_key = config_service.get_config("notification_webhooks_keys")["data_quality"]
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -75,6 +79,12 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=default_libraries,
 )
 
+skip_run_task = ShortCircuitOperator(
+    task_id=f"check-day-to-skip-execution",
+    python_callable=DAGRunDateValidators.check_is_in_range_of_days,
+    op_args=["{{ macros.ds_add(ds, 1) }}", range_of_days_to_run],
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -94,7 +104,6 @@ for table in tables_to_send.keys():
                     external_s3_bucket,
                     table,
                     webhook_key,
-                    json.dumps(partition_cols),
                     "{{ ds }}",
                 ],
             }
@@ -103,5 +112,5 @@ for table in tables_to_send.keys():
     load_tasks.append(send_data_task)
 
 chain(*load_tasks)
-chain(create_cluster_task, load_tasks)
+chain(skip_run_task, create_cluster_task, load_tasks)
 chain(load_tasks, terminate_cluster_task)

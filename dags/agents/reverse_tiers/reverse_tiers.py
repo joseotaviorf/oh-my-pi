@@ -3,6 +3,7 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain
+from airflow.operators.python_operator import ShortCircuitOperator
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -10,10 +11,13 @@ from databricks_plugin import (
 from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
+    DAGRunDateValidators,
+)
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.reverse_task_group import ReverseTaskGroup
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
@@ -37,6 +41,7 @@ cluster_description = config_service.get_config(
 default_libraries = config_service.get_config("default_libraries")
 partition_cols = config_service.get_config("partition_cols")
 dag_documentation = config_service.get_config("dag_documentation")
+range_of_days_to_run = config_service.get_config("range_of_days_to_run")
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -71,6 +76,12 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=default_libraries,
 )
 
+skip_run_task = ShortCircuitOperator(
+    task_id=f"check-day-to-skip-execution",
+    python_callable=DAGRunDateValidators.check_is_in_range_of_days,
+    op_args=["{{ macros.ds_add(ds, 1) }}", range_of_days_to_run],
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -91,5 +102,9 @@ datalake_task_groups = task_group.build_task_group_from_sql_files(
     partitions=partition_cols,
 )
 
-chain(create_cluster_task, ReverseTaskGroup.all_first_tasks(datalake_task_groups))
+chain(
+    skip_run_task,
+    create_cluster_task,
+    ReverseTaskGroup.all_first_tasks(datalake_task_groups),
+)
 chain(ReverseTaskGroup.all_last_tasks(datalake_task_groups), terminate_cluster_task)
