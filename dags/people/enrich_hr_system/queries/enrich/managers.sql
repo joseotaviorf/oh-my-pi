@@ -93,15 +93,13 @@ SELECT DISTINCT
     SUBSTR(REPLACE(managers['LastUpdateDate'], 'T', ' '), 0, 19),
     'yyyy-MM-dd HH:mm:ss'
   ) AS ts_last_update,
-  NOW() AS ts_load,
-  -- partitions
-  DATE_FORMAT(DATE(managers['EffectiveStartDate']), 'yyyy') AS year,
-  DATE_FORMAT(DATE(managers['EffectiveStartDate']), 'MM') AS month
+  NOW() AS ts_load
 FROM
   managers_step1 AS managers
 LEFT JOIN
   external_identifiers AS ei
     ON managers.id_person = ei.id_person
 WHERE
-  DATE_TRUNC('MONTH', DATE(managers['EffectiveStartDate'])) >= DATE_TRUNC('MONTH', DATE('{load_start_date}'))
-    AND ei.id_person IS NULL
+  ei.id_person IS NULL
+  AND DATE(managers['EffectiveStartDate']) BETWEEN DATE_SUB(DATE('{load_start_date}'), 35)
+    AND DATE('{load_end_date}')

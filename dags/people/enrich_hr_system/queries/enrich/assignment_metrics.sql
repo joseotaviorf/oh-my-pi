@@ -22,13 +22,9 @@ WITH assignment AS (
     a.action_code,
     a.dt_effective_start,
     a.assignment_status_type,
-    a.dt_projected_start,
-    a.year,
-    a.month
+    a.dt_projected_start
   FROM
     datalake_hr_system.assignments AS a
-  ORDER BY
-    dt_effective_start
 ),
 assignments_present AS (
   SELECT
@@ -58,9 +54,7 @@ assignments_present AS (
     ) AS qnt_promotions,
     a.dt_effective_start,
     a.dt_projected_start,
-    a.assignment_status_type,
-    a.year,
-    a.month
+    a.assignment_status_type
   FROM
     assignment a
   WHERE
@@ -95,9 +89,7 @@ assignments_future AS (
     ) AS qnt_promotions,
     a.dt_effective_start,
     a.dt_projected_start,
-    a.assignment_status_type,
-    a.year,
-    a.month
+    a.assignment_status_type
   FROM
     assignment a
   WHERE
@@ -553,7 +545,7 @@ FROM
 WHERE
   (
     wr.dt_start <= DATE('{load_start_date}')
-    AND wr.worker_type = 'E'
+    AND wr.worker_type IN ('E', 'C')
   )
   OR (
     COALESCE(ap.dt_projected_start, af.dt_projected_start) > DATE('{load_start_date}')

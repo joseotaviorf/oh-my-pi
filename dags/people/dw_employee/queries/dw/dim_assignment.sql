@@ -28,9 +28,7 @@ WITH
       a.dt_effective_start,
       a.dt_effective_end,
       a.dt_projected_start,
-      a.action_code,
-      a.year,
-      a.month
+      a.action_code
     FROM
       datalake_hr_system.assignments a
   ),
@@ -124,7 +122,7 @@ FROM
 WHERE
   (
     wr.dt_start <= DATE ('{load_start_date}')
-    AND wr.worker_type = 'E'
+    AND wr.worker_type IN ('E', 'C')
   )
   OR (
     COALESCE(ap.dt_projected_start, af.dt_projected_start) > DATE ('{load_start_date}')
