@@ -16,4 +16,4 @@ workflow:
       - listing_flow
       - discards_reason_by_context
 cluster:
-  type: databricks_12_2_med_memory_photon_cluster
+  type: databricks_12_2_med_2xlarge_general_photon_cluster
