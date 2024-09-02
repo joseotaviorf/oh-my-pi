@@ -295,13 +295,3 @@ columns:
       "yyyy-MM-dd HH:mm:ss")
   ts_load:
     description: "Timestamp when the record was loaded into the datalake."
-  year:
-    description: "[Partition] Year dt_effective_start"
-    lineage:
-    - datalake_hr_system_clean.workers.work_relationships.assignments.dt_effective_start
-    - datalake_hr_system_clean.workers.work_relationships.assignments.assignments_dff.dt_effective_start
-  month:
-    description: "[Partition] Month dt_effective_start"
-    lineage:
-    - datalake_hr_system_clean.workers.work_relationships.assignments.dt_effective_start
-    - datalake_hr_system_clean.workers.work_relationships.assignments.assignments_dff.dt_effective_start

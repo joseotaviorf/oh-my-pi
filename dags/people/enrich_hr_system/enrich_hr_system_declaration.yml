@@ -27,11 +27,11 @@ workflow:
     assignments:
       extraction_type: incremental
       merge_on: ["id_assignment", "dt_effective_start"]
-      z_order_by: ["id_assignment", "dt_effective_start"]
+      z_order_by: ["id_assignment"]
     managers:
       extraction_type: incremental
       merge_on: ["id_assignment", "dt_effective_start"]
-      z_order_by: ["id_assignment", "dt_effective_start"]
+      z_order_by: ["id_assignment"]
     demographic_attributes:
       extraction_type: incremental
       merge_on: ["id_person"]
