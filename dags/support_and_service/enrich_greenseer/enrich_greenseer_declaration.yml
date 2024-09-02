@@ -29,7 +29,7 @@ workflow:
 cluster:
     type: custom_cluster
     custom_configurations:
-        driver_node_type_id: r6gd.8xlarge
-        node_type_id: r6gd.8xlarge
+        driver_node_type_id: r5a.2xlarge
+        node_type_id: r5a.8xlarge
         num_workers: 4
         spark_version: 13.3.x-scala2.12
