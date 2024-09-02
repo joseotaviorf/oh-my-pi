@@ -16,7 +16,6 @@ JOB_NAME = "load_management_hierarchy_enrich"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
-
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -36,19 +35,33 @@ if __name__ == "__main__":
 
     config_service = ConfigurationService(f"enrich_{source}")
     table_name = "management_hierarchy"
+
     managers_query = """
-        SELECT
-            id_assignment,
-            id_manager_assignment
+        WITH assignments AS (
+            SELECT DISTINCT
+                id_assignment,
+                id_period_of_service,
+                id_person
+            FROM
+                datalake_hr_system.assignments
+        )
+        SELECT DISTINCT
+            managers.id_period_of_service,
+            managers.id_assignment,
+            managers.id_manager_assignment,
+            assignments.id_period_of_service AS id_manager_period_of_service
         FROM
             datalake_hr_system.managers
+        LEFT JOIN
+            assignments
+                ON assignments.id_assignment = managers.id_manager_assignment
         WHERE
-            dt_effective_start <= current_date
-            AND manager_type = 'LINE_MANAGER'
-            AND id_manager_assignment <> '300000008488092'
+            managers.dt_effective_start <= current_date
+            AND managers.manager_type = 'LINE_MANAGER'
+            AND managers.id_manager_assignment <> '300000008488092'
         QUALIFY
-            dt_effective_start = MAX(dt_effective_start)
-            OVER (PARTITION BY id_assignment)
+            dt_effective_start = MAX(managers.dt_effective_start)
+                OVER (PARTITION BY managers.id_period_of_service)
     """
 
     logger.info(
@@ -63,7 +76,8 @@ if __name__ == "__main__":
     df = df.filter(df.id_manager_assignment.isNotNull())
 
     df_degree = df.withColumn("separation_degree", lit(1))\
-                .withColumn("is_direct_manager", lit(True))
+                  .withColumn("is_direct_manager", lit(True))\
+                  .select("id_assignment", "id_manager_assignment", "separation_degree", "is_direct_manager", "id_period_of_service", "id_manager_period_of_service")
 
     df_result = df_degree
 
@@ -72,7 +86,14 @@ if __name__ == "__main__":
     for i in range(2, max_iterations + 1):
         df_next_degree = df.alias("df1")\
             .join(df_degree.alias("df2"), col("df1.id_manager_assignment") == col("df2.id_assignment"))\
-            .select(col("df1.id_assignment"), col("df2.id_manager_assignment"), lit(i).alias("separation_degree"), lit(False).alias("is_direct_manager"))
+            .select(
+                col("df1.id_assignment"),
+                col("df2.id_manager_assignment"),
+                lit(i).alias("separation_degree"),
+                lit(False).alias("is_direct_manager"),
+                col("df1.id_period_of_service"),
+                col("df2.id_manager_period_of_service")
+            )
 
         df_result = df_result.union(df_next_degree)
         df_degree = df_next_degree

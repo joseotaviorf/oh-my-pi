@@ -6,9 +6,17 @@ columns:
     description: "id assignment of the employee"
     lineage:
       - datalake_hr_system.managers.id_assignment
+  id_period_of_service:
+    description: "id period of service of the employee"
+    lineage:
+      - datalake_hr_system.managers.id_assignment
   id_manager_assignment:
     description: "id assignment of a person who is higher in hierarchy"
     lineage:
       - datalake_hr_system.managers.id_manager_assignment
+  id_manager_period_of_service:
+    description: "id period of service of a person who is higher in hierarchy"
+    lineage:
+      - datalake_hr_system.managers.id_period_of_service
   separation_degree:
     description: "distance between the employee and the manager"
