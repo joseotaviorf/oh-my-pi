@@ -70,12 +70,14 @@ def _send_requests(endpoint:str, payloads:list, chunk_size:int=30) -> None:
                 logger.error(
                     f"Exception trying to call metadata-propagator service, "
                     f"status_code={exception.response.status_code}, "
-                    f"error_message={exception.response.text}"
+                    f"error_message={exception.response.text}, "
+                    f"payload={chunk}"
                 )
             else:
                 logger.error(
                     f"Exception trying to call metadata-propagator service, "
-                    f"exception={exception}"
+                    f"exception={exception}, "
+                    f"payload={chunk}"
                 )
                 
 

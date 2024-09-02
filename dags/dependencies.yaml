@@ -1448,10 +1448,6 @@ bietlejuice.enrich_dai_report:
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_house:load-clean-house
 bietlejuice.enrich_dashboard_governance:
-  - bietlejuice.looker:load-clean-dashboard-elements
-  - bietlejuice.looker:load-clean-dashboards
-  - bietlejuice.looker:load-clean-folders
-  - bietlejuice.looker:load-clean-users
   - bietlejuice.metabase:load-clean-collection
   - bietlejuice.metabase:load-clean-core-user
   - bietlejuice.metabase:load-clean-metabase-database
