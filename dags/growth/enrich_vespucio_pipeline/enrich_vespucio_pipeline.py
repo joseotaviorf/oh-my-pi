@@ -151,6 +151,9 @@ class Tables:
     # )
 
     ebdb_clean_house_enrichment = "datalake_ebdb_clean.house_enrichment"
+    ebdb_clean_house = "datalake_ebdb_clean.house"
+    ebdb_clean_region = "datalake_ebdb_clean.region"
+    ebdb_clean_map_region = "datalake_ebdb_clean.map_region"
 
 
 source_tasks = [
@@ -411,6 +414,24 @@ plugin_tasks = [
             f"--input_ebdb_house_enrichment={Tables.ebdb_clean_house_enrichment}",
             f"--input_condo_compounds={Tables.condo_compounds}",
             f"--input_house_compounds={Tables.house_compounds}",
+        ],
+    ),
+    create_task(
+        entry_point="plugins_seo_neighborhood_recommendation",
+        parameters=[
+            f"--input_listings={Tables.listings}",
+            f"--input_houses={Tables.ebdb_clean_house}",
+            f"--input_regions={Tables.ebdb_clean_region}",
+            f"--input_map_regions={Tables.ebdb_clean_map_region}",
+            f"--output_database=neighborhood_recommendation_vespucio_plugin",
+            f"--output_listings_agg_by_neighborhood=listings_agg_by_neighborhood",
+            f"--output_listings_agg_by_city=listings_agg_by_city",
+            f"--output_listings_agg_ordered_by_count=listings_agg_ordered_by_count",
+            f"--output_nearests_neighborhoods=nearests_neighborhoods",
+            f"--output_keys_and_values_to_city_slug=keys_and_values_to_city_slug",
+            f"--output_keys_and_values_to_neighborhood_slug=keys_and_values_to_neighborhood_slug",
+            f"--redis_host=redis.pwa-tenants-link-service.quintoandar.com.br",
+            f"--redis_port=6379",
         ],
     ),
     # create_task(
