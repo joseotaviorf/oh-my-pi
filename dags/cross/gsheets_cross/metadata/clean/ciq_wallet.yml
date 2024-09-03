@@ -13,3 +13,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.carteira_ciq.cluster
     description: Partner segmentation based on quality and house attraction profile.
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.carteira_ciq.ts_load
+    description: Timestamp of when the table was loaded.
