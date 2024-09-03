@@ -278,49 +278,6 @@ WITH
         GROUP BY
             id_manager_assignment
     ),
-    disabilities_step1 AS (
-        SELECT
-            id_person,
-            EXPLODE(disabilities) AS disabilities
-        FROM
-            datalake_hr_system_clean.workers
-        QUALIFY 2 = DENSE_RANK() OVER (
-            PARTITION BY id_person
-            ORDER BY
-                dt_effective
-            )
-    ),
-    self_declaration AS (
-        SELECT
-            id_person,
-            legislation_code,
-            disability_self_declaration_code,
-            has_disability
-        FROM
-            datalake_hr_system.demographic_attributes
-        WHERE
-            disability_self_declaration_code IS NOT NULL
-            OR disability_self_declaration_description IS NOT NULL
-            OR has_disability IS TRUE
-    ),
-    cte_dim_employee_disability AS(
-        SELECT DISTINCT
-            COALESCE(sd.id_person, ds1.id_person) AS id_person,
-            MD5(
-                CONCAT(
-                COALESCE(disabilities ['Category'], '-1'),
-                COALESCE(disabilities ['Status'], '-1'),
-                COALESCE(disability_self_declaration_code, '-1'),
-                COALESCE(has_disability, FALSE)
-                )
-            ) AS sk_disability
-        FROM
-            disabilities_step1 ds1 FULL
-            OUTER JOIN
-                self_declaration sd
-                    ON ds1.id_person = sd.id_person
-                    AND ds1.disabilities ['LegislationCode'] = sd.legislation_code
-    ),
     assignments AS (
         SELECT DISTINCT
             id_assignment,
@@ -417,7 +374,7 @@ SELECT
     am.sk_manager_assignment,
     am.sk_business_partner,
     am.sk_business_partner_assignment,
-    COALESCE(ded.sk_disability, '-1') AS sk_disability,
+    COALESCE(d.sk_disability, '-1') AS sk_disability,
     REPLACE (am.dt_start_work_relationship, '-', '') AS sk_work_relationship_started_date,
     REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
     am.sk_last_increase_date,
@@ -442,6 +399,7 @@ SELECT
     am.is_active,
     am.is_pending_worker,
     am.is_manager,
+    COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
     am.assignment_age_months,
     am.qnt_directly_led,
     COALESCE(s.qnt_undirectly_led, 0) AS qnt_undirectly_led,
@@ -470,8 +428,8 @@ LEFT JOIN
     subordinates AS s
         ON s.id_assignment = am.sk_assignment
 LEFT JOIN
-    cte_dim_employee_disability AS ded
-        ON am.sk_employee = ded.id_person
+    datalake_hr_system.disability AS d
+        ON am.sk_employee = d.id_person
 LEFT JOIN
     managers_long AS ml
         ON ml.id_period_of_service = am.sk_assignment

@@ -1,0 +1,50 @@
+---
+database_name: datalake_hr_system
+table_name: disability
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table storing information about employees' disabilities.
+columns:
+  id_person:
+    description: 'Identifier for the person.'
+    lineage:
+    - .workers.id_person
+  sk_disability:
+    description: 'Surrogate key for the dimension table dim_disability.'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+    - datalake_hr_system.demographic_attributes.disability_self_declaration_code
+    - datalake_hr_system.demographic_attributes.disability_self_declaration_description
+  disability_category_code_wdoc:
+    description: 'Disability category code with documentation'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+  disability_category_wdoc:
+    description: 'Disability category with documentation'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+  disability_status_wdoc:
+    description: 'Disability status with documentation'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+  disability_self_declaration_code:
+    description: 'Self-declared disability code'
+    lineage:
+    - datalake_hr_system.demographic_attributes.disability_self_declaration_code
+  disability_self_declaration_description:
+    description: 'Self-declared disability description'
+    lineage:
+    - datalake_hr_system.demographic_attributes.disability_self_declaration_description
+  has_self_declared_disability:
+    description: 'Self-declared disability'
+    lineage:
+    - datalake_hr_system.demographic_attributes.has_disability
+  dt_effective_start:
+    description: 'Last update date'
+    lineage:
+    - datalake_hr_system_clean.workers.disabilities
+    - datalake_hr_system.demographic_attributes.dt_effective_start
+  ts_load:
+    description: ''
+    lineage:
+    - .workers.NOW()

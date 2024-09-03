@@ -32,5 +32,4 @@ workflow:
       extraction_type: incremental
       merge_on: ["sk_employee"]
     dim_disability:
-      extraction_type: incremental
       merge_on: ["sk_disability"]
