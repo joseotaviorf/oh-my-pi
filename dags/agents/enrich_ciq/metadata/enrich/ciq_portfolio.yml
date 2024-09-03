@@ -1,0 +1,30 @@
+---
+database_name: datalake_ciq
+table_name: ciq_portfolio
+description: 
+  Each record brings information about a given CIQ about which cluster it belongs to and which portfolio it belongs to.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_partner:
+    description: Id partner of CIQ.
+    lineage:
+      - datalake_gsheets_clean.ciq_portfolio.id_partner
+  portfolio_user_name:
+    description: User's portfolio in which it is allocated.
+    lineage:
+      - datalake_gsheets_clean.ciq_portfolio.portfolio_user_name
+  cluster_name:
+    description: Cluster of CIQ.
+    lineage:
+      - datalake_gsheets_clean.ciq_portfolio.cluster_name
+  is_last_status: 
+    description: Informs whether it is the most up-to-date status of that CIQ in the portfolio.
+  dt_start:
+    description: Date the CIQ was inserted into the portfolio control or had a portfolio or cluster change.
+    lineage:
+      - datalake_gsheets_clean.ciq_portfolio.ts_created
+  dt_end:
+    description: Date on which there was an end to that CIQ status in the portfolio.
+    lineage:
+      - datalake_gsheets_clean.ciq_portfolio.ts_created

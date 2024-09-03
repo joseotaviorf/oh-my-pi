@@ -1,0 +1,13 @@
+---
+table_name: datalake_ciq.ciq_portfolio
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_partner:
+    is_complete:
+      severity_level: Warning
+  portfolio_user_name:
+    is_complete:
+      severity_level: Warning
+  cluster_name:
+    is_complete:
+      severity_level: Warning

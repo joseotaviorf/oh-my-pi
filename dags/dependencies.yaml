@@ -1272,6 +1272,8 @@ bietlejuice.enrich_casa_mineira_portal:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-clean-responses
+bietlejuice.enrich_ciq:
+  - bietlejuice.gsheets_agents:done-clean-ciq-portfolio
 bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
