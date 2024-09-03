@@ -1,0 +1,18 @@
+table_name: dw_data_quality.dim_validation_level
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 200
+    severity_level: Error
+column_level_validations:
+  sk_validation_level:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  database:
+    is_complete:
+      severity_level: Error
+  table:
+    is_complete:
+      severity_level: Error

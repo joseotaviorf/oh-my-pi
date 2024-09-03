@@ -257,6 +257,8 @@ bietlejuice.dw_customer_support_test:
   - bietlejuice.enrich_customer_support_test:load-enrich-ivr-interactions
   - bietlejuice.enrich_quinto_messenger:load-enrich-message
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
+bietlejuice.dw_data_quality:
+  - bietlejuice.enrich_data_quality:load-enrich-validations
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_booking:load-dw-public-dim-booking

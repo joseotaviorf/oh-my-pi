@@ -1,0 +1,49 @@
+database_name: dw_data_quality
+table_name: fact_data_quality
+description: This fact table consolidates the data quality validations applied to bietlejuice DAGs.
+  In order to get an unique line, it's necessary to add all the columns.
+domain: Cross
+owner: bruna.prates@quintoandar.com.br
+columns:
+  sk_data_quality:
+    description: Id for the data quality. It's a hash generated from id_dag, database, table, validation_level, column and validation_type.
+  sk_dag:
+    description: DAG id, which is also the DAG name on Airflow.
+    lineage:
+      - datalake_data_quality.validations.id_dag
+  sk_validation_level:
+    description: Id of the level of validation.
+    lineage:
+      - dw_data_quality.dim_validation_level.pk_validation_level
+  sk_validation_type:
+    description: Id of the type of validation.
+    lineage:
+      - dw_data_quality.dim_validation_type.pk_validation_type
+  sk_validation_status:
+    description: Id of the status of validation.
+    lineage:
+      - dw_data_quality.dim_validation_status.pk_validation_status
+  validation_result:
+    description: Double value returned by validation.
+    lineage:
+      - datalake_data_quality.validations.validation_result
+  consecutive_failure_days:
+    description: Number of consecutive days the validation failed.
+    lineage:
+      - datalake_data_quality.validations.consecutive_failure_days
+  dt_executed:
+    description: Date of when data quality was executed.
+    lineage:
+      - datalake_data_quality.validations.dt_executed
+  year:
+    description: Year of when data quality was executed. Also, it's a partition of this table.
+    lineage:
+      - datalake_data_quality.validations.year
+  month:
+    description: Month of when data quality was executed. Also, it's a partition of this table.
+    lineage:
+      - datalake_data_quality.validations.month
+  day:
+    description: Day of when data quality was executed. Also, it's a partition of this table.
+    lineage:
+      - datalake_data_quality.validations.day
