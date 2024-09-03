@@ -4,6 +4,7 @@ WITH house_aud AS (
         r.id_user AS id_user_revision, 
         h_aud.id_user AS id_owner,
         h_aud.id_region,
+        h_aud.rev_type,
         h_aud.sale_price,
         CASE 
           WHEN lbc.ts_first_publication >= FROM_UNIXTIME(r.ts_revision/1000) THEN 'UNPUBLISHED' 
@@ -43,7 +44,9 @@ price_changes_raw AS (
     FROM 
         house_aud
     WHERE 
-        ((status_threshold = 'UNPUBLISHED' AND threshold = 1) OR (status_threshold = 'PUBLISHED' AND has_price_changed = TRUE))
+        ((status_threshold = 'UNPUBLISHED' AND threshold = 1) 
+        OR (status_threshold = 'PUBLISHED' AND has_price_changed = TRUE)) 
+        OR rev_type = 0
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_house, dt_change ORDER BY ts_revision DESC) = 1
 ),
@@ -110,7 +113,6 @@ sale_price_changes AS (
                 ELSE first_price_variation
             END, 4) AS first_price_variation,
         change_type,
-
         ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_price_started ASC) AS change_number,
         DATEDIFF(COALESCE(ts_price_ended, CURRENT_DATE), ts_price_started) AS days_with_pricing_scheme,
         ts_price_ended IS NULL AS is_last_price,

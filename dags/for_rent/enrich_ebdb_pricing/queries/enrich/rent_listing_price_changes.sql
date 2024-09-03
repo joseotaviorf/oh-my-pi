@@ -5,6 +5,7 @@ WITH house_aud AS (
       h_aud.id_user AS id_owner,
       h_aud.id_region,
       h_aud.rev AS id_revision,
+      h_aud.rev_type,
       h_aud.rent AS price,
       CASE 
          WHEN lbc.ts_first_publication >= FROM_UNIXTIME(r.ts_revision/1000) THEN 'UNPUBLISHED' 
@@ -46,7 +47,9 @@ price_changes_raw AS (
       house_aud
    WHERE 
       /* Filter the last price before publication and all changes while published. (Avoids price changes before deciding on the price that will actually be published). */
-      ((status_threshold = 'UNPUBLISHED' AND threshold = 1) OR (status_threshold = 'PUBLISHED' AND has_price_changed = TRUE))
+      ((status_threshold = 'UNPUBLISHED' AND threshold = 1) 
+      OR (status_threshold = 'PUBLISHED' AND has_price_changed = TRUE)) 
+      OR rev_type = 0
    QUALIFY
       ROW_NUMBER() OVER (PARTITION BY id_house, dt_change ORDER BY ts_revision DESC) = 1
 ),
@@ -83,7 +86,7 @@ price_changes_enriched AS (
          ELSE 'First price'
       END AS change_type,
       (price - lag_price)/NULLIF(lag_price, 0) AS last_price_variation,
-      (price - MIN(IF(lag_price IS NULL, price, null)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_price IS NULL, price, null)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
+      (price - MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
       IF(lag_price IS NULL, TRUE, FALSE) AS is_first_price,
       dt_change,
       ts_price_started,
@@ -115,7 +118,6 @@ price_changes AS (
                ELSE first_price_variation
          END, 4) AS first_price_variation,
       change_type,
-
       ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_price_started ASC) AS change_number,
       DATEDIFF(COALESCE(ts_price_ended, CURRENT_DATE), ts_price_started) AS days_with_pricing_scheme,
       ts_price_ended IS NULL AS is_last_price,
@@ -170,7 +172,7 @@ rent_calculator_changes AS (
       p_90,
       certainty,
       dt_change AS dt_calculator_result_started,
-      DATE(DATEADD(DAY, -1, COALESCE(LEAD(dt_change) OVER (PARTITION BY id_house ORDER BY ts_change), CURRENT_DATE)))  AS dt_calculator_result_ended
+      DATE(DATEADD(DAY, -1, COALESCE(LEAD(dt_change) OVER (PARTITION BY id_house ORDER BY ts_change), CURRENT_DATE))) AS dt_calculator_result_ended
    FROM
       house_predicted_price_aud
    WHERE 
