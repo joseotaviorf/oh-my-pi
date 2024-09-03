@@ -234,6 +234,7 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.heimdall:load-clean-activity
 bietlejuice.dw_customer_support:
+  - bietlejuice.bigfone:load-clean-ivr-closed-history
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics-tasks
   - bietlejuice.enrich_customer_demand:load-enrich-demand-metrics
@@ -246,9 +247,11 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
   - bietlejuice.enrich_greenseer:load-enrich-sessions
   - bietlejuice.enrich_satisfaction_rating:load-enrich-chat-fup-surveys
+  - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
+  - bietlejuice.sauron:load-clean-session
 bietlejuice.dw_customer_support_test:
   - bietlejuice.enrich_customer_support_test:load-enrich-calls
   - bietlejuice.enrich_customer_support_test:load-enrich-ivr-interactions

@@ -12,6 +12,10 @@ workflow:
   custom_schema: customer_support
   default_extraction_type: full
   tables_customization:
+    fact_user_blocks:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [sk_user, channel]
     fact_agent_ranking:
       partitions: [year, month, day]
       extraction_type: incremental

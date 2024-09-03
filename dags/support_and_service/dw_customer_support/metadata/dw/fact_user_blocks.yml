@@ -1,0 +1,70 @@
+database_name: dw_customer_support
+table_name: fact_user_blocks
+description: Table containing users blocked on whatsapp and direct call channels
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_user:
+    lineage:
+      - datalake_bigfone_clean.ivr_closed_history.id_user
+      - datalake_greenseer.sessions.id_user
+    description: SK of the user
+  tenant_journey_step:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.tenant_journey_step
+    description: User's tenant journey step
+  tenant_persona_step:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.tenant_persona_step
+    description: User's tenant persona step
+  landlord_journey_step:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.landlord_journey_step
+    description: User's landlord journey step
+  landlord_persona_step:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.landlord_persona_step
+    description: User's landlord persona step
+  channel:
+    description: Channel where the user was blocked from
+  user_data:
+    lineage:
+      - datalake_sauron_clean.session.user_data
+      - datalake_bigfone_clean.ivr_closed_history.user_phone
+    description: Data related to the user, either a phone number of email
+  strategy:
+    lineage:
+      - datalake_greenseer.sessions.memory
+      - datalake_bigfone_clean.ivr_closed_history.strategy
+    description:
+  is_tenant:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.is_tenant
+    description: Boolean if the user is a tenant
+  is_landlord:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.is_landlord
+    description: Boolean if the user is a landlord
+  is_pp_multi:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.is_pp_multi
+    description: Boolean if the user is PP Multi
+  has_app_installed:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.has_app_installed
+    description: Boolean if the user has opened the app in the last 45 days
+  ts_last_app_opened:
+    lineage:
+      - datalake_ss_logic_model.user_ss_metrics.ts_last_app_installed
+    description: Timestamp of when the user last opened the app
+  ts_blocked:
+    lineage:
+      - datalake_bigfone_clean.ivr_closed_history.ts_requested
+      - datalake_greenseer.sessions.ts_started
+    description: Timestamp of when the user was blocked
+  year:
+    description: Partition column
+  month:
+    description: Partition column
+  day:
+    description: Partition column
