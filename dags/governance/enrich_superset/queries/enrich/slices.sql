@@ -1,7 +1,7 @@
 with last_slice AS (
   SELECT
     *,
-    regexp_extract(slice_name,'\\[(Bedrock|Cross|Data Ops \\& Governance|Fintech|For Brokers|For Rent|For Sale|Growth|Internacional|MLOps|Rede|Support and Services|People|Agents)\\]') company_line,
+    regexp_extract(slice_name,'\\[(Bedrock|Cross|Data Ops \\& Governance|Fintech|For Brokers|For Rent|For Sale|Growth|Internacional|MLOps|Rede|Support and Services|People|Agents|Primitives)\\]') company_line,
     RANK() OVER (PARTITION BY id ORDER BY ts_changed DESC) most_recent_rank
   FROM datalake_superset_clean.slices
 ), slice_owners AS (
