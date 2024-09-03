@@ -1,0 +1,23 @@
+---
+database_name: datalake_copilot_service_clean
+table_name: message_flow
+owner: lucas.cardozo@quintoandar.com.br
+domain: primitives
+description: "This table stores the message-flow relationship in the Copilot service"
+columns:
+  id:
+    description: "The message-flow identifier"
+    lineage:
+    - datalake_copilot_service_raw.message_flow.id
+  id_message:
+    description: "The message identifier"
+    lineage:
+    - datalake_copilot_service_raw.message_flow.message_id
+  flow:
+    description: "The flow associated with this message"
+    lineage:
+    - datalake_copilot_service_raw.message_flow.flow
+  ts_created:
+    description: "The message-flow creation date"
+    lineage:
+    - datalake_copilot_service_raw.message_flow.created_at

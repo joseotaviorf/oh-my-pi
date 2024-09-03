@@ -18,5 +18,7 @@ workflow:
       {}
     state:
       {}
+    message_flow:
+      {}
 cluster:
   type: databricks_12_2_min_general_cluster

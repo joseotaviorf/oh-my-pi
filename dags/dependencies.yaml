@@ -1326,6 +1326,7 @@ bietlejuice.enrich_content_funnel:
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
 bietlejuice.enrich_copilot_service:
   - bietlejuice.copilot_service:load-clean-message
+  - bietlejuice.copilot_service:load-clean-message-flow
   - bietlejuice.copilot_service:load-clean-session
   - bietlejuice.copilot_service:load-clean-state
   - bietlejuice.ebdb_user:load-clean-user
