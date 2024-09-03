@@ -1,0 +1,35 @@
+---
+database_name: datalake_hr_system
+table_name: employee_ids
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Table that unifies employee IDs
+columns:
+  id_assignment:
+    description: "Id assignment of employee"
+    lineage:
+      - datalake_hr_system.assignments.id_assignment
+  id_period_of_service:
+    description: "Id period of service of employee. It is referenced in dw_employee.fact_assignment as sk_assignment."
+    lineage:
+      - datalake_hr_system.assignments.id_period_of_service
+  id_person:
+    description: "Id person of employee"
+    lineage:
+      - datalake_hr_system.assignments.id_person
+  assignment_number:
+    description: "Employee registration number"
+    lineage:
+      - datalake_hr_system.assignments.assignment_number
+  full_name:
+    description: "Full name of employee"
+    lineage:
+      - datalake_hr_system_clean.workers.names
+  work_email:
+    description: "Employee work email."
+    lineage:
+      - datalake_hr_system_clean.workers.emails
+  personal_email:
+    description: "Employee personal email"
+    lineage:
+      - datalake_hr_system_clean.workers.emails
