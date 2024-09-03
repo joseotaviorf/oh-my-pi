@@ -153,7 +153,7 @@ metabase_dashboard_enrich as (
       join metabase_dash_card mdc on mdc.id_dashboard = md.id_dashboard
       join metabase_last_view lv on lv.id_model = md.id_dashboard
       join metabase_collections mc on md.id_collection = mc.id_collection
-),
+)
 select
   platform,
   id_dashboard,
