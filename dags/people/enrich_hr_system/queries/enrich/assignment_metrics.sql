@@ -231,6 +231,7 @@ salary_raw AS (
     AND s.assignment_number NOT LIKE 'P%'
     QUALIFY a.dt_effective_start = MAX(a.dt_effective_start) OVER (PARTITION BY a.id_assignment)
       AND s.dt_from = MAX(s.dt_from) OVER (PARTITION BY s.assignment_number)
+      AND s.ts_last_update = MAX(s.ts_last_update) OVER (PARTITION BY s.assignment_number)
 ),
 cte_movements_step_0 AS (
   SELECT
