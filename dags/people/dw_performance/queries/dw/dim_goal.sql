@@ -29,7 +29,7 @@ SELECT
   replace(pg.dt_start, '-', '') AS sk_started_date,
   replace(pg.dt_target_completion, '-', '') AS sk_target_completion_date,
   pg.goal_name AS goal_name,
-  pg.priority,
+  ag.priority,
   ag.weight
 
 FROM datalake_hr_system_clean.performance_goals AS pg
