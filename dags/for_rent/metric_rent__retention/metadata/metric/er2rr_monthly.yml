@@ -7,8 +7,7 @@ owner: jonas.fiorini@quintoandar.com.br
 columns:
   dt_reference_month:
     lineage:
-      - dw_rent.dim_contract.ts_analyst_annulment_input
-      - dw_rent.dim_contract.dt_annulment
+      - dw_rent.dim_contract.dt_ended_rental_confirmed
     description: "Month of the ended rental or listing maturation."
     dimension: True
   category:

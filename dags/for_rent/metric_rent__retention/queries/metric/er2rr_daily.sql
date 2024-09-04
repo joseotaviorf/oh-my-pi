@@ -1,171 +1,180 @@
 WITH
-ended_rentals_confirmed AS (
-  SELECT
-    fct_or.sk_house_listing,
-    dc.rental_administrator,
-    fct_or.sk_house AS id_house,
-    (fct_or.sk_house_listing + 1) AS nxt_sk_house_listing,
-    dc.sk_contract,
-    dc.rent,
-    dc.value_segment,
-    dc.country_code,
-    dhl.is_exclusive,
-    DATE(COALESCE(dc.ts_analyst_annulment_input,dc.dt_annulment)) AS dt_ended_rental_confirmed,
-    ROW_NUMBER() OVER(PARTITION BY fct_or.sk_house_listing, DATE(COALESCE(dc.ts_analyst_annulment_input,dc.dt_annulment)) ORDER BY DATE(coalesce(dc.ts_analyst_annulment_input,dc.dt_annulment)) DESC) AS rn
-  FROM
-    dw_retention.fact_owner_retention AS fct_or
-  JOIN
-    dw_rent.dim_contract AS dc
-      ON dc.sk_contract = fct_or.sk_contract
-  LEFT JOIN
-    dw_rent.dim_house_listing AS dhl
-      ON dhl.sk_house_listing = fct_or.sk_house_listing
+rent_flow AS (
+  SELECT DISTINCT
+    de.sk_house_listing,
+    de.sk_contract,
+    DATE(de.ts_event) AS dt_contract_signed
+  FROM  
+    dw_rent.fact_rent_demand_events AS de 
   WHERE
-    dc.status IN ('Finalizado')
-    AND COALESCE(dc.ts_analyst_annulment_input,dc.dt_annulment) IS NOT NULL
+    de.sk_contract <> -1
+    AND de.sk_event_type = 9
   QUALIFY
-    rn = 1
+    ROW_NUMBER() OVER(PARTITION BY de.sk_house_listing ORDER BY de.ts_event) = 1
 ),
-contract_signed AS (
+next_house_listing_with_contract AS (
   SELECT
-    DATE(dc.ts_signature) AS contract_signed_date,
-    dc.rental_administrator,
-    fct_or.sk_house_listing,
-    fct_or.sk_contract AS sk_contract,
-    dc.value_segment
+    fhl.sk_house_listing,
+    LEAD(fhl.sk_house_listing) OVER(PARTITION BY dhl.id_house ORDER BY dhl.ts_listing_version_start) AS next_sk_house_listing
   FROM
-    dw_retention.fact_owner_retention AS fct_or
+    dw_rent.fact_house_listings AS fhl
   JOIN
-    dw_rent.dim_contract AS dc
-      ON fct_or.sk_contract = dc.sk_contract
+    dw_rent.dim_house_listing AS dhl
+      ON fhl.sk_house_listing = dhl.sk_house_listing
   WHERE
-    dc.ts_signature IS NOT NULL
-    AND IF(dc.status IN ('Ativo','Finalizado'), TRUE, FALSE)
-    AND dc.ts_signature < CURRENT_DATE
-  GROUP BY
-    1, 2, 3, 4, 5
+    fhl.sk_contract > -1
+),
+db_terminations AS (
+  SELECT DISTINCT
+    COALESCE(ct.id_house_listing, rf.sk_house_listing) AS sk_house_listing,
+    ct.id_contract AS sk_contract,
+    rf_cs.sk_contract AS next_sk_contract,
+    dc.country_code,
+    dc.value_segment AS category,
+    dc.rental_administrator,
+    dc.status AS contract_status,
+    dc.dt_start AS contract_start_dt,
+    DATE(ct.ts_created) AS tr_dt,
+    ct.dt_termination AS td_dt,
+    dc.dt_ended_rental_confirmed,
+    DATE(dhl.ts_publication) AS rl_dt,
+    rf_cs.dt_contract_signed,
+    dhl.is_early_demand,
+    DATE(dhl.ts_early_demand_started) AS dt_early_demand_started
+  FROM 
+    datalake_offboarding.contract_termination AS ct
+  LEFT JOIN 
+    dw_rent.dim_contract AS dc 
+      ON ct.id_contract = dc.sk_contract
+  LEFT JOIN
+    rent_flow rf
+      ON ct.id_contract = rf.sk_contract
+  LEFT JOIN
+    next_house_listing_with_contract AS nhl
+      ON COALESCE(ct.id_house_listing, rf.sk_house_listing) = nhl.sk_house_listing
+  LEFT JOIN 
+    dw_rent.dim_house_listing AS dhl 
+      ON nhl.next_sk_house_listing = dhl.sk_house_listing
+  LEFT JOIN 
+    rent_flow AS rf_cs
+      ON dhl.sk_house_listing = rf_cs.sk_house_listing
+  WHERE 
+    ct.ts_created >= DATE('2022-01-01')
+    AND ct.status <> 'CANCELED'
+    AND dc.rental_administrator NOT IN ('OWNER', 'THIRD_PARTY')
 ),
 metric_calculations AS (
   SELECT
-    CAST(erc.dt_ended_rental_confirmed AS DATE) AS dt_reference_day,
-    erc.country_code,
-    erc.value_segment AS category,
-    erc.rental_administrator,
-    COUNT(DISTINCT erc.sk_house_listing) AS qtd_ended_rental,
-    COUNT(DISTINCT cs.sk_contract) AS qtd_rerental,
+    CAST(db.dt_ended_rental_confirmed AS DATE) AS dt_reference_day,
+    db.country_code,
+    db.category,
+    db.rental_administrator,
+    COUNT(DISTINCT db.sk_house_listing) AS qtd_ended_rental,
+    COUNT(DISTINCT db.next_sk_contract) AS qtd_rerental,
     COUNT(DISTINCT
         IF(
-          dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
-          , erc.sk_house_listing
+          db.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
+          , db.sk_house_listing
           , NULL
         )
     ) AS qtd_ended_rental_matured_4W,
     COUNT(DISTINCT
         IF(
-          dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
-          , erc.sk_house_listing
+          db.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
+          , db.sk_house_listing
           , NULL
         )
     ) AS qtd_ended_rental_matured_12W,
     SUM(
       IF(
-        cs.sk_contract IS NOT NULL
-              AND DATEDIFF(cs.contract_signed_date, dt_ended_rental_confirmed) <= 28
+        db.next_sk_contract IS NOT NULL
+        AND DATEDIFF(db.dt_contract_signed, db.dt_ended_rental_confirmed) <= 28
         , 1
         , 0
       )
     ) AS qtd_RR_4W,
     SUM(
       IF(
-        cs.sk_contract IS NOT NULL
-              AND DATEDIFF(cs.contract_signed_date, dt_ended_rental_confirmed) <= 28
-        AND dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
+        db.next_sk_contract IS NOT NULL
+        AND DATEDIFF(db.dt_contract_signed, db.dt_ended_rental_confirmed) <= 28
+        AND db.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
         , 1
         , 0
       )
     ) AS qtd_RR_4W_matured,
     SUM(
       IF(
-        cs.sk_contract IS NOT NULL
-              AND DATEDIFF(cs.contract_signed_date, dt_ended_rental_confirmed) <= 84
+        db.next_sk_contract IS NOT NULL
+        AND DATEDIFF(db.dt_contract_signed, db.dt_ended_rental_confirmed) <= 84
         , 1
         , 0
       )
     ) AS qtd_RR_12W,
     SUM(
       IF(
-        cs.sk_contract IS NOT NULL
-              AND DATEDIFF(cs.contract_signed_date, dt_ended_rental_confirmed) <= 84
-        AND dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
+        db.next_sk_contract IS NOT NULL
+        AND DATEDIFF(db.dt_contract_signed, db.dt_ended_rental_confirmed) <= 84
+        AND db.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
         , 1
         , 0
       )
     ) AS qtd_RR_12W_matured
   FROM
-    ended_rentals_confirmed AS erc
-  LEFT JOIN
-    contract_signed AS cs
-      ON cs.sk_house_listing = erc.nxt_sk_house_listing
+    db_terminations AS db
   GROUP BY
     1, 2, 3, 4
 ),
 metric_calculations_maturation_4W AS (
   SELECT
-    CAST(DATE_ADD(erc.dt_ended_rental_confirmed, 28) AS DATE) AS dt_reference_day,
-    erc.country_code,
-    erc.value_segment AS category,
-    erc.rental_administrator,
+    CAST(DATE_ADD(db.dt_ended_rental_confirmed, 28) AS DATE) AS dt_reference_day,
+    db.country_code,
+    db.category,
+    db.rental_administrator,
     COUNT(DISTINCT
         IF(
-          dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
-          , erc.sk_house_listing
+          db.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
+          , db.sk_house_listing
           , NULL
         )
     ) AS qtd_ended_rental_matured_4W_by_maturation_date,
     SUM(
       IF(
-        cs.sk_contract IS NOT NULL
-              AND DATEDIFF(cs.contract_signed_date, dt_ended_rental_confirmed) <= 28
-        AND dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
+        db.next_sk_contract IS NOT NULL
+        AND DATEDIFF(db.dt_contract_signed, db.dt_ended_rental_confirmed) <= 28
+        AND db.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -28)
         , 1
         , 0
       )
     ) AS qtd_RR_4W_by_maturation_date
   FROM
-    ended_rentals_confirmed AS erc
-  LEFT JOIN
-    contract_signed AS cs
-      ON cs.sk_house_listing = erc.nxt_sk_house_listing
+    db_terminations AS db
   GROUP BY
     1, 2, 3, 4
 ),
 metric_calculations_maturation_12W AS (
   SELECT
-    CAST(DATE_ADD(erc.dt_ended_rental_confirmed, 84) AS DATE) AS dt_reference_day,
-    erc.country_code,
-    erc.value_segment AS category,
-    erc.rental_administrator,
+    CAST(DATE_ADD(db.dt_ended_rental_confirmed, 84) AS DATE) AS dt_reference_day,
+    db.country_code,
+    db.category,
+    db.rental_administrator,
     COUNT(DISTINCT
         IF(
-          dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
-          , erc.sk_house_listing
+          db.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
+          , db.sk_house_listing
           , NULL
         )
     ) AS qtd_ended_rental_matured_12W_by_maturation_date,
     SUM(
       IF(
-        cs.sk_contract IS NOT NULL
-              AND DATEDIFF(cs.contract_signed_date, dt_ended_rental_confirmed) <= 84
-        AND dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
+        db.next_sk_contract IS NOT NULL
+        AND DATEDIFF(db.dt_contract_signed, db.dt_ended_rental_confirmed) <= 84
+        AND db.dt_ended_rental_confirmed <= DATE_ADD(CURRENT_DATE, -84)
         , 1
         , 0
       )
     ) AS qtd_RR_12W_matured_by_maturation_date
   FROM
-    ended_rentals_confirmed AS erc
-  LEFT JOIN
-    contract_signed AS cs
-      ON cs.sk_house_listing = erc.nxt_sk_house_listing
+    db_terminations AS db
   GROUP BY
     1, 2, 3, 4
 ),
