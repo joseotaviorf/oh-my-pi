@@ -31,5 +31,3 @@ workflow:
     dim_employee_contact:
       extraction_type: incremental
       merge_on: ["sk_employee"]
-    dim_disability:
-      merge_on: ["sk_disability"]
