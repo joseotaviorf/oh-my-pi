@@ -16,6 +16,10 @@ workflow:
       partitions: [year, month, day]
       extraction_type: incremental
       z_order_by: [sk_user, channel]
+    fact_single_door_events:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      zorder_by: [sk_user, event_from, event_type, app]
     fact_agent_ranking:
       partitions: [year, month, day]
       extraction_type: incremental

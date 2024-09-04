@@ -234,6 +234,7 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.heimdall:load-clean-activity
 bietlejuice.dw_customer_support:
+  - bietlejuice.amplitude:load-clean-events
   - bietlejuice.bigfone:load-clean-ivr-closed-history
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics-tasks

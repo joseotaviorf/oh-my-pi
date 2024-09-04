@@ -1,0 +1,68 @@
+database_name: dw_customer_support
+table_name: fact_single_door_events
+description: Table with events related to Single Door features
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_event:
+    lineage:
+      - datalake_amplitude_clean.events.id_amplitude
+    description: SK of the event
+  sk_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: SK of the user
+  event_from:
+    description: What feature the event is from
+  event_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_type
+    description: Event type
+  app:
+    description: If the event is from the tenant or landlord app
+  city:
+    lineage:
+      - datalake_amplitude_clean.events.city
+    description: City
+  region:
+    lineage:
+      - datalake_amplitude_clean.events.region
+    description: Region
+  country:
+    lineage:
+      - datalake_amplitude_clean.events.country
+    description: Country
+  device_carrier:
+    lineage:
+      - datalake_amplitude_clean.events.device_carrier
+    description: Internet provider from the connection where the event happened
+  device_family:
+    lineage:
+      - datalake_amplitude_clean.events.device_family
+    description: Device family
+  device_type:
+    lineage:
+      - datalake_amplitude_clean.events.device_type
+    description: Device specific model
+  os_name:
+    lineage:
+      - datalake_amplitude_clean.events.os_name
+    description: iOS or Android
+  os_version:
+    lineage:
+      - datalake_amplitude_clean.events.os_version
+    description: OS version
+  version_name:
+    lineage:
+      - datalake_amplitude_clean.events.version_name
+    description: App version
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp of the event
+  year:
+    description: Partition column
+  month:
+    description: Partition column
+  day:
+    description: Partition column
