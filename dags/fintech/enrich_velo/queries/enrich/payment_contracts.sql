@@ -156,7 +156,7 @@ raw_asaas AS (
     WITH table_to_fix AS (
             SELECT
                 *,
-                REGEXP_EXTRACT(LOWER(REPLACE(REPLACE(description, 'proposta', ''), ':', '')), '(\\b\\d{5,8}\\b)', 1) AS id_propose_adjs
+                REGEXP_EXTRACT(LOWER(REPLACE(REPLACE(description, 'proposta', ''), ':', '')), '(\\b\\d{{5,8}}\\b)', 1) AS id_propose_adjs
             FROM
                 datalake_velo_asaas_clean.payments
             WHERE
