@@ -39,4 +39,4 @@ workflow:
       - propose_person_legacy
 
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_13_3_med_memory_cluster
