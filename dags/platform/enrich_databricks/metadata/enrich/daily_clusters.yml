@@ -7,10 +7,28 @@ owner: data-platform-team@quintoandar.com.br
 columns:
   id_cluster:
     description: Databricks cluster id
+  id_driver_instance_pool:
+    description: The identifier of the driver instance pool associated with the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.id_driver_instance_pool
+  id_worker_instance_pool:
+    description: The identifier of the worker instance pool associated with the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.id_worker_instance_pool
   cluster_name:
     description: Databricks cluster name
   dag_name:
     description: Dag name
+    lineage:
+      - datalake_databricks.unique_clusters.bietlejuice_dag_name
+  driver_instance_pool_name:
+    description: The name of the driver instance pool associated with the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.driver_instance_pool_name
+  worker_instance_pool_name:
+    description: The name of the worker instance pool associated with the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.worker_instance_pool_name
   driver_node_type:
     description: Driver's machine type, e.g. m5a.xlarge
   node_type:
@@ -27,8 +45,22 @@ columns:
     description: All compute costs for Driver and Workers
   total_cost:
     description: Total cost from Compute and DBUs for all nodes (including Driver)
+  seconds_cluster_started_to_init_scripts_started:
+    description: Time in seconds from cluster creation to initialization scripts start
+  seconds_init_scripts_started_to_init_scripts_finished:
+    description: Time in seconds from initialization scripts start to initialization scripts finish
+  seconds_init_scripts_finished_to_running_started:
+    description: Time in seconds from initialization scripts finish to the start of the "RUNNING" status
+  seconds_total_startup_time:
+    description: Total startup time in seconds
   is_last_of_day_for_dag:
     description: True if the cluster represents the last execution of the day for the dag
+  ts_init_scripts_started:
+    description: Timestamp of when the initialization scripts started
+  ts_init_scripts_finished:
+    description: Timestamp of when the initialization scripts finished
+  ts_running_started:
+    description: Timestamp of when the cluster entered the "RUNNING" status
   ts_cluster_started:
     description: Timestamp of when the cluster started
   ts_cluster_ended:

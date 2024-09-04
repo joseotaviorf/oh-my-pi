@@ -1,0 +1,51 @@
+---
+database_name: datalake_databricks
+table_name: unique_clusters
+description: Provides metrics about databricks Clusters using Overwatch data. One row per cluster.
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_cluster:
+    description: The unique identifier of the cluster.
+  id_organization:
+    description: The identifier of the organization associated with the cluster.
+  id_driver_instance_pool:
+    description: The identifier of the driver instance pool associated with the cluster.
+  id_worker_instance_pool:
+    description: The identifier of the worker instance pool associated with the cluster.
+  cluster_name:
+    description: The name of the cluster.
+  bietlejuice_dag_name:
+    description: The name of the Bietlejuice DAG associated with the cluster.
+  cluster_type:
+    description: The type of the cluster.
+  spark_version:
+    description: The version of Spark used by the cluster.
+  runtime_engine:
+    description: One of STANDARD or PHOTON.
+  init_scripts:
+    description: The initialization scripts used by the cluster.
+  custom_tags:
+    description: The custom tags associated with the cluster.
+  driver_node_type:
+    description: The node type of the driver node.
+  node_type:
+    description: The node type of the worker nodes.
+  aws_attributes:
+    description: The AWS attributes of the cluster.
+  driver_instance_pool_name:
+    description: The name of the driver instance pool associated with the cluster.
+  worker_instance_pool_name:
+    description: The name of the worker instance pool associated with the cluster.
+  num_workers:
+    description: The number of workers in the cluster.
+  autoscale:
+    description: Autoscale configuration of the cluster.
+  auto_termination_minutes:
+    description: The number of minutes of inactivity before the cluster is automatically terminated.
+  is_elastic_disk_enabled:
+    description: Indicates whether elastic disk is enabled for the cluster.
+  is_automated:
+    description: Indicates whether the cluster is automated.
+  ts_updated:
+    description: The timestamp of when the cluster was last updated.

@@ -1,6 +1,6 @@
 dag:
   name: enrich_databricks
-  owner: Data Engineering
+  owner: Data Platform
   schedule_interval: 0 0 * * *
   documentation: 
     dag_purpose: |
@@ -12,6 +12,12 @@ workflow:
   tables_customization:
     daily_clusters:
       partitions: [ dt_cluster_run ]
+    unique_clusters:
+      merge_on: [ id_cluster ]
+      when_matched_update_condition: "source.ts_updated > target.ts_updated"
+  inner_dependencies:
+    daily_clusters:
+      - unique_clusters
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, tomorrow_ds, 'load_end_date') }}"
