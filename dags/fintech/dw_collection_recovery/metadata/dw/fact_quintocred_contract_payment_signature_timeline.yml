@@ -29,8 +29,20 @@ columns:
     description: "Contract payment gateway"
     lineage:
       - datalake_velo.payment_contracts.gateway
+  gateway_clean:
+    description: "gateway clean"
+    lineage:
+      - datalake_velo.payment_contracts.gateway
   gateway_memory_transaction:
     description: "Last contract payment gateway"
+  id_memory_transaction:
+    description: "id_memory_transaction"
+  value_memory_transaction:
+    description: "value_memory_transaction"
+  dt_created_memory_transaction:
+    description: "dt_created_memory_transaction"
+  status_memory_transaction:
+    description: "status_memory_transaction"
   billing_type:
     description: "Contract billing type"
     lineage:
@@ -83,6 +95,10 @@ columns:
     description: "Month of reference"
     lineage:
       - datalake_velo.payment_contracts.ref_month
+  number_of_distinct_gateways_at_ref:
+    description: "Number of gateways in a specific date"
+    lineage:
+      - datalake_velo.payment_contracts.number_of_distinct_gateways_at_ref
   mob:
     description: "Mob calculated between the date of reference"
     lineage:
@@ -123,7 +139,7 @@ columns:
     description: ""
     lineage:
       - datalake_velo.payment_contracts.memory_annual_valid_limit
-  flag_dm_mod:
+  is_billing_mode_changed:
     description: ""
     lineage:
       - datalake_velo.payment_contracts.flag_dm_mod
@@ -132,6 +148,10 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.flag_missing_payment
   flag_annual_payment:
+    description: ""
+    lineage:
+      - datalake_velo.payment_contracts.flag_annual_payment
+  memory_flag_annual_payment:
     description: ""
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment

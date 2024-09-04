@@ -35,6 +35,10 @@ columns:
     description: Contract payment category
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.id
+  number_of_distinct_gateways_at_ref:
+    description: Number of gateways in a specific date
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.id
   dt_created:
     description: Contract creation date
     lineage:

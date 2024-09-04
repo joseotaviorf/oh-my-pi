@@ -1,30 +1,30 @@
 WITH propose_features AS (
     WITH base_executivos_comerciais AS (
-        SELECT
-            person.id AS id_person,
-            person.person_name,
-            company_executive.ts_updated,
+        SELECT 
+            person.id AS id_person, 
+            person.person_name, 
+            company_executive.ts_updated, 
             company.id AS sk_broker,
             ROW_NUMBER() OVER (PARTITION BY company.id ORDER BY company_executive.ts_updated DESC) AS rn
-        FROM
+        FROM 
             datalake_rental_guarantee_platform_clean.company_executive
-        LEFT JOIN
-            datalake_person_clean.person
+        LEFT JOIN 
+            datalake_person_clean.person 
             ON company_executive.uuid_person = person.uuid_person
-        LEFT JOIN
-            datalake_rental_guarantee_platform_clean.company
+        LEFT JOIN 
+            datalake_rental_guarantee_platform_clean.company 
             ON company_executive.uuid_company = company.uuid_company
-        WHERE
+        WHERE 
             company_executive.is_active
     ),
     base_executivos_comerciais_dedupli AS (
-        SELECT
-            *
-        FROM
-            base_executivos_comerciais
+        SELECT 
+            * 
+        FROM 
+            base_executivos_comerciais 
         WHERE rn = 1
     )
-    SELECT
+    SELECT 
         m.sk_propose,
         CAST(m.ts_sign_started AS date) AS ts_signed,
         CAST(m.dt_contract_started AS date) AS dt_contract_started,
@@ -44,7 +44,7 @@ WITH propose_features AS (
         m.is_legacy,
         CASE
             WHEN m.sk_propose < 5000000 THEN 'is_born_2.0'
-            ELSE 'is_born_3.0'
+            ELSE 'is_born_3.0' 
         END AS birth_origin,
         m.sk_broker,
         j4.name,
@@ -58,30 +58,30 @@ WITH propose_features AS (
         CONCAT(h.street, ', ', h.number, ' - ', h.neighborhood, ' - ', h.state) AS full_adress,
         h.zipcode,
         COALESCE(exec_com.person_name, 'UNFOUND') AS comercial_executive_name
-    FROM
+    FROM 
         dw_velo.fact_velo_propose AS m
-    LEFT JOIN
-        dw_velo.dim_velo_propose_values AS f1
+    LEFT JOIN 
+        dw_velo.dim_velo_propose_values AS f1 
         ON f1.sk_propose_values = m.sk_propose_values
-    LEFT JOIN
-        dw_velo.dim_velo_junk AS j1
+    LEFT JOIN 
+        dw_velo.dim_velo_junk AS j1 
         ON j1.sk_junk = m.sk_guarantee_status
-    LEFT JOIN
-        dw_velo.dim_velo_junk AS j2
+    LEFT JOIN 
+        dw_velo.dim_velo_junk AS j2 
         ON j2.sk_junk = m.sk_propose_status
-    LEFT JOIN
-        dw_velo.dim_velo_junk AS j3
+    LEFT JOIN 
+        dw_velo.dim_velo_junk AS j3 
         ON j3.sk_junk = m.sk_origin
-    LEFT JOIN
-        dw_velo.dim_velo_propose_person AS j4
+    LEFT JOIN 
+        dw_velo.dim_velo_propose_person AS j4 
         ON m.sk_primary_person = j4.sk_person
-    LEFT JOIN
-        dw_velo.dim_velo_house AS h
+    LEFT JOIN 
+        dw_velo.dim_velo_house AS h 
         ON h.sk_house = m.sk_house
-    LEFT JOIN
-        base_executivos_comerciais_dedupli AS exec_com
+    LEFT JOIN 
+        base_executivos_comerciais_dedupli AS exec_com 
         ON exec_com.sk_broker = m.sk_broker
-    WHERE
+    WHERE 
         m.is_contract
     ORDER BY m.sk_propose
 ),
@@ -176,7 +176,7 @@ base_mob AS (
         sk_propose, ref_month
 ),
 step_0 AS (
-    SELECT
+    SELECT 
         dd.month_start,
         p.sk_propose,
         p.dt_contract_started,
@@ -185,71 +185,71 @@ step_0 AS (
         DATE(rev.ts_created) AS start_date,
         pa.billing_model,
         pa.monthly_value
-   FROM
+   FROM 
         dw_velo.fact_velo_propose p
-   LEFT JOIN
-        datalake_rental_guarantee_platform_clean.propose pr
+   LEFT JOIN 
+        datalake_rental_guarantee_platform_clean.propose pr 
         ON pr.id = p.sk_propose
-   LEFT JOIN
-        datalake_rental_guarantee_platform_clean.propose_aud pa
+   LEFT JOIN 
+        datalake_rental_guarantee_platform_clean.propose_aud pa 
         ON p.sk_propose = pa.id
-   LEFT JOIN
-        datalake_rental_guarantee_platform_clean.rev_info rev
+   LEFT JOIN 
+        datalake_rental_guarantee_platform_clean.rev_info rev 
         ON pa.rev = rev.rev
-   LEFT JOIN
-        dw_public.dim_date dd
+   LEFT JOIN 
+        dw_public.dim_date dd 
         ON dd.month_start BETWEEN date_trunc('month', p.dt_contract_started) AND date_trunc('month', coalesce(p.dt_ended, CURRENT_DATE))
         AND IF(date_trunc('month', CURRENT_DATE) = dd.month_start, dd.date = CURRENT_DATE, dd.date = dd.month_start)
-   WHERE
+   WHERE 
         (billing_model_mod = TRUE OR monthly_value_mod = TRUE)
         AND p.dt_contract_started IS NOT NULL and p.is_contract
    ORDER BY 1
 ),
 step_mid0 AS (
-    SELECT
-        sk_propose,
+    SELECT 
+        sk_propose, 
         MIN(ts_started) AS first_reference_of_aud
-    FROM
+    FROM 
         step_0
     GROUP BY 1
 ),
 step_mid0_mid0 AS (
-   SELECT
+   SELECT 
         p.sk_propose,
         pa.billing_model AS first_billing_model,
         pa.monthly_value AS first_monthly_value
-   FROM
+   FROM 
         dw_velo.fact_velo_propose p
-   LEFT JOIN
-        datalake_rental_guarantee_platform_clean.propose pr
+   LEFT JOIN 
+        datalake_rental_guarantee_platform_clean.propose pr 
         ON pr.id = p.sk_propose
-   LEFT JOIN
-        datalake_rental_guarantee_platform_clean.propose_aud pa
+   LEFT JOIN 
+        datalake_rental_guarantee_platform_clean.propose_aud pa 
         ON p.sk_propose = pa.id
-   LEFT JOIN
-        datalake_rental_guarantee_platform_clean.rev_info rev
+   LEFT JOIN 
+        datalake_rental_guarantee_platform_clean.rev_info rev 
         ON pa.rev = rev.rev
    LEFT JOIN
         step_mid0 AS sm0 ON sm0.sk_propose = p.sk_propose
-
+ 
    WHERE 1=1
      AND p.dt_contract_started IS NOT NULL
      AND rev.ts_created = first_reference_of_aud
    ORDER BY 1
 ),
 step_mid0_mid1 AS (
-   SELECT
-        m.*,
-        f.first_billing_model,
+   SELECT 
+        m.*, 
+        f.first_billing_model, 
         f.first_monthly_value
-    FROM
+    FROM 
         step_0 AS m
    LEFT JOIN
-        step_mid0_mid0 AS f
+        step_mid0_mid0 AS f 
         ON f.sk_propose = m.sk_propose
 ),
 step_1 AS (
-    SELECT
+    SELECT 
         *,
         CASE
             WHEN month_start = date_trunc('month', start_date) THEN start_date
@@ -263,41 +263,41 @@ step_1 AS (
             WHEN month_start = date_trunc('month', start_date) THEN monthly_value
             ELSE NULL
         END AS monthly_value_mod
-   FROM
+   FROM 
         step_mid0_mid1
 ),
 step_2 AS (
-    SELECT
+    SELECT 
         *,
         ROW_NUMBER() OVER(PARTITION BY sk_propose, month_start ORDER BY property_dt_mod DESC) AS rn
-    FROM
+    FROM 
         step_1
 ),
 step_3 AS (
-    SELECT
+    SELECT 
         *,
         ROW_NUMBER() OVER(PARTITION BY sk_propose ORDER BY month_start ASC) AS rn_c
-    FROM
+    FROM 
         step_2
-    WHERE
+    WHERE 
         rn = 1
     ORDER BY month_start
 ),
 step_4 AS (
     SELECT
         *,
-        CASE
-            WHEN rn_c = 1 THEN coalesce(billing_model_mod, first_billing_model)
-            ELSE billing_model_mod
+        CASE 
+            WHEN rn_c = 1 THEN coalesce(billing_model_mod, first_billing_model) 
+            ELSE billing_model_mod 
         END AS billing_mode_classification,
-        CASE
-            WHEN rn_c = 1 THEN coalesce(monthly_value_mod, first_monthly_value)
-            ELSE monthly_value_mod
+        CASE 
+            WHEN rn_c = 1 THEN coalesce(monthly_value_mod, first_monthly_value) 
+            ELSE monthly_value_mod 
         END AS monthly_value_classification
 FROM step_3
 ),
 propose_property_timeline AS (
-SELECT
+SELECT 
     CAST(month_start AS DATE) AS ref_month,
     CAST(sk_propose AS INT) AS sk_propose,
     dt_contract_started,
@@ -305,9 +305,9 @@ SELECT
     property_dt_mod,
     billing_model_mod,
     monthly_value_mod,
-    CASE
-        WHEN billing_model_mod IS NOT NULL THEN 1
-        ELSE 0
+    CASE 
+        WHEN billing_model_mod IS NOT NULL THEN 1 
+        ELSE 0 
     END AS flag_dm_mod,
     COALESCE(billing_mode_classification, LAG(billing_mode_classification, 1) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY month_start)) AS billing_mode_at_ref,
     ROUND(COALESCE(monthly_value_classification, LAG(monthly_value_classification, 1) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY month_start)),2) AS monthly_value
@@ -349,18 +349,18 @@ mob_expansion_df AS (
         AND a.ref_month = b.ref_month
 ),
 check_mob_payment_progression AS (
-    SELECT
+    SELECT 
         mob.*,
         pay.*,
        CASE
            WHEN origin_table IS NULL THEN 1
            ELSE 0
        END AS flag_missing_payment
-    FROM
+    FROM 
         mob_expansion_df AS mob
-    LEFT JOIN
-        datalake_velo.payment_contracts AS pay
-        ON mob.sk_propose = pay.id_propose
+    LEFT JOIN 
+        payment_contracts AS pay
+        ON mob.sk_propose = pay.id_propose 
         AND mob.ref_month = pay.dt_month_ref_due
 ),
 df_transaction_w_values AS (
@@ -440,7 +440,12 @@ SELECT
     origin_table,
     status,
     gateway,
+    coalesce(gateway, 'UNDEFINED') AS gateway_clean,
     COALESCE(LAST_VALUE(gateway) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY ref_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 'UNDEFINED') AS gateway_memory_transaction,
+    LAST_VALUE(id) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY ref_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS id_memory_transaction,
+    LAST_VALUE(value) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY ref_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS value_memory_transaction,
+    LAST_VALUE(dt_created) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY ref_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS dt_created_memory_transaction,
+    LAST_VALUE(status) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY ref_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS status_memory_transaction,
     billing_type,
     category,
     birth_origin,
@@ -454,6 +459,7 @@ SELECT
     ref_mob_start,
     ref_mob_end,
     ref_month,
+    number_of_distinct_gateways_at_ref,
     mob,
     property_dt_mod,
     billing_model_mod,
@@ -462,11 +468,18 @@ SELECT
     monthly_guarantee,
     annual_guarantee,
     value,
-    memory_annual_limit,
-    memory_annual_valid_limit,
-    flag_dm_mod,
+    CASE 
+        WHEN memory_annual_limit > ref_month THEN memory_annual_limit 
+        ELSE NULL 
+    END AS memory_annual_limit,
+    CASE 
+        WHEN memory_annual_valid_limit > ref_month THEN memory_annual_valid_limit 
+        ELSE NULL 
+    END AS memory_annual_valid_limit,
+    flag_dm_mod AS is_billing_mode_changed,
     flag_missing_payment,
     flag_annual_payment,
+    LAST_VALUE(flag_annual_payment) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY ref_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS memory_flag_annual_payment,
     flag_annual_payment_month,
     flag_annual_payment_valid,
     flag_annual_payment_month_valid,
@@ -479,6 +492,5 @@ SELECT
     dt_due,
     dt_month_ref_due,
     dt_paid
-
 FROM
     memory_annual_valid_limit
