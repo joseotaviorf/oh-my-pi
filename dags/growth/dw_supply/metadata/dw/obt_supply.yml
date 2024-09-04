@@ -139,6 +139,9 @@ columns:
   discard_assigned_partner:
     description: Name of the assigned partner that has discarded the user.
     lineage: dw_growth.dim_supply_operation_flow.nm_assigned_partner
+  discard_ops_user:
+    description: Sk user of the attendant that has discarded the user.
+    lineage: dw_growth.dim_supply_operation_flow.nm_assigned_partner
   ds_objective:
     description: Objective associated with the lead according to business rules.
     lineage: dw_growth.dim_supply_operation_flow.ds_objective
