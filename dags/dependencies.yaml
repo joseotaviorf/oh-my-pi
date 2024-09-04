@@ -149,6 +149,7 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_velo:load-enrich-collections-wallet
   - bietlejuice.enrich_velo:load-enrich-junk
   - bietlejuice.enrich_velo:load-enrich-occurrence
+  - bietlejuice.enrich_velo:load-enrich-payment-contracts
   - bietlejuice.paschoalotto:load-clean-agreement-detail
   - bietlejuice.paschoalotto:load-clean-contract
   - bietlejuice.paschoalotto:load-clean-debt

@@ -359,7 +359,7 @@ check_mob_payment_progression AS (
     FROM 
         mob_expansion_df AS mob
     LEFT JOIN 
-        payment_contracts AS pay
+        datalake_velo.payment_contracts AS pay
         ON mob.sk_propose = pay.id_propose 
         AND mob.ref_month = pay.dt_month_ref_due
 ),
