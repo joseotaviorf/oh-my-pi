@@ -21,6 +21,8 @@ workflow:
     fact_quintocred_portfolio_timeline:
       - fact_negotiation_installment
       - fact_negotiation
+    fact_proposal_signature_payment_timeline:
+      - fact_quintocred_contract_payment_signature_timeline
 cluster:
   type: custom_cluster
   custom_configurations:
