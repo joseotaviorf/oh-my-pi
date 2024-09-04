@@ -18,7 +18,7 @@ WITH base AS (
         m.role,
         m.input_type,
         m.content,
-        COALESCE(state.flow, flow.flow) AS flow,
+        COALESCE(state.flow, mf.flow) AS flow,
         from_json(
             state, 
             "
@@ -75,8 +75,8 @@ WITH base AS (
     FROM
         datalake_copilot_service_clean.message AS m
     LEFT JOIN
-        datalake_copilot_service_clean.message_flow AS flow
-        ON m.id = flow.message_id
+        datalake_copilot_service_clean.message_flow AS mf
+        ON m.id = mf.id_message
     LEFT JOIN
         datalake_copilot_service_clean.state
         ON m.id = state.id_message
