@@ -4,7 +4,6 @@ sheets_info:
     sheet_name: carteira_ciq
     clean_table_name: ciq_wallet
     sheet_context: cross
-    partitioned: true
 
   events_aud:
     sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU

@@ -47,8 +47,8 @@ sheets_info:
     clean_table_name: asp_consultants_allocation
     sheet_context: agents
   ciq_portfolio:
-    sheet_id: 1GP89_-G1h_w4LXSVslOYASVF4PxXtI5ylAETkQ2gSys
-    sheet_name: carteiras
+    sheet_id: 1-1lJbv5430DWWVswf9AHTsi4dzAXvL2VBRqoaSv0j-A
+    sheet_name: carteira_ciq
     clean_table_name: ciq_portfolio
     sheet_context: agents
     partitioned: true
