@@ -18,7 +18,7 @@ metabase_dashboard_last_update as (
       order by
         ts_updated desc
     ) as row_number,
-    md.id as id_dashboard,
+    CAST(md.id as STRING) as id_dashboard,
     md.id_user_creator as id_owner,
     md.id_collection,
     md.name as title,
@@ -99,7 +99,7 @@ metabase_collections as (
 ),
 metabase_dash_card as (
   select
-    id_dashboard,
+    CAST(id_dashboard as STRING) as id_dashboard,
     collect_list(id_card) as ids_charts
   from
     datalake_metabase_clean.report_dashboard_card
