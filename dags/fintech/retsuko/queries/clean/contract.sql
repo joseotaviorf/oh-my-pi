@@ -10,6 +10,7 @@ SELECT
     status,
     blocked,
     landlord_transfer_funds_day,
+    landlord_legal_person,
     rental_administrator,
     adm_fee_minimum_amount,
     administration_fee,

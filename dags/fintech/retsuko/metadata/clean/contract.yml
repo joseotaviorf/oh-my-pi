@@ -40,6 +40,10 @@ columns:
     description: "Landlord payment day. In general is day 12, but in old contracts is day 10"
     lineage:
       - datalake_retsuko_raw.contract.landlord_transfer_funds_day
+  landlord_legal_person:
+    description: "Indicates if landlord legal person is physical (PF) or juridical (PJ)"
+    lineage:
+      - datalake_retsuko_raw.contract.landlord_legal_person
   rental_administrator:
     description: "Rental administrator type"
     lineage:

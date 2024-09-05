@@ -42,6 +42,10 @@ columns:
   description:
     lineage:
       - datalake_retsuko_raw.entry.description
+  status:
+    description: "Indicates if a entry is not-invoiceable (pending) or not (success)"
+    lineage:
+      - datalake_retsuko_raw.entry.status
   producer:
     lineage:
       - datalake_retsuko_raw.entry.producer

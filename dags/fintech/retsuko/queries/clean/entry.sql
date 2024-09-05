@@ -11,6 +11,7 @@ SELECT
     amount,
     bill_item,
     description,
+    status,
     producer,
     accrual_year_month,
     due_year_month,
