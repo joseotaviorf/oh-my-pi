@@ -195,6 +195,8 @@ cluster_template:
                 region: us-east-1
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
         custom_tags:
+            - key: application
+              value: {{ dag.dag_id }}
             - key: app
               value: airflow
             - key: resource-name
@@ -212,7 +214,7 @@ cluster_template:
             - key: cost-center
               value: c052
             - key: provisioner
-              value: databricks
+              value: bietlejuice
         init_scripts:
             - s3:
                   destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
