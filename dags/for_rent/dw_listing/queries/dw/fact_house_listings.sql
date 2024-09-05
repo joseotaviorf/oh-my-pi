@@ -1,26 +1,27 @@
 WITH house_listing_contracts AS (
     WITH latest_contract AS (
-        SELECT
-            id_house_listing,
-            MAX(id_contract) AS id_contract,
-            MAX(id_previous_contract) AS id_previous_contract,
-            DENSE_RANK() OVER (PARTITION BY id_house ORDER BY id_house_listing) AS order_renting
-        FROM
-          datalake_listing_contracts.listing_contracts
-        WHERE
-          contract_status IN ('Ativo', 'Finalizado')
-        GROUP BY id_house_listing, id_house
+      SELECT
+        id_house_listing,
+        LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY ts_listing_version_started) AS id_next_house_listing_rerented,
+        id_contract,
+        LAG(id_contract) OVER (PARTITION BY id_house ORDER BY id_house_listing) AS id_previous_contract,
+        DENSE_RANK() OVER (PARTITION BY id_house ORDER BY id_house_listing) AS order_renting
+      FROM
+        datalake_listing_contracts.listing_contracts
+      WHERE
+        contract_status IN ('Ativo', 'Finalizado')
     )
     SELECT
-        hl.id_house_listing,
-        c.id AS id_contract,
-        lc.id_previous_contract,
-        hl.version AS house_version,
-        lc.order_renting,
-        COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
-        c.ts_signed AS ts_contract_signed,
-        c.dt_termination AS dt_contract_annulment,
-        LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed
+      hl.id_house_listing,
+      id_next_house_listing_rerented,
+      c.id AS id_contract,
+      lc.id_previous_contract,
+      hl.version AS house_version,
+      lc.order_renting,
+      COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
+      c.ts_signed AS ts_contract_signed,
+      c.dt_termination AS dt_contract_annulment,
+      LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed
     FROM
       datalake_ebdb_listing.house_listing AS hl
     LEFT JOIN
@@ -41,24 +42,29 @@ lbc AS (
 ),
 autonomous_agent_info AS (
     SELECT DISTINCT
-        h.id AS id_house,
-        pa.id_user AS sk_autonomous_agent
-    FROM datalake_ebdb_clean.partner_agent pa
-    JOIN datalake_ebdb_clean.partner dp
+      h.id AS id_house,
+      pa.id_user AS sk_autonomous_agent
+    FROM
+      datalake_ebdb_clean.partner_agent AS pa
+    JOIN
+      datalake_ebdb_clean.partner AS dp
         ON pa.id_partner = dp.id
-    JOIN datalake_ebdb_clean.house h
+    JOIN
+      datalake_ebdb_clean.house AS h
         ON pa.id_user = h.id_user_registrant
-    LEFT JOIN datalake_ebdb_listing.listing_business_context lbc ON
-        lbc.id_house = h.id
+    LEFT JOIN
+      datalake_ebdb_listing.listing_business_context AS lbc
+        ON lbc.id_house = h.id
     WHERE
-        lbc.business_context <> 'SALE'
-        AND dp.type = 'AUTONOMOUS_AGENT'
-        AND dp.id <> '257' -- Test User
-        AND h.dt_creation >= pa.ts_created --This rule might change when we start to considering migration
-        AND h.id_external IS NOT NULL --This rule might change when we start to considering migration
+      lbc.business_context <> 'SALE'
+      AND dp.type = 'AUTONOMOUS_AGENT'
+      AND dp.id <> '257' -- Test User
+      AND h.dt_creation >= pa.ts_created --This rule might change when we start to considering migration
+      AND h.id_external IS NOT NULL --This rule might change when we start to considering migration
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   hl.id_house_listing AS sk_house_listing,
+  COALESCE(hlc.id_next_house_listing_rerented, -1) AS sk_next_house_listing_rerented,
   COALESCE(h.id_user, -1) AS sk_owner,
   COALESCE(h.id_region, -1) AS sk_region,
   COALESCE(h.id_user_registrant, -1) AS sk_user_registration,
@@ -82,26 +88,36 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   CAST(COALESCE(hlc.nr_renting, 0) AS SMALLINT) AS nr_renting,
   CAST(COALESCE(hlc.order_renting, 0) AS SMALLINT) AS order_renting,
   NOW() AS ts_load
-FROM datalake_ebdb_listing.house h
-LEFT JOIN lbc
-  ON lbc.id_house = h.id
-JOIN datalake_ebdb_listing.house_listing hl
-  ON hl.id_house = h.id
-LEFT JOIN house_listing_contracts hlc
-  ON hl.id_house_listing = hlc.id_house_listing
-LEFT JOIN datalake_ebdb_clean.condo cd
-  ON h.id_condo_parent = cd.id
-LEFT JOIN datalake_ebdb_clean.partner_agent pa_b2b_prime
-  ON h.id_user = pa_b2b_prime.id_user
-LEFT JOIN datalake_lead.conversion_lead lc
-  ON lc.id_house = h.id
-LEFT JOIN datalake_lead.lead l
-  ON l.id = lc.id_converted_lead
+FROM
+  datalake_ebdb_listing.house AS h
+LEFT JOIN
+  lbc
+    ON lbc.id_house = h.id
+JOIN
+  datalake_ebdb_listing.house_listing AS hl
+    ON hl.id_house = h.id
+LEFT JOIN
+  house_listing_contracts AS hlc
+    ON hl.id_house_listing = hlc.id_house_listing
+LEFT JOIN
+  datalake_ebdb_clean.condo AS cd
+    ON h.id_condo_parent = cd.id
+LEFT JOIN
+  datalake_ebdb_clean.partner_agent AS pa_b2b_prime
+    ON h.id_user = pa_b2b_prime.id_user
+LEFT JOIN
+  datalake_lead.conversion_lead AS lc
+    ON lc.id_house = h.id
+LEFT JOIN
+  datalake_lead.lead AS l
+    ON l.id = lc.id_converted_lead
     AND l.affiliate_type = 'B2BPartner'
-LEFT JOIN datalake_ebdb_clean.partner_agent pa_b2b_online
-  ON pa_b2b_online.id_user = l.id_user_has_indicated
-LEFT JOIN autonomous_agent_info aa_info
-  ON aa_info.id_house = h.id
+LEFT JOIN
+  datalake_ebdb_clean.partner_agent AS pa_b2b_online
+    ON pa_b2b_online.id_user = l.id_user_has_indicated
+LEFT JOIN
+  autonomous_agent_info AS aa_info
+    ON aa_info.id_house = h.id
 LEFT JOIN
   datalake_big_agent.house_rent_listing_consultant AS hlco
     ON hlco.id_house_listing = hl.id_house_listing
@@ -122,5 +138,5 @@ LEFT JOIN
       AND h.partner_3p_supply = cs.extracted_3p_tag
     ))
 WHERE
-  lbc.id_house IS NULL
-  OR lbc.is_for_rent
+  (lbc.id_house IS NULL
+  OR lbc.is_for_rent)
