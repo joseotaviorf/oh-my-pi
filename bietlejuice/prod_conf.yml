@@ -196,7 +196,7 @@ cluster_template:
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
         custom_tags:
             - key: application
-              value: {{ dag.dag_id }}
+              value: "{{ dag.dag_id }}"
             - key: app
               value: airflow
             - key: resource-name
