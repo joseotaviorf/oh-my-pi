@@ -5,13 +5,11 @@ SELECT
     instance_pool_id AS id_worker_instance_pool,
     cluster_name,
     CASE
-        WHEN cluster_name LIKE '%bietlejuice%'
-          THEN REPLACE(
-              REGEXP_REPLACE(
-                  REGEXP_REPLACE(cluster_name, '.+-bietlejuice', 'bietlejuice'),
-                  '(?:_mediator|_scheduled).+', ''
-              ), '-', '.'
-          )
+        WHEN cluster_name LIKE 'bietlejuice%' OR cluster_name LIKE 'job-%'
+          THEN NULLIF(REPLACE(REGEXP_EXTRACT(
+            cluster_name,
+            '(bietlejuice(?:\.|-)(?:(?:\w|\.)+))_(?:manual|scheduled|mediator_trig)'
+          ), '-', '.'), '')
     END AS bietlejuice_dag_name,
     cluster_type,
     spark_version,
