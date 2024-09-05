@@ -144,7 +144,6 @@ dags_out_of_pattern:
         "wonka.house_visit_availability",
     ]
 
-
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks
 dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
@@ -758,11 +757,11 @@ databricks_12_2_med_2_fixed_workers_general_photon_cluster:
         ebs_volume_size: 200
 
 databricks_13_3_min_fixed_workers_general_cluster:
-  <<: *cluster_anchor
-  driver_node_type_id: m5d.xlarge
-  node_type_id: m5d.large
-  num_workers: 1
-  spark_version: 13.3.x-scala2.12
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.large
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
 
 databricks_12_2_med_2xlarge_general_photon_cluster:
     <<: *cluster_anchor
@@ -915,4 +914,4 @@ databricks_12_2_med_mem_driver_high_mem_nodes:
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_PROD_WEBHOOK
 
-vespucio_pipeline_version: 0.23.0
+vespucio_pipeline_version: 0.23.1
