@@ -100,7 +100,7 @@ metabase_collections as (
 metabase_dash_card as (
   select
     CAST(id_dashboard as STRING) as id_dashboard,
-    collect_list(id_card) as ids_charts
+    collect_list(CAST(id_card as STRING)) as ids_charts
   from
     datalake_metabase_clean.report_dashboard_card
   where
