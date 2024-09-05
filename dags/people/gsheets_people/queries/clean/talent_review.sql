@@ -1,5 +1,6 @@
 SELECT
-    ciclo AS cycle,
+    person_number,
+    UPPER(ciclo) AS cycle,
     email,
     email_avaliador AS evaluator_email,
     prontidao AS readiness,
@@ -10,15 +11,13 @@ SELECT
     evo_criticidade AS evolution_criticality,
     evo_risco_de_perda AS evolution_loss_risk,
     evo_prontidao AS evolution_readiness,
-    ult_ciclo_avaliado AS last_cycle_evaluated,
-    ciclo_novo_padrao AS new_standard_cycle,
     genero AS gender,
     orientacao_sexual AS sexual_orientation,
     sexo AS sex,
-    raca AS ethnicity,
+    raca AS race,
     faixa_etaria AS age_range,
     tenure,
-    classe_cargo AS position_class,
+    classe_cargo AS job_class,
     banda AS band,
     centro_de_custo AS cost_center,
     sub_diretoria AS sub_board,
@@ -26,7 +25,7 @@ SELECT
     vice_presidencia AS vice_presidency,
     vertical,
     pais AS country,
-    empresa AS company,
+    empresa AS enterprise,
     geracao AS generation,
     l1_n,
     l2_n,
@@ -35,16 +34,21 @@ SELECT
     l5_n,
     l6_n,
     l7_n,
-    email_gestor AS manager_email,
-    CASE 
+    l8_n,
+    CASE
+      WHEN ult_ciclo_avaliado = '1'
+        THEN TRUE
+      ELSE FALSE
+    END AS is_evaluated_in_las_cycle,
+    CASE
       WHEN status = 'ativo'
         THEN TRUE
       ELSE FALSE
-    END AS is_active,
-    CASE 
+    END AS status,
+    CASE
       WHEN pcd = 'sim'
         THEN TRUE
       ELSE FALSE
-    END AS has_disabilty,
-    ts_load
+    END AS has_disability,
+    NOW() AS ts_load
 FROM datalake_gsheets_raw.talent_review

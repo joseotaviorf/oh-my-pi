@@ -1,167 +1,165 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: talent_review
 owner: leonardo.soares@quintoandar.com.br
 domain: people
-description: "Table with the talent review data"
+description: null
 columns:
+  person_number:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.talent_review.person_number
   cycle:
-    description: "The evaluation cycle or period during which assessments are conducted."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.ciclo
   email:
-    description: "The email address associated with the individual being evaluated."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.email
   evaluator_email:
-    description: "The email address of the evaluator or manager providing the assessment."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.email_avaliador
   readiness:
-    description: "Assessment of the individual's readiness for future responsibilities or roles."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.prontidao
   loss_risk:
-    description: "Evaluation of the risk of potential loss associated with the individual leaving the organization."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.risco_de_perda
   potential:
-    description: "Assessment of the individual's potential for growth and development within the organization."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.potencial
   criticality:
-    description: "Evaluation of the criticality or importance of the individual's role within the organization"
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.criticidade
   evolution_potential:
-    description: "Changes in potential rating compared to previous evaluations."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.evo_potencial
   evolution_criticality:
-    description: "Changes in criticality rating compared to previous evaluations."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.evo_criticidade
   evolution_loss_risk:
-    description: "Changes in loss risk rating compared to previous evaluations."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.evo_risco_de_perda
   evolution_readiness:
-    description: "Changes in readiness rating compared to previous evaluations."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.evo_prontidao
-  last_cycle_evaluated:
-    description: "The last evaluation cycle in which the individual was assessed."
-    lineage:
-    - datalake_gsheets_raw.talent_review.ult_ciclo_avaliado
-  new_standard_cycle:
-    description: ""
-    lineage:
-    - datalake_gsheets_raw.talent_review.ciclo_novo_padrao
   gender:
-    description: "The gender identity of the individual."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.genero
   sexual_orientation:
-    description: "The sexual orientation of the individual."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.orientacao_sexual
   sex:
-    description: "The biological sex of the individual."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.sexo
-  ethnicity:
-    description: "The ethnic or racial background of the individual."
+  race:
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.raca
   age_range:
-    description: "The age range of the individual."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.faixa_etaria
   tenure:
-    description: "The length of time the individual has been employed by the organization."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.tenure
-  position_class:
-    description: "The class or level of the individual's position within the organization."
+  job_class:
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.classe_cargo
   band:
-    description: "The band or salary range associated with the individual's position."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.banda
   cost_center:
-    description: "The cost center or department to which the individual belongs."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.centro_de_custo
   sub_board:
-    description: "Subordinate board or committee to which the individual may belong."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.sub_diretoria
   board:
-    description: "The board or committee to which the individual may belong."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.diretoria
   vice_presidency:
-    description: "The vice presidency or division within the organization."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.vice_presidencia
   vertical:
-    description: "The vertical or business unit within the organization."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.vertical
   country:
-    description: "The country in which the individual is located."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.pais
-  company:
-    description: "The company or organization to which the individual belongs."
+  enterprise:
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.empresa
   generation:
-    description: "The generational cohort to which the individual belongs."
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.geracao
   l1_n:
-    description: ""
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.l1_n
   l2_n:
-    description: ""
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.l2_n
   l3_n:
-    description: ""
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.l3_n
   l4_n:
-    description: ""
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.l4_n
   l5_n:
-    description: ""
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.l5_n
   l6_n:
-    description: ""
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.l6_n
   l7_n:
-    description: ""
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.l7_n
-  manager_email:
-    description: " The email address of the individual's manager or supervisor."
+  l8_n:
+    description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.email_gestor
-  is_active:
-    description: "Status if the individual is in the company"
+    - datalake_gsheets_raw.talent_review.l8_n
+  is_evaluated_in_las_cycle:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.talent_review.ult_ciclo_avaliado
+  status:
+    description: ''
     lineage:
     - datalake_gsheets_raw.talent_review.status
-  has_disabilty:
-    description: "Indicates whether the individual has a disability."
+  has_disability:
+    description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.pcd
+    - datalake_gsheets_raw.talent_review.pcd = 'sim'
   ts_load:
-    description: ""
-    lineage:
-    - datalake_gsheets_raw.talent_review.ts_load
+    description: ''
