@@ -48,12 +48,12 @@ retsuko_provisao AS (
             WHEN e.bill_item IN (
                 'entry.bill-item/adm-fee-adm-partner',
                 'entry.bill-item/igpm-adm-partner-adm-fee',
-                'entry.bill-item/ipca-adm-partner-adm-fee') THEN '61101.01.73'
+                'entry.bill-item/ipca-adm-partner-adm-fee') THEN '21107.01.16'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '31101.01.04'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN '61101.01.82'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN '61101.01.78'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-third-party-real-estate') THEN '61101.01.72'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-estate-agent') THEN '61101.01.71'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN '21107.01.31'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN '21107.01.31'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-third-party-real-estate') THEN '21107.01.31'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-estate-agent') THEN '21107.01.32'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN '31101.01.04'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN '31101.01.13'
         END AS account_number,
@@ -173,7 +173,7 @@ sap AS (
     FROM
         datalake_accounting_funnel.ledger
     WHERE
-        (account_number LIKE '31101%' OR account_number LIKE '61101%')
+        (account_number LIKE '31101%' OR account_number LIKE '21107%')
         AND document_number LIKE 'JE %'
 ),
 
