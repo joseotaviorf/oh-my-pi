@@ -10,7 +10,7 @@ WITH email_line AS (
 ),
 processed_data_per_line_per_day AS (
     SELECT
-        DATE(FROM_UTC_TIMESTAMP(created_time, 'America/Sao_Paulo')) AS created_date,
+        DATE(created_time) AS created_date,
         el.line,
         SUM((processed_input_data_bytes) / (1024 * 1024 * 1024)) AS total_processed_input_data_gbytes
     FROM
@@ -23,7 +23,7 @@ processed_data_per_line_per_day AS (
         AND state IN ('FINISHED', 'FAILED')
         AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
     GROUP BY
-        DATE(FROM_UTC_TIMESTAMP(created_time, 'America/Sao_Paulo')),
+        DATE(created_time),
         el.line
 ),
 total_platform_cost_per_day AS (
