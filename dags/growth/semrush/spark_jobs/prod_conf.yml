@@ -4,8 +4,8 @@ raw_partition_cols: ["domain", "year", "month", "day"]
 report_list:
   123i_organic_search_kw:
     configs:
-      domain: 123i.com.br
-      type: domain_organic
+      subdomain: 123i.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -13,8 +13,8 @@ report_list:
     display_limit: 110000 # expected number of results * 1,25
   ape11_organic_search_kw:
     configs:
-      domain: ape11.com.br
-      type: domain_organic
+      subdomain: ape11.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -22,8 +22,8 @@ report_list:
     display_limit: 45000 # expected number of results * 1,25
   arboimoveis_organic_search_kw:
     configs:
-      domain: arboimoveis.com.br
-      type: domain_organic
+      subdomain: arboimoveis.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -31,8 +31,8 @@ report_list:
     display_limit: 150000 # expected number of results * 1,25
   auxiliadorapredial_organic_search_kw:
     configs:
-      domain: auxiliadorapredial.com.br
-      type: domain_organic
+      subdomain: auxiliadorapredial.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -40,8 +40,8 @@ report_list:
     display_limit: 11000 # expected number of results * 1,25
   casamineira_organic_search_kw:
     configs:
-      domain: casamineira.com.br
-      type: domain_organic
+      subdomain: casamineira.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -49,8 +49,8 @@ report_list:
     display_limit: 165000 # expected number of results * 1,25
   chavesnamao_organic_search_kw:
     configs:
-      domain: chavesnamao.com.br
-      type: domain_organic
+      subdomain: chavesnamao.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -58,8 +58,8 @@ report_list:
     display_limit: 800000 # expected number of results * 1,25
   direcional_organic_search_kw:
     configs:
-      domain: direcional.com.br
-      type: domain_organic
+      subdomain: direcional.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -67,8 +67,8 @@ report_list:
     display_limit: 30000 # expected number of results * 1,25
   emcasa_organic_search_kw:
     configs:
-      domain: emcasa.com
-      type: domain_organic
+      subdomain: emcasa.com
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -76,8 +76,8 @@ report_list:
     display_limit: 15000 # expected number of results * 1,25
   imoveisestadao_organic_search_kw:
     configs:
-      domain: imoveis.estadao.com.br
-      type: domain_organic
+      subdomain: imoveis.estadao.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -85,8 +85,8 @@ report_list:
     display_limit: 25000 # expected number of results * 1,25
   imoveismercadolivre_organic_search_kw:
     configs:
-      domain: imoveis.mercadolivre.com.br
-      type: domain_organic
+      subdomain: imoveis.mercadolivre.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -94,8 +94,8 @@ report_list:
     display_limit: 20000 # expected number of results * 1,25
   imovelguide_organic_search_kw:
     configs:
-      domain: imovelguide.com.br
-      type: domain_organic
+      subdomain: imovelguide.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -103,8 +103,8 @@ report_list:
     display_limit: 70000 # expected number of results * 1,25
   imovelweb_organic_search_kw:
     configs:
-      domain: imovelweb.com.br
-      type: domain_organic
+      subdomain: imovelweb.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -112,8 +112,8 @@ report_list:
     display_limit: 300000 # expected number of results * 1,25
   loft_organic_search_kw:
     configs:
-      domain: loft.com.br
-      type: domain_organic
+      subdomain: loft.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -121,8 +121,8 @@ report_list:
     display_limit: 200000 # expected number of results * 1,25
   lopes_organic_search_kw:
     configs:
-      domain: lopes.com.br
-      type: domain_organic
+      subdomain: lopes.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -130,8 +130,8 @@ report_list:
     display_limit: 250000 # expected number of results * 1,25
   quintoandar_organic_search_kw:
     configs:
-      domain: quintoandar.com.br
-      type: domain_organic
+      subdomain: quintoandar.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -139,8 +139,8 @@ report_list:
     display_limit: 450000 # expected number of results * 1,25
   secovi_organic_search_kw:
     configs:
-      domain: secovi.com.br
-      type: domain_organic
+      subdomain: secovi.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -148,8 +148,8 @@ report_list:
     display_limit: 4000 # expected number of results * 1,25
   trisul_organic_search_kw:
     configs:
-      domain: trisul-sa.com.br
-      type: domain_organic
+      subdomain: trisul-sa.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -157,8 +157,8 @@ report_list:
     display_limit: 5000 # expected number of results * 1,25
   vivareal_organic_search_kw:
     configs:
-      domain: vivareal.com.br
-      type: domain_organic
+      subdomain: vivareal.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -166,8 +166,8 @@ report_list:
     display_limit: 800000 # expected number of results * 1,25
   wimoveis_organic_search_kw:
     configs:
-      domain: wimoveis.com.br
-      type: domain_organic
+      subdomain: wimoveis.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -175,8 +175,8 @@ report_list:
     display_limit: 250000 # expected number of results * 1,25
   zapimoveis_organic_search_kw:
     configs:
-      domain: zapimoveis.com.br
-      type: domain_organic
+      subdomain: zapimoveis.com.br
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
@@ -184,8 +184,8 @@ report_list:
     display_limit: 700000 # expected number of results * 1,25
   olximoveis_organic_search_kw:
     configs:
-      domain: olx.com.br%2Fimoveis
-      type: domain_organic
+      subdomain: olx.com.br%2Fimoveis
+      type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic

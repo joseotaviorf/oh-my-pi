@@ -35,7 +35,7 @@ def _create_dataframe_with_standard_columns(response_data: dict, display_date: s
 
     url_parsed = urllib.parse.urlparse(response_data['url'])
     query_params = urllib.parse.parse_qs(url_parsed.query)
-    domain = query_params['domain'][0]
+    domain = query_params['subdomain'][0]
 
     df = spark.read\
         .option("inferSchema",False)\
