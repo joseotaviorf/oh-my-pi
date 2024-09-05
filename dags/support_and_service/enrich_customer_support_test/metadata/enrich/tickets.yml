@@ -8,3 +8,102 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.id_ticket
     description: Ticket ID from Zendesk
+  id_problem_ticket:
+    description: Problem ticket linked with the current ticket, if exists. If this is filled, then the ticket is of 'incident' type
+    lineage:
+      - datalake_zendesk.tickets_current.id_problem_ticket
+  id_contract:
+    description: Contract ID associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets_current.id_contract
+  id_session:
+    description: Session ID from Sauron
+    lineage:
+      - datalake_zendesk.tickets_current.id_session
+  client_type:
+    description: Type of client, from custom_fields like 'Tipo de Cliente'
+    lineage:
+      - datalake_zendesk.tickets_current.client_type
+  step_tag:
+    description: Journey step of the client, from custom_fields
+    lineage:
+      - datalake_zendesk.tickets_current.step_tag
+  customer_type_tag:
+    description: Tag attached to the customer that requested the ticket, also from specific custom_fields
+    lineage:
+      - datalake_zendesk.tickets_current.customer_type_tag
+  contact_theme_tag:
+    description: Specific custom_fields associated with ticket taxonomy
+    lineage:
+      - datalake_zendesk.tickets_current.contact_theme_tag
+  contact_motivation_tag:
+    description: Tag attached to the reason the customer opened a ticket, also from specific custom_fields
+    lineage:
+      - datalake_zendesk.tickets_current.contact_motivation_tag
+  contact_theme_detail_tag:
+    description: Specific custom_fields associated with ticket taxonomy
+    lineage:
+      - datalake_zendesk.tickets_current.contact_theme_detail_tag
+  sla_target:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+      - datalake_gsheets_clean.tag_sla_target.sla
+    description:
+      Each task has an SLA target. For CRM tasks, the default SLA target is 5 days.
+      For Zendesk email tickets, it first considers the "tag sla target". If there is
+      no return, it then considers the "unique_theme_detail_sla_target", followed by
+      the "unique_theme_sla_target", and finally the "unique_journey_sla_target".
+  time_spent_solved_in_time:
+    description:
+      The total days worked on a task is calculated as the difference between the
+      task's start and end dates, not considering days off. If the total days worked
+      are less than or equal to the task's SLA target, the total days worked are
+      returned. Otherwise, the function returns 0.
+  time_spent_not_solved_in_time:
+    description:
+      The total days worked on a task is calculated as the difference between the
+      task's start and end dates, not considering days off. If the total days worked
+      are greater than the task's SLA target, the total days worked are returned.
+      Otherwise, the function returns 0.
+  days_worked:
+    description: The difference between the task's start and end dates, not considering days off.
+  days_off:
+    description:
+      Total days off between the task's start and end dates, considering holidays
+      and weekend.
+  total_time_spent:
+    description:
+      The total worked days spent on the task, it assumes the same value as
+      days_worked field.
+  is_ticket_solved_in_time:
+    description:
+      If the total days worked are  less than or equal to the task's SLA target, it is
+      equal to TRUE, otherwise, it is FALSE.
+  is_ticket_not_solved_in_time:
+    description:
+      If the total days_worked are greater than the task's SLA target, it is equal to
+      TRUE, otherwise, it is FALSE.
+  is_received_demand:
+    description: If the task ts_started is not null, then it is TRUE, otherwise, it is FALSE.
+  is_solved_demand:
+    description: If the task ts_completed is not null, then it is TRUE, otherwise, it is FALSE.
+  is_closed_demand:
+    description: If the task ts_closed is not null, then it is TRUE, otherwise, it is FALSE.
+  ts_sla_started:
+    description: Date in timestamp format that indicates when the SLA starts
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+  ts_solved:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+    description: Timestamp of when the ticket was solved
+  ts_closed:
+    description: Date in timestamp format that indicates when the ticket was closed.
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+  year:
+    description: Partition column
+  month:
+    description: Partition column
+  day:
+    description: Partition column
