@@ -1,5 +1,5 @@
 *                                                                       @quintoandar/bi-etl-ejuice-code-owners
-.woodpecker/**                                                           @quintoandar/data-ingestion-code-owners
+.woodpecker/**                                                          @quintoandar/data-ingestion-code-owners
 .drone.yml                                                              @quintoandar/data-ingestion-code-owners
 Makefile                                                                @quintoandar/data-ingestion-code-owners
 bietlejuice/base/airflow/**                                             @quintoandar/data-ingestion-code-owners
@@ -16,4 +16,6 @@ scripts/ci_cd/**                                                        @quintoa
 CODEOWNERS                                                              @quintoandar/data-ingestion-code-owners
 dags/primitives/                                                        @quintoandar/personalization @quintoandar/copilot-ds
 dags/mlops/                                                             @quintoandar/mlcops
-dags/governance/looker_temp*/                                            @quintoandar/data-ops-governance
+dags/governance/looker_temp*/                                           @quintoandar/data-ops-governance
+dags/growth/enrich_vespucio_pipeline/**                                 @quintoandar/atlas-db-code-owners
+dags/growth/zordominium_vespucio_plugin/**                              @quintoandar/atlas-db-code-owners
