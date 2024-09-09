@@ -2063,13 +2063,6 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-shared-costs
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-name-convention-shared-costs
-bietlejuice.enrich_mexico_braze_details:
-  - bietlejuice.braze_details:load-clean-campaign-details-indica-ai
-  - bietlejuice.braze_details:load-clean-campaign-details-owners
-  - bietlejuice.braze_details:load-clean-campaign-details-tenants
-  - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
-  - bietlejuice.braze_details:load-clean-canvas-details-owners
-  - bietlejuice.braze_details:load-clean-canvas-details-tenants
 bietlejuice.enrich_mexico_cib_events:
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
   - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
@@ -2098,11 +2091,6 @@ bietlejuice.enrich_mexico_google_ads:
 bietlejuice.enrich_mexico_marketing_automatic_daily_costs:
   - bietlejuice.enrich_mexico_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
   - bietlejuice.gsheets_growth:done-clean-marketing-cost-taxonomy
-bietlejuice.enrich_mexico_marketing_manual_daily_costs:
-  - bietlejuice.gsheets_growth_intraday:done-clean-mexico-marketing-manual-shared-costs
-bietlejuice.enrich_mexico_mox_reports:
-  - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
-  - bietlejuice.arquivo_confidencial:load-clean-rev-info
 bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.ebdb:load-clean-affiliate-data
   - bietlejuice.ebdb_user:load-clean-user
@@ -2113,9 +2101,6 @@ bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listings-reprocessed-leads
   - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
-bietlejuice.enrich_mexico_truora_reports:
-  - bietlejuice.arquivo_confidencial:load-clean-rev-info
-  - bietlejuice.arquivo_confidencial:load-clean-truora-check-process-aud
 bietlejuice.enrich_mission_control:
   - bietlejuice.mission_control:load-clean-contract
   - bietlejuice.mission_control:load-clean-contract-person

@@ -783,16 +783,6 @@ bietlejuice.metric_growth__demand:
   remove:
     - bietlejuice.enrich_growth_manual_daily_costs:load-enrich-daily-costs
     - bietlejuice.enrich_growth_automatic_daily_costs:load-enrich-daily-costs
-bietlejuice.metric_rent_benvi__demand:
-  remove:
-    - bietlejuice.enrich_mexico_marketing_manual_daily_costs:load-enrich-daily-costs # dependency not added due to be running later, should not be a block of the pipeline
-    - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-top-of-funnel-volumes-monthly
-    - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-top-of-funnel-volumes-weekly
-    - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
-    - bietlejuice.enrich_mexico_marketing_automatic_daily_costs:load-enrich-daily-costs
-    - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
-    - bietlejuice.gsheets_benvi:done-clean-mexico-demand-targets-2022
 bietlejuice.reports:
   # This database is ingested as a quality check for the reverse ETL process, which is why it needs to run after it.
   add:
@@ -989,6 +979,6 @@ bietlejuice.enrich_trino_costs:
     - bietlejuice.gsheets_governance:load-clean-cost-center-directory
 bietlejuice.dw_agent:
   remove:
-    - bietlejuice.sirena:load-clean-agents  
-    - bietlejuice.sirena:load-clean-prospects 
+    - bietlejuice.sirena:load-clean-agents
+    - bietlejuice.sirena:load-clean-prospects
     - bietlejuice.enrich_sirena:load-enrich-messages
