@@ -131,6 +131,7 @@ tickets_per_task AS (
     t.tags,
     t.description,
     t.status,
+    COALESCE(ch.worker_email, ca.worker_email, t.analyst_email) AS analyst_email,
     ch.source,
     CASE
       WHEN ca.direction IN ('outbound-api', 'outbound') OR ca.channel_type = 'call-in-app' THEN 'OUTBOUND'
