@@ -1,0 +1,37 @@
+---
+dag:
+  name: sap_4hana
+  schedule_start_date: 2024, 8, 1
+  schedule_interval: 0 2 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Ingestion of SAP Financial data via the new 4HANA API
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{partitions}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  tables_customization:
+    journal_entries:
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+        - table_api_path: "http/DEV/QueryDatasphere"
+cluster:
+  type: databricks_13_3_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - whl: "{artifacts_bucket}/sap-4hana-api-client-python/quintoandar_sap_4hana_api_client-0.1.0-py2.py3-none-any.whl"

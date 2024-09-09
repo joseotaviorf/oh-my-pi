@@ -1,0 +1,13 @@
+---
+database_name: datalake_sap_4hana_clean
+table_name: journal_entries
+columns:
+  year:
+    lineage:
+      - datalake_sap_4hana_raw.journal_entries.year
+  month:
+    lineage:
+      - datalake_sap_4hana_raw.journal_entries.month
+  day:
+    lineage:
+      - datalake_sap_4hana_raw.journal_entries.day
