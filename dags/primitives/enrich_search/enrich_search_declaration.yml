@@ -8,12 +8,22 @@ workflow:
   default_extraction_type: full
   extra_query_template_params:
         "days_past": 14
+        "days_past_21": 21
   inner_dependencies:
+    search_impressions:
+      - experiment_config
+    houses_published:
+      - experiment_config
     item_interaction:
       - amplitude_user_device
     item_interaction_sale:
       - amplitude_user_device
   tables_customization:
+    search_impressions:
+      partitions:
+        - year
+        - month
+        - day
     item_interaction:
       partitions:
       - year
@@ -36,7 +46,7 @@ cluster:
     spark_version: 10.4.x-scala2.12
     num_workers: 3
     spark_conf:
-      spark.metrics.namespace: "data_products.enrich_search"      
+      spark.metrics.namespace: "data_products.enrich_search"
     aws_attributes:
       ebs_volume_size: 200
   access_control_list:
