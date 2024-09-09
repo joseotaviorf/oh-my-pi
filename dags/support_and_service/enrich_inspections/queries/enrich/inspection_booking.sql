@@ -101,6 +101,100 @@ inspection_contract AS (
         datalake_region.region AS r
             ON r.id = h.id_region
     GROUP BY 1, 2, 3, 4, 9
+),
+repairs AS (
+    SELECT 
+        ins.id_inspection,
+        ins.id_contract,
+        rr.id_repair_request,
+        rr.ts_created AS dt_repair,
+        rev1.reviewer_type AS requester_type,
+        rev2.reviewer_type AS granted_type,
+        rr.responsibility,
+        rr.is_finished,
+        rr.is_exempted,
+        rev2.reviewer_type = 'OWNER' AS is_exempted_by_owner,
+        CASE 
+          WHEN rr.is_finished = false AND rev2.reviewer_type = 'ADMIN' AND rr.is_exempted = true THEN true 
+          ELSE false 
+        END AS exempted_on_ar,
+        ROW_NUMBER() OVER (PARTITION BY id_repair_request ORDER BY rr.ts_updated DESC) AS rn 
+    FROM 
+        datalake_inspections_clean.repair_request AS rr 
+    LEFT JOIN 
+        datalake_inspections_clean.item_group AS ig 
+          ON rr.id_item_group = ig.id_item_group
+    LEFT JOIN 
+        datalake_inspections_clean.room AS ro 
+          ON ro.id_room = ig.id_room 
+    LEFT JOIN  
+        datalake_inspections_clean.assessment AS asm 
+          ON asm.id_assessment = ro.id_assessment 
+    LEFT JOIN 
+        datalake_inspections_clean.inspection AS ins 
+          ON ins.id_inspection = asm.id_inspection 
+    LEFT JOIN 
+        datalake_inspections_clean.reviewer AS rev1 
+          ON rev1.id_reviewer = rr.id_reviewer 
+    LEFT JOIN 
+        datalake_inspections_clean.reviewer AS rev2 
+          ON rev2.id_reviewer = rr.id_granted_by 
+    WHERE 
+        rr.comment IS NOT NULL 
+        AND rr.responsibility IN ('TENANT','OWNER','ABSORBED_BY_COMPANY', 'EXEMPTED')  
+),
+repair_metrics AS (
+    SELECT 
+        id_contract,
+        id_inspection,
+        COUNT(CASE 
+          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1 
+        END) AS total_tentant_repair_ar,
+        COUNT(CASE 
+          WHEN requester_type = 'OWNER' THEN 1 
+        END) AS repairs_added_by_owner_review,
+        COUNT(CASE 
+          WHEN is_exempted_by_owner = true THEN 1 
+        END) AS repairs_exempted_by_owner_review,
+        COUNT(CASE 
+          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1 
+        END) + 
+          COUNT(CASE 
+            WHEN requester_type = 'OWNER' THEN 1 
+          END) - 
+            COUNT(CASE 
+              WHEN is_exempted_by_owner = true THEN 1 
+            END) AS total_tentant_repair_review, 
+        COUNT(CASE 
+          WHEN is_finished = true AND is_exempted = true THEN 1 
+        END) AS repairs_exempted_ac,
+        COUNT(
+          CASE 
+            WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1 
+        END) AS repairs_absorbed_ac,
+        COUNT(
+          CASE 
+            WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1 
+        END) + 
+            COUNT(CASE 
+              WHEN requester_type = 'OWNER' THEN 1 
+            END) - 
+              COUNT(CASE 
+                WHEN is_exempted_by_owner = true THEN 1 
+              END) - 
+                COUNT(
+                  CASE 
+                    WHEN is_finished = true AND is_exempted = true THEN 1 
+                END) - 
+                  COUNT(CASE 
+                    WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1 
+                  END) AS total_tentant_repair_ac
+    FROM 
+        repairs 
+    WHERE 
+        rn = 1
+    GROUP BY 
+          1,2
 )
 SELECT DISTINCT
     i.id_inspection,
@@ -122,6 +216,13 @@ SELECT DISTINCT
     i.source,
     a.source AS assessment_source,
     i.status,
+    rm.total_tentant_repair_ar,
+    rm.repairs_added_by_owner_review,
+    rm.repairs_exempted_by_owner_review,
+    rm.total_tentant_repair_review,
+    rm.repairs_exempted_ac,
+    rm.repairs_absorbed_ac,
+    rm.total_tentant_repair_ac,
     i.has_owner_accompanying,
     CASE
         WHEN FIRST(i.id_inspection) OVER(PARTITION BY i.id_contract, i.inspection_type ORDER BY i.ts_created) == i.id_inspection THEN TRUE
@@ -195,3 +296,6 @@ LEFT JOIN
 LEFT JOIN
     appointment_data AS ad
       ON ad.id_inspection = i.id_inspection
+LEFT JOIN
+    repair_metrics AS rm
+      ON rm.id_inspection = i.id_inspection

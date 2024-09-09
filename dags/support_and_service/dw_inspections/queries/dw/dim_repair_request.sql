@@ -4,6 +4,7 @@ SELECT DISTINCT
     rr.cost,
     rr.type AS repair_type,
     rr.comment,
+    rr.responsibility,
     rr.repair_service,
     rr.ts_created,
     rr.ts_updated,

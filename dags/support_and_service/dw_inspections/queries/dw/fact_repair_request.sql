@@ -91,3 +91,5 @@ LEFT JOIN
 LEFT JOIN
     contestation AS c
         ON c.id_repair_request = rr.id_repair_request
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY rr.id_repair_request ORDER BY rr.ts_updated) = 1

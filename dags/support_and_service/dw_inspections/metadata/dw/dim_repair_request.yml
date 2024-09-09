@@ -31,6 +31,10 @@ columns:
     lineage:
       - datalake_inspections_clean.repair_request.comment
     description: Commentary detailing the repair needed
+  responsibility:
+    lineage:
+      - datalake_inspections_clean.repair_request.responsibility
+    description: Descriptive information indicating who is responsible for the repair request.
   repair_service:
     lineage:
       - datalake_inspections_clean.repair_request.repair_service

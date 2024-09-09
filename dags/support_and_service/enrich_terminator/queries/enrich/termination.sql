@@ -1,6 +1,13 @@
 WITH last_inspection_synch AS(
     SELECT
         t.id,
+        ib.total_tentant_repair_ar,
+        ib.repairs_added_by_owner_review,
+        ib.repairs_exempted_by_owner_review,
+        ib.total_tentant_repair_review,
+        ib.repairs_exempted_ac,
+        ib.repairs_absorbed_ac,
+        ib.total_tentant_repair_ac,
         MAX(ib.id_external) FILTER(WHERE ib.inspection_type = 'offboarding') AS id_exit_inspection,
         MAX(DATE(ib.ts_inspected)) AS dt_last_inspection_synch
     FROM
@@ -11,7 +18,7 @@ WITH last_inspection_synch AS(
     WHERE
         ib.ts_inspected IS NOT NULL
     GROUP BY
-        t.id
+        1, 2, 3, 4, 5, 6, 7, 8
 ),
 last_negociation AS (
     SELECT
@@ -82,6 +89,13 @@ SELECT
     ln.fee_negotiation_status,
     ln.fee_payment_option,
     checklist.checklist_item,
+    lis.total_tentant_repair_ar,
+    lis.repairs_added_by_owner_review,
+    lis.repairs_exempted_by_owner_review,
+    lis.total_tentant_repair_review,
+    lis.repairs_exempted_ac,
+    lis.repairs_absorbed_ac,
+    lis.total_tentant_repair_ac,
     t.is_relisting,
     tw.has_automatically_closed_task,
     ci.is_contract_b2b,
@@ -131,4 +145,4 @@ LEFT JOIN
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY t.id ORDER BY t.ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY t.id ORDER BY t.ts_updated DESC) = 1
