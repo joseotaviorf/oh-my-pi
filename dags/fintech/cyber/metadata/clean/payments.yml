@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_cyber_raw.pmtfil.PMTDDESC
   id_payment:
-    description: "Payment ID"
+    description: "Payment ID. It is the datalake_trato_clean.payment.id column. To get 'our number' information, get it from table datalake_trato_clean.installment_charge"
     lineage:
       - datalake_cyber_raw.pmtfil.PMID
   contract_group:

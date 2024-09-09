@@ -3,7 +3,7 @@ database_name: datalake_cyber_clean
 table_name: bill
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: Table for storing debts (contract invoices). Table granularity - id_invoice.
+description: Table for storing debts (contract invoices). Table granularity - invoice entries or invoice (depends on the filter of invoice_or_entry field).
 columns:
   id_contract:
     description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"

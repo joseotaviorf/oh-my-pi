@@ -1,0 +1,75 @@
+---
+database_name: datalake_cyber_clean
+table_name: logs_code_description
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Contains valid action, result, function and screen codes.
+columns:
+  code:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVCODE
+  code_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVTYPE
+  code_available_manager:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVCLTYPE
+  user_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVCUTYPE
+  result_code_class:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVCLASS
+  is_valid_contact:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVCNTFLG
+  must_add_comment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVCOMFLG
+  requires_letter:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVLTRFLG
+  days_to_next_contact:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVDAYS
+  activity_score:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVWEIGHT
+  cost:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVCOST
+  code_description:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVDESC
+  group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVACCTG
+  phone_number_rank:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVTELRANK
+  module:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVMODULE
+  AVINACCT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVINACCT
+  AVRESULT:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.actvertb.AVRESULT

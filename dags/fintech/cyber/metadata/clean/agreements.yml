@@ -49,6 +49,7 @@ columns:
       Autorizado: "Same as Offset in Trato Feito"
       Cancelado: "Same as Canceled in Trato Feito"
       Finalizado: "Same as Finished in Trato Feito"
+      Pendente: ""
     lineage:
       - datalake_cyber_raw.agrhdr.AHSTATUS
   type_interest_quota:

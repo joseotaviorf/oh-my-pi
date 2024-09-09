@@ -1,0 +1,23 @@
+---
+database_name: datalake_cyber_clean
+table_name: agency_group
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: |
+  Groups were created that include advisory/agency and internal collection (QuintoAndar).
+  In order to facilitate the identification of the advisory/agency, the groups were created based on the advisory/agency code registered in the Cyber ​​system
+  For example, advisory/agency 010 (Paschoallotto) originated the G010 Group, which includes consultancy 010 and the internal collection associated with code 009.
+  In Cyber, with the creation of the Group it is possible to send the same contract to two or more different companies. With this, the system allows you to configure the commission percentage for each company, for example, 60% for one and 40% for another.
+columns:
+  agency_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_grupo_agency.GAGRUPO
+  id_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_grupo_agency.GAAGENCY
+  percentage_remuneration:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_grupo_agency.GAPERCREMUN

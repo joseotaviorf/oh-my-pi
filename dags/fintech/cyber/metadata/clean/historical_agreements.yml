@@ -1,0 +1,121 @@
+---
+database_name: datalake_cyber_clean
+table_name: historical_agreements
+owner: bianca.martins@quintoandar.com
+domain: fintech
+description: |
+  Historical table according to the contracts selected in the negotiation.
+  This table will contain information about the contracts that were selected in the negotiation and will be updated when the agreement is recorded.
+columns:
+  id_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.HAID
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.HAACCT
+  id_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHIDPARC
+  id_client:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHSSNUM
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.HAACCTG
+  contract_delay_days:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHDAYS
+  ts_due_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHDLQDT
+  total_contract_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHCURBAL
+  contract_main_overdue_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHAMTDLQ
+  AHVLJURATRA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLJURATRA
+  AHMULTCON:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHMULTCON
+  AHVLVENC:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLVENC
+  main_amount_overdue:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRPRCAG
+  main_amount_due:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRPRCAVAG
+  residual_final_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRPRMUAGR
+  agreement_fine_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRMUAGR
+  AHVLRPRJUAG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRPRJUAG
+  AHVLRJUAG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRJUAG
+  AHVLRCUSAG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRCUSAG
+  AHVLCUSTASAG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLCUSTASAG
+  AHVLRHOREAG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRHOREAG
+  AHVLRTXCARAG:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRTXCARAG
+  AHVLPRINC:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLPRINC
+  AHVLJUR:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLJUR
+  AHVLMUL:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLMUL
+  AHVLCUSTA:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLCUSTA
+  AHHONORARIOS:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHHONORARIOS
+  AHVLRDESPJUD:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRDESPJUD

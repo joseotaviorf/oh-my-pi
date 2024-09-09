@@ -1,8 +1,9 @@
 SELECT
     CAID AS id_campaign,
+    CASSNUM AS id_client,
+    CAAHID AS id_agreement,
     CANUMOFERTA AS offer_number,
     CAGRUPO AS billing_group,
-    CASSNUM AS id_client,
     CACPFCGC AS cpf_cnpj,
     CADTPROC AS ts_boletagem_sent,
     CADTVAL AS ts_due_boletagem,
@@ -17,7 +18,6 @@ SELECT
     CAFREQ AS frequency,
     CAORIGEM AS origin,
     CAACCTCOB AS billing_account,
-    CAAHID AS id_negotiation,
     CAQUE AS campaign_queue,
     CANOSSONUM AS our_number,
     CAPERENTR AS down_payment_percentage,

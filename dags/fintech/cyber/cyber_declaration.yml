@@ -36,20 +36,22 @@ workflow:
       clean_table_name: contracts_agreements
     agrhdr:
       clean_table_name: agreements
-    agpmtdet:
-      clean_table_name: agreement_installments
     agdscdet:
       clean_table_name: agreement_discounts
+    agpmtdet:
+      clean_table_name: agreement_installments
+    tb_boleto:
+      clean_table_name: agreement_invoices
     tb_historico_disponibilizacao:
       clean_table_name: history_contract_distribution
     tb_parcela:
       clean_table_name: bill
-    tb_boleto:
-      clean_table_name: invoices
     collid:
       clean_table_name: users
     agency:
       clean_table_name: agency
+    agr_hist:
+      clean_table_name: historical_agreements
 cluster:
   type: custom_cluster
   custom_configurations:

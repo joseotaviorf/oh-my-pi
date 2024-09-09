@@ -36,7 +36,7 @@ SELECT
         ELSE DMLAFLG
     END AS flag_account_in_agency_or_court,
     DMPTSCOR AS punctuation,
-    DMBRANCH AS agency,
+    DMBRANCH AS branch,
     DMOFFICR AS manager,
     CASE
         WHEN LOWER(DMRELFLG) = "c" THEN "Codevedor únicamente"

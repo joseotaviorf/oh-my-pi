@@ -1,0 +1,40 @@
+---
+dag:
+  name: cyber_complement
+  schedule_start_date: 2024, 8, 1
+  schedule_interval: 0 8 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      ingestion of cyber system tables about debts and collections.
+      cyber folder that contains all details about the system: https://drive.google.com/drive/folders/1qkegwyyddsnj37hdoa2yh8fz52cftfhx?usp=drive_link
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_cyber_raw
+  custom_schema: cyber
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+  tables_customization:
+    actvertb:
+      clean_table_name: logs_code_description
+    tb_grupo_agency:
+      clean_table_name: agency_group
+    agrtype:
+      clean_table_name: agreement_type
+    agtpdsc:
+      clean_table_name: agreement_type_discount
+    document:
+      clean_table_name: document
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5.xlarge
+    node_type_id: r5a.large
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+  custom_libraries:
+    - jar: "{artifacts_bucket}/jars/ojdbc8.jar"

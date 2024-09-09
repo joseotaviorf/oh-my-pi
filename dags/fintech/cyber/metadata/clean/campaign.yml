@@ -13,6 +13,10 @@ columns:
     description: "ID Client = CPF (TF: client.document)"
     lineage:
       - datalake_cyber_raw.tb_campanha.CASSNUM
+  id_agreement:
+    description: "ID negotiation"
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAAHID
   offer_number:
     description: "Offer Number"
     lineage:
@@ -30,7 +34,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_campanha.CADTPROC
   ts_due_boletagem:
-    description: ""
+    description: "Boletagem due date"
     lineage:
       - datalake_cyber_raw.tb_campanha.CADTVAL
   ts_due_down_payment:
@@ -77,10 +81,6 @@ columns:
     description: "Billing account (contract) number for correspondence"
     lineage:
       - datalake_cyber_raw.tb_campanha.CAACCTCOB
-  id_negotiation:
-    description: "ID negotiation"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CAAHID
   campaign_queue:
     description: "Campaign Queue"
     lineage:

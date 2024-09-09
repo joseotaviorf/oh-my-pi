@@ -3,7 +3,10 @@ database_name: datalake_cyber_clean
 table_name: delinquent_master
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: "Master table with contract data. Table granularity - id_contract + contract_group. Records can be updated and DMHOSTUP (ts_last_update) informs the date of the last update."
+description: |
+  Master table with contract data. Table granularity - id_contract + contract_group.
+  Records can be updated and DMHOSTUP (ts_last_update) informs the date of the last update.
+  The DMAGENCY (id_agency) column will be filled with the corresponding agency group code. To identify which agency belong to each group, it is necessary to consult the TB_GRUPO_AGENCY (datalake_cyber_clean.agency_group) table.
 columns:
   id_client:
     description: "ID client (CPF/CNPJ). TF: client.documentNumber where client-type = 'main-tenant'"
@@ -61,7 +64,7 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMPTSCOR
-  agency:
+  branch:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMBRANCH
