@@ -9,26 +9,12 @@ from bietlejuice.base.cdc.schema_treatment.mysql_cdc_schema_finder import (
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.clients.db_clients.spark_client import SparkClient
-from bietlejuice.consumers.db_consumers import PostgresConsumer
+from bietlejuice.consumers.db_consumers.postgres_consumer import PostgresConsumer
+from bietlejuice.consumers.db_consumers.mysql_consumer import MySqlConsumer
 
 
 class CdcSchemaFinderFactory:
-    def __init__(
-        self,
-        incoming_bucket: str,
-        source_database: str,
-        source_schema: str,
-        environment: str,
-        start_date: str,
-        end_date: str,
-        dbutils_secret_key: str,
-    ) -> None:
-        self.incoming_bucket = incoming_bucket
-        self.source_database = source_database
-        self.source_schema = source_schema
-        self.environment = environment
-        self.start_date = start_date
-        self.end_date = end_date
+    def __init__(self, dbutils_secret_key: str) -> None:
         self.dbutils_secret_key = dbutils_secret_key
 
     def get_cdc_schema_finder(self, database_type: DatabaseTypeEnum) -> CdcSchemaFinder:
@@ -45,12 +31,10 @@ class CdcSchemaFinderFactory:
         return PostgresCdcSchemaFinder(consumer)
 
     def get_mysql_cdc_schema_finder(self) -> CdcSchemaFinder:
-        return MySqlCdcSchemaFinder(
-            f"s3://{self.incoming_bucket}/{self.source_database}/{self.environment}_{self.source_schema}.data/",
-            start_date=self.start_date,
-            end_date=self.end_date,
-            schema=self.source_schema,
-        )
+        conn_config = self._get_conn_config()
+        spark_client = SparkClient()
+        mysql_consumer = MySqlConsumer(conn_config, spark_client)
+        return MySqlCdcSchemaFinder(mysql_consumer)
 
     def _get_conn_config(self):
         base_dbutils = BaseDBUtils()

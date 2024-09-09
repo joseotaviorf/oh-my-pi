@@ -4,7 +4,9 @@ from argparse import ArgumentParser
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
-from bietlejuice.base.cdc.reader.date_range_partition_reader import DateRangePartitionReader
+from bietlejuice.base.cdc.reader.date_range_partition_reader import (
+    DateRangePartitionReader,
+)
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
     CdcSchemaFinderFactory,
 )
@@ -227,12 +229,6 @@ def main():
 
     pre_treatment = CdcSchemaTreatmentFactory(
         schema_finder=CdcSchemaFinderFactory(
-            incoming_bucket=incoming_bucket,
-            source_database=source_database,
-            source_schema=source_schema,
-            environment=environment,
-            start_date=start_date,
-            end_date=end_date,
             dbutils_secret_key=dbutils_secret_key,
         ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
         datalake_table_schema=f"datalake_{schema}_transactional",

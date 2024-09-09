@@ -368,3 +368,22 @@ class MySqlConsumer(DBConsumer):
                     """
 
         return self.get_data_from_query(query)
+
+    @logger
+    def get_table_primary_keys(self, table_name) -> list:
+        """
+        Gets table primary keys from a MySQL database.
+        :param table_name: Name of a table
+        :return: A list with the primary keys of the table
+        """
+        query = f"""
+                SELECT
+                    column_name as col_name
+                FROM
+                    information_schema.key_column_usage
+                WHERE
+                    table_name = '{table_name}'
+                    AND constraint_name = 'PRIMARY'
+                """
+        df = self.get_data_from_query(query).collect()
+        return [row.col_name for row in df]

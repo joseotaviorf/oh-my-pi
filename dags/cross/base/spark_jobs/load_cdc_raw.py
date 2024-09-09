@@ -107,12 +107,6 @@ def main():
         # Hardcoded for now, while we don't have other sources such as Postgres
         pk_identifier = RawPrimaryKeyIdentifier(
             CdcSchemaFinderFactory(
-                incoming_bucket=incoming_bucket,
-                source_database=source_schema,
-                source_schema=source_schema,
-                environment=environment,
-                start_date=start_date,
-                end_date=end_date,
                 dbutils_secret_key=dbutils_secret_key,
             ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
             datalake_table_schema=f"datalake_{schema}_raw",

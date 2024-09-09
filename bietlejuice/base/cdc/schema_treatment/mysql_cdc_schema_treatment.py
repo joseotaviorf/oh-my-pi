@@ -60,9 +60,9 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
     def _treat_columns_from_latest_table_change(
         self, latest_table_change: dict, transactional_dataframe: DataFrame
     ) -> DataFrame:
-        """Forces the columns of the transactional dataframe to match the latest table DDL change in the source database, which is found in the schema topic."""
+        """Forces the columns of the transactional dataframe to match the latest table DDL change in the source database."""
 
-        transactional_dataframe = self._treat_timestamp_columns_from_schema_topic(
+        transactional_dataframe = self._treat_timestamp_columns(
             transactional_dataframe, latest_table_change
         )
         transactional_dataframe = self._treat_boolean_columns(
@@ -91,12 +91,12 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
 
         return transactional_dataframe
 
-    def _treat_timestamp_columns_from_schema_topic(
+    def _treat_timestamp_columns(
         self, transactional_dataframe: DataFrame, latest_table_change: dict
     ) -> DataFrame:
         """
         CDC saves date and datetime columns as unix timestamps. This method converts them back to datetime, identifying
-        the columns that are timestamps by looking at the latest DDL change in the schema topic, and treating them accordingly.
+        the columns that are timestamps by looking at the latest DDL change in the table schema, and treating them accordingly.
         """
         days_unix_columns = []
         milliseconds_unix_columns = []
