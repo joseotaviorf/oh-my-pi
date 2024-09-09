@@ -57,7 +57,7 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_clean.visit_cancellation_details AS vcd
   ON vse.id_cancellation_detail = vcd.id
-INNER JOIN
+LEFT JOIN
   dw_visit.dim_cancellation_type AS dct
   ON vcd.reason = dct.reason
   AND vcd.on_behalf_of = dct.on_behalf_of
