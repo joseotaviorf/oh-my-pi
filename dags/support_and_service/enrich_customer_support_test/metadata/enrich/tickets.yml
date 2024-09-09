@@ -20,6 +20,26 @@ columns:
     description: Session ID from Sauron
     lineage:
       - datalake_zendesk.tickets_current.id_session
+  first_analyst_email:
+    lineage:
+      - datalake_zendesk.tickets_current.analyst_email
+    description: First agent email that answered the first reservation.
+  last_analyst_email:
+    lineage:
+      - datalake_zendesk.tickets_current.analyst_email
+    description: Last agent email that answered the last reservation.
+  front_or_back:
+    lineage:
+      - datalake_gsheets_clean.department_control.front_or_back
+    description: If the ticket is a front or back ticket
+  area:
+    lineage:
+      - datalake_gsheets_clean.department_control.area
+    description: Area of the queue of the ticket
+  team:
+    lineage:
+      - datalake_gsheets_clean.department_control.team
+    description: Team of the queue of the ticket
   client_type:
     description: Type of client, from custom_fields like 'Tipo de Cliente'
     lineage:
@@ -89,6 +109,20 @@ columns:
     description: If the task ts_completed is not null, then it is TRUE, otherwise, it is FALSE.
   is_closed_demand:
     description: If the task ts_closed is not null, then it is TRUE, otherwise, it is FALSE.
+  is_ticket_rate:
+    description:
+      "Boolean flag indicating if the ticket is part of the ticket rate calculation.
+      In order to be part of, the ticket must follow several rules:
+      - The ticket area must be CX;
+      - The ticket team could be anyone but Ong Back;
+      - The ticket must be front or back, depending on the channel;
+      - The ticket must not belong to a few departments (Rescisão por Inadimplência [OFF][POS][BACK], Offboarding Reparos [OFF] [POS] [BACK],
+      Offboarding pré saída [OFF] [POS] [BACK], Proteção QuintoAndar [OFF] [POS] [BACK], Rescisão - Despejo [OFF][POS][BACK]
+      or Rescisão 1 [OFF] [POS] [BACK]);
+      - The date in which the ticket was solved must be later than 1st January/2022.
+      - If the ticket has channel email, then we accept all directions;
+      - If the ticket has channel chat, then we accept only direction inbound;
+      - If the ticket has channel call, we accept only directions inbound and outbound-api."
   ts_sla_started:
     description: Date in timestamp format that indicates when the SLA starts
     lineage:

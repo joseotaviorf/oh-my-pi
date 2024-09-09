@@ -180,6 +180,10 @@ SELECT
   c.id_reservation,
   rq.id_queue,
   c.id_worker,
+  CASE
+    WHEN c.channel_type = 'call-in-app' OR c.direction = 'outbound-api' THEN 'INAPP'
+    ELSE UPPER(c.direction)
+  END AS origin,
   c.direction,
   c.channel_type,
   c.bpo_name,

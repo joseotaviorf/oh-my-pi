@@ -58,6 +58,8 @@ incoming_tickets AS (
   WHERE
     MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
+/* The following CTE is needed because a single call/chat can create multiple tickets. Also, there are
+two CTEs for call dedupping because sometimes the id_call on a ticket is actually an id_task */
 unique_twilio_tickets AS (
   SELECT
     it.id_session,
@@ -76,12 +78,13 @@ unique_twilio_tickets AS (
     MAX(it.id_ticket) AS id_ticket
   FROM
     incoming_tickets AS it
-  INNER JOIN
+  INNER JOIN -- TODO: this OR yields poor performance but is needed as it.id_call is ambiguous
     datalake_customer_support_test.calls AS ca
-      ON COALESCE(ca.id_call, ca.id_task) = it.id_call
+      ON ca.id_call = it.id_call
+      OR ca.id_task = it.id_call
   GROUP BY 1, 2
 ),
-dedup_tickets AS (
+unique_tickets AS (
   SELECT
     id_ticket,
     channel
@@ -113,7 +116,7 @@ dedup_tickets AS (
   WHERE
     dtt.id_ticket IS NULL
 ),
-unique_tickets AS (
+tickets_per_task AS (
   SELECT
     dt.id_ticket,
     t.id_problem_ticket,
@@ -128,7 +131,13 @@ unique_tickets AS (
     t.tags,
     t.description,
     t.status,
-    t.analyst_email,
+    ch.source,
+    CASE
+      WHEN ca.direction IN ('outbound-api', 'outbound') OR ca.channel_type = 'call-in-app' THEN 'OUTBOUND'
+      WHEN ca.direction = 'inbound' THEN 'INBOUND'
+      WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'OUTBOUND'
+      ELSE 'INBOUND'
+    END AS direction,
     dt.channel,
     t.request_type,
     t.client_type,
@@ -153,7 +162,7 @@ unique_tickets AS (
   FROM
     incoming_tickets AS t
   INNER JOIN
-    dedup_tickets AS dt
+    unique_tickets AS dt
       ON dt.id_ticket = t.id_ticket
   LEFT JOIN
     datalake_customer_support_test.chats AS ch
@@ -163,22 +172,34 @@ unique_tickets AS (
       ON COALESCE(ca.id_call, ca.id_task) = t.id_call
 ),
 ticket_queue_attributes AS (
+  WITH queue_metrics AS (
+    SELECT
+      id_ticket,
+      FIRST(queue) OVER (PARTITION BY id_ticket ORDER BY ts_created) AS first_queue,
+      LAST(queue) OVER (PARTITION BY id_ticket ORDER BY ts_created) AS last_queue,
+      FIRST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_created) AS first_analyst_email,
+      LAST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_created) AS last_analyst_email
+    FROM
+      tickets_per_task
+  )
   SELECT
     tq.id_ticket,
-    FIRST(tq.queue) OVER (PARTITION BY tq.id_ticket ORDER BY tq.ts_created) AS first_queue,
-    LAST(tq.queue) OVER (PARTITION BY tq.id_ticket ORDER BY tq.ts_created) AS last_queue,
+    tq.first_queue,
+    tq.last_queue,
+    tq.first_analyst_email,
+    tq.last_analyst_email,
     dc.front_or_back,
     dc.journey_step,
     dc.team,
     dc.area
   FROM
-    unique_tickets AS tq
+    queue_metrics AS tq
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
-      ON dc.department = tq.queue
+      ON dc.department = tq.last_queue
 ),
 tickets AS (
-  SELECT
+  SELECT DISTINCT
     t.id_ticket,
     t.id_problem_ticket,
     t.id_user_main,
@@ -187,6 +208,8 @@ tickets AS (
     t.id_session,
     tq.first_queue,
     tq.last_queue,
+    tq.first_analyst_email,
+    tq.last_analyst_email,
     t.contact_ticket,
     t.task_sid_twilio,
     t.twilio_task,
@@ -207,7 +230,6 @@ tickets AS (
     tq.team,
     tq.area,
     t.status,
-    t.analyst_email,
     t.channel,
     t.request_type,
     t.client_type,
@@ -216,7 +238,6 @@ tickets AS (
     t.contact_theme_tag,
     t.contact_motivation_tag,
     t.contact_theme_detail_tag,
-    t.custom_fields_map,
     t.custom_fields,
     t.reopens,
     t.replies,
@@ -230,8 +251,8 @@ tickets AS (
     t.month,
     t.day
   FROM
-    unique_tickets AS t
-  LEFT JOIN
+    tickets_per_task AS t
+  INNER JOIN
     ticket_queue_attributes AS tq
       ON tq.id_ticket = t.id_ticket
 ),
@@ -421,11 +442,16 @@ SELECT DISTINCT
   t.id_session,
   t.first_queue,
   t.last_queue,
+  t.first_analyst_email,
+  t.last_analyst_email,
+  t.front_or_back,
+  t.journey_step,
+  t.team,
+  t.area,
   t.status,
   t.channel,
   t.tags,
   t.description,
-  t.analyst_email,
   t.request_type,
   t.client_type,
   t.step_tag,
@@ -459,8 +485,25 @@ SELECT DISTINCT
     ELSE TRUE
   END AS is_ticket_not_solved_in_time,
   btt.has_open_back_ticket,
+  t.is_back_ticket,
   t.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
   t.is_call_answered,
+  IF(
+    t.front_or_back = 'front'
+    AND DATE(t.ts_solved) >= DATE('2022-01-01')
+    AND t.contact_theme_detail_tag IS NOT NULL
+    AND t.team != 'Ong Back'
+    AND t.area = 'CX'
+    AND t.last_queue NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+      'Offboarding Reparos [OFF] [POS] [BACK]',
+      'Offboarding pré saída [OFF] [POS] [BACK]',
+      'Proteção QuintoAndar [OFF] [POS] [BACK]',
+      'Rescisão - Despejo [OFF][POS][BACK]',
+      'Rescisão 1 [OFF] [POS] [BACK]'
+    ),
+    TRUE,
+    FALSE
+  ) AS is_ticket_rate,
   t.ts_budget,
   t.ts_created,
   tdw.ts_sla_started,
