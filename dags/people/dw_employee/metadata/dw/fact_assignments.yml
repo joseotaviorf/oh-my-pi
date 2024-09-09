@@ -4,14 +4,14 @@ owner: isabella.araujo@quintoandar.com.br
 domain: people
 description: "Table storing detailed information about employee assignments."
 columns:
-  sk_assignment:
-    description: "Unique identifier for the period of service related to the assignment."
-    lineage:
-      - datalake_hr_system.assignments_metrics.sk_period_of_service
   sk_employee:
     description: "Unique identifier for the person related to the assignment."
     lineage:
       - datalake_hr_system.assignments_metrics.sk_person
+  sk_assignment:
+    description: "Unique identifier for the period of service related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_period_of_service
   sk_demographic_information:
     description: "Unique identifier for the demographic information related to the assignment."
     lineage:

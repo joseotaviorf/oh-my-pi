@@ -1,0 +1,36 @@
+database_name: dw_employee
+table_name: fact_assignment_events
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Records key events in the lifecycle of employee assignments, capturing changes such as salary adjustments, role changes, cost center assignments, and team transfers. It enables analysis of various employee-related events, like promotions and department changes."
+columns:
+  sk_employee:
+    description: "Unique identifier for the person related to the assignment."
+    lineage:
+      - datalake_hr_system.employee_ids.id_person
+  sk_assignment:
+    description: "Unique identifier for the period of service related to the assignment."
+    lineage:
+      - datalake_hr_system.employee_ids.id_period_of_service
+  sk_started_date:
+    description: "Started date of the event."
+    lineage:
+      - datalake_hr_system_clean.salaries.dt_from
+  sk_ended_date:
+    description: "Ended date of the event."
+    lineage:
+      - datalake_hr_system_clean.salaries.dt_to
+  event_type:
+    description: "Type of event being recorded, such as salary change, role change, or cost center reassignment."
+  event_value:
+    description: "The value or amount related to the event, such as salary or assignment."
+    lineage:
+      - datalake_hr_system_clean.salaries.salary_amount
+  action_reason:
+    description: "The reason or justification for the event, such as promotion or salary raise."
+    lineage:
+      - datalake_hr_system_clean.salaries.action_reason
+  currency_code:
+    description: "Currency code associated with the salary or financial adjustment."
+    lineage:
+      - datalake_hr_system_clean.salaries.currency_code
