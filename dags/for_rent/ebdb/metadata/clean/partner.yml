@@ -10,6 +10,9 @@ columns:
   id_state:
     lineage:
       - datalake_ebdb_raw.partner.state_id
+  uuid_company:
+    lineage:
+      - datalake_ebdb_raw.partner.companyuuid
   name:
     lineage:
       - datalake_ebdb_raw.partner.name

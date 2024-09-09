@@ -2,6 +2,7 @@ SELECT
     id,
     amplitudedeviceid as id_amplitude_device,
     state_id AS id_state,
+    companyUUID AS uuid_company,
     name,
     phone,
     cnpj,

@@ -1,5 +1,6 @@
 SELECT
     p.id AS id_partner,
+    p.uuid_company,
     paa.id_user,
     p.name,
     p.email,

@@ -13,6 +13,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.partner_agent_aud.id_user
     description: User ID (Main)
+  uuid_company:
+    lineage:
+      - datalake_ebdb_clean.partner.uuid_company
+    description: Company UUID of CIQ into Porfolio Manager.
   name:
     lineage:
       - datalake_ebdb_clean.partner.name
