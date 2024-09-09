@@ -52,7 +52,15 @@ columns:
   seconds_init_scripts_finished_to_running_started:
     description: Time in seconds from initialization scripts finish to the start of the "RUNNING" status
   seconds_total_startup_time:
-    description: Total startup time in seconds
+    description: Total startup time in seconds of when the cluster first started. Notice that if the cluster started multiple times, this is still only from the first time.
+  total_seconds_in_starting_state:
+    description: Total time in seconds the cluster spent in the "STARTING" state, including all times it started
+  total_seconds_uptime:
+    description: Total time in seconds the cluster was up. Includes startup time.
+  total_worker_instance_usage_seconds:
+    description: Total time in seconds the worker instances were up. If two workers were up for 10 minutes, this would be 20 minutes.
+  avg_target_num_workers:
+    description: Average number of workers the cluster had (or was trying to provision).
   is_last_of_day_for_dag:
     description: True if the cluster represents the last execution of the day for the dag
   ts_init_scripts_started:
@@ -61,6 +69,8 @@ columns:
     description: Timestamp of when the initialization scripts finished
   ts_running_started:
     description: Timestamp of when the cluster entered the "RUNNING" status
+  ts_first_state_started:
+    description: Timestamp of when the cluster entered the first state in the day
   ts_cluster_started:
     description: Timestamp of when the cluster started
   ts_cluster_ended:
