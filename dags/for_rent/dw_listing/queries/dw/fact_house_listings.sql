@@ -1,35 +1,37 @@
 WITH house_listing_contracts AS (
-    WITH latest_contract AS (
-      SELECT
-        id_house_listing,
-        LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY ts_listing_version_started) AS id_next_house_listing_rerented,
-        id_contract,
-        LAG(id_contract) OVER (PARTITION BY id_house ORDER BY id_house_listing) AS id_previous_contract,
-        DENSE_RANK() OVER (PARTITION BY id_house ORDER BY id_house_listing) AS order_renting
-      FROM
-        datalake_listing_contracts.listing_contracts
-      WHERE
-        contract_status IN ('Ativo', 'Finalizado')
-    )
+  WITH latest_contract AS (
     SELECT
-      hl.id_house_listing,
-      id_next_house_listing_rerented,
-      c.id AS id_contract,
-      lc.id_previous_contract,
-      hl.version AS house_version,
-      lc.order_renting,
-      COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
-      c.ts_signed AS ts_contract_signed,
-      c.dt_termination AS dt_contract_annulment,
-      LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed
+      id_house_listing,
+      LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY ts_listing_version_started) AS id_next_house_listing_rented,
+      MAX(id_contract) AS id_contract,
+      DENSE_RANK() OVER (PARTITION BY id_house ORDER BY id_house_listing) AS order_renting
     FROM
-      datalake_ebdb_listing.house_listing AS hl
-    LEFT JOIN
-      latest_contract AS lc
-        ON hl.id_house_listing = lc.id_house_listing
-    LEFT JOIN
-      datalake_ebdb_contract.contract AS c
-        ON c.id = lc.id_contract
+      datalake_listing_contracts.listing_contracts
+    WHERE
+      contract_status IN ('Ativo', 'Finalizado')
+    GROUP BY
+      id_house_listing, id_house, ts_listing_version_started
+  )
+  SELECT
+    hl.id_house_listing,
+    lc.id_next_house_listing_rented,
+    hl.id_house,
+    c.id AS id_contract,
+    LAG(lc.id_contract) OVER (PARTITION BY hl.id_house ORDER BY hl.id_house_listing) AS id_previous_contract,
+    hl.version AS house_version,
+    lc.order_renting,
+    COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
+    c.ts_signed AS ts_contract_signed,
+    c.dt_termination AS dt_contract_annulment,
+    LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed
+  FROM
+    datalake_ebdb_listing.house_listing AS hl
+  LEFT JOIN
+    latest_contract AS lc
+      ON hl.id_house_listing = lc.id_house_listing
+  LEFT JOIN
+    datalake_ebdb_contract.contract AS c
+      ON c.id = lc.id_contract
 ),
 lbc AS (
     SELECT
@@ -64,7 +66,7 @@ autonomous_agent_info AS (
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   hl.id_house_listing AS sk_house_listing,
-  COALESCE(hlc.id_next_house_listing_rerented, -1) AS sk_next_house_listing_rerented,
+  COALESCE(hlc.id_next_house_listing_rented, -1) AS sk_next_house_listing_rented,
   COALESCE(h.id_user, -1) AS sk_owner,
   COALESCE(h.id_region, -1) AS sk_region,
   COALESCE(h.id_user_registrant, -1) AS sk_user_registration,
