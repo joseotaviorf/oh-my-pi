@@ -59,6 +59,7 @@ aws AS (
         END AS pool_name,
         SUM(line_item_usage_amount) * 3600 AS compute_seconds_aws,
         COUNT(DISTINCT line_item_resource_id) AS num_provisioned_instances,
+        AVG(pricing_public_on_demand_rate::FLOAT) AS pricing_public_on_demand_rate,
         DATE(line_item_usage_start_date) AS dt_cluster_run
     FROM
         cost_usage_reports.aws_costs_new
@@ -85,6 +86,7 @@ metrics_without_pool AS (
         SUM(databricks.total_instance_usage_seconds) AS total_databricks_compute_seconds,
         SUM(aws.compute_seconds_aws - databricks.total_instance_usage_seconds) AS total_aws_idle_time_in_seconds,
         SUM(aws.compute_seconds_aws - databricks.total_instance_usage_seconds) / SUM(databricks.num_nodes) AS avg_idle_time_per_instance_in_seconds,
+        AVG(pricing_public_on_demand_rate) AS pricing_public_on_demand_rate,
         databricks.dt_cluster_run
     FROM
         databricks
@@ -112,6 +114,7 @@ metrics_with_pool AS (
         SUM(databricks.total_instance_usage_seconds) AS total_databricks_compute_seconds,
         ANY_VALUE(aws.compute_seconds_aws) - SUM(databricks.total_instance_usage_seconds) AS total_aws_idle_time_in_seconds,
         (ANY_VALUE(aws.compute_seconds_aws) - SUM(databricks.total_instance_usage_seconds)) / ANY_VALUE(aws.num_provisioned_instances) AS avg_idle_time_per_instance_in_seconds,
+        ANY_VALUE(pricing_public_on_demand_rate) AS pricing_public_on_demand_rate,
         aws.dt_cluster_run
     FROM
         aws

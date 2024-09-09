@@ -21,5 +21,7 @@ columns:
     description: The total time in seconds the nodes were up in AWS but not being used by Databricks.
   avg_idle_time_per_instance_in_seconds:
     description: The average idle time per instance in seconds.
+  pricing_public_on_demand_rate:
+    description: The public on-demand rate of the instance type.
   dt_cluster_run:
     description: The date the cluster was run.
