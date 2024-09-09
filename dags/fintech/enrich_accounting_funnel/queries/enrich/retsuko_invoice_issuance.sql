@@ -197,6 +197,45 @@ retsuko AS (
         retsuko_pos
 ),
 
+retsuko_sum AS (
+    SELECT DISTINCT
+        i.id_external AS id_finance_entity,
+        'seu barriga' AS source_name,
+        CASE
+            WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee', 'entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
+            WHEN e.bill_item = 'entry.bill-item/service-fee' THEN 'service fee'
+        END AS revenue_name,
+        i.accrual_year_month,
+        CAST(SUM(e.amount) AS DECIMAL(12,2)) AS source_amount
+    FROM
+        treated_entry e
+    INNER JOIN
+        datalake_retsuko.invoice i
+            ON e.id_invoice = i.id
+    WHERE
+        e.description != 'Crédito - Parcelamento corretagem - QuintoAndar'
+    AND (
+            (
+                (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
+                  'adm-fee',
+                  'brokerage-installment-fee',
+                  'brokerage-quinto-andar',
+                  'lockin',
+                  'adjustment-agreement-adm-fee',
+                  'igpm-adm-fee',
+                  'ipca-adm-fee',
+                  'service-fee'
+                  )
+                )
+            )
+        )
+    AND i.status != 'canceled'
+    AND DATE(i.ts_created) >= '2024-01-01'
+    GROUP BY
+        1, 2, 3, 4
+),
+
 sap_entity AS (
     SELECT
         id_finance_entity,
@@ -318,27 +357,31 @@ df AS (
 ),
 df_final AS (
     SELECT
-        id_retsuko_invoice_issuance,
-        id_business_entity,
-        id_finance_entity,
-        id_finance_entity_entry,
-        version,
-        contract_type,
-        source_name,
-        revenue_name,
-        accrual_year_month,
-        status,
-        source_amount,
-        sap_amount,
-        account_number,
-        is_completeness_compliance,
-        IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance,
-        IF(dt_sap_reference BETWEEN dt_source_trigger AND DATE_ADD(dt_source_trigger, 30), TRUE, FALSE) AS is_temporality_compliance,
-        dt_source_trigger,
-        dt_sap_created,
-        dt_sap_reference
+        df.id_retsuko_invoice_issuance,
+        df.id_business_entity,
+        df.id_finance_entity,
+        df.id_finance_entity_entry,
+        df.version,
+        df.contract_type,
+        df.source_name,
+        df.revenue_name,
+        df.accrual_year_month,
+        df.status,
+        rs.source_amount,
+        df.sap_amount,
+        df.account_number,
+        df.is_completeness_compliance,
+        IF((ABS(rs.source_amount) - ABS(df.sap_amount)) >= 0.05 OR (ABS(rs.source_amount) - ABS(df.sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance,
+        IF(df.dt_sap_reference BETWEEN df.dt_source_trigger AND DATE_ADD(df.dt_source_trigger, 30), TRUE, FALSE) AS is_temporality_compliance,
+        df.dt_source_trigger,
+        df.dt_sap_created,
+        df.dt_sap_reference
     FROM
         df
+    LEFT JOIN
+        retsuko_sum AS rs
+            ON rs.id_finance_entity = df.id_finance_entity
+            AND rs.revenue_name = df.revenue_name
 )
 
 SELECT
