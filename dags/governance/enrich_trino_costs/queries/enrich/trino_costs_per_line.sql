@@ -21,6 +21,7 @@ processed_data_per_line_per_day AS (
     WHERE
         querytype = 'SELECT'
         AND state IN ('FINISHED', 'FAILED')
+        AND tqlemcb.hour BETWEEN 5 AND 23
         AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
     GROUP BY
         DATE(created_time),
