@@ -9,6 +9,8 @@ workflow:
   extra_query_template_params:
         "days_past": 14
         "days_past_21": 21
+        "start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+        "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
     search_impressions:
       - experiment_config
