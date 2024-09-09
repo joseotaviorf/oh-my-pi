@@ -27,6 +27,12 @@ workflow:
     address_aud:
       raw_extraction_type: full
       raw_partitions: []
+    asaas_cancellation:
+      raw_extraction_type: full
+      raw_partitions: []    
+    asaas_cancellation_aud:
+      raw_extraction_type: full
+      raw_partitions: []  
     company:
       date_filter_column: updated_at
     company_aud:

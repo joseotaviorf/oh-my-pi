@@ -1,0 +1,28 @@
+SELECT
+    id,
+    asaas_customer_id           AS id_asaas_customer,
+    asaas_subscription_id       AS id_asaas_subscription,
+    batch_id                    AS id_batch, 
+    propose                     AS id_propose,
+    status, 
+    event,
+    rev, 
+    revtype                     AS rev_type, 
+    revend                      AS rev_end, 
+    raw_request, 
+    raw_response, 
+    status_mod                  AS mod_status, 	
+    event_mod                   AS mod_event, 
+    asaas_customer_id_mod       AS mod_id_asaas_customer, 
+    asaas_subscription_id_mod   AS mod_id_asaas_subscription, 
+    raw_request_mod             AS mod_raw_request, 
+    raw_response_mod            AS mod_raw_response, 
+    canceled_at_mod             AS mod_ts_canceled, 
+    reversed_at_mod             AS mod_ts_reversed, 
+    batch_id_mod                AS mod_id_batch,
+    created_at                  AS ts_created, 
+    updated_at                  AS ts_updated, 
+    canceled_at                 AS ts_canceled, 
+    reversed_at                 AS ts_reversed
+FROM
+    datalake_rental_guarantee_platform_raw.asaas_cancellation_aud

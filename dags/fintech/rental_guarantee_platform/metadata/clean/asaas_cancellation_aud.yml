@@ -1,0 +1,81 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: asaas_cancellation_aud
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.id
+  id_asaas_customer:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.asaas_customer_id
+  id_asaas_subscription:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_subscription_id
+  id_batch:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.batch_id
+  propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.propose
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.status
+  event:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.event
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.rev
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.revtype
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.revend
+  raw_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.raw_request
+  raw_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.raw_response
+  mod_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.status_mod
+  mod_event:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.event_mod
+  mod_id_asaas_customer:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.asaas_customer_id_mod
+  mod_id_asaas_subscription:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.asaas_subscription_id_mod
+  mod_raw_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.raw_request_mod
+  mod_raw_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.raw_response_mod
+  mod_ts_canceled:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.canceled_at_mod
+  mod_ts_reversed:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.reversed_at_mod
+  mod_id_batch:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.batch_id_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.updated_at
+  ts_canceled:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.canceled_at
+  ts_reversed:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation_aud.reversed_at

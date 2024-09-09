@@ -1,0 +1,45 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: asaas_cancellation
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.id
+  id_asaas_customer:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.asaas_customer_id
+  id_asaas_subscription:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_subscription_id
+  id_batch:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.batch_id
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.propose
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.status
+  event:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.event
+  raw_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.raw_request
+  raw_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.raw_response
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.updated_at
+  ts_canceled:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.canceled_at
+  ts_reversed:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.asaas_cancellation.reversed_at
