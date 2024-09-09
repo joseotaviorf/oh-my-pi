@@ -43,18 +43,6 @@ columns:
     lineage:
       - datalake_hr_system.assignments.id_assignment
       - datalake_hr_system.managers.id_manager_assignment
-  sk_business_partner:
-    description:
-      "Surrogate key for dim_employee, with the business partner of the employee.
-      Just the id_person"
-    lineage:
-      - datalake_hr_system.assignments.representatives.id_person
-  sk_business_partner_assignment:
-    description:
-      "Surrogate key for dim_assignment with the business partner of the employee.
-      Just the id_assignment"
-    lineage:
-      - datalake_hr_system.assignments.representatives.id_assignment
   dt_start_work_relationship:
     description: "Date key for the start of the work relationship. Format: YYYYMMDD"
     lineage:

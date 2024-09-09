@@ -105,8 +105,6 @@ SELECT
   am.sk_job,
   am.sk_manager,
   am.sk_manager_assignment,
-  am.sk_business_partner,
-  am.sk_business_partner_assignment,
   REPLACE(am.dt_start_work_relationship, '-', '') AS sk_start_work_relationship_date,
   REPLACE(am.dt_termination_work_relationship, '-', '') AS sk_termination_work_relationship_date,
   MD5(

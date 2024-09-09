@@ -172,33 +172,9 @@ assignments AS (
   SELECT
     id_person,
     id_period_service,
-    assignments ['AssignmentId'] AS id_assignment,
-    assignments ['representatives'] AS representatives
+    assignments ['AssignmentId'] AS id_assignment
   FROM
     assignments_step1
-),
-representatives_step1 AS (
-  SELECT
-    id_person,
-    id_period_service,
-    id_assignment,
-    explode(representatives) as representatives
-  FROM
-    assignments
-),
-representatives AS (
-  SELECT
-    id_person,
-    id_period_service,
-    id_assignment,
-    representatives ['PersonId'] AS id_person_hrbp,
-    representatives ['AssignmentNumber'] AS assignment_number_hrbp,
-    representatives ['ResponsibilityName'] AS responsibility_name_hrbp
-  FROM
-    representatives_step1
-  WHERE
-    representatives ['ResponsibilityType'] = 'BPs'
-  QUALIFY representatives ['FromDate'] = MAX(representatives ['FromDate']) OVER (PARTITION BY id_assignment)
 ),
 managers_direct_led AS (
   SELECT
@@ -436,8 +412,6 @@ SELECT
       '-1'
     )
   END AS sk_manager_assignment,
-  COALESCE(rep.id_person_hrbp, '-1') AS sk_business_partner,
-  COALESCE(ap_hbrp.id_assignment, '-1') AS sk_business_partner_assignment,
   COALESCE(REPLACE(s.dt_last_increase, '-', ''), '-1') AS sk_last_increase_date,
   COALESCE(REPLACE(s.dt_first_promotion, '-', ''), '-1') AS sk_first_promotion_date,
   -- non metrics
@@ -527,13 +501,6 @@ FROM
             mp.id_manager_assignment,
             mf.id_manager_assignment
           ) = af_manager.id_assignment
-  LEFT JOIN
-    representatives AS rep
-      ON wr.id_period_of_service = rep.id_period_service
-        AND ap.id_assignment = rep.id_assignment
-  LEFT JOIN
-    assignments_present AS ap_hbrp
-      ON rep.assignment_number_hrbp = ap_hbrp.assignment_number
   LEFT JOIN
     managers_direct_led AS mdl
       ON ap.id_assignment = mdl.id_manager_assignment

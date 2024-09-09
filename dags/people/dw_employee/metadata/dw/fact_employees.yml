@@ -36,14 +36,6 @@ columns:
     description: "Unique identifier for the manager’s assignment."
     lineage:
       - datalake_hr_system.assignments_metrics.sk_manager_assignment
-  sk_business_partner:
-    description: "Unique identifier for the business partner related to the assignment."
-    lineage:
-      - datalake_hr_system.assignments_metrics.sk_business_partner
-  sk_business_partner_assignment:
-    description: "Unique identifier for the business partner’s assignment."
-    lineage:
-      - datalake_hr_system.assignments_metrics.sk_business_partner_assignment
   sk_start_work_relationship_date:
     description: "Start date of the work relationship related to the assignment, formatted as SK."
     lineage:

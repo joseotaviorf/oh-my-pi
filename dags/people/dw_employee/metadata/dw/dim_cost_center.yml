@@ -6,19 +6,27 @@ domain: people
 description: Dimension table for cost center.
 columns:
   sk_cost_center:
-    description: 'Surrogate key for the cost center.'
+    description: "Surrogate key for the cost center."
     lineage:
-    - datalake_hr_system_clean.organizations.id_organization
+      - datalake_hr_system_clean.organizations.id_organization
+  sk_business_partner:
+    description: "Unique identifier for the business partner related to the assignment."
+    lineage:
+      - datalake_hr_system.employee_ids.id_person
+  sk_business_partner_assignment:
+    description: "Unique identifier for the business partner’s assignment."
+    lineage:
+      - datalake_hr_system.employee_ids.id_period_of_service
   cost_center_name:
-    description: 'Cost center name'
+    description: "Cost center name"
     lineage:
-    - datalake_hr_system_clean.organizations.name
+      - datalake_hr_system_clean.organizations.name
   cost_center_code:
-    description: 'Cost center code'
+    description: "Cost center code"
     lineage:
-    - datalake_hr_system_clean.organizations.codigo_dff
+      - datalake_hr_system_clean.organizations.codigo_dff
   business:
-    description: 'Business name'
+    description: "Business name"
     categories:
       "Benvi": ""
       "Classifieds": ""
@@ -32,22 +40,22 @@ columns:
       "QuintoCred": ""
       "Não se Aplica": ""
     lineage:
-    - "datalake_hr_system_clean.organizations.business"
+      - "datalake_hr_system_clean.organizations.business"
   product:
-    description: 'Product name'
+    description: "Product name"
     lineage:
-    - "datalake_hr_system_clean.organizations.product"
+      - "datalake_hr_system_clean.organizations.product"
   vertical:
-    description: 'Vertical name. Possible values'
+    description: "Vertical name. Possible values"
     categories:
       "Corp": ""
       "Tech": ""
       "Ops": ""
       "Não se Aplica": ""
     lineage:
-    - "datalake_hr_system_clean.organizations.vertical"
+      - "datalake_hr_system_clean.organizations.vertical"
   vice_presidency:
-    description: 'Vice presidency name'
+    description: "Vice presidency name"
     categories:
       "Benvi MX": ""
       "Classifieds LATAM": ""
@@ -58,29 +66,29 @@ columns:
       "Support & Services": ""
       "Não se Aplica": ""
     lineage:
-    - "datalake_hr_system_clean.organizations.vice_presidency"
+      - "datalake_hr_system_clean.organizations.vice_presidency"
   directorate:
-    description: 'Directorate name'
+    description: "Directorate name"
     lineage:
-    - "datalake_hr_system_clean.organizations.directorate"
+      - "datalake_hr_system_clean.organizations.directorate"
   subdirectorate:
-    description: 'Sub directorate name'
+    description: "Sub directorate name"
     lineage:
-    - "datalake_hr_system_clean.organizations.subdirectorate"
+      - "datalake_hr_system_clean.organizations.subdirectorate"
   status:
-    description: 'Status of the cost center'
+    description: "Status of the cost center"
     categories:
       "A": "Active cost center"
       "I": "Inactive cost center"
     lineage:
-    - datalake_hr_system_clean.organizations.status
+      - datalake_hr_system_clean.organizations.status
   dt_effective_start:
-    description: 'Date when the cost center became effective.'
+    description: "Date when the cost center became effective."
     lineage:
-    - datalake_hr_system_clean.organizations.dt_effective_start
+      - datalake_hr_system_clean.organizations.dt_effective_start
   dt_effective_end:
-    description: 'Date when the cost center became ineffective.'
+    description: "Date when the cost center became ineffective."
     lineage:
-    - datalake_hr_system_clean.organizations.dt_effective_end
+      - datalake_hr_system_clean.organizations.dt_effective_end
   ts_load:
-    description: 'Date and time when the record was loaded.'
+    description: "Date and time when the record was loaded."

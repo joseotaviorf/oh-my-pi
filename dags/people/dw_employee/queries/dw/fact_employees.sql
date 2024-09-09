@@ -372,8 +372,6 @@ SELECT
     am.sk_job,
     am.sk_manager,
     am.sk_manager_assignment,
-    am.sk_business_partner,
-    am.sk_business_partner_assignment,
     COALESCE(d.sk_disability, '-1') AS sk_disability,
     REPLACE (am.dt_start_work_relationship, '-', '') AS sk_work_relationship_started_date,
     REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
