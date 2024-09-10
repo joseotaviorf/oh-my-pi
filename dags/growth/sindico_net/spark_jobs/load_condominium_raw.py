@@ -57,16 +57,18 @@ def _fetch_condominium_data(auth_token:str, condominium_url:str, execution_date:
     }
 
     page = 1
+    size = 250
     result = []
 
     while True:
         try:
-            response = requests.get(f"{condominium_url}?page={page}", headers=headers)
+            response = requests.get(f"{condominium_url}?page={page}&size={size}", headers=headers)
             if response.status_code == 200:
                 try:
                     data = json.loads(response.text)
 
                     if data['total'] > 0:
+                        logger.info(f"m=_fetch_condominium_data, message=for {data['total']} volume of {page} page.")
                         page += 1
 
                         api_page_df = spark.createDataFrame([
