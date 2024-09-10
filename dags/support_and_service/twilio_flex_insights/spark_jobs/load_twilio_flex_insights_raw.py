@@ -45,16 +45,6 @@ if __name__ == "__main__":
 
     # TODO this is a temp fix
     all_table_details = {
-        "benvi_closing_metrics": {
-            "workspace_id": "vz8klwkjsszukriuuqllc3dz4d8sl6yx",
-            "object_id": "9051650",
-            "column_create_date": "date"
-        },
-        "benvi_inside_sales_call_metrics": {
-            "workspace_id": "vz8klwkjsszukriuuqllc3dz4d8sl6yx",
-            "object_id": "8703789",
-            "column_create_date": "date"
-        },
         "conversation_time_metrics": {
             "workspace_id": "vz8klwkjsszukriuuqllc3dz4d8sl6yx",
             "object_id": "801119",

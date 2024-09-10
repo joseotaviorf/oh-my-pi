@@ -3485,15 +3485,11 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract-person
-  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
-  - bietlejuice.dw_offer:load-dw-rent-dim-offer
-  - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
@@ -3515,7 +3511,6 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-iq-dispatches
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-pp-dispatches
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
-  - bietlejuice.terminator:load-clean-termination
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_call:load-dw-call-dim-call

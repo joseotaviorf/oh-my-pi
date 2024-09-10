@@ -21,18 +21,6 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   tables_customization:
-    benvi_closing_metrics:
-      extra_spark_job_arguments:
-        - table_details:
-            workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
-            object_id: "9051650"
-            column_create_date: "date"
-    benvi_inside_sales_call_metrics:
-      extra_spark_job_arguments:
-        - table_details:
-            workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
-            object_id: "8703789"
-            column_create_date: "date"
     conversation_time_metrics:
       extra_spark_job_arguments:
         - table_details:

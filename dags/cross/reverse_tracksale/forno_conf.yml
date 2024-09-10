@@ -96,51 +96,6 @@ campaigns:
     trigger_at_hour: 17
     trigger_at_minute: 0
   - campaign_code: 242
-    query: benvi_iq_onboarding
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
-    query: benvi_pp_onboarding
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
-    query: benvi_iq_ongoing
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
-    query: benvi_pp_ongoing
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
-    query: benvi_iq_offboarding
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
-    query: benvi_pp_offboarding
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
-    query: benvi_iq_lost_visits
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
-    query: benvi_iq_lost_proposals
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
-    query: benvi_pp_lost
-    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
-    trigger_at_hour: 19
-    trigger_at_minute: 0
-  - campaign_code: 242
     query: lost_iq
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
     trigger_at_hour: 17

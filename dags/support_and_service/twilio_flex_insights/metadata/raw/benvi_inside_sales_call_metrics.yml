@@ -1,8 +1,0 @@
----
-database_name: datalake_twilio_flex_insights_raw
-table_name: benvi_inside_sales_call_metrics
-columns:
-  agent:
-      tags:
-      - PII
-      - Confidential
