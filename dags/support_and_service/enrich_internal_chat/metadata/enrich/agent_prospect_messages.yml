@@ -12,13 +12,17 @@ columns:
     description: Message ID from Twilio
     lineage:
       - datalake_internal_chat_clean.internal_chat_messages.id_message
-  id_user_external:
+  id_user_sender:
     description: ID of the user that sent the message
     lineage:
       - datalake_internal_chat_clean.internal_chat_messages.id_user_external
+  id_user_receiver:
+    description: ID of the user that received the message
+    lineage:
+      - datalake_internal_chat_clean.internal_chat_messages.mentions
   changed_turn:
     description: If the message was a 'turn change', meaning if the previous message was sent by the other person
-  user_role:
+  user_role_sender:
     description: If the user is an agent or a prospect
   message:
     description: Message body

@@ -11,7 +11,8 @@ WITH agents AS (
 SELECT
   m.id_channel,
   m.id_message,
-  m.id_user_external,
+  m.id_user_external AS id_user_sender,
+  REPLACE(SPLIT(STRING(m.mentions), ':')[0], '[', '') AS id_user_receiver,
   CASE
     WHEN LAG(m.id_user_external) OVER(PARTITION BY m.id_channel ORDER BY m.ts_created) != m.id_user_external THEN 1
     ELSE 0
@@ -19,7 +20,7 @@ SELECT
   CASE
     WHEN a.id_main_user IS NOT NULL THEN 'AGENT'
     ELSE 'PROSPECT'
-  END AS user_role,
+  END AS user_role_sender,
   m.chat_type,
   m.message,
   m.index,
