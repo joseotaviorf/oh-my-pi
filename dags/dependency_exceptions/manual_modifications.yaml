@@ -20,10 +20,6 @@ bietlejuice.dw_call:
 bietlejuice.dw_casa_mineira_portal:
   remove:
     - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
-bietlejuice.dw_cib_events:
-  remove:
-    - bietlejuice.enrich_mexico_cib_events:load-enrich-cib-events
-    - bietlejuice.enrich_mexico_cib_segmentation:load-enrich-cib-segmentation
 bietlejuice.dw_country:
   override: []
 bietlejuice.dw_crm:

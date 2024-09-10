@@ -89,7 +89,6 @@ dags_out_of_pattern:
         "metric_rent__bookings",
         "metric_rent__contracts",
         "metric_rent__listings",
-        "metric_rent_benvi__supply",
         "metric_growth__demand",
         "metric_fintech__velo",
         "quintoandar",

@@ -125,8 +125,6 @@ bietlejuice.dw_casa_mineira_portal:
   - bietlejuice.enrich_casa_mineira_portal:load-enrich-real-estate-status
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses
-bietlejuice.dw_cib_segmentation:
-  - bietlejuice.enrich_mexico_cib_segmentation:load-enrich-cib-segmentation
 bietlejuice.dw_collection_recovery:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-house
@@ -2102,9 +2100,6 @@ bietlejuice.enrich_mexico_google_ads:
   - bietlejuice.google_ads:load-clean-campaigns-performance
   - bietlejuice.google_ads:load-clean-keywords-performance
   - bietlejuice.google_ads:load-clean-videos-performance
-bietlejuice.enrich_mexico_marketing_automatic_daily_costs:
-  - bietlejuice.enrich_mexico_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
-  - bietlejuice.gsheets_growth:done-clean-marketing-cost-taxonomy
 bietlejuice.enrich_mexico_rent_supply:
   - bietlejuice.ebdb:load-clean-affiliate-data
   - bietlejuice.ebdb_user:load-clean-user
@@ -3338,10 +3333,6 @@ bietlejuice.metric_rent__tickets:
   - bietlejuice.metric_rent__contracts:load-metric-ended-rentals-confirmed-daily
   - bietlejuice.metric_rent__contracts:load-metric-new-contracts-signed-daily
   - bietlejuice.metric_rent__contracts:load-metric-ongoing-rentals-daily
-bietlejuice.metric_rent_benvi__supply:
-  - bietlejuice.enrich_mexico_rent_supply:load-enrich-cohort-funnel
-  - bietlejuice.enrich_mexico_rent_supply:load-enrich-coincident-funnel
-  - bietlejuice.enrich_region:load-enrich-city-groups-per-periods
 bietlejuice.reports:
   - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-accepted-into-sns
   - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-sent-into-sns

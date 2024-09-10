@@ -1,8 +1,0 @@
----
-table_name: metric_rent_benvi.weekly_supply_funnel
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  country_code:
-    is_complete:
-  city_group:
-    is_complete:
