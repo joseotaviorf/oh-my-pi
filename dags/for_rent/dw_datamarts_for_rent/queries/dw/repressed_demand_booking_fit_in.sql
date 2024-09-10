@@ -200,6 +200,20 @@ visit_hoursalert_confirmed AS (
         AND id_user <> ''
         AND ts_event >= CURRENT_DATE - interval '182 days'
         AND MAKE_DATE(year, month, day) >= CURRENT_DATE - interval '182 days'
+  UNION ALL
+SELECT 
+  '' AS event,
+  ts_created AS event_date,
+  id_visitor AS user_id,
+  id_house AS house_id,
+  dt_visit AS target_date_raw,
+  dt_visit AS target_date,
+  begin_slot AS alert_slot_from,
+  end_slot AS alert_slot_to
+FROM 
+  datalake_ebdb_clean.visit_fitting
+WHERE
+  business_context = 'RENT'
 ),
 encaixes_raw AS (
     SELECT

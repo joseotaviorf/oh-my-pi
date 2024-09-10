@@ -302,6 +302,7 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.ebdb:load-clean-house-visit-status-aud
   - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
+  - bietlejuice.ebdb:load-clean-visit-fitting
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
@@ -457,6 +458,7 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-polygon-region
+  - bietlejuice.ebdb:load-clean-visit-fitting
   - bietlejuice.ebdb_condo:load-clean-info-amenities
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
@@ -1495,13 +1497,13 @@ bietlejuice.enrich_cyber_homolog:
   - bietlejuice.cyber:load-clean-agreement-installments
   - bietlejuice.cyber:load-clean-agreement-invoices
   - bietlejuice.cyber:load-clean-agreements
+  - bietlejuice.cyber:load-clean-bill
   - bietlejuice.cyber:load-clean-campaign
   - bietlejuice.cyber:load-clean-contracts
+  - bietlejuice.cyber:load-clean-historical-agreements
   - bietlejuice.cyber:load-clean-logs
   - bietlejuice.cyber:load-clean-payments
   - bietlejuice.cyber:load-clean-users
-  - bietlejuice.cyber:load-clean-bill
-  - bietlejuice.cyber:load-clean-historical-agreements
   - bietlejuice.cyber_complement:load-clean-logs-code-description
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house

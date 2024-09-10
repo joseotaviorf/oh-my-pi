@@ -188,7 +188,18 @@ visit_hoursalert_confirmed AS (
         AND id_user <> ''
         AND TRIM(ep_business_context) = 'sale'
         AND ep_house_id IS NOT NULL
-),
+    UNION ALL
+SELECT 
+  id_visitor AS user_id,
+  id_house AS house_id,
+  begin_slot AS alert_slot_from,
+  end_slot AS alert_slot_to,
+  dt_visit AS target_date,
+  ts_created AS event_date
+FROM 
+  datalake_ebdb_clean.visit_fitting
+WHERE
+  business_context = 'SALE'),
 encaixes_raw AS (
     SELECT
         evt.event_date,

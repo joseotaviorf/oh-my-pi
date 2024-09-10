@@ -127,8 +127,8 @@ date_series as (
           or status = 'Marcado'
           or (status = 'Cancelado' and date(dt_scheduling) = date(dt_cancel))
         )
-)
-, encaixes_raw as (
+),
+encaixes_raw as (
     select
         evt.ts_event as event_date,
         trim(evt.id_user) as user_id,
@@ -147,7 +147,20 @@ date_series as (
       and CAST(etb.house_id AS string) = trim(coalesce(evt.ep_house_id, ''))
     where cast(evt.year as string) || '-' || lpad(cast(evt.month as string), 2 , '0') >= '2019-01'
     	and ep_business_context != 'sale'
-)
+UNION ALL
+SELECT 
+  ts_created AS event_date,
+  id_visitor AS user_id,
+  id_house AS house_id,
+  dt_visit AS target_date,
+  begin_slot AS alert_slot_from,
+  end_slot AS alert_slot_to,
+  CASE WHEN id_visit IS NOT NULL THEN 1 ELSE 0 END AS encaixe_realizado,
+  rank() over (partition by trim(id_visitor), trim(coalesce(id_house, '')) order by ts_created desc) as rank_enc
+FROM 
+  datalake_ebdb_clean.visit_fitting
+WHERE
+  business_context = 'RENT')
 , encaixes_temp as (
 	select distinct
 		encaixe_realizado,
