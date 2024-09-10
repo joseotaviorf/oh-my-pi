@@ -89,6 +89,7 @@ task_group = DatalakeTaskGroup(
     relative_query_path=CONTEXT,
     spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
+    execution_timeout_hours=3,
 )
 
 raw_task_group = task_group.build_raw_task_group_for_all_tables(
