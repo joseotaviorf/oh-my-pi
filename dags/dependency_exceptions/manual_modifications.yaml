@@ -438,9 +438,6 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
 bietlejuice.enrich_marketing_manual_daily_costs:
   remove:
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
-bietlejuice.enrich_mexico_consolidated_marketing_metrics:
-  remove:
-    - bietlejuice.mexico_facebook_insights:load-clean-facebook-insights
 bietlejuice.enrich_nps_answer_drivers:
   add:
     - bietlejuice.enrich_tracksale:load-enrich-answer
