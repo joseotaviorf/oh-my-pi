@@ -8,7 +8,13 @@ WITH points_rule AS (
         pr.points,
         pr.max_points,
         pr.dt_start,
-        IF(pr.dt_start = DATE("2024-05-01"), DATE("2024-06-30"), pr.dt_end) AS dt_end,
+        CASE
+            -- These periods came without an end date filled in during the testing of the solution implementation, which is why we declared the end date. 
+            -- However, this should not occur for future periods and, if it does, it should not be corrected by Data.
+            WHEN pr.dt_start = DATE("2024-05-01") THEN DATE("2024-06-30")
+            WHEN pr.dt_start = DATE("2024-07-01") THEN DATE("2024-08-31")
+            ELSE pr.dt_end
+        END AS dt_end,
         pr.ts_created,
         pr.ts_updated
     FROM
