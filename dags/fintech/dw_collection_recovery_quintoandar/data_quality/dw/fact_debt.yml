@@ -1,0 +1,25 @@
+---
+table_name: dw_collection_recovery_quintoandar.fact_debt
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_debt:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_contract:
+    is_complete:
+      severity_level: Error
+  id_invoice:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  invoice_due_amount:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error

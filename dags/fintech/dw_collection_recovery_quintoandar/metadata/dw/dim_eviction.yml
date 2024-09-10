@@ -1,0 +1,58 @@
+database_name: dw_collection_recovery_quintoandar
+table_name: dim_eviction
+description: It contain data of QuintoAndar contracts in the eviction process. QuintoCred is not included in this table.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_eviction:
+    lineage:
+      - datalake_trato_feito_clean.eviction.id
+    description: Eviction ID. Table surrogate key
+  sk_debtor:
+    lineage:
+      - datalake_trato_feito_clean.eviction_data.cpf_client
+    description: Customer document (CPF). Foreign key to dim_debtor
+  id_contract:
+    lineage:
+      - datalake_recupera_clean.contracts.id_contract
+    description: Contract ID
+  creditor:
+    lineage:
+      - datalake_recupera_clean.contracts.id_creditor
+    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
+  status:
+    lineage:
+      - datalake_trato_feito_clean.eviction.status
+    description: Eviction status of a contract
+    categories:
+      ELIGIBLE: ""
+      PRE-EVICTION: ""
+      EVICTION: ""
+      SOLVED: ""
+  law_firm:
+    lineage:
+      - datalake_trato_feito_clean.eviction.law_firm
+    description: Law firm responsible for the eviction
+    categories:
+      PASCHOALOTTO: ""
+      PLC: ""
+      VLM: ""
+      ASL: ""
+  distributor:
+    lineage:
+      - datalake_trato_feito_clean.eviction_data.distributor_code_external
+    description: Code of the distributor. This column corresponds to the status in Recupera.
+  occurence:
+    lineage:
+      - datalake_trato_feito_clean.eviction_data.occurrence_code_external
+    description: Code of the occurrence. This column corresponds to the substatus in Recupera.
+  dt_occurrence_due_date:
+    lineage:
+      - datalake_trato_feito_clean.eviction_data.dt_occurrence_due_date_external
+    description: Date of the occurrence due date.
+  ts_status_updated:
+    lineage:
+      - datalake_trato_feito_clean.eviction.ts_status_updated
+    description: Timestamp of the status update.
+  ts_load:
+    description: "Timestamp of when the data was inserted into the table"

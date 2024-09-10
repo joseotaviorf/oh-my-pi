@@ -1,0 +1,28 @@
+database_name: dw_collection_recovery_quintoandar
+table_name: bridge_map_debt_negotiation
+description: |
+  This table contains the relationship between two keys from fact_debt and fact_negotiation (sk_debt and sk_negotiation).
+  A register will only enter this table when there is a negotiation to them.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_debt:
+    lineage:
+      - datalake_debt_recovery.negotiation.id_contract
+      - datalake_recupera_clean.creditor_pending.id_contract
+      - datalake_recupera_clean.complementary_records.id_contract
+      - datalake_recupera_clean.complementary_records_written_down.id_contract
+      - datalake_trato_feito_clean.debt.id_external
+      - datalake_recupera_clean.creditor_pending.id_installment
+      - datalake_recupera_clean.complementary_records.id_installment
+      - datalake_recupera_clean.complementary_records_written_down.id_installment
+    description: Surrogate key of table. It is a sequencial number based on the id_creditor, id_contract and id_installment.
+  sk_negotiation:
+    lineage:
+      - datalake_debt_recovery.negotiation.id_negotiation_recupera
+      - datalake_recupera_clean.creditor_pending.installment_code
+      - datalake_recupera_clean.complementary_records.installment_code
+      - datalake_recupera_clean.complementary_records_written_down.installment_code
+    description: Negotiation ID. Foreign key of table fact_negotiation.
+  ts_load:
+    description: Timestamp of when the data was inserted into the table

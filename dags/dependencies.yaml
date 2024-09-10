@@ -170,6 +170,34 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.trato_feito:load-clean-eviction
   - bietlejuice.trato_feito:load-clean-eviction-data
+bietlejuice.dw_collection_recovery_quintoandar:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_debt_recovery:load-enrich-installment
+  - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
+  - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
+  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
+  - bietlejuice.enrich_recupera:load-enrich-collection
+  - bietlejuice.enrich_recupera:load-enrich-installment
+  - bietlejuice.enrich_recupera:load-enrich-negotiation
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.paschoalotto:load-clean-agreement-detail
+  - bietlejuice.paschoalotto:load-clean-contract
+  - bietlejuice.paschoalotto:load-clean-debt
+  - bietlejuice.paschoalotto:load-clean-user
+  - bietlejuice.recupera:load-clean-complementary-records
+  - bietlejuice.recupera:load-clean-complementary-records-written-down
+  - bietlejuice.recupera:load-clean-contracts
+  - bietlejuice.recupera:load-clean-creditor-pending
+  - bietlejuice.recupera:load-clean-operational-records
+  - bietlejuice.recupera:load-clean-operators
+  - bietlejuice.recupera:load-clean-records
+  - bietlejuice.recupera:load-clean-status
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-eviction
+  - bietlejuice.trato_feito:load-clean-eviction-data
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract

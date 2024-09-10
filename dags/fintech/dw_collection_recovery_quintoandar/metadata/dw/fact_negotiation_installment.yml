@@ -1,0 +1,128 @@
+database_name: dw_collection_recovery_quintoandar
+table_name: fact_negotiation_installment
+description: Installments of negotiations
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_negotiation_installment:
+    lineage:
+      - datalake_recupera.installment.id_negotiation
+      - datalake_debt_recovery.negotiation.id_negotiation_recupera
+      - datalake_recupera.installment.installment_number
+    description: "Negotiation ID + Number of installment. Table surrogate key"
+  sk_negotiation:
+    lineage:
+      - datalake_recupera.installment.id_negotiation
+      - datalake_debt_recovery.negotiation.id_negotiation_recupera
+    description: "Negotiation ID. Foreign key to fact_negotiation"
+  sk_debtor:
+    lineage:
+      - datalake_recupera.installment.customer_document
+    description: "Customer document (CPF). Foreign key to dim_debtor"
+  id_installment:
+    lineage:
+      - datalake_debt_recovery.installment.id
+    description: Installment ID
+  id_invoice_extra:
+    lineage:
+      - datalake_trato_feito_clean.accounting_installment.id_external
+    description: Seu barriga extra invoice created through the negotiation.
+  id_receipt:
+    lineage:
+      - datalake_debt_recovery.installment.id_external
+      - datalake_recupera.installment.id_receipt
+    description: Seu barriga extra invoice created through the negotiation.
+  installment_number:
+    lineage:
+      - datalake_recupera.installment.installment_number
+    description: The number of the installment.
+  creditor:
+    lineage:
+      - datalake_recupera.installment.creditor
+      - datalake_debt_recovery.negotiation.debtor
+    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
+  is_special_installment:
+    lineage:
+      - datalake_recupera.installment.is_special_installment
+    description: Indicates whether it is a special installment or not (common installment)
+  installment_status:
+    lineage:
+      - datalake_recupera.installment.status
+      - datalake_debt_recovery.installment.status
+    description: Invoice status
+    categories:
+      expired: "The installment negotiation was broken before the installment was paid."
+      paid: "The installment was paid and accounted for."
+      pending: "The accounting registration of the installment (accounting-installment) is still pending."
+      registered: "The accounting record for the installment was created (the extra invoice was created in SeuBarriga)"
+      canceled: ""
+      failed: ""
+      ignored: ""
+  delay_days:
+    lineage:
+      - datalake_recupera.installment.delay_days
+    description: Installment Main amount.
+  main_amount:
+    lineage:
+      - datalake_recupera.installment.main_amount
+    description: Installment Main amount.
+  amount_to_pay:
+    lineage:
+      - datalake_recupera.installment.amount_to_pay
+      - datalake_debt_recovery.installment.total_amount
+    description: Total amount to be paid in the installment
+  updated_balance:
+    lineage:
+      - datalake_recupera.installment.updated_balance
+    description: Installment Updated Balance (saldo).
+  amount_fine:
+    lineage:
+      - datalake_recupera.installment.amount_fine
+    description: Fine Amount
+  interest_fee_amount:
+    lineage:
+      - datalake_recupera.installment.interest_fee_amount
+    description: Interest Value
+  default_interest_amount:
+    lineage:
+      - datalake_recupera.installment.default_interest_amount
+    description: Default interest value (juros de mora)
+  adm_fee_amount:
+    lineage:
+      - datalake_recupera.installment.adm_fee_amount
+      - datalake_debt_recovery.installment.adm_fee_amount
+    description: Administrative Fee Amount
+  discount_amount:
+    lineage:
+      - datalake_recupera.installment.discount_amount
+      - datalake_debt_recovery.installment.discount_amount
+    description: Discount Amount
+  paid_amount:
+    lineage:
+      - datalake_recupera.installment.paid_amount
+      - datalake_debt_recovery.installment.total_amount
+      - datalake_nexxera.cnab_charges_recupera.net_amount
+    description: Installment Paid Amount.
+  dt_creation:
+    lineage:
+      - datalake_recupera.installment.dt_formalization
+      - datalake_debt_recovery.installment.ts_created
+    description: Installment creation date.
+  dt_due:
+    lineage:
+      - datalake_recupera.installment.dt_due
+      - datalake_debt_recovery.installment.dt_due
+    description: Installment due date. Original field name = dt_vencimento
+  dt_paid:
+    lineage:
+      - datalake_recupera.installment.dt_paid
+      - datalake_debt_recovery.installment.ts_paid
+      - datalake_nexxera.cnab_charges_recupera.dt_occurrence_code
+    description: Installment Payment Date.
+  dt_canceled:
+    lineage:
+      - datalake_recupera.installment.dt_canceled
+      - datalake_debt_recovery.installment.ts_updated
+    description: Installment cancellation date.
+  ts_load:
+    description: Timestamp of when the data was inserted into the table

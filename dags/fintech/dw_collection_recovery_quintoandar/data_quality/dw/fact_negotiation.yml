@@ -1,0 +1,19 @@
+---
+table_name: dw_collection_recovery_quintoandar.fact_negotiation
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_negotiation:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_negotiation_trato_feito:
+    is_unique:
+      severity_level: Error
+  id_negotiation_recupera:
+    is_unique:
+      severity_level: Error
