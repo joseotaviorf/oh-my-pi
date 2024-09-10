@@ -11,12 +11,6 @@ SELECT
   l.complement AS complement,
   aa.code_description AS complement_description,
   l.comment AS occurrence_description,
-  NULL AS esforco,
-  NULL AS alo,
-  NULL AS cpc,
-  NULL AS promisse,
-  NULL AS agreement,
-  NULL AS failure,
   l.ts_activity AS ts_occurrence
 FROM datalake_cyber_clean.logs AS l
 INNER JOIN datalake_cyber_clean.contracts AS c

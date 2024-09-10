@@ -11,7 +11,6 @@ SELECT
         WHEN u.user_type = "Externo" THEN "Assessoria"
         WHEN id_campaign IS NOT NULL THEN "Carta Campanha"
     END AS origin_agreement,
-    NULL is_recurrent_debtor,
     CASE
         WHEN a.status = "Autorizado" THEN "offset"
         WHEN a.status = "Finalizado" THEN "finished"
@@ -19,7 +18,6 @@ SELECT
         ELSE a.status
     END AS negotiation_status,
     a.number_of_installments,
-    NULL AS paid_installments,
     a.broken_payments AS breached_installments,
     a.total_negotiated_amount_without_fees
     AS original_debt_amount,
