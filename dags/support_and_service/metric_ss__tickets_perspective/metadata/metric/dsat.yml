@@ -1,0 +1,77 @@
+database_name: metric_ss
+table_name: dsat
+description: This table contains DSAT KPI with target per many dimensions.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  channel:
+    description: Identify the channel for this ticket (call, chat, email).
+    dimension: True
+    lineage:
+      - dw_customer_support.fact_ticket.channel
+      - dw_customer_support.fact_ticket.ticket_via
+  journey:
+    description: Journey of the ticket.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.journey
+  journey_step:
+    description: Department journey step.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.journey_step
+  department:
+    description: Department name.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.department
+  team:
+    description: Department team.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.team
+  area:
+    description: Department area (e.g. CX).
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.area
+  customer_type:
+    description: Client type Note - This field does not belong to the taxonomy defined on Central Ops.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type
+  amount_dissatisfied:
+    metric:
+      name: DSAT Amount Dissatisfied
+      description: Sum of dissatisfied responses
+      acronym: Amount Dissatisfied
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analisys
+      approved_by: vicente.neto@quintoandar.com.br
+      link_to_metric: ""
+  amount_responses:
+    metric:
+      name: DSAT Amount Responses
+      description: Total responses
+      acronym: Amount Responses
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analisys
+      approved_by: vicente.neto@quintoandar.com.br
+      link_to_metric: ""
+  dsat_rate:
+    metric:
+      name: DSAT Rate
+      description: Semi-additive metrics representing the DSAT rate
+      acronym: DSAT Rate
+      is_additive: False
+      business_stage: CX
+      hierarchy: User analisys
+      approved_by: vicente.neto@quintoandar.com.br
+      link_to_metric: ""
+  dt_csat_responsed:
+    description: The responsed csat date.
+    dimension: True
+    lineage:
+      - dw_customer_support.fact_ticket.ts_csat_first_response

@@ -1,0 +1,19 @@
+---
+dag:
+  name: metric_ss__tickets_perspective
+  schedule_start_date: 2021,01,01
+  domain: Support and Service
+  owner: data-ae-ss@quintoandar.com.br
+  documentation:
+    dag_purpose: "This DAG creates the Data Support And Service KPIS with targets metrics, all related to the scope within the aggregation."
+workflow:
+  type: query
+  layer: metric
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    spark_version: 13.3.x-scala2.12
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.2xlarge
+    num_workers: 2
+

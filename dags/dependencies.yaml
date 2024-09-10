@@ -3329,6 +3329,18 @@ bietlejuice.metric_rent__tickets:
   - bietlejuice.metric_rent__contracts:load-metric-ended-rentals-confirmed-daily
   - bietlejuice.metric_rent__contracts:load-metric-new-contracts-signed-daily
   - bietlejuice.metric_rent__contracts:load-metric-ongoing-rentals-daily
+bietlejuice.metric_ss__segments_perspective:
+  - bietlejuice.dw_call:load-dw-call-fact-call-tasks
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
+bietlejuice.metric_ss__tickets_perspective:
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
 bietlejuice.reports:
   - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-accepted-into-sns
   - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-sent-into-sns

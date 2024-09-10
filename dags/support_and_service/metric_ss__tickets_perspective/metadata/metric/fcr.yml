@@ -1,0 +1,77 @@
+database_name: metric_ss
+table_name: fcr
+description: This table contains FCR (First Call Resolution)  KPI with target per many dimensions.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  channel:
+    description: Identify the channel for this ticket (call, chat, email).
+    dimension: True
+    lineage:
+      - dw_customer_support.fact_ticket.channel
+      - dw_customer_support.fact_ticket.ticket_via
+  journey:
+    description: Journey of the ticket.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.journey
+  journey_step:
+    description: Department journey step.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.journey_step
+  department:
+    description: Department name.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.department
+  team:
+    description: Department team.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.team
+  area:
+    description: Department area (e.g. CX).
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.area
+  customer_type:
+    description: Client type Note - This field does not belong to the taxonomy defined on Central Ops.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type
+  amount_resolutions:
+    metric:
+      name: Amount recontact tickets
+      description: Number of classified tickets that contacted us again within 4 days of the first contact
+      acronym: Amount Recontact
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analisys
+      approved_by: vicente.neto@quintoandar.com.br
+      link_to_metric: "https://docs.google.com/document/d/1X-cyvwZdQTsTVVkzeA1rjqDrtLt1XIryozl7VBWiqkU/edit?usp=sharing"
+  amount_tickets:
+    metric:
+      name: Amount Recontact Tickets
+      description: Amount of tickets that correspond or do not correspond to recontact
+      acronym: Amoun Recontact Responses
+      is_additive: True
+      business_stage: CX
+      hierarchy: User analisys
+      approved_by: vicente.neto@quintoandar.com.br
+      link_to_metric: "https://docs.google.com/document/d/1X-cyvwZdQTsTVVkzeA1rjqDrtLt1XIryozl7VBWiqkU/edit?usp=sharing"
+  fcr_rate:
+    metric:
+      name: Recontact Rate
+      description: Semi-additive metrics representing the Sum of tickets that are recontacted divided by the overall number of recontact tickets
+      acronym: DSAT Rate
+      is_additive: False
+      business_stage: CX
+      hierarchy: User analisys
+      approved_by: vicente.neto@quintoandar.com.br
+      link_to_metric: "https://docs.google.com/document/d/1X-cyvwZdQTsTVVkzeA1rjqDrtLt1XIryozl7VBWiqkU/edit?usp=sharing"
+  dt_ticket_created:
+    description: The created date of ticket.
+    dimension: True
+    lineage:
+      - dw_customer_support.fact_ticket.ts_started
