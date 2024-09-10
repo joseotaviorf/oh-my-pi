@@ -5,6 +5,7 @@ dag:
 workflow:
   type: query_delta
   layer: dw
+  custom_schema: collection_recovery_quintoandar
   tables_customization:
     fact_collection:
       partitions: ["year", "month", "day"]
