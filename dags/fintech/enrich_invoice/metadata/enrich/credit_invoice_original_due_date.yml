@@ -138,6 +138,10 @@ columns:
     lineage:
       - datalake_retsuko.invoice.id_external
     description: "Flag to indicate whether an invoice with debt has been forgiven"
+  is_fraud:
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: "Flag to indicate whether an invoice with debt was fraud"
   accrual_year_month:
     lineage:
       - datalake_retsuko.invoice.accrual_year_month

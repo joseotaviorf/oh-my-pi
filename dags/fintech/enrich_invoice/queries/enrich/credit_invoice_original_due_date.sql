@@ -13,6 +13,24 @@ debt_forgiveness AS (
   ON i.id_external = d.id_invoice
   WHERE status IN ("not-payable", "canceled")
 ),
+fraud AS ( 
+  SELECT
+    i.id_external,
+    i.id_contract_external,
+    i.id,
+    i.id_contract,
+    i.purpose,
+    i.status,
+    SUM(b.value_sign_bill_item) as due_amount 
+  FROM datalake_retsuko.invoice AS i
+  INNER JOIN datalake_retsuko.bill_items AS b
+  ON i.id_external = b.id_invoice
+  WHERE 
+      i.status = "not-payable" 
+  AND b.bill_item = "LOSS" 
+  AND LOWER(b.bill_item_description) LIKE "%ação boletos%"
+  GROUP BY 1,2,3,4,5,6
+),
 credit_holidays AS (
     SELECT
         12 AS day,
@@ -73,13 +91,14 @@ credit_holidays AS (
         inv.ts_paid,
         inv.ts_created,
         inv.status,
-        inv.due_amount,
+        coalesce(f.due_amount, inv.due_amount) AS due_amount, --NEW
         inv.ts_due,
         inv.accrual_year_month,
         DATE_ADD(ADD_MONTHS(DATE_FORMAT(CAST(UNIX_TIMESTAMP(CONCAT(CAST(inv.accrual_year_month AS STRING),'01'),'yyyyMMdd') AS TIMESTAMP), 'yyyy-MM-dd'),1),6) AS static_original_due_date,
         inv.purpose,
         acc.type AS account_type,
-        IF(df.id_external IS NOT NULL,TRUE,FALSE) AS is_debt_forgiveness
+        IF(df.id_external IS NOT NULL,TRUE,FALSE) AS is_debt_forgiveness,
+        IF(f.id_external IS NOT NULL,TRUE,FALSE) AS is_fraud
     FROM
         datalake_retsuko.invoice AS inv
     JOIN
@@ -88,9 +107,11 @@ credit_holidays AS (
         inv.id_contract = acc.id_contract
     LEFT JOIN debt_forgiveness df
         ON df.id_external = inv.id_external
+    LEFT JOIN fraud f 
+      ON f.id_external = inv.id_external
     WHERE
         acc.type = 'tenant'
-        AND (inv.due_amount < 0 OR df.id_external IS NOT NULL)
+        AND (inv.due_amount < 0 OR df.id_external IS NOT NULL OR f.id_external IS NOT NULL) --NEW
 ), invoices_fixed AS (
   SELECT
         inv.id,
@@ -149,10 +170,11 @@ credit_holidays AS (
                 hl.holiday_name IS NULL
                 AND DAYOFWEEK(inv.static_original_due_date) = 1 THEN DATE_ADD(inv.static_original_due_date,1)
         ELSE
-            inv.static_original_due_date END) AS original_due_date,
+        inv.static_original_due_date END) AS original_due_date,
         inv.purpose,
         inv.account_type,
-        inv.is_debt_forgiveness
+        inv.is_debt_forgiveness,
+        inv.is_fraud
   FROM
     invoices  AS inv
   LEFT JOIN
@@ -223,6 +245,7 @@ SELECT
         WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.original_due_date) >= 180 THEN TRUE
     ELSE FALSE END) AS is_over_180,
     inv.is_debt_forgiveness,
+    inv.is_fraud,
     inv.accrual_year_month,
     inv.original_due_date,
     inv.ts_paid,
