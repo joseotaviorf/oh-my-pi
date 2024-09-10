@@ -31,7 +31,7 @@ workflow:
       extraction_type: incremental
     workgroups: {}
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_memory_cluster
   custom_configurations:
     autotermination_minutes: 20
     aws_attributes:
