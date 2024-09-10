@@ -4,7 +4,7 @@ incremental_partitions: ["year", "month", "day"]
 custom_cluster:
   driver_node_type_id: r5a.12xlarge
   node_type_id: r5a.4xlarge
-  num_workers: 4
+  num_workers: 3
   aws_attributes:
     availability: ON_DEMAND
   spark_version: 12.2.x-scala2.12

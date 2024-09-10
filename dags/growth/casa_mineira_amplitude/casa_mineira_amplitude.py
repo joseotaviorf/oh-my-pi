@@ -20,7 +20,7 @@ SOURCE = "casa_mineira_amplitude"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2021, 6, 17, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
-CLUSTER_DESCRIPTION = "databricks_12_2_med_io-memory_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_io-general_cluster"
 
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols_dag")

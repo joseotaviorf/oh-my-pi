@@ -21,7 +21,7 @@ SOURCE = "wordpress_baroes"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 3, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 11 * * *"
-CLUSTER_DESCRIPTION = "databricks_12_2_med_io-memory_photon_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_min_io-general_photon_cluster"
 
 
 ## Config service
