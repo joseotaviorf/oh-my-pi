@@ -4,6 +4,7 @@ SELECT
         WHEN APFLAG = "S" THEN "Programado"
         WHEN APFLAG = "C" THEN "Concluído"
         WHEN APFLAG = "R" THEN "Quebrado"
+        WHEN APFLAG = "P" THEN "Pendente de Pagamento"
         ELSE APFLAG
     END AS status,
     CASE

@@ -3,14 +3,14 @@ database_name: datalake_cyber_clean
 table_name: payments
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: Table granularity - id_contract + contract_group
+description: Table granularity - installments of the negotiation that were paid
 columns:
   id_contract:
     description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.pmtfil.PMACCT
-  id_invoice:
-    description: "In case of negotiation payment ('Pagamento Acordo' value for payment_type), this field is filled with the negotiation + installment number. Otherwise, this field will be filled with the ID of the original invoice that was amortized in the payment (used for 5C) "
+  id_negotiation:
+    description: "In case of payment of negotiation ('Pagamento Acordo' value for payment_type), this field is filled with the negotiation + installment number. Otherwise, this field will be filled with the ID of the original invoice that was amortized in the payment (used for 5C) "
     lineage:
       - datalake_cyber_raw.pmtfil.PMTDDESC
   id_payment:

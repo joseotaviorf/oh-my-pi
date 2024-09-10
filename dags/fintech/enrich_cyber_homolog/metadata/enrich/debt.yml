@@ -1,0 +1,51 @@
+---
+database_name: datalake_cyber_homolog
+table_name: debt
+owner: null
+domain: fintech
+description: null
+columns:
+  id_debtor:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.c.id_client
+  id_contract:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.c.id_contract_external
+  id_invoice:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.id_invoice
+  creditor:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.a.contract_group
+  payment_status:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.b.retsuko_status
+  invoice_due_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.b.due_amount
+  paid_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.b.main_amount
+  interest_fee_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.b.interest_amount
+  fine_fee_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.b.fine_amount
+  debt_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.b.main_amount
+  dt_invoice_due:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.b.ts_due

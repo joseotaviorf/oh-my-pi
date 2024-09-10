@@ -1,0 +1,83 @@
+---
+database_name: datalake_cyber_homolog
+table_name: collection
+owner: null
+domain: fintech
+description: null
+columns:
+  id_contract:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.c.id_contract_external
+  id_customer:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.c.id_client
+  id_operator:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.UPPER(l.id_user)
+  creditor:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.l.contract_group
+  company:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.u.user_type
+  action:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.action
+  action_description:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.a.code_description
+  result:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.result
+  result_description:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.aa.code_description
+  complement:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.l.complement
+  complement_description:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.aa.code_description
+  occurrence_description:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.l.comment
+  esforco:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.NULL
+  alo:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.NULL
+  cpc:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.NULL
+  promisse:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.NULL
+  agreement:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.NULL
+  failure:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.NULL
+  ts_occurrence:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.l.ts_activity

@@ -1,0 +1,106 @@
+---
+database_name: datalake_cyber_homolog
+table_name: negotiation
+owner: null
+domain: fintech
+description: null
+columns:
+  id_negotiation:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.id_agreement
+  id_customer:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.c.id_client
+  id_contract:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.c.id_contract_external
+  id_operator:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.id_user
+  advisory:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.ag.agency_name
+  id_campaign:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.cp.offer_number
+  creditor:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.contract_group
+  agreement_type:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.agreement_type
+  origin_agreement:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.CASE WHEN u.user_type = "Externo" THEN "Assessoria"
+      WHEN NOT id_campaign IS NULL THEN "Carta Campanha" END
+  is_recurrent_debtor:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.NULL
+  negotiation_status:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.CASE WHEN a.status = "Autorizado" THEN "offset"
+      WHEN a.status = "Finalizado" THEN "finished" WHEN a.status = "Cancelado" THEN
+      "canceled" ELSE a.status END
+  number_of_installments:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.number_of_installments
+  paid_installments:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.NULL
+  breached_installments:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.broken_payments
+  original_debt_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.total_negotiated_amount_without_fees
+  fine_fee_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.fees_amount
+  percentage_paid_agreement:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.percentage_paid_agreement
+  additional_interest_rate:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.additional_interest_rate
+  interest_fee_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.interest_rate * a.total_negotiated_amount_without_fees
+  credit_card_fee_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.additional_interest_rate * a.total_negotiated_amount_without_fees
+  total_debt_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.total_negotiated_amount_with_fees
+  total_discount_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.ad.amount_without_discount - ad.amount_with_discount
+  negotiated_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.ad.amount_with_discount
+  dt_promisse:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.a.ts_agreement_creation

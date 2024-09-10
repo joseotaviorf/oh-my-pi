@@ -1,0 +1,85 @@
+---
+database_name: datalake_cyber_homolog
+table_name: installment
+owner: null
+domain: fintech
+description: null
+columns:
+  id_negotiation:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.a.id_agreement
+  id_contract:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.c.id_contract_external
+  id_debtor:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.c.id_client
+  id_receipt:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.p.id_payment
+  creditor:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.a.contract_group
+  status:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.status
+  installment_status:
+    description: ''
+    lineage:
+    - "datalake_cyber_clean.agreement_installments.CASE WHEN ai.status = 'Quebrado'\
+      \ THEN 'canceled' WHEN ai.status = 'Conclu\xEDdo' THEN 'paid' WHEN ai.status\
+      \ IN ('Pendente de Pagamento', 'Programado') THEN 'pending' ELSE ai.status END"
+  payment_type:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.payment_type
+  payment_method:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.payment_method
+  installment_number:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.installment_number
+  amount_to_pay:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.amount_to_pay
+  interest_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.interest_amount
+  fees_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.fees_amount
+  tax_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.tax_amount
+  amortization_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.amortization_amount
+  final_balance:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.final_balance
+  paid_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.p.payment_amount
+  dt_due:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.DATE(ai.ts_due_installment)
+  dt_paid:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreement_installments.DATE(p.ts_payment)

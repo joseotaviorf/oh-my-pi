@@ -1463,6 +1463,20 @@ bietlejuice.enrich_customer_support_test:
   - bietlejuice.quinto_messenger:load-clean-task
   - bietlejuice.quinto_messenger:load-clean-task-event
   - bietlejuice.sauron:load-clean-session
+bietlejuice.enrich_cyber_homolog:
+  - bietlejuice.cyber:load-clean-agency
+  - bietlejuice.cyber:load-clean-agreement-discounts
+  - bietlejuice.cyber:load-clean-agreement-installments
+  - bietlejuice.cyber:load-clean-agreement-invoices
+  - bietlejuice.cyber:load-clean-agreements
+  - bietlejuice.cyber:load-clean-campaign
+  - bietlejuice.cyber:load-clean-contracts
+  - bietlejuice.cyber:load-clean-logs
+  - bietlejuice.cyber:load-clean-payments
+  - bietlejuice.cyber:load-clean-users
+  - bietlejuice.cyber:load-clean-bill
+  - bietlejuice.cyber:load-clean-historical-agreements
+  - bietlejuice.cyber_complement:load-clean-logs-code-description
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
