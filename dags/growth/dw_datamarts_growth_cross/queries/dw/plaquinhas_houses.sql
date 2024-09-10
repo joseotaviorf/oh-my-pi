@@ -31,7 +31,6 @@ WITH rent_ongoing_listings AS (
       AND date >= CURRENT_DATE - INTERVAL '2' year -- DATE('2023-01-01') -- Month when the campaign started
       AND f.sk_region > 0
       AND dr.country_code = 'BR'
-      AND dr.city_group NOT IN ('Belo Horizonte', 'Uberlândia')
   QUALIFY ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC NULLS FIRST) = 1
 ),
 sale_ongoing_listings AS (
@@ -65,7 +64,6 @@ sale_ongoing_listings AS (
     AND date >= CURRENT_DATE - INTERVAL '2' year -- DATE('2023-01-01') -- Month when the campaign started
     AND f.sk_region > 0
     AND dr.country_code = 'BR'
-    AND dr.city_group NOT IN ('Belo Horizonte', 'Uberlândia')
   QUALIFY ROW_NUMBER() OVER(PARTITION BY f.sk_sale_listing, d.date ORDER BY f.ts_status_started DESC) = 1
 ),
 ol_detalhes AS (
