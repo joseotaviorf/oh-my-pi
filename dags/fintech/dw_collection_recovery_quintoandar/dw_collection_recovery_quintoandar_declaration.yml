@@ -1,11 +1,10 @@
 dag:
-  name: dw_collection_recovery_quintoandar_quintoandar
+  name: dw_collection_recovery_quintoandar
   schedule_start_date: 2023,11,11
   owner: Data Fintech
 workflow:
   type: query_delta
   layer: dw
-  custom_schema: collection_recovery_quintoandar
   tables_customization:
     fact_collection:
       partitions: ["year", "month", "day"]
