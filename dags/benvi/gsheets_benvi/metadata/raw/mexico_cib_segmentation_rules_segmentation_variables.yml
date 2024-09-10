@@ -1,5 +1,0 @@
-database_name: datalake_gsheets_raw
-table_name: mexico_cib_segmentation_rules_segmentation_variables
-description: Google Sheets containing the history of CIB's segmentation rules.
-domain: International
-owner: bruna.prates@quintoandar.com.br

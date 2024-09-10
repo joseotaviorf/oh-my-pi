@@ -1,8 +1,0 @@
----
-login_url: https://thribee.com/index.php/cod.campaigns_performance
-campaign_url: https://thribee.com/index.php/cod.source_overview_report_json
-accounts:
-  rent:
-    account_name: benvi_homes_mx
-    account_id: 5941945
-

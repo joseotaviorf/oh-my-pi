@@ -1,5 +1,0 @@
-database_name: datalake_gsheets_raw
-table_name: mexico_ongoing_listings_target
-description: Google Sheets that contains ongoing listings targets inputed manually by P&P team in Benvi.
-domain: International
-owner: guilherme.dorella@quintoandar.com.br

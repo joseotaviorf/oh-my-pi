@@ -10,7 +10,7 @@ sheets_info:
     sheet_name: rateio_manual
     clean_table_name: marketing_manual_shared_costs
     sheet_context: growth_intraday
-  
+
   marketing_manual_costs_name_convetion:
     sheet_id: 14G3BRxBoIgutpNL7l_0xdeoJ0rnLWAc5A4ww4ZqfQvs
     sheet_name: rateio_name_convention
@@ -21,18 +21,6 @@ sheets_info:
     sheet_id: 1YiFYgv-KTO8JydV5lO6HryZ8qnnN9wXSmPcGQ6KdmLI
     sheet_name: rateio_name_convention
     clean_table_name: marketing_name_convention_shared_costs
-    sheet_context: growth_intraday
-
-  mexico_marketing_manual_shared_costs:
-    sheet_id: 16mK3QXun__iihh13NGJW0B10Q71l-obpMLj0jwMnpYQ
-    sheet_name: mexico_rateio_manual
-    clean_table_name: mexico_marketing_manual_shared_costs
-    sheet_context: growth_intraday
-
-  mexico_marketing_name_convention_shared_costs:
-    sheet_id: 16mK3QXun__iihh13NGJW0B10Q71l-obpMLj0jwMnpYQ
-    sheet_name: mexico_rateio_name_convention
-    clean_table_name: mexico_marketing_name_convention_shared_costs
     sheet_context: growth_intraday
 
   casa_mineira_marketing_manual_shared_costs:

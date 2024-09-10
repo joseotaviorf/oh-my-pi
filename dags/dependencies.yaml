@@ -2103,16 +2103,6 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-shared-costs
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-name-convention-shared-costs
-bietlejuice.enrich_mexico_cib_events:
-  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
-  - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
-bietlejuice.enrich_mexico_google_ads:
-  - bietlejuice.google_ads:load-clean-ads-performance
-  - bietlejuice.google_ads:load-clean-campaigns-performance
-  - bietlejuice.google_ads:load-clean-keywords-performance
-  - bietlejuice.google_ads:load-clean-videos-performance
 bietlejuice.enrich_mission_control:
   - bietlejuice.mission_control:load-clean-contract
   - bietlejuice.mission_control:load-clean-contract-person
