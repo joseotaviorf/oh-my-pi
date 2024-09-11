@@ -57,7 +57,7 @@ houses_published AS (
         id_house,
         business_context,
         ts_house_published,
-        CONCAT('{', array_join(array_agg(CONCAT('"', experiment_config.experiment_name, '":"all"')), ','), '}') AS variants
+        CONCAT('\\{', array_join(array_agg(CONCAT('"', experiment_config.experiment_name, '":"all"')), ','), '\\}') AS variants
     FROM
         house_published_repeated
     LEFT JOIN
@@ -91,7 +91,7 @@ SELECT
 
     --ids
 
-    '{}' AS ids,
+    '\\{\\}' AS ids,
 
     -- dimensions
 

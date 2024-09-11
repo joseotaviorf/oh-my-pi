@@ -164,7 +164,7 @@ experiment_searches AS (
     id_search,
     -- this build a json {experiment_name: variant} example:
     -- {exemple_experiment_name_1: baseline, exemple_experiment_name_2: treatment_1, ....}
-    concat('{', array_join(array_agg(variants), ','), '}') AS variants
+    concat('\\{', array_join(array_agg(variants), ','), '\\}') AS variants
 FROM experiment_searches_not_json
 GROUP BY id_search
 ),
@@ -449,7 +449,7 @@ SELECT
 
     --experimentation
 
-    COALESCE(variants, '{}') AS variants,
+    COALESCE(variants, '\\{\\}') AS variants,
 
     --metrics
 
