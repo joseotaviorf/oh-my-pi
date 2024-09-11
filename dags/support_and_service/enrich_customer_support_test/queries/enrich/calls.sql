@@ -36,9 +36,8 @@ call_events AS (
   WHERE
     MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
 ),
-queues AS (
+reservation_queues AS (
   SELECT
-    id_task,
     id_reservation,
     id_queue,
     queue_name
@@ -46,6 +45,16 @@ queues AS (
     call_events
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_reservation ORDER BY ts_task_created) = 1
+),
+task_queues AS (
+  SELECT
+    id_task,
+    id_queue,
+    queue_name
+  FROM
+    call_events
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_task_created) = 1
 ),
 reservations AS (
   SELECT
@@ -59,7 +68,6 @@ reservations AS (
     worker_email,
     from_phone_number,
     to_phone_number,
-    TRUE AS is_call_answered,
     COUNT(
       CASE
         WHEN event_type = 'reservation.accepted' OR event_type = 'reservation.completed' THEN id_reservation
@@ -98,6 +106,14 @@ reservations AS (
     event_type LIKE 'reservation.%'
   GROUP BY ALL
 ),
+call_answered_flag AS (
+  SELECT
+    id_task,
+    MAX(is_reservation_answered) AS is_call_answered
+  FROM
+    reservations
+  GROUP BY 1
+),
 unanswered_calls AS (
   SELECT
     id_task,
@@ -128,27 +144,30 @@ unanswered_calls AS (
 ),
 calls AS (
   SELECT
-    id_call,
-    id_task,
-    id_reservation,
-    id_worker,
-    direction,
-    channel_type,
-    bpo_name,
-    worker_email,
-    from_phone_number,
-    to_phone_number,
-    is_call_answered,
-    is_reservation_answered,
-    is_reservation_timeout,
-    is_reservation_rejected,
-    is_reservation_canceled,
-    ts_reservation_created,
-    ts_reservation_accepted,
-    ts_reservation_ended,
-    ts_task_created
+    r.id_call,
+    r.id_task,
+    r.id_reservation,
+    r.id_worker,
+    r.direction,
+    r.channel_type,
+    r.bpo_name,
+    r.worker_email,
+    r.from_phone_number,
+    r.to_phone_number,
+    caf.is_call_answered,
+    r.is_reservation_answered,
+    r.is_reservation_timeout,
+    r.is_reservation_rejected,
+    r.is_reservation_canceled,
+    r.ts_reservation_created,
+    r.ts_reservation_accepted,
+    r.ts_reservation_ended,
+    r.ts_task_created
   FROM
-    reservations
+    reservations AS r
+  LEFT JOIN
+    call_answered_flag AS caf
+      ON caf.id_task = r.id_task
   UNION ALL
   SELECT
     id_call,
@@ -179,7 +198,7 @@ SELECT DISTINCT
   cs.id_user,
   c.id_task,
   c.id_reservation,
-  COALESCE(q1.id_queue, q2.id_queue) AS id_queue,
+  COALESCE(rq.id_queue, tq.id_queue) AS id_queue,
   c.id_worker,
   CASE
     WHEN c.channel_type = 'call-in-app' OR c.direction = 'outbound-api' THEN 'INAPP'
@@ -188,7 +207,7 @@ SELECT DISTINCT
   c.direction,
   c.channel_type,
   c.bpo_name,
-  COALESCE(q1.queue_name, q2.queue_name) AS queue_name,
+  COALESCE(rq.queue_name, tq.queue_name) AS queue_name,
   c.worker_email,
   c.from_phone_number,
   c.to_phone_number,
@@ -207,11 +226,11 @@ SELECT DISTINCT
 FROM
   calls AS c
 LEFT JOIN
-  queues AS q1
-    ON q1.id_reservation = c.id_reservation
+  reservation_queues AS rq
+    ON rq.id_reservation = c.id_reservation
 LEFT JOIN
-  queues AS q2
-    ON q2.id_task = c.id_task
+  task_queues AS tq
+    ON tq.id_task = c.id_task
     AND c.id_reservation IS NULL
 LEFT JOIN
   call_sessions AS cs
