@@ -19,9 +19,6 @@ columns:
       - reverse_atento.general_metric
       - reverse_atento.speech_call
       - reverse_atento.speech_chat
-      - reverse_atento.taxonomia_call
-      - reverse_atento.taxonomia_chat
-      - reverse_atento.taxonomia_email
       - reverse_atento.twilio_chat_aht
       - reverse_atento.recontact_mx
       - reverse_atento.taxonomy

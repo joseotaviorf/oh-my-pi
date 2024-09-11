@@ -56,30 +56,6 @@ WITH atento_tables AS (
     UNION ALL
   
   SELECT
-    'taxonomia_call' AS table_name,
-    ts_load
-  FROM
-      reverse_atento.taxonomia_call
-  
-    UNION ALL
-  
-  SELECT
-    'taxonomia_chat' AS table_name,
-    ts_load
-  FROM
-      reverse_atento.taxonomia_chat
-  
-    UNION ALL
-  
-  SELECT
-    'taxonomia_email' AS table_name,
-    ts_load
-  FROM
-      reverse_atento.taxonomia_email
-  
-    UNION ALL
-  
-  SELECT
     'twilio_chat_aht' AS table_name,
     ts_load
   FROM

@@ -529,15 +529,18 @@ bietlejuice.enrich_atento_reports:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric
     - bietlejuice.reverse_atento:load-reverse-csat-front
     - bietlejuice.reverse_atento:load-reverse-demand-metric
+    - bietlejuice.reverse_atento:load-reverse-email
     - bietlejuice.reverse_atento:load-reverse-fcr-metric
     - bietlejuice.reverse_atento:load-reverse-general-metric
+    - bietlejuice.reverse_atento:load-reverse-recontact-mx
+    - bietlejuice.reverse_atento:load-reverse-recontact
     - bietlejuice.reverse_atento:load-reverse-speech-call
     - bietlejuice.reverse_atento:load-reverse-speech-chat
-    - bietlejuice.reverse_atento:load-reverse-taxonomia-call
-    - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
-    - bietlejuice.reverse_atento:load-reverse-taxonomia-email
-    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
     - bietlejuice.reverse_atento:load-reverse-taxonomy
+    - bietlejuice.reverse_atento:load-reverse-tickets-transferred-total
+    - bietlejuice.reverse_atento:load-reverse-tickets-transferred
+    - bietlejuice.reverse_atento:load-reverse-tmr
+    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.enrich_databricks_usage_costs:
   add:
     - bietlejuice.gsheets_platform:done-clean-databricks-contract-details
@@ -792,15 +795,18 @@ bietlejuice.reverse_atento_access:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric
     - bietlejuice.reverse_atento:load-reverse-csat-front
     - bietlejuice.reverse_atento:load-reverse-demand-metric
+    - bietlejuice.reverse_atento:load-reverse-email
     - bietlejuice.reverse_atento:load-reverse-fcr-metric
     - bietlejuice.reverse_atento:load-reverse-general-metric
+    - bietlejuice.reverse_atento:load-reverse-recontact-mx
+    - bietlejuice.reverse_atento:load-reverse-recontact
     - bietlejuice.reverse_atento:load-reverse-speech-call
     - bietlejuice.reverse_atento:load-reverse-speech-chat
-    - bietlejuice.reverse_atento:load-reverse-taxonomia-call
-    - bietlejuice.reverse_atento:load-reverse-taxonomia-chat
-    - bietlejuice.reverse_atento:load-reverse-taxonomia-email
-    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
     - bietlejuice.reverse_atento:load-reverse-taxonomy
+    - bietlejuice.reverse_atento:load-reverse-tickets-transferred-total
+    - bietlejuice.reverse_atento:load-reverse-tickets-transferred
+    - bietlejuice.reverse_atento:load-reverse-tmr
+    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.reverse_bic_ss:
   add:
     - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
