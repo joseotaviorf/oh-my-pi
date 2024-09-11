@@ -79,3 +79,4 @@ FROM
   segments_perspective
 GROUP BY
   ALL
+  

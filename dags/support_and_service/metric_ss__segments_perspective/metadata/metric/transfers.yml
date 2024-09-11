@@ -85,3 +85,4 @@ columns:
     dimension: True
     lineage:
       - dw_customer_support.fact_received_contact.ts_created
+      
