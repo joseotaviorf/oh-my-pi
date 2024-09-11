@@ -104,6 +104,12 @@ tables:
         - perfil_do_estoque
         - ccv_medio_mensal
         - ccvs_mes_da_imobiliaria_sem_ser_com_rede_5a
+        - cluster_performance
+        - secretaria_o_responsavel
+        - expert_supply_responsavel
+        - expert_demand_responsavel
+        - pessoas_de_ops_supply_responsavel
+        - esta_no_leadgen_
       propertiesWithHistory:
         - hs_lead_status
         - categoria_do_membro
