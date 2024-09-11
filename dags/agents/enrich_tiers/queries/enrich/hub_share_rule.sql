@@ -44,4 +44,4 @@ JOIN
 WHERE
     ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY   
-    sr.ts_updated = LAST(sr.ts_updated) OVER (PARTITION BY sr.id_share_rule)
+    sr.ts_updated = LAST(sr.ts_updated) OVER (PARTITION BY sr.id_share_rule, ad.year, ad.bimester)
