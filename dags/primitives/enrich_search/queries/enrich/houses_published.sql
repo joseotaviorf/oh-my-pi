@@ -57,13 +57,13 @@ houses_published AS (
         id_house,
         business_context,
         ts_house_published,
-        CONCAT('{', array_join(array_agg(CONCAT('"', experiment_name, '":"all"')), ','), '}') AS variants
+        CONCAT('{', array_join(array_agg(CONCAT('"', experiment_config.experiment_name, '":"all"')), ','), '}') AS variants
     FROM
         house_published_repeated
     LEFT JOIN
-        datalake_search.experiments_config AS experiments_config
-        ON experiments_config.config.begin_date <= ts_house_published
-        AND (experiments_config.config.end_date >= ts_house_published OR experiments_config.config.end_date IS NULL)
+        datalake_search.experiment_config AS experiment_config
+        ON experiment_config.config.begin_date <= ts_house_published
+        AND (experiment_config.config.end_date >= ts_house_published OR experiment_config.config.end_date IS NULL)
     WHERE
         COALESCE(DATEDIFF(ts_house_published, ts_house_published_shift), 1000) > 84
     GROUP BY
@@ -86,7 +86,7 @@ house_cities AS (
 )
 
 SELECT
-    NULL AS id_search,
+    CAST(NULL AS STRING) AS id_search,
     houses_published.id_house,
 
     --ids

@@ -11,19 +11,19 @@ WITH experiments AS (
         experiment_name,
         config.begin_date,
         config.end_date,
-        variant_name,
-        config.variants[variant_name] as variant_standard_name
+        regexp_replace(_variant_name, '"', '') AS variant_name,
+        regexp_replace(variants[_variant_name], '"', '') as variant_standard_name
         FROM (
             SELECT
                 *,
-                explode(map_keys(config.variants)) AS variant_name
+                explode(map_keys(str_to_map(regexp_replace(config.variants, '\\{|\\}', '' )))) AS _variant_name,
+                str_to_map(regexp_replace(config.variants, '\\{|\\}', '' )) AS variants
             FROM
-                datalake_search.experiments_config
+                datalake_search.experiment_config
             WHERE
                 (DATE_SUB(DATE('{start_date}'), {days_past_21}) <= config.end_date OR config.end_date IS NULL)
                 AND DATE('{end_date}') >= config.begin_date
         )
-
 ),
 
 -----------------
@@ -154,7 +154,7 @@ duplicate_experiment_searches AS
 experiment_searches_not_json AS (
     SELECT DISTINCT
     id_search,
-    CONCAT('"', experiment_name, '":"', variant_standard_name, '"') AS variants
+    CONCAT('"', duplicate_experiment_searches.experiment_name, '":"', variant_standard_name, '"') AS variants
 FROM duplicate_experiment_searches
 WHERE row_n = 1
 ),
