@@ -8,8 +8,8 @@ WITH last_inspection_synch AS(
         ib.repairs_exempted_ac,
         ib.repairs_absorbed_ac,
         ib.total_tentant_repair_ac,
-        MAX(ib.id_external) FILTER(WHERE ib.inspection_type = 'offboarding') AS id_exit_inspection,
-        MAX(DATE(ib.ts_inspected)) AS dt_last_inspection_synch
+        ib.id_external AS id_exit_inspection,
+        DATE(ib.ts_inspected) AS dt_last_inspection_synch
     FROM
         datalake_terminator_clean.termination AS t
     JOIN
@@ -17,8 +17,10 @@ WITH last_inspection_synch AS(
             ON t.id_contract = ib.id_contract
     WHERE
         ib.ts_inspected IS NOT NULL
-    GROUP BY
-        1, 2, 3, 4, 5, 6, 7, 8
+        AND ib.inspection_type = 'offboarding'
+        AND ib.status <> 'cancelled'
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY t.id ORDER BY ib.ts_inspected DESC) = 1
 ),
 last_negociation AS (
     SELECT
