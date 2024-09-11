@@ -59,6 +59,12 @@ sheets_info:
     clean_table_name: aux_check_photo_sender
     sheet_context: static
 
+  broker_wave_allocation:
+    sheet_id: 19HqMoDNfuxc3_oS4v08wpiYP5RWY18QkNrT8sqUJV70
+    sheet_name: broker_wave_allocation
+    clean_table_name: broker_wave_allocation
+    sheet_context: static
+
   cities_neighborhoods_ibge_qa:
     sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
     sheet_name: ibge_5a_cities

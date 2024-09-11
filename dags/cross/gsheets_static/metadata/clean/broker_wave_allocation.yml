@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: broker_wave_allocation
+columns:
+  sk_broker:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.sk_broker
+  qtd_contratos:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.qtd_contratos
+  expected_revenue:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.expected_revenue
+  share_contratos:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.share_contratos
+  contratos_acc:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.contratos_acc
+  share_contratos_acc:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.share_contratos_acc
+  rank:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.rank
+  share_reas:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.share_reas
+  wave:
+    lineage:
+      - datalake_gsheets_raw.broker_wave_allocation.wave
