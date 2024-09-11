@@ -1,6 +1,6 @@
 dag:
   name: dw_date
-  owner: Data Engineering
+  owner: Data Fintech
 workflow:
   type: query
   layer: dw

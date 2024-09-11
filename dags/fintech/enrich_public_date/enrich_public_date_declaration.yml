@@ -2,7 +2,7 @@
 dag:
   name: enrich_public_date
   schedule_start_date: 2020, 7, 1
-  owner: Data Engineering
+  owner: Data Fintech
   documentation:
     dag_purpose: Creates enriched tables for the dw_public.dim_date using dynamical holidays from other sources
 workflow:

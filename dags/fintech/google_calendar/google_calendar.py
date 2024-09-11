@@ -47,7 +47,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 ENV = os.environ.get("ENVIRONMENT")
-DAG_OWNER = DAGOwnerEnum.DEFAULT_OWNER
+DAG_OWNER = DAGOwnerEnum.DATA_FINTECH
 
 extra_libs = [
     {"pypi": {"package": "google-api-python-client==2.48.0"}},
