@@ -3331,12 +3331,12 @@ bietlejuice.metric_rent__tickets:
   - bietlejuice.metric_rent__contracts:load-metric-ended-rentals-confirmed-daily
   - bietlejuice.metric_rent__contracts:load-metric-new-contracts-signed-daily
   - bietlejuice.metric_rent__contracts:load-metric-ongoing-rentals-daily
-bietlejuice.metric_ss__segments_perspective:
+bietlejuice.metric_ss__segments:
   - bietlejuice.dw_call:load-dw-call-fact-call-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
-bietlejuice.metric_ss__tickets_perspective:
+bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy

@@ -1,6 +1,6 @@
 ---
 dag:
-  name: metric_ss__tickets_perspective
+  name: metric_ss__tickets
   schedule_start_date: 2021,01,01
   domain: Support and Service
   owner: Data SS
