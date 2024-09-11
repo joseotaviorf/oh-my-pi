@@ -1,30 +1,42 @@
 database_name: datalake_amplitude_partner_taxonomy
 table_name: amplitude_partner_taxonomy
+description: Partner Agent data from Amplitude. Each row in the table shows an event related to the agent's context and its origin.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_device:
     lineage:
       - datalake_amplitude_clean.events.id_device
+    description: Device Id in Amplitude.
   country_code:
     lineage:
       - datalake_amplitude_clean.events.user_properties
+    description: Country code of the user.
   user_country:
     lineage:
       - datalake_amplitude_clean.events.country
+    description: Country of the user.
   utm_campaign:
     lineage:
       - datalake_amplitude_clean.events.user_properties
+    description: Identifies the promotion of an specific campaign.
   utm_medium:
     lineage:
       - datalake_amplitude_clean.events.user_properties
+    description: Identifies the type of strategy used on the campaign.
   utm_source:
     lineage:
       - datalake_amplitude_clean.events.user_properties
+    description: Identifies which url sent the traffic.
   year:
     lineage:
       - datalake_amplitude_clean.events.year
+    description: Year when the record was created or updated. It's a partition.
   month:
     lineage:
       - datalake_amplitude_clean.events.month
+    description: Month when the record was created or updated. It's a partition.
   day:
     lineage:
       - datalake_amplitude_clean.events.day
+    description: Day when the record was created or updated. It's a partition.

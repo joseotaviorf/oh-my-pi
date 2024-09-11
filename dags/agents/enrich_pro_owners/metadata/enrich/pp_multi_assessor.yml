@@ -39,7 +39,7 @@ columns:
     categories:
       PP: PP Multi User.
       ASS: Assessor User.
-  cluster_pp_mult:
+  cluster_pp_multi:
     lineage:
       - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
       - datalake_pro_owners.daily_owner_houses_quantity_history.ongoing_houses

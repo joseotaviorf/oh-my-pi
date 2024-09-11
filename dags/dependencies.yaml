@@ -2921,6 +2921,7 @@ bietlejuice.enrich_tiers:
 bietlejuice.enrich_tiers_classification:
   - bietlejuice.enrich_tiers:load-enrich-agent-performance
   - bietlejuice.enrich_tiers:load-enrich-hub-points-rule
+  - bietlejuice.enrich_tiers:load-enrich-hub-share-rule
 bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates

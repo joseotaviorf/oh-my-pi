@@ -1,8 +1,7 @@
 ---
 database_name: dw_hub_services
 table_name: fact_business_unit_region
-description: 
-  This fact shows the relationship between business units and their regions of operation, 
+description: This fact shows the relationship between business units and their regions of operation, 
   indicating whether they are active, when the operation started and ended.
   Each operation relationship is unique by sk_business_unit_region.
 domain: Data Agents

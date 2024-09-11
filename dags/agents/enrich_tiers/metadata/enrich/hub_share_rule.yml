@@ -1,11 +1,9 @@
 ---
 database_name: datalake_tiers
-table_name: hub_points_rule
-description: 
-  Table containing the rules for hub agents compensation ranges. 
+table_name: hub_share_rule
+description: Table containing the rules for hub agents compensation ranges. 
   These rules determine increases and bonuses in compensation based on performance rules. 
   This data reflects what these ranges are and what the conditions are for them to be achieved.
-
   Unlike the source table, this enrichment is designed to update the tier rules per hub on a bimonthly basis. 
   When the bimonthly period ends, the rule is frozen and can no longer be changed retroactively, except in 
   cases of data reprocessing.

@@ -1,13 +1,10 @@
 ---
 database_name: datalake_tiers
 table_name: hub_points_rule
-description: 
-  This table contains data on the agent's performance requirements for each operation, enabling the calculation of cumulative points.
+description: This table contains data on the agent's performance requirements for each operation, enabling the calculation of cumulative points.
   These cumulative points from operations can be used to check which compensation range the agent fits into, in the share_rule table.
-
   Unlike the source table, this enrichment is designed to update the tier rules per hub on a bimonthly basis. 
-  When the bimonthly period ends, the rule is frozen and can no longer be changed retroactively, except in 
-  cases of data reprocessing.
+  When the bimonthly period ends, the rule is frozen and can no longer be changed retroactively, except in cases of data reprocessing.
 domain: Data Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:

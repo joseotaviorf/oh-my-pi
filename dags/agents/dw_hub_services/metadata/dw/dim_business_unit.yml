@@ -1,8 +1,7 @@
 ---
 database_name: dw_hub_services
 table_name: dim_business_unit
-description: 
-  This dimension brings the data inherent to the Business Unit, such as name, type and business context, etc.
+description: This dimension brings the data inherent to the Business Unit, such as name, type and business context, etc.
   Each line is unique per Business Unit, represented by sk_business_unit.
 domain: Data Agents
 owner: data-ae-agents@quintoandar.com.br

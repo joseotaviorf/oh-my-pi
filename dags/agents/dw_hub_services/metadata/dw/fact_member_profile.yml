@@ -1,11 +1,9 @@
 ---
 database_name: dw_hub_services
 table_name: fact_member_profile
-description: 
-  This fact brings up the relationship between the members of the hub, which business 
+description: This fact brings up the relationship between the members of the hub, which business 
   unit it is linked to and who is its direct supervisor (parent member). 
   It also provides information whether this link is active, when it started and ended.
-
   Each line is unique due to the relationship between the hub member, the hub and its 
   parent member, this relationship being represented by sk_member_relationship.
 domain: Data Agents

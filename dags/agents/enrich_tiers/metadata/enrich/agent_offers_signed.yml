@@ -19,6 +19,8 @@ columns:
       - datalake_sale_offer_flows.offer_specialists.id_agent
       - datalake_ebdb_user.user.id_agent
     description: Unique identifier of the agent.
+  agent_profile:
+    description: Type of Agents (Negotiation Executive or Broker)
   has_tqc:
     description: Indicates that the offer had a buyer referral through the ‘Tem Quem Compra’ (TQC) program.
   has_ciq:
