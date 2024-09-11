@@ -9,4 +9,4 @@ SELECT
     CAST(NULLIF(REPLACE(share_reas, ',', ''), '') AS DECIMAL(14,10)) AS share_reas,
     wave
 FROM
-    datalake_gsheets_raw.nexxera_holly_days
+    datalake_gsheets_raw.broker_wave_allocation
