@@ -153,6 +153,7 @@ tickets_per_task AS (
     t.replies,
     ca.is_call_answered,
     t.ts_budget,
+    COALESCE(ca.ts_reservation_created, ch.ts_created) AS ts_created_twilio,
     t.ts_created,
     t.ts_solved,
     t.ts_closed,
@@ -174,12 +175,12 @@ tickets_per_task AS (
 ),
 ticket_queue_attributes AS (
   WITH queue_metrics AS (
-    SELECT
+    SELECT DISTINCT
       id_ticket,
-      FIRST(queue) OVER (PARTITION BY id_ticket ORDER BY ts_created) AS first_queue,
-      LAST(queue) OVER (PARTITION BY id_ticket ORDER BY ts_created) AS last_queue,
-      FIRST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_created) AS first_analyst_email,
-      LAST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_created) AS last_analyst_email
+      FIRST(queue) OVER (PARTITION BY id_ticket ORDER BY ts_created_twilio) AS first_queue,
+      FIRST(queue) OVER (PARTITION BY id_ticket ORDER BY ts_created_twilio DESC) AS last_queue,
+      FIRST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_created_twilio) AS first_analyst_email,
+      FIRST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_created_twilio DESC) AS last_analyst_email
     FROM
       tickets_per_task
   )
