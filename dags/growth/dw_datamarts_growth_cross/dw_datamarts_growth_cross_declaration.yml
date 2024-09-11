@@ -1,7 +1,7 @@
 dag:
   name: dw_datamarts_growth_cross
   owner: Data Growth
-  documentation:
+  documentation: 
     dag_purpose: |
       Creates/updates the datamart tables that have cross squad dependencies, for the context of Growth, in data lake.
 workflow:
@@ -16,34 +16,34 @@ workflow:
     marketing_demand_supply_branding_costs:
       - performance_marketing_cluster_promotional_bonus_costs
     performance_marketing_cluster_promotional_bonus_costs:
-      - performance_marketing_cluster_promotional_bonus
-    performance_marketing_metrics_demand:
-      - tenant_prospect_status
+      - performance_marketing_cluster_promotional_bonus 
+    performance_marketing_metrics_demand: 
+      - tenant_prospect_status 
       - rent_flow_interactions
-    tenant_prospect_status:
+    tenant_prospect_status: 
       - rent_flow_interactions
     tenant_prospects_activations:
       - rent_flow_interactions
     top_of_funnel_volumes_daily:
-      - performance_marketing_metrics_demand
-      - sale_performance_marketing_metrics_demand
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
       - tenant_prospect_status
-    top_of_funnel_volumes_monthly:
-      - performance_marketing_metrics_demand
-      - sale_performance_marketing_metrics_demand
+    top_of_funnel_volumes_monthly: 
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
       - tenant_prospect_status
     top_of_funnel_volumes_weekly:
-      - performance_marketing_metrics_demand
-      - sale_performance_marketing_metrics_demand
+      - performance_marketing_metrics_demand 
+      - sale_performance_marketing_metrics_demand 
       - tenant_prospect_status
     casa_mineira_top_of_funnel_volumes_daily:
-      - performance_marketing_metrics_imobiliaria_casa_mineira
+      - performance_marketing_metrics_imobiliaria_casa_mineira 
       - performance_marketing_metrics_portal_casa_mineira
     casa_mineira_top_of_funnel_volumes_monthly:
-      - performance_marketing_metrics_imobiliaria_casa_mineira
+      - performance_marketing_metrics_imobiliaria_casa_mineira 
       - performance_marketing_metrics_portal_casa_mineira
     casa_mineira_top_of_funnel_volumes_weekly:
-      - performance_marketing_metrics_imobiliaria_casa_mineira
+      - performance_marketing_metrics_imobiliaria_casa_mineira 
       - performance_marketing_metrics_portal_casa_mineira
 cluster:
   type: custom_cluster

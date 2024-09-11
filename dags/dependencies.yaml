@@ -363,8 +363,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
-  - bietlejuice.enrich_3p:load-enrich-houses-3p
-  - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliates-cost-attributions
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-contract-docusign-signed-events
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-home-page-viewed
