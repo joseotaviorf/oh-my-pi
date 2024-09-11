@@ -103,7 +103,7 @@ def upload_files(files: List[MetadataFileInfo], bucket):
 
 
 def metric_qualculation_method(metric_path: str) -> str:
-    base_path = "/bi-etl-ejuice"
+    base_path = "/woodpecker/src/github.com/quintoandar/bi-etl-ejuice/"
     sql_file_path = metric_path.replace("metadata", "queries").replace(".ymal", ".sql").replace(".yml", ".sql")
     safe_path = os.path.realpath(sql_file_path)
     common_base = os.path.commonpath([base_path, safe_path]) 
