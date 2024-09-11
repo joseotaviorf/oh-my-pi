@@ -91,6 +91,7 @@ SELECT
     else 'other'
   end query_reason,
   user,
+  session_user,
   state,
   if(array_size(warnings) = 0, false, true) AS has_warnings,
   has_row_number,

@@ -59,6 +59,10 @@ columns:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.id_resource_group
     description: User to request to run the query.
+  session_user:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.id_resource_group
+    description: User usedt by Trino to create execution session.
   state:
     lineage:
       - data_platform_metrics.trino_query_log_events_metrics_clean_batch.state
