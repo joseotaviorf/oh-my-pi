@@ -22,6 +22,10 @@ columns:
     lineage:
     - datalake_hubspot.company_history.extracted_3p_tag
     description: Tag related to the Rede partner company registered with HubSpot
+  cluster_performance:
+    lineage:
+      - datalake_hubspot.company.cluster_performance
+    description: Cluster that indicates the type of Rede partnership according to the Performance teams classification.
   company_cluster:
     lineage:
     - datalake_hubspot.company_history.company_cluster

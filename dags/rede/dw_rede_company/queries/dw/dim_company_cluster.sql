@@ -47,6 +47,7 @@ SELECT
   ch.id_company AS sk_company_hubspot,
   ch.company_name,
   ch.company_extracted_3p_tag,
+  c.cluster_performance,
   ch.company_cluster,
   ch.company_cluster LIKE 'Decola%' OR ch.company_cluster LIKE 'Comunidade%' AS is_decola_community,
   ch.company_cluster LIKE 'Decola%' OR ch.company_cluster LIKE 'Comunidade%' AND ch.ts_cluster_end IS NULL AS is_decola_current_cohort,
@@ -60,3 +61,6 @@ FROM
 LEFT JOIN
   decola_cohorts AS dc
     ON ch.id_company = dc.id_company
+LEFT JOIN
+  datalake_hubspot.company AS c
+    ON ch.id_company = c.id_company

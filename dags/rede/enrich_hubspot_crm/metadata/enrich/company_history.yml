@@ -282,6 +282,26 @@ columns:
     lineage:
       - datalake_hubspot_clean.company.properties
     description: Type of company inventory.
+  cluster_performance:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Cluster that indicates the type of Rede partnership according to the Performance teams classification.
+  responsible_secretary:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Person responsible for the Rede partner in the Secretariat team.
+  responsible_supply_expert:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Person responsible for the Rede partner in the Rede Supply team.
+  responsible_demand_expert:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Person responsible for the Rede partner in the Rede Demand team.
+  responsible_operations_supply:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Person responsible for the Rede partner in the Rede Operations team.
   average_monthly_ccvs:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -394,6 +414,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.company.properties
     description: Whether or not the company works with rent. Not the same as member_type! The company might work with rent, but only send sale leads, for example.
+  is_flagged_as_leadgen:
+    lineage:
+      - datalake_hubspot_clean.company.properties
+    description: Whether or not the company has agents in Lead Gen program.
   has_partnerships_with_other_agencies:
     lineage:
       - datalake_hubspot_clean.company.properties

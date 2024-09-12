@@ -46,6 +46,11 @@ SELECT
     COALESCE(ce.cnpj, c.cnpj, 'Unknown') AS cnpj,
     COALESCE(ce.rfc, c.rfc, 'Unknown') AS rfc,
     COALESCE(c.creci, 'Unknown') AS creci,
+    COALESCE(c.cluster_performance, 'Unknown') AS cluster_performance,
+    COALESCE(c.responsible_secretary, 'Unknown') AS responsible_secretary,
+    COALESCE(c.responsible_supply_expert, 'Unknown') AS responsible_supply_expert,
+    COALESCE(c.responsible_demand_expert, 'Unknown') AS responsible_demand_expert,
+    COALESCE(c.responsible_operations_supply, 'Unknown') AS responsible_operations_supply,
     CASE
         WHEN c.is_juridical_person THEN 'PJ'
         WHEN c.is_natural_person THEN 'PF'
@@ -71,6 +76,7 @@ SELECT
     ) AS is_3p_5a,
     COALESCE(c.is_for_sale, FALSE) OR COALESCE(ce.sale_listings_currently_owned, 0) > 0 AS is_for_sale,
     COALESCE(c.is_for_rent, FALSE) OR COALESCE(ce.rent_listings_currently_owned, 0) > 0 AS is_for_rent,
+    c.is_flagged_as_leadgen AS is_flagged_as_leadgen_in_hubspot,
     COALESCE(c.is_archived, FALSE) AS is_archived,
     c.ts_archived,
     LEAST(c.ts_created, ce.ts_created) AS ts_created,

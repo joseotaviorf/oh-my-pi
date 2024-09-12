@@ -177,6 +177,26 @@ columns:
     lineage:
     - datalake_hubspot.company.creci
     description: CRECI of the real estate agent in contact.
+  cluster_performance:
+    lineage:
+      - datalake_hubspot.company.cluster_performance
+    description: Cluster that indicates the type of Rede partnership according to the Performance teams classification.
+  responsible_secretary:
+    lineage:
+      - datalake_hubspot.company.responsible_secretary
+    description: Person responsible for the Rede partner in the Secretariat team.
+  responsible_supply_expert:
+    lineage:
+      - datalake_hubspot.company.responsible_supply_expert
+    description: Person responsible for the Rede partner in the Rede Supply team.
+  responsible_demand_expert:
+    lineage:
+      - datalake_hubspot.company.responsible_demand_expert
+    description: Person responsible for the Rede partner in the Rede Demand team.
+  responsible_operations_supply:
+    lineage:
+      - datalake_hubspot.company.responsible_operations_supply
+    description: Person responsible for the Rede partner in the Rede Operations team.
   person_type:
     lineage:
     - datalake_hubspot.company.person_type
@@ -189,6 +209,10 @@ columns:
     lineage:
     - datalake_hubspot.company.is_for_rent
     description: Whether or not the company works with rent.
+  is_flagged_as_leadgen:
+    lineage:
+      - datalake_hubspot.company_history.is_flagged_as_leadgen
+    description: Whether or not the company has agents in Lead Gen program.
   is_archived:
     lineage:
     - datalake_hubspot.company.is_archived
