@@ -50,7 +50,7 @@ proposals_contracts AS (
       ON t.id_task = ct.id
   LEFT JOIN
     datalake_ebdb_clean.contract ec
-      ON  ct.origin IN ('Contrato', 'ContratoFull')
+      ON LOWER(ct.origin) IN ('contrato', 'contratofull')
       AND ct.id_origin = ec.id
   LEFT JOIN
     datalake_ebdb_clean.house eci
