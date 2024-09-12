@@ -1,0 +1,51 @@
+---
+database_name: datalake_trino_detractor
+table_name: weekly_detractor_queries
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table materialize query executions considered detractor according to the thresholds defined on the DAG.
+columns:
+  id_superset_dashboard:
+    lineage:
+      - datalake_trino.trino_detractor_queries.id_superset_dashboard
+    description: Trino query ID.
+  superset_slice_id:
+    lineage:
+      - datalake_trino.trino_detractor_queries.superset_slice_id
+    description: Quarter for this entry date.
+  dashboard_name:
+    lineage:
+      - datalake_trino.trino_detractor_queries.dashboard_name
+    description: Line name.
+  slice_name:
+    lineage:
+      - datalake_trino.trino_detractor_queries.slice_name
+    description: Line name.
+  executor_email:
+    lineage:
+      - datalake_trino.trino_detractor_queries.executor_user
+    description: Line name.
+  last_owner_email:
+    lineage:
+      - datalake_trino.trino_detractor_queries.last_owner
+    description: Line name.
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+    description: Line name.
+  detractor_runs:
+    description: Trino query ID.
+  is_detractor:
+    description: Trino query ID.
+  superset_runs:
+    description: Trino query ID.
+  count_detractors:
+    description: Trino query ID.
+  ts_last_detractor_of_week:
+    lineage:
+      - datalake_trino.trino_detractor_queries.ts_execution_start
+    description: Trino query ID.
+  ts_last_superset_run_of_week:
+    lineage:
+      - datalake_superset_clean.logs.ts_event
+    description: Trino query ID.

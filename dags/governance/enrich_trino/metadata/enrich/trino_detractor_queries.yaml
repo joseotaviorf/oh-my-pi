@@ -1,0 +1,83 @@
+---
+database_name: datalake_trino
+table_name: trino_detractor_queries
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table materialize query executions considered detractor according to the thresholds defined on the DAG.
+columns:
+  id_superset_dashboard:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.session
+    description: Trino query ID.
+  superset_slice_id:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.session
+    description: Quarter for this entry date.
+  slice_name:
+    lineage:
+      - datalake_superset.slices.slice_name
+    description: Line name.
+  last_owner:
+    lineage:
+      - datalake_superset.slices.last_owner
+    description: Line name.
+  line:
+    lineage:
+      - datalake_superset.slices.company_line
+    description: Line name.
+  source:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.session
+    description: Trino query ID.
+  query_id:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.queryId
+    description: Trino query ID.
+  internal_network_input_data_size_GB:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.internal_network_input_data_size_bytes
+    description: Trino query ID.
+  cpu_time_sec:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.total_cpu_time
+    description: Trino query ID.
+  execution_time_sec:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_time
+    description: Trino query ID.
+  input_data_gb:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.processed_input_data_bytes
+    description: Trino query ID.
+  peak_total_memory_gb:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.peak_total_memory_reservation_bytes
+    description: Trino query ID.
+  number_stages:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.number_stages
+    description: Trino query ID.
+  is_saturday:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.created_time
+    description: Trino query ID.
+  ts_execution_start:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.execution_start_time
+    description: Trino query ID.
+  ts_execution_end:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.ts_execution_end
+    description: Trino query ID.
+  year:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.year
+    description: Trino query ID.
+  month:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.month
+    description: Trino query ID.
+  day:
+    lineage:
+      - data_platform_metrics.trino_query_log_events_metrics_clean_batch.day
+    description: Trino query ID.

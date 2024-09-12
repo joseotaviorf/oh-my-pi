@@ -22,7 +22,7 @@ processed_data_per_line_per_day AS (
         querytype = 'SELECT'
         AND state IN ('FINISHED', 'FAILED')
         AND tqlemcb.hour BETWEEN 5 AND 23
-        AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+        AND MAKE_DATE(year, month, day) BETWEEN DATE_SUB("{load_start_date}", 1) AND "{load_end_date}"
     GROUP BY
         DATE(created_time),
         el.line
@@ -35,7 +35,7 @@ total_platform_cost_per_day AS (
         cost_usage_reports.aws_costs_new
     WHERE
         COALESCE(resource_tags_aws_autoscaling_group_name, resource_tags_user_app) LIKE '%trino%'
-        AND MAKE_DATE(year, month, DAY(line_item_usage_start_date)) BETWEEN "{load_start_date}" AND "{load_end_date}"
+        AND MAKE_DATE(year, month, DAY(line_item_usage_start_date)) BETWEEN DATE_SUB("{load_start_date}", 1) AND "{load_end_date}"
     GROUP BY
         DATE(line_item_usage_start_date)
 )

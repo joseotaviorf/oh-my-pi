@@ -972,10 +972,16 @@ bietlejuice.demand_balancer_service:
   add:
     - quintoml.search.maestro.inference:batch-predict
 
+bietlejuice.enrich_trino:
+  remove:
+    - bietlejuice.enrich_people_public:load-enrich-org-chart
+    - bietlejuice.gsheets_governance:load-clean-cost-center-directory
+
 bietlejuice.enrich_trino_costs:
   remove:
     - bietlejuice.enrich_people_public:load-enrich-org-chart
     - bietlejuice.gsheets_governance:load-clean-cost-center-directory
+
 bietlejuice.dw_agent:
   remove:
     - bietlejuice.sirena:load-clean-agents
