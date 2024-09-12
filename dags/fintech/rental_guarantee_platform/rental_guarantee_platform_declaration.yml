@@ -29,10 +29,10 @@ workflow:
       raw_partitions: []
     asaas_cancellation:
       raw_extraction_type: full
-      raw_partitions: []    
+      raw_partitions: []
     asaas_cancellation_aud:
       raw_extraction_type: full
-      raw_partitions: []  
+      raw_partitions: []
     company:
       date_filter_column: updated_at
     company_aud:
@@ -255,5 +255,10 @@ workflow:
       date_filter_column: updated_at
     ticket_activation:
       date_filter_column: updated_at
+    charge:
+      date_filter_column: updated_at
+    bill_payment:
+      raw_extraction_type: full
+      raw_partitions: []
 cluster:
   type: databricks_12_2_med_general_cluster

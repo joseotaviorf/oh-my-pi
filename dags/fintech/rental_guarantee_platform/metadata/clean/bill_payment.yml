@@ -1,0 +1,12 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: bill_payment
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_bill:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.bill_payment.bill_id
+  id_payment:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.bill_payment.payment_id

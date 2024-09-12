@@ -1,0 +1,36 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: charge
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.id
+  id_bill:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.bill_id
+  type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.type
+  value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.value
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.version
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.charge.day
