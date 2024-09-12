@@ -33,11 +33,6 @@ tables:
     date_filter_column: revtstmp
     unixtime_measure: milliseconds
     clean_table_name: rev_info
-  - table_name: truora_check_process
-    extraction_type: incremental
-    date_filter_column: created_at
-  - table_name: truora_check_process_aud
-    extraction_type: full
   - table_name: unico_check_document
     extraction_type: incremental
     date_filter_column: updated_at
