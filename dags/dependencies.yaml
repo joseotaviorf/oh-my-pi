@@ -493,6 +493,7 @@ bietlejuice.dw_demand:
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
   - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results
 bietlejuice.dw_employee:
+  - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
@@ -1501,12 +1502,12 @@ bietlejuice.enrich_cyber_homolog:
   - bietlejuice.cyber:load-clean-bill
   - bietlejuice.cyber:load-clean-campaign
   - bietlejuice.cyber:load-clean-contracts
+  - bietlejuice.cyber:load-clean-contracts-agreements
   - bietlejuice.cyber:load-clean-historical-agreements
   - bietlejuice.cyber:load-clean-logs
   - bietlejuice.cyber:load-clean-payments
   - bietlejuice.cyber:load-clean-users
   - bietlejuice.cyber_complement:load-clean-logs-code-description
-  - bietlejuice.cyber:load-clean-contracts-agreements
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
