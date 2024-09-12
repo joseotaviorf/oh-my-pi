@@ -168,7 +168,11 @@ SELECT
   COALESCE(CAST(DATE_FORMAT(ce.ts_rent_last_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_rent_event_date,
   cc.nps_answer AS score,
   minutes_spent_answering AS minutes_response_time,
-  at.status AS dispatch_status,
+  CASE
+    WHEN COALESCE(at.dispatch_time,cc.ts_dispatch) IS NOT NULL
+    THEN 'Finalizado'
+    ELSE at.status
+  END AS dispatch_status,
   COALESCE(ac.city, 'NÃO INFORMADO') AS city,
   CAST(COALESCE(at.survey_opened, 'false') AS BOOLEAN) AS is_survey_opened,
   CASE
