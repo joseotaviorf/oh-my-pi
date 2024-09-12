@@ -29,7 +29,7 @@ workflow:
         load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
         load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
         cpu_threshold: 35784
-        execution_time_cpu_threshold: 180
+        execution_time_threshold: 180
         input_data_threshold: 928
         stages_threshold: 90
 cluster:

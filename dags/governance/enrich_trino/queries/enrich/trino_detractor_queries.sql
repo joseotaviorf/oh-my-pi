@@ -16,13 +16,13 @@ query_metrics AS (
         CAST(get_json_object(session, '$.source') AS STRING) AS source,
         CAST(
             get_json_object(
-                regexp_extract(query, '--\\s*(\\{.*\\})', 1),
+                regexp_extract(query, '--\\s*(\\{{.*\\}})', 1),
                 '$.slice_id'
             ) AS INT)
         AS id_superset_slice,
         CAST(
             get_json_object(
-                regexp_extract(query, '--\\s*(\\{.*\\})', 1),
+                regexp_extract(query, '--\\s*(\\{{.*\\}})', 1),
                 '$.dashboard_id'
             ) AS INT)
         AS id_superset_dashboard,
@@ -114,7 +114,7 @@ SELECT
     CASE WHEN (cpu_time_sec >= "{cpu_threshold}") THEN TRUE ELSE FALSE END AS cpu_time_sec_threshold_active,
     CASE WHEN (input_data_gb >= "{input_data_threshold}") THEN TRUE ELSE FALSE END AS input_data_gb_threshold_active,
     CASE WHEN (number_stages >= "{stages_threshold}") THEN TRUE ELSE FALSE END AS stages_threshold_active,
-    CASE WHEN (execution_time_sec >= "{execution_time_cpu_threshold}") THEN TRUE ELSE FALSE END AS execution_time_sec_threshold_active,
+    CASE WHEN (execution_time_sec >= "{execution_time_threshold}") THEN TRUE ELSE FALSE END AS execution_time_sec_threshold_active,
     ts_execution_start,
     ts_execution_end,
     base.year,
@@ -131,5 +131,5 @@ WHERE
         COALESCE(cpu_time_sec, 0) >= "{cpu_threshold}"
         OR COALESCE(input_data_gb, 0) >= "{input_data_threshold}"
         OR COALESCE(number_stages, 0) >= "{stages_threshold}"
-        OR COALESCE(execution_time_sec, 0) >= "{execution_time_cpu_threshold}"
+        OR COALESCE(execution_time_sec, 0) >= "{execution_time_threshold}"
     )
