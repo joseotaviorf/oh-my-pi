@@ -131,7 +131,7 @@ tickets_per_task AS (
     t.tags,
     t.description,
     t.status,
-    COALESCE(ch.queue_name, ca1.queue_name, ca1.queue_name, t.ticket_queue) AS queue,
+    COALESCE(ch.queue_name, ca1.queue_name, ca2.queue_name, t.ticket_queue) AS queue,
     ch.source,
     CASE
       WHEN COALESCE(ca1.direction, ca2.direction) IN ('outbound-api', 'outbound')
