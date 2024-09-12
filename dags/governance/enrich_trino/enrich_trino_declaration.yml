@@ -19,7 +19,7 @@ workflow:
     table_usage_information:
       - query_information
   tables_customization:
-    daily_detractor_queries:
+    trino_detractor_queries:
       extraction_type: incremental
       partitions:
         - year
