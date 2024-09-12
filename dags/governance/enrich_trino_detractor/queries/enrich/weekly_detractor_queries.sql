@@ -190,5 +190,5 @@ WITH base_detractor AS (
       ON counts.id_superset_slice = base.id_superset_slice
       AND counts.executor_email = base.executor_email
       AND counts.is_detractor = "Detractor"
-      AND counts.week_start BETWEEN ADD_MONTHS(DATE({"load_start_date"}), -3) AND base.week_start
+      AND counts.week_start BETWEEN ADD_MONTHS(DATE("{load_start_date}"), -3) AND base.week_start
   GROUP BY ALL

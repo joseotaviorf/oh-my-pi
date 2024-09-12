@@ -46,7 +46,7 @@ query_metrics AS (
     WHERE
         MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
         AND CAST(get_json_object(session, '$.source') AS STRING) = 'Apache Superset'
-        AND query LIKE '%-- {%'
+        AND query LIKE '%-- {{%'
         AND errorcode IS NULL
 ),
 enrich_base AS (
