@@ -131,11 +131,12 @@ tickets_per_task AS (
     t.tags,
     t.description,
     t.status,
-    COALESCE(ch.worker_email, ca.worker_email, t.analyst_email) AS analyst_email,
+    COALESCE(ch.queue_name, ca1.queue_name, ca1.queue_name, t.ticket_queue) AS queue,
     ch.source,
     CASE
-      WHEN ca.direction IN ('outbound-api', 'outbound') OR ca.channel_type = 'call-in-app' THEN 'OUTBOUND'
-      WHEN ca.direction = 'inbound' THEN 'INBOUND'
+      WHEN COALESCE(ca1.direction, ca2.direction) IN ('outbound-api', 'outbound')
+        OR COALESCE(ca1.channel_type, ca2.channel_type) = 'call-in-app' THEN 'OUTBOUND'
+      WHEN COALESCE(ca1.direction, ca2.direction) = 'inbound' THEN 'INBOUND'
       WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'OUTBOUND'
       ELSE 'INBOUND'
     END AS direction,
@@ -151,10 +152,10 @@ tickets_per_task AS (
     t.custom_fields,
     t.reopens,
     t.replies,
-    ca.is_call_answered,
+    COALESCE(ca1.is_call_answered, ca2.is_call_answered) AS is_call_answered,
     t.ts_budget,
-    COALESCE(ca.ts_reservation_created, ch.ts_created) AS ts_created_twilio,
     t.ts_created,
+    COALESCE(ca1.ts_reservation_created, ca2.ts_reservation_created, ch.ts_created) AS ts_created_twilio,
     t.ts_solved,
     t.ts_closed,
     t.ts_updated,
@@ -170,8 +171,13 @@ tickets_per_task AS (
     datalake_customer_support_test.chats AS ch
       ON ch.id_task = t.twilio_task
   LEFT JOIN
-    datalake_customer_support_test.calls AS ca
-      ON COALESCE(ca.id_call, ca.id_task) = t.id_call
+    datalake_customer_support_test.calls AS ca1
+      ON ca1.id_task = t.id_call
+      AND STARTSWITH(t.id_call, "WT")
+  LEFT JOIN
+    datalake_customer_support_test.calls AS ca2
+      ON ca2.id_call = t.id_call
+      AND STARTSWITH(t.id_call, "CA")
 ),
 ticket_queue_attributes AS (
   WITH queue_metrics AS (
